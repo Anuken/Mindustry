@@ -40,15 +40,15 @@ public class Conduit extends LiquidBlock {
         ConduitEntity entity = tile.entity();
         entity.blendbits = 0;
 
-        if(blends(tile, 0)){
+        if(blends(tile, 1) && blends(tile, 2)) {
+            entity.blendbits = 2;
+        }else if(blends(tile, 3) && blends(tile, 2)) {
+            entity.blendbits = 4;
+        }else if(blends(tile, 0)){
             if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)) {
                 entity.blendbits = 3;
             }else if(blends(tile, 1) && blends(tile, 3)) {
-                    entity.blendbits = 6;
-            }else if(blends(tile, 1) && blends(tile, 2)) {
-                entity.blendbits = 2;
-            }else if(blends(tile, 3) && blends(tile, 2)) {
-                entity.blendbits = 4;
+                entity.blendbits = 6;
             }else if(blends(tile, 1)) {
                 entity.blendbits = 5;
             }else if(blends(tile, 3)) {

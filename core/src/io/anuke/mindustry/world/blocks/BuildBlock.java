@@ -161,7 +161,7 @@ public class BuildBlock extends Block {
 
     @Remote(called = Loc.server, in = In.blocks)
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team){
-        tile.setBlock(block);
+        world.setBlock(tile, block, team);
         tile.setRotation(rotation);
         tile.setTeam(team);
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);

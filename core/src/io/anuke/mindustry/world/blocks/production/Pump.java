@@ -43,11 +43,6 @@ public class Pump extends LiquidBlock{
 	}
 	
 	@Override
-	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-		return false;
-	}
-	
-	@Override
 	public void draw(Tile tile){
 		Draw.rect(name(), tile.drawx(), tile.drawy());
 		

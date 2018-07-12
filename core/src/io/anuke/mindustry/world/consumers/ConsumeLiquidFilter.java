@@ -11,7 +11,6 @@ import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Strings;
 
 public class ConsumeLiquidFilter extends Consume{
     private final Predicate<Liquid> filter;
@@ -43,8 +42,6 @@ public class ConsumeLiquidFilter extends Consume{
                 table.add("/");
             }
         }
-
-        table.add("x" + Strings.toFixed(use * 60f, 1));
     }
 
     @Override

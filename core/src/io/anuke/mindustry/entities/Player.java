@@ -599,24 +599,25 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 		}
 
 		movement.set(targetX - x, targetY - y).limit(mech.speed);
-		movement.setAngle(Mathf.slerpDelta(movement.angle(), velocity.angle(), 0.05f));
+		movement.setAngle(Mathf.slerp(movement.angle(), velocity.angle(), 0.05f));
 
 		if(distanceTo(targetX, targetY) < attractDst){
 			movement.setZero();
 		}
 
 		velocity.add(movement);
-		updateVelocityStatus(mech.drag, mech.maxSpeed);
-
-		//hovering effect
-		x += Mathf.sin(Timers.time() + id * 999, 25f, 0.08f);
-		y += Mathf.cos(Timers.time() + id * 999, 25f, 0.08f);
 
 		if(velocity.len() <= 0.2f){
 			rotation += Mathf.sin(Timers.time() + id * 99, 10f, 1f);
 		}else{
 			rotation = Mathf.slerpDelta(rotation, velocity.angle(), velocity.len()/10f);
 		}
+
+		updateVelocityStatus(mech.drag, mech.maxSpeed);
+
+		//hovering effect
+		x += Mathf.sin(Timers.time() + id * 999, 25f, 0.08f);
+		y += Mathf.cos(Timers.time() + id * 999, 25f, 0.08f);
 
 		//update shooting if not building, not mining and there's ammo left
 		if(!isBuilding() && inventory.hasAmmo() && getMineTile() == null){

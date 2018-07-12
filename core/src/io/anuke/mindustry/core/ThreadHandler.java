@@ -115,11 +115,18 @@ public class ThreadHandler {
             while (true) {
                 long time = TimeUtils.nanoTime();
 
-                synchronized (toRun) {
-                    for(Runnable r : toRun){
-                        r.run();
+                while(true){
+                    Runnable r;
+                    synchronized (toRun){
+                        if(toRun.size > 0){
+                            r = toRun.pop();
+                        }else{
+                            r = null;
+                        }
                     }
-                    toRun.clear();
+
+                    if(r == null) break;
+                    r.run();
                 }
 
                 logic.doUpdate = true;

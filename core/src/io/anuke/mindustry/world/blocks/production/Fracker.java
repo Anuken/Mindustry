@@ -81,6 +81,11 @@ public class Fracker extends SolidPump {
         return new FrackerEntity();
     }
 
+    @Override
+    public float typeLiquid(Tile tile) {
+        return tile.entity.liquids.get(result);
+    }
+
     public static class FrackerEntity extends SolidPumpEntity{
         public float accumulator;
     }

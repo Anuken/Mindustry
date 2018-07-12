@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.mapgen;
 
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
@@ -144,6 +145,7 @@ public class WorldGenerator {
 	}
 
 	public static void generateMap(Tile[][] tiles, int seed){
+		MathUtils.random.setSeed((long)(Math.random() * 99999999));
 		Simplex sim = new Simplex(Mathf.random(99999));
 		Simplex sim2 = new Simplex(Mathf.random(99999));
 		Simplex sim3 = new Simplex(Mathf.random(99999));

@@ -10,6 +10,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -263,6 +264,28 @@ public class World extends Module{
 			for(Tile toremove : removals){
 				//note that setting a new block automatically unlinks it
 				if(toremove != null) toremove.setBlock(Blocks.air);
+			}
+		}
+	}
+
+	public void setBlock(Tile tile, Block block, Team team){
+		tile.setBlock(block);
+		if (block.isMultiblock()) {
+			int offsetx = -(block.size - 1) / 2;
+			int offsety = -(block.size - 1) / 2;
+
+			for (int dx = 0; dx < block.size; dx++) {
+				for (int dy = 0; dy < block.size; dy++) {
+					int worldx = dx + offsetx + tile.x;
+					int worldy = dy + offsety + tile.y;
+					if (!(worldx == tile.x && worldy == tile.y)) {
+						Tile toplace = world.tile(worldx, worldy);
+						if (toplace != null) {
+							toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));
+							toplace.setTeam(team);
+						}
+					}
+				}
 			}
 		}
 	}

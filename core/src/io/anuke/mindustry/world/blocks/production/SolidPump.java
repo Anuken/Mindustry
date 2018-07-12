@@ -74,8 +74,8 @@ public class SolidPump extends Pump {
             if(isValid(tile)) fraction = 1f;
         }
 
-        if(tile.entity.cons.valid() && tile.entity.liquids.total() < liquidCapacity - 0.001f){
-            float maxPump = Math.min(liquidCapacity - tile.entity.liquids.total(), pumpAmount * Timers.delta() * fraction);
+        if(tile.entity.cons.valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
+            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * Timers.delta() * fraction);
             tile.entity.liquids.add(result, maxPump);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
             if(Mathf.chance(Timers.delta() * updateEffectChance))
@@ -86,7 +86,7 @@ public class SolidPump extends Pump {
 
         entity.pumpTime += entity.warmup * Timers.delta();
 
-        tryDumpLiquid(tile, entity.liquids.current());
+        tryDumpLiquid(tile, result);
     }
 
     @Override
@@ -111,6 +111,10 @@ public class SolidPump extends Pump {
     @Override
     public TileEntity getEntity() {
         return new SolidPumpEntity();
+    }
+
+    public float typeLiquid(Tile tile){
+        return tile.entity.liquids.total();
     }
 
     public static class SolidPumpEntity extends TileEntity{

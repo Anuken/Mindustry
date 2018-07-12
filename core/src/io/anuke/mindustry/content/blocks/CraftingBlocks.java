@@ -153,7 +153,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
         melter = new PowerCrafter("melter") {{
             health = 200;
             outputLiquid = Liquids.lava;
-            outputLiquidAmount = 0.05f;
+            outputLiquidAmount = 0.75f;
             itemCapacity = 50;
             craftTime = 10f;
             hasLiquids = hasPower = true;
@@ -212,7 +212,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
             itemCapacity = 50;
             craftTime = 25f;
             outputLiquid = Liquids.oil;
-            outputLiquidAmount = 0.1f;
+            outputLiquidAmount = 0.14f;
             size = 2;
             health = 320;
             hasLiquids = true;
@@ -238,6 +238,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
             liquidCapacity = 21f;
             craftTime = 14;
             output = Items.stone;
+            itemCapacity = 20;
             health = 80;
             craftEffect = BlockFx.purifystone;
             hasLiquids = hasItems = true;

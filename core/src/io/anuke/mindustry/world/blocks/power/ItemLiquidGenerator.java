@@ -31,7 +31,7 @@ public abstract class ItemLiquidGenerator extends ItemGenerator {
         ItemGeneratorEntity entity = tile.entity();
 
         //liquid takes priority over solids
-        if(entity.liquids.currentAmount() >= 0.001f){
+        if(entity.liquids.currentAmount() >= 0.001f && entity.cons.valid()){
             float powerPerLiquid = getLiquidEfficiency(entity.liquids.current())*this.powerPerLiquid;
             float used = Math.min(entity.liquids.currentAmount(), maxLiquidGenerate * Timers.delta());
             used = Math.min(used, (powerCapacity - entity.power.amount)/powerPerLiquid);
@@ -47,7 +47,7 @@ public abstract class ItemLiquidGenerator extends ItemGenerator {
             float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * Timers.delta()) * entity.efficiency;
             float mfract = maxPower / (powerOutput);
 
-            if (entity.generateTime > 0f) {
+            if (entity.generateTime > 0f && entity.cons.valid()) {
                 entity.generateTime -= 1f / itemDuration * mfract;
                 entity.power.amount += maxPower;
                 entity.generateTime = Mathf.clamp(entity.generateTime);
