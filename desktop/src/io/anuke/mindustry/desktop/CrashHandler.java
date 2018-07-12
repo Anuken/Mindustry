@@ -54,7 +54,7 @@ public class CrashHandler {
         //try to write it
         try{
             filename = "crash-report-" + new SimpleDateFormat("dd-MM-yy h.mm.ss").format(new Date()) + ".txt";
-            Files.write(Paths.get(filename), result.getBytes());
+            Files.write(Paths.get(System.getProperty("user.home"), "mindustry-crash-reports", filename), result.getBytes());
         }catch (Throwable i){
             i.printStackTrace();
             failed = true;
