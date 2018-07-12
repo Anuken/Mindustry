@@ -166,7 +166,7 @@ public class Maps implements Disposable{
 
             for(String name : customMapNames){
                 try{
-                    String data = Settings.getString("map-data-" + name);
+                    String data = Settings.getString("map-data-" + name, "");
                     byte[] bytes = Base64Coder.decode(data);
                     loadMap(name, () -> new ByteArrayInputStream(bytes), true);
                 }catch (Exception e){
@@ -182,7 +182,7 @@ public class Maps implements Disposable{
 		if(!gwt){
 			return customMapDirectory.child(name + "." + mapExtension)::read;
 		}else{
-			String data = Settings.getString("map-data-" + name);
+			String data = Settings.getString("map-data-" + name, "");
 			byte[] bytes = Base64Coder.decode(data);
 			return () -> new ByteArrayInputStream(bytes);
 		}

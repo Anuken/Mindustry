@@ -218,6 +218,16 @@ public class HtmlLauncher extends GwtApplication {
             public InputStream read() {
                 return stream;
             }
+
+            @Override
+            public String nameWithoutExtension() {
+                return "unknown";
+            }
+
+            @Override
+            public String name() {
+                return "unknown";
+            }
         });
     }
 }

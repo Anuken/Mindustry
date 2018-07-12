@@ -70,7 +70,7 @@ public class BuildBlock extends Block {
 
     @Override
     public void setBars(){
-        bars.replace(new BlockBar(BarType.health, true, tile -> (float)tile.<BuildEntity>entity().progress));
+        bars.replace(new BlockBar(BarType.health, true, tile -> tile.<BuildEntity>entity().progress));
     }
 
     @Override

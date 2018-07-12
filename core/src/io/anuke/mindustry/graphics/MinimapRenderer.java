@@ -121,7 +121,6 @@ public class MinimapRenderer implements Disposable{
         int color = colorFor(world.tile(tile.x, tile.y));
         pixmap.drawPixel(tile.x, pixmap.getHeight() - 1 - tile.y, color);
 
-        texture.bind();
         Pixmaps.drawPixel(texture, tile.x, pixmap.getHeight() - 1 - tile.y, color);
     }
 
