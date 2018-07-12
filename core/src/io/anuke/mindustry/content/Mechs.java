@@ -48,7 +48,7 @@ public class Mechs implements ContentList {
         }};
 
         dart = new Mech("dart-ship", true){{
-            drillPower = -1;
+            drillPower = 1;
             speed = 0.4f;
             maxSpeed = 3f;
             drag = 0.1f;

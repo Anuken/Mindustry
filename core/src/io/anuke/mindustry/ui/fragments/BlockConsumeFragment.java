@@ -103,7 +103,9 @@ public class BlockConsumeFragment extends Fragment {
                 }).size(10*scale).get();
 
                 result.hovered(() -> hovered[0] = true);
-                result.exited(() -> hovered[0] = false);
+                if(!mobile){
+                    result.exited(() -> hovered[0] = false);
+                }
 
                 table.row();
             }
