@@ -3,6 +3,10 @@ language: android
 jdk:
     - openjdk8
 
+before_install:
+echo yes | sdkmanager "platforms;android-27"
+echo yes | sdkmanager "build-tools;27.0.3"
+
 android:
   components:
     - android-26
