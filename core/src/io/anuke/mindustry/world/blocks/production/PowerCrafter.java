@@ -28,6 +28,15 @@ public class PowerCrafter extends Block{
     }
 
     @Override
+    public void init() {
+        super.init();
+
+        if(outputLiquid != null){
+            outputsLiquid = true;
+        }
+    }
+
+    @Override
     public void setStats() {
         super.setStats();
 

@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.ExplosionFx;
@@ -35,13 +36,15 @@ public class NuclearReactor extends PowerGenerator {
 	protected Color hotColor = Color.valueOf("ff9575a3");
 	protected int fuelUseTime = 120; //time to consume 1 fuel
 	protected float powerMultiplier = 0.45f; //power per frame, depends on full capacity
-	protected float heating = 0.009f; //heating per frame
+	protected float heating = 0.013f; //heating per frame
 	protected float coolantPower = 0.015f; //how much heat decreases per coolant unit
 	protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
-	protected float maxLiquidUse = 4f; //max liquid use per frame
+	protected float maxLiquidUse = 2f; //max liquid use per frame
 	protected int explosionRadius = 19;
 	protected int explosionDamage = 135;
 	protected float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
+
+	protected TextureRegion topRegion, lightsRegion;
 
 	public NuclearReactor(String name) {
 		super(name);
@@ -52,6 +55,14 @@ public class NuclearReactor extends PowerGenerator {
 		hasLiquids = true;
 
 		consumes.item(Items.thorium);
+	}
+
+	@Override
+	public void load() {
+		super.load();
+
+		topRegion = Draw.region(name + "-center");
+		lightsRegion = Draw.region(name + "-lights");
 	}
 
 	@Override
@@ -88,7 +99,7 @@ public class NuclearReactor extends PowerGenerator {
 			Liquid liquid = entity.liquids.current();
 
 			if(liquid.temperature <= 0.5f){ //is coolant
-				float pow = coolantPower * liquid.heatCapacity; //heat depleted per unit of liquid
+				float pow = coolantPower * (liquid.heatCapacity + 0.5f/liquid.temperature); //heat depleted per unit of liquid
 				float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), entity.heat / pow), maxLiquidUse * Timers.delta()); //max that can be cooled in terms of liquid
 				entity.heat -= maxUsed * pow;
 				entity.liquids.remove(liquid, maxUsed);
@@ -167,13 +178,17 @@ public class NuclearReactor extends PowerGenerator {
 		
 		Draw.color(coolColor, hotColor, entity.heat);
 		Draw.rect("white", tile.drawx(), tile.drawy(), size * tilesize, size * tilesize);
+
+		Draw.color(entity.liquids.current().color);
+		Draw.alpha(entity.liquids.currentAmount() / liquidCapacity);
+		Draw.rect(topRegion, tile.drawx(), tile.drawy());
 		
 		if(entity.heat > flashThreshold){
 			float flash = 1f + ((entity.heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
 			entity.flash += flash * Timers.delta();
 			Draw.color(Color.RED, Color.YELLOW, Mathf.absin(entity.flash, 9f, 1f));
 			Draw.alpha(0.6f);
-			Draw.rect(name + "-lights", tile.drawx(), tile.drawy());
+			Draw.rect(lightsRegion, tile.drawx(), tile.drawy());
 		}
 		
 		Draw.reset();

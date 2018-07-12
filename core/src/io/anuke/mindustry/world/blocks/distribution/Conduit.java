@@ -40,14 +40,14 @@ public class Conduit extends LiquidBlock {
         ConduitEntity entity = tile.entity();
         entity.blendbits = 0;
 
-        if(blends(tile, 1) && blends(tile, 2)) {
+        if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)) {
+            entity.blendbits = 3;
+        }else if(blends(tile, 1) && blends(tile, 2)) {
             entity.blendbits = 2;
         }else if(blends(tile, 3) && blends(tile, 2)) {
             entity.blendbits = 4;
         }else if(blends(tile, 0)){
-            if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)) {
-                entity.blendbits = 3;
-            }else if(blends(tile, 1) && blends(tile, 3)) {
+            if(blends(tile, 1) && blends(tile, 3)) {
                 entity.blendbits = 6;
             }else if(blends(tile, 1)) {
                 entity.blendbits = 5;
@@ -63,7 +63,9 @@ public class Conduit extends LiquidBlock {
 
     private boolean blends(Tile tile, int direction){
         Tile other = tile.getNearby(Mathf.mod(tile.getRotation() - direction, 4));
-        if(other == null || !(other.block().hasLiquids)) return false;
+        if(other != null) other = other.target();
+
+        if(other == null || !(other.block().hasLiquids) || !(other.block().outputsLiquid)) return false;
         return (tile.getNearby(tile.getRotation()) == other)
                 || (!other.block().rotate || other.getNearby(other.getRotation()) == tile);
     }

@@ -22,6 +22,7 @@ public class LiquidBlocks extends BlockList implements ContentList{
             pumpAmount = 0.25f;
             consumes.power(0.015f);
             liquidCapacity = 30f;
+            hasPower = true;
             size = 2;
             tier = 1;
         }};

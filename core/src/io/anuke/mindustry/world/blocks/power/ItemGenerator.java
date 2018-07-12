@@ -37,7 +37,7 @@ public abstract class ItemGenerator extends PowerGenerator {
 		itemCapacity = 20;
 		hasItems = true;
 
-		consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false);
+		consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false).optional(true);
 	}
 
 	@Override

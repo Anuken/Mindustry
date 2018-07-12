@@ -36,7 +36,7 @@ public class DesktopPlatform extends Platform {
     public DesktopPlatform(String[] args){
         this.args = args;
 
-        Vars.testMobile = Array.with(args).contains("-testMobile", false);
+        Vars.testMobile = isDebug() && Array.with(args).contains("-testMobile", false);
 
         if(useDiscord) {
             DiscordEventHandlers handlers = new DiscordEventHandlers();
@@ -106,7 +106,7 @@ public class DesktopPlatform extends Platform {
 
     @Override
     public boolean isDebug() {
-        return args.length > 0 && args[0].equalsIgnoreCase("-debug");
+        return args.length > 0 && args[0].equalsIgnoreCase("-debug_" + getUUID().hashCode());
     }
 
     @Override

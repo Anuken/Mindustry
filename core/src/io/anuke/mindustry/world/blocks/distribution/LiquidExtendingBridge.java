@@ -13,6 +13,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge {
         super(name);
         hasItems = false;
         hasLiquids = true;
+        outputsLiquid = true;
     }
 
     @Override

@@ -121,7 +121,7 @@ public class CraftingBlocks extends BlockList implements ContentList {
 
             consumes.power(0.1f);
             consumes.item(Items.titanium);
-            consumes.liquid(Liquids.water, 0.2f);
+            consumes.liquid(Liquids.water, 0.3f);
         }};
 
         blastMixer = new GenericCrafter("blast-mixer") {{

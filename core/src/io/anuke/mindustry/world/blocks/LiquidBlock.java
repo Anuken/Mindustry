@@ -16,6 +16,7 @@ public class LiquidBlock extends Block{
 		solid = true;
 		hasLiquids = true;
 		group = BlockGroup.liquids;
+		outputsLiquid = true;
 	}
 
 	@Override

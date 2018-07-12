@@ -20,6 +20,7 @@ public abstract class BaseBlock {
     public boolean hasLiquids;
     public boolean hasPower;
 
+    public boolean outputsLiquid = false;
     public boolean singleLiquid = true;
 
     public int itemCapacity;

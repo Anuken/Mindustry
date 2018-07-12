@@ -10,9 +10,10 @@ import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.ThreadArray;
 
 public class Liquid implements UnlockableContent{
-	private static final Array<Liquid> liquids = new Array<>();
+	private static final Array<Liquid> liquids = new ThreadArray<>();
 
 	public final Color color;
 	public final String name;

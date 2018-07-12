@@ -5,13 +5,13 @@ jdk:
 
 android:
   components:
-    - android-26
+    - android-27
 
     # Additional components
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
-    - addon-google_apis-google-26
+    - addon-google_apis-google-27
 
 script: 
     - ./gradlew desktop:dist
