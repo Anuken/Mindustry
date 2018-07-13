@@ -233,6 +233,10 @@ public class UI extends SceneModule{
     }
 
     public void loadLogic(Callable call){
+        loadLogic("$text.loading", call);
+    }
+
+    public void loadLogic(String text, Callable call){
         loadfrag.show();
         Timers.runTask(7f, () -> {
             threads.run(() -> {

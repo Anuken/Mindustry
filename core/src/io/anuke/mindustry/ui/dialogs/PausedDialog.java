@@ -1,9 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.util.Bundles;
@@ -130,15 +128,12 @@ public class PausedDialog extends FloatingDialog{
             return;
         }
 
-        ui.loadfrag.show("$text.saveload");
-
-        Timers.runTask(5f, () -> {
-            ui.loadfrag.hide();
+        ui.loadLogic("$text.saveload", () -> {
             try{
                 control.getSaves().getCurrent().save();
             }catch(Throwable e){
-                e = (e.getCause() == null ? e : e.getCause());
-                ui.showError("[orange]" + Bundles.get("text.savefail") + "\n[white]" + ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" + "at " + e.getStackTrace()[0].getFileName() + ":" + e.getStackTrace()[0].getLineNumber());
+                e.printStackTrace();
+                threads.runGraphics(() -> ui.showError("[orange]" + Bundles.get("text.savefail")));
             }
             state.set(State.menu);
         });

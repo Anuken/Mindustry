@@ -4,7 +4,9 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Difficulty;
+import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.GameMode;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.ThreadArray;
@@ -19,6 +21,14 @@ public class Saves{
     private SaveSlot current;
     private boolean saving;
     private float time;
+
+    public Saves(){
+        Events.on(StateChangeEvent.class, (prev, state) -> {
+            if(state == State.menu){
+                threads.run(() -> current = null);
+            }
+        });
+    }
 
     public void load(){
         saves.clear();
@@ -37,9 +47,6 @@ public class Saves{
     }
 
     public void update(){
-        if(state.is(State.menu)){
-            current = null;
-        }
 
         if(!state.is(State.menu) && !state.gameOver && current != null && current.isAutosave()){
             time += Timers.delta();
@@ -109,15 +116,15 @@ public class Saves{
         }
 
         public void load(){
-            current = this;
             SaveIO.loadFromSlot(index);
             meta = SaveIO.getData(index);
+            current = this;
         }
 
         public void save(){
-            current = this;
             SaveIO.saveToSlot(index);
             meta = SaveIO.getData(index);
+            current = this;
         }
 
         public String getDate(){
