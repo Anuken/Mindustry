@@ -30,7 +30,9 @@ public class OverflowGate extends Splitter{
         }
     }
 
-    Tile getTileTarget(Tile tile, Item item, int from, boolean flip){
+    @Override
+    Tile getTileTarget(Tile tile, Item item, Tile src, boolean flip){
+        int from = tile.relativeTo(src.x, src.y);
         if(from == -1) return null;
         Tile to = tile.getNearby((from + 2) % 4);
         Tile edge = Edges.getFacingEdge(tile, to);

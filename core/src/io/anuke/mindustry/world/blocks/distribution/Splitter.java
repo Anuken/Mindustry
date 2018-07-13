@@ -34,9 +34,10 @@ public class Splitter extends Block{
         SplitterEntity entity = tile.entity();
         if(entity.lastItem != null){
             entity.time += 1f/speed * Timers.delta();
-            Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput);
+            Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
 
             if(target != null && (entity.time >= 1f)){
+                getTileTarget(tile, entity.lastItem, entity.lastInput, true);
                 target.block().handleItem(entity.lastItem, target, Edges.getFacingEdge(tile, target));
                 entity.items.remove(entity.lastItem, 1);
                 entity.lastItem = null;
@@ -57,16 +58,16 @@ public class Splitter extends Block{
         entity.items.add(item, 1);
         entity.lastItem = item;
         entity.time = 0f;
-        entity.lastInput = tile.relativeTo(source.x, source.y);
+        entity.lastInput = source;
     }
 
-    Tile getTileTarget(Tile tile, Item item, int from){
+    Tile getTileTarget(Tile tile, Item item, Tile from, boolean set){
         Array<Tile> proximity = tile.entity.proximity();
         int counter = tile.getDump();
         for(int i = 0; i < proximity.size; i++){
             Tile other = proximity.get((i + counter) % proximity.size);
-            if(tile.relativeTo(other.x, other.y) == from) continue;
-            tile.setDump((byte) ((tile.getDump() + 1) % proximity.size));
+            if(tile == from) continue;
+            if(set) tile.setDump((byte) ((tile.getDump() + 1) % proximity.size));
             if(other.block().acceptItem(item, other, Edges.getFacingEdge(tile, other))){
                 return other;
             }
@@ -91,7 +92,7 @@ public class Splitter extends Block{
 
     public class SplitterEntity extends TileEntity{
         Item lastItem;
-        int lastInput;
+        Tile lastInput;
         float time;
     }
 }
