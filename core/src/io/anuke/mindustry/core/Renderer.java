@@ -110,6 +110,7 @@ public class Renderer extends RendererModule{
         Cursors.arrow = Cursors.loadCursor("cursor");
         Cursors.hand = Cursors.loadCursor("hand");
         Cursors.ibeam = Cursors.loadCursor("ibar");
+        Cursors.restoreCursor();
         Cursors.loadCustom("drill");
         Cursors.loadCustom("unload");
 

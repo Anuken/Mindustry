@@ -16,6 +16,7 @@ import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
 import io.anuke.mindustry.gen.CallEntity;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Tile;
@@ -47,9 +48,11 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     protected Item targetItem;
     protected Tile mineTile;
     protected Queue<BuildRequest> placeQueue = new ThreadQueue<>();
+
     public final UnitState
 
-            build = new UnitState(){
+    build = new UnitState(){
+
         public void entered(){
             if(!(target instanceof BuildEntity)){
                 target = null;
@@ -90,6 +93,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     },
 
     repair = new UnitState(){
+
         public void entered(){
             target = null;
         }
@@ -118,141 +122,142 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             }
         }
     },
-            mine = new UnitState(){
-                public void entered(){
-                    target = null;
+
+    mine = new UnitState(){
+        public void entered(){
+            target = null;
+        }
+
+        public void update(){
+            TileEntity entity = getClosestCore();
+
+            if(entity == null) return;
+
+            if(targetItem == null){
+                findItem();
+            }
+
+            //core full
+            if(targetItem != null && entity.tile.block().acceptStack(targetItem, 1, entity.tile, Drone.this) == 0){
+                setState(repair);
+                return;
+            }
+
+            //if inventory is full, drop it off.
+            if(inventory.isFull()){
+                setState(drop);
+            }else{
+                if(targetItem != null && !inventory.canAcceptItem(targetItem)){
+                    setState(drop);
+                    return;
                 }
 
-                public void update(){
-                    TileEntity entity = getClosestCore();
+                retarget(() -> {
+                    if(findItemDrop()){
+                        return;
+                    }
 
-                    if(entity == null) return;
-
-                    if(targetItem == null){
+                    if(getMineTile() == null){
                         findItem();
                     }
 
-                    //core full
-                    if(targetItem != null && entity.tile.block().acceptStack(targetItem, 1, entity.tile, Drone.this) == 0){
-                        setState(repair);
-                        return;
+                    if(targetItem == null) return;
+
+                    target = world.indexer().findClosestOre(x, y, targetItem);
+                });
+
+                if(target instanceof Tile){
+                    moveTo(type.range / 1.5f);
+
+                    if(distanceTo(target) < type.range && mineTile != target){
+                        setMineTile((Tile) target);
                     }
 
-                    //if inventory is full, drop it off.
-                    if(inventory.isFull()){
+                    if(((Tile) target).block() != Blocks.air){
                         setState(drop);
-                    }else{
-                        if(targetItem != null && !inventory.canAcceptItem(targetItem)){
-                            setState(drop);
-                            return;
-                        }
-
-                        retarget(() -> {
-                            if(findItemDrop()){
-                                return;
-                            }
-
-                            if(getMineTile() == null){
-                                findItem();
-                            }
-
-                            if(targetItem == null) return;
-
-                            target = world.indexer().findClosestOre(x, y, targetItem);
-                        });
-
-                        if(target instanceof Tile){
-                            moveTo(type.range / 1.5f);
-
-                            if(distanceTo(target) < type.range && mineTile != target){
-                                setMineTile((Tile) target);
-                            }
-
-                            if(((Tile) target).block() != Blocks.air){
-                                setState(drop);
-                            }
-                        }
                     }
                 }
+            }
+        }
 
-                public void exited(){
-                    setMineTile(null);
+        public void exited(){
+            setMineTile(null);
+        }
+    },
+    pickup = new UnitState(){
+        public void entered(){
+            target = null;
+        }
+
+        public void update(){
+            ItemDrop item = (ItemDrop) target;
+
+            if(inventory.isFull() || !inventory.canAcceptItem(item.getItem(), 1)){
+                setState(drop);
+                return;
+            }
+
+            if(distanceTo(item) < 4){
+                item.collision(Drone.this, x, y);
+            }
+
+            //item has been picked up
+            if(item.getAmount() == 0){
+                if(!findItemDrop()){
+                    setState(drop);
                 }
-            },
-            pickup = new UnitState(){
-                public void entered(){
-                    target = null;
-                }
+            }
 
-                public void update(){
-                    ItemDrop item = (ItemDrop) target;
+            moveTo(0f);
+        }
+    },
+    drop = new UnitState(){
+        public void entered(){
+            target = null;
+        }
 
-                    if(inventory.isFull() || !inventory.canAcceptItem(item.getItem(), 1)){
-                        setState(drop);
-                        return;
-                    }
+        public void update(){
+            if(inventory.isEmpty()){
+                setState(mine);
+                return;
+            }
 
-                    if(distanceTo(item) < 4){
-                        item.collision(Drone.this, x, y);
-                    }
+            target = getClosestCore();
 
-                    //item has been picked up
-                    if(item.getAmount() == 0){
-                        if(!findItemDrop()){
-                            setState(drop);
-                        }
-                    }
+            if(target == null) return;
 
-                    moveTo(0f);
-                }
-            },
-            drop = new UnitState(){
-                public void entered(){
-                    target = null;
-                }
+            TileEntity tile = (TileEntity) target;
 
-                public void update(){
-                    if(inventory.isEmpty()){
-                        setState(mine);
-                        return;
-                    }
-
-                    target = getClosestCore();
-
-                    if(target == null) return;
-
-                    TileEntity tile = (TileEntity) target;
-
-                    if(distanceTo(target) < type.range){
-                        if(tile.tile.block().acceptStack(inventory.getItem().item, inventory.getItem().amount, tile.tile, Drone.this) == inventory.getItem().amount){
-                            CallEntity.transferItemTo(inventory.getItem().item, inventory.getItem().amount, x, y, tile.tile);
-                            inventory.clearItem();
-                        }
-
-                        setState(repair);
-                    }
-
-                    circle(type.range / 1.8f);
-                }
-            },
-            retreat = new UnitState(){
-                public void entered(){
-                    target = null;
+            if(distanceTo(target) < type.range){
+                if(tile.tile.block().acceptStack(inventory.getItem().item, inventory.getItem().amount, tile.tile, Drone.this) == inventory.getItem().amount){
+                    CallEntity.transferItemTo(inventory.getItem().item, inventory.getItem().amount, x, y, tile.tile);
+                    inventory.clearItem();
                 }
 
-                public void update(){
-                    if(health >= health){
-                        state.set(attack);
-                    }else if(!targetHasFlag(BlockFlag.repair)){
-                        if(timer.get(timerTarget, 20)){
-                            Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair));
-                            if(target != null) Drone.this.target = target.entity;
-                        }
-                    }else{
-                        circle(40f);
-                    }
+                setState(repair);
+            }
+
+            circle(type.range / 1.8f);
+        }
+    },
+    retreat = new UnitState(){
+        public void entered(){
+            target = null;
+        }
+
+        public void update(){
+            if(health >= health){
+                state.set(attack);
+            }else if(!targetHasFlag(BlockFlag.repair)){
+                if(timer.get(timerTarget, 20)){
+                    Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair));
+                    if(target != null) Drone.this.target = target.entity;
                 }
-            };
+            }else{
+                circle(40f);
+            }
+        }
+    };
 
     {
         initEvents();
@@ -322,6 +327,12 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     @Override
     public void update(){
         super.update();
+
+        if(Net.client() && state.is(repair) && target instanceof TileEntity){
+            TileEntity entity = (TileEntity) target;
+            entity.health += type.healSpeed * Timers.delta();
+            entity.health = Mathf.clamp(entity.health, 0, entity.tile.block().health);
+        }
 
         x += Mathf.sin(Timers.time() + id * 999, 25f, 0.07f);
         y += Mathf.cos(Timers.time() + id * 999, 25f, 0.07f);
@@ -418,6 +429,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     public void write(DataOutput data) throws IOException{
         super.write(data);
         data.writeInt(mineTile == null ? -1 : mineTile.packedPosition());
+        data.writeInt(state.is(repair) && target instanceof TileEntity ? ((TileEntity)target).tile.packedPosition() : -1);
         writeBuilding(data);
     }
 
@@ -425,11 +437,20 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     public void read(DataInput data, long time) throws IOException{
         super.read(data, time);
         int mined = data.readInt();
+        int repairing = data.readInt();
 
         readBuilding(data);
 
         if(mined != -1){
             mineTile = world.tile(mined);
+        }
+
+        if(repairing != -1){
+            Tile tile = world.tile(repairing);
+            target = tile.entity;
+            state.set(repair);
+        }else{
+            state.set(retreat);
         }
     }
 

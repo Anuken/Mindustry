@@ -495,8 +495,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             damage(health + 1); //die instantly
         }
 
-        if(ui.chatfrag.chatOpen()) return;
-
         float speed = isBoosting && !mech.flying ? debug ? 5f : mech.boostSpeed : mech.speed;
         //fraction of speed when at max load
         float carrySlowdown = 0.7f;
@@ -511,7 +509,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         //drop from carrier on key press
-        if(Inputs.keyTap("drop_unit")){
+        if(!ui.chatfrag.chatOpen() && Inputs.keyTap("drop_unit")){
             if(!mech.flying){
                 if(getCarrier() != null){
                     CallEntity.dropSelf(this);
@@ -547,7 +545,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         movement.limit(speed * Timers.delta());
 
         if(getCarrier() == null){
-            velocity.add(movement);
+            if(!ui.chatfrag.chatOpen()){
+                velocity.add(movement);
+            }
             float prex = x, prey = y;
             updateVelocityStatus(mech.drag, 10f);
             moved = distanceTo(prex, prey) > 0.01f;
@@ -557,13 +557,15 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             y = Mathf.lerpDelta(y, getCarrier().getY(), 0.1f);
         }
 
-        if(!isShooting()){
-            if(!movement.isZero()){
-                rotation = Mathf.slerpDelta(rotation, movement.angle(), 0.13f);
+        if(!ui.chatfrag.chatOpen()){
+            if(!isShooting()){
+                if(!movement.isZero()){
+                    rotation = Mathf.slerpDelta(rotation, movement.angle(), 0.13f);
+                }
+            }else{
+                float angle = control.input(playerIndex).mouseAngle(x, y);
+                this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f);
             }
-        }else{
-            float angle = control.input(playerIndex).mouseAngle(x, y);
-            this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f);
         }
     }
 
