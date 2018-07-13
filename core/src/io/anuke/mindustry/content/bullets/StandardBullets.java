@@ -5,27 +5,27 @@ import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
 
-public class StandardBullets extends BulletList implements ContentList {
+public class StandardBullets extends BulletList implements ContentList{
     public static BulletType tungsten, lead, carbide, thorium, homing, tracer;
 
     @Override
-    public void load() {
+    public void load(){
 
-        tungsten = new BasicBulletType(3.2f, 10, "bullet") {
+        tungsten = new BasicBulletType(3.2f, 10, "bullet"){
             {
                 bulletWidth = 9f;
                 bulletHeight = 11f;
             }
         };
 
-        lead = new BasicBulletType(2.5f, 5, "bullet") {
+        lead = new BasicBulletType(2.5f, 5, "bullet"){
             {
                 bulletWidth = 7f;
                 bulletHeight = 9f;
             }
         };
 
-        carbide = new BasicBulletType(3.5f, 18, "bullet") {
+        carbide = new BasicBulletType(3.5f, 18, "bullet"){
             {
                 bulletWidth = 9f;
                 bulletHeight = 12f;
@@ -33,7 +33,7 @@ public class StandardBullets extends BulletList implements ContentList {
             }
         };
 
-        thorium = new BasicBulletType(4f, 29, "bullet") {
+        thorium = new BasicBulletType(4f, 29, "bullet"){
             {
                 bulletWidth = 10f;
                 bulletHeight = 13f;
@@ -41,7 +41,7 @@ public class StandardBullets extends BulletList implements ContentList {
             }
         };
 
-        homing = new BasicBulletType(3f, 9, "bullet") {
+        homing = new BasicBulletType(3f, 9, "bullet"){
             {
                 bulletWidth = 7f;
                 bulletHeight = 9f;
@@ -49,7 +49,7 @@ public class StandardBullets extends BulletList implements ContentList {
             }
         };
 
-        tracer = new BasicBulletType(3.2f, 11, "bullet") {
+        tracer = new BasicBulletType(3.2f, 11, "bullet"){
             {
                 bulletWidth = 10f;
                 bulletHeight = 12f;

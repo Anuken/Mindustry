@@ -10,11 +10,11 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-public class ExplosionFx extends FxList implements ContentList {
+public class ExplosionFx extends FxList implements ContentList{
     public static Effect shockwave, bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke;
 
     @Override
-    public void load() {
+    public void load(){
 
         shockwave = new Effect(10f, 80f, e -> {
             Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.fin());

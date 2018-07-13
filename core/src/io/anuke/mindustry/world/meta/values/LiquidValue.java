@@ -5,20 +5,20 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.meta.ContentStatValue;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-public class LiquidValue implements ContentStatValue {
+public class LiquidValue implements ContentStatValue{
     private final Liquid liquid;
 
-    public LiquidValue(Liquid liquid) {
+    public LiquidValue(Liquid liquid){
         this.liquid = liquid;
     }
 
     @Override
-    public UnlockableContent[] getValueContent() {
+    public UnlockableContent[] getValueContent(){
         return new UnlockableContent[]{liquid};
     }
 
     @Override
-    public void display(Table table) {
-        table.addImage(liquid.getContentIcon()).size(8*3);
+    public void display(Table table){
+        table.addImage(liquid.getContentIcon()).size(8 * 3);
     }
 }

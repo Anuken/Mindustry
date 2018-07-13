@@ -8,48 +8,48 @@ import io.anuke.ucore.core.Timers;
 
 public class Router extends Block{
 
-	public Router(String name) {
-		super(name);
-		update = true;
-		solid = true;
-		itemCapacity = 20;
-		hasItems = true;
-		group = BlockGroup.transportation;
-		autoSleep = true;
-	}
-	
-	@Override
-	public void update(Tile tile){
-		int iterations = Math.max(1, (int) (Timers.delta() + 0.4f));
-		boolean moved = tile.entity.items.totalItems() > 0;
-
-		for(int i = 0; i < iterations; i ++) {
-			if (tile.entity.items.totalItems() > 0) {
-				tryDump(tile);
-				moved = true;
-			}
-		}
-
-		if(!moved){
-			tile.entity.sleep();
-		}
-	}
-
-	@Override
-	public boolean canDump(Tile tile, Tile to, Item item) {
-        return !(to.block() instanceof Router) || ((float) to.target().entity.items.totalItems() / to.target().block().itemCapacity) < ((float) tile.entity.items.totalItems() / to.target().block().itemCapacity);
+    public Router(String name){
+        super(name);
+        update = true;
+        solid = true;
+        itemCapacity = 20;
+        hasItems = true;
+        group = BlockGroup.transportation;
+        autoSleep = true;
     }
 
-	@Override
-	public void handleItem(Item item, Tile tile, Tile source){
-		super.handleItem(item, tile, source);
-		tile.entity.wakeUp();
-	}
+    @Override
+    public void update(Tile tile){
+        int iterations = Math.max(1, (int) (Timers.delta() + 0.4f));
+        boolean moved = tile.entity.items.total() > 0;
 
-	@Override
-	public boolean acceptItem(Item item, Tile tile, Tile source){
-		int items = tile.entity.items.totalItems();
-		return items < itemCapacity;
-	}
+        for(int i = 0; i < iterations; i++){
+            if(tile.entity.items.total() > 0){
+                tryDump(tile);
+                moved = true;
+            }
+        }
+
+        if(!moved){
+            tile.entity.sleep();
+        }
+    }
+
+    @Override
+    public boolean canDump(Tile tile, Tile to, Item item){
+        return !(to.block() instanceof Router) || ((float) to.target().entity.items.total() / to.target().block().itemCapacity) < ((float) tile.entity.items.total() / to.target().block().itemCapacity);
+    }
+
+    @Override
+    public void handleItem(Item item, Tile tile, Tile source){
+        super.handleItem(item, tile, source);
+        tile.entity.wakeUp();
+    }
+
+    @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        int items = tile.entity.items.total();
+        return items < itemCapacity;
+    }
 
 }

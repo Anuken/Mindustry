@@ -1,63 +1,98 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
+import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.ucore.core.Timers;
 
 public class Splitter extends Block{
+    protected float speed = 9f;
 
     public Splitter(String name){
         super(name);
         solid = true;
-        instantTransfer = true;
-        destructible = true;
+        update = true;
+        hasItems = true;
+        itemCapacity = 1;
         group = BlockGroup.transportation;
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        Tile to = getTileTarget(item, tile, source, false);
+    public void setBars(){
+        super.setBars();
 
-        return to != null && to.block().acceptItem(item, to, tile);
+        bars.remove(BarType.inventory);
+    }
+
+    @Override
+    public void update(Tile tile){
+        SplitterEntity entity = tile.entity();
+        if(entity.lastItem != null){
+            entity.time += 1f/speed * Timers.delta();
+            Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
+
+            if(target != null && (entity.time >= 1f)){
+                getTileTarget(tile, entity.lastItem, entity.lastInput, true);
+                target.block().handleItem(entity.lastItem, target, Edges.getFacingEdge(tile, target));
+                entity.items.remove(entity.lastItem, 1);
+                entity.lastItem = null;
+            }
+        }
+    }
+
+    @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        SplitterEntity entity = tile.entity();
+
+        return entity.lastItem == null;
     }
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        Tile to = getTileTarget(item, tile, source, true);
-
-        to.block().handleItem(item, to, tile);
+        SplitterEntity entity = tile.entity();
+        entity.items.add(item, 1);
+        entity.lastItem = item;
+        entity.time = 0f;
+        entity.lastInput = source;
     }
 
-    Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
-        int dir = source.relativeTo(dest.x, dest.y);
-        if(dir == -1) return null;
-        Tile to;
-
-        Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
-        Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
-        boolean ac = !(a.block().instantTransfer && source.block().instantTransfer) &&
-                a.block().acceptItem(item, a, dest);
-        boolean bc = !(b.block().instantTransfer && source.block().instantTransfer) &&
-                b.block().acceptItem(item, b, dest);
-
-        if(ac && !bc){
-            to = a;
-        }else if(bc && !ac){
-            to = b;
-        }else{
-            if(dest.getDump() == 0){
-                to = a;
-                if(flip)
-                    dest.setDump((byte)1);
-            }else{
-                to = b;
-                if(flip)
-                    dest.setDump((byte)0);
+    Tile getTileTarget(Tile tile, Item item, Tile from, boolean set){
+        Array<Tile> proximity = tile.entity.proximity();
+        int counter = tile.getDump();
+        for(int i = 0; i < proximity.size; i++){
+            Tile other = proximity.get((i + counter) % proximity.size);
+            if(tile == from) continue;
+            if(set) tile.setDump((byte) ((tile.getDump() + 1) % proximity.size));
+            if(other.block().acceptItem(item, other, Edges.getFacingEdge(tile, other))){
+                return other;
             }
         }
+        return null;
+    }
 
-        return to;
+    @Override
+    public int removeStack(Tile tile, Item item, int amount){
+        SplitterEntity entity = tile.entity();
+        int result = super.removeStack(tile, item, amount);
+        if(result != 0 && item == entity.lastItem){
+            entity.lastItem = null;
+        }
+        return result;
+    }
+
+    @Override
+    public TileEntity getEntity(){
+        return new SplitterEntity();
+    }
+
+    public class SplitterEntity extends TileEntity{
+        Item lastItem;
+        Tile lastInput;
+        float time;
     }
 }

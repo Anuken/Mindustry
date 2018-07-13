@@ -5,13 +5,15 @@ import io.anuke.ucore.util.Bits;
 
 import java.nio.ByteBuffer;
 
-public class MapTileData {
-    /**Tile size: 4 bytes. <br>
+public class MapTileData{
+    /**
+     * Tile size: 4 bytes. <br>
      * 0: ground tile <br>
      * 1: wall tile <br>
      * 2: rotation + team <br>
      * 3: link (x/y) <br>
-     * 4: elevation <br>*/
+     * 4: elevation <br>
+     */
     private final static int TILE_SIZE = 5;
 
     private final ByteBuffer buffer;
@@ -36,7 +38,7 @@ public class MapTileData {
         this.readOnly = readOnly;
 
         if(mapping != null && !readOnly){
-            for(int i = 0; i < width * height; i ++){
+            for(int i = 0; i < width * height; i++){
                 TileDataMarker marker = new TileDataMarker();
                 read(marker);
                 buffer.position(i * TILE_SIZE);
@@ -59,28 +61,38 @@ public class MapTileData {
         return height;
     }
 
-    /**Write a byte to a specific position.*/
+    /**
+     * Write a byte to a specific position.
+     */
     public void write(int x, int y, DataPosition position, byte data){
         buffer.put((x + width * y) * TILE_SIZE + position.ordinal(), data);
     }
 
-    /**Gets a byte at a specific position.*/
+    /**
+     * Gets a byte at a specific position.
+     */
     public byte read(int x, int y, DataPosition position){
         return buffer.get((x + width * y) * TILE_SIZE + position.ordinal());
     }
 
-    /**Reads and returns the next tile data.*/
+    /**
+     * Reads and returns the next tile data.
+     */
     public TileDataMarker read(TileDataMarker marker){
         marker.read(buffer);
         return marker;
     }
 
-    /**Writes this tile data marker.*/
+    /**
+     * Writes this tile data marker.
+     */
     public void write(TileDataMarker marker){
         marker.write(buffer);
     }
 
-    /**Sets read position to the specified coordinates*/
+    /**
+     * Sets read position to the specified coordinates
+     */
     public void position(int x, int y){
         buffer.position((x + width * y) * TILE_SIZE);
     }
@@ -93,7 +105,7 @@ public class MapTileData {
         floor, wall, link, rotationTeam, elevation
     }
 
-    public class TileDataMarker {
+    public class TileDataMarker{
         public byte floor, wall;
         public byte link;
         public byte rotation;
@@ -110,8 +122,8 @@ public class MapTileData {
             team = Bits.getRightByte(rt);
 
             if(map != null){
-                floor = (byte)map.get(floor, floor);
-                wall = (byte)map.get(wall, wall);
+                floor = (byte) map.get(floor, floor);
+                wall = (byte) map.get(wall, wall);
             }
         }
 

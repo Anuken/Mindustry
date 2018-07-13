@@ -1,36 +1,31 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Log;
 
-public class Fracker extends SolidPump {
-    protected Liquid inputLiquid;
-    protected float inputLiquidUse;
-    protected float inputCapacity = 20f;
-    protected Item inputItem = Items.sand;
+public class Fracker extends SolidPump{
     protected float itemUseTime = 100f;
 
     protected TextureRegion liquidRegion;
     protected TextureRegion rotatorRegion;
     protected TextureRegion topRegion;
 
-    public Fracker(String name) {
+    public Fracker(String name){
         super(name);
         hasItems = true;
         itemCapacity = 20;
+        singleLiquid = false;
+
+        consumes.require(ConsumeItem.class);
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
 
         liquidRegion = Draw.region(name + "-liquid");
@@ -39,22 +34,18 @@ public class Fracker extends SolidPump {
     }
 
     @Override
-    public void setStats() {
+    public void setStats(){
         super.setStats();
-
-        stats.add(BlockStat.inputItem, inputItem);
-        stats.add(BlockStat.inputLiquid, inputLiquid);
-        stats.add(BlockStat.liquidUse, 60f *inputLiquidUse, StatUnit.liquidSecond);
     }
 
     @Override
-    public void draw(Tile tile) {
+    public void draw(Tile tile){
         FrackerEntity entity = tile.entity();
 
-        Draw.rect(name, tile.drawx(), tile.drawy());
+        Draw.rect(region, tile.drawx(), tile.drawy());
 
-        Draw.color(tile.entity.liquids.liquid.color);
-        Draw.alpha(tile.entity.liquids.amount/liquidCapacity);
+        Draw.color(result.color);
+        Draw.alpha(tile.entity.liquids.get(result) / liquidCapacity);
         Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
         Draw.color();
 
@@ -63,52 +54,39 @@ public class Fracker extends SolidPump {
     }
 
     @Override
-    public TextureRegion[] getIcon() {
+    public TextureRegion[] getIcon(){
         return new TextureRegion[]{Draw.region(name), Draw.region(name + "-rotator"), Draw.region(name + "-top")};
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         FrackerEntity entity = tile.entity();
+        Item item = consumes.item();
 
-        while(entity.accumulator > itemUseTime && entity.items.hasItem(inputItem, 1)){
-            entity.items.removeItem(inputItem, 1);
+        while(entity.accumulator > itemUseTime && entity.items.has(item, 1)){
+            entity.items.remove(item, 1);
             entity.accumulator -= itemUseTime;
         }
 
-        if(entity.input >= Math.min(inputLiquidUse * Timers.delta(), inputCapacity) && entity.accumulator < itemUseTime){
+        if(entity.cons.valid() && entity.accumulator < itemUseTime){
             super.update(tile);
-            entity.input -= inputLiquidUse * Timers.delta();
             entity.accumulator += Timers.delta();
         }else{
-            tryDumpLiquid(tile);
+            tryDumpLiquid(tile, result);
         }
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return item == inputItem && tile.entity.items.totalItems() < itemCapacity;
-    }
-
-    @Override
-    public float handleAuxLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
-        if(liquid != inputLiquid){
-            return 0f;
-        }else{
-            FrackerEntity entity = tile.entity();
-            float accepted = Math.min(inputCapacity - entity.input, amount);
-            entity.input += accepted;
-            return accepted;
-        }
-    }
-
-    @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new FrackerEntity();
     }
 
+    @Override
+    public float typeLiquid(Tile tile){
+        return tile.entity.liquids.get(result);
+    }
+
     public static class FrackerEntity extends SolidPumpEntity{
-        public float input;
         public float accumulator;
     }
 }

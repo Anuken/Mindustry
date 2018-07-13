@@ -16,7 +16,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import static io.anuke.mindustry.Vars.renderer;
 import static io.anuke.mindustry.Vars.showFog;
 
-public class Minimap extends Table {
+public class Minimap extends Table{
 
     public Minimap(){
         super("button");
@@ -26,17 +26,17 @@ public class Minimap extends Table {
 
         Image image = new Image(new TextureRegionDrawable(new TextureRegion())){
             @Override
-            public void draw(Batch batch, float parentAlpha) {
+            public void draw(Batch batch, float parentAlpha){
                 if(renderer.minimap().getRegion() == null) return;
 
-                TextureRegionDrawable draw = (TextureRegionDrawable)getDrawable();
+                TextureRegionDrawable draw = (TextureRegionDrawable) getDrawable();
                 draw.getRegion().setRegion(renderer.minimap().getRegion());
                 super.draw(batch, parentAlpha);
                 if(renderer.minimap().getTexture() != null){
                     renderer.minimap().drawEntities(x, y, width, height);
                 }
 
-                if(showFog) {
+                if(showFog){
                     renderer.fog().getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
                     draw.getRegion().setTexture(renderer.fog().getTexture());
@@ -53,7 +53,7 @@ public class Minimap extends Table {
         };
 
         addListener(new InputListener(){
-            public boolean scrolled (InputEvent event, float x, float y, int amount) {
+            public boolean scrolled(InputEvent event, float x, float y, int amount){
                 renderer.minimap().zoomBy(amount);
                 return true;
             }

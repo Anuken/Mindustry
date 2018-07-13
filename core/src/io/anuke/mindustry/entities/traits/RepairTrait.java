@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities.traits;
 import io.anuke.ucore.entities.trait.HealthTrait;
 
 //TODO implement
-public interface RepairTrait extends TeamTrait {
+public interface RepairTrait extends TeamTrait{
 
     HealthTrait getRepairing();
 

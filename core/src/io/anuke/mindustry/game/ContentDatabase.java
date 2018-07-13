@@ -8,13 +8,19 @@ import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 
-public class ContentDatabase {
-    /**Maps unlockable type names to a set of unlocked content.*/
+public class ContentDatabase{
+    /**
+     * Maps unlockable type names to a set of unlocked content.
+     */
     private ObjectMap<String, ObjectSet<String>> unlocked = new ObjectMap<>();
-    /**Whether unlockables have changed since the last save.*/
+    /**
+     * Whether unlockables have changed since the last save.
+     */
     private boolean dirty;
 
-    /**Returns whether or not this piece of content is unlocked yet.*/
+    /**
+     * Returns whether or not this piece of content is unlocked yet.
+     */
     public boolean isUnlocked(UnlockableContent content){
         if(!unlocked.containsKey(content.getContentTypeName())){
             unlocked.put(content.getContentTypeName(), new ObjectSet<>());
@@ -25,10 +31,13 @@ public class ContentDatabase {
         return set.contains(content.getContentName());
     }
 
-    /**Makes this piece of content 'unlocked', if possible.
+    /**
+     * Makes this piece of content 'unlocked', if possible.
      * If this piece of content is already unlocked or cannot be unlocked due to dependencies, nothing changes.
      * Results are not saved until you call {@link #save()}.
-     * @return whether or not this content was newly unlocked.*/
+     *
+     * @return whether or not this content was newly unlocked.
+     */
     public boolean unlockContent(UnlockableContent content){
         if(!content.canBeUnlocked()) return false;
 
@@ -48,12 +57,16 @@ public class ContentDatabase {
         return ret;
     }
 
-    /**Returns whether unlockables have changed since the last save.*/
+    /**
+     * Returns whether unlockables have changed since the last save.
+     */
     public boolean isDirty(){
         return dirty;
     }
 
-    /**Clears all unlocked content.*/
+    /**
+     * Clears all unlocked content.
+     */
     public void reset(){
         unlocked.clear();
         dirty = true;

@@ -27,28 +27,124 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected Trail trail = new Trail(8);
     protected CarriableTrait carrying;
 
+    protected final UnitState
+
+    resupply = new UnitState(){
+        public void entered(){
+            target = null;
+        }
+
+        public void update(){
+            if(inventory.totalAmmo() + 10 >= inventory.ammoCapacity()){
+                state.set(attack);
+            }else if(!targetHasFlag(BlockFlag.resupplyPoint)){
+                retarget(() -> targetClosestAllyFlag(BlockFlag.resupplyPoint));
+            }else{
+                circle(20f);
+            }
+        }
+    },
+    idle = new UnitState(){
+        public void update(){
+            retarget(() -> {
+                targetClosest();
+                targetClosestEnemyFlag(BlockFlag.target);
+
+                if(target != null){
+                    setState(attack);
+                }
+            });
+
+            target = getClosestCore();
+            if(target != null){
+                circle(50f);
+            }
+            velocity.scl(0.8f);
+        }
+    },
+    attack = new UnitState(){
+        public void entered(){
+            target = null;
+        }
+
+        public void update(){
+            if(Units.invalidateTarget(target, team, x, y)){
+                target = null;
+            }
+
+            if(!inventory.hasAmmo()){
+                state.set(resupply);
+            }else if(target == null){
+                retarget(() -> {
+                    targetClosest();
+                    targetClosestEnemyFlag(BlockFlag.target);
+                    targetClosestEnemyFlag(BlockFlag.producer);
+
+                    if(target == null){
+                        setState(idle);
+                    }
+                });
+            }else{
+                attack(150f);
+
+                if((Mathf.angNear(angleTo(target), rotation, 15f) || !inventory.getAmmo().bullet.keepVelocity) //bombers don't care about rotation
+                        && distanceTo(target) < inventory.getAmmo().getRange()){
+                    AmmoType ammo = inventory.getAmmo();
+                    inventory.useAmmo();
+
+                    Vector2 to = Predict.intercept(FlyingUnit.this, target, ammo.bullet.speed);
+
+                    getWeapon().update(FlyingUnit.this, to.x, to.y);
+                }
+            }
+        }
+    },
+    retreat = new UnitState(){
+        public void entered(){
+            target = null;
+        }
+
+        public void update(){
+            if(health >= maxHealth()){
+                state.set(attack);
+            }else if(!targetHasFlag(BlockFlag.repair)){
+                retarget(() -> {
+                    Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair));
+                    if(target != null) FlyingUnit.this.target = target.entity;
+                });
+            }else{
+                circle(20f);
+            }
+        }
+    };
+
     //instantiation only
     public FlyingUnit(){
 
     }
 
     @Override
-    public CarriableTrait getCarry() {
+    public void drawShadow(){
+        Draw.rect(type.region, x + elevation * elevationScale, y - elevation * elevationScale, rotation - 90);
+    }
+
+    @Override
+    public CarriableTrait getCarry(){
         return carrying;
     }
 
     @Override
-    public void setCarry(CarriableTrait unit) {
+    public void setCarry(CarriableTrait unit){
         this.carrying = unit;
     }
 
     @Override
-    public float getCarryWeight() {
+    public float getCarryWeight(){
         return type.carryWeight;
     }
 
     @Override
-    public void update() {
+    public void update(){
         super.update();
 
         updateRotation();
@@ -59,7 +155,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     }
 
     @Override
-    public void draw() {
+    public void draw(){
         Draw.alpha(hitTime / hitDuration);
 
         Draw.rect(type.name, x, y, rotation - 90);
@@ -70,12 +166,12 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     }
 
     @Override
-    public void drawOver() {
-        trail.draw(Palette.lightTrail, Palette.lightTrail, 5f);
+    public void drawOver(){
+        trail.draw(Palette.lightTrail, 5f);
     }
 
     @Override
-    public void behavior() {
+    public void behavior(){
         if(health <= health * type.retreatPercent && !isWave &&
                 Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
@@ -93,7 +189,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     }
 
     @Override
-    public float drawSize() {
+    public float drawSize(){
         return 60;
     }
 
@@ -103,7 +199,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
         x += Mathf.sin(Timers.time() + id * 999, 25f, 0.07f);
         y += Mathf.cos(Timers.time() + id * 999, 25f, 0.07f);
 
-        if (velocity.len() <= 0.2f) {
+        if(velocity.len() <= 0.2f){
             rotation += Mathf.sin(Timers.time() + id * 99, 10f, 8f);
         }
     }
@@ -122,7 +218,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
         vec.set(target.getX() - x, target.getY() - y);
 
         if(vec.len() < circleLength){
-            vec.rotate((circleLength-vec.len())/circleLength * 180f);
+            vec.rotate((circleLength - vec.len()) / circleLength * 180f);
         }
 
         vec.setLength(speed * Timers.delta());
@@ -135,7 +231,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
         vec.set(target.getX() - x, target.getY() - y);
 
-        float length = Mathf.clamp((distanceTo(target) - circleLength)/100f, -1f, 1f);
+        float length = Mathf.clamp((distanceTo(target) - circleLength) / 100f, -1f, 1f);
 
         vec.setLength(type.speed * Timers.delta() * length);
         if(length < 0) vec.rotate(180f);
@@ -152,102 +248,11 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
         if(diff > 100f && vec.len() < circleLength){
             vec.setAngle(velocity.angle());
         }else{
-            vec.setAngle(Mathf.slerpDelta(velocity.angle(), vec.angle(),  0.44f));
+            vec.setAngle(Mathf.slerpDelta(velocity.angle(), vec.angle(), 0.44f));
         }
 
-        vec.setLength(type.speed*Timers.delta());
+        vec.setLength(type.speed * Timers.delta());
 
         velocity.add(vec);
     }
-
-    public final UnitState
-
-    resupply = new UnitState(){
-        public void entered() {
-            target = null;
-        }
-
-        public void update() {
-            if(inventory.totalAmmo() + 10 >= inventory.ammoCapacity()){
-                state.set(attack);
-            }else if(!targetHasFlag(BlockFlag.resupplyPoint)){
-                retarget(() -> targetClosestAllyFlag(BlockFlag.resupplyPoint));
-            }else{
-                circle(20f);
-            }
-        }
-    },
-    idle = new UnitState() {
-        public void update() {
-            retarget(() -> {
-                targetClosest();
-                targetClosestEnemyFlag(BlockFlag.target);
-
-                if(target != null){
-                    setState(attack);
-                }
-            });
-
-            target = getClosestCore();
-            if(target != null){
-                circle(50f);
-            }
-            velocity.scl(0.8f);
-        }
-    },
-    attack = new UnitState(){
-        public void entered() {
-            target = null;
-        }
-
-        public void update() {
-            if(Units.invalidateTarget(target, team, x, y)){
-                target = null;
-            }
-
-            if(!inventory.hasAmmo()) {
-                state.set(resupply);
-            }else if (target == null){
-                retarget(() -> {
-                    targetClosest();
-                    targetClosestEnemyFlag(BlockFlag.target);
-                    targetClosestEnemyFlag(BlockFlag.producer);
-
-                    if(target == null){
-                        setState(idle);
-                    }
-                });
-            }else{
-                attack(150f);
-
-                if ((Mathf.angNear(angleTo(target), rotation, 15f) || !inventory.getAmmo().bullet.keepVelocity) //bombers don't care about rotation
-                        && distanceTo(target) < inventory.getAmmo().getRange()) {
-                    AmmoType ammo = inventory.getAmmo();
-                    inventory.useAmmo();
-
-                    Vector2 to = Predict.intercept(FlyingUnit.this, target, ammo.bullet.speed);
-
-                    getWeapon().update(FlyingUnit.this, to.x, to.y);
-                }
-            }
-        }
-    },
-    retreat = new UnitState() {
-        public void entered() {
-            target = null;
-        }
-
-        public void update() {
-            if(health >= maxHealth()){
-                state.set(attack);
-            }else if(!targetHasFlag(BlockFlag.repair)){
-                retarget(() -> {
-                    Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair));
-                    if (target != null) FlyingUnit.this.target = target.entity;
-                });
-            }else{
-                circle(20f);
-            }
-        }
-    };
 }

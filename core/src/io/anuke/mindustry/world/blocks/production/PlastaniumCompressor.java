@@ -4,14 +4,14 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
-public class PlastaniumCompressor extends GenericCrafter {
+public class PlastaniumCompressor extends GenericCrafter{
 
-    public PlastaniumCompressor(String name) {
+    public PlastaniumCompressor(String name){
         super(name);
     }
 
     @Override
-    public void draw(Tile tile) {
+    public void draw(Tile tile){
         super.draw(tile);
 
         GenericCrafterEntity entity = tile.entity();

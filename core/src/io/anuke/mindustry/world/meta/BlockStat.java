@@ -2,8 +2,10 @@ package io.anuke.mindustry.world.meta;
 
 import io.anuke.ucore.util.Bundles;
 
-/**Describes one type of stat for a block.*/
-public enum BlockStat {
+/**
+ * Describes one type of stat for a block.
+ */
+public enum BlockStat{
     health(StatCategory.general),
     size(StatCategory.general),
 
@@ -14,15 +16,18 @@ public enum BlockStat {
 
     liquidCapacity(StatCategory.liquids),
     liquidOutput(StatCategory.liquids),
+    coolant(StatCategory.liquids),
+    coolantUse(StatCategory.liquids),
 
     powerCapacity(StatCategory.power),
     powerUse(StatCategory.power),
     powerRange(StatCategory.power),
     powerTransferSpeed(StatCategory.power),
     maxPowerGeneration(StatCategory.power),
+    inputLiquidFuel(StatCategory.power),
+    liquidFuelUse(StatCategory.power),
 
     inputLiquid(StatCategory.crafting),
-    inputLiquidAux(StatCategory.crafting),
     liquidUse(StatCategory.crafting),
     inputItem(StatCategory.crafting),
     inputItems(StatCategory.crafting),
@@ -38,14 +43,12 @@ public enum BlockStat {
     shots(StatCategory.shooting),
     reload(StatCategory.shooting),
     powerShot(StatCategory.shooting),
-    targetsAir(StatCategory.shooting)
-,
-    ;
+    targetsAir(StatCategory.shooting),;
 
 
     public final StatCategory category;
 
-    BlockStat(StatCategory category) {
+    BlockStat(StatCategory category){
         this.category = category;
     }
 

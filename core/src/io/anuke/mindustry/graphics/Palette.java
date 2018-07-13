@@ -2,7 +2,7 @@ package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.graphics.Color;
 
-public class Palette {
+public class Palette{
     public static final Color bulletYellow = Color.valueOf("ffeec9");
     public static final Color bulletYellowBack = Color.valueOf("f9c87a");
 

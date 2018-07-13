@@ -27,14 +27,16 @@ import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.*;
 
-/**Class for specifying read/write methods for code generation.*/
-public class TypeIO {
+/**
+ * Class for specifying read/write methods for code generation.
+ */
+public class TypeIO{
 
     @WriteClass(Player.class)
     public static void writePlayer(ByteBuffer buffer, Player player){
         if(player == null){
             buffer.putInt(-1);
-        }else {
+        }else{
             buffer.putInt(player.id);
         }
     }
@@ -47,7 +49,7 @@ public class TypeIO {
 
     @WriteClass(Unit.class)
     public static void writeUnit(ByteBuffer buffer, Unit unit){
-        buffer.put((byte)unit.getGroup().getID());
+        buffer.put((byte) unit.getGroup().getID());
         buffer.putInt(unit.getID());
     }
 
@@ -55,12 +57,12 @@ public class TypeIO {
     public static Unit readUnit(ByteBuffer buffer){
         byte gid = buffer.get();
         int id = buffer.getInt();
-        return (Unit)Entities.getGroup(gid).getByID(id);
+        return (Unit) Entities.getGroup(gid).getByID(id);
     }
 
     @WriteClass(ShooterTrait.class)
     public static void writeShooter(ByteBuffer buffer, ShooterTrait trait){
-        buffer.put((byte)trait.getGroup().getID());
+        buffer.put((byte) trait.getGroup().getID());
         buffer.putInt(trait.getID());
     }
 
@@ -85,10 +87,10 @@ public class TypeIO {
     @WriteClass(CarriableTrait.class)
     public static void writeCarriable(ByteBuffer buffer, CarriableTrait unit){
         if(unit == null){
-            buffer.put((byte)-1);
+            buffer.put((byte) -1);
             return;
         }
-        buffer.put((byte)unit.getGroup().getID());
+        buffer.put((byte) unit.getGroup().getID());
         buffer.putInt(unit.getID());
     }
 
@@ -99,15 +101,16 @@ public class TypeIO {
             return null;
         }
         int id = buffer.getInt();
-        return (CarriableTrait)Entities.getGroup(gid).getByID(id);
+        return (CarriableTrait) Entities.getGroup(gid).getByID(id);
     }
 
     @WriteClass(CarryTrait.class)
     public static void writeCarry(ByteBuffer buffer, CarryTrait unit){
         if(unit == null){
-            buffer.put((byte)-1);
+            buffer.put((byte) -1);
+            return;
         }
-        buffer.put((byte)unit.getGroup().getID());
+        buffer.put((byte) unit.getGroup().getID());
         buffer.putInt(unit.getID());
     }
 
@@ -118,12 +121,12 @@ public class TypeIO {
             return null;
         }
         int id = buffer.getInt();
-        return (CarryTrait)Entities.getGroup(gid).getByID(id);
+        return (CarryTrait) Entities.getGroup(gid).getByID(id);
     }
 
     @WriteClass(BaseUnit.class)
     public static void writeBaseUnit(ByteBuffer buffer, BaseUnit unit){
-        buffer.put((byte)unit.getGroup().getID());
+        buffer.put((byte) unitGroups[unit.getTeam().ordinal()].getID());
         buffer.putInt(unit.getID());
     }
 
@@ -131,7 +134,7 @@ public class TypeIO {
     public static BaseUnit writeBaseUnit(ByteBuffer buffer){
         byte gid = buffer.get();
         int id = buffer.getInt();
-        return (BaseUnit)Entities.getGroup(gid).getByID(id);
+        return (BaseUnit) Entities.getGroup(gid).getByID(id);
     }
 
     @WriteClass(Tile.class)
@@ -146,7 +149,7 @@ public class TypeIO {
 
     @WriteClass(Block.class)
     public static void writeBlock(ByteBuffer buffer, Block block){
-        buffer.put((byte)block.id);
+        buffer.put((byte) block.id);
     }
 
     @ReadClass(Block.class)
@@ -156,7 +159,7 @@ public class TypeIO {
 
     @WriteClass(KickReason.class)
     public static void writeKick(ByteBuffer buffer, KickReason reason){
-        buffer.put((byte)reason.ordinal());
+        buffer.put((byte) reason.ordinal());
     }
 
     @ReadClass(KickReason.class)
@@ -166,7 +169,7 @@ public class TypeIO {
 
     @WriteClass(Team.class)
     public static void writeTeam(ByteBuffer buffer, Team reason){
-        buffer.put((byte)reason.ordinal());
+        buffer.put((byte) reason.ordinal());
     }
 
     @ReadClass(Team.class)
@@ -176,7 +179,7 @@ public class TypeIO {
 
     @WriteClass(AdminAction.class)
     public static void writeAction(ByteBuffer buffer, AdminAction reason){
-        buffer.put((byte)reason.ordinal());
+        buffer.put((byte) reason.ordinal());
     }
 
     @ReadClass(AdminAction.class)
@@ -186,7 +189,7 @@ public class TypeIO {
 
     @WriteClass(Effect.class)
     public static void writeEffect(ByteBuffer buffer, Effect effect){
-        buffer.putShort((short)effect.id);
+        buffer.putShort((short) effect.id);
     }
 
     @ReadClass(Effect.class)
@@ -226,7 +229,7 @@ public class TypeIO {
 
     @WriteClass(Liquid.class)
     public static void writeLiquid(ByteBuffer buffer, Liquid liquid){
-        buffer.put((byte)liquid.id);
+        buffer.put((byte) liquid.id);
     }
 
     @ReadClass(Liquid.class)
@@ -246,7 +249,7 @@ public class TypeIO {
 
     @WriteClass(BulletType.class)
     public static void writeBulletType(ByteBuffer buffer, BulletType type){
-        buffer.put((byte)type.id);
+        buffer.put((byte) type.id);
     }
 
     @ReadClass(BulletType.class)
@@ -256,7 +259,7 @@ public class TypeIO {
 
     @WriteClass(Item.class)
     public static void writeItem(ByteBuffer buffer, Item item){
-        buffer.put((byte)item.id);
+        buffer.put((byte) item.id);
     }
 
     @ReadClass(Item.class)
@@ -266,7 +269,7 @@ public class TypeIO {
 
     @WriteClass(Recipe.class)
     public static void writeRecipe(ByteBuffer buffer, Recipe recipe){
-        buffer.put((byte)recipe.id);
+        buffer.put((byte) recipe.id);
     }
 
     @ReadClass(Recipe.class)
@@ -276,19 +279,19 @@ public class TypeIO {
 
     @WriteClass(String.class)
     public static void writeString(ByteBuffer buffer, String string){
-        if(string != null) {
+        if(string != null){
             byte[] bytes = string.getBytes();
             buffer.putShort((short) bytes.length);
             buffer.put(bytes);
         }else{
-            buffer.putShort((short)-1);
+            buffer.putShort((short) -1);
         }
     }
 
     @ReadClass(String.class)
     public static String readString(ByteBuffer buffer){
         short length = buffer.getShort();
-        if(length != -1) {
+        if(length != -1){
             byte[] bytes = new byte[length];
             buffer.get(bytes);
             return new String(bytes);
@@ -299,7 +302,7 @@ public class TypeIO {
 
     @WriteClass(byte[].class)
     public static void writeBytes(ByteBuffer buffer, byte[] bytes){
-        buffer.putShort((short)bytes.length);
+        buffer.putShort((short) bytes.length);
         buffer.put(bytes);
     }
 
@@ -314,10 +317,10 @@ public class TypeIO {
     @WriteClass(TraceInfo.class)
     public static void writeTrace(ByteBuffer buffer, TraceInfo info){
         buffer.putInt(info.playerid);
-        buffer.putShort((short)info.ip.getBytes().length);
+        buffer.putShort((short) info.ip.getBytes().length);
         buffer.put(info.ip.getBytes());
-        buffer.put(info.modclient ? (byte)1 : 0);
-        buffer.put(info.android ? (byte)1 : 0);
+        buffer.put(info.modclient ? (byte) 1 : 0);
+        buffer.put(info.android ? (byte) 1 : 0);
 
         buffer.putInt(info.totalBlocksBroken);
         buffer.putInt(info.structureBlocksBroken);

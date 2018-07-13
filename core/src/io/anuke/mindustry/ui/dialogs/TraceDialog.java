@@ -5,7 +5,7 @@ import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
-public class TraceDialog extends FloatingDialog {
+public class TraceDialog extends FloatingDialog{
 
     public TraceDialog(){
         super("$text.trace");

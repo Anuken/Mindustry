@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.ucore.util.Mathf;
 
-public class Interpolator {
+public class Interpolator{
     //used for movement
     public Vector2 target = new Vector2();
     public Vector2 last = new Vector2();
@@ -38,11 +38,12 @@ public class Interpolator {
 
     public void update(){
 
+        /*
         if(pos.dst(target) > 128){
             pos.set(target);
             lastUpdated = 0;
             updateSpacing = 16;
-        }
+        }*/
 
         if(lastUpdated != 0 && updateSpacing != 0){
             float timeSinceUpdate = TimeUtils.timeSinceMillis(lastUpdated);
@@ -54,7 +55,7 @@ public class Interpolator {
                 values = new float[targets.length];
             }
 
-            for (int i = 0; i < values.length; i++) {
+            for(int i = 0; i < values.length; i++){
                 values[i] = Mathf.slerp(values[i], targets[i], alpha);
             }
         }else{

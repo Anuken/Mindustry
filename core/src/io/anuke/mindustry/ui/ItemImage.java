@@ -9,31 +9,27 @@ import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
-public class ItemImage extends Stack {
+public class ItemImage extends Stack{
 
-    public ItemImage(TextureRegion region, Supplier<CharSequence> text) {
+    public ItemImage(TextureRegion region, Supplier<CharSequence> text){
         Table t = new Table().left().bottom();
 
         t.label(text).color(Color.DARK_GRAY).padBottom(-22).get().setFontScale(Unit.dp.scl(0.5f));
         t.row();
         t.label(text).get().setFontScale(Unit.dp.scl(0.5f));
 
-        Image image = new Image(region);
-
-        add(image);
+        add(new Image(region));
         add(t);
     }
 
-    public ItemImage(ItemStack stack) {
+    public ItemImage(ItemStack stack){
         Table t = new Table().left().bottom();
 
         t.add(stack.amount + "").color(Color.DARK_GRAY).padBottom(-22).get().setFontScale(Unit.dp.scl(0.5f));
         t.row();
         t.add(stack.amount + "").get().setFontScale(Unit.dp.scl(0.5f));
 
-        Image image = new Image(stack.item.region);
-
-        add(image);
+        add(new Image(stack.item.region));
         add(t);
     }
 }

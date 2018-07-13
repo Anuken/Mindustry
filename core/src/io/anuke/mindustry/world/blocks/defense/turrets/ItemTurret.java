@@ -11,18 +11,18 @@ import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 
-public class ItemTurret extends CooledTurret {
+public class ItemTurret extends CooledTurret{
     protected int maxAmmo = 50;
     protected AmmoType[] ammoTypes;
     protected ObjectMap<Item, AmmoType> ammoMap = new ObjectMap<>();
 
-    public ItemTurret(String name) {
+    public ItemTurret(String name){
         super(name);
         hasItems = true;
     }
 
     @Override
-    public void setStats() {
+    public void setStats(){
         super.setStats();
 
         stats.remove(BlockStat.itemCapacity);
@@ -31,51 +31,51 @@ public class ItemTurret extends CooledTurret {
     }
 
     @Override
-    public int acceptStack(Item item, int amount, Tile tile, Unit source) {
+    public int acceptStack(Item item, int amount, Tile tile, Unit source){
         TurretEntity entity = tile.entity();
 
         AmmoType type = ammoMap.get(item);
 
         if(type == null) return 0;
 
-        return Math.min((int)((maxAmmo - entity.totalAmmo) / ammoMap.get(item).quantityMultiplier), amount);
+        return Math.min((int) ((maxAmmo - entity.totalAmmo) / ammoMap.get(item).quantityMultiplier), amount);
     }
-    
+
     @Override
     public void handleStack(Item item, int amount, Tile tile, Unit source){
-        for (int i = 0; i < amount; i++) {
+        for(int i = 0; i < amount; i++){
             handleItem(item, tile, null);
         }
     }
 
     //currently can't remove items from turrets.
     @Override
-    public int removeStack(Tile tile, Item item, int amount) {
+    public int removeStack(Tile tile, Item item, int amount){
         return 0;
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source) {
+    public void handleItem(Item item, Tile tile, Tile source){
         TurretEntity entity = tile.entity();
 
         AmmoType type = ammoMap.get(item);
         entity.totalAmmo += type.quantityMultiplier;
-        entity.items.addItem(item, 1);
+        entity.items.add(item, 1);
 
         //find ammo entry by type
-        for(int i = 0; i < entity.ammo.size; i ++){
+        for(int i = 0; i < entity.ammo.size; i++){
             AmmoEntry entry = entity.ammo.get(i);
 
             //if found, put it to the right
             if(entry.type == type){
                 entry.amount += type.quantityMultiplier;
-                entity.ammo.swap(i, entity.ammo.size-1);
+                entity.ammo.swap(i, entity.ammo.size - 1);
                 return;
             }
         }
 
         //must not be found
-        AmmoEntry entry = new AmmoEntry(type, (int)type.quantityMultiplier);
+        AmmoEntry entry = new AmmoEntry(type, (int) type.quantityMultiplier);
         entity.ammo.add(entry);
     }
 
@@ -89,19 +89,19 @@ public class ItemTurret extends CooledTurret {
     @Override
     public void setBars(){
         super.setBars();
-        bars.replace(new BlockBar(BarType.inventory, true, tile -> (float)tile.<TurretEntity>entity().totalAmmo / maxAmmo));
+        bars.replace(new BlockBar(BarType.inventory, true, tile -> (float) tile.<TurretEntity>entity().totalAmmo / maxAmmo));
     }
 
     @Override
     public void init(){
         super.init();
 
-        if(ammoTypes != null) {
-            for (AmmoType type : ammoTypes) {
+        if(ammoTypes != null){
+            for(AmmoType type : ammoTypes){
                 if(type.item == null) continue;
-                if (ammoMap.containsKey(type.item)) {
+                if(ammoMap.containsKey(type.item)){
                     throw new RuntimeException("Turret \"" + name + "\" has two conflicting ammo entries on item type " + type.item + "!");
-                } else {
+                }else{
                     ammoMap.put(type.item, type);
                 }
             }

@@ -55,7 +55,7 @@ public class HostDialog extends FloatingDialog{
                 try{
                     Net.host(Vars.port);
                     player.isAdmin = true;
-                }catch (IOException e){
+                }catch(IOException e){
                     ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
                 }
                 ui.loadfrag.hide();

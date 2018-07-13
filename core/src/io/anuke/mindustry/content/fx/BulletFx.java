@@ -10,12 +10,12 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-public class BulletFx extends FxList implements ContentList {
+public class BulletFx extends FxList implements ContentList{
     public static Effect hitBulletSmall, hitBulletBig, hitFlameSmall, hitLiquid, hitLancer, despawn, flakExplosion, blastExplosion, plasticExplosion,
             artilleryTrail, incendTrail, missileTrail;
 
     @Override
-    public void load() {
+    public void load(){
 
         hitBulletSmall = new Effect(14, e -> {
             Draw.color(Color.WHITE, Palette.lightOrange, e.fin());

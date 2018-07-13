@@ -5,7 +5,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Bits;
 
-public class ItemBuffer {
+public class ItemBuffer{
     private final float speed;
 
     private long[] buffer;
@@ -20,9 +20,13 @@ public class ItemBuffer {
         return index < buffer.length;
     }
 
-    public void accept(Item item){
+    public void accept(Item item, short data){
         //if(!accepts()) return;
-        buffer[index ++] = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), item.id);
+        buffer[index++] = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), Bits.packInt((short) item.id, data));
+    }
+
+    public void accept(Item item){
+        accept(item, (short) -1);
     }
 
     public Item poll(){
@@ -31,14 +35,26 @@ public class ItemBuffer {
             float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
 
             if(Timers.time() >= time + speed || Timers.time() < time){
-                return Item.getByID(Bits.getRightInt(l));
+                return Item.getByID(Bits.getLeftShort(Bits.getRightInt(l)));
             }
         }
         return null;
     }
 
+    public short pollData(){
+        if(index > 0){
+            long l = buffer[0];
+            float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
+
+            if(Timers.time() >= time + speed || Timers.time() < time){
+                return Bits.getRightShort(Bits.getRightInt(l));
+            }
+        }
+        return -1;
+    }
+
     public void remove(){
         System.arraycopy(buffer, 1, buffer, 0, index - 1);
-        index --;
+        index--;
     }
 }

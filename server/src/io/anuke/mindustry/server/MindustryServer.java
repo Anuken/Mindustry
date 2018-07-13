@@ -11,7 +11,7 @@ import io.anuke.ucore.modules.ModuleCore;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class MindustryServer extends ModuleCore {
+public class MindustryServer extends ModuleCore{
     private String[] args;
 
     public MindustryServer(String[] args){

@@ -26,20 +26,26 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
 
     //TODO call event
 
+    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+    public static void setSortedUnloaderItem(Player player, Tile tile, Item item){
+        SortedUnloaderEntity entity = tile.entity();
+        entity.sortItem = item;
+    }
+
     @Override
     public void update(Tile tile){
         SortedUnloaderEntity entity = tile.entity();
 
-        if(entity.items.totalItems() == 0 && entity.timer.get(timerUnload, speed)){
+        if(entity.items.total() == 0 && entity.timer.get(timerUnload, speed)){
             tile.allNearby(other -> {
-                if(other.block() instanceof StorageBlock && entity.items.totalItems() == 0 &&
-                        ((StorageBlock)other.block()).hasItem(other, entity.sortItem)){
-                    offloadNear(tile, ((StorageBlock)other.block()).removeItem(other, entity.sortItem));
+                if(other.block() instanceof StorageBlock && entity.items.total() == 0 &&
+                        ((StorageBlock) other.block()).hasItem(other, entity.sortItem)){
+                    offloadNear(tile, ((StorageBlock) other.block()).removeItem(other, entity.sortItem));
                 }
             });
         }
 
-        if(entity.items.totalItems() > 0){
+        if(entity.items.total() > 0){
             tryDump(tile);
         }
     }
@@ -66,17 +72,11 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
         return new SortedUnloaderEntity();
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
-    public static void setSortedUnloaderItem(Player player, Tile tile, Item item){
-        SortedUnloaderEntity entity = tile.entity();
-        entity.sortItem = item;
-    }
-
     public static class SortedUnloaderEntity extends TileEntity{
         public Item sortItem = Items.tungsten;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException {
+        public void write(DataOutputStream stream) throws IOException{
             stream.writeByte(sortItem.id);
         }
 

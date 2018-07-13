@@ -15,11 +15,27 @@ public abstract class Upgrade implements Content{
     public final String description;
 
     public Upgrade(String name){
-        this.id = lastid ++;
+        this.id = lastid++;
         this.name = name;
-        this.description = Bundles.get("upgrade."+name+".description");
+        this.description = Bundles.get("upgrade." + name + ".description");
 
         upgrades.add(this);
+    }
+
+    public static <T extends Upgrade> void forEach(Consumer<T> type, Predicate<Upgrade> pred){
+        for(Upgrade u : upgrades){
+            if(pred.test(u)){
+                type.accept((T) u);
+            }
+        }
+    }
+
+    public static Array<Upgrade> all(){
+        return upgrades;
+    }
+
+    public static <T extends Upgrade> T getByID(byte id){
+        return (T) upgrades.get(id);
     }
 
     public String localizedName(){
@@ -32,23 +48,7 @@ public abstract class Upgrade implements Content{
     }
 
     @Override
-    public Array<? extends Content> getAll() {
+    public Array<? extends Content> getAll(){
         return all();
-    }
-
-    public static <T extends Upgrade> void forEach(Consumer<T> type, Predicate<Upgrade> pred){
-        for(Upgrade u : upgrades){
-            if(pred.test(u)){
-                type.accept((T)u);
-            }
-        }
-    }
-
-    public static Array<Upgrade> all() {
-        return upgrades;
-    }
-
-    public static <T extends Upgrade> T getByID(byte id){
-        return (T)upgrades.get(id);
     }
 }

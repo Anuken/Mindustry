@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.mapgen;
 
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
@@ -26,233 +27,236 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 
-public class WorldGenerator {
-	static int oreIndex = 0;
-	
-	/**Should fill spawns with the correct spawnpoints.*/
-	public static void loadTileData(Tile[][] tiles, MapTileData data, boolean genOres, int seed){
-		data.position(0, 0);
-		TileDataMarker marker = data.newDataMarker();
+public class WorldGenerator{
+    static int oreIndex = 0;
 
-		for(int y = 0; y < data.height(); y ++){
-			for(int x = 0; x < data.width(); x ++){
-				data.read(marker);
-				
-				tiles[x][y] = new Tile(x, y, marker.floor, marker.wall == Blocks.blockpart.id ? 0 : marker.wall, marker.rotation, marker.team, marker.elevation);
-			}
-		}
+    /**
+     * Should fill spawns with the correct spawnpoints.
+     */
+    public static void loadTileData(Tile[][] tiles, MapTileData data, boolean genOres, int seed){
+        data.position(0, 0);
+        TileDataMarker marker = data.newDataMarker();
 
-		prepareTiles(tiles, seed, genOres);
-	}
+        for(int y = 0; y < data.height(); y++){
+            for(int x = 0; x < data.width(); x++){
+                data.read(marker);
 
-	public static void prepareTiles(Tile[][] tiles, int seed, boolean genOres){
-		
-		//find multiblocks
-		IntArray multiblocks = new IntArray();
+                tiles[x][y] = new Tile(x, y, marker.floor, marker.wall == Blocks.blockpart.id ? 0 : marker.wall, marker.rotation, marker.team, marker.elevation);
+            }
+        }
 
-		for(int x = 0; x < tiles.length; x ++) {
-			for (int y = 0; y < tiles[0].length; y++) {
-				Tile tile = tiles[x][y];
-				
-				Team team = tile.getTeam();
+        prepareTiles(tiles, seed, genOres);
+    }
 
-				if(tile.block() == StorageBlocks.core &&
-						state.teams.has(team)){
-					state.teams.get(team).cores.add(tile);
-				}
-				
-				if(tiles[x][y].block().isMultiblock()){
-					multiblocks.add(tiles[x][y].packedPosition());
-				}
-			}
-		}
+    public static void prepareTiles(Tile[][] tiles, int seed, boolean genOres){
 
-		//place multiblocks now
-		for(int i = 0; i < multiblocks.size; i ++){
-			int pos = multiblocks.get(i);
+        //find multiblocks
+        IntArray multiblocks = new IntArray();
 
-			int x = pos % tiles.length;
-			int y = pos / tiles[0].length;
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
 
-			Block result = tiles[x][y].block();
-			Team team = tiles[x][y].getTeam();
+                Team team = tile.getTeam();
 
-			int offsetx = -(result.size-1)/2;
-			int offsety = -(result.size-1)/2;
+                if(tile.block() == StorageBlocks.core &&
+                        state.teams.has(team)){
+                    state.teams.get(team).cores.add(tile);
+                }
 
-			for(int dx = 0; dx < result.size; dx ++){
-				for(int dy = 0; dy < result.size; dy ++){
-					int worldx = dx + offsetx + x;
-					int worldy = dy + offsety + y;
-					if(!(worldx == x && worldy == y)){
-						Tile toplace = world.tile(worldx, worldy);
-						if(toplace != null) {
-							toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));
-							toplace.setTeam(team);
-						}
-					}
-				}
-			}
-		}
+                if(tiles[x][y].block().isMultiblock()){
+                    multiblocks.add(tiles[x][y].packedPosition());
+                }
+            }
+        }
 
-		//update cliffs, occlusion data
-		for(int x = 0; x < tiles.length; x ++){
-			for(int y = 0; y < tiles[0].length; y ++) {
-				Tile tile = tiles[x][y];
+        //place multiblocks now
+        for(int i = 0; i < multiblocks.size; i++){
+            int pos = multiblocks.get(i);
 
-				tile.updateOcclusion();
+            int x = pos % tiles.length;
+            int y = pos / tiles[0].length;
 
-				//fix things on cliffs that shouldn't be
-				if(tile.block() != Blocks.air && tile.cliffs != 0){
-					tile.setBlock(Blocks.air);
-				}
-			}
-		}
+            Block result = tiles[x][y].block();
+            Team team = tiles[x][y].getTeam();
 
-		oreIndex = 0;
+            int offsetx = -(result.size - 1) / 2;
+            int offsety = -(result.size - 1) / 2;
 
-		if(genOres) {
-			Array<OreEntry> ores = Array.with(
-					new OreEntry(Items.tungsten, 0.3f, seed),
-					new OreEntry(Items.coal, 0.284f, seed),
-					new OreEntry(Items.lead, 0.28f, seed),
-					new OreEntry(Items.titanium, 0.27f, seed),
-					new OreEntry(Items.thorium, 0.26f, seed)
-			);
+            for(int dx = 0; dx < result.size; dx++){
+                for(int dy = 0; dy < result.size; dy++){
+                    int worldx = dx + offsetx + x;
+                    int worldy = dy + offsety + y;
+                    if(!(worldx == x && worldy == y)){
+                        Tile toplace = world.tile(worldx, worldy);
+                        if(toplace != null){
+                            toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));
+                            toplace.setTeam(team);
+                        }
+                    }
+                }
+            }
+        }
 
-			for (int x = 0; x < tiles.length; x++) {
-				for (int y = 0; y < tiles[0].length; y++) {
+        //update cliffs, occlusion data
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
 
-					Tile tile = tiles[x][y];
+                tile.updateOcclusion();
 
-					if(!tile.floor().hasOres || tile.cliffs != 0 || tile.block() != Blocks.air){
-						continue;
-					}
+                //fix things on cliffs that shouldn't be
+                if(tile.block() != Blocks.air && tile.cliffs != 0){
+                    tile.setBlock(Blocks.air);
+                }
+            }
+        }
 
-					for(int i = ores.size-1; i >= 0; i --){
-						OreEntry entry = ores.get(i);
-						if(entry.noise.octaveNoise2D(2, 0.7, 1f / (2 + i*2), x, y)/2f +
-								entry.ridge.getValue(x, y, 1f / (28 + i*4)) >= 2.0f - entry.frequency*4.0f
-								&& entry.ridge.getValue(x+9999, y+9999, 1f/100f) > 0.4){
-							tile.setFloor((Floor) OreBlocks.get(tile.floor(), entry.item));
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
+        oreIndex = 0;
 
-	public static void generateMap(Tile[][] tiles, int seed){
-		Simplex sim = new Simplex(Mathf.random(99999));
-		Simplex sim2 = new Simplex(Mathf.random(99999));
-		Simplex sim3 = new Simplex(Mathf.random(99999));
+        if(genOres){
+            Array<OreEntry> ores = Array.with(
+                    new OreEntry(Items.tungsten, 0.3f, seed),
+                    new OreEntry(Items.coal, 0.284f, seed),
+                    new OreEntry(Items.lead, 0.28f, seed),
+                    new OreEntry(Items.titanium, 0.27f, seed),
+                    new OreEntry(Items.thorium, 0.26f, seed)
+            );
 
-		SeedRandom random = new SeedRandom(Mathf.random(99999));
+            for(int x = 0; x < tiles.length; x++){
+                for(int y = 0; y < tiles[0].length; y++){
 
-		int width = tiles.length, height = tiles[0].length;
+                    Tile tile = tiles[x][y];
 
-		ObjectMap<Block, Block> decoration = new ObjectMap<>();
+                    if(!tile.floor().hasOres || tile.cliffs != 0 || tile.block() != Blocks.air){
+                        continue;
+                    }
 
-		decoration.put(Blocks.grass, Blocks.shrub);
-		decoration.put(Blocks.stone, Blocks.rock);
-		decoration.put(Blocks.ice, Blocks.icerock);
-		decoration.put(Blocks.snow, Blocks.icerock);
-		decoration.put(Blocks.blackstone, Blocks.blackrock);
+                    for(int i = ores.size - 1; i >= 0; i--){
+                        OreEntry entry = ores.get(i);
+                        if(entry.noise.octaveNoise2D(1, 0.7, 1f / (4 + i * 2), x, y) / 4f +
+                                Math.abs(0.5f - entry.noise.octaveNoise2D(2, 0.7, 1f / (50 + i * 2), x, y)) > 0.48f &&
+                                Math.abs(0.5f - entry.noise.octaveNoise2D(1, 1, 1f / (55 + i * 4), x, y)) > 0.22f){
+                            tile.setFloor((Floor) OreBlocks.get(tile.floor(), entry.item));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				Block floor = Blocks.stone;
-				Block wall = Blocks.air;
+    public static void generateMap(Tile[][] tiles, int seed){
+        MathUtils.random.setSeed((long) (Math.random() * 99999999));
+        Simplex sim = new Simplex(Mathf.random(99999));
+        Simplex sim2 = new Simplex(Mathf.random(99999));
+        Simplex sim3 = new Simplex(Mathf.random(99999));
 
-				double elevation = sim.octaveNoise2D(3, 0.5, 1f/100, x, y) * 4.1 - 1;
-				double temp = sim3.octaveNoise2D(7, 0.53, 1f/320f, x, y);
+        SeedRandom random = new SeedRandom(Mathf.random(99999));
 
-				double r = sim2.octaveNoise2D(1, 0.6, 1f/70, x, y);
-				double edgeDist = Math.max(width/2, height/2) - Math.max(Math.abs(x - width/2), Math.abs(y - height/2));
-				double dst = Vector2.dst(width/2, height/2, x, y);
-				double elevDip = 30;
+        int width = tiles.length, height = tiles[0].length;
 
-				double border = 14;
+        ObjectMap<Block, Block> decoration = new ObjectMap<>();
 
-				if(edgeDist < border){
-					elevation += (border - edgeDist)/6.0;
-				}
+        decoration.put(Blocks.grass, Blocks.shrub);
+        decoration.put(Blocks.stone, Blocks.rock);
+        decoration.put(Blocks.ice, Blocks.icerock);
+        decoration.put(Blocks.snow, Blocks.icerock);
+        decoration.put(Blocks.blackstone, Blocks.blackrock);
 
-				if(temp < 0.35){
-					floor = Blocks.snow;
-				}else if(temp < 0.45){
-					floor = Blocks.stone;
-				}else if(temp < 0.65){
-					floor = Blocks.grass;
-				}else if(temp < 0.8){
-					floor = Blocks.sand;
-				}else if(temp < 0.9){
-					floor = Blocks.blackstone;
-					elevation = 0f;
-				}else{
-					floor = Blocks.lava;
-				}
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                Block floor = Blocks.stone;
+                Block wall = Blocks.air;
 
-				if(dst < elevDip){
-					elevation -= (elevDip - dst)/elevDip * 3.0;
-				}else if(r > 0.9){
-					floor = Blocks.water;
-					elevation = 0;
+                double elevation = sim.octaveNoise2D(3, 0.5, 1f / 100, x, y) * 4.1 - 1;
+                double temp = sim3.octaveNoise2D(7, 0.54, 1f / 320f, x, y);
 
-					if(r > 0.94){
-						floor = Blocks.deepwater;
-					}
-				}
+                double r = sim2.octaveNoise2D(1, 0.6, 1f / 70, x, y);
+                double edgeDist = Math.max(width / 2, height / 2) - Math.max(Math.abs(x - width / 2), Math.abs(y - height / 2));
+                double dst = Vector2.dst(width / 2, height / 2, x, y);
+                double elevDip = 30;
 
-				if(wall == Blocks.air && decoration.containsKey(floor) && random.chance(0.03)){
-					wall = decoration.get(floor);
-				}
+                double border = 14;
 
-				Tile tile = new Tile(x, y, (byte)floor.id, (byte)wall.id);
-				tile.elevation = (byte)Math.max(elevation, 0);
-				tiles[x][y] = tile;
-			}
-		}
+                if(edgeDist < border){
+                    elevation += (border - edgeDist) / 6.0;
+                }
 
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				Tile tile = tiles[x][y];
+                if(temp < 0.35){
+                    floor = Blocks.snow;
+                }else if(temp < 0.45){
+                    floor = Blocks.stone;
+                }else if(temp < 0.65){
+                    floor = Blocks.grass;
+                }else if(temp < 0.8){
+                    floor = Blocks.sand;
+                }else if(temp < 0.9){
+                    floor = Blocks.blackstone;
+                    elevation = 0f;
+                }else{
+                    floor = Blocks.lava;
+                }
 
-				byte elevation = tile.elevation;
+                if(dst < elevDip){
+                    elevation -= (elevDip - dst) / elevDip * 3.0;
+                }else if(r > 0.9){
+                    floor = Blocks.water;
+                    elevation = 0;
 
-				for(GridPoint2 point : Geometry.d4){
-					if(!Mathf.inBounds(x + point.x, y + point.y, width, height)) continue;
-					if(tiles[x + point.x][y + point.y].elevation < elevation){
+                    if(r > 0.94){
+                        floor = Blocks.deepwater;
+                    }
+                }
 
-						if(Mathf.chance(0.05)){
-							tile.elevation = -1;
-						}
-						break;
-					}
-				}
-			}
-		}
+                if(wall == Blocks.air && decoration.containsKey(floor) && random.chance(0.03)){
+                    wall = decoration.get(floor);
+                }
 
-		tiles[width/2][height/2].setBlock(StorageBlocks.core);
-		tiles[width/2][height/2].setTeam(Team.blue);
-		
-		prepareTiles(tiles, seed, true);
-	}
+                Tile tile = new Tile(x, y, (byte) floor.id, (byte) wall.id);
+                tile.elevation = (byte) Math.max(elevation, 0);
+                tiles[x][y] = tile;
+            }
+        }
 
-	static class OreEntry{
-		final float frequency;
-		final Item item;
-		final Simplex noise;
-		final RidgedPerlin ridge;
-		final int index;
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                Tile tile = tiles[x][y];
 
-		OreEntry(Item item, float frequency, int seed) {
-			this.frequency = frequency;
-			this.item = item;
-			this.noise = new Simplex(seed + oreIndex);
-			this.ridge = new RidgedPerlin(seed + oreIndex, 2);
-			this.index = oreIndex ++;
-		}
-	}
+                byte elevation = tile.elevation;
+
+                for(GridPoint2 point : Geometry.d4){
+                    if(!Mathf.inBounds(x + point.x, y + point.y, width, height)) continue;
+                    if(tiles[x + point.x][y + point.y].elevation < elevation){
+
+                        if(Mathf.chance(0.05)){
+                            tile.elevation = -1;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        tiles[width / 2][height / 2].setBlock(StorageBlocks.core);
+        tiles[width / 2][height / 2].setTeam(Team.blue);
+
+        prepareTiles(tiles, seed, true);
+    }
+
+    public static class OreEntry{
+        final float frequency;
+        final Item item;
+        final Simplex noise;
+        final RidgedPerlin ridge;
+        final int index;
+
+        OreEntry(Item item, float frequency, int seed){
+            this.frequency = frequency;
+            this.item = item;
+            this.noise = new Simplex(seed + oreIndex);
+            this.ridge = new RidgedPerlin(seed + oreIndex, 2);
+            this.index = oreIndex++;
+        }
+    }
 }

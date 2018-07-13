@@ -14,12 +14,12 @@ public class PhaseWeaver extends PowerSmelter{
     protected TextureRegion bottomRegion;
     protected TextureRegion weaveRegion;
 
-    public PhaseWeaver(String name) {
+    public PhaseWeaver(String name){
         super(name);
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
 
         bottomRegion = Draw.region(name + "-bottom");
@@ -27,7 +27,7 @@ public class PhaseWeaver extends PowerSmelter{
     }
 
     @Override
-    public TextureRegion[] getIcon() {
+    public TextureRegion[] getIcon(){
         if(icon == null){
             icon = new TextureRegion[]{Draw.region(name + "-bottom"), Draw.region(name)};
         }
@@ -35,7 +35,7 @@ public class PhaseWeaver extends PowerSmelter{
     }
 
     @Override
-    public void draw(Tile tile) {
+    public void draw(Tile tile){
         PowerSmelterEntity entity = tile.entity();
 
         Draw.rect(bottomRegion, tile.drawx(), tile.drawy());
@@ -59,11 +59,11 @@ public class PhaseWeaver extends PowerSmelter{
                     tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
                     tile.drawy(),
                     90,
-                    size * Vars.tilesize /2f);
+                    size * Vars.tilesize / 2f);
 
             Draw.reset();
         }
 
-        Draw.rect(name, tile.drawx(), tile.drawy());
+        Draw.rect(region, tile.drawx(), tile.drawy());
     }
 }

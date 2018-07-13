@@ -11,6 +11,11 @@ import java.io.IOException;
 public class Streamable implements Packet{
     public transient ByteArrayInputStream stream;
 
+    @Override
+    public boolean isImportant(){
+        return true;
+    }
+
     public static class StreamBuilder{
         public final int id;
         public final Class<? extends Streamable> type;
@@ -25,15 +30,15 @@ public class Streamable implements Packet{
         }
 
         public void add(byte[] bytes){
-            try {
+            try{
                 stream.write(bytes);
-            }catch (IOException e){
+            }catch(IOException e){
                 throw new RuntimeException(e);
             }
         }
 
         public Streamable build(){
-            try {
+            try{
                 Streamable s = ClassReflection.newInstance(type);
                 s.stream = new ByteArrayInputStream(stream.toByteArray());
                 return s;
@@ -45,10 +50,5 @@ public class Streamable implements Packet{
         public boolean isDone(){
             return stream.size() >= total;
         }
-    }
-
-    @Override
-    public boolean isImportant() {
-        return true;
     }
 }

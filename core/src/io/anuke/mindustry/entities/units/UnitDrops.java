@@ -6,7 +6,7 @@ import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.util.Mathf;
 
-public class UnitDrops {
+public class UnitDrops{
     private static final int maxItems = 200;
     private static Item[] dropTable;
 
@@ -19,7 +19,7 @@ public class UnitDrops {
             dropTable = new Item[]{Items.tungsten, Items.lead, Items.carbide};
         }
 
-        for (int i = 0; i < 3; i++) {
+        for(int i = 0; i < 3; i++){
             for(Item item : dropTable){
                 if(Mathf.chance(0.03)){
                     int amount = Mathf.random(20, 40);

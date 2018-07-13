@@ -5,8 +5,8 @@ import io.anuke.ucore.scene.ui.Dialog;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class RestartDialog extends Dialog {
-    
+public class RestartDialog extends Dialog{
+
     public RestartDialog(){
         super("$text.gameover", "dialog");
 
@@ -21,7 +21,7 @@ public class RestartDialog extends Dialog {
             pack();
         });
 
-        getButtonTable().addButton("$text.menu", ()-> {
+        getButtonTable().addButton("$text.menu", () -> {
             hide();
             state.set(State.menu);
             logic.reset();

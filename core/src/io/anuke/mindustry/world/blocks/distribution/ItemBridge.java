@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
@@ -29,16 +30,17 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
-public class ItemBridge extends Block {
+public class ItemBridge extends Block{
     protected static int lastPlaced;
 
     protected int timerTransport = timers++;
     protected int range;
-    protected float powerUse = 0.05f;
     protected float transportTime = 2f;
     protected IntArray removals = new IntArray();
 
-    public ItemBridge(String name) {
+    protected TextureRegion endRegion, bridgeRegion, arrowRegion;
+
+    public ItemBridge(String name){
         super(name);
         update = true;
         solid = true;
@@ -50,8 +52,35 @@ public class ItemBridge extends Block {
         hasItems = true;
     }
 
+    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+    public static void linkItemBridge(Player player, Tile tile, Tile other){
+        ItemBridgeEntity entity = tile.entity();
+        ItemBridgeEntity oe = other.entity();
+        entity.link = other.packedPosition();
+        oe.incoming.add(tile.packedPosition());
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    public static void unlinkItemBridge(Player player, Tile tile, Tile other){
+        ItemBridgeEntity entity = tile.entity();
+        entity.link = -1;
+        if(other != null){
+            ItemBridgeEntity oe = other.entity();
+            oe.incoming.remove(tile.packedPosition());
+        }
+    }
+
     @Override
-    public void placed(Tile tile) {
+    public void load(){
+        super.load();
+
+        endRegion = Draw.region(name + "-end");
+        bridgeRegion = Draw.region(name + "-bridge");
+        arrowRegion = Draw.region(name + "-arrow");
+    }
+
+    @Override
+    public void placed(Tile tile){
         Tile last = world.tile(lastPlaced);
         if(linkValid(tile, last)){
             ItemBridgeEntity entity = last.entity();
@@ -63,13 +92,13 @@ public class ItemBridge extends Block {
     }
 
     @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid) {
+    public void drawPlace(int x, int y, int rotation, boolean valid){
         Lines.stroke(2f);
         Draw.color(Palette.placing);
-        for(int i = 0; i < 4; i ++){
+        for(int i = 0; i < 4; i++){
             Lines.dashLine(
-                    x * tilesize + Geometry.d4[i].x * (tilesize/2f + 2),
-                    y * tilesize + Geometry.d4[i].y * (tilesize/2f + 2),
+                    x * tilesize + Geometry.d4[i].x * (tilesize / 2f + 2),
+                    y * tilesize + Geometry.d4[i].y * (tilesize / 2f + 2),
                     x * tilesize + Geometry.d4[i].x * range * tilesize,
                     y * tilesize + Geometry.d4[i].y * range * tilesize,
                     range);
@@ -87,8 +116,8 @@ public class ItemBridge extends Block {
         Lines.square(tile.drawx(), tile.drawy(),
                 tile.block().size * tilesize / 2f + 1f);
 
-        for(int i = 1; i <= range; i ++){
-            for(int j = 0; j < 4; j ++){
+        for(int i = 1; i <= range; i++){
+            for(int j = 0; j < 4; j++){
                 Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
                 if(linkValid(tile, other)){
                     boolean linked = other.packedPosition() == entity.link;
@@ -104,7 +133,7 @@ public class ItemBridge extends Block {
     }
 
     @Override
-    public boolean onConfigureTileTapped(Tile tile, Tile other) {
+    public boolean onConfigureTileTapped(Tile tile, Tile other){
         ItemBridgeEntity entity = tile.entity();
 
         if(linkValid(tile, other)){
@@ -119,11 +148,11 @@ public class ItemBridge extends Block {
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         ItemBridgeEntity entity = tile.entity();
 
-        entity.time += entity.cycleSpeed*Timers.delta();
-        entity.time2 += (entity.cycleSpeed-1f)*Timers.delta();
+        entity.time += entity.cycleSpeed * Timers.delta();
+        entity.time2 += (entity.cycleSpeed - 1f) * Timers.delta();
 
         removals.clear();
 
@@ -137,7 +166,7 @@ public class ItemBridge extends Block {
             }
         }
 
-        for(int j = 0; j < removals.size; j ++)
+        for(int j = 0; j < removals.size; j++)
             entity.incoming.remove(removals.get(j));
 
         Tile other = world.tile(entity.link);
@@ -145,11 +174,9 @@ public class ItemBridge extends Block {
             tryDump(tile);
             entity.uptime = 0f;
         }else{
-            float use = Math.min(powerCapacity, powerUse * Timers.delta());
 
-            if(!hasPower || entity.power.amount >= use){
+            if(entity.cons.valid()){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
-                if(hasPower) entity.power.amount -= use;
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
             }
@@ -162,19 +189,19 @@ public class ItemBridge extends Block {
         ItemBridgeEntity entity = tile.entity();
 
         if(entity.uptime >= 0.5f && entity.timer.get(timerTransport, transportTime)){
-            Item item = entity.items.takeItem();
+            Item item = entity.items.take();
             if(item != null && other.block().acceptItem(item, other, tile)){
                 other.block().handleItem(item, other, tile);
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 4f, 0.05f);
             }else{
                 entity.cycleSpeed = Mathf.lerpDelta(entity.cycleSpeed, 1f, 0.01f);
-                if(item != null) entity.items.addItem(item, 1);
+                if(item != null) entity.items.add(item, 1);
             }
         }
     }
 
     @Override
-    public void drawLayer(Tile tile) {
+    public void drawLayer(Tile tile){
         ItemBridgeEntity entity = tile.entity();
 
         Tile other = world.tile(entity.link);
@@ -185,40 +212,65 @@ public class ItemBridge extends Block {
         Draw.color(Color.WHITE, Color.BLACK, Mathf.absin(Timers.time(), 6f, 0.07f));
         Draw.alpha(Math.max(entity.uptime, 0.25f));
 
-        Draw.rect(name + "-end", tile.drawx(), tile.drawy(), i*90 + 90);
-        Draw.rect(name + "-end", other.drawx(), other.drawy(), i*90 + 270);
+        Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);
+        Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
 
         Lines.stroke(8f);
-        Lines.line(Draw.region(name + "-bridge"),
+        Lines.line(bridgeRegion,
                 tile.worldx(),
                 tile.worldy(),
                 other.worldx(),
-                other.worldy(), CapStyle.none, -tilesize/2f);
+                other.worldy(), CapStyle.none, -tilesize / 2f);
 
         int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y));
 
-        float time = entity.time2/1.7f;
-        int arrows = (dist)*tilesize/4-2;
+        float time = entity.time2 / 1.7f;
+        int arrows = (dist) * tilesize / 4 - 2;
 
         Draw.color();
 
-        for(int a = 0; a < arrows; a ++){
-            Draw.alpha(Mathf.absin(a/(float)arrows - entity.time/100f, 0.1f, 1f) * entity.uptime);
-            Draw.rect(name + "-arrow",
-                    tile.worldx() + Geometry.d4[i].x*(tilesize/2f + a*4f + time % 4f),
-                    tile.worldy() + Geometry.d4[i].y*(tilesize/2f + a*4f + time % 4f),
-                    i*90f);
+        for(int a = 0; a < arrows; a++){
+            Draw.alpha(Mathf.absin(a / (float) arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime);
+            Draw.rect(arrowRegion,
+                    tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 4f + time % 4f),
+                    tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f),
+                    i * 90f);
         }
         Draw.reset();
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.items.totalItems() < itemCapacity;
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        ItemBridgeEntity entity = tile.entity();
+        Tile other = world.tile(entity.link);
+        boolean linked = false;
+
+        if(linkValid(tile, other)){
+            linked = true;
+            int rel = tile.absoluteRelativeTo(other.x, other.y);
+            int rel2 = tile.relativeTo(source.x, source.y);
+
+            if(rel == rel2) return false;
+        }else{
+            int i = tile.relativeTo(source.x, source.y);
+
+            IntSetIterator it = entity.incoming.iterator();
+
+            while(it.hasNext){
+                int v = it.next();
+                int x = v % world.width();
+                int y = v / world.width();
+                if(tile.absoluteRelativeTo(x, y) == i){
+                    return false;
+                }
+            }
+        }
+
+        return tile.entity.items.total() < itemCapacity && (linked || source.block() instanceof ItemBridge);
     }
 
     @Override
-    public boolean canDump(Tile tile, Tile to, Item item) {
+    public boolean canDump(Tile tile, Tile to, Item item){
         ItemBridgeEntity entity = tile.entity();
 
         Tile other = world.tile(entity.link);
@@ -245,7 +297,7 @@ public class ItemBridge extends Block {
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new ItemBridgeEntity();
     }
 
@@ -266,24 +318,6 @@ public class ItemBridge extends Block {
         return other.block() == this && (!checkDouble || other.<ItemBridgeEntity>entity().link != tile.packedPosition());
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
-    public static void linkItemBridge(Player player, Tile tile, Tile other){
-        ItemBridgeEntity entity = tile.entity();
-        ItemBridgeEntity oe = other.entity();
-        entity.link = other.packedPosition();
-        oe.incoming.add(tile.packedPosition());
-    }
-
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
-    public static void unlinkItemBridge(Player player, Tile tile, Tile other){
-        ItemBridgeEntity entity = tile.entity();
-        entity.link = -1;
-        if(other != null) {
-            ItemBridgeEntity oe = other.entity();
-            oe.incoming.remove(tile.packedPosition());
-        }
-    }
-
     public static class ItemBridgeEntity extends TileEntity{
         public int link = -1;
         public IntSet incoming = new IntSet();
@@ -293,7 +327,7 @@ public class ItemBridge extends Block {
         public float cycleSpeed = 1f;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException {
+        public void write(DataOutputStream stream) throws IOException{
             stream.writeInt(link);
             stream.writeFloat(uptime);
             stream.writeByte(incoming.size);
@@ -306,11 +340,11 @@ public class ItemBridge extends Block {
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException {
+        public void read(DataInputStream stream) throws IOException{
             link = stream.readInt();
             uptime = stream.readFloat();
             byte links = stream.readByte();
-            for(int i = 0; i < links; i ++){
+            for(int i = 0; i < links; i++){
                 incoming.add(stream.readInt());
             }
         }

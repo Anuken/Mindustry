@@ -33,7 +33,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public class MechFactory extends Block{
     protected Mech mech;
-    protected float buildTime = 60*5;
+    protected float buildTime = 60 * 5;
 
     protected TextureRegion openRegion;
 
@@ -44,14 +44,53 @@ public class MechFactory extends Block{
         solidifes = true;
     }
 
+    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks)
+    public static void onMechFactoryTap(Player player, Tile tile){
+        if(!checkValidTap(tile, player)) return;
+
+        MechFactoryEntity entity = tile.entity();
+        player.beginRespawning(entity);
+    }
+
+    @Remote(called = Loc.server, in = In.blocks)
+    public static void onMechFactoryDone(Tile tile){
+        MechFactoryEntity entity = tile.entity();
+
+        Effects.effect(Fx.spawn, entity);
+
+        if(entity.player == null) return;
+
+        Mech result = ((MechFactory) tile.block()).mech;
+
+        if(entity.player.mech == result){
+            entity.player.mech = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
+        }else{
+            entity.player.mech = result;
+        }
+
+        entity.progress = 0;
+        entity.player.heal();
+        entity.open = true;
+        entity.player.setDead(false);
+        entity.player.inventory.clear();
+        entity.player = null;
+    }
+
+    protected static boolean checkValidTap(Tile tile, Player player){
+        MechFactoryEntity entity = tile.entity();
+        return Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
+                Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.player == null;
+    }
+
     @Override
-    public boolean isSolidFor(Tile tile) {
+    public boolean isSolidFor(Tile tile){
         MechFactoryEntity entity = tile.entity();
         return !entity.open;
     }
 
     @Override
-    public void tapped(Tile tile, Player player) {
+    public void tapped(Tile tile, Player player){
+        if(mobile && !mech.flying) return;
 
         if(checkValidTap(tile, player)){
             CallBlocks.onMechFactoryTap(player, tile);
@@ -61,18 +100,18 @@ public class MechFactory extends Block{
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
         openRegion = Draw.region(name + "-open");
     }
 
     @Override
-    public void draw(Tile tile) {
+    public void draw(Tile tile){
         MechFactoryEntity entity = tile.entity();
 
         Draw.rect(entity.open ? openRegion : Draw.region(name), tile.drawx(), tile.drawy());
 
-        if(entity.player != null) {
+        if(entity.player != null){
             TextureRegion region = mech.iconRegion;
 
             if(entity.player.mech == mech){
@@ -102,7 +141,7 @@ public class MechFactory extends Block{
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         MechFactoryEntity entity = tile.entity();
 
         if(entity.open){
@@ -132,46 +171,8 @@ public class MechFactory extends Block{
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new MechFactoryEntity();
-    }
-
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks)
-    public static void onMechFactoryTap(Player player, Tile tile){
-        if(!checkValidTap(tile, player)) return;
-
-        MechFactoryEntity entity = tile.entity();
-        player.beginRespawning(entity);
-    }
-
-    @Remote(called = Loc.server, in = In.blocks)
-    public static void onMechFactoryDone(Tile tile){
-        MechFactoryEntity entity = tile.entity();
-
-        Effects.effect(Fx.spawn, entity);
-
-        if(entity.player == null) return;
-
-        Mech result = ((MechFactory)tile.block()).mech;
-
-        if(entity.player.mech == result){
-            entity.player.mech = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
-        }else{
-            entity.player.mech = result;
-        }
-
-        entity.progress = 0;
-        entity.player.heal();
-        entity.open = true;
-        entity.player.setDead(false);
-        entity.player.inventory.clear();
-        entity.player = null;
-    }
-
-    protected static boolean checkValidTap(Tile tile, Player player){
-        MechFactoryEntity entity = tile.entity();
-        return Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
-                Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.player == null;
     }
 
     public class MechFactoryEntity extends TileEntity implements SpawnerTrait{
@@ -182,12 +183,13 @@ public class MechFactory extends Block{
         boolean open;
 
         @Override
-        public void updateSpawning(Unit unit) {
-            if(!(unit instanceof Player)) throw new IllegalArgumentException("Mech factories only accept player respawners.");
+        public void updateSpawning(Unit unit){
+            if(!(unit instanceof Player))
+                throw new IllegalArgumentException("Mech factories only accept player respawners.");
 
             if(player == null){
                 progress = 0f;
-                player = (Player)unit;
+                player = (Player) unit;
 
                 player.rotation = 90f;
                 player.baseRotation = 90f;
@@ -197,19 +199,19 @@ public class MechFactory extends Block{
         }
 
         @Override
-        public float getSpawnProgress() {
+        public float getSpawnProgress(){
             return progress;
         }
 
         @Override
-        public void write(DataOutputStream stream) throws IOException {
+        public void write(DataOutputStream stream) throws IOException{
             stream.writeFloat(progress);
             stream.writeFloat(time);
             stream.writeFloat(heat);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException {
+        public void read(DataInputStream stream) throws IOException{
             progress = stream.readFloat();
             time = stream.readFloat();
             heat = stream.readFloat();

@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
-public class OreBlock extends Floor {
+public class OreBlock extends Floor{
     public Floor base;
 
     public OreBlock(Item ore, Floor base){
@@ -32,7 +32,7 @@ public class OreBlock extends Floor {
 
     @Override
     public void draw(Tile tile){
-        Draw.rect(variantRegions[Mathf.randomSeed(tile.id(), 0, Math.max(0, variantRegions.length-1))], tile.worldx(), tile.worldy());
+        Draw.rect(variantRegions[Mathf.randomSeed(tile.id(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
 
         drawEdges(tile, false);
     }
@@ -45,7 +45,7 @@ public class OreBlock extends Floor {
     }
 
     @Override
-    public boolean blendOverride(Block block) {
+    public boolean blendOverride(Block block){
         return block == base;
     }
 }

@@ -27,7 +27,10 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.ThreadArray;
+import io.anuke.ucore.util.Translator;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -36,297 +39,304 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class Turret extends Block{
-	protected static final int targetInterval = 15;
-	
-	protected final int timerTarget = timers++;
+    protected static final int targetInterval = 15;
 
-	protected Color heatColor = Palette.turretHeat;
-	protected Effect shootEffect = Fx.none;
-	protected Effect smokeEffect = Fx.none;
-	protected Effect ammoUseEffect = Fx.none;
+    protected final int timerTarget = timers++;
+
+    protected Color heatColor = Palette.turretHeat;
+    protected Effect shootEffect = Fx.none;
+    protected Effect smokeEffect = Fx.none;
+    protected Effect ammoUseEffect = Fx.none;
 
     protected int ammoPerShot = 1;
     protected float ammoEjectBack = 1f;
-	protected float range = 50f;
-	protected float reload = 10f;
-	protected float inaccuracy = 0f;
-	protected int shots = 1;
-	protected float recoil = 1f;
-	protected float restitution = 0.02f;
-	protected float cooldown = 0.02f;
-	protected float rotatespeed = 5f; //in degrees per tick
-	protected float shootCone = 8f;
-	protected float shootShake = 0f;
-	protected boolean targetAir = true;
+    protected float range = 50f;
+    protected float reload = 10f;
+    protected float inaccuracy = 0f;
+    protected int shots = 1;
+    protected float recoil = 1f;
+    protected float restitution = 0.02f;
+    protected float cooldown = 0.02f;
+    protected float rotatespeed = 5f; //in degrees per tick
+    protected float shootCone = 8f;
+    protected float shootShake = 0f;
+    protected boolean targetAir = true;
 
-	protected Translator tr = new Translator();
-	protected Translator tr2 = new Translator();
+    protected Translator tr = new Translator();
+    protected Translator tr2 = new Translator();
 
-	protected TextureRegion baseRegion;
-	protected TextureRegion heatRegion;
-	protected TextureRegion baseTopRegion;
+    protected TextureRegion baseRegion;
+    protected TextureRegion heatRegion;
+    protected TextureRegion baseTopRegion;
 
-    protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(name, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-	protected BiConsumer<Tile, TurretEntity> heatDrawer = (tile, entity) ->{
-		Graphics.setAdditiveBlending();
-		Draw.color(heatColor);
-		Draw.alpha(entity.heat);
-		Draw.rect(heatRegion, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-		Graphics.setNormalBlending();
-	};
+    protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+    protected BiConsumer<Tile, TurretEntity> heatDrawer = (tile, entity) -> {
+        if(entity.heat <= 0.00001f) return;
+        Graphics.setAdditiveBlending();
+        Draw.color(heatColor);
+        Draw.alpha(entity.heat);
+        Draw.rect(heatRegion, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+        Graphics.setNormalBlending();
+    };
 
-	public Turret(String name) {
-		super(name);
-		update = true;
-		solid = true;
-		layer = Layer.turret;
-		group = BlockGroup.turrets;
-	}
+    public Turret(String name){
+        super(name);
+        update = true;
+        solid = true;
+        layer = Layer.turret;
+        group = BlockGroup.turrets;
+    }
 
-	@Override
-	public void init() {
-		super.init();
-		viewRange = range;
-	}
+    @Override
+    public void init(){
+        super.init();
+        viewRange = range;
+    }
 
-	@Override
-	public void load() {
-		super.load();
+    @Override
+    public void load(){
+        super.load();
 
-		baseRegion = Draw.region("block-" + size);
-		baseTopRegion = Draw.region("block-" +size + "-top");
-		heatRegion = Draw.region(name + "-heat");
-	}
+        baseRegion = Draw.region("block-" + size);
+        baseTopRegion = Draw.region("block-" + size + "-top");
+        heatRegion = Draw.region(name + "-heat");
+    }
 
-	@Override
-	public void setStats(){
-		super.setStats();
+    @Override
+    public void setStats(){
+        super.setStats();
 		/*
 		if(ammo != null) stats.add("ammo", ammo);
 		if(ammo != null) stats.add("ammocapacity", maxAmmo);
 		if(ammo != null) stats.add("ammoitem", ammoMultiplier);*/
 
-		stats.add(BlockStat.shootRange, range, StatUnit.blocks);
-		stats.add(BlockStat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-		stats.add(BlockStat.reload, 60f/reload, StatUnit.seconds);
-		stats.add(BlockStat.shots, shots, StatUnit.none);
-		stats.add(BlockStat.targetsAir, targetAir);
-	}
-	
-	@Override
-	public void draw(Tile tile){
-		Draw.rect(baseRegion, tile.drawx(), tile.drawy());
-		Draw.color(tile.getTeam().color, Color.WHITE, 0.45f);
-		Draw.rect(baseTopRegion, tile.drawx(), tile.drawy());
-		Draw.color();
-	}
-	
-	@Override
-	public void drawLayer(Tile tile){
-		TurretEntity entity = tile.entity();
+        stats.add(BlockStat.shootRange, range, StatUnit.blocks);
+        stats.add(BlockStat.inaccuracy, (int) inaccuracy, StatUnit.degrees);
+        stats.add(BlockStat.reload, 60f / reload, StatUnit.seconds);
+        stats.add(BlockStat.shots, shots, StatUnit.none);
+        stats.add(BlockStat.targetsAir, targetAir);
+    }
 
-		tr2.trns(entity.rotation, -entity.recoil);
+    @Override
+    public void draw(Tile tile){
+        Draw.rect(baseRegion, tile.drawx(), tile.drawy());
+        Draw.color(tile.getTeam().color, Color.WHITE, 0.45f);
+        Draw.rect(baseTopRegion, tile.drawx(), tile.drawy());
+        Draw.color();
+    }
 
-		drawer.accept(tile, entity);
+    @Override
+    public void drawLayer(Tile tile){
+        TurretEntity entity = tile.entity();
 
-		if(Draw.hasRegion(name + "-heat")){
-			heatDrawer.accept(tile, entity);
-		}
+        tr2.trns(entity.rotation, -entity.recoil);
 
-		Draw.color();
-	}
+        drawer.accept(tile, entity);
 
-	@Override
+        if(heatRegion != null){
+            heatDrawer.accept(tile, entity);
+        }
+
+        Draw.color();
+    }
+
+    @Override
     public TextureRegion[] getBlockIcon(){
-	    if(blockIcon == null){
-	        blockIcon = new TextureRegion[]{Draw.region("block-icon-" + name)};
+        if(blockIcon == null){
+            blockIcon = new TextureRegion[]{Draw.region("block-icon-" + name)};
         }
         return blockIcon;
     }
 
     @Override
-	public TextureRegion[] getCompactIcon(){
-		if(compactIcon == null) {
-			compactIcon = new TextureRegion[]{iconRegion(Draw.region("block-icon-" + name))};
-		}
-		return compactIcon;
-	}
+    public TextureRegion[] getCompactIcon(){
+        if(compactIcon == null){
+            compactIcon = new TextureRegion[]{iconRegion(Draw.region("block-icon-" + name))};
+        }
+        return compactIcon;
+    }
 
-	@Override
-	public void drawSelect(Tile tile){
-		Draw.color(tile.getTeam().color);
-		Lines.dashCircle(tile.drawx(), tile.drawy(), range);
-		Draw.reset();
-	}
-	
-	@Override
-	public void drawPlace(int x, int y, int rotation, boolean valid){
-		Draw.color(Palette.placing);
-		Lines.stroke(1f);
-		Lines.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range);
-	}
+    @Override
+    public void drawSelect(Tile tile){
+        Draw.color(tile.getTeam().color);
+        Lines.dashCircle(tile.drawx(), tile.drawy(), range);
+        Draw.reset();
+    }
 
-	@Override
-	public void update(Tile tile){
-		TurretEntity entity = tile.entity();
-		
-		if(entity.target != null && entity.target.isDead())
-			entity.target = null;
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        Draw.color(Palette.placing);
+        Lines.stroke(1f);
+        Lines.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range);
+    }
 
-		entity.recoil = Mathf.lerpDelta(entity.recoil, 0f, restitution);
-		entity.heat = Mathf.lerpDelta(entity.heat, 0f, cooldown);
-		
-		if(hasAmmo(tile)){
-			
-			if(entity.timer.get(timerTarget, targetInterval)){
-				entity.target = Units.getClosestEnemy(tile.getTeam(),
-						tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir));
-			}
-			
-			if(entity.target != null){
-			    AmmoType type = peekAmmo(tile);
-			    float speed = type.bullet.speed;
-			    if(speed < 0.1f) speed = 9999999f;
+    @Override
+    public void update(Tile tile){
+        TurretEntity entity = tile.entity();
 
-				Vector2 result = Predict.intercept(entity, entity.target, speed);
-				if(result.isZero()){
-					result.set(entity.target.getX(), entity.target.getY());
-				}
-				
-				float targetRot = result.sub(tile.drawx(), tile.drawy()).angle();
-				
-				if(Float.isNaN(entity.rotation)){
-					entity.rotation = 0;
-				}
+        if(entity.target != null && entity.target.isDead())
+            entity.target = null;
 
-				entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * Timers.delta());
+        entity.recoil = Mathf.lerpDelta(entity.recoil, 0f, restitution);
+        entity.heat = Mathf.lerpDelta(entity.heat, 0f, cooldown);
 
-				if(Angles.angleDist(entity.rotation, targetRot) < shootCone){
-					updateShooting(tile);
-				}
-			}
-		}
-	}
+        if(hasAmmo(tile)){
 
-	/**Consume ammo and return a type.*/
-	public AmmoType useAmmo(Tile tile){
+            if(entity.timer.get(timerTarget, targetInterval)){
+                entity.target = Units.getClosestEnemy(tile.getTeam(),
+                        tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir));
+            }
+
+            if(entity.target != null){
+                AmmoType type = peekAmmo(tile);
+                float speed = type.bullet.speed;
+                if(speed < 0.1f) speed = 9999999f;
+
+                Vector2 result = Predict.intercept(entity, entity.target, speed);
+                if(result.isZero()){
+                    result.set(entity.target.getX(), entity.target.getY());
+                }
+
+                float targetRot = result.sub(tile.drawx(), tile.drawy()).angle();
+
+                if(Float.isNaN(entity.rotation)){
+                    entity.rotation = 0;
+                }
+
+                entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * Timers.delta());
+
+                if(Angles.angleDist(entity.rotation, targetRot) < shootCone){
+                    updateShooting(tile);
+                }
+            }
+        }
+    }
+
+    /**
+     * Consume ammo and return a type.
+     */
+    public AmmoType useAmmo(Tile tile){
         TurretEntity entity = tile.entity();
         AmmoEntry entry = entity.ammo.peek();
         entry.amount -= ammoPerShot;
         if(entry.amount == 0) entity.ammo.pop();
         entity.totalAmmo -= ammoPerShot;
-        Timers.run(reload/2f, () -> ejectEffects(tile));
+        Timers.run(reload / 2f, () -> ejectEffects(tile));
         return entry.type;
     }
 
-    /**Get the ammo type that will be returned if useAmmo is called.*/
+    /**
+     * Get the ammo type that will be returned if useAmmo is called.
+     */
     public AmmoType peekAmmo(Tile tile){
         TurretEntity entity = tile.entity();
         return entity.ammo.peek().type;
     }
 
-    /**Returns whether the turret has ammo.*/
-	public boolean hasAmmo(Tile tile){
-		TurretEntity entity = tile.entity();
-		return entity.ammo.size > 0 && entity.ammo.peek().amount >= ammoPerShot;
-	}
-	
-	protected void updateShooting(Tile tile){
-		TurretEntity entity = tile.entity();
+    /**
+     * Returns whether the turret has ammo.
+     */
+    public boolean hasAmmo(Tile tile){
+        TurretEntity entity = tile.entity();
+        return entity.ammo.size > 0 && entity.ammo.peek().amount >= ammoPerShot;
+    }
 
-		if(entity.reload >= reload) {
-		    AmmoType type = peekAmmo(tile);
+    protected void updateShooting(Tile tile){
+        TurretEntity entity = tile.entity();
+
+        if(entity.reload >= reload){
+            AmmoType type = peekAmmo(tile);
 
             shoot(tile, type);
 
             entity.reload = 0f;
         }else{
-			entity.reload += Timers.delta() * peekAmmo(tile).reloadMultiplier;
-		}
-	}
+            entity.reload += Timers.delta() * peekAmmo(tile).reloadMultiplier;
+        }
+    }
 
-	protected void shoot(Tile tile, AmmoType ammo){
-		TurretEntity entity = tile.entity();
+    protected void shoot(Tile tile, AmmoType ammo){
+        TurretEntity entity = tile.entity();
 
-		entity.recoil = recoil;
-		entity.heat = 1f;
+        entity.recoil = recoil;
+        entity.heat = 1f;
 
-		AmmoType type = peekAmmo(tile);
-		useAmmo(tile);
+        AmmoType type = peekAmmo(tile);
+        useAmmo(tile);
 
-		tr.trns(entity.rotation, size * tilesize / 2);
+        tr.trns(entity.rotation, size * tilesize / 2);
 
-		bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy));
+        bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy));
 
-		effects(tile);
-	}
-	
-	protected void bullet(Tile tile, BulletType type, float angle){
-		Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
-	}
+        effects(tile);
+    }
 
-	protected void effects(Tile tile){
-		Effect shootEffect = this.shootEffect == Fx.none ? peekAmmo(tile).shootEffect : this.shootEffect;
-		Effect smokeEffect = this.smokeEffect == Fx.none ? peekAmmo(tile).smokeEffect : this.smokeEffect;
+    protected void bullet(Tile tile, BulletType type, float angle){
+        Bullet.create(type, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y, angle);
+    }
 
-		TurretEntity entity = tile.entity();
+    protected void effects(Tile tile){
+        Effect shootEffect = this.shootEffect == Fx.none ? peekAmmo(tile).shootEffect : this.shootEffect;
+        Effect smokeEffect = this.smokeEffect == Fx.none ? peekAmmo(tile).smokeEffect : this.smokeEffect;
 
-		Effects.effect(shootEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
-		Effects.effect(smokeEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+        TurretEntity entity = tile.entity();
 
-		if (shootShake > 0) {
-			Effects.shake(shootShake, shootShake, tile.entity);
-		}
+        Effects.effect(shootEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+        Effects.effect(smokeEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
 
-		entity.recoil = recoil;
-	}
+        if(shootShake > 0){
+            Effects.shake(shootShake, shootShake, tile.entity);
+        }
 
-	protected void ejectEffects(Tile tile){
-		if(!isTurret(tile)) return;
-		TurretEntity entity = tile.entity();
+        entity.recoil = recoil;
+    }
 
-		Effects.effect(ammoUseEffect, tile.drawx() - Angles.trnsx(entity.rotation, ammoEjectBack),
-				tile.drawy() - Angles.trnsy(entity.rotation, ammoEjectBack), entity.rotation);
-	}
+    protected void ejectEffects(Tile tile){
+        if(!isTurret(tile)) return;
+        TurretEntity entity = tile.entity();
 
-	protected boolean isTurret(Tile tile){
-		return (tile.entity instanceof TurretEntity);
-	}
+        Effects.effect(ammoUseEffect, tile.drawx() - Angles.trnsx(entity.rotation, ammoEjectBack),
+                tile.drawy() - Angles.trnsy(entity.rotation, ammoEjectBack), entity.rotation);
+    }
 
-	@Override
-	public TileEntity getEntity(){
-		return new TurretEntity();
-	}
-	
-	public static class TurretEntity extends TileEntity{
-		public TileEntity blockTarget;
-		public Array<AmmoEntry> ammo = new ThreadArray<>();
-		public int totalAmmo;
-		public float reload;
-		public float rotation = 90;
-		public float recoil = 0f;
-		public float heat;
-		public int shots;
-		public Unit target;
-		
-		@Override
-		public void write(DataOutputStream stream) throws IOException{
-		    stream.writeByte(ammo.size);
-		    for(AmmoEntry entry : ammo){
+    protected boolean isTurret(Tile tile){
+        return (tile.entity instanceof TurretEntity);
+    }
+
+    @Override
+    public TileEntity getEntity(){
+        return new TurretEntity();
+    }
+
+    public static class TurretEntity extends TileEntity{
+        public TileEntity blockTarget;
+        public Array<AmmoEntry> ammo = new ThreadArray<>();
+        public int totalAmmo;
+        public float reload;
+        public float rotation = 90;
+        public float recoil = 0f;
+        public float heat;
+        public int shots;
+        public Unit target;
+
+        @Override
+        public void write(DataOutputStream stream) throws IOException{
+            stream.writeByte(ammo.size);
+            for(AmmoEntry entry : ammo){
                 stream.writeByte(entry.type.id);
                 stream.writeShort(entry.amount);
             }
-		}
-		
-		@Override
-		public void read(DataInputStream stream) throws IOException{
-			byte amount = stream.readByte();
-			for(int i = 0; i < amount; i ++){
-			    AmmoType type = AmmoType.getByID(stream.readByte());
-			    short ta = stream.readShort();
-			    ammo.add(new AmmoEntry(type, ta));
-			    totalAmmo += ta;
+        }
+
+        @Override
+        public void read(DataInputStream stream) throws IOException{
+            byte amount = stream.readByte();
+            for(int i = 0; i < amount; i++){
+                AmmoType type = AmmoType.getByID(stream.readByte());
+                short ta = stream.readShort();
+                ammo.add(new AmmoEntry(type, ta));
+                totalAmmo += ta;
             }
-		}
-	}
+        }
+    }
 }

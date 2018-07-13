@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:3.1.0'
+        classpath 'com.android.tools.build:gradle:3.1.3'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
     }
 }
@@ -27,7 +27,7 @@ allprojects {
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
         aiVersion = '1.8.1'
-        uCoreVersion = '2241e5402e'
+        uCoreVersion = 'c502931313'
 
         getVersionString = {
             String buildVersion = getBuildVersion()

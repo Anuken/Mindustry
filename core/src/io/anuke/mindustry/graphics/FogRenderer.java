@@ -1,5 +1,6 @@
 package io.anuke.mindustry.graphics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -23,7 +24,9 @@ import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.*;
 
-/**Used for rendering fog of war. A framebuffer is used for this.*/
+/**
+ * Used for rendering fog of war. A framebuffer is used for this.
+ */
 public class FogRenderer implements Disposable{
     private TextureRegion region = new TextureRegion();
     private FrameBuffer buffer;
@@ -41,8 +44,8 @@ public class FogRenderer implements Disposable{
             Graphics.clear(0, 0, 0, 1f);
             buffer.end();
 
-            for (int x = 0; x < world.width(); x++) {
-                for (int y = 0; y < world.height(); y++) {
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
                     Tile tile = world.tile(x, y);
 
                     if(tile.getTeam() == players[0].getTeam() && tile.block().synthetic() && tile.block().viewRange > 0){
@@ -65,14 +68,14 @@ public class FogRenderer implements Disposable{
         float vw = Core.camera.viewportWidth * Core.camera.zoom;
         float vh = Core.camera.viewportHeight * Core.camera.zoom;
 
-        float px = Core.camera.position.x -= vw/2f;
-        float py = Core.camera.position.y -= vh/2f;
+        float px = Core.camera.position.x -= vw / 2f;
+        float py = Core.camera.position.y -= vh / 2f;
 
         float u = px / tilesize / world.width();
         float v = py / tilesize / world.height();
 
-        float u2 = (px + vw)/ tilesize / world.width();
-        float v2 = (py + vh)/ tilesize / world.height();
+        float u2 = (px + vw) / tilesize / world.width();
+        float v2 = (py + vh) / tilesize / world.height();
 
         if(Core.batch instanceof ClipSpriteBatch){
             ((ClipSpriteBatch) Core.batch).enableClip(false);
@@ -122,8 +125,8 @@ public class FogRenderer implements Disposable{
         renderer.pixelSurface.getBuffer().end();
         Graphics.shader();
 
-        Graphics.begin();
-        Core.batch.draw(renderer.pixelSurface.texture(), px, py + vh, vw, -vh);
+        Graphics.setScreen();
+        Core.batch.draw(renderer.pixelSurface.texture(), 0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -Gdx.graphics.getHeight());
         Graphics.end();
 
         if(Core.batch instanceof ClipSpriteBatch){
@@ -136,7 +139,7 @@ public class FogRenderer implements Disposable{
     }
 
     @Override
-    public void dispose() {
+    public void dispose(){
         if(buffer != null) buffer.dispose();
     }
 }

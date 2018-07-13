@@ -24,142 +24,142 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class LevelDialog extends FloatingDialog{
-	
-	public LevelDialog(){
-		super("$text.level.select");
-		addCloseButton();
-		shown(this::setup);
 
-		onResize(this::setup);
-	}
-	
-	void setup(){
-		content().clear();
+    public LevelDialog(){
+        super("$text.level.select");
+        addCloseButton();
+        shown(this::setup);
 
-		Table maps = new Table();
-		maps.marginRight(14);
-		ScrollPane pane = new ScrollPane(maps, "clear-black");
-		pane.setFadeScrollBars(false);
-		
-		int maxwidth = (Gdx.graphics.getHeight() > Gdx.graphics.getHeight() ? 2 : 4);
-		
-		Table selmode = new Table();
-		ButtonGroup<TextButton> group = new ButtonGroup<>();
-		selmode.add("$text.level.mode").padRight(15f);
-		
-		for(GameMode mode : GameMode.values()){
-			TextButton[] b = {null};
-			b[0] = Elements.newButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode);
-			b[0].update(() -> b[0].setChecked(state.mode == mode));
-			group.add(b[0]);
-			selmode.add(b[0]).size(130f, 54f);
-		}
-		selmode.addButton("?", this::displayGameModeHelp).size(50f, 54f).padLeft(18f);
-		
-		content().add(selmode);
-		content().row();
+        onResize(this::setup);
+    }
 
-		Difficulty[] ds = Difficulty.values();
+    void setup(){
+        content().clear();
 
-		float s = 50f;
+        Table maps = new Table();
+        maps.marginRight(14);
+        ScrollPane pane = new ScrollPane(maps, "clear-black");
+        pane.setFadeScrollBars(false);
 
-		Table sdif = new Table();
+        int maxwidth = (Gdx.graphics.getHeight() > Gdx.graphics.getHeight() ? 2 : 4);
 
-		sdif.add("$setting.difficulty.name").padRight(15f);
+        Table selmode = new Table();
+        ButtonGroup<TextButton> group = new ButtonGroup<>();
+        selmode.add("$text.level.mode").padRight(15f);
 
-		sdif.defaults().height(s+4);
-		sdif.addImageButton("icon-arrow-left", 10*3, () -> {
-			state.difficulty = (ds[Mathf.mod(state.difficulty.ordinal() - 1, ds.length)]);
-		}).width(s);
+        for(GameMode mode : GameMode.values()){
+            TextButton[] b = {null};
+            b[0] = Elements.newButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode);
+            b[0].update(() -> b[0].setChecked(state.mode == mode));
+            group.add(b[0]);
+            selmode.add(b[0]).size(130f, 54f);
+        }
+        selmode.addButton("?", this::displayGameModeHelp).size(50f, 54f).padLeft(18f);
 
-		sdif.addButton("", () -> {
+        content().add(selmode);
+        content().row();
 
-		}).update(t -> {
-			t.setText(state.difficulty.toString());
-			t.setTouchable(Touchable.disabled);
-		}).width(180f);
+        Difficulty[] ds = Difficulty.values();
 
-		sdif.addImageButton("icon-arrow-right", 10*3, () -> {
-			state.difficulty = (ds[Mathf.mod(state.difficulty.ordinal() + 1, ds.length)]);
-		}).width(s);
+        float s = 50f;
 
-		content().add(sdif);
-		content().row();
+        Table sdif = new Table();
 
-		float images = 146f;
+        sdif.add("$setting.difficulty.name").padRight(15f);
 
-		int i = 0;
-		for(Map map : world.maps().all()){
+        sdif.defaults().height(s + 4);
+        sdif.addImageButton("icon-arrow-left", 10 * 3, () -> {
+            state.difficulty = (ds[Mathf.mod(state.difficulty.ordinal() - 1, ds.length)]);
+        }).width(s);
 
-			if(i % maxwidth == 0){
-				maps.row();
-			}
-			
-			ImageButton image = new ImageButton(new TextureRegion(map.texture), "clear");
-			image.margin(5);
-			image.getImageCell().size(images);
-			image.top();
-			image.row();
-			image.add("[accent]" + Bundles.get("map."+map.name+".name", map.name)).pad(3f).growX().wrap().get().setAlignment(Align.center, Align.center);
-			image.row();
-			image.label((() -> Bundles.format("text.level.highscore", Settings.getInt("hiscore" + map.name, 0)))).pad(3f);
+        sdif.addButton("", () -> {
 
-			BorderImage border = new BorderImage(map.texture, 3f);
-			image.replaceImage(border);
+        }).update(t -> {
+            t.setText(state.difficulty.toString());
+            t.setTouchable(Touchable.disabled);
+        }).width(180f);
 
-			image.clicked(() -> {
-				hide();
-				control.playMap(map);
-			});
-			
-			maps.add(image).width(170).fillY().top().pad(4f);
-			
-			i ++;
-		}
+        sdif.addImageButton("icon-arrow-right", 10 * 3, () -> {
+            state.difficulty = (ds[Mathf.mod(state.difficulty.ordinal() + 1, ds.length)]);
+        }).width(s);
 
-		ImageButton genb = maps.addImageButton("icon-editor", "clear", 16*3, () -> {
-			hide();
+        content().add(sdif);
+        content().row();
 
-			ui.loadfrag.show();
+        float images = 146f;
 
-			Timers.run(5f, () -> {
-				Cursors.restoreCursor();
-				threads.run(() -> {
-					world.loadProceduralMap();
-					logic.play();
-					Gdx.app.postRunnable(ui.loadfrag::hide);
-				});
-			});
-		}).width(170).fillY().pad(4f).get();
+        int i = 0;
+        for(Map map : world.maps().all()){
 
-		genb.top();
-		genb.margin(5);
-		genb.clearChildren();
-		genb.add(new BorderImage(Draw.region("icon-generated"), 3f)).size(images);
-		genb.row();
-		genb.add("$text.map.random").growX().wrap().pad(3f).get().setAlignment(Align.center, Align.center);
-		genb.row();
-		genb.add("<generated>").pad(3f);
-		
-		content().add(pane).uniformX();
-	}
+            if(i % maxwidth == 0){
+                maps.row();
+            }
 
-	private void displayGameModeHelp() {
-		FloatingDialog d = new FloatingDialog(Bundles.get("mode.text.help.title"));
-		d.setFillParent(false);
-		Table table = new Table();
-		table.defaults().pad(1f);
-		ScrollPane pane = new ScrollPane(table, "clear");
-		pane.setFadeScrollBars(false);
-		table.row();
-		for(GameMode mode : GameMode.values()){
-			table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(600f);
-			table.row();
-		}
+            ImageButton image = new ImageButton(new TextureRegion(map.texture), "clear");
+            image.margin(5);
+            image.getImageCell().size(images);
+            image.top();
+            image.row();
+            image.add("[accent]" + Bundles.get("map." + map.name + ".name", map.name)).pad(3f).growX().wrap().get().setAlignment(Align.center, Align.center);
+            image.row();
+            image.label((() -> Bundles.format("text.level.highscore", Settings.getInt("hiscore" + map.name, 0)))).pad(3f);
 
-		d.content().add(pane);
-		d.buttons().addButton("$text.ok", d::hide).size(110, 50).pad(10f);
-		d.show();
-	}
+            BorderImage border = new BorderImage(map.texture, 3f);
+            image.replaceImage(border);
+
+            image.clicked(() -> {
+                hide();
+                control.playMap(map);
+            });
+
+            maps.add(image).width(170).fillY().top().pad(4f);
+
+            i++;
+        }
+
+        ImageButton genb = maps.addImageButton("icon-editor", "clear", 16 * 3, () -> {
+            hide();
+
+            ui.loadfrag.show();
+
+            Timers.run(5f, () -> {
+                Cursors.restoreCursor();
+                threads.run(() -> {
+                    world.loadProceduralMap();
+                    logic.play();
+                    Gdx.app.postRunnable(ui.loadfrag::hide);
+                });
+            });
+        }).width(170).fillY().pad(4f).get();
+
+        genb.top();
+        genb.margin(5);
+        genb.clearChildren();
+        genb.add(new BorderImage(Draw.region("icon-generated"), 3f)).size(images);
+        genb.row();
+        genb.add("$text.map.random").growX().wrap().pad(3f).get().setAlignment(Align.center, Align.center);
+        genb.row();
+        genb.add("<generated>").pad(3f);
+
+        content().add(pane).uniformX();
+    }
+
+    private void displayGameModeHelp(){
+        FloatingDialog d = new FloatingDialog(Bundles.get("mode.text.help.title"));
+        d.setFillParent(false);
+        Table table = new Table();
+        table.defaults().pad(1f);
+        ScrollPane pane = new ScrollPane(table, "clear");
+        pane.setFadeScrollBars(false);
+        table.row();
+        for(GameMode mode : GameMode.values()){
+            table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(600f);
+            table.row();
+        }
+
+        d.content().add(pane);
+        d.buttons().addButton("$text.ok", d::hide).size(110, 50).pad(10f);
+        d.show();
+    }
 
 }

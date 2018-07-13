@@ -25,7 +25,7 @@ import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class JoinDialog extends FloatingDialog {
+public class JoinDialog extends FloatingDialog{
     Array<Server> servers = new Array<>();
     Dialog add;
     Server renaming;
@@ -49,7 +49,7 @@ public class JoinDialog extends FloatingDialog {
         add = new FloatingDialog("$text.joingame.title");
         add.content().add("$text.joingame.ip").padRight(5f).left();
 
-        Platform.instance.addDialog(add.content().addField(Settings.getString("ip"), text ->{
+        Platform.instance.addDialog(add.content().addField(Settings.getString("ip"), text -> {
             Settings.putString("ip", text);
             Settings.save();
         }).size(320f, 54f).get(), 100);
@@ -58,7 +58,7 @@ public class JoinDialog extends FloatingDialog {
         add.buttons().defaults().size(140f, 60f).pad(4f);
         add.buttons().addButton("$text.cancel", add::hide);
         add.buttons().addButton("$text.ok", () -> {
-            if(renaming == null) {
+            if(renaming == null){
                 Server server = new Server(Settings.getString("ip"), Strings.parseInt(Settings.getString("port")));
                 servers.add(server);
                 saveServers();
@@ -88,11 +88,11 @@ public class JoinDialog extends FloatingDialog {
 
     void setupRemote(){
         remote.clear();
-        for (Server server : servers) {
+        for(Server server : servers){
             //why are java lambdas this bad
             TextButton[] buttons = {null};
 
-            TextButton button = buttons[0] = remote.addButton("[accent]"+server.ip, "clear", () -> {
+            TextButton button = buttons[0] = remote.addButton("[accent]" + server.ip, "clear", () -> {
                 if(!buttons[0].childrenPressed()) connect(server.ip, Vars.port);
             }).width(targetWidth()).height(150f).pad(4f).get();
 
@@ -104,16 +104,16 @@ public class JoinDialog extends FloatingDialog {
 
             inner.add(button.getLabel()).growX();
 
-            inner.addImageButton("icon-loading", "empty", 16*2, () -> {
+            inner.addImageButton("icon-loading", "empty", 16 * 2, () -> {
                 refreshServer(server);
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton("icon-pencil", "empty", 16*2, () -> {
+            inner.addImageButton("icon-pencil", "empty", 16 * 2, () -> {
                 renaming = server;
                 add.show();
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton("icon-trash-16", "empty", 16*2, () -> {
+            inner.addImageButton("icon-trash-16", "empty", 16 * 2, () -> {
                 ui.showConfirm("$text.confirm", "$text.server.delete", () -> {
                     servers.removeValue(server, true);
                     saveServers();
@@ -124,7 +124,8 @@ public class JoinDialog extends FloatingDialog {
 
             button.row();
 
-            server.content = button.table(t -> {}).grow().get();
+            server.content = button.table(t -> {
+            }).grow().get();
 
             remote.row();
         }
@@ -143,7 +144,7 @@ public class JoinDialog extends FloatingDialog {
         Net.pingHost(server.ip, server.port, host -> {
             String versionString;
 
-            if(host.version == -1) {
+            if(host.version == -1){
                 versionString = Bundles.format("text.server.version", Bundles.get("text.server.custombuild"));
             }else if(host.version == 0){
                 versionString = Bundles.get("text.server.outdated");
@@ -179,7 +180,7 @@ public class JoinDialog extends FloatingDialog {
     }
 
     void refreshLocal(){
-        if(!Vars.gwt) {
+        if(!Vars.gwt){
             local.clear();
             local.background("button");
             local.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + Strings.animated(4, 10f, ".")).pad(10f);
@@ -227,7 +228,7 @@ public class JoinDialog extends FloatingDialog {
         content().row();
         content().add(pane).width(w + 34).pad(0);
         content().row();
-        content().addCenteredImageTextButton("$text.server.add", "icon-add", "clear", 14*3, () -> {
+        content().addCenteredImageTextButton("$text.server.add", "icon-add", "clear", 14 * 3, () -> {
             renaming = null;
             add.show();
         }).marginLeft(6).width(w).height(80f).update(button -> {
@@ -238,7 +239,7 @@ public class JoinDialog extends FloatingDialog {
                 pad = 6;
             }
 
-            Cell<TextButton> cell = ((Table)pane.getParent()).getCell(button);
+            Cell<TextButton> cell = ((Table) pane.getParent()).getCell(button);
 
             if(!MathUtils.isEqual(cell.getMinWidth(), pw)){
                 cell.width(pw);
@@ -256,10 +257,10 @@ public class JoinDialog extends FloatingDialog {
         if(array.size == 0){
             local.add("$text.hosts.none").pad(10f);
             local.add().growX();
-            local.addImageButton("icon-loading", 16*2f, this::refreshLocal).pad(-10f).padLeft(0).padTop(-6).size(70f, 74f);
-        }else {
-            for (Host a : array) {
-                TextButton button = local.addButton("[accent]"+a.name, "clear", () -> {
+            local.addImageButton("icon-loading", 16 * 2f, this::refreshLocal).pad(-10f).padLeft(0).padTop(-6).size(70f, 74f);
+        }else{
+            for(Host a : array){
+                TextButton button = local.addButton("[accent]" + a.name, "clear", () -> {
                     connect(a.address, Vars.port);
                 }).width(w).height(80f).pad(4f).get();
                 button.left();
@@ -289,18 +290,18 @@ public class JoinDialog extends FloatingDialog {
                 Net.connect(ip, port);
                 hide();
                 add.hide();
-            }catch (Exception e) {
+            }catch(Exception e){
                 Throwable t = e;
                 while(t.getCause() != null){
                     t = t.getCause();
                 }
                 //TODO localize
                 String error = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
-                if(error.contains("connection refused")) {
+                if(error.contains("connection refused")){
                     error = "connection refused";
                 }else if(error.contains("port out of range")){
                     error = "invalid port!";
-                }else if(error.contains("invalid argument")) {
+                }else if(error.contains("invalid argument")){
                     error = "invalid IP or port!";
                 }else if(t.getClass().toString().toLowerCase().contains("sockettimeout")){
                     error = "timed out!\nmake sure the host has port forwarding set up,\nand that the address is correct!";
@@ -340,6 +341,7 @@ public class JoinDialog extends FloatingDialog {
             this.port = port;
         }
 
-        Server(){}
+        Server(){
+        }
     }
 }

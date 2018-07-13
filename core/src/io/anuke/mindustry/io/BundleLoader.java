@@ -3,17 +3,17 @@ package io.anuke.mindustry.io;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.I18NBundle;
-import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
 
 import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.headless;
 
-public class BundleLoader {
-    private static final boolean externalBundle = false;
+public class BundleLoader{
 
     public static void load(){
         Settings.defaults("locale", "default");
@@ -27,10 +27,10 @@ public class BundleLoader {
             return Locale.getDefault();
         }else{
             Locale lastLocale;
-            if (loc.contains("_")) {
+            if(loc.contains("_")){
                 String[] split = loc.split("_");
                 lastLocale = new Locale(split[0], split[1]);
-            } else {
+            }else{
                 lastLocale = new Locale(loc);
             }
 
@@ -40,20 +40,20 @@ public class BundleLoader {
 
     private static void loadBundle(){
         I18NBundle.setExceptionOnMissingKey(false);
+        try{
+            //try loading external bundle
+            FileHandle handle = Gdx.files.local("bundle");
 
-        if(externalBundle){
-            try {
-                FileHandle handle = Gdx.files.local("bundle");
+            Locale locale = Locale.ENGLISH;
+            Core.bundle = I18NBundle.createBundle(handle, locale);
 
-                Locale locale = Locale.ENGLISH;
-                Core.bundle = I18NBundle.createBundle(handle, locale);
-            }catch (Exception e){
-                Log.err(e);
-                Platform.instance.showError("Failed to find bundle!\nMake sure you have bundle.properties in the same directory\nas the jar file.\n\nIf the problem persists, try running it through the command prompt:\n" +
-                        "Hold left-shift, then right click and select 'open command prompt here'.\nThen, type in 'java -jar mindustry.jar' without quotes.");
-                Gdx.app.exit();
+            Log.info("NOTE: external translation bundle has been loaded.");
+            if(!headless){
+                Timers.run(10f, () -> Vars.ui.showInfo("Note: You have successfully loaded an external translation bundle."));
             }
-        }else{
+        }catch(Throwable e){
+            //no external bundle found
+
             FileHandle handle = Gdx.files.internal("bundles/bundle");
 
             Locale locale = getLocale();
@@ -61,5 +61,6 @@ public class BundleLoader {
             if(!headless) Log.info("Got locale: {0}", locale);
             Core.bundle = I18NBundle.createBundle(handle, locale);
         }
+
     }
 }

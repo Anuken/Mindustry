@@ -8,8 +8,10 @@ import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
-/**Class that renders a trail.*/
-public class Trail {
+/**
+ * Class that renders a trail.
+ */
+public class Trail{
     private final static float maxJump = 15f;
     private final int length;
     private final FloatArray points = new FloatArray();
@@ -26,7 +28,7 @@ public class Trail {
 
         points.add(curx, cury);
 
-        if(points.size > length*2) {
+        if(points.size > length * 2){
             float[] items = points.items;
             System.arraycopy(items, 2, items, 0, points.size - 2);
             points.size -= 2;
@@ -40,26 +42,23 @@ public class Trail {
         points.clear();
     }
 
-    public synchronized void draw(Color start, Color end, float stroke){
+    public synchronized void draw(Color color, float stroke){
+        Draw.color(color);
 
         for(int i = 0; i < points.size - 2; i += 2){
             float x = points.get(i);
             float y = points.get(i + 1);
             float x2 = points.get(i + 2);
             float y2 = points.get(i + 3);
-            float s = Mathf.clamp((float)(i) / points.size);
-
-            Draw.color(start, end, s);
+            float s = Mathf.clamp((float) (i) / points.size);
 
             Lines.stroke(s * stroke);
             Lines.line(x, y, x2, y2);
         }
 
         if(points.size >= 2){
-            Fill.circle(points.get(points.size-2), points.get(points.size-1), stroke/2f);
+            Fill.circle(points.get(points.size - 2), points.get(points.size - 1), stroke / 2f);
         }
-
-        Draw.color(start);
 
         Draw.reset();
     }

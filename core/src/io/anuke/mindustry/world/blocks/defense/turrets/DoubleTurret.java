@@ -6,10 +6,10 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class DoubleTurret extends ItemTurret {
+public class DoubleTurret extends ItemTurret{
     protected float shotWidth = 2f;
 
-    public DoubleTurret(String name) {
+    public DoubleTurret(String name){
         super(name);
         shots = 2;
     }
@@ -17,7 +17,7 @@ public class DoubleTurret extends ItemTurret {
     @Override
     protected void shoot(Tile tile, AmmoType ammo){
         TurretEntity entity = tile.entity();
-        entity.shots ++;
+        entity.shots++;
 
         int i = Mathf.signs[entity.shots % 2];
 

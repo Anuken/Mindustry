@@ -22,7 +22,7 @@ public class ColorPickDialog extends Dialog{
         Table table = new Table();
         content().add(table);
 
-        for(int i = 0; i < playerColors.length; i ++){
+        for(int i = 0; i < playerColors.length; i++){
             Color color = playerColors[i];
 
             ImageButton button = table.addImageButton("white", "toggle", 34, () -> {
@@ -32,12 +32,12 @@ public class ColorPickDialog extends Dialog{
             button.setChecked(players[0].color.equals(color));
             button.getStyle().imageUpColor = color;
 
-            if(i%4 == 3){
+            if(i % 4 == 3){
                 table.row();
             }
         }
 
-        keyDown(key->{
+        keyDown(key -> {
             if(key == Keys.ESCAPE || key == Keys.BACK)
                 hide();
         });

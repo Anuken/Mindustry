@@ -4,11 +4,11 @@ import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.units.MechFactory;
 
-public class UpgradeBlocks extends BlockList {
+public class UpgradeBlocks extends BlockList{
     public static Block deltaFactory, tauFactory, omegaFactory, dartFactory, javelinFactory, tridentFactory, halberdFactory;
 
     @Override
-    public void load() {
+    public void load(){
         deltaFactory = new MechFactory("delta-mech-factory"){{
             mech = Mechs.delta;
             size = 2;

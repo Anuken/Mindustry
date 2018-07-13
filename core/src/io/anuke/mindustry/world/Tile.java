@@ -10,9 +10,10 @@ import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.modules.InventoryModule;
-import io.anuke.mindustry.world.blocks.modules.LiquidModule;
-import io.anuke.mindustry.world.blocks.modules.PowerModule;
+import io.anuke.mindustry.world.modules.ConsumeModule;
+import io.anuke.mindustry.world.modules.InventoryModule;
+import io.anuke.mindustry.world.modules.LiquidModule;
+import io.anuke.mindustry.world.modules.PowerModule;
 import io.anuke.ucore.entities.trait.PosTrait;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
@@ -23,420 +24,426 @@ import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 
-public class Tile implements PosTrait, TargetTrait {
-	public static final Object tileSetLock = new Object();
-	
-	/**Block ID data.*/
-	private Block wall;
-	private Floor floor;
-	/**Rotation, 0-3. Also used to store offload location for routers, in which case it can be any number.*/
-	private byte rotation;
-	/**Team ordinal.*/
-	private byte team;
-	/**The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
-	 * This is relative to the block it is linked to; negate coords to find the link.*/
-	public byte link = 0;
-	public short x, y;
-	/**Tile traversal cost.*/
-	public byte cost = 1;
-	/**Elevation of tile.*/
-	public byte elevation;
-	/**Position of cliffs around the tile, packed into bits 0-8.*/
-	public byte cliffs;
-	/**Tile entity, usually null.*/
-	public TileEntity entity;
-	
-	public Tile(int x, int y){
-		this.x = (short)x;
-		this.y = (short)y;
-	}
+public class Tile implements PosTrait, TargetTrait{
+    public static final Object tileSetLock = new Object();
+    /**
+     * The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
+     * This is relative to the block it is linked to; negate coords to find the link.
+     */
+    public byte link = 0;
+    public short x, y;
+    /** Tile traversal cost. */
+    public byte cost = 1;
+    /** Elevation of tile. */
+    public byte elevation;
+    /** Position of cliffs around the tile, packed into bits 0-8. */
+    public byte cliffs;
+    /** Tile entity, usually null. */
+    public TileEntity entity;
+    /** Block ID data. */
+    private Block wall;
+    private Floor floor;
+    /** Rotation, 0-3. Also used to store offload location for routers, in which case it can be any number. */
+    private byte rotation;
+    /** Team ordinal. */
+    private byte team;
 
-	public Tile(int x, int y, byte floor, byte wall){
-		this(x, y);
-		this.floor = (Floor) Block.getByID(floor);
-		this.wall = Block.getByID(wall);
-		changed();
-	}
-	
-	public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team, byte elevation){
-		this(x, y);
-		this.floor =(Floor) Block.getByID(floor);
-		this.wall = Block.getByID(wall);
-		this.rotation = rotation;
-		this.elevation = elevation;
-		changed();
-		this.team = team;
-	}
+    public Tile(int x, int y){
+        this.x = (short) x;
+        this.y = (short) y;
+    }
 
-	public int packedPosition(){
-		return x + y * world.width();
-	}
-	
-	public byte getWallID(){
-		return (byte)wall.id;
-	}
-	
-	public byte getFloorID(){
-		return (byte)floor.id;
-	}
-	
-	/**Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile.*/
-	public byte relativeTo(int cx, int cy){
-		if(x == cx && y == cy - 1) return 1;
-		if(x == cx && y == cy + 1) return 3;
-		if(x == cx - 1 && y == cy) return 0;
-		if(x == cx + 1 && y == cy) return 2;
-		return -1;
-	}
+    public Tile(int x, int y, byte floor, byte wall){
+        this(x, y);
+        this.floor = (Floor) Block.getByID(floor);
+        this.wall = Block.getByID(wall);
+        changed();
+    }
 
-	public byte absoluteRelativeTo(int cx, int cy){
-		if(x == cx && y <= cy - 1) return 1;
-		if(x == cx && y >= cy + 1) return 3;
-		if(x <= cx - 1 && y == cy) return 0;
-		if(x >= cx + 1 && y == cy) return 2;
-		return -1;
-	}
+    public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team, byte elevation){
+        this(x, y);
+        this.floor = (Floor) Block.getByID(floor);
+        this.wall = Block.getByID(wall);
+        this.rotation = rotation;
+        this.elevation = elevation;
+        changed();
+        this.team = team;
+    }
 
-	public byte sizedRelativeTo(int cx, int cy){
-		if(x == cx && y == cy - 1 - block().size/2) return 1;
-		if(x == cx && y == cy + 1 + block().size/2) return 3;
-		if(x == cx - 1 - block().size/2 && y == cy) return 0;
-		if(x == cx + 1 + block().size/2 && y == cy) return 2;
-		return -1;
-	}
-	
-	public <T extends TileEntity> T entity(){
-		return (T)entity;
-	}
-	
-	public int id(){
-		return x + y * world.width();
-	}
-	
-	public float worldx(){
-		return x * tilesize;
-	}
-	
-	public float worldy(){
-		return y * tilesize;
-	}
+    public int packedPosition(){
+        return x + y * world.width();
+    }
 
-	public float drawx(){
-		return block().offset() + worldx();
-	}
+    public byte getWallID(){
+        return (byte) wall.id;
+    }
 
-	public float drawy(){
-		return block().offset() + worldy();
-	}
-	
-	public Floor floor(){
-		return floor;
-	}
-	
-	public Block block(){
-		return wall;
-	}
+    public byte getFloorID(){
+        return (byte) floor.id;
+    }
 
-	public Team getTeam(){
-		return Team.all[team];
-	}
+    /** Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile. */
+    public byte relativeTo(int cx, int cy){
+        if(x == cx && y == cy - 1) return 1;
+        if(x == cx && y == cy + 1) return 3;
+        if(x == cx - 1 && y == cy) return 0;
+        if(x == cx + 1 && y == cy) return 2;
+        return -1;
+    }
 
-	public byte getTeamID(){
-		return team;
-	}
+    public byte absoluteRelativeTo(int cx, int cy){
+        if(x == cx && y <= cy - 1) return 1;
+        if(x == cx && y >= cy + 1) return 3;
+        if(x <= cx - 1 && y == cy) return 0;
+        if(x >= cx + 1 && y == cy) return 2;
+        return -1;
+    }
 
-	public void setTeam(Team team){
-		this.team = (byte)team.ordinal();
-	}
-	
-	/**Returns the break time of the block, <i>or</i> the breaktime of the linked block, if this tile is linked.*/
-	public float getBreakTime(){
-		Block block = target().block();
-		if(Recipe.getByResult(block) != null){
-			return Recipe.getByResult(block).cost;
-		}else{
-			return 15f;
-		}
-	}
-	
-	public void setBlock(Block type, int rotation){
-		synchronized (tileSetLock) {
-			if(rotation < 0) rotation = (-rotation + 2);
-			this.wall = type;
-			this.link = 0;
-			setRotation((byte) (rotation % 4));
-			changed();
-		}
-	}
-	
-	public void setBlock(Block type){
-		synchronized (tileSetLock) {
-			this.wall = type;
-			this.link = 0;
-			changed();
-		}
-	}
-	
-	public void setFloor(Floor type){
-		this.floor = type;
-	}
-	
-	public void setRotation(byte rotation){
-		this.rotation = rotation;
-	}
-	
-	public void setDump(byte dump){
-		this.rotation = dump;
-	}
-	
-	public byte getRotation(){
-		return rotation;
-	}
-	
-	public byte getDump(){
-		return rotation;
-	}
+    public byte sizedRelativeTo(int cx, int cy){
+        if(x == cx && y == cy - 1 - block().size / 2) return 1;
+        if(x == cx && y == cy + 1 + block().size / 2) return 3;
+        if(x == cx - 1 - block().size / 2 && y == cy) return 0;
+        if(x == cx + 1 + block().size / 2 && y == cy) return 2;
+        return -1;
+    }
 
-	public boolean passable(){
-		Block block = block();
-		Block floor = floor();
-		return isLinked() || !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible && !block.update)));
-	}
+    public <T extends TileEntity> T entity(){
+        return (T) entity;
+    }
 
-	/**Whether this block was placed by a player/unit.*/
-	public boolean synthetic(){
-		Block block = block();
-		return block.update || block.destructible;
-	}
-	
-	public boolean solid(){
-		Block block = block();
-		Block floor = floor();
-		return block.solid || cliffs != 0 || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
-				|| (isLinked() && getLinked().block().isSolidFor(getLinked()));
-	}
-	
-	public boolean breakable(){
-		Block block = block();
-		if(link == 0){
-			return (block.destructible || block.breakable || block.update);
-		}else{
-			return getLinked().breakable();
-		}
-	}
-	
-	public boolean isLinked(){
-		return link != 0;
-	}
-	
-	/**Sets this to a linked tile, which sets the block to a blockpart. dx and dy can only be -8-7.*/
-	public void setLinked(byte dx, byte dy){
-		setBlock(Blocks.blockpart);
-		link = Bits.packByte((byte)(dx + 8), (byte)(dy + 8));
-	}
-	
-	/**Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
-	 * This array contains all linked tiles, including this tile itself.*/
-	public synchronized Array<Tile> getLinkedTiles(Array<Tile> tmpArray){
-		Block block = block();
-		tmpArray.clear();
-		if(block.isMultiblock()){
-			int offsetx = -(block.size-1)/2;
-			int offsety = -(block.size-1)/2;
-			for(int dx = 0; dx < block.size; dx ++){
-				for(int dy = 0; dy < block.size; dy ++){
-					Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-					tmpArray.add(other);
-				}
-			}
-		}else{
-			tmpArray.add(this);
-		}
-		return tmpArray;
-	}
+    public int id(){
+        return x + y * world.width();
+    }
 
-	/**Returns the list of all tiles linked to this multiblock if it were this block, or an empty array if it's not a multiblock.
-	 * This array contains all linked tiles, including this tile itself.*/
-	public synchronized Array<Tile> getLinkedTilesAs(Block block, Array<Tile> tmpArray){
-		tmpArray.clear();
-		if(block.isMultiblock()){
-			int offsetx = -(block.size-1)/2;
-			int offsety = -(block.size-1)/2;
-			for(int dx = 0; dx < block.size; dx ++){
-				for(int dy = 0; dy < block.size; dy ++){
-					Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-					tmpArray.add(other);
-				}
-			}
-		}else{
-			tmpArray.add(this);
-		}
-		return tmpArray;
-	}
-	
-	/**Returns the block the multiblock is linked to, or null if it is not linked to any block.*/
-	public Tile getLinked(){
-		if(link == 0){
-			return null;
-		}else{
-			byte dx = Bits.getLeftByte(link);
-			byte dy = Bits.getRightByte(link);
-			return world.tile(x - (dx - 8), y - (dy - 8));
-		}
-	}
+    public float worldx(){
+        return x * tilesize;
+    }
 
-	public void allNearby(Consumer<Tile> cons){
-		for(GridPoint2 point : Edges.getEdges(block().size)){
-			Tile tile = world.tile(x + point.x, y + point.y);
-			if(tile != null){
-				cons.accept(tile.target());
-			}
-		}
-	}
+    public float worldy(){
+        return y * tilesize;
+    }
 
-	public void allInside(Consumer<Tile> cons){
-		for(GridPoint2 point : Edges.getInsideEdges(block().size)){
-			Tile tile = world.tile(x + point.x, y + point.y);
-			if(tile != null){
-				cons.accept(tile);
-			}
-		}
-	}
+    public float drawx(){
+        return block().offset() + worldx();
+    }
 
-	public Tile target(){
-		Tile link = getLinked();
-		return link == null ? this : link;
-	}
+    public float drawy(){
+        return block().offset() + worldy();
+    }
 
-	public Tile getNearby(GridPoint2 relative){
-		return world.tile(x + relative.x, y + relative.y);
-	}
+    public Floor floor(){
+        return floor;
+    }
 
-	public Tile getNearby(int dx, int dy){
-		return world.tile(x + dx, y + dy);
-	}
+    public Block block(){
+        return wall;
+    }
 
-	public Tile getNearby(int rotation){
-		if(rotation == 0) return world.tile(x + 1, y);
-		if(rotation == 1) return world.tile(x, y + 1);
-		if(rotation == 2) return world.tile(x - 1, y);
-		if(rotation == 3) return world.tile(x, y - 1);
-		return null;
-	}
+    public Team getTeam(){
+        return Team.all[team];
+    }
 
-	public Tile[] getNearby(Tile[] temptiles){
-		temptiles[0] = world.tile(x+1, y);
-		temptiles[1] = world.tile(x, y+1);
-		temptiles[2] = world.tile(x-1, y);
-		temptiles[3] = world.tile(x, y-1);
-		return temptiles;
-	}
+    public void setTeam(Team team){
+        this.team = (byte) team.ordinal();
+    }
 
-	public void updateOcclusion(){
-		cost = 1;
-		cliffs = 0;
-		boolean occluded = false;
+    public byte getTeamID(){
+        return team;
+    }
 
-		//check for occlusion
-		for(int i = 0; i < 8; i ++){
-			GridPoint2 point = Geometry.d8[i];
-			Tile tile = world.tile(x + point.x, y + point.y);
-			if(tile != null && tile.solid()){
-				occluded = true;
-				break;
-			}
-		}
+    /** Returns the break time of the block, <i>or</i> the breaktime of the linked block, if this tile is linked. */
+    public float getBreakTime(){
+        Block block = target().block();
+        if(Recipe.getByResult(block) != null){
+            return Recipe.getByResult(block).cost;
+        }else{
+            return 15f;
+        }
+    }
 
-		//check for bitmasking cliffs
-		for(int i = 0; i < 4; i ++){
-			GridPoint2 pc = Geometry.d4[i];
-			GridPoint2 pcprev = Geometry.d4[Mathf.mod(i - 1, 4)];
-			GridPoint2 pcnext = Geometry.d4[(i + 1) % 4];
-			GridPoint2 pe = Geometry.d8edge[i];
+    public void setBlock(Block type, int rotation){
+        synchronized(tileSetLock){
+            preChanged();
+            if(rotation < 0) rotation = (-rotation + 2);
+            this.wall = type;
+            this.link = 0;
+            setRotation((byte) (rotation % 4));
+            changed();
+        }
+    }
 
-			Tile tc = world.tile(x + pc.x, y + pc.y);
-			Tile tprev = world.tile(x + pcprev.x, y + pcprev.y);
-			Tile tnext = world.tile(x + pcnext.x, y + pcnext.y);
-			Tile te = world.tile(x + pe.x, y + pe.y);
-			Tile tex = world.tile(x, y + pe.y);
-			Tile tey = world.tile(x + pe.x, y);
+    public void setBlock(Block type){
+        synchronized(tileSetLock){
+            preChanged();
+            this.wall = type;
+            this.link = 0;
+            changed();
+        }
+    }
 
-			//check for cardinal direction elevation changes and bitmask that
-			if(tc != null && tprev != null && tnext != null && ((tc.elevation < elevation && tc.elevation != -1))){
-				cliffs |= (1 << (i*2));
-			}
+    public void setFloor(Floor type){
+        this.floor = type;
+    }
 
-			//00S
-            //0X0
-            //010
+    public byte getRotation(){
+        return rotation;
+    }
 
-			//check for corner bitmasking: doesn't even get checked so it doesn't matter
-			/*if(te != null && tex != null && tey != null && te.elevation == -1 && elevation > 0){
-				cliffs |= (1 << (((i+1)%4)*2));
-			}*/
-		}
-		if(occluded){
-			cost += 1;
-		}
-	}
-	
-	public void changed(){
+    public void setRotation(byte rotation){
+        this.rotation = rotation;
+    }
 
-		synchronized (tileSetLock) {
-			if (entity != null) {
-				entity.remove();
-				entity = null;
-			}
+    public byte getDump(){
+        return rotation;
+    }
 
-			team = 0;
+    public void setDump(byte dump){
+        this.rotation = dump;
+    }
 
-			Block block = block();
+    public boolean passable(){
+        Block block = block();
+        Block floor = floor();
+        return isLinked() || !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible && !block.update)));
+    }
 
-			if (block.hasEntity()) {
-				entity = block.getEntity().init(this, block.update);
-				if(block.hasItems) entity.items = new InventoryModule();
-				if(block.hasLiquids) entity.liquids = new LiquidModule();
-				if(block.hasPower) entity.power = new PowerModule();
-			}
+    /** Whether this block was placed by a player/unit. */
+    public boolean synthetic(){
+        Block block = block();
+        return block.update || block.destructible;
+    }
 
-			updateOcclusion();
-		}
+    public boolean solid(){
+        Block block = block();
+        Block floor = floor();
+        return block.solid || cliffs != 0 || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
+                || (isLinked() && getLinked().block().isSolidFor(getLinked()));
+    }
 
-		world.notifyChanged(this);
-	}
+    public boolean breakable(){
+        Block block = block();
+        if(link == 0){
+            return (block.destructible || block.breakable || block.update);
+        }else{
+            return getLinked().breakable();
+        }
+    }
 
-	@Override
-	public boolean isDead() {
-		return false; //tiles never die
-	}
+    public boolean isLinked(){
+        return link != 0;
+    }
 
-	@Override
-	public Vector2 getVelocity() {
-		return Vector2.Zero;
-	}
+    /** Sets this to a linked tile, which sets the block to a blockpart. dx and dy can only be -8-7. */
+    public void setLinked(byte dx, byte dy){
+        setBlock(Blocks.blockpart);
+        link = Bits.packByte((byte) (dx + 8), (byte) (dy + 8));
+    }
 
-	@Override
-	public float getX() {
-		return drawx();
-	}
+    /**
+     * Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
+     * This array contains all linked tiles, including this tile itself.
+     */
+    public synchronized Array<Tile> getLinkedTiles(Array<Tile> tmpArray){
+        Block block = block();
+        tmpArray.clear();
+        if(block.isMultiblock()){
+            int offsetx = -(block.size - 1) / 2;
+            int offsety = -(block.size - 1) / 2;
+            for(int dx = 0; dx < block.size; dx++){
+                for(int dy = 0; dy < block.size; dy++){
+                    Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
+                    tmpArray.add(other);
+                }
+            }
+        }else{
+            tmpArray.add(this);
+        }
+        return tmpArray;
+    }
 
-	@Override
-	public float getY() {
-		return drawy();
-	}
+    /**
+     * Returns the list of all tiles linked to this multiblock if it were this block, or an empty array if it's not a multiblock.
+     * This array contains all linked tiles, including this tile itself.
+     */
+    public synchronized Array<Tile> getLinkedTilesAs(Block block, Array<Tile> tmpArray){
+        tmpArray.clear();
+        if(block.isMultiblock()){
+            int offsetx = -(block.size - 1) / 2;
+            int offsety = -(block.size - 1) / 2;
+            for(int dx = 0; dx < block.size; dx++){
+                for(int dy = 0; dy < block.size; dy++){
+                    Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
+                    tmpArray.add(other);
+                }
+            }
+        }else{
+            tmpArray.add(this);
+        }
+        return tmpArray;
+    }
 
-	@Override
-	public void setX(float x) {}
+    /** Returns the block the multiblock is linked to, or null if it is not linked to any block. */
+    public Tile getLinked(){
+        if(link == 0){
+            return null;
+        }else{
+            byte dx = Bits.getLeftByte(link);
+            byte dy = Bits.getRightByte(link);
+            return world.tile(x - (dx - 8), y - (dy - 8));
+        }
+    }
 
-	@Override
-	public void setY(float y) {}
+    public void allNearby(Consumer<Tile> cons){
+        for(GridPoint2 point : Edges.getEdges(block().size)){
+            Tile tile = world.tile(x + point.x, y + point.y);
+            if(tile != null){
+                cons.accept(tile.target());
+            }
+        }
+    }
 
-	@Override
-	public String toString(){
-		Block block = block();
-		Block floor = floor();
-		
-		return floor.name() + ":" + block.name() + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : ClassReflection.getSimpleName(entity.getClass())) +
-				(link != 0 ? " link=[" + (Bits.getLeftByte(link) - 8) + ", " + (Bits.getRightByte(link) - 8) +  "]" : "");
-	}
+    public void allInside(Consumer<Tile> cons){
+        for(GridPoint2 point : Edges.getInsideEdges(block().size)){
+            Tile tile = world.tile(x + point.x, y + point.y);
+            if(tile != null){
+                cons.accept(tile);
+            }
+        }
+    }
+
+    public Tile target(){
+        Tile link = getLinked();
+        return link == null ? this : link;
+    }
+
+    public Tile getNearby(GridPoint2 relative){
+        return world.tile(x + relative.x, y + relative.y);
+    }
+
+    public Tile getNearby(int dx, int dy){
+        return world.tile(x + dx, y + dy);
+    }
+
+    public Tile getNearby(int rotation){
+        if(rotation == 0) return world.tile(x + 1, y);
+        if(rotation == 1) return world.tile(x, y + 1);
+        if(rotation == 2) return world.tile(x - 1, y);
+        if(rotation == 3) return world.tile(x, y - 1);
+        return null;
+    }
+
+    public Tile[] getNearby(Tile[] temptiles){
+        temptiles[0] = world.tile(x + 1, y);
+        temptiles[1] = world.tile(x, y + 1);
+        temptiles[2] = world.tile(x - 1, y);
+        temptiles[3] = world.tile(x, y - 1);
+        return temptiles;
+    }
+
+    public void updateOcclusion(){
+        cost = 1;
+        cliffs = 0;
+        boolean occluded = false;
+
+        //check for occlusion
+        for(int i = 0; i < 8; i++){
+            GridPoint2 point = Geometry.d8[i];
+            Tile tile = world.tile(x + point.x, y + point.y);
+            if(tile != null && tile.solid()){
+                occluded = true;
+                break;
+            }
+        }
+
+        //check for bitmasking cliffs
+        for(int i = 0; i < 4; i++){
+            GridPoint2 pc = Geometry.d4[i];
+            GridPoint2 pcprev = Geometry.d4[Mathf.mod(i - 1, 4)];
+            GridPoint2 pcnext = Geometry.d4[(i + 1) % 4];
+
+            Tile tc = world.tile(x + pc.x, y + pc.y);
+            Tile tprev = world.tile(x + pcprev.x, y + pcprev.y);
+            Tile tnext = world.tile(x + pcnext.x, y + pcnext.y);
+
+            //check for cardinal direction elevation changes and bitmask that
+            if(tc != null && tprev != null && tnext != null && ((tc.elevation < elevation && tc.elevation != -1))){
+                cliffs |= (1 << (i * 2));
+            }
+        }
+        if(occluded){
+            cost += 1;
+        }
+    }
+
+    private void preChanged(){
+        synchronized(tileSetLock){
+            if(entity != null){
+                entity.removeFromProximity();
+            }
+        }
+    }
+
+    private void changed(){
+
+        synchronized(tileSetLock){
+            if(entity != null){
+                entity.remove();
+                entity = null;
+            }
+
+            team = 0;
+
+            Block block = block();
+
+            if(block.hasEntity()){
+                entity = block.getEntity().init(this, block.update);
+                entity.cons = new ConsumeModule();
+                if(block.hasItems) entity.items = new InventoryModule();
+                if(block.hasLiquids) entity.liquids = new LiquidModule();
+                if(block.hasPower) entity.power = new PowerModule();
+                entity.updateProximity();
+            }
+
+            updateOcclusion();
+        }
+
+        world.notifyChanged(this);
+    }
+
+    @Override
+    public boolean isDead(){
+        return false; //tiles never die
+    }
+
+    @Override
+    public Vector2 getVelocity(){
+        return Vector2.Zero;
+    }
+
+    @Override
+    public float getX(){
+        return drawx();
+    }
+
+    @Override
+    public void setX(float x){
+    }
+
+    @Override
+    public float getY(){
+        return drawy();
+    }
+
+    @Override
+    public void setY(float y){
+    }
+
+    @Override
+    public String toString(){
+        Block block = block();
+        Block floor = floor();
+
+        return floor.name() + ":" + block.name() + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : ClassReflection.getSimpleName(entity.getClass())) +
+                (link != 0 ? " link=[" + (Bits.getLeftByte(link) - 8) + ", " + (Bits.getRightByte(link) - 8) + "]" : "");
+    }
 }

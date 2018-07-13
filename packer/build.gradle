@@ -43,3 +43,12 @@ task generateSprites(dependsOn: classes, type: JavaExec) {
     standardInput = System.in
     workingDir = textureFolder
 }
+
+task fixBundles(dependsOn: classes, type: JavaExec) {
+    file(textureFolder).mkdirs()
+
+    main = "io.anuke.mindustry.BundleLauncher"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../core/assets/bundles/"
+}

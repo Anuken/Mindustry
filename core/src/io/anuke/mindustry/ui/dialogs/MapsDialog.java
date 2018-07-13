@@ -22,13 +22,13 @@ import java.io.DataInputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class MapsDialog extends FloatingDialog {
+public class MapsDialog extends FloatingDialog{
 
-    public MapsDialog() {
+    public MapsDialog(){
         super("$text.maps");
 
         addCloseButton();
-        buttons().addImageTextButton("$text.editor.importmap", "icon-add", 14*2, () -> {
+        buttons().addImageTextButton("$text.editor.importmap", "icon-add", 14 * 2, () -> {
             Platform.instance.showFileChooser("$text.editor.importmap", "Map File", file -> {
                 try{
                     DataInputStream stream = new DataInputStream(file.read());
@@ -50,7 +50,7 @@ public class MapsDialog extends FloatingDialog {
                         setup();
                     }
 
-                }catch (Exception e){
+                }catch(Exception e){
                     ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
                     Log.err(e);
                 }
@@ -86,11 +86,11 @@ public class MapsDialog extends FloatingDialog {
             button.row();
             button.addImage("white").growX().pad(4).color(Color.GRAY);
             button.row();
-            ((Image)button.stack(new Image(map.texture), new BorderImage(map.texture)).size(mapsize-20f).get().getChildren().first()).setScaling(Scaling.fit);
+            ((Image) button.stack(new Image(map.texture), new BorderImage(map.texture)).size(mapsize - 20f).get().getChildren().first()).setScaling(Scaling.fit);
             button.row();
             button.add(map.custom ? "$text.custom" : "$text.builtin").color(Color.GRAY).padTop(3);
 
-            i ++;
+            i++;
         }
 
         if(world.maps().all().size == 0){
@@ -139,13 +139,13 @@ public class MapsDialog extends FloatingDialog {
 
         table.row();
 
-        table.addImageTextButton("$text.editor.openin", "icon-load-map", "clear", 16*2, () -> {
+        table.addImageTextButton("$text.editor.openin", "icon-load-map", "clear", 16 * 2, () -> {
             Vars.ui.editor.beginEditMap(map.stream.get());
             dialog.hide();
             hide();
         }).fillX().height(50f).marginLeft(6);
 
-        table.addImageTextButton("$text.delete", "icon-trash-16", "clear", 16*2, () -> {
+        table.addImageTextButton("$text.delete", "icon-trash-16", "clear", 16 * 2, () -> {
             ui.showConfirm("$text.confirm", Bundles.format("text.map.delete", map.name), () -> {
                 world.maps().removeMap(map);
                 dialog.hide();

@@ -9,7 +9,7 @@ import io.anuke.mindustry.entities.Player;
 import static io.anuke.mindustry.Vars.maxTextLength;
 import static io.anuke.mindustry.Vars.playerGroup;
 
-public class NetEvents {
+public class NetEvents{
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void sendMessage(Player player, String message){

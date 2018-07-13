@@ -43,9 +43,9 @@ public class ChatFragment extends Table{
     private Array<String> history = new Array<>();
     private int historyPos = 0;
     private int scrollPos = 0;
-    private Fragment container = new Fragment() {
+    private Fragment container = new Fragment(){
         @Override
-        public void build(Group parent) {
+        public void build(Group parent){
             scene.add(ChatFragment.this);
         }
     };
@@ -67,17 +67,17 @@ public class ChatFragment extends Table{
                 toggle();
             }
 
-            if (chatOpen) {
-                if (Inputs.keyTap("chat_history_prev") && historyPos < history.size - 1) {
-                    if (historyPos == 0) history.set(0, chatfield.getText());
+            if(chatOpen){
+                if(Inputs.keyTap("chat_history_prev") && historyPos < history.size - 1){
+                    if(historyPos == 0) history.set(0, chatfield.getText());
                     historyPos++;
                     updateChat();
                 }
-                if (Inputs.keyTap("chat_history_next") && historyPos > 0) {
+                if(Inputs.keyTap("chat_history_next") && historyPos > 0){
                     historyPos--;
                     updateChat();
                 }
-                scrollPos = (int)Mathf.clamp(scrollPos + Inputs.getAxis("chat_scroll"), 0, Math.max(0, messages.size - messagesShown));
+                scrollPos = (int) Mathf.clamp(scrollPos + Inputs.getAxis("chat_scroll"), 0, Math.max(0, messages.size - messagesShown));
             }
         });
 
@@ -85,7 +85,7 @@ public class ChatFragment extends Table{
         setup();
     }
 
-    public Fragment container() {
+    public Fragment container(){
         return container;
     }
 
@@ -108,16 +108,16 @@ public class ChatFragment extends Table{
         chatfield.setStyle(chatfield.getStyle());
         Platform.instance.addDialog(chatfield, Vars.maxTextLength);
 
-        bottom().left().marginBottom(offsety).marginLeft(offsetx*2).add(fieldlabel).padBottom(4f);
+        bottom().left().marginBottom(offsety).marginLeft(offsetx * 2).add(fieldlabel).padBottom(4f);
 
         add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
 
-        if(Vars.mobile) {
+        if(Vars.mobile){
             marginBottom(105f);
             marginRight(240f);
         }
 
-        if(Vars.mobile) {
+        if(Vars.mobile){
             addImageButton("icon-arrow-right", 14 * 2, this::toggle).size(46f, 51f).visible(() -> chatOpen).pad(2f);
         }
     }
@@ -128,7 +128,7 @@ public class ChatFragment extends Table{
         batch.setColor(shadowColor);
 
         if(chatOpen)
-            batch.draw(skin.getRegion("white"), offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight()-1);
+            batch.draw(skin.getRegion("white"), offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
 
         super.draw(batch, alpha);
 
@@ -143,18 +143,18 @@ public class ChatFragment extends Table{
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || chatOpen); i++){
 
             layout.setText(font, messages.get(i).formattedMessage, Color.WHITE, textWidth, Align.bottomLeft, true);
-            theight += layout.height+textspacing;
-            if(i - scrollPos == 0) theight -= textspacing+1;
+            theight += layout.height + textspacing;
+            if(i - scrollPos == 0) theight -= textspacing + 1;
 
             font.getCache().clear();
             font.getCache().addText(messages.get(i).formattedMessage, fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
 
-            if(!chatOpen && fadetime-i < 1f && fadetime-i >= 0f){
-                font.getCache().setAlphas(fadetime-i);
-                batch.setColor(0, 0, 0, shadowColor.a*(fadetime-i));
+            if(!chatOpen && fadetime - i < 1f && fadetime - i >= 0f){
+                font.getCache().setAlphas(fadetime - i);
+                batch.setColor(0, 0, 0, shadowColor.a * (fadetime - i));
             }
 
-            batch.draw(skin.getRegion("white"), offsetx, theight-layout.height-2, textWidth + Unit.dp.scl(4f), layout.height+textspacing);
+            batch.draw(skin.getRegion("white"), offsetx, theight - layout.height - 2, textWidth + Unit.dp.scl(4f), layout.height + textspacing);
             batch.setColor(shadowColor);
 
             font.getCache().draw(batch);
@@ -163,7 +163,7 @@ public class ChatFragment extends Table{
         batch.setColor(Color.WHITE);
 
         if(fadetime > 0 && !chatOpen)
-            fadetime -= Timers.delta()/180f;
+            fadetime -= Timers.delta() / 180f;
     }
 
     private void sendMessage(){
@@ -197,12 +197,12 @@ public class ChatFragment extends Table{
         clearChatInput();
     }
 
-    public void updateChat() {
+    public void updateChat(){
         chatfield.setText(history.get(historyPos));
         chatfield.setCursorPosition(chatfield.getText().length());
     }
 
-    public void clearChatInput() {
+    public void clearChatInput(){
         historyPos = 0;
         history.set(0, "");
         chatfield.setText("");
@@ -234,7 +234,7 @@ public class ChatFragment extends Table{
             if(sender == null){ //no sender, this is a server message?
                 formattedMessage = message;
             }else{
-                formattedMessage = "[CORAL][["+sender+"[CORAL]]:[WHITE] "+message;
+                formattedMessage = "[CORAL][[" + sender + "[CORAL]]:[WHITE] " + message;
             }
         }
     }

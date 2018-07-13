@@ -12,20 +12,10 @@ public class WeatherEvent implements Content{
     public final String name;
 
     public WeatherEvent(String name){
-        this.id = lastid ++;
+        this.id = lastid++;
         this.name = name;
 
         all.add(this);
-    }
-
-    @Override
-    public String getContentTypeName() {
-        return "weatherevent";
-    }
-
-    @Override
-    public Array<? extends Content> getAll() {
-        return all();
     }
 
     public static Array<WeatherEvent> all(){
@@ -34,5 +24,15 @@ public class WeatherEvent implements Content{
 
     public static WeatherEvent getByID(int id){
         return all.get(id);
+    }
+
+    @Override
+    public String getContentTypeName(){
+        return "weatherevent";
+    }
+
+    @Override
+    public Array<? extends Content> getAll(){
+        return all();
     }
 }

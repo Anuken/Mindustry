@@ -2,8 +2,10 @@ package io.anuke.mindustry.world.meta;
 
 import io.anuke.ucore.util.Bundles;
 
-/**Defines a unit of measurement for block stats.*/
-public enum StatUnit {
+/**
+ * Defines a unit of measurement for block stats.
+ */
+public enum StatUnit{
     blocks,
     powerSecond,
     liquidSecond,

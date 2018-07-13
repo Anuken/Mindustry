@@ -7,75 +7,90 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Content;
 
 public class StatusEffect implements Content{
-	private static final Array<StatusEffect> array = new Array<>();
-	private static int lastid;
+    private static final Array<StatusEffect> array = new Array<>();
+    private static int lastid;
 
-	/**Duration of this status effect in ticks at maximum power.*/
-	public final float baseDuration;
-	public final int id;
+    /**
+     * Duration of this status effect in ticks at maximum power.
+     */
+    public final float baseDuration;
+    public final int id;
 
-	public float damageMultiplier = 1f; //damage dealt
-	public float armorMultiplier = 1f; //armor points
-	public float speedMultiplier = 1f; //speed
+    public float damageMultiplier = 1f; //damage dealt
+    public float armorMultiplier = 1f; //armor points
+    public float speedMultiplier = 1f; //speed
 
-	/**Set of 'opposite' effects, which will decrease the duration of this effect when applied.*/
-	protected ObjectSet<StatusEffect> opposites = new ObjectSet<>();
-	/**The strength of time decrease when met with an opposite effect, as a fraction of the other's duration.*/
-	protected float oppositeScale = 0.5f;
+    /**
+     * Set of 'opposite' effects, which will decrease the duration of this effect when applied.
+     */
+    protected ObjectSet<StatusEffect> opposites = new ObjectSet<>();
+    /**
+     * The strength of time decrease when met with an opposite effect, as a fraction of the other's duration.
+     */
+    protected float oppositeScale = 0.5f;
 
-	public StatusEffect(float baseDuration){
-		this.baseDuration = baseDuration;
+    public StatusEffect(float baseDuration){
+        this.baseDuration = baseDuration;
 
-		id = lastid++;
-		array.add(this);
-	}
+        id = lastid++;
+        array.add(this);
+    }
 
-	/**Runs every tick on the affected unit while time is greater than 0.*/
-	public void update(Unit unit, float time){}
+    public static StatusEffect getByID(int id){
+        return array.get(id);
+    }
 
-	/**Called when transitioning between two status effects.
-	 * @param to The state to transition to
-	 * @param time The current status effect time
-	 * @param newTime The time that the new status effect will last*/
-	public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
-		if(opposites.contains(to)){
-			time -= newTime*oppositeScale;
-			if(time > 0) {
-				return result.set(this, time);
-			}
-		}
+    public static Array<StatusEffect> all(){
+        return array;
+    }
 
-		return result.set(to, newTime);
-	}
+    /**
+     * Runs every tick on the affected unit while time is greater than 0.
+     */
+    public void update(Unit unit, float time){
+    }
 
-	/**Called when this effect transitions to a new status effect.*/
-	public void onTransition(Unit unit, StatusEffect to){}
+    /**
+     * Called when transitioning between two status effects.
+     *
+     * @param to The state to transition to
+     * @param time The current status effect time
+     * @param newTime The time that the new status effect will last
+     */
+    public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
+        if(opposites.contains(to)){
+            time -= newTime * oppositeScale;
+            if(time > 0){
+                return result.set(this, time);
+            }
+        }
 
-	public boolean isOpposite(StatusEffect other){
-		return opposites.size > 0 && opposites.contains(other);
-	}
+        return result.set(to, newTime);
+    }
 
-	public void setOpposites(StatusEffect... effects){
-		for(StatusEffect e : effects){
-			opposites.add(e);
-		}
-	}
+    /**
+     * Called when this effect transitions to a new status effect.
+     */
+    public void onTransition(Unit unit, StatusEffect to){
+    }
 
-	@Override
-	public String getContentTypeName() {
-		return "statuseffect";
-	}
+    public boolean isOpposite(StatusEffect other){
+        return opposites.size > 0 && opposites.contains(other);
+    }
 
-	@Override
-	public Array<? extends Content> getAll() {
-		return null;
-	}
+    public void setOpposites(StatusEffect... effects){
+        for(StatusEffect e : effects){
+            opposites.add(e);
+        }
+    }
 
-	public static StatusEffect getByID(int id){
-		return array.get(id);
-	}
+    @Override
+    public String getContentTypeName(){
+        return "statuseffect";
+    }
 
-	public static Array<StatusEffect> all(){
-		return array;
-	}
+    @Override
+    public Array<? extends Content> getAll(){
+        return null;
+    }
 }

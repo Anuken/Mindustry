@@ -8,8 +8,6 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -17,40 +15,31 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
 
-public class Incinerator extends Block {
-    protected float powerUse = 0.07f;
+public class Incinerator extends Block{
     protected Effect effect = BlockFx.fuelburn;
     protected Color flameColor = Color.valueOf("ffad9d");
 
-    public Incinerator(String name) {
+    public Incinerator(String name){
         super(name);
         hasPower = true;
         hasLiquids = true;
         update = true;
         solid = true;
+
+        consumes.power(0.05f);
     }
 
     @Override
-    public void setBars() {
+    public void setBars(){
         super.setBars();
         bars.remove(BarType.liquid);
     }
 
     @Override
-    public void setStats() {
-        super.setStats();
-
-        stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
-    }
-
-    @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         IncineratorEntity entity = tile.entity();
 
-        float used = Math.min(powerCapacity, powerUse * Timers.delta());
-
-        if(entity.power.amount >= used){
-            entity.power.amount -= used;
+        if(entity.cons.valid()){
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.04f);
         }else{
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.02f);
@@ -58,7 +47,7 @@ public class Incinerator extends Block {
     }
 
     @Override
-    public void draw(Tile tile) {
+    public void draw(Tile tile){
         super.draw(tile);
 
         IncineratorEntity entity = tile.entity();
@@ -67,7 +56,7 @@ public class Incinerator extends Block {
             float g = 0.3f;
             float r = 0.06f;
 
-            Draw.alpha(((1f-g) + Mathf.absin(Timers.time(), 8f, g) + Mathf.random(r) - r) * entity.heat);
+            Draw.alpha(((1f - g) + Mathf.absin(Timers.time(), 8f, g) + Mathf.random(r) - r) * entity.heat);
 
             Draw.tint(flameColor);
             Fill.circle(tile.drawx(), tile.drawy(), 2f);
@@ -79,33 +68,33 @@ public class Incinerator extends Block {
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source) {
+    public void handleItem(Item item, Tile tile, Tile source){
         if(Mathf.chance(0.3)){
             Effects.effect(effect, tile.drawx(), tile.drawy());
         }
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source) {
+    public boolean acceptItem(Item item, Tile tile, Tile source){
         IncineratorEntity entity = tile.entity();
         return entity.heat > 0.5f;
     }
 
     @Override
-    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         if(Mathf.chance(0.02)){
             Effects.effect(effect, tile.drawx(), tile.drawy());
         }
     }
 
     @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         IncineratorEntity entity = tile.entity();
         return entity.heat > 0.5f;
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new IncineratorEntity();
     }
 

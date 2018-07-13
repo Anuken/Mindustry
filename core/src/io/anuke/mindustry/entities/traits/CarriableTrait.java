@@ -8,6 +8,7 @@ public interface CarriableTrait extends TeamTrait, TargetTrait, SolidTrait{
         return getCarrier() != null;
     }
 
-    void setCarrier(CarryTrait carrier);
     CarryTrait getCarrier();
+
+    void setCarrier(CarryTrait carrier);
 }

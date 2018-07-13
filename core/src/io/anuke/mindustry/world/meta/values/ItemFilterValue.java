@@ -6,24 +6,24 @@ import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-public class ItemFilterValue implements StatValue {
+public class ItemFilterValue implements StatValue{
     private final Predicate<Item> filter;
 
-    public ItemFilterValue(Predicate<Item> filter) {
+    public ItemFilterValue(Predicate<Item> filter){
         this.filter = filter;
     }
 
     @Override
-    public void display(Table table) {
+    public void display(Table table){
         Array<Item> list = new Array<>();
 
         for(Item item : Item.all()){
             if(filter.test(item)) list.add(item);
         }
 
-        for (int i = 0; i < list.size; i++) {
+        for(int i = 0; i < list.size; i++){
             Item item = list.get(i);
-            table.addImage(item.region).size(8*3).padRight(2).padLeft(2);
+            table.addImage(item.region).size(8 * 3).padRight(2).padLeft(2);
             if(i != list.size - 1){
                 table.add("/");
             }

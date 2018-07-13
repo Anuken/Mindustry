@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class NetworkIO {
+public class NetworkIO{
 
     public static void writeWorld(Player player, OutputStream os){
 
@@ -59,7 +59,7 @@ public class NetworkIO {
             stream.writeShort(world.width());
             stream.writeShort(world.height());
 
-            for (int i = 0; i < world.width() * world.height(); i++) {
+            for(int i = 0; i < world.width() * world.height(); i++){
                 Tile tile = world.tile(i);
 
                 stream.writeByte(tile.getFloorID());
@@ -70,24 +70,25 @@ public class NetworkIO {
                     stream.writeByte(tile.link);
                 }else if(tile.entity != null){
                     stream.writeByte(Bits.packByte(tile.getTeamID(), tile.getRotation())); //team + rotation
-                    stream.writeShort((short)tile.entity.health); //health
+                    stream.writeShort((short) tile.entity.health); //health
 
                     if(tile.entity.items != null) tile.entity.items.write(stream);
                     if(tile.entity.power != null) tile.entity.power.write(stream);
                     if(tile.entity.liquids != null) tile.entity.liquids.write(stream);
+                    if(tile.entity.cons != null) tile.entity.cons.write(stream);
 
                     tile.entity.write(stream);
                 }else if(tile.getWallID() == 0){
                     int consecutives = 0;
 
-                    for (int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++) {
+                    for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                         Tile nextTile = world.tile(j);
 
                         if(nextTile.getFloorID() != tile.getFloorID() || nextTile.getWallID() != 0 || nextTile.elevation != tile.elevation){
                             break;
                         }
 
-                        consecutives ++;
+                        consecutives++;
                     }
 
                     stream.writeByte(consecutives);
@@ -106,12 +107,14 @@ public class NetworkIO {
                 }
             }
 
-        }catch (IOException e){
+        }catch(IOException e){
             throw new RuntimeException(e);
         }
     }
 
-    /**Return whether a custom map is expected, and thus whether the client should wait for additional data.*/
+    /**
+     * Return whether a custom map is expected, and thus whether the client should wait for additional data.
+     */
     public static void loadWorld(InputStream is){
 
         Player player = players[0];
@@ -131,7 +134,7 @@ public class NetworkIO {
             ObjectMap<String, String> tags = new ObjectMap<>();
 
             byte tagSize = stream.readByte();
-            for (int i = 0; i < tagSize; i++) {
+            for(int i = 0; i < tagSize; i++){
                 String key = stream.readUTF();
                 String value = stream.readUTF();
                 tags.put(key, value);
@@ -168,8 +171,8 @@ public class NetworkIO {
 
             Tile[][] tiles = world.createTiles(width, height);
 
-            for (int i = 0; i < width * height; i++) {
-                int x = i % width, y = i /width;
+            for(int i = 0; i < width * height; i++){
+                int x = i % width, y = i / width;
                 byte floorid = stream.readByte();
                 byte wallid = stream.readByte();
                 byte elevation = stream.readByte();
@@ -177,9 +180,9 @@ public class NetworkIO {
                 Tile tile = new Tile(x, y, floorid, wallid);
                 tile.elevation = elevation;
 
-                if (wallid == Blocks.blockpart.id) {
+                if(wallid == Blocks.blockpart.id){
                     tile.link = stream.readByte();
-                }else if (tile.entity != null) {
+                }else if(tile.entity != null){
                     byte tr = stream.readByte();
                     short health = stream.readShort();
 
@@ -190,15 +193,16 @@ public class NetworkIO {
                     tile.entity.health = health;
                     tile.setRotation(rotation);
 
-                    if (tile.entity.items != null) tile.entity.items.read(stream);
-                    if (tile.entity.power != null) tile.entity.power.read(stream);
-                    if (tile.entity.liquids != null) tile.entity.liquids.read(stream);
+                    if(tile.entity.items != null) tile.entity.items.read(stream);
+                    if(tile.entity.power != null) tile.entity.power.read(stream);
+                    if(tile.entity.liquids != null) tile.entity.liquids.read(stream);
+                    if(tile.entity.cons != null) tile.entity.cons.read(stream);
 
                     tile.entity.read(stream);
                 }else if(wallid == 0){
                     int consecutives = stream.readUnsignedByte();
 
-                    for (int j = i + 1; j < i + 1 + consecutives; j++) {
+                    for(int j = i + 1; j < i + 1 + consecutives; j++){
                         int newx = j % width, newy = j / width;
                         Tile newTile = new Tile(newx, newy, floorid, wallid);
                         newTile.elevation = elevation;
@@ -215,13 +219,13 @@ public class NetworkIO {
             state.teams = new TeamInfo();
 
             byte teams = stream.readByte();
-            for (int i = 0; i < teams; i++) {
+            for(int i = 0; i < teams; i++){
                 Team team = Team.all[stream.readByte()];
                 boolean ally = stream.readBoolean();
                 short cores = stream.readShort();
                 state.teams.add(team, ally);
 
-                for (int j = 0; j < cores; j++) {
+                for(int j = 0; j < cores; j++){
                     state.teams.get(team).cores.add(world.tile(stream.readInt()));
                 }
 
@@ -232,7 +236,7 @@ public class NetworkIO {
 
             world.endMapLoad();
 
-        }catch (IOException e){
+        }catch(IOException e){
             throw new RuntimeException(e);
         }
     }
@@ -248,10 +252,10 @@ public class NetworkIO {
 
         ByteBuffer buffer = ByteBuffer.allocate(128);
 
-        buffer.put((byte)host.getBytes().length);
+        buffer.put((byte) host.getBytes().length);
         buffer.put(host.getBytes());
 
-        buffer.put((byte)map.getBytes().length);
+        buffer.put((byte) map.getBytes().length);
         buffer.put(map.getBytes());
 
         buffer.putInt(playerGroup.size());

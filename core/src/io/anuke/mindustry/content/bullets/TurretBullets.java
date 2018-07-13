@@ -29,13 +29,13 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class TurretBullets extends BulletList implements ContentList {
+public class TurretBullets extends BulletList implements ContentList{
     public static BulletType fireball, basicFlame, lancerLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt;
 
     @Override
-    public void load() {
+    public void load(){
 
-        fireball = new BulletType(1f, 4) {
+        fireball = new BulletType(1f, 4){
             {
                 pierce = true;
                 hitTiles = false;
@@ -45,12 +45,12 @@ public class TurretBullets extends BulletList implements ContentList {
             }
 
             @Override
-            public void init(Bullet b) {
+            public void init(Bullet b){
                 b.getVelocity().setLength(0.6f + Mathf.random(2f));
             }
 
             @Override
-            public void draw(Bullet b) {
+            public void draw(Bullet b){
                 //TODO add color to the bullet depending on the color of the flame it came from
                 Draw.color(Palette.lightFlame, Palette.darkFlame, Color.GRAY, b.fin());
                 Fill.circle(b.x, b.y, 3f * b.fout());
@@ -58,25 +58,25 @@ public class TurretBullets extends BulletList implements ContentList {
             }
 
             @Override
-            public void update(Bullet b) {
-                if (Mathf.chance(0.04 * Timers.delta())) {
+            public void update(Bullet b){
+                if(Mathf.chance(0.04 * Timers.delta())){
                     Tile tile = world.tileWorld(b.x, b.y);
-                    if (tile != null) {
+                    if(tile != null){
                         Fire.create(tile);
                     }
                 }
 
-                if (Mathf.chance(0.1 * Timers.delta())) {
+                if(Mathf.chance(0.1 * Timers.delta())){
                     Effects.effect(EnvironmentFx.fireballsmoke, b.x, b.y);
                 }
 
-                if (Mathf.chance(0.1 * Timers.delta())) {
+                if(Mathf.chance(0.1 * Timers.delta())){
                     Effects.effect(EnvironmentFx.ballfire, b.x, b.y);
                 }
             }
         };
 
-        basicFlame = new BulletType(2f, 5) {
+        basicFlame = new BulletType(2f, 5){
             {
                 hitsize = 7f;
                 lifetime = 30f;
@@ -88,11 +88,11 @@ public class TurretBullets extends BulletList implements ContentList {
             }
 
             @Override
-            public void draw(Bullet b) {
+            public void draw(Bullet b){
             }
         };
 
-        lancerLaser = new BulletType(0.001f, 110) {
+        lancerLaser = new BulletType(0.001f, 110){
             Color[] colors = {Palette.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Palette.lancerLaser, Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
             float[] lenscales = {1f, 1.1f, 1.13f, 1.14f};
@@ -107,19 +107,19 @@ public class TurretBullets extends BulletList implements ContentList {
             }
 
             @Override
-            public void init(Bullet b) {
+            public void init(Bullet b){
                 Damage.collideLine(b, b.getTeam(), hiteffect, b.x, b.y, b.angle(), length);
             }
 
             @Override
-            public void draw(Bullet b) {
+            public void draw(Bullet b){
                 float f = Mathf.curve(b.fin(), 0f, 0.2f);
                 float baseLen = length * f;
 
                 Lines.lineAngle(b.x, b.y, b.angle(), baseLen);
-                for (int s = 0; s < 3; s++) {
+                for(int s = 0; s < 3; s++){
                     Draw.color(colors[s]);
-                    for (int i = 0; i < tscales.length; i++) {
+                    for(int i = 0; i < tscales.length; i++){
                         Lines.stroke(7f * b.fout() * (s == 0 ? 1.5f : s == 1 ? 1f : 0.3f) * tscales[i]);
                         Lines.lineAngle(b.x, b.y, b.angle(), baseLen * lenscales[i]);
                     }
@@ -128,24 +128,24 @@ public class TurretBullets extends BulletList implements ContentList {
             }
         };
 
-        fuseShot = new BulletType(0.01f, 100) {
+        fuseShot = new BulletType(0.01f, 100){
             //TODO
         };
 
-        waterShot = new LiquidBulletType(Liquids.water) {
+        waterShot = new LiquidBulletType(Liquids.water){
             {
                 status = StatusEffects.wet;
                 statusIntensity = 0.5f;
                 knockback = 0.65f;
             }
         };
-        cryoShot = new LiquidBulletType(Liquids.cryofluid) {
+        cryoShot = new LiquidBulletType(Liquids.cryofluid){
             {
                 status = StatusEffects.freezing;
                 statusIntensity = 0.5f;
             }
         };
-        lavaShot = new LiquidBulletType(Liquids.lava) {
+        lavaShot = new LiquidBulletType(Liquids.lava){
             {
                 damage = 4;
                 speed = 1.9f;
@@ -154,7 +154,7 @@ public class TurretBullets extends BulletList implements ContentList {
                 statusIntensity = 0.5f;
             }
         };
-        oilShot = new LiquidBulletType(Liquids.oil) {
+        oilShot = new LiquidBulletType(Liquids.oil){
             {
                 speed = 2f;
                 drag = 0.03f;
@@ -162,7 +162,7 @@ public class TurretBullets extends BulletList implements ContentList {
                 statusIntensity = 0.5f;
             }
         };
-        lightning = new BulletType(0.001f, 10) {
+        lightning = new BulletType(0.001f, 10){
             {
                 lifetime = 1;
                 despawneffect = Fx.none;
@@ -170,16 +170,16 @@ public class TurretBullets extends BulletList implements ContentList {
             }
 
             @Override
-            public void draw(Bullet b) {
+            public void draw(Bullet b){
             }
 
             @Override
-            public void init(Bullet b) {
+            public void init(Bullet b){
                 Lightning.create(b.getTeam(), hiteffect, Palette.lancerLaser, damage, b.x, b.y, b.angle(), 30);
             }
         };
 
-        driverBolt = new BulletType(5f, 20) {
+        driverBolt = new BulletType(5f, 20){
             {
                 collidesTiles = false;
                 lifetime = 200f;
@@ -189,7 +189,7 @@ public class TurretBullets extends BulletList implements ContentList {
             }
 
             @Override
-            public void draw(Bullet b) {
+            public void draw(Bullet b){
                 Draw.color(Color.LIGHT_GRAY);
                 Fill.square(b.x, b.y, 3f, b.angle());
 
@@ -199,7 +199,7 @@ public class TurretBullets extends BulletList implements ContentList {
             }
 
             @Override
-            public void update(Bullet b) {
+            public void update(Bullet b){
                 //data MUST be an instance of DriverBulletData
                 if(!(b.getData() instanceof DriverBulletData)){
                     hit(b);
@@ -208,7 +208,7 @@ public class TurretBullets extends BulletList implements ContentList {
 
                 float hitDst = 7f;
 
-                DriverBulletData data = (DriverBulletData)b.getData();
+                DriverBulletData data = (DriverBulletData) b.getData();
 
                 //if the target is dead, just keep flying until the bullet explodes
                 if(data.to.isDead()){
@@ -245,15 +245,15 @@ public class TurretBullets extends BulletList implements ContentList {
             }
 
             @Override
-            public void despawned(Bullet b) {
+            public void despawned(Bullet b){
                 super.despawned(b);
 
                 if(!(b.getData() instanceof DriverBulletData)) return;
 
-                DriverBulletData data = (DriverBulletData)b.getData();
+                DriverBulletData data = (DriverBulletData) b.getData();
                 data.to.isRecieving = false;
 
-                for(int i = 0; i < data.items.length; i ++){
+                for(int i = 0; i < data.items.length; i++){
                     int amountDropped = Mathf.random(0, data.items[i]);
                     if(amountDropped > 0){
                         float angle = b.angle() + Mathf.range(100f);
@@ -264,7 +264,7 @@ public class TurretBullets extends BulletList implements ContentList {
             }
 
             @Override
-            public void hit(Bullet b, float hitx, float hity) {
+            public void hit(Bullet b, float hitx, float hity){
                 super.hit(b, hitx, hity);
                 despawned(b);
             }

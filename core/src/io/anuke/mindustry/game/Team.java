@@ -2,7 +2,7 @@ package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.graphics.Color;
 
-public enum Team {
+public enum Team{
     none(Color.DARK_GRAY),
     blue(Color.ROYAL),
     red(Color.valueOf("e84737")),
@@ -10,10 +10,9 @@ public enum Team {
     purple(Color.valueOf("ba5bd9")),
     orange(Color.valueOf("e8c66a"));
 
+    public final static Team[] all = values();
     public final Color color;
     public final int intColor;
-
-    public final static Team[] all = values();
 
     Team(Color color){
         this.color = color;

@@ -12,7 +12,6 @@ import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.mindustry.world.meta.values.ItemListValue;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -24,16 +23,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class PowerSmelter extends PowerBlock {
+public class PowerSmelter extends PowerBlock{
     protected final int timerDump = timers++;
     protected final int timerCraft = timers++;
 
-    /**Recipe format:
-     * First item in each array: result
-     * Everything else in each array: requirements. Can have duplicates.*/
-    protected ItemStack[] inputs;
     protected Item result;
-    protected float powerUse;
 
     protected float minFlux = 0.2f;
     protected int fluxNeeded = 1;
@@ -51,7 +45,7 @@ public class PowerSmelter extends PowerBlock {
 
     protected TextureRegion topRegion;
 
-    public PowerSmelter(String name) {
+    public PowerSmelter(String name){
         super(name);
         hasItems = true;
         update = true;
@@ -60,7 +54,7 @@ public class PowerSmelter extends PowerBlock {
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
         topRegion = Draw.region(name + "-top");
     }
@@ -70,20 +64,17 @@ public class PowerSmelter extends PowerBlock {
         super.setBars();
         bars.remove(BarType.inventory);
 
-        for(ItemStack item : inputs){
-            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.getItem(item.item) / itemCapacity));
+        for(ItemStack item : consumes.items()){
+            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.get(item.item) / itemCapacity));
         }
     }
 
     @Override
     public void setStats(){
         super.setStats();
-        //TODO input/outputs
 
-        stats.add(BlockStat.inputItems, new ItemListValue(inputs));
-        stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
         stats.add(BlockStat.outputItem, result);
-        stats.add(BlockStat.craftSpeed, 60f/craftTime, StatUnit.itemsSecond);
+        stats.add(BlockStat.craftSpeed, 60f / craftTime, StatUnit.itemsSecond);
         stats.add(BlockStat.inputItemCapacity, itemCapacity, StatUnit.items);
         stats.add(BlockStat.outputItemCapacity, itemCapacity, StatUnit.items);
     }
@@ -93,33 +84,27 @@ public class PowerSmelter extends PowerBlock {
 
         PowerSmelterEntity entity = tile.entity();
 
-        if(entity.timer.get(timerDump, 5) && entity.items.hasItem(result)){
+        if(entity.timer.get(timerDump, 5) && entity.items.has(result)){
             tryDump(tile, result);
         }
 
-        float used = powerUse * Timers.delta();
-
         //heat it up if there's enough power
-        if(entity.power.amount > used){
-            entity.power.amount -= used;
-            entity.heat += 1f / heatUpTime;
+        if(entity.cons.valid()){
+            entity.heat += 1f / heatUpTime * Timers.delta();
             if(Mathf.chance(Timers.delta() * burnEffectChance))
-                Effects.effect(burnEffect, entity.x + Mathf.range(size*4f), entity.y + Mathf.range(size*4));
+                Effects.effect(burnEffect, entity.x + Mathf.range(size * 4f), entity.y + Mathf.range(size * 4));
         }else{
-            entity.heat -= 1f / heatUpTime;
+            entity.heat -= 1f / heatUpTime * Timers.delta();
         }
 
         entity.heat = Mathf.clamp(entity.heat);
         entity.time += entity.heat * Timers.delta();
 
-        //make sure it has all the items
-        for(ItemStack item : inputs){
-            if(!entity.items.hasItem(item.item, item.amount)){
-                return;
-            }
+        if(!entity.cons.valid()){
+            return;
         }
 
-        if(entity.items.getItem(result) >= itemCapacity //output full
+        if(entity.items.get(result) >= itemCapacity //output full
                 || entity.heat <= minHeat //not burning
                 || !entity.timer.get(timerCraft, craftTime)){ //not yet time
             return;
@@ -130,8 +115,8 @@ public class PowerSmelter extends PowerBlock {
         if(useFlux){
             //remove flux materials if present
             for(Item item : Item.all()){
-                if(item.fluxiness >= minFlux && tile.entity.items.getItem(item) >= fluxNeeded){
-                    tile.entity.items.removeItem(item, fluxNeeded);
+                if(item.fluxiness >= minFlux && tile.entity.items.get(item) >= fluxNeeded){
+                    tile.entity.items.remove(item, fluxNeeded);
 
                     //chance of not consuming inputs if flux material present
                     consumeInputs = !Mathf.chance(item.fluxiness * baseFluxChance);
@@ -140,9 +125,9 @@ public class PowerSmelter extends PowerBlock {
             }
         }
 
-        if(consumeInputs) {
-            for (ItemStack item : inputs) {
-                entity.items.removeItem(item.item, item.amount);
+        if(consumeInputs){
+            for(ItemStack item : consumes.items()){
+                entity.items.remove(item.item, item.amount);
             }
         }
 
@@ -153,22 +138,22 @@ public class PowerSmelter extends PowerBlock {
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
 
-        for(ItemStack stack : inputs){
+        for(ItemStack stack : consumes.items()){
             if(stack.item == item){
-                return tile.entity.items.getItem(item) < itemCapacity;
+                return tile.entity.items.get(item) < itemCapacity;
             }
         }
 
         if(useFlux && item.fluxiness >= minFlux){
-            return tile.entity.items.getItem(item) < itemCapacity;
+            return tile.entity.items.get(item) < itemCapacity;
         }
 
         return false;
     }
 
     @Override
-    public int getMaximumAccepted(Tile tile, Item item) {
-        return itemCapacity - tile.entity.items.getItem(item);
+    public int getMaximumAccepted(Tile tile, Item item){
+        return itemCapacity - tile.entity.items.get(item);
     }
 
     @Override
@@ -183,7 +168,7 @@ public class PowerSmelter extends PowerBlock {
             float r = 0.06f;
             float cr = Mathf.random(0.1f);
 
-            Draw.alpha(((1f-g) + Mathf.absin(Timers.time(), 8f, g) + Mathf.random(r) - r) * entity.heat);
+            Draw.alpha(((1f - g) + Mathf.absin(Timers.time(), 8f, g) + Mathf.random(r) - r) * entity.heat);
 
             Draw.tint(flameColor);
             Fill.circle(tile.drawx(), tile.drawy(), 3f + Mathf.absin(Timers.time(), 5f, 2f) + cr);
@@ -196,7 +181,7 @@ public class PowerSmelter extends PowerBlock {
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new PowerSmelterEntity();
     }
 
@@ -205,12 +190,12 @@ public class PowerSmelter extends PowerBlock {
         public float time;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException {
+        public void write(DataOutputStream stream) throws IOException{
             stream.writeFloat(heat);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException {
+        public void read(DataInputStream stream) throws IOException{
             heat = stream.readFloat();
         }
     }

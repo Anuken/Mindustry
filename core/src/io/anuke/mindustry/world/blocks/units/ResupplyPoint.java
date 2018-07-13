@@ -9,8 +9,8 @@ import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
@@ -22,14 +22,13 @@ import io.anuke.ucore.util.Mathf;
 public class ResupplyPoint extends Block{
     private static Rectangle rect = new Rectangle();
 
-    protected int timerSupply = timers ++;
-    protected int timerTarget = timers ++;
+    protected int timerSupply = timers++;
+    protected int timerTarget = timers++;
 
     protected float supplyRadius = 50f;
     protected float supplyInterval = 10f;
-    protected float powerUsage = 0.2f;
 
-    public ResupplyPoint(String name) {
+    public ResupplyPoint(String name){
         super(name);
         update = true;
         solid = true;
@@ -38,6 +37,8 @@ public class ResupplyPoint extends Block{
         hasItems = true;
         hasPower = true;
         powerCapacity = 20f;
+
+        consumes.power(0.02f);
     }
 
     @Override
@@ -48,7 +49,7 @@ public class ResupplyPoint extends Block{
     }
 
     @Override
-    public void drawLayer(Tile tile) {
+    public void drawLayer(Tile tile){
         ResupplyPointEntity entity = tile.entity();
 
         if(entity.strength > 0f){
@@ -64,11 +65,11 @@ public class ResupplyPoint extends Block{
                     x1, y1, entity.lastx, entity.lasty, entity.strength);
 
             Draw.color(Palette.accent);
-            for(int i = 0; i < dstTo/space-1; i ++){
-                float fract = (i * space) / dstTo + ((Timers.time()/90f) % (space/dstTo));
-                Draw.alpha(Mathf.clamp(fract*1.5f));
-                Draw.rect("transfer-arrow", x1 + fract*xf, y1 + fract*yf,
-                        8, 8*entity.strength, ang);
+            for(int i = 0; i < dstTo / space - 1; i++){
+                float fract = (i * space) / dstTo + ((Timers.time() / 90f) % (space / dstTo));
+                Draw.alpha(Mathf.clamp(fract * 1.5f));
+                Draw.rect("transfer-arrow", x1 + fract * xf, y1 + fract * yf,
+                        8, 8 * entity.strength, ang);
             }
 
             Draw.color();
@@ -77,18 +78,18 @@ public class ResupplyPoint extends Block{
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         ResupplyPointEntity entity = tile.entity();
 
         if(!validTarget(entity, entity.target) || entity.target.distanceTo(tile) > supplyRadius){
             entity.target = null;
         }else if(entity.target != null && entity.strength > 0.5f){
 
-            if(entity.timer.get(timerSupply, supplyInterval)) {
-                for (int i = 0; i < tile.entity.items.items.length; i++) {
+            if(entity.timer.get(timerSupply, supplyInterval)){
+                for(int i = 0; i < Item.all().size; i++){
                     Item item = Item.getByID(i);
-                    if (tile.entity.items.items[i] > 0 && entity.target.acceptsAmmo(item)) {
-                        tile.entity.items.items[i]--;
+                    if(tile.entity.items.has(item) && entity.target.acceptsAmmo(item)){
+                        tile.entity.items.remove(item, 1);
                         entity.target.addAmmo(item);
                         break;
                     }
@@ -98,10 +99,7 @@ public class ResupplyPoint extends Block{
             entity.rotation = Mathf.slerpDelta(entity.rotation, entity.angleTo(entity.target), 0.5f);
         }
 
-        float powerUse = Math.min(Timers.delta() * powerUsage, powerCapacity);
-
-        if(entity.target != null && entity.power.amount >= powerUse){
-            entity.power.amount -= powerUse;
+        if(entity.target != null && entity.cons.valid()){
             entity.lastx = entity.target.x;
             entity.lasty = entity.target.y;
             entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.08f * Timers.delta());
@@ -109,7 +107,7 @@ public class ResupplyPoint extends Block{
             entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.08f * Timers.delta());
         }
 
-        if(entity.timer.get(timerTarget, 20)) {
+        if(entity.timer.get(timerTarget, 20)){
             rect.setSize(supplyRadius * 2).setCenter(tile.drawx(), tile.drawy());
 
             entity.target = Units.getClosest(tile.getTeam(), tile.drawx(), tile.drawy(), supplyRadius, unit -> validTarget(entity, unit));
@@ -117,12 +115,12 @@ public class ResupplyPoint extends Block{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.items.totalItems() < itemCapacity;
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        return tile.entity.items.total() < itemCapacity;
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new ResupplyPointEntity();
     }
 
@@ -130,9 +128,9 @@ public class ResupplyPoint extends Block{
         if(unit == null || unit.inventory.totalAmmo() >= unit.inventory.ammoCapacity()
                 || unit.isDead()) return false;
 
-        for(int i = 0; i < entity.items.items.length; i ++) {
+        for(int i = 0; i < Item.all().size; i++){
             Item item = Item.getByID(i);
-            if (entity.items.items[i] > 0 && unit.acceptsAmmo(item)) {
+            if(entity.items.has(item) && unit.acceptsAmmo(item)){
                 return true;
             }
         }

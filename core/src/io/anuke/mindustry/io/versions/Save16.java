@@ -11,6 +11,7 @@ import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.SaveFileVersion;
+import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
@@ -27,14 +28,14 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
-public class Save16 extends SaveFileVersion {
+public class Save16 extends SaveFileVersion{
 
     public Save16(){
         super(16);
     }
 
     @Override
-    public void read(DataInputStream stream) throws IOException {
+    public void read(DataInputStream stream) throws IOException{
         /*long loadTime = */
         stream.readLong();
 
@@ -61,7 +62,7 @@ public class Save16 extends SaveFileVersion {
 
         IntMap<Block> blockMap = new IntMap<>();
 
-        for(int i = 0; i < blocksize; i ++){
+        for(int i = 0; i < blocksize; i++){
             String name = stream.readUTF();
             int id = stream.readShort();
 
@@ -72,9 +73,9 @@ public class Save16 extends SaveFileVersion {
 
         byte groups = stream.readByte();
 
-        for (int i = 0; i < groups; i++) {
+        for(int i = 0; i < groups; i++){
             int amount = stream.readInt();
-            for (int j = 0; j < amount; j++) {
+            for(int j = 0; j < amount; j++){
                 byte typeid = stream.readByte();
                 SaveTrait trait = (SaveTrait) TypeTrait.getTypeByID(typeid).get();
                 trait.readSave(stream);
@@ -94,8 +95,8 @@ public class Save16 extends SaveFileVersion {
 
         Tile[][] tiles = world.createTiles(width, height);
 
-        for (int i = 0; i < width * height; i++) {
-            int x = i % width, y = i /width;
+        for(int i = 0; i < width * height; i++){
+            int x = i % width, y = i / width;
             byte floorid = stream.readByte();
             byte wallid = stream.readByte();
             byte elevation = stream.readByte();
@@ -103,9 +104,9 @@ public class Save16 extends SaveFileVersion {
             Tile tile = new Tile(x, y, floorid, wallid);
             tile.elevation = elevation;
 
-            if (wallid == Blocks.blockpart.id) {
+            if(wallid == Blocks.blockpart.id){
                 tile.link = stream.readByte();
-            }else if (tile.entity != null) {
+            }else if(tile.entity != null){
                 byte tr = stream.readByte();
                 short health = stream.readShort();
 
@@ -118,9 +119,10 @@ public class Save16 extends SaveFileVersion {
                 tile.entity.health = health;
                 tile.setRotation(rotation);
 
-                if (tile.entity.items != null) tile.entity.items.read(stream);
-                if (tile.entity.power != null) tile.entity.power.read(stream);
-                if (tile.entity.liquids != null) tile.entity.liquids.read(stream);
+                if(tile.entity.items != null) tile.entity.items.read(stream);
+                if(tile.entity.power != null) tile.entity.power.read(stream);
+                if(tile.entity.liquids != null) tile.entity.liquids.read(stream);
+                if(tile.entity.cons != null) tile.entity.cons.read(stream);
 
                 tile.entity.read(stream);
 
@@ -131,7 +133,7 @@ public class Save16 extends SaveFileVersion {
             }else if(wallid == 0){
                 int consecutives = stream.readUnsignedByte();
 
-                for (int j = i + 1; j < i + 1 + consecutives; j++) {
+                for(int j = i + 1; j < i + 1 + consecutives; j++){
                     int newx = j % width, newy = j / width;
                     Tile newTile = new Tile(newx, newy, floorid, wallid);
                     newTile.elevation = elevation;
@@ -148,10 +150,11 @@ public class Save16 extends SaveFileVersion {
     }
 
     @Override
-    public void write(DataOutputStream stream) throws IOException {
+    public void write(DataOutputStream stream) throws IOException{
         //--META--
         stream.writeInt(version); //version id
         stream.writeLong(TimeUtils.millis()); //last saved
+        stream.writeInt(Version.build);
 
         //--GENERAL STATE--
         stream.writeByte(state.mode.ordinal()); //gamemode
@@ -167,20 +170,19 @@ public class Save16 extends SaveFileVersion {
 
         stream.writeInt(Block.all().size);
 
-        for(int i = 0; i < Block.all().size; i ++){
+        for(int i = 0; i < Block.all().size; i++){
             Block block = Block.all().get(i);
             stream.writeUTF(block.name);
             stream.writeShort(block.id);
         }
 
         //--ENTITIES--
-        //TODO synchronized block here
 
         int groups = 0;
 
         for(EntityGroup<?> group : Entities.getAllGroups()){
             if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
-                groups ++;
+                groups++;
             }
         }
 
@@ -190,8 +192,8 @@ public class Save16 extends SaveFileVersion {
             if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
                 stream.writeInt(group.size());
                 for(Entity entity : group.all()){
-                    stream.writeByte(((SaveTrait)entity).getTypeID());
-                    ((SaveTrait)entity).writeSave(stream);
+                    stream.writeByte(((SaveTrait) entity).getTypeID());
+                    ((SaveTrait) entity).writeSave(stream);
                 }
             }
         }
@@ -204,7 +206,7 @@ public class Save16 extends SaveFileVersion {
         stream.writeShort(world.width());
         stream.writeShort(world.height());
 
-        for (int i = 0; i < world.width() * world.height(); i++) {
+        for(int i = 0; i < world.width() * world.height(); i++){
             Tile tile = world.tile(i);
 
             stream.writeByte(tile.getFloorID());
@@ -215,24 +217,25 @@ public class Save16 extends SaveFileVersion {
                 stream.writeByte(tile.link);
             }else if(tile.entity != null){
                 stream.writeByte(Bits.packByte(tile.getTeamID(), tile.getRotation())); //team + rotation
-                stream.writeShort((short)tile.entity.health); //health
+                stream.writeShort((short) tile.entity.health); //health
 
                 if(tile.entity.items != null) tile.entity.items.write(stream);
                 if(tile.entity.power != null) tile.entity.power.write(stream);
                 if(tile.entity.liquids != null) tile.entity.liquids.write(stream);
+                if(tile.entity.cons != null) tile.entity.cons.write(stream);
 
                 tile.entity.write(stream);
             }else if(tile.getWallID() == 0){
                 int consecutives = 0;
 
-                for (int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++) {
+                for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                     Tile nextTile = world.tile(j);
 
                     if(nextTile.getFloorID() != tile.getFloorID() || nextTile.getWallID() != 0 || nextTile.elevation != tile.elevation){
                         break;
                     }
 
-                    consecutives ++;
+                    consecutives++;
                 }
 
                 stream.writeByte(consecutives);

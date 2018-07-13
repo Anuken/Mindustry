@@ -49,237 +49,237 @@ import java.util.Locale;
 import static io.anuke.mindustry.Vars.*;
 
 public class AndroidLauncher extends AndroidApplication{
-	public static final int PERMISSION_REQUEST_CODE = 1;
+    public static final int PERMISSION_REQUEST_CODE = 1;
 
-	boolean doubleScaleTablets = true;
-	FileChooser chooser;
+    boolean doubleScaleTablets = true;
+    FileChooser chooser;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState){
-		super.onCreate(savedInstanceState);
+    @Override
+    protected void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
 
-		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		config.useImmersiveMode = true;
+        AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+        config.useImmersiveMode = true;
 
-		Platform.instance = new Platform(){
-			DateFormat format = SimpleDateFormat.getDateTimeInstance();
+        Platform.instance = new Platform(){
+            DateFormat format = SimpleDateFormat.getDateTimeInstance();
 
-			@Override
-			public boolean hasDiscord() {
-				return isPackageInstalled("com.discord");
-			}
+            @Override
+            public boolean hasDiscord(){
+                return isPackageInstalled("com.discord");
+            }
 
-			@Override
-			public String format(Date date){
-				return format.format(date);
-			}
+            @Override
+            public String format(Date date){
+                return format.format(date);
+            }
 
-			@Override
-			public String format(int number){
-				return NumberFormat.getIntegerInstance().format(number);
-			}
+            @Override
+            public String format(int number){
+                return NumberFormat.getIntegerInstance().format(number);
+            }
 
-			@Override
-			public void addDialog(TextField field, int length){
-				TextFieldDialogListener.add(field, 0, length);
-			}
+            @Override
+            public void addDialog(TextField field, int length){
+                TextFieldDialogListener.add(field, 0, length);
+            }
 
-			@Override
-			public String getLocaleName(Locale locale){
-				return locale.getDisplayName(locale);
-			}
+            @Override
+            public String getLocaleName(Locale locale){
+                return locale.getDisplayName(locale);
+            }
 
-			@Override
-			public void openDonations() {
-				showDonations();
-			}
+            @Override
+            public void openDonations(){
+                showDonations();
+            }
 
-			@Override
-			public ThreadProvider getThreadProvider() {
-				return new DefaultThreadImpl();
-			}
+            @Override
+            public ThreadProvider getThreadProvider(){
+                return new DefaultThreadImpl();
+            }
 
-			@Override
-			public boolean isDebug() {
-				return false;
-			}
+            @Override
+            public boolean isDebug(){
+                return false;
+            }
 
-			@Override
-			public String getUUID() {
-				try {
-					String s = Secure.getString(getContext().getContentResolver(),
-							Secure.ANDROID_ID);
+            @Override
+            public String getUUID(){
+                try{
+                    String s = Secure.getString(getContext().getContentResolver(),
+                            Secure.ANDROID_ID);
 
-					int len = s.length();
-					byte[] data = new byte[len / 2];
-					for (int i = 0; i < len; i += 2) {
-						data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-								+ Character.digit(s.charAt(i + 1), 16));
-					}
+                    int len = s.length();
+                    byte[] data = new byte[len / 2];
+                    for(int i = 0; i < len; i += 2){
+                        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                                + Character.digit(s.charAt(i + 1), 16));
+                    }
 
-					String result = new String(Base64Coder.encode(data));
+                    String result = new String(Base64Coder.encode(data));
 
-					if(result.equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
+                    if(result.equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
 
-					return result;
-				}catch (Exception e){
-					return super.getUUID();
-				}
-			}
+                    return result;
+                }catch(Exception e){
+                    return super.getUUID();
+                }
+            }
 
-			@Override
-			public void shareFile(FileHandle file){
+            @Override
+            public void shareFile(FileHandle file){
 
-			}
+            }
 
-			@Override
-			public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype) {
-				chooser = new FileChooser(text, file -> file.extension().equalsIgnoreCase(filetype), open, cons);
+            @Override
+            public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype){
+                chooser = new FileChooser(text, file -> file.extension().equalsIgnoreCase(filetype), open, cons);
 
-				if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-						checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
-					chooser.show();
-					chooser = null;
-				}else {
-					ArrayList<String> perms = new ArrayList<>();
+                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                        checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
+                    chooser.show();
+                    chooser = null;
+                }else{
+                    ArrayList<String> perms = new ArrayList<>();
 
-					if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-						perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-					}
+                    if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    }
 
-					if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-						perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-					}
+                    if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+                    }
 
-					requestPermissions(perms.toArray(new String[perms.size()]), PERMISSION_REQUEST_CODE);
-				}
-			}
+                    requestPermissions(perms.toArray(new String[perms.size()]), PERMISSION_REQUEST_CODE);
+                }
+            }
 
-			@Override
-			public void beginForceLandscape() {
-				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-			}
+            @Override
+            public void beginForceLandscape(){
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
 
-			@Override
-			public void endForceLandscape() {
-				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-			}
+            @Override
+            public void endForceLandscape(){
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+            }
 
-			@Override
-			public boolean canDonate(){
-				return true;
-			}
-		};
+            @Override
+            public boolean canDonate(){
+                return true;
+            }
+        };
 
-		try {
-			ProviderInstaller.installIfNeeded(this);
-		} catch (GooglePlayServicesRepairableException e) {
-			GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-			apiAvailability.getErrorDialog(this, e.getConnectionStatusCode(), 0).show();
-		} catch (GooglePlayServicesNotAvailableException e) {
-			Log.e("SecurityException", "Google Play Services not available.");
-		}
+        try{
+            ProviderInstaller.installIfNeeded(this);
+        }catch(GooglePlayServicesRepairableException e){
+            GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+            apiAvailability.getErrorDialog(this, e.getConnectionStatusCode(), 0).show();
+        }catch(GooglePlayServicesNotAvailableException e){
+            Log.e("SecurityException", "Google Play Services not available.");
+        }
 
-		if(doubleScaleTablets && isTablet(this.getContext())){
-			Unit.dp.addition = 0.5f;
-		}
-		
-		config.hideStatusBar = true;
+        if(doubleScaleTablets && isTablet(this.getContext())){
+            Unit.dp.addition = 0.5f;
+        }
+
+        config.hideStatusBar = true;
 
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());
 
         initialize(new Mindustry(), config);
 
-		checkFiles(getIntent());
-	}
+        checkFiles(getIntent());
+    }
 
-	@Override
-	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-		if(requestCode == PERMISSION_REQUEST_CODE){
-			for(int i : grantResults){
-				if(i != PackageManager.PERMISSION_GRANTED) return;
-			}
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
+        if(requestCode == PERMISSION_REQUEST_CODE){
+            for(int i : grantResults){
+                if(i != PackageManager.PERMISSION_GRANTED) return;
+            }
 
-			if(chooser != null){
-				chooser.show();
-			}
-		}
-	}
+            if(chooser != null){
+                chooser.show();
+            }
+        }
+    }
 
-	private void checkFiles(Intent intent){
-		try {
-			Uri uri = intent.getData();
-			if (uri != null) {
-				File myFile = null;
-				String scheme = uri.getScheme();
-				if (scheme.equals("file")) {
-					String fileName = uri.getEncodedPath();
-					myFile = new File(fileName);
-				} else if (!scheme.equals("content")) {
-					//error
-					return;
-				}
+    private void checkFiles(Intent intent){
+        try{
+            Uri uri = intent.getData();
+            if(uri != null){
+                File myFile = null;
+                String scheme = uri.getScheme();
+                if(scheme.equals("file")){
+                    String fileName = uri.getEncodedPath();
+                    myFile = new File(fileName);
+                }else if(!scheme.equals("content")){
+                    //error
+                    return;
+                }
 
-				boolean save = uri.getPath().endsWith(saveExtension);
-				boolean map = uri.getPath().endsWith(mapExtension);
+                boolean save = uri.getPath().endsWith(saveExtension);
+                boolean map = uri.getPath().endsWith(mapExtension);
 
-				InputStream inStream;
-				if (myFile != null) inStream = new FileInputStream(myFile);
-				else inStream = getContentResolver().openInputStream(uri);
+                InputStream inStream;
+                if(myFile != null) inStream = new FileInputStream(myFile);
+                else inStream = getContentResolver().openInputStream(uri);
 
-				Gdx.app.postRunnable(() -> {
+                Gdx.app.postRunnable(() -> {
 
-					if(save){ //open save
-						System.out.println("Opening save.");
-						FileHandle file = Gdx.files.local("temp-save." + saveExtension);
-						file.write(inStream, false);
+                    if(save){ //open save
+                        System.out.println("Opening save.");
+                        FileHandle file = Gdx.files.local("temp-save." + saveExtension);
+                        file.write(inStream, false);
 
-						if(SaveIO.isSaveValid(file)){
-							try{
-								SaveSlot slot = control.getSaves().importSave(file);
-								ui.load.runLoadSave(slot);
-							}catch (IOException e){
-								ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
-							}
-						}else{
-							ui.showError("$text.save.import.invalid");
-						}
+                        if(SaveIO.isSaveValid(file)){
+                            try{
+                                SaveSlot slot = control.getSaves().importSave(file);
+                                ui.load.runLoadSave(slot);
+                            }catch(IOException e){
+                                ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
+                            }
+                        }else{
+                            ui.showError("$text.save.import.invalid");
+                        }
 
-					}else if(map){ //open map
-						Gdx.app.postRunnable(() -> {
-							System.out.println("Opening map.");
-							if (!ui.editor.isShown()) {
-								ui.editor.show();
-							}
+                    }else if(map){ //open map
+                        Gdx.app.postRunnable(() -> {
+                            System.out.println("Opening map.");
+                            if(!ui.editor.isShown()){
+                                ui.editor.show();
+                            }
 
-							ui.editor.beginEditMap(inStream);
-						});
-					}
-				});
-			}
+                            ui.editor.beginEditMap(inStream);
+                        });
+                    }
+                });
+            }
 
-		}catch (IOException e){
-			e.printStackTrace();
-		}
-	}
-	
-	private boolean isPackageInstalled(String packagename) {
-	    try {
-	    	getPackageManager().getPackageInfo(packagename, 0);
-	        return true;
-	    } catch (Exception e) {
-	        return false;
-	    }
-	}
-	
-	private boolean isTablet(Context context) {
-		TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-		return manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE;
-	}
-	
-	private void showDonations(){
-		Intent intent = new Intent(this, DonationsActivity.class);
-		startActivity(intent);
-	}
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isPackageInstalled(String packagename){
+        try{
+            getPackageManager().getPackageInfo(packagename, 0);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
+    }
+
+    private boolean isTablet(Context context){
+        TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        return manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE;
+    }
+
+    private void showDonations(){
+        Intent intent = new Intent(this, DonationsActivity.class);
+        startActivity(intent);
+    }
 }

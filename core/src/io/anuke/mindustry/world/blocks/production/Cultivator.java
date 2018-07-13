@@ -19,75 +19,83 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Cultivator extends Drill {
+public class Cultivator extends Drill{
     protected Color plantColor = Color.valueOf("648b55");
     protected Color plantColorLight = Color.valueOf("73a75f");
     protected Color bottomColor = Color.valueOf("474747");
+    protected TextureRegion middleRegion, topRegion;
 
     protected Item result;
 
     protected SeedRandom random = new SeedRandom(0);
     protected float recurrence = 6f;
 
-    public Cultivator(String name) {
+    public Cultivator(String name){
         super(name);
         drillEffect = Fx.none;
     }
 
     @Override
-    public void setStats() {
+    public void setStats(){
         super.setStats();
 
         stats.remove(BlockStat.drillTier);
         stats.add(BlockStat.drillTier, table -> {
-            table.addImage("grass1").size(8*3).padBottom(3).padTop(3);
+            table.addImage("grass1").size(8 * 3).padBottom(3).padTop(3);
         });
     }
 
     @Override
-    public void update(Tile tile) {
-        super.update(tile);
+    public void load(){
+        super.load();
 
-        CultivatorEntity entity = tile.entity();
-        entity.warmup = Mathf.lerpDelta(entity.warmup,
-                tile.entity.liquids.amount > liquidUse ? 1f : 0f, 0.015f);
+        middleRegion = Draw.region(name + "-middle");
+        topRegion = Draw.region(name + "-top");
     }
 
     @Override
-    public void draw(Tile tile) {
+    public void update(Tile tile){
+        super.update(tile);
+
+        CultivatorEntity entity = tile.entity();
+        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.cons.valid() ? 1f : 0f, 0.015f);
+    }
+
+    @Override
+    public void draw(Tile tile){
         CultivatorEntity entity = tile.entity();
 
-        Draw.rect(name, tile.drawx(), tile.drawy());
+        Draw.rect(region, tile.drawx(), tile.drawy());
 
         Draw.color(plantColor);
         Draw.alpha(entity.warmup);
-        Draw.rect(name + "-middle", tile.drawx(), tile.drawy());
+        Draw.rect(middleRegion, tile.drawx(), tile.drawy());
 
         Draw.color(bottomColor, plantColorLight, entity.warmup);
 
         random.setSeed(tile.packedPosition());
-        for(int i = 0; i < 12; i ++){
+        for(int i = 0; i < 12; i++){
             float offset = random.nextFloat() * 999999f;
             float x = random.range(4f), y = random.range(4f);
             float life = 1f - (((Timers.time() + offset) / 50f) % recurrence);
 
             if(life > 0){
-                Lines.stroke(entity.warmup * (life*1f + 0.2f));
-                Lines.poly(tile.drawx() + x, tile.drawy() + y, 8, (1f-life) * 3f);
+                Lines.stroke(entity.warmup * (life * 1f + 0.2f));
+                Lines.poly(tile.drawx() + x, tile.drawy() + y, 8, (1f - life) * 3f);
             }
         }
 
         Draw.color();
-        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+        Draw.rect(topRegion, tile.drawx(), tile.drawy());
     }
 
     @Override
-    public TextureRegion[] getIcon() {
-        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-top"), };
+    public TextureRegion[] getIcon(){
+        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-top"),};
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new CultivatorEntity();
     }
 
@@ -97,7 +105,7 @@ public class Cultivator extends Drill {
     }
 
     @Override
-    public Item getDrop(Tile tile) {
+    public Item getDrop(Tile tile){
         return Items.biomatter;
     }
 
@@ -105,12 +113,12 @@ public class Cultivator extends Drill {
         public float warmup;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException {
+        public void write(DataOutputStream stream) throws IOException{
             stream.writeFloat(warmup);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException {
+        public void read(DataInputStream stream) throws IOException{
             warmup = stream.readFloat();
         }
     }

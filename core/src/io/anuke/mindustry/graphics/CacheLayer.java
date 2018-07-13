@@ -8,7 +8,7 @@ import io.anuke.ucore.graphics.Shader;
 
 import static io.anuke.mindustry.Vars.renderer;
 
-public enum CacheLayer {
+public enum CacheLayer{
     water{
         @Override
         public void begin(){
@@ -57,25 +57,24 @@ public enum CacheLayer {
     walls;
 
     public void begin(){
-        
+
     }
 
     public void end(){
-        
+
     }
 
     protected void beginShader(){
         //renderer.getBlocks().endFloor();
-        renderer.effectSurface.getBuffer().begin();
+        renderer.effectSurface.getBuffer().bind();
         Graphics.clear(Color.CLEAR);
         //renderer.getBlocks().beginFloor();
     }
 
     public void endShader(Shader shader){
         renderer.getBlocks().endFloor();
-        renderer.effectSurface.getBuffer().end();
 
-        renderer.pixelSurface.getBuffer().begin();
+        renderer.pixelSurface.getBuffer().bind();
 
         Graphics.shader(shader);
         Graphics.begin();

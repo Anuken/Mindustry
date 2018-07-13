@@ -5,75 +5,77 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
-/**Used for multiblocks. Each block that is not the center of the multiblock is a blockpart.
+/**
+ * Used for multiblocks. Each block that is not the center of the multiblock is a blockpart.
  * Think of these as delegates to the actual block; all events are passed to the target block.
- * They are made to share all properties from the linked tile/block.*/
+ * They are made to share all properties from the linked tile/block.
+ */
 public class BlockPart extends Block{
 
-	public BlockPart() {
-		super("blockpart");
-		solid = false;
-		hasPower = hasItems = hasLiquids = true;
-	}
-	
-	@Override
-	public void draw(Tile tile){
-		//do nothing
-	}
+    public BlockPart(){
+        super("blockpart");
+        solid = false;
+        hasPower = hasItems = hasLiquids = true;
+    }
 
-	@Override
-	public void drawShadow(Tile tile){
-		//also do nothing
-	}
-	
-	@Override
-	public boolean isSolidFor(Tile tile){
-		return tile.getLinked() == null
-				|| (tile.getLinked().block() instanceof BlockPart || tile.getLinked().solid()
-				|| tile.getLinked().block().isSolidFor(tile.getLinked()));
-	}
-	
-	@Override
-	public void handleItem(Item item, Tile tile, Tile source){
-		tile.getLinked().block().handleItem(item, tile.getLinked(), source);
-	}
-	
-	@Override
-	public boolean acceptItem(Item item, Tile tile, Tile source){
-		return tile.getLinked().block().acceptItem(item, tile.getLinked(), source);
-	}
+    @Override
+    public void draw(Tile tile){
+        //do nothing
+    }
 
-	@Override
-	public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-		Block block = linked(tile);
-		return block.hasLiquids
-				&& block.acceptLiquid(tile.getLinked(), source, liquid, amount);
-	}
+    @Override
+    public void drawShadow(Tile tile){
+        //also do nothing
+    }
 
-	@Override
-	public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-		Block block = linked(tile);
-		block.handleLiquid(tile.getLinked(), source, liquid, amount);
-	}
+    @Override
+    public boolean isSolidFor(Tile tile){
+        return tile.getLinked() == null
+                || (tile.getLinked().block() instanceof BlockPart || tile.getLinked().solid()
+                || tile.getLinked().block().isSolidFor(tile.getLinked()));
+    }
 
-	@Override
-	public float addPower(Tile tile, float amount){
-		Block block = linked(tile);
-		if(block.hasPower){
-			return block.addPower(tile.getLinked(), amount);
-		}else{
-			return amount;
-		}
-	}
-	
-	@Override
-	public boolean acceptPower(Tile tile, Tile from, float amount) {
+    @Override
+    public void handleItem(Item item, Tile tile, Tile source){
+        tile.getLinked().block().handleItem(item, tile.getLinked(), source);
+    }
+
+    @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        return tile.getLinked().block().acceptItem(item, tile.getLinked(), source);
+    }
+
+    @Override
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        Block block = linked(tile);
+        return block.hasLiquids
+                && block.acceptLiquid(tile.getLinked(), source, liquid, amount);
+    }
+
+    @Override
+    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        Block block = linked(tile);
+        block.handleLiquid(tile.getLinked(), source, liquid, amount);
+    }
+
+    @Override
+    public float addPower(Tile tile, float amount){
+        Block block = linked(tile);
+        if(block.hasPower){
+            return block.addPower(tile.getLinked(), amount);
+        }else{
+            return amount;
+        }
+    }
+
+    @Override
+    public boolean acceptPower(Tile tile, Tile from, float amount){
         Block block = linked(tile);
         return block.hasPower && block.acceptPower(tile.getLinked(), from, amount);
     }
-	
-	private Block linked(Tile tile){
-		return tile.getLinked().block();
-	}
+
+    private Block linked(Tile tile){
+        return tile.getLinked().block();
+    }
 
 }

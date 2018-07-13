@@ -12,7 +12,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-/**Class for controlling status effects on an entity.*/
+/**
+ * Class for controlling status effects on an entity.
+ */
 public class StatusController implements Saveable{
     private static final StatusEntry globalResult = new StatusEntry();
     private static final Array<StatusEntry> removals = new ThreadArray<>();
@@ -26,20 +28,20 @@ public class StatusController implements Saveable{
     public void handleApply(Unit unit, StatusEffect effect, float intensity){
         if(effect == StatusEffects.none) return; //don't apply empty effects
 
-        float newTime = effect.baseDuration*intensity;
+        float newTime = effect.baseDuration * intensity;
 
         if(statuses.size > 0){
             //check for opposite effects
             for(StatusEntry entry : statuses){
                 //extend effect
-                if(entry.effect == effect) {
+                if(entry.effect == effect){
                     entry.time = Math.max(entry.time, newTime);
                     return;
                 }else if(entry.effect.isOpposite(effect)){ //find opposite
                     entry.effect.getTransition(unit, effect, entry.time, newTime, globalResult);
                     entry.time = globalResult.time;
 
-                    if (globalResult.effect != entry.effect) {
+                    if(globalResult.effect != entry.effect){
                         entry.effect.onTransition(unit, globalResult.effect);
                         entry.effect = globalResult.effect;
                     }
@@ -94,7 +96,7 @@ public class StatusController implements Saveable{
         return damageMultiplier;
     }
 
-    public float getArmorMultiplier() {
+    public float getArmorMultiplier(){
         return armorMultiplier;
     }
 
@@ -106,24 +108,24 @@ public class StatusController implements Saveable{
     }
 
     @Override
-    public void writeSave(DataOutput stream) throws IOException {
+    public void writeSave(DataOutput stream) throws IOException{
         stream.writeByte(statuses.size);
         for(StatusEntry entry : statuses){
             stream.writeByte(entry.effect.id);
-            stream.writeShort((short)(entry.time * 2));
+            stream.writeShort((short) (entry.time * 2));
         }
     }
 
     @Override
-    public void readSave(DataInput stream) throws IOException {
-        for (StatusEntry effect : statuses){
+    public void readSave(DataInput stream) throws IOException{
+        for(StatusEntry effect : statuses){
             Pooling.free(effect);
         }
 
         statuses.clear();
 
         byte amount = stream.readByte();
-        for (int i = 0; i < amount; i++) {
+        for(int i = 0; i < amount; i++){
             byte id = stream.readByte();
             float time = stream.readShort() / 2f;
             StatusEntry entry = Pooling.obtain(StatusEntry.class);
@@ -132,7 +134,7 @@ public class StatusController implements Saveable{
         }
     }
 
-    public static class StatusEntry {
+    public static class StatusEntry{
         public StatusEffect effect;
         public float time;
 

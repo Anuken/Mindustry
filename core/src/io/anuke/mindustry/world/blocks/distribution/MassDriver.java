@@ -33,7 +33,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class MassDriver extends Block {
+public class MassDriver extends Block{
     protected float range;
     protected float rotateSpeed = 0.04f;
     protected float translation = 7f;
@@ -45,7 +45,7 @@ public class MassDriver extends Block {
     protected Effect recieveEffect = BlockFx.smeltsmoke;
     protected float shake = 3f;
 
-    public MassDriver(String name) {
+    public MassDriver(String name){
         super(name);
         update = true;
         solid = true;
@@ -56,33 +56,77 @@ public class MassDriver extends Block {
         hasPower = true;
     }
 
+    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    public static void linkMassDriver(Player player, Tile tile, int position){
+        MassDriverEntity entity = tile.entity();
+
+        //called in main thread to prevent issues
+        threads.run(() -> entity.link = position);
+    }
+
+    @Remote(called = Loc.server, in = In.blocks)
+    public static void onMassDriverFire(Tile tile, Tile target){
+        //just in case the client has invalid data
+        if(!(tile.entity instanceof MassDriverEntity) || !(target.entity instanceof MassDriverEntity)) return;
+
+        MassDriver driver = (MassDriver) tile.block();
+
+        MassDriverEntity entity = tile.entity();
+        MassDriverEntity other = target.entity();
+
+        entity.reload = 1f;
+
+        DriverBulletData data = Pooling.obtain(DriverBulletData.class);
+        data.from = entity;
+        data.to = other;
+        for(int i = 0; i < Item.all().size; i++){
+            data.items[i] = entity.items.get(Item.getByID(i));
+        }
+        entity.items.clear();
+
+        float angle = tile.angleTo(target);
+
+        other.isRecieving = true;
+        Bullet.create(TurretBullets.driverBolt, entity, entity.getTeam(),
+                tile.drawx() + Angles.trnsx(angle, driver.translation), tile.drawy() + Angles.trnsy(angle, driver.translation),
+                angle, 1f, data);
+
+        Effects.effect(driver.shootEffect, tile.drawx() + Angles.trnsx(angle, driver.translation),
+                tile.drawy() + Angles.trnsy(angle, driver.translation), angle);
+
+        Effects.effect(driver.smokeEffect, tile.drawx() + Angles.trnsx(angle, driver.translation),
+                tile.drawy() + Angles.trnsy(angle, driver.translation), angle);
+
+        Effects.shake(driver.shake, driver.shake, entity);
+    }
+
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         MassDriverEntity entity = tile.entity();
 
         Tile link = world.tile(entity.link);
 
         if(entity.isUnloading){
             tryDump(tile);
-            if(entity.items.totalItems() <= 0){
+            if(entity.items.total() <= 0){
                 entity.isUnloading = false;
             }
         }
 
         if(entity.reload > 0f){
-            entity.reload = Mathf.clamp(entity.reload - Timers.delta()/reloadTime);
+            entity.reload = Mathf.clamp(entity.reload - Timers.delta() / reloadTime);
         }
 
-        if(!entity.isRecieving) {
+        if(!entity.isRecieving){
 
-            if (entity.waiting.size > 0) { //accepting takes priority over shooting
+            if(entity.waiting.size > 0){ //accepting takes priority over shooting
                 Tile waiter = entity.waiting.first();
 
                 entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(waiter), rotateSpeed);
-            }else if (tile.entity.items.totalItems() >= minDistribute &&
-                linkValid(tile) && //only fire when at least at half-capacity and power
-                tile.entity.power.amount >= powerCapacity &&
-                link.block().itemCapacity - link.entity.items.totalItems() >= minDistribute && entity.reload <= 0.0001f) {
+            }else if(tile.entity.items.total() >= minDistribute &&
+                    linkValid(tile) && //only fire when at least at half-capacity and power
+                    tile.entity.power.amount >= powerCapacity &&
+                    link.block().itemCapacity - link.entity.items.total() >= minDistribute && entity.reload <= 0.0001f){
 
                 MassDriverEntity other = link.entity();
                 other.waiting.add(tile);
@@ -91,8 +135,8 @@ public class MassDriver extends Block {
 
                 entity.rotation = Mathf.slerpDelta(entity.rotation, target, rotateSpeed);
 
-                if (Mathf.angNear(entity.rotation, target, 1f) &&
-                        Mathf.angNear(other.rotation, target + 180f, 1f)) {
+                if(Mathf.angNear(entity.rotation, target, 1f) &&
+                        Mathf.angNear(other.rotation, target + 180f, 1f)){
                     CallBlocks.onMassDriverFire(tile, link);
                 }
             }
@@ -102,7 +146,7 @@ public class MassDriver extends Block {
     }
 
     @Override
-    public void drawLayer(Tile tile) {
+    public void drawLayer(Tile tile){
         MassDriverEntity entity = tile.entity();
 
         Draw.rect(name + "-turret",
@@ -112,7 +156,7 @@ public class MassDriver extends Block {
     }
 
     @Override
-    public void drawConfigure(Tile tile) {
+    public void drawConfigure(Tile tile){
         super.drawConfigure(tile);
 
         MassDriverEntity entity = tile.entity();
@@ -137,7 +181,7 @@ public class MassDriver extends Block {
 
         MassDriverEntity entity = tile.entity();
 
-        if(entity.link == other.packedPosition()) {
+        if(entity.link == other.packedPosition()){
             CallBlocks.linkMassDriver(null, tile, -1);
             return false;
         }else if(other.block() instanceof MassDriver && other.distanceTo(tile) <= range){
@@ -149,12 +193,12 @@ public class MassDriver extends Block {
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return tile.entity.items.totalItems() < itemCapacity;
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        return tile.entity.items.total() < itemCapacity;
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new MassDriverEntity();
     }
 
@@ -166,46 +210,16 @@ public class MassDriver extends Block {
         return link != null && link.block() instanceof MassDriver && tile.distanceTo(link) <= range;
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
-    public static void linkMassDriver(Player player, Tile tile, int position){
-        MassDriverEntity entity = tile.entity();
+    public static class DriverBulletData implements Poolable{
+        public MassDriverEntity from, to;
+        public int[] items = new int[Item.all().size];
 
-        //called in main thread to prevent issues
-        threads.run(() -> entity.link = position);
-    }
-
-    @Remote(called = Loc.server, in = In.blocks)
-    public static void onMassDriverFire(Tile tile, Tile target){
-        //just in case the client has invalid data
-        if(!(tile.entity instanceof MassDriverEntity) || !(target.entity instanceof MassDriverEntity)) return;
-
-        MassDriver driver = (MassDriver)tile.block();
-
-        MassDriverEntity entity = tile.entity();
-        MassDriverEntity other = target.entity();
-
-        entity.reload = 1f;
-
-        DriverBulletData data = Pooling.obtain(DriverBulletData.class);
-        data.from = entity;
-        data.to = other;
-        System.arraycopy(entity.items.items, 0, data.items, 0, data.items.length);
-        entity.items.clear();
-
-        float angle = tile.angleTo(target);
-
-        other.isRecieving = true;
-        Bullet.create(TurretBullets.driverBolt, entity, entity.getTeam(),
-                tile.drawx() + Angles.trnsx(angle, driver.translation), tile.drawy() + Angles.trnsy(angle, driver.translation),
-                angle, 1f, data);
-
-        Effects.effect(driver.shootEffect, tile.drawx() + Angles.trnsx(angle, driver.translation),
-                tile.drawy() + Angles.trnsy(angle, driver.translation), angle);
-
-        Effects.effect(driver.smokeEffect, tile.drawx() + Angles.trnsx(angle, driver.translation),
-                tile.drawy() + Angles.trnsy(angle, driver.translation), angle);
-
-        Effects.shake(driver.shake, driver.shake, entity);
+        @Override
+        public void reset(){
+            from = null;
+            to = null;
+            ;
+        }
     }
 
     public class MassDriverEntity extends TileEntity{
@@ -221,12 +235,12 @@ public class MassDriver extends Block {
         public float reload = 0f;
 
         public void handlePayload(Bullet bullet, DriverBulletData data){
-            int totalItems = items.totalItems();
+            int totalItems = items.total();
 
             //add all the items possible
-            for(int i = 0; i < data.items.length; i ++){
+            for(int i = 0; i < data.items.length; i++){
                 int maxAdd = Math.min(data.items[i], itemCapacity - totalItems);
-                items.items[i] += maxAdd;
+                items.add(Item.getByID(i), maxAdd);
                 data.items[i] -= maxAdd;
                 totalItems += maxAdd;
 
@@ -236,7 +250,7 @@ public class MassDriver extends Block {
             }
 
             //drop all items remaining on the ground
-            for(int i = 0; i < data.items.length; i ++){
+            for(int i = 0; i < data.items.length; i++){
                 int amountDropped = Mathf.random(0, data.items[i]);
                 if(amountDropped > 0){
                     float angle = Mathf.range(180f);
@@ -258,24 +272,13 @@ public class MassDriver extends Block {
         }
 
         @Override
-        public void write(DataOutputStream stream) throws IOException {
+        public void write(DataOutputStream stream) throws IOException{
             stream.writeInt(link);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException {
+        public void read(DataInputStream stream) throws IOException{
             link = stream.readInt();
-        }
-    }
-
-    public static class DriverBulletData implements Poolable{
-        public MassDriverEntity from, to;
-        public int[] items = new int[Item.all().size];
-
-        @Override
-        public void reset() {
-            from = null;
-            to = null;;
         }
     }
 }

@@ -1,16 +1,18 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.utils.Scaling;
-import static io.anuke.mindustry.Vars.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 
+import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.players;
+
 public class LocalPlayerDialog extends FloatingDialog{
 
-    public LocalPlayerDialog() {
+    public LocalPlayerDialog(){
         super("$text.addplayers");
 
         addCloseButton();
@@ -22,7 +24,7 @@ public class LocalPlayerDialog extends FloatingDialog{
 
         content().clear();
 
-        if(players.length > 1) {
+        if(players.length > 1){
             content().addImageButton("icon-cancel", 14 * 2, () -> {
                 control.removePlayer();
                 rebuild();
@@ -49,7 +51,7 @@ public class LocalPlayerDialog extends FloatingDialog{
             content().add(table).pad(5);
         }
 
-        if(players.length < 4) {
+        if(players.length < 4){
             content().addImageButton("icon-add", 14 * 2, () -> {
                 control.addPlayer(players.length);
                 rebuild();

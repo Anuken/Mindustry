@@ -10,14 +10,14 @@ import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-public class LoadingFragment extends Fragment {
+public class LoadingFragment extends Fragment{
     private Table table;
     private TextButton button;
 
     @Override
-    public void build(Group parent) {
+    public void build(Group parent){
 
-       table = new table("loadDim"){{
+        table = new table("loadDim"){{
             add().height(70f).row();
 
             touchable(Touchable.enabled);
@@ -33,7 +33,8 @@ public class LoadingFragment extends Fragment {
 
             row();
 
-            button = get().addButton("$text.cancel", () -> {}).pad(20).size(250f, 70f).get();
+            button = get().addButton("$text.cancel", () -> {
+            }).pad(20).size(250f, 70f).get();
             button.setVisible(false);
         }}.end().get();
 

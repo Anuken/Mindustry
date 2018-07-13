@@ -10,11 +10,11 @@ import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-public class EnvironmentFx extends FxList implements ContentList {
+public class EnvironmentFx extends FxList implements ContentList{
     public static Effect burning, fire, smoke, steam, fireballsmoke, ballfire, freezing, melting, wet, oily;
 
     @Override
-    public void load() {
+    public void load(){
 
         burning = new Effect(35f, e -> {
             Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());

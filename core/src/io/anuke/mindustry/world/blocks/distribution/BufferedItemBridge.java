@@ -10,13 +10,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class BufferedItemBridge extends ExtendingItemBridge {
-    protected int timerAccept = timers ++;
+public class BufferedItemBridge extends ExtendingItemBridge{
+    protected int timerAccept = timers++;
 
     protected float speed = 40f;
     protected int bufferCapacity = 50;
 
-    public BufferedItemBridge(String name) {
+    public BufferedItemBridge(String name){
         super(name);
         hasPower = false;
         hasItems = true;
@@ -26,8 +26,8 @@ public class BufferedItemBridge extends ExtendingItemBridge {
     public void updateTransport(Tile tile, Tile other){
         BufferedItemBridgeEntity entity = tile.entity();
 
-        if(entity.buffer.accepts() && entity.items.totalItems() > 0){
-            entity.buffer.accept(entity.items.takeItem());
+        if(entity.buffer.accepts() && entity.items.total() > 0){
+            entity.buffer.accept(entity.items.take());
         }
 
         Item item = entity.buffer.poll();
@@ -41,7 +41,7 @@ public class BufferedItemBridge extends ExtendingItemBridge {
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new BufferedItemBridgeEntity();
     }
 
@@ -49,12 +49,12 @@ public class BufferedItemBridge extends ExtendingItemBridge {
         ItemBuffer buffer = new ItemBuffer(bufferCapacity, speed);
 
         @Override
-        public void write(DataOutputStream stream) throws IOException {
+        public void write(DataOutputStream stream) throws IOException{
             super.write(stream);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException {
+        public void read(DataInputStream stream) throws IOException{
             super.read(stream);
         }
     }

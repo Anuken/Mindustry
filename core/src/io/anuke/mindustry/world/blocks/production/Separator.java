@@ -1,55 +1,61 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
-/**Extracts a random list of items from an input item and an input liquid.*/
-public class Separator extends Block {
-    protected final int timerDump = timers ++;
+/**
+ * Extracts a random list of items from an input item and an input liquid.
+ */
+public class Separator extends Block{
+    protected final int timerDump = timers++;
 
-    protected Liquid liquid;
-    protected Item item;
     protected Item[] results;
-    protected float liquidUse;
-    protected float powerUse;
     protected float filterTime;
     protected float spinnerRadius = 2.5f;
     protected float spinnerLength = 1f;
     protected float spinnerThickness = 1f;
     protected float spinnerSpeed = 2f;
 
+    protected Color color = Color.valueOf("858585");
+    protected TextureRegion liquidRegion;
+
     protected boolean offloading = false;
 
-    public Separator(String name) {
+    public Separator(String name){
         super(name);
         update = true;
         solid = true;
         hasItems = true;
         hasLiquids = true;
+
+        consumes.item(Items.stone);
+        consumes.liquid(Liquids.water, 0.1f);
     }
 
     @Override
-    public void setStats() {
+    public void load(){
+        super.load();
+
+        liquidRegion = Draw.region(name + "-liquid");
+    }
+
+    @Override
+    public void setStats(){
         super.setStats();
 
-        if(hasPower){
-            stats.add(BlockStat.powerUse, powerUse * 60f, StatUnit.powerSecond);
-        }
-
-        stats.add(BlockStat.liquidUse, liquidUse * 60f, StatUnit.liquidSecond);
-        stats.add(BlockStat.inputLiquid, liquid);
         stats.add(BlockStat.outputItem, new ItemFilterValue(item -> {
             for(Item i : results){
                 if(item == i) return true;
@@ -59,36 +65,29 @@ public class Separator extends Block {
     }
 
     @Override
-    public void draw(Tile tile) {
+    public void draw(Tile tile){
         super.draw(tile);
 
         GenericCrafterEntity entity = tile.entity();
 
-        Draw.color(tile.entity.liquids.liquid.color);
-        Draw.alpha(tile.entity.liquids.amount / liquidCapacity);
-        Draw.rect(name + "-liquid", tile.drawx(), tile.drawy());
+        Draw.color(tile.entity.liquids.current().color);
+        Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
+        Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
 
-        Draw.color(Color.valueOf("858585"));
+        Draw.color(color);
         Lines.stroke(spinnerThickness);
-        Lines.spikes(tile.drawx(), tile.drawy(), spinnerRadius, spinnerLength, 3, entity.totalProgress*spinnerSpeed);
+        Lines.spikes(tile.drawx(), tile.drawy(), spinnerRadius, spinnerLength, 3, entity.totalProgress * spinnerSpeed);
         Draw.reset();
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         GenericCrafterEntity entity = tile.entity();
 
-        float liquidUsed = Math.min(liquidCapacity, liquidUse * Timers.delta());
-        float powerUsed = Math.min(powerCapacity, powerUse * Timers.delta());
+        entity.totalProgress += entity.warmup * Timers.delta();
 
-        entity.totalProgress += entity.warmup*Timers.delta();
-
-        if(entity.liquids.amount >= liquidUsed && entity.items.hasItem(item) &&
-                (!hasPower || entity.power.amount >= powerUsed)){
-            entity.progress += 1f/filterTime;
-            entity.liquids.amount -= liquidUsed;
-            if(hasPower) entity.power.amount -= powerUsed;
-
+        if(entity.cons.valid()){
+            entity.progress += 1f / filterTime;
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
@@ -97,7 +96,7 @@ public class Separator extends Block {
         if(entity.progress >= 1f){
             entity.progress = 0f;
             Item item = Mathf.select(results);
-            entity.items.removeItem(this.item, 1);
+            entity.items.remove(consumes.item(), consumes.itemAmount());
             if(item != null){
                 offloading = true;
                 offloadNear(tile, item);
@@ -111,22 +110,12 @@ public class Separator extends Block {
     }
 
     @Override
-    public boolean canDump(Tile tile, Tile to, Item item) {
-        return offloading || item != this.item;
+    public boolean canDump(Tile tile, Tile to, Item item){
+        return offloading || item != consumes.item();
     }
 
     @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
-        return super.acceptLiquid(tile, source, liquid, amount) && this.liquid == liquid;
-    }
-
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source) {
-        return this.item == item && tile.entity.items.getItem(item) < itemCapacity;
-    }
-
-    @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new GenericCrafterEntity();
     }
 }

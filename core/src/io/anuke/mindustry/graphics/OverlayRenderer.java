@@ -24,10 +24,10 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class OverlayRenderer {
+public class OverlayRenderer{
 
     public void drawBottom(){
-        for(Player player : players) {
+        for(Player player : players){
             InputHandler input = control.input(player.playerIndex);
 
             if(!input.isDrawing() || player.isDead()) continue;
@@ -43,7 +43,7 @@ public class OverlayRenderer {
 
     public void drawTop(){
 
-        for(Player player : players) {
+        for(Player player : players){
             if(player.isDead()) continue; //dead player don't draw
 
             InputHandler input = control.input(player.playerIndex);
@@ -52,7 +52,7 @@ public class OverlayRenderer {
             if(input.frag.config.isShown()){
                 Tile tile = input.frag.config.getSelectedTile();
 
-                synchronized (Tile.tileSetLock) {
+                synchronized(Tile.tileSetLock){
                     tile.block().drawConfigure(tile);
                 }
             }
@@ -62,14 +62,14 @@ public class OverlayRenderer {
             Draw.reset();
 
             //draw selected block bars and info
-            if (input.recipe == null && !ui.hasMouse() && !input.frag.config.isShown()) {
+            if(input.recipe == null && !ui.hasMouse() && !input.frag.config.isShown()){
                 Vector2 vec = Graphics.world(input.getMouseX(), input.getMouseY());
                 Tile tile = world.tileWorld(vec.x, vec.y);
 
-                if (tile != null && tile.block() != Blocks.air) {
+                if(tile != null && tile.block() != Blocks.air){
                     Tile target = tile.target();
 
-                    if (showBlockDebug && target.entity != null) {
+                    if(showBlockDebug && target.entity != null){
                         Draw.color(Color.RED);
                         Lines.crect(target.drawx(), target.drawy(), target.block().size * tilesize, target.block().size * tilesize);
                         Vector2 v = new Vector2();
@@ -78,7 +78,7 @@ public class OverlayRenderer {
                         Draw.tscl(0.25f);
                         Array<Object> arr = target.block().getDebugInfo(target);
                         StringBuilder result = new StringBuilder();
-                        for (int i = 0; i < arr.size / 2; i++) {
+                        for(int i = 0; i < arr.size / 2; i++){
                             result.append(arr.get(i * 2));
                             result.append(": ");
                             result.append(arr.get(i * 2 + 1));
@@ -92,27 +92,27 @@ public class OverlayRenderer {
                         Draw.reset();
                     }
 
-                    synchronized (Tile.tileSetLock) {
+                    synchronized(Tile.tileSetLock){
                         Block block = target.block();
                         TileEntity entity = target.entity;
 
-                        if (entity != null) {
+                        if(entity != null){
                             int[] values = {0, 0};
                             boolean[] doDraw = {false};
 
                             Callable drawbars = () -> {
-                                for (BlockBar bar : block.bars.list()) {
+                                for(BlockBar bar : block.bars.list()){
                                     float offset = Mathf.sign(bar.top) * (block.size / 2f * tilesize + 2f + (bar.top ? values[0] : values[1]));
 
                                     float value = bar.value.get(target);
 
-                                    if (MathUtils.isEqual(value, -1f)) continue;
+                                    if(MathUtils.isEqual(value, -1f)) continue;
 
                                     if(doDraw[0]){
                                         drawBar(bar.type.color, target.drawx(), target.drawy() + offset, value);
                                     }
 
-                                    if (bar.top)
+                                    if(bar.top)
                                         values[0]++;
                                     else
                                         values[1]++;
@@ -122,11 +122,11 @@ public class OverlayRenderer {
                             drawbars.run();
 
                             if(values[0] > 0){
-                                drawEncloser(target.drawx(), target.drawy() + block.size * tilesize/2f + 2f, values[0]);
+                                drawEncloser(target.drawx(), target.drawy() + block.size * tilesize / 2f + 2f, values[0]);
                             }
 
                             if(values[1] > 0){
-                                drawEncloser(target.drawx(), target.drawy() - block.size * tilesize/2f - 2f - values[1], values[1]);
+                                drawEncloser(target.drawx(), target.drawy() - block.size * tilesize / 2f - 2f - values[1], values[1]);
                             }
 
                             doDraw[0] = true;
@@ -142,7 +142,7 @@ public class OverlayRenderer {
                 }
             }
 
-            if (input.isDroppingItem()) {
+            if(input.isDroppingItem()){
                 Vector2 v = Graphics.world(input.getMouseX(), input.getMouseY());
                 float size = 8;
                 Draw.rect(player.inventory.getItem().item.region, v.x, v.y, size, size);
@@ -151,8 +151,8 @@ public class OverlayRenderer {
                 Draw.reset();
 
                 Tile tile = world.tileWorld(v.x, v.y);
-                if (tile != null) tile = tile.target();
-                if (tile != null && tile.block().acceptStack(player.inventory.getItem().item, player.inventory.getItem().amount, tile, player) > 0) {
+                if(tile != null) tile = tile.target();
+                if(tile != null && tile.block().acceptStack(player.inventory.getItem().item, player.inventory.getItem().amount, tile, player) > 0){
                     Draw.color(Palette.place);
                     Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1 + Mathf.absin(Timers.time(), 5f, 1f));
                     Draw.color();
@@ -176,9 +176,9 @@ public class OverlayRenderer {
         float x = unit.x;
         float y = unit.y;
 
-        if(unit == players[0] && players.length == 1 && snapCamera) {
-            x = (int)(x + 0.0001f);
-            y = (int)(y + 0.0001f);
+        if(unit == players[0] && players.length == 1 && snapCamera){
+            x = (int) (x + 0.0001f);
+            y = (int) (y + 0.0001f);
         }
 
         drawEncloser(x, y - 9f, 2f);
@@ -193,25 +193,23 @@ public class OverlayRenderer {
 
         float len = 3;
 
-        float w = (int) (len * 2 * finion) + 0.5f;
-
-        x -= 0.5f;
-        y += 0.5f;
+        float w = (int) (len * 2 * finion);
 
         Draw.color(Color.BLACK);
-        Lines.line(x - len + 1, y, x + len + 0.5f, y);
-        Draw.color(color);
-        if(w >= 1)
-            Lines.line(x - len + 1, y, x - len + w, y);
-        Draw.reset();
+        Fill.crect(x - len, y, len * 2f, 1);
+        if(finion > 0){
+            Draw.color(color);
+            Fill.crect(x - len, y, Math.max(1, w), 1);
+        }
+        Draw.color();
     }
 
     void drawEncloser(float x, float y, float height){
 
-        float len = 3;
+        float len = 4;
 
         Draw.color(Palette.bar);
-        Fill.crect(x - len - 1, y - 1, len*2f + 2f, height + 2f);
+        Fill.crect(x - len, y - 1, len * 2f, height + 2f);
         Draw.color();
     }
 }
