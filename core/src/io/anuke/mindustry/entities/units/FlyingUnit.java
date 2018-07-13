@@ -23,9 +23,13 @@ import static io.anuke.mindustry.Vars.world;
 public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected static Translator vec = new Translator();
     protected static float wobblyness = 0.6f;
-    public final UnitState
 
-            resupply = new UnitState(){
+    protected Trail trail = new Trail(8);
+    protected CarriableTrait carrying;
+
+    protected final UnitState
+
+    resupply = new UnitState(){
         public void entered(){
             target = null;
         }
@@ -40,81 +44,79 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             }
         }
     },
-            idle = new UnitState(){
-                public void update(){
-                    retarget(() -> {
-                        targetClosest();
-                        targetClosestEnemyFlag(BlockFlag.target);
+    idle = new UnitState(){
+        public void update(){
+            retarget(() -> {
+                targetClosest();
+                targetClosestEnemyFlag(BlockFlag.target);
 
-                        if(target != null){
-                            setState(attack);
-                        }
-                    });
+                if(target != null){
+                    setState(attack);
+                }
+            });
 
-                    target = getClosestCore();
-                    if(target != null){
-                        circle(50f);
+            target = getClosestCore();
+            if(target != null){
+                circle(50f);
+            }
+            velocity.scl(0.8f);
+        }
+    },
+    attack = new UnitState(){
+        public void entered(){
+            target = null;
+        }
+
+        public void update(){
+            if(Units.invalidateTarget(target, team, x, y)){
+                target = null;
+            }
+
+            if(!inventory.hasAmmo()){
+                state.set(resupply);
+            }else if(target == null){
+                retarget(() -> {
+                    targetClosest();
+                    targetClosestEnemyFlag(BlockFlag.target);
+                    targetClosestEnemyFlag(BlockFlag.producer);
+
+                    if(target == null){
+                        setState(idle);
                     }
-                    velocity.scl(0.8f);
+                });
+            }else{
+                attack(150f);
+
+                if((Mathf.angNear(angleTo(target), rotation, 15f) || !inventory.getAmmo().bullet.keepVelocity) //bombers don't care about rotation
+                        && distanceTo(target) < inventory.getAmmo().getRange()){
+                    AmmoType ammo = inventory.getAmmo();
+                    inventory.useAmmo();
+
+                    Vector2 to = Predict.intercept(FlyingUnit.this, target, ammo.bullet.speed);
+
+                    getWeapon().update(FlyingUnit.this, to.x, to.y);
                 }
-            },
-            attack = new UnitState(){
-                public void entered(){
-                    target = null;
-                }
+            }
+        }
+    },
+    retreat = new UnitState(){
+        public void entered(){
+            target = null;
+        }
 
-                public void update(){
-                    if(Units.invalidateTarget(target, team, x, y)){
-                        target = null;
-                    }
-
-                    if(!inventory.hasAmmo()){
-                        state.set(resupply);
-                    }else if(target == null){
-                        retarget(() -> {
-                            targetClosest();
-                            targetClosestEnemyFlag(BlockFlag.target);
-                            targetClosestEnemyFlag(BlockFlag.producer);
-
-                            if(target == null){
-                                setState(idle);
-                            }
-                        });
-                    }else{
-                        attack(150f);
-
-                        if((Mathf.angNear(angleTo(target), rotation, 15f) || !inventory.getAmmo().bullet.keepVelocity) //bombers don't care about rotation
-                                && distanceTo(target) < inventory.getAmmo().getRange()){
-                            AmmoType ammo = inventory.getAmmo();
-                            inventory.useAmmo();
-
-                            Vector2 to = Predict.intercept(FlyingUnit.this, target, ammo.bullet.speed);
-
-                            getWeapon().update(FlyingUnit.this, to.x, to.y);
-                        }
-                    }
-                }
-            },
-            retreat = new UnitState(){
-                public void entered(){
-                    target = null;
-                }
-
-                public void update(){
-                    if(health >= maxHealth()){
-                        state.set(attack);
-                    }else if(!targetHasFlag(BlockFlag.repair)){
-                        retarget(() -> {
-                            Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair));
-                            if(target != null) FlyingUnit.this.target = target.entity;
-                        });
-                    }else{
-                        circle(20f);
-                    }
-                }
-            };
-    protected Trail trail = new Trail(8);
-    protected CarriableTrait carrying;
+        public void update(){
+            if(health >= maxHealth()){
+                state.set(attack);
+            }else if(!targetHasFlag(BlockFlag.repair)){
+                retarget(() -> {
+                    Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair));
+                    if(target != null) FlyingUnit.this.target = target.entity;
+                });
+            }else{
+                circle(20f);
+            }
+        }
+    };
 
     //instantiation only
     public FlyingUnit(){

@@ -3,6 +3,7 @@ package io.anuke.mindustry.io;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save16;
@@ -15,9 +16,10 @@ import java.util.zip.InflaterInputStream;
 import static io.anuke.mindustry.Vars.*;
 
 public class SaveIO{
+    public static final IntArray breakingVersions = IntArray.with(47);
     public static final IntMap<SaveFileVersion> versions = new IntMap<>();
     public static final Array<SaveFileVersion> versionArray = Array.with(
-            new Save16()
+        new Save16()
     );
 
     static{

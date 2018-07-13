@@ -11,6 +11,7 @@ import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.SaveFileVersion;
+import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
@@ -153,6 +154,7 @@ public class Save16 extends SaveFileVersion{
         //--META--
         stream.writeInt(version); //version id
         stream.writeLong(TimeUtils.millis()); //last saved
+        stream.writeInt(Version.build);
 
         //--GENERAL STATE--
         stream.writeByte(state.mode.ordinal()); //gamemode
@@ -175,7 +177,6 @@ public class Save16 extends SaveFileVersion{
         }
 
         //--ENTITIES--
-        //TODO synchronized block here
 
         int groups = 0;
 

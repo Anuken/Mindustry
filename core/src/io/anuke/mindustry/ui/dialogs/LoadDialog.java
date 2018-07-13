@@ -185,7 +185,13 @@ public class LoadDialog extends FloatingDialog{
     public void modifyButton(TextButton button, SaveSlot slot){
         button.clicked(() -> {
             if(!button.childrenPressed()){
-                runLoadSave(slot);
+                int build = slot.getBuild();
+                if(SaveIO.breakingVersions.contains(build)){
+                    ui.showInfo("$text.save.old");
+                    slot.delete();
+                }else{
+                    runLoadSave(slot);
+                }
             }
         });
     }

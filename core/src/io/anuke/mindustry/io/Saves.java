@@ -144,6 +144,10 @@ public class Saves{
             Settings.save();
         }
 
+        public int getBuild(){
+            return meta.build;
+        }
+
         public int getWave(){
             return meta.wave;
         }
