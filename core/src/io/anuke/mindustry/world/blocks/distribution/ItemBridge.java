@@ -243,8 +243,10 @@ public class ItemBridge extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         ItemBridgeEntity entity = tile.entity();
         Tile other = world.tile(entity.link);
+        boolean linked = false;
 
         if(linkValid(tile, other)){
+            linked = true;
             int rel = tile.absoluteRelativeTo(other.x, other.y);
             int rel2 = tile.relativeTo(source.x, source.y);
 
@@ -264,7 +266,7 @@ public class ItemBridge extends Block{
             }
         }
 
-        return tile.entity.items.total() < itemCapacity;
+        return tile.entity.items.total() < itemCapacity && (linked || source.block() instanceof ItemBridge);
     }
 
     @Override
