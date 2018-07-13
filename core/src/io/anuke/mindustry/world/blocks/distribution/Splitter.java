@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
@@ -17,6 +18,13 @@ public class Splitter extends Block{
         update = true;
         hasItems = false;
         group = BlockGroup.transportation;
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        bars.remove(BarType.inventory);
     }
 
     @Override

@@ -24,7 +24,7 @@ public class LiquidBridge extends ItemBridge{
         entity.time2 += (entity.cycleSpeed - 1f) * Timers.delta();
 
         Tile other = world.tile(entity.link);
-        if(!linkValid(tile, other)){
+        if(!linkValid(tile, other) ){
             tryDumpLiquid(tile, entity.liquids.current());
         }else{
             if(entity.cons.valid()){
@@ -32,7 +32,6 @@ public class LiquidBridge extends ItemBridge{
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
             }
-
 
             if(entity.uptime >= 0.5f){
 

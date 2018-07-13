@@ -17,7 +17,7 @@ public class OverflowGate extends Splitter{
         if(dir == -1) return null;
         Tile to = dest.getNearby(dir);
 
-        if(!(to.block().acceptItem(item, to, dest) ||
+        if((!to.block().acceptItem(item, to, dest) ||
                 (to.block().instantTransfer && source.block().instantTransfer))){
             Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
             Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
