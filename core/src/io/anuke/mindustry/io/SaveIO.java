@@ -134,6 +134,8 @@ public class SaveIO{
             FileHandle backup = file.sibling(file.name() + "-backup." + file.extension());
             if(backup.exists()){
                 load(new InflaterInputStream(backup.read()));
+            }else{
+                throw new RuntimeException(e);
             }
         }
     }

@@ -1,22 +1,24 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.ucore.core.Timers;
 
 public class Splitter extends Block{
-    protected float speed = 30f;
+    protected float speed = 9f;
 
     public Splitter(String name){
         super(name);
         solid = true;
-        instantTransfer = true;
         update = true;
-        hasItems = false;
+        hasItems = true;
+        itemCapacity = 1;
         group = BlockGroup.transportation;
     }
 
@@ -28,29 +30,68 @@ public class Splitter extends Block{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        Tile to = getTileTarget(item, tile, source, false);
+    public void update(Tile tile){
+        SplitterEntity entity = tile.entity();
+        if(entity.lastItem != null){
+            entity.time += 1f/speed * Timers.delta();
+            Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput);
 
-        return to != null;
+            if(target != null && (entity.time >= 1f)){
+                target.block().handleItem(entity.lastItem, target, Edges.getFacingEdge(tile, target));
+                entity.items.remove(entity.lastItem, 1);
+                entity.lastItem = null;
+            }
+        }
+    }
+
+    @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        SplitterEntity entity = tile.entity();
+
+        return entity.lastItem == null;
     }
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        Tile to = getTileTarget(item, tile, source, true);
-        to.block().handleItem(item, to, Edges.getFacingEdge(tile, to));
+        SplitterEntity entity = tile.entity();
+        entity.items.add(item, 1);
+        entity.lastItem = item;
+        entity.time = 0f;
+        entity.lastInput = tile.relativeTo(source.x, source.y);
     }
 
-    Tile getTileTarget(Item item, Tile tile, Tile source, boolean flip){
+    Tile getTileTarget(Tile tile, Item item, int from){
         Array<Tile> proximity = tile.entity.proximity();
         int counter = tile.getDump();
         for(int i = 0; i < proximity.size; i++){
             Tile other = proximity.get((i + counter) % proximity.size);
-            if(flip) tile.setDump((byte) ((tile.getDump() + 1) % proximity.size));
-            if(other != source && !(source.block().instantTransfer && other.block().instantTransfer) && !(other.block() instanceof Splitter) &&
-                    other.block().acceptItem(item, other, Edges.getFacingEdge(tile, other))){
+            if(tile.relativeTo(other.x, other.y) == from) continue;
+            tile.setDump((byte) ((tile.getDump() + 1) % proximity.size));
+            if(other.block().acceptItem(item, other, Edges.getFacingEdge(tile, other))){
                 return other;
             }
         }
         return null;
+    }
+
+    @Override
+    public int removeStack(Tile tile, Item item, int amount){
+        SplitterEntity entity = tile.entity();
+        int result = super.removeStack(tile, item, amount);
+        if(result != 0 && item == entity.lastItem){
+            entity.lastItem = null;
+        }
+        return result;
+    }
+
+    @Override
+    public TileEntity getEntity(){
+        return new SplitterEntity();
+    }
+
+    public class SplitterEntity extends TileEntity{
+        Item lastItem;
+        int lastInput;
+        float time;
     }
 }

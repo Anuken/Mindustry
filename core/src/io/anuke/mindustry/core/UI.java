@@ -34,6 +34,7 @@ import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.players;
+import static io.anuke.mindustry.Vars.threads;
 import static io.anuke.ucore.scene.actions.Actions.*;
 
 public class UI extends SceneModule{
@@ -228,6 +229,16 @@ public class UI extends SceneModule{
         Timers.runTask(7f, () -> {
             call.run();
             loadfrag.hide();
+        });
+    }
+
+    public void loadLogic(Callable call){
+        loadfrag.show();
+        Timers.runTask(7f, () -> {
+            threads.run(() -> {
+                call.run();
+                threads.runGraphics(loadfrag::hide);
+            });
         });
     }
 

@@ -1,7 +1,9 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
 public class OverflowGate extends Splitter{
@@ -9,22 +11,35 @@ public class OverflowGate extends Splitter{
     public OverflowGate(String name){
         super(name);
         hasItems = true;
+        speed = 1f;
     }
 
     @Override
-    Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
-        int dir = source.relativeTo(dest.x, dest.y);
-        if(dir == -1) return null;
-        Tile to = dest.getNearby(dir);
+    public void update(Tile tile){
+        SplitterEntity entity = tile.entity();
+        if(entity.lastItem != null){
+            entity.time += 1f/speed * Timers.delta();
+            Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
 
-        if((!to.block().acceptItem(item, to, dest) ||
-                (to.block().instantTransfer && source.block().instantTransfer))){
-            Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
-            Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
-            boolean ac = !(a.block().instantTransfer && source.block().instantTransfer) &&
-                    a.block().acceptItem(item, a, dest);
-            boolean bc = !(b.block().instantTransfer && source.block().instantTransfer) &&
-                    b.block().acceptItem(item, b, dest);
+            if(target != null && (entity.time >= 1f)){
+                getTileTarget(tile, entity.lastItem, entity.lastInput, true);
+                target.block().handleItem(entity.lastItem, target, Edges.getFacingEdge(tile, target));
+                entity.items.remove(entity.lastItem, 1);
+                entity.lastItem = null;
+            }
+        }
+    }
+
+    Tile getTileTarget(Tile tile, Item item, int from, boolean flip){
+        if(from == -1) return null;
+        Tile to = tile.getNearby((from + 2) % 4);
+        Tile edge = Edges.getFacingEdge(tile, to);
+
+        if(!to.block().acceptItem(item, to, edge) || (to.block() instanceof OverflowGate)){
+            Tile a = tile.getNearby(Mathf.mod(from - 1, 4));
+            Tile b = tile.getNearby(Mathf.mod(from + 1, 4));
+            boolean ac = a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate);
+            boolean bc = b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate);
 
             if(!ac && !bc){
                 return null;
@@ -35,14 +50,12 @@ public class OverflowGate extends Splitter{
             }else if(bc && !ac){
                 to = b;
             }else{
-                if(dest.getDump() == 0){
+                if(tile.getDump() == 0){
                     to = a;
-                    if(flip)
-                        dest.setDump((byte) 1);
+                    if(flip) tile.setDump((byte) 1);
                 }else{
                     to = b;
-                    if(flip)
-                        dest.setDump((byte) 0);
+                    if(flip) tile.setDump((byte) 0);
                 }
             }
         }

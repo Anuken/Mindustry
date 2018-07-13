@@ -52,6 +52,7 @@ public class Edges{
     }
 
     public static Tile getFacingEdge(Tile tile, Tile other){
+        if(!tile.block().isMultiblock()) return tile;
         int size = tile.block().size;
         return world.tile(tile.x + Mathf.clamp(other.x - tile.x, -(size - 1) / 2, (size / 2)),
                 tile.y + Mathf.clamp(other.y - tile.y, -(size - 1) / 2, (size / 2)));

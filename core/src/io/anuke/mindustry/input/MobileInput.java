@@ -33,20 +33,17 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.scene.builders.table;
+import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class MobileInput extends InputHandler implements GestureListener{
-    /**
-     * Maximum speed the player can pan.
-     */
+    /** Maximum speed the player can pan. */
     private static final float maxPanSpeed = 1.3f;
     private static Rectangle r1 = new Rectangle(), r2 = new Rectangle();
-    /**
-     * Distance to edge of screen to start panning.
-     */
+    /** Distance to edge of screen to start panning. */
     private final float edgePan = io.anuke.ucore.scene.ui.layout.Unit.dp.scl(60f);
 
     //gesture data
@@ -54,53 +51,31 @@ public class MobileInput extends InputHandler implements GestureListener{
     private Vector2 vector = new Vector2();
     private float initzoom = -1;
     private boolean zoomed = false;
-    /**
-     * Set of completed guides.
-     */
+    /** Set of completed guides. */
     private ObjectSet<String> guides = new ObjectSet<>();
 
-    /**
-     * Position where the player started dragging a line.
-     */
+    /** Position where the player started dragging a line. */
     private int lineStartX, lineStartY;
 
-    /**
-     * Animation scale for line.
-     */
+    /** Animation scale for line. */
     private float lineScale;
-    /**
-     * Animation data for crosshair.
-     */
+    /** Animation data for crosshair. */
     private float crosshairScale;
     private TargetTrait lastTarget;
 
-    /**
-     * List of currently selected tiles to place.
-     */
+    /** List of currently selected tiles to place. */
     private Array<PlaceRequest> selection = new Array<>();
-    /**
-     * Place requests to be removed.
-     */
+    /** Place requests to be removed. */
     private Array<PlaceRequest> removals = new Array<>();
-    /**
-     * Whether or not the player is currently shifting all placed tiles.
-     */
+    /** Whether or not the player is currently shifting all placed tiles. */
     private boolean selecting;
-    /**
-     * Whether the player is currently in line-place mode.
-     */
+    /** Whether the player is currently in line-place mode. */
     private boolean lineMode;
-    /**
-     * Current place mode.
-     */
+    /** Current place mode. */
     private PlaceMode mode = none;
-    /**
-     * Whether no recipe was available when switching to break mode.
-     */
+    /** Whether no recipe was available when switching to break mode. */
     private Recipe lastRecipe;
-    /**
-     * Last placed request. Used for drawing block overlay.
-     */
+    /** Last placed request. Used for drawing block overlay. */
     private PlaceRequest lastPlaced;
 
     public MobileInput(Player player){
@@ -110,9 +85,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     //region utility methods
 
-    /**
-     * Check and assign targets for a specific position.
-     */
+    /** Check and assign targets for a specific position. */
     void checkTargets(float x, float y){
         synchronized(Entities.entityLock){
             Unit unit = Units.getClosestEnemy(player.getTeam(), x, y, 20f, u -> true);
@@ -130,16 +103,12 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
     }
 
-    /**
-     * Returns whether this tile is in the list of requests, or at least colliding with one.
-     */
+    /** Returns whether this tile is in the list of requests, or at least colliding with one. */
     boolean hasRequest(Tile tile){
         return getRequest(tile) != null;
     }
 
-    /**
-     * Returns whether this block overlaps any selection requests.
-     */
+    /** Returns whether this block overlaps any selection requests. */
     boolean checkOverlapPlacement(int x, int y, Block block){
         r2.setSize(block.size * tilesize);
         r2.setCenter(x * tilesize + block.offset(), y * tilesize + block.offset());
@@ -159,9 +128,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         return false;
     }
 
-    /**
-     * Returns the selection request that overlaps this tile, or null.
-     */
+    /** Returns the selection request that overlaps this tile, or null. */
     PlaceRequest getRequest(Tile tile){
         r2.setSize(tilesize);
         r2.setCenter(tile.worldx(), tile.worldy());
@@ -250,6 +217,8 @@ public class MobileInput extends InputHandler implements GestureListener{
                 margin(5);
                 defaults().size(60f);
 
+                touchable(Touchable.enabled);
+
                 //Add a cancel button
                 new imagebutton("icon-cancel", 16 * 2f, () -> {
                     mode = none;
@@ -297,6 +266,8 @@ public class MobileInput extends InputHandler implements GestureListener{
                 margin(5);
                 defaults().size(60f);
 
+                touchable(Touchable.enabled);
+
                 //Add a break button.
                 new imagebutton("icon-break", "toggle", 16 * 2f, () -> {
                     mode = mode == breaking ? recipe == null ? none : placing : breaking;
@@ -310,6 +281,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             new table("pane"){{
                 margin(5);
                 defaults().size(60f);
+
+                touchable(Touchable.enabled);
 
                 //Add a 'cancel building' button.
                 new imagebutton("icon-cancel", 16 * 2f, player::clearBuilding);
