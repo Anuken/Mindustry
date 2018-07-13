@@ -5,7 +5,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Bits;
 
-public class ItemBuffer {
+public class ItemBuffer{
     private final float speed;
 
     private long[] buffer;
@@ -22,11 +22,11 @@ public class ItemBuffer {
 
     public void accept(Item item, short data){
         //if(!accepts()) return;
-        buffer[index ++] = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), Bits.packInt((short)item.id, data));
+        buffer[index++] = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), Bits.packInt((short) item.id, data));
     }
 
     public void accept(Item item){
-        accept(item, (short)-1);
+        accept(item, (short) -1);
     }
 
     public Item poll(){
@@ -55,6 +55,6 @@ public class ItemBuffer {
 
     public void remove(){
         System.arraycopy(buffer, 1, buffer, 0, index - 1);
-        index --;
+        index--;
     }
 }

@@ -4,9 +4,9 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.Mathf;
 
-public class OverflowGate extends Splitter {
+public class OverflowGate extends Splitter{
 
-    public OverflowGate(String name) {
+    public OverflowGate(String name){
         super(name);
         hasItems = true;
     }
@@ -38,11 +38,11 @@ public class OverflowGate extends Splitter {
                 if(dest.getDump() == 0){
                     to = a;
                     if(flip)
-                        dest.setDump((byte)1);
+                        dest.setDump((byte) 1);
                 }else{
                     to = b;
                     if(flip)
-                        dest.setDump((byte)0);
+                        dest.setDump((byte) 0);
                 }
             }
         }

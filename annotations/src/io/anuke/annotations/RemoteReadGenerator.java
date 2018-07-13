@@ -14,22 +14,25 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 
-/**Generates code for reading remote invoke packets on the client and server.*/
-public class RemoteReadGenerator {
+/** Generates code for reading remote invoke packets on the client and server. */
+public class RemoteReadGenerator{
     private final HashMap<String, ClassSerializer> serializers;
 
-    /**Creates a read generator that uses the supplied serializer setup.*/
-    public RemoteReadGenerator(HashMap<String, ClassSerializer> serializers) {
+    /** Creates a read generator that uses the supplied serializer setup. */
+    public RemoteReadGenerator(HashMap<String, ClassSerializer> serializers){
         this.serializers = serializers;
     }
 
-    /**Generates a class for reading remote invoke packets.
+    /**
+     * Generates a class for reading remote invoke packets.
+     *
      * @param entries List of methods to use/
      * @param className Simple target class name.
      * @param packageName Full target package name.
-     * @param needsPlayer Whether this read method requires a reference to the player sender.*/
+     * @param needsPlayer Whether this read method requires a reference to the player sender.
+     */
     public void generateFor(List<MethodEntry> entries, String className, String packageName, boolean needsPlayer)
-            throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException, IOException {
+            throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException, IOException{
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
 
@@ -69,10 +72,10 @@ public class RemoteReadGenerator {
             StringBuilder varResult = new StringBuilder();
 
             //go through each parameter
-            for(int i = 0; i < entry.element.getParameters().size(); i ++){
+            for(int i = 0; i < entry.element.getParameters().size(); i++){
                 VariableElement var = entry.element.getParameters().get(i);
 
-                if(!needsPlayer || i != 0) { //if client, skip first parameter since it's always of type player and doesn't need to be read
+                if(!needsPlayer || i != 0){ //if client, skip first parameter since it's always of type player and doesn't need to be read
                     //full type name of parameter
                     String typeName = var.asType().toString();
                     //name of parameter
@@ -81,17 +84,17 @@ public class RemoteReadGenerator {
                     String capName = typeName.equals("byte") ? "" : Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
 
                     //write primitives automatically
-                    if (Utils.isPrimitive(typeName)) {
-                        if (typeName.equals("boolean")) {
+                    if(Utils.isPrimitive(typeName)){
+                        if(typeName.equals("boolean")){
                             readBlock.addStatement("boolean " + varName + " = buffer.get() == 1");
-                        } else {
+                        }else{
                             readBlock.addStatement(typeName + " " + varName + " = buffer.get" + capName + "()");
                         }
-                    } else {
+                    }else{
                         //else, try and find a serializer
                         ClassSerializer ser = serializers.get(typeName);
 
-                        if (ser == null) { //make sure a serializer exists!
+                        if(ser == null){ //make sure a serializer exists!
                             Utils.messager.printMessage(Kind.ERROR, "No @ReadClass method to read class type: '" + typeName + "'", var);
                             return;
                         }
@@ -121,7 +124,7 @@ public class RemoteReadGenerator {
             }
 
             readBlock.nextControlFlow("catch (java.lang.Exception e)");
-            readBlock.addStatement("throw new java.lang.RuntimeException(\"Failed to to read remote method '"+entry.element.getSimpleName() +"'!\", e)");
+            readBlock.addStatement("throw new java.lang.RuntimeException(\"Failed to to read remote method '" + entry.element.getSimpleName() + "'!\", e)");
             readBlock.endControlFlow();
         }
 

@@ -47,429 +47,429 @@ import static io.anuke.ucore.core.Core.batch;
 import static io.anuke.ucore.core.Core.camera;
 
 public class Renderer extends RendererModule{
-	public Surface effectSurface;
-	
-	private int targetscale = baseCameraScale;
-	private Texture background = new Texture("sprites/background.png");
+    public Surface effectSurface;
 
-	private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
-	private Vector2 avgPosition = new Translator();
-	private Vector2 tmpVector1 = new Translator();
-	private Vector2 tmpVector2 = new Translator();
+    private int targetscale = baseCameraScale;
+    private Texture background = new Texture("sprites/background.png");
 
-	private BlockRenderer blocks = new BlockRenderer();
-	private MinimapRenderer minimap = new MinimapRenderer();
-	private OverlayRenderer overlays = new OverlayRenderer();
-	private FogRenderer fog = new FogRenderer();
+    private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
+    private Vector2 avgPosition = new Translator();
+    private Vector2 tmpVector1 = new Translator();
+    private Vector2 tmpVector2 = new Translator();
 
-	public Renderer() {
-		pixelate = true;
-		Lines.setCircleVertices(14);
+    private BlockRenderer blocks = new BlockRenderer();
+    private MinimapRenderer minimap = new MinimapRenderer();
+    private OverlayRenderer overlays = new OverlayRenderer();
+    private FogRenderer fog = new FogRenderer();
 
-		Shaders.init();
+    public Renderer(){
+        pixelate = true;
+        Lines.setCircleVertices(14);
 
-		Core.cameraScale = baseCameraScale;
-		Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
-			if(effect == Fx.none) return;
-			if(Settings.getBool("effects")){
-				Rectangle view = rect.setSize(camera.viewportWidth, camera.viewportHeight)
-						.setCenter(camera.position.x, camera.position.y);
-				Rectangle pos = rect2.setSize(effect.size).setCenter(x, y);
+        Shaders.init();
 
-				if(view.overlaps(pos)){
+        Core.cameraScale = baseCameraScale;
+        Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
+            if(effect == Fx.none) return;
+            if(Settings.getBool("effects")){
+                Rectangle view = rect.setSize(camera.viewportWidth, camera.viewportHeight)
+                        .setCenter(camera.position.x, camera.position.y);
+                Rectangle pos = rect2.setSize(effect.size).setCenter(x, y);
 
-					if(!(effect instanceof GroundEffect)) {
-						EffectEntity entity = Pooling.obtain(EffectEntity.class);
-						entity.effect = effect;
-						entity.color = color;
-						entity.rotation = rotation;
-						entity.data = data;
-						entity.id ++;
-						entity.set(x, y);
-						if(data instanceof BaseEntity){
-							entity.setParent((BaseEntity)data);
-						}
-						threads.runGraphics(() -> effectGroup.add(entity));
-					}else{
-						GroundEffectEntity entity = Pooling.obtain(GroundEffectEntity.class);
-						entity.effect = effect;
-						entity.color = color;
-						entity.rotation = rotation;
-						entity.id ++;
-						entity.data = data;
-						entity.set(x, y);
-						threads.runGraphics(() -> groundEffectGroup.add(entity));
-					}
-				}
-			}
-		});
+                if(view.overlaps(pos)){
 
-		Cursors.cursorScaling = 3;
-		Cursors.outlineColor = Color.valueOf("444444");
+                    if(!(effect instanceof GroundEffect)){
+                        EffectEntity entity = Pooling.obtain(EffectEntity.class);
+                        entity.effect = effect;
+                        entity.color = color;
+                        entity.rotation = rotation;
+                        entity.data = data;
+                        entity.id++;
+                        entity.set(x, y);
+                        if(data instanceof BaseEntity){
+                            entity.setParent((BaseEntity) data);
+                        }
+                        threads.runGraphics(() -> effectGroup.add(entity));
+                    }else{
+                        GroundEffectEntity entity = Pooling.obtain(GroundEffectEntity.class);
+                        entity.effect = effect;
+                        entity.color = color;
+                        entity.rotation = rotation;
+                        entity.id++;
+                        entity.data = data;
+                        entity.set(x, y);
+                        threads.runGraphics(() -> groundEffectGroup.add(entity));
+                    }
+                }
+            }
+        });
 
-		Cursors.arrow = Cursors.loadCursor("cursor");
-		Cursors.hand = Cursors.loadCursor("hand");
-		Cursors.ibeam = Cursors.loadCursor("ibar");
-		Cursors.loadCustom("drill");
-		Cursors.loadCustom("unload");
+        Cursors.cursorScaling = 3;
+        Cursors.outlineColor = Color.valueOf("444444");
 
-		clearColor = Hue.lightness(0.4f);
-		clearColor.a = 1f;
+        Cursors.arrow = Cursors.loadCursor("cursor");
+        Cursors.hand = Cursors.loadCursor("hand");
+        Cursors.ibeam = Cursors.loadCursor("ibar");
+        Cursors.loadCustom("drill");
+        Cursors.loadCustom("unload");
 
-		background.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-	}
+        clearColor = Hue.lightness(0.4f);
+        clearColor.a = 1f;
 
-	@Override
-	public void init(){
-		int scale = Core.cameraScale;
+        background.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+    }
+
+    @Override
+    public void init(){
+        int scale = Core.cameraScale;
 
         effectSurface = Graphics.createSurface(scale);
-		pixelSurface = Graphics.createSurface(scale);
-	}
+        pixelSurface = Graphics.createSurface(scale);
+    }
 
-	@Override
-	public void update(){
+    @Override
+    public void update(){
 
-		if(Core.cameraScale != targetscale){
-			float targetzoom = (float) Core.cameraScale / targetscale;
-			camera.zoom = Mathf.lerpDelta(camera.zoom, targetzoom, 0.2f);
+        if(Core.cameraScale != targetscale){
+            float targetzoom = (float) Core.cameraScale / targetscale;
+            camera.zoom = Mathf.lerpDelta(camera.zoom, targetzoom, 0.2f);
 
-			if(Mathf.in(camera.zoom, targetzoom, 0.005f)){
-				camera.zoom = 1f;
-				Graphics.setCameraScale(targetscale);
-				for(Player player : players) {
+            if(Mathf.in(camera.zoom, targetzoom, 0.005f)){
+                camera.zoom = 1f;
+                Graphics.setCameraScale(targetscale);
+                for(Player player : players){
                     control.input(player.playerIndex).resetCursor();
                 }
-			}
-		}else{
-			camera.zoom = Mathf.lerpDelta(camera.zoom, 1f, 0.2f);
-		}
+            }
+        }else{
+            camera.zoom = Mathf.lerpDelta(camera.zoom, 1f, 0.2f);
+        }
 
-		if(state.is(State.menu)){
-			Graphics.clear(Color.BLACK);
-		}else{
+        if(state.is(State.menu)){
+            Graphics.clear(Color.BLACK);
+        }else{
             Vector2 position = averagePosition();
 
             if(!mobile){
-            	setCamera(position.x + 0.0001f, position.y + 0.0001f);
-			}
+                setCamera(position.x + 0.0001f, position.y + 0.0001f);
+            }
 
-			clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, world.height() * tilesize - tilesize / 2f);
+            clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
-			float prex = camera.position.x, prey = camera.position.y;
-			updateShake(0.75f);
+            float prex = camera.position.x, prey = camera.position.y;
+            updateShake(0.75f);
 
-			float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
-			float lastx = camera.position.x, lasty = camera.position.y;
-			
-			if(snapCamera){
-				camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
-			}
-			
-			if(Gdx.graphics.getHeight() / Core.cameraScale % 2 == 1){
-				camera.position.add(0, -0.5f, 0);
-			}
+            float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
+            float lastx = camera.position.x, lasty = camera.position.y;
 
-			if(Gdx.graphics.getWidth() / Core.cameraScale % 2 == 1){
-				camera.position.add(-0.5f, 0, 0);
-			}
-			
-			draw();
+            if(snapCamera){
+                camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
+            }
 
-			camera.position.set(lastx - deltax, lasty - deltay, 0);
-		}
+            if(Gdx.graphics.getHeight() / Core.cameraScale % 2 == 1){
+                camera.position.add(0, -0.5f, 0);
+            }
 
-		if(debug && !ui.chatfrag.chatOpen()) {
-			renderer.record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
-		}
-	}
+            if(Gdx.graphics.getWidth() / Core.cameraScale % 2 == 1){
+                camera.position.add(-0.5f, 0, 0);
+            }
 
-	@Override
-	public void draw(){
-		camera.update();
+            draw();
 
-		Graphics.clear(clearColor);
-		
-		batch.setProjectionMatrix(camera.combined);
+            camera.position.set(lastx - deltax, lasty - deltay, 0);
+        }
 
-		Graphics.surface(pixelSurface, false);
+        if(debug && !ui.chatfrag.chatOpen()){
+            renderer.record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
+        }
+    }
 
-		drawPadding();
-		
-		blocks.drawFloor();
+    @Override
+    public void draw(){
+        camera.update();
 
-		drawAndInterpolate(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
-		drawAndInterpolate(puddleGroup);
-		drawAndInterpolate(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
+        Graphics.clear(clearColor);
 
-		blocks.processBlocks();
-		blocks.drawBlocks(Layer.block);
+        batch.setProjectionMatrix(camera.combined);
 
-		Graphics.shader(Shaders.blockbuild, false);
+        Graphics.surface(pixelSurface, false);
+
+        drawPadding();
+
+        blocks.drawFloor();
+
+        drawAndInterpolate(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
+        drawAndInterpolate(puddleGroup);
+        drawAndInterpolate(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
+
+        blocks.processBlocks();
+        blocks.drawBlocks(Layer.block);
+
+        Graphics.shader(Shaders.blockbuild, false);
         blocks.drawBlocks(Layer.placement);
         Graphics.shader();
 
         blocks.drawBlocks(Layer.overlay);
 
         if(itemGroup.size() > 0){
-			Shaders.outline.color.set(Team.none.color);
+            Shaders.outline.color.set(Team.none.color);
 
-			Graphics.beginShaders(Shaders.outline);
-			drawAndInterpolate(itemGroup);
-			Graphics.endShaders();
-		}
+            Graphics.beginShaders(Shaders.outline);
+            drawAndInterpolate(itemGroup);
+            Graphics.endShaders();
+        }
 
         drawAllTeams(false);
 
-		blocks.skipLayer(Layer.turret);
-		blocks.drawBlocks(Layer.laser);
+        blocks.skipLayer(Layer.turret);
+        blocks.drawBlocks(Layer.laser);
 
-		drawFlyerShadows();
+        drawFlyerShadows();
 
-		drawAllTeams(true);
+        drawAllTeams(true);
 
-		drawAndInterpolate(bulletGroup);
-		drawAndInterpolate(effectGroup);
+        drawAndInterpolate(bulletGroup);
+        drawAndInterpolate(effectGroup);
 
-		overlays.drawBottom();
-		drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
-		overlays.drawTop();
+        overlays.drawBottom();
+        drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
+        overlays.drawTop();
 
-		Graphics.flushSurface();
+        Graphics.flushSurface();
 
-		if(showPaths && debug) drawDebug();
+        if(showPaths && debug) drawDebug();
 
-		batch.end();
+        batch.end();
 
-		if(showFog){
-			fog.draw();
-		}
+        if(showFog){
+            fog.draw();
+        }
 
-		Graphics.beginCam();
-		EntityDraw.setClip(false);
-		drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
-		EntityDraw.setClip(true);
-		Graphics.end();
-	}
+        Graphics.beginCam();
+        EntityDraw.setClip(false);
+        drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
+        EntityDraw.setClip(true);
+        Graphics.end();
+    }
 
-	private void drawFlyerShadows(){
-		Graphics.surface(effectSurface, true, false);
+    private void drawFlyerShadows(){
+        Graphics.surface(effectSurface, true, false);
 
-		float trnsX = 12, trnsY = -13;
+        float trnsX = 12, trnsY = -13;
 
-		Graphics.end();
-		Core.batch.getTransformMatrix().translate(trnsX, trnsY, 0);
-		Graphics.begin();
+        Graphics.end();
+        Core.batch.getTransformMatrix().translate(trnsX, trnsY, 0);
+        Graphics.begin();
 
-		for(EntityGroup<? extends BaseUnit> group : unitGroups){
-			if(!group.isEmpty()){
-				drawAndInterpolate(group, unit -> unit.isFlying() && !unit.isDead(), Unit::drawShadow);
-			}
-		}
+        for(EntityGroup<? extends BaseUnit> group : unitGroups){
+            if(!group.isEmpty()){
+                drawAndInterpolate(group, unit -> unit.isFlying() && !unit.isDead(), Unit::drawShadow);
+            }
+        }
 
-		if(!playerGroup.isEmpty()){
-			drawAndInterpolate(playerGroup, unit -> unit.isFlying() && !unit.isDead(), Unit::drawShadow);
-		}
+        if(!playerGroup.isEmpty()){
+            drawAndInterpolate(playerGroup, unit -> unit.isFlying() && !unit.isDead(), Unit::drawShadow);
+        }
 
-		Graphics.end();
-		Core.batch.getTransformMatrix().translate(-trnsX, -trnsY, 0);
-		Graphics.begin();
+        Graphics.end();
+        Core.batch.getTransformMatrix().translate(-trnsX, -trnsY, 0);
+        Graphics.begin();
 
-		//TODO this actually isn't necessary
-		Draw.color(0, 0, 0, 0.15f);
-		Graphics.flushSurface();
-		Draw.color();
-	}
+        //TODO this actually isn't necessary
+        Draw.color(0, 0, 0, 0.15f);
+        Graphics.flushSurface();
+        Draw.color();
+    }
 
-	private void drawAllTeams(boolean flying){
-		for(Team team : Team.all){
-			EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
+    private void drawAllTeams(boolean flying){
+        for(Team team : Team.all){
+            EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
 
-			if(group.count(p -> p.isFlying() == flying) +
-					playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
+            if(group.count(p -> p.isFlying() == flying) +
+                    playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
-			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
-			drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawUnder);
+            drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
+            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawUnder);
 
-			Shaders.outline.color.set(team.color);
-			Shaders.mix.color.set(Color.WHITE);
+            Shaders.outline.color.set(team.color);
+            Shaders.mix.color.set(Color.WHITE);
 
-			Graphics.beginShaders(Shaders.outline);
-			Graphics.shader(Shaders.mix, true);
-			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead());
-			drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team);
-			Graphics.shader();
-			blocks.drawTeamBlocks(Layer.turret, team);
-			Graphics.endShaders();
+            Graphics.beginShaders(Shaders.outline);
+            Graphics.shader(Shaders.mix, true);
+            drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead());
+            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team);
+            Graphics.shader();
+            blocks.drawTeamBlocks(Layer.turret, team);
+            Graphics.endShaders();
 
-			drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
-			drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
-		}
-	}
+            drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
+            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
+        }
+    }
 
-	public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group){
-		drawAndInterpolate(group, t -> true, DrawTrait::draw);
-	}
+    public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group){
+        drawAndInterpolate(group, t -> true, DrawTrait::draw);
+    }
 
-	public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw){
-		drawAndInterpolate(group, toDraw, DrawTrait::draw);
-	}
+    public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw){
+        drawAndInterpolate(group, toDraw, DrawTrait::draw);
+    }
 
-	public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
-		EntityDraw.drawWith(group, toDraw, t -> {
-			float lastx = t.getX(), lasty = t.getY(), lastrot = 0f;
+    public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
+        EntityDraw.drawWith(group, toDraw, t -> {
+            float lastx = t.getX(), lasty = t.getY(), lastrot = 0f;
 
-			if(threads.doInterpolate() && threads.isEnabled() && t instanceof SolidTrait){
-				SolidTrait s = (SolidTrait)t;
+            if(threads.doInterpolate() && threads.isEnabled() && t instanceof SolidTrait){
+                SolidTrait s = (SolidTrait) t;
 
-				lastrot = s.getRotation();
+                lastrot = s.getRotation();
 
-				if(s.lastUpdated() != 0){
-					float timeSinceUpdate = TimeUtils.timeSinceMillis(s.lastUpdated());
-					float alpha = Math.min(timeSinceUpdate / s.updateSpacing(), 1f);
+                if(s.lastUpdated() != 0){
+                    float timeSinceUpdate = TimeUtils.timeSinceMillis(s.lastUpdated());
+                    float alpha = Math.min(timeSinceUpdate / s.updateSpacing(), 1f);
 
-					tmpVector1.set(s.lastPosition().x, s.lastPosition().y)
-							.lerp(tmpVector2.set(lastx, lasty), alpha);
-					s.setRotation(Mathf.slerp(s.lastPosition().z, lastrot, alpha));
+                    tmpVector1.set(s.lastPosition().x, s.lastPosition().y)
+                            .lerp(tmpVector2.set(lastx, lasty), alpha);
+                    s.setRotation(Mathf.slerp(s.lastPosition().z, lastrot, alpha));
 
-					s.setX(tmpVector1.x);
-					s.setY(tmpVector1.y);
-				}
-			}
+                    s.setX(tmpVector1.x);
+                    s.setY(tmpVector1.y);
+                }
+            }
 
-			//TODO extremely hacky
-			if(t instanceof Player && ((Player) t).getCarry() != null && ((Player) t).getCarry() instanceof Player && ((Player) ((Player) t).getCarry()).isLocal){
-				((Player) t).x = ((Player) t).getCarry().getX();
-				((Player) t).y = ((Player) t).getCarry().getY();
-			}
+            //TODO extremely hacky
+            if(t instanceof Player && ((Player) t).getCarry() != null && ((Player) t).getCarry() instanceof Player && ((Player) ((Player) t).getCarry()).isLocal){
+                ((Player) t).x = ((Player) t).getCarry().getX();
+                ((Player) t).y = ((Player) t).getCarry().getY();
+            }
 
-			drawer.accept(t);
+            drawer.accept(t);
 
-			t.setX(lastx);
-			t.setY(lasty);
+            t.setX(lastx);
+            t.setY(lasty);
 
-			if(threads.doInterpolate() && threads.isEnabled()) {
+            if(threads.doInterpolate() && threads.isEnabled()){
 
-				if (t instanceof SolidTrait) {
-					((SolidTrait) t).setRotation(lastrot);
-				}
-			}
-		});
-	}
+                if(t instanceof SolidTrait){
+                    ((SolidTrait) t).setRotation(lastrot);
+                }
+            }
+        });
+    }
 
-	@Override
-	public void resize(int width, int height){
-		super.resize(width, height);
-		for(Player player : players) {
+    @Override
+    public void resize(int width, int height){
+        super.resize(width, height);
+        for(Player player : players){
             control.input(player.playerIndex).resetCursor();
         }
-		camera.position.set(players[0].x, players[0].y, 0);
-	}
+        camera.position.set(players[0].x, players[0].y, 0);
+    }
 
-	@Override
-	public void dispose() {
-		background.dispose();
-		fog.dispose();
-	}
+    @Override
+    public void dispose(){
+        background.dispose();
+        fog.dispose();
+    }
 
-	public Vector2 averagePosition(){
-		avgPosition.setZero();
+    public Vector2 averagePosition(){
+        avgPosition.setZero();
 
-		drawAndInterpolate(playerGroup, p -> p.isLocal, p -> {
-			avgPosition.add(p.x, p.y);
-		});
+        drawAndInterpolate(playerGroup, p -> p.isLocal, p -> {
+            avgPosition.add(p.x, p.y);
+        });
 
         avgPosition.scl(1f / players.length);
         return avgPosition;
     }
 
-	public FogRenderer fog() {
-		return fog;
-	}
+    public FogRenderer fog(){
+        return fog;
+    }
 
-	public MinimapRenderer minimap() {
-		return minimap;
-	}
+    public MinimapRenderer minimap(){
+        return minimap;
+    }
 
-	void drawPadding(){
-		float vw = world.width() * tilesize;
-		float cw = camera.viewportWidth * camera.zoom;
-		float ch = camera.viewportHeight * camera.zoom;
-		if(vw < cw){
-			batch.draw(background,
-					camera.position.x + vw/2,
-					Mathf.round(camera.position.y - ch/2, tilesize),
-					(cw - vw) /2,
-					ch + tilesize,
-					0, 0,
-					((cw - vw) / 2 / tilesize), -ch / tilesize + 1);
+    void drawPadding(){
+        float vw = world.width() * tilesize;
+        float cw = camera.viewportWidth * camera.zoom;
+        float ch = camera.viewportHeight * camera.zoom;
+        if(vw < cw){
+            batch.draw(background,
+                    camera.position.x + vw / 2,
+                    Mathf.round(camera.position.y - ch / 2, tilesize),
+                    (cw - vw) / 2,
+                    ch + tilesize,
+                    0, 0,
+                    ((cw - vw) / 2 / tilesize), -ch / tilesize + 1);
 
-			batch.draw(background,
-					camera.position.x - vw/2,
-					Mathf.round(camera.position.y - ch/2, tilesize),
-					-(cw - vw) /2,
-					ch + tilesize,
-					0, 0,
-					-((cw - vw) / 2 / tilesize), -ch / tilesize + 1);
-		}
-	}
+            batch.draw(background,
+                    camera.position.x - vw / 2,
+                    Mathf.round(camera.position.y - ch / 2, tilesize),
+                    -(cw - vw) / 2,
+                    ch + tilesize,
+                    0, 0,
+                    -((cw - vw) / 2 / tilesize), -ch / tilesize + 1);
+        }
+    }
 
-	void drawDebug(){
-		int rangex = (int)(Core.camera.viewportWidth/tilesize/2), rangey = (int)(Core.camera.viewportHeight/tilesize/2);
+    void drawDebug(){
+        int rangex = (int) (Core.camera.viewportWidth / tilesize / 2), rangey = (int) (Core.camera.viewportHeight / tilesize / 2);
 
-		for(int x = -rangex; x <= rangex; x++) {
-			for (int y = -rangey; y <= rangey; y++) {
-				int worldx = Mathf.scl(camera.position.x, tilesize) + x;
-				int worldy = Mathf.scl(camera.position.y, tilesize) + y;
+        for(int x = -rangex; x <= rangex; x++){
+            for(int y = -rangey; y <= rangey; y++){
+                int worldx = Mathf.scl(camera.position.x, tilesize) + x;
+                int worldy = Mathf.scl(camera.position.y, tilesize) + y;
 
-				if(world.tile(worldx, worldy) == null) continue;
+                if(world.tile(worldx, worldy) == null) continue;
 
-				float value = world.pathfinder().getDebugValue(worldx, worldy);
-				Draw.color(Color.PURPLE);
-				Draw.alpha((value % 10f) / 10f);
-				Lines.square(worldx * tilesize, worldy*tilesize, 4f);
-			}
-		}
+                float value = world.pathfinder().getDebugValue(worldx, worldy);
+                Draw.color(Color.PURPLE);
+                Draw.alpha((value % 10f) / 10f);
+                Lines.square(worldx * tilesize, worldy * tilesize, 4f);
+            }
+        }
 
-		Draw.color(Color.ORANGE);
-		Draw.tcolor(Color.ORANGE);
+        Draw.color(Color.ORANGE);
+        Draw.tcolor(Color.ORANGE);
 
-		ObjectIntMap<Tile> seen = new ObjectIntMap<>();
+        ObjectIntMap<Tile> seen = new ObjectIntMap<>();
 
-		for(BlockFlag flag : BlockFlag.values()){
-			for(Tile tile : world.indexer().getEnemy(Team.blue, flag)){
-				int index = seen.getAndIncrement(tile, 0, 1);
-				Draw.tscl(0.125f);
-				Draw.text(flag.name(), tile.drawx(), tile.drawy() + tile.block().size * tilesize/2f + 4 + index * 3);
-				Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize/2f);
-			}
-		}
-		Draw.tscl(fontScale);
-		Draw.tcolor();
+        for(BlockFlag flag : BlockFlag.values()){
+            for(Tile tile : world.indexer().getEnemy(Team.blue, flag)){
+                int index = seen.getAndIncrement(tile, 0, 1);
+                Draw.tscl(0.125f);
+                Draw.text(flag.name(), tile.drawx(), tile.drawy() + tile.block().size * tilesize / 2f + 4 + index * 3);
+                Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f);
+            }
+        }
+        Draw.tscl(fontScale);
+        Draw.tcolor();
 
-		Draw.color();
-	}
+        Draw.color();
+    }
 
-	public BlockRenderer getBlocks() {
-		return blocks;
-	}
+    public BlockRenderer getBlocks(){
+        return blocks;
+    }
 
-	public void setCameraScale(int amount){
-		targetscale = amount;
-		clampScale();
-		//scale up all surfaces in preparation for the zoom
-		for(Surface surface : Graphics.getSurfaces()){
-			surface.setScale(targetscale);
-		}
-	}
+    public void setCameraScale(int amount){
+        targetscale = amount;
+        clampScale();
+        //scale up all surfaces in preparation for the zoom
+        for(Surface surface : Graphics.getSurfaces()){
+            surface.setScale(targetscale);
+        }
+    }
 
-	public void scaleCamera(int amount){
-		setCameraScale(targetscale + amount);
-	}
+    public void scaleCamera(int amount){
+        setCameraScale(targetscale + amount);
+    }
 
-	public void clampScale(){
-		float s = io.anuke.ucore.scene.ui.layout.Unit.dp.scl(1f);
-		targetscale = Mathf.clamp(targetscale, Math.round(s*2), Math.round(s*5));
-	}
+    public void clampScale(){
+        float s = io.anuke.ucore.scene.ui.layout.Unit.dp.scl(1f);
+        targetscale = Mathf.clamp(targetscale, Math.round(s * 2), Math.round(s * 5));
+    }
 
 }

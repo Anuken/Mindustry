@@ -24,13 +24,15 @@ import io.anuke.ucore.modules.Module;
 
 import static io.anuke.mindustry.Vars.*;
 
-/**Logic module.
+/**
+ * Logic module.
  * Handles all logic for entities and waves.
  * Handles game state events.
  * Does not store any game state itself.
- *
- * This class should <i>not</i> call any outside methods to change state of modules, but instead fire events.*/
-public class Logic extends Module {
+ * <p>
+ * This class should <i>not</i> call any outside methods to change state of modules, but instead fire events.
+ */
+public class Logic extends Module{
     public boolean doUpdate = true;
 
     public Logic(){
@@ -49,11 +51,11 @@ public class Logic extends Module {
 
         //fill inventory with items for debugging
 
-        for (TeamData team : state.teams.getTeams()) {
-            for (Tile tile : team.cores) {
-                if(debug) {
-                    for (Item item : Item.all()) {
-                        if (item.type == ItemType.material) {
+        for(TeamData team : state.teams.getTeams()){
+            for(Tile tile : team.cores){
+                if(debug){
+                    for(Item item : Item.all()){
+                        if(item.type == ItemType.material){
                             tile.entity.items.add(item, 1000);
                         }
                     }
@@ -85,7 +87,7 @@ public class Logic extends Module {
 
     public void runWave(){
         state.spawner.spawnEnemies();
-        state.wave ++;
+        state.wave++;
         state.wavetime = wavespace * state.difficulty.timeScaling;
 
         Events.fire(WaveEvent.class);
@@ -137,7 +139,8 @@ public class Logic extends Module {
                     runWave();
                 }
 
-                if(!Entities.defaultGroup().isEmpty()) throw new RuntimeException("Do not add anything to the default group!");
+                if(!Entities.defaultGroup().isEmpty())
+                    throw new RuntimeException("Do not add anything to the default group!");
 
                 Entities.update(bulletGroup);
                 for(EntityGroup group : unitGroups){

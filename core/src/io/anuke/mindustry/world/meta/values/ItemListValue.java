@@ -11,23 +11,23 @@ public class ItemListValue implements ContentStatValue{
     private final Item[] items;
     private final ItemStack[] stacks;
 
-    public ItemListValue(Item[] items) {
+    public ItemListValue(Item[] items){
         this.items = items;
         this.stacks = null;
     }
 
-    public ItemListValue(ItemStack[] stacks) {
+    public ItemListValue(ItemStack[] stacks){
         this.stacks = stacks;
         this.items = null;
     }
 
     @Override
-    public UnlockableContent[] getValueContent() {
+    public UnlockableContent[] getValueContent(){
         if(items != null){
             return items;
-        }else {
+        }else{
             Item[] res = new Item[stacks.length];
-            for (int i = 0; i < res.length; i++) {
+            for(int i = 0; i < res.length; i++){
                 res[i] = stacks[i].item;
             }
             return res;
@@ -35,14 +35,14 @@ public class ItemListValue implements ContentStatValue{
     }
 
     @Override
-    public void display(Table table) {
+    public void display(Table table){
         if(items != null){
             for(Item item : items){
-                table.addImage(item.region).size(8*3).padRight(5);
+                table.addImage(item.region).size(8 * 3).padRight(5);
             }
         }else{
             for(ItemStack stack : stacks){
-                table.add(new ItemImage(stack)).size(8*3).padRight(5);
+                table.add(new ItemImage(stack)).size(8 * 3).padRight(5);
             }
         }
     }

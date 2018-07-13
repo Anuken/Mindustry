@@ -4,9 +4,9 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
-public class DropPoint extends Block {
+public class DropPoint extends Block{
 
-    public DropPoint(String name) {
+    public DropPoint(String name){
         super(name);
 
         hasItems = true;
@@ -15,13 +15,13 @@ public class DropPoint extends Block {
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source) {
+    public boolean acceptItem(Item item, Tile tile, Tile source){
         return false;
     }
 
     @Override
-    public void update(Tile tile) {
-        if (tile.entity.items.total() > 0) {
+    public void update(Tile tile){
+        if(tile.entity.items.total() > 0){
             tryDump(tile);
         }
     }

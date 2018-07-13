@@ -7,6 +7,8 @@ import io.anuke.ucore.util.Timer;
 public interface ShooterTrait extends VelocityTrait, TeamTrait, InventoryTrait{
 
     Timer getTimer();
+
     int getShootTimer(boolean left);
+
     Weapon getWeapon();
 }

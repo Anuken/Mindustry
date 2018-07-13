@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Saves {
+public class Saves{
     private int nextSlot;
     private Array<SaveSlot> saves = new ThreadArray<>();
     private SaveSlot current;
@@ -22,7 +22,7 @@ public class Saves {
 
     public void load(){
         saves.clear();
-        for(int i = 0; i < saveSlots; i ++){
+        for(int i = 0; i < saveSlots; i++){
             if(SaveIO.isSaveValid(i)){
                 SaveSlot slot = new SaveSlot(i);
                 saves.add(slot);
@@ -32,7 +32,7 @@ public class Saves {
         }
     }
 
-    public SaveSlot getCurrent() {
+    public SaveSlot getCurrent(){
         return current;
     }
 
@@ -43,14 +43,14 @@ public class Saves {
 
         if(!state.is(State.menu) && !state.gameOver && current != null && current.isAutosave()){
             time += Timers.delta();
-            if(time > Settings.getInt("saveinterval")*60) {
+            if(time > Settings.getInt("saveinterval") * 60){
                 saving = true;
 
                 Timers.run(2f, () -> {
-                    try {
+                    try{
                         SaveIO.saveToSlot(current.index);
                         current.meta = SaveIO.getData(current.index);
-                    }catch (Exception e){
+                    }catch(Exception e){
                         e.printStackTrace();
                     }
                     saving = false;
@@ -77,7 +77,7 @@ public class Saves {
 
     public void addSave(String name){
         SaveSlot slot = new SaveSlot(nextSlot);
-        nextSlot ++;
+        nextSlot++;
         slot.setName(name);
         saves.add(slot);
         SaveIO.saveToSlot(slot.index);
@@ -88,7 +88,7 @@ public class Saves {
     public SaveSlot importSave(FileHandle file) throws IOException{
         SaveSlot slot = new SaveSlot(nextSlot);
         slot.importFile(file);
-        nextSlot ++;
+        nextSlot++;
         slot.setName(file.nameWithoutExtension());
         saves.add(slot);
         slot.meta = SaveIO.getData(slot.index);
@@ -129,11 +129,11 @@ public class Saves {
         }
 
         public String getName(){
-            return Settings.getString("save-"+index+"-name", "untittled");
+            return Settings.getString("save-" + index + "-name", "untittled");
         }
 
         public void setName(String name){
-            Settings.putString("save-"+index+"-name", name);
+            Settings.putString("save-" + index + "-name", name);
             Settings.save();
         }
 
@@ -150,18 +150,18 @@ public class Saves {
         }
 
         public boolean isAutosave(){
-            return Settings.getBool("save-"+index+"-autosave", !gwt);
+            return Settings.getBool("save-" + index + "-autosave", !gwt);
         }
 
         public void setAutosave(boolean save){
-            Settings.putBool("save-"+index + "-autosave", save);
+            Settings.putBool("save-" + index + "-autosave", save);
             Settings.save();
         }
 
         public void importFile(FileHandle file) throws IOException{
             try{
                 file.copyTo(SaveIO.fileFor(index));
-            }catch (Exception e){
+            }catch(Exception e){
                 throw new IOException(e);
             }
         }
@@ -172,7 +172,7 @@ public class Saves {
                     file = file.parent().child(file.nameWithoutExtension() + "." + saveExtension);
                 }
                 SaveIO.fileFor(index).copyTo(file);
-            }catch (Exception e){
+            }catch(Exception e){
                 throw new IOException(e);
             }
         }

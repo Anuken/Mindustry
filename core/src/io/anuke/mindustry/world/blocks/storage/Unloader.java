@@ -2,10 +2,10 @@ package io.anuke.mindustry.world.blocks.storage;
 
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockGroup;
 
-public class Unloader extends Block {
+public class Unloader extends Block{
     protected final int timerUnload = timers++;
     protected int speed = 5;
 
@@ -23,8 +23,8 @@ public class Unloader extends Block {
         if(tile.entity.items.total() == 0 && tile.entity.timer.get(timerUnload, speed)){
             tile.allNearby(other -> {
                 if(other.block() instanceof StorageBlock && tile.entity.items.total() == 0 &&
-                        ((StorageBlock)other.block()).hasItem(other, null)){
-                    offloadNear(tile, ((StorageBlock)other.block()).removeItem(other, null));
+                        ((StorageBlock) other.block()).hasItem(other, null)){
+                    offloadNear(tile, ((StorageBlock) other.block()).removeItem(other, null));
                 }
             });
         }
@@ -35,11 +35,12 @@ public class Unloader extends Block {
     }
 
     @Override
-    public boolean canDump(Tile tile, Tile to, Item item) {
+    public boolean canDump(Tile tile, Tile to, Item item){
         Block block = to.target().block();
         return !(block instanceof StorageBlock);
     }
 
     @Override
-    public void setBars(){}
+    public void setBars(){
+    }
 }

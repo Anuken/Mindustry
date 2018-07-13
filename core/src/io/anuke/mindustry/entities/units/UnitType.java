@@ -18,12 +18,9 @@ import io.anuke.ucore.util.Bundles;
 public class UnitType implements UnlockableContent{
     private static byte lastid = 0;
     private static Array<UnitType> types = new Array<>();
-
-    protected final Supplier<? extends BaseUnit> constructor;
-
     public final String name;
     public final byte id;
-
+    protected final Supplier<? extends BaseUnit> constructor;
     public float health = 60;
     public float hitsize = 5f;
     public float hitsizeTile = 4f;
@@ -57,44 +54,52 @@ public class UnitType implements UnlockableContent{
         TypeTrait.registerType(type, mainConstructor);
     }
 
+    public static UnitType getByID(byte id){
+        return types.get(id);
+    }
+
+    public static Array<UnitType> all(){
+        return types;
+    }
+
     @Override
-    public void displayInfo(Table table) {
+    public void displayInfo(Table table){
         ContentDisplay.displayUnit(table, this);
     }
 
     @Override
-    public String localizedName() {
+    public String localizedName(){
         return Bundles.get("unit." + name + ".name");
     }
 
     @Override
-    public TextureRegion getContentIcon() {
+    public TextureRegion getContentIcon(){
         return iconRegion;
     }
 
     @Override
-    public void load() {
+    public void load(){
         iconRegion = Draw.region("unit-icon-" + name);
         region = Draw.region(name);
 
-        if(!isFlying) {
+        if(!isFlying){
             legRegion = Draw.region(name + "-leg");
             baseRegion = Draw.region(name + "-base");
         }
     }
 
     @Override
-    public String getContentTypeName() {
+    public String getContentTypeName(){
         return "unit-type";
     }
 
     @Override
-    public String getContentName() {
+    public String getContentName(){
         return name;
     }
 
     @Override
-    public Array<? extends Content> getAll() {
+    public Array<? extends Content> getAll(){
         return types;
     }
 
@@ -102,13 +107,5 @@ public class UnitType implements UnlockableContent{
         BaseUnit unit = constructor.get();
         unit.init(this, team);
         return unit;
-    }
-
-    public static UnitType getByID(byte id){
-        return types.get(id);
-    }
-
-    public static Array<UnitType> all(){
-        return types;
     }
 }

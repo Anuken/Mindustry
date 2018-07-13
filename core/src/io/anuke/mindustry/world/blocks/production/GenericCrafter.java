@@ -26,108 +26,108 @@ import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.headless;
 
 public class GenericCrafter extends Block{
-	protected final int timerDump = timers++;
+    protected final int timerDump = timers++;
 
-	protected Item output;
-	protected float craftTime = 80;
-	protected Effect craftEffect = BlockFx.purify;
-	protected Effect updateEffect = Fx.none;
-	protected float updateEffectChance = 0.04f;
+    protected Item output;
+    protected float craftTime = 80;
+    protected Effect craftEffect = BlockFx.purify;
+    protected Effect updateEffect = Fx.none;
+    protected float updateEffectChance = 0.04f;
 
-	public GenericCrafter(String name) {
-		super(name);
-		update = true;
-		solid = true;
-		health = 60;
-	}
+    public GenericCrafter(String name){
+        super(name);
+        update = true;
+        solid = true;
+        health = 60;
+    }
 
-	@Override
-	public void setBars(){
-		super.setBars();
+    @Override
+    public void setBars(){
+        super.setBars();
 
-		if(consumes.has(ConsumeItem.class)) bars.replace(new BlockBar(BarType.inventory, true,
-				tile -> (float)tile.entity.items.get(consumes.item()) / itemCapacity));
-	}
-	
-	@Override
-	public void setStats(){
-		super.setStats();
-		stats.add(BlockStat.craftSpeed, 60f/craftTime, StatUnit.itemsSecond);
-		stats.add(BlockStat.outputItem, output);
-	}
-	
-	@Override
-	public void draw(Tile tile){
-		Draw.rect(name(), tile.drawx(), tile.drawy());
-		
-		if(!hasLiquids) return;
-		
-		Draw.color(tile.entity.liquids.current().color);
-		Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
-		Draw.rect("blank", tile.drawx(), tile.drawy(), 2, 2);
-		Draw.color();
-	}
+        if(consumes.has(ConsumeItem.class)) bars.replace(new BlockBar(BarType.inventory, true,
+                tile -> (float) tile.entity.items.get(consumes.item()) / itemCapacity));
+    }
 
-	@Override
-	public TextureRegion[] getIcon(){
-		return new TextureRegion[]{Draw.region(name)};
-	}
-	
-	@Override
-	public void update(Tile tile){
-		GenericCrafterEntity entity = tile.entity();
+    @Override
+    public void setStats(){
+        super.setStats();
+        stats.add(BlockStat.craftSpeed, 60f / craftTime, StatUnit.itemsSecond);
+        stats.add(BlockStat.outputItem, output);
+    }
 
-		if(entity.cons.valid()){
+    @Override
+    public void draw(Tile tile){
+        Draw.rect(name(), tile.drawx(), tile.drawy());
 
-			entity.progress += 1f / craftTime * Timers.delta();
-			entity.totalProgress += Timers.delta();
-			entity.warmup = Mathf.lerp(entity.warmup, 1f, 0.02f);
+        if(!hasLiquids) return;
 
-			if(Mathf.chance(Timers.delta() * updateEffectChance))
-				Effects.effect(updateEffect, entity.x + Mathf.range(size*4f), entity.y + Mathf.range(size*4));
-		}else{
-			entity.warmup = Mathf.lerp(entity.warmup, 0f, 0.02f);
-		}
+        Draw.color(tile.entity.liquids.current().color);
+        Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
+        Draw.rect("blank", tile.drawx(), tile.drawy(), 2, 2);
+        Draw.color();
+    }
 
-		if(entity.progress >= 1f){
-			
-			if(consumes.has(ConsumeItem.class)) tile.entity.items.remove(consumes.item(), consumes.itemAmount());
+    @Override
+    public TextureRegion[] getIcon(){
+        return new TextureRegion[]{Draw.region(name)};
+    }
 
-			//unlock output item
-			if(!headless){
-				control.database().unlockContent(output);
-			}
+    @Override
+    public void update(Tile tile){
+        GenericCrafterEntity entity = tile.entity();
 
-			offloadNear(tile, output);
-			Effects.effect(craftEffect, tile.drawx(), tile.drawy());
-			entity.progress = 0f;
-		}
-		
-		if(tile.entity.timer.get(timerDump, 5)){
-			tryDump(tile, output);
-		}
-	}
+        if(entity.cons.valid()){
 
-	@Override
-	public TileEntity getEntity() {
-		return new GenericCrafterEntity();
-	}
+            entity.progress += 1f / craftTime * Timers.delta();
+            entity.totalProgress += Timers.delta();
+            entity.warmup = Mathf.lerp(entity.warmup, 1f, 0.02f);
 
-	public static class GenericCrafterEntity extends TileEntity{
-		public float progress;
-		public float totalProgress;
-		public float warmup;
+            if(Mathf.chance(Timers.delta() * updateEffectChance))
+                Effects.effect(updateEffect, entity.x + Mathf.range(size * 4f), entity.y + Mathf.range(size * 4));
+        }else{
+            entity.warmup = Mathf.lerp(entity.warmup, 0f, 0.02f);
+        }
 
-		@Override
-		public void write(DataOutputStream stream) throws IOException {
-			stream.writeFloat(progress);
-			stream.writeFloat(warmup);
-		}
+        if(entity.progress >= 1f){
 
-		@Override
-		public void read(DataInputStream stream) throws IOException {
-			progress = stream.readFloat();
-			warmup = stream.readFloat();
-		}
-	}
+            if(consumes.has(ConsumeItem.class)) tile.entity.items.remove(consumes.item(), consumes.itemAmount());
+
+            //unlock output item
+            if(!headless){
+                control.database().unlockContent(output);
+            }
+
+            offloadNear(tile, output);
+            Effects.effect(craftEffect, tile.drawx(), tile.drawy());
+            entity.progress = 0f;
+        }
+
+        if(tile.entity.timer.get(timerDump, 5)){
+            tryDump(tile, output);
+        }
+    }
+
+    @Override
+    public TileEntity getEntity(){
+        return new GenericCrafterEntity();
+    }
+
+    public static class GenericCrafterEntity extends TileEntity{
+        public float progress;
+        public float totalProgress;
+        public float warmup;
+
+        @Override
+        public void write(DataOutputStream stream) throws IOException{
+            stream.writeFloat(progress);
+            stream.writeFloat(warmup);
+        }
+
+        @Override
+        public void read(DataInputStream stream) throws IOException{
+            progress = stream.readFloat();
+            warmup = stream.readFloat();
+        }
+    }
 }

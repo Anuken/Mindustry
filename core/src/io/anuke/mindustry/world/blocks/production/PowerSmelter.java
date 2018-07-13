@@ -23,7 +23,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class PowerSmelter extends PowerBlock {
+public class PowerSmelter extends PowerBlock{
     protected final int timerDump = timers++;
     protected final int timerCraft = timers++;
 
@@ -45,7 +45,7 @@ public class PowerSmelter extends PowerBlock {
 
     protected TextureRegion topRegion;
 
-    public PowerSmelter(String name) {
+    public PowerSmelter(String name){
         super(name);
         hasItems = true;
         update = true;
@@ -54,7 +54,7 @@ public class PowerSmelter extends PowerBlock {
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
         topRegion = Draw.region(name + "-top");
     }
@@ -74,7 +74,7 @@ public class PowerSmelter extends PowerBlock {
         super.setStats();
 
         stats.add(BlockStat.outputItem, result);
-        stats.add(BlockStat.craftSpeed, 60f/craftTime, StatUnit.itemsSecond);
+        stats.add(BlockStat.craftSpeed, 60f / craftTime, StatUnit.itemsSecond);
         stats.add(BlockStat.inputItemCapacity, itemCapacity, StatUnit.items);
         stats.add(BlockStat.outputItemCapacity, itemCapacity, StatUnit.items);
     }
@@ -92,7 +92,7 @@ public class PowerSmelter extends PowerBlock {
         if(entity.cons.valid()){
             entity.heat += 1f / heatUpTime * Timers.delta();
             if(Mathf.chance(Timers.delta() * burnEffectChance))
-                Effects.effect(burnEffect, entity.x + Mathf.range(size*4f), entity.y + Mathf.range(size*4));
+                Effects.effect(burnEffect, entity.x + Mathf.range(size * 4f), entity.y + Mathf.range(size * 4));
         }else{
             entity.heat -= 1f / heatUpTime * Timers.delta();
         }
@@ -125,8 +125,8 @@ public class PowerSmelter extends PowerBlock {
             }
         }
 
-        if(consumeInputs) {
-            for (ItemStack item : consumes.items()) {
+        if(consumeInputs){
+            for(ItemStack item : consumes.items()){
                 entity.items.remove(item.item, item.amount);
             }
         }
@@ -152,7 +152,7 @@ public class PowerSmelter extends PowerBlock {
     }
 
     @Override
-    public int getMaximumAccepted(Tile tile, Item item) {
+    public int getMaximumAccepted(Tile tile, Item item){
         return itemCapacity - tile.entity.items.get(item);
     }
 
@@ -168,7 +168,7 @@ public class PowerSmelter extends PowerBlock {
             float r = 0.06f;
             float cr = Mathf.random(0.1f);
 
-            Draw.alpha(((1f-g) + Mathf.absin(Timers.time(), 8f, g) + Mathf.random(r) - r) * entity.heat);
+            Draw.alpha(((1f - g) + Mathf.absin(Timers.time(), 8f, g) + Mathf.random(r) - r) * entity.heat);
 
             Draw.tint(flameColor);
             Fill.circle(tile.drawx(), tile.drawy(), 3f + Mathf.absin(Timers.time(), 5f, 2f) + cr);
@@ -181,7 +181,7 @@ public class PowerSmelter extends PowerBlock {
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new PowerSmelterEntity();
     }
 
@@ -190,12 +190,12 @@ public class PowerSmelter extends PowerBlock {
         public float time;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException {
+        public void write(DataOutputStream stream) throws IOException{
             stream.writeFloat(heat);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException {
+        public void read(DataInputStream stream) throws IOException{
             heat = stream.readFloat();
         }
     }

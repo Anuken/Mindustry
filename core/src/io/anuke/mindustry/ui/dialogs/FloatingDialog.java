@@ -11,43 +11,43 @@ import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.ScrollPane;
 
 public class FloatingDialog extends Dialog{
-	
-	public FloatingDialog(String title){
-		super(title, "dialog");
-		setFillParent(true);
-		title().setAlignment(Align.center);
-		getTitleTable().row();
-		getTitleTable().addImage("white", Palette.accent)
-		.growX().height(3f).pad(4f);
 
-		boolean[] done = {false};
+    public FloatingDialog(String title){
+        super(title, "dialog");
+        setFillParent(true);
+        title().setAlignment(Align.center);
+        getTitleTable().row();
+        getTitleTable().addImage("white", Palette.accent)
+                .growX().height(3f).pad(4f);
 
-		shown(() -> Gdx.app.postRunnable(() ->
-				forEach(child -> {
-					if (done[0]) return;
+        boolean[] done = {false};
 
-					if (child instanceof ScrollPane) {
-						Core.scene.setScrollFocus(child);
-						done[0] = true;
-					}
-				})));
-	}
+        shown(() -> Gdx.app.postRunnable(() ->
+                forEach(child -> {
+                    if(done[0]) return;
 
-	protected void onResize(Runnable run){
-		Events.on(ResizeEvent.class, () -> {
-			if(isShown()){
-				run.run();
-			}
-		});
-	}
-	
-	@Override
-	public void addCloseButton(){
-		buttons().addImageTextButton("$text.back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
-		
-		keyDown(key -> {
-			if(key == Keys.ESCAPE || key == Keys.BACK)
-				hide();
-		});
-	}
+                    if(child instanceof ScrollPane){
+                        Core.scene.setScrollFocus(child);
+                        done[0] = true;
+                    }
+                })));
+    }
+
+    protected void onResize(Runnable run){
+        Events.on(ResizeEvent.class, () -> {
+            if(isShown()){
+                run.run();
+            }
+        });
+    }
+
+    @Override
+    public void addCloseButton(){
+        buttons().addImageTextButton("$text.back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+
+        keyDown(key -> {
+            if(key == Keys.ESCAPE || key == Keys.BACK)
+                hide();
+        });
+    }
 }

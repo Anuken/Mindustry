@@ -12,14 +12,18 @@ import io.anuke.ucore.core.Timers;
 public class PowerCrafter extends Block{
     protected final int timerDump = timers++;
 
-    /**Optional.*/
+    /**
+     * Optional.
+     */
     protected Item outputItem;
-    /**Optional. Set hasLiquids to true when using.*/
+    /**
+     * Optional. Set hasLiquids to true when using.
+     */
     protected Liquid outputLiquid;
     protected float outputLiquidAmount;
     protected float craftTime;
 
-    public PowerCrafter(String name) {
+    public PowerCrafter(String name){
         super(name);
         solid = true;
         update = true;
@@ -28,7 +32,7 @@ public class PowerCrafter extends Block{
     }
 
     @Override
-    public void init() {
+    public void init(){
         super.init();
 
         if(outputLiquid != null){
@@ -37,7 +41,7 @@ public class PowerCrafter extends Block{
     }
 
     @Override
-    public void setStats() {
+    public void setStats(){
         super.setStats();
 
         if(outputItem != null){
@@ -50,11 +54,11 @@ public class PowerCrafter extends Block{
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         GenericCrafterEntity entity = tile.entity();
 
         if(entity.cons.valid()){
-            entity.progress += 1f/craftTime;
+            entity.progress += 1f / craftTime;
             entity.totalProgress += Timers.delta();
         }
 
@@ -75,7 +79,7 @@ public class PowerCrafter extends Block{
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new GenericCrafterEntity();
     }
 }

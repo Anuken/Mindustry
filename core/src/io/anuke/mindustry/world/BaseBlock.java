@@ -15,7 +15,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
-public abstract class BaseBlock {
+public abstract class BaseBlock{
     public boolean hasItems;
     public boolean hasLiquids;
     public boolean hasPower;
@@ -34,7 +34,9 @@ public abstract class BaseBlock {
         return true;
     }
 
-    /**Returns the amount of items this block can accept.*/
+    /**
+     * Returns the amount of items this block can accept.
+     */
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
         if(acceptItem(item, tile, tile) && hasItems && source.getTeam() == tile.getTeam()){
             return Math.min(getMaximumAccepted(tile, item), amount);
@@ -47,25 +49,32 @@ public abstract class BaseBlock {
         return itemCapacity - tile.entity.items.total();
     }
 
-    /**Remove a stack from this inventory, and return the amount removed.*/
+    /**
+     * Remove a stack from this inventory, and return the amount removed.
+     */
     public int removeStack(Tile tile, Item item, int amount){
         tile.entity.wakeUp();
         tile.entity.items.remove(item, amount);
         return amount;
     }
 
-    /**Handle a stack input.*/
+    /**
+     * Handle a stack input.
+     */
     public void handleStack(Item item, int amount, Tile tile, Unit source){
         tile.entity.wakeUp();
         tile.entity.items.add(item, amount);
     }
 
-    /**Returns offset for stack placement.*/
+    /**
+     * Returns offset for stack placement.
+     */
     public void getStackOffset(Item item, Tile tile, Translator trns){
 
     }
 
-    public void onProximityUpdate(Tile tile){}
+    public void onProximityUpdate(Tile tile){
+    }
 
     public void handleItem(Item item, Tile tile, Tile source){
         tile.entity.items.add(item, 1);
@@ -89,7 +98,9 @@ public abstract class BaseBlock {
         return true;
     }
 
-    /**Returns how much power is accepted.*/
+    /**
+     * Returns how much power is accepted.
+     */
     public float addPower(Tile tile, float amount){
         float canAccept = Math.min(powerCapacity - tile.entity.power.amount, amount);
 
@@ -102,16 +113,16 @@ public abstract class BaseBlock {
         Array<Tile> proximity = tile.entity.proximity();
         int dump = tile.getDump();
 
-        for (int i = 0; i < proximity.size; i ++) {
+        for(int i = 0; i < proximity.size; i++){
             incrementDump(tile, proximity.size);
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
 
-            if (other.block().hasLiquids) {
+            if(other.block().hasLiquids){
                 float ofract = other.entity.liquids.get(liquid) / other.block().liquidCapacity;
                 float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
 
-                if (ofract < fract) tryMoveLiquid(tile, in, other, (fract - ofract) * liquidCapacity / 2f, liquid);
+                if(ofract < fract) tryMoveLiquid(tile, in, other, (fract - ofract) * liquidCapacity / 2f, liquid);
             }
         }
 
@@ -133,36 +144,36 @@ public abstract class BaseBlock {
 
         if(next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
 
-            if(next.block().acceptLiquid(next, tile, liquid, 0f)) {
+            if(next.block().acceptLiquid(next, tile, liquid, 0f)){
                 float ofract = next.entity.liquids.get(liquid) / next.block().liquidCapacity;
                 float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
                 float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (liquidCapacity), tile.entity.liquids.get(liquid));
                 flow = Math.min(flow, next.block().liquidCapacity - next.entity.liquids.get(liquid) - 0.001f);
 
-                if (flow > 0f && ofract <= fract && next.block().acceptLiquid(next, tile, liquid, flow)) {
+                if(flow > 0f && ofract <= fract && next.block().acceptLiquid(next, tile, liquid, flow)){
                     next.block().handleLiquid(next, tile, liquid, flow);
                     tile.entity.liquids.remove(liquid, flow);
                     return flow;
-                } else if (ofract > 0.1f && fract > 0.1f) {
+                }else if(ofract > 0.1f && fract > 0.1f){
                     Liquid other = next.entity.liquids.current();
-                    if ((other.flammability > 0.3f && liquid.temperature > 0.7f) ||
-                            (liquid.flammability > 0.3f && other.temperature > 0.7f)) {
+                    if((other.flammability > 0.3f && liquid.temperature > 0.7f) ||
+                            (liquid.flammability > 0.3f && other.temperature > 0.7f)){
                         tile.entity.damage(1 * Timers.delta());
                         next.entity.damage(1 * Timers.delta());
-                        if (Mathf.chance(0.1 * Timers.delta())) {
+                        if(Mathf.chance(0.1 * Timers.delta())){
                             Effects.effect(EnvironmentFx.fire, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
                         }
-                    } else if ((liquid.temperature > 0.7f && other.temperature < 0.55f) ||
-                            (other.temperature > 0.7f && liquid.temperature < 0.55f)) {
+                    }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) ||
+                            (other.temperature > 0.7f && liquid.temperature < 0.55f)){
                         tile.entity.liquids.remove(liquid, Math.min(tile.entity.liquids.get(liquid), 0.7f * Timers.delta()));
-                        if (Mathf.chance(0.2f * Timers.delta())) {
+                        if(Mathf.chance(0.2f * Timers.delta())){
                             Effects.effect(EnvironmentFx.steam, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
                         }
                     }
                 }
             }
         }else if(leak && !next.block().solid && !next.block().hasLiquids){
-            float leakAmount = tile.entity.liquids.get(liquid)/1.5f;
+            float leakAmount = tile.entity.liquids.get(liquid) / 1.5f;
             Puddle.deposit(next, tile, liquid, leakAmount);
             tile.entity.liquids.remove(liquid, leakAmount);
         }
@@ -171,12 +182,13 @@ public abstract class BaseBlock {
 
     /**
      * Tries to put this item into a nearby container, if there are no available
-     * containers, it gets added to the block's inventory.*/
+     * containers, it gets added to the block's inventory.
+     */
     public void offloadNear(Tile tile, Item item){
         Array<Tile> proximity = tile.entity.proximity();
         int dump = tile.getDump();
 
-        for(int i = 0; i < proximity.size; i ++){
+        for(int i = 0; i < proximity.size; i++){
             incrementDump(tile, proximity.size);
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
@@ -189,32 +201,38 @@ public abstract class BaseBlock {
         handleItem(item, tile, tile);
     }
 
-    /**Try dumping any item near the tile.*/
+    /**
+     * Try dumping any item near the tile.
+     */
     public boolean tryDump(Tile tile){
         return tryDump(tile, null);
     }
 
-    /**Try dumping a specific item near the tile.
-     * @param todump Item to dump. Can be null to dump anything.*/
+    /**
+     * Try dumping a specific item near the tile.
+     *
+     * @param todump Item to dump. Can be null to dump anything.
+     */
     public boolean tryDump(Tile tile, Item todump){
         TileEntity entity = tile.entity;
-        if(entity == null || !hasItems || tile.entity.items.total() == 0 || (todump != null && !entity.items.has(todump))) return false;
+        if(entity == null || !hasItems || tile.entity.items.total() == 0 || (todump != null && !entity.items.has(todump)))
+            return false;
 
         Array<Tile> proximity = entity.proximity();
         int dump = tile.getDump();
 
         if(proximity.size == 0) return false;
 
-        for(int i = 0; i < proximity.size; i ++){
+        for(int i = 0; i < proximity.size; i++){
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
 
-            if(todump == null) {
+            if(todump == null){
 
-                for (int ii = 0; ii < Item.all().size; ii++) {
+                for(int ii = 0; ii < Item.all().size; ii++){
                     Item item = Item.getByID(ii);
 
-                    if (entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)) {
+                    if(entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                         other.block().handleItem(item, other, in);
                         tile.entity.items.remove(item, 1);
                         incrementDump(tile, proximity.size);
@@ -223,7 +241,7 @@ public abstract class BaseBlock {
                 }
             }else{
 
-                if (other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)) {
+                if(other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
                     other.block().handleItem(todump, other, in);
                     tile.entity.items.remove(todump, 1);
                     incrementDump(tile, proximity.size);
@@ -238,10 +256,12 @@ public abstract class BaseBlock {
     }
 
     private void incrementDump(Tile tile, int prox){
-        tile.setDump((byte)((tile.getDump() + 1) % prox));
+        tile.setDump((byte) ((tile.getDump() + 1) % prox));
     }
 
-    /**Used for dumping items.*/
+    /**
+     * Used for dumping items.
+     */
     public boolean canDump(Tile tile, Tile to, Item item){
         return true;
     }

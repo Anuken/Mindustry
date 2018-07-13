@@ -20,86 +20,86 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.threads;
 
 public class Door extends Wall{
-	protected final Rectangle rect = new Rectangle();
+    protected final Rectangle rect = new Rectangle();
 
-	protected Effect openfx = BlockFx.dooropen;
-	protected Effect closefx = BlockFx.doorclose;
+    protected Effect openfx = BlockFx.dooropen;
+    protected Effect closefx = BlockFx.doorclose;
 
-	protected TextureRegion openRegion;
+    protected TextureRegion openRegion;
 
-	public Door(String name) {
-		super(name);
-		solid = false;
-		solidifes = true;
-		consumesTap = true;
-	}
+    public Door(String name){
+        super(name);
+        solid = false;
+        solidifes = true;
+        consumesTap = true;
+    }
 
-	@Override
-	public void load() {
-		super.load();
-		openRegion = Draw.region(name + "-open");
-	}
+    @Override
+    public void load(){
+        super.load();
+        openRegion = Draw.region(name + "-open");
+    }
 
-	@Override
-	public void draw(Tile tile){
-		DoorEntity entity = tile.entity();
-		
-		if(!entity.open){
-			Draw.rect(region, tile.drawx(), tile.drawy());
-		}else{
-			Draw.rect(openRegion, tile.drawx(), tile.drawy());
-		}
-	}
+    @Override
+    public void draw(Tile tile){
+        DoorEntity entity = tile.entity();
 
-	@Override
-	public CursorType getCursor(Tile tile){
-		return CursorType.hand;
-	}
-	
-	@Override
-	public boolean isSolidFor(Tile tile){
-		DoorEntity entity = tile.entity();
-		return !entity.open;
-	}
+        if(!entity.open){
+            Draw.rect(region, tile.drawx(), tile.drawy());
+        }else{
+            Draw.rect(openRegion, tile.drawx(), tile.drawy());
+        }
+    }
 
-	@Override
-	public void tapped(Tile tile, Player player){
-		DoorEntity entity = tile.entity();
+    @Override
+    public CursorType getCursor(Tile tile){
+        return CursorType.hand;
+    }
 
-		threads.run(() -> {
+    @Override
+    public boolean isSolidFor(Tile tile){
+        DoorEntity entity = tile.entity();
+        return !entity.open;
+    }
 
-			if(Units.anyEntities(tile) && entity.open){
-				return;
-			}
+    @Override
+    public void tapped(Tile tile, Player player){
+        DoorEntity entity = tile.entity();
 
-			entity.open = !entity.open;
-			if(!entity.open){
-				Effects.effect(closefx, tile.drawx(), tile.drawy());
-			}else{
-				Effects.effect(openfx, tile.drawx(), tile.drawy());
-			}
-		});
-	}
-	
-	@Override
-	public TileEntity getEntity(){
-		return new DoorEntity();
-	}
-	
-	public class DoorEntity extends TileEntity{
-		public boolean open = false;
-		
-		@Override
-		public void write(DataOutputStream stream) throws IOException{
-			super.write(stream);
-			stream.writeBoolean(open);
-		}
-		
-		@Override
-		public void read(DataInputStream stream) throws IOException{
-			super.read(stream);
-			open = stream.readBoolean();
-		}
-	}
+        threads.run(() -> {
+
+            if(Units.anyEntities(tile) && entity.open){
+                return;
+            }
+
+            entity.open = !entity.open;
+            if(!entity.open){
+                Effects.effect(closefx, tile.drawx(), tile.drawy());
+            }else{
+                Effects.effect(openfx, tile.drawx(), tile.drawy());
+            }
+        });
+    }
+
+    @Override
+    public TileEntity getEntity(){
+        return new DoorEntity();
+    }
+
+    public class DoorEntity extends TileEntity{
+        public boolean open = false;
+
+        @Override
+        public void write(DataOutputStream stream) throws IOException{
+            super.write(stream);
+            stream.writeBoolean(open);
+        }
+
+        @Override
+        public void read(DataInputStream stream) throws IOException{
+            super.read(stream);
+            open = stream.readBoolean();
+        }
+    }
 
 }

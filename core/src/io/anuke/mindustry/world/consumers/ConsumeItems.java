@@ -9,41 +9,41 @@ import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.ItemListValue;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-public class ConsumeItems extends Consume {
+public class ConsumeItems extends Consume{
     private ItemStack[] items;
 
-    public ConsumeItems(ItemStack[] items) {
+    public ConsumeItems(ItemStack[] items){
         this.items = items;
     }
 
-    public ItemStack[] getItems() {
+    public ItemStack[] getItems(){
         return items;
     }
 
     @Override
-    public void buildTooltip(Table table) {
+    public void buildTooltip(Table table){
         for(ItemStack stack : items){
-            table.add(new ItemImage(stack)).size(8*4).padRight(5);
+            table.add(new ItemImage(stack)).size(8 * 4).padRight(5);
         }
     }
 
     @Override
-    public String getIcon() {
+    public String getIcon(){
         return "icon-item";
     }
 
     @Override
-    public void update(Block block, TileEntity entity) {
+    public void update(Block block, TileEntity entity){
 
     }
 
     @Override
-    public boolean valid(Block block, TileEntity entity) {
+    public boolean valid(Block block, TileEntity entity){
         return entity.items.has(items);
     }
 
     @Override
-    public void display(BlockStats stats) {
+    public void display(BlockStats stats){
         stats.add(BlockStat.inputItems, new ItemListValue(items));
     }
 }

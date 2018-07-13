@@ -35,30 +35,51 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class BuildBlock extends Block {
-    public BuildBlock(String name) {
+public class BuildBlock extends Block{
+    public BuildBlock(String name){
         super(name);
         update = true;
-        size = Integer.parseInt(name.charAt(name.length()-1) + "");
+        size = Integer.parseInt(name.charAt(name.length() - 1) + "");
         health = 1;
         layer = Layer.placement;
         consumesTap = true;
         solidifes = true;
     }
 
+    @Remote(called = Loc.server, in = In.blocks)
+    public static void onDeconstructFinish(Tile tile, Block block){
+        Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
+        world.removeBlock(tile);
+    }
+
+    @Remote(called = Loc.server, in = In.blocks)
+    public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team){
+        world.setBlock(tile, block, team);
+        tile.setRotation(rotation);
+        tile.setTeam(team);
+        Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
+
+        //last builder was this local client player, call placed()
+        if(!headless && builderID == players[0].id){
+            //this is run delayed, since if this is called on the server, all clients need to recieve the onBuildFinish()
+            //event first before they can recieve the placed() event modification results
+            threads.runDelay(() -> tile.block().placed(tile));
+        }
+    }
+
     @Override
-    public boolean isSolidFor(Tile tile) {
+    public boolean isSolidFor(Tile tile){
         BuildEntity entity = tile.entity();
         return entity == null || entity.recipe == null || entity.recipe.result.solid || entity.previous.solid;
     }
 
     @Override
-    public CursorType getCursor(Tile tile) {
+    public CursorType getCursor(Tile tile){
         return CursorType.hand;
     }
 
     @Override
-    public void tapped(Tile tile, Player player) {
+    public void tapped(Tile tile, Player player){
         BuildEntity entity = tile.entity();
 
         //if the target is constructible, begin constructing
@@ -84,7 +105,7 @@ public class BuildBlock extends Block {
 
     @Override
     public void afterDestroyed(Tile tile, TileEntity e){
-        BuildEntity entity = (BuildEntity)e;
+        BuildEntity entity = (BuildEntity) e;
 
         if(entity.previous != null && entity.previous.synthetic()){
             tile.setBlock(entity.previous);
@@ -102,13 +123,13 @@ public class BuildBlock extends Block {
 
         if(entity.previous == null) return;
 
-        for (TextureRegion region : entity.previous.getBlockIcon()) {
+        for(TextureRegion region : entity.previous.getBlockIcon()){
             Draw.rect(region, tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.getRotation() * 90 : 0);
         }
     }
 
     @Override
-    public void drawLayer(Tile tile) {
+    public void drawLayer(Tile tile){
 
         BuildEntity entity = tile.entity();
 
@@ -120,7 +141,7 @@ public class BuildBlock extends Block {
 
         for(TextureRegion region : target.getBlockIcon()){
             Shaders.blockbuild.region = region;
-            Shaders.blockbuild.progress = (float)entity.progress;
+            Shaders.blockbuild.progress = (float) entity.progress;
             Shaders.blockbuild.apply();
 
             Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.getRotation() * 90 : 0);
@@ -130,7 +151,7 @@ public class BuildBlock extends Block {
     }
 
     @Override
-    public void drawShadow(Tile tile) {
+    public void drawShadow(Tile tile){
         BuildEntity entity = tile.entity();
 
         Recipe recipe = entity.recipe;
@@ -144,45 +165,28 @@ public class BuildBlock extends Block {
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
 
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new BuildEntity();
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
-    public static void onDeconstructFinish(Tile tile, Block block){
-        Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
-        world.removeBlock(tile);
-    }
-
-    @Remote(called = Loc.server, in = In.blocks)
-    public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team){
-        world.setBlock(tile, block, team);
-        tile.setRotation(rotation);
-        tile.setTeam(team);
-        Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
-
-        //last builder was this local client player, call placed()
-        if(!headless && builderID == players[0].id){
-            //this is run delayed, since if this is called on the server, all clients need to recieve the onBuildFinish()
-            //event first before they can recieve the placed() event modification results
-            threads.runDelay(() -> tile.block().placed(tile));
-        }
-    }
-
     public class BuildEntity extends TileEntity{
-        /**The recipe of the block that is being constructed.
-         * If there is no recipe for this block, as is the case with rocks, 'previous' is used.*/
+        /**
+         * The recipe of the block that is being constructed.
+         * If there is no recipe for this block, as is the case with rocks, 'previous' is used.
+         */
         public Recipe recipe;
 
         public float progress = 0;
         public float buildCost;
-        /**The block that used to be here.
-         * If a non-recipe block is being deconstructed, this is the block that is being deconstructed.*/
+        /**
+         * The block that used to be here.
+         * If a non-recipe block is being deconstructed, this is the block that is being deconstructed.
+         */
         public Block previous;
         public int builderID = -1;
 
@@ -191,8 +195,8 @@ public class BuildBlock extends Block {
         public void construct(Unit builder, TileEntity core, float amount){
             float maxProgress = checkRequired(core.items, amount, false);
 
-            for (int i = 0; i < recipe.requirements.length; i++) {
-                accumulator[i] += recipe.requirements[i].amount*maxProgress; //add min amount progressed to the accumulator
+            for(int i = 0; i < recipe.requirements.length; i++){
+                accumulator[i] += recipe.requirements[i].amount * maxProgress; //add min amount progressed to the accumulator
             }
 
             maxProgress = checkRequired(core.items, maxProgress, true);
@@ -211,14 +215,14 @@ public class BuildBlock extends Block {
         public void deconstruct(Unit builder, TileEntity core, float amount){
             Recipe recipe = Recipe.getByResult(previous);
 
-            if(recipe != null) {
+            if(recipe != null){
                 ItemStack[] requirements = recipe.requirements;
 
-                for (int i = 0; i < requirements.length; i++) {
+                for(int i = 0; i < requirements.length; i++){
                     accumulator[i] += requirements[i].amount * amount / 2f; //add scaled amount progressed to the accumulator
                     int accumulated = (int) (accumulator[i]); //get amount
 
-                    if (amount > 0) { //if it's positive, add it to the core
+                    if(amount > 0){ //if it's positive, add it to the core
                         int accepting = core.tile.block().acceptStack(requirements[i].item, accumulated, core.tile, builder);
                         core.tile.block().handleStack(requirements[i].item, accepting, core.tile, builder);
 
@@ -237,8 +241,8 @@ public class BuildBlock extends Block {
         private float checkRequired(InventoryModule inventory, float amount, boolean remove){
             float maxProgress = amount;
 
-            for(int i = 0; i < recipe.requirements.length; i ++){
-                int required = (int)(accumulator[i]); //calculate items that are required now
+            for(int i = 0; i < recipe.requirements.length; i++){
+                int required = (int) (accumulator[i]); //calculate items that are required now
 
                 if(inventory.get(recipe.requirements[i].item) == 0){
                     maxProgress = 0f;
@@ -246,15 +250,15 @@ public class BuildBlock extends Block {
                     //calculate how many items it can actually use
                     int maxUse = Math.min(required, inventory.get(recipe.requirements[i].item));
                     //get this as a fraction
-                    float fraction = maxUse / (float)required;
+                    float fraction = maxUse / (float) required;
 
                     //move max progress down if this fraction is less than 1
-                    maxProgress = Math.min(maxProgress, maxProgress*fraction);
+                    maxProgress = Math.min(maxProgress, maxProgress * fraction);
 
                     accumulator[i] -= maxUse;
 
                     //remove stuff that is actually used
-                    if(remove) {
+                    if(remove){
                         inventory.remove(recipe.requirements[i].item, maxUse);
                     }
                 }
@@ -288,7 +292,7 @@ public class BuildBlock extends Block {
         }
 
         @Override
-        public void write(DataOutputStream stream) throws IOException {
+        public void write(DataOutputStream stream) throws IOException{
             stream.writeFloat(progress);
             stream.writeShort(previous == null ? -1 : previous.id);
             stream.writeShort(recipe == null ? -1 : recipe.result.id);
@@ -304,15 +308,15 @@ public class BuildBlock extends Block {
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException {
+        public void read(DataInputStream stream) throws IOException{
             progress = stream.readFloat();
             short pid = stream.readShort();
             short rid = stream.readShort();
             byte acsize = stream.readByte();
-            
+
             if(acsize != -1){
                 accumulator = new float[acsize];
-                for (int i = 0; i < acsize; i++) {
+                for(int i = 0; i < acsize; i++){
                     accumulator[i] = stream.readFloat();
                 }
             }

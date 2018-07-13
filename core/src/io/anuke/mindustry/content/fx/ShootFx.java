@@ -12,11 +12,11 @@ import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-public class ShootFx extends FxList implements ContentList {
+public class ShootFx extends FxList implements ContentList{
     public static Effect shootSmall, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke, shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium, shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot;
 
     @Override
-    public void load() {
+    public void load(){
 
         shootSmall = new Effect(8, e -> {
             Draw.color(Palette.lighterOrange, Palette.lightOrange, e.fin());
@@ -111,7 +111,7 @@ public class ShootFx extends FxList implements ContentList {
         shellEjectMedium = new GroundEffect(34f, 400f, e -> {
             Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.fin());
             float rot = e.rotation + 90f;
-            for (int i : Mathf.signs) {
+            for(int i : Mathf.signs){
                 float len = (2f + e.finpow() * 10f) * i;
                 float lr = rot + e.fin() * 20f * i;
                 Draw.rect("casing",
@@ -122,7 +122,7 @@ public class ShootFx extends FxList implements ContentList {
 
             Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.fin());
 
-            for (int i : Mathf.signs) {
+            for(int i : Mathf.signs){
                 Angles.randLenVectors(e.id, 4, 1f + e.finpow() * 11f, e.rotation + 90f * i, 20f, (x, y) -> {
                     Fill.circle(e.x + x, e.y + y, e.fout() * 1.5f);
                 });
@@ -134,7 +134,7 @@ public class ShootFx extends FxList implements ContentList {
         shellEjectBig = new GroundEffect(22f, 400f, e -> {
             Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.fin());
             float rot = e.rotation + 90f;
-            for (int i : Mathf.signs) {
+            for(int i : Mathf.signs){
                 float len = (4f + e.finpow() * 8f) * i;
                 float lr = rot + Mathf.randomSeedRange(e.id + i + 6, 20f * e.fin()) * i;
                 Draw.rect("casing",
@@ -146,7 +146,7 @@ public class ShootFx extends FxList implements ContentList {
 
             Draw.color(Color.LIGHT_GRAY);
 
-            for (int i : Mathf.signs) {
+            for(int i : Mathf.signs){
                 Angles.randLenVectors(e.id, 4, -e.finpow() * 15f, e.rotation + 90f * i, 25f, (x, y) -> {
                     Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
                 });
@@ -158,7 +158,7 @@ public class ShootFx extends FxList implements ContentList {
         lancerLaserShoot = new Effect(21f, e -> {
             Draw.color(Palette.lancerLaser);
 
-            for (int i : Mathf.signs) {
+            for(int i : Mathf.signs){
                 Shapes.tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 90f * i);
             }
 

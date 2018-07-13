@@ -6,10 +6,10 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 
 //TODO scale velocity depending on fslope()
-public class ArtilleryBulletType extends BasicBulletType {
+public class ArtilleryBulletType extends BasicBulletType{
     protected Effect trailEffect = BulletFx.artilleryTrail;
 
-    public ArtilleryBulletType(float speed, float damage, String bulletSprite) {
+    public ArtilleryBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage, bulletSprite);
         collidesTiles = false;
         collides = false;
@@ -17,18 +17,18 @@ public class ArtilleryBulletType extends BasicBulletType {
     }
 
     @Override
-    public void update(Bullet b) {
+    public void update(Bullet b){
         super.update(b);
 
-        if(b.timer.get(0, 3 + b.fslope()*2f)){
+        if(b.timer.get(0, 3 + b.fslope() * 2f)){
             Effects.effect(trailEffect, backColor, b.x, b.y, b.fslope() * 4f);
         }
     }
 
     @Override
-    public void draw(Bullet b) {
+    public void draw(Bullet b){
         float baseScale = 0.7f;
-        float scale = (baseScale + b.fslope()*(1f-baseScale));
+        float scale = (baseScale + b.fslope() * (1f - baseScale));
 
         float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
 

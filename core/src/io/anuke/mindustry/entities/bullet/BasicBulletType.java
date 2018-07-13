@@ -12,8 +12,10 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-/**A BulletType for most ammo-based bullets shot from turrets and units.*/
-public class BasicBulletType extends BulletType {
+/**
+ * A BulletType for most ammo-based bullets shot from turrets and units.
+ */
+public class BasicBulletType extends BulletType{
     public Color backColor = Palette.bulletYellowBack, frontColor = Palette.bulletYellow;
     public float bulletWidth = 5f, bulletHeight = 7f;
     public float bulletShrink = 0.5f;
@@ -23,7 +25,9 @@ public class BasicBulletType extends BulletType {
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
     public BulletType fragBullet = null;
 
-    /**Use a negative value to disable splash damage.*/
+    /**
+     * Use a negative value to disable splash damage.
+     */
     public float splashDamageRadius = -1f;
     public float splashDamage = 6f;
 
@@ -39,19 +43,19 @@ public class BasicBulletType extends BulletType {
 
     public float hitShake = 0f;
 
-    public BasicBulletType(float speed, float damage, String bulletSprite) {
+    public BasicBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage);
         this.bulletSprite = bulletSprite;
     }
 
     @Override
-    public void load() {
+    public void load(){
         backRegion = Draw.region(bulletSprite + "-back");
         frontRegion = Draw.region(bulletSprite);
     }
 
     @Override
-    public void draw(Bullet b) {
+    public void draw(Bullet b){
         float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
 
         Draw.color(backColor);
@@ -62,7 +66,7 @@ public class BasicBulletType extends BulletType {
     }
 
     @Override
-    public void update(Bullet b) {
+    public void update(Bullet b){
         super.update(b);
 
         if(homingPower > 0.0001f){
@@ -74,20 +78,20 @@ public class BasicBulletType extends BulletType {
     }
 
     @Override
-    public void hit(Bullet b, float x, float y) {
+    public void hit(Bullet b, float x, float y){
         super.hit(b, x, y);
 
         Effects.shake(hitShake, hitShake, b);
 
-        if(fragBullet != null) {
-            for (int i = 0; i < fragBullets; i++) {
+        if(fragBullet != null){
+            for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
                 float a = Mathf.random(360f);
                 Bullet.create(fragBullet, b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax));
             }
         }
 
-        if(Mathf.chance(incendChance)) {
+        if(Mathf.chance(incendChance)){
             Damage.createIncend(x, y, incendSpread, incendAmount);
         }
 
@@ -97,7 +101,7 @@ public class BasicBulletType extends BulletType {
     }
 
     @Override
-    public void despawned(Bullet b) {
+    public void despawned(Bullet b){
         if(fragBullet != null || splashDamageRadius > 0){
             hit(b);
         }

@@ -2,13 +2,15 @@ package io.anuke.mindustry.ui;
 
 import io.anuke.ucore.util.Bundles;
 
-/**A low-garbage way to format bundle strings.*/
-public class IntFormat {
+/**
+ * A low-garbage way to format bundle strings.
+ */
+public class IntFormat{
     private final StringBuilder builder = new StringBuilder();
     private final String text;
     private int lastValue = Integer.MIN_VALUE;
 
-    public IntFormat(String text) {
+    public IntFormat(String text){
         this.text = text;
     }
 

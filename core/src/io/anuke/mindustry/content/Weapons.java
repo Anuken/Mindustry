@@ -8,13 +8,13 @@ import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.type.Weapon;
 
-public class Weapons implements ContentList {
+public class Weapons implements ContentList{
     public static Weapon blaster, chainBlaster, shockgun, sapper, swarmer, bomber, flakgun, flamethrower, missiles;
 
     @Override
-    public void load() {
+    public void load(){
 
-        blaster = new Weapon("blaster") {{
+        blaster = new Weapon("blaster"){{
             length = 1.5f;
             reload = 15f;
             roundrobin = true;
@@ -22,7 +22,7 @@ public class Weapons implements ContentList {
             setAmmo(AmmoTypes.bulletLead);
         }};
 
-        missiles = new Weapon("missiles") {{
+        missiles = new Weapon("missiles"){{
             length = 1.5f;
             reload = 40f;
             shots = 2;
@@ -33,7 +33,7 @@ public class Weapons implements ContentList {
             setAmmo(AmmoTypes.weaponMissile);
         }};
 
-        chainBlaster = new Weapon("chain-blaster") {{
+        chainBlaster = new Weapon("chain-blaster"){{
             length = 1.5f;
             reload = 30f;
             roundrobin = true;
@@ -41,7 +41,7 @@ public class Weapons implements ContentList {
             setAmmo(AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletTungsten, AmmoTypes.bulletSilicon, AmmoTypes.bulletThorium);
         }};
 
-        shockgun = new Weapon("shockgun") {{
+        shockgun = new Weapon("shockgun"){{
             length = 1f;
             reload = 50f;
             roundrobin = true;
@@ -53,7 +53,7 @@ public class Weapons implements ContentList {
             setAmmo(AmmoTypes.shotgunTungsten);
         }};
 
-        flakgun = new Weapon("flakgun") {{
+        flakgun = new Weapon("flakgun"){{
             length = 1f;
             reload = 70f;
             roundrobin = true;
@@ -65,7 +65,7 @@ public class Weapons implements ContentList {
             setAmmo(AmmoTypes.shellCarbide);
         }};
 
-        flamethrower = new Weapon("flamethrower") {{
+        flamethrower = new Weapon("flamethrower"){{
             length = 1f;
             reload = 14f;
             roundrobin = true;
@@ -74,7 +74,7 @@ public class Weapons implements ContentList {
             setAmmo(AmmoTypes.flamerThermite);
         }};
 
-        sapper = new Weapon("sapper") {{
+        sapper = new Weapon("sapper"){{
             length = 1.5f;
             reload = 12f;
             roundrobin = true;
@@ -82,7 +82,7 @@ public class Weapons implements ContentList {
             setAmmo(AmmoTypes.bulletCarbide);
         }};
 
-        swarmer = new Weapon("swarmer") {{
+        swarmer = new Weapon("swarmer"){{
             length = 1.5f;
             reload = 10f;
             roundrobin = true;
@@ -90,7 +90,7 @@ public class Weapons implements ContentList {
             setAmmo(AmmoTypes.bulletPyratite);
         }};
 
-        bomber = new Weapon("bomber") {{
+        bomber = new Weapon("bomber"){{
             length = 0f;
             width = 2f;
             reload = 5f;
@@ -103,7 +103,7 @@ public class Weapons implements ContentList {
     }
 
     @Override
-    public Array<? extends Content> getAll() {
+    public Array<? extends Content> getAll(){
         return Upgrade.all();
     }
 }

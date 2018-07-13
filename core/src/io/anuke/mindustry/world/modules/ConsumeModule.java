@@ -30,12 +30,12 @@ public class ConsumeModule extends BlockModule{
     }
 
     @Override
-    public void write(DataOutput stream) throws IOException {
+    public void write(DataOutput stream) throws IOException{
         stream.writeBoolean(valid);
     }
 
     @Override
-    public void read(DataInput stream) throws IOException {
+    public void read(DataInput stream) throws IOException{
         valid = stream.readBoolean();
     }
 }

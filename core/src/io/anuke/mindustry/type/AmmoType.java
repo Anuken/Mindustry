@@ -11,32 +11,52 @@ public class AmmoType implements Content{
     private static Array<AmmoType> allTypes = new Array<>(32);
 
     public final byte id;
-    /**The item used. Always null if liquid isn't.*/
+    /**
+     * The item used. Always null if liquid isn't.
+     */
     public final Item item;
-    /**The liquid used. Always null if item isn't.*/
+    /**
+     * The liquid used. Always null if item isn't.
+     */
     public final Liquid liquid;
-    /**The resulting bullet. Never null.*/
+    /**
+     * The resulting bullet. Never null.
+     */
     public final BulletType bullet;
-    /**For item ammo, this is amount given per ammo item.
-     * For liquid ammo, this is amount used per shot.*/
+    /**
+     * For item ammo, this is amount given per ammo item.
+     * For liquid ammo, this is amount used per shot.
+     */
     public final float quantityMultiplier;
-    /**Reload speed multiplier.*/
+    /**
+     * Reload speed multiplier.
+     */
     public float reloadMultiplier = 1f;
-    /**Bullet recoil strength.*/
+    /**
+     * Bullet recoil strength.
+     */
     public float recoil = 0f;
-    /**Additional inaccuracy in degrees.*/
+    /**
+     * Additional inaccuracy in degrees.
+     */
     public float inaccuracy;
-    /**Effect created when shooting.*/
+    /**
+     * Effect created when shooting.
+     */
     public Effect shootEffect = Fx.none;
-    /**Extra smoke effect created when shooting.*/
+    /**
+     * Extra smoke effect created when shooting.
+     */
     public Effect smokeEffect = Fx.none;
 
     {
-        this.id = (byte)(lastID++);
+        this.id = (byte) (lastID++);
         allTypes.add(this);
     }
 
-    /**Creates an AmmoType with no liquid or item. Used for power-based ammo.*/
+    /**
+     * Creates an AmmoType with no liquid or item. Used for power-based ammo.
+     */
     public AmmoType(BulletType result){
         this.item = null;
         this.liquid = null;
@@ -45,7 +65,9 @@ public class AmmoType implements Content{
         this.reloadMultiplier = 1f;
     }
 
-    /**Creates an AmmoType with an item.*/
+    /**
+     * Creates an AmmoType with an item.
+     */
     public AmmoType(Item item, BulletType result, float multiplier){
         this.item = item;
         this.liquid = null;
@@ -53,7 +75,9 @@ public class AmmoType implements Content{
         this.quantityMultiplier = multiplier;
     }
 
-    /**Creates an AmmoType with a liquid.*/
+    /**
+     * Creates an AmmoType with a liquid.
+     */
     public AmmoType(Liquid liquid, BulletType result, float multiplier){
         this.item = null;
         this.liquid = liquid;
@@ -61,26 +85,28 @@ public class AmmoType implements Content{
         this.quantityMultiplier = multiplier;
     }
 
-    /**Returns maximum distance the bullet this ammo type has can travel.*/
-    public float getRange(){
-        return bullet.speed * bullet.lifetime;
-    }
-
-    @Override
-    public String getContentTypeName() {
-        return "ammotype";
-    }
-
-    @Override
-    public Array<? extends Content> getAll() {
-        return allTypes;
-    }
-
-    public static Array<AmmoType> all() {
+    public static Array<AmmoType> all(){
         return allTypes;
     }
 
     public static AmmoType getByID(int id){
         return allTypes.get(id);
+    }
+
+    /**
+     * Returns maximum distance the bullet this ammo type has can travel.
+     */
+    public float getRange(){
+        return bullet.speed * bullet.lifetime;
+    }
+
+    @Override
+    public String getContentTypeName(){
+        return "ammotype";
+    }
+
+    @Override
+    public Array<? extends Content> getAll(){
+        return allTypes;
     }
 }

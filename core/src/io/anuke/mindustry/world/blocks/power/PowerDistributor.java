@@ -7,9 +7,9 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.ucore.core.Timers;
 
-public class PowerDistributor extends PowerBlock {
+public class PowerDistributor extends PowerBlock{
 
-    public PowerDistributor(String name) {
+    public PowerDistributor(String name){
         super(name);
     }
 
@@ -26,7 +26,7 @@ public class PowerDistributor extends PowerBlock {
         for(GridPoint2 point : Edges.getEdges(size)){
             Tile target = tile.getNearby(point);
             if(target != null && target.block().hasPower &&
-                    shouldDistribute(tile, target)) sources ++;
+                    shouldDistribute(tile, target)) sources++;
         }
 
         if(sources == 0) return;
@@ -39,7 +39,7 @@ public class PowerDistributor extends PowerBlock {
             target = target.target();
 
             if(target.block().hasPower && shouldDistribute(tile, target)){
-                float diff = (tile.entity.power.amount / powerCapacity - target.entity.power.amount / target.block().powerCapacity)/1.4f;
+                float diff = (tile.entity.power.amount / powerCapacity - target.entity.power.amount / target.block().powerCapacity) / 1.4f;
 
                 float transmit = Math.min(result * Timers.delta(), diff * powerCapacity);
                 if(target.block().acceptPower(target, tile, transmit)){
@@ -50,7 +50,7 @@ public class PowerDistributor extends PowerBlock {
         }
     }
 
-    protected boolean shouldDistribute(Tile tile, Tile other) {
+    protected boolean shouldDistribute(Tile tile, Tile other){
         other = other.target();
         //only generators can distribute to other generators
         return (!(other.block() instanceof PowerGenerator) || tile.block() instanceof PowerGenerator)
@@ -60,7 +60,7 @@ public class PowerDistributor extends PowerBlock {
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         distributePower(tile);
     }
 }

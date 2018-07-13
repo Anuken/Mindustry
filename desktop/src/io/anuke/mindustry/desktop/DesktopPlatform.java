@@ -27,7 +27,7 @@ import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class DesktopPlatform extends Platform {
+public class DesktopPlatform extends Platform{
     final static boolean useDiscord = OS.is64Bit;
     final static String applicationId = "398246104468291591";
     final static DateFormat format = SimpleDateFormat.getDateTimeInstance();
@@ -38,14 +38,14 @@ public class DesktopPlatform extends Platform {
 
         Vars.testMobile = isDebug() && Array.with(args).contains("-testMobile", false);
 
-        if(useDiscord) {
+        if(useDiscord){
             DiscordEventHandlers handlers = new DiscordEventHandlers();
             DiscordRPC.INSTANCE.Discord_Initialize(applicationId, handlers, true, "");
         }
     }
 
     @Override
-    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filter) {
+    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filter){
         new FileChooser(text, file -> file.extension().equalsIgnoreCase(filter), open, cons).show();
     }
 
@@ -70,7 +70,7 @@ public class DesktopPlatform extends Platform {
     }
 
     @Override
-    public void updateRPC() {
+    public void updateRPC(){
 
         if(!useDiscord) return;
 
@@ -89,7 +89,7 @@ public class DesktopPlatform extends Platform {
         }else{
             if(ui.editor != null && ui.editor.isShown()){
                 presence.state = "In Editor";
-            }else {
+            }else{
                 presence.state = "In Menu";
             }
         }
@@ -100,26 +100,27 @@ public class DesktopPlatform extends Platform {
     }
 
     @Override
-    public void onGameExit() {
+    public void onGameExit(){
         if(useDiscord) DiscordRPC.INSTANCE.Discord_Shutdown();
     }
 
     @Override
-    public boolean isDebug() {
+    public boolean isDebug(){
         return args.length > 0 && args[0].equalsIgnoreCase("-debug_" + getUUID().hashCode());
     }
 
     @Override
-    public ThreadProvider getThreadProvider() {
+    public ThreadProvider getThreadProvider(){
         return new DefaultThreadImpl();
     }
 
     @Override
-    public String getUUID() {
-        try {
+    public String getUUID(){
+        try{
             Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
             NetworkInterface out;
-            for(out = e.nextElement(); out.getHardwareAddress() == null && e.hasMoreElements() && validAddress(out.getHardwareAddress()); out = e.nextElement());
+            for(out = e.nextElement(); out.getHardwareAddress() == null && e.hasMoreElements() && validAddress(out.getHardwareAddress()); out = e.nextElement())
+                ;
 
             byte[] bytes = out.getHardwareAddress();
             byte[] result = new byte[8];
@@ -130,7 +131,7 @@ public class DesktopPlatform extends Platform {
             if(str.equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
 
             return str;
-        }catch (Exception e){
+        }catch(Exception e){
             return super.getUUID();
         }
     }

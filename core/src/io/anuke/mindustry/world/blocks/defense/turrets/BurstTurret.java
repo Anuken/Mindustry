@@ -7,11 +7,11 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class BurstTurret extends ItemTurret {
+public class BurstTurret extends ItemTurret{
     protected float burstSpacing = 5;
     protected float xRand = 0f;
 
-    public BurstTurret(String name) {
+    public BurstTurret(String name){
         super(name);
     }
 
@@ -21,7 +21,7 @@ public class BurstTurret extends ItemTurret {
 
         entity.heat = 1f;
 
-        for (int i = 0; i < shots; i++) {
+        for(int i = 0; i < shots; i++){
             Timers.run(burstSpacing * i, () -> {
                 if(!(tile.entity instanceof TurretEntity) ||
                         !hasAmmo(tile)) return;

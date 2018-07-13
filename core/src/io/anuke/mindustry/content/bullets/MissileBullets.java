@@ -6,13 +6,13 @@ import io.anuke.mindustry.entities.bullet.MissileBulletType;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
 
-public class MissileBullets extends BulletList implements ContentList {
+public class MissileBullets extends BulletList implements ContentList{
     public static BulletType explosive, incindiary, surge, javelin;
 
     @Override
-    public void load() {
+    public void load(){
 
-        explosive = new MissileBulletType(1.8f, 10, "missile") {
+        explosive = new MissileBulletType(1.8f, 10, "missile"){
             {
                 bulletWidth = 8f;
                 bulletHeight = 8f;
@@ -26,7 +26,7 @@ public class MissileBullets extends BulletList implements ContentList {
             }
         };
 
-        incindiary = new MissileBulletType(2f, 12, "missile") {
+        incindiary = new MissileBulletType(2f, 12, "missile"){
             {
                 frontColor = Palette.lightishOrange;
                 backColor = Palette.lightOrange;
@@ -44,14 +44,14 @@ public class MissileBullets extends BulletList implements ContentList {
             }
         };
 
-        surge = new MissileBulletType(3f, 5, "bullet") {
+        surge = new MissileBulletType(3f, 5, "bullet"){
             {
                 bulletWidth = 7f;
                 bulletHeight = 9f;
             }
         };
 
-        javelin = new MissileBulletType(2.5f, 10, "missile") {
+        javelin = new MissileBulletType(2.5f, 10, "missile"){
             {
                 bulletWidth = 8f;
                 bulletHeight = 8f;

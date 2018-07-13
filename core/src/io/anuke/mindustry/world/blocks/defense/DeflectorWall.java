@@ -16,13 +16,13 @@ import io.anuke.ucore.util.Physics;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class DeflectorWall extends Wall {
+public class DeflectorWall extends Wall{
     static final float hitTime = 10f;
 
     protected float maxDamageDeflect = 5f;
     protected Rectangle rect = new Rectangle();
 
-    public DeflectorWall(String name) {
+    public DeflectorWall(String name){
         super(name);
     }
 
@@ -41,7 +41,7 @@ public class DeflectorWall extends Wall {
         Draw.rect("blank", tile.drawx(), tile.drawy(), tilesize * size, tilesize * size);
         Draw.reset();
 
-        entity.hit = Mathf.clamp(entity.hit - Timers.delta()/hitTime);
+        entity.hit = Mathf.clamp(entity.hit - Timers.delta() / hitTime);
 
         Graphics.setNormalBlending();
     }
@@ -56,13 +56,13 @@ public class DeflectorWall extends Wall {
         float penX = Math.abs(entity.x - bullet.x), penY = Math.abs(entity.y - bullet.y);
 
         Vector2 position = Physics.raycastRect(bullet.lastPosition().x, bullet.lastPosition().y, bullet.x, bullet.y,
-                rect.setCenter(entity.x, entity.y).setSize(size * tilesize + bullet.hitbox.width +  bullet.hitbox.height));
+                rect.setCenter(entity.x, entity.y).setSize(size * tilesize + bullet.hitbox.width + bullet.hitbox.height));
 
         if(position != null){
             bullet.set(position.x, position.y);
         }
 
-        if(penX > penY) {
+        if(penX > penY){
             bullet.getVelocity().x *= -1;
         }else{
             bullet.getVelocity().y *= -1;
@@ -73,11 +73,11 @@ public class DeflectorWall extends Wall {
         bullet.scaleTime(1f);
         bullet.supressCollision();
 
-        ((DeflectorEntity)entity).hit = 1f;
+        ((DeflectorEntity) entity).hit = 1f;
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new DeflectorEntity();
     }
 

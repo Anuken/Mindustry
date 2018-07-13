@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.mapgen;
 
-public class GenProperties {
+public class GenProperties{
     public long seed;
     public MapStyle maps;
     public OreStyle ores;
@@ -11,24 +11,40 @@ public class GenProperties {
     public EnvironmentStyle environment;
 
     enum MapStyle{
-        /**256x512*/
+        /**
+         * 256x512
+         */
         longY,
-        /**128x256*/
+        /**
+         * 128x256
+         */
         smallY,
-        /**128x128*/
+        /**
+         * 128x128
+         */
         small,
-        /**256x256*/
+        /**
+         * 256x256
+         */
         normal
     }
 
     enum OreStyle{
-        /**'vanilla' noise-distributed ores*/
+        /**
+         * 'vanilla' noise-distributed ores
+         */
         normal,
-        /**ores hug the walls*/
+        /**
+         * ores hug the walls
+         */
         nearWalls,
-        /**ores hug all liquid rivers*/
+        /**
+         * ores hug all liquid rivers
+         */
         nearRivers,
-        /**large veins*/
+        /**
+         * large veins
+         */
         largeVeins
     }
 
@@ -40,22 +56,36 @@ public class GenProperties {
     }
 
     enum RiverStyle{
-        /**long thin river spanning entire map*/
+        /**
+         * long thin river spanning entire map
+         */
         longThin,
-        /**long river branching into many others*/
+        /**
+         * long river branching into many others
+         */
         longBranch,
-        /**one long, thick river*/
+        /**
+         * one long, thick river
+         */
         longThick,
-        /**short, thick river that ends in a lake*/
+        /**
+         * short, thick river that ends in a lake
+         */
         shortLake
     }
 
     enum TerrainStyle{
-        /**bordered around by the normal material*/
+        /**
+         * bordered around by the normal material
+         */
         normal,
-        /**everything is islands*/
+        /**
+         * everything is islands
+         */
         waterIslands,
-        /**everything is islands: lava edition*/
+        /**
+         * everything is islands: lava edition
+         */
         lavaIslands
     }
 

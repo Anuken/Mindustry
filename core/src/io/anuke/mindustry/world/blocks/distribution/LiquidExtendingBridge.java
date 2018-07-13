@@ -7,9 +7,9 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class LiquidExtendingBridge extends ExtendingItemBridge {
+public class LiquidExtendingBridge extends ExtendingItemBridge{
 
-    public LiquidExtendingBridge(String name) {
+    public LiquidExtendingBridge(String name){
         super(name);
         hasItems = false;
         hasLiquids = true;
@@ -17,11 +17,11 @@ public class LiquidExtendingBridge extends ExtendingItemBridge {
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         ItemBridgeEntity entity = tile.entity();
 
-        entity.time += entity.cycleSpeed* Timers.delta();
-        entity.time2 += (entity.cycleSpeed-1f)*Timers.delta();
+        entity.time += entity.cycleSpeed * Timers.delta();
+        entity.time2 += (entity.cycleSpeed - 1f) * Timers.delta();
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
@@ -45,7 +45,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge {
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source) {
+    public boolean acceptItem(Item item, Tile tile, Tile source){
         return false;
     }
 }

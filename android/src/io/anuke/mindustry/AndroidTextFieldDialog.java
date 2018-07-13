@@ -11,20 +11,20 @@ import android.widget.EditText;
 import com.badlogic.gdx.Gdx;
 
 public class AndroidTextFieldDialog{
-	private Activity activity;
-	private EditText userInput;
-	private AlertDialog.Builder builder;
-	private TextPromptListener listener;
-	private boolean isBuild;
+    private Activity activity;
+    private EditText userInput;
+    private AlertDialog.Builder builder;
+    private TextPromptListener listener;
+    private boolean isBuild;
 
-	public AndroidTextFieldDialog() {
-		this.activity = (Activity)Gdx.app;
-		load();
-	}
+    public AndroidTextFieldDialog(){
+        this.activity = (Activity) Gdx.app;
+        load();
+    }
 
-	public AndroidTextFieldDialog show() {
+    public AndroidTextFieldDialog show(){
 
-		activity.runOnUiThread(() -> {
+        activity.runOnUiThread(() -> {
             AlertDialog dialog = builder.create();
 
             dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
@@ -33,12 +33,12 @@ public class AndroidTextFieldDialog{
 
         });
 
-		return this;
-	}
+        return this;
+    }
 
-	private AndroidTextFieldDialog load() {
+    private AndroidTextFieldDialog load(){
 
-		activity.runOnUiThread(() -> {
+        activity.runOnUiThread(() -> {
 
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
             LayoutInflater li = LayoutInflater.from(activity);
@@ -55,64 +55,65 @@ public class AndroidTextFieldDialog{
             isBuild = true;
         });
 
-		// Wait till TextPrompt is built.
-		while (!isBuild) {
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) { }
-		}
+        // Wait till TextPrompt is built.
+        while(!isBuild){
+            try{
+                Thread.sleep(10);
+            }catch(InterruptedException e){
+            }
+        }
 
-		return this;
-	}
+        return this;
+    }
 
-	public int getResourceId(String pVariableName, String pVariableType) {
-		try {
-			return activity.getResources().getIdentifier(pVariableName, pVariableType, activity.getPackageName());
-		} catch (Exception e) {
-			Gdx.app.error("Android Dialogs", "Cannot find resouce with name: " + pVariableName
-					+ " Did you copy the layouts to /res/layouts and /res/layouts_v14 ?");
-			e.printStackTrace();
-			return -1;
-		}
-	}
+    public int getResourceId(String pVariableName, String pVariableType){
+        try{
+            return activity.getResources().getIdentifier(pVariableName, pVariableType, activity.getPackageName());
+        }catch(Exception e){
+            Gdx.app.error("Android Dialogs", "Cannot find resouce with name: " + pVariableName
+                    + " Did you copy the layouts to /res/layouts and /res/layouts_v14 ?");
+            e.printStackTrace();
+            return -1;
+        }
+    }
 
-	public AndroidTextFieldDialog setText(CharSequence value) {
-		userInput.append(value);
-		return this;
-	}
+    public AndroidTextFieldDialog setText(CharSequence value){
+        userInput.append(value);
+        return this;
+    }
 
-	public AndroidTextFieldDialog setCancelButtonLabel(CharSequence label) {
-		builder.setNegativeButton(label, (dialog, id) -> dialog.cancel());
-		return this;
-	}
+    public AndroidTextFieldDialog setCancelButtonLabel(CharSequence label){
+        builder.setNegativeButton(label, (dialog, id) -> dialog.cancel());
+        return this;
+    }
 
-	public AndroidTextFieldDialog setConfirmButtonLabel(CharSequence label) {
-		builder.setPositiveButton(label, (dialog, id) -> {
-            if (listener != null && !userInput.getText().toString().isEmpty()) {
+    public AndroidTextFieldDialog setConfirmButtonLabel(CharSequence label){
+        builder.setPositiveButton(label, (dialog, id) -> {
+            if(listener != null && !userInput.getText().toString().isEmpty()){
                 listener.confirm(userInput.getText().toString());
             }
 
         });
-		return this;
-	}
+        return this;
+    }
 
-	public AndroidTextFieldDialog setTextPromptListener(TextPromptListener listener) {
-		this.listener = listener;
-		return this;
-	}
+    public AndroidTextFieldDialog setTextPromptListener(TextPromptListener listener){
+        this.listener = listener;
+        return this;
+    }
 
-	public AndroidTextFieldDialog setInputType(int type) {
-		userInput.setInputType(type);
-		return this;
-	}
+    public AndroidTextFieldDialog setInputType(int type){
+        userInput.setInputType(type);
+        return this;
+    }
 
-	public AndroidTextFieldDialog setMaxLength(int length) {
-		userInput.setFilters(new InputFilter[] { new InputFilter.LengthFilter(length) });
-		return this;
-	}
-	
-	public  interface TextPromptListener{
-		void confirm(String text);
-	}
+    public AndroidTextFieldDialog setMaxLength(int length){
+        userInput.setFilters(new InputFilter[]{new InputFilter.LengthFilter(length)});
+        return this;
+    }
+
+    public interface TextPromptListener{
+        void confirm(String text);
+    }
 
 }

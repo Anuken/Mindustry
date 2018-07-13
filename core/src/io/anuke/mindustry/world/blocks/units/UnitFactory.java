@@ -35,14 +35,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class UnitFactory extends Block {
+public class UnitFactory extends Block{
     protected UnitType type;
     protected float produceTime = 1000f;
     protected float openDuration = 50f;
     protected float launchVelocity = 0f;
     protected String unitRegion;
 
-    public UnitFactory(String name) {
+    public UnitFactory(String name){
         super(name);
         update = true;
         hasPower = true;
@@ -52,21 +52,41 @@ public class UnitFactory extends Block {
         consumes.require(ConsumeItems.class);
     }
 
-    @Override
-    public void setStats() {
-        super.setStats();
+    @Remote(called = Loc.server, in = In.blocks)
+    public static void onUnitFactorySpawn(Tile tile){
+        UnitFactoryEntity entity = tile.entity();
+        UnitFactory factory = (UnitFactory) tile.block();
 
-        stats.add(BlockStat.craftSpeed, produceTime/60f, StatUnit.seconds);
+        entity.buildTime = 0f;
+        entity.hasSpawned = true;
+
+        Effects.shake(2f, 3f, entity);
+        Effects.effect(BlockFx.producesmoke, tile.drawx(), tile.drawy());
+
+        if(!Net.client()){
+            BaseUnit unit = factory.type.create(tile.getTeam());
+            unit.setSpawner(tile);
+            unit.set(tile.drawx(), tile.drawy());
+            unit.add();
+            unit.getVelocity().y = factory.launchVelocity;
+        }
     }
 
     @Override
-    public boolean isSolidFor(Tile tile) {
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.craftSpeed, produceTime / 60f, StatUnit.seconds);
+    }
+
+    @Override
+    public boolean isSolidFor(Tile tile){
         UnitFactoryEntity entity = tile.entity();
         return type.isFlying || !entity.open;
     }
 
     @Override
-    public void setBars() {
+    public void setBars(){
         super.setBars();
 
         bars.add(new BlockBar(BarType.production, true, tile -> tile.<UnitFactoryEntity>entity().buildTime / produceTime));
@@ -74,22 +94,22 @@ public class UnitFactory extends Block {
     }
 
     @Override
-    public TextureRegion[] getIcon() {
+    public TextureRegion[] getIcon(){
         return new TextureRegion[]{
-            Draw.region(name),
-            Draw.region(name + "-top")
+                Draw.region(name),
+                Draw.region(name + "-top")
         };
     }
 
     @Override
-    public void draw(Tile tile) {
+    public void draw(Tile tile){
         UnitFactoryEntity entity = tile.entity();
         TextureRegion region = Draw.region(unitRegion == null ? type.name : unitRegion);
 
         Draw.rect(name(), tile.drawx(), tile.drawy());
 
         Shaders.build.region = region;
-        Shaders.build.progress = entity.buildTime/produceTime;
+        Shaders.build.progress = entity.buildTime / produceTime;
         Shaders.build.color.set(Palette.accent);
         Shaders.build.color.a = entity.speedScl;
         Shaders.build.time = -entity.time / 10f;
@@ -103,7 +123,7 @@ public class UnitFactory extends Block {
         Draw.alpha(entity.speedScl);
 
         Lines.lineAngleCenter(
-                tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize/2f*size - 2f),
+                tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 2f * size - 2f),
                 tile.drawy(),
                 90,
                 size * Vars.tilesize - 4f);
@@ -114,7 +134,7 @@ public class UnitFactory extends Block {
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         UnitFactoryEntity entity = tile.entity();
 
         entity.time += Timers.delta() * entity.speedScl;
@@ -123,7 +143,7 @@ public class UnitFactory extends Block {
             if(entity.openCountdown > Timers.delta()){
                 entity.openCountdown -= Timers.delta();
             }else{
-                if(type.isFlying || !Units.anyEntities(tile)) {
+                if(type.isFlying || !Units.anyEntities(tile)){
                     entity.open = false;
                     entity.openCountdown = -1;
                 }else{
@@ -143,7 +163,7 @@ public class UnitFactory extends Block {
             }
         }*/
 
-        if(!entity.hasSpawned && hasRequirements(entity.items, entity.buildTime/produceTime) &&
+        if(!entity.hasSpawned && hasRequirements(entity.items, entity.buildTime / produceTime) &&
                 entity.cons.valid() && !entity.open){
 
             entity.buildTime += Timers.delta();
@@ -166,9 +186,9 @@ public class UnitFactory extends Block {
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source) {
+    public boolean acceptItem(Item item, Tile tile, Tile source){
         for(ItemStack stack : consumes.items()){
-            if(item == stack.item && tile.entity.items.get(item) <= stack.amount*2){
+            if(item == stack.item && tile.entity.items.get(item) <= stack.amount * 2){
                 return true;
             }
         }
@@ -176,37 +196,17 @@ public class UnitFactory extends Block {
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new UnitFactoryEntity();
     }
 
     protected boolean hasRequirements(InventoryModule inv, float fraction){
         for(ItemStack stack : consumes.items()){
-            if(!inv.has(stack.item, (int)(fraction * stack.amount))){
+            if(!inv.has(stack.item, (int) (fraction * stack.amount))){
                 return false;
             }
         }
         return true;
-    }
-
-    @Remote(called = Loc.server, in = In.blocks)
-    public static void onUnitFactorySpawn(Tile tile){
-        UnitFactoryEntity entity = tile.entity();
-        UnitFactory factory = (UnitFactory)tile.block();
-
-        entity.buildTime = 0f;
-        entity.hasSpawned = true;
-
-        Effects.shake(2f, 3f, entity);
-        Effects.effect(BlockFx.producesmoke, tile.drawx(), tile.drawy());
-
-        if(!Net.client()) {
-            BaseUnit unit = factory.type.create(tile.getTeam());
-            unit.setSpawner(tile);
-            unit.set(tile.drawx(), tile.drawy());
-            unit.add();
-            unit.getVelocity().y = factory.launchVelocity;
-        }
     }
 
     public static class UnitFactoryEntity extends TileEntity{
@@ -218,13 +218,13 @@ public class UnitFactory extends Block {
         public boolean hasSpawned;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException {
+        public void write(DataOutputStream stream) throws IOException{
             stream.writeFloat(buildTime);
             stream.writeBoolean(hasSpawned);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException {
+        public void read(DataInputStream stream) throws IOException{
             buildTime = stream.readFloat();
             hasSpawned = stream.readBoolean();
         }

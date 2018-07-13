@@ -8,30 +8,30 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
 
 public class ColorMapper implements ContentList{
-	private static IntMap<Block> blockMap = new IntMap<>();
-	private static ObjectIntMap<Block> colorMap = new ObjectIntMap<>();
+    private static IntMap<Block> blockMap = new IntMap<>();
+    private static ObjectIntMap<Block> colorMap = new ObjectIntMap<>();
 
-	@Override
-	public void load() {
-		for(Block block : Block.all()){
-			int color = Color.rgba8888(block.minimapColor);
-			if(color == 0) continue; //skip blocks that are not mapped
+    public static Block getByColor(int color){
+        return blockMap.get(color);
+    }
 
-			blockMap.put(color, block);
-			colorMap.put(block, color);
-		}
-	}
+    public static int getBlockColor(Block block){
+        return colorMap.get(block, 0);
+    }
 
-	@Override
-	public Array<? extends Content> getAll() {
-		return new Array<>();
-	}
+    @Override
+    public void load(){
+        for(Block block : Block.all()){
+            int color = Color.rgba8888(block.minimapColor);
+            if(color == 0) continue; //skip blocks that are not mapped
 
-	public static Block getByColor(int color){
-		return blockMap.get(color);
-	}
+            blockMap.put(color, block);
+            colorMap.put(block, color);
+        }
+    }
 
-	public static int getBlockColor(Block block){
-		return colorMap.get(block, 0);
-	}
+    @Override
+    public Array<? extends Content> getAll(){
+        return new Array<>();
+    }
 }

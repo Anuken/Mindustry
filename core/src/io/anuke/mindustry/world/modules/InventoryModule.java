@@ -13,7 +13,7 @@ public class InventoryModule extends BlockModule{
     private int total;
 
     public void forEach(ItemConsumer cons){
-        for (int i = 0; i < items.length; i++) {
+        for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
                 cons.accept(Item.getByID(i), items[i]);
             }
@@ -22,7 +22,7 @@ public class InventoryModule extends BlockModule{
 
     public float sum(ItemCalculator calc){
         float sum = 0f;
-        for (int i = 0; i < items.length; i++) {
+        for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
                 sum += calc.get(Item.getByID(i), items[i]);
             }
@@ -47,12 +47,14 @@ public class InventoryModule extends BlockModule{
 
     public boolean has(ItemStack[] stacks, float amountScaling){
         for(ItemStack stack : stacks){
-            if(!has(stack.item, (int)(stack.amount * amountScaling))) return false;
+            if(!has(stack.item, (int) (stack.amount * amountScaling))) return false;
         }
         return true;
     }
 
-    /**Returns true if this entity has at least one of each item in each stack.*/
+    /**
+     * Returns true if this entity has at least one of each item in each stack.
+     */
     public boolean hasOne(ItemStack[] stacks){
         for(ItemStack stack : stacks){
             if(!has(stack.item, 1)) return false;
@@ -65,10 +67,10 @@ public class InventoryModule extends BlockModule{
     }
 
     public Item take(){
-        for(int i = 0; i < items.length; i ++){
+        for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
-                items[i] --;
-                total --;
+                items[i]--;
+                total--;
                 return Item.getByID(i);
             }
         }
@@ -104,15 +106,15 @@ public class InventoryModule extends BlockModule{
     }
 
     @Override
-    public void write(DataOutput stream) throws IOException {
+    public void write(DataOutput stream) throws IOException{
         byte amount = 0;
-        for (int item : items) {
-            if (item > 0) amount++;
+        for(int item : items){
+            if(item > 0) amount++;
         }
 
         stream.writeByte(amount); //amount of items
 
-        for(int i = 0; i < items.length; i ++){
+        for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
                 stream.writeByte(i); //item ID
                 stream.writeInt(items[i]); //item amount
@@ -121,11 +123,11 @@ public class InventoryModule extends BlockModule{
     }
 
     @Override
-    public void read(DataInput stream) throws IOException {
+    public void read(DataInput stream) throws IOException{
         byte count = stream.readByte();
         total = 0;
 
-        for(int j = 0; j < count; j ++){
+        for(int j = 0; j < count; j++){
             int itemid = stream.readByte();
             int itemamount = stream.readInt();
             items[itemid] = itemamount;

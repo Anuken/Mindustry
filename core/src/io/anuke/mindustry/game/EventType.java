@@ -4,7 +4,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.function.Event;
 
-public class EventType {
+public class EventType{
 
     public interface PlayEvent extends Event{
         void handle();
@@ -22,19 +22,25 @@ public class EventType {
         void handle();
     }
 
-    /**This event is called from the logic thread.
-     * DO NOT INITIALIZE GRAPHICS HERE.*/
+    /**
+     * This event is called from the logic thread.
+     * DO NOT INITIALIZE GRAPHICS HERE.
+     */
     public interface WorldLoadEvent extends Event{
         void handle();
     }
 
-    /**Called after the WorldLoadEvent is, and all logic has been loaded.
-     * It is safe to intialize graphics here.*/
+    /**
+     * Called after the WorldLoadEvent is, and all logic has been loaded.
+     * It is safe to intialize graphics here.
+     */
     public interface WorldLoadGraphicsEvent extends Event{
         void handle();
     }
 
-    /**Called from the logic thread. Do not access graphics here!*/
+    /**
+     * Called from the logic thread. Do not access graphics here!
+     */
     public interface TileChangeEvent extends Event{
         void handle(Tile tile);
     }

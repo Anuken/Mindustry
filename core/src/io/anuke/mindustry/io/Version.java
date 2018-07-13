@@ -8,7 +8,7 @@ import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 
-public class Version {
+public class Version{
     public static String name;
     public static String type;
     public static String code;
@@ -16,7 +16,7 @@ public class Version {
     public static String buildName;
 
     public static void init(){
-        try {
+        try{
             FileHandle file = Gdx.files.internal("version.properties");
 
             ObjectMap<String, String> map = new ObjectMap<>();
@@ -28,7 +28,7 @@ public class Version {
             build = Strings.canParseInt(map.get("build")) ? Integer.parseInt(map.get("build")) : -1;
             buildName = build == -1 ? map.get("build") : "build " + build;
 
-        }catch (IOException e){
+        }catch(IOException e){
             throw new RuntimeException(e);
         }
     }

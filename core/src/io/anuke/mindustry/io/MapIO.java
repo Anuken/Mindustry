@@ -18,8 +18,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-/**Reads and writes map files.*/
-public class MapIO {
+/**
+ * Reads and writes map files.
+ */
+public class MapIO{
     private static final int version = 0;
     private static IntIntMap defaultBlockMap = new IntIntMap();
 
@@ -36,8 +38,8 @@ public class MapIO {
         TileDataMarker marker = data.newDataMarker();
         Color color = new Color();
 
-        for(int y = 0; y < data.height(); y ++){
-            for(int x = 0; x < data.width(); x ++){
+        for(int y = 0; y < data.height(); y++){
+            for(int x = 0; x < data.width(); x++){
                 data.read(marker);
                 Block floor = Block.getByID(marker.floor);
                 Block wall = Block.getByID(marker.wall);
@@ -45,7 +47,7 @@ public class MapIO {
                 if(wallc == 0 && (wall.update || wall.solid || wall.breakable)) wallc = Team.all[marker.team].intColor;
                 wallc = wallc == 0 ? ColorMapper.getBlockColor(floor) : wallc;
                 if(marker.elevation > 0){
-                    float scaling = 1f + marker.elevation/8f;
+                    float scaling = 1f + marker.elevation / 8f;
                     color.set(wallc);
                     color.mul(scaling, scaling, scaling, 1f);
                     wallc = Color.rgba8888(color);
@@ -62,17 +64,17 @@ public class MapIO {
     public static MapTileData readPixmap(Pixmap pixmap){
         MapTileData data = new MapTileData(pixmap.getWidth(), pixmap.getHeight());
 
-        for(int x = 0; x < data.width(); x ++){
-            for(int y = 0; y < data.height(); y ++){
+        for(int x = 0; x < data.width(); x++){
+            for(int y = 0; y < data.height(); y++){
                 Block block = ColorMapper.getByColor(pixmap.getPixel(y, pixmap.getWidth() - 1 - x));
 
                 if(block == null){
-                    data.write(x, y, DataPosition.floor, (byte)Blocks.stone.id);
+                    data.write(x, y, DataPosition.floor, (byte) Blocks.stone.id);
                 }else{
-                    data.write(x, y, DataPosition.floor, (byte)block.id);
+                    data.write(x, y, DataPosition.floor, (byte) block.id);
                 }
 
-                data.write(x, y, DataPosition.wall, (byte)Blocks.air.id);
+                data.write(x, y, DataPosition.wall, (byte) Blocks.air.id);
             }
         }
 
@@ -94,25 +96,31 @@ public class MapIO {
         ds.close();
     }
 
-    /**Reads tile data, skipping meta.*/
-    public static MapTileData readTileData(DataInputStream stream, boolean readOnly) throws IOException {
+    /**
+     * Reads tile data, skipping meta.
+     */
+    public static MapTileData readTileData(DataInputStream stream, boolean readOnly) throws IOException{
         MapMeta meta = readMapMeta(stream);
         return readTileData(stream, meta, readOnly);
     }
 
 
-    /**Does not skip meta. Call after reading meta.*/
-    public static MapTileData readTileData(DataInputStream stream, MapMeta meta, boolean readOnly) throws IOException {
+    /**
+     * Does not skip meta. Call after reading meta.
+     */
+    public static MapTileData readTileData(DataInputStream stream, MapMeta meta, boolean readOnly) throws IOException{
         byte[] bytes = new byte[stream.available()];
         stream.readFully(bytes);
         return new MapTileData(bytes, meta.width, meta.height, meta.blockMap, readOnly);
     }
 
-    /**Reads tile data, skipping meta tags.*/
+    /**
+     * Reads tile data, skipping meta tags.
+     */
     public static MapTileData readTileData(Map map, boolean readOnly){
-        try (DataInputStream ds = new DataInputStream(map.stream.get())){
+        try(DataInputStream ds = new DataInputStream(map.stream.get())){
             return MapIO.readTileData(ds, readOnly);
-        }catch (IOException e){
+        }catch(IOException e){
             throw new RuntimeException(e);
         }
     }
@@ -125,14 +133,14 @@ public class MapIO {
 
         byte tagAmount = stream.readByte();
 
-        for(int i = 0; i < tagAmount; i ++){
+        for(int i = 0; i < tagAmount; i++){
             String name = stream.readUTF();
             String value = stream.readUTF();
             tags.put(name, value);
         }
 
         short blocks = stream.readShort();
-        for(int i = 0; i < blocks; i ++){
+        for(int i = 0; i < blocks; i++){
             short id = stream.readShort();
             String name = stream.readUTF();
             Block block = Block.getByName(name);
@@ -151,7 +159,7 @@ public class MapIO {
 
     public static void writeMapMeta(DataOutputStream stream, MapMeta meta) throws IOException{
         stream.writeInt(meta.version);
-        stream.writeByte((byte)meta.tags.size);
+        stream.writeByte((byte) meta.tags.size);
 
         for(Entry<String, String> entry : meta.tags.entries()){
             stream.writeUTF(entry.key);

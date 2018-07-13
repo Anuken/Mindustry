@@ -5,9 +5,11 @@ import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.threads;
 
-/**Used to group entities together, for formations and such.
- * Usually, squads are used by units spawned in the same wave.*/
-public class Squad {
+/**
+ * Used to group entities together, for formations and such.
+ * Usually, squads are used by units spawned in the same wave.
+ */
+public class Squad{
     public Vector2 direction = new Translator();
     public int units;
 

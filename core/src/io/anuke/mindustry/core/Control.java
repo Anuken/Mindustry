@@ -30,148 +30,152 @@ import io.anuke.ucore.util.Atlas;
 
 import static io.anuke.mindustry.Vars.*;
 
-/**Control module.
+/**
+ * Control module.
  * Handles all input, saving, keybinds and keybinds.
  * Should <i>not</i> handle any logic-critical state.
- * This class is not created in the headless server.*/
+ * This class is not created in the headless server.
+ */
 public class Control extends Module{
-	/**Minimum period of time between the same sound being played.*/
-	private static final long minSoundPeriod = 100;
+    /**
+     * Minimum period of time between the same sound being played.
+     */
+    private static final long minSoundPeriod = 100;
 
-	private boolean hiscore = false;
-	private boolean wasPaused = false;
-	private Saves saves;
-	private ContentDatabase db;
-	private InputHandler[] inputs = {};
-	private ObjectMap<Sound, Long> soundMap = new ObjectMap<>();
+    private boolean hiscore = false;
+    private boolean wasPaused = false;
+    private Saves saves;
+    private ContentDatabase db;
+    private InputHandler[] inputs = {};
+    private ObjectMap<Sound, Long> soundMap = new ObjectMap<>();
 
     private Throwable error;
     private Input gdxInput;
 
-	public Control(){
+    public Control(){
 
-		saves = new Saves();
-		db = new ContentDatabase();
+        saves = new Saves();
+        db = new ContentDatabase();
 
-		Inputs.useControllers(!gwt);
+        Inputs.useControllers(!gwt);
 
-		Gdx.input.setCatchBackKey(true);
+        Gdx.input.setCatchBackKey(true);
 
-		Effects.setShakeFalloff(10000f);
+        Effects.setShakeFalloff(10000f);
 
-		ContentLoader.initialize(Content::init);
-		Core.atlas = new Atlas("sprites.atlas");
-		Core.atlas.setErrorRegion("error");
-		ContentLoader.initialize(Content::load);
+        ContentLoader.initialize(Content::init);
+        Core.atlas = new Atlas("sprites.atlas");
+        Core.atlas.setErrorRegion("error");
+        ContentLoader.initialize(Content::load);
 
-		db.load();
+        db.load();
 
-		gdxInput = Gdx.input;
+        gdxInput = Gdx.input;
 
-		Sounds.load("shoot.mp3", "place.mp3", "explosion.mp3", "enemyshoot.mp3",
-				"corexplode.mp3", "break.mp3", "spawn.mp3", "flame.mp3", "die.mp3",
-				"respawn.mp3", "purchase.mp3", "flame2.mp3", "bigshot.mp3", "laser.mp3", "lasershot.mp3",
-				"ping.mp3", "tesla.mp3", "waveend.mp3", "railgun.mp3", "blast.mp3", "bang2.mp3");
+        Sounds.load("shoot.mp3", "place.mp3", "explosion.mp3", "enemyshoot.mp3",
+                "corexplode.mp3", "break.mp3", "spawn.mp3", "flame.mp3", "die.mp3",
+                "respawn.mp3", "purchase.mp3", "flame2.mp3", "bigshot.mp3", "laser.mp3", "lasershot.mp3",
+                "ping.mp3", "tesla.mp3", "waveend.mp3", "railgun.mp3", "blast.mp3", "bang2.mp3");
 
-		Sounds.setFalloff(9000f);
-		Sounds.setPlayer((sound, volume) -> {
-			long time = TimeUtils.millis();
-			long value = soundMap.get(sound, 0L);
+        Sounds.setFalloff(9000f);
+        Sounds.setPlayer((sound, volume) -> {
+            long time = TimeUtils.millis();
+            long value = soundMap.get(sound, 0L);
 
-			if(TimeUtils.timeSinceMillis(value) >= minSoundPeriod){
-				threads.run(() -> sound.play(volume));
-				soundMap.put(sound, time);
-			}
-		});
+            if(TimeUtils.timeSinceMillis(value) >= minSoundPeriod){
+                threads.run(() -> sound.play(volume));
+                soundMap.put(sound, time);
+            }
+        });
 
         Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3");
 
         DefaultKeybinds.load();
 
-		Settings.defaultList(
-			"ip", "localhost",
-			"port", port+"",
-			"color-0", Color.rgba8888(playerColors[8]),
-            "color-1", Color.rgba8888(playerColors[11]),
-            "color-2", Color.rgba8888(playerColors[13]),
-            "color-3", Color.rgba8888(playerColors[9]),
-			"name", "player",
-			"lastBuild", 0
-		);
+        Settings.defaultList(
+                "ip", "localhost",
+                "port", port + "",
+                "color-0", Color.rgba8888(playerColors[8]),
+                "color-1", Color.rgba8888(playerColors[11]),
+                "color-2", Color.rgba8888(playerColors[13]),
+                "color-3", Color.rgba8888(playerColors[9]),
+                "name", "player",
+                "lastBuild", 0
+        );
 
-		KeyBinds.load();
+        KeyBinds.load();
 
-		addPlayer(0);
+        addPlayer(0);
 
-		saves.load();
+        saves.load();
 
-		Events.on(StateChangeEvent.class, (from, to) -> {
-			if((from == State.playing && to == State.menu) || (from == State.menu && to != State.menu)){
-				Timers.runTask(5f, Platform.instance::updateRPC);
-			}
-		});
+        Events.on(StateChangeEvent.class, (from, to) -> {
+            if((from == State.playing && to == State.menu) || (from == State.menu && to != State.menu)){
+                Timers.runTask(5f, Platform.instance::updateRPC);
+            }
+        });
 
-		Events.on(PlayEvent.class, () -> {
-		    for(Player player : players){
+        Events.on(PlayEvent.class, () -> {
+            for(Player player : players){
                 player.add();
             }
 
-			state.set(State.playing);
-		});
+            state.set(State.playing);
+        });
 
-		Events.on(WorldLoadGraphicsEvent.class, () -> {
-			if(mobile){
-				Core.camera.position.set(players[0].x, players[0].y, 0);
-			}
-		});
+        Events.on(WorldLoadGraphicsEvent.class, () -> {
+            if(mobile){
+                Core.camera.position.set(players[0].x, players[0].y, 0);
+            }
+        });
 
-		Events.on(ResetEvent.class, () -> {
-		    for(Player player : players){
-		        player.reset();
+        Events.on(ResetEvent.class, () -> {
+            for(Player player : players){
+                player.reset();
             }
 
-			hiscore = false;
+            hiscore = false;
 
-			saves.resetSave();
-		});
+            saves.resetSave();
+        });
 
-		Events.on(WaveEvent.class, () -> {
+        Events.on(WaveEvent.class, () -> {
 
-			int last = Settings.getInt("hiscore" + world.getMap().name, 0);
+            int last = Settings.getInt("hiscore" + world.getMap().name, 0);
 
-			if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer){
-				Settings.putInt("hiscore" + world.getMap().name, state.wave);
-				Settings.save();
-				hiscore = true;
-			}
+            if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer){
+                Settings.putInt("hiscore" + world.getMap().name, state.wave);
+                Settings.save();
+                hiscore = true;
+            }
 
-			Platform.instance.updateRPC();
-		});
+            Platform.instance.updateRPC();
+        });
 
-		Events.on(GameOverEvent.class, () -> {
-			Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+        Events.on(GameOverEvent.class, () -> {
+            Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
 
-			//TODO game over effect
-			ui.restart.show();
+            //TODO game over effect
+            ui.restart.show();
 
-			Timers.runTask(30f, () -> state.set(State.menu));
-		});
+            Timers.runTask(30f, () -> state.set(State.menu));
+        });
 
-		Events.on(WorldLoadEvent.class, () -> threads.runGraphics(() -> Events.fire(WorldLoadGraphicsEvent.class)));
-	}
+        Events.on(WorldLoadEvent.class, () -> threads.runGraphics(() -> Events.fire(WorldLoadGraphicsEvent.class)));
+    }
 
-	public void addPlayer(int index){
-	    if(players.length != index + 1){
-	        Player[] old = players;
-	        players = new Player[index + 1];
+    public void addPlayer(int index){
+        if(players.length != index + 1){
+            Player[] old = players;
+            players = new Player[index + 1];
             System.arraycopy(old, 0, players, 0, old.length);
         }
 
         if(inputs.length != index + 1){
-			InputHandler[] oldi = inputs;
-			inputs = new InputHandler[index + 1];
-			System.arraycopy(oldi, 0, inputs, 0, oldi.length);
-		}
+            InputHandler[] oldi = inputs;
+            inputs = new InputHandler[index + 1];
+            System.arraycopy(oldi, 0, inputs, 0, oldi.length);
+        }
 
         Player setTo = (index == 0 ? null : players[0]);
 
@@ -205,8 +209,8 @@ public class Control extends Module{
     }
 
     public void removePlayer(){
-	    players[players.length-1].remove();
-	    inputs[inputs.length-1].remove();
+        players[players.length - 1].remove();
+        inputs[inputs.length - 1].remove();
 
         Player[] old = players;
         players = new Player[players.length - 1];
@@ -217,191 +221,191 @@ public class Control extends Module{
         System.arraycopy(oldi, 0, inputs, 0, inputs.length);
     }
 
-	public ContentDatabase database() {
-		return db;
-	}
-
-	public Input gdxInput(){
-	    return gdxInput;
+    public ContentDatabase database(){
+        return db;
     }
 
-	public void setError(Throwable error){
-		this.error = error;
-	}
-
-	public Saves getSaves(){
-		return saves;
-	}
-
-	public InputHandler input(int index){
-		return inputs[index];
-	}
-
-	public void triggerUpdateInput(){
-	    //Gdx.input = proxy;
+    public Input gdxInput(){
+        return gdxInput;
     }
 
-	public void playMap(Map map){
-		ui.loadfrag.show();
+    public void setError(Throwable error){
+        this.error = error;
+    }
 
-		Timers.run(5f, () ->
-			threads.run(() -> {
-				logic.reset();
-				world.loadMap(map);
-				logic.play();
+    public Saves getSaves(){
+        return saves;
+    }
 
-				Gdx.app.postRunnable(ui.loadfrag::hide);
-			}));
-	}
+    public InputHandler input(int index){
+        return inputs[index];
+    }
 
-	public boolean isHighScore(){
-		return hiscore;
-	}
+    public void triggerUpdateInput(){
+        //Gdx.input = proxy;
+    }
 
-	private void checkUnlockableBlocks(){
-		TileEntity entity = players[0].getClosestCore();
+    public void playMap(Map map){
+        ui.loadfrag.show();
 
-		if(entity == null) return;
+        Timers.run(5f, () ->
+                threads.run(() -> {
+                    logic.reset();
+                    world.loadMap(map);
+                    logic.play();
 
-		entity.items.forEach((item, amount) -> control.database().unlockContent(item));
+                    Gdx.app.postRunnable(ui.loadfrag::hide);
+                }));
+    }
 
-		if(players[0].inventory.hasItem()){
-			control.database().unlockContent(players[0].inventory.getItem().item);
-		}
+    public boolean isHighScore(){
+        return hiscore;
+    }
 
-		for(int i = 0 ; i < Recipe.all().size; i ++){
-			Recipe recipe = Recipe.all().get(i);
-			if(!recipe.debugOnly && entity.items.has(recipe.requirements, 1.4f)){
-				if(control.database().unlockContent(recipe)){
-					ui.hudfrag.showUnlock(recipe);
-				}
-			}
-		}
-	}
+    private void checkUnlockableBlocks(){
+        TileEntity entity = players[0].getClosestCore();
 
-	@Override
-	public void dispose(){
-		Platform.instance.onGameExit();
-		ContentLoader.dispose();
-		Net.dispose();
-		ui.editor.dispose();
-		inputs = new InputHandler[]{};
-		players = new Player[]{};
-	}
+        if(entity == null) return;
 
-	@Override
-	public void pause(){
-		wasPaused = state.is(State.paused);
-		if(state.is(State.playing)) state.set(State.paused);
-	}
+        entity.items.forEach((item, amount) -> control.database().unlockContent(item));
 
-	@Override
-	public void resume(){
-		if(state.is(State.paused) && !wasPaused){
+        if(players[0].inventory.hasItem()){
+            control.database().unlockContent(players[0].inventory.getItem().item);
+        }
+
+        for(int i = 0; i < Recipe.all().size; i++){
+            Recipe recipe = Recipe.all().get(i);
+            if(!recipe.debugOnly && entity.items.has(recipe.requirements, 1.4f)){
+                if(control.database().unlockContent(recipe)){
+                    ui.hudfrag.showUnlock(recipe);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void dispose(){
+        Platform.instance.onGameExit();
+        ContentLoader.dispose();
+        Net.dispose();
+        ui.editor.dispose();
+        inputs = new InputHandler[]{};
+        players = new Player[]{};
+    }
+
+    @Override
+    public void pause(){
+        wasPaused = state.is(State.paused);
+        if(state.is(State.playing)) state.set(State.paused);
+    }
+
+    @Override
+    public void resume(){
+        if(state.is(State.paused) && !wasPaused){
             state.set(State.playing);
-		}
-	}
+        }
+    }
 
-	@Override
-	public void init(){
-		EntityPhysics.initPhysics();
+    @Override
+    public void init(){
+        EntityPhysics.initPhysics();
 
-		Platform.instance.updateRPC();
+        Platform.instance.updateRPC();
 
-		if(!Settings.has("4.0-warning")){
-			Settings.putBool("4.0-warning", true);
+        if(!Settings.has("4.0-warning")){
+            Settings.putBool("4.0-warning", true);
 
-			Timers.run(5f, () -> {
-				FloatingDialog dialog = new FloatingDialog("[orange]WARNING![]");
-				dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
-				dialog.content().add("The beta version you are about to play should be considered very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
-						"A large portion of content is still unimplemented. \nAll current art and UI is temporary, and will be re-drawn before release. " +
-						"\n\n[accent]Saves and maps may be corrupted without warning between updates.[] You have been warned!").wrap().width(500f);
-				dialog.show();
+            Timers.run(5f, () -> {
+                FloatingDialog dialog = new FloatingDialog("[orange]WARNING![]");
+                dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
+                dialog.content().add("The beta version you are about to play should be considered very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
+                        "A large portion of content is still unimplemented. \nAll current art and UI is temporary, and will be re-drawn before release. " +
+                        "\n\n[accent]Saves and maps may be corrupted without warning between updates.[] You have been warned!").wrap().width(500f);
+                dialog.show();
 
-			});
-		}
+            });
+        }
 
-		if(!Settings.has("4.0-no-sound")){
-			Settings.putBool("4.0-no-sound", true);
+        if(!Settings.has("4.0-no-sound")){
+            Settings.putBool("4.0-no-sound", true);
 
-			Timers.run(4f, () -> {
-				FloatingDialog dialog = new FloatingDialog("[orange]Attention![]");
-				dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
-				dialog.content().add("You might have noticed that 4.0 does not have any sound.\nThis is [orange]intentional![] Sound will be added in a later update.\n\n[LIGHT_GRAY](now stop reporting this as a bug)").wrap().width(500f);
-				dialog.show();
+            Timers.run(4f, () -> {
+                FloatingDialog dialog = new FloatingDialog("[orange]Attention![]");
+                dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
+                dialog.content().add("You might have noticed that 4.0 does not have any sound.\nThis is [orange]intentional![] Sound will be added in a later update.\n\n[LIGHT_GRAY](now stop reporting this as a bug)").wrap().width(500f);
+                dialog.show();
 
-			});
-		}
-	}
+            });
+        }
+    }
 
-	/**Called from main logic thread.*/
-	public void runUpdateLogic(){
-		if(!state.is(State.menu)) {
-			renderer.minimap().updateUnitArray();
-		}
-	}
+    /** Called from main logic thread.*/
+    public void runUpdateLogic(){
+        if(!state.is(State.menu)){
+            renderer.minimap().updateUnitArray();
+        }
+    }
 
-	@Override
-	public void update(){
+    @Override
+    public void update(){
 
-		if(error != null){
-			throw new RuntimeException(error);
-		}
+        if(error != null){
+            throw new RuntimeException(error);
+        }
 
         if(Inputs.keyTap("console")){
-			console = !console;
-		}
+            console = !console;
+        }
 
         saves.update();
 
-		triggerUpdateInput();
+        triggerUpdateInput();
 
-		for(InputHandler inputHandler : inputs){
-			inputHandler.updateController();
-		}
+        for(InputHandler inputHandler : inputs){
+            inputHandler.updateController();
+        }
 
-		if(!state.is(State.menu)){
-		    for(InputHandler input : inputs){
-		        input.update();
+        if(!state.is(State.menu)){
+            for(InputHandler input : inputs){
+                input.update();
             }
 
             //check unlocks every 2 seconds
-			if(!state.mode.infiniteResources && Timers.get("timerCheckUnlock", 120)){
-				checkUnlockableBlocks();
+            if(!state.mode.infiniteResources && Timers.get("timerCheckUnlock", 120)){
+                checkUnlockableBlocks();
 
-				//save if the db changed, but don't save unlocks
-				if(db.isDirty() && !debug){
-					db.save();
-				}
-			}
+                //save if the db changed, but don't save unlocks
+                if(db.isDirty() && !debug){
+                    db.save();
+                }
+            }
 
-			if(Inputs.keyTap("pause") && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            if(Inputs.keyTap("pause") && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
-			}
+            }
 
-			if(Inputs.keyTap("menu")){
-				if(state.is(State.paused)){
-					ui.paused.hide();
+            if(Inputs.keyTap("menu")){
+                if(state.is(State.paused)){
+                    ui.paused.hide();
                     state.set(State.playing);
-				}else if (!ui.restart.isShown()){
-					if(ui.chatfrag.chatOpen()) {
-						ui.chatfrag.hide();
-					}else{
-						ui.paused.show();
+                }else if(!ui.restart.isShown()){
+                    if(ui.chatfrag.chatOpen()){
+                        ui.chatfrag.hide();
+                    }else{
+                        ui.paused.show();
                         state.set(State.paused);
-					}
-				}
-			}
+                    }
+                }
+            }
 
-			if(!state.is(State.paused) || Net.active()){
-				Entities.update(effectGroup);
-				Entities.update(groundEffectGroup);
-			}
-		}else{
-			if(!state.is(State.paused) || Net.active()){
-				Timers.update();
-			}
-		}
-	}
+            if(!state.is(State.paused) || Net.active()){
+                Entities.update(effectGroup);
+                Entities.update(groundEffectGroup);
+            }
+        }else{
+            if(!state.is(State.paused) || Net.active()){
+                Timers.update();
+            }
+        }
+    }
 }

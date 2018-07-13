@@ -15,26 +15,31 @@ public class Blocks extends BlockList implements ContentList{
     public static Block air, spawn, blockpart, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, dirt, sand, ice, snow, grass, shrub, rock, icerock, blackrock;
 
 
-
     @Override
-    public void load() {
-        air = new Floor("air") {
+    public void load(){
+        air = new Floor("air"){
             {
                 blend = false;
             }
+
             //don't draw
-            public void draw(Tile tile) {}
-            public void load() {}
-            public void init() {}
+            public void draw(Tile tile){
+            }
+
+            public void load(){
+            }
+
+            public void init(){
+            }
         };
 
         blockpart = new BlockPart();
 
-        for(int i = 1; i <= 6; i ++){
+        for(int i = 1; i <= 6; i++){
             new BuildBlock("build" + i);
         }
 
-        space = new Floor("space") {{
+        space = new Floor("space"){{
             placeableOn = false;
             variants = 0;
             cacheLayer = CacheLayer.space;
@@ -43,11 +48,11 @@ public class Blocks extends BlockList implements ContentList{
             minimapColor = Color.valueOf("000001");
         }};
 
-        metalfloor = new Floor("metalfloor") {{
+        metalfloor = new Floor("metalfloor"){{
             variants = 6;
         }};
 
-        deepwater = new Floor("deepwater") {{
+        deepwater = new Floor("deepwater"){{
             liquidColor = Color.valueOf("546bb3");
             speedMultiplier = 0.2f;
             variants = 0;
@@ -60,7 +65,7 @@ public class Blocks extends BlockList implements ContentList{
             minimapColor = Color.valueOf("465a96");
         }};
 
-        water = new Floor("water") {{
+        water = new Floor("water"){{
             liquidColor = Color.valueOf("546bb3");
             speedMultiplier = 0.5f;
             variants = 0;
@@ -72,7 +77,7 @@ public class Blocks extends BlockList implements ContentList{
             minimapColor = Color.valueOf("506eb4");
         }};
 
-        lava = new Floor("lava") {{
+        lava = new Floor("lava"){{
             liquidColor = Color.valueOf("ed5334");
             speedMultiplier = 0.2f;
             damageTaken = 0.5f;
@@ -85,7 +90,7 @@ public class Blocks extends BlockList implements ContentList{
             minimapColor = Color.valueOf("ed5334");
         }};
 
-        oil = new Floor("oil") {{
+        oil = new Floor("oil"){{
             liquidColor = Color.valueOf("292929");
             status = StatusEffects.tarred;
             statusIntensity = 1f;
@@ -97,7 +102,7 @@ public class Blocks extends BlockList implements ContentList{
             minimapColor = Color.valueOf("292929");
         }};
 
-        stone = new Floor("stone") {{
+        stone = new Floor("stone"){{
             hasOres = true;
             drops = new ItemStack(Items.stone, 1);
             blends = block -> block != this && !(block instanceof Ore);
@@ -105,7 +110,7 @@ public class Blocks extends BlockList implements ContentList{
             playerUnmineable = true;
         }};
 
-        blackstone = new Floor("blackstone") {{
+        blackstone = new Floor("blackstone"){{
             drops = new ItemStack(Items.stone, 1);
             minimapColor = Color.valueOf("252525");
             playerUnmineable = true;
@@ -115,14 +120,14 @@ public class Blocks extends BlockList implements ContentList{
             minimapColor = Color.valueOf("6e501e");
         }};
 
-        sand = new Floor("sand") {{
+        sand = new Floor("sand"){{
             drops = new ItemStack(Items.sand, 1);
             minimapColor = Color.valueOf("988a67");
             hasOres = true;
             playerUnmineable = true;
         }};
 
-        ice = new Floor("ice") {{
+        ice = new Floor("ice"){{
             dragMultiplier = 0.3f;
             speedMultiplier = 0.4f;
             minimapColor = Color.valueOf("c4e3e7");
@@ -143,15 +148,15 @@ public class Blocks extends BlockList implements ContentList{
             shadow = "shrubshadow";
         }};
 
-        rock = new Rock("rock") {{
+        rock = new Rock("rock"){{
             variants = 2;
         }};
 
-        icerock = new Rock("icerock") {{
+        icerock = new Rock("icerock"){{
             variants = 2;
         }};
 
-        blackrock = new Rock("blackrock") {{
+        blackrock = new Rock("blackrock"){{
             variants = 1;
         }};
     }

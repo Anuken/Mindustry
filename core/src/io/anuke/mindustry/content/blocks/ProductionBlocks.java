@@ -11,22 +11,22 @@ import io.anuke.mindustry.world.blocks.production.Drill;
 import io.anuke.mindustry.world.blocks.production.Fracker;
 import io.anuke.mindustry.world.blocks.production.SolidPump;
 
-public class ProductionBlocks extends BlockList implements ContentList {
+public class ProductionBlocks extends BlockList implements ContentList{
     public static Block tungstenDrill, carbideDrill, laserdrill, blastdrill, plasmadrill, waterextractor, oilextractor, cultivator;
 
     @Override
-    public void load() {
-        tungstenDrill = new Drill("tungsten-drill") {{
+    public void load(){
+        tungstenDrill = new Drill("tungsten-drill"){{
             tier = 2;
             drillTime = 340;
         }};
 
-        carbideDrill = new Drill("carbide-drill") {{
+        carbideDrill = new Drill("carbide-drill"){{
             tier = 3;
             drillTime = 280;
         }};
 
-        laserdrill = new Drill("laser-drill") {{
+        laserdrill = new Drill("laser-drill"){{
             drillTime = 180;
             size = 2;
             hasPower = true;
@@ -37,7 +37,7 @@ public class ProductionBlocks extends BlockList implements ContentList {
             consumes.power(0.2f);
         }};
 
-        blastdrill = new Drill("blast-drill") {{
+        blastdrill = new Drill("blast-drill"){{
             drillTime = 120;
             size = 3;
             drawRim = true;
@@ -52,7 +52,7 @@ public class ProductionBlocks extends BlockList implements ContentList {
             consumes.power(0.5f);
         }};
 
-        plasmadrill = new Drill("plasma-drill") {{
+        plasmadrill = new Drill("plasma-drill"){{
             heatColor = Color.valueOf("ff461b");
             drillTime = 90;
             size = 4;
@@ -69,7 +69,7 @@ public class ProductionBlocks extends BlockList implements ContentList {
             consumes.power(0.7f);
         }};
 
-        waterextractor = new SolidPump("water-extractor") {{
+        waterextractor = new SolidPump("water-extractor"){{
             result = Liquids.water;
             pumpAmount = 0.1f;
             size = 2;
@@ -79,7 +79,7 @@ public class ProductionBlocks extends BlockList implements ContentList {
             consumes.power(0.2f);
         }};
 
-        oilextractor = new Fracker("oil-extractor") {{
+        oilextractor = new Fracker("oil-extractor"){{
             result = Liquids.oil;
             updateEffect = BlockFx.pulverize;
             liquidCapacity = 50f;
@@ -93,7 +93,7 @@ public class ProductionBlocks extends BlockList implements ContentList {
             consumes.liquid(Liquids.water, 0.3f);
         }};
 
-        cultivator = new Cultivator("cultivator") {{
+        cultivator = new Cultivator("cultivator"){{
             result = Items.biomatter;
             drillTime = 260;
             size = 2;

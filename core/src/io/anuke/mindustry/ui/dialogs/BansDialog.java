@@ -6,7 +6,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class BansDialog extends FloatingDialog {
+public class BansDialog extends FloatingDialog{
 
     public BansDialog(){
         super("$text.server.bans");
@@ -40,7 +40,7 @@ public class BansDialog extends FloatingDialog {
 
             res.labelWrap("IP: [LIGHT_GRAY]" + info.lastIP + "\n[]Name: [LIGHT_GRAY]" + info.lastName).width(w - h - 24f);
             res.add().growX();
-            res.addImageButton("icon-cancel", 14*3, () -> {
+            res.addImageButton("icon-cancel", 14 * 3, () -> {
                 ui.showConfirm("$text.confirm", "$text.confirmunban", () -> {
                     netServer.admins.unbanPlayerID(info.id);
                     setup();

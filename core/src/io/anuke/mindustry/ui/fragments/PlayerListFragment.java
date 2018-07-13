@@ -116,26 +116,26 @@ public class PlayerListFragment extends Fragment{
             button.labelWrap("[#" + player.color.toString().toUpperCase() + "]" + player.name).width(170f).pad(10);
             button.add().grow();
 
-            button.addImage("icon-admin").size(14*2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5);
+            button.addImage("icon-admin").size(14 * 2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5);
 
             if((Net.server() || players[0].isAdmin) && !player.isLocal && (!player.isAdmin || Net.server())){
                 button.add().growY();
 
-                float bs = (h + 14)/2f;
+                float bs = (h + 14) / 2f;
 
                 button.table(t -> {
                     t.defaults().size(bs - 1, bs + 3);
                     //TODO requests.
 
-                    t.addImageButton("icon-ban", 14*2, () -> {
+                    t.addImageButton("icon-ban", 14 * 2, () -> {
                         ui.showConfirm("$text.confirm", "$text.confirmban", () -> Call.onAdminRequest(player, AdminAction.ban));
                     }).padBottom(-5.1f);
 
-                    t.addImageButton("icon-cancel", 14*2, () -> Call.onAdminRequest(player, AdminAction.kick)).padBottom(-5.1f);
+                    t.addImageButton("icon-cancel", 14 * 2, () -> Call.onAdminRequest(player, AdminAction.kick)).padBottom(-5.1f);
 
                     t.row();
 
-                    t.addImageButton("icon-admin", "toggle", 14*2, () -> {
+                    t.addImageButton("icon-admin", "toggle", 14 * 2, () -> {
                         if(Net.client()) return;
 
                         String id = netServer.admins.getTraceByID(player.uuid).uuid;
@@ -154,7 +154,7 @@ public class PlayerListFragment extends Fragment{
                         b.setDisabled(Net.client());
                     }).get().setTouchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled);
 
-                    t.addImageButton("icon-zoom-small", 14*2, () -> Call.onAdminRequest(player, AdminAction.trace));
+                    t.addImageButton("icon-zoom-small", 14 * 2, () -> Call.onAdminRequest(player, AdminAction.trace));
 
                 }).padRight(12).padTop(-5).padLeft(0).padBottom(-10).size(bs + 10f, bs);
 

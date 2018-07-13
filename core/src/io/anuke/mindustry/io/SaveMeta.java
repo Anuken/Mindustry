@@ -8,7 +8,7 @@ import java.util.Date;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class SaveMeta {
+public class SaveMeta{
     public int version;
     public String date;
     public GameMode mode;

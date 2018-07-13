@@ -12,14 +12,18 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class CooledTurret extends Turret {
-    /**How much reload is lowered by for each unit of liquid of heat capacity 1.*/
+public class CooledTurret extends Turret{
+    /**
+     * How much reload is lowered by for each unit of liquid of heat capacity 1.
+     */
     protected float coolantMultiplier = 1f;
-    /**Max coolant used per tick.*/
+    /**
+     * Max coolant used per tick.
+     */
     protected float maxUsed = 1f;
     protected Effect coolEffect = BlockFx.fuelburn;
 
-    public CooledTurret(String name) {
+    public CooledTurret(String name){
         super(name);
         hasLiquids = true;
         liquidCapacity = 20f;
@@ -28,7 +32,7 @@ public class CooledTurret extends Turret {
     }
 
     @Override
-    protected void updateShooting(Tile tile) {
+    protected void updateShooting(Tile tile){
         super.updateShooting(tile);
 
         TurretEntity entity = tile.entity();
@@ -39,7 +43,7 @@ public class CooledTurret extends Turret {
         entity.liquids.remove(liquid, used);
 
         if(Mathf.chance(0.04 * used)){
-            Effects.effect(coolEffect, tile.drawx() + Mathf.range(size * tilesize/2f), tile.drawy() + Mathf.range(size * tilesize/2f));
+            Effects.effect(coolEffect, tile.drawx() + Mathf.range(size * tilesize / 2f), tile.drawy() + Mathf.range(size * tilesize / 2f));
         }
 
         //don't use oil as coolant, thanks
@@ -49,7 +53,7 @@ public class CooledTurret extends Turret {
     }
 
     @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         return super.acceptLiquid(tile, source, liquid, amount) && liquid.temperature <= 0.5f;
     }
 }

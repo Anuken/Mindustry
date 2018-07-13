@@ -1,6 +1,6 @@
 package io.anuke.mindustry.net;
 
-public class Host {
+public class Host{
     public final String name;
     public final String address;
     public final String mapname;

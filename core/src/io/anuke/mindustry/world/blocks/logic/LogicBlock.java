@@ -4,7 +4,7 @@ import io.anuke.mindustry.world.Block;
 
 public class LogicBlock extends Block{
 
-    public LogicBlock(String name) {
+    public LogicBlock(String name){
         super(name);
     }
 }

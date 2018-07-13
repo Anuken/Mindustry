@@ -19,9 +19,7 @@ import io.anuke.ucore.util.Strings;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.control;
-import static io.anuke.mindustry.Vars.debug;
-import static io.anuke.mindustry.Vars.headless;
+import static io.anuke.mindustry.Vars.*;
 
 public class Recipe implements UnlockableContent{
     private static int lastid;
@@ -40,7 +38,7 @@ public class Recipe implements UnlockableContent{
     private Recipe[] recipeDependencies;
 
     public Recipe(Category category, Block result, ItemStack... requirements){
-        this.id = lastid ++;
+        this.id = lastid++;
         this.result = result;
         this.requirements = requirements;
         this.category = category;
@@ -58,96 +56,10 @@ public class Recipe implements UnlockableContent{
         recipeMap.put(result, this);
     }
 
-    public Recipe setDependencies(Block... blocks){
-        this.dependencies = blocks;
-        return this;
-    }
-
-    public Recipe setDesktop(){
-        desktopOnly = true;
-        return this;
-    }
-
-    public Recipe setDebug(){
-        debugOnly = true;
-        return this;
-    }
-
-    @Override
-    public boolean isHidden() {
-        return debugOnly;
-    }
-
-    @Override
-    public void displayInfo(Table table) {
-        ContentDisplay.displayRecipe(table, this);
-    }
-
-    @Override
-    public String localizedName() {
-        return result.formalName;
-    }
-
-    @Override
-    public TextureRegion getContentIcon() {
-        return result.getEditorIcon();
-    }
-
-    @Override
-    public void init() {
-        if(!Bundles.has("block." + result.name + ".name")) {
-            Log.err("WARNING: Recipe block '{0}' does not have a formal name defined. Add the following to bundle.properties:", result.name);
-            Log.err("block.{0}.name={1}", result.name, Strings.capitalize(result.name.replace('-', '_')));
-        }/*else if(result.fullDescription == null){
-            Log.err("WARNING: Recipe block '{0}' does not have a description defined.", result.name);
-        }*/
-    }
-
-    @Override
-    public String getContentName() {
-        return result.name;
-    }
-
-    @Override
-    public String getContentTypeName() {
-        return "recipe";
-    }
-
-    @Override
-    public void onUnlock() {
-        for(OrderedMap<BlockStat, StatValue> map : result.stats.toMap().values()){
-            for(StatValue value : map.values()){
-                if(value instanceof ContentStatValue){
-                    ContentStatValue stat = (ContentStatValue)value;
-                    UnlockableContent[] content = stat.getValueContent();
-                    for(UnlockableContent c : content){
-                        control.database().unlockContent(c);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public UnlockableContent[] getDependencies() {
-        if(dependencies == null){
-            return null;
-        }else if(recipeDependencies == null){
-            recipeDependencies = new Recipe[dependencies.length];
-            for (int i = 0; i < recipeDependencies.length; i++) {
-                recipeDependencies[i] = Recipe.getByResult(dependencies[i]);
-            }
-        }
-        return recipeDependencies;
-    }
-
-    @Override
-    public Array<? extends Content> getAll() {
-        return allRecipes;
-    }
-
-    /**Returns unlocked recipes in a category.
-     * Do not call on the server backend, as unlocking does not exist!*/
+    /**
+     * Returns unlocked recipes in a category.
+     * Do not call on the server backend, as unlocking does not exist!
+     */
     public static void getUnlockedByCategory(Category category, Array<Recipe> r){
         if(headless){
             throw new RuntimeException("Not enabled on the headless backend!");
@@ -155,17 +67,19 @@ public class Recipe implements UnlockableContent{
 
         r.clear();
         for(Recipe recipe : allRecipes){
-            if(recipe.category == category && (Vars.control.database().isUnlocked(recipe) || (debug && recipe.debugOnly))) {
+            if(recipe.category == category && (Vars.control.database().isUnlocked(recipe) || (debug && recipe.debugOnly))){
                 r.add(recipe);
             }
         }
     }
 
-    /**Returns all recipes in a category.*/
+    /**
+     * Returns all recipes in a category.
+     */
     public static void getByCategory(Category category, Array<Recipe> r){
         r.clear();
         for(Recipe recipe : allRecipes){
-            if(recipe.category == category) {
+            if(recipe.category == category){
                 r.add(recipe);
             }
         }
@@ -185,5 +99,93 @@ public class Recipe implements UnlockableContent{
         }else{
             return allRecipes.get(id);
         }
+    }
+
+    public Recipe setDesktop(){
+        desktopOnly = true;
+        return this;
+    }
+
+    public Recipe setDebug(){
+        debugOnly = true;
+        return this;
+    }
+
+    @Override
+    public boolean isHidden(){
+        return debugOnly;
+    }
+
+    @Override
+    public void displayInfo(Table table){
+        ContentDisplay.displayRecipe(table, this);
+    }
+
+    @Override
+    public String localizedName(){
+        return result.formalName;
+    }
+
+    @Override
+    public TextureRegion getContentIcon(){
+        return result.getEditorIcon();
+    }
+
+    @Override
+    public void init(){
+        if(!Bundles.has("block." + result.name + ".name")){
+            Log.err("WARNING: Recipe block '{0}' does not have a formal name defined. Add the following to bundle.properties:", result.name);
+            Log.err("block.{0}.name={1}", result.name, Strings.capitalize(result.name.replace('-', '_')));
+        }/*else if(result.fullDescription == null){
+            Log.err("WARNING: Recipe block '{0}' does not have a description defined.", result.name);
+        }*/
+    }
+
+    @Override
+    public String getContentName(){
+        return result.name;
+    }
+
+    @Override
+    public String getContentTypeName(){
+        return "recipe";
+    }
+
+    @Override
+    public void onUnlock(){
+        for(OrderedMap<BlockStat, StatValue> map : result.stats.toMap().values()){
+            for(StatValue value : map.values()){
+                if(value instanceof ContentStatValue){
+                    ContentStatValue stat = (ContentStatValue) value;
+                    UnlockableContent[] content = stat.getValueContent();
+                    for(UnlockableContent c : content){
+                        control.database().unlockContent(c);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public UnlockableContent[] getDependencies(){
+        if(dependencies == null){
+            return null;
+        }else if(recipeDependencies == null){
+            recipeDependencies = new Recipe[dependencies.length];
+            for(int i = 0; i < recipeDependencies.length; i++){
+                recipeDependencies[i] = Recipe.getByResult(dependencies[i]);
+            }
+        }
+        return recipeDependencies;
+    }
+
+    public Recipe setDependencies(Block... blocks){
+        this.dependencies = blocks;
+        return this;
+    }
+
+    @Override
+    public Array<? extends Content> getAll(){
+        return allRecipes;
     }
 }

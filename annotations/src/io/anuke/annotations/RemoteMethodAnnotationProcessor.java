@@ -18,25 +18,25 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-/**The annotation processor for generating remote method call code.*/
+/** The annotation processor for generating remote method call code. */
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({
-    "io.anuke.annotations.Annotations.Remote",
-    "io.anuke.annotations.Annotations.WriteClass",
-    "io.anuke.annotations.Annotations.ReadClass",
+        "io.anuke.annotations.Annotations.Remote",
+        "io.anuke.annotations.Annotations.WriteClass",
+        "io.anuke.annotations.Annotations.ReadClass",
 })
-public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
-    /**Maximum size of each event packet.*/
+public class RemoteMethodAnnotationProcessor extends AbstractProcessor{
+    /** Maximum size of each event packet. */
     public static final int maxPacketSize = 4096;
-    /**Name of the base package to put all the generated classes.*/
+    /** Name of the base package to put all the generated classes. */
     private static final String packageName = "io.anuke.mindustry.gen";
 
-    /**Name of class that handles reading and invoking packets on the server.*/
+    /** Name of class that handles reading and invoking packets on the server. */
     private static final String readServerName = "RemoteReadServer";
-    /**Name of class that handles reading and invoking packets on the client.*/
+    /** Name of class that handles reading and invoking packets on the client. */
     private static final String readClientName = "RemoteReadClient";
 
-    /**Processing round number.*/
+    /** Processing round number. */
     private int round;
 
     //class serializers
@@ -51,7 +51,7 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
     private ArrayList<ClassEntry> classes;
 
     @Override
-    public synchronized void init(ProcessingEnvironment processingEnv) {
+    public synchronized void init(ProcessingEnvironment processingEnv){
         super.init(processingEnv);
         //put all relevant utils into utils class
         Utils.typeUtils = processingEnv.getTypeUtils();
@@ -61,15 +61,15 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
     }
 
     @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
         if(round > 1) return false; //only process 2 rounds
 
-        round ++;
+        round++;
 
-        try {
+        try{
 
             //round 1: find all annotations, generate *writers*
-            if(round == 1) {
+            if(round == 1){
                 //get serializers
                 serializers = new IOFinder().findSerializers(roundEnv);
 
@@ -88,21 +88,21 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
                 orderedElements.sort(Comparator.comparing(Object::toString));
 
                 //create methods
-                for (Element element : orderedElements) {
+                for(Element element : orderedElements){
                     Remote annotation = element.getAnnotation(Remote.class);
 
                     //check for static
-                    if (!element.getModifiers().contains(Modifier.STATIC) || !element.getModifiers().contains(Modifier.PUBLIC)) {
+                    if(!element.getModifiers().contains(Modifier.STATIC) || !element.getModifiers().contains(Modifier.PUBLIC)){
                         Utils.messager.printMessage(Kind.ERROR, "All @Remote methods must be public and static: ", element);
                     }
 
                     //can't generate none methods
-                    if (annotation.targets() == Loc.none) {
+                    if(annotation.targets() == Loc.none){
                         Utils.messager.printMessage(Kind.ERROR, "A @Remote method's targets() cannot be equal to 'none':", element);
                     }
 
                     //get and create class entry if needed
-                    if (!classMap.containsKey(annotation.in())) {
+                    if(!classMap.containsKey(annotation.in())){
                         ClassEntry clas = new ClassEntry(annotation.in());
                         classMap.put(annotation.in(), clas);
                         classes.add(clas);
@@ -127,7 +127,7 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
                 writegen.generateFor(classes, packageName);
 
                 return true;
-            }else if(round == 2) { //round 2: generate all *readers*
+            }else if(round == 2){ //round 2: generate all *readers*
                 RemoteReadGenerator readgen = new RemoteReadGenerator(serializers);
 
                 //generate server readers
@@ -147,7 +147,7 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor {
                 return true;
             }
 
-        }catch (Exception e){
+        }catch(Exception e){
             e.printStackTrace();
             throw new RuntimeException(e);
         }

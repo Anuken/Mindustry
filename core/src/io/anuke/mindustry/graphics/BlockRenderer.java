@@ -15,203 +15,207 @@ import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.core.Core.camera;
 
 public class BlockRenderer{
-	private final static int initialRequests = 32*32;
+    private final static int initialRequests = 32 * 32;
 
-	private FloorRenderer floorRenderer;
-	
-	private Array<BlockRequest> requests = new Array<>(initialRequests);
-	private Layer lastLayer;
-	private int requestidx = 0;
-	private int iterateidx = 0;
+    private FloorRenderer floorRenderer;
 
-	public BlockRenderer(){
-		floorRenderer = new FloorRenderer();
+    private Array<BlockRequest> requests = new Array<>(initialRequests);
+    private Layer lastLayer;
+    private int requestidx = 0;
+    private int iterateidx = 0;
 
-		for(int i = 0; i < requests.size; i ++){
-			requests.set(i, new BlockRequest());
-		}
-	}
-	
-	private class BlockRequest implements Comparable<BlockRequest>{
-		Tile tile;
-		Layer layer;
-		
-		@Override
-		public int compareTo(BlockRequest other){
-			return layer.compareTo(other.layer);
-		}
+    public BlockRenderer(){
+        floorRenderer = new FloorRenderer();
 
-		@Override
-		public String toString(){
-			return tile.block().name + ":" + layer.toString();
-		}
-	}
-	
-	/**Process all blocks to draw, simultaneously drawing block shadows and static blocks.*/
-	public void processBlocks(){
-		requestidx = 0;
-		lastLayer = null;
-		
-		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2)+2;
-		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2)+2;
+        for(int i = 0; i < requests.size; i++){
+            requests.set(i, new BlockRequest());
+        }
+    }
 
-		int expandr = 4;
-		
-		Graphics.surface(renderer.effectSurface, true, false);
+    /**
+     * Process all blocks to draw, simultaneously drawing block shadows and static blocks.
+     */
+    public void processBlocks(){
+        requestidx = 0;
+        lastLayer = null;
 
-		int avgx = Mathf.scl(camera.position.x, tilesize);
-		int avgy = Mathf.scl(camera.position.y, tilesize);
+        int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
+        int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
 
-		int minx = Math.max(avgx - rangex - expandr, 0);
-		int miny = Math.max(avgy - rangey - expandr, 0);
-		int maxx = Math.min(world.width() - 1, avgx + rangex + expandr);
-		int maxy = Math.min(world.height() - 1, avgy+ rangey + expandr);
+        int expandr = 4;
 
-		for(int x = minx; x <= maxx; x++){
-			for(int y = miny; y <= maxy; y++){
-				boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
+        Graphics.surface(renderer.effectSurface, true, false);
 
-				synchronized (Tile.tileSetLock) {
-					Tile tile = world.rawTile(x, y);
+        int avgx = Mathf.scl(camera.position.x, tilesize);
+        int avgy = Mathf.scl(camera.position.y, tilesize);
 
-					if (tile != null) {
-						Block block = tile.block();
+        int minx = Math.max(avgx - rangex - expandr, 0);
+        int miny = Math.max(avgy - rangey - expandr, 0);
+        int maxx = Math.min(world.width() - 1, avgx + rangex + expandr);
+        int maxy = Math.min(world.height() - 1, avgy + rangey + expandr);
 
-						if (!expanded && block != Blocks.air && world.isAccessible(x, y)) {
-							tile.block().drawShadow(tile);
-						}
+        for(int x = minx; x <= maxx; x++){
+            for(int y = miny; y <= maxy; y++){
+                boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
 
-						if (!(block instanceof StaticBlock)) {
-							if (block != Blocks.air) {
-								if (!expanded) {
-									addRequest(tile, Layer.block);
-								}
+                synchronized(Tile.tileSetLock){
+                    Tile tile = world.rawTile(x, y);
 
-								if (block.expanded || !expanded) {
-									if (block.layer != null && block.isLayer(tile)) {
-										addRequest(tile, block.layer);
-									}
+                    if(tile != null){
+                        Block block = tile.block();
 
-									if (block.layer2 != null && block.isLayer2(tile)) {
-										addRequest(tile, block.layer2);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+                        if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
+                            tile.block().drawShadow(tile);
+                        }
 
-		//TODO this actually isn't necessary
-		Draw.color(0, 0, 0, 0.15f);
-		Graphics.flushSurface();
-		Draw.color();
+                        if(!(block instanceof StaticBlock)){
+                            if(block != Blocks.air){
+                                if(!expanded){
+                                    addRequest(tile, Layer.block);
+                                }
 
-		Graphics.end();
-		floorRenderer.beginDraw();
-		floorRenderer.drawLayer(CacheLayer.walls);
-		floorRenderer.endDraw();
-		Graphics.begin();
+                                if(block.expanded || !expanded){
+                                    if(block.layer != null && block.isLayer(tile)){
+                                        addRequest(tile, block.layer);
+                                    }
 
-		Sort.instance().sort(requests.items, 0, requestidx);
-		iterateidx = 0;
-	}
+                                    if(block.layer2 != null && block.isLayer2(tile)){
+                                        addRequest(tile, block.layer2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-	public int getRequests(){
-		return requestidx;
-	}
-	
-	public void drawBlocks(Layer stopAt){
-		
-		for(; iterateidx < requestidx; iterateidx ++){
+        //TODO this actually isn't necessary
+        Draw.color(0, 0, 0, 0.15f);
+        Graphics.flushSurface();
+        Draw.color();
 
-			if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
-				break;
-			}
-			
-			BlockRequest req = requests.get(iterateidx);
+        Graphics.end();
+        floorRenderer.beginDraw();
+        floorRenderer.drawLayer(CacheLayer.walls);
+        floorRenderer.endDraw();
+        Graphics.begin();
 
-			if(req.layer != lastLayer){
-				if(lastLayer != null) layerEnds(lastLayer);
-				layerBegins(req.layer);
-			}
+        Sort.instance().sort(requests.items, 0, requestidx);
+        iterateidx = 0;
+    }
 
-			synchronized (Tile.tileSetLock) {
-				Block block = req.tile.block();
+    public int getRequests(){
+        return requestidx;
+    }
 
-				if (req.layer == Layer.block) {
-					block.draw(req.tile);
-				} else if (req.layer == block.layer) {
-					block.drawLayer(req.tile);
-				} else if (req.layer == block.layer2) {
-					block.drawLayer2(req.tile);
-				}
-			}
+    public void drawBlocks(Layer stopAt){
 
-			lastLayer = req.layer;
-		}
-	}
+        for(; iterateidx < requestidx; iterateidx++){
 
-	public void drawTeamBlocks(Layer layer, Team team){
-		int index = this.iterateidx;
+            if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
+                break;
+            }
 
-		for(; index < requestidx; index ++){
+            BlockRequest req = requests.get(iterateidx);
 
-			if(index < requests.size && requests.get(index).layer.ordinal() > layer.ordinal()){
-				break;
-			}
+            if(req.layer != lastLayer){
+                if(lastLayer != null) layerEnds(lastLayer);
+                layerBegins(req.layer);
+            }
 
-			BlockRequest req = requests.get(index);
-			if(req.tile.getTeam() != team) continue;
+            synchronized(Tile.tileSetLock){
+                Block block = req.tile.block();
 
-			synchronized (Tile.tileSetLock) {
-				Block block = req.tile.block();
+                if(req.layer == Layer.block){
+                    block.draw(req.tile);
+                }else if(req.layer == block.layer){
+                    block.drawLayer(req.tile);
+                }else if(req.layer == block.layer2){
+                    block.drawLayer2(req.tile);
+                }
+            }
 
-				if (req.layer == block.layer) {
-					block.drawLayer(req.tile);
-				} else if (req.layer == block.layer2) {
-					block.drawLayer2(req.tile);
-				}
-			}
-		}
-	}
+            lastLayer = req.layer;
+        }
+    }
 
-	public void skipLayer(Layer stopAt){
+    public void drawTeamBlocks(Layer layer, Team team){
+        int index = this.iterateidx;
 
-		for(; iterateidx < requestidx; iterateidx ++){
-			if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
-				break;
-			}
-		}
-	}
+        for(; index < requestidx; index++){
 
-	public void beginFloor(){
-		floorRenderer.beginDraw();
-	}
+            if(index < requests.size && requests.get(index).layer.ordinal() > layer.ordinal()){
+                break;
+            }
 
-	public void endFloor(){
-		floorRenderer.endDraw();
-	}
+            BlockRequest req = requests.get(index);
+            if(req.tile.getTeam() != team) continue;
 
-	public void drawFloor(){
-		floorRenderer.drawFloor();
-	}
+            synchronized(Tile.tileSetLock){
+                Block block = req.tile.block();
 
-	private void layerBegins(Layer layer){}
+                if(req.layer == block.layer){
+                    block.drawLayer(req.tile);
+                }else if(req.layer == block.layer2){
+                    block.drawLayer2(req.tile);
+                }
+            }
+        }
+    }
 
-	private void layerEnds(Layer layer){}
+    public void skipLayer(Layer stopAt){
 
-	private void addRequest(Tile tile, Layer layer){
-		if(requestidx >= requests.size){
-			requests.add(new BlockRequest());
-		}
-		BlockRequest r = requests.get(requestidx);
-		if(r == null){
-			requests.set(requestidx, r = new BlockRequest());
-		}
-		r.tile = tile;
-		r.layer = layer;
-		requestidx ++;
-	}
+        for(; iterateidx < requestidx; iterateidx++){
+            if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
+                break;
+            }
+        }
+    }
+
+    public void beginFloor(){
+        floorRenderer.beginDraw();
+    }
+
+    public void endFloor(){
+        floorRenderer.endDraw();
+    }
+
+    public void drawFloor(){
+        floorRenderer.drawFloor();
+    }
+
+    private void layerBegins(Layer layer){
+    }
+
+    private void layerEnds(Layer layer){
+    }
+
+    private void addRequest(Tile tile, Layer layer){
+        if(requestidx >= requests.size){
+            requests.add(new BlockRequest());
+        }
+        BlockRequest r = requests.get(requestidx);
+        if(r == null){
+            requests.set(requestidx, r = new BlockRequest());
+        }
+        r.tile = tile;
+        r.layer = layer;
+        requestidx++;
+    }
+
+    private class BlockRequest implements Comparable<BlockRequest>{
+        Tile tile;
+        Layer layer;
+
+        @Override
+        public int compareTo(BlockRequest other){
+            return layer.compareTo(other.layer);
+        }
+
+        @Override
+        public String toString(){
+            return tile.block().name + ":" + layer.toString();
+        }
+    }
 }

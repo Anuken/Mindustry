@@ -11,9 +11,9 @@ public class ArtilleryBullets extends BulletList implements ContentList{
     public static BulletType carbide, plastic, plasticFrag, homing, incindiary, explosive, surge;
 
     @Override
-    public void load() {
+    public void load(){
 
-        carbide = new ArtilleryBulletType(3f, 0, "shell") {
+        carbide = new ArtilleryBulletType(3f, 0, "shell"){
             {
                 hiteffect = BulletFx.flakExplosion;
                 knockback = 0.8f;
@@ -25,7 +25,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
             }
         };
 
-        plasticFrag = new BasicBulletType(2.5f, 6, "bullet") {
+        plasticFrag = new BasicBulletType(2.5f, 6, "bullet"){
             {
                 bulletWidth = 10f;
                 bulletHeight = 12f;
@@ -36,7 +36,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
             }
         };
 
-        plastic = new ArtilleryBulletType(3.3f, 0, "shell") {
+        plastic = new ArtilleryBulletType(3.3f, 0, "shell"){
             {
                 hiteffect = BulletFx.plasticExplosion;
                 knockback = 1f;
@@ -52,7 +52,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
             }
         };
 
-        homing = new ArtilleryBulletType(3f, 0, "shell") {
+        homing = new ArtilleryBulletType(3f, 0, "shell"){
             {
                 hiteffect = BulletFx.flakExplosion;
                 knockback = 0.8f;
@@ -66,7 +66,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
             }
         };
 
-        incindiary = new ArtilleryBulletType(3f, 0, "shell") {
+        incindiary = new ArtilleryBulletType(3f, 0, "shell"){
             {
                 hiteffect = BulletFx.blastExplosion;
                 knockback = 0.8f;
@@ -83,7 +83,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
             }
         };
 
-        explosive = new ArtilleryBulletType(2f, 0, "shell") {
+        explosive = new ArtilleryBulletType(2f, 0, "shell"){
             {
                 hiteffect = BulletFx.blastExplosion;
                 knockback = 0.8f;
@@ -97,7 +97,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
             }
         };
 
-        surge = new ArtilleryBulletType(3f, 0, "shell") {
+        surge = new ArtilleryBulletType(3f, 0, "shell"){
             {
                 //TODO
             }

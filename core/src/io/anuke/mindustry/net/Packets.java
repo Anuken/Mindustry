@@ -16,15 +16,34 @@ import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.world;
 
-/**Class for storing all packets.*/
-public class Packets {
+/**
+ * Class for storing all packets.
+ */
+public class Packets{
+
+    public enum KickReason{
+        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true), recentKick, nameInUse, idInUse, fastShoot, nameEmpty, customClient;
+        public final boolean quiet;
+
+        KickReason(){
+            quiet = false;
+        }
+
+        KickReason(boolean quiet){
+            this.quiet = quiet;
+        }
+    }
+
+    public enum AdminAction{
+        kick, ban, trace, wave
+    }
 
     public static class Connect implements Packet{
         public int id;
         public String addressTCP;
 
         @Override
-        public boolean isImportant() {
+        public boolean isImportant(){
             return true;
         }
     }
@@ -33,7 +52,7 @@ public class Packets {
         public int id;
 
         @Override
-        public boolean isImportant() {
+        public boolean isImportant(){
             return true;
         }
     }
@@ -49,17 +68,17 @@ public class Packets {
         public int color;
 
         @Override
-        public void write(ByteBuffer buffer) {
+        public void write(ByteBuffer buffer){
             buffer.putInt(Version.build);
             IOUtils.writeString(buffer, name);
             IOUtils.writeString(buffer, usid);
-            buffer.put(mobile ? (byte)1 : 0);
+            buffer.put(mobile ? (byte) 1 : 0);
             buffer.putInt(color);
             buffer.put(Base64Coder.decode(uuid));
         }
 
         @Override
-        public void read(ByteBuffer buffer) {
+        public void read(ByteBuffer buffer){
             version = buffer.getInt();
             name = IOUtils.readString(buffer);
             usid = IOUtils.readString(buffer);
@@ -78,7 +97,7 @@ public class Packets {
         public int writeLength;
 
         @Override
-        public void read(ByteBuffer buffer) {
+        public void read(ByteBuffer buffer){
             type = buffer.get();
             priority = buffer.get();
             writeLength = buffer.getShort();
@@ -88,29 +107,29 @@ public class Packets {
         }
 
         @Override
-        public void write(ByteBuffer buffer) {
+        public void write(ByteBuffer buffer){
             buffer.put(type);
             buffer.put(priority);
-            buffer.putShort((short)writeLength);
+            buffer.putShort((short) writeLength);
 
             writeBuffer.position(0);
-            for(int i = 0; i < writeLength; i ++){
+            for(int i = 0; i < writeLength; i++){
                 buffer.put(writeBuffer.get());
             }
         }
 
         @Override
-        public void reset() {
+        public void reset(){
             priority = 0;
         }
 
         @Override
-        public boolean isImportant() {
+        public boolean isImportant(){
             return priority == 1;
         }
 
         @Override
-        public boolean isUnimportant() {
+        public boolean isUnimportant(){
             return priority == 2;
         }
     }
@@ -127,7 +146,7 @@ public class Packets {
         public BuildRequest currentRequest;
 
         @Override
-        public void write(ByteBuffer buffer) {
+        public void write(ByteBuffer buffer){
             Player player = Vars.players[0];
 
             buffer.putInt(lastSnapshot);
@@ -138,33 +157,33 @@ public class Packets {
             buffer.putFloat(player.y);
             buffer.putFloat(player.pointerX);
             buffer.putFloat(player.pointerY);
-            buffer.put(player.isBoosting ? (byte)1 : 0);
-            buffer.put(player.isShooting ? (byte)1 : 0);
+            buffer.put(player.isBoosting ? (byte) 1 : 0);
+            buffer.put(player.isShooting ? (byte) 1 : 0);
 
-            buffer.put((byte)(Mathf.clamp(player.getVelocity().x, -Unit.maxAbsVelocity, Unit.maxAbsVelocity) * Unit.velocityPercision));
-            buffer.put((byte)(Mathf.clamp(player.getVelocity().y, -Unit.maxAbsVelocity, Unit.maxAbsVelocity) * Unit.velocityPercision));
+            buffer.put((byte) (Mathf.clamp(player.getVelocity().x, -Unit.maxAbsVelocity, Unit.maxAbsVelocity) * Unit.velocityPercision));
+            buffer.put((byte) (Mathf.clamp(player.getVelocity().y, -Unit.maxAbsVelocity, Unit.maxAbsVelocity) * Unit.velocityPercision));
             //saving 4 bytes, yay?
-            buffer.putShort((short)(player.rotation*2));
-            buffer.putShort((short)(player.baseRotation*2));
+            buffer.putShort((short) (player.rotation * 2));
+            buffer.putShort((short) (player.baseRotation * 2));
 
             buffer.putInt(player.getMineTile() == null ? -1 : player.getMineTile().packedPosition());
 
             BuildRequest request = player.getCurrentRequest();
 
             if(request != null){
-                buffer.put(request.remove ? (byte)1 : 0);
+                buffer.put(request.remove ? (byte) 1 : 0);
                 buffer.putInt(world.toPacked(request.x, request.y));
                 if(!request.remove){
-                    buffer.put((byte)request.recipe.id);
-                    buffer.put((byte)request.rotation);
+                    buffer.put((byte) request.recipe.id);
+                    buffer.put((byte) request.rotation);
                 }
             }else{
-                buffer.put((byte)-1);
+                buffer.put((byte) -1);
             }
         }
 
         @Override
-        public void read(ByteBuffer buffer) {
+        public void read(ByteBuffer buffer){
             lastSnapshot = buffer.getInt();
             snapid = buffer.getInt();
             timeSent = buffer.getLong();
@@ -177,17 +196,17 @@ public class Packets {
             shooting = buffer.get() == 1;
             xv = buffer.get() / Unit.velocityPercision;
             yv = buffer.get() / Unit.velocityPercision;
-            rotation = buffer.getShort()/2f;
-            baseRotation = buffer.getShort()/2f;
+            rotation = buffer.getShort() / 2f;
+            baseRotation = buffer.getShort() / 2f;
             mining = world.tile(buffer.getInt());
 
             byte type = buffer.get();
-            if (type != -1) {
+            if(type != -1){
                 int position = buffer.getInt();
 
-                if (type == 1) { //remove
+                if(type == 1){ //remove
                     currentRequest = new BuildRequest(position % world.width(), position / world.width());
-                } else { //place
+                }else{ //place
                     byte recipe = buffer.get();
                     byte rotation = buffer.get();
                     currentRequest = new BuildRequest(position % world.width(), position / world.width(), rotation, Recipe.getByID(recipe));
@@ -198,41 +217,28 @@ public class Packets {
         }
     }
 
-    public enum KickReason{
-        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true), recentKick, nameInUse, idInUse, fastShoot, nameEmpty, customClient;
-        public final boolean quiet;
-
-        KickReason(){ quiet = false; }
-
-        KickReason(boolean quiet){
-            this.quiet = quiet;
-        }
-    }
-
-    public enum AdminAction{
-        kick, ban, trace, wave
-    }
-
-    /**Marks the beginning of a stream.*/
+    /**
+     * Marks the beginning of a stream.
+     */
     public static class StreamBegin implements Packet{
         private static int lastid;
 
-        public int id = lastid ++;
+        public int id = lastid++;
         public int total;
         public Class<? extends Streamable> type;
 
         @Override
-        public void write(ByteBuffer buffer) {
+        public void write(ByteBuffer buffer){
             buffer.putInt(id);
             buffer.putInt(total);
             buffer.put(Registrator.getID(type));
         }
 
         @Override
-        public void read(ByteBuffer buffer) {
+        public void read(ByteBuffer buffer){
             id = buffer.getInt();
             total = buffer.getInt();
-            type = (Class<? extends Streamable>)Registrator.getByID(buffer.get());
+            type = (Class<? extends Streamable>) Registrator.getByID(buffer.get());
         }
     }
 
@@ -241,14 +247,14 @@ public class Packets {
         public byte[] data;
 
         @Override
-        public void write(ByteBuffer buffer) {
+        public void write(ByteBuffer buffer){
             buffer.putInt(id);
-            buffer.putShort((short)data.length);
+            buffer.putShort((short) data.length);
             buffer.put(data);
         }
 
         @Override
-        public void read(ByteBuffer buffer) {
+        public void read(ByteBuffer buffer){
             id = buffer.getInt();
             data = new byte[buffer.getShort()];
             buffer.get(data);

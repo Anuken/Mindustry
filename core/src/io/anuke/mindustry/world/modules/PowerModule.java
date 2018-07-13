@@ -26,7 +26,7 @@ public class PowerModule extends BlockModule{
     }
 
     @Override
-    public void write(DataOutput stream) throws IOException {
+    public void write(DataOutput stream) throws IOException{
         stream.writeFloat(amount);
     }
 

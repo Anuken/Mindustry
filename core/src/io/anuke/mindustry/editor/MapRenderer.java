@@ -34,18 +34,18 @@ public class MapRenderer implements Disposable{
 
     public void resize(int width, int height){
         if(chunks != null){
-            for(int x = 0; x < chunks.length; x ++){
-                for(int y = 0; y < chunks[0].length; y ++){
+            for(int x = 0; x < chunks.length; x++){
+                for(int y = 0; y < chunks[0].length; y++){
                     chunks[x][y].dispose();
                 }
             }
         }
 
-        chunks = new IndexedRenderer[(int)Math.ceil((float)width/chunksize)][(int)Math.ceil((float)height/chunksize )];
+        chunks = new IndexedRenderer[(int) Math.ceil((float) width / chunksize)][(int) Math.ceil((float) height / chunksize)];
 
-        for(int x = 0; x < chunks.length; x ++){
-            for(int y = 0; y < chunks[0].length; y ++){
-                chunks[x][y] = new IndexedRenderer(chunksize*chunksize*2);
+        for(int x = 0; x < chunks.length; x++){
+            for(int y = 0; y < chunks[0].length; y++){
+                chunks[x][y] = new IndexedRenderer(chunksize * chunksize * 2);
             }
         }
         this.width = width;
@@ -69,8 +69,8 @@ public class MapRenderer implements Disposable{
         updates.addAll(delayedUpdates);
         delayedUpdates.clear();
 
-        for(int x = 0; x < chunks.length; x ++){
-            for(int y = 0; y < chunks[0].length; y ++){
+        for(int x = 0; x < chunks.length; x++){
+            for(int y = 0; y < chunks[0].length; y++){
                 IndexedRenderer mesh = chunks[x][y];
 
                 mesh.getTransformMatrix().setToTranslation(tx, ty, 0).scl(tw / (width * tilesize),
@@ -86,19 +86,19 @@ public class MapRenderer implements Disposable{
 
     public void updatePoint(int x, int y){
         //TODO spread out over multiple frames?
-        updates.add(x + y*width);
+        updates.add(x + y * width);
     }
 
     public void updateAll(){
-        for(int x = 0; x < width; x ++){
-            for(int y = 0; y < height; y ++){
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
                 render(x, y);
             }
         }
     }
 
     private void render(int wx, int wy){
-        int x = wx/chunksize, y = wy/chunksize;
+        int x = wx / chunksize, y = wy / chunksize;
         IndexedRenderer mesh = chunks[x][y];
         //TileDataMarker data = editor.getMap().readAt(wx, wy);
         byte bf = editor.getMap().read(wx, wy, DataPosition.floor);
@@ -111,19 +111,19 @@ public class MapRenderer implements Disposable{
         Block floor = Block.getByID(bf);
         Block wall = Block.getByID(bw);
 
-        int offsetx = -(wall.size-1)/2;
-        int offsety = -(wall.size-1)/2;
+        int offsetx = -(wall.size - 1) / 2;
+        int offsety = -(wall.size - 1) / 2;
 
         TextureRegion region;
 
-        if(bw != 0) {
+        if(bw != 0){
             region = wall.getEditorIcon();
 
-            if (wall.rotate) {
+            if(wall.rotate){
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
                         wx * tilesize + offsetx * tilesize, wy * tilesize + offsety * tilesize,
                         region.getRegionWidth(), region.getRegionHeight(), rotation * 90 - 90);
-            } else {
+            }else{
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
                         wx * tilesize + offsetx * tilesize, wy * tilesize + offsety * tilesize,
                         region.getRegionWidth(), region.getRegionHeight());
@@ -131,16 +131,16 @@ public class MapRenderer implements Disposable{
         }else{
             region = floor.getEditorIcon();
 
-            mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
+            mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
         }
 
         boolean check = checkElevation(elev, wx, wy);
 
-        if(wall.update || wall.destructible) {
+        if(wall.update || wall.destructible){
             mesh.setColor(team.color);
             region = Draw.region("block-border");
         }else if(elev > 0 && check){
-            mesh.setColor(tmpColor.fromHsv((360f * elev/127f * 4f) % 360f, 0.5f + (elev / 4f) % 0.5f, 1f));
+            mesh.setColor(tmpColor.fromHsv((360f * elev / 127f * 4f) % 360f, 0.5f + (elev / 4f) % 0.5f, 1f));
             region = Draw.region("block-elevation");
         }else if(elev == -1){
             region = Draw.region("block-slope");
@@ -148,8 +148,8 @@ public class MapRenderer implements Disposable{
             region = Draw.region("clear");
         }
 
-        mesh.draw((wx % chunksize) + (wy % chunksize)*chunksize + chunksize*chunksize, region,
-                wx * tilesize + offsetx*tilesize, wy * tilesize  + offsety * tilesize,
+        mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize, region,
+                wx * tilesize + offsetx * tilesize, wy * tilesize + offsety * tilesize,
                 region.getRegionWidth(), region.getRegionHeight());
         mesh.setColor(Color.WHITE);
     }
@@ -165,19 +165,19 @@ public class MapRenderer implements Disposable{
             if(value < elev){
                 return true;
             }else if(value > elev){
-                delayedUpdates.add(wx + wy*width);
+                delayedUpdates.add(wx + wy * width);
             }
         }
         return false;
     }
 
     @Override
-    public void dispose() {
+    public void dispose(){
         if(chunks == null){
             return;
         }
-        for(int x = 0; x < chunks.length; x ++){
-            for(int y = 0; y < chunks[0].length; y ++){
+        for(int x = 0; x < chunks.length; x++){
+            for(int y = 0; y < chunks[0].length; y++){
                 if(chunks[x][y] != null){
                     chunks[x][y].dispose();
                 }

@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.ThreadArray;
 
-public class Consumers {
+public class Consumers{
     private ObjectMap<Class<? extends Consume>, Consume> map = new ObjectMap<>();
     private ObjectSet<Class<? extends Consume>> required = new ObjectSet<>();
     private ThreadArray<Consume> results = new ThreadArray<>();
@@ -20,7 +20,7 @@ public class Consumers {
     }
 
     public void checkRequired(Block block){
-        for (Class<? extends Consume> c : required){
+        for(Class<? extends Consume> c : required){
             if(!map.containsKey(c)){
                 throw new RuntimeException("Missing required consumer of type \"" + ClassReflection.getSimpleName(c) + "\" in block \"" + block.name + "\"!");
             }
@@ -92,14 +92,14 @@ public class Consumers {
         if(!map.containsKey(type)){
             throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "'!");
         }
-        return (T)map.get(type);
+        return (T) map.get(type);
     }
 
-    public Iterable<Consume> all() {
+    public Iterable<Consume> all(){
         return map.values();
     }
 
-    public ThreadArray<Consume> array() {
+    public ThreadArray<Consume> array(){
         return results;
     }
 

@@ -9,11 +9,13 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-/**Artillery turrets have special shooting calculations done to hit targets.*/
-public class ArtilleryTurret extends ItemTurret {
+/**
+ * Artillery turrets have special shooting calculations done to hit targets.
+ */
+public class ArtilleryTurret extends ItemTurret{
     protected float velocityInaccuracy = 0f;
 
-    public ArtilleryTurret(String name) {
+    public ArtilleryTurret(String name){
         super(name);
         targetAir = false;
     }
@@ -34,9 +36,9 @@ public class ArtilleryTurret extends ItemTurret {
         float dst = entity.distanceTo(predict.x, predict.y);
         float maxTraveled = type.bullet.lifetime * type.bullet.speed;
 
-        for (int i = 0; i < shots; i++) {
+        for(int i = 0; i < shots; i++){
             Bullet.create(ammo.bullet, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y,
-                    entity.rotation + Mathf.range(inaccuracy + type.inaccuracy), dst/maxTraveled + Mathf.range(velocityInaccuracy));
+                    entity.rotation + Mathf.range(inaccuracy + type.inaccuracy), dst / maxTraveled + Mathf.range(velocityInaccuracy));
         }
 
         effects(tile);

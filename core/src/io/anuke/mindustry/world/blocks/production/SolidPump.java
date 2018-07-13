@@ -13,8 +13,10 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
-/**Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.*/
-public class SolidPump extends Pump {
+/**
+ * Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.
+ */
+public class SolidPump extends Pump{
     protected Liquid result = Liquids.water;
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.02f;
@@ -26,14 +28,14 @@ public class SolidPump extends Pump {
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
 
         liquidRegion = Draw.region(name + "-liquid");
     }
 
     @Override
-    public void setStats() {
+    public void setStats(){
         super.setStats();
 
         stats.remove(BlockStat.liquidOutput);
@@ -41,7 +43,7 @@ public class SolidPump extends Pump {
     }
 
     @Override
-    public void draw(Tile tile) {
+    public void draw(Tile tile){
         SolidPumpEntity entity = tile.entity();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
@@ -54,7 +56,7 @@ public class SolidPump extends Pump {
     }
 
     @Override
-    public TextureRegion[] getIcon() {
+    public TextureRegion[] getIcon(){
         return new TextureRegion[]{Draw.region(name), Draw.region(name + "-rotator"), Draw.region(name + "-top")};
     }
 
@@ -67,7 +69,7 @@ public class SolidPump extends Pump {
         if(isMultiblock()){
             for(Tile other : tile.getLinkedTiles(tempTiles)){
                 if(isValid(other)){
-                    fraction += 1f/ size;
+                    fraction += 1f / size;
                 }
             }
         }else{
@@ -79,7 +81,7 @@ public class SolidPump extends Pump {
             tile.entity.liquids.add(result, maxPump);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
             if(Mathf.chance(Timers.delta() * updateEffectChance))
-                Effects.effect(updateEffect, entity.x + Mathf.range(size*2f), entity.y + Mathf.range(size*2f));
+                Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
         }
@@ -90,7 +92,7 @@ public class SolidPump extends Pump {
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile) {
+    public boolean canPlaceOn(Tile tile){
         if(isMultiblock()){
             for(Tile other : tile.getLinkedTilesAs(this, drawTiles)){
                 if(isValid(other)){
@@ -109,7 +111,7 @@ public class SolidPump extends Pump {
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new SolidPumpEntity();
     }
 

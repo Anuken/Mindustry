@@ -30,7 +30,7 @@ import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class BlockInventoryFragment extends Fragment {
+public class BlockInventoryFragment extends Fragment{
     private final static float holdWithdraw = 40f;
 
     private Table table;
@@ -44,8 +44,20 @@ public class BlockInventoryFragment extends Fragment {
         this.input = input;
     }
 
+    @Remote(called = Loc.server, targets = Loc.both, in = In.blocks, forward = true)
+    public static void requestItem(Player player, Tile tile, Item item, int amount){
+        if(player == null) return;
+
+        int removed = tile.block().removeStack(tile, item, amount);
+
+        player.inventory.addItem(item, removed);
+        for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
+            Timers.run(j * 3f, () -> CallEntity.transferItemEffect(item, tile.drawx(), tile.drawy(), player));
+        }
+    }
+
     @Override
-    public void build(Group parent) {
+    public void build(Group parent){
         table = new Table();
         table.setVisible(() -> !state.is(State.menu));
         table.setTransform(true);
@@ -55,7 +67,8 @@ public class BlockInventoryFragment extends Fragment {
 
     public void showFor(Tile t){
         this.tile = t.target();
-        if(tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.total() == 0) return;
+        if(tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.total() == 0)
+            return;
         rebuild(true);
     }
 
@@ -93,10 +106,10 @@ public class BlockInventoryFragment extends Fragment {
                 }
 
                 updateTablePosition();
-                if(tile.block().hasItems) {
-                    for (int i = 0; i < Item.all().size; i++) {
+                if(tile.block().hasItems){
+                    for(int i = 0; i < Item.all().size; i++){
                         boolean has = tile.entity.items.has(Item.getByID(i));
-                        if (has != container.contains(i)) {
+                        if(has != container.contains(i)){
                             rebuild(false);
                         }
                     }
@@ -108,13 +121,13 @@ public class BlockInventoryFragment extends Fragment {
         int row = 0;
 
         table.margin(6f);
-        table.defaults().size(mobile ? 16*3 : 16*2).space(6f);
+        table.defaults().size(mobile ? 16 * 3 : 16 * 2).space(6f);
 
-        if(tile.block().hasItems) {
+        if(tile.block().hasItems){
 
-            for (int i = 0; i < Item.all().size; i++) {
+            for(int i = 0; i < Item.all().size; i++){
                 Item item = Item.getByID(i);
-                if (!tile.entity.items.has(item)) continue;
+                if(!tile.entity.items.has(item)) continue;
 
                 container.add(i);
 
@@ -133,7 +146,7 @@ public class BlockInventoryFragment extends Fragment {
 
                 image.addListener(new InputListener(){
                     @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                         if(!canPick.get() || !tile.entity.items.has(item)) return false;
                         int amount = Math.min(1, player.inventory.itemCapacityUsed(item));
                         CallBlocks.requestItem(player, tile, item, amount);
@@ -144,14 +157,14 @@ public class BlockInventoryFragment extends Fragment {
                     }
 
                     @Override
-                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button){
                         holding = false;
                         lastItem = null;
                     }
                 });
                 table.add(image);
 
-                if (row++ % cols == cols - 1) table.row();
+                if(row++ % cols == cols - 1) table.row();
             }
         }
 
@@ -168,29 +181,17 @@ public class BlockInventoryFragment extends Fragment {
     }
 
     private String round(float f){
-        f = (int)f;
+        f = (int) f;
         if(f >= 1000){
-            return Strings.toFixed(f/1000, 1) + "k";
+            return Strings.toFixed(f / 1000, 1) + "k";
         }else{
-            return (int)f+"";
+            return (int) f + "";
         }
     }
 
     private void updateTablePosition(){
-        Vector2 v =  Graphics.screen(tile.drawx() + tile.block().size * tilesize/2f, tile.drawy() + tile.block().size * tilesize/2f);
+        Vector2 v = Graphics.screen(tile.drawx() + tile.block().size * tilesize / 2f, tile.drawy() + tile.block().size * tilesize / 2f);
         table.pack();
         table.setPosition(v.x, v.y, Align.topLeft);
-    }
-
-    @Remote(called = Loc.server, targets = Loc.both, in = In.blocks, forward = true)
-    public static void requestItem(Player player, Tile tile, Item item, int amount){
-        if(player == null) return;
-
-        int removed = tile.block().removeStack(tile, item, amount);
-
-        player.inventory.addItem(item, removed);
-        for(int j = 0; j < Mathf.clamp(removed/3, 1, 8); j ++){
-            Timers.run(j*3f, () -> CallEntity.transferItemEffect(item, tile.drawx(), tile.drawy(), player));
-        }
     }
 }

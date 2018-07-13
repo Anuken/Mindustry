@@ -13,7 +13,7 @@ import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.headless;
 
-public class BundleLoader {
+public class BundleLoader{
 
     public static void load(){
         Settings.defaults("locale", "default");
@@ -27,10 +27,10 @@ public class BundleLoader {
             return Locale.getDefault();
         }else{
             Locale lastLocale;
-            if (loc.contains("_")) {
+            if(loc.contains("_")){
                 String[] split = loc.split("_");
                 lastLocale = new Locale(split[0], split[1]);
-            } else {
+            }else{
                 lastLocale = new Locale(loc);
             }
 
@@ -40,7 +40,7 @@ public class BundleLoader {
 
     private static void loadBundle(){
         I18NBundle.setExceptionOnMissingKey(false);
-        try {
+        try{
             //try loading external bundle
             FileHandle handle = Gdx.files.local("bundle");
 
@@ -51,7 +51,7 @@ public class BundleLoader {
             if(!headless){
                 Timers.run(10f, () -> Vars.ui.showInfo("Note: You have successfully loaded an external translation bundle."));
             }
-        }catch (Throwable e){
+        }catch(Throwable e){
             //no external bundle found
 
             FileHandle handle = Gdx.files.internal("bundles/bundle");

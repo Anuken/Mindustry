@@ -13,24 +13,24 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Conduit extends LiquidBlock {
+public class Conduit extends LiquidBlock{
     protected final int timerFlow = timers++;
 
     protected TextureRegion[] topRegions = new TextureRegion[7];
     protected TextureRegion[] botRegions = new TextureRegion[7];
 
-    public Conduit(String name) {
+    public Conduit(String name){
         super(name);
         rotate = true;
         solid = false;
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
 
         liquidRegion = Draw.region("conduit-liquid");
-        for (int i = 0; i < topRegions.length; i++) {
+        for(int i = 0; i < topRegions.length; i++){
             topRegions[i] = Draw.region(name + "-top-" + i);
             botRegions[i] = Draw.region("conduit-bottom-" + i);
         }
@@ -40,23 +40,23 @@ public class Conduit extends LiquidBlock {
         ConduitEntity entity = tile.entity();
         entity.blendbits = 0;
 
-        if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)) {
+        if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)){
             entity.blendbits = 3;
-        }else if(blends(tile, 1) && blends(tile, 2)) {
+        }else if(blends(tile, 1) && blends(tile, 2)){
             entity.blendbits = 2;
-        }else if(blends(tile, 3) && blends(tile, 2)) {
+        }else if(blends(tile, 3) && blends(tile, 2)){
             entity.blendbits = 4;
         }else if(blends(tile, 0)){
-            if(blends(tile, 1) && blends(tile, 3)) {
+            if(blends(tile, 1) && blends(tile, 3)){
                 entity.blendbits = 6;
-            }else if(blends(tile, 1)) {
+            }else if(blends(tile, 1)){
                 entity.blendbits = 5;
-            }else if(blends(tile, 3)) {
+            }else if(blends(tile, 3)){
                 entity.blendbits = 1;
             }
-        }else if(blends(tile, 1)) {
+        }else if(blends(tile, 1)){
             entity.blendbits = 5;
-        }else if(blends(tile, 3)) {
+        }else if(blends(tile, 3)){
             entity.blendbits = 1;
         }
     }
@@ -90,7 +90,7 @@ public class Conduit extends LiquidBlock {
     @Override
     public void update(Tile tile){
         ConduitEntity entity = tile.entity();
-        entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquids.total()/liquidCapacity, 0.05f);
+        entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquids.total() / liquidCapacity, 0.05f);
 
         if(tile.entity.liquids.total() > 0.001f && tile.entity.timer.get(timerFlow, 1)){
             tryMoveLiquid(tile, tile.getNearby(tile.getRotation()), true, tile.entity.liquids.current());
@@ -109,27 +109,27 @@ public class Conduit extends LiquidBlock {
     }
 
     @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         tile.entity.wakeUp();
         return super.acceptLiquid(tile, source, liquid, amount) && ((2 + source.relativeTo(tile.x, tile.y)) % 4 != tile.getRotation());
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new ConduitEntity();
     }
 
-    public static class ConduitEntity extends TileEntity {
+    public static class ConduitEntity extends TileEntity{
         public float smoothLiquid;
         public byte blendbits;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException {
+        public void write(DataOutputStream stream) throws IOException{
             stream.writeFloat(smoothLiquid);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException {
+        public void read(DataInputStream stream) throws IOException{
             smoothLiquid = stream.readFloat();
         }
     }

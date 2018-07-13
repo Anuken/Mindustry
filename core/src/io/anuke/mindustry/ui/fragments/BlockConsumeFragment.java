@@ -17,12 +17,12 @@ import io.anuke.ucore.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class BlockConsumeFragment extends Fragment {
+public class BlockConsumeFragment extends Fragment{
     private Table table;
     private boolean visible;
 
     @Override
-    public void build(Group parent) {
+    public void build(Group parent){
         table = new Table();
         table.setVisible(() -> !state.is(State.menu) && visible);
         table.setTransform(true);
@@ -68,7 +68,7 @@ public class BlockConsumeFragment extends Fragment {
                 rebuild(block, entity);
             }
 
-            Vector2 v = Graphics.screen(tile.drawx() - tile.block().size * tilesize/2f, tile.drawy() + tile.block().size * tilesize/2f);
+            Vector2 v = Graphics.screen(tile.drawx() - tile.block().size * tilesize / 2f, tile.drawy() + tile.block().size * tilesize / 2f);
             table.pack();
             table.setPosition(v.x, v.y, Align.topRight);
         });
@@ -78,7 +78,8 @@ public class BlockConsumeFragment extends Fragment {
 
     public void hide(){
         table.clear();
-        table.update(() -> {});
+        table.update(() -> {
+        });
         visible = false;
     }
 
@@ -97,10 +98,10 @@ public class BlockConsumeFragment extends Fragment {
                 }).get().act(0);
 
                 Table result = table.table(out -> {
-                    out.addImage(c.getIcon()).size(10*scale).color(Color.DARK_GRAY).padRight(-10*scale).padBottom(-scale*2);
-                    out.addImage(c.getIcon()).size(10*scale).color(Palette.accent);
-                    out.addImage("icon-missing").size(10*scale).color(Palette.remove).padLeft(-10*scale);
-                }).size(10*scale).get();
+                    out.addImage(c.getIcon()).size(10 * scale).color(Color.DARK_GRAY).padRight(-10 * scale).padBottom(-scale * 2);
+                    out.addImage(c.getIcon()).size(10 * scale).color(Palette.accent);
+                    out.addImage("icon-missing").size(10 * scale).color(Palette.remove).padLeft(-10 * scale);
+                }).size(10 * scale).get();
 
                 result.hovered(() -> hovered[0] = true);
                 if(!mobile){

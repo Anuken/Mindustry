@@ -6,7 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public abstract class SaveFileVersion {
+public abstract class SaveFileVersion{
     public final int version;
 
     public SaveFileVersion(int version){
@@ -23,5 +23,6 @@ public abstract class SaveFileVersion {
     }
 
     public abstract void read(DataInputStream stream) throws IOException;
+
     public abstract void write(DataOutputStream stream) throws IOException;
 }

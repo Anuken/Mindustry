@@ -10,7 +10,7 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class LaserTurret extends PowerTurret {
+public class LaserTurret extends PowerTurret{
 
     protected float chargeTime = 30f;
     protected int chargeEffects = 5;
@@ -18,7 +18,7 @@ public class LaserTurret extends PowerTurret {
     protected Effect chargeEffect = Fx.none;
     protected Effect chargeBeginEffect = Fx.none;
 
-    public LaserTurret(String name) {
+    public LaserTurret(String name){
         super(name);
     }
 
@@ -31,7 +31,7 @@ public class LaserTurret extends PowerTurret {
         tr.trns(entity.rotation, size * tilesize / 2);
         Effects.effect(chargeBeginEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
 
-        for(int i = 0; i < chargeEffects; i ++){
+        for(int i = 0; i < chargeEffects; i++){
             Timers.run(Mathf.random(chargeMaxDelay), () -> {
                 if(!isTurret(tile)) return;
                 tr.trns(entity.rotation, size * tilesize / 2);

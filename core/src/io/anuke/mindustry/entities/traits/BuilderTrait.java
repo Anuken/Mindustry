@@ -36,34 +36,48 @@ import java.util.Arrays;
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
-/**Interface for units that build, break or mine things.*/
+/**
+ * Interface for units that build, break or mine things.
+ */
 public interface BuilderTrait extends Entity{
     //these are not instance variables!
     Translator[] tmptr = {new Translator(), new Translator(), new Translator(), new Translator()};
     float placeDistance = 140f;
     float mineDistance = 70f;
 
-    /**Returns the queue for storing build requests.*/
+    /**
+     * Returns the queue for storing build requests.
+     */
     Queue<BuildRequest> getPlaceQueue();
 
-    /**Returns the tile this builder is currently mining.*/
+    /**
+     * Returns the tile this builder is currently mining.
+     */
     Tile getMineTile();
 
-    /**Sets the tile this builder is currently mining.*/
+    /**
+     * Sets the tile this builder is currently mining.
+     */
     void setMineTile(Tile tile);
 
-    /**Returns the minining speed of this miner. 1 = standard, 0.5 = half speed, 2 = double speed, etc.*/
+    /**
+     * Returns the minining speed of this miner. 1 = standard, 0.5 = half speed, 2 = double speed, etc.
+     */
     float getMinePower();
 
-    /**Build power, can be any float. 1 = builds recipes in normal time, 0 = doesn't build at all.*/
+    /**
+     * Build power, can be any float. 1 = builds recipes in normal time, 0 = doesn't build at all.
+     */
     float getBuildPower(Tile tile);
 
-    /**Whether this type of builder can begin creating new blocks.*/
+    /**
+     * Whether this type of builder can begin creating new blocks.
+     */
     default boolean canCreateBlocks(){
         return true;
     }
 
-    default void writeBuilding(DataOutput output) throws IOException {
+    default void writeBuilding(DataOutput output) throws IOException{
         BuildRequest request = getCurrentRequest();
 
         if(request != null){
@@ -83,17 +97,17 @@ public interface BuilderTrait extends Entity{
     }
 
     default void readBuilding(DataInput input, boolean applyChanges) throws IOException{
-        synchronized (getPlaceQueue()) {
+        synchronized(getPlaceQueue()){
             if(applyChanges) getPlaceQueue().clear();
 
             byte type = input.readByte();
-            if (type != -1) {
+            if(type != -1){
                 int position = input.readInt();
                 BuildRequest request;
 
-                if (type == 1) { //remove
+                if(type == 1){ //remove
                     request = new BuildRequest(position % world.width(), position / world.width());
-                } else { //place
+                }else{ //place
                     byte recipe = input.readByte();
                     byte rotation = input.readByte();
                     request = new BuildRequest(position % world.width(), position / world.width(), rotation, Recipe.getByID(recipe));
@@ -106,17 +120,21 @@ public interface BuilderTrait extends Entity{
         }
     }
 
-    /**Return whether this builder's place queue contains items.*/
+    /**
+     * Return whether this builder's place queue contains items.
+     */
     default boolean isBuilding(){
         return getPlaceQueue().size != 0;
     }
 
-    /**If a place request matching this signature is present, it is removed.
-     * Otherwise, a new place request is added to the queue.*/
+    /**
+     * If a place request matching this signature is present, it is removed.
+     * Otherwise, a new place request is added to the queue.
+     */
     default void replaceBuilding(int x, int y, int rotation, Recipe recipe){
-        synchronized (getPlaceQueue()) {
-            for (BuildRequest request : getPlaceQueue()) {
-                if (request.x == x && request.y == y) {
+        synchronized(getPlaceQueue()){
+            for(BuildRequest request : getPlaceQueue()){
+                if(request.x == x && request.y == y){
                     clearBuilding();
                     addBuildRequest(request);
                     return;
@@ -127,16 +145,20 @@ public interface BuilderTrait extends Entity{
         addBuildRequest(new BuildRequest(x, y, rotation, recipe));
     }
 
-    /**Clears the placement queue.*/
+    /**
+     * Clears the placement queue.
+     */
     default void clearBuilding(){
         getPlaceQueue().clear();
     }
 
-    /**Add another build requests to the tail of the queue, if it doesn't exist there yet.*/
+    /**
+     * Add another build requests to the tail of the queue, if it doesn't exist there yet.
+     */
     default void addBuildRequest(BuildRequest place){
-        synchronized (getPlaceQueue()) {
-            for (BuildRequest request : getPlaceQueue()) {
-                if (request.x == place.x && request.y == place.y) {
+        synchronized(getPlaceQueue()){
+            for(BuildRequest request : getPlaceQueue()){
+                if(request.x == place.x && request.y == place.y){
                     return;
                 }
             }
@@ -144,16 +166,20 @@ public interface BuilderTrait extends Entity{
         }
     }
 
-    /**Return the build requests currently active, or the one at the top of the queue.
-     * May return null.*/
+    /**
+     * Return the build requests currently active, or the one at the top of the queue.
+     * May return null.
+     */
     default BuildRequest getCurrentRequest(){
-        synchronized (getPlaceQueue()) {
+        synchronized(getPlaceQueue()){
             return getPlaceQueue().size == 0 ? null : getPlaceQueue().first();
         }
     }
 
-    /**Update building mechanism for this unit.
-     * This includes mining.*/
+    /**
+     * Update building mechanism for this unit.
+     * This includes mining.
+     */
     default void updateBuilding(Unit unit){
         BuildRequest current = getCurrentRequest();
 
@@ -176,8 +202,8 @@ public interface BuilderTrait extends Entity{
 
         Tile tile = world.tile(current.x, current.y);
 
-        if (!(tile.block() instanceof BuildBlock)) {
-            if(canCreateBlocks() && !current.remove && Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)) {
+        if(!(tile.block() instanceof BuildBlock)){
+            if(canCreateBlocks() && !current.remove && Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)){
                 Build.beginPlace(unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
             }else if(canCreateBlocks() && current.remove && Build.validBreak(unit.getTeam(), current.x, current.y)){
                 Build.beginBreak(unit.getTeam(), current.x, current.y);
@@ -203,7 +229,9 @@ public interface BuilderTrait extends Entity{
         current.progress = entity.progress();
     }
 
-    /**Do not call directly.*/
+    /**
+     * Do not call directly.
+     */
     default void updateMining(Unit unit){
         Tile tile = getMineTile();
 
@@ -216,26 +244,28 @@ public interface BuilderTrait extends Entity{
             if(unit.inventory.canAcceptItem(item) &&
                     Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
                 CallEntity.transferItemToUnit(item,
-                        tile.worldx() + Mathf.range(tilesize/2f),
-                        tile.worldy() + Mathf.range(tilesize/2f),
+                        tile.worldx() + Mathf.range(tilesize / 2f),
+                        tile.worldy() + Mathf.range(tilesize / 2f),
                         unit);
             }
 
             if(Mathf.chance(0.06 * Timers.delta())){
                 Effects.effect(BlockFx.pulverizeSmall,
-                        tile.worldx() + Mathf.range(tilesize/2f),
-                        tile.worldy() + Mathf.range(tilesize/2f), 0f, item.color);
+                        tile.worldx() + Mathf.range(tilesize / 2f),
+                        tile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
             }
         }
     }
 
-    /**Draw placement effects for an entity. This includes mining*/
+    /**
+     * Draw placement effects for an entity. This includes mining
+     */
     default void drawBuilding(Unit unit){
         BuildRequest request;
 
-        synchronized (getPlaceQueue()) {
-            if (!isBuilding()) {
-                if (getMineTile() != null) {
+        synchronized(getPlaceQueue()){
+            if(!isBuilding()){
+                if(getMineTile() != null){
                     drawMining(unit);
                 }
                 return;
@@ -255,7 +285,7 @@ public interface BuilderTrait extends Entity{
         float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
         float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
 
-        float sz = Vars.tilesize*tile.block().size/2f;
+        float sz = Vars.tilesize * tile.block().size / 2f;
         float ang = unit.angleTo(tile);
 
         tmptr[0].set(tile.drawx() - sz, tile.drawy() - sz);
@@ -286,14 +316,16 @@ public interface BuilderTrait extends Entity{
         Draw.color();
     }
 
-    /**Internal use only.*/
+    /**
+     * Internal use only.
+     */
     default void drawMining(Unit unit){
         Tile tile = getMineTile();
 
         if(tile == null) return;
 
         float focusLen = 4f + Mathf.absin(Timers.time(), 1.1f, 0.5f);
-        float swingScl = 12f, swingMag = tilesize/8f;
+        float swingScl = 12f, swingMag = tilesize / 8f;
         float flashScl = 0.3f;
 
         float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
@@ -302,10 +334,10 @@ public interface BuilderTrait extends Entity{
         float ex = tile.worldx() + Mathf.sin(Timers.time() + 48, swingScl, swingMag);
         float ey = tile.worldy() + Mathf.sin(Timers.time() + 48, swingScl + 2f, swingMag);
 
-        Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f-flashScl + Mathf.absin(Timers.time(), 0.5f, flashScl));
+        Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f - flashScl + Mathf.absin(Timers.time(), 0.5f, flashScl));
         Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey);
 
-        if(unit instanceof Player && ((Player) unit).isLocal) {
+        if(unit instanceof Player && ((Player) unit).isLocal){
             Draw.color(Palette.accent);
             Lines.poly(tile.worldx(), tile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Timers.time());
         }
@@ -313,16 +345,20 @@ public interface BuilderTrait extends Entity{
         Draw.color();
     }
 
-    /**Class for storing build requests. Can be either a place or remove request.*/
-    class BuildRequest {
+    /**
+     * Class for storing build requests. Can be either a place or remove request.
+     */
+    class BuildRequest{
         public final int x, y, rotation;
         public final Recipe recipe;
         public final boolean remove;
 
         public float progress;
 
-        /**This creates a build request.*/
-        public BuildRequest(int x, int y, int rotation, Recipe recipe) {
+        /**
+         * This creates a build request.
+         */
+        public BuildRequest(int x, int y, int rotation, Recipe recipe){
             this.x = x;
             this.y = y;
             this.rotation = rotation;
@@ -330,8 +366,10 @@ public interface BuilderTrait extends Entity{
             this.remove = false;
         }
 
-        /**This creates a remove request.*/
-        public BuildRequest(int x, int y) {
+        /**
+         * This creates a remove request.
+         */
+        public BuildRequest(int x, int y){
             this.x = x;
             this.y = y;
             this.rotation = -1;

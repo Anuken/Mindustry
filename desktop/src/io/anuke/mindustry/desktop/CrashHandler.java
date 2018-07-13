@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class CrashHandler {
+public class CrashHandler{
 
     public static void handle(Throwable e){
         //TODO send full error report to server via HTTP
@@ -24,7 +24,7 @@ public class CrashHandler {
             netActive = Net.active();
             netServer = Net.server();
             Net.dispose();
-        }catch (Throwable p){
+        }catch(Throwable p){
             p.printStackTrace();
         }
 
@@ -39,8 +39,8 @@ public class CrashHandler {
             header += "Net Active: " + netActive + "\n";
             header += "Net Server: " + netServer + "\n";
             header += "OS: " + System.getProperty("os.name") + "\n";
-            header += "Multithreading: " + Settings.getBool("multithread")+ "\n----\n";
-        }catch (Throwable e4){
+            header += "Multithreading: " + Settings.getBool("multithread") + "\n----\n";
+        }catch(Throwable e4){
             header += "\n--error getting additional info--\n";
             e4.printStackTrace();
         }
@@ -55,16 +55,16 @@ public class CrashHandler {
         try{
             filename = "crash-report-" + new SimpleDateFormat("dd-MM-yy h.mm.ss").format(new Date()) + ".txt";
             Files.write(Paths.get(System.getProperty("user.home"), "mindustry-crash-reports", filename), result.getBytes());
-        }catch (Throwable i){
+        }catch(Throwable i){
             i.printStackTrace();
             failed = true;
         }
 
         try{
             javax.swing.JOptionPane.showMessageDialog(null, "An error has occured: \n" + result + "\n\n" +
-                (!failed ? "A crash report has been written to " + new File(filename).getAbsolutePath() + ".\nPlease send this file to the developer!"
-                        : "Failed to generate crash report.\nPlease send an image of this crash log to the developer!"));
-        }catch (Throwable i){
+                    (!failed ? "A crash report has been written to " + new File(filename).getAbsolutePath() + ".\nPlease send this file to the developer!"
+                            : "Failed to generate crash report.\nPlease send an image of this crash log to the developer!"));
+        }catch(Throwable i){
             i.printStackTrace();
             //what now?
         }

@@ -10,11 +10,11 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
-public class UnitFx extends FxList implements ContentList {
+public class UnitFx extends FxList implements ContentList{
     public static Effect vtolHover, unitDrop, unitPickup, pickup;
 
     @Override
-    public void load() {
+    public void load(){
 
         vtolHover = new Effect(40f, e -> {
             float len = e.finpow() * 10f;

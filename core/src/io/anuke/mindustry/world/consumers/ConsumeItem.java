@@ -9,50 +9,50 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-public class ConsumeItem extends Consume {
+public class ConsumeItem extends Consume{
     private final Item item;
     private final int amount;
 
-    public ConsumeItem(Item item) {
+    public ConsumeItem(Item item){
         this.item = item;
         this.amount = 1;
     }
 
-    public ConsumeItem(Item item, int amount) {
+    public ConsumeItem(Item item, int amount){
         this.item = item;
         this.amount = amount;
     }
 
-    public int getAmount() {
+    public int getAmount(){
         return amount;
     }
 
-    public Item get() {
+    public Item get(){
         return item;
     }
 
     @Override
-    public void buildTooltip(Table table) {
-        table.add(new ItemImage(new ItemStack(item, amount))).size(8*4);
+    public void buildTooltip(Table table){
+        table.add(new ItemImage(new ItemStack(item, amount))).size(8 * 4);
     }
 
     @Override
-    public String getIcon() {
+    public String getIcon(){
         return "icon-item";
     }
 
     @Override
-    public void update(Block block, TileEntity entity) {
+    public void update(Block block, TileEntity entity){
         //doesn't update because consuming items is very specific
     }
 
     @Override
-    public boolean valid(Block block, TileEntity entity) {
+    public boolean valid(Block block, TileEntity entity){
         return entity.items.has(item, amount);
     }
 
     @Override
-    public void display(BlockStats stats) {
+    public void display(BlockStats stats){
         stats.add(BlockStat.inputItem, item);
     }
 }

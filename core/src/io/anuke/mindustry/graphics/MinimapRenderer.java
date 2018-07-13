@@ -54,7 +54,7 @@ public class MinimapRenderer implements Disposable{
 
     public void zoomBy(int amount){
         zoom += amount;
-        zoom = Mathf.clamp(zoom, 1, Math.min(world.width(), world.height())/baseSize/2);
+        zoom = Mathf.clamp(zoom, 1, Math.min(world.width(), world.height()) / baseSize / 2);
     }
 
     public void reset(){
@@ -71,10 +71,10 @@ public class MinimapRenderer implements Disposable{
         int sz = baseSize * zoom;
         float dx = (Core.camera.position.x / tilesize);
         float dy = (Core.camera.position.y / tilesize);
-        dx = Mathf.clamp(dx, sz, world.width()-sz);
-        dy = Mathf.clamp(dy, sz, world.height()-sz);
+        dx = Mathf.clamp(dx, sz, world.width() - sz);
+        dy = Mathf.clamp(dy, sz, world.height() - sz);
 
-        synchronized (units){
+        synchronized(units){
             rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
             Graphics.flush();
 
@@ -93,24 +93,24 @@ public class MinimapRenderer implements Disposable{
         }
     }
 
-    public TextureRegion getRegion() {
+    public TextureRegion getRegion(){
         if(texture == null) return null;
 
         int sz = Mathf.clamp(baseSize * zoom, baseSize, Math.min(world.width(), world.height()));
         float dx = (Core.camera.position.x / tilesize);
         float dy = (Core.camera.position.y / tilesize);
-        dx = Mathf.clamp(dx, sz, world.width()-sz);
-        dy = Mathf.clamp(dy, sz, world.height()-sz);
+        dx = Mathf.clamp(dx, sz, world.width() - sz);
+        dy = Mathf.clamp(dy, sz, world.height() - sz);
         float invTexWidth = 1f / texture.getWidth();
         float invTexHeight = 1f / texture.getHeight();
-        float x = dx - sz, y = world.height()-dy - sz, width = sz*2, height = sz*2;
+        float x = dx - sz, y = world.height() - dy - sz, width = sz * 2, height = sz * 2;
         region.setRegion(x * invTexWidth, y * invTexHeight, (x + width) * invTexWidth, (y + height) * invTexHeight);
         return region;
     }
 
     public void updateAll(){
-        for(int x = 0; x < world.width(); x ++){
-            for(int y = 0; y < world.height(); y ++){
+        for(int x = 0; x < world.width(); x++){
+            for(int y = 0; y < world.height(); y++){
                 pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, colorFor(world.tile(x, y)));
             }
         }
@@ -128,10 +128,10 @@ public class MinimapRenderer implements Disposable{
         int sz = baseSize * zoom;
         float dx = (Core.camera.position.x / tilesize);
         float dy = (Core.camera.position.y / tilesize);
-        dx = Mathf.clamp(dx, sz, world.width()-sz);
-        dy = Mathf.clamp(dy, sz, world.height()-sz);
+        dx = Mathf.clamp(dx, sz, world.width() - sz);
+        dy = Mathf.clamp(dy, sz, world.height() - sz);
 
-        synchronized (units) {
+        synchronized(units){
             rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
             units.clear();
             Units.getNearby(rect, units::add);
@@ -142,7 +142,7 @@ public class MinimapRenderer implements Disposable{
         int color = tile.breakable() ? tile.target().getTeam().intColor : ColorMapper.getBlockColor(tile.block());
         if(color == 0) color = ColorMapper.getBlockColor(tile.floor());
         if(tile.elevation > 0){
-            float mul = 1.1f+tile.elevation/4f;
+            float mul = 1.1f + tile.elevation / 4f;
             tmpColor.set(color);
             tmpColor.mul(mul, mul, mul, 1f);
             color = Color.rgba8888(tmpColor);
@@ -151,7 +151,7 @@ public class MinimapRenderer implements Disposable{
     }
 
     @Override
-    public void dispose() {
+    public void dispose(){
         pixmap.dispose();
         texture.dispose();
         texture = null;

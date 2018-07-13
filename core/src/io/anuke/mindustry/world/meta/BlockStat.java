@@ -2,8 +2,10 @@ package io.anuke.mindustry.world.meta;
 
 import io.anuke.ucore.util.Bundles;
 
-/**Describes one type of stat for a block.*/
-public enum BlockStat {
+/**
+ * Describes one type of stat for a block.
+ */
+public enum BlockStat{
     health(StatCategory.general),
     size(StatCategory.general),
 
@@ -41,14 +43,12 @@ public enum BlockStat {
     shots(StatCategory.shooting),
     reload(StatCategory.shooting),
     powerShot(StatCategory.shooting),
-    targetsAir(StatCategory.shooting)
-,
-    ;
+    targetsAir(StatCategory.shooting),;
 
 
     public final StatCategory category;
 
-    BlockStat(StatCategory category) {
+    BlockStat(StatCategory category){
         this.category = category;
     }
 

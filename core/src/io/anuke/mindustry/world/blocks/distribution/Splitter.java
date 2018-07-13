@@ -35,9 +35,9 @@ public class Splitter extends Block{
     Tile getTileTarget(Item item, Tile tile, Tile source, boolean flip){
         Array<Tile> proximity = tile.entity.proximity();
         int counter = tile.getDump();
-        for (int i = 0; i < proximity.size; i++) {
+        for(int i = 0; i < proximity.size; i++){
             Tile other = proximity.get((i + counter) % proximity.size);
-            if(flip) tile.setDump((byte)((tile.getDump() + 1) % proximity.size));
+            if(flip) tile.setDump((byte) ((tile.getDump() + 1) % proximity.size));
             if(other != source && !(source.block().instantTransfer && other.block().instantTransfer) && !(other.block() instanceof Splitter) &&
                     other.block().acceptItem(item, other, Edges.getFacingEdge(tile, other))){
                 return other;

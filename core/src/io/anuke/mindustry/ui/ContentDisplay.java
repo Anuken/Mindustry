@@ -18,16 +18,16 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
-public class ContentDisplay {
+public class ContentDisplay{
 
     public static void displayRecipe(Table table, Recipe recipe){
         Block block = recipe.result;
 
         table.table(title -> {
-            int size = 8*6;
+            int size = 8 * 6;
 
             if(block instanceof Turret){
-                size = (8 * block.size + 2) * (7 - block.size*2);
+                size = (8 * block.size + 2) * (7 - block.size * 2);
             }
 
             title.addImage(Draw.region("block-icon-" + block.name)).size(size);
@@ -58,7 +58,7 @@ public class ContentDisplay {
             table.add("$text.category." + cat.name()).color(Palette.accent).fillX();
             table.row();
 
-            for (BlockStat stat : map.keys()){
+            for(BlockStat stat : map.keys()){
                 table.table(inset -> {
                     inset.left();
                     inset.add("[LIGHT_GRAY]" + stat.localized() + ":[] ");
@@ -92,13 +92,13 @@ public class ContentDisplay {
 
         table.left().defaults().fillX();
 
-        table.add(Bundles.format("text.item.explosiveness", (int)(item.explosiveness * 100)));
+        table.add(Bundles.format("text.item.explosiveness", (int) (item.explosiveness * 100)));
         table.row();
-        table.add(Bundles.format("text.item.flammability", (int)(item.flammability * 100)));
+        table.add(Bundles.format("text.item.flammability", (int) (item.flammability * 100)));
         table.row();
-        table.add(Bundles.format("text.item.radioactivity", (int)(item.radioactivity * 100)));
+        table.add(Bundles.format("text.item.radioactivity", (int) (item.radioactivity * 100)));
         table.row();
-        table.add(Bundles.format("text.item.fluxiness", (int)(item.fluxiness * 100)));
+        table.add(Bundles.format("text.item.fluxiness", (int) (item.fluxiness * 100)));
         table.row();
         table.add(Bundles.format("text.item.hardness", item.hardness));
         table.row();
@@ -127,15 +127,15 @@ public class ContentDisplay {
 
         table.left().defaults().fillX();
 
-        table.add(Bundles.format("text.item.explosiveness", (int)(liquid.explosiveness * 100)));
+        table.add(Bundles.format("text.item.explosiveness", (int) (liquid.explosiveness * 100)));
         table.row();
-        table.add(Bundles.format("text.item.flammability", (int)(liquid.flammability * 100)));
+        table.add(Bundles.format("text.item.flammability", (int) (liquid.flammability * 100)));
         table.row();
-        table.add(Bundles.format("text.liquid.heatcapacity", (int)(liquid.heatCapacity * 100)));
+        table.add(Bundles.format("text.liquid.heatcapacity", (int) (liquid.heatCapacity * 100)));
         table.row();
-        table.add(Bundles.format("text.liquid.temperature", (int)(liquid.temperature * 100)));
+        table.add(Bundles.format("text.liquid.temperature", (int) (liquid.temperature * 100)));
         table.row();
-        table.add(Bundles.format("text.liquid.viscosity", (int)(liquid.viscosity * 100)));
+        table.add(Bundles.format("text.liquid.viscosity", (int) (liquid.viscosity * 100)));
         table.row();
     }
 

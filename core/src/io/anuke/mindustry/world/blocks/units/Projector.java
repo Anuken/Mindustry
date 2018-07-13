@@ -11,7 +11,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
-public abstract class Projector extends Block {
+public abstract class Projector extends Block{
     protected final int timerApply = timers++;
     protected final float applyTime = 4f;
 
@@ -20,7 +20,7 @@ public abstract class Projector extends Block {
     protected StatusEffect status;
     protected float intensity = 1f;
 
-    public Projector(String name) {
+    public Projector(String name){
         super(name);
         hasPower = true;
         update = true;
@@ -35,7 +35,7 @@ public abstract class Projector extends Block {
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         ProjectorEntity entity = tile.entity();
 
         if(entity.cons.valid()){
@@ -44,7 +44,7 @@ public abstract class Projector extends Block {
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.01f);
         }
 
-        if(entity.heat > 0.6f && Timers.get(timerApply, applyTime)) {
+        if(entity.heat > 0.6f && Timers.get(timerApply, applyTime)){
             Units.getNearby(tile.getTeam(), tile.drawx(), tile.drawy(), range, unit -> {
                 unit.applyEffect(status, intensity);
             });
@@ -52,7 +52,7 @@ public abstract class Projector extends Block {
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new ProjectorEntity();
     }
 

@@ -13,44 +13,43 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.shieldGroup;
 
 //todo re-implement
-public class Shield extends BaseEntity implements DrawTrait {
-	public boolean active;
-	public boolean hitPlayers = false;
-	public float radius = 0f;
-	
-	private float uptime = 0f;
-	private final Tile tile;
-	
-	public Shield(Tile tile){
-		this.tile = tile;
-		this.x = tile.worldx();
-		this.y = tile.worldy();
-	}
-	
-	public float drawSize(){
-		return 150;
-	}
-	
-	@Override
-	public void update(){
-		float alpha = 0.1f;
-		Interpolation interp = Interpolation.fade;
-		
-		if(active){
-			uptime = interp.apply(uptime, 1f, alpha * Timers.delta());
-		}else{
-			uptime = interp.apply(uptime, 0f, alpha * Timers.delta());
-			if(uptime <= 0.05f)
-				remove();
-		}
-		uptime = Mathf.clamp(uptime);
-		
-		if(!(tile.block() instanceof ShieldBlock)){
-			remove();
-			return;
-		}
-		
-		ShieldBlock block = (ShieldBlock)tile.block();
+public class Shield extends BaseEntity implements DrawTrait{
+    private final Tile tile;
+    public boolean active;
+    public boolean hitPlayers = false;
+    public float radius = 0f;
+    private float uptime = 0f;
+
+    public Shield(Tile tile){
+        this.tile = tile;
+        this.x = tile.worldx();
+        this.y = tile.worldy();
+    }
+
+    public float drawSize(){
+        return 150;
+    }
+
+    @Override
+    public void update(){
+        float alpha = 0.1f;
+        Interpolation interp = Interpolation.fade;
+
+        if(active){
+            uptime = interp.apply(uptime, 1f, alpha * Timers.delta());
+        }else{
+            uptime = interp.apply(uptime, 0f, alpha * Timers.delta());
+            if(uptime <= 0.05f)
+                remove();
+        }
+        uptime = Mathf.clamp(uptime);
+
+        if(!(tile.block() instanceof ShieldBlock)){
+            remove();
+            return;
+        }
+
+        ShieldBlock block = (ShieldBlock) tile.block();
 
 		/*
 		Entities.getNearby(bulletGroup, x, y, block.shieldRadius * 2*uptime + 10, entity->{
@@ -64,39 +63,39 @@ public class Shield extends BaseEntity implements DrawTrait {
 				}
 			}
 		});*/
-	}
-	
-	@Override
-	public void draw(){
-		if(!(tile.block() instanceof ShieldBlock) || radius <= 1f){
-			return;
-		}
+    }
 
-		Fill.circle(x, y, drawRadius());
-	}
-	
-	float drawRadius(){
-		return (radius + Mathf.sin(Timers.time(), 25f, 1f));
-	}
-	
-	public void removeDelay(){
-		active = false;
-	}
+    @Override
+    public void draw(){
+        if(!(tile.block() instanceof ShieldBlock) || radius <= 1f){
+            return;
+        }
 
-	@Override
-	public EntityGroup targetGroup() {
-		return shieldGroup;
-	}
+        Fill.circle(x, y, drawRadius());
+    }
 
-	@Override
-	public void added(){
-		active = true;
-	}
-	
-	@Override
-	public void removed(){
-		active = false;
-		uptime = 0f;
-	}
-	
+    float drawRadius(){
+        return (radius + Mathf.sin(Timers.time(), 25f, 1f));
+    }
+
+    public void removeDelay(){
+        active = false;
+    }
+
+    @Override
+    public EntityGroup targetGroup(){
+        return shieldGroup;
+    }
+
+    @Override
+    public void added(){
+        active = true;
+    }
+
+    @Override
+    public void removed(){
+        active = false;
+        uptime = 0f;
+    }
+
 }

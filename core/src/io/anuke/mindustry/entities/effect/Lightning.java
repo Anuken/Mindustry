@@ -46,7 +46,15 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
     private Color color = Palette.lancerLaser;
     private SeedRandom random = new SeedRandom();
 
-    /**Create a lighting branch at a location. Use Team.none to damage everyone.*/
+    /**
+     * For pooling use only. Do not call directly!
+     */
+    public Lightning(){
+    }
+
+    /**
+     * Create a lighting branch at a location. Use Team.none to damage everyone.
+     */
     public static void create(Team team, Effect effect, Color color, float damage, float x, float y, float targetAngle, int length){
         CallEntity.createLighting(lastSeed++, team, effect, color, damage, x, y, targetAngle, length);
     }
@@ -69,7 +77,7 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
 
         Units.getNearbyEnemies(team, rect, entities::add);
 
-        for(int i = 0; i < length; i ++){
+        for(int i = 0; i < length; i++){
             l.lines.add(new Vector2(x, y));
 
             float fx = x, fy = y;
@@ -82,15 +90,15 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
 
             Units.getNearbyEnemies(team, rect, entity -> {
                 float dst = entity.distanceTo(x2, y2);
-                if(dst < attractRange) {
+                if(dst < attractRange){
                     angle = Mathf.slerp(angle, Angles.angle(x2, y2, entity.x, entity.y), (attractRange - dst) / attractRange / 4f);
                 }
 
                 entity.getHitbox(hitrect);
-                hitrect.x -= range/2f;
-                hitrect.y -= range/2f;
-                hitrect.width += range/2f;
-                hitrect.height += range/2f;
+                hitrect.x -= range / 2f;
+                hitrect.y -= range / 2f;
+                hitrect.width += range / 2f;
+                hitrect.height += range / 2f;
 
                 if(hitrect.contains(x2, y2) || hitrect.contains(fx, fy)){
                     float result = damage;
@@ -104,7 +112,7 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
             });
 
             if(l.random.chance(0.1f)){
-                createLighting(l.random.nextInt(), team, effect, color, damage, x2, y2, angle + l.random.range(100f), length/3);
+                createLighting(l.random.nextInt(), team, effect, color, damage, x2, y2, angle + l.random.range(100f), length / 3);
             }
 
             x = x2;
@@ -115,47 +123,44 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
         l.add();
     }
 
-    /**For pooling use only. Do not call directly!*/
-    public Lightning(){}
-
     @Override
-    public boolean isSyncing() {
+    public boolean isSyncing(){
         return false;
     }
 
     @Override
-    public void write(DataOutput data) throws IOException {
+    public void write(DataOutput data) throws IOException{
 
     }
 
     @Override
-    public void read(DataInput data, long time) throws IOException {
+    public void read(DataInput data, long time) throws IOException{
 
     }
 
     @Override
-    public float lifetime() {
+    public float lifetime(){
         return 10;
     }
 
     @Override
-    public void reset() {
+    public void reset(){
         color = Palette.lancerLaser;
         lines.clear();
     }
 
     @Override
-    public void removed() {
+    public void removed(){
         Pooling.free(this);
     }
 
     @Override
-    public void draw() {
+    public void draw(){
         float lx = x, ly = y;
         Draw.color(color, Color.WHITE, fin());
-        for(int i = 0; i < lines.size; i ++){
+        for(int i = 0; i < lines.size; i++){
             Vector2 v = lines.get(i);
-            Lines.stroke(fout() * 3f + 1f-(float)i/lines.size);
+            Lines.stroke(fout() * 3f + 1f - (float) i / lines.size);
             Lines.line(lx, ly, v.x, v.y);
             lx = v.x;
             ly = v.y;
@@ -164,7 +169,7 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
     }
 
     @Override
-    public EntityGroup targetGroup() {
+    public EntityGroup targetGroup(){
         return bulletGroup;
     }
 }

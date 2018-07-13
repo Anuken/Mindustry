@@ -25,76 +25,80 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Log;
 
-/**Loads all game content.
- * Call load() before doing anything with content.*/
-public class ContentLoader {
+/**
+ * Loads all game content.
+ * Call load() before doing anything with content.
+ */
+public class ContentLoader{
     private static boolean loaded = false;
     private static ObjectSet<Array<? extends Content>> contentSet = new OrderedSet<>();
     private static OrderedMap<String, Array<Content>> contentMap = new OrderedMap<>();
     private static ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
     private static ContentList[] content = {
-        //effects
-        new BlockFx(),
-        new BulletFx(),
-        new EnvironmentFx(),
-        new ExplosionFx(),
-        new Fx(),
-        new ShootFx(),
-        new UnitFx(),
+            //effects
+            new BlockFx(),
+            new BulletFx(),
+            new EnvironmentFx(),
+            new ExplosionFx(),
+            new Fx(),
+            new ShootFx(),
+            new UnitFx(),
 
-        //items
-        new Items(),
+            //items
+            new Items(),
 
-        //status effects
-        new StatusEffects(),
+            //status effects
+            new StatusEffects(),
 
-        //liquids
-        new Liquids(),
+            //liquids
+            new Liquids(),
 
-        //bullets
-        new ArtilleryBullets(),
-        new FlakBullets(),
-        new MissileBullets(),
-        new StandardBullets(),
-        new TurretBullets(),
-        new WeaponBullets(),
+            //bullets
+            new ArtilleryBullets(),
+            new FlakBullets(),
+            new MissileBullets(),
+            new StandardBullets(),
+            new TurretBullets(),
+            new WeaponBullets(),
 
 
-        //ammotypes
-        new AmmoTypes(),
+            //ammotypes
+            new AmmoTypes(),
 
-        //weapons
-        new Weapons(),
+            //weapons
+            new Weapons(),
 
-        //mechs
-        new Mechs(),
+            //mechs
+            new Mechs(),
 
-        //units
-        new UnitTypes(),
+            //units
+            new UnitTypes(),
 
-        //blocks
-        new Blocks(),
-        new DefenseBlocks(),
-        new DistributionBlocks(),
-        new ProductionBlocks(),
-        new TurretBlocks(),
-        new DebugBlocks(),
-        new LiquidBlocks(),
-        new StorageBlocks(),
-        new UnitBlocks(),
-        new PowerBlocks(),
-        new CraftingBlocks(),
-        new UpgradeBlocks(),
-        new OreBlocks(),
+            //blocks
+            new Blocks(),
+            new DefenseBlocks(),
+            new DistributionBlocks(),
+            new ProductionBlocks(),
+            new TurretBlocks(),
+            new DebugBlocks(),
+            new LiquidBlocks(),
+            new StorageBlocks(),
+            new UnitBlocks(),
+            new PowerBlocks(),
+            new CraftingBlocks(),
+            new UpgradeBlocks(),
+            new OreBlocks(),
 
-        //not really a content class, but this makes initialization easier
-        new ColorMapper(),
+            //not really a content class, but this makes initialization easier
+            new ColorMapper(),
 
-        //recipes
-        new Recipes(),
+            //recipes
+            new Recipes(),
     };
 
-    /**Creates all content types.*/
+    /**
+     * Creates all content types.
+     */
     public static void load(){
         if(loaded){
             Log.info("Content already loaded, skipping.");
@@ -103,11 +107,11 @@ public class ContentLoader {
 
         registerTypes();
 
-        for (ContentList list : content){
+        for(ContentList list : content){
             list.load();
         }
 
-        for (ContentList list : content){
+        for(ContentList list : content){
             if(list.getAll().size != 0){
                 String type = list.getAll().first().getContentTypeName();
 
@@ -134,7 +138,9 @@ public class ContentLoader {
         loaded = true;
     }
 
-    /**Initializes all content with the specified function.*/
+    /**
+     * Initializes all content with the specified function.
+     */
     public static void initialize(Consumer<Content> callable){
         if(initialization.contains(callable)) return;
 
@@ -155,8 +161,10 @@ public class ContentLoader {
         return contentMap;
     }
 
-    /**Registers sync IDs for all types of sync entities.
-     * Do not register units here!*/
+    /**
+     * Registers sync IDs for all types of sync entities.
+     * Do not register units here!
+     */
     private static void registerTypes(){
         TypeTrait.registerType(Player.class, Player::new);
         TypeTrait.registerType(ItemDrop.class, ItemDrop::new);

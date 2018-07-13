@@ -3,30 +3,30 @@ package io.anuke.mindustry.content;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.StatusController.StatusEntry;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
-public class StatusEffects implements ContentList {
+public class StatusEffects implements ContentList{
     public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded;
 
     @Override
-    public void load() {
+    public void load(){
 
         none = new StatusEffect(0);
 
-        burning = new StatusEffect(4 * 60f) {
+        burning = new StatusEffect(4 * 60f){
             {
                 oppositeScale = 0.5f;
             }
 
             @Override
-            public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result) {
-                if (to == tarred) {
+            public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
+                if(to == tarred){
                     unit.damage(1f);
                     Effects.effect(EnvironmentFx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                     return result.set(this, Math.min(time + newTime, baseDuration + tarred.baseDuration));
@@ -36,45 +36,45 @@ public class StatusEffects implements ContentList {
             }
 
             @Override
-            public void update(Unit unit, float time) {
+            public void update(Unit unit, float time){
                 unit.damagePeriodic(0.04f);
 
-                if (Mathf.chance(Timers.delta() * 0.2f)) {
+                if(Mathf.chance(Timers.delta() * 0.2f)){
                     Effects.effect(EnvironmentFx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
         };
 
-        freezing = new StatusEffect(5 * 60f) {
+        freezing = new StatusEffect(5 * 60f){
             {
                 oppositeScale = 0.4f;
                 speedMultiplier = 0.7f;
             }
 
             @Override
-            public void update(Unit unit, float time) {
+            public void update(Unit unit, float time){
 
-                if (Mathf.chance(Timers.delta() * 0.15f)) {
+                if(Mathf.chance(Timers.delta() * 0.15f)){
                     Effects.effect(EnvironmentFx.freezing, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
         };
 
-        wet = new StatusEffect(3 * 60f) {
+        wet = new StatusEffect(3 * 60f){
             {
                 oppositeScale = 0.5f;
                 speedMultiplier = 0.999f;
             }
 
             @Override
-            public void update(Unit unit, float time) {
-                if (Mathf.chance(Timers.delta() * 0.15f)) {
+            public void update(Unit unit, float time){
+                if(Mathf.chance(Timers.delta() * 0.15f)){
                     Effects.effect(EnvironmentFx.wet, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
         };
 
-        melting = new StatusEffect(5 * 60f) {
+        melting = new StatusEffect(5 * 60f){
             {
                 oppositeScale = 0.2f;
                 speedMultiplier = 0.8f;
@@ -82,8 +82,8 @@ public class StatusEffects implements ContentList {
             }
 
             @Override
-            public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result) {
-                if (to == tarred) {
+            public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
+                if(to == tarred){
                     return result.set(this, Math.min(time + newTime / 2f, baseDuration));
                 }
 
@@ -91,30 +91,30 @@ public class StatusEffects implements ContentList {
             }
 
             @Override
-            public void update(Unit unit, float time) {
+            public void update(Unit unit, float time){
                 unit.damagePeriodic(0.3f);
 
-                if (Mathf.chance(Timers.delta() * 0.2f)) {
+                if(Mathf.chance(Timers.delta() * 0.2f)){
                     Effects.effect(EnvironmentFx.melting, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
         };
 
-        tarred = new StatusEffect(4 * 60f) {
+        tarred = new StatusEffect(4 * 60f){
             {
                 speedMultiplier = 0.6f;
             }
 
             @Override
-            public void update(Unit unit, float time) {
-                if (Mathf.chance(Timers.delta() * 0.15f)) {
+            public void update(Unit unit, float time){
+                if(Mathf.chance(Timers.delta() * 0.15f)){
                     Effects.effect(EnvironmentFx.oily, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
 
             @Override
-            public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result) {
-                if (to == melting || to == burning) {
+            public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
+                if(to == melting || to == burning){
                     return result.set(to, newTime + time);
                 }
 
@@ -122,7 +122,7 @@ public class StatusEffects implements ContentList {
             }
         };
 
-        overdrive = new StatusEffect(6f) {
+        overdrive = new StatusEffect(6f){
             {
                 armorMultiplier = 0.95f;
                 speedMultiplier = 1.05f;
@@ -130,13 +130,13 @@ public class StatusEffects implements ContentList {
             }
 
             @Override
-            public void update(Unit unit, float time) {
+            public void update(Unit unit, float time){
                 //idle regen boosted
                 unit.health += 0.01f * Timers.delta();
             }
         };
 
-        shielded = new StatusEffect(6f) {
+        shielded = new StatusEffect(6f){
             {
                 armorMultiplier = 3f;
             }
@@ -149,7 +149,7 @@ public class StatusEffects implements ContentList {
     }
 
     @Override
-    public Array<? extends Content> getAll() {
+    public Array<? extends Content> getAll(){
         return StatusEffect.all();
     }
 }

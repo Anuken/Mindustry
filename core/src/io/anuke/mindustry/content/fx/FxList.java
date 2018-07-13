@@ -7,7 +7,7 @@ import io.anuke.mindustry.type.ContentList;
 public abstract class FxList implements ContentList{
 
     @Override
-    public Array<? extends Content> getAll() {
+    public Array<? extends Content> getAll(){
         return Array.with();
     }
 }

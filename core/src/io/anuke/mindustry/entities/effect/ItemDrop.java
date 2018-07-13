@@ -35,7 +35,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawTrait, VelocityTrait, TimeTrait, TargetTrait, Poolable {
+public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawTrait, VelocityTrait, TimeTrait, TargetTrait, Poolable{
     private static final float sinkLifetime = 80f;
 
     private Interpolator interpolator = new Interpolator();
@@ -45,6 +45,14 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
     private Vector2 velocity = new Vector2();
     private float time;
     private float sinktime;
+
+    /**
+     * Internal use only!
+     */
+    public ItemDrop(){
+        hitbox.setSize(5f);
+        hitboxTile.setSize(5f);
+    }
 
     public static ItemDrop create(Item item, int amount, float x, float y, float angle){
         ItemDrop drop = new ItemDrop();
@@ -73,13 +81,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
         }
     }
 
-    /**Internal use only!*/
-    public ItemDrop(){
-        hitbox.setSize(5f);
-        hitboxTile.setSize(5f);
-    }
-
-    public Item getItem() {
+    public Item getItem(){
         return item;
     }
 
@@ -88,66 +90,66 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
     }
 
     @Override
-    public boolean isDead() {
+    public boolean isDead(){
         return !isAdded();
     }
 
     @Override
-    public Team getTeam() {
+    public Team getTeam(){
         return Team.none;
     }
 
     @Override
-    public float lifetime() {
-        return 60*60;
+    public float lifetime(){
+        return 60 * 60;
     }
 
     @Override
-    public void time(float time) {
+    public void time(float time){
         this.time = time;
     }
 
     @Override
-    public float time() {
+    public float time(){
         return time;
     }
 
     @Override
-    public Vector2 getVelocity() {
+    public Vector2 getVelocity(){
         return velocity;
     }
 
     @Override
-    public boolean collides(SolidTrait other) {
+    public boolean collides(SolidTrait other){
         return other instanceof Player && time > 20f;
     }
 
     @Override
-    public void collision(SolidTrait other, float x, float y) {
-        Unit player = (Unit)other;
+    public void collision(SolidTrait other, float x, float y){
+        Unit player = (Unit) other;
         if(player.inventory.canAcceptItem(item, 1)){
             int used = Math.min(amount, player.inventory.capacity() - player.inventory.getItem().amount);
             player.inventory.addItem(item, used);
             amount -= used;
 
-            if(amount <= 0) {
+            if(amount <= 0){
                 CallEntity.onPickup(getID());
             }
         }
     }
 
     @Override
-    public void draw() {
-        float size = itemSize * (1f - sinktime/sinkLifetime) * (1f-Mathf.curve(fin(), 0.98f));
+    public void draw(){
+        float size = itemSize * (1f - sinktime / sinkLifetime) * (1f - Mathf.curve(fin(), 0.98f));
 
         Tile tile = world.tileWorld(x, y);
 
-        Draw.color(Color.WHITE, tile == null || !tile.floor().isLiquid ? Color.WHITE : tile.floor().liquidColor, sinktime/sinkLifetime);
+        Draw.color(Color.WHITE, tile == null || !tile.floor().isLiquid ? Color.WHITE : tile.floor().liquidColor, sinktime / sinkLifetime);
         Draw.rect(item.region, x, y, size, size);
 
         int stored = Mathf.clamp(amount / 6, 1, 8);
 
-        for(int i = 0; i < stored; i ++) {
+        for(int i = 0; i < stored; i++){
             float px = stored == 1 ? 0 : Mathf.randomSeedRange(i + 1, 4f);
             float py = stored == 1 ? 0 : Mathf.randomSeedRange(i + 2, 4f);
             Draw.rect(item.region, x + px, y + py, size, size);
@@ -157,8 +159,8 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
     }
 
     @Override
-    public void update() {
-        if(Net.client()) {
+    public void update(){
+        if(Net.client()){
             interpolate();
         }else{
             updateVelocity(0.2f);
@@ -190,28 +192,28 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
     }
 
     @Override
-    public void reset() {
+    public void reset(){
         time = 0f;
         interpolator.reset();
     }
 
     @Override
-    public Interpolator getInterpolator() {
+    public Interpolator getInterpolator(){
         return interpolator;
     }
 
     @Override
-    public float drawSize() {
+    public float drawSize(){
         return 10;
     }
 
     @Override
-    public EntityGroup targetGroup() {
+    public EntityGroup targetGroup(){
         return itemGroup;
     }
 
     @Override
-    public void writeSave(DataOutput data) throws IOException {
+    public void writeSave(DataOutput data) throws IOException{
         data.writeFloat(x);
         data.writeFloat(y);
         data.writeByte(item.id);
@@ -219,7 +221,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
     }
 
     @Override
-    public void readSave(DataInput data) throws IOException {
+    public void readSave(DataInput data) throws IOException{
         x = data.readFloat();
         y = data.readFloat();
         item = Item.getByID(data.readByte());

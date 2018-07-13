@@ -6,11 +6,11 @@ import io.anuke.mindustry.entities.units.types.*;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
 
-public class UnitTypes implements ContentList {
+public class UnitTypes implements ContentList{
     public static UnitType drone, scout, vtol, monsoon, titan, fabricator;
 
     @Override
-    public void load() {
+    public void load(){
         drone = new UnitType("drone", Drone.class, Drone::new){{
             isFlying = true;
             drag = 0.01f;
@@ -73,7 +73,7 @@ public class UnitTypes implements ContentList {
     }
 
     @Override
-    public Array<? extends Content> getAll() {
+    public Array<? extends Content> getAll(){
         return UnitType.all();
     }
 }

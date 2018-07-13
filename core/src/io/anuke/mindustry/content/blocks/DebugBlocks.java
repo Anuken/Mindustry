@@ -28,45 +28,52 @@ import java.io.IOException;
 public class DebugBlocks extends BlockList implements ContentList{
     public static Block powerVoid, powerInfinite, itemSource, liquidSource, itemVoid;
 
+    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+    public static void setLiquidSourceLiquid(Player player, Tile tile, Liquid liquid){
+        LiquidSourceEntity entity = tile.entity();
+        entity.source = liquid;
+    }
+
     @Override
-    public void load() {
-        powerVoid = new PowerBlock("powervoid") {
+    public void load(){
+        powerVoid = new PowerBlock("powervoid"){
             {
                 powerCapacity = Float.MAX_VALUE;
             }
         };
 
-        powerInfinite = new PowerNode("powerinfinite") {
+        powerInfinite = new PowerNode("powerinfinite"){
             {
                 powerCapacity = 10000f;
                 powerSpeed = 100f;
             }
 
             @Override
-            public void update(Tile tile) {
+            public void update(Tile tile){
                 super.update(tile);
                 tile.entity.power.amount = powerCapacity;
             }
         };
 
-        itemSource = new Sorter("itemsource") {
+        itemSource = new Sorter("itemsource"){
             {
                 hasItems = true;
             }
+
             @Override
-            public void update(Tile tile) {
+            public void update(Tile tile){
                 SorterEntity entity = tile.entity();
                 entity.items.set(entity.sortItem, 1);
                 tryDump(tile, entity.sortItem);
             }
 
             @Override
-            public boolean acceptItem(Item item, Tile tile, Tile source) {
+            public boolean acceptItem(Item item, Tile tile, Tile source){
                 return false;
             }
         };
 
-        liquidSource = new Block("liquidsource") {
+        liquidSource = new Block("liquidsource"){
             {
                 update = true;
                 solid = true;
@@ -76,7 +83,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public void update(Tile tile) {
+            public void update(Tile tile){
                 LiquidSourceEntity entity = tile.entity();
 
                 tile.entity.liquids.add(entity.source, liquidCapacity);
@@ -84,7 +91,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public void draw(Tile tile) {
+            public void draw(Tile tile){
                 super.draw(tile);
 
                 LiquidSourceEntity entity = tile.entity();
@@ -95,7 +102,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public void buildTable(Tile tile, Table table) {
+            public void buildTable(Tile tile, Table table){
                 LiquidSourceEntity entity = tile.entity();
 
                 Array<Liquid> items = Liquid.all();
@@ -103,8 +110,8 @@ public class DebugBlocks extends BlockList implements ContentList{
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
                 Table cont = new Table();
 
-                for (int i = 0; i < items.size; i++) {
-                    if (i == 0) continue;
+                for(int i = 0; i < items.size; i++){
+                    if(i == 0) continue;
                     final int f = i;
                     ImageButton button = cont.addImageButton("white", "toggle", 24, () -> {
                         CallBlocks.setLiquidSourceLiquid(null, tile, items.get(f));
@@ -112,7 +119,7 @@ public class DebugBlocks extends BlockList implements ContentList{
                     button.getStyle().imageUpColor = items.get(i).color;
                     button.setChecked(entity.source.id == f);
 
-                    if (i % 4 == 3) {
+                    if(i % 4 == 3){
                         cont.row();
                     }
                 }
@@ -121,43 +128,37 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public TileEntity getEntity() {
+            public TileEntity getEntity(){
                 return new LiquidSourceEntity();
             }
         };
 
-        itemVoid = new Block("itemvoid") {
+        itemVoid = new Block("itemvoid"){
             {
                 update = solid = true;
             }
 
             @Override
-            public void handleItem(Item item, Tile tile, Tile source) {
+            public void handleItem(Item item, Tile tile, Tile source){
             }
 
             @Override
-            public boolean acceptItem(Item item, Tile tile, Tile source) {
+            public boolean acceptItem(Item item, Tile tile, Tile source){
                 return true;
             }
         };
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
-    public static void setLiquidSourceLiquid(Player player, Tile tile, Liquid liquid){
-        LiquidSourceEntity entity = tile.entity();
-        entity.source = liquid;
-    }
-
-    class LiquidSourceEntity extends TileEntity {
+    class LiquidSourceEntity extends TileEntity{
         public Liquid source = Liquids.water;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException {
+        public void write(DataOutputStream stream) throws IOException{
             stream.writeByte(source.id);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException {
+        public void read(DataInputStream stream) throws IOException{
             source = Liquid.getByID(stream.readByte());
         }
     }

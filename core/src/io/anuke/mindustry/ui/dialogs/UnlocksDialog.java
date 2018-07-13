@@ -15,9 +15,9 @@ import io.anuke.ucore.scene.utils.UIUtils;
 
 import static io.anuke.mindustry.Vars.control;
 
-public class UnlocksDialog extends FloatingDialog {
+public class UnlocksDialog extends FloatingDialog{
 
-    public UnlocksDialog() {
+    public UnlocksDialog(){
         super("$text.unlocks");
 
         addCloseButton();
@@ -38,7 +38,7 @@ public class UnlocksDialog extends FloatingDialog {
             Array<Content> array = allContent.get(key);
             if(array.size == 0 || !(array.first() instanceof UnlockableContent)) continue;
 
-            table.add("$content." +key + ".name").growX().left().color(Palette.accent);
+            table.add("$content." + key + ".name").growX().left().color(Palette.accent);
             table.row();
             table.addImage("white").growX().pad(5).padLeft(0).padRight(0).height(3).color(Palette.accent);
             table.row();
@@ -46,19 +46,19 @@ public class UnlocksDialog extends FloatingDialog {
                 list.left();
 
                 int maxWidth = UIUtils.portrait() ? 7 : 13;
-                int size = 8*6;
+                int size = 8 * 6;
 
                 int count = 0;
 
-                for (int i = 0; i < array.size; i++) {
-                    UnlockableContent unlock = (UnlockableContent)array.get(i);
+                for(int i = 0; i < array.size; i++){
+                    UnlockableContent unlock = (UnlockableContent) array.get(i);
 
                     if(unlock.isHidden()) continue;
 
                     Image image = control.database().isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked");
                     list.add(image).size(size).pad(3);
 
-                    if(control.database().isUnlocked(unlock)) {
+                    if(control.database().isUnlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));
                         image.addListener(new Tooltip<>(new Table("clear"){{
                             add(unlock.localizedName());

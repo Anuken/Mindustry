@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
@@ -18,17 +19,18 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class BlockConfigFragment extends Fragment {
+public class BlockConfigFragment extends Fragment{
     private Table table = new Table();
     private InputHandler input;
     private Tile configTile;
+    private Block configBlock;
 
     public BlockConfigFragment(InputHandler input){
         this.input = input;
     }
 
     @Override
-    public void build(Group parent) {
+    public void build(Group parent){
         parent.addChild(table);
     }
 
@@ -42,6 +44,7 @@ public class BlockConfigFragment extends Fragment {
 
     public void showConfig(Tile tile){
         configTile = tile;
+        configBlock = tile.block();
 
         table.setVisible(true);
         table.clear();
@@ -63,9 +66,9 @@ public class BlockConfigFragment extends Fragment {
             }
 
             table.setOrigin(Align.center);
-            Vector2 pos = Graphics.screen(tile.drawx(), tile.drawy() - tile.block().size * tilesize/2f - 1);
+            Vector2 pos = Graphics.screen(tile.drawx(), tile.drawy() - tile.block().size * tilesize / 2f - 1);
             table.setPosition(pos.x, pos.y, Align.top);
-            if(configTile == null || configTile.block() == Blocks.air){
+            if(configTile == null || configTile.block() == Blocks.air || configTile.block() != configBlock){
                 hideConfig();
             }
         });

@@ -21,169 +21,169 @@ import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
 
 public class Smelter extends Block{
-	protected final int timerDump = timers++;
-	protected final int timerCraft = timers++;
+    protected final int timerDump = timers++;
+    protected final int timerCraft = timers++;
 
-	protected Item result;
+    protected Item result;
 
-	protected float minFlux = 0.2f;
-	protected float baseFluxChance = 0.15f;
-	protected boolean useFlux = false;
+    protected float minFlux = 0.2f;
+    protected float baseFluxChance = 0.15f;
+    protected boolean useFlux = false;
 
-	protected float craftTime = 20f;
-	protected float burnDuration = 50f;
-	protected Effect craftEffect = BlockFx.smelt, burnEffect = BlockFx.fuelburn;
-	protected Color flameColor = Color.valueOf("ffb879");
+    protected float craftTime = 20f;
+    protected float burnDuration = 50f;
+    protected Effect craftEffect = BlockFx.smelt, burnEffect = BlockFx.fuelburn;
+    protected Color flameColor = Color.valueOf("ffb879");
 
-	public Smelter(String name) {
-		super(name);
-		update = true;
-		hasItems = true;
-		solid = true;
-		itemCapacity = 20;
+    public Smelter(String name){
+        super(name);
+        update = true;
+        hasItems = true;
+        solid = true;
+        itemCapacity = 20;
 
-		consumes.require(ConsumeItems.class);
-		consumes.require(ConsumeItem.class);
-	}
+        consumes.require(ConsumeItems.class);
+        consumes.require(ConsumeItem.class);
+    }
 
-	@Override
-	public void setBars(){
-		for(ItemStack item : consumes.items()){
-			bars.add(new BlockBar(BarType.inventory, true, tile -> (float)tile.entity.items.get(item.item)/itemCapacity));
-		}
-	}
-	
-	@Override
-	public void setStats(){
-		super.setStats();
+    @Override
+    public void setBars(){
+        for(ItemStack item : consumes.items()){
+            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.get(item.item) / itemCapacity));
+        }
+    }
 
-		//TODO
-		//stats.add(BlockStat.inputFuel, fuel);
-		stats.add(BlockStat.fuelBurnTime, burnDuration/60f, StatUnit.seconds);
-		stats.add(BlockStat.outputItem, result);
-		stats.add(BlockStat.craftSpeed, 60f/craftTime, StatUnit.itemsSecond);
-		stats.add(BlockStat.inputItemCapacity, itemCapacity, StatUnit.items);
-		stats.add(BlockStat.outputItemCapacity, itemCapacity, StatUnit.items);
-	}
+    @Override
+    public void setStats(){
+        super.setStats();
 
-	@Override
-	public void init() {
-		super.init();
+        //TODO
+        //stats.add(BlockStat.inputFuel, fuel);
+        stats.add(BlockStat.fuelBurnTime, burnDuration / 60f, StatUnit.seconds);
+        stats.add(BlockStat.outputItem, result);
+        stats.add(BlockStat.craftSpeed, 60f / craftTime, StatUnit.itemsSecond);
+        stats.add(BlockStat.inputItemCapacity, itemCapacity, StatUnit.items);
+        stats.add(BlockStat.outputItemCapacity, itemCapacity, StatUnit.items);
+    }
 
-		for(ItemStack item : consumes.items()){
-			if(item.item.fluxiness >= minFlux && useFlux){
-				throw new IllegalArgumentException("'" + name + "' has input item '" + item.item.name + "', which is a flux, when useFlux is enabled. To prevent ambiguous item use, either remove this flux item from the inputs, or set useFlux to false.");
-			}
-		}
-	}
+    @Override
+    public void init(){
+        super.init();
 
-	@Override
-	public void update(Tile tile){
-		SmelterEntity entity = tile.entity();
-		
-		if(entity.timer.get(timerDump, 5) && entity.items.has(result)){
-			tryDump(tile, result);
-		}
+        for(ItemStack item : consumes.items()){
+            if(item.item.fluxiness >= minFlux && useFlux){
+                throw new IllegalArgumentException("'" + name + "' has input item '" + item.item.name + "', which is a flux, when useFlux is enabled. To prevent ambiguous item use, either remove this flux item from the inputs, or set useFlux to false.");
+            }
+        }
+    }
 
-		//add fuel
-		if(entity.consumed(ConsumeItem.class) && entity.burnTime <= 0f){
-			entity.items.remove(consumes.item(), 1);
-			entity.burnTime += burnDuration;
-			Effects.effect(burnEffect, entity.x + Mathf.range(2f), entity.y + Mathf.range(2f));
-		}
+    @Override
+    public void update(Tile tile){
+        SmelterEntity entity = tile.entity();
 
-		//decrement burntime
-		if(entity.burnTime > 0){
-			entity.burnTime -= Timers.delta();
-			entity.heat = Mathf.lerp(entity.heat, 1f, 0.02f);
-		}else{
-			entity.heat = Mathf.lerp(entity.heat, 0f, 0.02f);
-		}
+        if(entity.timer.get(timerDump, 5) && entity.items.has(result)){
+            tryDump(tile, result);
+        }
 
-		//make sure it has all the items
-		if(!entity.cons.valid()){
-			return;
-		}
+        //add fuel
+        if(entity.consumed(ConsumeItem.class) && entity.burnTime <= 0f){
+            entity.items.remove(consumes.item(), 1);
+            entity.burnTime += burnDuration;
+            Effects.effect(burnEffect, entity.x + Mathf.range(2f), entity.y + Mathf.range(2f));
+        }
 
-		if(entity.items.get(result) >= itemCapacity //output full
-				|| entity.burnTime <= 0 //not burning
-				|| !entity.timer.get(timerCraft, craftTime)){ //not yet time
-			return;
-		}
+        //decrement burntime
+        if(entity.burnTime > 0){
+            entity.burnTime -= Timers.delta();
+            entity.heat = Mathf.lerp(entity.heat, 1f, 0.02f);
+        }else{
+            entity.heat = Mathf.lerp(entity.heat, 0f, 0.02f);
+        }
 
-		boolean consumeInputs = true;
+        //make sure it has all the items
+        if(!entity.cons.valid()){
+            return;
+        }
 
-		if(useFlux){
-			//remove flux materials if present
-			for(Item item : Item.all()){
-				if(item.fluxiness >= minFlux && tile.entity.items.get(item) > 0){
-					tile.entity.items.remove(item, 1);
+        if(entity.items.get(result) >= itemCapacity //output full
+                || entity.burnTime <= 0 //not burning
+                || !entity.timer.get(timerCraft, craftTime)){ //not yet time
+            return;
+        }
 
-					//chance of not consuming inputs if flux material present
-					consumeInputs = !Mathf.chance(item.fluxiness * baseFluxChance);
-					break;
-				}
-			}
-		}
+        boolean consumeInputs = true;
 
-		if(consumeInputs) {
-			for (ItemStack item : consumes.items()) {
-				entity.items.remove(item.item, item.amount);
-			}
-		}
-		
-		offloadNear(tile, result);
-		Effects.effect(craftEffect, flameColor, tile.drawx(), tile.drawy());
-	}
+        if(useFlux){
+            //remove flux materials if present
+            for(Item item : Item.all()){
+                if(item.fluxiness >= minFlux && tile.entity.items.get(item) > 0){
+                    tile.entity.items.remove(item, 1);
 
-	@Override
-	public int getMaximumAccepted(Tile tile, Item item) {
-		return itemCapacity - tile.entity.items.get(item);
-	}
+                    //chance of not consuming inputs if flux material present
+                    consumeInputs = !Mathf.chance(item.fluxiness * baseFluxChance);
+                    break;
+                }
+            }
+        }
 
-	@Override
-	public boolean acceptItem(Item item, Tile tile, Tile source){
-		boolean isInput = false;
+        if(consumeInputs){
+            for(ItemStack item : consumes.items()){
+                entity.items.remove(item.item, item.amount);
+            }
+        }
 
-		for(ItemStack req : consumes.items()){
-			if(req.item == item){
-				isInput = true;
-				break;
-			}
-		}
+        offloadNear(tile, result);
+        Effects.effect(craftEffect, flameColor, tile.drawx(), tile.drawy());
+    }
 
-		return (isInput && tile.entity.items.get(item) < itemCapacity) || (item == consumes.item() && tile.entity.items.get(consumes.item()) < itemCapacity) ||
-				(useFlux && item.fluxiness >= minFlux && tile.entity.items.get(item) < itemCapacity);
-	}
+    @Override
+    public int getMaximumAccepted(Tile tile, Item item){
+        return itemCapacity - tile.entity.items.get(item);
+    }
 
-	@Override
-	public void draw(Tile tile){
-		super.draw(tile);
+    @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        boolean isInput = false;
+
+        for(ItemStack req : consumes.items()){
+            if(req.item == item){
+                isInput = true;
+                break;
+            }
+        }
+
+        return (isInput && tile.entity.items.get(item) < itemCapacity) || (item == consumes.item() && tile.entity.items.get(consumes.item()) < itemCapacity) ||
+                (useFlux && item.fluxiness >= minFlux && tile.entity.items.get(item) < itemCapacity);
+    }
+
+    @Override
+    public void draw(Tile tile){
+        super.draw(tile);
 
         SmelterEntity entity = tile.entity();
 
         //draw glowing center
-		if(entity.heat > 0f){
-			float g = 0.1f;
+        if(entity.heat > 0f){
+            float g = 0.1f;
 
-			Draw.alpha(((1f-g) + Mathf.absin(Timers.time(), 8f, g)) * entity.heat);
+            Draw.alpha(((1f - g) + Mathf.absin(Timers.time(), 8f, g)) * entity.heat);
 
-			Draw.tint(flameColor);
-			Fill.circle(tile.drawx(), tile.drawy(), 2f + Mathf.absin(Timers.time(), 5f, 0.8f));
-			Draw.color(1f, 1f, 1f, entity.heat);
-			Fill.circle(tile.drawx(), tile.drawy(), 1f + Mathf.absin(Timers.time(), 5f, 0.7f));
+            Draw.tint(flameColor);
+            Fill.circle(tile.drawx(), tile.drawy(), 2f + Mathf.absin(Timers.time(), 5f, 0.8f));
+            Draw.color(1f, 1f, 1f, entity.heat);
+            Fill.circle(tile.drawx(), tile.drawy(), 1f + Mathf.absin(Timers.time(), 5f, 0.7f));
 
-			Draw.color();
-		}
+            Draw.color();
+        }
     }
 
-	@Override
-	public TileEntity getEntity() {
-		return new SmelterEntity();
-	}
+    @Override
+    public TileEntity getEntity(){
+        return new SmelterEntity();
+    }
 
-	public class SmelterEntity extends TileEntity{
-		public float burnTime;
-		public float heat;
-	}
+    public class SmelterEntity extends TileEntity{
+        public float burnTime;
+        public float heat;
+    }
 }

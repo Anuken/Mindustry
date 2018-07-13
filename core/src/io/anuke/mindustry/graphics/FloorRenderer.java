@@ -26,7 +26,7 @@ import java.util.Arrays;
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
-public class FloorRenderer {
+public class FloorRenderer{
     private final static int chunksize = 64;
 
     private Chunk[][] cache;
@@ -38,6 +38,35 @@ public class FloorRenderer {
         Events.on(WorldLoadGraphicsEvent.class, this::clearTiles);
     }
 
+    static ShaderProgram createDefaultShader(){
+        String vertexShader = "attribute vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
+                + "attribute vec2 " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
+                + "uniform mat4 u_projTrans;\n" //
+                + "varying vec2 v_texCoords;\n" //
+                + "\n" //
+                + "void main()\n" //
+                + "{\n" //
+                + "   v_texCoords = " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
+                + "   gl_Position =  u_projTrans * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
+                + "}\n";
+        String fragmentShader = "#ifdef GL_ES\n" //
+                + "#define LOWP lowp\n" //
+                + "precision mediump float;\n" //
+                + "#else\n" //
+                + "#define LOWP \n" //
+                + "#endif\n" //
+                + "varying vec2 v_texCoords;\n" //
+                + "uniform sampler2D u_texture;\n" //
+                + "void main()\n"//
+                + "{\n" //
+                + "  gl_FragColor = texture2D(u_texture, v_texCoords);\n" //
+                + "}";
+
+        ShaderProgram shader = new ShaderProgram(vertexShader, fragmentShader);
+        if(!shader.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
+        return shader;
+    }
+
     public void drawFloor(){
         if(cache == null){
             return;
@@ -45,11 +74,11 @@ public class FloorRenderer {
 
         OrthographicCamera camera = Core.camera;
 
-        int crangex = (int)(camera.viewportWidth * camera.zoom / (chunksize * tilesize))+1;
-        int crangey = (int)(camera.viewportHeight * camera.zoom / (chunksize * tilesize))+1;
+        int crangex = (int) (camera.viewportWidth * camera.zoom / (chunksize * tilesize)) + 1;
+        int crangey = (int) (camera.viewportHeight * camera.zoom / (chunksize * tilesize)) + 1;
 
-        for(int x = -crangex; x <= crangex; x++) {
-            for (int y = -crangey; y <= crangey; y++) {
+        for(int x = -crangex; x <= crangex; x++){
+            for(int y = -crangey; y <= crangey; y++){
                 int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
                 int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
 
@@ -71,13 +100,13 @@ public class FloorRenderer {
                 int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
                 int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
 
-                if (!Mathf.inBounds(worldx, worldy, cache))
+                if(!Mathf.inBounds(worldx, worldy, cache))
                     continue;
 
                 Chunk chunk = cache[worldx][worldy];
 
                 //loop through all layers, and add layer index if it exists
-                for(int i = 0; i < layers - 1; i ++){
+                for(int i = 0; i < layers - 1; i++){
                     if(chunk.caches[i] != -1){
                         drawnLayerSet.add(i);
                     }
@@ -95,7 +124,7 @@ public class FloorRenderer {
         Graphics.end();
         beginDraw();
 
-        for(int i = 0; i < drawnLayers.size; i ++) {
+        for(int i = 0; i < drawnLayers.size; i++){
             CacheLayer layer = CacheLayer.values()[drawnLayers.get(i)];
 
             drawLayer(layer);
@@ -131,13 +160,13 @@ public class FloorRenderer {
 
         OrthographicCamera camera = Core.camera;
 
-        int crangex = (int)(camera.viewportWidth * camera.zoom / (chunksize * tilesize))+1;
-        int crangey = (int)(camera.viewportHeight * camera.zoom / (chunksize * tilesize))+1;
+        int crangex = (int) (camera.viewportWidth * camera.zoom / (chunksize * tilesize)) + 1;
+        int crangey = (int) (camera.viewportHeight * camera.zoom / (chunksize * tilesize)) + 1;
 
         layer.begin();
 
-        for (int x = -crangex; x <= crangex; x++) {
-            for (int y = -crangey; y <= crangey; y++) {
+        for(int x = -crangex; x <= crangex; x++){
+            for(int y = -crangey; y <= crangey; y++){
                 int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
                 int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
 
@@ -166,12 +195,12 @@ public class FloorRenderer {
 
         ObjectSet<CacheLayer> used = new ObjectSet<>();
 
-        for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++) {
-            for (int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++) {
+        for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
+            for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
                 Tile tile = world.tile(tilex, tiley);
-                if (tile != null){
+                if(tile != null){
                     used.add(tile.block().cacheLayer == CacheLayer.walls ?
-                            CacheLayer.walls  : tile.floor().cacheLayer);
+                            CacheLayer.walls : tile.floor().cacheLayer);
                 }
             }
         }
@@ -180,7 +209,7 @@ public class FloorRenderer {
             cacheChunkLayer(cx, cy, chunk, layer);
         }
 
-       // Log.info("Time to cache a chunk: {0}", TimeUtils.timeSinceNanos(time) / 1000000f);
+        // Log.info("Time to cache a chunk: {0}", TimeUtils.timeSinceNanos(time) / 1000000f);
     }
 
     private void cacheChunkLayer(int cx, int cy, Chunk chunk, CacheLayer layer){
@@ -211,25 +240,21 @@ public class FloorRenderer {
         chunk.caches[layer.ordinal()] = cbatch.getLastCache();
     }
 
-    private class Chunk{
-        int[] caches = new int[CacheLayer.values().length];
-    }
-
     public void clearTiles(){
         if(cbatch != null) cbatch.dispose();
 
         Timers.mark();
 
-        int chunksx = Mathf.ceil((float)world.width() / chunksize), chunksy = Mathf.ceil((float)world.height() / chunksize);
+        int chunksx = Mathf.ceil((float) world.width() / chunksize), chunksy = Mathf.ceil((float) world.height() / chunksize);
         cache = new Chunk[chunksx][chunksy];
-        cbatch = new CacheBatch(world.width()*world.height()*4*4);
+        cbatch = new CacheBatch(world.width() * world.height() * 4 * 4);
 
         Log.info("Time to create: {0}", Timers.elapsed());
 
         Timers.mark();
 
-        for (int x = 0; x < chunksx; x++) {
-            for (int y = 0; y < chunksy; y++) {
+        for(int x = 0; x < chunksx; x++){
+            for(int y = 0; y < chunksy; y++){
                 cache[x][y] = new Chunk();
                 Arrays.fill(cache[x][y].caches, -1);
 
@@ -240,32 +265,7 @@ public class FloorRenderer {
         Log.info("Time to cache: {0}", Timers.elapsed());
     }
 
-    static ShaderProgram createDefaultShader () {
-        String vertexShader = "attribute vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
-                + "attribute vec2 " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
-                + "uniform mat4 u_projTrans;\n" //
-                + "varying vec2 v_texCoords;\n" //
-                + "\n" //
-                + "void main()\n" //
-                + "{\n" //
-                + "   v_texCoords = " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
-                + "   gl_Position =  u_projTrans * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
-                + "}\n";
-        String fragmentShader = "#ifdef GL_ES\n" //
-                + "#define LOWP lowp\n" //
-                + "precision mediump float;\n" //
-                + "#else\n" //
-                + "#define LOWP \n" //
-                + "#endif\n" //
-                + "varying vec2 v_texCoords;\n" //
-                + "uniform sampler2D u_texture;\n" //
-                + "void main()\n"//
-                + "{\n" //
-                + "  gl_FragColor = texture2D(u_texture, v_texCoords);\n" //
-                + "}";
-
-        ShaderProgram shader = new ShaderProgram(vertexShader, fragmentShader);
-        if (!shader.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
-        return shader;
+    private class Chunk{
+        int[] caches = new int[CacheLayer.values().length];
     }
 }

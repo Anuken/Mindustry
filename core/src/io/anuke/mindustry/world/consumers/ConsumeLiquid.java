@@ -9,50 +9,50 @@ import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-public class ConsumeLiquid extends Consume {
+public class ConsumeLiquid extends Consume{
     protected final float use;
     protected final Liquid liquid;
 
-    public ConsumeLiquid(Liquid liquid, float use) {
+    public ConsumeLiquid(Liquid liquid, float use){
         this.liquid = liquid;
         this.use = use;
     }
 
-    public float used() {
+    public float used(){
         return use;
     }
 
-    public Liquid get() {
+    public Liquid get(){
         return liquid;
     }
 
     @Override
-    public void buildTooltip(Table table) {
-        table.addImage(liquid.getContentIcon()).size(8*3);
+    public void buildTooltip(Table table){
+        table.addImage(liquid.getContentIcon()).size(8 * 3);
     }
 
     @Override
-    public String getIcon() {
+    public String getIcon(){
         return "icon-liquid";
     }
 
     @Override
-    public void update(Block block, TileEntity entity) {
+    public void update(Block block, TileEntity entity){
         entity.liquids.remove(liquid, Math.min(use(block), entity.liquids.get(liquid)));
     }
 
     @Override
-    public boolean valid(Block block, TileEntity entity) {
+    public boolean valid(Block block, TileEntity entity){
         return entity.liquids.get(liquid) >= use(block);
     }
 
     @Override
-    public void display(BlockStats stats) {
+    public void display(BlockStats stats){
         stats.add(BlockStat.liquidUse, use * 60f, StatUnit.liquidSecond);
         stats.add(BlockStat.inputLiquid, liquid);
     }
 
-    float use(Block block) {
+    float use(Block block){
         return Math.min(use * Timers.delta(), block.liquidCapacity);
     }
 }

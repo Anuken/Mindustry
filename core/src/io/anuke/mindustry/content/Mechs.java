@@ -8,14 +8,16 @@ import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Upgrade;
 
-public class Mechs implements ContentList {
+public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, halberd;
 
-    /**These are not new mechs, just re-assignments for convenience.*/
+    /**
+     * These are not new mechs, just re-assignments for convenience.
+     */
     public static Mech starterDesktop, starterMobile;
 
     @Override
-    public void load() {
+    public void load(){
 
         alpha = new Mech("alpha-mech", false){{
             drillPower = 1;
@@ -85,7 +87,7 @@ public class Mechs implements ContentList {
     }
 
     @Override
-    public Array<? extends Content> getAll() {
+    public Array<? extends Content> getAll(){
         return Upgrade.all();
     }
 }

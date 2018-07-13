@@ -45,20 +45,30 @@ public class NetServer extends Module{
     private final static byte[] reusableSnapArray = new byte[maxSnapshotSize];
     private final static float serverSyncTime = 4, kickDuration = 30 * 1000;
     private final static Vector2 vector = new Vector2();
-    /**If a play goes away of their server-side coordinates by this distance, they get teleported back.*/
+    /**
+     * If a play goes away of their server-side coordinates by this distance, they get teleported back.
+     */
     private final static float correctDist = 16f;
 
     public final Administration admins = new Administration();
 
-    /**Maps connection IDs to players.*/
+    /**
+     * Maps connection IDs to players.
+     */
     private IntMap<Player> connections = new IntMap<>();
     private boolean closing = false;
 
-    /**Stream for writing player sync data to.*/
+    /**
+     * Stream for writing player sync data to.
+     */
     private CountableByteArrayOutputStream syncStream = new CountableByteArrayOutputStream();
-    /**Data stream for writing player sync data to.*/
+    /**
+     * Data stream for writing player sync data to.
+     */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
-    /**Encoder for computing snapshot deltas.*/
+    /**
+     * Encoder for computing snapshot deltas.
+     */
     private DEZEncoder encoder = new DEZEncoder();
 
     public NetServer(){
@@ -105,14 +115,14 @@ public class NetServer extends Module{
 
             boolean preventDuplicates = headless;
 
-            if(preventDuplicates) {
-                for (Player player : playerGroup.all()) {
-                    if (player.name.equalsIgnoreCase(packet.name)) {
+            if(preventDuplicates){
+                for(Player player : playerGroup.all()){
+                    if(player.name.equalsIgnoreCase(packet.name)){
                         kick(id, KickReason.nameInUse);
                         return;
                     }
 
-                    if (player.uuid.equals(packet.uuid)) {
+                    if(player.uuid.equals(packet.uuid)){
                         kick(id, KickReason.idInUse);
                         return;
                     }
@@ -181,7 +191,7 @@ public class NetServer extends Module{
 
             long elapsed = TimeUtils.timeSinceMillis(connection.lastRecievedClientTime);
 
-            float maxSpeed = (packet.boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed)*2.5f;
+            float maxSpeed = (packet.boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed) * 2.5f;
 
             //extra 1.1x multiplicaton is added just in case
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
@@ -238,6 +248,86 @@ public class NetServer extends Module{
         });
     }
 
+    /**
+     * Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.
+     */
+    private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID, int base){
+        if(bytes.length < maxSnapshotSize){
+            Call.onSnapshot(userid, bytes, snapshotID, (short) 0, bytes.length, base);
+        }else{
+            int remaining = bytes.length;
+            int offset = 0;
+            int chunkid = 0;
+            while(remaining > 0){
+                int used = Math.min(remaining, maxSnapshotSize);
+                byte[] toSend;
+                //re-use sent byte arrays when possible
+                if(used == maxSnapshotSize){
+                    toSend = reusableSnapArray;
+                    System.arraycopy(bytes, offset, toSend, 0, Math.min(offset + maxSnapshotSize, bytes.length) - offset);
+                }else{
+                    toSend = Arrays.copyOfRange(bytes, offset, Math.min(offset + maxSnapshotSize, bytes.length));
+                }
+                Call.onSnapshot(userid, toSend, snapshotID, (short) chunkid, bytes.length, base);
+
+                remaining -= used;
+                offset += used;
+                chunkid++;
+            }
+        }
+    }
+
+    public static void onDisconnect(Player player){
+        Call.sendMessage("[accent]" + player.name + " has disconnected.");
+        Call.onPlayerDisconnect(player.id);
+        player.remove();
+        netServer.connections.remove(player.con.id);
+    }
+
+    @Remote(targets = Loc.client, called = Loc.server)
+    public static void onAdminRequest(Player player, Player other, AdminAction action){
+
+        if(!player.isAdmin){
+            Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
+                    player.name, player.con.address);
+            return;
+        }
+
+        if(other == null || (other.isAdmin && other != player)){ //fun fact: this means you can ban yourself
+            Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
+            return;
+        }
+
+        if(action == AdminAction.wave){
+            //no verification is done, so admins can hypothetically spam waves
+            //not a real issue, because server owners may want to do just that
+            state.wavetime = 0f;
+        }else if(action == AdminAction.ban){
+            netServer.admins.banPlayerIP(other.con.address);
+            netServer.kick(other.con.id, KickReason.banned);
+            Log.info("&lc{0} has banned {1}.", player.name, other.name);
+        }else if(action == AdminAction.kick){
+            netServer.kick(other.con.id, KickReason.kick);
+            Log.info("&lc{0} has kicked {1}.", player.name, other.name);
+        }else if(action == AdminAction.trace){
+            //TODO
+            if(player.con != null){
+                Call.onTraceInfo(player.con.id, netServer.admins.getTraceByID(other.uuid));
+            }else{
+                NetClient.onTraceInfo(netServer.admins.getTraceByID(other.uuid));
+            }
+            Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
+        }
+    }
+
+    @Remote(targets = Loc.client)
+    public static void connectConfirm(Player player){
+        player.add();
+        player.con.hasConnected = true;
+        Call.sendMessage("[accent]" + player.name + " has connected.");
+        Log.info("&y{0} has connected.", player.name);
+    }
+
     public void update(){
         if(!headless && !closing && Net.server() && state.is(State.menu)){
             closing = true;
@@ -270,7 +360,7 @@ public class NetServer extends Module{
 
         if((reason == KickReason.kick || reason == KickReason.banned) && admins.getTraceByID(getUUID(con.id)).uuid != null){
             PlayerInfo info = admins.getInfo(admins.getTraceByID(getUUID(con.id)).uuid);
-            info.timesKicked ++;
+            info.timesKicked++;
             info.lastKicked = TimeUtils.millis();
         }
 
@@ -288,7 +378,7 @@ public class NetServer extends Module{
 
     String fixName(String name){
 
-        for(int i = 0; i < name.length(); i ++){
+        for(int i = 0; i < name.length(); i++){
             if(name.charAt(i) == '[' && i != name.length() - 1 && name.charAt(i + 1) != '[' && (i == 0 || name.charAt(i - 1) != '[')){
                 String prev = name.substring(0, i);
                 String next = name.substring(i);
@@ -303,7 +393,7 @@ public class NetServer extends Module{
 
     String checkColor(String str){
 
-        for(int i = 1; i < str.length(); i ++){
+        for(int i = 1; i < str.length(); i++){
             if(str.charAt(i) == ']'){
                 String color = str.substring(1, i);
 
@@ -318,7 +408,7 @@ public class NetServer extends Module{
                         if(result.a <= 0.8f){
                             return str.substring(i + 1);
                         }
-                    }catch (Exception e){
+                    }catch(Exception e){
                         return str;
                     }
                 }
@@ -328,10 +418,10 @@ public class NetServer extends Module{
     }
 
     void sync(){
-        try {
+        try{
 
             //iterate through each player
-            for (Player player : connections.values()) {
+            for(Player player : connections.values()){
                 NetConnection connection = player.con;
 
                 if(!connection.isConnected()){
@@ -344,7 +434,8 @@ public class NetServer extends Module{
 
                 //if the player hasn't acknowledged that it has recieved the packet, send the same thing again
                 if(connection.currentBaseID < connection.lastSentSnapshotID){
-                    if(showSnapshotSize) Log.info("Re-sending snapshot: {0} bytes, ID {1} base {2} baselength {3}", connection.lastSentSnapshot.length, connection.lastSentSnapshotID, connection.lastSentBase, connection.currentBaseSnapshot.length);
+                    if(showSnapshotSize)
+                        Log.info("Re-sending snapshot: {0} bytes, ID {1} base {2} baselength {3}", connection.lastSentSnapshot.length, connection.lastSentSnapshotID, connection.lastSentBase, connection.currentBaseSnapshot.length);
                     sendSplitSnapshot(connection.id, connection.lastSentSnapshot, connection.lastSentSnapshotID, connection.lastSentBase);
                     return;
                 }
@@ -371,17 +462,17 @@ public class NetServer extends Module{
 
                 int totalGroups = 0;
 
-                for (EntityGroup<?> group : Entities.getAllGroups()) {
-                    if (!group.isEmpty() && (group.all().get(0) instanceof SyncTrait)) totalGroups ++;
+                for(EntityGroup<?> group : Entities.getAllGroups()){
+                    if(!group.isEmpty() && (group.all().get(0) instanceof SyncTrait)) totalGroups++;
                 }
 
                 //write total amount of serializable groups
                 dataStream.writeByte(totalGroups);
 
                 //check for syncable groups
-                for (EntityGroup<?> group : Entities.getAllGroups()) {
+                for(EntityGroup<?> group : Entities.getAllGroups()){
                     //TODO range-check sync positions to optimize?
-                    if (group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
+                    if(group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
 
                     //make sure mapping is enabled for this group
                     if(!group.mappingEnabled()){
@@ -391,8 +482,8 @@ public class NetServer extends Module{
                     int amount = 0;
 
                     for(Entity entity : group.all()){
-                        if(((SyncTrait)entity).isSyncing()){
-                            amount ++;
+                        if(((SyncTrait) entity).isSyncing()){
+                            amount++;
                         }
                     }
 
@@ -401,15 +492,16 @@ public class NetServer extends Module{
                     dataStream.writeShort(amount);
 
                     for(Entity entity : group.all()){
-                        if(!((SyncTrait)entity).isSyncing()) continue;
+                        if(!((SyncTrait) entity).isSyncing()) continue;
 
                         int position = syncStream.position();
                         //write all entities now
                         dataStream.writeInt(entity.getID()); //write id
-                        dataStream.writeByte(((SyncTrait)entity).getTypeID()); //write type ID
-                        ((SyncTrait)entity).write(dataStream); //write entity
+                        dataStream.writeByte(((SyncTrait) entity).getTypeID()); //write type ID
+                        ((SyncTrait) entity).write(dataStream); //write entity
                         int length = syncStream.position() - position; //length must always be less than 127 bytes
-                        if(length > 127) throw new RuntimeException("Write size for entity of type " + group.getType() + " must not exceed 127!");
+                        if(length > 127)
+                            throw new RuntimeException("Write size for entity of type " + group.getType() + " must not exceed 127!");
                         dataStream.writeByte(length);
                     }
                 }
@@ -433,7 +525,8 @@ public class NetServer extends Module{
 
                     //send diff, otherwise
                     byte[] diff = ByteDeltaEncoder.toDiff(new ByteMatcherHash(connection.currentBaseSnapshot, bytes), encoder);
-                    if(showSnapshotSize) Log.info("Shrank snapshot: {0} -> {1}, Base {2} ID {3} base length = {4}", bytes.length, diff.length, connection.currentBaseID, connection.currentBaseID + 1, connection.currentBaseSnapshot.length);
+                    if(showSnapshotSize)
+                        Log.info("Shrank snapshot: {0} -> {1}, Base {2} ID {3} base length = {4}", bytes.length, diff.length, connection.currentBaseID, connection.currentBaseID + 1, connection.currentBaseSnapshot.length);
                     sendSplitSnapshot(connection.id, diff, connection.currentBaseID + 1, connection.currentBaseID);
                     connection.lastSentSnapshot = diff;
                     connection.lastSentSnapshotID = connection.currentBaseID + 1;
@@ -441,86 +534,8 @@ public class NetServer extends Module{
                 }
             }
 
-        }catch (IOException e){
+        }catch(IOException e){
             e.printStackTrace();
         }
-    }
-
-    /**Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.*/
-    private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID, int base){
-        if(bytes.length < maxSnapshotSize){
-            Call.onSnapshot(userid, bytes, snapshotID, (short)0, bytes.length, base);
-        }else{
-            int remaining = bytes.length;
-            int offset = 0;
-            int chunkid = 0;
-            while(remaining > 0){
-                int used = Math.min(remaining, maxSnapshotSize);
-                byte[] toSend;
-                //re-use sent byte arrays when possible
-                if(used == maxSnapshotSize){
-                    toSend = reusableSnapArray;
-                    System.arraycopy(bytes, offset, toSend, 0, Math.min(offset + maxSnapshotSize, bytes.length) - offset);
-                }else {
-                    toSend = Arrays.copyOfRange(bytes, offset, Math.min(offset + maxSnapshotSize, bytes.length));
-                }
-                Call.onSnapshot(userid, toSend, snapshotID, (short)chunkid, bytes.length, base);
-
-                remaining -= used;
-                offset += used;
-                chunkid ++;
-            }
-        }
-    }
-
-    public static void onDisconnect(Player player){
-        Call.sendMessage("[accent]" + player.name + " has disconnected.");
-        Call.onPlayerDisconnect(player.id);
-        player.remove();
-        netServer.connections.remove(player.con.id);
-    }
-
-    @Remote(targets = Loc.client, called = Loc.server)
-    public static void onAdminRequest(Player player, Player other, AdminAction action){
-
-        if(!player.isAdmin){
-            Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
-                    player.name, player.con.address);
-            return;
-        }
-
-        if(other == null || (other.isAdmin && other != player)){ //fun fact: this means you can ban yourself
-            Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
-            return;
-        }
-
-        if(action == AdminAction.wave) {
-            //no verification is done, so admins can hypothetically spam waves
-            //not a real issue, because server owners may want to do just that
-            state.wavetime = 0f;
-        }else if(action == AdminAction.ban){
-            netServer.admins.banPlayerIP(other.con.address);
-            netServer.kick(other.con.id, KickReason.banned);
-            Log.info("&lc{0} has banned {1}.", player.name, other.name);
-        }else if(action == AdminAction.kick){
-            netServer.kick(other.con.id, KickReason.kick);
-            Log.info("&lc{0} has kicked {1}.", player.name, other.name);
-        }else if(action == AdminAction.trace){
-            //TODO
-            if(player.con != null) {
-                Call.onTraceInfo(player.con.id, netServer.admins.getTraceByID(other.uuid));
-            }else{
-                NetClient.onTraceInfo(netServer.admins.getTraceByID(other.uuid));
-            }
-            Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
-        }
-    }
-
-    @Remote(targets = Loc.client)
-    public static void connectConfirm(Player player){
-        player.add();
-        player.con.hasConnected = true;
-        Call.sendMessage("[accent]" + player.name + " has connected.");
-        Log.info("&y{0} has connected.", player.name);
     }
 }

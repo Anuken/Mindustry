@@ -12,19 +12,19 @@ import static io.anuke.mindustry.type.Category.*;
 public class Recipes implements ContentList{
 
     @Override
-	public void load (){
+    public void load(){
         //WALLS
         new Recipe(defense, DefenseBlocks.tungstenWall, new ItemStack(Items.tungsten, 12));
-        new Recipe(defense, DefenseBlocks.tungstenWallLarge, new ItemStack(Items.tungsten, 12*4));
+        new Recipe(defense, DefenseBlocks.tungstenWallLarge, new ItemStack(Items.tungsten, 12 * 4));
 
         new Recipe(defense, DefenseBlocks.carbideWall, new ItemStack(Items.carbide, 12));
-        new Recipe(defense, DefenseBlocks.carbideWallLarge, new ItemStack(Items.carbide, 12*4));
+        new Recipe(defense, DefenseBlocks.carbideWallLarge, new ItemStack(Items.carbide, 12 * 4));
 
         new Recipe(defense, DefenseBlocks.thoriumWall, new ItemStack(Items.thorium, 12));
-        new Recipe(defense, DefenseBlocks.thoriumWallLarge, new ItemStack(Items.thorium, 12*4));
+        new Recipe(defense, DefenseBlocks.thoriumWallLarge, new ItemStack(Items.thorium, 12 * 4));
 
         new Recipe(defense, DefenseBlocks.door, new ItemStack(Items.carbide, 12), new ItemStack(Items.silicon, 8));
-        new Recipe(defense, DefenseBlocks.doorLarge, new ItemStack(Items.carbide, 12*4), new ItemStack(Items.silicon, 8*4));
+        new Recipe(defense, DefenseBlocks.doorLarge, new ItemStack(Items.carbide, 12 * 4), new ItemStack(Items.silicon, 8 * 4));
 
         //TURRETS
         new Recipe(weapon, TurretBlocks.duo, new ItemStack(Items.tungsten, 40));
@@ -171,7 +171,6 @@ public class Recipes implements ContentList{
         new Recipe(production, ProductionBlocks.oilextractor, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40));*/
 
 
-
         //new Recipe(distribution, DistributionBlocks.massDriver, new ItemStack(Items.carbide, 1));
 
 
@@ -282,7 +281,7 @@ public class Recipes implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll() {
+    public Array<? extends Content> getAll(){
         return Recipe.all();
     }
 }

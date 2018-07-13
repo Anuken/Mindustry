@@ -4,9 +4,9 @@ import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects;
 
-public class MissileBulletType extends BasicBulletType {
+public class MissileBulletType extends BasicBulletType{
 
-    public MissileBulletType(float speed, float damage, String bulletSprite) {
+    public MissileBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage, bulletSprite);
         backColor = Palette.missileYellowBack;
         frontColor = Palette.missileYellow;
@@ -14,7 +14,7 @@ public class MissileBulletType extends BasicBulletType {
     }
 
     @Override
-    public void update(Bullet b) {
+    public void update(Bullet b){
         super.update(b);
 
         if(b.timer.get(0, 4f)){

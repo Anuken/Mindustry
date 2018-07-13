@@ -8,16 +8,17 @@ import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public class UnitInventory implements Saveable{
+    private final Unit unit;
     private Array<AmmoEntry> ammos = new Array<>();
     private int totalAmmo;
     private ItemStack item = new ItemStack(Items.stone, 0);
 
-    private final Unit unit;
-
-    public UnitInventory(Unit unit) {
+    public UnitInventory(Unit unit){
         this.unit = unit;
     }
 
@@ -26,24 +27,24 @@ public class UnitInventory implements Saveable{
     }
 
     @Override
-    public void writeSave(DataOutput stream) throws IOException {
+    public void writeSave(DataOutput stream) throws IOException{
         stream.writeShort(item.amount);
         stream.writeByte(item.item.id);
         stream.writeShort(totalAmmo);
         stream.writeByte(ammos.size);
-        for(int i = 0; i < ammos.size; i ++){
+        for(int i = 0; i < ammos.size; i++){
             stream.writeByte(ammos.get(i).type.id);
             stream.writeShort(ammos.get(i).amount);
         }
     }
 
     @Override
-    public void readSave(DataInput stream) throws IOException {
+    public void readSave(DataInput stream) throws IOException{
         short iamount = stream.readShort();
         byte iid = stream.readByte();
         this.totalAmmo = stream.readShort();
         byte ammoa = stream.readByte();
-        for(int i = 0; i < ammoa; i ++){
+        for(int i = 0; i < ammoa; i++){
             byte aid = stream.readByte();
             int am = stream.readShort();
             ammos.add(new AmmoEntry(AmmoType.getByID(aid), am));
@@ -53,12 +54,14 @@ public class UnitInventory implements Saveable{
         item.amount = iamount;
     }
 
-    /**Returns ammo range, or MAX_VALUE if this inventory has no ammo.*/
+    /**
+     * Returns ammo range, or MAX_VALUE if this inventory has no ammo.
+     */
     public float getAmmoRange(){
         return hasAmmo() ? getAmmo().getRange() : Float.MAX_VALUE;
     }
 
-    public AmmoType getAmmo() {
+    public AmmoType getAmmo(){
         return ammos.size == 0 ? null : ammos.peek().type;
     }
 
@@ -69,9 +72,9 @@ public class UnitInventory implements Saveable{
     public void useAmmo(){
         if(unit.isInfiniteAmmo()) return;
         AmmoEntry entry = ammos.peek();
-        entry.amount --;
+        entry.amount--;
         if(entry.amount == 0) ammos.pop();
-        totalAmmo --;
+        totalAmmo--;
     }
 
     public int totalAmmo(){
@@ -91,19 +94,19 @@ public class UnitInventory implements Saveable{
         totalAmmo += type.quantityMultiplier;
 
         //find ammo entry by type
-        for(int i = ammos.size - 1; i >= 0; i --){
+        for(int i = ammos.size - 1; i >= 0; i--){
             AmmoEntry entry = ammos.get(i);
 
             //if found, put it to the right
             if(entry.type == type){
                 entry.amount += type.quantityMultiplier;
-                ammos.swap(i, ammos.size-1);
+                ammos.swap(i, ammos.size - 1);
                 return;
             }
         }
 
         //must not be found
-        AmmoEntry entry = new AmmoEntry(type, (int)type.quantityMultiplier);
+        AmmoEntry entry = new AmmoEntry(type, (int) type.quantityMultiplier);
         ammos.add(entry);
     }
 

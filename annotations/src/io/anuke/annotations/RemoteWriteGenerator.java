@@ -14,17 +14,17 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 
-/**Generates code for writing remote invoke packets on the client and server.*/
-public class RemoteWriteGenerator {
+/** Generates code for writing remote invoke packets on the client and server. */
+public class RemoteWriteGenerator{
     private final HashMap<String, ClassSerializer> serializers;
 
-    /**Creates a write generator that uses the supplied serializer setup.*/
-    public RemoteWriteGenerator(HashMap<String, ClassSerializer> serializers) {
+    /** Creates a write generator that uses the supplied serializer setup. */
+    public RemoteWriteGenerator(HashMap<String, ClassSerializer> serializers){
         this.serializers = serializers;
     }
 
-    /**Generates all classes in this list.*/
-    public void generateFor(List<ClassEntry> entries, String packageName) throws IOException {
+    /** Generates all classes in this list. */
+    public void generateFor(List<ClassEntry> entries, String packageName) throws IOException{
 
         for(ClassEntry entry : entries){
             //create builder
@@ -58,7 +58,7 @@ public class RemoteWriteGenerator {
         }
     }
 
-    /**Creates a specific variant for a method entry.*/
+    /** Creates a specific variant for a method entry. */
     private void writeMethodVariant(TypeSpec.Builder classBuilder, MethodEntry methodEntry, boolean toAll, boolean forwarded){
         ExecutableElement elem = methodEntry.element;
 
@@ -99,7 +99,7 @@ public class RemoteWriteGenerator {
         if(!forwarded && methodEntry.local != Loc.none){
             //add in local checks
             if(methodEntry.local != Loc.both){
-                method.beginControlFlow("if("+getCheckString(methodEntry.local) + " || !io.anuke.mindustry.net.Net.active())");
+                method.beginControlFlow("if(" + getCheckString(methodEntry.local) + " || !io.anuke.mindustry.net.Net.active())");
             }
 
             //concatenate parameters
@@ -109,16 +109,16 @@ public class RemoteWriteGenerator {
                 //special case: calling local-only methods uses the local player
                 if(index == 0 && methodEntry.where == Loc.client){
                     results.append("io.anuke.mindustry.Vars.players[0]");
-                }else {
+                }else{
                     results.append(var.getSimpleName());
                 }
                 if(index != elem.getParameters().size() - 1) results.append(", ");
-                index ++;
+                index++;
             }
 
             //add the statement to call it
             method.addStatement("$N." + elem.getSimpleName() + "(" + results.toString() + ")",
-                    ((TypeElement)elem.getEnclosingElement()).getQualifiedName().toString());
+                    ((TypeElement) elem.getEnclosingElement()).getQualifiedName().toString());
 
             if(methodEntry.local != Loc.both){
                 method.endControlFlow();
@@ -126,7 +126,7 @@ public class RemoteWriteGenerator {
         }
 
         //start control flow to check if it's actually client/server so no netcode is called
-        method.beginControlFlow("if("+getCheckString(methodEntry.where)+")");
+        method.beginControlFlow("if(" + getCheckString(methodEntry.where) + ")");
 
         //add statement to create packet from pool
         method.addStatement("$1N packet = $2N.obtain($1N.class)", "io.anuke.mindustry.net.Packets.InvokePacket", "io.anuke.ucore.util.Pooling");
@@ -139,7 +139,7 @@ public class RemoteWriteGenerator {
         //rewind buffer
         method.addStatement("TEMP_BUFFER.position(0)");
 
-        for(int i = 0; i < elem.getParameters().size(); i ++){
+        for(int i = 0; i < elem.getParameters().size(); i++){
             //first argument is skipped as it is always the player caller
             if((!methodEntry.where.isServer/* || methodEntry.mode == Loc.both*/) && i == 0){
                 continue;
@@ -164,7 +164,7 @@ public class RemoteWriteGenerator {
                 method.beginControlFlow("if(io.anuke.mindustry.net.Net.server())");
             }
 
-            if(Utils.isPrimitive(typeName)) { //check if it's a primitive, and if so write it
+            if(Utils.isPrimitive(typeName)){ //check if it's a primitive, and if so write it
                 if(typeName.equals("boolean")){ //booleans are special
                     method.addStatement("TEMP_BUFFER.put(" + varName + " ? (byte)1 : 0)");
                 }else{
@@ -181,7 +181,7 @@ public class RemoteWriteGenerator {
                 }
 
                 //add statement for writing it
-                method.addStatement(ser.writeMethod + "(TEMP_BUFFER, " + varName +")");
+                method.addStatement(ser.writeMethod + "(TEMP_BUFFER, " + varName + ")");
             }
 
             if(writePlayerSkipCheck){ //write end check
@@ -197,7 +197,7 @@ public class RemoteWriteGenerator {
         if(forwarded){ //forward packet
             if(!methodEntry.local.isClient){ //if the client doesn't get it called locally, forward it back after validation
                 sendString = "send(";
-            }else {
+            }else{
                 sendString = "sendExcept(exceptSenderID, ";
             }
         }else if(toAll){ //send to all players / to server
@@ -207,8 +207,8 @@ public class RemoteWriteGenerator {
         }
 
         //send the actual packet
-        method.addStatement("io.anuke.mindustry.net.Net." + sendString + "packet, "+
-                (methodEntry.unreliable ? "io.anuke.mindustry.net.Net.SendMode.udp" : "io.anuke.mindustry.net.Net.SendMode.tcp")+")");
+        method.addStatement("io.anuke.mindustry.net.Net." + sendString + "packet, " +
+                (methodEntry.unreliable ? "io.anuke.mindustry.net.Net.SendMode.udp" : "io.anuke.mindustry.net.Net.SendMode.tcp") + ")");
 
 
         //end check for server/client
@@ -220,7 +220,7 @@ public class RemoteWriteGenerator {
 
     private String getCheckString(Loc loc){
         return loc.isClient && loc.isServer ? "io.anuke.mindustry.net.Net.server() || io.anuke.mindustry.net.Net.client()" :
-               loc.isClient ? "io.anuke.mindustry.net.Net.client()" :
-               loc.isServer ? "io.anuke.mindustry.net.Net.server()" : "false";
+                loc.isClient ? "io.anuke.mindustry.net.Net.client()" :
+                        loc.isServer ? "io.anuke.mindustry.net.Net.server()" : "false";
     }
 }

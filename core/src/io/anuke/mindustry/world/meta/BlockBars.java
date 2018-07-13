@@ -3,8 +3,8 @@ package io.anuke.mindustry.world.meta;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.world.BarType;
 
-public class BlockBars {
-    private Array<BlockBar> list = Array.with(new BlockBar(BarType.health, false, tile -> tile.entity.health / (float)tile.block().health));
+public class BlockBars{
+    private Array<BlockBar> list = Array.with(new BlockBar(BarType.health, false, tile -> tile.entity.health / (float) tile.block().health));
 
     public void add(BlockBar bar){
         list.add(bar);
@@ -36,7 +36,7 @@ public class BlockBars {
         list.removeAll(removals, true);
     }
 
-    public Array<BlockBar> list() {
+    public Array<BlockBar> list(){
         return list;
     }
 }

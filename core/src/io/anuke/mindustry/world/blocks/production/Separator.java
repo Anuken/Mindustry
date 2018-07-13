@@ -16,9 +16,11 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
-/**Extracts a random list of items from an input item and an input liquid.*/
-public class Separator extends Block {
-    protected final int timerDump = timers ++;
+/**
+ * Extracts a random list of items from an input item and an input liquid.
+ */
+public class Separator extends Block{
+    protected final int timerDump = timers++;
 
     protected Item[] results;
     protected float filterTime;
@@ -32,7 +34,7 @@ public class Separator extends Block {
 
     protected boolean offloading = false;
 
-    public Separator(String name) {
+    public Separator(String name){
         super(name);
         update = true;
         solid = true;
@@ -44,14 +46,14 @@ public class Separator extends Block {
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
 
         liquidRegion = Draw.region(name + "-liquid");
     }
 
     @Override
-    public void setStats() {
+    public void setStats(){
         super.setStats();
 
         stats.add(BlockStat.outputItem, new ItemFilterValue(item -> {
@@ -63,7 +65,7 @@ public class Separator extends Block {
     }
 
     @Override
-    public void draw(Tile tile) {
+    public void draw(Tile tile){
         super.draw(tile);
 
         GenericCrafterEntity entity = tile.entity();
@@ -74,18 +76,18 @@ public class Separator extends Block {
 
         Draw.color(color);
         Lines.stroke(spinnerThickness);
-        Lines.spikes(tile.drawx(), tile.drawy(), spinnerRadius, spinnerLength, 3, entity.totalProgress*spinnerSpeed);
+        Lines.spikes(tile.drawx(), tile.drawy(), spinnerRadius, spinnerLength, 3, entity.totalProgress * spinnerSpeed);
         Draw.reset();
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         GenericCrafterEntity entity = tile.entity();
 
-        entity.totalProgress += entity.warmup*Timers.delta();
+        entity.totalProgress += entity.warmup * Timers.delta();
 
         if(entity.cons.valid()){
-            entity.progress += 1f/filterTime;
+            entity.progress += 1f / filterTime;
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
@@ -108,12 +110,12 @@ public class Separator extends Block {
     }
 
     @Override
-    public boolean canDump(Tile tile, Tile to, Item item) {
+    public boolean canDump(Tile tile, Tile to, Item item){
         return offloading || item != consumes.item();
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new GenericCrafterEntity();
     }
 }

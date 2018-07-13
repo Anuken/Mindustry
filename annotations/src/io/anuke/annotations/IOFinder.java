@@ -10,12 +10,16 @@ import javax.tools.Diagnostic.Kind;
 import java.util.HashMap;
 import java.util.Set;
 
-/**This class finds reader and writer methods annotated by the {@link io.anuke.annotations.Annotations.WriteClass}
- * and {@link io.anuke.annotations.Annotations.ReadClass} annotations.*/
-public class IOFinder {
+/**
+ * This class finds reader and writer methods annotated by the {@link io.anuke.annotations.Annotations.WriteClass}
+ * and {@link io.anuke.annotations.Annotations.ReadClass} annotations.
+ */
+public class IOFinder{
 
-    /**Finds all class serializers for all types and returns them. Logs errors when necessary.
-     * Maps fully qualified class names to their serializers.*/
+    /**
+     * Finds all class serializers for all types and returns them. Logs errors when necessary.
+     * Maps fully qualified class names to their serializers.
+     */
     public HashMap<String, ClassSerializer> findSerializers(RoundEnvironment env){
         HashMap<String, ClassSerializer> result = new HashMap<>();
 
@@ -51,33 +55,33 @@ public class IOFinder {
     }
 
     private String getValue(WriteClass write){
-        try {
+        try{
             Class<?> type = write.value();
             return type.getName();
-        }catch (MirroredTypeException e){
+        }catch(MirroredTypeException e){
             return e.getTypeMirror().toString();
         }
     }
 
     private String getValue(ReadClass read){
-        try {
+        try{
             Class<?> type = read.value();
             return type.getName();
-        }catch (MirroredTypeException e){
+        }catch(MirroredTypeException e){
             return e.getTypeMirror().toString();
         }
     }
 
-    /**Information about read/write methods for a specific class type.*/
+    /** Information about read/write methods for a specific class type. */
     public static class ClassSerializer{
-        /**Fully qualified method name of the reader.*/
+        /** Fully qualified method name of the reader. */
         public final String readMethod;
-        /**Fully qualified method name of the writer.*/
+        /** Fully qualified method name of the writer. */
         public final String writeMethod;
-        /**Fully qualified class type name.*/
+        /** Fully qualified class type name. */
         public final String classType;
 
-        public ClassSerializer(String readMethod, String writeMethod, String classType) {
+        public ClassSerializer(String readMethod, String writeMethod, String classType){
             this.readMethod = readMethod;
             this.writeMethod = writeMethod;
             this.classType = classType;

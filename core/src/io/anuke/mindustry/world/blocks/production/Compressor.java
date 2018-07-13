@@ -7,30 +7,30 @@ import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterE
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
-public class Compressor extends PowerCrafter {
+public class Compressor extends PowerCrafter{
     protected TextureRegion liquidRegion, topRegion;
     protected TextureRegion[] frameRegions;
 
-    public Compressor(String name) {
+    public Compressor(String name){
         super(name);
         hasLiquids = true;
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
 
         frameRegions = new TextureRegion[3];
-        for (int i = 0; i < 3; i++) {
+        for(int i = 0; i < 3; i++){
             frameRegions[i] = Draw.region(name + "-frame" + i);
         }
-        
+
         liquidRegion = Draw.region(name + "-liquid");
         topRegion = Draw.region(name + "-top");
     }
 
     @Override
-    public void draw(Tile tile) {
+    public void draw(Tile tile){
         GenericCrafterEntity entity = tile.entity();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
@@ -42,7 +42,7 @@ public class Compressor extends PowerCrafter {
     }
 
     @Override
-    public TextureRegion[] getIcon() {
+    public TextureRegion[] getIcon(){
         return new TextureRegion[]{Draw.region(name), Draw.region(name + "-top")};
     }
 }

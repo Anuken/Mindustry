@@ -18,7 +18,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class WaveSpawner {
+public class WaveSpawner{
     private static final int quadsize = 4;
 
     private Bits quadrants;
@@ -34,28 +34,28 @@ public class WaveSpawner {
 
     public void write(DataOutput output) throws IOException{
         output.writeShort(flySpawns.size);
-        for (FlyerSpawn spawn : flySpawns){
+        for(FlyerSpawn spawn : flySpawns){
             output.writeFloat(spawn.angle);
         }
 
         output.writeShort(groundSpawns.size);
-        for (GroundSpawn spawn : groundSpawns){
-            output.writeShort((short)spawn.x);
-            output.writeShort((short)spawn.y);
+        for(GroundSpawn spawn : groundSpawns){
+            output.writeShort((short) spawn.x);
+            output.writeShort((short) spawn.y);
         }
     }
 
     public void read(DataInput input) throws IOException{
         short flya = input.readShort();
-        
-        for (int i = 0; i < flya; i++) {
+
+        for(int i = 0; i < flya; i++){
             FlyerSpawn spawn = new FlyerSpawn();
             spawn.angle = input.readFloat();
             flySpawns.add(spawn);
         }
-        
+
         short grounda = input.readShort();
-        for (int i = 0; i < grounda; i++) {
+        for(int i = 0; i < grounda; i++){
             GroundSpawn spawn = new GroundSpawn();
             spawn.x = input.readShort();
             spawn.y = input.readShort();
@@ -80,13 +80,13 @@ public class WaveSpawner {
         int addGround = groundGroups - groundSpawns.size, addFly = flyGroups - flySpawns.size;
 
         //add extra groups if the total exceeds it
-        for (int i = 0; i < addGround; i++) {
+        for(int i = 0; i < addGround; i++){
             GroundSpawn spawn = new GroundSpawn();
             findLocation(spawn);
             groundSpawns.add(spawn);
         }
 
-        for (int i = 0; i < addFly; i++) {
+        for(int i = 0; i < addFly; i++){
             FlyerSpawn spawn = new FlyerSpawn();
             findLocation(spawn);
             flySpawns.add(spawn);
@@ -99,7 +99,7 @@ public class WaveSpawner {
             int groups = group.getGroupsSpawned(state.wave);
             int spawned = group.getUnitsSpawned(state.wave);
 
-            for (int i = 0; i < groups; i++) {
+            for(int i = 0; i < groups; i++){
                 Squad squad = new Squad();
                 float spawnX, spawnY;
                 float spread;
@@ -109,11 +109,11 @@ public class WaveSpawner {
                     //TODO verify flyer spawn
 
                     float margin = 40f; //how far away from the edge flying units spawn
-                    spawnX = world.width() *tilesize/2f + Mathf.sqrwavex(spawn.angle) * (world.width()/2f*tilesize + margin);
-                    spawnY = world.height() * tilesize/2f + Mathf.sqrwavey(spawn.angle) * (world.height()/2f*tilesize + margin);
+                    spawnX = world.width() * tilesize / 2f + Mathf.sqrwavex(spawn.angle) * (world.width() / 2f * tilesize + margin);
+                    spawnY = world.height() * tilesize / 2f + Mathf.sqrwavey(spawn.angle) * (world.height() / 2f * tilesize + margin);
                     spread = margin / 1.5f;
 
-                    flyCount ++;
+                    flyCount++;
                 }else{
                     GroundSpawn spawn = groundSpawns.get(groundCount);
                     checkQuadrant(spawn.x, spawn.y);
@@ -121,14 +121,14 @@ public class WaveSpawner {
                         findLocation(spawn);
                     }
 
-                    spawnX = spawn.x * quadsize * tilesize + quadsize * tilesize/2f;
-                    spawnY = spawn.y * quadsize * tilesize + quadsize * tilesize/2f;
-                    spread = quadsize*tilesize/3f;
+                    spawnX = spawn.x * quadsize * tilesize + quadsize * tilesize / 2f;
+                    spawnY = spawn.y * quadsize * tilesize + quadsize * tilesize / 2f;
+                    spread = quadsize * tilesize / 3f;
 
-                    groundCount ++;
+                    groundCount++;
                 }
 
-                for (int j = 0; j < spawned; j++) {
+                for(int j = 0; j < spawned; j++){
                     BaseUnit unit = group.createUnit(Team.red);
                     unit.setWave();
                     unit.setSquad(squad);
@@ -140,19 +140,19 @@ public class WaveSpawner {
     }
 
     public void checkAllQuadrants(){
-        for(int x = 0; x < quadWidth(); x ++){
-            for(int y = 0; y < quadHeight(); y ++){
+        for(int x = 0; x < quadWidth(); x++){
+            for(int y = 0; y < quadHeight(); y++){
                 checkQuadrant(x, y);
             }
         }
     }
-    
+
     private void checkQuadrant(int quadx, int quady){
         setQuad(quadx, quady, true);
 
         outer:
-        for (int x = quadx * quadsize; x < world.width() && x < (quadx + 1)*quadsize; x++) {
-            for (int y = quady * quadsize; y < world.height() && y < (quady + 1)*quadsize; y++) {
+        for(int x = quadx * quadsize; x < world.width() && x < (quadx + 1) * quadsize; x++){
+            for(int y = quady * quadsize; y < world.height() && y < (quady + 1) * quadsize; y++){
                 Tile tile = world.tile(x, y);
 
                 if(tile == null || tile.solid() || world.pathfinder().getValueforTeam(Team.red, x, y) == Float.MAX_VALUE){
@@ -190,7 +190,7 @@ public class WaveSpawner {
         spawn.x = -1;
         spawn.y = -1;
 
-        int shellWidth = quadWidth()*2 + quadHeight() * 2 * 6;
+        int shellWidth = quadWidth() * 2 + quadHeight() * 2 * 6;
         shellWidth = Math.min(quadWidth() * quadHeight() / 4, shellWidth);
 
         Mathf.traverseSpiral(quadWidth(), quadHeight(), Mathf.random(shellWidth), (x, y) -> {
@@ -210,11 +210,11 @@ public class WaveSpawner {
     }
 
     private int quadWidth(){
-        return Mathf.ceil(world.width() / (float)quadsize);
+        return Mathf.ceil(world.width() / (float) quadsize);
     }
 
     private int quadHeight(){
-        return Mathf.ceil(world.height() / (float)quadsize);
+        return Mathf.ceil(world.height() / (float) quadsize);
     }
 
     private class FlyerSpawn{

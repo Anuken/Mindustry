@@ -33,226 +33,307 @@ import io.anuke.ucore.util.Translator;
 import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler extends InputAdapter{
-	/**Used for dropping items.*/
+    /**
+     * Used for dropping items.
+     */
     final static float playerSelectRange = mobile ? 17f : 11f;
-	/**Maximum line length.*/
-	final static int maxLength = 100;
+    /**
+     * Maximum line length.
+     */
+    final static int maxLength = 100;
     final static Translator stackTrns = new Translator();
-    /**Distance on the back from where items originate.*/
-	final static float backTrns = 3f;
+    /**
+     * Distance on the back from where items originate.
+     */
+    final static float backTrns = 3f;
 
-	public final Player player;
-	public final String section;
-	public final OverlayFragment frag = new OverlayFragment(this);
+    public final Player player;
+    public final String section;
+    public final OverlayFragment frag = new OverlayFragment(this);
 
-	public Recipe recipe;
-	public int rotation;
-	public boolean droppingItem;
+    public Recipe recipe;
+    public int rotation;
+    public boolean droppingItem;
 
-	public InputHandler(Player player){
-	    this.player = player;
-	    this.section = "player_" + (player.playerIndex + 1);
-	    Timers.run(1f, () -> frag.build(Core.scene.getRoot()));
+    public InputHandler(Player player){
+        this.player = player;
+        this.section = "player_" + (player.playerIndex + 1);
+        Timers.run(1f, () -> frag.build(Core.scene.getRoot()));
     }
 
     //methods to override
 
-	public void update(){
+    @Remote(targets = Loc.client, called = Loc.server, in = In.entities)
+    public static void dropItem(Player player, float angle){
+        if(Net.server() && !player.inventory.hasItem()){
+            throw new ValidateException(player, "Player cannot drop an item.");
+        }
 
-	}
-
-	public float getMouseX(){
-		return control.gdxInput().getX();
-	}
-
-    public float getMouseY(){
-    	return control.gdxInput().getY();
+        ItemDrop.create(player.inventory.getItem().item, player.inventory.getItem().amount, player.x, player.y, angle);
+        player.inventory.clearItem();
     }
 
-	public void resetCursor(){
+    @Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
+    public static void transferInventory(Player player, Tile tile){
+        if(Net.server() && (!player.inventory.hasItem() || player.isTransferring)){
+            throw new ValidateException(player, "Player cannot transfer an item.");
+        }
 
-	}
+        threads.run(() -> {
+            if(player == null || tile.entity == null) return;
 
-	public boolean isCursorVisible(){
-		return false;
-	}
+            player.isTransferring = true;
 
-	public void buildUI(Group group){
+            ItemStack stack = player.inventory.getItem();
+            int accepted = tile.block().acceptStack(stack.item, stack.amount, tile, player);
 
-	}
+            boolean clear = stack.amount == accepted;
+            int sent = Mathf.clamp(accepted / 4, 1, 8);
+            int removed = accepted / sent;
+            int[] remaining = {accepted, accepted};
 
-	public void updateController(){
+            for(int i = 0; i < sent; i++){
+                boolean end = i == sent - 1;
+                Timers.run(i * 3, () -> {
+                    tile.block().getStackOffset(stack.item, tile, stackTrns);
 
-	}
+                    ItemTransfer.create(stack.item,
+                            player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
+                            new Translator(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
 
-	public void drawOutlined(){
+                                tile.block().handleStack(stack.item, removed, tile, player);
+                                remaining[1] -= removed;
 
-	}
+                                if(end && remaining[1] > 0){
+                                    tile.block().handleStack(stack.item, remaining[1], tile, player);
+                                }
+                            });
 
-	public void drawTop(){
+                    stack.amount -= removed;
+                    remaining[0] -= removed;
 
-	}
+                    if(end){
+                        stack.amount -= remaining[0];
+                        if(clear){
+                            player.inventory.clearItem();
+                        }
+                        player.isTransferring = false;
+                    }
+                });
+            }
+        });
+    }
 
-	public boolean isDrawing(){
-		return false;
-	}
+    @Remote(targets = Loc.both, called = Loc.server, forward = true, in = In.blocks)
+    public static void onTileTapped(Player player, Tile tile){
+        if(tile == null || player == null) return;
+        tile.block().tapped(tile, player);
+    }
 
-	/**Handles tile tap events that are not platform specific.*/
-	boolean tileTapped(Tile tile){
-		tile = tile.target();
+    public void update(){
 
-		boolean consumed = false, showedInventory = false, showedConsume = false;
+    }
 
-		//check if tapped block is configurable
-		if(tile.block().configurable && tile.getTeam() == player.getTeam()){
-			consumed = true;
-			if(((!frag.config.isShown() && tile.block().shouldShowConfigure(tile, player)) //if the config fragment is hidden, show
-					//alternatively, the current selected block can 'agree' to switch config tiles
-					|| (frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)))) {
-				frag.config.showConfig(tile);
-			}
-			//otherwise...
-		}else if(!frag.config.hasConfigMouse()){ //make sure a configuration fragment isn't on the cursor
-			//then, if it's shown and the current block 'agrees' to hide, hide it.
-			if(frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)) {
-				consumed = true;
-				frag.config.hideConfig();
-			}
-		}
+    public float getMouseX(){
+        return control.gdxInput().getX();
+    }
 
-		//call tapped event
-		if(tile.getTeam() == player.getTeam()){
-			CallBlocks.onTileTapped(player, tile);
-		}
+    public float getMouseY(){
+        return control.gdxInput().getY();
+    }
 
-		//consume tap event if necessary
-		if(tile.getTeam() == player.getTeam() && tile.block().consumesTap){
-			consumed = true;
-		}else if(tile.getTeam() == player.getTeam() && tile.block().synthetic() && !consumed) {
-			if(tile.block().hasItems && tile.entity.items.total() > 0) {
-				frag.inv.showFor(tile);
-				consumed = true;
-				showedInventory = true;
-			}
+    public void resetCursor(){
 
-			if(tile.block().consumes.hasAny()){
-				frag.consume.show(tile);
-				consumed = true;
-				showedConsume = true;
-			}
-		}
+    }
 
-		if(!showedInventory){
-			frag.inv.hide();
-		}
+    public boolean isCursorVisible(){
+        return false;
+    }
+
+    public void buildUI(Group group){
+
+    }
+
+    public void updateController(){
+
+    }
+
+    public void drawOutlined(){
+
+    }
+
+    public void drawTop(){
+
+    }
+
+    public boolean isDrawing(){
+        return false;
+    }
+
+    /**
+     * Handles tile tap events that are not platform specific.
+     */
+    boolean tileTapped(Tile tile){
+        tile = tile.target();
+
+        boolean consumed = false, showedInventory = false, showedConsume = false;
+
+        //check if tapped block is configurable
+        if(tile.block().configurable && tile.getTeam() == player.getTeam()){
+            consumed = true;
+            if(((!frag.config.isShown() && tile.block().shouldShowConfigure(tile, player)) //if the config fragment is hidden, show
+                    //alternatively, the current selected block can 'agree' to switch config tiles
+                    || (frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)))){
+                frag.config.showConfig(tile);
+            }
+            //otherwise...
+        }else if(!frag.config.hasConfigMouse()){ //make sure a configuration fragment isn't on the cursor
+            //then, if it's shown and the current block 'agrees' to hide, hide it.
+            if(frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)){
+                consumed = true;
+                frag.config.hideConfig();
+            }
+        }
+
+        //call tapped event
+        if(tile.getTeam() == player.getTeam()){
+            CallBlocks.onTileTapped(player, tile);
+        }
+
+        //consume tap event if necessary
+        if(tile.getTeam() == player.getTeam() && tile.block().consumesTap){
+            consumed = true;
+        }else if(tile.getTeam() == player.getTeam() && tile.block().synthetic() && !consumed){
+            if(tile.block().hasItems && tile.entity.items.total() > 0){
+                frag.inv.showFor(tile);
+                consumed = true;
+                showedInventory = true;
+            }
+
+            if(tile.block().consumes.hasAny()){
+                frag.consume.show(tile);
+                consumed = true;
+                showedConsume = true;
+            }
+        }
+
+        if(!showedInventory){
+            frag.inv.hide();
+        }
 
         if(!showedConsume){
             frag.consume.hide();
         }
 
-		return consumed;
-	}
+        return consumed;
+    }
 
-	/**Tries to select the player to drop off items, returns true if successful.*/
-	boolean tryTapPlayer(float x, float y){
-		if(canTapPlayer(x, y)){
-			droppingItem = true;
-			return true;
-		}
-		return false;
-	}
+    /**
+     * Tries to select the player to drop off items, returns true if successful.
+     */
+    boolean tryTapPlayer(float x, float y){
+        if(canTapPlayer(x, y)){
+            droppingItem = true;
+            return true;
+        }
+        return false;
+    }
 
-	boolean canTapPlayer(float x, float y){
-		return Vector2.dst(x, y, player.x, player.y) <= playerSelectRange && player.inventory.hasItem();
-	}
+    boolean canTapPlayer(float x, float y){
+        return Vector2.dst(x, y, player.x, player.y) <= playerSelectRange && player.inventory.hasItem();
+    }
 
-	/**Tries to begin mining a tile, returns true if successful.*/
-	boolean tryBeginMine(Tile tile){
-		if(canMine(tile)){
-			//if a block is clicked twice, reset it
-			player.setMineTile(player.getMineTile() == tile ? null : tile);
-			return true;
-		}
-		return false;
-	}
+    /**
+     * Tries to begin mining a tile, returns true if successful.
+     */
+    boolean tryBeginMine(Tile tile){
+        if(canMine(tile)){
+            //if a block is clicked twice, reset it
+            player.setMineTile(player.getMineTile() == tile ? null : tile);
+            return true;
+        }
+        return false;
+    }
 
-	boolean canMine(Tile tile){
-		return !ui.hasMouse()
-				&& tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
-				&& !tile.floor().playerUnmineable
-				&& player.inventory.canAcceptItem(tile.floor().drops.item)
-				&& Units.getClosestEnemy(player.getTeam(), tile.worldx(), tile.worldy(), 40f, e -> true) == null //don't being mining when an enemy is near
-				&& tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance;
-	}
+    boolean canMine(Tile tile){
+        return !ui.hasMouse()
+                && tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
+                && !tile.floor().playerUnmineable
+                && player.inventory.canAcceptItem(tile.floor().drops.item)
+                && Units.getClosestEnemy(player.getTeam(), tile.worldx(), tile.worldy(), 40f, e -> true) == null //don't being mining when an enemy is near
+                && tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance;
+    }
 
-	/**Returns the tile at the specified MOUSE coordinates.*/
-	Tile tileAt(float x, float y){
-		Vector2 vec = Graphics.world(x, y);
-		if(isPlacing()){
-			vec.sub(recipe.result.offset(), recipe.result.offset());
-		}
-		return world.tileWorld(vec.x, vec.y);
-	}
+    /**
+     * Returns the tile at the specified MOUSE coordinates.
+     */
+    Tile tileAt(float x, float y){
+        Vector2 vec = Graphics.world(x, y);
+        if(isPlacing()){
+            vec.sub(recipe.result.offset(), recipe.result.offset());
+        }
+        return world.tileWorld(vec.x, vec.y);
+    }
 
-	public boolean isPlacing(){
-		return recipe != null;
-	}
+    public boolean isPlacing(){
+        return recipe != null;
+    }
 
-	public float mouseAngle(float x, float y){
+    public float mouseAngle(float x, float y){
         return Graphics.world(getMouseX(), getMouseY()).sub(x, y).angle();
     }
 
-	public void remove(){
-	    Inputs.removeProcessor(this);
-	    frag.remove();
+    public void remove(){
+        Inputs.removeProcessor(this);
+        frag.remove();
     }
 
-	public boolean canShoot(){
-		return recipe == null && !ui.hasMouse() && !onConfigurable() && !isDroppingItem();
-	}
-	
-	public boolean onConfigurable(){
-		return false;
-	}
+    public boolean canShoot(){
+        return recipe == null && !ui.hasMouse() && !onConfigurable() && !isDroppingItem();
+    }
 
-	public boolean isDroppingItem(){
-		return droppingItem;
-	}
+    public boolean onConfigurable(){
+        return false;
+    }
 
-	public void tryDropItems(Tile tile, float x, float y){
-		if(!droppingItem || !player.inventory.hasItem() || canTapPlayer(x, y)){
-			droppingItem = false;
-			return;
-		}
+    public boolean isDroppingItem(){
+        return droppingItem;
+    }
 
-		droppingItem = false;
+    public void tryDropItems(Tile tile, float x, float y){
+        if(!droppingItem || !player.inventory.hasItem() || canTapPlayer(x, y)){
+            droppingItem = false;
+            return;
+        }
 
-		ItemStack stack = player.inventory.getItem();
+        droppingItem = false;
 
-		if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.block().hasItems){
-			CallBlocks.transferInventory(player, tile);
-		}else{
-			CallEntity.dropItem(player.angleTo(x, y));
-		}
-	}
+        ItemStack stack = player.inventory.getItem();
 
-	public boolean cursorNear(){
-		return true;
-	}
-	
-	public void tryPlaceBlock(int x, int y){
-		if(recipe != null && validPlace(x, y, recipe.result, rotation) && cursorNear()){
-			placeBlock(x, y, recipe, rotation);
-		}
-	}
-	
-	public void tryBreakBlock(int x, int y){
-		if(cursorNear() && validBreak(x, y)){
-			breakBlock(x, y);
-		}
-	}
-	
-	public boolean validPlace(int x, int y, Block type, int rotation){
+        if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.block().hasItems){
+            CallBlocks.transferInventory(player, tile);
+        }else{
+            CallEntity.dropItem(player.angleTo(x, y));
+        }
+    }
+
+    public boolean cursorNear(){
+        return true;
+    }
+
+    public void tryPlaceBlock(int x, int y){
+        if(recipe != null && validPlace(x, y, recipe.result, rotation) && cursorNear()){
+            placeBlock(x, y, recipe, rotation);
+        }
+    }
+
+    public void tryBreakBlock(int x, int y){
+        if(cursorNear() && validBreak(x, y)){
+            breakBlock(x, y);
+        }
+    }
+
+    public boolean validPlace(int x, int y, Block type, int rotation){
         for(Tile tile : state.teams.get(player.getTeam()).cores){
             if(tile.distanceTo(x * tilesize, y * tilesize) < coreBuildRange){
                 return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
@@ -261,89 +342,22 @@ public abstract class InputHandler extends InputAdapter{
         }
 
         return false;
-	}
-	
-	public boolean validBreak(int x, int y){
-		return Build.validBreak(player.getTeam(), x, y);
-	}
-	
-	public void placeBlock(int x, int y, Recipe recipe, int rotation){
+    }
+
+    public boolean validBreak(int x, int y){
+        return Build.validBreak(player.getTeam(), x, y);
+    }
+
+    public void placeBlock(int x, int y, Recipe recipe, int rotation){
         //todo multiplayer support
         player.addBuildRequest(new BuildRequest(x, y, rotation, recipe));
-	}
+    }
 
-	public void breakBlock(int x, int y){
+    public void breakBlock(int x, int y){
 
-		//todo multiplayer support
-    	Tile tile = world.tile(x, y).target();
-		player.addBuildRequest(new BuildRequest(tile.x, tile.y));
-	}
-
-	@Remote(targets = Loc.client, called = Loc.server, in = In.entities)
-	public static void dropItem(Player player, float angle){
-		if(Net.server() && !player.inventory.hasItem()){
-			throw new ValidateException(player, "Player cannot drop an item.");
-		}
-
-		ItemDrop.create(player.inventory.getItem().item, player.inventory.getItem().amount, player.x, player.y, angle);
-		player.inventory.clearItem();
-	}
-
-	@Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
-	public static void transferInventory(Player player, Tile tile){
-		if(Net.server() && (!player.inventory.hasItem() || player.isTransferring)) {
-			throw new ValidateException(player, "Player cannot transfer an item.");
-		}
-
-		threads.run(() -> {
-			if (player == null || tile.entity == null) return;
-
-			player.isTransferring = true;
-
-			ItemStack stack = player.inventory.getItem();
-			int accepted = tile.block().acceptStack(stack.item, stack.amount, tile, player);
-
-			boolean clear = stack.amount == accepted;
-			int sent = Mathf.clamp(accepted / 4, 1, 8);
-			int removed = accepted / sent;
-			int[] remaining = {accepted, accepted};
-
-			for (int i = 0; i < sent; i++) {
-				boolean end = i == sent - 1;
-				Timers.run(i * 3, () -> {
-					tile.block().getStackOffset(stack.item, tile, stackTrns);
-
-					ItemTransfer.create(stack.item,
-							player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
-							new Translator(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
-
-								tile.block().handleStack(stack.item, removed, tile, player);
-								remaining[1] -= removed;
-
-								if (end && remaining[1] > 0) {
-									tile.block().handleStack(stack.item, remaining[1], tile, player);
-								}
-							});
-
-					stack.amount -= removed;
-					remaining[0] -= removed;
-
-					if (end) {
-						stack.amount -= remaining[0];
-						if (clear) {
-							player.inventory.clearItem();
-						}
-						player.isTransferring = false;
-					}
-				});
-			}
-		});
-	}
-
-	@Remote(targets = Loc.both, called = Loc.server, forward = true, in = In.blocks)
-	public static void onTileTapped(Player player, Tile tile){
-		if(tile == null || player == null) return;
-		tile.block().tapped(tile, player);
-	}
+        //todo multiplayer support
+        Tile tile = world.tile(x, y).target();
+        player.addBuildRequest(new BuildRequest(tile.x, tile.y));
+    }
 
 }

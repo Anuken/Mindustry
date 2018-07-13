@@ -16,10 +16,10 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
-public class LiquidBulletType extends BulletType {
+public class LiquidBulletType extends BulletType{
     Liquid liquid;
 
-    public LiquidBulletType(Liquid liquid) {
+    public LiquidBulletType(Liquid liquid){
         super(2.5f, 0);
         this.liquid = liquid;
 
@@ -31,14 +31,14 @@ public class LiquidBulletType extends BulletType {
     }
 
     @Override
-    public void draw(Bullet b) {
+    public void draw(Bullet b){
         Draw.color(liquid.color, Color.WHITE, b.fout() / 100f + Mathf.randomSeedRange(b.id, 0.1f));
 
-        Fill.circle(b.x, b.y, 0.5f + b.fout()*2.5f);
+        Fill.circle(b.x, b.y, 0.5f + b.fout() * 2.5f);
     }
 
     @Override
-    public void hit(Bullet b, float hitx, float hity) {
+    public void hit(Bullet b, float hitx, float hity){
         Effects.effect(hiteffect, liquid.color, hitx, hity);
         Puddle.deposit(world.tileWorld(hitx, hity), liquid, 5f);
 
@@ -46,7 +46,7 @@ public class LiquidBulletType extends BulletType {
             float intensity = 400f;
             Fire.extinguish(world.tileWorld(hitx, hity), intensity);
             for(GridPoint2 p : Geometry.d4){
-                Fire.extinguish(world.tileWorld(hitx + p.x*tilesize, hity + p.y*tilesize), intensity);
+                Fire.extinguish(world.tileWorld(hitx + p.x * tilesize, hity + p.y * tilesize), intensity);
             }
         }
     }

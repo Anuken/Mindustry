@@ -2,7 +2,7 @@ package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.Color;
 
-public enum BarType {
+public enum BarType{
     health(Color.SCARLET),
     inventory(Color.GREEN),
     power(Color.valueOf("fbeb67")),

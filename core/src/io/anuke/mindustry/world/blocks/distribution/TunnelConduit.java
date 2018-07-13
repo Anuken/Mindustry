@@ -7,11 +7,11 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.ucore.graphics.Draw;
 
-public class TunnelConduit extends LiquidBlock {
+public class TunnelConduit extends LiquidBlock{
     protected int maxdist = 3;
     protected float speed = 53;
 
-    protected TunnelConduit(String name) {
+    protected TunnelConduit(String name){
         super(name);
         rotate = true;
         solid = true;
@@ -21,7 +21,7 @@ public class TunnelConduit extends LiquidBlock {
     }
 
     @Override
-    public void setBars() {
+    public void setBars(){
         super.setBars();
         bars.remove(BarType.liquid);
     }
@@ -37,39 +37,39 @@ public class TunnelConduit extends LiquidBlock {
     }
 
     @Override
-    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         Tile tunnel = getDestTunnel(tile);
-        if (tunnel == null) return;
+        if(tunnel == null) return;
         Tile to = tunnel.getNearby(tunnel.getRotation());
-        if (to == null || !(to.block().hasLiquids)) return;
+        if(to == null || !(to.block().hasLiquids)) return;
 
-        if (to.block().acceptLiquid(to, tunnel, liquid, amount))
+        if(to.block().acceptLiquid(to, tunnel, liquid, amount))
             to.block().handleLiquid(to, tunnel, liquid, amount);
     }
 
     @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         int rot = source.relativeTo(tile.x, tile.y);
-        if (rot != (tile.getRotation() + 2) % 4) return false;
+        if(rot != (tile.getRotation() + 2) % 4) return false;
         Tile tunnel = getDestTunnel(tile);
 
-        if (tunnel != null) {
+        if(tunnel != null){
             Tile to = tunnel.getNearby(tunnel.getRotation());
             return to != null && (to.block().hasLiquids) &&
                     (to.block()).acceptLiquid(to, tunnel, liquid, amount);
-        } else {
+        }else{
             return false;
         }
     }
 
-    Tile getDestTunnel(Tile tile) {
+    Tile getDestTunnel(Tile tile){
         Tile dest = tile;
         int rel = (tile.getRotation() + 2) % 4;
-        for (int i = 0; i < maxdist; i++) {
-            if (dest == null) return null;
+        for(int i = 0; i < maxdist; i++){
+            if(dest == null) return null;
             dest = dest.getNearby(rel);
-            if (dest != null && dest.block() instanceof TunnelConduit && dest.getRotation() == rel
-                    && dest.getNearby(rel) != null) {
+            if(dest != null && dest.block() instanceof TunnelConduit && dest.getRotation() == rel
+                    && dest.getNearby(rel) != null){
                 return dest;
             }
         }

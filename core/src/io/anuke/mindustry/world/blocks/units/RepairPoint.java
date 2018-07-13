@@ -9,8 +9,8 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
@@ -22,14 +22,14 @@ import io.anuke.ucore.util.Mathf;
 public class RepairPoint extends Block{
     private static Rectangle rect = new Rectangle();
 
-    protected int timerTarget = timers ++;
+    protected int timerTarget = timers++;
 
     protected float repairRadius = 50f;
     protected float repairSpeed = 0.3f;
 
     protected TextureRegion topRegion;
 
-    public RepairPoint(String name) {
+    public RepairPoint(String name){
         super(name);
         update = true;
         solid = true;
@@ -42,7 +42,7 @@ public class RepairPoint extends Block{
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
 
         topRegion = Draw.region(name + "-turret");
@@ -56,14 +56,14 @@ public class RepairPoint extends Block{
     }
 
     @Override
-    public void drawLayer(Tile tile) {
+    public void drawLayer(Tile tile){
         RepairPointEntity entity = tile.entity();
 
         Draw.rect(topRegion, tile.drawx(), tile.drawy(), entity.rotation - 90);
     }
 
     @Override
-    public void drawLayer2(Tile tile) {
+    public void drawLayer2(Tile tile){
         RepairPointEntity entity = tile.entity();
 
         if(entity.target != null &&
@@ -80,11 +80,11 @@ public class RepairPoint extends Block{
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         RepairPointEntity entity = tile.entity();
 
         if(entity.target != null && (entity.target.isDead() || entity.target.distanceTo(tile) > repairRadius ||
-            entity.target.health >= entity.target.maxHealth())){
+                entity.target.health >= entity.target.maxHealth())){
             entity.target = null;
         }else if(entity.target != null){
             entity.target.health += repairSpeed * Timers.delta() * entity.strength;
@@ -98,7 +98,7 @@ public class RepairPoint extends Block{
             entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.07f * Timers.delta());
         }
 
-        if(entity.timer.get(timerTarget, 20)) {
+        if(entity.timer.get(timerTarget, 20)){
             rect.setSize(repairRadius * 2).setCenter(tile.drawx(), tile.drawy());
             entity.target = Units.getClosest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius,
                     unit -> unit.health < unit.maxHealth());
@@ -106,14 +106,14 @@ public class RepairPoint extends Block{
     }
 
     @Override
-    public boolean shouldConsume(Tile tile) {
+    public boolean shouldConsume(Tile tile){
         RepairPointEntity entity = tile.entity();
 
         return entity.target != null;
     }
 
     @Override
-    public TileEntity getEntity() {
+    public TileEntity getEntity(){
         return new RepairPointEntity();
     }
 
