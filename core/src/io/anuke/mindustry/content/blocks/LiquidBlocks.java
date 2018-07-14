@@ -58,13 +58,13 @@ public class LiquidBlocks extends BlockList implements ContentList{
         liquidJunction = new LiquidJunction("liquid-junction");
 
         bridgeConduit = new LiquidExtendingBridge("bridge-conduit"){{
-            range = 3;
+            range = 4;
             hasPower = false;
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
-            range = 7;
-            hasPower = false;
+            range = 11;
+            hasPower = true;
             consumes.power(0.05f);
         }};
     }

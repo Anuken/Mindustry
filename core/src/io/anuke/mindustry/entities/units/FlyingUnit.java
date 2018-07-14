@@ -23,10 +23,6 @@ import static io.anuke.mindustry.Vars.world;
 public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected static Translator vec = new Translator();
     protected static float wobblyness = 0.6f;
-
-    protected Trail trail = new Trail(8);
-    protected CarriableTrait carrying;
-
     protected final UnitState
 
     resupply = new UnitState(){
@@ -44,6 +40,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             }
         }
     },
+
     idle = new UnitState(){
         public void update(){
             retarget(() -> {
@@ -62,6 +59,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             velocity.scl(0.8f);
         }
     },
+
     attack = new UnitState(){
         public void entered(){
             target = null;
@@ -88,7 +86,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
                 attack(150f);
 
                 if((Mathf.angNear(angleTo(target), rotation, 15f) || !inventory.getAmmo().bullet.keepVelocity) //bombers don't care about rotation
-                        && distanceTo(target) < inventory.getAmmo().getRange()){
+                && distanceTo(target) < inventory.getAmmo().getRange()){
                     AmmoType ammo = inventory.getAmmo();
                     inventory.useAmmo();
 
@@ -117,6 +115,8 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             }
         }
     };
+    protected Trail trail = new Trail(8);
+    protected CarriableTrait carrying;
 
     //instantiation only
     public FlyingUnit(){
@@ -149,7 +149,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
         updateRotation();
         trail.update(x + Angles.trnsx(rotation + 180f, 6f) + Mathf.range(wobblyness),
-                y + Angles.trnsy(rotation + 180f, 6f) + Mathf.range(wobblyness));
+        y + Angles.trnsy(rotation + 180f, 6f) + Mathf.range(wobblyness));
 
         wobble();
     }
@@ -173,7 +173,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     @Override
     public void behavior(){
         if(health <= health * type.retreatPercent && !isWave &&
-                Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair)) != null){
+        Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
         }
 

@@ -153,7 +153,7 @@ public class LevelDialog extends FloatingDialog{
         pane.setFadeScrollBars(false);
         table.row();
         for(GameMode mode : GameMode.values()){
-            table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(600f);
+            table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(400f);
             table.row();
         }
 

@@ -27,12 +27,13 @@ public class DistributionBlocks extends BlockList implements ContentList{
         }};
 
         bridgeConveyor = new BufferedItemBridge("bridge-conveyor"){{
-            range = 3;
+            range = 4;
+            speed = 60f;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
-            range = 7;
-            hasPower = false;
+            range = 11;
+            hasPower = true;
             consumes.power(0.05f);
         }};
 

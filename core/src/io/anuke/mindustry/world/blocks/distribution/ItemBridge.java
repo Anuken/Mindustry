@@ -99,8 +99,8 @@ public class ItemBridge extends Block{
             Lines.dashLine(
                     x * tilesize + Geometry.d4[i].x * (tilesize / 2f + 2),
                     y * tilesize + Geometry.d4[i].y * (tilesize / 2f + 2),
-                    x * tilesize + Geometry.d4[i].x * range * tilesize,
-                    y * tilesize + Geometry.d4[i].y * range * tilesize,
+                    x * tilesize + Geometry.d4[i].x * (range + 0.5f) * tilesize,
+                    y * tilesize + Geometry.d4[i].y * (range + 0.5f) * tilesize,
                     range);
         }
 

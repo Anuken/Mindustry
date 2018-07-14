@@ -112,6 +112,8 @@ public class MapEditor{
         boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
 
         if(drawBlock.isMultiblock()){
+            x = Mathf.clamp(x, (drawBlock.size-1)/2, map.width() - drawBlock.size/2 - 1);
+            y = Mathf.clamp(y, (drawBlock.size-1)/2, map.height() - drawBlock.size/2 - 1);
 
             int offsetx = -(drawBlock.size - 1) / 2;
             int offsety = -(drawBlock.size - 1) / 2;
