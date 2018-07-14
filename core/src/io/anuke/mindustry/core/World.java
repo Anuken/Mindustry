@@ -15,6 +15,7 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.maps.Maps;
+import io.anuke.mindustry.maps.Sectors;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.mapgen.WorldGenerator;
@@ -37,17 +38,23 @@ public class World extends Module{
     private Pathfinder pathfinder = new Pathfinder();
     private BlockIndexer indexer = new BlockIndexer();
     private Maps maps = new Maps();
+    private Sectors sectors = new Sectors();
 
     private Array<Tile> tempTiles = new ThreadArray<>();
     private boolean generating, invalidMap;
 
     public World(){
         maps.load();
+        sectors.load();
     }
 
     @Override
     public void dispose(){
         maps.dispose();
+    }
+
+    public Sectors sectors(){
+        return sectors;
     }
 
     public Maps maps(){
@@ -208,7 +215,7 @@ public class World extends Module{
 
         beginMapLoad();
 
-        int width = 400, height = 400;
+        int width = 250, height = 250;
 
         Tile[][] tiles = createTiles(width, height);
 

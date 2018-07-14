@@ -36,8 +36,8 @@ public class Save16 extends SaveFileVersion{
 
     @Override
     public void read(DataInputStream stream) throws IOException{
-        /*long loadTime = */
-        stream.readLong();
+        stream.readLong(); //time
+        stream.readInt(); //build
 
         //general state
         byte mode = stream.readByte();
@@ -154,7 +154,7 @@ public class Save16 extends SaveFileVersion{
         //--META--
         stream.writeInt(version); //version id
         stream.writeLong(TimeUtils.millis()); //last saved
-        stream.writeInt(Version.build);
+        stream.writeInt(Version.build); //build
 
         //--GENERAL STATE--
         stream.writeByte(state.mode.ordinal()); //gamemode
