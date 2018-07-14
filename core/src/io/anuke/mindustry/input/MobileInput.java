@@ -412,11 +412,13 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
+        TargetTrait target = player.target;
+
         //draw targeting crosshair
-        if(player.target != null){
-            if(player.target != lastTarget){
+        if(target != null){
+            if(target != lastTarget){
                 crosshairScale = 0f;
-                lastTarget = player.target;
+                lastTarget = target;
             }
 
             crosshairScale = Mathf.lerpDelta(crosshairScale, 1f, 0.2f);
@@ -426,8 +428,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             float radius = Interpolation.swingIn.apply(crosshairScale);
 
-            Lines.poly(player.target.getX(), player.target.getY(), 4, 7f * radius, Timers.time() * 1.5f);
-            Lines.spikes(player.target.getX(), player.target.getY(), 3f * radius, 6f * radius, 4, Timers.time() * 1.5f);
+            Lines.poly(target.getX(), target.getY(), 4, 7f * radius, Timers.time() * 1.5f);
+            Lines.spikes(target.getX(), target.getY(), 3f * radius, 6f * radius, 4, Timers.time() * 1.5f);
         }
 
         Draw.reset();
