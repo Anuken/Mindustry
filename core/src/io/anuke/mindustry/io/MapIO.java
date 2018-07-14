@@ -8,8 +8,11 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.io.MapTileData.DataPosition;
-import io.anuke.mindustry.io.MapTileData.TileDataMarker;
+import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.maps.MapMeta;
+import io.anuke.mindustry.maps.MapTileData;
+import io.anuke.mindustry.maps.MapTileData.DataPosition;
+import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 

@@ -256,7 +256,7 @@ public class Renderer extends RendererModule{
     private void drawFlyerShadows(){
         Graphics.surface(effectSurface, true, false);
 
-        float trnsX = 12, trnsY = -13;
+        float trnsX = -12, trnsY = -13;
 
         Graphics.end();
         Core.batch.getTransformMatrix().translate(trnsX, trnsY, 0);

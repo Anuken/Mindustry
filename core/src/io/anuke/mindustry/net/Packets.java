@@ -6,7 +6,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
-import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.io.IOUtils;

@@ -14,7 +14,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadServer;
-import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.*;

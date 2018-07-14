@@ -1,4 +1,4 @@
-package io.anuke.mindustry.io;
+package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;

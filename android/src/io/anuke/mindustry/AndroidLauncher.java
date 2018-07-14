@@ -26,7 +26,7 @@ import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.io.SaveIO;
-import io.anuke.mindustry.io.Saves.SaveSlot;
+import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.ucore.function.Consumer;

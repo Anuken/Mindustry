@@ -2,8 +2,8 @@ package io.anuke.mindustry.editor;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
-import io.anuke.mindustry.io.MapTileData;
-import io.anuke.mindustry.io.MapTileData.TileDataMarker;
+import io.anuke.mindustry.maps.MapTileData;
+import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.ucore.util.Bits;
 
 public class DrawOperation{

@@ -259,16 +259,12 @@ public abstract class BaseBlock{
         tile.setDump((byte) ((tile.getDump() + 1) % prox));
     }
 
-    /**
-     * Used for dumping items.
-     */
+    /** Used for dumping items.*/
     public boolean canDump(Tile tile, Tile to, Item item){
         return true;
     }
 
-    /**
-     * Try offloading an item to a nearby container in its facing direction. Returns true if success.
-     */
+    /** Try offloading an item to a nearby container in its facing direction. Returns true if success.*/
     public boolean offloadDir(Tile tile, Item item){
         Tile other = tile.getNearby(tile.getRotation());
         if(other != null && other.block().acceptItem(item, other, tile)){

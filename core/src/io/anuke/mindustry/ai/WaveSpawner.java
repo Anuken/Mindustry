@@ -7,7 +7,7 @@ import io.anuke.mindustry.entities.units.Squad;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.WaveCreator;
+import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.util.Mathf;
@@ -169,7 +169,7 @@ public class WaveSpawner{
         quadrants = new Bits(quadWidth() * quadHeight());
 
         if(groups == null){
-            groups = WaveCreator.getSpawns();
+            groups = Waves.getSpawns();
         }
     }
 

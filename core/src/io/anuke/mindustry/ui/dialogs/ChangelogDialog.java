@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.Changelogs;
 import io.anuke.mindustry.io.Changelogs.VersionInfo;
-import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.game.Version;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;

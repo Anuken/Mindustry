@@ -1,6 +1,6 @@
 package io.anuke.mindustry.desktop;
 
-import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.Strings;

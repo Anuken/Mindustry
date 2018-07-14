@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;

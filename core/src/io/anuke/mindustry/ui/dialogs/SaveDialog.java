@@ -2,7 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.io.Saves.SaveSlot;
+import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.util.Bundles;

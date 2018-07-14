@@ -7,7 +7,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.io.SaveIO;
-import io.anuke.mindustry.io.Saves.SaveSlot;
+import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.ScrollPane;

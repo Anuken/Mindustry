@@ -1,11 +1,12 @@
-package io.anuke.mindustry.io;
+package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
-import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.io.SaveMeta;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;

@@ -1,4 +1,4 @@
-package io.anuke.mindustry.io;
+package io.anuke.mindustry.maps;
 
 import com.badlogic.gdx.utils.IntIntMap;
 import io.anuke.ucore.util.Bits;

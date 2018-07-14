@@ -3,6 +3,7 @@ package io.anuke.mindustry.io;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.maps.Map;
 
 import java.util.Date;
 

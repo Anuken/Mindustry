@@ -1,6 +1,6 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.mindustry.io.Map;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Core;

@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.io.MapTileData.DataPosition;
+import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
