@@ -259,12 +259,13 @@ public class TypeIO{
 
     @WriteClass(Item.class)
     public static void writeItem(ByteBuffer buffer, Item item){
-        buffer.put((byte) item.id);
+        buffer.put(item == null ? -1 : (byte) item.id);
     }
 
     @ReadClass(Item.class)
     public static Item readItem(ByteBuffer buffer){
-        return Item.getByID(buffer.get());
+        byte id = buffer.get();
+        return id == -1 ? null : Item.getByID(id);
     }
 
     @WriteClass(Recipe.class)

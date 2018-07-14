@@ -255,7 +255,7 @@ public abstract class BaseBlock{
         return false;
     }
 
-    private void incrementDump(Tile tile, int prox){
+    protected void incrementDump(Tile tile, int prox){
         tile.setDump((byte) ((tile.getDump() + 1) % prox));
     }
 

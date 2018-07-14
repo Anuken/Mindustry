@@ -207,7 +207,7 @@ public class BuildBlock extends Block{
                 builderID = builder.getID();
             }
 
-            if(progress >= 1f){
+            if(progress >= 1f || debug){
                 CallBlocks.onConstructFinish(tile, recipe.result, builderID, tile.getRotation(), tile.getTeam());
             }
         }
@@ -233,7 +233,7 @@ public class BuildBlock extends Block{
 
             progress = Mathf.clamp(progress - amount);
 
-            if(progress <= 0){
+            if(progress <= 0 || debug){
                 CallBlocks.onDeconstructFinish(tile, this.recipe == null ? previous : this.recipe.result);
             }
         }

@@ -47,7 +47,6 @@ public class Recipes implements ContentList{
         new Recipe(distribution, DistributionBlocks.splitter, new ItemStack(Items.lead, 6));
 
         //advanced carbide transporation
-        //new Recipe(distribution, DistributionBlocks.splitter, new ItemStack(Items.carbide, 2), new ItemStack(Items.tungsten, 2));
         new Recipe(distribution, DistributionBlocks.distributor, new ItemStack(Items.carbide, 8), new ItemStack(Items.tungsten, 8));
         new Recipe(distribution, DistributionBlocks.sorter, new ItemStack(Items.carbide, 4), new ItemStack(Items.tungsten, 4));
         new Recipe(distribution, DistributionBlocks.overflowGate, new ItemStack(Items.carbide, 4), new ItemStack(Items.tungsten, 8));
@@ -105,8 +104,8 @@ public class Recipes implements ContentList{
         new Recipe(power, PowerBlocks.nuclearReactor, new ItemStack(Items.lead, 600), new ItemStack(Items.silicon, 400), new ItemStack(Items.carbide, 300), new ItemStack(Items.thorium, 300));
 
         //new Recipe(distribution, StorageBlocks.core, new ItemStack(Items.carbide, 50));
-        new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.carbide, 40), new ItemStack(Items.silicon, 50));
-        new Recipe(distribution, StorageBlocks.sortedunloader, new ItemStack(Items.carbide, 40), new ItemStack(Items.silicon, 70));
+        //new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.carbide, 40), new ItemStack(Items.silicon, 50));
+        new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.carbide, 40), new ItemStack(Items.silicon, 70));
         new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.carbide, 500), new ItemStack(Items.thorium, 350));
 
         //DRILLS, PRODUCERS
