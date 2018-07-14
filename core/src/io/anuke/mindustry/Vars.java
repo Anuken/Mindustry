@@ -23,6 +23,7 @@ import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.OS;
+import io.anuke.ucore.util.Translator;
 
 import java.util.Locale;
 
@@ -129,6 +130,8 @@ public class Vars{
     public static EntityGroup<Puddle> puddleGroup;
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<BaseUnit>[] unitGroups;
+
+    public static final Translator[] tmptr = new Translator[]{new Translator(), new Translator(), new Translator(), new Translator()};
 
     public static void init(){
         Version.init();

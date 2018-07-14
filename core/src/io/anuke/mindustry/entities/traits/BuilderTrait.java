@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.tmptr;
 import static io.anuke.mindustry.Vars.world;
 
 /**
@@ -41,7 +42,6 @@ import static io.anuke.mindustry.Vars.world;
  */
 public interface BuilderTrait extends Entity{
     //these are not instance variables!
-    Translator[] tmptr = {new Translator(), new Translator(), new Translator(), new Translator()};
     float placeDistance = 140f;
     float mineDistance = 70f;
 

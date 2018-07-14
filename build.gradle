@@ -168,6 +168,10 @@ project(":core") {
 project(":server") {
     apply plugin: "java"
 
+    configurations {
+        compile.exclude module: android
+    }
+    
     dependencies {
         compileOnly project(":annotations")
 
