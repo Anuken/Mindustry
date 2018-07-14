@@ -28,8 +28,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
-import static io.anuke.mindustry.Vars.control;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
 
 public class IOSLauncher extends IOSApplication.Delegate {
@@ -120,7 +119,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
             FileHandle file = Gdx.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
             Gdx.files.absolute(url.getPath()).copyTo(file);
 
-            if(file.extension().equalsIgnoreCase("mins")){ //open save
+            if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
 
                 if(SaveIO.isSaveValid(file)){
                     try{
@@ -133,11 +132,14 @@ public class IOSLauncher extends IOSApplication.Delegate {
                     ui.showError("$text.save.import.invalid");
                 }
 
-            }else if(file.extension().equalsIgnoreCase("png")){ //open map
-                if(!ui.editor.isShown()){
-                    ui.editor.show();
-                }
-                ui.editor.tryLoadMap(file);
+            }else if(file.extension().equalsIgnoreCase(mapExtension)){ //open map
+                Gdx.app.postRunnable(() -> {
+                    if (!ui.editor.isShown()) {
+                        ui.editor.show();
+                    }
+
+                    ui.editor.beginEditMap(file.read());
+                });
             }
         });
     }

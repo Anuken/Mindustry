@@ -2,40 +2,43 @@ package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Placement;
-import io.anuke.mindustry.world.blocks.types.BlockPart;
-import io.anuke.mindustry.world.blocks.types.Floor;
-import io.anuke.mindustry.world.blocks.types.Rock;
-import io.anuke.mindustry.world.blocks.types.StaticBlock;
+import io.anuke.mindustry.world.blocks.BlockPart;
+import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.Rock;
+import io.anuke.mindustry.world.blocks.StaticBlock;
 import io.anuke.ucore.core.Settings;
+
+import static io.anuke.mindustry.Vars.headless;
 import static io.anuke.mindustry.Vars.world;
 
-public class Administration {
+public class Administration{
     public static final int defaultMaxBrokenBlocks = 15;
-    public static final int defaultBreakCooldown = 1000*15;
+    public static final int defaultBreakCooldown = 1000 * 15;
 
-    private Json json = new Json();
-    /**All player info. Maps UUIDs to info. This persists throughout restarts.*/
+    /**
+     * All player info. Maps UUIDs to info. This persists throughout restarts.
+     */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
-    /**Maps UUIDs to trace infos. This is wiped when a player logs off.*/
+    /**
+     * Maps UUIDs to trace infos. This is wiped when a player logs off.
+     */
     private ObjectMap<String, TraceInfo> traceInfo = new ObjectMap<>();
-    /**Maps packed coordinates to logs for that coordinate */
+    /**
+     * Maps packed coordinates to logs for that coordinate
+     */
     private IntMap<Array<EditLog>> editLogs = new IntMap<>();
-    
+
     private Array<String> bannedIPs = new Array<>();
 
     public Administration(){
         Settings.defaultList(
-            "playerInfo", "{}",
-            "bannedIPs", "{}",
-            "antigrief", false,
-            "antigrief-max", defaultMaxBrokenBlocks,
-            "antigrief-cooldown", defaultBreakCooldown
+                "antigrief", false,
+                "antigrief-max", defaultMaxBrokenBlocks,
+                "antigrief-cooldown", defaultBreakCooldown
         );
 
         load();
@@ -45,13 +48,22 @@ public class Administration {
         return Settings.getBool("antigrief");
     }
 
-    public boolean isValidateReplace(){
-        return false;
-    }
-
     public void setAntiGrief(boolean antiGrief){
         Settings.putBool("antigrief", antiGrief);
         Settings.save();
+    }
+
+    public boolean allowsCustomClients(){
+        return Settings.getBool("allow-custom", !headless);
+    }
+
+    public void setCustomClients(boolean allowed){
+        Settings.putBool("allow-custom", allowed);
+        Settings.save();
+    }
+
+    public boolean isValidateReplace(){
+        return false;
     }
 
     public void setAntiGriefParams(int maxBreak, int cooldown){
@@ -60,59 +72,62 @@ public class Administration {
         Settings.save();
     }
 
-    public IntMap<Array<EditLog>> getEditLogs() {
+    public IntMap<Array<EditLog>> getEditLogs(){
         return editLogs;
     }
-    
-    public void logEdit(int x, int y, Player player, Block block, int rotation, EditLog.EditAction action) {
-    	if(block instanceof BlockPart || block instanceof Rock || block instanceof Floor || block instanceof StaticBlock) return;
-    	if(editLogs.containsKey(x + y * world.width())) {
-			editLogs.get(x + y * world.width()).add(new EditLog(player.name, block, rotation, action));
-		}
-		else {
-			Array<EditLog> logs = new Array<>();
-			logs.add(new EditLog(player.name, block, rotation, action));
-			editLogs.put(x + y * world.width(), logs);
-		}
+
+    public void logEdit(int x, int y, Player player, Block block, int rotation, EditLog.EditAction action){
+        if(block instanceof BlockPart || block instanceof Rock || block instanceof Floor || block instanceof StaticBlock)
+            return;
+        if(editLogs.containsKey(x + y * world.width())){
+            editLogs.get(x + y * world.width()).add(new EditLog(player.name, block, rotation, action));
+        }else{
+            Array<EditLog> logs = new Array<>();
+            logs.add(new EditLog(player.name, block, rotation, action));
+            editLogs.put(x + y * world.width(), logs);
+        }
     }
-    
+
+    /*
     public void rollbackWorld(int rollbackTimes) {
         for(IntMap.Entry<Array<EditLog>> editLog : editLogs.entries()) {
             int coords = editLog.key;
             Array<EditLog> logs = editLog.value;
-        
+
             for(int i = 0; i < rollbackTimes; i++) {
-            
+
                 EditLog log = logs.get(logs.size - 1);
-            
+
                 int x = coords % world.width();
                 int y = coords / world.width();
                 Block result = log.block;
                 int rotation = log.rotation;
-            
+
+                //TODO fix this mess, broken with 4.0
+
                 if(log.action == EditLog.EditAction.PLACE) {
-                    Placement.breakBlock(x, y, false, false);
-                
+                   // Build.breakBlock(x, y, false, false);
+
                     Packets.BreakPacket packet = new Packets.BreakPacket();
                     packet.x = (short) x;
                     packet.y = (short) y;
                     packet.playerid = 0;
-                
+
                     Net.send(packet, Net.SendMode.tcp);
                 }
                 else if(log.action == EditLog.EditAction.BREAK) {
-                    Placement.placeBlock(x, y, result, rotation, false, false);
-                
+                    //Build.placeBlock(x, y, result, rotation, false, false);
+
                     Packets.PlacePacket packet = new Packets.PlacePacket();
                     packet.x = (short) x;
                     packet.y = (short) y;
                     packet.rotation = (byte) rotation;
                     packet.playerid = 0;
-                    packet.block = result.id;
-                
+                    //packet.block = result.id;
+
                     Net.send(packet, Net.SendMode.tcp);
                 }
-            
+
                 logs.removeIndex(logs.size - 1);
                 if(logs.size == 0) {
                     editLogs.remove(coords);
@@ -120,8 +135,8 @@ public class Administration {
                 }
             }
         }
-    }
-    
+    }*/
+
     public boolean validateBreak(String id, String ip){
         if(!isAntiGrief() || isAdmin(id, ip)) return true;
 
@@ -134,18 +149,18 @@ public class Administration {
         long[] breaks = info.lastBroken;
 
         int shiftBy = 0;
-        for(int i = 0; i < breaks.length && breaks[i] != 0; i ++){
+        for(int i = 0; i < breaks.length && breaks[i] != 0; i++){
             if(TimeUtils.timeSinceMillis(breaks[i]) >= Settings.getInt("antigrief-cooldown")){
                 shiftBy = i;
             }
         }
 
-        for (int i = 0; i < breaks.length; i++) {
+        for(int i = 0; i < breaks.length; i++){
             breaks[i] = (i + shiftBy >= breaks.length) ? 0 : breaks[i + shiftBy];
         }
 
         int remaining = 0;
-        for(int i = 0; i < breaks.length; i ++){
+        for(int i = 0; i < breaks.length; i++){
             if(breaks[i] == 0){
                 remaining = breaks.length - i;
                 break;
@@ -158,29 +173,35 @@ public class Administration {
         return true;
     }
 
-    /**Call when a player joins to update their information here.*/
+    /**
+     * Call when a player joins to update their information here.
+     */
     public void updatePlayerJoined(String id, String ip, String name){
         PlayerInfo info = getCreateInfo(id);
         info.lastName = name;
         info.lastIP = ip;
-        info.timesJoined ++;
+        info.timesJoined++;
         if(!info.names.contains(name, false)) info.names.add(name);
         if(!info.ips.contains(ip, false)) info.ips.add(ip);
     }
 
-    /**Returns trace info by IP.*/
-    public TraceInfo getTrace(String ip){
-        if(!traceInfo.containsKey(ip)) traceInfo.put(ip, new TraceInfo(ip));
+    /**
+     * Returns trace info by IP.
+     */
+    public TraceInfo getTraceByID(String uuid){
+        if(!traceInfo.containsKey(uuid)) traceInfo.put(uuid, new TraceInfo(uuid));
 
-        return traceInfo.get(ip);
+        return traceInfo.get(uuid);
     }
 
     public void clearTraces(){
         traceInfo.clear();
     }
 
-    /**Bans a player by IP; returns whether this player was already banned.
-     * If there are players who at any point had this IP, they will be UUID banned as well.*/
+    /**
+     * Bans a player by IP; returns whether this player was already banned.
+     * If there are players who at any point had this IP, they will be UUID banned as well.
+     */
     public boolean banPlayerIP(String ip){
         if(bannedIPs.contains(ip, false))
             return false;
@@ -197,7 +218,9 @@ public class Administration {
         return true;
     }
 
-    /**Bans a player by UUID; returns whether this player was already banned.*/
+    /**
+     * Bans a player by UUID; returns whether this player was already banned.
+     */
     public boolean banPlayerID(String id){
         if(playerInfo.containsKey(id) && playerInfo.get(id).banned)
             return false;
@@ -209,8 +232,10 @@ public class Administration {
         return true;
     }
 
-    /**Unbans a player by IP; returns whether this player was banned in the first place.
-     * This method also unbans any player that was banned and had this IP.*/
+    /**
+     * Unbans a player by IP; returns whether this player was banned in the first place.
+     * This method also unbans any player that was banned and had this IP.
+     */
     public boolean unbanPlayerIP(String ip){
         boolean found = bannedIPs.contains(ip, false);
 
@@ -228,8 +253,10 @@ public class Administration {
         return found;
     }
 
-    /**Unbans a player by ID; returns whether this player was banned in the first place.
-     * This also unbans all IPs the player used.*/
+    /**
+     * Unbans a player by ID; returns whether this player was banned in the first place.
+     * This also unbans all IPs the player used.
+     */
     public boolean unbanPlayerID(String id){
         PlayerInfo info = getCreateInfo(id);
 
@@ -243,7 +270,9 @@ public class Administration {
         return true;
     }
 
-    /**Returns list of all players with admin status*/
+    /**
+     * Returns list of all players with admin status
+     */
     public Array<PlayerInfo> getAdmins(){
         Array<PlayerInfo> result = new Array<>();
         for(PlayerInfo info : playerInfo.values()){
@@ -254,7 +283,9 @@ public class Administration {
         return result;
     }
 
-    /**Returns list of all players with admin status*/
+    /**
+     * Returns list of all players with admin status
+     */
     public Array<PlayerInfo> getBanned(){
         Array<PlayerInfo> result = new Array<>();
         for(PlayerInfo info : playerInfo.values()){
@@ -265,26 +296,32 @@ public class Administration {
         return result;
     }
 
-    /**Returns all banned IPs. This does not include the IPs of ID-banned players.*/
+    /**
+     * Returns all banned IPs. This does not include the IPs of ID-banned players.
+     */
     public Array<String> getBannedIPs(){
         return bannedIPs;
     }
 
-    /**Makes a player an admin. Returns whether this player was already an admin.*/
-    public boolean adminPlayer(String id, String ip){
+    /**
+     * Makes a player an admin. Returns whether this player was already an admin.
+     */
+    public boolean adminPlayer(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
 
         if(info.admin)
             return false;
 
-        info.validAdminIP = ip;
+        info.adminUsid = usid;
         info.admin = true;
         save();
 
         return true;
     }
 
-    /**Makes a player no longer an admin. Returns whether this player was an admin in the first place.*/
+    /**
+     * Makes a player no longer an admin. Returns whether this player was an admin in the first place.
+     */
     public boolean unAdminPlayer(String id){
         PlayerInfo info = getCreateInfo(id);
 
@@ -305,9 +342,9 @@ public class Administration {
         return getCreateInfo(uuid).banned;
     }
 
-    public boolean isAdmin(String id, String ip){
+    public boolean isAdmin(String id, String usip){
         PlayerInfo info = getCreateInfo(id);
-        return info.admin && ip.equals(info.validAdminIP);
+        return info.admin && usip.equals(info.adminUsid);
     }
 
     public Array<PlayerInfo> findByName(String name, boolean last){
@@ -363,23 +400,23 @@ public class Administration {
     }
 
     public void save(){
-        Settings.putString("playerInfo", json.toJson(playerInfo));
-        Settings.putString("bannedIPs", json.toJson(bannedIPs));
+        Settings.putJson("player-info", playerInfo);
+        Settings.putJson("banned-ips", bannedIPs);
         Settings.save();
     }
 
     private void load(){
-        playerInfo = json.fromJson(ObjectMap.class, Settings.getString("playerInfo"));
-        bannedIPs = json.fromJson(Array.class, Settings.getString("bannedIPs"));
+        playerInfo = Settings.getJson("player-info", ObjectMap.class);
+        bannedIPs = Settings.getJson("banned-ips", Array.class);
     }
 
     public static class PlayerInfo{
         public String id;
         public String lastName = "<unknown>", lastIP = "<unknown>";
-        public String validAdminIP;
         public Array<String> ips = new Array<>();
         public Array<String> names = new Array<>();
-        public int timesKicked; //TODO not implemented!
+        public String adminUsid;
+        public int timesKicked;
         public int timesJoined;
         public int totalBlockPlaced;
         public int totalBlocksBroken;
@@ -392,7 +429,8 @@ public class Administration {
             this.id = id;
         }
 
-        private PlayerInfo(){}
+        private PlayerInfo(){
+        }
     }
 
 }

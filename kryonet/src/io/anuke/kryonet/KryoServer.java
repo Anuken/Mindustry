@@ -6,20 +6,20 @@ import com.badlogic.gdx.utils.Base64Coder;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
+import io.anuke.kryonet.CustomListeners.UnreliableListener;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Net.ServerProvider;
+import io.anuke.mindustry.net.NetConnection;
+import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.net.Streamable.StreamBegin;
-import io.anuke.mindustry.net.Streamable.StreamChunk;
+import io.anuke.mindustry.net.Streamable;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Strings;
 import org.java_websocket.WebSocket;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ClientHandshake;
@@ -36,6 +36,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import static io.anuke.mindustry.Vars.headless;
 
 public class KryoServer implements ServerProvider {
+    final boolean tcpOnly = System.getProperty("java.version") == null;
     final Server server;
     final ByteSerializer serializer = new ByteSerializer();
     final ByteBuffer buffer = ByteBuffer.allocate(4096);
@@ -48,7 +49,9 @@ public class KryoServer implements ServerProvider {
     int lastconnection = 0;
 
     public KryoServer(){
-        server = new Server(4096*2, 2048, connection -> new ByteSerializer());
+        KryoCore.init();
+
+        server = new Server(4096*2, 4096, connection -> new ByteSerializer());
         server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
             buffer.position(0);
@@ -71,7 +74,7 @@ public class KryoServer implements ServerProvider {
                 Log.info("&bRecieved connection: {0} / {1}. Kryonet ID: {2}", c.id, c.addressTCP, connection.getID());
 
                 connections.add(kn);
-                Gdx.app.postRunnable(() ->  Net.handleServerReceived(kn.id, c));
+                Gdx.app.postRunnable(() -> Net.handleServerReceived(kn.id, c));
             }
 
             @Override
@@ -106,8 +109,8 @@ public class KryoServer implements ServerProvider {
             }
         };
 
-        if(KryoRegistrator.fakeLag){
-            server.addListener(new LagListener(KryoRegistrator.fakeLagMin, KryoRegistrator.fakeLagMax, listener));
+        if(KryoCore.fakeLag){
+            server.addListener(new UnreliableListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, KryoCore.fakeLagDrop, KryoCore.fakeLagDuplicate, listener));
         }else{
             server.addListener(listener);
         }
@@ -139,7 +142,11 @@ public class KryoServer implements ServerProvider {
         lastconnection = 0;
         connections.clear();
         missing.clear();
-        server.bind(port, port);
+        if(tcpOnly){
+            server.bind(port);
+        }else{
+            server.bind(port, port);
+        }
         webServer = new SocketServer(Vars.webPort);
         webServer.start();
 
@@ -316,6 +323,11 @@ public class KryoServer implements ServerProvider {
         }
 
         @Override
+        public boolean isConnected(){
+            return connection == null ? !socket.isClosed() : connection.isConnected();
+        }
+
+        @Override
         public void send(Object object, SendMode mode){
             if(socket != null){
                 try {
@@ -346,10 +358,13 @@ public class KryoServer implements ServerProvider {
                 }catch (Exception e){
                     Log.err(e);
                     Log.info("Disconnecting invalid client!");
+
                     try{
+                        //send error packet here
+                        /*
                         NetErrorPacket packet = new NetErrorPacket();
                         packet.message = Strings.parseException(e, true);
-                        Timers.runTask(5f, connection::close);
+                        Timers.runTask(5f, connection::close);*/
                     }catch (Exception e2){
                         Log.err(e2);
                         connection.close();

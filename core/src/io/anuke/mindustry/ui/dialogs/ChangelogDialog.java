@@ -25,7 +25,7 @@ public class ChangelogDialog extends FloatingDialog{
 
         content().add("$text.changelog.loading");
 
-        if(!ios && !OS.isMac) {
+        if(!ios && !OS.isMac){
             Changelogs.getChangelog(result -> {
                 versions = result;
                 Gdx.app.postRunnable(this::setup);

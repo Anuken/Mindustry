@@ -1,13 +1,15 @@
 package io.anuke.kryonet;
 
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.serialization.Serialization;
 import io.anuke.mindustry.net.Packet;
 import io.anuke.mindustry.net.Registrator;
+import io.anuke.ucore.util.Pooling;
 
 import java.nio.ByteBuffer;
+
+import static io.anuke.mindustry.net.Net.packetPoolLock;
 
 public class ByteSerializer implements Serialization {
 
@@ -29,18 +31,16 @@ public class ByteSerializer implements Serialization {
 
     @Override
     public Object read(ByteBuffer byteBuffer) {
-        try {
-            byte id = byteBuffer.get();
-            if(id == -2){
-               return FrameworkSerializer.read(byteBuffer);
-            }else {
-                Class<?> type = Registrator.getByID(id);
-                Packet packet = (Packet) ClassReflection.newInstance(type);
+        byte id = byteBuffer.get();
+        if(id == -2){
+           return FrameworkSerializer.read(byteBuffer);
+        }else{
+            Class<?> type = Registrator.getByID(id);
+            synchronized (packetPoolLock) {
+                Packet packet = (Packet) Pooling.obtain(type);
                 packet.read(byteBuffer);
                 return packet;
             }
-        }catch (ReflectionException e){
-            throw new RuntimeException(e);
         }
     }
 

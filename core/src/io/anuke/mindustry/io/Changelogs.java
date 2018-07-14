@@ -8,7 +8,7 @@ import io.anuke.ucore.function.Consumer;
 
 import static io.anuke.mindustry.Vars.releasesURL;
 
-public class Changelogs {
+public class Changelogs{
 
     public static void getChangelog(Consumer<Array<VersionInfo>> success, Consumer<Throwable> fail){
         Net.http(releasesURL, "GET", result -> {
@@ -30,7 +30,7 @@ public class Changelogs {
         public final String name, description;
         public final int id, build;
 
-        public VersionInfo(String name, String description, int id, int build) {
+        public VersionInfo(String name, String description, int id, int build){
             this.name = name;
             this.description = description;
             this.id = id;
@@ -38,7 +38,7 @@ public class Changelogs {
         }
 
         @Override
-        public String toString() {
+        public String toString(){
             return "VersionInfo{" +
                     "name='" + name + '\'' +
                     ", description='" + description + '\'' +

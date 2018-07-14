@@ -1,148 +1,190 @@
 package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.entities.enemies.EnemyTypes;
+import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.content.UnitTypes;
+import io.anuke.mindustry.content.Weapons;
+import io.anuke.mindustry.type.ItemStack;
 
 public class WaveCreator{
-	
-	public static Array<EnemySpawn> getSpawns(){
 
-		return Array.with(
-			new EnemySpawn(EnemyTypes.standard){{
-				scaling = 1;
-				before = 3;
-			}},
-			
-			new EnemySpawn(EnemyTypes.fast){{
-				scaling = 1;
-				after = 3;
-				spacing = 5;
-				amount = 3;
-				tierscaleback = 0;
-			}},
-			
-			new EnemySpawn(EnemyTypes.blast){{
-				after = 4;
-				amount = 2;
-				spacing = 5;
-				scaling = 2;
-				tierscaleback = 1;
-			}},
-			
-			new EnemySpawn(EnemyTypes.tank){{
-				after = 5;
-				spacing = 5;
-				scaling = 2;
-				amount = 2;
-			}},
-			
-			new EnemySpawn(EnemyTypes.rapid){{
-				after = 7;
-				spacing = 5;
-				scaling = 2;
-				amount = 3;
-			}},
-			
-			new EnemySpawn(EnemyTypes.healer){{
-				after = 5;
-				spacing = 5;
-				scaling = 1;
-				amount = 1;
-			}},
-			
-			new EnemySpawn(EnemyTypes.standard){{
-				scaling = 3;
-				after = 8;
-				spacing = 4;
-				tier = 2;
-			}},
-			
-			new EnemySpawn(EnemyTypes.titan){{
-				after = 6;
-				amount = 2;
-				spacing = 5;
-				scaling = 3;
-			}},
-			
-			new EnemySpawn(EnemyTypes.flamer){{
-				after = 12;
-				amount = 2;
-				spacing = 5;
-				scaling = 3;
-			}},
-			
-			new EnemySpawn(EnemyTypes.emp){{
-				after = 15;
-				amount = 1;
-				spacing = 5;
-				scaling = 2;
-			}},
-			
-			new EnemySpawn(EnemyTypes.blast){{
-				after = 4 + 5 + 5;
-				amount = 3;
-				spacing = 5;
-				scaling = 2;
-				tierscaleback = 0;
-			}},
-			//boss wave
-			new EnemySpawn(EnemyTypes.fortress){{
-				after = 16;
-				amount = 1;
-				spacing = 5;
-				scaling = 1;
-			}},
-			
-			new EnemySpawn(EnemyTypes.titan){{
-				after = 16;
-				amount = 1;
-				spacing = 5;
-				scaling = 3;
-				tierscaleback = 0;
-			}},
-			
-			new EnemySpawn(EnemyTypes.healer){{
-				after = 16;
-				spacing = 5;
-				scaling = 2;
-				amount = 2;
-			}},
-			//end boss wave
-			
-			//enchanced boss wave
-			new EnemySpawn(EnemyTypes.mortar){{
-				after = 16 + 5;
-				amount = 1;
-				spacing = 5;
-				scaling = 3;
-			}},
-			
-			new EnemySpawn(EnemyTypes.emp){{
-				after = 16 + 5;
-				amount = 1;
-				spacing = 5;
-				scaling = 3;
-			}}
-			//end enchanced boss wave
-		);
-	}
+    public static Array<SpawnGroup> getSpawns(){
+        return Array.with(
+                new SpawnGroup(UnitTypes.scout){{
+                    end = 8;
+                    unitScaling = 2;
+                }},
 
-	public static void testWaves(int from, int to){
-		Array<EnemySpawn> spawns = getSpawns();
-		for(int i = from; i <= to; i ++){
-			System.out.print(i+": ");
-			int total = 0;
-			for(EnemySpawn spawn : spawns){
-				int a = spawn.evaluate(i, 0);
-				int t = spawn.tier(i, 0);
-				total += a;
-				
-				if(a > 0){
-					System.out.print(a+"x" + spawn.type.name + "-" + t + " ");
-				}
-			}
-			System.out.print(" (" + total + ")");
-			System.out.println();
-		}
-	}
+                new SpawnGroup(UnitTypes.vtol){{
+                    begin = 12;
+                    end = 14;
+                }},
+
+                new SpawnGroup(UnitTypes.scout){{
+                    begin = 11;
+                    unitScaling = 2;
+                    spacing = 2;
+                    max = 4;
+                }},
+
+                new SpawnGroup(UnitTypes.titan){{
+                    begin = 9;
+                    spacing = 3;
+                    unitScaling = 2;
+
+                    end = 30;
+                }},
+
+                new SpawnGroup(UnitTypes.scout){{
+                    begin = 10;
+                    unitScaling = 2;
+                    unitAmount = 1;
+                    spacing = 2;
+                    ammoItem = Items.tungsten;
+                    end = 30;
+                }},
+
+                new SpawnGroup(UnitTypes.titan){{
+                    begin = 28;
+                    spacing = 3;
+                    unitScaling = 2;
+                    weapon = Weapons.flamethrower;
+                    end = 40;
+                }},
+
+                new SpawnGroup(UnitTypes.titan){{
+                    begin = 45;
+                    spacing = 3;
+                    unitScaling = 2;
+                    weapon = Weapons.flamethrower;
+                    effect = StatusEffects.overdrive;
+                }},
+
+                new SpawnGroup(UnitTypes.titan){{
+                    begin = 120;
+                    spacing = 2;
+                    unitScaling = 3;
+                    unitAmount = 5;
+                    weapon = Weapons.flakgun;
+                    effect = StatusEffects.overdrive;
+                }},
+
+                new SpawnGroup(UnitTypes.vtol){{
+                    begin = 16;
+                    unitScaling = 2;
+                    spacing = 2;
+
+                    end = 39;
+                    max = 7;
+                }},
+
+                new SpawnGroup(UnitTypes.scout){{
+                    begin = 82;
+                    spacing = 3;
+                    unitAmount = 4;
+                    groupAmount = 2;
+                    unitScaling = 3;
+                    effect = StatusEffects.overdrive;
+                    ammoItem = Items.silicon;
+                }},
+
+                new SpawnGroup(UnitTypes.scout){{
+                    begin = 41;
+                    spacing = 5;
+                    unitAmount = 1;
+                    unitScaling = 3;
+                    effect = StatusEffects.shielded;
+                    ammoItem = Items.thorium;
+                    max = 10;
+                }},
+
+                new SpawnGroup(UnitTypes.scout){{
+                    begin = 35;
+                    spacing = 3;
+                    unitAmount = 4;
+                    groupAmount = 2;
+                    effect = StatusEffects.overdrive;
+                    items = new ItemStack(Items.blastCompound, 60);
+                    end = 60;
+                }},
+
+                new SpawnGroup(UnitTypes.scout){{
+                    begin = 42;
+                    spacing = 3;
+                    unitAmount = 4;
+                    groupAmount = 2;
+                    effect = StatusEffects.overdrive;
+                    items = new ItemStack(Items.pyratite, 100);
+                    end = 130;
+                }},
+
+                new SpawnGroup(UnitTypes.monsoon){{
+                    begin = 40;
+                    ammoItem = Items.blastCompound;
+                    unitAmount = 2;
+                    spacing = 2;
+                    unitScaling = 3;
+                    max = 8;
+                }},
+
+                new SpawnGroup(UnitTypes.vtol){{
+                    begin = 50;
+                    unitAmount = 4;
+                    unitScaling = 3;
+                    spacing = 5;
+                    groupAmount = 2;
+                    effect = StatusEffects.overdrive;
+                    max = 8;
+                }},
+
+                new SpawnGroup(UnitTypes.monsoon){{
+                    begin = 53;
+                    ammoItem = Items.pyratite;
+                    unitAmount = 2;
+                    unitScaling = 3;
+                    spacing = 4;
+                    max = 8;
+                    end = 74;
+                }},
+
+                new SpawnGroup(UnitTypes.monsoon){{
+                    begin = 53;
+                    ammoItem = Items.coal;
+                    unitAmount = 2;
+                    unitScaling = 3;
+                    spacing = 4;
+                    max = 8;
+                    end = 74;
+                }}
+        );
+    }
+
+    public static void testWaves(int from, int to){
+        Array<SpawnGroup> spawns = getSpawns();
+        for(int i = from; i <= to; i++){
+            System.out.print(i + ": ");
+            int total = 0;
+            for(SpawnGroup spawn : spawns){
+                int a = spawn.getUnitsSpawned(i) * spawn.getGroupsSpawned(i);
+                total += a;
+
+                if(a > 0){
+                    System.out.print(a + "x" + spawn.type.name);
+
+                    if(spawn.weapon != null){
+                        System.out.print(":" + spawn.weapon.name);
+                    }
+
+                    if(spawn.ammoItem != null){
+                        System.out.print(":" + spawn.ammoItem.name);
+                    }
+
+                    System.out.print(" ");
+                }
+            }
+            System.out.print(" (" + total + ")");
+            System.out.println();
+        }
+    }
 }

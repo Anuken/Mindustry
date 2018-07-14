@@ -2,13 +2,13 @@ package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.scene.ui.Dialog;
 
 import static io.anuke.mindustry.Vars.discordURL;
 import static io.anuke.mindustry.Vars.ui;
 
-public class DiscordDialog extends Dialog {
+public class DiscordDialog extends Dialog{
 
     public DiscordDialog(){
         super("", "dialog");
@@ -33,16 +33,16 @@ public class DiscordDialog extends Dialog {
                 i.addImage("icon-discord").size(14 * 3);
             }).size(h).left();
 
-            t.add("$text.discord").color(Colors.get("accent")).growX().padLeft(10f);
+            t.add("$text.discord").color(Palette.accent).growX().padLeft(10f);
         }).size(470f, h).pad(10f);
 
         buttons().defaults().size(170f, 50);
 
         buttons().addButton("$text.back", this::hide);
-        buttons().addButton("$text.copylink", () ->{
+        buttons().addButton("$text.copylink", () -> {
             Gdx.app.getClipboard().setContents(discordURL);
         });
-        buttons().addButton("$text.openlink", () ->{
+        buttons().addButton("$text.openlink", () -> {
             if(!Gdx.net.openURI(discordURL)){
                 ui.showError("$text.linkfail");
                 Gdx.app.getClipboard().setContents(discordURL);

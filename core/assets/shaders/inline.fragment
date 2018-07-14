@@ -1,0 +1,184 @@
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
+
+uniform sampler2D u_texture;
+
+uniform vec4 u_color;
+uniform vec2 u_texsize;
+uniform vec2 u_uv;
+uniform vec2 u_uv2;
+uniform float u_progress;
+uniform float u_time;
+
+varying vec4 v_color;
+varying vec2 v_texCoord;
+
+const float chunk = 4.0;
+
+bool id(vec2 coords, vec4 base, float basediff){
+    vec4 target = texture2D(u_texture, coords);
+    return target.a < 0.1 || (coords.x < u_uv.x || coords.y < u_uv.y || coords.x > u_uv2.x || coords.y > u_uv2.y);
+}
+
+bool cont(vec2 T, vec2 v, float basediff){
+    float step = 1.0;
+    vec4 base = texture2D(u_texture, T);
+    return base.a > 0.1 &&
+           		(id(T + vec2(0, step) * v, base, basediff) || id(T + vec2(0, -step) * v, base, basediff) ||
+           		id(T + vec2(step, 0) * v, base, basediff) || id(T + vec2(-step, 0) * v, base, basediff));
+}
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+float round(float f){
+    return float(int(f / chunk)) * chunk;
+}
+
+vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
+
+float snoise(vec3 v){
+  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+
+// First corner
+  vec3 i  = floor(v + dot(v, C.yyy) );
+  vec3 x0 =   v - i + dot(i, C.xxx) ;
+
+// Other corners
+  vec3 g = step(x0.yzx, x0.xyz);
+  vec3 l = 1.0 - g;
+  vec3 i1 = min( g.xyz, l.zxy );
+  vec3 i2 = max( g.xyz, l.zxy );
+
+  //  x0 = x0 - 0. + 0.0 * C
+  vec3 x1 = x0 - i1 + 1.0 * C.xxx;
+  vec3 x2 = x0 - i2 + 2.0 * C.xxx;
+  vec3 x3 = x0 - 1. + 3.0 * C.xxx;
+
+// Permutations
+  i = mod(i, 289.0 );
+  vec4 p = permute( permute( permute(
+             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
+           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+
+// Gradients
+// ( N*N points uniformly over a square, mapped onto an octahedron.)
+  float n_ = 1.0/7.0; // N=7
+  vec3  ns = n_ * D.wyz - D.xzx;
+
+  vec4 j = p - 49.0 * floor(p * ns.z *ns.z);  //  mod(p,N*N)
+
+  vec4 x_ = floor(j * ns.z);
+  vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)
+
+  vec4 x = x_ *ns.x + ns.yyyy;
+  vec4 y = y_ *ns.x + ns.yyyy;
+  vec4 h = 1.0 - abs(x) - abs(y);
+
+  vec4 b0 = vec4( x.xy, y.xy );
+  vec4 b1 = vec4( x.zw, y.zw );
+
+  vec4 s0 = floor(b0)*2.0 + 1.0;
+  vec4 s1 = floor(b1)*2.0 + 1.0;
+  vec4 sh = -step(h, vec4(0.0));
+
+  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+
+  vec3 p0 = vec3(a0.xy,h.x);
+  vec3 p1 = vec3(a0.zw,h.y);
+  vec3 p2 = vec3(a1.xy,h.z);
+  vec3 p3 = vec3(a1.zw,h.w);
+
+//Normalise gradients
+  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+  p0 *= norm.x;
+  p1 *= norm.y;
+  p2 *= norm.z;
+  p3 *= norm.w;
+
+// Mix final noise value
+  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+  m = m * m;
+  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),
+                                dot(p2,x2), dot(p3,x3) ) );
+}
+
+void main() {
+
+	vec2 t = v_texCoord.xy;
+
+	vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
+
+	bool any = false;
+
+	vec2 coords = (v_texCoord-u_uv) / v;
+
+	/*
+	const float scl = 10.0;
+	float result = (snoise(vec3(coords.x / scl, coords.y / scl, u_time/400000.0)) + 1.0)/2.0;
+
+	vec4 color = texture2D(u_texture, t);
+
+	if(result < u_progress){
+	    gl_FragColor = color;
+	}else if(result < u_progress*2.0 && color.a > 0.1){
+	    gl_FragColor = u_color;
+	}else{
+	    gl_FragColor = vec4(0.0);
+	}*/
+
+
+	float value = coords.x + coords.y;
+
+	vec4 color = texture2D(u_texture, t);
+	vec2 rc = vec2(round(coords.x), round(coords.y));
+	vec2 center = ((u_uv + u_uv2)/2.0 - u_uv) /v;
+
+	float r = clamp(rand(rc) + u_progress, 0.0, 1.0);
+
+	const float start = 0.7;
+	const float end = 0.9;
+
+    const float scl = 10.0;
+    float result = snoise(vec3(coords.x / scl, coords.y / scl, u_time/400.0))*2.0;
+	float dst = (abs(center.x - coords.x) + abs(center.y - coords.y)) / 2.0;
+
+    if(dst - 1.0 < u_progress * (center.x) && dst> u_progress * (center.x) && color.a > 0.1){
+        gl_FragColor = u_color;
+    }else if(r > end){
+        gl_FragColor = color;
+    }else if(cont(t, v, 100.0) && mod(u_time / 1.5 + value, 20.0) < 5.0 && color.a > 0.1){
+       gl_FragColor = u_color;
+	}else if(r > start && color.a > 0.1){
+	    float fr = (r-start)*(1.0/(end-start));
+
+	    vec2 next = rc + chunk/2.0;
+	    float rdst = max(abs(coords.x - next.x), abs(coords.y - next.y)) + result;
+	    if(rdst / (chunk/2.0) < fr){
+	        gl_FragColor = u_color;
+	    }else{
+	        gl_FragColor = vec4(0.0);
+	    }
+	}else{
+	    gl_FragColor = vec4(0.0);
+	}
+/*
+    if(mod(u_time / 1.5 + value, 30.0) < 15.0 && color.a > 0.1){
+        gl_FragColor = u_color;
+    }else if(cont(t, v, 3.0)){
+        gl_FragColor = color;
+	}else if(cont(t, v, 1.5)){
+		gl_FragColor = u_color;
+    //}else if(mix(rand(vec2(dst)) * u_progress, 1.0, u_progress) > 0.5){
+    //    gl_FragColor = texture2D(u_texture, T);
+	}else{
+	    gl_FragColor = vec4(0.0);
+	}*/
+}

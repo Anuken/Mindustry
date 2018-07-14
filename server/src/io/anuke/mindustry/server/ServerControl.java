@@ -1,6 +1,5 @@
 package io.anuke.mindustry.server;
 
-import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
@@ -9,16 +8,15 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.io.Map;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.Version;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
-import io.anuke.mindustry.net.Packets.ChatPacket;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Map;
-import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.modules.Module;
@@ -35,37 +33,24 @@ import java.util.Scanner;
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.util.Log.*;
 
-public class ServerControl extends Module {
+public class ServerControl extends Module{
     private final CommandHandler handler = new CommandHandler("");
     private ShuffleMode mode;
 
     public ServerControl(String[] args){
         Settings.defaultList(
-            "shufflemode", "normal",
-            "bans", "",
-            "admins", ""
+                "shufflemode", "normal",
+                "bans", "",
+                "admins", ""
         );
 
         mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
 
-        Effects.setScreenShakeProvider((a, b) -> {});
-        Effects.setEffectProvider((a, b, c, d, e) -> {});
+        Effects.setScreenShakeProvider((a, b) -> {
+        });
+        Effects.setEffectProvider((a, b, c, d, e, f) -> {
+        });
         Sounds.setHeadless(true);
-
-        //override default handling of chat packets
-        Net.handle(ChatPacket.class, (packet) -> {
-            info("&y" + (packet.name == null ? "" : packet.name) +  ": &lb{0}", packet.text);
-        });
-
-        //don't do anything at all for GDX logging: don't want controller info and such
-        Gdx.app.setApplicationLogger(new ApplicationLogger() {
-            @Override public void log(String tag, String message) { }
-            @Override public void log(String tag, String message, Throwable exception) { }
-            @Override public void error(String tag, String message) { }
-            @Override public void error(String tag, String message, Throwable exception) { }
-            @Override public void debug(String tag, String message) { }
-            @Override public void debug(String tag, String message, Throwable exception) { }
-        });
 
         String[] commands = {};
 
@@ -96,18 +81,32 @@ public class ServerControl extends Module {
                 netServer.kick(connection.id, KickReason.gameover);
             }
 
-            if (mode != ShuffleMode.off) {
-                Array<Map> maps = mode == ShuffleMode.both ? world.maps().getAllMaps() :
-                        mode == ShuffleMode.normal ? world.maps().getDefaultMaps() : world.maps().getCustomMaps();
+            if(mode != ShuffleMode.off){
+                if(world.maps().all().size > 0){
+                    Array<Map> maps = mode == ShuffleMode.both ? world.maps().all() :
+                            mode == ShuffleMode.normal ? world.maps().defaultMaps() : world.maps().customMaps();
 
-                Map previous = world.getMap();
-                Map map = previous;
-                while (map == previous || !map.visible) map = maps.random();
+                    Map previous = world.getMap();
+                    Map map = previous;
+                    while(map == previous) map = maps.random();
 
-                info("Selected next map to be {0}.", map.name);
-                state.set(State.playing);
-                logic.reset();
-                world.loadMap(map);
+                    if(map != null){
+
+                        info("Selected next map to be {0}.", map.name);
+                        state.set(State.playing);
+
+                        logic.reset();
+                        world.loadMap(map);
+                    }else{
+                        info("Selected a procedural map.");
+                        world.loadProceduralMap();
+                        logic.play();
+                    }
+                }else{
+                    info("Selected a procedural map.");
+                    world.loadProceduralMap();
+                    logic.play();
+                }
             }else{
                 state.set(State.menu);
                 Net.closeServer();
@@ -142,7 +141,7 @@ public class ServerControl extends Module {
             Log.info("Stopped server.");
         });
 
-        handler.register("host", "[mapname] [mode]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "[mode] [mapname]", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
@@ -150,37 +149,43 @@ public class ServerControl extends Module {
 
             Map result = null;
 
-            if(arg.length > 0) {
-                String search = arg[0];
-                for (Map map : world.maps().list()) {
-                    if (map.name.equalsIgnoreCase(search))
-                        result = map;
-                }
-
-                if(result == null){
-                    err("No map with name &y'{0}'&lr found.", search);
+            if(arg.length > 0){
+                GameMode mode;
+                try{
+                    mode = GameMode.valueOf(arg[0]);
+                }catch(IllegalArgumentException e){
+                    err("No gamemode '{0}' found.", arg[0]);
                     return;
                 }
+
+                info("Loading map...");
+                state.mode = mode;
+
+                if(arg.length > 1){
+                    String search = arg[1];
+                    for(Map map : world.maps().all()){
+                        if(map.name.equalsIgnoreCase(search))
+                            result = map;
+                    }
+
+                    if(result == null){
+                        err("No map with name &y'{0}'&lr found.", search);
+                        return;
+                    }
+
+                    logic.reset();
+                    world.loadMap(result);
+                }else{
+                    Log.info("&ly&fiNo map specified, so a procedural one was generated.");
+                    world.loadProceduralMap();
+                }
+
             }else{
-                while(result == null || !result.visible)
-                    result = world.maps().getAllMaps().random();
-                Log.info("&ly&fiNo map specified, so &lb{0}&ly was chosen randomly.", result.name);
+                Log.info("&ly&fiNo map specified, so a procedural one was generated.");
+                world.loadProceduralMap();
             }
 
-            GameMode mode;
-            try{
-                mode = arg.length < 2 ? GameMode.waves : GameMode.valueOf(arg[1]);
-            }catch (IllegalArgumentException e){
-                err("No gamemode '{0}' found.", arg[1]);
-                return;
-            }
-
-            info("Loading map...");
-            state.mode = mode;
-
-            logic.reset();
-            world.loadMap(result);
-            state.set(State.playing);
+            logic.play();
             info("Map loaded.");
 
             host();
@@ -188,8 +193,8 @@ public class ServerControl extends Module {
 
         handler.register("maps", "Display all available maps.", arg -> {
             Log.info("Maps:");
-            for(Map map : world.maps().getAllMaps()){
-                Log.info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.getWidth(), map.getHeight());
+            for(Map map : world.maps().all()){
+                Log.info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
             }
         });
 
@@ -197,23 +202,23 @@ public class ServerControl extends Module {
             if(state.is(State.menu)){
                 info("&lyStatus: &rserver closed");
             }else{
-                info("&lyStatus: &lcPlaying on map &fi{0}&fb &lb/&lc Wave {1} &lb/&lc {2}",
-                        Strings.capitalize(world.getMap().name), state.wave, Strings.capitalize(state.difficulty.name()));
-                if(state.enemies > 0){
-                    info("&ly{0} enemies remaining.", state.enemies);
+                info("&lyStatus: &lcPlaying on map &fi{0}&fb &lb/&lc Wave {1} &lb/&lc {2} &lb/&lc {3}",
+                        Strings.capitalize(world.getMap().name), state.wave, Strings.capitalize(state.difficulty.name()), Strings.capitalize(state.mode.name()));
+                if(state.mode.disableWaveTimer){
+                    info("&ly{0} enemies.", unitGroups[Team.red.ordinal()].size());
                 }else{
-                    info("&ly{0} seconds until next wave.", (int)(state.wavetime / 60));
+                    info("&ly{0} seconds until next wave.", (int) (state.wavetime / 60));
                 }
 
-                if(playerGroup.size() > 0) {
+                if(playerGroup.size() > 0){
                     info("&lyPlayers: {0}", playerGroup.size());
-                    for (Player p : playerGroup.all()) {
+                    for(Player p : playerGroup.all()){
                         print("   &y" + p.name);
                     }
                 }else{
                     info("&lyNo players connected.");
                 }
-                info("&lbFPS: {0}", (int)(60f/Timers.delta()));
+                info("&lbFPS: {0}", (int) (60f / Timers.delta()));
             }
         });
 
@@ -221,10 +226,10 @@ public class ServerControl extends Module {
             if(state.is(State.menu)){
                 info("&lyServer is closed.");
             }else{
-                if(playerGroup.size() > 0) {
+                if(playerGroup.size() > 0){
                     info("&lyPlayers: {0}", playerGroup.size());
-                    for (Player p : playerGroup.all()) {
-                        print("   &y{0} / Connection {1} / IP: {2}", p.name, p.clientid, Net.getConnection(p.clientid).address);
+                    for(Player p : playerGroup.all()){
+                        print("   &y{0} / Connection {1} / IP: {2}", p.name, p.con.id, p.con.address);
                     }
                 }else{
                     info("&lyNo players connected.");
@@ -233,12 +238,13 @@ public class ServerControl extends Module {
         });
 
         handler.register("say", "<message...>", "Send a message to all players.", arg -> {
-            if(!state.is(State.playing)) {
+            if(!state.is(State.playing)){
                 err("Not hosting. Host a game first.");
                 return;
             }
 
-            netCommon.sendMessage("[GRAY][[Server]:[] " + arg[0]);
+            Call.sendMessage("[GRAY][[Server]:[] " + arg[0]);
+
             info("&lyServer: &lb{0}", arg[0]);
         });
 
@@ -247,7 +253,7 @@ public class ServerControl extends Module {
                 Difficulty diff = Difficulty.valueOf(arg[0]);
                 state.difficulty = diff;
                 info("Difficulty set to '{0}'.", arg[0]);
-            }catch (IllegalArgumentException e){
+            }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
             }
         });
@@ -255,11 +261,9 @@ public class ServerControl extends Module {
         handler.register("friendlyfire", "<on/off>", "Enable or disable friendly fire.", arg -> {
             String s = arg[0];
             if(s.equalsIgnoreCase("on")){
-                NetEvents.handleFriendlyFireChange(true);
                 state.friendlyFire = true;
                 info("Friendly fire enabled.");
             }else if(s.equalsIgnoreCase("off")){
-                NetEvents.handleFriendlyFireChange(false);
                 state.friendlyFire = false;
                 info("Friendly fire disabled.");
             }else{
@@ -284,15 +288,33 @@ public class ServerControl extends Module {
                 err("Incorrect command usage.");
             }
 
-            if(arg.length >= 2) {
-                try {
+            if(arg.length >= 2){
+                try{
                     int maxbreak = Integer.parseInt(arg[1]);
                     int cooldown = (arg.length >= 3 ? Integer.parseInt(arg[2]) : Administration.defaultBreakCooldown);
                     netServer.admins.setAntiGriefParams(maxbreak, cooldown);
                     info("Anti-grief parameters set.");
-                } catch (NumberFormatException e) {
+                }catch(NumberFormatException e){
                     err("Invalid number format.");
                 }
+            }
+        });
+
+        handler.register("allow-custom-clients", "[on/off]", "Allow or disallow custom clients.", arg -> {
+            if(arg.length == 0){
+                info("Custom clients are currently &lc{0}.", netServer.admins.allowsCustomClients() ? "allowed" : "disallowed");
+                return;
+            }
+
+            String s = arg[0];
+            if(s.equalsIgnoreCase("on")){
+                netServer.admins.setCustomClients(true);
+                info("Custom clients enabled.");
+            }else if(s.equalsIgnoreCase("off")){
+                netServer.admins.setCustomClients(false);
+                info("Custom clients disabled.");
+            }else{
+                err("Incorrect command usage.");
             }
         });
 
@@ -303,13 +325,13 @@ public class ServerControl extends Module {
                 Settings.putString("shufflemode", arg[0]);
                 Settings.save();
                 info("Shuffle mode set to '{0}'.", arg[0]);
-            }catch (Exception e){
+            }catch(Exception e){
                 err("Unknown shuffle mode '{0}'.", arg[0]);
             }
         });
 
         handler.register("kick", "<username...>", "Kick a person by name.", arg -> {
-            if(!state.is(State.playing)) {
+            if(!state.is(State.playing)){
                 err("Not hosting a game yet. Calm down.");
                 return;
             }
@@ -324,7 +346,7 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                netServer.kick(target.clientid, KickReason.kick);
+                netServer.kick(target.con.id, KickReason.kick);
                 info("It is done.");
             }else{
                 info("Nobody with that name could be found...");
@@ -332,7 +354,7 @@ public class ServerControl extends Module {
         });
 
         handler.register("ban", "<username...>", "Ban a person by name.", arg -> {
-            if(!state.is(State.playing)) {
+            if(!state.is(State.playing)){
                 err("Can't ban people by name with no players.");
                 return;
             }
@@ -347,11 +369,11 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                String ip = Net.getConnection(target.clientid).address;
+                String ip = target.con.address;
                 netServer.admins.banPlayerIP(ip);
-                netServer.admins.banPlayerID(netServer.admins.getTrace(ip).uuid);
-                netServer.kick(target.clientid, KickReason.banned);
-                info("Banned player by IP and ID: {0} / {1}", ip, netServer.admins.getTrace(ip).uuid);
+                netServer.admins.banPlayerID(target.uuid);
+                netServer.kick(target.con.id, KickReason.banned);
+                info("Banned player by IP and ID: {0} / {1}", ip, target.uuid);
             }else{
                 info("Nobody with that name could be found.");
             }
@@ -377,7 +399,7 @@ public class ServerControl extends Module {
                 Log.info("&lmBanned players [IP]:");
                 for(String string : ipbans){
                     PlayerInfo info = netServer.admins.findByIP(string);
-                    if(info != null) {
+                    if(info != null){
                         Log.info(" &lm '{0}' / Last known name: '{1}' / ID: '{2}'", string, info.lastName, info.id);
                     }else{
                         Log.info(" &lm '{0}' (No known name or info)", string);
@@ -387,14 +409,13 @@ public class ServerControl extends Module {
         });
 
         handler.register("banip", "<ip>", "Ban a person by IP.", arg -> {
-            if(netServer.admins.banPlayerIP(arg[0])) {
+            if(netServer.admins.banPlayerIP(arg[0])){
                 info("Banned player by IP: {0}.", arg[0]);
 
                 for(Player player : playerGroup.all()){
-                    if(Net.getConnection(player.clientid) != null &&
-                            Net.getConnection(player.clientid).address != null &&
-                            Net.getConnection(player.clientid).address.equals(arg[0])){
-                        netServer.kick(player.clientid, KickReason.banned);
+                    if(player.con.address != null &&
+                            player.con.address.equals(arg[0])){
+                        netServer.kick(player.con.id, KickReason.banned);
                         break;
                     }
                 }
@@ -404,12 +425,12 @@ public class ServerControl extends Module {
         });
 
         handler.register("banid", "<id>", "Ban a person by their unique ID.", arg -> {
-            if(netServer.admins.banPlayerID(arg[0])) {
+            if(netServer.admins.banPlayerID(arg[0])){
                 info("Banned player by ID: {0}.", arg[0]);
 
                 for(Player player : playerGroup.all()){
-                    if(netServer.admins.getTrace(Net.getConnection(player.clientid).address).uuid.equals(arg[0])){
-                        netServer.kick(player.clientid, KickReason.banned);
+                    if(player.uuid.equals(arg[0])){
+                        netServer.kick(player.con.id, KickReason.banned);
                         break;
                     }
                 }
@@ -419,7 +440,7 @@ public class ServerControl extends Module {
         });
 
         handler.register("unbanip", "<ip>", "Completely unban a person by IP.", arg -> {
-            if(netServer.admins.unbanPlayerIP(arg[0])) {
+            if(netServer.admins.unbanPlayerIP(arg[0])){
                 info("Unbanned player by IP: {0}.", arg[0]);
             }else{
                 err("That IP is not banned!");
@@ -427,7 +448,7 @@ public class ServerControl extends Module {
         });
 
         handler.register("unbanid", "<id>", "Completely unban a person by ID.", arg -> {
-            if(netServer.admins.unbanPlayerID(arg[0])) {
+            if(netServer.admins.unbanPlayerID(arg[0])){
                 info("&lmUnbanned player by ID: {0}.", arg[0]);
             }else{
                 err("That IP is not banned!");
@@ -435,7 +456,7 @@ public class ServerControl extends Module {
         });
 
         handler.register("admin", "<username...>", "Make a user admin", arg -> {
-            if(!state.is(State.playing)) {
+            if(!state.is(State.playing)){
                 err("Open the server first.");
                 return;
             }
@@ -450,17 +471,16 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                String id = netServer.admins.getTrace(Net.getConnection(target.clientid).address).uuid;
-                netServer.admins.adminPlayer(id, Net.getConnection(target.clientid).address);
-                NetEvents.handleAdminSet(target, true);
-                info("Admin-ed player by ID: {0} / {1}", id, arg[0]);
+                netServer.admins.adminPlayer(target.uuid, target.usid);
+                target.isAdmin = true;
+                info("Admin-ed player by ID: {0} / {1}", target.uuid, arg[0]);
             }else{
                 info("Nobody with that name could be found.");
             }
         });
 
         handler.register("unadmin", "<username...>", "Removes admin status from a player", arg -> {
-            if(!state.is(State.playing)) {
+            if(!state.is(State.playing)){
                 err("Open the server first.");
                 return;
             }
@@ -475,10 +495,9 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                String id = netServer.admins.getTrace(Net.getConnection(target.clientid).address).uuid;
-                netServer.admins.unAdminPlayer(id);
-                NetEvents.handleAdminSet(target, false);
-                info("Un-admin-ed player by ID: {0} / {1}", id, arg[0]);
+                netServer.admins.unAdminPlayer(target.uuid);
+                target.isAdmin = false;
+                info("Un-admin-ed player by ID: {0} / {1}", target.uuid, arg[0]);
             }else{
                 info("Nobody with that name could be found.");
             }
@@ -498,10 +517,8 @@ public class ServerControl extends Module {
         });
 
         handler.register("runwave", "Trigger the next wave.", arg -> {
-            if(!state.is(State.playing)) {
+            if(!state.is(State.playing)){
                 err("Not hosting. Host a game first.");
-            }else if(state.enemies > 0){
-                err("There are still {0} enemies remaining.", state.enemies);
             }else{
                 logic.runWave();
                 info("Wave spawned.");
@@ -547,24 +564,20 @@ public class ServerControl extends Module {
         });
 
         handler.register("griefers", "[min-break:place-ratio] [min-breakage]", "Find possible griefers currently online.", arg -> {
-            if(!state.is(State.playing)) {
+            if(!state.is(State.playing)){
                 err("Open the server first.");
                 return;
             }
 
-            try {
+            try{
 
                 float ratio = arg.length > 0 ? Float.parseFloat(arg[0]) : 0.5f;
                 int minbreak = arg.length > 1 ? Integer.parseInt(arg[1]) : 100;
 
                 boolean found = false;
 
-                for (Player player : playerGroup.all()) {
-                    if(Net.getConnection(player.clientid) == null){
-                        err("Player \"{0}\" does not have an associated connection!");
-                        continue;
-                    }
-                    TraceInfo info = netServer.admins.getTrace(Net.getConnection(player.clientid).address);
+                for(Player player : playerGroup.all()){
+                    TraceInfo info = netServer.admins.getTraceByID(player.uuid);
                     if(info.totalBlocksBroken >= minbreak && info.totalBlocksBroken / Math.max(info.totalBlocksPlaced, 1f) >= ratio){
                         info("&ly - Player '{0}' / UUID &lm{1}&ly found: &lc{2}&ly broken and &lc{3}&ly placed.",
                                 player.name, info.uuid, info.totalBlocksBroken, info.totalBlocksPlaced);
@@ -572,22 +585,23 @@ public class ServerControl extends Module {
                     }
                 }
 
-                if (!found) {
+                if(!found){
                     info("No griefers matching the criteria have been found.");
                 }
 
-            }catch (NumberFormatException e){
+            }catch(NumberFormatException e){
                 err("Invalid number format.");
             }
         });
 
         handler.register("gameover", "Force a game over.", arg -> {
             if(state.is(State.menu)){
-               info("Not playing a map.");
-               return;
+                info("Not playing a map.");
+                return;
             }
 
-            world.removeBlock(world.getCore());
+            Events.fire(GameOverEvent.class);
+
             info("Core destroyed.");
         });
 
@@ -604,10 +618,10 @@ public class ServerControl extends Module {
                     if(tile.entity != null){
                         Array<Object> arr = tile.block().getDebugInfo(tile);
                         StringBuilder result = new StringBuilder();
-                        for(int i = 0; i < arr.size/2; i ++){
-                            result.append(arr.get(i*2));
+                        for(int i = 0; i < arr.size / 2; i++){
+                            result.append(arr.get(i * 2));
                             result.append(": ");
-                            result.append(arr.get(i*2 + 1));
+                            result.append(arr.get(i * 2 + 1));
                             result.append("\n");
                         }
                         Log.info("&ly{0}", result);
@@ -617,7 +631,7 @@ public class ServerControl extends Module {
                 }else{
                     Log.info("No tile at that location.");
                 }
-            }catch (NumberFormatException e){
+            }catch(NumberFormatException e){
                 Log.err("Invalid coordinates passed.");
             }
         });
@@ -627,7 +641,7 @@ public class ServerControl extends Module {
 
             Array<PlayerInfo> infos = netServer.admins.findByName(arg[0], checkAll);
 
-            if(infos.size == 1) {
+            if(infos.size == 1){
                 PlayerInfo info = infos.peek();
                 Log.info("&lcTrace info for player '{0}' / UUID {1}:", info.lastName, info.id);
                 Log.info("  &lyall names used: {0}", info.names);
@@ -653,7 +667,7 @@ public class ServerControl extends Module {
 
             Array<PlayerInfo> infos = netServer.admins.findByIPs(arg[0]);
 
-            if(infos.size == 1) {
+            if(infos.size == 1){
                 PlayerInfo info = infos.peek();
                 Log.info("&lcTrace info for player '{0}' / UUID {1}:", info.lastName, info.id);
                 Log.info("  &lyall names used: {0}", info.names);
@@ -695,7 +709,7 @@ public class ServerControl extends Module {
         });
 
         handler.register("trace", "<username...>", "Trace a player's actions", arg -> {
-            if(!state.is(State.playing)) {
+            if(!state.is(State.playing)){
                 err("Open the server first.");
                 return;
             }
@@ -710,9 +724,9 @@ public class ServerControl extends Module {
             }
 
             if(target != null){
-                TraceInfo info = netServer.admins.getTrace(Net.getConnection(target.clientid).address);
+                TraceInfo info = netServer.admins.getTraceByID(target.uuid);
                 Log.info("&lcTrace info for player '{0}':", target.name);
-                Log.info("  &lyEntity ID: {0}", info. playerid);
+                Log.info("  &lyEntity ID: {0}", info.playerid);
                 Log.info("  &lyIP: {0}", info.ip);
                 Log.info("  &lyUUID: {0}", info.uuid);
                 Log.info("  &lycustom client: {0}", info.modclient);
@@ -728,28 +742,28 @@ public class ServerControl extends Module {
                 info("Nobody with that name could be found.");
             }
         });
-	
-		handler.register("rollback", "<amount>", "Rollback the block edits in the world", arg -> {
-			if(!state.is(State.playing)) {
-				err("Open the server first.");
-				return;
-			}
-			
-			if(!Strings.canParsePostiveInt(arg[0])) {
-				err("Please input a valid, positive, number of times to rollback");
-				return;
-			}
-			
-			int rollbackTimes = Integer.valueOf(arg[0]);
-			IntMap<Array<EditLog>> editLogs = netServer.admins.getEditLogs();
-			if(editLogs.size == 0){
-				err("Nothing to rollback!");
-				return;
-			}
-			
-			netServer.admins.rollbackWorld(rollbackTimes);
-			info("Rollback done!");
-		});
+
+        handler.register("rollback", "<amount>", "Rollback the block edits in the world", arg -> {
+            if(!state.is(State.playing)){
+                err("Open the server first.");
+                return;
+            }
+
+            if(!Strings.canParsePostiveInt(arg[0])){
+                err("Please input a valid, positive, number of times to rollback");
+                return;
+            }
+
+            int rollbackTimes = Integer.valueOf(arg[0]);
+            IntMap<Array<EditLog>> editLogs = netServer.admins.getEditLogs();
+            if(editLogs.size == 0){
+                err("Nothing to rollback!");
+                return;
+            }
+
+            //netServer.admins.rollbackWorld(rollbackTimes);
+            info("Rollback done!");
+        });
     }
 
     private void readCommands(){
@@ -760,11 +774,27 @@ public class ServerControl extends Module {
             Gdx.app.postRunnable(() -> {
                 Response response = handler.handleMessage(line);
 
-                if (response.type == ResponseType.unknownCommand) {
-                    err("Invalid command. Type 'help' for help.");
-                }else if (response.type == ResponseType.fewArguments) {
+                if(response.type == ResponseType.unknownCommand){
+
+                    int minDst = 0;
+                    Command closest = null;
+
+                    for(Command command : handler.getCommandList()){
+                        int dst = Strings.levenshtein(command.text, response.runCommand);
+                        if(dst < 3 && (closest == null || dst < minDst)){
+                            minDst = dst;
+                            closest = command;
+                        }
+                    }
+
+                    if(closest != null){
+                        err("Command not found. Did you mean \"" + closest.text + "\"?");
+                    }else{
+                        err("Invalid command. Type 'help' for help.");
+                    }
+                }else if(response.type == ResponseType.fewArguments){
                     err("Too few command arguments. Usage: " + response.command.text + " " + response.command.paramText);
-                }else if (response.type == ResponseType.manyArguments) {
+                }else if(response.type == ResponseType.manyArguments){
                     err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
                 }
             });
@@ -772,9 +802,9 @@ public class ServerControl extends Module {
     }
 
     private void host(){
-        try {
+        try{
             Net.host(port);
-        }catch (IOException e){
+        }catch(IOException e){
             Log.err(e);
             state.set(State.menu);
         }

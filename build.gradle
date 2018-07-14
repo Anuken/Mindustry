@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.1.3'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
     }
 }
@@ -21,13 +21,13 @@ allprojects {
     version = 'release'
 
     ext {
-        versionNumber = '3.5'
-        versionType = 'release'
+        versionNumber = '4.0'
+        versionType = 'alpha'
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
         aiVersion = '1.8.1'
-        uCoreVersion = 'd5af97f93813d8767423521b1fcc5a5e0f7241d9'
+        uCoreVersion = 'c502931313'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -86,6 +86,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.0'
+        compile 'com.yuvimasory:orange-extensions:1.3.0'
     }
 }
 
@@ -96,6 +97,8 @@ project(":html") {
 
     dependencies {
         compile project(":core")
+        compileOnly project(":annotations")
+
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
@@ -107,25 +110,10 @@ project(":html") {
         compile "com.sksamuel.gwt:gwt-websockets:1.0.4"
         compile "com.sksamuel.gwt:gwt-websockets:1.0.4:sources"
     }
-}
 
-project(":android") {
-    apply plugin: "android"
-
-    configurations { natives }
-
-    dependencies {
-        implementation project(":core")
-        implementation project(":kryonet")
-        implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
-        implementation "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        implementation "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
-    }
+    compileJava.options.compilerArgs = [
+        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
+    ]
 }
 
 project(":ios") {
@@ -142,16 +130,14 @@ project(":ios") {
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
     }
-
-    robovm {
-
-    }
 }
 
 project(":core") {
     apply plugin: "java"
 
     dependencies {
+        compileOnly project(":annotations")
+
         boolean comp = System.properties["release"] == null || System.properties["release"] == "false"
 
         if(!comp){
@@ -160,29 +146,55 @@ project(":core") {
             println("Compiling DEBUG build.")
         }
 
-        if(new File('../uCore').exists() && comp){
+        if(new File(projectDir.parent, '../uCore').exists() && comp){
             compile project(":uCore")
         }else{
             compile "com.github.anuken:ucore:$uCoreVersion"
         }
 
-        if(new File('../GDXGifRecorder').exists() && comp) {
+        if(new File(projectDir.parent, '../GDXGifRecorder').exists() && comp) {
             compile project(":GDXGifRecorder")
         }
+
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
     }
+
+    compileJava.options.compilerArgs = [
+        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
+    ]
 }
 
 project(":server") {
     apply plugin: "java"
 
+    configurations {
+        compile.exclude module: android
+    }
+    
     dependencies {
+        compileOnly project(":annotations")
+
         compile project(":core")
         compile project(":kryonet")
         compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    }
+}
+
+project(":packer") {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":core")
+    }
+}
+
+project(":annotations") {
+    apply plugin: "java"
+
+    dependencies {
+        compile 'com.squareup:javapoet:1.11.0'
     }
 }
 

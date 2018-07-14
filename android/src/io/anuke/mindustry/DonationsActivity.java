@@ -8,12 +8,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.Button;
-
 import org.sufficientlysecure.donations.DonationsFragment;
 
-public class DonationsActivity extends FragmentActivity {
-    DonationsFragment donationsFragment;
-
+public class DonationsActivity extends FragmentActivity{
     /**
      * Google
      */
@@ -21,13 +18,14 @@ public class DonationsActivity extends FragmentActivity {
     private static final String[] GOOGLE_CATALOG = new String[]{
             "mindustry.donation.1", "mindustry.donation.2", "mindustry.donation.5",
             "mindustry.donation.10", "mindustry.donation.15",
-            "mindustry.donation.25", "mindustry.donation.50" };
+            "mindustry.donation.25", "mindustry.donation.50"};
+    DonationsFragment donationsFragment;
 
     /**
      * Called when the activity is first created.
      */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
         setTheme(R.style.GdxTheme);
@@ -35,7 +33,7 @@ public class DonationsActivity extends FragmentActivity {
         setContentView(R.layout.donations_activity);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        if (BuildConfig.DONATIONS_GOOGLE) {
+        if(BuildConfig.DONATIONS_GOOGLE){
             donationsFragment = DonationsFragment.newInstance(BuildConfig.DEBUG, true, GOOGLE_PUBKEY, GOOGLE_CATALOG,
                     getResources().getStringArray(R.array.donation_google_catalog_values), false, null, null,
                     null, false, null, null, false, null);
@@ -48,9 +46,10 @@ public class DonationsActivity extends FragmentActivity {
 
     public void onStart(){
         super.onStart();
-        Button b = ((Button)findViewById(org.sufficientlysecure.donations.R.id.donations__google_android_market_donate_button));
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) {
+        Button b = ((Button) findViewById(org.sufficientlysecure.donations.R.id.donations__google_android_market_donate_button));
+        b.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
                 donationsFragment.donateGoogleOnClick(donationsFragment.getView());
                 b.setEnabled(false);
             }
@@ -58,20 +57,19 @@ public class DonationsActivity extends FragmentActivity {
     }
 
 
-
     /**
      * Needed for Google Play In-app Billing. It uses startIntentSenderForResult(). The result is not propagated to
      * the Fragment like in startActivityForResult(). Thus we need to propagate manually to our Fragment.
      */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-        Button b = ((Button)findViewById(org.sufficientlysecure.donations.R.id.donations__google_android_market_donate_button));
+        Button b = ((Button) findViewById(org.sufficientlysecure.donations.R.id.donations__google_android_market_donate_button));
         b.setEnabled(true);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentByTag("donationsFragment");
-        if (fragment != null) {
+        if(fragment != null){
             fragment.onActivityResult(requestCode, resultCode, data);
             //TODO donation event, set settings?
         }

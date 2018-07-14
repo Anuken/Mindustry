@@ -1,4 +1,8 @@
 
+apply plugin: "com.android.application"
+
+configurations { natives }
+
 repositories {
 	mavenCentral()
     jcenter()
@@ -8,9 +12,20 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.android.support:support-v4:22.1.1'
+    implementation project(":core")
+    implementation project(":kryonet")
+    implementation 'com.android.support:support-v4:25.3.1'
     implementation 'org.sufficientlysecure:donations:2.5'
     implementation 'com.google.android.gms:play-services-auth:11.8.0'
+
+    implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+    implementation "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+    implementation "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
 }
 
 task deploy(type: Copy){
@@ -22,8 +37,8 @@ task deploy(type: Copy){
 }
 
 android {
-    buildToolsVersion '26.0.2'
-    compileSdkVersion 26
+    buildToolsVersion '27.0.3'
+    compileSdkVersion 27
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -35,7 +50,7 @@ android {
             jniLibs.srcDirs = ['libs']
         }
 
-        instrumentTest.setRoot('tests')
+        androidTest.setRoot('tests')
     }
     packagingOptions {
         exclude 'META-INF/robovm/ios/robovm.xml'

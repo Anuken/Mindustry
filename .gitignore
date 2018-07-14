@@ -2,6 +2,7 @@
 
 /core/assets/mindustry-saves/
 /core/assets/mindustry-maps/
+/core/assets/bundles/output/
 /deploy/
 /desktop/packr-out/
 /desktop/packr-export/
@@ -9,9 +10,12 @@
 /desktop/mindustry-maps/
 /desktop/gifexport/
 /core/lib/
+/core/assets-raw/sprites/generated/
 /annotations/build/
 /kryonet/build/
+/packer/build/
 /server/build/
+/annotations/build/
 /android/assets/mindustry-maps/
 /android/assets/mindustry-saves/
 /core/assets/gifexport/

@@ -1,10 +1,10 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.IntIntMap;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.Blocks;
 
-public class TraceInfo {
+public class TraceInfo{
     public int playerid;
     public String ip;
     public boolean modclient;

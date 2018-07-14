@@ -1,0 +1,53 @@
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
+
+uniform sampler2D u_texture;
+
+uniform float u_time;
+uniform float u_progress;
+uniform vec4 u_color;
+uniform vec2 u_uv;
+uniform vec2 u_uv2;
+uniform vec2 u_texsize;
+
+varying vec4 v_color;
+varying vec2 v_texCoord;
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+bool id(vec4 v){
+    return v.a > 0.1;
+}
+
+void main() {
+    vec2 coords = (v_texCoord.xy - u_uv) / (u_uv2 - u_uv);
+    vec2 t = v_texCoord.xy;
+
+	vec4 c = texture2D(u_texture, v_texCoord.xy);
+	
+	vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
+	float step = 1.0;
+	
+	bool outline = texture2D(u_texture, t).a < 0.1 &&
+		(id(texture2D(u_texture, t + vec2(0, step) * v)) || id(texture2D(u_texture, t + vec2(0, -step) * v)) ||
+		id(texture2D(u_texture, t + vec2(step, 0) * v)) || id(texture2D(u_texture, t + vec2(-step, 0) * v)));
+	
+    if(1.0-abs(coords.x - 0.5)*2.0 < 1.0-u_progress){
+        c = vec4(0.0);
+    }
+
+    if(c.a > 0.01 || outline){
+        float f = abs(sin(coords.x*2.0 + u_time));
+        if(f > 0.9 || (f > 0.7 && rand(t) > 0.6))
+            f = 1.0;
+        else
+            f = 0.0;
+        c = mix(c, u_color, f * u_color.a);
+    }
+
+    gl_FragColor = c * v_color;
+}

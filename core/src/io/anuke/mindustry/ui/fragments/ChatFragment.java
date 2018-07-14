@@ -9,11 +9,12 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.Label.LabelStyle;
 import io.anuke.ucore.scene.ui.TextField;
@@ -21,13 +22,13 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.players;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.ucore.core.Core.scene;
 import static io.anuke.ucore.core.Core.skin;
 
-public class ChatFragment extends Table implements Fragment{
+public class ChatFragment extends Table{
     private final static int messagesShown = 10;
-    private final static int maxLength = 150;
     private Array<ChatMessage> messages = new Array<>();
     private float fadetime;
     private boolean chatOpen = false;
@@ -39,9 +40,15 @@ public class ChatFragment extends Table implements Fragment{
     private float textWidth = Unit.dp.scl(600);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
     private float textspacing = Unit.dp.scl(10);
-    private Array<String> history = new Array<String>();
+    private Array<String> history = new Array<>();
     private int historyPos = 0;
     private int scrollPos = 0;
+    private Fragment container = new Fragment(){
+        @Override
+        public void build(Group parent){
+            scene.add(ChatFragment.this);
+        }
+    };
 
     public ChatFragment(){
         super();
@@ -51,7 +58,6 @@ public class ChatFragment extends Table implements Fragment{
 
         setVisible(() -> !state.is(State.menu) && Net.active());
 
-        //TODO put it in input?
         update(() -> {
             if(!Net.active() && chatOpen){
                 hide();
@@ -61,17 +67,17 @@ public class ChatFragment extends Table implements Fragment{
                 toggle();
             }
 
-            if (chatOpen) {
-                if (Inputs.keyTap("chat_history_prev") && historyPos < history.size - 1) {
-                    if (historyPos == 0) history.set(0, chatfield.getText());
+            if(chatOpen){
+                if(Inputs.keyTap("chat_history_prev") && historyPos < history.size - 1){
+                    if(historyPos == 0) history.set(0, chatfield.getText());
                     historyPos++;
                     updateChat();
                 }
-                if (Inputs.keyTap("chat_history_next") && historyPos > 0) {
+                if(Inputs.keyTap("chat_history_next") && historyPos > 0){
                     historyPos--;
                     updateChat();
                 }
-                scrollPos = (int)Mathf.clamp(scrollPos + Inputs.getAxis("chat_scroll"), 0, Math.max(0, messages.size - messagesShown));
+                scrollPos = (int) Mathf.clamp(scrollPos + Inputs.getAxis("chat_scroll"), 0, Math.max(0, messages.size - messagesShown));
             }
         });
 
@@ -79,9 +85,8 @@ public class ChatFragment extends Table implements Fragment{
         setup();
     }
 
-    @Override
-    public void build() {
-        scene.add(this);
+    public Fragment container(){
+        return container;
     }
 
     public void clearMessages(){
@@ -96,23 +101,23 @@ public class ChatFragment extends Table implements Fragment{
         fieldlabel.setStyle(fieldlabel.getStyle());
 
         chatfield = new TextField("", new TextField.TextFieldStyle(skin.get(TextField.TextFieldStyle.class)));
-        chatfield.setTextFieldFilter((field, c) -> field.getText().length() < maxLength);
+        chatfield.setTextFieldFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
         chatfield.getStyle().background = null;
         chatfield.getStyle().fontColor = Color.WHITE;
         chatfield.getStyle().font = skin.getFont("default-font-chat");
         chatfield.setStyle(chatfield.getStyle());
-        Platform.instance.addDialog(chatfield, maxLength);
+        Platform.instance.addDialog(chatfield, Vars.maxTextLength);
 
-        bottom().left().marginBottom(offsety).marginLeft(offsetx*2).add(fieldlabel).padBottom(4f);
+        bottom().left().marginBottom(offsety).marginLeft(offsetx * 2).add(fieldlabel).padBottom(4f);
 
         add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
 
-        if(Vars.mobile) {
+        if(Vars.mobile){
             marginBottom(105f);
             marginRight(240f);
         }
 
-        if(Vars.mobile) {
+        if(Vars.mobile){
             addImageButton("icon-arrow-right", 14 * 2, this::toggle).size(46f, 51f).visible(() -> chatOpen).pad(2f);
         }
     }
@@ -123,7 +128,7 @@ public class ChatFragment extends Table implements Fragment{
         batch.setColor(shadowColor);
 
         if(chatOpen)
-            batch.draw(skin.getRegion("white"), offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight()-1);
+            batch.draw(skin.getRegion("white"), offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
 
         super.draw(batch, alpha);
 
@@ -138,18 +143,18 @@ public class ChatFragment extends Table implements Fragment{
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || chatOpen); i++){
 
             layout.setText(font, messages.get(i).formattedMessage, Color.WHITE, textWidth, Align.bottomLeft, true);
-            theight += layout.height+textspacing;
-            if(i - scrollPos == 0) theight -= textspacing+1;
+            theight += layout.height + textspacing;
+            if(i - scrollPos == 0) theight -= textspacing + 1;
 
             font.getCache().clear();
             font.getCache().addText(messages.get(i).formattedMessage, fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
 
-            if(!chatOpen && fadetime-i < 1f && fadetime-i >= 0f){
-                font.getCache().setAlphas(fadetime-i);
-                batch.setColor(0, 0, 0, shadowColor.a*(fadetime-i));
+            if(!chatOpen && fadetime - i < 1f && fadetime - i >= 0f){
+                font.getCache().setAlphas(fadetime - i);
+                batch.setColor(0, 0, 0, shadowColor.a * (fadetime - i));
             }
 
-            batch.draw(skin.getRegion("white"), offsetx, theight-layout.height-2, textWidth + Unit.dp.scl(4f), layout.height+textspacing);
+            batch.draw(skin.getRegion("white"), offsetx, theight - layout.height - 2, textWidth + Unit.dp.scl(4f), layout.height + textspacing);
             batch.setColor(shadowColor);
 
             font.getCache().draw(batch);
@@ -158,7 +163,7 @@ public class ChatFragment extends Table implements Fragment{
         batch.setColor(Color.WHITE);
 
         if(fadetime > 0 && !chatOpen)
-            fadetime -= Timers.delta()/180f;
+            fadetime -= Timers.delta() / 180f;
     }
 
     private void sendMessage(){
@@ -168,7 +173,8 @@ public class ChatFragment extends Table implements Fragment{
         if(message.replaceAll(" ", "").isEmpty()) return;
 
         history.insert(1, message);
-        NetEvents.handleSendMessage(message);
+
+        Call.sendMessage(players[0], message);
     }
 
     public void toggle(){
@@ -191,12 +197,12 @@ public class ChatFragment extends Table implements Fragment{
         clearChatInput();
     }
 
-    public void updateChat() {
+    public void updateChat(){
         chatfield.setText(history.get(historyPos));
         chatfield.setCursorPosition(chatfield.getText().length());
     }
 
-    public void clearChatInput() {
+    public void clearChatInput(){
         historyPos = 0;
         history.set(0, "");
         chatfield.setText("");
@@ -228,7 +234,7 @@ public class ChatFragment extends Table implements Fragment{
             if(sender == null){ //no sender, this is a server message?
                 formattedMessage = message;
             }else{
-                formattedMessage = "[CORAL][["+sender+"[CORAL]]:[WHITE] "+message;
+                formattedMessage = "[CORAL][[" + sender + "[CORAL]]:[WHITE] " + message;
             }
         }
     }

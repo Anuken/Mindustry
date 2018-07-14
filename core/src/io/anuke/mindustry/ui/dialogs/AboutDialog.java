@@ -8,22 +8,30 @@ import io.anuke.mindustry.ui.Links.LinkEntry;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.ScrollPane;
+import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.OS;
 
 import static io.anuke.mindustry.Vars.ios;
 import static io.anuke.mindustry.Vars.ui;
 
-public class AboutDialog extends FloatingDialog {
+public class AboutDialog extends FloatingDialog{
     private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "trello");
 
     public AboutDialog(){
         super("$text.about.button");
 
-        addCloseButton();
+        shown(this::setup);
+        onResize(this::setup);
+    }
 
-        float h = 80f;
-        float w = 600f;
+    void setup(){
+        content().clear();
+        buttons().clear();
+
+        float h = UIUtils.portrait() ? 90f : 80f;
+        float w = UIUtils.portrait() ? 330f : 600f;
 
         Table in = new Table();
         ScrollPane pane = new ScrollPane(in, "clear");
@@ -43,21 +51,21 @@ public class AboutDialog extends FloatingDialog {
 
             table.table(i -> {
                 i.background("button");
-                i.addImage("icon-" + link.name).size(14*3f);
-            }).size(h-5, h);
+                i.addImage("icon-" + link.name).size(14 * 3f);
+            }).size(h - 5, h);
 
             table.table(inset -> {
-                inset.add("[accent]"+link.name.replace("-", " ")).growX().left();
+                inset.add("[accent]" + link.name.replace("-", " ")).growX().left();
                 inset.row();
                 inset.labelWrap(link.description).width(w - 100f).color(Color.LIGHT_GRAY).growX();
             }).padLeft(8);
 
-            table.addImageButton("icon-link", 14*3, () -> {
+            table.addImageButton("icon-link", 14 * 3, () -> {
                 if(!Gdx.net.openURI(link.link)){
                     ui.showError("$text.linkfail");
                     Gdx.app.getClipboard().setContents(link.link);
                 }
-            }).size(h-5, h);
+            }).size(h - 5, h);
 
             in.add(table).size(w, h).padTop(5).row();
         }
@@ -66,10 +74,18 @@ public class AboutDialog extends FloatingDialog {
 
         content().add(pane).growX();
 
+        addCloseButton();
+
         buttons().addButton("$text.credits", this::showCredits).size(200f, 64f);
 
         if(!ios && !OS.isMac){
             buttons().addButton("$text.changelog.title", ui.changelog::show).size(200f, 64f);
+        }
+
+        if(UIUtils.portrait()){
+            for(Cell<?> cell : buttons().getCells()){
+                cell.width(140f);
+            }
         }
 
     }

@@ -2,31 +2,37 @@ package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Difficulty;
+import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.GameMode;
-import io.anuke.mindustry.world.Map;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.ThreadArray;
 
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.saveSlots;
-import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.*;
 
-public class Saves {
+public class Saves{
     private int nextSlot;
-    private Array<SaveSlot> saves = new Array<>();
+    private Array<SaveSlot> saves = new ThreadArray<>();
     private SaveSlot current;
     private boolean saving;
     private float time;
 
-    private AsyncExecutor exec = new AsyncExecutor(1);
+    public Saves(){
+        Events.on(StateChangeEvent.class, (prev, state) -> {
+            if(state == State.menu){
+                threads.run(() -> current = null);
+            }
+        });
+    }
 
     public void load(){
         saves.clear();
-        for(int i = 0; i < saveSlots; i ++){
+        for(int i = 0; i < saveSlots; i++){
             if(SaveIO.isSaveValid(i)){
                 SaveSlot slot = new SaveSlot(i);
                 saves.add(slot);
@@ -36,25 +42,25 @@ public class Saves {
         }
     }
 
-    public SaveSlot getCurrent() {
+    public SaveSlot getCurrent(){
         return current;
     }
 
     public void update(){
-        if(state.is(State.menu)){
-            current = null;
-        }
 
         if(!state.is(State.menu) && !state.gameOver && current != null && current.isAutosave()){
             time += Timers.delta();
-            if(time > Settings.getInt("saveinterval")*60) {
+            if(time > Settings.getInt("saveinterval") * 60){
                 saving = true;
 
-                exec.submit(() -> {
-                    SaveIO.saveToSlot(current.index);
-                    current.meta = SaveIO.getData(current.index);
+                Timers.run(2f, () -> {
+                    try{
+                        SaveIO.saveToSlot(current.index);
+                        current.meta = SaveIO.getData(current.index);
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
                     saving = false;
-                    return true;
                 });
 
                 time = 0;
@@ -78,7 +84,7 @@ public class Saves {
 
     public void addSave(String name){
         SaveSlot slot = new SaveSlot(nextSlot);
-        nextSlot ++;
+        nextSlot++;
         slot.setName(name);
         saves.add(slot);
         SaveIO.saveToSlot(slot.index);
@@ -89,7 +95,7 @@ public class Saves {
     public SaveSlot importSave(FileHandle file) throws IOException{
         SaveSlot slot = new SaveSlot(nextSlot);
         slot.importFile(file);
-        nextSlot ++;
+        nextSlot++;
         slot.setName(file.nameWithoutExtension());
         saves.add(slot);
         slot.meta = SaveIO.getData(slot.index);
@@ -110,15 +116,15 @@ public class Saves {
         }
 
         public void load(){
-            current = this;
             SaveIO.loadFromSlot(index);
             meta = SaveIO.getData(index);
+            current = this;
         }
 
         public void save(){
-            current = this;
             SaveIO.saveToSlot(index);
             meta = SaveIO.getData(index);
+            current = this;
         }
 
         public String getDate(){
@@ -130,12 +136,16 @@ public class Saves {
         }
 
         public String getName(){
-            return Settings.getString("save-"+index+"-name");
+            return Settings.getString("save-" + index + "-name", "untittled");
         }
 
         public void setName(String name){
-            Settings.putString("save-"+index+"-name", name);
+            Settings.putString("save-" + index + "-name", name);
             Settings.save();
+        }
+
+        public int getBuild(){
+            return meta.build;
         }
 
         public int getWave(){
@@ -151,29 +161,29 @@ public class Saves {
         }
 
         public boolean isAutosave(){
-            return Settings.getBool("save-"+index+"-autosave");
+            return Settings.getBool("save-" + index + "-autosave", !gwt);
         }
 
         public void setAutosave(boolean save){
-            Settings.putBool("save-"+index + "-autosave", save);
+            Settings.putBool("save-" + index + "-autosave", save);
             Settings.save();
         }
 
         public void importFile(FileHandle file) throws IOException{
             try{
                 file.copyTo(SaveIO.fileFor(index));
-            }catch (Exception e){
+            }catch(Exception e){
                 throw new IOException(e);
             }
         }
 
         public void exportFile(FileHandle file) throws IOException{
             try{
-                if(!file.extension().equals("mins")){
-                    file = file.parent().child(file.nameWithoutExtension() + ".mins");
+                if(!file.extension().equals(saveExtension)){
+                    file = file.parent().child(file.nameWithoutExtension() + "." + saveExtension);
                 }
                 SaveIO.fileFor(index).copyTo(file);
-            }catch (Exception e){
+            }catch(Exception e){
                 throw new IOException(e);
             }
         }

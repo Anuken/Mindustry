@@ -1,0 +1,40 @@
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
+
+uniform sampler2D u_texture;
+
+uniform vec4 u_color;
+uniform vec2 u_texsize;
+uniform vec2 u_uv;
+uniform vec2 u_uv2;
+
+varying vec4 v_color;
+varying vec2 v_texCoord;
+
+bool id(vec2 coords, vec4 base){
+    vec4 target = texture2D(u_texture, coords);
+    return  target.a < 0.1 || (coords.x < u_uv.x || coords.y < u_uv.y || coords.x > u_uv2.x || coords.y > u_uv2.y);
+}
+
+bool cont(vec2 T, vec2 v){
+    float step = 1.0;
+    vec4 base = texture2D(u_texture, T);
+    return base.a > 0.1 &&
+           		(id(T + vec2(0, step) * v, base) || id(T + vec2(0, -step) * v, base) ||
+           		id(T + vec2(step, 0) * v, base) || id(T + vec2(-step, 0) * v, base));
+}
+
+void main() {
+	vec2 t = v_texCoord.xy;
+	vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
+	vec2 coord = t / v;
+	vec4 c = texture2D(u_texture, t);
+
+	if(cont(t, v) ){
+		gl_FragColor = u_color;
+	}else{
+		gl_FragColor = vec4(0.0);
+	}
+}

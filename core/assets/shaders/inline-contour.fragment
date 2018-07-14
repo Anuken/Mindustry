@@ -1,0 +1,63 @@
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
+
+uniform sampler2D u_texture;
+
+uniform vec4 u_color;
+uniform vec2 u_texsize;
+uniform vec2 u_uv;
+uniform vec2 u_uv2;
+uniform float u_progress;
+uniform float u_time;
+
+varying vec4 v_color;
+varying vec2 v_texCoord;
+
+float diff(vec4 target, vec4 base){
+    return (max(target.a / base.a, max(target.r / base.r, max(target.g / base.g, target.b / base.b))) -
+               min (target.a / base.a, min(target.r / base.r, min(target.g / base.g, target.b / base.b)))) * 4.0;
+}
+
+bool id(vec2 coords, vec4 base, float basediff){
+    vec4 target = texture2D(u_texture, coords);
+    return (diff(target, base)) > basediff - basediff*u_progress
+        || (basediff < 5.0 && (coords.x < u_uv.x || coords.y < u_uv.y || coords.x > u_uv2.x || coords.y > u_uv2.y));
+}
+
+bool cont(vec2 T, vec2 v, float basediff){
+    float step = 1.0;
+    vec4 base = texture2D(u_texture, T);
+    return base.a > 0.1 &&
+           		(id(T + vec2(0, step) * v, base, basediff) || id(T + vec2(0, -step) * v, base, basediff) ||
+           		id(T + vec2(step, 0) * v, base, basediff) || id(T + vec2(-step, 0) * v, base, basediff));
+}
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+void main() {
+
+	vec2 t = v_texCoord.xy;
+
+	vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
+	vec2 coords = (v_texCoord-u_uv) / v;
+	float value = coords.x + coords.y;
+
+	vec4 color = texture2D(u_texture, t);
+
+	vec2 center = ((u_uv + u_uv2)/2.0 - u_uv) /v;
+	float dst = (abs(center.x - coords.x) + abs(center.y - coords.y)) / 2.0;
+
+    if(dst - 1.0 < u_progress * (center.x) && dst> u_progress * (center.x) && color.a > 0.1){
+        gl_FragColor = u_color;
+	}else if(cont(t, v, 6.0)){
+	    gl_FragColor = color;
+	}else if(cont(t, v, 3.0) && color.a > 0.1){
+        gl_FragColor = u_color;
+    }else{
+        gl_FragColor = vec4(0.0);
+    }
+}

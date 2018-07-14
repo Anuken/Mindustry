@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
@@ -11,7 +12,7 @@ import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.player;
+import static io.anuke.mindustry.Vars.players;
 import static io.anuke.mindustry.Vars.ui;
 
 public class HostDialog extends FloatingDialog{
@@ -20,13 +21,15 @@ public class HostDialog extends FloatingDialog{
     public HostDialog(){
         super("$text.hostserver");
 
+        Player player = players[0];
+
         addCloseButton();
 
         content().table(t -> {
             t.add("$text.name").padRight(10);
             t.addField(Settings.getString("name"), text -> {
                 if(text.isEmpty()) return;
-                Vars.player.name = text;
+                player.name = text;
                 Settings.put("name", text);
                 Settings.save();
                 ui.listfrag.rebuild();
@@ -35,11 +38,11 @@ public class HostDialog extends FloatingDialog{
             ImageButton button = t.addImageButton("white", 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
-                    Settings.putInt("color", Color.rgba8888(color));
+                    Settings.putInt("color-0", Color.rgba8888(color));
                     Settings.save();
                 });
             }).size(50f, 54f).get();
-            button.update(() -> button.getStyle().imageUpColor = player.getColor());
+            button.update(() -> button.getStyle().imageUpColor = player.color);
         }).width(w).height(70f).pad(4).colspan(3);
 
         content().row();
@@ -52,7 +55,7 @@ public class HostDialog extends FloatingDialog{
                 try{
                     Net.host(Vars.port);
                     player.isAdmin = true;
-                }catch (IOException e){
+                }catch(IOException e){
                     ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
                 }
                 ui.loadfrag.hide();

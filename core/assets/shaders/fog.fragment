@@ -1,0 +1,22 @@
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
+
+uniform sampler2D u_texture;
+
+const float round = 0.23;
+
+varying vec4 v_color;
+varying vec2 v_texCoord;
+
+void main() {
+	vec4 color = texture2D(u_texture, v_texCoord.xy);
+	color.a = 1.0 - color.r;
+	color.rgb = vec3(0.0);
+	color.a = float(int(color.a / round)) * round;
+	if(color.a >= 1.0 - round){
+	    color.a = 1.0;
+	}
+	gl_FragColor = color * v_color;
+}
