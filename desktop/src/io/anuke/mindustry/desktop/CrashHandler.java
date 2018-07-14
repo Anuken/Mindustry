@@ -5,7 +5,6 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.Strings;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -41,7 +40,7 @@ public class CrashHandler{
             header += "OS: " + System.getProperty("os.name") + "\n";
             header += "Multithreading: " + Settings.getBool("multithread") + "\n----\n";
         }catch(Throwable e4){
-            header += "\n--error getting additional info--\n";
+            header += "--error getting additional info--\n";
             e4.printStackTrace();
         }
 
@@ -54,7 +53,7 @@ public class CrashHandler{
         //try to write it
         try{
             filename = "crash-report-" + new SimpleDateFormat("dd-MM-yy h.mm.ss").format(new Date()) + ".txt";
-            Files.write(Paths.get(System.getProperty("user.home"), "mindustry-crash-reports", filename), result.getBytes());
+            Files.write(Paths.get(System.getProperty("user.home"), filename), result.getBytes());
         }catch(Throwable i){
             i.printStackTrace();
             failed = true;
@@ -62,7 +61,7 @@ public class CrashHandler{
 
         try{
             javax.swing.JOptionPane.showMessageDialog(null, "An error has occured: \n" + result + "\n\n" +
-                    (!failed ? "A crash report has been written to " + new File(filename).getAbsolutePath() + ".\nPlease send this file to the developer!"
+                    (!failed ? "A crash report has been written to " + Paths.get(System.getProperty("user.home"), filename).toFile().getAbsolutePath() + ".\nPlease send this file to the developer!"
                             : "Failed to generate crash report.\nPlease send an image of this crash log to the developer!"));
         }catch(Throwable i){
             i.printStackTrace();
