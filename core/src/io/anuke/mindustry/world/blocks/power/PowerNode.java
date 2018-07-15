@@ -259,7 +259,7 @@ public class PowerNode extends PowerBlock{
 
         for(int i = 0; i < entity.links.size; i++){
             Tile target = world.tile(entity.links.get(i));
-            if(shouldDistribute(tile, target)){
+            if(targets > 0 && shouldDistribute(tile, target)){
 
                 float transmit = Math.min(result, entity.power.amount);
                 if(target.block().acceptPower(target, tile, transmit)){

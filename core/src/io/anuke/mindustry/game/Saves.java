@@ -48,6 +48,7 @@ public class Saves{
     }
 
     public void update(){
+        SaveSlot current = this.current;
 
         if(!state.is(State.menu) && !state.gameOver && current != null && current.isAutosave()){
             time += Timers.delta();

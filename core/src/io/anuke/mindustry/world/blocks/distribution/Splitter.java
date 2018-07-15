@@ -11,7 +11,7 @@ import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Timers;
 
 public class Splitter extends Block{
-    protected float speed = 9f;
+    protected float speed = 8f;
 
     public Splitter(String name){
         super(name);
