@@ -215,7 +215,7 @@ public class World extends Module{
 
         beginMapLoad();
 
-        int width = 250, height = 250;
+        int width = 400, height = 400;
 
         Tile[][] tiles = createTiles(width, height);
 
