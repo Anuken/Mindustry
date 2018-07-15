@@ -139,14 +139,14 @@ public class MenuFragment extends Fragment{
     }
 
     private void showPlaySelect(){
-        float w = 200f;
+        float w = 220f;
         float bw = w * 2f + 10f;
 
         FloatingDialog dialog = new FloatingDialog("$text.play");
         dialog.addCloseButton();
         dialog.content().defaults().height(66f).width(w).padRight(5f);
 
-        dialog.content().add(new MenuButton("icon-play-2", "$text.newgame", () -> {
+        dialog.content().add(new MenuButton("icon-play-2", "$text.campaign", () -> {
             dialog.hide();
             ui.levels.show();
         })).width(bw).colspan(2);
@@ -161,7 +161,10 @@ public class MenuFragment extends Fragment{
             }
         }));
 
-        dialog.content().add(new MenuButton("icon-tutorial", "$text.tutorial", () -> ui.showInfo("The tutorial is currently not yet implemented.")));
+        dialog.content().add(new MenuButton("icon-editor", "$text.customgame", () -> {
+            dialog.hide();
+            ui.levels.show();
+        }));
 
         dialog.content().row();
 

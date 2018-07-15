@@ -28,12 +28,11 @@ import static io.anuke.mindustry.Vars.world;
 
 
 public class WorldGenerator{
-    static int oreIndex = 0;
+    private int seed;
+    int oreIndex = 0;
 
-    /**
-     * Should fill spawns with the correct spawnpoints.
-     */
-    public static void loadTileData(Tile[][] tiles, MapTileData data, boolean genOres, int seed){
+    /**Loads raw map tile data into a Tile[][] array, setting up multiblocks, cliffs and ores. */
+    public void loadTileData(Tile[][] tiles, MapTileData data, boolean genOres, int seed){
         data.position(0, 0);
         TileDataMarker marker = data.newDataMarker();
 
@@ -48,7 +47,7 @@ public class WorldGenerator{
         prepareTiles(tiles, seed, genOres);
     }
 
-    public static void prepareTiles(Tile[][] tiles, int seed, boolean genOres){
+    public void prepareTiles(Tile[][] tiles, int seed, boolean genOres){
 
         //find multiblocks
         IntArray multiblocks = new IntArray();
@@ -146,7 +145,7 @@ public class WorldGenerator{
         }
     }
 
-    public static void generateMap(Tile[][] tiles, int seed){
+    public void generateMap(Tile[][] tiles, int seed){
         MathUtils.random.setSeed((long) (Math.random() * 99999999));
         Simplex sim = new Simplex(Mathf.random(99999));
         Simplex sim2 = new Simplex(Mathf.random(99999));
@@ -244,7 +243,7 @@ public class WorldGenerator{
         prepareTiles(tiles, seed, true);
     }
 
-    public static class OreEntry{
+    public class OreEntry{
         final float frequency;
         final Item item;
         final Simplex noise;

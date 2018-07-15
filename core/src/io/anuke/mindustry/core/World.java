@@ -1,7 +1,6 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.ai.BlockIndexer;
@@ -11,8 +10,8 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.io.MapIO;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.maps.Maps;
 import io.anuke.mindustry.maps.Sectors;
@@ -31,14 +30,13 @@ import io.anuke.ucore.util.Tmp;
 import static io.anuke.mindustry.Vars.*;
 
 public class World extends Module{
-    private int seed;
-
     private Map currentMap;
     private Tile[][] tiles;
     private Pathfinder pathfinder = new Pathfinder();
     private BlockIndexer indexer = new BlockIndexer();
     private Maps maps = new Maps();
     private Sectors sectors = new Sectors();
+    private WorldGenerator generator = new WorldGenerator();
 
     private Array<Tile> tempTiles = new ThreadArray<>();
     private boolean generating, invalidMap;
@@ -204,9 +202,7 @@ public class World extends Module{
         Events.fire(WorldLoadEvent.class);
     }
 
-    /**
-     * Loads up a procedural map. This does not call play(), but calls reset().
-     */
+    /**Loads up a procedural map. This does not call play(), but calls reset().*/
     public void loadProceduralMap(){
         Timers.mark();
         Timers.mark();
@@ -225,7 +221,7 @@ public class World extends Module{
         EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
         Timers.mark();
-        WorldGenerator.generateMap(tiles, Mathf.random(9999999));
+        generator.generateMap(tiles, Mathf.random(9999999));
         Log.info("Time to generate base map: {0}", Timers.elapsed());
 
         Log.info("Time to generate fully without additional events: {0}", Timers.elapsed());
@@ -236,13 +232,8 @@ public class World extends Module{
     }
 
     public void loadMap(Map map){
-        loadMap(map, MathUtils.random(0, 999999));
-    }
-
-    public void loadMap(Map map, int seed){
         beginMapLoad();
         this.currentMap = map;
-        this.seed = seed;
 
         int width = map.meta.width, height = map.meta.height;
 
@@ -250,7 +241,7 @@ public class World extends Module{
 
         EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
-        WorldGenerator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), seed);
+        generator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), 0);
 
         if(!headless && state.teams.get(players[0].getTeam()).cores.size == 0){
             ui.showError("$text.map.nospawn");
@@ -261,10 +252,6 @@ public class World extends Module{
         }
 
         endMapLoad();
-    }
-
-    public int getSeed(){
-        return seed;
     }
 
     public void notifyChanged(Tile tile){
