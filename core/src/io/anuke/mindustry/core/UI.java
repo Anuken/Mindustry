@@ -13,15 +13,12 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.modules.SceneModule;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.Skin;
 import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.builders.build;
 import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
@@ -32,9 +29,7 @@ import io.anuke.ucore.util.Mathf;
 
 import java.util.Locale;
 
-import static io.anuke.mindustry.Vars.control;
-import static io.anuke.mindustry.Vars.players;
-import static io.anuke.mindustry.Vars.threads;
+import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
 
 public class UI extends SceneModule{
@@ -162,10 +157,10 @@ public class UI extends SceneModule{
         levels = new LevelDialog();
         language = new LanguageDialog();
         settings = new SettingsMenuDialog();
+        host = new HostDialog();
         paused = new PausedDialog();
         changelog = new ChangelogDialog();
         about = new AboutDialog();
-        host = new HostDialog();
         bans = new BansDialog();
         admins = new AdminsDialog();
         traces = new TraceDialog();
@@ -174,8 +169,6 @@ public class UI extends SceneModule{
         localplayers = new LocalPlayerDialog();
         unlocks = new UnlocksDialog();
         content = new ContentInfoDialog();
-
-        build.begin(scene);
 
         Group group = Core.scene.getRoot();
 
@@ -186,8 +179,6 @@ public class UI extends SceneModule{
         listfrag.build(group);
         debugfrag.build(group);
         loadfrag.build(group);
-
-        build.end();
     }
 
     @Override
@@ -220,11 +211,11 @@ public class UI extends SceneModule{
         }
     }
 
-    public void loadAnd(Callable call){
+    public void loadAnd(Runnable call){
         loadAnd("$text.loading", call);
     }
 
-    public void loadAnd(String text, Callable call){
+    public void loadAnd(String text, Runnable call){
         loadfrag.show(text);
         Timers.runTask(7f, () -> {
             call.run();
@@ -232,11 +223,11 @@ public class UI extends SceneModule{
         });
     }
 
-    public void loadLogic(Callable call){
+    public void loadLogic(Runnable call){
         loadLogic("$text.loading", call);
     }
 
-    public void loadLogic(String text, Callable call){
+    public void loadLogic(String text, Runnable call){
         loadfrag.show();
         Timers.runTask(7f, () -> {
             threads.run(() -> {
@@ -289,14 +280,14 @@ public class UI extends SceneModule{
         }}.show();
     }
 
-    public void showConfirm(String title, String text, Listenable confirmed){
+    public void showConfirm(String title, String text, Runnable confirmed){
         FloatingDialog dialog = new FloatingDialog(title);
         dialog.content().add(text).width(400f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons().defaults().size(200f, 54f).pad(2f);
         dialog.buttons().addButton("$text.cancel", dialog::hide);
         dialog.buttons().addButton("$text.ok", () -> {
             dialog.hide();
-            confirmed.listen();
+            confirmed.run();
         });
         dialog.keyDown(Keys.ESCAPE, dialog::hide);
         dialog.keyDown(Keys.BACK, dialog::hide);

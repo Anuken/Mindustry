@@ -10,12 +10,8 @@ import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.builders.button;
-import io.anuke.ucore.scene.builders.label;
-import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
@@ -24,44 +20,14 @@ import static io.anuke.mindustry.Vars.*;
 
 public class PlayerListFragment extends Fragment{
     private boolean visible = false;
-    private Table content = new Table();
+    private Table content = new Table().marginRight(13f).marginLeft(13f);
     private ObjectMap<Player, Boolean> checkmap = new ObjectMap<>();
 
     @Override
     public void build(Group parent){
-        new table(){{
-            new table("pane"){{
-                touchable(Touchable.enabled);
-                margin(14f);
-                new label(() -> Bundles.format(playerGroup.size() == 1 ? "text.players.single" :
-                        "text.players", playerGroup.size()));
-                row();
-                content.marginRight(13f).marginLeft(13f);
-                ScrollPane pane = new ScrollPane(content, "clear");
-                pane.setScrollingDisabled(true, false);
-                pane.setFadeScrollBars(false);
-                add(pane).grow();
-                row();
-                new table("pane"){{
-                    margin(0f);
-                    defaults().growX().height(50f).fillY();
-
-                    //get().addCheck("$text.server.friendlyfire", b -> {
-//                        CallClient.friendlyFireChange(b);
-                    //}).left().padLeft(-12).pad(0).update(i -> i.setChecked(state.friendlyFire)).disabled(b -> Net.client()).padRight(5);
-
-                    new button("$text.server.bans", () -> {
-                        ui.bans.show();
-                    }).cell.disabled(b -> Net.client());
-
-                    new button("$text.server.admins", () -> {
-                        ui.admins.show();
-                    }).cell.disabled(b -> Net.client());
-
-                }}.pad(10f).growX().end();
-            }}.end();
-
-            update(t -> {
+        parent.fill(cont -> {
+            cont.visible(() -> visible);
+            cont.update(() -> {
                 if(!(Net.active() && !state.is(State.menu))){
                     visible = false;
                 }
@@ -85,8 +51,22 @@ public class PlayerListFragment extends Fragment{
                 }
             });
 
-            visible(() -> visible);
-        }}.end();
+            cont.table("pane", pane -> {
+                pane.label(() -> Bundles.format(playerGroup.size() == 1 ? "text.players.single" : "text.players", playerGroup.size()));
+                pane.row();
+                pane.pane("clear", content)
+                    .grow().get().setScrollingDisabled(true, false);
+                pane.row();
+
+                pane.table("pane", menu -> {
+                    menu.defaults().growX().height(50f).fillY();
+
+                    menu.addButton("$text.server.bans", ui.bans::show).disabled(b -> Net.client());
+                    menu.addButton("$text.server.admins", ui.admins::show).disabled(b -> Net.client());
+                }).margin(0f).pad(10f).growX();
+
+            }).touchable(Touchable.enabled).margin(14f);
+        });
 
         rebuild();
     }

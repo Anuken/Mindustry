@@ -16,7 +16,6 @@ import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
@@ -100,7 +99,7 @@ public class OverlayRenderer{
                             int[] values = {0, 0};
                             boolean[] doDraw = {false};
 
-                            Callable drawbars = () -> {
+                            Runnable drawbars = () -> {
                                 for(BlockBar bar : block.bars.list()){
                                     float offset = Mathf.sign(bar.top) * (block.size / 2f * tilesize + 2f + (bar.top ? values[0] : values[1]));
 

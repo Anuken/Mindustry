@@ -1,10 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.builders.label;
-import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.TextButton;
@@ -16,32 +13,24 @@ public class LoadingFragment extends Fragment{
 
     @Override
     public void build(Group parent){
+        parent.fill("loadDim", t -> {
+            t.setVisible(false);
+            t.setTouchable(Touchable.enabled);
+            t.add().height(70f).row();
 
-        table = new table("loadDim"){{
-            add().height(70f).row();
+            t.addImage("white").growX().height(3f).pad(4f).growX().get().setColor(Palette.accent);
+            t.row();
+            t.add("$text.loading").name("namelabel").pad(10f);
+            t.row();
+            t.addImage("white").growX().height(3f).pad(4f).growX().get().setColor(Palette.accent);
+            t.row();
 
-            touchable(Touchable.enabled);
-            get().addImage("white").growX()
-                    .height(3f).pad(4f).growX().get().setColor(Palette.accent);
-            row();
-            new label("$text.loading"){{
-                get().setName("namelabel");
-            }}.pad(10);
-            row();
-            get().addImage("white").growX()
-                    .height(3f).pad(4f).growX().get().setColor(Palette.accent);
-
-            row();
-
-            button = get().addButton("$text.cancel", () -> {
-            }).pad(20).size(250f, 70f).get();
-            button.setVisible(false);
-        }}.end().get();
-
-        table.setVisible(false);
+            button = t.addButton("$text.cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
+            table = t;
+        });
     }
 
-    public void setButton(Listenable listener){
+    public void setButton(Runnable listener){
         button.setVisible(true);
         button.getListeners().removeIndex(button.getListeners().size - 1);
         button.clicked(listener);

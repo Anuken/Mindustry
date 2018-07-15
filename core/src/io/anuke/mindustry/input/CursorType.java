@@ -1,6 +1,5 @@
 package io.anuke.mindustry.input;
 
-import io.anuke.ucore.function.Callable;
 import io.anuke.ucore.scene.utils.Cursors;
 
 /**
@@ -12,9 +11,9 @@ public enum CursorType{
     drill(() -> Cursors.set("drill")),
     unload(() -> Cursors.set("unload"));
 
-    private final Callable call;
+    private final Runnable call;
 
-    CursorType(Callable call){
+    CursorType(Runnable call){
         this.call = call;
     }
 

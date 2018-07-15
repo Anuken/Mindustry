@@ -24,7 +24,7 @@ public class BlockConsumeFragment extends Fragment{
     @Override
     public void build(Group parent){
         table = new Table();
-        table.setVisible(() -> !state.is(State.menu) && visible);
+        table.visible(() -> !state.is(State.menu) && visible);
         table.setTransform(true);
         parent.setTransform(true);
         parent.addChild(table);

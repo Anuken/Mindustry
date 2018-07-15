@@ -14,12 +14,8 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.builders.button;
-import io.anuke.ucore.scene.builders.label;
-import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.style.TextureRegionDrawable;
 import io.anuke.ucore.scene.ui.Label;
-import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Log.LogHandler;
@@ -41,10 +37,6 @@ public class DebugFragment extends Fragment{
                 }
             }
         });
-    }
-
-    public static void printDebugInfo(){
-        Gdx.app.error("Minudstry Info Dump", debugInfo());
     }
 
     public static String debugInfo(){
@@ -120,43 +112,41 @@ public class DebugFragment extends Fragment{
     public void build(Group parent){
 
         Player player = players[0];
-        new table(){{
-            visible(() -> debug);
+        parent.fill(c -> {
+            c.bottom().left().visible(() -> debug);
 
-            abottom().aleft();
+            c.table("pane", t -> {
+                t.defaults().fillX().width(100f);
 
-            new table("pane"){{
-                defaults().fillX().width(100f);
+                t.label(() -> Gdx.app.getJavaHeap() / 1024 / 1024 + "MB");
+                t.row();
 
-                new label(() -> Gdx.app.getJavaHeap() / 1024 / 1024 + "MB");
-                row();
-
-                new label("Debug");
-                row();
-                new button("noclip", "toggle", () -> noclip = !noclip);
-                row();
-                new button("items", () -> {
+                t.add("Debug");
+                t.row();
+                t.addButton("noclip", "toggle", () -> noclip = !noclip);
+                t.row();
+                t.addButton("items", () -> {
                     for(int i = 0; i < 10; i++){
                         ItemDrop.create(Item.all().random(), 5, player.x, player.y, Mathf.random(360f));
                     }
                 });
-                row();
-                new button("team", "toggle", player::toggleTeam);
-                row();
-                new button("blocks", "toggle", () -> showBlockDebug = !showBlockDebug);
-                row();
-                new button("fog", () -> showFog = !showFog);
-                row();
-                new button("gameover", () -> {
+                t.row();
+                t.addButton("team", "toggle", player::toggleTeam);
+                t.row();
+                t.addButton("blocks", "toggle", () -> showBlockDebug = !showBlockDebug);
+                t.row();
+                t.addButton("fog", () -> showFog = !showFog);
+                t.row();
+                t.addButton("gameover", () -> {
                     state.teams.get(Team.blue).cores.get(0).entity.health = 0;
                     state.teams.get(Team.blue).cores.get(0).entity.damage(1);
                 });
-                row();
-                new button("wave", () -> state.wavetime = 0f);
-                row();
-                new button("death", () -> player.damage(99999, true));
-                row();
-                new button("spawn", () -> {
+                t.row();
+                t.addButton("wave", () -> state.wavetime = 0f);
+                t.row();
+                t.addButton("death", () -> player.damage(99999, true));
+                t.row();
+                t.addButton("spawn", () -> {
                     FloatingDialog dialog = new FloatingDialog("debug spawn");
                     for(UnitType type : UnitType.all()){
                         dialog.content().addImageButton("white", 40, () -> {
@@ -171,27 +161,20 @@ public class DebugFragment extends Fragment{
                     dialog.setFillParent(false);
                     dialog.show();
                 });
-                row();
-            }}.end();
-
-            row();
-
-        }}.end();
+                t.row();
+            });
+        });
 
 
-        new table(){{
-            visible(() -> console);
+        parent.fill(t -> {
+            t.top().left().visible(() -> console);
 
-            atop().aleft();
+            t.table("pane", p -> {
+                p.defaults().fillX();
 
-            new table("pane"){{
-                defaults().fillX();
-
-                ScrollPane pane = new ScrollPane(new Label(DebugFragment::debugInfo), "clear");
-
-                add(pane);
-                row();
-                new button("dump", () -> {
+                p.pane("clear", new Label(DebugFragment::debugInfo));
+                p.row();
+                p.addButton("dump", () -> {
                     try{
                         FileHandle file = Gdx.files.local("packet-dump.txt");
                         file.writeString("--INFO--\n", false);
@@ -202,20 +185,16 @@ public class DebugFragment extends Fragment{
                         ui.showError("Error dumping log.");
                     }
                 });
-            }}.end();
-        }}.end();
+            });
+        });
 
-        new table(){{
-            visible(() -> console);
-
-            atop();
+        parent.fill(t -> {
+            t.top().visible(() -> console);
 
             Table table = new Table("pane");
             table.label(() -> log.toString());
 
-            ScrollPane pane = new ScrollPane(table, "clear");
-
-            get().add(pane);
-        }}.end();
+            t.pane("clear", table);
+        });
     }
 }

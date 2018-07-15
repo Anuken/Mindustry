@@ -11,8 +11,8 @@ import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.io.MapIO;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.type.Recipe;
@@ -23,13 +23,9 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.input.Input;
 import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.builders.build;
-import io.anuke.ucore.scene.builders.label;
-import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -95,8 +91,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             t.addImageTextButton("$text.editor.import", "icon-load-map", isize, () ->
                     createDialog("$text.editor.import",
-                            "$text.editor.importmap", "$text.editor.importmap.description", "icon-load-map", (Listenable) loadDialog::show,
-                            "$text.editor.importfile", "$text.editor.importfile.description", "icon-file", (Listenable) () -> {
+                            "$text.editor.importmap", "$text.editor.importmap.description", "icon-load-map", (Runnable) loadDialog::show,
+                            "$text.editor.importfile", "$text.editor.importfile.description", "icon-file", (Runnable) () -> {
                                 Platform.instance.showFileChooser("$text.loadimage", "Map Files", file -> {
                                     ui.loadAnd(() -> {
                                         try{
@@ -135,7 +131,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 						}*/));
 
             t.addImageTextButton("$text.editor.export", "icon-save-map", isize, () -> createDialog("$text.editor.export",
-                    "$text.editor.exportfile", "$text.editor.exportfile.description", "icon-file", (Listenable) () -> {
+                    "$text.editor.exportfile", "$text.editor.exportfile.description", "icon-file", (Runnable) () -> {
                         if(!gwt){
                             Platform.instance.showFileChooser("$text.saveimage", "Map Files", file -> {
                                 file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
@@ -224,9 +220,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         clearChildren();
         margin(0);
-        build.begin(this);
         build();
-        build.end();
 
         update(() -> {
             if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
@@ -302,10 +296,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
             String name = (String) arguments[i];
             String description = (String) arguments[i + 1];
             String iconname = (String) arguments[i + 2];
-            Listenable listenable = (Listenable) arguments[i + 3];
+            Runnable listenable = (Runnable) arguments[i + 3];
 
             TextButton button = dialog.content().addButton(name, () -> {
-                listenable.listen();
+                listenable.run();
                 dialog.hide();
                 menu.hide();
             }).left().get();
@@ -386,14 +380,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
         float size = mobile ? (int) (Math.min(Gdx.graphics.getHeight(), Gdx.graphics.getWidth()) / amount / Unit.dp.scl(1f)) :
                 Math.min(Gdx.graphics.getDisplayMode().height / amount, baseSize);
 
-        new table(){{
-            aleft();
+        table(cont -> {
+            cont.left();
 
-            new table("button"){{
-                margin(0);
-                Table tools = new Table();
-                tools.top();
-                atop();
+            cont.table("button", mid -> {
+                mid.top();
+
+                Table tools = new Table().top();
 
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
@@ -410,8 +403,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 };
 
                 tools.defaults().size(size, size + 4f).padBottom(-5.1f);
-
-                //tools.addImageButton("icon-back", 16*2, () -> tryExit());
 
                 tools.addImageButton("icon-menu-large", 16 * 2f, menu::show);
 
@@ -452,9 +443,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.row();
 
-                tools.table("button", t -> {
-                    t.add("$text.editor.teams");
-                }).colspan(3).height(40).width(size * 3f);
+                tools.table("button", t -> t.add("$text.editor.teams"))
+                        .colspan(3).height(40).width(size * 3f);
 
                 tools.row();
 
@@ -475,58 +465,48 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     if(i++ % 3 == 2) tools.row();
                 }
 
-                add(tools).top().padBottom(-6);
+                mid.add(tools).top().padBottom(-6);
 
-                row();
+                mid.row();
 
-                new table("button"){{
-                    atop();
+                mid.table("button", t -> {
                     Slider slider = new Slider(0, MapEditor.brushSizes.length - 1, 1, false);
                     slider.moved(f -> editor.setBrushSize(MapEditor.brushSizes[(int) (float) f]));
-                    new label("brush");
-                    row();
-                    add(slider).width(size * 3f - 20).padTop(4f);
-                }}.padTop(5).growX().growY().top().end();
 
-                row();
+                    t.top();
+                    t.add("$text.editor.brush");
+                    t.row();
+                    t.add(slider).width(size * 3f - 20).padTop(4f);
+                }).padTop(5).growX().growY().top();
 
-                get().table("button", t -> {
-                    t.add("$text.editor.elevation");
-                }).colspan(3).height(40).width(size * 3f);
+                mid.row();
 
-                row();
+                mid.table("button", t -> t.add("$text.editor.elevation"))
+                    .colspan(3).height(40).width(size * 3f);
 
-                get().table("button", t -> {
+                mid.row();
+
+                mid.table("button", t -> {
                     t.margin(0);
                     t.addImageButton("icon-arrow-left", 16 * 2f, () -> editor.setDrawElevation(editor.getDrawElevation() - 1))
-                            .disabled(b -> editor.getDrawElevation() <= -1).size(size);
+                    .disabled(b -> editor.getDrawElevation() <= -1).size(size);
 
                     t.label(() -> editor.getDrawElevation() == -1 ? "$text.editor.slope" : (editor.getDrawElevation() + ""))
-                            .size(size).get().setAlignment(Align.center, Align.center);
+                    .size(size).get().setAlignment(Align.center, Align.center);
 
                     t.addImageButton("icon-arrow-right", 16 * 2f, () -> editor.setDrawElevation(editor.getDrawElevation() + 1))
-                            .disabled(b -> editor.getDrawElevation() >= 127).size(size);
+                    .disabled(b -> editor.getDrawElevation() >= 127).size(size);
                 }).colspan(3).height(size).padTop(-5).width(size * 3f);
 
-            }}.left().growY().end();
+            }).margin(0).left().growY();
 
 
-            new table("button"){{
-                margin(5);
-                marginBottom(10);
-                add(view).grow();
-            }}.grow().end();
+            cont.table("button", t -> t.add(view).grow())
+                    .margin(5).marginBottom(10).grow();
 
-            new table(){{
+            cont.table(this::addBlockSelection).right().growY();
 
-                row();
-
-                addBlockSelection(get());
-
-                row();
-
-            }}.right().growY().end();
-        }}.grow().end();
+        }).grow();
     }
 
     private void doInput(){

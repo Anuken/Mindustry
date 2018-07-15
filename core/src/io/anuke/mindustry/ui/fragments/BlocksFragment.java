@@ -16,7 +16,6 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.Touchable;
@@ -37,60 +36,37 @@ public class BlocksFragment extends Fragment{
     private static final float size = 48;
     //maximum recipe rows
     private static final int maxrow = 3;
-    /**
-     * Table containing description that is shown on top.
-     */
+    /** Table containing description that is shown on top.*/
     private Table descTable;
-    /**
-     * Main table containing the whole menu.
-     */
+    /** Main table containing the whole menu.*/
     private Table mainTable;
-    /**
-     * Table for all section buttons and blocks.
-     */
+    /** Table for all section buttons and blocks.*/
     private Table selectTable;
-    /**
-     * Whether the whole thing is shown or hidden by the popup button.
-     */
+    /** Whether the whole thing is shown or hidden by the popup button.*/
     private boolean shown = true;
-    /**
-     * Recipe currently hovering over.
-     */
+    /** Recipe currently hovering over.*/
     private Recipe hoverRecipe;
-    /**
-     * Last category selected.
-     */
+    /** Last category selected.*/
     private Category lastCategory;
-    /**
-     * Last block pane scroll Y position.
-     */
+    /** Last block pane scroll Y position.*/
     private float lastScroll;
-    /**
-     * Temporary recipe array for storage
-     */
+    /** Temporary recipe array for storage*/
     private Array<Recipe> recipes = new Array<>();
 
     public void build(Group parent){
         InputHandler input = control.input(0);
 
-        //create container table
-        new table(){{
-            abottom();
-            aright();
+        parent.fill(container -> {
+            container.bottom().right().visible(() -> !state.is(State.menu));
 
-            //make it only be shown when needed.
-            visible(() -> !state.is(State.menu));
-
-            //create the main blocks table
-            mainTable = new table(){{
+            mainTable = container.table(main -> {
 
                 //add top description table
                 descTable = new Table("button");
-                descTable.setVisible(() -> hoverRecipe != null || input.recipe != null); //make sure it's visible when necessary
+                descTable.visible(() -> hoverRecipe != null || input.recipe != null); //make sure it's visible when necessary
                 descTable.update(() -> {
-                    // note: This is required because there is no direct connection between
-                    // input.recipe and the description ui. If input.recipe gets set to null
-                    // a proper cleanup of the ui elements is required.
+                    // note: This is required because there is no direct connection between input.recipe and the description ui.
+                    // If input.recipe gets set to null, a proper cleanup of the ui elements is required.
                     boolean anyRecipeShown = input.recipe != null || hoverRecipe != null;
                     boolean descriptionTableClean = descTable.getChildren().size == 0;
                     boolean cleanupRequired = !anyRecipeShown && !descriptionTableClean;
@@ -99,26 +75,17 @@ public class BlocksFragment extends Fragment{
                     }
                 });
 
-                add(descTable).fillX().uniformX();
+                container.add(descTable).fillX().uniformX();
 
-                row();
+                container.row();
 
                 //now add the block selection menu
-                selectTable = new table("pane"){{
-                    touchable(Touchable.enabled);
+                selectTable = main.table("pane", select -> {})
+                .margin(10f).marginLeft(0f).marginRight(0f).marginTop(-5)
+                .touchable(Touchable.enabled).right().bottom().get();
 
-                    margin(10f);
-                    marginLeft(0f);
-                    marginRight(0f);
-                    marginTop(-5);
-
-                }}.right().bottom().end().get();
-
-                visible(() -> !state.is(State.menu));
-
-            }}.end().get();
-
-        }}.end();
+            }).bottom().right().get();
+        });
 
         rebuild();
     }
@@ -178,7 +145,7 @@ public class BlocksFragment extends Fragment{
             //scrollpane for recipes
             ScrollPane pane = new ScrollPane(recipeTable, "clear-black");
             pane.setOverscroll(false, false);
-            pane.setVisible(catb::isChecked);
+            pane.visible(catb::isChecked);
             pane.setScrollYForce(lastScroll);
             pane.update(() -> {
                 Element e = Core.scene.hit(Graphics.mouse().x, Graphics.mouse().y, true);
@@ -288,7 +255,7 @@ public class BlocksFragment extends Fragment{
         selectTable.add(stack).growX().left().top().colspan(Category.values().length).padBottom(-5).height((size + 12) * rowsUsed);
     }
 
-    void toggle(boolean show, float t, Interpolation ip){
+    void toggle(float t, Interpolation ip){
         if(shown){
             shown = false;
             mainTable.actions(Actions.translateBy(0, mainTable.getTranslation().y + (-mainTable.getHeight() - descTable.getHeight()), t, ip));

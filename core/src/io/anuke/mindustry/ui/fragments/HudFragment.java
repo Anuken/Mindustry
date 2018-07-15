@@ -1,7 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
@@ -20,9 +19,6 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.builders.imagebutton;
-import io.anuke.ucore.scene.builders.label;
-import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ImageButton;
@@ -37,7 +33,6 @@ public class HudFragment extends Fragment{
     public final BlocksFragment blockfrag = new BlocksFragment();
 
     private ImageButton menu, flip;
-    private Table respawntable;
     private Table wavetable;
     private Table infolabel;
     private Table lastUnlockTable;
@@ -49,124 +44,93 @@ public class HudFragment extends Fragment{
     public void build(Group parent){
 
         //menu at top left
-        new table(){{
-            atop();
-            aleft();
+        parent.fill(cont -> {
 
-            new table(){{
+            cont.top().left().visible(() -> !state.is(State.menu));
 
-                new table(){{
-                    left();
-                    defaults().size(dsize).left();
+            cont.table(select -> {
+                select.left();
+                select.defaults().size(dsize).left();
 
-                    menu = new imagebutton("icon-menu", isize, ui.paused::show).get();
-                    flip = new imagebutton("icon-arrow-up", isize, () -> toggleMenus()).get();
+                menu = select.addImageButton("icon-menu", isize, ui.paused::show).get();
+                flip = select.addImageButton("icon-arrow-up", isize, this::toggleMenus).get();
 
-                    update(t -> {
-                        if(Inputs.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
-                            toggleMenus();
-                        }
-                    });
+                select.update(() -> {
+                    if(Inputs.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
+                        toggleMenus();
+                    }
+                });
 
-                    new imagebutton("icon-pause", isize, () -> {
-                        if(Net.active()){
-                            ui.listfrag.toggle();
+                select.addImageButton("icon-pause", isize, () -> {
+                    if(Net.active()){
+                        ui.listfrag.toggle();
+                    }else{
+                        state.set(state.is(State.paused) ? State.playing : State.paused);
+                    }
+                }).update(i -> {
+                    if(Net.active()){
+                        i.getStyle().imageUp = Core.skin.getDrawable("icon-players");
+                    }else{
+                        i.setDisabled(Net.active());
+                        i.getStyle().imageUp = Core.skin.getDrawable(state.is(State.paused) ? "icon-play" : "icon-pause");
+                    }
+                }).get();
+
+                select.addImageButton("icon-settings", isize, () -> {
+                    if(Net.active() && mobile){
+                        if(ui.chatfrag.chatOpen()){
+                            ui.chatfrag.hide();
                         }else{
-                            state.set(state.is(State.paused) ? State.playing : State.paused);
+                            ui.chatfrag.toggle();
                         }
-                    }).update(i -> {
-                        if(Net.active()){
-                            i.getStyle().imageUp = Core.skin.getDrawable("icon-players");
-                        }else{
-                            i.setDisabled(Net.active());
-                            i.getStyle().imageUp = Core.skin.getDrawable(state.is(State.paused) ? "icon-play" : "icon-pause");
-                        }
-                    }).get();
+                    }else{
+                        ui.settings.show();
+                    }
+                }).update(i -> {
+                    if(Net.active() && mobile){
+                        i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
+                    }else{
+                        i.getStyle().imageUp = Core.skin.getDrawable("icon-settings");
+                    }
+                }).get();
+            });
 
-                    new imagebutton("icon-settings", isize, () -> {
-                        if(Net.active() && mobile){
-                            if(ui.chatfrag.chatOpen()){
-                                ui.chatfrag.hide();
-                            }else{
-                                ui.chatfrag.toggle();
-                            }
-                        }else{
-                            ui.settings.show();
-                        }
-                    }).update(i -> {
-                        if(Net.active() && mobile){
-                            i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
-                        }else{
-                            i.getStyle().imageUp = Core.skin.getDrawable("icon-settings");
-                        }
-                    }).get();
+            cont.row();
 
-                }}.end();
+            cont.table(this::addWaveTable).touchable(Touchable.enabled).fillX().height(66f);
 
-                row();
+            cont.row();
 
-                new table(){{
-                    touchable(Touchable.enabled);
-                    addWaveTable();
-                }}.fillX().end();
+            //fps display
+            infolabel = cont.table(t -> {
+                IntFormat fps = new IntFormat("text.fps");
+                IntFormat tps = new IntFormat("text.tps");
+                IntFormat ping = new IntFormat("text.ping");
+                t.label(() -> fps.get(Gdx.graphics.getFramesPerSecond())).padRight(10);
+                t.label(() -> tps.get(threads.getTPS())).visible(() -> threads.isEnabled());
+                t.row();
+                t.label(() -> ping.get(Net.getPing())).visible(() -> Net.client() && !gwt).colspan(2);
+            }).size(-1).visible(() -> Settings.getBool("fps")).get();
 
-                row();
+            //make wave box appear below rest of menu
+            cont.swapActor(wavetable, menu.getParent());
+        });
 
-                visible(() -> !state.is(State.menu));
-                row();
-                new table(){{
-                    IntFormat fps = new IntFormat("text.fps");
-                    IntFormat tps = new IntFormat("text.tps");
-                    IntFormat ping = new IntFormat("text.ping");
-                    new label(() -> fps.get(Gdx.graphics.getFramesPerSecond())).padRight(10);
-                    new label(() -> tps.get(threads.getTPS())).visible(() -> threads.isEnabled());
-                    row();
-                    new label(() -> ping.get(Net.getPing())).visible(() -> Net.client() && !gwt).colspan(2);
-
-                    infolabel = get();
-                }}.size(-1).end().visible(() -> Settings.getBool("fps"));
-
-            }}.end();
-        }}.end();
-
-        new table(){{
-            visible(() -> !state.is(State.menu));
-            atop();
-            aright();
-
-            Minimap minimap = new Minimap();
-
-            add(minimap).visible(() -> Settings.getBool("minimap"));
-        }}.end();
+        //minimap
+        parent.fill(t -> t.top().right().add(new Minimap())
+            .visible(() -> !state.is(State.menu) && Settings.getBool("minimap")));
 
         //paused table
-        new table(){{
-            visible(() -> state.is(State.paused) && !Net.active());
-            atop();
+        parent.fill(t -> {
+            t.top().visible(() -> state.is(State.paused) && !Net.active());
+            t.table(top -> top.add("[orange]< " + Bundles.get("text.paused") + " >").pad(6).get().setFontScale(fontScale * 0.75f));
+        });
 
-            new table("pane"){{
-                new label("[orange]< " + Bundles.get("text.paused") + " >").scale(0.75f).pad(6);
-            }}.end();
-        }}.end();
-
-        //respawn background table
-        new table("white"){{
-            respawntable = get();
-            respawntable.setColor(Color.CLEAR);
-            update(t -> {
-                if(state.is(State.menu)){
-                    respawntable.setColor(Color.CLEAR);
-                }
-            });
-        }}.end();
-
-        new table(){{
-            abottom();
-            visible(() -> !state.is(State.menu) && control.getSaves().isSaving());
-
-            new label("$text.saveload");
-
-        }}.end();
+        //'saving' indicator
+        parent.fill(t -> {
+            t.bottom().visible(() -> !state.is(State.menu) && control.getSaves().isSaving());
+            t.add("$text.saveload");
+        });
 
         blockfrag.build(Core.scene.getRoot());
     }
@@ -281,12 +245,12 @@ public class HudFragment extends Fragment{
 
         if(shown){
             shown = false;
-            blockfrag.toggle(false, dur, in);
+            blockfrag.toggle(dur, in);
             wavetable.actions(Actions.translateBy(0, (wavetable.getHeight() + dsize) - wavetable.getTranslation().y, dur, in));
             infolabel.actions(Actions.translateBy(0, (wavetable.getHeight()) - wavetable.getTranslation().y, dur, in));
         }else{
             shown = true;
-            blockfrag.toggle(true, dur, in);
+            blockfrag.toggle(dur, in);
             wavetable.actions(Actions.translateBy(0, -wavetable.getTranslation().y, dur, in));
             infolabel.actions(Actions.translateBy(0, -infolabel.getTranslation().y, dur, in));
         }
@@ -301,40 +265,30 @@ public class HudFragment extends Fragment{
         }
     }
 
-    private void addWaveTable(){
+    private void addWaveTable(Table table){
+        wavetable = table;
         float uheight = 66f;
 
         IntFormat wavef = new IntFormat("text.wave");
         IntFormat timef = new IntFormat("text.wave.waiting");
 
-        wavetable = new table("button"){{
-            aleft();
-            new table(){{
-                aleft();
+        table.background("button");
+        table.left().table(text -> {
+            text.left();
+            text.label(() -> wavef.get(state.wave)).left().get().setFontScale(fontScale * 1.5f);
+            text.row();
+            text.label(() -> unitGroups[Team.red.ordinal()].size() > 0 && state.mode.disableWaveTimer ?
+                getEnemiesRemaining() : (state.mode.disableWaveTimer) ? "$text.waiting" :
+                timef.get((int) (state.wavetime / 60f))).minWidth(126).left();
+        });
 
-                new label(() -> wavef.get(state.wave)).scale(fontScale * 1.5f).left().padLeft(-6);
+        table.add().growX();
 
-                row();
-
-                new label(() -> unitGroups[Team.red.ordinal()].size() > 0 && state.mode.disableWaveTimer ?
-                        getEnemiesRemaining() :
-                        (state.mode.disableWaveTimer) ? "$text.waiting"
-                                : timef.get((int) (state.wavetime / 60f)))
-                        .minWidth(126).padLeft(-6).left();
-
-                margin(10f);
-                get().marginLeft(6);
-            }}.left().end();
-
-            add().growX();
-
-            playButton(uheight);
-        }}.height(uheight).fillX().expandX().end().get();
-        wavetable.getParent().getParent().swapActor(wavetable.getParent(), menu.getParent());
+        playButton(uheight);
     }
 
     private void playButton(float uheight){
-        new imagebutton("icon-play", 30f, () -> {
+        wavetable.addImageButton("icon-play", 30f, () -> {
             if(Net.client() && players[0].isAdmin){
                 Call.onAdminRequest(players[0], AdminAction.wave);
             }else{

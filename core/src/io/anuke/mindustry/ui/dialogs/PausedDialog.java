@@ -2,8 +2,6 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.scene.builders.build;
-import io.anuke.ucore.scene.builders.imagebutton;
 import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
@@ -81,43 +79,28 @@ public class PausedDialog extends FloatingDialog{
             });
 
         }else{
-            build.begin(content());
-
             content().defaults().size(120f).pad(5);
             float isize = 14f * 4;
 
-            new imagebutton("icon-play-2", isize, () -> {
+            content().addRowImageTextButton("$text.back", "icon-play-2", isize, () -> {
                 hide();
                 if(!wasPaused && !state.is(State.menu))
                     state.set(State.playing);
-            }).text("$text.back").padTop(4f);
-
-            new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
-
-            imagebutton sa = new imagebutton("icon-save", isize, save::show);
-            sa.text("$text.save").padTop(4f);
+            });
+            content().addRowImageTextButton("$text.settings", "icon-tools", isize, ui.settings::show);
+            content().addRowImageTextButton("$text.save", "icon-save", isize, save::show);
 
             content().row();
 
-            imagebutton lo = new imagebutton("icon-load", isize, load::show);
-            lo.text("$text.load").padTop(4f);
-            lo.cell.disabled(b -> Net.active());
-
-            imagebutton ho = new imagebutton("icon-host", isize, () -> {
-                ui.host.show();
-            });
-            ho.text("$text.host").padTop(4f);
-            ho.cell.disabled(b -> Net.active());
-
-            new imagebutton("icon-quit", isize, () -> {
+            content().addRowImageTextButton("$text.load", "icon-load", isize, load::show).disabled(b -> Net.active());
+            content().addRowImageTextButton("$text.host", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
+            content().addRowImageTextButton("$text.quit", "icon-quit", isize, () -> {
                 ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
                     if(Net.client()) netClient.disconnectQuietly();
                     runExitSave();
                     hide();
                 });
-            }).text("Quit").padTop(4f);
-
-            build.end();
+            });
         }
     }
 

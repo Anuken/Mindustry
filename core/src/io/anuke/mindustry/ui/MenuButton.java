@@ -2,16 +2,15 @@ package io.anuke.mindustry.ui;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Align;
-import io.anuke.ucore.function.Listenable;
 import io.anuke.ucore.scene.ui.TextButton;
 
 public class MenuButton extends TextButton{
 
-    public MenuButton(String icon, String text, Listenable clicked){
+    public MenuButton(String icon, String text, Runnable clicked){
         this(icon, text, null, clicked);
     }
 
-    public MenuButton(String icon, String text, String description, Listenable clicked){
+    public MenuButton(String icon, String text, String description, Runnable clicked){
         super("default");
         float s = 66f;
 

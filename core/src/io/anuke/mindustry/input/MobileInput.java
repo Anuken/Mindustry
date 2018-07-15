@@ -31,8 +31,6 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.builders.imagebutton;
-import io.anuke.ucore.scene.builders.table;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.util.Mathf;
 
@@ -210,25 +208,23 @@ public class MobileInput extends InputHandler implements GestureListener{
     public void buildUI(Group group){
 
         //Create confirm/cancel table
-        new table(){{
-            abottom().aleft();
+        group.fill(c -> {
+            c.bottom().left().visible(() -> !state.is(State.menu));
 
-            new table("pane"){{
-                margin(5);
-                defaults().size(60f);
-
-                touchable(Touchable.enabled);
+            c.table("pane", act -> {
+                act.margin(5);
+                act.defaults().size(60f);
 
                 //Add a cancel button
-                new imagebutton("icon-cancel", 16 * 2f, () -> {
+                act.addImageButton("icon-cancel", 16*2f, () -> {
                     mode = none;
                     recipe = null;
                 });
 
-                row();
+                act.row();
 
                 //Add an accept button, which places everything.
-                new imagebutton("icon-check", 16 * 2f, () -> {
+                act.addImageButton("icon-check", 16 * 2f, () -> {
                     for(PlaceRequest request : selection){
                         Tile tile = request.tile();
 
@@ -248,48 +244,39 @@ public class MobileInput extends InputHandler implements GestureListener{
                     removals.addAll(selection);
                     selection.clear();
                     selecting = false;
-                }).cell.disabled(i -> selection.size == 0);
+                }).disabled(i -> selection.size == 0);
 
-                row();
+                act.row();
 
                 //Add a rotate button
-                new imagebutton("icon-arrow", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
-                        .update(i -> {
-                            i.getImage().setRotation(rotation * 90);
-                            i.getImage().setOrigin(Align.center);
-                        }).cell.disabled(i -> recipe == null || !recipe.result.rotate);
-            }}.visible(() -> mode != none).end();
+                act.addImageButton("icon-arrow", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
+                        .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center))
+                        .disabled(i -> recipe == null || !recipe.result.rotate);
+            }).visible(() -> mode != none).touchable(Touchable.enabled);;
 
-            row();
+            c.row();
 
-            new table("pane"){{
-                margin(5);
-                defaults().size(60f);
-
-                touchable(Touchable.enabled);
+            c.table("pane", remove -> {
+                remove.defaults().size(60f);
 
                 //Add a break button.
-                new imagebutton("icon-break", "toggle", 16 * 2f, () -> {
+                remove.addImageButton("icon-break", "toggle", 16 * 2f, () -> {
                     mode = mode == breaking ? recipe == null ? none : placing : breaking;
                     lastRecipe = recipe;
                     if(mode == breaking){
                         showGuide("deconstruction");
                     }
                 }).update(l -> l.setChecked(mode == breaking));
-            }}.end();
+            }).margin(5).touchable(Touchable.enabled);;
 
-            new table("pane"){{
-                margin(5);
-                defaults().size(60f);
-
-                touchable(Touchable.enabled);
+            c.table("pane", cancel -> {
+                cancel.defaults().size(60f);
 
                 //Add a 'cancel building' button.
-                new imagebutton("icon-cancel", 16 * 2f, player::clearBuilding);
+                cancel.addImageButton("icon-cancel", 16 * 2f, player::clearBuilding);
 
-                visible(() -> player.getPlaceQueue().size > 0);
-            }}.left().colspan(2).end();
-        }}.visible(() -> !state.is(State.menu)).end();
+            }).left().colspan(2).margin(5).touchable(Touchable.enabled).visible(() -> player.getPlaceQueue().size > 0);
+        });
     }
 
     @Override

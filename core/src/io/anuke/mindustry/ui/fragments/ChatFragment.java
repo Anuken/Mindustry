@@ -56,7 +56,7 @@ public class ChatFragment extends Table{
         setFillParent(true);
         font = Core.skin.getFont("default-font");
 
-        setVisible(() -> !state.is(State.menu) && Net.active());
+        visible(() -> !state.is(State.menu) && Net.active());
 
         update(() -> {
             if(!Net.active() && chatOpen){
