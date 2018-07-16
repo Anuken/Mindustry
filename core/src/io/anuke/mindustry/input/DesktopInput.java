@@ -305,6 +305,10 @@ public class DesktopInput extends InputHandler{
     public void updateController(){
         boolean mousemove = Gdx.input.getDeltaX() > 1 || Gdx.input.getDeltaY() > 1;
 
+        if(state.is(State.menu)){
+            droppingItem = false;
+        }
+
         if(KeyBinds.getSection(section).device.type == DeviceType.controller && (!mousemove || player.playerIndex > 0)){
             if(player.playerIndex > 0){
                 controlling = true;

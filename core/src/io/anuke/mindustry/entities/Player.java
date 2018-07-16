@@ -665,9 +665,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         team = (team == Team.blue ? Team.red : Team.blue);
     }
 
-    /**
-     * Resets all values of the player.
-     */
+    /** Resets all values of the player.*/
     public void reset(){
         status.clear();
         team = Team.blue;

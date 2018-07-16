@@ -38,9 +38,7 @@ import static io.anuke.mindustry.Vars.world;
 public class TileEntity extends BaseEntity implements TargetTrait{
     public static final float timeToSleep = 60f * 4; //4 seconds to fall asleep
     private static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
-    /**
-     * This value is only used for debugging.
-     */
+    /**This value is only used for debugging.*/
     public static int sleepingEntities = 0;
     public Tile tile;
     public Timer timer;

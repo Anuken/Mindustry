@@ -33,18 +33,12 @@ import io.anuke.ucore.util.Translator;
 import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler extends InputAdapter{
-    /**
-     * Used for dropping items.
-     */
+    /**Used for dropping items.*/
     final static float playerSelectRange = mobile ? 17f : 11f;
-    /**
-     * Maximum line length.
-     */
+    /**Maximum line length.*/
     final static int maxLength = 100;
     final static Translator stackTrns = new Translator();
-    /**
-     * Distance on the back from where items originate.
-     */
+    /**Distance on the back from where items originate.*/
     final static float backTrns = 3f;
 
     public final Player player;

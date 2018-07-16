@@ -131,6 +131,7 @@ public class ServerControl extends Module{
 
         handler.register("version", "Displays server version info.", arg -> {
             info("&lmVersion: &lyMindustry {0} {1} / {2}", Version.code, Version.type, Version.buildName);
+            info("&lmJava Version: &ly{0}", System.getProperty("java.version"));
         });
 
         handler.register("exit", "Exit the server application.", arg -> {

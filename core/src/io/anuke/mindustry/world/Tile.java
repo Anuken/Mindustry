@@ -402,6 +402,15 @@ public class Tile implements PosTrait, TargetTrait{
                 if(block.hasLiquids) entity.liquids = new LiquidModule();
                 if(block.hasPower) entity.power = new PowerModule();
                 entity.updateProximity();
+            }else{
+                //since the entity won't update proximity for us, update proximity for all nearby tiles manually
+                for(GridPoint2 p : Geometry.d4){
+                    Tile tile = world.tile(x + p.x, y + p.y);
+                    if(tile != null){
+                        tile = tile.target();
+                        tile.block().onProximityUpdate(tile);
+                    }
+                }
             }
 
             updateOcclusion();

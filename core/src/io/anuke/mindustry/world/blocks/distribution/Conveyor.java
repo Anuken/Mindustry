@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongArray;
 import io.anuke.mindustry.entities.TileEntity;
@@ -33,8 +32,7 @@ public class Conveyor extends Block{
     private static ItemPos pos2 = new ItemPos();
     private final Translator tr1 = new Translator();
     private final Translator tr2 = new Translator();
-    private final TextureRegion region1 = new TextureRegion();
-    private final TextureRegion region2 = new TextureRegion();
+    private final TextureRegion[][] regions = new TextureRegion[7][4];
 
     protected float speed = 0f;
     protected float carryCapacity = 8f;
@@ -47,7 +45,7 @@ public class Conveyor extends Block{
         group = BlockGroup.transportation;
         hasItems = true;
         autoSleep = true;
-        itemCapacity = Math.round(tilesize / itemSpace);
+        itemCapacity = 4;
     }
 
     private static int compareItems(Long a, Long b){
@@ -57,8 +55,7 @@ public class Conveyor extends Block{
     }
 
     @Override
-    public void setBars(){
-    }
+    public void setBars(){}
 
     @Override
     public void setStats(){
@@ -67,34 +64,70 @@ public class Conveyor extends Block{
     }
 
     @Override
+    public void load(){
+        super.load();
+
+        for(int i = 0; i < regions.length; i++){
+            for(int j = 0; j < 4; j++){
+                regions[i][j] = Draw.region(name + "-" + i + "-" + j);
+            }
+        }
+    }
+
+    @Override
     public void draw(Tile tile){
         ConveyorEntity entity = tile.entity();
         byte rotation = tile.getRotation();
 
-        GridPoint2 point = Geometry.d4[rotation];
+        int frame = entity.clogHeat <= 0.5f ? (int) ((Timers.time() / 4f) % 4) : 0;
+        Draw.rect(regions[entity.blendbits][frame], tile.drawx(), tile.drawy(), tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation*90);
+    }
 
-        int offset = entity.clogHeat <= 0.5f ? (int) ((Timers.time() / 4f) % 8) : 0;
-        TextureRegion region = Draw.region(name);
+    @Override
+    public void onProximityUpdate(Tile tile){
+        ConveyorEntity entity = tile.entity();
+        entity.blendbits = 0;
+        entity.blendsclx = entity.blendscly = 1;
 
-        region1.setRegion(region, 0, 0, region.getRegionWidth() - offset, region.getRegionHeight());
-        region2.setRegion(region, region.getRegionWidth() - offset, 0, offset, region.getRegionHeight());
-
-        float x = tile.drawx(), y = tile.drawy();
-
-        if(offset % 2 == 1){
-            if(point.x < 0) x += 0.75f;
-            if(point.y < 0)
-                y += 0.5f;
-            else if(point.y > 0)
-                y -= 0.5f;
+        if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)){
+            entity.blendbits = 3;
+        }else if(blends(tile, 1) && blends(tile, 3)){
+            entity.blendbits = 4;
+        }else if(blends(tile, 1) && blends(tile, 2)){
+            entity.blendbits = 2;
+        }else if(blends(tile, 3) && blends(tile, 2)){
+            entity.blendbits = 2;
+            entity.blendscly = -1;
+        }else if(blends(tile, 0)){
+            if(blends(tile, 1)){
+                entity.blendbits = 1;
+                entity.blendscly = -1;
+            }else if(blends(tile, 3)){
+                entity.blendbits = 1;
+            }
+        }else if(blends(tile, 1)){
+            entity.blendbits = 1;
+            entity.blendscly = -1;
+        }else if(blends(tile, 3)){
+            entity.blendbits = 1;
         }
+    }
 
-        Draw.rect(region1,
-                x + (point.x * (tilesize / 2f - region1.getRegionWidth() / 2f)),
-                y + (point.y * (tilesize / 2f - region1.getRegionWidth() / 2f)), rotation * 90);
-        Draw.rect(region2,
-                x - (point.x * (tilesize / 2f - region2.getRegionWidth() / 2f)),
-                y - (point.y * (tilesize / 2f - region2.getRegionWidth() / 2f)), rotation * 90);
+    private boolean blends(Tile tile, int direction){
+        Tile other = tile.getNearby(Mathf.mod(tile.getRotation() - direction, 4));
+        if(other != null) other = other.target();
+
+        if(other == null || !(other.block().hasItems) /*|| !(other.block().outputsLiquid)*/) return false;
+        return (tile.getNearby(tile.getRotation()) == other)
+        || (!other.block().rotate || other.getNearby(other.getRotation()) == tile);
+    }
+
+    @Override
+    public TextureRegion[] getIcon(){
+        if(icon == null){
+            icon = new TextureRegion[]{Draw.region(name + "-0-0")};
+        }
+        return super.getIcon();
     }
 
     @Override
@@ -331,6 +364,8 @@ public class Conveyor extends Block{
         float minitem = 1;
         float carrying;
         float minCarry = 2f;
+        int blendbits;
+        int blendsclx, blendscly;
 
         float clogHeat = 0f;
 
