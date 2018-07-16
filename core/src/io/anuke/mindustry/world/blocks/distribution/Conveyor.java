@@ -32,7 +32,8 @@ public class Conveyor extends Block{
     private static ItemPos pos2 = new ItemPos();
     private final Translator tr1 = new Translator();
     private final Translator tr2 = new Translator();
-    private final TextureRegion[][] regions = new TextureRegion[7][4];
+
+    private TextureRegion[][] regions = new TextureRegion[7][4];
 
     protected float speed = 0f;
     protected float carryCapacity = 8f;
@@ -75,12 +76,24 @@ public class Conveyor extends Block{
     }
 
     @Override
+    public void drawShadow(Tile tile){
+        ConveyorEntity entity = tile.entity();
+
+        if(entity.blendshadowrot == -1){
+            super.drawShadow(tile);
+        }else{
+            Draw.rect("shadow-corner", tile.drawx(), tile.drawy(), (tile.getRotation() + 3 + entity.blendshadowrot) * 90);
+        }
+    }
+
+    @Override
     public void draw(Tile tile){
         ConveyorEntity entity = tile.entity();
         byte rotation = tile.getRotation();
 
         int frame = entity.clogHeat <= 0.5f ? (int) ((Timers.time() / 4f) % 4) : 0;
-        Draw.rect(regions[entity.blendbits][frame], tile.drawx(), tile.drawy(), tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation*90);
+        Draw.rect(regions[entity.blendbits][frame], tile.drawx(), tile.drawy(),
+            tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation*90);
     }
 
     @Override
@@ -88,6 +101,7 @@ public class Conveyor extends Block{
         ConveyorEntity entity = tile.entity();
         entity.blendbits = 0;
         entity.blendsclx = entity.blendscly = 1;
+        entity.blendshadowrot = -1;
 
         if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)){
             entity.blendbits = 3;
@@ -98,18 +112,13 @@ public class Conveyor extends Block{
         }else if(blends(tile, 3) && blends(tile, 2)){
             entity.blendbits = 2;
             entity.blendscly = -1;
-        }else if(blends(tile, 0)){
-            if(blends(tile, 1)){
-                entity.blendbits = 1;
-                entity.blendscly = -1;
-            }else if(blends(tile, 3)){
-                entity.blendbits = 1;
-            }
         }else if(blends(tile, 1)){
             entity.blendbits = 1;
             entity.blendscly = -1;
+            entity.blendshadowrot = 0;
         }else if(blends(tile, 3)){
             entity.blendbits = 1;
+            entity.blendshadowrot = 1;
         }
     }
 
@@ -364,6 +373,8 @@ public class Conveyor extends Block{
         float minitem = 1;
         float carrying;
         float minCarry = 2f;
+
+        int blendshadowrot = -1;
         int blendbits;
         int blendsclx, blendscly;
 

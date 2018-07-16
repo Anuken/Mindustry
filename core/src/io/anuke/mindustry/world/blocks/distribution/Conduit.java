@@ -37,28 +37,36 @@ public class Conduit extends LiquidBlock{
     }
 
     @Override
+    public void drawShadow(Tile tile){
+        ConduitEntity entity = tile.entity();
+
+        if(entity.blendshadowrot == -1){
+            super.drawShadow(tile);
+        }else{
+            Draw.rect("shadow-corner", tile.drawx(), tile.drawy(), (tile.getRotation() + 3 + entity.blendshadowrot) * 90);
+        }
+    }
+
+    @Override
     public void onProximityUpdate(Tile tile){
         ConduitEntity entity = tile.entity();
         entity.blendbits = 0;
+        entity.blendshadowrot = -1;
 
         if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)){
             entity.blendbits = 3;
-        }else             if(blends(tile, 1) && blends(tile, 3)){
+        }else if(blends(tile, 1) && blends(tile, 3)){
             entity.blendbits = 6;
         }else if(blends(tile, 1) && blends(tile, 2)){
             entity.blendbits = 2;
         }else if(blends(tile, 3) && blends(tile, 2)){
             entity.blendbits = 4;
-        }else if(blends(tile, 0)){
-            if(blends(tile, 1)){
-                entity.blendbits = 5;
-            }else if(blends(tile, 3)){
-                entity.blendbits = 1;
-            }
         }else if(blends(tile, 1)){
             entity.blendbits = 5;
+            entity.blendshadowrot = 0;
         }else if(blends(tile, 3)){
             entity.blendbits = 1;
+            entity.blendshadowrot = 1;
         }
     }
 
@@ -122,7 +130,9 @@ public class Conduit extends LiquidBlock{
 
     public static class ConduitEntity extends TileEntity{
         public float smoothLiquid;
-        public byte blendbits;
+
+        byte blendbits;
+        int blendshadowrot;
 
         @Override
         public void write(DataOutputStream stream) throws IOException{
