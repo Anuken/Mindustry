@@ -5,15 +5,18 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
+import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.GridMap;
 
-import static io.anuke.mindustry.Vars.headless;
+import static io.anuke.mindustry.Vars.*;
 
 public class Sectors{
-    private static final int sectorSize = 256;
-    private static final int sectorImageSize = 8;
+    private static final int sectorImageSize = 16;
+
     private GridMap<Sector> grid = new GridMap<>();
 
     public Sectors(){
@@ -32,8 +35,9 @@ public class Sectors{
         sector.unlocked = true;
         if(sector.texture == null) createTexture(sector);
 
+        //TODO fix
         for(GridPoint2 point : Geometry.d4){
-            createSector(sector.x + point.x, sector.y + point.y);
+        //    createSector(sector.x + point.x, sector.y + point.y);
         }
     }
 
@@ -45,6 +49,7 @@ public class Sectors{
         sector.x = (short)x;
         sector.y = (short)y;
         sector.unlocked = false;
+        grid.put(x, y, sector);
     }
 
     public void load(){
@@ -74,9 +79,15 @@ public class Sectors{
 
         int worldX = sector.x * sectorSize;
         int worldY = sector.y * sectorSize;
-        for(int x = worldX; x < (worldX + sectorSize); x++){
-            for(int y = worldY; y < (worldY + sectorSize); y++){
+        for(int x = 0; x < sectorImageSize; x++){
+            for(int y = 0; y < sectorImageSize; y++){
+                int toX = x * sectorSize / sectorImageSize;
+                int toY = y * sectorSize / sectorImageSize;
 
+                GenResult result = world.generator().generateTile(sector.x, sector.y, toX, toY);
+
+                int color = ColorMapper.getBlockColor(result.wall == Blocks.air ? result.floor : result.wall);
+                pixmap.drawPixel(x, sectorImageSize - 1 - y, color);
             }
         }
 

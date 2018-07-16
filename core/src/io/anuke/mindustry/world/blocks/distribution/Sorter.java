@@ -27,6 +27,7 @@ public class Sorter extends Block implements SelectionTrait{
         update = true;
         solid = true;
         instantTransfer = true;
+        outputsItems = true;
         group = BlockGroup.transportation;
         configurable = true;
     }

@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.mapgen;
+package io.anuke.mindustry.maps.generation;
 
 public class GenProperties{
     public long seed;

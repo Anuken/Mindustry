@@ -23,6 +23,8 @@ public abstract class BaseBlock{
     public boolean outputsLiquid = false;
     public boolean singleLiquid = true;
 
+    public boolean outputsItems = false;
+
     public int itemCapacity;
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;

@@ -17,7 +17,7 @@ import io.anuke.mindustry.maps.Maps;
 import io.anuke.mindustry.maps.Sectors;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.mapgen.WorldGenerator;
+import io.anuke.mindustry.maps.generation.WorldGenerator;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityPhysics;
@@ -49,6 +49,10 @@ public class World extends Module{
     @Override
     public void dispose(){
         maps.dispose();
+    }
+
+    public WorldGenerator generator(){
+        return generator;
     }
 
     public Sectors sectors(){

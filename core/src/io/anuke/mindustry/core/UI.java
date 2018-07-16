@@ -61,6 +61,7 @@ public class UI extends SceneModule{
     public LocalPlayerDialog localplayers;
     public UnlocksDialog unlocks;
     public ContentInfoDialog content;
+    public SectorsDialog sectors;
 
     private Locale lastLocale;
 
@@ -167,6 +168,7 @@ public class UI extends SceneModule{
         localplayers = new LocalPlayerDialog();
         unlocks = new UnlocksDialog();
         content = new ContentInfoDialog();
+        sectors = new SectorsDialog();
 
         Group group = Core.scene.getRoot();
 

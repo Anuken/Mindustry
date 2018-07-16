@@ -1,7 +1,6 @@
-package io.anuke.mindustry.world.mapgen;
+package io.anuke.mindustry.maps.generation;
 
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
@@ -19,17 +18,38 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
+import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.SeedRandom;
 
+import static io.anuke.mindustry.Vars.sectorSize;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 
 public class WorldGenerator{
-    private int seed;
-    int oreIndex = 0;
+    private final int seed = 0;
+    private int oreIndex = 0;
+
+    private Simplex sim = new Simplex(seed);
+    private Simplex sim2 = new Simplex(seed + 1);
+    private Simplex sim3 = new Simplex(seed + 2);
+
+    private SeedRandom random = new SeedRandom(seed + 3);
+
+    private GenResult result = new GenResult();
+    private ObjectMap<Block, Block> decoration;
+
+    public WorldGenerator(){
+        decoration = Mathf.map(
+            Blocks.grass, Blocks.shrub,
+            Blocks.stone, Blocks.rock,
+            Blocks.ice, Blocks.icerock,
+            Blocks.snow, Blocks.icerock,
+            Blocks.blackstone, Blocks.blackrock
+        );
+    }
 
     /**Loads raw map tile data into a Tile[][] array, setting up multiblocks, cliffs and ores. */
     public void loadTileData(Tile[][] tiles, MapTileData data, boolean genOres, int seed){
@@ -146,74 +166,12 @@ public class WorldGenerator{
     }
 
     public void generateMap(Tile[][] tiles, int seed){
-        MathUtils.random.setSeed((long) (Math.random() * 99999999));
-        Simplex sim = new Simplex(Mathf.random(99999));
-        Simplex sim2 = new Simplex(Mathf.random(99999));
-        Simplex sim3 = new Simplex(Mathf.random(99999));
-
-        SeedRandom random = new SeedRandom(Mathf.random(99999));
-
         int width = tiles.length, height = tiles[0].length;
-
-        ObjectMap<Block, Block> decoration = new ObjectMap<>();
-
-        decoration.put(Blocks.grass, Blocks.shrub);
-        decoration.put(Blocks.stone, Blocks.rock);
-        decoration.put(Blocks.ice, Blocks.icerock);
-        decoration.put(Blocks.snow, Blocks.icerock);
-        decoration.put(Blocks.blackstone, Blocks.blackrock);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                Block floor = Blocks.stone;
-                Block wall = Blocks.air;
-
-                double elevation = sim.octaveNoise2D(3, 0.5, 1f / 100, x, y) * 4.1 - 1;
-                double temp = sim3.octaveNoise2D(7, 0.54, 1f / 320f, x, y);
-
-                double r = sim2.octaveNoise2D(1, 0.6, 1f / 70, x, y);
-                double edgeDist = Math.max(width / 2, height / 2) - Math.max(Math.abs(x - width / 2), Math.abs(y - height / 2));
-                double dst = Vector2.dst(width / 2, height / 2, x, y);
-                double elevDip = 30;
-
-                double border = 14;
-
-                if(edgeDist < border){
-                    elevation += (border - edgeDist) / 6.0;
-                }
-
-                if(temp < 0.35){
-                    floor = Blocks.snow;
-                }else if(temp < 0.45){
-                    floor = Blocks.stone;
-                }else if(temp < 0.65){
-                    floor = Blocks.grass;
-                }else if(temp < 0.8){
-                    floor = Blocks.sand;
-                }else if(temp < 0.9){
-                    floor = Blocks.blackstone;
-                    elevation = 0f;
-                }else{
-                    floor = Blocks.lava;
-                }
-
-                if(dst < elevDip){
-                    elevation -= (elevDip - dst) / elevDip * 3.0;
-                }else if(r > 0.9){
-                    floor = Blocks.water;
-                    elevation = 0;
-
-                    if(r > 0.94){
-                        floor = Blocks.deepwater;
-                    }
-                }
-
-                if(wall == Blocks.air && decoration.containsKey(floor) && random.chance(0.03)){
-                    wall = decoration.get(floor);
-                }
-
-                Tile tile = new Tile(x, y, (byte) floor.id, (byte) wall.id);
-                tile.elevation = (byte) Math.max(elevation, 0);
+                GenResult result = generateTile(0, 0, x, y);
+                Tile tile = new Tile(x, y, (byte)result.floor.id, (byte)result.wall.id, (byte)0, (byte)0, result.elevation);
                 tiles[x][y] = tile;
             }
         }
@@ -241,6 +199,72 @@ public class WorldGenerator{
         tiles[width / 2][height / 2].setTeam(Team.blue);
 
         prepareTiles(tiles, seed, true);
+    }
+
+    public void setSector(int sectorX, int sectorY){
+        random.setSeed(Bits.packLong(sectorX, sectorY));
+    }
+
+    public GenResult generateTile(int sectorX, int sectorY, int localX, int localY){
+        int x = sectorX * sectorSize + localX;
+        int y = sectorY * sectorSize + localY;
+
+        Block floor = Blocks.stone;
+        Block wall = Blocks.air;
+
+        double elevation = sim.octaveNoise2D(3, 0.5, 1f / 100, x, y) * 4.1 - 1;
+        double temp = sim3.octaveNoise2D(7, 0.54, 1f / 320f, x, y);
+
+        double r = sim2.octaveNoise2D(1, 0.6, 1f / 70, x, y);
+        double edgeDist = Math.max(sectorSize / 2, sectorSize / 2) - Math.max(Math.abs(x - sectorSize / 2), Math.abs(y - sectorSize / 2));
+        double dst = Vector2.dst(sectorSize / 2, sectorSize / 2, x, y);
+        double elevDip = 30;
+
+        double border = 14;
+
+        if(edgeDist < border){
+            elevation += (border - edgeDist) / 6.0;
+        }
+
+        if(temp < 0.35){
+            floor = Blocks.snow;
+        }else if(temp < 0.45){
+            floor = Blocks.stone;
+        }else if(temp < 0.65){
+            floor = Blocks.grass;
+        }else if(temp < 0.8){
+            floor = Blocks.sand;
+        }else if(temp < 0.9){
+            floor = Blocks.blackstone;
+            elevation = 0f;
+        }else{
+            floor = Blocks.lava;
+        }
+
+        if(dst < elevDip){
+            elevation -= (elevDip - dst) / elevDip * 3.0;
+        }else if(r > 0.9){
+            floor = Blocks.water;
+            elevation = 0;
+
+            if(r > 0.94){
+                floor = Blocks.deepwater;
+            }
+        }
+
+        if(wall == Blocks.air && decoration.containsKey(floor) && random.chance(0.03)){
+            wall = decoration.get(floor);
+        }
+
+        result.wall = wall;
+        result.floor = floor;
+        result.elevation = (byte) Math.max(elevation, 0);
+        return result;
+    }
+
+    public class GenResult{
+        public Block floor, wall;
+        public byte elevation;
     }
 
     public class OreEntry{

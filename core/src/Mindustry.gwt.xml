@@ -17,6 +17,6 @@
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.Team"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Streamable"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.meta.BlockBar"/>
-    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.mapgen.WorldGenerator"/>
+    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.maps.generation.WorldGenerator"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.StatusController"/>
 </module>
