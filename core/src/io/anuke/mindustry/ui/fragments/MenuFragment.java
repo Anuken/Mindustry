@@ -55,7 +55,7 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-                play = new MobileButton("icon-play-2", isize, "$text.play", ui.levels::show),
+                play = new MobileButton("icon-play-2", isize, "$text.play", this::showPlaySelect),
                 maps = new MobileButton("icon-map", isize, "$text.maps", ui.maps::show),
                 load = new MobileButton("icon-load", isize, "$text.load", ui.load::show),
                 join = new MobileButton("icon-add", isize, "$text.joingame", ui.join::show),
