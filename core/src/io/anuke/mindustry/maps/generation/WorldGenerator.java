@@ -165,12 +165,12 @@ public class WorldGenerator{
         }
     }
 
-    public void generateMap(Tile[][] tiles, int seed){
+    public void generateMap(Tile[][] tiles, int sectorX, int sectorY){
         int width = tiles.length, height = tiles[0].length;
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                GenResult result = generateTile(0, 0, x, y);
+                GenResult result = generateTile(sectorX, sectorY, x, y);
                 Tile tile = new Tile(x, y, (byte)result.floor.id, (byte)result.wall.id, (byte)0, (byte)0, result.elevation);
                 tiles[x][y] = tile;
             }
@@ -212,12 +212,12 @@ public class WorldGenerator{
         Block floor = Blocks.stone;
         Block wall = Blocks.air;
 
-        double elevation = sim.octaveNoise2D(3, 0.5, 1f / 100, x, y) * 4.1 - 1;
-        double temp = sim3.octaveNoise2D(7, 0.54, 1f / 320f, x, y);
+        double elevation = sim.octaveNoise2D(3, 0.5, 1f / 500, x, y) * 4.1 - 1;
+        double temp = sim3.octaveNoise2D(7, 0.54, 1f / 820f, x, y);
 
         double r = sim2.octaveNoise2D(1, 0.6, 1f / 70, x, y);
         double edgeDist = Math.max(sectorSize / 2, sectorSize / 2) - Math.max(Math.abs(x - sectorSize / 2), Math.abs(y - sectorSize / 2));
-        double dst = Vector2.dst(sectorSize / 2, sectorSize / 2, x, y);
+        double dst = Vector2.dst((sectorX * sectorSize) + sectorSize/2f, (sectorY * sectorSize) + sectorSize/2f, x, y);
         double elevDip = 30;
 
         double border = 14;

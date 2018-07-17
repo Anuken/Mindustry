@@ -1,13 +1,12 @@
 package io.anuke.mindustry.maps;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
-import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.GridMap;
@@ -77,8 +76,6 @@ public class Sectors{
 
         Pixmap pixmap = new Pixmap(sectorImageSize, sectorImageSize, Format.RGBA8888);
 
-        int worldX = sector.x * sectorSize;
-        int worldY = sector.y * sectorSize;
         for(int x = 0; x < sectorImageSize; x++){
             for(int y = 0; y < sectorImageSize; y++){
                 int toX = x * sectorSize / sectorImageSize;
@@ -86,7 +83,7 @@ public class Sectors{
 
                 GenResult result = world.generator().generateTile(sector.x, sector.y, toX, toY);
 
-                int color = ColorMapper.getBlockColor(result.wall == Blocks.air ? result.floor : result.wall);
+                int color = Color.rgba8888(result.floor.minimapColor);
                 pixmap.drawPixel(x, sectorImageSize - 1 - y, color);
             }
         }

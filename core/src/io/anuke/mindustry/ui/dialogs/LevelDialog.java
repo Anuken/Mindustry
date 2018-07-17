@@ -8,7 +8,6 @@ import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.ButtonGroup;
@@ -16,7 +15,6 @@ import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.scene.utils.Elements;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
@@ -119,17 +117,19 @@ public class LevelDialog extends FloatingDialog{
 
         ImageButton genb = maps.addImageButton("icon-editor", "clear", 16 * 3, () -> {
             hide();
+            //TODO
 
+            /*
             ui.loadfrag.show();
 
             Timers.run(5f, () -> {
                 Cursors.restoreCursor();
                 threads.run(() -> {
-                    world.loadProceduralMap();
+                    world.loadProceduralMap(0, 0);
                     logic.play();
                     Gdx.app.postRunnable(ui.loadfrag::hide);
                 });
-            });
+            });*/
         }).width(170).fillY().pad(4f).get();
 
         genb.top();

@@ -207,7 +207,7 @@ public class World extends Module{
     }
 
     /**Loads up a procedural map. This does not call play(), but calls reset().*/
-    public void loadProceduralMap(){
+    public void loadProceduralMap(int sectorX, int sectorY){
         Timers.mark();
         Timers.mark();
 
@@ -215,17 +215,17 @@ public class World extends Module{
 
         beginMapLoad();
 
-        int width = 400, height = 400;
+        int width = sectorSize, height = sectorSize;
 
         Tile[][] tiles = createTiles(width, height);
 
-        Map map = new Map("Generated Map", new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
+        Map map = new Map("Sector [" + sectorX + ", " + sectorY + "]", new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
         setMap(map);
 
         EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
         Timers.mark();
-        generator.generateMap(tiles, Mathf.random(9999999));
+        generator.generateMap(tiles, sectorX, sectorY);
         Log.info("Time to generate base map: {0}", Timers.elapsed());
 
         Log.info("Time to generate fully without additional events: {0}", Timers.elapsed());

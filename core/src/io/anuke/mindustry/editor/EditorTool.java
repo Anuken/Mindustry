@@ -84,6 +84,7 @@ public enum EditorTool{
 
             byte bf = editor.getMap().read(x, y, DataPosition.floor);
             byte bw = editor.getMap().read(x, y, DataPosition.wall);
+            byte be = editor.getMap().read(x, y, DataPosition.elevation);
             boolean synth = editor.getDrawBlock().synthetic();
             byte brt = Bits.packByte((byte) editor.getDrawRotation(), (byte) editor.getDrawTeam().ordinal());
 
@@ -105,8 +106,9 @@ public enum EditorTool{
 
                 byte nbf = editor.getMap().read(px, py, DataPosition.floor);
                 byte nbw = editor.getMap().read(px, py, DataPosition.wall);
+                byte nbe = editor.getMap().read(px, py, DataPosition.elevation);
 
-                if((floor ? nbf : nbw) == dest){
+                if((floor ? nbf : nbw) == dest && nbe == be){
                     TileDataMarker prev = editor.getPrev(px, py, false);
 
                     if(floor){
