@@ -177,23 +177,30 @@ public class Conveyor extends Block{
         entity.wakeUp();
 
         float speed = this.speed * tilesize / 2.3f;
+        float centerSpeed = 0.1f;
+        float centerDstScl = 3f;
         float tx = Geometry.d4[tile.getRotation()].x, ty = Geometry.d4[tile.getRotation()].y;
 
         float min;
+        float centerx = 0f, centery = 0f;
 
         if(Math.abs(tx) > Math.abs(ty)){
             float rx = tile.worldx() - tx / 2f * tilesize;
             min = Mathf.clamp((unit.x - rx) * tx / tilesize);
+            centery = Mathf.clamp((tile.worldy() - unit.y) / centerDstScl, -centerSpeed, centerSpeed);
+            if(Math.abs(tile.worldy() - unit.y) < 1f) centery = 0f;
         }else{
             float ry = tile.worldy() - ty / 2f * tilesize;
             min = Mathf.clamp((unit.y - ry) * ty / tilesize);
+            centerx = Mathf.clamp((tile.worldx() - unit.x) / centerDstScl, -centerSpeed, centerSpeed);
+            if(Math.abs(tile.worldx() - unit.x) < 1f) centerx = 0f;
         }
 
         entity.minCarry = Math.min(entity.minCarry, min);
         entity.carrying += unit.getMass();
 
         if(entity.convey.size * itemSpace < 0.9f){
-            unit.getVelocity().add(tx * speed * Timers.delta(), ty * speed * Timers.delta());
+            unit.getVelocity().add((tx * speed + centerx) * Timers.delta(), (ty * speed + centery) * Timers.delta());
         }
     }
 

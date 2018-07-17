@@ -110,8 +110,8 @@ public class Block extends BaseBlock implements Content{
     protected TextureRegion[] icon;
     protected TextureRegion[] compactIcon;
     protected TextureRegion editorIcon;
-    protected TextureRegion shadowRegion;
-    protected TextureRegion region;
+    public TextureRegion shadowRegion;
+    public TextureRegion region;
 
     public Block(String name){
         this.name = name;
