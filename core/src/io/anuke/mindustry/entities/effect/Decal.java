@@ -33,10 +33,5 @@ public abstract class Decal extends TimedEntity implements BelowLiquidTrait, Dra
         return groundEffectGroup;
     }
 
-    @Override
-    public float fin() {
-        return time / lifetime();
-    }
-
     abstract void drawDecal();
 }

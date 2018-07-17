@@ -26,6 +26,7 @@ public class TextFieldDialogListener {
         });
     }
 
+    @SuppressWarnings("deprecation")
     private static void show(TextField field, int maxLength){
 
         UIAlertViewDelegateAdapter delegate = new UIAlertViewDelegateAdapter() {

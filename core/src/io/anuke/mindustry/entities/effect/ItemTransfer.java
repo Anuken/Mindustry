@@ -134,9 +134,4 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     public EntityGroup targetGroup(){
         return effectGroup;
     }
-
-    @Override
-    public float fin(){
-        return time() / lifetime();
-    }
 }
