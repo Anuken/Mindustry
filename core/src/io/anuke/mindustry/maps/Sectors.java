@@ -1,12 +1,13 @@
 package io.anuke.mindustry.maps;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
+import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.GridMap;
@@ -19,7 +20,7 @@ public class Sectors{
     private GridMap<Sector> grid = new GridMap<>();
 
     public Sectors(){
-
+        Settings.json().addClassTag("Sector", Sector.class);
     }
 
     /**If a sector is not yet unlocked, returns null.*/
@@ -34,9 +35,8 @@ public class Sectors{
         sector.unlocked = true;
         if(sector.texture == null) createTexture(sector);
 
-        //TODO fix
         for(GridPoint2 point : Geometry.d4){
-        //    createSector(sector.x + point.x, sector.y + point.y);
+            createSector(sector.x + point.x, sector.y + point.y);
         }
     }
 
@@ -57,6 +57,10 @@ public class Sectors{
         for(Sector sector : out){
             createTexture(sector);
             grid.put(sector.x, sector.y, sector);
+        }
+
+        if(out.size == 0){
+            unlockSector(0, 0);
         }
     }
 
@@ -83,7 +87,7 @@ public class Sectors{
 
                 GenResult result = world.generator().generateTile(sector.x, sector.y, toX, toY);
 
-                int color = Color.rgba8888(result.floor.minimapColor);
+                int color = ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation);
                 pixmap.drawPixel(x, sectorImageSize - 1 - y, color);
             }
         }

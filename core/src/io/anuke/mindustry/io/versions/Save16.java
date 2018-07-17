@@ -38,6 +38,7 @@ public class Save16 extends SaveFileVersion{
         stream.readLong(); //time
         stream.readLong(); //total playtime
         stream.readInt(); //build
+        stream.readInt(); //sector ID
 
         //general state
         byte mode = stream.readByte();
@@ -102,7 +103,7 @@ public class Save16 extends SaveFileVersion{
             byte elevation = stream.readByte();
 
             Tile tile = new Tile(x, y, floorid, wallid);
-            tile.elevation = elevation;
+            tile.setElevation(elevation);
 
             if(wallid == Blocks.blockpart.id){
                 tile.link = stream.readByte();
@@ -136,7 +137,7 @@ public class Save16 extends SaveFileVersion{
                 for(int j = i + 1; j < i + 1 + consecutives; j++){
                     int newx = j % width, newy = j / width;
                     Tile newTile = new Tile(newx, newy, floorid, wallid);
-                    newTile.elevation = elevation;
+                    newTile.setElevation(elevation);
                     tiles[newx][newy] = newTile;
                 }
 
@@ -156,6 +157,7 @@ public class Save16 extends SaveFileVersion{
         stream.writeLong(TimeUtils.millis()); //last saved
         stream.writeLong(headless ? 0 : control.getSaves().getTotalPlaytime()); //playtime
         stream.writeInt(Version.build); //build
+        stream.writeInt(world.getSector() == null ? invalidSector : world.getSector().packedPosition()); //sector ID
 
         //--GENERAL STATE--
         stream.writeByte(state.mode.ordinal()); //gamemode
@@ -212,7 +214,7 @@ public class Save16 extends SaveFileVersion{
 
             stream.writeByte(tile.getFloorID());
             stream.writeByte(tile.getWallID());
-            stream.writeByte(tile.elevation);
+            stream.writeByte(tile.getElevation());
 
             if(tile.block() instanceof BlockPart){
                 stream.writeByte(tile.link);
@@ -232,7 +234,7 @@ public class Save16 extends SaveFileVersion{
                 for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                     Tile nextTile = world.tile(j);
 
-                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.getWallID() != 0 || nextTile.elevation != tile.elevation){
+                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.getWallID() != 0 || nextTile.getElevation() != tile.getElevation()){
                         break;
                     }
 

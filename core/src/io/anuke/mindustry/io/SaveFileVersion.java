@@ -14,14 +14,15 @@ public abstract class SaveFileVersion{
     }
 
     public SaveMeta getData(DataInputStream stream) throws IOException{
-        long time = stream.readLong(); //read last saved time
+        long time = stream.readLong();
         long playtime = stream.readLong();
         int build = stream.readInt();
-        byte mode = stream.readByte(); //read the gamemode
-        String map = stream.readUTF(); //read the map
-        int wave = stream.readInt(); //read the wave
-        byte difficulty = stream.readByte(); //read the difficulty
-        return new SaveMeta(version, time, playtime, build, mode, map, wave, Difficulty.values()[difficulty]);
+        int sector = stream.readInt();
+        byte mode = stream.readByte();
+        String map = stream.readUTF();
+        int wave = stream.readInt();
+        byte difficulty = stream.readByte();
+        return new SaveMeta(version, time, playtime, build, sector, mode, map, wave, Difficulty.values()[difficulty]);
     }
 
     public abstract void read(DataInputStream stream) throws IOException;

@@ -2,6 +2,7 @@ package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
@@ -21,6 +22,7 @@ import static io.anuke.mindustry.Vars.*;
 public class Saves{
     private int nextSlot;
     private Array<SaveSlot> saves = new ThreadArray<>();
+    private IntMap<SaveSlot> saveMap = new IntMap<>();
     private SaveSlot current;
     private boolean saving;
     private float time;
@@ -44,6 +46,7 @@ public class Saves{
             if(SaveIO.isSaveValid(index)){
                 SaveSlot slot = new SaveSlot(index);
                 saves.add(slot);
+                saveMap.put(slot.index, slot);
                 slot.meta = SaveIO.getData(index);
                 nextSlot = Math.max(index + 1, nextSlot);
             }
@@ -99,16 +102,18 @@ public class Saves{
         return saving;
     }
 
-    public void addSave(String name){
+    public SaveSlot addSave(String name){
         SaveSlot slot = new SaveSlot(nextSlot);
         nextSlot++;
         slot.setName(name);
         saves.add(slot);
+        saveMap.put(slot.index, slot);
         SaveIO.saveToSlot(slot.index);
         slot.meta = SaveIO.getData(slot.index);
         current = slot;
 
         saveSlots();
+        return slot;
     }
 
     public SaveSlot importSave(FileHandle file) throws IOException{
@@ -117,10 +122,15 @@ public class Saves{
         nextSlot++;
         slot.setName(file.nameWithoutExtension());
         saves.add(slot);
+        saveMap.put(slot.index, slot);
         slot.meta = SaveIO.getData(slot.index);
         current = slot;
         saveSlots();
         return slot;
+    }
+
+    public SaveSlot getByID(int id){
+        return saveMap.get(id);
     }
 
     public Array<SaveSlot> getSaveSlots(){
@@ -155,6 +165,10 @@ public class Saves{
             SaveIO.saveToSlot(index);
             meta = SaveIO.getData(index);
             current = this;
+        }
+
+        public boolean isHidden(){
+            return meta.sector != invalidSector;
         }
 
         public String getPlayTime(){
@@ -223,11 +237,16 @@ public class Saves{
         }
 
         public void delete(){
-            SaveIO.fileFor(index).delete();
+            if(!gwt){ //can't delete files
+                SaveIO.fileFor(index).delete();
+            }
             saves.removeValue(this, true);
+            saveMap.remove(index);
             if(this == current){
                 current = null;
             }
+
+            saveSlots();
         }
     }
 }

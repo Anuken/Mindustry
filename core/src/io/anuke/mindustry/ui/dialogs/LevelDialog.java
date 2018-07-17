@@ -125,7 +125,7 @@ public class LevelDialog extends FloatingDialog{
             Timers.run(5f, () -> {
                 Cursors.restoreCursor();
                 threads.run(() -> {
-                    world.loadProceduralMap(0, 0);
+                    world.loadSector(0, 0);
                     logic.play();
                     Gdx.app.postRunnable(ui.loadfrag::hide);
                 });

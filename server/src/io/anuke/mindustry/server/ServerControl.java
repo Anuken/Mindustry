@@ -104,13 +104,11 @@ public class ServerControl extends Module{
                         world.loadMap(map);
                     }else{
                         info("Selected a procedural map.");
-                        world.loadProceduralMap();
-                        logic.play();
+                        playSectorMap();
                     }
                 }else{
                     info("Selected a procedural map.");
-                    world.loadProceduralMap();
-                    logic.play();
+                    playSectorMap();
                 }
             }else{
                 state.set(State.menu);
@@ -181,17 +179,17 @@ public class ServerControl extends Module{
 
                     logic.reset();
                     world.loadMap(result);
+                    logic.play();
                 }else{
                     Log.info("&ly&fiNo map specified, so a procedural one was generated.");
-                    world.loadProceduralMap();
+                    playSectorMap();
                 }
 
             }else{
                 Log.info("&ly&fiNo map specified, so a procedural one was generated.");
-                world.loadProceduralMap();
+                playSectorMap();
             }
 
-            logic.play();
             info("Map loaded.");
 
             host();
@@ -805,6 +803,11 @@ public class ServerControl extends Module{
                 }
             });
         }
+    }
+
+    private void playSectorMap(){
+        world.loadSector(world.sectors().get(0, 0));
+        logic.play();
     }
 
     private void host(){

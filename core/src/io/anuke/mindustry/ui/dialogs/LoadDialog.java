@@ -56,6 +56,7 @@ public class LoadDialog extends FloatingDialog{
         Array<SaveSlot> array = control.getSaves().getSaveSlots();
 
         for(SaveSlot slot : array){
+            if(slot.isHidden()) continue;
 
             TextButton button = new TextButton("[accent]" + slot.getName(), "clear");
             button.getLabelCell().growX().left();
@@ -140,7 +141,10 @@ public class LoadDialog extends FloatingDialog{
     }
 
     public void addSetup(){
-        if(control.getSaves().getSaveSlots().size == 0){
+        boolean valids = false;
+        for(SaveSlot slot : control.getSaves().getSaveSlots()) if(!slot.isHidden()) valids = true;
+
+        if(!valids){
 
             slots.row();
             slots.addButton("$text.save.none", "clear", () -> {

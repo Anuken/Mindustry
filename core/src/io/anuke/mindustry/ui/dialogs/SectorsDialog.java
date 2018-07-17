@@ -12,6 +12,7 @@ import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
+import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.scene.utils.ScissorStack;
 import io.anuke.ucore.util.Bundles;
@@ -26,15 +27,18 @@ public class SectorsDialog extends FloatingDialog{
     public SectorsDialog(){
         super("$text.sectors");
 
-        addCloseButton();
-        setup();
+        shown(this::setup);
     }
 
     void setup(){
         content().clear();
+        buttons().clear();
+
+        addCloseButton();
 
         content().label(() -> Bundles.format("text.sector", selected == null ? "<none>" :
-        selected.x + ", " + selected.y + (!selected.unlocked ? Bundles.get("text.sector.locked") : "")));
+        (selected.x + ", " + selected.y + (!selected.unlocked ? " " + Bundles.get("text.sector.locked") : ""))
+                + (selected.saveID == -1 && selected.unlocked ? " " + Bundles.get("text.sector.unexplored") : "")));
         content().row();
         content().add(new SectorView()).grow();
         content().row();
@@ -42,10 +46,22 @@ public class SectorsDialog extends FloatingDialog{
             hide();
 
             ui.loadLogic(() -> {
-                world.loadProceduralMap(selected.x, selected.y);
-                logic.play();
+                if(!selected.hasSave()){
+                    world.loadSector(selected);
+                    logic.play();
+                    selected.saveID = control.getSaves().addSave("sector-" + selected.packedPosition()).index;
+                    world.sectors().save();
+                }else{
+                    control.getSaves().getByID(selected.saveID).load();
+                    logic.play();
+                }
             });
-        }).size(230f, 64f).disabled(b -> selected == null);
+        }).size(230f, 64f).name("deploy-button").disabled(b -> selected == null || !selected.unlocked);
+    }
+
+    void selectSector(Sector sector){
+        buttons().<TextButton>find("deploy-button").setText(sector.hasSave() ? "$text.sector.resume" : "$text.sector.deploy");
+        selected = sector;
     }
 
     class SectorView extends Element{
@@ -110,22 +126,20 @@ public class SectorsDialog extends FloatingDialog{
                     float drawX = x + width/2f+ sectorX * sectorSize - offsetX * sectorSize - panX % sectorSize;
                     float drawY = y + height/2f + sectorY * sectorSize - offsetY * sectorSize - panY % sectorSize;
 
-                    if(world.sectors().get(sectorX, sectorY) == null){
-                        world.sectors().unlockSector(sectorX, sectorY);
-                    }
-
                     Sector sector = world.sectors().get(sectorX, sectorY);
 
-                    if(sector == null) continue;
+                    if(sector != null && sector.texture != null){
+                        Draw.color(Color.WHITE);
+                        Draw.rect(sector.texture, drawX, drawY, sectorSize, sectorSize);
+                    }
 
-                    Draw.color(Color.WHITE);
-                    Draw.rect(sector.texture, drawX, drawY, sectorSize, sectorSize);
-
-                    if(sector == selected){
+                    if(sector == null){
+                        Draw.color(Color.DARK_GRAY);
+                    }else if(sector == selected){
                         Draw.color(Palette.place);
                     }else if(Mathf.inRect(mouse.x, mouse.y, drawX - sectorSize/2f, drawY - sectorSize/2f, drawX + sectorSize/2f, drawY + sectorSize/2f)){
                         if(clicked){
-                            selected = sector;
+                            selectSector(sector);
                         }
                         Draw.color(Palette.remove);
                     }else if (sector.unlocked){
@@ -134,7 +148,7 @@ public class SectorsDialog extends FloatingDialog{
                         Draw.color(Color.LIGHT_GRAY);
                     }
 
-                    Lines.stroke(selected == sector ? 5f : 3f);
+                    Lines.stroke(sector != null && selected == sector ? 5f : 3f);
                     Lines.crect(drawX, drawY, sectorSize, sectorSize);
                 }
             }

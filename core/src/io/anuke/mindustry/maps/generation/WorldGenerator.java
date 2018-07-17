@@ -180,14 +180,14 @@ public class WorldGenerator{
             for(int y = 0; y < height; y++){
                 Tile tile = tiles[x][y];
 
-                byte elevation = tile.elevation;
+                byte elevation = tile.getElevation();
 
                 for(GridPoint2 point : Geometry.d4){
                     if(!Mathf.inBounds(x + point.x, y + point.y, width, height)) continue;
-                    if(tiles[x + point.x][y + point.y].elevation < elevation){
+                    if(tiles[x + point.x][y + point.y].getElevation() < elevation){
 
                         if(Mathf.chance(0.05)){
-                            tile.elevation = -1;
+                            tile.setElevation(-1);
                         }
                         break;
                     }

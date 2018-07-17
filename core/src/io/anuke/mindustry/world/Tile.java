@@ -34,8 +34,6 @@ public class Tile implements PosTrait, TargetTrait{
     public short x, y;
     /** Tile traversal cost. */
     public byte cost = 1;
-    /** Elevation of tile. */
-    public byte elevation;
     /** Position of cliffs around the tile, packed into bits 0-8. */
     public byte cliffs;
     /** Tile entity, usually null. */
@@ -47,6 +45,8 @@ public class Tile implements PosTrait, TargetTrait{
     private byte rotation;
     /** Team ordinal. */
     private byte team;
+    /** Tile elevation. -1 means slope.*/
+    private byte elevation;
 
     public Tile(int x, int y){
         this.x = (short) x;
@@ -65,7 +65,7 @@ public class Tile implements PosTrait, TargetTrait{
         this.floor = (Floor) Block.getByID(floor);
         this.wall = Block.getByID(wall);
         this.rotation = rotation;
-        this.elevation = elevation;
+        this.setElevation(elevation);
         changed();
         this.team = team;
     }
@@ -201,6 +201,14 @@ public class Tile implements PosTrait, TargetTrait{
         this.rotation = dump;
     }
 
+    public byte getElevation(){
+        return elevation;
+    }
+
+    public void setElevation(int elevation){
+        this.elevation = (byte)elevation;
+    }
+
     public boolean passable(){
         Block block = block();
         Block floor = floor();
@@ -217,7 +225,7 @@ public class Tile implements PosTrait, TargetTrait{
         Block block = block();
         Block floor = floor();
         return block.solid || cliffs != 0 || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
-                || (isLinked() && getLinked().block().isSolidFor(getLinked()));
+        || (isLinked() && getLinked().block().isSolidFor(getLinked()));
     }
 
     public boolean breakable(){
@@ -453,6 +461,6 @@ public class Tile implements PosTrait, TargetTrait{
         Block floor = floor();
 
         return floor.name() + ":" + block.name() + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : ClassReflection.getSimpleName(entity.getClass())) +
-                (link != 0 ? " link=[" + (Bits.getLeftByte(link) - 8) + ", " + (Bits.getRightByte(link) - 8) + "]" : "");
+        (link != 0 ? " link=[" + (Bits.getLeftByte(link) - 8) + ", " + (Bits.getRightByte(link) - 8) + "]" : "");
     }
 }

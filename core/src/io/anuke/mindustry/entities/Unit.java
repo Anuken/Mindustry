@@ -244,7 +244,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 }
 
                 //on slope
-                if(tile.elevation == -1){
+                if(tile.getElevation() == -1){
                     velocity.scl(0.7f);
                 }
             }

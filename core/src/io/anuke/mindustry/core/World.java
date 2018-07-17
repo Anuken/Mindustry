@@ -11,10 +11,7 @@ import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.maps.MapMeta;
-import io.anuke.mindustry.maps.Maps;
-import io.anuke.mindustry.maps.Sectors;
+import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.maps.generation.WorldGenerator;
@@ -31,6 +28,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class World extends Module{
     private Map currentMap;
+    private Sector currentSector;
     private Tile[][] tiles;
     private Pathfinder pathfinder = new Pathfinder();
     private BlockIndexer indexer = new BlockIndexer();
@@ -43,6 +41,10 @@ public class World extends Module{
 
     public World(){
         maps.load();
+    }
+
+    @Override
+    public void init(){
         sectors.load();
     }
 
@@ -103,6 +105,10 @@ public class World extends Module{
 
     public Map getMap(){
         return currentMap;
+    }
+
+    public Sector getSector(){
+        return currentSector;
     }
 
     public void setMap(Map map){
@@ -206,8 +212,9 @@ public class World extends Module{
         Events.fire(WorldLoadEvent.class);
     }
 
-    /**Loads up a procedural map. This does not call play(), but calls reset().*/
-    public void loadProceduralMap(int sectorX, int sectorY){
+    /**Loads up a sector map. This does not call play(), but calls reset().*/
+    public void loadSector(Sector sector){
+        currentSector = sector;
         Timers.mark();
         Timers.mark();
 
@@ -219,13 +226,13 @@ public class World extends Module{
 
         Tile[][] tiles = createTiles(width, height);
 
-        Map map = new Map("Sector [" + sectorX + ", " + sectorY + "]", new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
+        Map map = new Map("Sector [" + sector.x + ", " + sector.y + "]", new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
         setMap(map);
 
         EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
         Timers.mark();
-        generator.generateMap(tiles, sectorX, sectorY);
+        generator.generateMap(tiles, sector.x, sector.y);
         Log.info("Time to generate base map: {0}", Timers.elapsed());
 
         Log.info("Time to generate fully without additional events: {0}", Timers.elapsed());
@@ -236,6 +243,7 @@ public class World extends Module{
     }
 
     public void loadMap(Map map){
+        currentSector = null;
         beginMapLoad();
         this.currentMap = map;
 
