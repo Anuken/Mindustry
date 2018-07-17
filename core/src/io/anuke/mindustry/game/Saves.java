@@ -4,9 +4,9 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
-import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.SaveMeta;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
@@ -33,12 +33,15 @@ public class Saves{
 
     public void load(){
         saves.clear();
-        for(int i = 0; i < saveSlots; i++){
-            if(SaveIO.isSaveValid(i)){
-                SaveSlot slot = new SaveSlot(i);
+        int[] slots = Settings.getJson("save-slots", int[].class);
+
+        for(int i = 0; i < slots.length; i++){
+            int index = slots[i];
+            if(SaveIO.isSaveValid(index)){
+                SaveSlot slot = new SaveSlot(index);
                 saves.add(slot);
-                slot.meta = SaveIO.getData(i);
-                nextSlot = i + 1;
+                slot.meta = SaveIO.getData(index);
+                nextSlot = Math.max(index + 1, nextSlot);
             }
         }
     }
@@ -80,10 +83,6 @@ public class Saves{
         return saving;
     }
 
-    public boolean canAddSave(){
-        return nextSlot < saveSlots;
-    }
-
     public void addSave(String name){
         SaveSlot slot = new SaveSlot(nextSlot);
         nextSlot++;
@@ -92,6 +91,8 @@ public class Saves{
         SaveIO.saveToSlot(slot.index);
         slot.meta = SaveIO.getData(slot.index);
         current = slot;
+
+        saveSlots();
     }
 
     public SaveSlot importSave(FileHandle file) throws IOException{
@@ -102,11 +103,21 @@ public class Saves{
         saves.add(slot);
         slot.meta = SaveIO.getData(slot.index);
         current = slot;
+        saveSlots();
         return slot;
     }
 
     public Array<SaveSlot> getSaveSlots(){
         return saves;
+    }
+
+    private void saveSlots(){
+        int[] result = new int[saves.size];
+        for(int i = 0; i < result.length; i++){
+            result[i] = saves.get(i).index;
+        }
+        Settings.putJson("save-slots", result);
+        Settings.save();
     }
 
     public class SaveSlot{

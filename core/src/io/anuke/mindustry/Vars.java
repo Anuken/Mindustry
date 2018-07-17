@@ -41,8 +41,8 @@ public class Vars{
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
     public static final int maxTextLength = 150;
     public static final int maxNameLength = 40;
-    public static final int maxCharNameLength = 20;
-    public static final int saveSlots = 64;
+    //public static final int maxCharNameLength = 20;
+   // public static final int saveSlots = 64;
     public static final float itemSize = 5f;
     public static final int tilesize = 8;
     public static final int sectorSize = 256;

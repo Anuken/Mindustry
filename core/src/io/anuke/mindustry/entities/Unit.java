@@ -19,6 +19,7 @@ import io.anuke.ucore.entities.impl.DestructibleEntity;
 import io.anuke.ucore.entities.trait.DamageTrait;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.trait.SolidTrait;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
@@ -44,7 +45,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
      * Maximum absolute value of a velocity vector component.
      */
     public static final float maxAbsVelocity = 127f / velocityPercision;
-    public static final float elevationScale = 4f;
 
     private static final Vector2 moveVector = new Vector2();
 
@@ -59,7 +59,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected Vector2 velocity = new Translator(0f, 0.0001f);
     protected float hitTime;
     protected float drownTime;
-    protected float elevation;
 
     @Override
     public UnitInventory getInventory(){
@@ -235,10 +234,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         if(isFlying()){
             x += velocity.x / getMass() * Timers.delta();
             y += velocity.y / getMass() * Timers.delta();
-
-            if(tile != null){
-                elevation = Mathf.lerpDelta(elevation, tile.elevation, 0.04f);
-            }
         }else{
             boolean onLiquid = floor.isLiquid;
 
@@ -318,6 +313,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void drawShadow(){
+        Draw.rect(getIconRegion(), x , y, rotation - 90);
     }
 
     public void drawView(){

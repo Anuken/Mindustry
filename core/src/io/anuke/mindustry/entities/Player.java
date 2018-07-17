@@ -276,7 +276,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void drawShadow(){
-        Draw.rect(mech.iconRegion, x - elevation * elevationScale, y - elevation * elevationScale, rotation - 90);
+        Draw.rect(mech.iconRegion, x , y, rotation - 90);
     }
 
     @Override
