@@ -223,7 +223,7 @@ public class WorldGenerator{
         double border = 14;
 
         if(edgeDist < border){
-            elevation += (border - edgeDist) / 6.0;
+        //    elevation += (border - edgeDist) / 6.0;
         }
 
         if(temp < 0.35){

@@ -16,10 +16,7 @@ public class Build{
     private static final Rectangle rect = new Rectangle();
     private static final Rectangle hitrect = new Rectangle();
 
-    /**
-     * Returns block type that was broken, or null if unsuccesful.
-     */
-    //@Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
+    /**Returns block type that was broken, or null if unsuccesful.*/
     public static void beginBreak(Team team, int x, int y){
         if(!validBreak(team, x, y)){
             return;
@@ -61,10 +58,7 @@ public class Build{
 
     }
 
-    /**
-     * Places a BuildBlock at this location.
-     */
-    //@Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
+    /**Places a BuildBlock at this location.*/
     public static void beginPlace(Team team, int x, int y, Recipe recipe, int rotation){
         if(!validPlace(team, x, y, recipe.result, rotation)){
             return;
@@ -107,9 +101,7 @@ public class Build{
         threads.runDelay(() -> Events.fire(BlockBuildEvent.class, team, tile));
     }
 
-    /**
-     * Returns whether a tile can be placed at this location by this team.
-     */
+    /**Returns whether a tile can be placed at this location by this team.*/
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
         Recipe recipe = Recipe.getByResult(type);
 
@@ -179,9 +171,7 @@ public class Build{
         }
     }
 
-    /**
-     * Returns whether the tile at this position is breakable by this team
-     */
+    /**Returns whether the tile at this position is breakable by this team*/
     public static boolean validBreak(Team team, int x, int y){
         Tile tile = world.tile(x, y);
 

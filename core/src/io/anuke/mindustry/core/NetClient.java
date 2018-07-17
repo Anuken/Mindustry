@@ -41,59 +41,33 @@ public class NetClient extends Module{
     private final static float playerSyncTime = 2;
 
     private Timer timer = new Timer(5);
-    /**
-     * Whether the client is currently connecting.
-     */
+    /**Whether the client is currently connecting.*/
     private boolean connecting = false;
-    /**
-     * If true, no message will be shown on disconnect.
-     */
+    /**If true, no message will be shown on disconnect.*/
     private boolean quiet = false;
-    /**
-     * Counter for data timeout.
-     */
+    /**Counter for data timeout.*/
     private float timeoutTime = 0f;
-    /**
-     * Last sent client snapshot ID.
-     */
+    /**Last sent client snapshot ID.*/
     private int lastSent;
 
-    /**
-     * Last snapshot ID recieved.
-     */
+    /**Last snapshot ID recieved.*/
     private int lastSnapshotBaseID = -1;
-    /**
-     * Last snapshot recieved.
-     */
+    /**Last snapshot recieved.*/
     private byte[] lastSnapshotBase;
-    /**
-     * Current snapshot that is being built from chinks.
-     */
+    /**Current snapshot that is being built from chinks.*/
     private byte[] currentSnapshot;
-    /**
-     * Array of recieved chunk statuses.
-     */
+    /**Array of recieved chunk statuses.*/
     private boolean[] recievedChunks;
-    /**
-     * Counter of how many chunks have been recieved.
-     */
+    /**Counter of how many chunks have been recieved.*/
     private int recievedChunkCounter;
-    /**
-     * ID of snapshot that is currently being constructed.
-     */
+    /**ID of snapshot that is currently being constructed.*/
     private int currentSnapshotID = -1;
 
-    /**
-     * Decoder for uncompressing snapshots.
-     */
+    /**Decoder for uncompressing snapshots.*/
     private DEZDecoder decoder = new DEZDecoder();
-    /**
-     * List of entities that were removed, and need not be added while syncing.
-     */
+    /**List of entities that were removed, and need not be added while syncing.*/
     private IntSet removed = new IntSet();
-    /**
-     * Byte stream for reading in snapshots.
-     */
+    /**Byte stream for reading in snapshots.*/
     private ReusableByteArrayInputStream byteStream = new ReusableByteArrayInputStream();
     private DataInputStream dataStream = new DataInputStream(byteStream);
 

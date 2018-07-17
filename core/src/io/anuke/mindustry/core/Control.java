@@ -368,6 +368,15 @@ public class Control extends Module{
                 input.update();
             }
 
+            //check unlocked sectors
+            if(world.getSector() != null && world.getSector().goal.isComplete() && !world.getSector().complete){
+                world.sectors().completeSector(world.getSector().x, world.getSector().y);
+                world.sectors().save();
+                if(!headless){
+                    ui.showInfoFade("$text.sector.unlocked");
+                }
+            }
+
             //check unlocks every 2 seconds
             if(!state.mode.infiniteResources && Timers.get("timerCheckUnlock", 120)){
                 checkUnlockableBlocks();

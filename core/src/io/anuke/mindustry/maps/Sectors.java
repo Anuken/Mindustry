@@ -29,11 +29,10 @@ public class Sectors{
     }
 
     /**Unlocks a sector. This shows nearby sectors.*/
-    public void unlockSector(int x, int y){
+    public void completeSector(int x, int y){
         createSector(x, y);
         Sector sector = get(x, y);
-        sector.unlocked = true;
-        if(sector.texture == null) createTexture(sector);
+        sector.complete = true;
 
         for(GridPoint2 point : Geometry.d4){
             createSector(sector.x + point.x, sector.y + point.y);
@@ -47,8 +46,10 @@ public class Sectors{
         Sector sector = new Sector();
         sector.x = (short)x;
         sector.y = (short)y;
-        sector.unlocked = false;
+        sector.complete = false;
         grid.put(x, y, sector);
+
+        if(sector.texture == null) createTexture(sector);
     }
 
     public void load(){
@@ -60,7 +61,7 @@ public class Sectors{
         }
 
         if(out.size == 0){
-            unlockSector(0, 0);
+            createSector(0, 0);
         }
     }
 

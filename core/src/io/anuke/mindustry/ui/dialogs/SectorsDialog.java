@@ -37,8 +37,9 @@ public class SectorsDialog extends FloatingDialog{
         addCloseButton();
 
         content().label(() -> Bundles.format("text.sector", selected == null ? "<none>" :
-        (selected.x + ", " + selected.y + (!selected.unlocked ? " " + Bundles.get("text.sector.locked") : ""))
-                + (selected.saveID == -1 && selected.unlocked ? " " + Bundles.get("text.sector.unexplored") : "")));
+        (selected.x + ", " + selected.y + (!selected.complete && selected.saveID != -1 ? " " + Bundles.get("text.sector.locked") : ""))
+                + (selected.saveID == -1 ? " " + Bundles.get("text.sector.unexplored") :
+                    (selected.hasSave() ? " [accent]/[white] " + Bundles.format("text.sector.time", selected.getSave().getPlayTime()) : ""))));
         content().row();
         content().add(new SectorView()).grow();
         content().row();
@@ -56,7 +57,7 @@ public class SectorsDialog extends FloatingDialog{
                     logic.play();
                 }
             });
-        }).size(230f, 64f).name("deploy-button").disabled(b -> selected == null || !selected.unlocked);
+        }).size(230f, 64f).name("deploy-button").disabled(b -> selected == null);
     }
 
     void selectSector(Sector sector){
@@ -148,7 +149,7 @@ public class SectorsDialog extends FloatingDialog{
                             selectSector(sector);
                         }
                         Draw.color(Palette.remove);
-                    }else if (sector.unlocked){
+                    }else if (sector.complete){
                         Draw.color(Palette.accent);
                     }else{
                         Draw.color(Color.LIGHT_GRAY);
