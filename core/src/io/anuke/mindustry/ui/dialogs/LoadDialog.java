@@ -124,6 +124,8 @@ public class LoadDialog extends FloatingDialog{
             button.row();
             button.label(() -> Bundles.format("text.save.autosave", color + Bundles.get(slot.isAutosave() ? "text.on" : "text.off")));
             button.row();
+            button.label(() -> Bundles.format("text.save.playtime", color + slot.getPlayTime()));
+            button.row();
             button.add(Bundles.format("text.save.date", color + slot.getDate())).colspan(2).padTop(5).right();
             button.row();
             modifyButton(button, slot);

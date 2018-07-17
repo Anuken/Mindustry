@@ -2,6 +2,7 @@ package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.io.SaveIO;
@@ -10,6 +11,7 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.ThreadArray;
 
 import java.io.IOException;
@@ -23,6 +25,9 @@ public class Saves{
     private boolean saving;
     private float time;
 
+    private long totalPlaytime;
+    private long lastTimestamp;
+
     public Saves(){
         Events.on(StateChangeEvent.class, (prev, state) -> {
             if(state == State.menu){
@@ -35,8 +40,7 @@ public class Saves{
         saves.clear();
         int[] slots = Settings.getJson("save-slots", int[].class);
 
-        for(int i = 0; i < slots.length; i++){
-            int index = slots[i];
+        for(int index : slots){
             if(SaveIO.isSaveValid(index)){
                 SaveSlot slot = new SaveSlot(index);
                 saves.add(slot);
@@ -52,6 +56,14 @@ public class Saves{
 
     public void update(){
         SaveSlot current = this.current;
+
+        if(current != null && !state.is(State.menu)
+            && !(state.isPaused() && ui.hasDialog())){
+            if(lastTimestamp != 0){
+                totalPlaytime += TimeUtils.timeSinceMillis(lastTimestamp);
+            }
+            lastTimestamp = TimeUtils.millis();
+        }
 
         if(!state.is(State.menu) && !state.gameOver && current != null && current.isAutosave()){
             time += Timers.delta();
@@ -73,6 +85,10 @@ public class Saves{
         }else{
             time = 0;
         }
+    }
+
+    public long getTotalPlaytime(){
+        return totalPlaytime;
     }
 
     public void resetSave(){
@@ -132,12 +148,17 @@ public class Saves{
             SaveIO.loadFromSlot(index);
             meta = SaveIO.getData(index);
             current = this;
+            totalPlaytime = meta.timePlayed;
         }
 
         public void save(){
             SaveIO.saveToSlot(index);
             meta = SaveIO.getData(index);
             current = this;
+        }
+
+        public String getPlayTime(){
+            return Strings.formatMillis(current == this ? totalPlaytime : meta.timePlayed);
         }
 
         public String getDate(){

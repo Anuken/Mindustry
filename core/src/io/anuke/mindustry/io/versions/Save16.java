@@ -25,8 +25,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Save16 extends SaveFileVersion{
 
@@ -37,6 +36,7 @@ public class Save16 extends SaveFileVersion{
     @Override
     public void read(DataInputStream stream) throws IOException{
         stream.readLong(); //time
+        stream.readLong(); //total playtime
         stream.readInt(); //build
 
         //general state
@@ -154,6 +154,7 @@ public class Save16 extends SaveFileVersion{
         //--META--
         stream.writeInt(version); //version id
         stream.writeLong(TimeUtils.millis()); //last saved
+        stream.writeLong(headless ? 0 : control.getSaves().getTotalPlaytime()); //playtime
         stream.writeInt(Version.build); //build
 
         //--GENERAL STATE--

@@ -21,7 +21,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             health = 70;
             result = Items.carbide;
             craftTime = 45f;
-            burnDuration = 46f;
+            burnDuration = 45f;
             useFlux = true;
 
             consumes.items(new ItemStack[]{new ItemStack(Items.tungsten, 3)});

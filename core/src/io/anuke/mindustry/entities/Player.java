@@ -283,7 +283,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void draw(){
         if((debug && (!showPlayer || !showUI)) || dead) return;
 
-        if(!movement.isZero() && moved){
+        if(!movement.isZero() && moved && !state.isPaused()){
             walktime += Timers.delta() * movement.len() / 0.7f * getFloorOn().speedMultiplier;
             baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
         }
