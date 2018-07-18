@@ -53,10 +53,10 @@ public class Logic extends Module{
 
         for(TeamData team : state.teams.getTeams()){
             for(Tile tile : team.cores){
-                if(debug){
+                if(true){
                     for(Item item : Item.all()){
                         if(item.type == ItemType.material){
-                            tile.entity.items.add(item, 1000);
+                            tile.entity.items.set(item, 1000);
                         }
                     }
                 }else{

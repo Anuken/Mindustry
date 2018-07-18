@@ -19,6 +19,8 @@ public class Sector{
     public transient Texture texture;
     /**Goal of this sector-- what needs to be accomplished to unlock it.*/
     public transient Goal goal = new WaveGoal(30);
+    /**Sector size; if more than 1, the coordinates are the bottom left corner.*/
+    public int size = 1;
 
     public SaveSlot getSave(){
         return control.getSaves().getByID(saveID);

@@ -199,7 +199,7 @@ public class CoreBlock extends StorageBlock{
         if(entity.currentUnit != null){
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += Timers.delta();
-            entity.progress += 1f / (entity.currentUnit instanceof Player ? respawnduration : droneRespawnDuration);
+            entity.progress += 1f / (entity.currentUnit instanceof Player ? respawnduration : droneRespawnDuration) * Timers.delta();
 
             //instant build for fast testing.
             if(debug){

@@ -1,12 +1,13 @@
 package io.anuke.mindustry.editor;
 
 import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.ucore.function.IntPositionConsumer;
 import io.anuke.ucore.util.Bits;
 
 import static io.anuke.mindustry.Vars.ui;
@@ -73,6 +74,12 @@ public enum EditorTool{
             edit = true;
         }
 
+        IntArray stack = new IntArray();
+        int width;
+        byte be, dest;
+        boolean floor;
+        MapTileData data;
+
         public void touched(MapEditor editor, int x, int y){
             if(editor.getDrawBlock().isMultiblock()){
                 //don't fill multiblocks, thanks
@@ -80,20 +87,75 @@ public enum EditorTool{
                 return;
             }
 
-            boolean floor = editor.getDrawBlock() instanceof Floor;
+            data = editor.getMap();
 
-            byte bf = editor.getMap().read(x, y, DataPosition.floor);
-            byte bw = editor.getMap().read(x, y, DataPosition.wall);
-            byte be = editor.getMap().read(x, y, DataPosition.elevation);
+            floor = editor.getDrawBlock() instanceof Floor;
+
+            byte bf = data.read(x, y, DataPosition.floor);
+            byte bw = data.read(x, y, DataPosition.wall);
+            be = data.read(x, y, DataPosition.elevation);
             boolean synth = editor.getDrawBlock().synthetic();
             byte brt = Bits.packByte((byte) editor.getDrawRotation(), (byte) editor.getDrawTeam().ordinal());
 
-            byte dest = floor ? bf : bw;
+            dest = floor ? bf : bw;
             byte draw = (byte) editor.getDrawBlock().id;
 
-            int width = editor.getMap().width();
+            width = editor.getMap().width();
             int height = editor.getMap().height();
 
+            int x1;
+            boolean spanAbove, spanBelow;
+
+            stack.clear();
+
+            stack.add(asi(x, y));
+
+            IntPositionConsumer writer = (px, py) -> {
+                TileDataMarker prev = editor.getPrev(px, py, false);
+
+                if(floor){
+                    data.write(px, py, DataPosition.floor, draw);
+                }else{
+                    data.write(px, py, DataPosition.wall, draw);
+                }
+
+                if(synth){
+                    data.write(px, py, DataPosition.rotationTeam, brt);
+                }
+
+                editor.onWrite(px, py, prev);
+            };
+
+            while(stack.size > 0){
+                int popped = stack.pop();
+                x = popped % width;
+                y = popped / width;
+
+                x1 = x;
+                while(x1 >= 0 && eq(x1, y)) x1--;
+                x1++;
+                spanAbove = spanBelow = false;
+                while(x1 < width && eq(x1, y)){
+                    writer.accept(x1, y);
+
+                    if(!spanAbove && y > 0 && eq(x1, y - 1)){
+                        stack.add(asi(x1, y - 1));
+                        spanAbove = true;
+                    }else if(spanAbove && y > 0 && eq(x1, y - 1)){
+                        spanAbove = false;
+                    }
+
+                    if(!spanBelow && y < height - 1 && eq(x1, y + 1)){
+                        stack.add(asi(x1, y + 1));
+                        spanBelow = true;
+                    }else if(spanBelow && y < height - 1 && eq(x1, y + 1)){
+                        spanBelow = false;
+                    }
+                    x1++;
+                }
+            }
+
+            /*
             IntSet set = new IntSet();
             IntArray points = new IntArray();
             points.add(asInt(x, y, editor.getMap().width()));
@@ -129,9 +191,18 @@ public enum EditorTool{
                     editor.onWrite(px, py, prev);
                 }
             }
+            */
         }
 
-        int asInt(int x, int y, int width){
+        boolean eq(int px, int py){
+            byte nbf = data.read(px, py, DataPosition.floor);
+            byte nbw = data.read(px, py, DataPosition.wall);
+            byte nbe = data.read(px, py, DataPosition.elevation);
+
+            return (floor ? nbf : nbw) == dest && nbe == be;
+        }
+
+        int asi(int x, int y){
             return x + y * width;
         }
     },

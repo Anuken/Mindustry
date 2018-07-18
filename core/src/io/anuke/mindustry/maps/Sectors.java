@@ -16,6 +16,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Sectors{
     private static final int sectorImageSize = 16;
+    private static final float sectorLargeChance = 0.1f;
 
     private GridMap<Sector> grid = new GridMap<>();
 

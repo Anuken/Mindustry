@@ -111,9 +111,6 @@ public class MapRenderer implements Disposable{
         Block floor = Block.getByID(bf);
         Block wall = Block.getByID(bw);
 
-        int offsetx = -(wall.size - 1) / 2;
-        int offsety = -(wall.size - 1) / 2;
-
         TextureRegion region;
 
         if(bw != 0){
@@ -121,11 +118,12 @@ public class MapRenderer implements Disposable{
 
             if(wall.rotate){
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
-                        wx * tilesize + offsetx * tilesize, wy * tilesize + offsety * tilesize,
+                        wx * tilesize + wall.offset(), wy * tilesize + wall.offset(),
                         region.getRegionWidth(), region.getRegionHeight(), rotation * 90 - 90);
             }else{
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
-                        wx * tilesize + offsetx * tilesize, wy * tilesize + offsety * tilesize,
+                        wx * tilesize + wall.offset() + (tilesize - region.getRegionWidth())/2f,
+                        wy * tilesize + wall.offset() + (tilesize - region.getRegionHeight())/2f,
                         region.getRegionWidth(), region.getRegionHeight());
             }
         }else{
@@ -149,7 +147,7 @@ public class MapRenderer implements Disposable{
         }
 
         mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize, region,
-                wx * tilesize + offsetx * tilesize, wy * tilesize + offsety * tilesize,
+                wx * tilesize - (wall.size/3) * tilesize, wy * tilesize - (wall.size/3) * tilesize,
                 region.getRegionWidth(), region.getRegionHeight());
         mesh.setColor(Color.WHITE);
     }

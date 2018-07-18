@@ -191,12 +191,14 @@ public class BuildBlock extends Block{
         public int builderID = -1;
 
         private float[] accumulator;
+        private float[] totalAccumulator;
 
         public void construct(Unit builder, TileEntity core, float amount){
             float maxProgress = checkRequired(core.items, amount, false);
 
             for(int i = 0; i < recipe.requirements.length; i++){
-                accumulator[i] += recipe.requirements[i].amount * maxProgress; //add min amount progressed to the accumulator
+                accumulator[i] += Math.min(recipe.requirements[i].amount * maxProgress, recipe.requirements[i].amount - totalAccumulator[i] + 0.00001f); //add min amount progressed to the accumulator
+                totalAccumulator[i] = Math.min(totalAccumulator[i] + recipe.requirements[i].amount * maxProgress, recipe.requirements[i].amount);
             }
 
             maxProgress = checkRequired(core.items, maxProgress, true);
@@ -219,7 +221,9 @@ public class BuildBlock extends Block{
                 ItemStack[] requirements = recipe.requirements;
 
                 for(int i = 0; i < requirements.length; i++){
-                    accumulator[i] += requirements[i].amount * amount / 2f; //add scaled amount progressed to the accumulator
+                    accumulator[i] += Math.min(requirements[i].amount * amount / 2f, requirements[i].amount/2f - totalAccumulator[i]); //add scaled amount progressed to the accumulator
+                    totalAccumulator[i] = Math.min(totalAccumulator[i] + requirements[i].amount * amount / 2f, requirements[i].amount);
+
                     int accumulated = (int) (accumulator[i]); //get amount
 
                     if(amount > 0){ //if it's positive, add it to the core
@@ -255,6 +259,7 @@ public class BuildBlock extends Block{
                     //move max progress down if this fraction is less than 1
                     maxProgress = Math.min(maxProgress, maxProgress * fraction);
 
+                    //TODO uncomment?
                     accumulator[i] -= maxUse;
 
                     //remove stuff that is actually used
@@ -276,6 +281,7 @@ public class BuildBlock extends Block{
             this.recipe = recipe;
             this.previous = previous;
             this.accumulator = new float[recipe.requirements.length];
+            this.totalAccumulator = new float[recipe.requirements.length];
             this.buildCost = recipe.cost;
         }
 
@@ -285,6 +291,7 @@ public class BuildBlock extends Block{
             if(Recipe.getByResult(previous) != null){
                 this.recipe = Recipe.getByResult(previous);
                 this.accumulator = new float[Recipe.getByResult(previous).requirements.length];
+                this.totalAccumulator = new float[Recipe.getByResult(previous).requirements.length];
                 this.buildCost = Recipe.getByResult(previous).cost;
             }else{
                 this.buildCost = 20f; //default no-recipe build cost is 20
@@ -301,8 +308,9 @@ public class BuildBlock extends Block{
                 stream.writeByte(-1);
             }else{
                 stream.writeByte(accumulator.length);
-                for(float d : accumulator){
-                    stream.writeFloat(d);
+                for(int i = 0; i < accumulator.length; i++){
+                    stream.writeFloat(accumulator[i]);
+                    stream.writeFloat(totalAccumulator[i]);
                 }
             }
         }
@@ -316,8 +324,10 @@ public class BuildBlock extends Block{
 
             if(acsize != -1){
                 accumulator = new float[acsize];
+                totalAccumulator = new float[acsize];
                 for(int i = 0; i < acsize; i++){
                     accumulator[i] = stream.readFloat();
+                    totalAccumulator[i] = stream.readFloat();
                 }
             }
 
