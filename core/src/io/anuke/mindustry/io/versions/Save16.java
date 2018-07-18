@@ -9,9 +9,9 @@ import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.io.SaveFileVersion;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
@@ -38,13 +38,15 @@ public class Save16 extends SaveFileVersion{
         stream.readLong(); //time
         stream.readLong(); //total playtime
         stream.readInt(); //build
-        stream.readInt(); //sector ID
+        int sector = stream.readInt(); //sector ID
 
         //general state
         byte mode = stream.readByte();
         String mapname = stream.readUTF();
         Map map = world.maps().getByName(mapname);
         world.setMap(map);
+
+        world.setSector(world.sectors().get(sector));
 
         int wave = stream.readInt();
         byte difficulty = stream.readByte();

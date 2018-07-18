@@ -59,6 +59,10 @@ public class SectorsDialog extends FloatingDialog{
                 }
             });
         }).size(230f, 64f).name("deploy-button").disabled(b -> selected == null);
+
+        if(debug){
+            buttons().addButton("unlock",  () -> world.sectors().completeSector(selected.x, selected.y)).size(230f, 64f).disabled(b -> selected == null);
+        }
     }
 
     void selectSector(Sector sector){
@@ -67,11 +71,11 @@ public class SectorsDialog extends FloatingDialog{
     }
 
     class SectorView extends Element{
-        float panX, panY;
         float lastX, lastY;
         float sectorSize = 100f;
         float sectorPadding = 14f;
         boolean clicked = false;
+        float panX = -sectorPadding/2f, panY = -sectorSize/2f;
 
         SectorView(){
             addListener(new InputListener(){
@@ -132,10 +136,19 @@ public class SectorsDialog extends FloatingDialog{
                     float drawY = y + height/2f + sectorY * padSectorSize - offsetY * padSectorSize - panY % padSectorSize;
 
                     Sector sector = world.sectors().get(sectorX, sectorY);
+                    int size = (sector == null ? 1 : sector.size);
+                    float padding = (size-1) * sectorPadding;
+
+                    if(sector != null && (sector.x != sectorX || sector.y != sectorY)){
+                        continue;
+                    }
+
+                    drawX += (size-1)/2f*padSectorSize;
+                    drawY += (size-1)/2f*padSectorSize;
 
                     if(sector != null && sector.texture != null){
                         Draw.color(Color.WHITE);
-                        Draw.rect(sector.texture, drawX, drawY, sectorSize, sectorSize);
+                        Draw.rect(sector.texture, drawX, drawY, sectorSize * size + padding, sectorSize * size + padding);
                     }
 
                     float stroke = 4f;
@@ -145,7 +158,8 @@ public class SectorsDialog extends FloatingDialog{
                     }else if(sector == selected){
                         Draw.color(Palette.place);
                         stroke = 6f;
-                    }else if(Mathf.inRect(mouse.x, mouse.y, drawX - padSectorSize/2f, drawY - padSectorSize/2f, drawX + padSectorSize/2f, drawY + padSectorSize/2f)){
+                    }else if(Mathf.inRect(mouse.x, mouse.y, drawX - padSectorSize/2f * size, drawY - padSectorSize/2f * size,
+                                                            drawX + padSectorSize/2f * size, drawY + padSectorSize/2f * size)){
                         if(clicked){
                             selectSector(sector);
                         }
@@ -157,7 +171,7 @@ public class SectorsDialog extends FloatingDialog{
                     }
 
                     Lines.stroke(stroke);
-                    Lines.crect(drawX, drawY, sectorSize, sectorSize, (int)stroke);
+                    Lines.crect(drawX, drawY, sectorSize * size + padding, sectorSize * size + padding, (int)stroke);
                 }
             }
 

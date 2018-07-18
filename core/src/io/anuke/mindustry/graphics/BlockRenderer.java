@@ -31,9 +31,7 @@ public class BlockRenderer{
         }
     }
 
-    /**
-     * Process all blocks to draw, simultaneously drawing block shadows and static blocks.
-     */
+    /**Process all blocks to draw, simultaneously drawing block shadows.*/
     public void processBlocks(){
         requestidx = 0;
         lastLayer = null;

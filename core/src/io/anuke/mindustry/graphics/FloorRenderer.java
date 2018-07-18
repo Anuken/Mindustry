@@ -17,6 +17,7 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
@@ -28,6 +29,7 @@ import static io.anuke.mindustry.Vars.world;
 public class FloorRenderer{
     private final static int chunksize = 64;
 
+    private int gutter;
     private Chunk[][] cache;
     private CacheBatch cbatch;
     private IntSet drawnLayerSet = new IntSet();
@@ -76,15 +78,18 @@ public class FloorRenderer{
         int crangex = (int) (camera.viewportWidth * camera.zoom / (chunksize * tilesize)) + 1;
         int crangey = (int) (camera.viewportHeight * camera.zoom / (chunksize * tilesize)) + 1;
 
+        int camx = Mathf.scl(camera.position.x, chunksize * tilesize);
+        int camy = Mathf.scl(camera.position.y, chunksize * tilesize);
+
         for(int x = -crangex; x <= crangex; x++){
             for(int y = -crangey; y <= crangey; y++){
-                int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
-                int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
+                int worldx = camx + x;
+                int worldy = camy + y;
 
                 if(!Mathf.inBounds(worldx, worldy, cache))
                     continue;
 
-                fillChunk(worldx * chunksize * tilesize, worldy * chunksize * tilesize);
+                fillChunk((worldx) * chunksize * tilesize, (worldy) * chunksize * tilesize);
             }
         }
 
@@ -96,8 +101,8 @@ public class FloorRenderer{
         //preliminary layer check
         for(int x = -crangex; x <= crangex; x++){
             for(int y = -crangey; y <= crangey; y++){
-                int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
-                int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
+                int worldx = camx + x;
+                int worldy = camy + y;
 
                 if(!Mathf.inBounds(worldx, worldy, cache))
                     continue;
@@ -184,7 +189,7 @@ public class FloorRenderer{
 
     private void fillChunk(float x, float y){
         Draw.color(Color.GRAY);
-        Draw.crect("white", x, y, chunksize * tilesize, chunksize * tilesize);
+        Fill.crect(x, y, chunksize * tilesize, chunksize * tilesize);
         Draw.color();
     }
 
@@ -195,7 +200,7 @@ public class FloorRenderer{
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
-                Tile tile = world.tile(tilex, tiley);
+                Tile tile = world.tile(tilex - gutter, tiley - gutter);
                 if(tile != null){
                     used.add(tile.floor().cacheLayer);
                 }
@@ -214,8 +219,11 @@ public class FloorRenderer{
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
-                Tile tile = world.tile(tilex, tiley);
-                if(tile == null) continue;
+                Tile tile = world.tile(tilex - gutter, tiley - gutter);
+                if(tile == null){
+                    Fill.rect((tilex - gutter) * tilesize, (tiley - gutter) * tilesize, tilesize, tilesize);
+                    continue;
+                }
 
                 if(tile.floor().cacheLayer == layer){
                     tile.floor().draw(tile);
@@ -235,7 +243,14 @@ public class FloorRenderer{
 
         Timers.mark();
 
-        int chunksx = Mathf.ceil((float) world.width() / chunksize), chunksy = Mathf.ceil((float) world.height() / chunksize);
+        if(world.getSector() != null){
+            gutter = 32;
+        }else{
+            gutter = 0;
+        }
+
+        int chunksx = Mathf.ceil((float) (world.width() + gutter) / chunksize),
+            chunksy = Mathf.ceil((float) (world.height() + gutter) / chunksize) ;
         cache = new Chunk[chunksx][chunksy];
         cbatch = new CacheBatch(world.width() * world.height() * 4 * 4);
 

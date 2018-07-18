@@ -111,6 +111,10 @@ public class World extends Module{
         return currentSector;
     }
 
+    public void setSector(Sector currentSector){
+        this.currentSector = currentSector;
+    }
+
     public void setMap(Map map){
         this.currentMap = map;
     }
@@ -222,7 +226,7 @@ public class World extends Module{
 
         beginMapLoad();
 
-        int width = sectorSize, height = sectorSize;
+        int width = sectorSize * sector.size, height = sectorSize * sector.size;
 
         Tile[][] tiles = createTiles(width, height);
 

@@ -8,15 +8,17 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.world.ColorMapper;
+import io.anuke.mindustry.world.Edges;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.GridMap;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class Sectors{
     private static final int sectorImageSize = 16;
-    private static final float sectorLargeChance = 0.1f;
+    private static final float sectorLargeChance = 0.15f;
 
     private GridMap<Sector> grid = new GridMap<>();
 
@@ -29,26 +31,43 @@ public class Sectors{
         return grid.get(x, y);
     }
 
+    public Sector get(int position){
+        return grid.get(Bits.getLeftShort(position), Bits.getRightShort(position));
+    }
+
     /**Unlocks a sector. This shows nearby sectors.*/
     public void completeSector(int x, int y){
         createSector(x, y);
         Sector sector = get(x, y);
         sector.complete = true;
 
-        for(GridPoint2 point : Geometry.d4){
+        for(GridPoint2 point : Edges.getEdges(sector.size)){
             createSector(sector.x + point.x, sector.y + point.y);
         }
     }
 
     /**Creates a sector at a location if it is not present, but does not unlock it.*/
     public void createSector(int x, int y){
+        boolean isLarge = Mathf.randomSeed(Bits.packInt((short)round2(x), (short)round2(y))) < sectorLargeChance;
+
+        if(isLarge){
+            x = round2(x);
+            y = round2(y);
+        }
+
         if(grid.containsKey(x, y)) return;
 
         Sector sector = new Sector();
         sector.x = (short)x;
         sector.y = (short)y;
         sector.complete = false;
-        grid.put(x, y, sector);
+        sector.size = isLarge ? 2 : 1;
+
+        for(int cx = 0; cx < sector.size; cx++){
+            for(int cy = 0; cy < sector.size; cy++){
+                grid.put(x + cx, y + cy, sector);
+            }
+        }
 
         if(sector.texture == null) createTexture(sector);
     }
@@ -58,7 +77,11 @@ public class Sectors{
 
         for(Sector sector : out){
             createTexture(sector);
-            grid.put(sector.x, sector.y, sector);
+            for(int cx = 0; cx < sector.size; cx++){
+                for(int cy = 0; cy < sector.size; cy++){
+                    grid.put(sector.x + cx, sector.y + cy, sector);
+                }
+            }
         }
 
         if(out.size == 0){
@@ -77,20 +100,27 @@ public class Sectors{
         Settings.save();
     }
 
+    private int round2(int i){
+        if(i < 0){
+            i --;
+        }
+        return i/2*2;
+    }
+
     private void createTexture(Sector sector){
         if(headless) return; //obviously not created or needed on server
 
-        Pixmap pixmap = new Pixmap(sectorImageSize, sectorImageSize, Format.RGBA8888);
+        Pixmap pixmap = new Pixmap(sectorImageSize * sector.size, sectorImageSize * sector.size, Format.RGBA8888);
 
-        for(int x = 0; x < sectorImageSize; x++){
-            for(int y = 0; y < sectorImageSize; y++){
+        for(int x = 0; x < pixmap.getWidth(); x++){
+            for(int y = 0; y < pixmap.getHeight(); y++){
                 int toX = x * sectorSize / sectorImageSize;
                 int toY = y * sectorSize / sectorImageSize;
 
                 GenResult result = world.generator().generateTile(sector.x, sector.y, toX, toY);
 
                 int color = ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation);
-                pixmap.drawPixel(x, sectorImageSize - 1 - y, color);
+                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, color);
             }
         }
 
