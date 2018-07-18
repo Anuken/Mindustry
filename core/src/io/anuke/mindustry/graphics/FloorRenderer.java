@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Events;
@@ -94,7 +93,7 @@ public class FloorRenderer{
         drawnLayers.clear();
         drawnLayerSet.clear();
 
-        //preliminary layer check:
+        //preliminary layer check
         for(int x = -crangex; x <= crangex; x++){
             for(int y = -crangey; y <= crangey; y++){
                 int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
@@ -106,7 +105,7 @@ public class FloorRenderer{
                 Chunk chunk = cache[worldx][worldy];
 
                 //loop through all layers, and add layer index if it exists
-                for(int i = 0; i < layers - 1; i++){
+                for(int i = 0; i < layers; i++){
                     if(chunk.caches[i] != -1){
                         drawnLayerSet.add(i);
                     }
@@ -191,7 +190,6 @@ public class FloorRenderer{
 
     private void cacheChunk(int cx, int cy){
         Chunk chunk = cache[cx][cy];
-        //long time = TimeUtils.nanoTime();
 
         ObjectSet<CacheLayer> used = new ObjectSet<>();
 
@@ -199,8 +197,7 @@ public class FloorRenderer{
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
                 Tile tile = world.tile(tilex, tiley);
                 if(tile != null){
-                    used.add(tile.block().cacheLayer == CacheLayer.walls ?
-                            CacheLayer.walls : tile.floor().cacheLayer);
+                    used.add(tile.floor().cacheLayer);
                 }
             }
         }
@@ -208,8 +205,6 @@ public class FloorRenderer{
         for(CacheLayer layer : used){
             cacheChunkLayer(cx, cy, chunk, layer);
         }
-
-        // Log.info("Time to cache a chunk: {0}", TimeUtils.timeSinceNanos(time) / 1000000f);
     }
 
     private void cacheChunkLayer(int cx, int cy, Chunk chunk, CacheLayer layer){
@@ -222,15 +217,10 @@ public class FloorRenderer{
                 Tile tile = world.tile(tilex, tiley);
                 if(tile == null) continue;
 
-                if(tile.floor().cacheLayer == layer && tile.block().cacheLayer != CacheLayer.walls){
+                if(tile.floor().cacheLayer == layer){
                     tile.floor().draw(tile);
-                }else if(tile.floor().cacheLayer.ordinal() < layer.ordinal() && tile.block().cacheLayer != CacheLayer.walls && layer != CacheLayer.walls){
+                }else if(tile.floor().cacheLayer.ordinal() < layer.ordinal()){
                     tile.floor().drawNonLayer(tile);
-                }
-
-                if(tile.block().cacheLayer == layer && layer == CacheLayer.walls){
-                    Block block = tile.block();
-                    block.draw(tile);
                 }
             }
         }

@@ -4,41 +4,28 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.BlockPart;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.Rock;
-import io.anuke.mindustry.world.blocks.StaticBlock;
 import io.anuke.ucore.core.Settings;
 
 import static io.anuke.mindustry.Vars.headless;
-import static io.anuke.mindustry.Vars.world;
 
 public class Administration{
     public static final int defaultMaxBrokenBlocks = 15;
     public static final int defaultBreakCooldown = 1000 * 15;
 
-    /**
-     * All player info. Maps UUIDs to info. This persists throughout restarts.
-     */
+    /**All player info. Maps UUIDs to info. This persists throughout restarts.*/
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
-    /**
-     * Maps UUIDs to trace infos. This is wiped when a player logs off.
-     */
+    /**Maps UUIDs to trace infos. This is wiped when a player logs off.*/
     private ObjectMap<String, TraceInfo> traceInfo = new ObjectMap<>();
-    /**
-     * Maps packed coordinates to logs for that coordinate
-     */
+    /** Maps packed coordinates to logs for that coordinate*/
     private IntMap<Array<EditLog>> editLogs = new IntMap<>();
 
     private Array<String> bannedIPs = new Array<>();
 
     public Administration(){
         Settings.defaultList(
-                "antigrief", false,
-                "antigrief-max", defaultMaxBrokenBlocks,
-                "antigrief-cooldown", defaultBreakCooldown
+            "antigrief", false,
+            "antigrief-max", defaultMaxBrokenBlocks,
+            "antigrief-cooldown", defaultBreakCooldown
         );
 
         load();
@@ -74,18 +61,6 @@ public class Administration{
 
     public IntMap<Array<EditLog>> getEditLogs(){
         return editLogs;
-    }
-
-    public void logEdit(int x, int y, Player player, Block block, int rotation, EditLog.EditAction action){
-        if(block instanceof BlockPart || block instanceof Rock || block instanceof Floor || block instanceof StaticBlock)
-            return;
-        if(editLogs.containsKey(x + y * world.width())){
-            editLogs.get(x + y * world.width()).add(new EditLog(player.name, block, rotation, action));
-        }else{
-            Array<EditLog> logs = new Array<>();
-            logs.add(new EditLog(player.name, block, rotation, action));
-            editLogs.put(x + y * world.width(), logs);
-        }
     }
 
     /*

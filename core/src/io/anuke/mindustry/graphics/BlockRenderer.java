@@ -6,7 +6,6 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.StaticBlock;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
@@ -68,23 +67,22 @@ public class BlockRenderer{
                             tile.block().drawShadow(tile);
                         }
 
-                        if(!(block instanceof StaticBlock)){
-                            if(block != Blocks.air){
-                                if(!expanded){
-                                    addRequest(tile, Layer.block);
+                        if(block != Blocks.air){
+                            if(!expanded){
+                                addRequest(tile, Layer.block);
+                            }
+
+                            if(block.expanded || !expanded){
+                                if(block.layer != null && block.isLayer(tile)){
+                                    addRequest(tile, block.layer);
                                 }
 
-                                if(block.expanded || !expanded){
-                                    if(block.layer != null && block.isLayer(tile)){
-                                        addRequest(tile, block.layer);
-                                    }
-
-                                    if(block.layer2 != null && block.isLayer2(tile)){
-                                        addRequest(tile, block.layer2);
-                                    }
+                                if(block.layer2 != null && block.isLayer2(tile)){
+                                    addRequest(tile, block.layer2);
                                 }
                             }
                         }
+
                     }
                 }
             }
@@ -94,12 +92,6 @@ public class BlockRenderer{
         Draw.color(0, 0, 0, 0.15f);
         Graphics.flushSurface();
         Draw.color();
-
-        Graphics.end();
-        floorRenderer.beginDraw();
-        floorRenderer.drawLayer(CacheLayer.walls);
-        floorRenderer.endDraw();
-        Graphics.begin();
 
         Sort.instance().sort(requests.items, 0, requestidx);
         iterateidx = 0;

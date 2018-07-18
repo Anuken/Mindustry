@@ -228,7 +228,7 @@ public class UI extends SceneModule{
     }
 
     public void loadLogic(String text, Runnable call){
-        loadfrag.show();
+        loadfrag.show(text);
         Timers.runTask(7f, () -> {
             threads.run(() -> {
                 call.run();

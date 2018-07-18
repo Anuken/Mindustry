@@ -53,8 +53,7 @@ public enum CacheLayer{
             endShader(Shaders.space);
         }
     },
-    normal,
-    walls;
+    normal;
 
     public void begin(){
 
