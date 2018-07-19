@@ -70,10 +70,10 @@ public class Control extends Module{
 
         gdxInput = Gdx.input;
 
-        Sounds.load("shoot.mp3", "place.mp3", "explosion.mp3", "enemyshoot.mp3",
-                "corexplode.mp3", "break.mp3", "spawn.mp3", "flame.mp3", "die.mp3",
-                "respawn.mp3", "purchase.mp3", "flame2.mp3", "bigshot.mp3", "laser.mp3", "lasershot.mp3",
-                "ping.mp3", "tesla.mp3", "waveend.mp3", "railgun.mp3", "blast.mp3", "bang2.mp3");
+        //Sounds.load("shoot.mp3", "place.mp3", "explosion.mp3", "enemyshoot.mp3",
+        //        "corexplode.mp3", "break.mp3", "spawn.mp3", "flame.mp3", "die.mp3",
+        //        "respawn.mp3", "purchase.mp3", "flame2.mp3", "bigshot.mp3", "laser.mp3", "lasershot.mp3",
+        //        "ping.mp3", "tesla.mp3", "waveend.mp3", "railgun.mp3", "blast.mp3", "bang2.mp3");
 
         Sounds.setFalloff(9000f);
         Sounds.setPlayer((sound, volume) -> {
@@ -86,7 +86,7 @@ public class Control extends Module{
             }
         });
 
-        Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3");
+        //Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3");
 
         DefaultKeybinds.load();
 
@@ -318,7 +318,7 @@ public class Control extends Module{
                 dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
                 dialog.content().add("The beta version you are about to play should be considered very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
                         "A large portion of content is still unimplemented. \nAll current art and UI is temporary, and will be re-drawn before release. " +
-                        "\n\n[accent]Saves and maps may be corrupted without warning between updates.[] You have been warned!").wrap().width(500f);
+                        "\n\n[accent]Saves and maps may be corrupted without warning between updates.[] You have been warned!").wrap().width(400f);
                 dialog.show();
 
             });
@@ -330,7 +330,7 @@ public class Control extends Module{
             Timers.run(4f, () -> {
                 FloatingDialog dialog = new FloatingDialog("[orange]Attention![]");
                 dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
-                dialog.content().add("You might have noticed that 4.0 does not have any sound.\nThis is [orange]intentional![] Sound will be added in a later update.\n\n[LIGHT_GRAY](now stop reporting this as a bug)").wrap().width(500f);
+                dialog.content().add("You might have noticed that 4.0 does not have any sound.\nThis is [orange]intentional![] Sound will be added in a later update.\n\n[LIGHT_GRAY](now stop reporting this as a bug)").wrap().width(400f);
                 dialog.show();
 
             });

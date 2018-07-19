@@ -443,9 +443,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //call tap events
         if(pointer == 0 && !selecting && mode == none){
-            if(!tileTapped(cursor.target()) && !tryTapPlayer(worldx, worldy)){
-                tryBeginMine(cursor);
-            }
+            tryTapPlayer(worldx, worldy);
         }
 
         return false;
@@ -567,6 +565,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             //add to selection queue if it's a valid BREAK position
             cursor = cursor.target();
             selection.add(new PlaceRequest(cursor.worldx(), cursor.worldy()));
+        }else if(!tileTapped(cursor.target()) && !canTapPlayer(worldx, worldy)){
+            tryBeginMine(cursor);
         }else{ //else, try and carry units
             if(player.getCarry() != null){
                 player.dropCarry(); //drop off unit

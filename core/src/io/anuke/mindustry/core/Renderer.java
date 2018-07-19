@@ -114,7 +114,7 @@ public class Renderer extends RendererModule{
         Cursors.loadCustom("drill");
         Cursors.loadCustom("unload");
 
-        clearColor = Hue.lightness(0.4f);
+        clearColor = Hue.lightness(0f);
         clearColor.a = 1f;
 
         background.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
@@ -157,6 +157,9 @@ public class Renderer extends RendererModule{
 
             if(world.getSector() == null){
                 clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, world.height() * tilesize - tilesize / 2f);
+            }else{
+                camera.position.x = Mathf.clamp(camera.position.x, -tilesize / 2f, world.width() * tilesize - tilesize / 2f);
+                camera.position.y = Mathf.clamp(camera.position.y, -tilesize / 2f, world.height() * tilesize - tilesize / 2f);
             }
 
             float prex = camera.position.x, prey = camera.position.y;
@@ -196,6 +199,8 @@ public class Renderer extends RendererModule{
         batch.setProjectionMatrix(camera.combined);
 
         Graphics.surface(pixelSurface, false);
+
+        Graphics.clear(clearColor);
 
         drawPadding();
 

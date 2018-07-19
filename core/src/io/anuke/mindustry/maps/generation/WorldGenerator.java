@@ -206,6 +206,10 @@ public class WorldGenerator{
     }
 
     public GenResult generateTile(int sectorX, int sectorY, int localX, int localY){
+        return generateTile(sectorX, sectorY, localX, localY, true);
+    }
+
+    public GenResult generateTile(int sectorX, int sectorY, int localX, int localY, boolean detailed){
         int x = sectorX * sectorSize + localX;
         int y = sectorY * sectorSize + localY;
 
@@ -243,7 +247,7 @@ public class WorldGenerator{
 
         if(dst < elevDip){
             elevation -= (elevDip - dst) / elevDip * 3.0;
-        }else if(r > 0.9){
+        }else if(detailed && r > 0.9){
             floor = Blocks.water;
             elevation = 0;
 
@@ -252,7 +256,7 @@ public class WorldGenerator{
             }
         }
 
-        if(wall == Blocks.air && decoration.containsKey(floor) && random.chance(0.03)){
+        if(detailed && wall == Blocks.air && decoration.containsKey(floor) && random.chance(0.03)){
             wall = decoration.get(floor);
         }
 

@@ -78,18 +78,6 @@ public class FloorRenderer{
         int camx = Mathf.scl(camera.position.x, chunksize * tilesize);
         int camy = Mathf.scl(camera.position.y, chunksize * tilesize);
 
-        for(int x = -crangex; x <= crangex; x++){
-            for(int y = -crangey; y <= crangey; y++){
-                int worldx = camx + x;
-                int worldy = camy + y;
-
-                if(!Mathf.inBounds(worldx, worldy, cache))
-                    continue;
-
-                fillChunk((worldx) * chunksize * tilesize, (worldy) * chunksize * tilesize);
-            }
-        }
-
         int layers = CacheLayer.values().length;
 
         drawnLayers.clear();
@@ -185,7 +173,7 @@ public class FloorRenderer{
     }
 
     private void fillChunk(float x, float y){
-        Draw.color(Color.GRAY);
+        Draw.color(Color.BLACK);
         Fill.crect(x, y, chunksize * tilesize, chunksize * tilesize);
         Draw.color();
     }
@@ -202,7 +190,7 @@ public class FloorRenderer{
                 Tile tile = world.tile(tilex - gutter, tiley - gutter);
                 Floor floor = null;
 
-                if(tile == null && sector != null){
+                if(tile == null && sector != null && tilex < world.width() + gutter*2 && tiley < world.height() + gutter*2){
                     GenResult result = world.generator().generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
                     floor = (Floor) result.floor;
                 }else if(tile != null){
@@ -233,7 +221,7 @@ public class FloorRenderer{
                 Floor floor;
 
                 if(tile == null){
-                    if(sector != null){
+                    if(sector != null && tilex < world.width() + gutter*2 && tiley < world.height() + gutter*2){
                         GenResult result = world.generator().generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
                         floor = (Floor)result.floor;
                         gutterTile.setFloor(floor);

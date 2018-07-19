@@ -117,7 +117,7 @@ public class Sectors{
                 int toX = x * sectorSize / sectorImageSize;
                 int toY = y * sectorSize / sectorImageSize;
 
-                GenResult result = world.generator().generateTile(sector.x, sector.y, toX, toY);
+                GenResult result = world.generator().generateTile(sector.x, sector.y, toX, toY, false);
 
                 int color = ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation);
                 pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, color);

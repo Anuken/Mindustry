@@ -164,9 +164,7 @@ public abstract class InputHandler extends InputAdapter{
         return false;
     }
 
-    /**
-     * Handles tile tap events that are not platform specific.
-     */
+    /**Handles tile tap events that are not platform specific.*/
     boolean tileTapped(Tile tile){
         tile = tile.target();
 
