@@ -72,7 +72,7 @@ public abstract class BaseBlock{
     }
 
     public void onProximityUpdate(Tile tile){
-        if(tile.entity != null) tile.entity.wakeUp();
+        if(tile.entity != null) tile.entity.noSleep();
     }
 
     public void handleItem(Item item, Tile tile, Tile source){

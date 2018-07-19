@@ -176,7 +176,7 @@ public class Conveyor extends Block{
     public void unitOn(Tile tile, Unit unit){
         ConveyorEntity entity = tile.entity();
 
-        entity.wakeUp();
+        entity.noSleep();
 
         float speed = this.speed * tilesize / 2.3f;
         float centerSpeed = 0.1f;
@@ -267,6 +267,8 @@ public class Conveyor extends Block{
 
         if(totalMoved/Timers.delta() <= 0.0001f){
             entity.sleep();
+        }else{
+            entity.noSleep();
         }
 
         if(minremove != Integer.MAX_VALUE) entity.convey.truncate(minremove);

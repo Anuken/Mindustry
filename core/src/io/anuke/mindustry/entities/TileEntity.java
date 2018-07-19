@@ -103,6 +103,17 @@ public class TileEntity extends BaseEntity implements TargetTrait{
      * If the entity was sleeping, this enables it. This also resets the sleep timer.
      */
     public void wakeUp(){
+        noSleep();
+
+        for(Tile tile : proximity){
+            if(tile.entity.isSleeping()){
+                tile.entity.wakeUp();
+            }
+        }
+    }
+
+    /**Call when this entity is updating. This wakes it up.*/
+    public void noSleep(){
         sleepTime = 0f;
         if(sleeping){
             add();

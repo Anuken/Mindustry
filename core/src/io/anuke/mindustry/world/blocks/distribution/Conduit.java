@@ -105,7 +105,7 @@ public class Conduit extends LiquidBlock{
 
         if(tile.entity.liquids.total() > 0.001f && tile.entity.timer.get(timerFlow, 1)){
             tryMoveLiquid(tile, tile.getNearby(tile.getRotation()), true, tile.entity.liquids.current());
-            entity.wakeUp();
+            entity.noSleep();
         }else{
             entity.sleep();
         }
