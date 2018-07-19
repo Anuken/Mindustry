@@ -216,8 +216,8 @@ public class WorldGenerator{
         Block floor = Blocks.stone;
         Block wall = Blocks.air;
 
-        double elevation = sim.octaveNoise2D(3, 0.5, 1f / 500, x, y) * 4.1 - 1;
-        double temp = sim3.octaveNoise2D(7, 0.54, 1f / 820f, x, y);
+        double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.5, 1f / 500, x, y) * 4.1 - 1;
+        double temp = sim3.octaveNoise2D(detailed ? 12 : 6, 0.54, 1f / 820f, x, y);
 
         double r = sim2.octaveNoise2D(1, 0.6, 1f / 70, x, y);
         double edgeDist = Math.max(sectorSize / 2, sectorSize / 2) - Math.max(Math.abs(x - sectorSize / 2), Math.abs(y - sectorSize / 2));

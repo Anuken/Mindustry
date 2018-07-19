@@ -31,22 +31,14 @@ public class DesktopInput extends InputHandler{
     //controller info
     private float controlx, controly;
     private boolean controlling;
-    /**
-     * Current cursor type.
-     */
+    /**Current cursor type.*/
     private CursorType cursorType = normal;
 
-    /**
-     * Position where the player started dragging a line.
-     */
+    /**Position where the player started dragging a line.*/
     private int selectX, selectY;
-    /**
-     * Whether selecting mode is active.
-     */
+    /**Whether selecting mode is active.*/
     private PlaceMode mode;
-    /**
-     * Animation scale for line.
-     */
+    /**Animation scale for line.*/
     private float selectScale;
 
     public DesktopInput(Player player){
@@ -54,9 +46,7 @@ public class DesktopInput extends InputHandler{
         this.section = "player_" + (player.playerIndex + 1);
     }
 
-    /**
-     * Draws a placement icon for a specific block.
-     */
+    /**Draws a placement icon for a specific block.*/
     void drawPlace(int x, int y, Block block, int rotation){
         if(validPlace(x, y, block, rotation)){
             Draw.color();

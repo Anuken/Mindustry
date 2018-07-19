@@ -63,6 +63,7 @@ public class PlayerListFragment extends Fragment{
 
                     menu.addButton("$text.server.bans", ui.bans::show).disabled(b -> Net.client());
                     menu.addButton("$text.server.admins", ui.admins::show).disabled(b -> Net.client());
+                    menu.addButton("$text.close", this::toggle);
                 }).margin(0f).pad(10f).growX();
 
             }).touchable(Touchable.enabled).margin(14f);
