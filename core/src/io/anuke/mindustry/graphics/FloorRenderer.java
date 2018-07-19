@@ -4,13 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
+import io.anuke.mindustry.maps.Sector;
+import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Graphics;
@@ -18,11 +20,13 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
+import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import java.util.Arrays;
 
+import static io.anuke.mindustry.Vars.mapPadding;
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
@@ -30,6 +34,8 @@ public class FloorRenderer{
     private final static int chunksize = 64;
 
     private int gutter;
+    private Tile gutterTile;
+    private Tile gutterNearTile = new Tile(0, 0);
     private Chunk[][] cache;
     private CacheBatch cbatch;
     private IntSet drawnLayerSet = new IntSet();
@@ -37,35 +43,26 @@ public class FloorRenderer{
 
     public FloorRenderer(){
         Events.on(WorldLoadGraphicsEvent.class, this::clearTiles);
-    }
 
-    static ShaderProgram createDefaultShader(){
-        String vertexShader = "attribute vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
-                + "attribute vec2 " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
-                + "uniform mat4 u_projTrans;\n" //
-                + "varying vec2 v_texCoords;\n" //
-                + "\n" //
-                + "void main()\n" //
-                + "{\n" //
-                + "   v_texCoords = " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
-                + "   gl_Position =  u_projTrans * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
-                + "}\n";
-        String fragmentShader = "#ifdef GL_ES\n" //
-                + "#define LOWP lowp\n" //
-                + "precision mediump float;\n" //
-                + "#else\n" //
-                + "#define LOWP \n" //
-                + "#endif\n" //
-                + "varying vec2 v_texCoords;\n" //
-                + "uniform sampler2D u_texture;\n" //
-                + "void main()\n"//
-                + "{\n" //
-                + "  gl_FragColor = texture2D(u_texture, v_texCoords);\n" //
-                + "}";
+        gutterTile = new Tile(0, 0){
+            @Override
+            public Tile getNearby(int dx, int dy){
+                Sector sec = world.getSector();
+                GenResult result = world.generator().generateTile(sec.x, sec.y, x + dx, y + dy);
+                gutterNearTile.x = (short)(x + dx);
+                gutterNearTile.y = (short)(y + dy);
+                gutterNearTile.setElevation(result.elevation);
+                gutterNearTile.setFloor((Floor)result.floor);
+                return gutterNearTile;
+            }
 
-        ShaderProgram shader = new ShaderProgram(vertexShader, fragmentShader);
-        if(!shader.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
-        return shader;
+            @Override
+            public Tile getNearby(int rotation){
+                int dx = Geometry.d4[rotation].x;
+                int dy = Geometry.d4[rotation].y;
+                return getNearby(dx, dy);
+            }
+        };
     }
 
     public void drawFloor(){
@@ -198,11 +195,22 @@ public class FloorRenderer{
 
         ObjectSet<CacheLayer> used = new ObjectSet<>();
 
+        Sector sector = world.getSector();
+
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
                 Tile tile = world.tile(tilex - gutter, tiley - gutter);
-                if(tile != null){
-                    used.add(tile.floor().cacheLayer);
+                Floor floor = null;
+
+                if(tile == null && sector != null){
+                    GenResult result = world.generator().generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
+                    floor = (Floor) result.floor;
+                }else if(tile != null){
+                    floor = tile.floor();
+                }
+
+                if(floor != null){
+                    used.add(floor.cacheLayer);
                 }
             }
         }
@@ -217,18 +225,34 @@ public class FloorRenderer{
         Graphics.useBatch(cbatch);
         cbatch.begin();
 
+        Sector sector = world.getSector();
+
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
                 Tile tile = world.tile(tilex - gutter, tiley - gutter);
+                Floor floor;
+
                 if(tile == null){
-                    Fill.rect((tilex - gutter) * tilesize, (tiley - gutter) * tilesize, tilesize, tilesize);
-                    continue;
+                    if(sector != null){
+                        GenResult result = world.generator().generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
+                        floor = (Floor)result.floor;
+                        gutterTile.setFloor(floor);
+                        gutterTile.x = (short)(tilex - gutter);
+                        gutterTile.y = (short)(tiley - gutter);
+                        gutterTile.setElevation(result.elevation);
+                        gutterTile.updateOcclusion();
+                        tile = gutterTile;
+                    }else{
+                        continue;
+                    }
+                }else{
+                    floor = tile.floor();
                 }
 
-                if(tile.floor().cacheLayer == layer){
-                    tile.floor().draw(tile);
-                }else if(tile.floor().cacheLayer.ordinal() < layer.ordinal()){
-                    tile.floor().drawNonLayer(tile);
+                if(floor.cacheLayer == layer){
+                    floor.draw(tile);
+                }else if(floor.cacheLayer.ordinal() < layer.ordinal()){
+                    floor.drawNonLayer(tile);
                 }
             }
         }
@@ -244,7 +268,7 @@ public class FloorRenderer{
         Timers.mark();
 
         if(world.getSector() != null){
-            gutter = 32;
+            gutter = mapPadding;
         }else{
             gutter = 0;
         }

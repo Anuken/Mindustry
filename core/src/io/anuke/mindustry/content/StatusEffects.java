@@ -48,7 +48,7 @@ public class StatusEffects implements ContentList{
         freezing = new StatusEffect(5 * 60f){
             {
                 oppositeScale = 0.4f;
-                speedMultiplier = 0.7f;
+                speedMultiplier = 0.5f;
             }
 
             @Override
@@ -63,7 +63,7 @@ public class StatusEffects implements ContentList{
         wet = new StatusEffect(3 * 60f){
             {
                 oppositeScale = 0.5f;
-                speedMultiplier = 0.999f;
+                speedMultiplier = 0.9f;
             }
 
             @Override

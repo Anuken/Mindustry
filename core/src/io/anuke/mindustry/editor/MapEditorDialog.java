@@ -566,8 +566,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         for(Block block : Block.all()){
             TextureRegion[] regions = block.getCompactIcon();
-            if((block.synthetic() && (Recipe.getByResult(block) == null || !control.database().isUnlocked(Recipe.getByResult(block)))) && !debug && block != StorageBlocks.core)
+            if((block.synthetic() && (Recipe.getByResult(block) == null || !control.database().isUnlocked(Recipe.getByResult(block)))) && !debug && block != StorageBlocks.core){
                 continue;
+            }
+
+            if(Recipe.getByResult(block) != null && Recipe.getByResult(block).debugOnly && !debug){
+                continue;
+            }
 
             if(regions.length == 0 || regions[0] == Draw.region("jjfgj")) continue;
 

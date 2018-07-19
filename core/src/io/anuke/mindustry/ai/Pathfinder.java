@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.ObjectSet.ObjectSetIterator;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -84,7 +85,7 @@ public class Pathfinder{
     }
 
     private boolean passable(Tile tile, Team team){
-        return (tile.getWallID() == 0 && !tile.floor().isLiquid && tile.cliffs == 0 && !tile.floor().solid && !(tile.floor().isLiquid && (tile.floor().damageTaken > 0 || tile.floor().drownTime > 0)))
+        return (tile.block() == Blocks.air && !tile.floor().isLiquid && tile.cliffs == 0 && !tile.floor().solid && !(tile.floor().isLiquid && (tile.floor().damageTaken > 0 || tile.floor().drownTime > 0)))
                 || (tile.breakable() && (tile.getTeam() != team)) || !tile.solid();
     }
 

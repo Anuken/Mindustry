@@ -208,7 +208,7 @@ public class BuildBlock extends Block{
             if(builder instanceof Player){
                 builderID = builder.getID();
             }
-
+            
             if(progress >= 1f || debug){
                 CallBlocks.onConstructFinish(tile, recipe.result, builderID, tile.getRotation(), tile.getTeam());
             }

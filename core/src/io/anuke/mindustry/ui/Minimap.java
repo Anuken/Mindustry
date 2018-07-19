@@ -15,6 +15,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.renderer;
 import static io.anuke.mindustry.Vars.showFog;
+import static io.anuke.mindustry.Vars.world;
 
 public class Minimap extends Table{
 
@@ -39,9 +40,27 @@ public class Minimap extends Table{
                 if(showFog){
                     renderer.fog().getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
-                    draw.getRegion().setTexture(renderer.fog().getTexture());
-                    draw.getRegion().setV(1f - draw.getRegion().getV());
-                    draw.getRegion().setV2(1f - draw.getRegion().getV2());
+                    TextureRegion r = draw.getRegion();
+                    float pad = renderer.fog().getPadding();
+
+                    float px = r.getU() * world.width() + pad;
+                    float py = r.getV() * world.height() + pad;
+                    float px2 = r.getU2() * world.width() + pad;
+                    float py2 = r.getV2() * world.height() + pad;
+
+                    r.setTexture(renderer.fog().getTexture());
+                    r.setU(px / (world.width() + pad*2f));
+                    r.setV(1f - py / (world.height() + pad*2f));
+                    r.setU2(px2 / (world.width() + pad*2f));
+                    r.setV2(1f - py2 / (world.height() + pad*2f));
+
+                    //r.setV(1f - draw.getRegion().getV());
+                    //r.setV2(1f - draw.getRegion().getV2());
+
+                    //r.setU(r.getU() + renderer.fog().getPadding()/(float)(world.width() + renderer.fog().getPadding()*2) * renderer.minimap().getZoom());
+                    //r.setV(r.getV() - renderer.fog().getPadding()/(float)(world.height() + renderer.fog().getPadding()*2) * renderer.minimap().getZoom());
+                    //r.setU2(r.getU2() - renderer.fog().getPadding()/(float)(world.width() + renderer.fog().getPadding()*2) * renderer.minimap().getZoom());
+                    //r.setV2(r.getV2() + renderer.fog().getPadding()/(float)(world.height() + renderer.fog().getPadding()*2) * renderer.minimap().getZoom());
 
                     Graphics.shader(Shaders.fog);
                     super.draw(batch, parentAlpha);

@@ -215,7 +215,7 @@ public class Save16 extends SaveFileVersion{
             Tile tile = world.tile(i);
 
             stream.writeByte(tile.getFloorID());
-            stream.writeByte(tile.getWallID());
+            stream.writeByte(tile.getBlockID());
             stream.writeByte(tile.getElevation());
 
             if(tile.block() instanceof BlockPart){
@@ -230,13 +230,13 @@ public class Save16 extends SaveFileVersion{
                 if(tile.entity.cons != null) tile.entity.cons.write(stream);
 
                 tile.entity.write(stream);
-            }else if(tile.getWallID() == 0){
+            }else if(tile.block() == Blocks.air){
                 int consecutives = 0;
 
                 for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                     Tile nextTile = world.tile(j);
 
-                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.getWallID() != 0 || nextTile.getElevation() != tile.getElevation()){
+                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getElevation() != tile.getElevation()){
                         break;
                     }
 

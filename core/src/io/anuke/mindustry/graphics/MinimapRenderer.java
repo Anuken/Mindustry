@@ -57,6 +57,10 @@ public class MinimapRenderer implements Disposable{
         zoom = Mathf.clamp(zoom, 1, Math.min(world.width(), world.height()) / baseSize / 2);
     }
 
+    public float getZoom(){
+        return zoom;
+    }
+
     public void reset(){
         if(pixmap != null){
             pixmap.dispose();

@@ -8,7 +8,6 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.InventoryModule;
@@ -18,7 +17,6 @@ import io.anuke.ucore.entities.trait.PosTrait;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -74,7 +72,7 @@ public class Tile implements PosTrait, TargetTrait{
         return x + y * world.width();
     }
 
-    public byte getWallID(){
+    public byte getBlockID(){
         return (byte) wall.id;
     }
 
@@ -149,16 +147,6 @@ public class Tile implements PosTrait, TargetTrait{
 
     public byte getTeamID(){
         return team;
-    }
-
-    /** Returns the break time of the block, <i>or</i> the breaktime of the linked block, if this tile is linked. */
-    public float getBreakTime(){
-        Block block = target().block();
-        if(Recipe.getByResult(block) != null){
-            return Recipe.getByResult(block).cost;
-        }else{
-            return 15f;
-        }
     }
 
     public void setBlock(Block type, int rotation){
@@ -340,14 +328,6 @@ public class Tile implements PosTrait, TargetTrait{
         return null;
     }
 
-    public Tile[] getNearby(Tile[] temptiles){
-        temptiles[0] = world.tile(x + 1, y);
-        temptiles[1] = world.tile(x, y + 1);
-        temptiles[2] = world.tile(x - 1, y);
-        temptiles[3] = world.tile(x, y - 1);
-        return temptiles;
-    }
-
     public void updateOcclusion(){
         cost = 1;
         cliffs = 0;
@@ -365,16 +345,10 @@ public class Tile implements PosTrait, TargetTrait{
 
         //check for bitmasking cliffs
         for(int i = 0; i < 4; i++){
-            GridPoint2 pc = Geometry.d4[i];
-            GridPoint2 pcprev = Geometry.d4[Mathf.mod(i - 1, 4)];
-            GridPoint2 pcnext = Geometry.d4[(i + 1) % 4];
-
-            Tile tc = world.tile(x + pc.x, y + pc.y);
-            Tile tprev = world.tile(x + pcprev.x, y + pcprev.y);
-            Tile tnext = world.tile(x + pcnext.x, y + pcnext.y);
+            Tile tc = getNearby(i);
 
             //check for cardinal direction elevation changes and bitmask that
-            if(tc != null && tprev != null && tnext != null && ((tc.elevation < elevation && tc.elevation != -1))){
+            if(tc != null && ((tc.elevation < elevation && tc.elevation != -1))){
                 cliffs |= (1 << (i * 2));
             }
         }

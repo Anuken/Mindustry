@@ -17,8 +17,6 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.world;
-
 public class Floor extends Block{
     //TODO implement proper bitmasking
     protected static IntIntMap bitmask = Mathf.mapInt(2, 1, 8, 2, 10, 3, 11, 4, 16, 5, 18, 6, 22, 7, 24, 8,
@@ -174,7 +172,7 @@ public class Floor extends Block{
         for(int i = 0; i < 8; i++){
             int dx = Geometry.d8[i].x, dy = Geometry.d8[i].y;
 
-            Tile other = world.tile(tile.x + dx, tile.y + dy);
+            Tile other = tile.getNearby(dx, dy);
 
             if(other == null) continue;
 

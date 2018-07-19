@@ -133,7 +133,7 @@ public abstract class Turret extends Block{
 
         drawer.accept(tile, entity);
 
-        if(heatRegion != null){
+        if(heatRegion != Draw.region("error")){
             heatDrawer.accept(tile, entity);
         }
 

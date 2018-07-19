@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import io.anuke.mindustry.entities.Unit;
@@ -16,9 +17,9 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.entities.EntityDraw;
-import io.anuke.ucore.graphics.ClipSpriteBatch;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
+import io.anuke.ucore.scene.utils.ScissorStack;
 
 import java.nio.ByteBuffer;
 
@@ -28,15 +29,23 @@ import static io.anuke.mindustry.Vars.*;
  * Used for rendering fog of war. A framebuffer is used for this.
  */
 public class FogRenderer implements Disposable{
+    private static final int extraPadding = 3;
+    private static final int shadowPadding = 1;
+
     private TextureRegion region = new TextureRegion();
     private FrameBuffer buffer;
     private ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(4);
     private Array<Tile> changeQueue = new Array<>();
+    private int padding;
+    private Rectangle rect = new Rectangle();
 
     public FogRenderer(){
         Events.on(WorldLoadGraphicsEvent.class, () -> {
             dispose();
-            buffer = new FrameBuffer(Format.RGBA8888, world.width(), world.height(), false);
+
+            padding = world.getSector() != null ? mapPadding + extraPadding : 0;
+
+            buffer = new FrameBuffer(Format.RGBA8888, world.width() + padding*2, world.height() + padding*2, false);
             changeQueue.clear();
 
             //clear buffer to black
@@ -62,26 +71,26 @@ public class FogRenderer implements Disposable{
         }));
     }
 
+    public int getPadding(){
+        return padding;
+    }
+
     public void draw(){
         if(buffer == null) return;
 
         float vw = Core.camera.viewportWidth * Core.camera.zoom;
         float vh = Core.camera.viewportHeight * Core.camera.zoom;
 
-        float px = Core.camera.position.x -= vw / 2f;
-        float py = Core.camera.position.y -= vh / 2f;
+        float px = Core.camera.position.x - vw / 2f;
+        float py = Core.camera.position.y - vh / 2f;
 
-        float u = px / tilesize / world.width();
-        float v = py / tilesize / world.height();
+        float u = (px / tilesize + padding) / buffer.getWidth();
+        float v = (py / tilesize + padding) / buffer.getHeight();
 
-        float u2 = (px + vw) / tilesize / world.width();
-        float v2 = (py + vh) / tilesize / world.height();
+        float u2 = ((px + vw) / tilesize + padding) / buffer.getWidth();
+        float v2 = ((py + vh) / tilesize + padding) / buffer.getHeight();
 
-        if(Core.batch instanceof ClipSpriteBatch){
-            ((ClipSpriteBatch) Core.batch).enableClip(false);
-        }
-
-        Core.batch.getProjectionMatrix().setToOrtho2D(0, 0, world.width() * tilesize, world.height() * tilesize);
+        Core.batch.getProjectionMatrix().setToOrtho2D(-padding * tilesize, -padding * tilesize, buffer.getWidth() * tilesize, buffer.getHeight() * tilesize);
 
         Draw.color(Color.WHITE);
 
@@ -92,6 +101,10 @@ public class FogRenderer implements Disposable{
         //Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
         //Gdx.gl.glReadPixels(world.width()/2, world.height()/2 + 20, 1, 1, GL20.GL_RGB, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
         //Log.info(pixelBuffer.get(0));
+
+        boolean pop = ScissorStack.pushScissors(rect.set((padding-shadowPadding), (padding-shadowPadding),
+                    (world.width() + shadowPadding*2) ,
+                    (world.height() + shadowPadding*2)));
 
         Graphics.begin();
         EntityDraw.setClip(false);
@@ -111,6 +124,8 @@ public class FogRenderer implements Disposable{
         Graphics.end();
         buffer.end();
 
+        if(pop) ScissorStack.popScissors();
+
         region.setTexture(buffer.getColorBufferTexture());
         region.setRegion(u, v2, u2, v);
 
@@ -128,10 +143,6 @@ public class FogRenderer implements Disposable{
         Graphics.setScreen();
         Core.batch.draw(renderer.pixelSurface.texture(), 0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -Gdx.graphics.getHeight());
         Graphics.end();
-
-        if(Core.batch instanceof ClipSpriteBatch){
-            ((ClipSpriteBatch) Core.batch).enableClip(true);
-        }
     }
 
     public Texture getTexture(){
