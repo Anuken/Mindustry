@@ -161,7 +161,7 @@ public class Administration{
     }
 
     /**
-     * Returns trace info by IP.
+     * Returns trace info by UUID.
      */
     public TraceInfo getTraceByID(String uuid){
         if(!traceInfo.containsKey(uuid)) traceInfo.put(uuid, new TraceInfo(uuid));

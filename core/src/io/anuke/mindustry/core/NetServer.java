@@ -45,30 +45,20 @@ public class NetServer extends Module{
     private final static byte[] reusableSnapArray = new byte[maxSnapshotSize];
     private final static float serverSyncTime = 4, kickDuration = 30 * 1000;
     private final static Vector2 vector = new Vector2();
-    /**
-     * If a play goes away of their server-side coordinates by this distance, they get teleported back.
-     */
+    /**If a play goes away of their server-side coordinates by this distance, they get teleported back.*/
     private final static float correctDist = 16f;
 
     public final Administration admins = new Administration();
 
-    /**
-     * Maps connection IDs to players.
-     */
+    /**Maps connection IDs to players.*/
     private IntMap<Player> connections = new IntMap<>();
     private boolean closing = false;
 
-    /**
-     * Stream for writing player sync data to.
-     */
+    /**Stream for writing player sync data to.*/
     private CountableByteArrayOutputStream syncStream = new CountableByteArrayOutputStream();
-    /**
-     * Data stream for writing player sync data to.
-     */
+    /**Data stream for writing player sync data to.*/
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
-    /**
-     * Encoder for computing snapshot deltas.
-     */
+    /**Encoder for computing snapshot deltas.*/
     private DEZEncoder encoder = new DEZEncoder();
 
     public NetServer(){
@@ -278,8 +268,10 @@ public class NetServer extends Module{
     }
 
     public static void onDisconnect(Player player){
-        Call.sendMessage("[accent]" + player.name + " has disconnected.");
-        Call.onPlayerDisconnect(player.id);
+        if(player.con.hasConnected){
+            Call.sendMessage("[accent]" + player.name + " has disconnected.");
+            Call.onPlayerDisconnect(player.id);
+        }
         player.remove();
         netServer.connections.remove(player.con.id);
     }
@@ -358,13 +350,14 @@ public class NetServer extends Module{
             Log.info("Kicking connection #{0} / IP: {1}. Reason: {2}", connection, con.address, reason);
         }
 
-        if((reason == KickReason.kick || reason == KickReason.banned) && admins.getTraceByID(getUUID(con.id)).uuid != null){
+        Player player = connections.get(con.id);
+
+        if(player != null && (reason == KickReason.kick || reason == KickReason.banned) && admins.getTraceByID(getUUID(con.id)).uuid != null){
             PlayerInfo info = admins.getInfo(admins.getTraceByID(getUUID(con.id)).uuid);
             info.timesKicked++;
             info.lastKicked = TimeUtils.millis();
         }
 
-        //TODO kick player, send kick packet
         Call.onKick(connection, reason);
 
         Timers.runTask(2f, con::close);
