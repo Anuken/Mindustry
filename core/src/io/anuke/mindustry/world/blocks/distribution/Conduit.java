@@ -49,6 +49,8 @@ public class Conduit extends LiquidBlock{
 
     @Override
     public void onProximityUpdate(Tile tile){
+        super.onProximityUpdate(tile);
+
         ConduitEntity entity = tile.entity();
         entity.blendbits = 0;
         entity.blendshadowrot = -1;

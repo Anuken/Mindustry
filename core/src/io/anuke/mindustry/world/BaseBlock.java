@@ -60,22 +60,19 @@ public abstract class BaseBlock{
         return amount;
     }
 
-    /**
-     * Handle a stack input.
-     */
+    /**Handle a stack input.*/
     public void handleStack(Item item, int amount, Tile tile, Unit source){
         tile.entity.wakeUp();
         tile.entity.items.add(item, amount);
     }
 
-    /**
-     * Returns offset for stack placement.
-     */
+    /**Returns offset for stack placement.*/
     public void getStackOffset(Item item, Tile tile, Translator trns){
 
     }
 
     public void onProximityUpdate(Tile tile){
+        if(tile.entity != null) tile.entity.wakeUp();
     }
 
     public void handleItem(Item item, Tile tile, Tile source){

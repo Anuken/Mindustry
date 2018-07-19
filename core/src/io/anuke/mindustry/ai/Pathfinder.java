@@ -11,6 +11,7 @@ import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Events;
@@ -29,6 +30,7 @@ public class Pathfinder{
     public Pathfinder(){
         Events.on(WorldLoadEvent.class, this::clear);
         Events.on(TileChangeEvent.class, tile -> {
+            if(Net.client()) return;
 
             for(TeamData data : state.teams.getTeams()){
                 if(data.team != tile.getTeam() && paths[data.team.ordinal()].weights[tile.x][tile.y] >= Float.MAX_VALUE){
@@ -41,6 +43,8 @@ public class Pathfinder{
     }
 
     public void update(){
+        if(Net.client()) return;
+
         ObjectSetIterator<TeamData> iterator = new ObjectSetIterator<>(state.teams.getTeams());
 
         for(TeamData team : iterator){

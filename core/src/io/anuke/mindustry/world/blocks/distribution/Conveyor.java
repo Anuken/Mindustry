@@ -98,6 +98,8 @@ public class Conveyor extends Block{
 
     @Override
     public void onProximityUpdate(Tile tile){
+        super.onProximityUpdate(tile);
+
         ConveyorEntity entity = tile.entity();
         entity.blendbits = 0;
         entity.blendsclx = entity.blendscly = 1;
@@ -224,6 +226,7 @@ public class Conveyor extends Block{
                 break;
             }
 
+            float prev = pos.y;
             float nextpos = (i == entity.convey.size - 1 ? 100f : pos2.set(entity.convey.get(i + 1), ItemPos.updateShorts).y) - itemSpace;
             if(entity.minCarry >= pos.y && entity.minCarry <= nextpos){
                 nextpos = entity.minCarry;
@@ -233,12 +236,12 @@ public class Conveyor extends Block{
             if(maxmove > minmove){
                 pos.y += maxmove;
                 pos.x = Mathf.lerpDelta(pos.x, 0, 0.06f);
-                totalMoved += maxmove;
             }else{
                 pos.x = Mathf.lerpDelta(pos.x, pos.seed / offsetScl, 0.1f);
             }
 
             pos.y = Mathf.clamp(pos.y);
+            totalMoved += (pos.y - prev);
 
             if(pos.y >= 0.9999f && offloadDir(tile, pos.item)){
                 minremove = Math.min(i, minremove);
@@ -262,7 +265,7 @@ public class Conveyor extends Block{
         entity.carrying = 0f;
         entity.minCarry = 2f;
 
-        if(totalMoved <= 0.0001f){
+        if(totalMoved/Timers.delta() <= 0.0001f){
             entity.sleep();
         }
 

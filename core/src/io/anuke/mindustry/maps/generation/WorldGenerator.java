@@ -1,7 +1,6 @@
 package io.anuke.mindustry.maps.generation;
 
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -18,14 +17,13 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
+import io.anuke.ucore.noise.VoronoiNoise;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.SeedRandom;
 
-import static io.anuke.mindustry.Vars.sectorSize;
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 
 public class WorldGenerator{
@@ -35,6 +33,7 @@ public class WorldGenerator{
     private Simplex sim = new Simplex(seed);
     private Simplex sim2 = new Simplex(seed + 1);
     private Simplex sim3 = new Simplex(seed + 2);
+    private VoronoiNoise vn = new VoronoiNoise(seed + 2, (short)0);
 
     private SeedRandom random = new SeedRandom(seed + 3);
 
@@ -195,8 +194,10 @@ public class WorldGenerator{
             }
         }
 
-        tiles[width / 2][height / 2].setBlock(StorageBlocks.core);
-        tiles[width / 2][height / 2].setTeam(Team.blue);
+        int coreX = width/2, coreY = height/3;
+
+        tiles[coreX][coreY].setBlock(StorageBlocks.core);
+        tiles[coreX][coreY].setTeam(Team.blue);
 
         prepareTiles(tiles, seed, true);
     }
@@ -217,11 +218,11 @@ public class WorldGenerator{
         Block wall = Blocks.air;
 
         double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.5, 1f / 500, x, y) * 4.1 - 1;
-        double temp = sim3.octaveNoise2D(detailed ? 12 : 6, 0.54, 1f / 820f, x, y);
+        double temp = vn.noise(x, y, 1f/200f)/2f + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 620f, x, y);
 
         double r = sim2.octaveNoise2D(1, 0.6, 1f / 70, x, y);
         double edgeDist = Math.max(sectorSize / 2, sectorSize / 2) - Math.max(Math.abs(x - sectorSize / 2), Math.abs(y - sectorSize / 2));
-        double dst = Vector2.dst((sectorX * sectorSize) + sectorSize/2f, (sectorY * sectorSize) + sectorSize/2f, x, y);
+        //double dst = Vector2.dst((sectorX * sectorSize) + sectorSize/2f, (sectorY * sectorSize) + sectorSize/2f, x, y);
         double elevDip = 30;
 
         double border = 14;
@@ -245,9 +246,9 @@ public class WorldGenerator{
             floor = Blocks.lava;
         }
 
-        if(dst < elevDip){
-            elevation -= (elevDip - dst) / elevDip * 3.0;
-        }else if(detailed && r > 0.9){
+        //if(dst < elevDip){
+        //    elevation -= (elevDip - dst) / elevDip * 3.0;
+        /*}else*/if(detailed && r > 0.9){
             floor = Blocks.water;
             elevation = 0;
 
