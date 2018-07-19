@@ -168,8 +168,10 @@ public class WaveSpawner{
         groundSpawns.clear();
         quadrants = new Bits(quadWidth() * quadHeight());
 
-        if(groups == null){
+        if(world.getSector() == null){
             groups = Waves.getSpawns();
+        }else{
+            groups = world.getSector().spawns;
         }
     }
 
