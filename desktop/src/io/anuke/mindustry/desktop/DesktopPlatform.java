@@ -17,6 +17,7 @@ import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Strings;
 
+import java.io.File;
 import java.net.NetworkInterface;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -106,7 +107,9 @@ public class DesktopPlatform extends Platform{
 
     @Override
     public boolean isDebug(){
-        return args.length > 0 && args[0].equalsIgnoreCase("-debug_" + getUUID().hashCode());
+        //honestly I'm just putting this ridiculous """anti-debug""" mess here to see if anyone bothers solving it without editing source
+        return args.length > 0 && args[0].equals("-debug_" + getUUID().hashCode() + "_"
+                + " " + System.getProperty("os.arch") + "nice" + (int)(Math.sin(System.getProperty("user.dir").hashCode()) * 100) + Thread.currentThread().getStackTrace()[1].toString()) && new File("../../desktop/build/").exists();
     }
 
     @Override

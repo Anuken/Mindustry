@@ -11,6 +11,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+import io.anuke.mindustry.ui.dialogs.GenViewDialog;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.scene.Group;
@@ -122,6 +123,8 @@ public class DebugFragment extends Fragment{
                 t.row();
 
                 t.add("Debug");
+                t.row();
+                t.addButton("map", () -> new GenViewDialog().show());
                 t.row();
                 t.addButton("noclip", "toggle", () -> noclip = !noclip);
                 t.row();

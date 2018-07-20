@@ -43,7 +43,7 @@ public class NetServer extends Module{
     public final static boolean showSnapshotSize = false;
 
     private final static byte[] reusableSnapArray = new byte[maxSnapshotSize];
-    private final static float serverSyncTime = 4, kickDuration = 30 * 1000;
+    private final static float serverSyncTime = 5, kickDuration = 30 * 1000;
     private final static Vector2 vector = new Vector2();
     /**If a play goes away of their server-side coordinates by this distance, they get teleported back.*/
     private final static float correctDist = 16f;

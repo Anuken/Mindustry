@@ -217,8 +217,8 @@ public class WorldGenerator{
         Block floor = Blocks.stone;
         Block wall = Blocks.air;
 
-        double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.5, 1f / 500, x, y) * 4.1 - 1;
-        double temp = vn.noise(x, y, 1f/200f)/2f + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 620f, x, y);
+        double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.5, 1f / 500, x, y) * 5.1 - 1;
+        double temp = vn.noise(x, y, 1f/400f)/2f + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 620f, x, y);
 
         double r = sim2.octaveNoise2D(1, 0.6, 1f / 70, x, y);
         double edgeDist = Math.max(sectorSize / 2, sectorSize / 2) - Math.max(Math.abs(x - sectorSize / 2), Math.abs(y - sectorSize / 2));
@@ -255,6 +255,10 @@ public class WorldGenerator{
             if(r > 0.94){
                 floor = Blocks.deepwater;
             }
+        }
+
+        if(((Floor)floor).liquidDrop != null){
+            elevation = 0;
         }
 
         if(detailed && wall == Blocks.air && decoration.containsKey(floor) && random.chance(0.03)){
