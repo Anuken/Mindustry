@@ -33,7 +33,8 @@ public class WorldGenerator{
     private Simplex sim = new Simplex(seed);
     private Simplex sim2 = new Simplex(seed + 1);
     private Simplex sim3 = new Simplex(seed + 2);
-    private VoronoiNoise vn = new VoronoiNoise(seed + 2, (short)0);
+    private RidgedPerlin rid = new RidgedPerlin(seed + 4, 1);
+    private VoronoiNoise vn = new VoronoiNoise(seed + 2, (short)1);
 
     private SeedRandom random = new SeedRandom(seed + 3);
 
@@ -211,14 +212,19 @@ public class WorldGenerator{
     }
 
     public GenResult generateTile(int sectorX, int sectorY, int localX, int localY, boolean detailed){
-        int x = sectorX * sectorSize + localX;
-        int y = sectorY * sectorSize + localY;
+        return generateTile(result, sectorX, sectorY, localX, localY, detailed);
+    }
+
+    public GenResult generateTile(GenResult result, int sectorX, int sectorY, int localX, int localY, boolean detailed){
+        int x = sectorX * sectorSize + localX + Short.MAX_VALUE;
+        int y = sectorY * sectorSize + localY + Short.MAX_VALUE;
 
         Block floor = Blocks.stone;
         Block wall = Blocks.air;
 
-        double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.5, 1f / 500, x, y) * 5.1 - 1;
-        double temp = vn.noise(x, y, 1f/400f)/2f + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 620f, x, y);
+        double ridge = Mathf.clamp(rid.getValue(x, y, 1f / 400f))/3f;
+        double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.5, 1f / 500, x, y) * 5.1 - 1 - ridge;
+        double temp = sim3.octaveNoise2D(detailed ? 2 : 0, 1, 1f / 13f, x, y)/13f + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 620f, x, y) - ridge;
 
         double r = sim2.octaveNoise2D(1, 0.6, 1f / 70, x, y);
         double edgeDist = Math.max(sectorSize / 2, sectorSize / 2) - Math.max(Math.abs(x - sectorSize / 2), Math.abs(y - sectorSize / 2));
@@ -271,7 +277,7 @@ public class WorldGenerator{
         return result;
     }
 
-    public class GenResult{
+    public static class GenResult{
         public Block floor, wall;
         public byte elevation;
     }
