@@ -13,12 +13,12 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentDatabase;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.MobileInput;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
@@ -48,7 +48,7 @@ public class Control extends Module{
     private ObjectMap<Sound, Long> soundMap = new ObjectMap<>();
 
     private Throwable error;
-    private Input gdxInput;
+    //private Input gdxInput;
 
     public Control(){
 
@@ -68,12 +68,7 @@ public class Control extends Module{
 
         db.load();
 
-        gdxInput = Gdx.input;
-
-        //Sounds.load("shoot.mp3", "place.mp3", "explosion.mp3", "enemyshoot.mp3",
-        //        "corexplode.mp3", "break.mp3", "spawn.mp3", "flame.mp3", "die.mp3",
-        //        "respawn.mp3", "purchase.mp3", "flame2.mp3", "bigshot.mp3", "laser.mp3", "lasershot.mp3",
-        //        "ping.mp3", "tesla.mp3", "waveend.mp3", "railgun.mp3", "blast.mp3", "bang2.mp3");
+        //gdxInput = Gdx.input;
 
         Sounds.setFalloff(9000f);
         Sounds.setPlayer((sound, volume) -> {
@@ -85,8 +80,6 @@ public class Control extends Module{
                 soundMap.put(sound, time);
             }
         });
-
-        //Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3");
 
         DefaultKeybinds.load();
 
@@ -224,7 +217,7 @@ public class Control extends Module{
     }
 
     public Input gdxInput(){
-        return gdxInput;
+        return Gdx.input;
     }
 
     public void setError(Throwable error){

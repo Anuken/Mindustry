@@ -208,6 +208,11 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
     }
 
     @Override
+    public float fin() {
+        return time()/lifetime();
+    }
+
+    @Override
     public EntityGroup targetGroup(){
         return itemGroup;
     }

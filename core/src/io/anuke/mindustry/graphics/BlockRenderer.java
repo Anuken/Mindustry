@@ -3,11 +3,12 @@ package io.anuke.mindustry.graphics;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Sort;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.game.EventType.TileChangeEvent;
+import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -19,6 +20,7 @@ public class BlockRenderer{
     private FloorRenderer floorRenderer;
 
     private Array<BlockRequest> requests = new Array<>(initialRequests);
+    private int lastCamX, lastCamY;
     private Layer lastLayer;
     private int requestidx = 0;
     private int iterateidx = 0;
@@ -29,22 +31,38 @@ public class BlockRenderer{
         for(int i = 0; i < requests.size; i++){
             requests.set(i, new BlockRequest());
         }
+
+        Events.on(WorldLoadGraphicsEvent.class, () -> {
+            lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
+        });
+
+        Events.on(TileChangeEvent.class, tile -> {
+            threads.runGraphics(() -> {
+                //TODO invalidate camera position if it's in the view range
+            });
+        });
     }
 
     /**Process all blocks to draw, simultaneously drawing block shadows.*/
     public void processBlocks(){
-        requestidx = 0;
+        iterateidx = 0;
         lastLayer = null;
+
+        int avgx = Mathf.scl(camera.position.x, tilesize);
+        int avgy = Mathf.scl(camera.position.y, tilesize);
+
+        if(avgx == lastCamX && avgy == lastCamY){
+            return;
+        }
+
+        requestidx = 0;
 
         int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
         int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
 
         int expandr = 4;
 
-        Graphics.surface(renderer.effectSurface, true, false);
-
-        int avgx = Mathf.scl(camera.position.x, tilesize);
-        int avgy = Mathf.scl(camera.position.y, tilesize);
+        //Graphics.surface(renderer.effectSurface, true, false);
 
         int minx = Math.max(avgx - rangex - expandr, 0);
         int miny = Math.max(avgy - rangey - expandr, 0);
@@ -61,9 +79,9 @@ public class BlockRenderer{
                     if(tile != null){
                         Block block = tile.block();
 
-                        if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
-                            tile.block().drawShadow(tile);
-                        }
+                        //if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
+                        //    tile.block().drawShadow(tile);
+                        //}
 
                         if(block != Blocks.air){
                             if(!expanded){
@@ -80,19 +98,20 @@ public class BlockRenderer{
                                 }
                             }
                         }
-
                     }
                 }
             }
         }
 
         //TODO this actually isn't necessary
-        Draw.color(0, 0, 0, 0.15f);
-        Graphics.flushSurface();
-        Draw.color();
+        //Draw.color(0, 0, 0, 0.15f);
+        //Graphics.flushSurface();
+        //Draw.color();
 
         Sort.instance().sort(requests.items, 0, requestidx);
-        iterateidx = 0;
+
+        lastCamX = avgx;
+        lastCamY = avgy;
     }
 
     public int getRequests(){
