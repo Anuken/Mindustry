@@ -8,8 +8,10 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 
 public class Generators {
@@ -143,6 +145,33 @@ public class Generators {
                 }
 
                 image.save("liquid-icon-" + liquid.name);
+            }
+        });
+
+        context.generate("block-edges", () -> {
+            for(Block block : Block.all()){
+                if(!(block instanceof Floor)) continue;
+                Floor floor = (Floor)block;
+                if(floor.getIcon().length > 0 && !Draw.hasRegion(floor.name + "-cliff-side")){
+                    Image floori = context.get(floor.getIcon()[0]);
+                    Color color = floori.getColor(0, 0).mul(1.3f, 1.3f, 1.3f, 1f);
+
+                    String[] names = {"cliff-edge-2", "cliff-edge", "cliff-edge-1", "cliff-side"};
+                    for(String str : names){
+                        Image image = context.get("generic-" + str);
+
+                        for(int x = 0; x < image.width(); x++){
+                            for(int y = 0; y < image.height(); y++){
+                                Color other = image.getColor(x, y);
+                                if(other.a > 0){
+                                    image.draw(x, y, color);
+                                }
+                            }
+                        }
+
+                        image.save(floor.name + "-" + str);
+                    }
+                }
             }
         });
 
