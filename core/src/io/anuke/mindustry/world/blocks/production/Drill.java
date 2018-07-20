@@ -31,42 +31,24 @@ public class Drill extends Block{
     protected final Array<Tile> drawTiles = new Array<>();
     protected final Array<Item> toAdd = new Array<>();
 
-    /**
-     * Maximum tier of blocks this drill can mine.
-     */
+    /**Maximum tier of blocks this drill can mine.*/
     protected int tier;
-    /**
-     * Base time to drill one ore, in frames.
-     */
+    /**Base time to drill one ore, in frames.*/
     protected float drillTime = 300;
-    /**
-     * Whether the liquid is required to drill. If false, then it will be used as a speed booster.
-     */
+    /**Whether the liquid is required to drill. If false, then it will be used as a speed booster.*/
     protected boolean liquidRequired = false;
-    /**
-     * How many times faster the drill will progress when boosted by liquid.
-     */
+    /**How many times faster the drill will progress when boosted by liquid.*/
     protected float liquidBoostIntensity = 1.6f;
-    /**
-     * Speed at which the drill speeds up.
-     */
+    /**Speed at which the drill speeds up.*/
     protected float warmupSpeed = 0.02f;
 
-    /**
-     * Effect played when an item is produced. This is colored.
-     */
+    /**Effect played when an item is produced. This is colored.*/
     protected Effect drillEffect = BlockFx.mine;
-    /**
-     * Speed the drill bit rotates at.
-     */
+    /**Speed the drill bit rotates at.*/
     protected float rotateSpeed = 2f;
-    /**
-     * Effect randomly played while drilling.
-     */
+    /**Effect randomly played while drilling.*/
     protected Effect updateEffect = BlockFx.pulverizeSmall;
-    /**
-     * Chance the update effect will appear.
-     */
+    /**Chance the update effect will appear.*/
     protected float updateEffectChance = 0.02f;
 
     protected boolean drawRim = false;
