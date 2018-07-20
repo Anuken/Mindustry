@@ -8,7 +8,11 @@ import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Events;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -16,14 +20,16 @@ import static io.anuke.ucore.core.Core.camera;
 
 public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
+    private final static int expandr = 4;
 
     private FloorRenderer floorRenderer;
 
     private Array<BlockRequest> requests = new Array<>(initialRequests);
-    private int lastCamX, lastCamY;
+    private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private Layer lastLayer;
     private int requestidx = 0;
     private int iterateidx = 0;
+    private Surface shadows = Graphics.createSurface().setSize(2, 2);
 
     public BlockRenderer(){
         floorRenderer = new FloorRenderer();
@@ -38,9 +44,25 @@ public class BlockRenderer{
 
         Events.on(TileChangeEvent.class, tile -> {
             threads.runGraphics(() -> {
-                //TODO invalidate camera position if it's in the view range
+                int avgx = Mathf.scl(camera.position.x, tilesize);
+                int avgy = Mathf.scl(camera.position.y, tilesize);
+                int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
+                int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
+
+                if(Math.abs(avgx - tile.x) <= rangex && Math.abs(avgy - tile.y) <= rangey){
+                    lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
+                }
             });
         });
+    }
+
+    public void drawShadows(){
+        Draw.color(0, 0, 0, 0.15f);
+        Draw.rect(shadows.texture(),
+            Core.camera.position.x - Core.camera.position.x % tilesize,
+            Core.camera.position.y - Core.camera.position.y % tilesize,
+            shadows.width(), -shadows.height());
+        Draw.color();
     }
 
     /**Process all blocks to draw, simultaneously drawing block shadows.*/
@@ -51,18 +73,24 @@ public class BlockRenderer{
         int avgx = Mathf.scl(camera.position.x, tilesize);
         int avgy = Mathf.scl(camera.position.y, tilesize);
 
-        if(avgx == lastCamX && avgy == lastCamY){
+        int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
+        int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
+
+        if(avgx == lastCamX && avgy == lastCamY && lastRangeX == rangex && lastRangeY == rangey){
             return;
+        }
+
+        int shadowW = rangex * tilesize*2, shadowH = rangey * tilesize*2;
+
+        if(shadows.width() != shadowW || shadows.height() != shadowH){
+            shadows.setSize(shadowW, shadowH);
         }
 
         requestidx = 0;
 
-        int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
-        int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
-
-        int expandr = 4;
-
-        //Graphics.surface(renderer.effectSurface, true, false);
+        Graphics.end();
+        Core.batch.getProjectionMatrix().setToOrtho2D(Mathf.round(Core.camera.position.x, tilesize)-shadowW/2f, Mathf.round(Core.camera.position.y, tilesize)-shadowH/2f, shadowW, shadowH);
+        Graphics.surface(shadows);
 
         int minx = Math.max(avgx - rangex - expandr, 0);
         int miny = Math.max(avgy - rangey - expandr, 0);
@@ -79,9 +107,9 @@ public class BlockRenderer{
                     if(tile != null){
                         Block block = tile.block();
 
-                        //if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
-                        //    tile.block().drawShadow(tile);
-                        //}
+                        if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
+                            tile.block().drawShadow(tile);
+                        }
 
                         if(block != Blocks.air){
                             if(!expanded){
@@ -103,15 +131,17 @@ public class BlockRenderer{
             }
         }
 
-        //TODO this actually isn't necessary
-        //Draw.color(0, 0, 0, 0.15f);
-        //Graphics.flushSurface();
-        //Draw.color();
+        Graphics.surface();
+        Graphics.end();
+        Core.batch.setProjectionMatrix(camera.combined);
+        Graphics.begin();
 
         Sort.instance().sort(requests.items, 0, requestidx);
 
         lastCamX = avgx;
         lastCamY = avgy;
+        lastRangeX = rangex;
+        lastRangeY = rangey;
     }
 
     public int getRequests(){

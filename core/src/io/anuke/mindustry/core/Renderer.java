@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectIntMap;
@@ -63,6 +64,8 @@ public class Renderer extends RendererModule{
     private FogRenderer fog = new FogRenderer();
 
     public Renderer(){
+        Core.batch = new SpriteBatch(4096);
+
         pixelate = true;
         Lines.setCircleVertices(14);
 
@@ -211,6 +214,7 @@ public class Renderer extends RendererModule{
         drawAndInterpolate(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
 
         blocks.processBlocks();
+        blocks.drawShadows();
         blocks.drawBlocks(Layer.block);
 
         Graphics.shader(Shaders.blockbuild, false);
