@@ -4,13 +4,10 @@ import com.badlogic.gdx.math.Interpolation;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.defense.ShieldBlock;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.BaseEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
-
-import static io.anuke.mindustry.Vars.shieldGroup;
 
 //todo re-implement
 public class Shield extends BaseEntity implements DrawTrait{
@@ -80,11 +77,6 @@ public class Shield extends BaseEntity implements DrawTrait{
 
     public void removeDelay(){
         active = false;
-    }
-
-    @Override
-    public EntityGroup targetGroup(){
-        return shieldGroup;
     }
 
     @Override

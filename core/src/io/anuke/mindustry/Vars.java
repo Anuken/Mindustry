@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Json;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -11,7 +12,6 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Puddle;
-import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
@@ -48,9 +48,7 @@ public class Vars{
     public static final int sectorSize = 256;
     public static final int mapPadding = 3;
     public static final int invalidSector = Integer.MAX_VALUE;
-    public static final Locale[] locales = {new Locale("en"), new Locale("fr"), new Locale("ru"), new Locale("uk", "UA"), new Locale("pl"),
-            new Locale("de"), new Locale("pt", "BR"), new Locale("ko"), new Locale("in", "ID"),
-            new Locale("ita"), new Locale("es"), new Locale("zh","TW")};
+    public static Locale[] locales;
     public static final Color[] playerColors = {
             Color.valueOf("82759a"),
             Color.valueOf("c0c1c5"),
@@ -126,7 +124,6 @@ public class Vars{
     public static EntityGroup<Player> playerGroup;
     public static EntityGroup<TileEntity> tileGroup;
     public static EntityGroup<Bullet> bulletGroup;
-    public static EntityGroup<Shield> shieldGroup;
     public static EntityGroup<EffectEntity> effectGroup;
     public static EntityGroup<DrawTrait> groundEffectGroup;
     public static EntityGroup<ItemDrop> itemGroup;
@@ -138,12 +135,26 @@ public class Vars{
     public static final Translator[] tmptr = new Translator[]{new Translator(), new Translator(), new Translator(), new Translator()};
 
     public static void init(){
+
+        //load locales
+        String[] stra = new Json().fromJson(String[].class, Gdx.files.internal("locales.json"));
+        locales = new Locale[stra.length];
+        for(int i = 0; i < locales.length; i++){
+            String code = stra[i];
+            if(code.contains("_")){
+                locales[i] = new Locale(code.split("_")[0], code.split("_")[1]);
+            }else if(code.contains("-")){
+                locales[i] = new Locale(code.split("-")[0], code.split("-")[1]);
+            }else{
+                locales[i] = new Locale(code);
+            }
+        }
+
         Version.init();
 
         playerGroup = Entities.addGroup(Player.class).enableMapping();
         tileGroup = Entities.addGroup(TileEntity.class, false);
         bulletGroup = Entities.addGroup(Bullet.class).enableMapping();
-        shieldGroup = Entities.addGroup(Shield.class, false);
         effectGroup = Entities.addGroup(EffectEntity.class, false);
         groundEffectGroup = Entities.addGroup(DrawTrait.class, false);
         puddleGroup = Entities.addGroup(Puddle.class, false).enableMapping();

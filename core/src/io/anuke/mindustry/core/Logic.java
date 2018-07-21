@@ -149,7 +149,6 @@ public class Logic extends Module{
                 Entities.update(puddleGroup);
                 Entities.update(tileGroup);
                 Entities.update(fireGroup);
-                Entities.update(shieldGroup);
                 Entities.update(playerGroup);
                 Entities.update(itemGroup);
 
