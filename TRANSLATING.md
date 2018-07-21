@@ -21,6 +21,19 @@ In the folder with all the bundles in it, click the *'create new file'* button, 
 Then, copy-paste the entire contents of the [English translation bundle](https://raw.githubusercontent.com/Anuken/Mindustry/master/core/assets/bundles/bundle.propertie) into the file, and translate all the necessary text to your language.
 Once you are done, press the *propose new file* button at the bottom, then 'create pull request twice'.  
 
+#### Useful Information
+
+- When you see text surrounded by square brackets, such as `[RED]`, `[]` or `[accent]`, this indicates a color code. Don't translate it.
+- `{0}` means an argument that will be replaced when the text is displayed. For example, `Wave: {0}` will replace the `{0}` with whatever wave you are in.
+- Empty lines are fine, and it doesn't matter in what order you place the text.
+- `\n` means "new line". If you want to split text into multiple lines, use `\n` to do it.
+
+#### Testing your translation bundle
+
+There are two ways to test the translation bundle:
+1) Assuming you have the PC version downloaded, download your bundle file, name it `bundle.properties`, then place it in the same folder as the Mindustry desktop executable and run it. *You should get a popup message in-game confirming that you have loaded an external translation.*
+2) For advanced users: simply download your fork of mindustry and compile/run the game.
+
 **And that's it.**  
 
 *(...of course, that's never really it. Bother me on Discord when something inevatably goes wrong.)*
