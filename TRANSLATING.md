@@ -1,5 +1,8 @@
 ## Translating for Mindustry
 
+**DISCLAIMER:** *Currently, 4.0 is far from done, which means that things such as block names, descriptions, and core text will be changing often. If you begin translating now, you might have to re-do large chunks of the bundle before final release.*
+
+
 To begin, log in to your GitHub account, or if you don't have one yet, create it [here](https://github.com/).
 
 Consult [this list](https://www.science.co.il/language/Locale-codes.php) to find the locale code for your language. Once you've found it, 
