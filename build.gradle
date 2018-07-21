@@ -43,6 +43,17 @@ allprojects {
             return project.ext.mainClassName.substring(0, project.ext.mainClassName.indexOf("desktop") - 1)
         }
 
+        generateLocales = {
+            def output = '["en",'
+            def bundles = new File('core/assets/bundles/')
+            bundles.listFiles().each { other ->
+                if(other.name == "bundle.properties") return;
+                output += '"' + other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + '",'
+            }
+            output = (output.substring(0, output.size() - 1) + "]")
+            new File('core/assets/locales.json').text = output;
+        }
+
         writeVersion = {
             def pfile = new File('core/assets/version.properties')
             def props = new Properties()
@@ -135,8 +146,13 @@ project(":ios") {
 project(":core") {
     apply plugin: "java"
 
+    task finish {
+        generateLocales()
+    }
+
     dependencies {
         compileOnly project(":annotations")
+        build.finalizedBy(finish)
 
         boolean comp = System.properties["release"] == null || System.properties["release"] == "false"
 
