@@ -20,7 +20,6 @@
 /android/assets/mindustry-saves/
 /core/assets/gifexport/
 /core/assets/version.properties
-/core/assets/locales.json
 *.gif
 
 version.properties
