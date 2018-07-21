@@ -224,7 +224,7 @@ public class WorldGenerator{
 
         double ridge = Mathf.clamp(rid.getValue(x, y, 1f / 400f))/3f;
         double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.5, 1f / 500, x, y) * 5.1 - 1 - ridge;
-        double temp = sim3.octaveNoise2D(detailed ? 2 : 0, 1, 1f / 13f, x, y)/13f + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 620f, x, y) - ridge;
+        double temp = sim3.octaveNoise2D(detailed ? 2 : 1, 1, 1f / 13f, x, y)/13f + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 620f, x, y) - ridge;
 
         double r = sim2.octaveNoise2D(1, 0.6, 1f / 70, x, y);
         double edgeDist = Math.max(sectorSize / 2, sectorSize / 2) - Math.max(Math.abs(x - sectorSize / 2), Math.abs(y - sectorSize / 2));
