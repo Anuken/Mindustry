@@ -503,9 +503,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         if(mech.flying){
             //prevent strafing backwards, have a penalty for doing so
-            float angDist = Angles.angleDist(rotation, velocity.angle()) / 180f;
             float penalty = 0.2f; //when going 180 degrees backwards, reduce speed to 0.2x
-            speed *= Mathf.lerp(1f, penalty, angDist);
+            speed *= Mathf.lerp(1f, penalty, Angles.angleDist(rotation, velocity.angle()) / 180f);
         }
 
         //drop from carrier on key press

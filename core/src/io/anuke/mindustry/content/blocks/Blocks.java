@@ -114,6 +114,7 @@ public class Blocks extends BlockList implements ContentList{
             drops = new ItemStack(Items.stone, 1);
             minimapColor = Color.valueOf("252525");
             playerUnmineable = true;
+            hasOres = true;
         }};
 
         dirt = new Floor("dirt"){{
@@ -130,7 +131,7 @@ public class Blocks extends BlockList implements ContentList{
         ice = new Floor("ice"){{
             dragMultiplier = 0.3f;
             speedMultiplier = 0.4f;
-            minimapColor = Color.valueOf("c4e3e7");
+            minimapColor = Color.valueOf("b8eef8");
             hasOres = true;
         }};
 

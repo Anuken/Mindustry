@@ -34,7 +34,7 @@ public class WorldGenerator{
     private Simplex sim2 = new Simplex(seed + 1);
     private Simplex sim3 = new Simplex(seed + 2);
     private RidgedPerlin rid = new RidgedPerlin(seed + 4, 1);
-    private VoronoiNoise vn = new VoronoiNoise(seed + 2, (short)1);
+    private VoronoiNoise vn = new VoronoiNoise(seed + 2, (short)0);
 
     private SeedRandom random = new SeedRandom(seed + 3);
 
@@ -42,6 +42,8 @@ public class WorldGenerator{
     private ObjectMap<Block, Block> decoration;
 
     public WorldGenerator(){
+        vn.setUseDistance(true);
+
         decoration = Mathf.map(
             Blocks.grass, Blocks.shrub,
             Blocks.stone, Blocks.rock,
@@ -222,9 +224,11 @@ public class WorldGenerator{
         Block floor = Blocks.stone;
         Block wall = Blocks.air;
 
-        double ridge = Mathf.clamp(rid.getValue(x, y, 1f / 400f))/3f;
-        double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.5, 1f / 500, x, y) * 5.1 - 1 - ridge;
-        double temp = sim3.octaveNoise2D(detailed ? 2 : 1, 1, 1f / 13f, x, y)/13f + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 620f, x, y) - ridge;
+        double ridge = rid.getValue(x, y, 1f / 400f);
+        double iceridge = rid.getValue(x+99999, y, 1f / 500f);
+        double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.5, 1f / 500, x, y) * 6.1 - 1 - ridge;
+        double temp = vn.noise(x, y, 1f / 300f) * sim3.octaveNoise2D(detailed ? 2 : 1, 1, 1f / 13f, x, y)/13f
+        + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 920f, x, y);
 
         double r = sim2.octaveNoise2D(1, 0.6, 1f / 70, x, y);
         double edgeDist = Math.max(sectorSize / 2, sectorSize / 2) - Math.max(Math.abs(x - sectorSize / 2), Math.abs(y - sectorSize / 2));
@@ -237,31 +241,43 @@ public class WorldGenerator{
         //    elevation += (border - edgeDist) / 6.0;
         }
 
-        if(temp < 0.35){
-            floor = Blocks.snow;
-        }else if(temp < 0.45){
-            floor = Blocks.stone;
-        }else if(temp < 0.65){
-            floor = Blocks.grass;
-        }else if(temp < 0.8){
+        if(elevation < 0.7){
+            floor = Blocks.deepwater;
+        }else if(elevation < 0.79){
+            floor = Blocks.water;
+        }else if(elevation < 0.85){
             floor = Blocks.sand;
-        }else if(temp < 0.9){
+        }else if(temp < 0.55){
+            floor = Blocks.grass;
+        }else if(temp < 0.65){
+            floor = Blocks.sand;
+        }else if(temp + ridge/2f < 0.8 || elevation < 1.3){
             floor = Blocks.blackstone;
-            elevation = 0f;
         }else{
             floor = Blocks.lava;
         }
 
+        if(elevation > 3.5){
+            floor = Blocks.snow;
+        }else if(elevation > 3){
+            floor = Blocks.stone;
+        }
+
+        if(elevation > 2 && iceridge > 0.3){
+            elevation ++;
+            floor = Blocks.ice;
+        }
+
         //if(dst < elevDip){
         //    elevation -= (elevDip - dst) / elevDip * 3.0;
-        /*}else*/if(detailed && r > 0.9){
-            floor = Blocks.water;
-            elevation = 0;
+        /*}else*///if(detailed && r > 0.9){
+            //floor = Blocks.water;
+            //elevation = 0;
 
-            if(r > 0.94){
-                floor = Blocks.deepwater;
-            }
-        }
+            //if(r > 0.94){
+            //    floor = Blocks.deepwater;
+            //}
+        //}
 
         if(((Floor)floor).liquidDrop != null){
             elevation = 0;

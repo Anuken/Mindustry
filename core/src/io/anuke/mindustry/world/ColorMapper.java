@@ -11,7 +11,7 @@ import io.anuke.mindustry.type.ContentList;
 public class ColorMapper implements ContentList{
     private static IntMap<Block> blockMap = new IntMap<>();
     private static ObjectIntMap<Block> colorMap = new ObjectIntMap<>();
-    private static Color tmpColor = new Color();
+    private static ThreadLocal<Color> tmpColors = new ThreadLocal<>();
 
     public static Block getByColor(int color){
         return blockMap.get(color);
@@ -25,6 +25,8 @@ public class ColorMapper implements ContentList{
         int color = wall.breakable ? team.intColor : getBlockColor(wall);
         if(color == 0) color = ColorMapper.getBlockColor(floor);
         if(elevation > 0){
+            if(tmpColors.get() == null) tmpColors.set(new Color());
+            Color tmpColor = tmpColors.get();
             float mul = 1.1f + elevation / 4f;
             tmpColor.set(color);
             tmpColor.mul(mul, mul, mul, 1f);
