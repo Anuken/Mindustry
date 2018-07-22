@@ -188,7 +188,7 @@ public class WorldGenerator{
                     if(!Mathf.inBounds(x + point.x, y + point.y, width, height)) continue;
                     if(tiles[x + point.x][y + point.y].getElevation() < elevation){
 
-                        if(Mathf.chance(0.05)){
+                        if(Mathf.chance(0.06)){
                             tile.setElevation(-1);
                         }
                         break;
