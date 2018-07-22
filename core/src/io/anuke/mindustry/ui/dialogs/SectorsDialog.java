@@ -3,7 +3,6 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.ucore.core.Graphics;
@@ -47,17 +46,7 @@ public class SectorsDialog extends FloatingDialog{
         buttons().addImageTextButton("$text.sector.deploy", "icon-play",  10*3, () -> {
             hide();
 
-            ui.loadLogic(() -> {
-                if(!selected.hasSave()){
-                    world.loadSector(selected);
-                    logic.play();
-                    selected.saveID = control.getSaves().addSave("sector-" + selected.packedPosition()).index;
-                    world.sectors().save();
-                }else{
-                    control.getSaves().getByID(selected.saveID).load();
-                    state.set(State.playing);
-                }
-            });
+            ui.loadLogic(() -> world.sectors().playSector(selected));
         }).size(230f, 64f).name("deploy-button").disabled(b -> selected == null);
 
         if(debug){

@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.world.ColorMapper;
@@ -24,6 +25,18 @@ public class Sectors{
 
     public Sectors(){
         Settings.json().addClassTag("Sector", Sector.class);
+    }
+
+    public void playSector(Sector sector){
+        if(!sector.hasSave()){
+            world.loadSector(sector);
+            logic.play();
+            sector.saveID = control.getSaves().addSave("sector-" + sector.packedPosition()).index;
+            world.sectors().save();
+        }else{
+            control.getSaves().getByID(sector.saveID).load();
+            state.set(State.playing);
+        }
     }
 
     /**If a sector is not yet unlocked, returns null.*/

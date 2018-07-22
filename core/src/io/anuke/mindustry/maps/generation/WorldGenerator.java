@@ -27,16 +27,16 @@ import static io.anuke.mindustry.Vars.*;
 
 
 public class WorldGenerator{
-    private final int seed = 0;
+    private static final int baseSeed = 0;
     private int oreIndex = 0;
 
-    private Simplex sim = new Simplex(seed);
-    private Simplex sim2 = new Simplex(seed + 1);
-    private Simplex sim3 = new Simplex(seed + 2);
-    private RidgedPerlin rid = new RidgedPerlin(seed + 4, 1);
-    private VoronoiNoise vn = new VoronoiNoise(seed + 2, (short)0);
+    private Simplex sim = new Simplex(baseSeed);
+    private Simplex sim2 = new Simplex(baseSeed + 1);
+    private Simplex sim3 = new Simplex(baseSeed + 2);
+    private RidgedPerlin rid = new RidgedPerlin(baseSeed + 4, 1);
+    private VoronoiNoise vn = new VoronoiNoise(baseSeed + 2, (short)0);
 
-    private SeedRandom random = new SeedRandom(seed + 3);
+    private SeedRandom random = new SeedRandom(baseSeed + 3);
 
     private GenResult result = new GenResult();
     private ObjectMap<Block, Block> decoration;
@@ -69,7 +69,7 @@ public class WorldGenerator{
         prepareTiles(tiles, seed, genOres);
     }
 
-    public void prepareTiles(Tile[][] tiles, int seed, boolean genOres){
+    public void prepareTiles(Tile[][] tiles, long seed, boolean genOres){
 
         //find multiblocks
         IntArray multiblocks = new IntArray();
@@ -137,11 +137,11 @@ public class WorldGenerator{
 
         if(genOres){
             Array<OreEntry> ores = Array.with(
-                    new OreEntry(Items.tungsten, 0.3f, seed),
-                    new OreEntry(Items.coal, 0.284f, seed),
-                    new OreEntry(Items.lead, 0.28f, seed),
-                    new OreEntry(Items.titanium, 0.27f, seed),
-                    new OreEntry(Items.thorium, 0.26f, seed)
+                new OreEntry(Items.tungsten, 0.3f, seed),
+                new OreEntry(Items.coal, 0.284f, seed),
+                new OreEntry(Items.lead, 0.28f, seed),
+                new OreEntry(Items.titanium, 0.27f, seed),
+                new OreEntry(Items.thorium, 0.26f, seed)
             );
 
             for(int x = 0; x < tiles.length; x++){
@@ -169,6 +169,8 @@ public class WorldGenerator{
 
     public void generateMap(Tile[][] tiles, int sectorX, int sectorY){
         int width = tiles.length, height = tiles[0].length;
+        long seed = Bits.packLong(sectorX, sectorY);
+        SeedRandom rnd = new SeedRandom(seed);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
@@ -188,7 +190,7 @@ public class WorldGenerator{
                     if(!Mathf.inBounds(x + point.x, y + point.y, width, height)) continue;
                     if(tiles[x + point.x][y + point.y].getElevation() < elevation){
 
-                        if(Mathf.chance(0.06)){
+                        if(rnd.chance(0.06)){
                             tile.setElevation(-1);
                         }
                         break;
@@ -203,10 +205,6 @@ public class WorldGenerator{
         tiles[coreX][coreY].setTeam(Team.blue);
 
         prepareTiles(tiles, seed, true);
-    }
-
-    public void setSector(int sectorX, int sectorY){
-        random.setSeed(Bits.packLong(sectorX, sectorY));
     }
 
     public GenResult generateTile(int sectorX, int sectorY, int localX, int localY){
@@ -283,11 +281,11 @@ public class WorldGenerator{
         final RidgedPerlin ridge;
         final int index;
 
-        OreEntry(Item item, float frequency, int seed){
+        OreEntry(Item item, float frequency, long seed){
             this.frequency = frequency;
             this.item = item;
             this.noise = new Simplex(seed + oreIndex);
-            this.ridge = new RidgedPerlin(seed + oreIndex, 2);
+            this.ridge = new RidgedPerlin((int)(seed + oreIndex), 2);
             this.index = oreIndex++;
         }
     }

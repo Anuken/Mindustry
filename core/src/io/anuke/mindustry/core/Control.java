@@ -144,12 +144,16 @@ public class Control extends Module{
         });
 
         Events.on(GameOverEvent.class, () -> {
-            Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+            //delete saves for game-over sectors
+            if(world.getSector() != null && world.getSector().hasSave()){
+                world.getSector().getSave().delete();
+            }
 
-            //TODO game over effect
-            ui.restart.show();
-
-            Timers.runTask(30f, () -> state.set(State.menu));
+            threads.runGraphics(() -> {
+                Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+                ui.restart.show();
+                state.set(State.menu);
+            });
         });
 
         Events.on(WorldLoadEvent.class, () -> threads.runGraphics(() -> Events.fire(WorldLoadGraphicsEvent.class)));
