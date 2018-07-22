@@ -221,25 +221,14 @@ public class WorldGenerator{
         int x = sectorX * sectorSize + localX + Short.MAX_VALUE;
         int y = sectorY * sectorSize + localY + Short.MAX_VALUE;
 
-        Block floor = Blocks.stone;
+        Block floor;
         Block wall = Blocks.air;
 
         double ridge = rid.getValue(x, y, 1f / 400f);
-        double iceridge = rid.getValue(x+99999, y, 1f / 500f);
+        double iceridge = rid.getValue(x+99999, y, 1f / 300f) + sim3.octaveNoise2D(2, 1f, 1f/14f, x, y)/11f;
         double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.5, 1f / 500, x, y) * 6.1 - 1 - ridge;
         double temp = vn.noise(x, y, 1f / 300f) * sim3.octaveNoise2D(detailed ? 2 : 1, 1, 1f / 13f, x, y)/13f
         + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 920f, x, y);
-
-        double r = sim2.octaveNoise2D(1, 0.6, 1f / 70, x, y);
-        double edgeDist = Math.max(sectorSize / 2, sectorSize / 2) - Math.max(Math.abs(x - sectorSize / 2), Math.abs(y - sectorSize / 2));
-        //double dst = Vector2.dst((sectorX * sectorSize) + sectorSize/2f, (sectorY * sectorSize) + sectorSize/2f, x, y);
-        double elevDip = 30;
-
-        double border = 14;
-
-        if(edgeDist < border){
-        //    elevation += (border - edgeDist) / 6.0;
-        }
 
         if(elevation < 0.7){
             floor = Blocks.deepwater;
@@ -263,21 +252,10 @@ public class WorldGenerator{
             floor = Blocks.stone;
         }
 
-        if(elevation > 2 && iceridge > 0.3){
+        if(elevation > 3.3 && iceridge > 0.25){
             elevation ++;
             floor = Blocks.ice;
         }
-
-        //if(dst < elevDip){
-        //    elevation -= (elevDip - dst) / elevDip * 3.0;
-        /*}else*///if(detailed && r > 0.9){
-            //floor = Blocks.water;
-            //elevation = 0;
-
-            //if(r > 0.94){
-            //    floor = Blocks.deepwater;
-            //}
-        //}
 
         if(((Floor)floor).liquidDrop != null){
             elevation = 0;

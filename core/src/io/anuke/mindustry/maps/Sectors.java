@@ -18,7 +18,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Sectors{
     private static final int sectorImageSize = 16;
-    private static final float sectorLargeChance = 0.15f;
+    private static final float sectorLargeChance = 0.23f;
 
     private GridMap<Sector> grid = new GridMap<>();
 
@@ -48,7 +48,7 @@ public class Sectors{
 
     /**Creates a sector at a location if it is not present, but does not unlock it.*/
     public void createSector(int x, int y){
-        boolean isLarge = Mathf.randomSeed(Bits.packInt((short)round2(x), (short)round2(y))) < sectorLargeChance;
+        boolean isLarge = Mathf.randomSeed(3+Bits.packInt((short)round2(x), (short)round2(y))) < sectorLargeChance;
 
         if(isLarge){
             x = round2(x);

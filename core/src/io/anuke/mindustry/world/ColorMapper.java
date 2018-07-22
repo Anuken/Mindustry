@@ -27,8 +27,9 @@ public class ColorMapper implements ContentList{
         if(elevation > 0){
             if(tmpColors.get() == null) tmpColors.set(new Color());
             Color tmpColor = tmpColors.get();
-            float mul = 1.1f + elevation / 4f;
             tmpColor.set(color);
+            float maxMult = 1f/Math.max(Math.max(tmpColor.r, tmpColor.g), tmpColor.b) ;
+            float mul = Math.min(1.1f + elevation / 4f, maxMult);
             tmpColor.mul(mul, mul, mul, 1f);
             color = Color.rgba8888(tmpColor);
         }
