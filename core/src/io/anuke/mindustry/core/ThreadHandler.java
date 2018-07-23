@@ -3,6 +3,7 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
 
@@ -19,6 +20,7 @@ public class ThreadHandler{
     private float framesSinceUpdate;
     private boolean enabled;
     private boolean rendered = true;
+    private long lastFrameTime;
 
     public ThreadHandler(ThreadProvider impl){
         this.impl = impl;
@@ -69,7 +71,24 @@ public class ThreadHandler{
         return framesSinceUpdate;
     }
 
-    public void handleRender(){
+    public void handleBeginRender(){
+        lastFrameTime = TimeUtils.millis();
+    }
+
+    public void handleEndRender(){
+        int fpsCap = Settings.getInt("fpscap", 125);
+
+        if(fpsCap <= 120){
+            long target = 1000/fpsCap;
+            long elapsed = TimeUtils.timeSinceMillis(lastFrameTime);
+            if(elapsed < target){
+                try{
+                    impl.sleep(target - elapsed);
+                }catch(InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+        }
 
         if(!enabled) return;
 

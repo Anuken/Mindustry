@@ -35,8 +35,9 @@ public class Mindustry extends ModuleCore{
 
     @Override
     public void render(){
+        threads.handleBeginRender();
         super.render();
-        threads.handleRender();
+        threads.handleEndRender();
     }
 
 }

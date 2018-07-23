@@ -76,12 +76,12 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        basicFlame = new BulletType(2f, 5){
+        basicFlame = new BulletType(2.3f, 5){
             {
                 hitsize = 7f;
-                lifetime = 30f;
+                lifetime = 35f;
                 pierce = true;
-                drag = 0.07f;
+                drag = 0.05f;
                 hiteffect = BulletFx.hitFlameSmall;
                 despawneffect = Fx.none;
                 status = StatusEffects.burning;

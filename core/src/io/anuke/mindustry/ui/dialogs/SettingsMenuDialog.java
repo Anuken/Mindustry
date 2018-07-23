@@ -135,6 +135,10 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.sliderPref("saveinterval", 90, 10, 5 * 120, i -> Bundles.format("setting.seconds", i));
 
         if(!gwt){
+            graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Bundles.get("setting.fpscap.none") : Bundles.format("setting.fpscap.text", s)));
+        }
+
+        if(!gwt){
             graphics.checkPref("multithread", true, threads::setEnabled);
 
             if(Settings.getBool("multithread")){

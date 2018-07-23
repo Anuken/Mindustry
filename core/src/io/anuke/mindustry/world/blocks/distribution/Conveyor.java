@@ -142,11 +142,6 @@ public class Conveyor extends Block{
     }
 
     @Override
-    public boolean isLayer(Tile tile){
-        return tile.<ConveyorEntity>entity().convey.size > 0;
-    }
-
-    @Override
     public void drawLayer(Tile tile){
         ConveyorEntity entity = tile.entity();
 
@@ -265,7 +260,9 @@ public class Conveyor extends Block{
         entity.carrying = 0f;
         entity.minCarry = 2f;
 
-        if(totalMoved/Timers.delta() <= 0.0001f){
+        Tile next = tile.getNearby(tile.getRotation());
+
+        if((next != null && next.block() instanceof Conveyor) && totalMoved/Timers.delta() <= 0.0001f){
             entity.sleep();
         }else{
             entity.noSleep();
