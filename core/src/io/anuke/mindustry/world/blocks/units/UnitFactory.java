@@ -176,6 +176,7 @@ public class UnitFactory extends Block{
             entity.open = true;
 
             Timers.run(openDuration / 1.5f, () -> CallBlocks.onUnitFactorySpawn(tile));
+            useContent(type);
 
             entity.openCountdown = openDuration;
 

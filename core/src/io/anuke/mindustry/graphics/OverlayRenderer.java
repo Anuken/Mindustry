@@ -65,7 +65,7 @@ public class OverlayRenderer{
                 Vector2 vec = Graphics.world(input.getMouseX(), input.getMouseY());
                 Tile tile = world.tileWorld(vec.x, vec.y);
 
-                if(tile != null && tile.block() != Blocks.air){
+                if(tile != null && tile.block() != Blocks.air && tile.getTeam() == players[0].getTeam()){
                     Tile target = tile.target();
 
                     if(showBlockDebug && target.entity != null){

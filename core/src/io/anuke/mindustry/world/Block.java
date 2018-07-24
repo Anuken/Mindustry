@@ -13,6 +13,7 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
@@ -29,8 +30,7 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Block extends BaseBlock implements Content{
     private static int lastid;
@@ -179,6 +179,13 @@ public class Block extends BaseBlock implements Content{
     /** Returns whether ot not this block can be place on the specified tile. */
     public boolean canPlaceOn(Tile tile){
         return true;
+    }
+
+    /**Call when some content is produced. This unlocks the content if it is applicable.*/
+    public void useContent(UnlockableContent content){
+        if(!headless){
+            control.database().unlockContent(content);
+        }
     }
 
     /** Called after all blocks are created. */
