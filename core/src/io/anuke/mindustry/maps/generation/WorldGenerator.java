@@ -249,10 +249,12 @@ public class WorldGenerator{
             floor = Blocks.lava;
         }
 
-        if(elevation > 3){
-            floor = Blocks.snow;
-        }else if(elevation > 2.5){
-            floor = Blocks.stone;
+        if(temp < 0.6f){
+            if(elevation > 3){
+                floor = Blocks.snow;
+            }else if(elevation > 2.5){
+                floor = Blocks.stone;
+            }
         }
 
         if(elevation > 3.3 && iceridge > 0.25 && temp < 0.6f){
