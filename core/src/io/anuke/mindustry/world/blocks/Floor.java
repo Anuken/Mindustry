@@ -12,6 +12,7 @@ import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.function.BiPredicate;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Geometry;
@@ -60,6 +61,7 @@ public class Floor extends Block{
     protected TextureRegion[] variantRegions;
     protected Vector2[] offsets;
     protected Predicate<Floor> blends = block -> block != this && !block.blendOverride(this);
+    protected BiPredicate<Tile, Tile> tileBlends = (tile, other) -> false;
     protected boolean blend = true;
 
     public Floor(String name){
@@ -178,7 +180,7 @@ public class Floor extends Block{
 
             Floor floor = other.floor();
 
-            if((floor.id <= this.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || !blends.test(floor) || (floor.cacheLayer.ordinal() > this.cacheLayer.ordinal() && !sameLayer) ||
+            if((floor.id <= this.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!blends.test(floor) && !tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > this.cacheLayer.ordinal() && !sameLayer) ||
                     (sameLayer && floor.cacheLayer == this.cacheLayer)) continue;
 
             TextureRegion region = floor.edgeRegions[i];
