@@ -230,16 +230,13 @@ public class World extends Module{
 
         Tile[][] tiles = createTiles(width, height);
 
-        Map map = new Map("Sector [" + sector.x + ", " + sector.y + "]", new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
+        Map map = new Map("Sector " + sector.x + ", " + sector.y, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
         setMap(map);
 
         EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
         Timers.mark();
-        generator.generateMap(tiles, sector.x, sector.y);
-        Log.info("Time to generate base map: {0}", Timers.elapsed());
-
-        Log.info("Time to generate fully without additional events: {0}", Timers.elapsed());
+        generator.generateMap(tiles, sector);
 
         endMapLoad();
 

@@ -27,7 +27,7 @@ public class Smelter extends Block{
     protected Item result;
 
     protected float minFlux = 0.2f;
-    protected float baseFluxChance = 0.15f;
+    protected float baseFluxChance = 0.25f;
     protected boolean useFlux = false;
 
     protected float craftTime = 20f;

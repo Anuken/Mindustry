@@ -366,7 +366,7 @@ public class Control extends Module{
             }
 
             //check unlocked sectors
-            if(world.getSector() != null && world.getSector().goal.isComplete() && !world.getSector().complete){
+            if(world.getSector() != null && world.getSector().mission.isComplete() && !world.getSector().complete){
                 world.sectors().completeSector(world.getSector().x, world.getSector().y);
                 world.sectors().save();
                 if(!headless){

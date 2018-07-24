@@ -2,10 +2,10 @@ package io.anuke.mindustry.maps.goals;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class WaveGoal implements Goal{
+public class WaveMission implements Mission{
     private final int target;
 
-    public WaveGoal(int target){
+    public WaveMission(int target){
         this.target = target;
     }
 

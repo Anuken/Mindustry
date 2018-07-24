@@ -1,6 +1,7 @@
 package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.Sort;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -25,6 +26,7 @@ public class BlockRenderer{
     private FloorRenderer floorRenderer;
 
     private Array<BlockRequest> requests = new Array<>(initialRequests);
+    private IntSet teamChecks = new IntSet();
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private Layer lastLayer;
     private int requestidx = 0;
@@ -65,7 +67,11 @@ public class BlockRenderer{
         Draw.color();
     }
 
-    /**Process all blocks to draw, simultaneously drawing block shadows.*/
+    public boolean isTeamShown(Team team){
+        return teamChecks.contains(team.ordinal());
+    }
+
+    /**Process all blocks to draw, simultaneously updating the block shadow framebuffer.*/
     public void processBlocks(){
         iterateidx = 0;
         lastLayer = null;
@@ -86,6 +92,7 @@ public class BlockRenderer{
             shadows.setSize(shadowW, shadowH);
         }
 
+        teamChecks.clear();
         requestidx = 0;
 
         Graphics.end();
@@ -106,6 +113,7 @@ public class BlockRenderer{
 
                     if(tile != null){
                         Block block = tile.block();
+                        Team team = tile.getTeam();
 
                         if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
                             tile.block().drawShadow(tile);
@@ -114,6 +122,7 @@ public class BlockRenderer{
                         if(block != Blocks.air){
                             if(!expanded){
                                 addRequest(tile, Layer.block);
+                                teamChecks.add(team.ordinal());
                             }
 
                             if(block.expanded || !expanded){
@@ -194,7 +203,9 @@ public class BlockRenderer{
             synchronized(Tile.tileSetLock){
                 Block block = req.tile.block();
 
-                if(req.layer == block.layer){
+                if(req.layer == Layer.block){
+                    block.draw(req.tile);
+                }else if(req.layer == block.layer){
                     block.drawLayer(req.tile);
                 }else if(req.layer == block.layer2){
                     block.drawLayer2(req.tile);

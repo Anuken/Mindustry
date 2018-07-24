@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
+import io.anuke.mindustry.maps.goals.BattleMission;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.ucore.core.Settings;
@@ -75,6 +76,7 @@ public class Sectors{
         sector.y = (short)y;
         sector.complete = false;
         sector.size = isLarge ? 2 : 1;
+        initSector(sector);
 
         for(int cx = 0; cx < sector.size; cx++){
             for(int cy = 0; cy < sector.size; cy++){
@@ -90,6 +92,7 @@ public class Sectors{
 
         for(Sector sector : out){
             createTexture(sector);
+            initSector(sector);
             for(int cx = 0; cx < sector.size; cx++){
                 for(int cy = 0; cy < sector.size; cy++){
                     grid.put(sector.x + cx, sector.y + cy, sector);
@@ -111,6 +114,10 @@ public class Sectors{
 
         Settings.putJson("sectors", out);
         Settings.save();
+    }
+
+    private void initSector(Sector sector){
+        sector.mission = new BattleMission();
     }
 
     private int round2(int i){

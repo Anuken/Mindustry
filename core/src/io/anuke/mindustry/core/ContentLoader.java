@@ -35,65 +35,65 @@ public class ContentLoader{
     private static OrderedMap<String, Array<Content>> contentMap = new OrderedMap<>();
     private static ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
     private static ContentList[] content = {
-            //effects
-            new BlockFx(),
-            new BulletFx(),
-            new EnvironmentFx(),
-            new ExplosionFx(),
-            new Fx(),
-            new ShootFx(),
-            new UnitFx(),
+        //effects
+        new BlockFx(),
+        new BulletFx(),
+        new EnvironmentFx(),
+        new ExplosionFx(),
+        new Fx(),
+        new ShootFx(),
+        new UnitFx(),
 
-            //items
-            new Items(),
+        //items
+        new Items(),
 
-            //status effects
-            new StatusEffects(),
+        //status effects
+        new StatusEffects(),
 
-            //liquids
-            new Liquids(),
+        //liquids
+        new Liquids(),
 
-            //bullets
-            new ArtilleryBullets(),
-            new FlakBullets(),
-            new MissileBullets(),
-            new StandardBullets(),
-            new TurretBullets(),
-            new WeaponBullets(),
+        //bullets
+        new ArtilleryBullets(),
+        new FlakBullets(),
+        new MissileBullets(),
+        new StandardBullets(),
+        new TurretBullets(),
+        new WeaponBullets(),
 
 
-            //ammotypes
-            new AmmoTypes(),
+        //ammotypes
+        new AmmoTypes(),
 
-            //weapons
-            new Weapons(),
+        //weapons
+        new Weapons(),
 
-            //mechs
-            new Mechs(),
+        //mechs
+        new Mechs(),
 
-            //units
-            new UnitTypes(),
+        //units
+        new UnitTypes(),
 
-            //blocks
-            new Blocks(),
-            new DefenseBlocks(),
-            new DistributionBlocks(),
-            new ProductionBlocks(),
-            new TurretBlocks(),
-            new DebugBlocks(),
-            new LiquidBlocks(),
-            new StorageBlocks(),
-            new UnitBlocks(),
-            new PowerBlocks(),
-            new CraftingBlocks(),
-            new UpgradeBlocks(),
-            new OreBlocks(),
+        //blocks
+        new Blocks(),
+        new DefenseBlocks(),
+        new DistributionBlocks(),
+        new ProductionBlocks(),
+        new TurretBlocks(),
+        new DebugBlocks(),
+        new LiquidBlocks(),
+        new StorageBlocks(),
+        new UnitBlocks(),
+        new PowerBlocks(),
+        new CraftingBlocks(),
+        new UpgradeBlocks(),
+        new OreBlocks(),
 
-            //not really a content class, but this makes initialization easier
-            new ColorMapper(),
+        //not really a content class, but this makes initialization easier
+        new ColorMapper(),
 
-            //recipes
-            new Recipes(),
+        //recipes
+        new Recipes(),
     };
 
     /**

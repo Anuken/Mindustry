@@ -11,6 +11,7 @@ import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
+import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -18,7 +19,6 @@ import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
 import io.anuke.ucore.noise.VoronoiNoise;
-import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.SeedRandom;
@@ -167,14 +167,13 @@ public class WorldGenerator{
         }
     }
 
-    public void generateMap(Tile[][] tiles, int sectorX, int sectorY){
+    public void generateMap(Tile[][] tiles, Sector sector){
         int width = tiles.length, height = tiles[0].length;
-        long seed = Bits.packLong(sectorX, sectorY);
-        SeedRandom rnd = new SeedRandom(seed);
+        SeedRandom rnd = new SeedRandom(sector.getSeed());
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                GenResult result = generateTile(sectorX, sectorY, x, y);
+                GenResult result = generateTile(sector.x, sector.y, x, y);
                 Tile tile = new Tile(x, y, (byte)result.floor.id, (byte)result.wall.id, (byte)0, (byte)0, result.elevation);
                 tiles[x][y] = tile;
             }
@@ -204,7 +203,9 @@ public class WorldGenerator{
         tiles[coreX][coreY].setBlock(StorageBlocks.core);
         tiles[coreX][coreY].setTeam(Team.blue);
 
-        prepareTiles(tiles, seed, true);
+        sector.mission.generate(tiles, sector);
+
+        prepareTiles(tiles, sector.getSeed(), true);
     }
 
     public GenResult generateTile(int sectorX, int sectorY, int localX, int localY){

@@ -25,7 +25,7 @@ public class MapEditor{
     private byte elevation;
     private int rotation;
     private Block drawBlock = Blocks.stone;
-    private Team drawTeam = Team.none;
+    private Team drawTeam = Team.blue;
 
     public MapEditor(){
 

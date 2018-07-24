@@ -31,7 +31,7 @@ public class PowerSmelter extends PowerBlock{
 
     protected float minFlux = 0.2f;
     protected int fluxNeeded = 1;
-    protected float baseFluxChance = 0.15f;
+    protected float baseFluxChance = 0.25f;
     protected boolean useFlux = false;
 
     protected float heatUpTime = 80f;

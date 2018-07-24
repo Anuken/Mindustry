@@ -215,7 +215,23 @@ public class Renderer extends RendererModule{
 
         blocks.processBlocks();
         blocks.drawShadows();
-        blocks.drawBlocks(Layer.block);
+        for(Team team : Team.all){
+            if(blocks.isTeamShown(team)){
+                boolean outline = team != players[0].getTeam() && team != Team.none;
+
+                if(outline){
+                    Shaders.outline.color.set(team.color);
+                    Graphics.beginShaders(Shaders.outline);
+                }
+
+                blocks.drawTeamBlocks(Layer.block, team);
+
+                if(outline){
+                    Graphics.endShaders();
+                }
+            }
+        }
+        blocks.skipLayer(Layer.block);
 
         Graphics.shader(Shaders.blockbuild, false);
         blocks.drawBlocks(Layer.placement);

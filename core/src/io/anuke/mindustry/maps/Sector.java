@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.maps.goals.Goal;
-import io.anuke.mindustry.maps.goals.WaveGoal;
+import io.anuke.mindustry.maps.goals.Mission;
+import io.anuke.mindustry.maps.goals.WaveMission;
 import io.anuke.ucore.util.Bits;
 
 import static io.anuke.mindustry.Vars.control;
@@ -21,10 +21,14 @@ public class Sector{
     public int size = 1;
     /**Display texture. Needs to be disposed.*/
     public transient Texture texture;
-    /**Goal of this sector-- what needs to be accomplished to unlock it.*/
-    public transient Goal goal = new WaveGoal(30);
+    /**Mission of this sector-- what needs to be accomplished to unlock it.*/
+    public transient Mission mission = new WaveMission(30);
     /**Enemies spawned at this sector.*/
     public transient Array<SpawnGroup> spawns = new Array<>();
+
+    public int getSeed(){
+        return Bits.packInt(x, y);
+    }
 
     public SaveSlot getSave(){
         return control.getSaves().getByID(saveID);
