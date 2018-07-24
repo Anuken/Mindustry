@@ -2,11 +2,14 @@ package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.ucore.function.Supplier;
@@ -37,7 +40,7 @@ public class UnitType implements UnlockableContent{
     public float carryWeight = 1f;
     public int ammoCapacity = 100;
     public int itemCapacity = 30;
-    public int mineLevel = 2;
+    public ObjectSet<Item> toMine = ObjectSet.with(Items.lead, Items.tungsten);
     public float buildPower = 0.3f, minePower = 0.7f, healSpeed = 0.1f;
     public Weapon weapon = Weapons.blaster;
     public float weaponOffsetX, weaponOffsetY;

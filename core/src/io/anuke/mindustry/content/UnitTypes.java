@@ -1,6 +1,7 @@
 package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.entities.units.types.*;
 import io.anuke.mindustry.game.Content;
@@ -69,6 +70,7 @@ public class UnitTypes implements ContentList{
             buildPower = 0.9f;
             minePower = 1.1f;
             healSpeed = 0.09f;
+            toMine = ObjectSet.with(Items.lead, Items.tungsten, Items.titanium);
         }};
     }
 
