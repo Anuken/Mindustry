@@ -225,7 +225,7 @@ public class WorldGenerator{
 
         double ridge = rid.getValue(x, y, 1f / 400f);
         double iceridge = rid.getValue(x+99999, y, 1f / 300f) + sim3.octaveNoise2D(2, 1f, 1f/14f, x, y)/11f;
-        double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.5, 1f / 500, x, y) * 6.1 - 1 - ridge;
+        double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.62, 1f / 640, x, y) * 6.1 - 1 - ridge;
         double temp = vn.noise(x, y, 1f / 300f) * sim3.octaveNoise2D(detailed ? 2 : 1, 1, 1f / 13f, x, y)/13f
         + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 920f, x, y);
 
@@ -237,21 +237,25 @@ public class WorldGenerator{
             floor = Blocks.sand;
         }else if(temp < 0.55){
             floor = Blocks.grass;
-        }else if(temp < 0.65){
+        }else if(temp < 0.6){
             floor = Blocks.sand;
         }else if(temp + ridge/2f < 0.8 || elevation < 1.3){
             floor = Blocks.blackstone;
+
+            if(iceridge > 0.25){
+                elevation ++;
+            }
         }else{
             floor = Blocks.lava;
         }
 
-        if(elevation > 3.5){
+        if(elevation > 3){
             floor = Blocks.snow;
-        }else if(elevation > 3){
+        }else if(elevation > 2.5){
             floor = Blocks.stone;
         }
 
-        if(elevation > 3.3 && iceridge > 0.25){
+        if(elevation > 3.3 && iceridge > 0.25 && temp < 0.6f){
             elevation ++;
             floor = Blocks.ice;
         }
