@@ -16,7 +16,7 @@ public class Waves{
                 unitScaling = 2;
             }},
 
-            new SpawnGroup(UnitTypes.vtol){{
+            new SpawnGroup(UnitTypes.interceptor){{
                 begin = 12;
                 end = 14;
             }},
@@ -70,7 +70,7 @@ public class Waves{
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(UnitTypes.vtol){{
+            new SpawnGroup(UnitTypes.interceptor){{
                 begin = 16;
                 unitScaling = 2;
                 spacing = 2;
@@ -128,7 +128,7 @@ public class Waves{
                 max = 8;
             }},
 
-            new SpawnGroup(UnitTypes.vtol){{
+            new SpawnGroup(UnitTypes.interceptor){{
                 begin = 50;
                 unitAmount = 4;
                 unitScaling = 3;

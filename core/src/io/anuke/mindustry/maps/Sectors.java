@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
@@ -118,6 +119,8 @@ public class Sectors{
 
     private void initSector(Sector sector){
         sector.mission = new BattleMission();
+        //add all ores for now since material differences aren't well handled yet
+        sector.ores.addAll(Items.tungsten, Items.coal, Items.lead, Items.thorium, Items.titanium);
     }
 
     private int round2(int i){

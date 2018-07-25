@@ -6,6 +6,7 @@ import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.maps.goals.Mission;
 import io.anuke.mindustry.maps.goals.WaveMission;
+import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.util.Bits;
 
 import static io.anuke.mindustry.Vars.control;
@@ -25,6 +26,8 @@ public class Sector{
     public transient Mission mission = new WaveMission(30);
     /**Enemies spawned at this sector.*/
     public transient Array<SpawnGroup> spawns = new Array<>();
+    /**Ores that appear in this sector.*/
+    public transient Array<Item> ores = new Array<>();
 
     public int getSeed(){
         return Bits.packInt(x, y);

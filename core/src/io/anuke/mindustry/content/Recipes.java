@@ -134,6 +134,7 @@ public class Recipes implements ContentList{
         //actual unit related stuff
         new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.tungsten, 50), new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 130));
         new Recipe(units, UnitBlocks.fabricatorFactory, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 100), new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 300));
+        new Recipe(units, UnitBlocks.interceptorFactory, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 100), new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 300));
 
         new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));
         new Recipe(units, UnitBlocks.resupplyPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));

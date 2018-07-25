@@ -8,7 +8,7 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
 
 public class UnitTypes implements ContentList{
-    public static UnitType drone, scout, vtol, monsoon, titan, fabricator;
+    public static UnitType drone, scout, interceptor, monsoon, titan, fabricator;
 
     @Override
     public void load(){
@@ -41,7 +41,7 @@ public class UnitTypes implements ContentList{
             health = 260;
         }};
 
-        vtol = new UnitType("vtol", Vtol.class, Vtol::new){{
+        interceptor = new UnitType("interceptor", Interceptor.class, Interceptor::new){{
             speed = 0.3f;
             maxVelocity = 1.9f;
             drag = 0.01f;

@@ -210,7 +210,7 @@ public class BuildBlock extends Block{
             }
             
             if(progress >= 1f || debug){
-                CallBlocks.onConstructFinish(tile, recipe.result, builderID, tile.getRotation(), tile.getTeam());
+                CallBlocks.onConstructFinish(tile, recipe.result, builderID, tile.getRotation(), builder.getTeam());
             }
         }
 

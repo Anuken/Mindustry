@@ -66,10 +66,10 @@ public class WorldGenerator{
             }
         }
 
-        prepareTiles(tiles, seed, genOres);
+        prepareTiles(tiles, seed, genOres, null);
     }
 
-    public void prepareTiles(Tile[][] tiles, long seed, boolean genOres){
+    public void prepareTiles(Tile[][] tiles, long seed, boolean genOres, Array<Item> usedOres){
 
         //find multiblocks
         IntArray multiblocks = new IntArray();
@@ -136,13 +136,22 @@ public class WorldGenerator{
         oreIndex = 0;
 
         if(genOres){
-            Array<OreEntry> ores = Array.with(
+            Array<OreEntry> baseOres = Array.with(
                 new OreEntry(Items.tungsten, 0.3f, seed),
                 new OreEntry(Items.coal, 0.284f, seed),
                 new OreEntry(Items.lead, 0.28f, seed),
                 new OreEntry(Items.titanium, 0.27f, seed),
                 new OreEntry(Items.thorium, 0.26f, seed)
             );
+
+            Array<OreEntry> ores = new Array<>();
+            if(usedOres == null){
+                ores.addAll(baseOres);
+            }else{
+                for(Item item : usedOres){
+                    ores.add(baseOres.select(entry -> entry.item == item).iterator().next());
+                }
+            }
 
             for(int x = 0; x < tiles.length; x++){
                 for(int y = 0; y < tiles[0].length; y++){
@@ -205,7 +214,7 @@ public class WorldGenerator{
 
         sector.mission.generate(tiles, sector);
 
-        prepareTiles(tiles, sector.getSeed(), true);
+        prepareTiles(tiles, sector.getSeed(), true, sector.ores);
     }
 
     public GenResult generateTile(int sectorX, int sectorY, int localX, int localY){
