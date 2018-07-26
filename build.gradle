@@ -154,12 +154,10 @@ project(":core") {
         compileOnly project(":annotations")
         build.finalizedBy(finish)
 
-        boolean comp = System.properties["release"] == null || System.properties["release"] == "false"
+        def comp = System.properties["release"] == null || System.properties["release"] == "false"
 
         if(!comp){
-            println("NOTICE: Compiling release build.")
-        }else{
-            println("Compiling DEBUG build.")
+            println("Note: Compiling release build.")
         }
 
         if(new File(projectDir.parent, '../uCore').exists() && comp){
