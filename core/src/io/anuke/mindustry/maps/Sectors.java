@@ -9,7 +9,7 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
-import io.anuke.mindustry.maps.goals.BattleMission;
+import io.anuke.mindustry.maps.missions.BattleMission;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.ucore.core.Settings;

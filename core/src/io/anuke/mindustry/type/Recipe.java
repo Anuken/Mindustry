@@ -113,7 +113,7 @@ public class Recipe implements UnlockableContent{
 
     @Override
     public boolean isHidden(){
-        return debugOnly;
+        return debugOnly || (desktopOnly && mobile);
     }
 
     @Override

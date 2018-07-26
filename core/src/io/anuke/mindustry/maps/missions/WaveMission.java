@@ -1,4 +1,4 @@
-package io.anuke.mindustry.maps.goals;
+package io.anuke.mindustry.maps.missions;
 
 import static io.anuke.mindustry.Vars.*;
 

@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.maps.goals.Mission;
-import io.anuke.mindustry.maps.goals.WaveMission;
+import io.anuke.mindustry.maps.missions.Mission;
+import io.anuke.mindustry.maps.missions.WaveMission;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.util.Bits;
 

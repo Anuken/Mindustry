@@ -1,4 +1,4 @@
-package io.anuke.mindustry.maps.goals;
+package io.anuke.mindustry.maps.missions;
 
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.world.Tile;

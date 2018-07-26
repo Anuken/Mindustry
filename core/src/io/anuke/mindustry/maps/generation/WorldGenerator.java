@@ -207,7 +207,7 @@ public class WorldGenerator{
             }
         }
 
-        int coreX = width/2, coreY = height/3;
+        int coreX = 60, coreY = 60;
 
         tiles[coreX][coreY].setBlock(StorageBlocks.core);
         tiles[coreX][coreY].setTeam(Team.blue);
