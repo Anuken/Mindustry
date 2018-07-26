@@ -23,6 +23,9 @@ import static io.anuke.mindustry.Vars.world;
 public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected static Translator vec = new Translator();
     protected static float wobblyness = 0.6f;
+
+    protected Trail trail = new Trail(8);
+    protected CarriableTrait carrying;
     protected final UnitState
 
     resupply = new UnitState(){
@@ -115,12 +118,18 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             }
         }
     };
-    protected Trail trail = new Trail(8);
-    protected CarriableTrait carrying;
 
     //instantiation only
     public FlyingUnit(){
 
+    }
+
+    @Override
+    public void onCommand(UnitCommand command){
+        state.set(command == UnitCommand.retreat ? retreat :
+                 (command == UnitCommand.attack ? attack :
+                 (command == UnitCommand.idle ? resupply :
+                 (null))));
     }
 
     @Override

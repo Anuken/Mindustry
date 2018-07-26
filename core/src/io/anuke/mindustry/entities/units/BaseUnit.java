@@ -58,9 +58,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected Squad squad;
     protected int spawner;
 
-    /**
-     * internal constructor used for deserialization, DO NOT USE
-     */
+    /**internal constructor used for deserialization, DO NOT USE*/
     public BaseUnit(){
     }
 
@@ -86,9 +84,10 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         threads.runDelay(unit::remove);
     }
 
-    /**
-     * Initialize the type and team of this unit. Only call once!
-     */
+    /**Called when a command is recieved from the command center.*/
+    public abstract void onCommand(UnitCommand command);
+
+    /**Initialize the type and team of this unit. Only call once!*/
     public void init(UnitType type, Team team){
         if(this.type != null) throw new RuntimeException("This unit is already initialized!");
 
@@ -108,9 +107,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         this.spawner = tile.packedPosition();
     }
 
-    /**
-     * Sets this to a 'wave' unit, which means it has slightly different AI and will not run out of ammo.
-     */
+    /**Sets this to a 'wave' unit, which means it has slightly different AI and will not run out of ammo.*/
     public void setWave(){
         isWave = true;
     }

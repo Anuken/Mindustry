@@ -31,9 +31,11 @@ public abstract class GroundUnit extends BaseUnit{
 
     protected float walkTime;
     protected float baseRotation;
+    protected Weapon weapon;
+
     public final UnitState
 
-            resupply = new UnitState(){
+    resupply = new UnitState(){
         public void entered(){
             target = null;
         }
@@ -51,64 +53,71 @@ public abstract class GroundUnit extends BaseUnit{
             }
         }
     },
-            attack = new UnitState(){
-                public void entered(){
-                    target = null;
-                }
+    attack = new UnitState(){
+        public void entered(){
+            target = null;
+        }
 
-                public void update(){
-                    TileEntity core = getClosestEnemyCore();
-                    float dst = core == null ? 0 : distanceTo(core);
+        public void update(){
+            TileEntity core = getClosestEnemyCore();
+            float dst = core == null ? 0 : distanceTo(core);
 
-                    if(core != null && inventory.hasAmmo() && dst < inventory.getAmmo().getRange() / 1.1f){
-                        target = core;
-                    }else{
-                        retarget(() -> targetClosest());
-                    }
+            if(core != null && inventory.hasAmmo() && dst < inventory.getAmmo().getRange() / 1.1f){
+                target = core;
+            }else{
+                retarget(() -> targetClosest());
+            }
 
-                    if(!inventory.hasAmmo()){
-                        state.set(resupply);
-                    }else if(target != null){
-                        if(core != null){
-                            if(dst > inventory.getAmmo().getRange() * 0.5f){
-                                moveToCore();
-                            }
-
-                        }else{
-                            moveToCore();
-                        }
-
-                        if(distanceTo(target) < inventory.getAmmo().getRange()){
-                            rotate(angleTo(target));
-
-                            if(Mathf.angNear(angleTo(target), rotation, 13f)){
-                                AmmoType ammo = inventory.getAmmo();
-
-                                Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.bullet.speed);
-
-                                getWeapon().update(GroundUnit.this, to.x, to.y);
-                            }
-                        }
-
-                    }else{
+            if(!inventory.hasAmmo()){
+                state.set(resupply);
+            }else if(target != null){
+                if(core != null){
+                    if(dst > inventory.getAmmo().getRange() * 0.5f){
                         moveToCore();
                     }
-                }
-            },
-            retreat = new UnitState(){
-                public void entered(){
-                    target = null;
+
+                }else{
+                    moveToCore();
                 }
 
-                public void update(){
-                    if(health >= health){
-                        state.set(attack);
+                if(distanceTo(target) < inventory.getAmmo().getRange()){
+                    rotate(angleTo(target));
+
+                    if(Mathf.angNear(angleTo(target), rotation, 13f)){
+                        AmmoType ammo = inventory.getAmmo();
+
+                        Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.bullet.speed);
+
+                        getWeapon().update(GroundUnit.this, to.x, to.y);
                     }
-
-                    moveAwayFromCore();
                 }
-            };
-    protected Weapon weapon;
+
+            }else{
+                moveToCore();
+            }
+        }
+    },
+    retreat = new UnitState(){
+        public void entered(){
+            target = null;
+        }
+
+        public void update(){
+            if(health >= health){
+                state.set(attack);
+            }
+
+            moveAwayFromCore();
+        }
+    };
+
+    @Override
+    public void onCommand(UnitCommand command){
+        state.set(command == UnitCommand.retreat ? retreat :
+                (command == UnitCommand.attack ? attack :
+                (command == UnitCommand.idle ? resupply :
+                (null))));
+    }
 
     @Override
     public void init(UnitType type, Team team){

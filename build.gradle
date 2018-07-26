@@ -156,9 +156,7 @@ project(":core") {
 
         def comp = System.properties["release"] == null || System.properties["release"] == "false"
 
-        if(!comp){
-            println("Note: Compiling release build.")
-        }
+        if(!comp) println("Note: Compiling release build.")
 
         if(new File(projectDir.parent, '../uCore').exists() && comp){
             compile project(":uCore")
