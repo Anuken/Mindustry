@@ -65,7 +65,7 @@ public class UnitBlocks extends BlockList implements ContentList{
         }};
 
         commandCenter = new CommandCenter("command-center"){{
-
+            size = 2;
         }};
     }
 }

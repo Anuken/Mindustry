@@ -32,9 +32,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     private Object data;
     private boolean supressCollision;
 
-    /**
-     * Internal use only!
-     */
+    /**Internal use only!*/
     public Bullet(){
     }
 
