@@ -4,20 +4,19 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.gen.CallEntity;
-import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.trait.SolidTrait;
 
 public interface CarryTrait extends TeamTrait, SolidTrait, TargetTrait{
-    @Remote(called = Loc.both, targets = Loc.both, forward = true, in = In.entities)
+    @Remote(called = Loc.both, targets = Loc.both, forward = true)
     static void dropSelf(Player player){
         if(player.getCarrier() != null){
             player.getCarrier().dropCarry();
         }
     }
 
-    @Remote(called = Loc.both, targets = Loc.both, forward = true, in = In.entities)
+    @Remote(called = Loc.both, targets = Loc.both, forward = true)
     static void setCarryOf(Player player, CarryTrait trait, CarriableTrait unit){
         if(trait == null) return;
         if(player != null){ //when a server recieves this called from a player, set the carrier to the player.
@@ -72,6 +71,6 @@ public interface CarryTrait extends TeamTrait, SolidTrait, TargetTrait{
      * Carries a unit. To drop a unit, call with {@code null}.
      */
     default void carry(CarriableTrait unit){
-        CallEntity.setCarryOf(this instanceof Player ? (Player) this : null, this, unit);
+        Call.setCarryOf(this instanceof Player ? (Player) this : null, this, unit);
     }
 }

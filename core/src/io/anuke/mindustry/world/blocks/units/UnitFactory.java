@@ -9,10 +9,9 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -52,7 +51,7 @@ public class UnitFactory extends Block{
         consumes.require(ConsumeItems.class);
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void onUnitFactorySpawn(Tile tile){
         UnitFactoryEntity entity = tile.entity();
         UnitFactory factory = (UnitFactory) tile.block();
@@ -175,7 +174,7 @@ public class UnitFactory extends Block{
         if(entity.buildTime >= produceTime && !entity.open){
             entity.open = true;
 
-            Timers.run(openDuration / 1.5f, () -> CallBlocks.onUnitFactorySpawn(tile));
+            Timers.run(openDuration / 1.5f, () -> Call.onUnitFactorySpawn(tile));
             useContent(type);
 
             entity.openCountdown = openDuration;

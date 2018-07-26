@@ -12,7 +12,7 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnit;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
-import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -227,7 +227,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
             if(distanceTo(target) < type.range){
                 if(tile.tile.block().acceptStack(inventory.getItem().item, inventory.getItem().amount, tile.tile, Drone.this) == inventory.getItem().amount){
-                    CallEntity.transferItemTo(inventory.getItem().item, inventory.getItem().amount, x, y, tile.tile);
+                    Call.transferItemTo(inventory.getItem().item, inventory.getItem().amount, x, y, tile.tile);
                     inventory.clearItem();
                 }
 
@@ -288,7 +288,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         float dist = Math.min(entity.distanceTo(x, y) - placeDistance, 0);
 
         if(dist / type.maxVelocity < timeToBuild * 0.9f){
-            //CallEntity.onDroneBeginBuild(this, entity.tile, entity.recipe);
+            //Call.onDroneBeginBuild(this, entity.tile, entity.recipe);
             target = entity;
             setState(build);
         }

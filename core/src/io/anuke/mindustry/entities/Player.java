@@ -14,10 +14,9 @@ import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.*;
@@ -83,7 +82,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     //region unit and event overrides, utility methods
 
-    @Remote(in = In.entities, targets = Loc.server, called = Loc.server)
+    @Remote(targets = Loc.server, called = Loc.server)
     public static void onPlayerDamage(Player player, float amount){
         if(player == null) return;
 
@@ -91,7 +90,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         player.health -= amount;
     }
 
-    @Remote(in = In.entities, targets = Loc.server, called = Loc.server)
+    @Remote(targets = Loc.server, called = Loc.server)
     public static void onPlayerDeath(Player player){
         if(player == null) return;
 
@@ -228,10 +227,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void damage(float amount){
-        CallEntity.onPlayerDamage(this, calculateDamage(amount));
+        Call.onPlayerDamage(this, calculateDamage(amount));
 
         if(health <= 0 && !dead){
-            CallEntity.onPlayerDeath(this);
+            Call.onPlayerDeath(this);
         }
     }
 
@@ -511,7 +510,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         if(!ui.chatfrag.chatOpen() && Inputs.keyTap("drop_unit")){
             if(!mech.flying){
                 if(getCarrier() != null){
-                    CallEntity.dropSelf(this);
+                    Call.dropSelf(this);
                 }
             }else if(getCarry() != null){
                 dropCarry();

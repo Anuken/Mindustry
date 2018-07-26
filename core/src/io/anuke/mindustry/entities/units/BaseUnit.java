@@ -16,7 +16,7 @@ import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
-import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
@@ -62,7 +62,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public BaseUnit(){
     }
 
-    @Remote(called = Loc.server, in = In.entities)
+    @Remote(called = Loc.server)
     public static void onUnitDeath(BaseUnit unit){
         if(unit == null) return;
 
@@ -370,7 +370,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public void onDeath(){
-        CallEntity.onUnitDeath(this);
+        Call.onUnitDeath(this);
     }
 
     @Override

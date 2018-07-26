@@ -11,7 +11,7 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
@@ -46,13 +46,13 @@ public class BuildBlock extends Block{
         solidifes = true;
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void onDeconstructFinish(Tile tile, Block block){
         Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
         world.removeBlock(tile);
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team){
         world.setBlock(tile, block, team);
         tile.setRotation(rotation);
@@ -210,7 +210,7 @@ public class BuildBlock extends Block{
             }
             
             if(progress >= 1f || debug){
-                CallBlocks.onConstructFinish(tile, recipe.result, builderID, tile.getRotation(), builder.getTeam());
+                Call.onConstructFinish(tile, recipe.result, builderID, tile.getRotation(), builder.getTeam());
             }
         }
 
@@ -238,7 +238,7 @@ public class BuildBlock extends Block{
             progress = Mathf.clamp(progress - amount);
 
             if(progress <= 0 || debug){
-                CallBlocks.onDeconstructFinish(tile, this.recipe == null ? previous : this.recipe.result);
+                Call.onDeconstructFinish(tile, this.recipe == null ? previous : this.recipe.result);
             }
         }
 

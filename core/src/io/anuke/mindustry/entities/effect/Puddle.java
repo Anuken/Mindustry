@@ -15,7 +15,7 @@ import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
-import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Liquid;
@@ -136,7 +136,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
                 (liquid.flammability > 0.3f && dest.temperature > 0.7f)){ //flammable liquid + hot liquid
             Fire.create(tile);
             if(Mathf.chance(0.006 * amount)){
-                CallEntity.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f));
+                Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f));
             }
         }else if(dest.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot puddle
             if(Mathf.chance(0.5f * amount)){
@@ -152,7 +152,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         return 0f;
     }
 
-    @Remote(called = Loc.server, in = In.entities)
+    @Remote(called = Loc.server)
     public static void onPuddleRemoved(int puddleid){
         puddleGroup.removeByID(puddleid);
     }
@@ -190,7 +190,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
             amount = Mathf.clamp(amount, 0, maxLiquid);
 
             if(amount <= 0f){
-                CallEntity.onPuddleRemoved(getID());
+                Call.onPuddleRemoved(getID());
             }
         }
 

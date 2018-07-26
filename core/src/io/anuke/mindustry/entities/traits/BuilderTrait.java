@@ -8,7 +8,7 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
@@ -243,7 +243,7 @@ public interface BuilderTrait extends Entity{
 
             if(unit.inventory.canAcceptItem(item) &&
                     Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
-                CallEntity.transferItemToUnit(item,
+                Call.transferItemToUnit(item,
                         tile.worldx() + Mathf.range(tilesize / 2f),
                         tile.worldy() + Mathf.range(tilesize / 2f),
                         unit);

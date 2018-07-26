@@ -11,7 +11,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.ItemDrop;
-import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.In;
@@ -56,7 +56,7 @@ public class MassDriver extends Block{
         hasPower = true;
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void linkMassDriver(Player player, Tile tile, int position){
         MassDriverEntity entity = tile.entity();
 
@@ -64,7 +64,7 @@ public class MassDriver extends Block{
         threads.run(() -> entity.link = position);
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void onMassDriverFire(Tile tile, Tile target){
         //just in case the client has invalid data
         if(!(tile.entity instanceof MassDriverEntity) || !(target.entity instanceof MassDriverEntity)) return;
@@ -137,7 +137,7 @@ public class MassDriver extends Block{
 
                 if(Mathf.angNear(entity.rotation, target, 1f) &&
                         Mathf.angNear(other.rotation, target + 180f, 1f)){
-                    CallBlocks.onMassDriverFire(tile, link);
+                    Call.onMassDriverFire(tile, link);
                 }
             }
         }
@@ -182,10 +182,10 @@ public class MassDriver extends Block{
         MassDriverEntity entity = tile.entity();
 
         if(entity.link == other.packedPosition()){
-            CallBlocks.linkMassDriver(null, tile, -1);
+            Call.linkMassDriver(null, tile, -1);
             return false;
         }else if(other.block() instanceof MassDriver && other.distanceTo(tile) <= range){
-            CallBlocks.linkMassDriver(null, tile, other.packedPosition());
+            Call.linkMassDriver(null, tile, other.packedPosition());
             return false;
         }
 

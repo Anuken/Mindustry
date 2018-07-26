@@ -52,7 +52,7 @@ public class CommandCenter extends Block{
         //TODO
     }
 
-    @Remote(called = Loc.server, forward = true, in = In.blocks, targets = Loc.both)
+    @Remote(called = Loc.server, forward = true, targets = Loc.both)
     public static void onCommandCenterSet(Player player, Tile tile, UnitCommand command){
         for(Tile center : world.indexer().getAllied(tile.getTeam(), BlockFlag.comandCenter)){
             if(center.block() instanceof CommandCenter){

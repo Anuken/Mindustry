@@ -85,7 +85,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         create(type, parent.owner, parent.team, x, y, angle, velocityScl);
     }
 
-    @Remote(called = Loc.server, in = In.entities)
+    @Remote(called = Loc.server)
     public static void createBullet(BulletType type, float x, float y, float angle){
         create(type, null, Team.none, x, y, angle);
     }

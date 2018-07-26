@@ -3,11 +3,9 @@ package io.anuke.mindustry.world.blocks.storage;
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.gen.CallBlocks;
-import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.SelectionTrait;
@@ -25,7 +23,7 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
         configurable = true;
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSortedUnloaderItem(Player player, Tile tile, Item item){
         SortedUnloaderEntity entity = tile.entity();
         entity.sortItem = item;
@@ -63,7 +61,7 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
     @Override
     public void buildTable(Tile tile, Table table){
         SortedUnloaderEntity entity = tile.entity();
-        buildItemTable(table, true, () -> entity.sortItem, item -> CallBlocks.setSortedUnloaderItem(null, tile, item));
+        buildItemTable(table, true, () -> entity.sortItem, item -> Call.setSortedUnloaderItem(null, tile, item));
     }
 
     @Override

@@ -35,6 +35,8 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor{
     private static final String readServerName = "RemoteReadServer";
     /** Name of class that handles reading and invoking packets on the client. */
     private static final String readClientName = "RemoteReadClient";
+    /**Simple class name of generated class name.*/
+    private static final String callLocation = "Call";
 
     /** Processing round number. */
     private int round;
@@ -102,15 +104,15 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor{
                     }
 
                     //get and create class entry if needed
-                    if(!classMap.containsKey(annotation.in())){
-                        ClassEntry clas = new ClassEntry(annotation.in());
-                        classMap.put(annotation.in(), clas);
+                    if(!classMap.containsKey(callLocation)){
+                        ClassEntry clas = new ClassEntry(callLocation);
+                        classMap.put(callLocation, clas);
                         classes.add(clas);
 
                         Utils.messager.printMessage(Kind.NOTE, "Generating class '" + clas.name + "'.");
                     }
 
-                    ClassEntry entry = classMap.get(annotation.in());
+                    ClassEntry entry = classMap.get(callLocation);
 
                     //create and add entry
                     MethodEntry method = new MethodEntry(entry.name, Utils.getMethodName(element), annotation.targets(), annotation.variants(),

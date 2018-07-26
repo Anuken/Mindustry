@@ -11,9 +11,8 @@ import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.net.In;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.EntityGroup;
@@ -56,10 +55,10 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
      * Create a lighting branch at a location. Use Team.none to damage everyone.
      */
     public static void create(Team team, Effect effect, Color color, float damage, float x, float y, float targetAngle, int length){
-        CallEntity.createLighting(lastSeed++, team, effect, color, damage, x, y, targetAngle, length);
+        Call.createLighting(lastSeed++, team, effect, color, damage, x, y, targetAngle, length);
     }
 
-    @Remote(called = Loc.server, in = In.entities)
+    @Remote(called = Loc.server)
     public static void createLighting(int seed, Team team, Effect effect, Color color, float damage, float x, float y, float targetAngle, int length){
         Lightning l = Pooling.obtain(Lightning.class);
 
