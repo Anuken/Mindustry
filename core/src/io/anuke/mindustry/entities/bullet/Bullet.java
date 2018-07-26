@@ -8,7 +8,6 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
