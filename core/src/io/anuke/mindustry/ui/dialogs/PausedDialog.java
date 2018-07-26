@@ -43,19 +43,12 @@ public class PausedDialog extends FloatingDialog{
             content().row();
             content().addButton("$text.savegame", () -> {
                 save.show();
-            });
+            }).disabled(s -> world.getSector() != null);
 
             content().row();
             content().addButton("$text.loadgame", () -> {
                 load.show();
             }).disabled(b -> Net.active());
-
-            //Local multiplayer is currently functional, but disabled.
-			/*
-            content().row();
-            content().addButton("$text.addplayers", () -> {
-                ui.localplayers.show();
-            }).disabled(b -> Net.active());*/
 
             content().row();
 
@@ -88,7 +81,7 @@ public class PausedDialog extends FloatingDialog{
                     state.set(State.playing);
             });
             content().addRowImageTextButton("$text.settings", "icon-tools", isize, ui.settings::show);
-            content().addRowImageTextButton("$text.save", "icon-save", isize, save::show);
+            content().addRowImageTextButton("$text.save", "icon-save", isize, save::show).disabled(b -> world.getSector() != null);
 
             content().row();
 
