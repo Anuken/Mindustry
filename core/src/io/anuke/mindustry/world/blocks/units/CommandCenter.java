@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
@@ -13,6 +14,8 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
@@ -24,7 +27,8 @@ import static io.anuke.mindustry.Vars.*;
 public class CommandCenter extends Block{
     protected TextureRegion[] commandRegions = new TextureRegion[UnitCommand.values().length];
     protected Color topColor = Color.valueOf("eab678");
-    protected Color bottomColor = Color.valueOf("d4986b");
+    protected Color bottomColor = Color.valueOf("5e5e5e");
+    protected Effect effect = BlockFx.commandSend;
 
     public CommandCenter(String name){
         super(name);
@@ -60,7 +64,7 @@ public class CommandCenter extends Block{
         CommandCenterEntity entity = tile.entity();
         super.draw(tile);
 
-        Draw.colorl(0.3f);
+        Draw.color(bottomColor);
         Draw.rect(commandRegions[entity.command.ordinal()], tile.drawx(), tile.drawy() - 1);
         Draw.color(topColor);
         Draw.rect(commandRegions[entity.command.ordinal()], tile.drawx(), tile.drawy());
@@ -80,6 +84,8 @@ public class CommandCenter extends Block{
 
     @Remote(called = Loc.server, forward = true, targets = Loc.both)
     public static void onCommandCenterSet(Player player, Tile tile, UnitCommand command){
+        Effects.effect(((CommandCenter)tile.block()).effect, tile);
+
         for(Tile center : world.indexer().getAllied(tile.getTeam(), BlockFlag.comandCenter)){
             if(center.block() instanceof CommandCenter){
                 CommandCenterEntity entity = center.entity();
@@ -97,7 +103,7 @@ public class CommandCenter extends Block{
         return new CommandCenterEntity();
     }
 
-    class CommandCenterEntity extends TileEntity{
-        UnitCommand command = UnitCommand.idle;
+    public class CommandCenterEntity extends TileEntity{
+        public UnitCommand command = UnitCommand.idle;
     }
 }

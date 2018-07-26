@@ -23,6 +23,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.units.CommandCenter.CommandCenterEntity;
 import io.anuke.mindustry.world.blocks.units.UnitFactory.UnitFactoryEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
@@ -40,6 +41,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
+/**Base class for AI units.*/
 public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static int timerIndex = 0;
 
@@ -92,6 +94,17 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         this.type = type;
         this.team = team;
+    }
+
+    public boolean isCommanded(){
+        return !isWave && world.indexer().getAllied(team, BlockFlag.comandCenter).size != 0;
+    }
+
+    public UnitCommand getCommand(){
+        if(isCommanded()){
+            return world.indexer().getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
+        }
+        return null;
     }
 
     public UnitType getType(){
@@ -379,6 +392,10 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         state.set(getStartState());
 
         health(maxHealth());
+
+        if(isCommanded()){
+            onCommand(getCommand());
+        }
     }
 
     @Override
