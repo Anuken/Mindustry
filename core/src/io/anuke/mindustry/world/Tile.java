@@ -38,7 +38,7 @@ public class Tile implements PosTrait, TargetTrait{
     private byte cliffs;
     private Block wall;
     private Floor floor;
-    /** Rotation, 0-3. Also used to store offload location for routers, in which case it can be any number. */
+    /** Rotation, 0-3. Also used to store offload location, in which case it can be any number. */
     private byte rotation;
     /** Team ordinal. */
     private byte team;
