@@ -2,6 +2,7 @@ package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -32,10 +33,11 @@ public class FogRenderer implements Disposable{
 
     private TextureRegion region = new TextureRegion();
     private FrameBuffer buffer;
-    private ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(4);
+    private ByteBuffer pixelBuffer;
     private Array<Tile> changeQueue = new Array<>();
     private int padding;
     private Rectangle rect = new Rectangle();
+    private boolean dirty;
 
     public FogRenderer(){
         Events.on(WorldLoadGraphicsEvent.class, () -> {
@@ -51,15 +53,8 @@ public class FogRenderer implements Disposable{
             Graphics.clear(0, 0, 0, 1f);
             buffer.end();
 
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    Tile tile = world.tile(x, y);
-
-                    if(tile.getTeam() == players[0].getTeam() && tile.block().synthetic() && tile.block().viewRange > 0){
-                        changeQueue.add(tile);
-                    }
-                }
-            }
+            pixelBuffer = ByteBuffer.allocateDirect(world.width() * world.height() * 3);
+            dirty = true;
         });
 
         Events.on(TileChangeEvent.class, tile -> threads.runGraphics(() -> {
@@ -67,6 +62,25 @@ public class FogRenderer implements Disposable{
                 changeQueue.add(tile);
             }
         }));
+    }
+
+    public void writeFog(){
+        if(buffer == null) return;
+
+        buffer.begin();
+        pixelBuffer.position(0);
+        Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
+        Gdx.gl.glReadPixels(padding, padding, world.width(), world.height(), GL20.GL_RGB, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
+
+        pixelBuffer.position(0);
+        for(int i = 0; i < world.width() * world.height(); i++){
+            byte r = pixelBuffer.get();
+            if(r != 0){
+                world.tile(i).setVisibility((byte)1);
+            }
+            pixelBuffer.position(pixelBuffer.position() + 2);
+        }
+        buffer.end();
     }
 
     public int getPadding(){
@@ -94,12 +108,6 @@ public class FogRenderer implements Disposable{
 
         buffer.begin();
 
-        //TODO use this for per-tile visibility to show/hide units
-        //pixelBuffer.position(0);
-        //Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
-        //Gdx.gl.glReadPixels(world.width()/2, world.height()/2 + 20, 1, 1, GL20.GL_RGB, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
-        //Log.info(pixelBuffer.get(0));
-
         boolean pop = ScissorStack.pushScissors(rect.set((padding-shadowPadding), (padding-shadowPadding),
                     (world.width() + shadowPadding*2) ,
                     (world.height() + shadowPadding*2)));
@@ -117,6 +125,16 @@ public class FogRenderer implements Disposable{
         }
 
         changeQueue.clear();
+
+        if(dirty){
+            for(int i = 0; i < world.width() * world.height(); i++){
+                Tile tile = world.tile(i);
+                if(tile.discovered()){
+                    Fill.rect(tile.worldx(), tile.worldy(), tilesize, tilesize);
+                }
+            }
+            dirty = false;
+        }
 
         EntityDraw.setClip(true);
         Graphics.end();

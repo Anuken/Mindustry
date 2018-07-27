@@ -67,21 +67,21 @@ public class UI extends SceneModule{
 
     public UI(){
         Dialog.setShowAction(() -> sequence(
-                alpha(0f),
-                originCenter(),
-                moveToAligned(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, Align.center),
-                scaleTo(0.0f, 1f),
-                parallel(
-                        scaleTo(1f, 1f, 0.1f, Interpolation.fade),
-                        fadeIn(0.1f, Interpolation.fade)
-                )
+            alpha(0f),
+            originCenter(),
+            moveToAligned(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, Align.center),
+            scaleTo(0.0f, 1f),
+            parallel(
+                scaleTo(1f, 1f, 0.1f, Interpolation.fade),
+                fadeIn(0.1f, Interpolation.fade)
+            )
         ));
 
         Dialog.setHideAction(() -> sequence(
-                parallel(
-                        scaleTo(0.01f, 0.01f, 0.1f, Interpolation.fade),
-                        fadeOut(0.1f, Interpolation.fade)
-                )
+            parallel(
+                scaleTo(0.01f, 0.01f, 0.1f, Interpolation.fade),
+                fadeOut(0.1f, Interpolation.fade)
+            )
         ));
 
         TooltipManager.getInstance().animations = false;
@@ -179,6 +179,7 @@ public class UI extends SceneModule{
         listfrag.build(group);
         debugfrag.build(group);
         loadfrag.build(group);
+
     }
 
     @Override

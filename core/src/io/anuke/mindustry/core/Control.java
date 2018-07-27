@@ -48,7 +48,6 @@ public class Control extends Module{
     private ObjectMap<Sound, Long> soundMap = new ObjectMap<>();
 
     private Throwable error;
-    //private Input gdxInput;
 
     public Control(){
 
@@ -67,8 +66,6 @@ public class Control extends Module{
         ContentLoader.initialize(Content::load);
 
         db.load();
-
-        //gdxInput = Gdx.input;
 
         Sounds.setFalloff(9000f);
         Sounds.setPlayer((sound, volume) -> {

@@ -495,7 +495,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     .size(size).get().setAlignment(Align.center, Align.center);
 
                     t.addImageButton("icon-arrow-right", 16 * 2f, () -> editor.setDrawElevation(editor.getDrawElevation() + 1))
-                    .disabled(b -> editor.getDrawElevation() >= 127).size(size);
+                    .disabled(b -> editor.getDrawElevation() >= 63).size(size);
                 }).colspan(3).height(size).padTop(-5).width(size * 3f);
 
             }).margin(0).left().growY();

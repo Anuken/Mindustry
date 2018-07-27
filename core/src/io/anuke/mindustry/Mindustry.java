@@ -29,7 +29,10 @@ public class Mindustry extends ModuleCore{
         module(ui = new UI());
         module(netServer = new NetServer());
         module(netClient = new NetClient());
+    }
 
+    @Override
+    public void postInit(){
         Log.info("Time to load [total]: {0}", Timers.elapsed());
     }
 
