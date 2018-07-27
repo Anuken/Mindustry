@@ -85,8 +85,8 @@ public abstract class BaseBlock{
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         return hasLiquids && tile.entity.liquids.get(liquid) + amount < liquidCapacity &&
-                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f))
-                && (!consumes.has(ConsumeLiquid.class) || consumes.liquid() == liquid);
+                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f)) &&
+                (!consumes.has(ConsumeLiquid.class) || consumes.liquid() == liquid);
     }
 
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
