@@ -11,6 +11,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -26,7 +27,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class CommandCenter extends Block{
     protected TextureRegion[] commandRegions = new TextureRegion[UnitCommand.values().length];
-    protected Color topColor = Color.valueOf("eab678");
+    protected Color topColor = Palette.command;
     protected Color bottomColor = Color.valueOf("5e5e5e");
     protected Effect effect = BlockFx.commandSend;
 

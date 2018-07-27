@@ -278,9 +278,11 @@ public class BlockFx extends FxList implements ContentList{
             Draw.reset();
         });
 
-        commandSend = new Effect(30, e -> {
+        commandSend = new Effect(28, e -> {
+            Draw.color(Palette.command);
             Lines.stroke(e.fout() * 2f);
-            Lines.poly(e.x, e.y, 40, 4f + e.fin() * 120f);
+            Lines.poly(e.x, e.y, 40, 4f + e.finpow() * 120f);
+            Draw.color();
         });
     }
 }
