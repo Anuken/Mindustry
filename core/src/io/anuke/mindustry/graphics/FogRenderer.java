@@ -25,9 +25,7 @@ import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.Vars.*;
 
-/**
- * Used for rendering fog of war. A framebuffer is used for this.
- */
+/**Used for rendering fog of war. A framebuffer is used for this.*/
 public class FogRenderer implements Disposable{
     private static final int extraPadding = 3;
     private static final int shadowPadding = 1;

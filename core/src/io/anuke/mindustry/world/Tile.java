@@ -29,14 +29,13 @@ public class Tile implements PosTrait, TargetTrait{
      * This is relative to the block it is linked to; negate coords to find the link.
      */
     public byte link = 0;
-    public short x, y;
     /** Tile traversal cost. */
     public byte cost = 1;
-    /** Position of cliffs around the tile, packed into bits 0-8. */
-    public byte cliffs;
     /** Tile entity, usually null. */
     public TileEntity entity;
-    /** Block ID data. */
+    public short x, y;
+    /** Position of cliffs around the tile, packed into bits 0-8. */
+    private byte cliffs;
     private Block wall;
     private Floor floor;
     /** Rotation, 0-3. Also used to store offload location for routers, in which case it can be any number. */
@@ -197,6 +196,18 @@ public class Tile implements PosTrait, TargetTrait{
         this.elevation = (byte)elevation;
     }
 
+    public byte getCliffs(){
+        return cliffs;
+    }
+
+    public void setCliffs(byte cliffs){
+        this.cliffs = cliffs;
+    }
+
+    public boolean hasCliffs(){
+        return getCliffs() != 0;
+    }
+
     public boolean passable(){
         Block block = block();
         Block floor = floor();
@@ -212,7 +223,7 @@ public class Tile implements PosTrait, TargetTrait{
     public boolean solid(){
         Block block = block();
         Block floor = floor();
-        return block.solid || cliffs != 0 || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
+        return block.solid || getCliffs() != 0 || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
         || (isLinked() && getLinked().block().isSolidFor(getLinked()));
     }
 

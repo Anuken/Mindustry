@@ -127,7 +127,7 @@ public class WorldGenerator{
                 tile.updateOcclusion();
 
                 //fix things on cliffs that shouldn't be
-                if(tile.block() != Blocks.air && tile.cliffs != 0){
+                if(tile.block() != Blocks.air && tile.hasCliffs()){
                     tile.setBlock(Blocks.air);
                 }
             }
@@ -158,7 +158,7 @@ public class WorldGenerator{
 
                     Tile tile = tiles[x][y];
 
-                    if(!tile.floor().hasOres || tile.cliffs != 0 || tile.block() != Blocks.air){
+                    if(!tile.floor().hasOres || tile.hasCliffs() || tile.block() != Blocks.air){
                         continue;
                     }
 
