@@ -12,7 +12,6 @@ import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Base64Coder;
@@ -48,7 +47,7 @@ import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class AndroidLauncher extends AndroidApplication{
+public class AndroidLauncher extends PatchedAndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
 
     boolean doubleScaleTablets = true;
