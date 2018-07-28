@@ -53,6 +53,15 @@ public class FogRenderer implements Disposable{
             Graphics.clear(0, 0, 0, 1f);
             buffer.end();
 
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
+                    Tile tile = world.tile(x, y);
+                    if(tile.getTeam() == players[0].getTeam() && tile.block().synthetic() && tile.block().viewRange > 0){
+                        changeQueue.add(tile);
+                    }
+                }
+            }
+
             pixelBuffer = ByteBuffer.allocateDirect(world.width() * world.height() * 3);
             dirty = true;
         });
