@@ -13,6 +13,7 @@ import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.ui.TextButton;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.scene.utils.ScissorStack;
 import io.anuke.ucore.util.Bundles;
@@ -61,8 +62,8 @@ public class SectorsDialog extends FloatingDialog{
 
     class SectorView extends Element{
         float lastX, lastY;
-        float sectorSize = 100f;
-        float sectorPadding = 14f;
+        float sectorSize = Unit.dp.scl(100f);
+        float sectorPadding = Unit.dp.scl(14f);
         boolean clicked = false;
         float panX = -sectorPadding/2f, panY = -sectorSize/2f;
 
@@ -159,13 +160,13 @@ public class SectorsDialog extends FloatingDialog{
                         Draw.color(Color.LIGHT_GRAY);
                     }
 
-                    Lines.stroke(stroke);
+                    Lines.stroke(Unit.dp.scl(stroke));
                     Lines.crect(drawX, drawY, sectorSize * size + padding, sectorSize * size + padding, (int)stroke);
                 }
             }
 
             Draw.color(Palette.accent);
-            Lines.stroke(4f);
+            Lines.stroke(Unit.dp.scl(4f));
             Lines.crect(x + width/2f, y + height/2f, clipSize, clipSize);
 
             Draw.reset();
