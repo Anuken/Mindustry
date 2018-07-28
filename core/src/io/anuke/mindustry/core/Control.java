@@ -375,7 +375,7 @@ public class Control extends Module{
             if(!state.mode.infiniteResources && Timers.get("timerCheckUnlock", 120)){
                 checkUnlockableBlocks();
 
-                //save if the db changed, but don't save unlocks
+                //save if the db changed, but don't save in debug
                 if(db.isDirty() && !debug){
                     db.save();
                 }

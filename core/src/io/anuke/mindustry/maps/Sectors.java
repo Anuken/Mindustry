@@ -15,6 +15,7 @@ import io.anuke.mindustry.world.Edges;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.GridMap;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -36,8 +37,19 @@ public class Sectors{
             sector.saveID = control.getSaves().addSave("sector-" + sector.packedPosition()).index;
             world.sectors().save();
         }else{
-            control.getSaves().getByID(sector.saveID).load();
-            state.set(State.playing);
+            try{
+                sector.getSave().load();
+                state.set(State.playing);
+            }catch(Exception e){
+                Log.err(e);
+                sector.getSave().delete();
+
+                playSector(sector);
+
+                if(!headless){
+                    threads.runGraphics(() -> ui.showError("$text.sector.corrupted"));
+                }
+            }
         }
     }
 
