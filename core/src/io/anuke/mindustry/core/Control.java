@@ -81,14 +81,14 @@ public class Control extends Module{
         DefaultKeybinds.load();
 
         Settings.defaultList(
-                "ip", "localhost",
-                "port", port + "",
-                "color-0", Color.rgba8888(playerColors[8]),
-                "color-1", Color.rgba8888(playerColors[11]),
-                "color-2", Color.rgba8888(playerColors[13]),
-                "color-3", Color.rgba8888(playerColors[9]),
-                "name", "player",
-                "lastBuild", 0
+            "ip", "localhost",
+            "port", port + "",
+            "color-0", Color.rgba8888(playerColors[8]),
+            "color-1", Color.rgba8888(playerColors[11]),
+            "color-2", Color.rgba8888(playerColors[13]),
+            "color-3", Color.rgba8888(playerColors[9]),
+            "name", "player",
+            "lastBuild", 0
         );
 
         KeyBinds.load();
