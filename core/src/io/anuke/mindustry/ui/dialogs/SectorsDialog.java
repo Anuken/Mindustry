@@ -12,7 +12,6 @@ import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
-import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.scene.utils.ScissorStack;
@@ -37,10 +36,12 @@ public class SectorsDialog extends FloatingDialog{
 
         addCloseButton();
 
-        content().label(() -> Bundles.format("text.sector", selected == null ? "<none>" :
+        content().label(() -> Bundles.format("text.sector", selected == null ? Bundles.get("text.none") :
         (selected.x + ", " + selected.y + (!selected.complete && selected.saveID != -1 ? " " + Bundles.get("text.sector.locked") : ""))
                 + (selected.saveID == -1 ? " " + Bundles.get("text.sector.unexplored") :
                     (selected.hasSave() ? " [accent]/[white] " + Bundles.format("text.sector.time", selected.getSave().getPlayTime()) : ""))));
+        content().row();
+        content().label(() -> Bundles.format("text.mission", selected == null ? Bundles.get("text.none") : selected.mission.displayString()));
         content().row();
         content().add(new SectorView()).grow();
         content().row();
@@ -48,7 +49,8 @@ public class SectorsDialog extends FloatingDialog{
             hide();
 
             ui.loadLogic(() -> world.sectors().playSector(selected));
-        }).size(230f, 64f).name("deploy-button").disabled(b -> selected == null);
+        }).size(230f, 64f).disabled(b -> selected == null)
+        .update(t -> t.setText(selected != null && selected.hasSave() ? "$text.sector.resume" : "$text.sector.deploy"));
 
         if(debug){
             buttons().addButton("unlock",  () -> world.sectors().completeSector(selected.x, selected.y)).size(230f, 64f).disabled(b -> selected == null);
@@ -56,7 +58,6 @@ public class SectorsDialog extends FloatingDialog{
     }
 
     void selectSector(Sector sector){
-        buttons().<TextButton>find("deploy-button").setText(sector.hasSave() ? "$text.sector.resume" : "$text.sector.deploy");
         selected = sector;
     }
 

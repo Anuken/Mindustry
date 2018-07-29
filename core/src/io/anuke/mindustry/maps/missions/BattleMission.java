@@ -5,8 +5,19 @@ import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.util.Bundles;
 
 public class BattleMission implements Mission{
+    private final int difficulty;
+
+    public BattleMission(int difficulty){
+        this.difficulty = difficulty;
+    }
+
+    @Override
+    public String displayString(){
+        return Bundles.get("text.mission.battle");
+    }
 
     @Override
     public void generate(Tile[][] tiles, Sector sector){

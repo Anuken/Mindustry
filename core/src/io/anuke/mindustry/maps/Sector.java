@@ -28,6 +28,8 @@ public class Sector{
     public transient Array<SpawnGroup> spawns = new Array<>();
     /**Ores that appear in this sector.*/
     public transient Array<Item> ores = new Array<>();
+    /**Difficulty of the sector, measured by calculating distance from origin.*/
+    public transient int difficulty;
 
     public int getSeed(){
         return Bits.packInt(x, y);

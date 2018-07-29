@@ -33,6 +33,7 @@ Color: {
     lightgray: {a: 1, b: 0.65, g: 0.65, r: 0.65 }
 	orange: {hex: "FFA500"},
 	accent: {hex: "f4ba6e"},
+	accentDark: {hex: "f4ba6e"},
 },
 TintedDrawable: {
 	dialogDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.9} },

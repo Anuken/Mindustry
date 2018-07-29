@@ -10,6 +10,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.maps.missions.BattleMission;
+import io.anuke.mindustry.maps.missions.WaveMission;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.ucore.core.Settings;
@@ -130,15 +131,23 @@ public class Sectors{
     }
 
     private void initSector(Sector sector){
-        sector.mission = new BattleMission();
+        sector.difficulty = (int)(Mathf.dst(sector.x, sector.y)/2);
+
+        if(sector.difficulty < 1){
+            sector.mission = new WaveMission(30);
+        }else{
+            sector.mission = Mathf.choose(
+                new BattleMission(sector.difficulty),
+                new WaveMission(30 + sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 5)*5)
+            );
+        }
+
         //add all ores for now since material differences aren't well handled yet
         sector.ores.addAll(Items.tungsten, Items.coal, Items.lead, Items.thorium, Items.titanium);
     }
 
     private int round2(int i){
-        if(i < 0){
-            i --;
-        }
+        if(i < 0) i --;
         return i/2*2;
     }
 
