@@ -149,6 +149,16 @@ public class Block extends BaseBlock implements Content{
         return blocks.get(id);
     }
 
+    /**Populates the array with all blocks that produce this content.*/
+    public static void getByProduction(Array<Block> arr, Content content){
+        arr.clear();
+        for(Block block : Block.all()){
+            if(block.produces.get() == content){
+                arr.add(block);
+            }
+        }
+    }
+
     public boolean isLayer(Tile tile){
         return true;
     }

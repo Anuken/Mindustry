@@ -335,7 +335,7 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     public boolean validBreak(int x, int y){
-        return Build.validBreak(player.getTeam(), x, y);
+        return Build.validBreak(player.getTeam(), x, y) && Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
     }
 
     public void placeBlock(int x, int y, Recipe recipe, int rotation){
@@ -344,7 +344,6 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     public void breakBlock(int x, int y){
-
         //todo multiplayer support
         Tile tile = world.tile(x, y).target();
         player.addBuildRequest(new BuildRequest(tile.x, tile.y));

@@ -37,9 +37,11 @@ public class Sectors{
             logic.play();
             sector.saveID = control.getSaves().addSave("sector-" + sector.packedPosition()).index;
             world.sectors().save();
+            world.setSector(sector);
         }else{
             try{
                 sector.getSave().load();
+                world.setSector(sector);
                 state.set(State.playing);
             }catch(Exception e){
                 Log.err(e);

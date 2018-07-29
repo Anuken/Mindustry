@@ -42,7 +42,7 @@ import static io.anuke.mindustry.Vars.world;
  */
 public interface BuilderTrait extends Entity{
     //these are not instance variables!
-    float placeDistance = 140f;
+    float placeDistance = 150f;
     float mineDistance = 70f;
 
     /**
@@ -202,7 +202,11 @@ public interface BuilderTrait extends Entity{
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(!(tile.block() instanceof BuildBlock)){
+        if(unit.distanceTo(tile) > placeDistance){
+            return;
+        }
+
+        if(!(tile.block() instanceof BuildBlock) ){
             if(canCreateBlocks() && !current.remove && Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)){
                 Build.beginPlace(unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
             }else if(canCreateBlocks() && current.remove && Build.validBreak(unit.getTeam(), current.x, current.y)){
