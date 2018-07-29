@@ -75,6 +75,8 @@ public class Smelter extends Block{
                 throw new IllegalArgumentException("'" + name + "' has input item '" + item.item.name + "', which is a flux, when useFlux is enabled. To prevent ambiguous item use, either remove this flux item from the inputs, or set useFlux to false.");
             }
         }
+
+        produces.set(result);
     }
 
     @Override

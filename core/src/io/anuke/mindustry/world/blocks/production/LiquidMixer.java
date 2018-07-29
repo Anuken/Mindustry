@@ -25,6 +25,13 @@ public class LiquidMixer extends LiquidBlock{
     }
 
     @Override
+    public void init(){
+        super.init();
+
+        produces.set(outputLiquid);
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
 

@@ -36,6 +36,7 @@ public class Block extends BaseBlock implements Content{
     private static int lastid;
     private static Array<Block> blocks = new Array<>(140);
     private static ObjectMap<String, Block> map = new ObjectMap<>();
+
     /** internal name */
     public final String name;
     /** internal ID */
@@ -104,12 +105,14 @@ public class Block extends BaseBlock implements Content{
     public Color minimapColor = Color.CLEAR;
     /** View range of this block type. Use a value < 0 to disable. */
     public float viewRange = 10;
+
     protected Array<Tile> tempTiles = new Array<>();
     protected Color tempColor = new Color();
     protected TextureRegion[] blockIcon;
     protected TextureRegion[] icon;
     protected TextureRegion[] compactIcon;
     protected TextureRegion editorIcon;
+
     public TextureRegion shadowRegion;
     public TextureRegion region;
 

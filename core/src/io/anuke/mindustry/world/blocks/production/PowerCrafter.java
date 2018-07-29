@@ -39,6 +39,12 @@ public class PowerCrafter extends Block{
         if(outputLiquid != null){
             outputsLiquid = true;
         }
+
+        if(outputLiquid != null){
+            produces.set(outputLiquid);
+        }else if(outputItem != null){
+            produces.set(outputItem);
+        }
     }
 
     @Override

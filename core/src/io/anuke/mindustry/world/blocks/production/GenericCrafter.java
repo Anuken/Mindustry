@@ -47,6 +47,13 @@ public class GenericCrafter extends Block{
     }
 
     @Override
+    public void init(){
+        super.init();
+
+        produces.set(output);
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
         stats.add(BlockStat.craftSpeed, 60f / craftTime, StatUnit.itemsSecond);

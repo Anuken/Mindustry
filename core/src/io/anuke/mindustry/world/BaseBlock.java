@@ -10,6 +10,7 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
+import io.anuke.mindustry.world.meta.Producers;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
@@ -31,6 +32,7 @@ public abstract class BaseBlock{
     public float powerCapacity = 10f;
 
     public Consumers consumes = new Consumers();
+    public Producers produces = new Producers();
 
     public boolean shouldConsume(Tile tile){
         return true;

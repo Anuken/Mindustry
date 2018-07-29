@@ -54,6 +54,13 @@ public class PowerSmelter extends PowerBlock{
     }
 
     @Override
+    public void init(){
+        super.init();
+
+        produces.set(result);
+    }
+
+    @Override
     public void load(){
         super.load();
         topRegion = Draw.region(name + "-top");
