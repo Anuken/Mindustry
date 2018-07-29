@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.maps.Sector;
+import io.anuke.mindustry.maps.missions.Mission;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -35,7 +36,6 @@ public class WorldGenerator{
     private Simplex sim3 = new Simplex(baseSeed + 2);
     private RidgedPerlin rid = new RidgedPerlin(baseSeed + 4, 1);
     private VoronoiNoise vn = new VoronoiNoise(baseSeed + 2, (short)0);
-
     private SeedRandom random = new SeedRandom(baseSeed + 3);
 
     private GenResult result = new GenResult();
@@ -212,7 +212,9 @@ public class WorldGenerator{
         tiles[coreX][coreY].setBlock(StorageBlocks.core);
         tiles[coreX][coreY].setTeam(Team.blue);
 
-        sector.mission.generate(tiles, sector);
+        for(Mission mission : sector.missions){
+            mission.generate(tiles, sector);
+        }
 
         prepareTiles(tiles, sector.getSeed(), true, sector.ores);
     }

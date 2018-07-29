@@ -134,12 +134,12 @@ public class Sectors{
         sector.difficulty = (int)(Mathf.dst(sector.x, sector.y)/2);
 
         if(sector.difficulty < 1){
-            sector.mission = new WaveMission(30);
+            sector.missions.add(new WaveMission(30));
         }else{
-            sector.mission = Mathf.choose(
+            sector.missions.add(Mathf.choose(
                 new BattleMission(sector.difficulty),
                 new WaveMission(30 + sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 5)*5)
-            );
+            ));
         }
 
         //add all ores for now since material differences aren't well handled yet

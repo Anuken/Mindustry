@@ -84,30 +84,13 @@ public class TileEntity extends BaseEntity implements TargetTrait{
         return this;
     }
 
-    /**
-     * Call when nothing is happening to the entity.
-     * This increments the internal sleep timer.
-     */
+    /**Call when nothing is happening to the entity. This increments the internal sleep timer.*/
     public void sleep(){
         sleepTime += Timers.delta();
         if(!sleeping && sleepTime >= timeToSleep){
             remove();
             sleeping = true;
             sleepingEntities++;
-        }
-    }
-
-    /**
-     * Call when something just happened to the entity.
-     * If the entity was sleeping, this enables it. This also resets the sleep timer.
-     */
-    public void wakeUp(){
-        noSleep();
-
-        for(Tile tile : proximity){
-            if(tile.entity.isSleeping()){
-                tile.entity.wakeUp();
-            }
         }
     }
 

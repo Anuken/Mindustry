@@ -71,9 +71,16 @@ public class Items implements ContentList{
             cost = 1.5f;
         }};
 
-        surgealloy = new Item("surge-alloy", Color.valueOf("b4d5c7")){{
-            type = ItemType.material;
-        }};
+        surgealloy = new Item("surge-alloy", Color.valueOf("b4d5c7")){
+            {
+                type = ItemType.material;
+            }
+
+            @Override
+            public boolean isHidden(){
+                return true;
+            }
+        };
 
         biomatter = new Item("biomatter", Color.valueOf("648b55")){{
             flammability = 0.4f;

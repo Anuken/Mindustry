@@ -209,7 +209,6 @@ public class Conveyor extends Block{
 
         int minremove = Integer.MAX_VALUE;
         float speed = Math.max(this.speed - (1f - (carryCapacity - entity.carrying) / carryCapacity), 0f);
-        float totalMoved = 0f;
 
         for(int i = entity.convey.size - 1; i >= 0; i--){
             long value = entity.convey.get(i);
@@ -221,7 +220,6 @@ public class Conveyor extends Block{
                 break;
             }
 
-            float prev = pos.y;
             float nextpos = (i == entity.convey.size - 1 ? 100f : pos2.set(entity.convey.get(i + 1), ItemPos.updateShorts).y) - itemSpace;
             if(entity.minCarry >= pos.y && entity.minCarry <= nextpos){
                 nextpos = entity.minCarry;
@@ -236,11 +234,9 @@ public class Conveyor extends Block{
             }
 
             pos.y = Mathf.clamp(pos.y);
-            totalMoved += (pos.y - prev);
 
             if(pos.y >= 0.9999f && offloadDir(tile, pos.item)){
                 minremove = Math.min(i, minremove);
-                totalMoved = 1f;
                 tile.entity.items.remove(pos.item, 1);
             }else{
                 value = pos.pack();
@@ -260,9 +256,7 @@ public class Conveyor extends Block{
         entity.carrying = 0f;
         entity.minCarry = 2f;
 
-        Tile next = tile.getNearby(tile.getRotation());
-
-        if((next != null && next.block() instanceof Conveyor) && totalMoved/Timers.delta() <= 0.0001f){
+        if(entity.items.total() == 0){
             entity.sleep();
         }else{
             entity.noSleep();
@@ -279,7 +273,7 @@ public class Conveyor extends Block{
     @Override
     public synchronized int removeStack(Tile tile, Item item, int amount){
         ConveyorEntity entity = tile.entity();
-        entity.wakeUp();
+        entity.noSleep();
         int removed = 0;
 
         for(int j = 0; j < amount; j++){
@@ -315,7 +309,7 @@ public class Conveyor extends Block{
         long result = ItemPos.packItem(item, 0f, 0f, (byte) Mathf.random(255));
         entity.convey.insert(0, result);
         entity.items.add(item, 1);
-        entity.wakeUp();
+        entity.noSleep();
     }
 
     @Override
@@ -337,7 +331,7 @@ public class Conveyor extends Block{
         float y = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 
         ConveyorEntity entity = tile.entity();
-        entity.wakeUp();
+        entity.noSleep();
         long result = ItemPos.packItem(item, y * 0.9f, pos, (byte) Mathf.random(255));
         boolean inserted = false;
 

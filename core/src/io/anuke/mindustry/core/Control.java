@@ -363,11 +363,18 @@ public class Control extends Module{
             }
 
             //check unlocked sectors
-            if(world.getSector() != null && world.getSector().mission.isComplete() && !world.getSector().complete){
-                world.sectors().completeSector(world.getSector().x, world.getSector().y);
-                world.sectors().save();
-                if(!headless){
-                    ui.showInfoFade("$text.sector.unlocked");
+            if(world.getSector() != null && !world.getSector().complete){
+                //all assigned missions are complete
+                if(world.getSector().completedMissions >= world.getSector().missions.size){
+
+                    world.sectors().completeSector(world.getSector().x, world.getSector().y);
+                    world.sectors().save();
+                    if(!headless){
+                        ui.showInfoFade("$text.sector.unlocked");
+                    }
+                }else if(world.getSector().missions.get(world.getSector().completedMissions).isComplete()){
+                    //increment completed missions, check next index next frame
+                    world.getSector().completedMissions ++;
                 }
             }
 

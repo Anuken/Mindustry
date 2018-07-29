@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.maps.missions.Mission;
-import io.anuke.mindustry.maps.missions.WaveMission;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.util.Bits;
 
@@ -20,10 +19,12 @@ public class Sector{
     public int saveID = -1;
     /**Sector size; if more than 1, the coordinates are the bottom left corner.*/
     public int size = 1;
+    /**Num of missions in this sector that have been completed so far.*/
+    public int completedMissions;
     /**Display texture. Needs to be disposed.*/
     public transient Texture texture;
-    /**Mission of this sector-- what needs to be accomplished to unlock it.*/
-    public transient Mission mission = new WaveMission(30);
+    /**Missions of this sector-- what needs to be accomplished to unlock it.*/
+    public transient Array<Mission> missions = new Array<>();
     /**Enemies spawned at this sector.*/
     public transient Array<SpawnGroup> spawns = new Array<>();
     /**Ores that appear in this sector.*/
