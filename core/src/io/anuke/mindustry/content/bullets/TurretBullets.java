@@ -179,7 +179,7 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        driverBolt = new BulletType(5f, 20){
+        driverBolt = new BulletType(5f, 50){
             {
                 collidesTiles = false;
                 lifetime = 200f;
@@ -190,11 +190,14 @@ public class TurretBullets extends BulletList implements ContentList{
 
             @Override
             public void draw(Bullet b){
-                Draw.color(Color.LIGHT_GRAY);
-                Fill.square(b.x, b.y, 3f, b.angle());
+                float w = 11f, h = 13f;
 
-                Draw.color(Palette.lighterOrange);
-                Fill.square(b.x, b.y, 2f, b.angle());
+                Draw.color(Palette.bulletYellowBack);
+                Draw.rect("shell-back", b.x, b.y, w, h, b.angle() + 90);
+
+                Draw.color(Palette.bulletYellow);
+                Draw.rect("shell", b.x, b.y, w, h, b.angle() + 90);
+
                 Draw.reset();
             }
 

@@ -10,7 +10,6 @@ import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 
@@ -26,7 +25,7 @@ public class Generators {
                     continue;
                 }
 
-                if(block instanceof Turret){
+                if(block.turretIcon){
                     Color color = Color.ROYAL;
 
                     Image image = context.get(block.name);

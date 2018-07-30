@@ -51,6 +51,7 @@ public class Recipes implements ContentList{
         new Recipe(distribution, DistributionBlocks.sorter, new ItemStack(Items.carbide, 4), new ItemStack(Items.tungsten, 4));
         new Recipe(distribution, DistributionBlocks.overflowGate, new ItemStack(Items.carbide, 4), new ItemStack(Items.tungsten, 8));
         new Recipe(distribution, DistributionBlocks.bridgeConveyor, new ItemStack(Items.carbide, 8), new ItemStack(Items.tungsten, 8));
+        new Recipe(distribution, DistributionBlocks.massDriver, new ItemStack(Items.carbide, 400), new ItemStack(Items.silicon, 300), new ItemStack(Items.lead, 400), new ItemStack(Items.thorium, 250));
 
         //CRAFTING
 
@@ -171,8 +172,6 @@ public class Recipes implements ContentList{
         new Recipe(production, ProductionBlocks.waterextractor, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40));
         new Recipe(production, ProductionBlocks.oilextractor, new ItemStack(Items.titanium, 40), new ItemStack(Items.surgealloy, 40));*/
 
-
-        //new Recipe(distribution, DistributionBlocks.massDriver, new ItemStack(Items.carbide, 1));
 
 
         /*

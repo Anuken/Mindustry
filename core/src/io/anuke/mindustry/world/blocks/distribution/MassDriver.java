@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import io.anuke.annotations.Annotations.Loc;
@@ -38,11 +39,12 @@ public class MassDriver extends Block{
     protected float translation = 7f;
     protected int minDistribute = 10;
     protected float knockback = 4f;
-    protected float reloadTime = 80f;
+    protected float reloadTime = 100f;
     protected Effect shootEffect = ShootFx.shootBig2;
     protected Effect smokeEffect = ShootFx.shootBigSmoke2;
-    protected Effect recieveEffect = BlockFx.smeltsmoke;
+    protected Effect recieveEffect = BlockFx.mineBig;
     protected float shake = 3f;
+    protected TextureRegion turretRegion;
 
     public MassDriver(String name){
         super(name);
@@ -53,6 +55,7 @@ public class MassDriver extends Block{
         itemCapacity = 50;
         layer = Layer.turret;
         hasPower = true;
+        turretIcon = true;
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
@@ -97,6 +100,28 @@ public class MassDriver extends Block{
                 tile.drawy() + Angles.trnsy(angle, driver.translation), angle);
 
         Effects.shake(driver.shake, driver.shake, entity);
+    }
+
+    @Override
+    public TextureRegion[] getBlockIcon(){
+        if(blockIcon == null){
+            blockIcon = new TextureRegion[]{region, turretRegion};
+        }
+        return super.getBlockIcon();
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        turretRegion = Draw.region(name + "-turret");
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        viewRange = range;
     }
 
     @Override
@@ -148,7 +173,7 @@ public class MassDriver extends Block{
     public void drawLayer(Tile tile){
         MassDriverEntity entity = tile.entity();
 
-        Draw.rect(name + "-turret",
+        Draw.rect(turretRegion,
                 tile.drawx() + Angles.trnsx(entity.rotation + 180f, entity.reload * knockback),
                 tile.drawy() + Angles.trnsy(entity.rotation + 180f, entity.reload * knockback),
                 entity.rotation - 90);
@@ -156,7 +181,11 @@ public class MassDriver extends Block{
 
     @Override
     public void drawConfigure(Tile tile){
-        super.drawConfigure(tile);
+        float sin = Mathf.absin(Timers.time(), 6f, 1f);
+
+        Draw.color(Palette.accent);
+        Lines.stroke(1f);
+        Lines.circle(tile.drawx(), tile.drawy(), (tile.block().size/2f+1) * tilesize + sin);
 
         MassDriverEntity entity = tile.entity();
 
@@ -164,8 +193,7 @@ public class MassDriver extends Block{
             Tile target = world.tile(entity.link);
 
             Draw.color(Palette.place);
-            Lines.square(target.drawx(), target.drawy(),
-                    target.block().size * tilesize / 2f + 1f);
+            Lines.circle(target.drawx(), target.drawy(), (target.block().size/2f+1) * tilesize + sin);
             Draw.reset();
         }
 
@@ -217,7 +245,6 @@ public class MassDriver extends Block{
         public void reset(){
             from = null;
             to = null;
-            ;
         }
     }
 

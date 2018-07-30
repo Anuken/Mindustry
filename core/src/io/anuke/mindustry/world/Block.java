@@ -105,6 +105,8 @@ public class Block extends BaseBlock implements Content{
     public Color minimapColor = Color.CLEAR;
     /** View range of this block type. Use a value < 0 to disable. */
     public float viewRange = 10;
+    /**Whether the top icon is outlined, like a turret.*/
+    public boolean turretIcon = false;
 
     protected Array<Tile> tempTiles = new Array<>();
     protected Color tempColor = new Color();

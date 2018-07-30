@@ -85,6 +85,7 @@ public abstract class Turret extends Block{
         solid = true;
         layer = Layer.turret;
         group = BlockGroup.turrets;
+        turretIcon = true;
     }
 
     @Override
