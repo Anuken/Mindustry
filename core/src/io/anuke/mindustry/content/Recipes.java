@@ -75,7 +75,6 @@ public class Recipes implements ContentList{
 
         new Recipe(crafting, CraftingBlocks.solidifier, new ItemStack(Items.carbide, 30), new ItemStack(Items.tungsten, 20));
         new Recipe(crafting, CraftingBlocks.melter, new ItemStack(Items.tungsten, 60), new ItemStack(Items.lead, 70), new ItemStack(Items.carbide, 90));
-
         new Recipe(crafting, CraftingBlocks.incinerator, new ItemStack(Items.carbide, 10), new ItemStack(Items.lead, 30));
 
         //processing
@@ -105,14 +104,14 @@ public class Recipes implements ContentList{
         new Recipe(power, PowerBlocks.nuclearReactor, new ItemStack(Items.lead, 600), new ItemStack(Items.silicon, 400), new ItemStack(Items.carbide, 300), new ItemStack(Items.thorium, 300));
 
         //new Recipe(distribution, StorageBlocks.core, new ItemStack(Items.carbide, 50));
-        //new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.carbide, 40), new ItemStack(Items.silicon, 50));
-        new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.carbide, 40), new ItemStack(Items.silicon, 70));
+        new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.carbide, 40), new ItemStack(Items.silicon, 50));
         new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.carbide, 500), new ItemStack(Items.thorium, 350));
 
         //DRILLS, PRODUCERS
         new Recipe(production, ProductionBlocks.tungstenDrill, new ItemStack(Items.tungsten, 25));
         new Recipe(production, ProductionBlocks.carbideDrill, new ItemStack(Items.tungsten, 50), new ItemStack(Items.carbide, 60));
         new Recipe(production, ProductionBlocks.laserdrill, new ItemStack(Items.tungsten, 90), new ItemStack(Items.carbide, 110), new ItemStack(Items.silicon, 70), new ItemStack(Items.titanium, 80));
+        new Recipe(production, ProductionBlocks.blastdrill, new ItemStack(Items.tungsten, 140), new ItemStack(Items.carbide, 180), new ItemStack(Items.silicon, 120), new ItemStack(Items.titanium, 130), new ItemStack(Items.thorium, 130));
 
         new Recipe(production, ProductionBlocks.waterextractor, new ItemStack(Items.tungsten, 50), new ItemStack(Items.carbide, 50), new ItemStack(Items.lead, 40));
         new Recipe(production, ProductionBlocks.cultivator, new ItemStack(Items.tungsten, 20), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 20));
@@ -121,7 +120,6 @@ public class Recipes implements ContentList{
         //UNITS
 
         //bodies
-
         new Recipe(units, UpgradeBlocks.dartFactory, new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240))
                 .setDesktop(); //dart is desktop only, because it's the starter mobile ship
 

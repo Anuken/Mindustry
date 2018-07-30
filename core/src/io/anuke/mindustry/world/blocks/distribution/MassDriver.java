@@ -18,6 +18,8 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -52,10 +54,8 @@ public class MassDriver extends Block{
         solid = true;
         configurable = true;
         hasItems = true;
-        itemCapacity = 50;
         layer = Layer.turret;
         hasPower = true;
-        turretIcon = true;
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
@@ -115,6 +115,13 @@ public class MassDriver extends Block{
         super.load();
 
         turretRegion = Draw.region(name + "-turret");
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.powerShot, powerCapacity, StatUnit.powerUnits);
     }
 
     @Override
