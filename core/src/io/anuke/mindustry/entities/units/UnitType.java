@@ -16,14 +16,19 @@ import io.anuke.ucore.function.Supplier;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Strings;
 
 //TODO merge unit type with mech
 public class UnitType implements UnlockableContent{
     private static byte lastid = 0;
     private static Array<UnitType> types = new Array<>();
-    public final String name;
-    public final byte id;
+
     protected final Supplier<? extends BaseUnit> constructor;
+
+    public final String name;
+    public final String description;
+    public final byte id;
     public float health = 60;
     public float hitsize = 5f;
     public float hitsizeTile = 4f;
@@ -51,10 +56,16 @@ public class UnitType implements UnlockableContent{
         this.id = lastid++;
         this.name = name;
         this.constructor = mainConstructor;
+        this.description = Bundles.getOrNull("unit." + name + ".description");
 
         types.add(this);
 
         TypeTrait.registerType(type, mainConstructor);
+
+        if(!Bundles.has("unit." + this.name + ".name")){
+            Log.err("Warning: unit '" + name + "' is missing a localized name. Add the follow to bundle.properties:");
+            Log.err("unit." + this.name + ".name=" + Strings.capitalize(name.replace('-', '_')));
+        }
     }
 
     public static UnitType getByID(byte id){

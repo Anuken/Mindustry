@@ -23,33 +23,19 @@ public class Item implements Comparable<Item>, UnlockableContent{
     public final Color color;
     public TextureRegion region;
 
-    /**
-     * type of the item; used for tabs and core acceptance. default value is {@link ItemType#resource}.
-     */
+    /**type of the item; used for tabs and core acceptance. default value is {@link ItemType#resource}.*/
     public ItemType type = ItemType.resource;
-    /**
-     * how explosive this item is.
-     */
+    /**how explosive this item is.*/
     public float explosiveness = 0f;
-    /**
-     * flammability above 0.3 makes this eleigible for item burners.
-     */
+    /**flammability above 0.3 makes this eleigible for item burners.*/
     public float flammability = 0f;
-    /**
-     * how radioactive this item is. 0=none, 1=chernobyl ground zero
-     */
+    /**how radioactive this item is. 0=none, 1=chernobyl ground zero*/
     public float radioactivity;
-    /**
-     * how effective this item is as flux for smelting. 0 = not a flux, 0.5 = normal flux, 1 = very good
-     */
+    /**how effective this item is as flux for smelting. 0 = not a flux, 0.5 = normal flux, 1 = very good*/
     public float fluxiness = 0f;
-    /**
-     * drill hardness of the item
-     */
+    /**drill hardness of the item*/
     public int hardness = 0;
-    /**
-     * the burning color of this item
-     */
+    /**the burning color of this item*/
     public Color flameColor = Palette.darkFlame.cpy();
     /**
      * base material cost of this item, used for calculating place times

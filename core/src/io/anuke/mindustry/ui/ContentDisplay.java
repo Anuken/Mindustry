@@ -17,6 +17,7 @@ import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
 
 public class ContentDisplay{
 
@@ -144,6 +145,31 @@ public class ContentDisplay{
     }
 
     public static void displayUnit(Table table, UnitType unit){
+        table.table(title -> {
+            title.addImage(unit.getContentIcon()).size(8 * 6);
+            title.add("[accent]" + unit.localizedName()).padLeft(5);
+        });
 
+        table.row();
+
+        table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+
+        table.row();
+
+        if(unit.description != null){
+            table.add(unit.description).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.row();
+
+            table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+            table.row();
+        }
+
+        table.left().defaults().fillX();
+
+        table.add(Bundles.format("text.unit.health", unit.health));
+        table.row();
+        table.add(Bundles.format("text.unit.speed", Strings.toFixed(unit.speed, 1)));
+        table.row();
+        table.row();
     }
 }
