@@ -138,8 +138,6 @@ public class Vars{
             String code = stra[i];
             if(code.contains("_")){
                 locales[i] = new Locale(code.split("_")[0], code.split("_")[1]);
-            }else if(code.contains("-")){
-                locales[i] = new Locale(code.split("-")[0], code.split("-")[1]);
             }else{
                 locales[i] = new Locale(code);
             }

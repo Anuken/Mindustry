@@ -26,7 +26,6 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
-        aiVersion = '1.8.1'
         uCoreVersion = '239e6a5bad'
 
         getVersionString = {
@@ -112,7 +111,6 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-ai:$aiVersion:sources"
 
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion"

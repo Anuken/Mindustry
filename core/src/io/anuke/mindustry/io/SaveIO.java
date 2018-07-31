@@ -49,9 +49,7 @@ public class SaveIO{
 
     public static void loadFromSlot(int slot){
         if(gwt){
-            String string = Settings.getString("save-" + slot + "-data", "");
-            ByteArrayInputStream stream = new ByteArrayInputStream(Base64Coder.decode(string));
-            load(stream);
+            load(getSlotStream(slot));
         }else{
             load(fileFor(slot));
         }
@@ -113,14 +111,14 @@ public class SaveIO{
     }
 
     public static void write(FileHandle file){
-        write(file.write(false));
+        write(new DeflaterOutputStream(file.write(false)));
     }
 
     public static void write(OutputStream os){
         DataOutputStream stream;
 
         try{
-            stream = new DataOutputStream(new DeflaterOutputStream(os));
+            stream = new DataOutputStream(os);
             getVersion().write(stream);
             stream.close();
         }catch(Exception e){

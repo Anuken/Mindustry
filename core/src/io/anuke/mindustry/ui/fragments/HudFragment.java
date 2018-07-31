@@ -109,7 +109,9 @@ public class HudFragment extends Fragment{
                 t.label(() -> fps.get(Gdx.graphics.getFramesPerSecond())).padRight(10);
                 t.label(() -> tps.get(threads.getTPS())).visible(() -> threads.isEnabled());
                 t.row();
-                t.label(() -> ping.get(Net.getPing())).visible(() -> Net.client() && !gwt).colspan(2);
+                if(Net.hasClient()){
+                    t.label(() -> ping.get(Net.getPing())).visible(() -> Net.client() && !gwt).colspan(2);
+                }
             }).size(-1).visible(() -> Settings.getBool("fps")).get();
 
             //make wave box appear below rest of menu

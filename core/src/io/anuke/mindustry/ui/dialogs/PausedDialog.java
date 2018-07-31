@@ -56,7 +56,7 @@ public class PausedDialog extends FloatingDialog{
                 if(!gwt){
                     ui.host.show();
                 }else{
-                    ui.showInfo("$text.host.web");
+                    ui.showInfo("$text.web.unsupported");
                 }
             }).disabled(b -> Net.active());
 

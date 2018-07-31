@@ -115,12 +115,6 @@ public class HtmlLauncher extends GwtApplication {
 				return NumberFormat.getDecimalFormat().format(number);
 			}
 
-			@Override
-            public boolean canJoinGame(){
-			    String ref = Document.get().getReferrer();
-			    return !ref.startsWith("https") && !ref.contains("itch.io");
-            }
-
             @Override
             public void downloadFile(String name, byte[] bytes) {
                 downloadBytes(name, new String(Base64Coder.encode(bytes)));

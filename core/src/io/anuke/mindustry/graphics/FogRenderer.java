@@ -62,7 +62,7 @@ public class FogRenderer implements Disposable{
                 }
             }
 
-            pixelBuffer = ByteBuffer.allocateDirect(world.width() * world.height() * 3);
+            pixelBuffer = ByteBuffer.allocateDirect(world.width() * world.height() * 4);
             dirty = true;
         });
 
@@ -79,7 +79,7 @@ public class FogRenderer implements Disposable{
         buffer.begin();
         pixelBuffer.position(0);
         Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
-        Gdx.gl.glReadPixels(padding, padding, world.width(), world.height(), GL20.GL_RGB, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
+        Gdx.gl.glReadPixels(padding, padding, world.width(), world.height(), GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
 
         pixelBuffer.position(0);
         for(int i = 0; i < world.width() * world.height(); i++){
@@ -87,7 +87,7 @@ public class FogRenderer implements Disposable{
             if(r != 0){
                 world.tile(i).setVisibility((byte)1);
             }
-            pixelBuffer.position(pixelBuffer.position() + 2);
+            pixelBuffer.position(pixelBuffer.position() + 3);
         }
         buffer.end();
     }

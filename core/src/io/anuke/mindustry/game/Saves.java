@@ -214,7 +214,7 @@ public class Saves{
         }
 
         public boolean isAutosave(){
-            return Settings.getBool("save-" + index + "-autosave", !gwt);
+            return Settings.getBool("save-" + index + "-autosave", true);
         }
 
         public void setAutosave(boolean save){

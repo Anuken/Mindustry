@@ -43,10 +43,6 @@ public abstract class Platform {
     public String getLocaleName(Locale locale){
         return locale.toString();
     }
-    /**Whether joining games is supported.*/
-    public boolean canJoinGame(){
-        return true;
-    }
     /**Whether debug mode is enabled.*/
     public boolean isDebug(){return false;}
     /**Must be a base64 string 8 bytes in length.*/
