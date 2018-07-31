@@ -32,8 +32,6 @@ public class Vars{
     public static final float respawnduration = 60 * 4;
     //time between waves in frames (on normal mode)
     public static final float wavespace = 60 * 60 * 2f;
-    //waves can last no longer than 3 minutes, otherwise the next one spawns
-    public static final float maxwavespace = 60 * 60 * 4f;
     //set ridiculously high for now
     public static final float coreBuildRange = 800999f;
     //discord group URL
@@ -41,8 +39,6 @@ public class Vars{
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
     public static final int maxTextLength = 150;
     public static final int maxNameLength = 40;
-    //public static final int maxCharNameLength = 20;
-   // public static final int saveSlots = 64;
     public static final float itemSize = 5f;
     public static final int tilesize = 8;
     public static final int sectorSize = 300;
@@ -69,7 +65,6 @@ public class Vars{
     };
     //server port
     public static final int port = 6567;
-    public static final int webPort = 6568;
     public static boolean testMobile;
     //shorthand for whether or not this is running on android or ios
     public static boolean mobile;

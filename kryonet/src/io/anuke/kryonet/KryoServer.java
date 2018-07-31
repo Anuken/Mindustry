@@ -2,48 +2,38 @@ package io.anuke.kryonet;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Base64Coder;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
 import io.anuke.kryonet.CustomListeners.UnreliableListener;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Net.ServerProvider;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.NetworkIO;
-import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.net.Packets.Connect;
+import io.anuke.mindustry.net.Packets.Disconnect;
+import io.anuke.mindustry.net.Packets.StreamBegin;
+import io.anuke.mindustry.net.Packets.StreamChunk;
 import io.anuke.mindustry.net.Streamable;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
-import org.java_websocket.WebSocket;
-import org.java_websocket.exceptions.WebsocketNotConnectedException;
-import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.server.WebSocketServer;
 
 import java.io.IOException;
-import java.net.BindException;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedSelectorException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import static io.anuke.mindustry.Vars.headless;
-
 public class KryoServer implements ServerProvider {
     final boolean tcpOnly = System.getProperty("java.version") == null;
     final Server server;
-    final ByteSerializer serializer = new ByteSerializer();
-    final ByteBuffer buffer = ByteBuffer.allocate(4096);
     final CopyOnWriteArrayList<KryoConnection> connections = new CopyOnWriteArrayList<>();
     final CopyOnWriteArraySet<Integer> missing = new CopyOnWriteArraySet<>();
     final Array<KryoConnection> array = new Array<>();
-    SocketServer webServer;
     Thread serverThread;
 
     int lastconnection = 0;
@@ -147,8 +137,6 @@ public class KryoServer implements ServerProvider {
         }else{
             server.bind(port, port);
         }
-        webServer = new SocketServer(Vars.webPort);
-        webServer.start();
 
         serverThread = new Thread(() -> {
             try{
@@ -168,27 +156,6 @@ public class KryoServer implements ServerProvider {
         lastconnection = 0;
 
         async(server::close);
-
-        //kill them all
-        for (Thread worker : Thread.getAllStackTraces().keySet()) {
-            if (worker.getName().contains("WebSocketWorker")) {
-                worker.interrupt();
-            }
-        }
-
-        try {
-            if (webServer != null) webServer.stop(1);
-        }catch (NullPointerException e){
-            try {
-                synchronized (webServer) {
-                    ((Thread) UCore.getPrivate(WebSocketServer.class, webServer, "selectorthread")).join(1);
-                }
-            }catch (InterruptedException j){
-                handleException(j);
-            }
-        }catch (InterruptedException e){
-            handleException(e);
-        }
     }
 
     @Override
@@ -289,17 +256,6 @@ public class KryoServer implements ServerProvider {
         return null;
     }
 
-    KryoConnection getBySocket(WebSocket socket){
-        for(int i = 0; i < connections.size(); i ++){
-            KryoConnection con = connections.get(i);
-            if(con.socket == socket){
-                return con;
-            }
-        }
-
-        return null;
-    }
-
     void async(Runnable run){
         Thread thread = new Thread(run);
         thread.setDaemon(true);
@@ -307,169 +263,41 @@ public class KryoServer implements ServerProvider {
     }
 
     class KryoConnection extends NetConnection{
-        public final WebSocket socket;
         public final Connection connection;
-
-        public KryoConnection(int id, String address, WebSocket socket) {
-            super(id, address);
-            this.socket = socket;
-            this.connection = null;
-        }
 
         public KryoConnection(int id, String address, Connection connection) {
             super(id, address);
-            this.socket = null;
             this.connection = connection;
         }
 
         @Override
         public boolean isConnected(){
-            return connection == null ? !socket.isClosed() : connection.isConnected();
+            return connection.isConnected();
         }
 
         @Override
         public void send(Object object, SendMode mode){
-            if(socket != null){
-                try {
-                    synchronized (buffer) {
-                        buffer.position(0);
-                        serializer.write(buffer, object);
-                        int pos = buffer.position();
-                        buffer.position(0);
-                        byte[] out = new byte[pos];
-                        buffer.get(out);
-                        String string = new String(Base64Coder.encode(out));
-                        socket.send(string);
-                    }
-                }catch (WebsocketNotConnectedException e){
-                    //don't log anything, it's not important
-                    connections.remove(this);
-                }catch (Exception e){
-                    connections.remove(this);
-                    e.printStackTrace();
+            try {
+                if (mode == SendMode.tcp) {
+                    connection.sendTCP(object);
+                } else {
+                    connection.sendUDP(object);
                 }
-            }else if (connection != null) {
-                try {
-                    if (mode == SendMode.tcp) {
-                        connection.sendTCP(object);
-                    } else {
-                        connection.sendUDP(object);
-                    }
-                }catch (Exception e){
-                    Log.err(e);
-                    Log.info("Disconnecting invalid client!");
+            }catch (Exception e){
+                Log.err(e);
+                Log.info("Disconnecting invalid client!");
+                connection.close();
 
-                    try{
-                        //send error packet here
-                        /*
-                        NetErrorPacket packet = new NetErrorPacket();
-                        packet.message = Strings.parseException(e, true);
-                        Timers.runTask(5f, connection::close);*/
-                    }catch (Exception e2){
-                        Log.err(e2);
-                        connection.close();
-                    }
-                    connection.close();
-
-                    KryoConnection k = getByKryoID(connection.getID());
-                    if(k != null) connections.remove(k);
-                    Log.info("Connection removed {0}", k);
-                }
+                KryoConnection k = getByKryoID(connection.getID());
+                if(k != null) connections.remove(k);
+                Log.info("Connection removed {0}", k);
             }
         }
 
         @Override
         public void close(){
-            if(socket != null){
-                if(socket.isOpen()) socket.close();
-            }else if (connection != null) {
-                if(connection.isConnected()) connection.close();
-            }
+            if(connection.isConnected()) connection.close();
         }
-
-    }
-
-    class SocketServer extends WebSocketServer {
-
-        public SocketServer(int port) {
-            super(new InetSocketAddress(port));
-        }
-
-        @Override
-        public void onOpen(WebSocket conn, ClientHandshake handshake) {}
-
-        @Override
-        public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-            if (conn == null) return;
-
-            KryoConnection k = getBySocket(conn);
-            if(k == null) return;
-
-            Disconnect disconnect = new Disconnect();
-            disconnect.id = k.id;
-            Log.info("&bLost web connection: {0}", k.id);
-            Gdx.app.postRunnable(() -> Net.handleServerReceived(k.id, disconnect));
-        }
-
-        @Override
-        public void onMessage(WebSocket conn, String message) {
-            try {
-                if(message.equals("ping")){
-                    ByteBuffer ping = NetworkIO.writeServerData();
-                    conn.send(new String(Base64Coder.encode(ping.array())));
-                }else {
-                    KryoConnection k = getBySocket(conn);
-
-                    if (k == null){
-                        Connect connect = new Connect();
-                        connect.addressTCP = conn.getRemoteSocketAddress().getAddress().getHostAddress();
-                        k = new KryoConnection(lastconnection ++, connect.addressTCP, conn);
-
-                        Log.info("&bRecieved web connection: {0} {1}", k.id, connect.addressTCP);
-                        connections.add(k);
-
-                        int id = k.id;
-
-                        Gdx.app.postRunnable(() -> Net.handleServerReceived(id, connect));
-                    }
-
-                    int id = k.id;
-
-                    byte[] out = Base64Coder.decode(message);
-                    ByteBuffer buffer = ByteBuffer.wrap(out);
-                    Object o = serializer.read(buffer);
-                    Gdx.app.postRunnable(() -> {
-                        try {
-                            Net.handleServerReceived(id, o);
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                    });
-                }
-            }catch (Exception e){
-                Log.err(e);
-            }
-        }
-
-        @Override
-        public void onError(WebSocket conn, Exception ex) {
-            Log.info("WS error: ");
-            Log.err(ex);
-            if(ex instanceof BindException){
-                Net.closeServer();
-                if(!headless) {
-                    Net.showError("$text.server.addressinuse");
-                }else{
-                    Log.err("Web address in use!");
-                }
-            }else if(ex.getMessage().equals("Permission denied")){
-                Net.closeServer();
-                Net.showError("Permission denied.");
-            }
-        }
-
-        @Override
-        public void onStart() {}
     }
 
 }
