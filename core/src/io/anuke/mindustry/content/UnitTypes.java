@@ -61,7 +61,7 @@ public class UnitTypes implements ContentList{
             isFlying = true;
             drag = 0.01f;
             speed = 0.2f;
-            maxVelocity = 0.6f;
+            maxVelocity = 0.9f;
             ammoCapacity = 0;
             range = 70f;
             itemCapacity = 70;
