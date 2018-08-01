@@ -369,9 +369,7 @@ public class Control extends Module{
 
                     world.sectors().completeSector(world.getSector().x, world.getSector().y);
                     world.sectors().save();
-                    if(!headless){
-                        ui.showInfoFade("$text.sector.unlocked");
-                    }
+                    ui.missions.show(world.getSector());
                 }else if(world.getSector().currentMission().isComplete()){
                     //increment completed missions, check next index next frame
                     world.getSector().completedMissions ++;

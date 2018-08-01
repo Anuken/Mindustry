@@ -115,7 +115,7 @@ public class PausedDialog extends FloatingDialog{
         }
     }
 
-    private void runExitSave(){
+    public void runExitSave(){
         if(control.getSaves().getCurrent() == null ||
                 !control.getSaves().getCurrent().isAutosave()){
             state.set(State.menu);

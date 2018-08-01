@@ -146,7 +146,6 @@ public class Recipes implements ContentList{
         new Recipe(liquid, LiquidBlocks.pulseConduit, new ItemStack(Items.titanium, 1), new ItemStack(Items.lead, 1));
         new Recipe(liquid, LiquidBlocks.phaseConduit, new ItemStack(Items.phasematter, 10), new ItemStack(Items.silicon, 15), new ItemStack(Items.lead, 20), new ItemStack(Items.titanium, 20));
 
-
         new Recipe(liquid, LiquidBlocks.liquidRouter, new ItemStack(Items.carbide, 4), new ItemStack(Items.lead, 4));
         new Recipe(liquid, LiquidBlocks.liquidtank, new ItemStack(Items.titanium, 50), new ItemStack(Items.lead, 50), new ItemStack(Items.carbide, 20));
         new Recipe(liquid, LiquidBlocks.liquidJunction, new ItemStack(Items.carbide, 4), new ItemStack(Items.lead, 4));

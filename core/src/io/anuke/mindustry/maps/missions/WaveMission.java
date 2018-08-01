@@ -15,7 +15,7 @@ public class WaveMission implements Mission{
 
     @Override
     public void display(Table table){
-
+        table.add(Bundles.format("text.mission.wave", target));
     }
 
     @Override
