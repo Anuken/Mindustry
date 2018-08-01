@@ -14,7 +14,6 @@ import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.utils.Elements;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
@@ -45,11 +44,10 @@ public class CustomGameDialog extends FloatingDialog{
         selmode.add("$text.level.mode").padRight(15f);
 
         for(GameMode mode : GameMode.values()){
-            TextButton[] b = {null};
-            b[0] = Elements.newButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode);
-            b[0].update(() -> b[0].setChecked(state.mode == mode));
-            group.add(b[0]);
-            selmode.add(b[0]).size(130f, 54f);
+            if(mode.hidden) continue;
+
+            selmode.addButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode)
+                .update(b -> b.setChecked(state.mode == mode)).group(group).size(130f, 54f);
         }
         selmode.addButton("?", this::displayGameModeHelp).size(50f, 54f).padLeft(18f);
 
