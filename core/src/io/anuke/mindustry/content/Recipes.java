@@ -131,9 +131,10 @@ public class Recipes implements ContentList{
         //new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
 
         //actual unit related stuff
-        new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.tungsten, 50), new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 130));
-        new Recipe(units, UnitBlocks.fabricatorFactory, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 100), new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 300));
-        new Recipe(units, UnitBlocks.interceptorFactory, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 100), new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 300));
+        new Recipe(units, UnitBlocks.dronePad, new ItemStack(Items.tungsten, 50), new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 130));
+        new Recipe(units, UnitBlocks.fabricatorPad, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 100), new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 300));
+        new Recipe(units, UnitBlocks.interceptorPad, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 100), new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 300));
+        new Recipe(units, UnitBlocks.monsoonPad, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 100), new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 300));
 
         new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));
         new Recipe(units, UnitBlocks.resupplyPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));
@@ -257,7 +258,7 @@ public class Recipes implements ContentList{
         new Recipe(units, UnitBlocks.dropPoint, new ItemStack(Items.carbide, 10));
         new Recipe(units, UnitBlocks.resupplyPoint, new ItemStack(Items.carbide, 10));
 
-        new Recipe(units, UnitBlocks.droneFactory, new ItemStack(Items.tungsten, 50));
+        new Recipe(units, UnitBlocks.dronePad, new ItemStack(Items.tungsten, 50));
         new Recipe(units, UnitBlocks.reconstructor, new ItemStack(Items.tungsten, 1));
 
         new Recipe(units, UnitBlocks.overdriveProjector, new ItemStack(Items.tungsten, 1));

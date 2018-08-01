@@ -8,12 +8,13 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.units.*;
 
 public class UnitBlocks extends BlockList implements ContentList{
-    public static Block resupplyPoint, repairPoint, droneFactory, fabricatorFactory, interceptorFactory, dropPoint,
-            reconstructor, overdriveProjector, shieldProjector, commandCenter;
+    public static Block resupplyPoint, repairPoint, dronePad,
+    fabricatorPad, interceptorPad, monsoonPad, scoutPad, titanPad,
+    dropPoint, reconstructor, overdriveProjector, shieldProjector, commandCenter;
 
     @Override
     public void load(){
-        droneFactory = new UnitFactory("drone-factory"){{
+        dronePad = new UnitFactory("drone-pad"){{
             type = UnitTypes.drone;
             produceTime = 800;
             size = 2;
@@ -21,7 +22,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30)});
         }};
 
-        fabricatorFactory = new UnitFactory("fabricator-factory"){{
+        fabricatorPad = new UnitFactory("fabricator-pad"){{
             type = UnitTypes.fabricator;
             produceTime = 1600;
             size = 2;
@@ -29,12 +30,21 @@ public class UnitBlocks extends BlockList implements ContentList{
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80)});
         }};
 
-        interceptorFactory = new UnitFactory("interceptor-factory"){{
+        interceptorPad = new UnitFactory("interceptor-pad"){{
             type = UnitTypes.interceptor;
             produceTime = 1300;
             size = 2;
             consumes.power(0.1f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 40)});
+        }};
+
+        monsoonPad = new UnitFactory("monsoon-pad"){{
+            type = UnitTypes.monsoon;
+            produceTime = 1400;
+            size = 3;
+            consumes.power(0.14f);
+            shadow = "shadow-round-3";
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 50), new ItemStack(Items.plastanium, 50)});
         }};
 
         resupplyPoint = new ResupplyPoint("resupply-point"){{

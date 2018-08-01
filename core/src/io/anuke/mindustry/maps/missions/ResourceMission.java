@@ -3,6 +3,7 @@ package io.anuke.mindustry.maps.missions;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.type.Item;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
 public class ResourceMission implements Mission{
@@ -12,6 +13,11 @@ public class ResourceMission implements Mission{
     public ResourceMission(Item item, int amount){
         this.item = item;
         this.amount = amount;
+    }
+
+    @Override
+    public void display(Table table){
+
     }
 
     @Override

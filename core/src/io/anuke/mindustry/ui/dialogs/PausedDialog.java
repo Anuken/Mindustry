@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
@@ -10,10 +11,24 @@ public class PausedDialog extends FloatingDialog{
     public boolean wasPaused = false;
     private SaveDialog save = new SaveDialog();
     private LoadDialog load = new LoadDialog();
+    private Table missionTable;
 
     public PausedDialog(){
         super("$text.menu");
         setup();
+
+        shown(this::rebuild);
+    }
+
+    void rebuild(){
+        missionTable.clear();
+        if(world.getSector() != null){
+            missionTable.add("[LIGHT_GRAY]" + Bundles.format("text.mission", ""));
+            missionTable.row();
+            missionTable.table(t -> {
+                world.getSector().currentMission().display(t);
+            });
+        }
     }
 
     void setup(){
@@ -27,6 +42,9 @@ public class PausedDialog extends FloatingDialog{
             wasPaused = state.is(State.paused);
             if(!Net.active()) state.set(State.paused);
         });
+
+        content().table(t -> missionTable = t);
+        content().row();
 
         if(!mobile){
             content().defaults().width(220).height(50);

@@ -6,6 +6,7 @@ import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
 public class BattleMission implements Mission{
@@ -13,6 +14,11 @@ public class BattleMission implements Mission{
 
     public BattleMission(int difficulty){
         this.difficulty = difficulty;
+    }
+
+    @Override
+    public void display(Table table){
+        table.add("$text.mission.battle");
     }
 
     @Override

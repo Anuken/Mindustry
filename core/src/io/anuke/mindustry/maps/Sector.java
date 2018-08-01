@@ -32,6 +32,10 @@ public class Sector{
     /**Difficulty of the sector, measured by calculating distance from origin and applying scaling.*/
     public transient int difficulty;
 
+    public Mission currentMission(){
+        return missions.get(completedMissions);
+    }
+
     public int getSeed(){
         return Bits.packInt(x, y);
     }
