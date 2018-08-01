@@ -12,9 +12,9 @@ import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadServer;
-import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.*;
@@ -175,16 +175,14 @@ public class NetServer extends Module{
             NetConnection connection = Net.getConnection(id);
             if(player == null || connection == null || packet.snapid < connection.lastRecievedClientSnapshot) return;
 
-            boolean verifyPosition = !player.isDead() && !debug && headless && !player.mech.flying && player.getCarrier() == null;
+            boolean verifyPosition = !player.isDead() && !debug && headless && player.getCarrier() == null;
 
             if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = TimeUtils.millis() - 16;
 
             long elapsed = TimeUtils.timeSinceMillis(connection.lastRecievedClientTime);
 
-            float maxSpeed = (packet.boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed) * 2.5f;
-
-            //extra 1.1x multiplicaton is added just in case
-            float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
+            float maxSpeed = packet.boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
+            float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.1f, player.mech.maxSpeed * 1.05f);
 
             player.pointerX = packet.pointerX;
             player.pointerY = packet.pointerY;
@@ -236,6 +234,15 @@ public class NetServer extends Module{
             if(player == null) return;
             RemoteReadServer.readPacket(packet.writeBuffer, packet.type, player);
         });
+    }
+
+    private float compound(float speed, float drag){
+        float total = 0f;
+        for(int i = 0; i < 10; i++){
+            total *= (1f - drag);
+            total += speed;
+        }
+        return total;
     }
 
     /**

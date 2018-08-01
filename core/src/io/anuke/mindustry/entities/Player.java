@@ -547,7 +547,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 velocity.add(movement);
             }
             float prex = x, prey = y;
-            updateVelocityStatus(mech.drag, 10f);
+            updateVelocityStatus(mech.drag, mech.maxSpeed);
             moved = distanceTo(prex, prey) > 0.01f;
         }else{
             velocity.setZero();

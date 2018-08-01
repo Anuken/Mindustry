@@ -131,11 +131,11 @@ public class Logic extends Module{
 
             if(!state.is(State.paused) || Net.active()){
 
-                if(!state.mode.disableWaveTimer){
+                if(!state.mode.disableWaveTimer && !state.mode.disableWaves){
                     state.wavetime -= Timers.delta();
                 }
 
-                if(!Net.client() && state.wavetime <= 0){
+                if(!Net.client() && state.wavetime <= 0 && !state.mode.disableWaves){
                     runWave();
                 }
 

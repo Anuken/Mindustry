@@ -219,6 +219,7 @@ public class World extends Module{
     /**Loads up a sector map. This does not call play(), but calls reset().*/
     public void loadSector(Sector sector){
         currentSector = sector;
+        state.mode = sector.missions.peek().getMode();
         Timers.mark();
         Timers.mark();
 

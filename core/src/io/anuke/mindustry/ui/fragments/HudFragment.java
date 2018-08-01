@@ -285,6 +285,7 @@ public class HudFragment extends Fragment{
         });
 
         table.add().growX();
+        table.visible(() -> !state.mode.disableWaves);
 
         playButton(uheight);
     }

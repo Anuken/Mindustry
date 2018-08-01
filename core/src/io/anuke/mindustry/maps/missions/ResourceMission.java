@@ -1,6 +1,7 @@
 package io.anuke.mindustry.maps.missions;
 
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.util.Bundles;
 
@@ -11,6 +12,11 @@ public class ResourceMission implements Mission{
     public ResourceMission(Item item, int amount){
         this.item = item;
         this.amount = amount;
+    }
+
+    @Override
+    public GameMode getMode(){
+        return GameMode.waves;
     }
 
     @Override

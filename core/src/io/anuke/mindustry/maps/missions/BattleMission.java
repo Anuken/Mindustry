@@ -2,6 +2,7 @@ package io.anuke.mindustry.maps.missions;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.world.Tile;
@@ -12,6 +13,11 @@ public class BattleMission implements Mission{
 
     public BattleMission(int difficulty){
         this.difficulty = difficulty;
+    }
+
+    @Override
+    public GameMode getMode(){
+        return GameMode.noWaves;
     }
 
     @Override
