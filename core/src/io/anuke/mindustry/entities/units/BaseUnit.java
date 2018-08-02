@@ -24,7 +24,7 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.units.CommandCenter.CommandCenterEntity;
-import io.anuke.mindustry.world.blocks.units.UnitFactory.UnitFactoryEntity;
+import io.anuke.mindustry.world.blocks.units.UnitPad.UnitFactoryEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;

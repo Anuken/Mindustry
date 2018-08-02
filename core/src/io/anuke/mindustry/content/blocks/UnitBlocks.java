@@ -14,7 +14,7 @@ public class UnitBlocks extends BlockList implements ContentList{
 
     @Override
     public void load(){
-        dronePad = new UnitFactory("drone-pad"){{
+        dronePad = new UnitPad("drone-pad"){{
             type = UnitTypes.drone;
             produceTime = 800;
             size = 2;
@@ -22,7 +22,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30)});
         }};
 
-        fabricatorPad = new UnitFactory("fabricator-pad"){{
+        fabricatorPad = new UnitPad("fabricator-pad"){{
             type = UnitTypes.fabricator;
             produceTime = 1600;
             size = 2;
@@ -30,7 +30,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80)});
         }};
 
-        interceptorPad = new UnitFactory("interceptor-pad"){{
+        interceptorPad = new UnitPad("interceptor-pad"){{
             type = UnitTypes.interceptor;
             produceTime = 1300;
             size = 2;
@@ -38,7 +38,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 40)});
         }};
 
-        monsoonPad = new UnitFactory("monsoon-pad"){{
+        monsoonPad = new UnitPad("monsoon-pad"){{
             type = UnitTypes.monsoon;
             produceTime = 1400;
             size = 3;

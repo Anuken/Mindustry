@@ -34,19 +34,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class UnitFactory extends Block{
+public class UnitPad extends Block{
     protected UnitType type;
     protected float produceTime = 1000f;
     protected float openDuration = 50f;
     protected float launchVelocity = 0f;
     protected String unitRegion;
 
-    public UnitFactory(String name){
+    public UnitPad(String name){
         super(name);
         update = true;
         hasPower = true;
         hasItems = true;
         solidifes = true;
+        itemCapacity = 10;
 
         consumes.require(ConsumeItems.class);
     }
@@ -54,7 +55,7 @@ public class UnitFactory extends Block{
     @Remote(called = Loc.server)
     public static void onUnitFactorySpawn(Tile tile){
         UnitFactoryEntity entity = tile.entity();
-        UnitFactory factory = (UnitFactory) tile.block();
+        UnitPad factory = (UnitPad) tile.block();
 
         entity.buildTime = 0f;
         entity.hasSpawned = true;
@@ -188,11 +189,21 @@ public class UnitFactory extends Block{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         for(ItemStack stack : consumes.items()){
-            if(item == stack.item && tile.entity.items.get(item) <= stack.amount * 2){
+            if(item == stack.item && tile.entity.items.get(item) < stack.amount * 2){
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public int getMaximumAccepted(Tile tile, Item item){
+        for(ItemStack stack : consumes.items()){
+            if(item == stack.item){
+                return stack.amount * 2;
+            }
+        }
+        return 0;
     }
 
     @Override
