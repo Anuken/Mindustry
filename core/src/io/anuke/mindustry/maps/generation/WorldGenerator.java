@@ -1,7 +1,6 @@
 package io.anuke.mindustry.maps.generation;
 
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -208,11 +207,6 @@ public class WorldGenerator{
             }
         }
 
-        int coreX = 60, coreY = 60;
-
-        tiles[coreX][coreY].setBlock(StorageBlocks.core);
-        tiles[coreX][coreY].setTeam(Team.blue);
-
         for(Mission mission : sector.missions){
             mission.generate(tiles, sector);
         }
@@ -232,8 +226,6 @@ public class WorldGenerator{
         int x = sectorX * sectorSize + localX + Short.MAX_VALUE;
         int y = sectorY * sectorSize + localY + Short.MAX_VALUE;
 
-        int coreX = 60, coreY = 60;
-
         Block floor;
         Block wall = Blocks.air;
 
@@ -242,13 +234,6 @@ public class WorldGenerator{
         double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.62, 1f / 640, x, y) * 6.1 - 1 - ridge;
         double temp = vn.noise(x, y, 1f / 300f) * sim3.octaveNoise2D(detailed ? 2 : 1, 1, 1f / 13f, x, y)/13f
         + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 920f, x, y);
-
-        double dst = Vector2.dst(localX, localY, coreX, coreY);
-        double lerpDst = 20;
-
-        if(dst < lerpDst){
-            elevation = Mathf.lerp((float)elevation, 0.88f, Mathf.clamp(2*(1f-(float)(dst / lerpDst))));
-        }
 
         if(elevation < 0.7){
             floor = Blocks.deepwater;

@@ -112,9 +112,7 @@ public class HudFragment extends Fragment{
                 if(Net.hasClient()){
                     t.label(() -> ping.get(Net.getPing())).visible(() -> Net.client() && !gwt).colspan(2);
                 }
-            }).size(-1).visible(() -> Settings.getBool("fps")).update(t -> {
-                t.setTranslation(0, state.mode.disableWaves ? waves.getHeight() : 0);
-            }).get();
+            }).size(-1).visible(() -> Settings.getBool("fps")).update(t -> t.setTranslation(0, state.mode.disableWaves ? waves.getHeight() : 0)).get();
 
             //make wave box appear below rest of menu
             cont.swapActor(wavetable, menu.getParent());

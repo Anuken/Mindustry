@@ -359,8 +359,8 @@ public class NetServer extends Module{
 
         Player player = connections.get(con.id);
 
-        if(player != null && (reason == KickReason.kick || reason == KickReason.banned) && admins.getTraceByID(getUUID(con.id)).uuid != null){
-            PlayerInfo info = admins.getInfo(admins.getTraceByID(getUUID(con.id)).uuid);
+        if(player != null && (reason == KickReason.kick || reason == KickReason.banned) && player.uuid != null){
+            PlayerInfo info = admins.getInfo(player.uuid);
             info.timesKicked++;
             info.lastKicked = TimeUtils.millis();
         }
