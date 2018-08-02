@@ -8,6 +8,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.ucore.noise.Noise;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
@@ -23,19 +24,20 @@ public class WaveMission implements Mission{
 
     @Override
     public void generate(Tile[][] tiles, Sector sector){
+        Noise.setSeed(0);
         int coreX = tiles.length/2, coreY = tiles.length/2;
         float targetElevation = Math.max(tiles[coreX][coreY].getElevation(), 1);
 
         int lerpDst = 20;
-        for(int x = -lerpDst/2; x <= lerpDst/2; x++){
-            for(int y = -lerpDst/2; y <= lerpDst/2; y++){
+        for(int x = -lerpDst; x <= lerpDst; x++){
+            for(int y = -lerpDst; y <= lerpDst; y++){
                 int wx = tiles.length/2 + x, wy = tiles[0].length/2 + y;
 
                 float dst = Vector2.dst(wx, wy, coreX, coreY);
                 float elevation = tiles[wx][wy].getElevation();
 
                 if(dst < lerpDst){
-                    elevation = Mathf.lerp(elevation, targetElevation, Mathf.clamp(2*(1f-(dst / lerpDst))));
+                    elevation = Mathf.lerp(elevation, targetElevation, Mathf.clamp(2*(1f-(dst / lerpDst))) + Noise.nnoise(wx, wy, 8f, 1f));
                 }
 
                 if(tiles[wx][wy].floor().liquidDrop == null){
