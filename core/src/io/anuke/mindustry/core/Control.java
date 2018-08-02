@@ -13,6 +13,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentDatabase;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
@@ -109,6 +110,12 @@ public class Control extends Module{
             }
 
             state.set(State.playing);
+
+            if(state.mode == GameMode.sandbox && !Settings.getBool("sandbox-warning", false)){
+                threads.runGraphics(() -> ui.showInfo("$mode.sandbox.warning"));
+                Settings.putBool("sandbox-warning", true);
+                Settings.save();
+            }
         });
 
         Events.on(WorldLoadGraphicsEvent.class, () -> {

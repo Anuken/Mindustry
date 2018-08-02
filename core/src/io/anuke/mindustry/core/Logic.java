@@ -59,7 +59,7 @@ public class Logic extends Module{
                             tile.entity.items.set(item, 1000);
                         }
                     }
-                }else{
+                }else if(!state.mode.infiniteResources){
                     tile.entity.items.add(Items.tungsten, 50);
                     tile.entity.items.add(Items.lead, 20);
                 }
