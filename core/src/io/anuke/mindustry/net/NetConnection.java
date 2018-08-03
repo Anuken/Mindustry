@@ -31,6 +31,7 @@ public abstract class NetConnection{
     public long lastRecievedClientTime;
 
     public boolean hasConnected = false;
+    public boolean hasBegunConnecting = false;
 
     public NetConnection(int id, String address){
         this.id = id;

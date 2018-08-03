@@ -80,8 +80,17 @@ public class NetServer extends Module{
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
             String uuid = packet.uuid;
 
-            if(Net.getConnection(id) == null ||
-                    admins.isIPBanned(Net.getConnection(id).address)) return;
+            NetConnection connection = Net.getConnection(id);
+
+            if(connection == null ||
+                    admins.isIPBanned(connection.address)) return;
+
+            if(connection.hasBegunConnecting){
+                kick(id, KickReason.idInUse);
+                return;
+            }
+
+            connection.hasBegunConnecting = true;
 
             TraceInfo trace = admins.getTraceByID(uuid);
             PlayerInfo info = admins.getInfo(uuid);
@@ -112,7 +121,7 @@ public class NetServer extends Module{
                         return;
                     }
 
-                    if(player.uuid.equals(packet.uuid)){
+                    if(player.uuid.equals(packet.uuid) || player.usid.equals(packet.usid)){
                         kick(id, KickReason.idInUse);
                         return;
                     }
@@ -182,7 +191,7 @@ public class NetServer extends Module{
             long elapsed = TimeUtils.timeSinceMillis(connection.lastRecievedClientTime);
 
             float maxSpeed = packet.boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
-            float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.1f, player.mech.maxSpeed * 1.05f);
+            float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.2f, player.mech.maxSpeed * 1.05f);
 
             player.pointerX = packet.pointerX;
             player.pointerY = packet.pointerY;
@@ -195,12 +204,16 @@ public class NetServer extends Module{
             }
 
             vector.set(packet.x - player.getInterpolator().target.x, packet.y - player.getInterpolator().target.y);
-
             vector.limit(maxMove);
 
             float prevx = player.x, prevy = player.y;
             player.set(player.getInterpolator().target.x, player.getInterpolator().target.y);
-            player.move(vector.x, vector.y);
+            if(!player.mech.flying){
+                player.move(vector.x, vector.y);
+            }else{
+                player.x += vector.x;
+                player.y += vector.y;
+            }
             float newx = player.x, newy = player.y;
 
             if(!verifyPosition){
@@ -238,16 +251,14 @@ public class NetServer extends Module{
 
     private float compound(float speed, float drag){
         float total = 0f;
-        for(int i = 0; i < 10; i++){
+        for(int i = 0; i < 20; i++){
             total *= (1f - drag);
             total += speed;
         }
         return total;
     }
 
-    /**
-     * Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.
-     */
+    /** Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.*/
     private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID, int base){
         if(bytes.length < maxSnapshotSize){
             Call.onSnapshot(userid, bytes, snapshotID, (short) 0, bytes.length, base);
@@ -321,6 +332,8 @@ public class NetServer extends Module{
 
     @Remote(targets = Loc.client)
     public static void connectConfirm(Player player){
+        if(player.con == null || player.con.hasConnected) return;
+
         player.add();
         player.con.hasConnected = true;
         Call.sendMessage("[accent]" + player.name + " [accent]has connected.");
