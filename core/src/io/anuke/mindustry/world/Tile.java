@@ -165,6 +165,11 @@ public class Tile implements PosTrait, TargetTrait{
         }
     }
 
+    public void setBlock(Block type, Team team){
+        setBlock(type);
+        setTeam(team);
+    }
+
     public void setBlock(Block type){
         synchronized(tileSetLock){
             preChanged();

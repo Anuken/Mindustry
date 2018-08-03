@@ -161,6 +161,10 @@ public class Block extends BaseBlock implements Content{
         }
     }
 
+    public boolean dropsItem(Item item){
+        return drops != null && drops.item == item;
+    }
+
     public boolean isLayer(Tile tile){
         return true;
     }

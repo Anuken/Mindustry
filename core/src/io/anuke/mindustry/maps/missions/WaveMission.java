@@ -2,8 +2,7 @@ package io.anuke.mindustry.maps.missions;
 
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.Sector;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
@@ -17,9 +16,9 @@ public class WaveMission implements Mission{
     }
 
     @Override
-    public void generate(Tile[][] tiles, Sector sector){
-        int coreX = tiles.length/2, coreY = tiles.length/2;
-        generateCoreAt(tiles, coreX, coreY, Team.blue);
+    public void generate(Generation gen){
+        int coreX = gen.width/2, coreY = gen.height/2;
+        generateCoreAt(gen, coreX, coreY, Team.blue);
     }
 
     @Override

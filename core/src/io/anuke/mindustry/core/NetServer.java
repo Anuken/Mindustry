@@ -95,6 +95,7 @@ public class NetServer extends Module{
             TraceInfo trace = admins.getTraceByID(uuid);
             PlayerInfo info = admins.getInfo(uuid);
             trace.uuid = uuid;
+            trace.ip = connection.address;
             trace.android = packet.mobile;
 
             if(admins.isIDBanned(uuid)){
@@ -224,6 +225,7 @@ public class NetServer extends Module{
             }else if(Vector2.dst(packet.x, packet.y, newx, newy) > correctDist){
                 Call.onPositionSet(id, newx, newy); //teleport and correct position when necessary
             }
+
             //reset player to previous synced position so it gets interpolated
             player.x = prevx;
             player.y = prevy;

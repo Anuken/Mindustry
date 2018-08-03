@@ -66,10 +66,12 @@ public class WorldGenerator{
             }
         }
 
-        prepareTiles(tiles, seed, genOres, null);
+        prepareTiles(tiles);
+
+        generateOres(tiles, seed, genOres, null);
     }
 
-    public void prepareTiles(Tile[][] tiles, long seed, boolean genOres, Array<Item> usedOres){
+    public void prepareTiles(Tile[][] tiles){
 
         //find multiblocks
         IntArray multiblocks = new IntArray();
@@ -132,16 +134,18 @@ public class WorldGenerator{
                 }
             }
         }
+    }
 
+    public void generateOres(Tile[][] tiles, long seed, boolean genOres, Array<Item> usedOres){
         oreIndex = 0;
 
         if(genOres){
             Array<OreEntry> baseOres = Array.with(
-                new OreEntry(Items.tungsten, 0.3f, seed),
-                new OreEntry(Items.coal, 0.284f, seed),
-                new OreEntry(Items.lead, 0.28f, seed),
-                new OreEntry(Items.titanium, 0.27f, seed),
-                new OreEntry(Items.thorium, 0.26f, seed)
+            new OreEntry(Items.tungsten, 0.3f, seed),
+            new OreEntry(Items.coal, 0.284f, seed),
+            new OreEntry(Items.lead, 0.28f, seed),
+            new OreEntry(Items.titanium, 0.27f, seed),
+            new OreEntry(Items.thorium, 0.26f, seed)
             );
 
             Array<OreEntry> ores = new Array<>();
@@ -165,8 +169,8 @@ public class WorldGenerator{
                     for(int i = ores.size - 1; i >= 0; i--){
                         OreEntry entry = ores.get(i);
                         if(entry.noise.octaveNoise2D(1, 0.7, 1f / (4 + i * 2), x, y) / 4f +
-                                Math.abs(0.5f - entry.noise.octaveNoise2D(2, 0.7, 1f / (50 + i * 2), x, y)) > 0.48f &&
-                                Math.abs(0.5f - entry.noise.octaveNoise2D(1, 1, 1f / (55 + i * 4), x, y)) > 0.22f){
+                        Math.abs(0.5f - entry.noise.octaveNoise2D(2, 0.7, 1f / (50 + i * 2), x, y)) > 0.48f &&
+                        Math.abs(0.5f - entry.noise.octaveNoise2D(1, 1, 1f / (55 + i * 4), x, y)) > 0.22f){
                             tile.setFloor((Floor) OreBlocks.get(tile.floor(), entry.item));
                             break;
                         }
@@ -207,11 +211,15 @@ public class WorldGenerator{
             }
         }
 
+        generateOres(tiles, sector.getSeed(), true, sector.ores);
+
+        Generation gen = new Generation(sector, tiles, tiles.length, tiles[0].length, random);
+
         for(Mission mission : sector.missions){
-            mission.generate(tiles, sector);
+            mission.generate(gen);
         }
 
-        prepareTiles(tiles, sector.getSeed(), true, sector.ores);
+        prepareTiles(tiles);
     }
 
     public GenResult generateTile(int sectorX, int sectorY, int localX, int localY){
