@@ -17,7 +17,7 @@ public class FortressGenerator{
     private final Block[] turretBlocks = {TurretBlocks.duo, TurretBlocks.hail, TurretBlocks.wave};
     private final Block[] drillBlocks = {ProductionBlocks.tungstenDrill, ProductionBlocks.carbideDrill};
     private final Block[] armorBlocks = {DefenseBlocks.tungstenWall, DefenseBlocks.carbideWall, DefenseBlocks.thoriumWall};
-    private final int minCoreDst = 30;
+    private final int minCoreDst = 50;
 
     private int enemyX, enemyY, coreX, coreY;
     private Team team;
@@ -42,7 +42,7 @@ public class FortressGenerator{
         for(int x = 2; x < gen.width - 2; x++){
             for(int y = 2; y < gen.height - 2; y++){
                 if(Vector2.dst(x, y, coreX, coreY) > minCoreDst &&
-                    gen.tiles[x][y].floor().dropsItem(ore) && gen.random.chance(0.03)){
+                    gen.tiles[x][y].floor().dropsItem(ore) && gen.random.chance(0.02)){
                     
                     int elevation = gen.tiles[x][y].getElevation();
                     gen.tiles[x][y].setBlock(drill, team);

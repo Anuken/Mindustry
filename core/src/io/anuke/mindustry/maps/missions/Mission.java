@@ -26,12 +26,14 @@ public interface Mission{
         int lerpDst = 20;
         for(int x = -lerpDst; x <= lerpDst; x++){
             for(int y = -lerpDst; y <= lerpDst; y++){
-                int wx = gen.width/2 + x, wy = gen.height/2 + y;
+                int wx = gen.width / 2 + x, wy = gen.height / 2 + y;
 
                 float dst = Vector2.dst(wx, wy, coreX, coreY);
                 float elevation = gen.tiles[wx][wy].getElevation();
 
-                if(dst < lerpDst){
+                if(dst < 4){
+                    elevation = targetElevation;
+                }else if(dst < lerpDst){
                     elevation = Mathf.lerp(elevation, targetElevation, Mathf.clamp(2*(1f-(dst / lerpDst))) + Noise.nnoise(wx, wy, 8f, 1f));
                 }
 

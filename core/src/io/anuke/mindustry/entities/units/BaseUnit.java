@@ -329,6 +329,10 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         if(!Net.client()){
             avoidOthers(8f);
+
+            if(spawner != -1 && (world.tile(spawner) == null || world.tile(spawner).entity == null)){
+                damage(health);
+            }
         }
 
         if(squad != null){
