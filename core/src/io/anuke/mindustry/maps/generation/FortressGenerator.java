@@ -1,29 +1,67 @@
 package io.anuke.mindustry.maps.generation;
 
-import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.blocks.DefenseBlocks;
-import io.anuke.mindustry.content.blocks.ProductionBlocks;
-import io.anuke.mindustry.content.blocks.TurretBlocks;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.maps.generation.StructureFormat.StructBlock;
+import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.util.Geometry;
+import io.anuke.mindustry.world.blocks.defense.turrets.ItemTurret;
+import io.anuke.mindustry.world.blocks.defense.turrets.PowerTurret;
+import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
+
+import static io.anuke.mindustry.Vars.world;
 
 public class FortressGenerator{
-    private final Block[] turretBlocks = {TurretBlocks.duo, TurretBlocks.hail, TurretBlocks.wave};
-    private final Block[] drillBlocks = {ProductionBlocks.tungstenDrill, ProductionBlocks.carbideDrill};
-    private final Block[] armorBlocks = {DefenseBlocks.tungstenWall, DefenseBlocks.carbideWall, DefenseBlocks.thoriumWall};
-    private final int minCoreDst = 50;
+    private final static int minCoreDst = 50;
+    private static Structure[] structures;
 
     private int enemyX, enemyY, coreX, coreY;
     private Team team;
     private Generation gen;
 
+    private static void init(){
+        if(structures != null) return;
+
+        String vaults = "BQMADWNhcmJpZGUtZHJpbGwCAA10dW5nc3Rlbi13YWxsAQATdHVuZ3N0ZW4td2FsbC1sYXJnZQAAA2FpcgQABXZhdWx0CQUAAgABAAEAAQABAAIAAAABAAAAAAACAAAAAQAAAAABAQABAgEBAQAAAAIAAgMBAAEAAAICAAAAAAAAAgACAgAABAIAAAIAAgIAAAAAAAACAAICAgMCAwIDAgM=";
+
+        structures = new Structure[]{
+            //tiny duo outpost
+            new Structure(Items.tungsten, "BAMADnR1bmdzdGVuLWRyaWxsAgADZHVvAQANdHVuZ3N0ZW4td2FsbAAAA2FpcgMFAQABAwEDAQMBAAEAAgMDAwIDAQABAAEBAQEBAQEA"),
+
+            //basic outposts with duos
+            new Structure(Items.tungsten, "BAIAA2R1bwMADWNhcmJpZGUtZHJpbGwBAA10dW5nc3Rlbi13YWxsAAADYWlyBQUAAAEAAQABAAAAAQABAAIAAQABAAEAAgADAwIAAQABAAEAAgABAAEAAAABAAEAAQAAAA=="),
+
+            //more advanced duo outpost
+            new Structure(Items.lead, "BwYADnR1bmdzdGVuLWRyaWxsAwADZHVvBAAIc3BsaXR0ZXIBAA10dW5nc3Rlbi13YWxsAgATdHVuZ3N0ZW4td2FsbC1sYXJnZQAAA2FpcgUACGNvbnZleW9yCQkAAAAAAQEBAQEBAQEBAgAAAAAAAAICAAEDAAQDAwACAgAAAAABAgACAAABAgUCAQEAAAAAAQABAgMAAQIBAgUCAQEBAQMAAQABAgQCBQMFAwYCBQEFAQQDAQABAgMAAQEBAQUAAQMBAwMAAQABAwICAAMBAQUAAQMCAgADAQMAAAAAAAIDAAQDAwAAAwADAAAAAAAAAQIBAwEDAQMBAwAAAAA="),
+
+            //material storage
+            new Structure(Items.lead, vaults),
+            new Structure(Items.coal, vaults),
+            new Structure(Items.titanium, vaults),
+
+            //salvo outpost
+            new Structure(Items.tungsten, "BAIABXNhbHZvAwANY2FyYmlkZS1kcmlsbAAAA2FpcgEADGNhcmJpZGUtd2FsbAcHAAAAAAEDAQMBAwEDAAABAwEDAQMCAAAAAQMAAAEAAgAAAAAAAAABAwEDAQAAAAAAAwACAAAAAQIBAAEBAgAAAAAAAAABAgAAAQEAAAAAAQEBAQEBAAABAQEBAQEBAQAAAAA="),
+
+            //advanced laser outpost
+            new Structure(null, "BQIABmxhbmNlcgEAEmNhcmJpZGUtd2FsbC1sYXJnZQQAEXNvbGFyLXBhbmVsLWxhcmdlAAADYWlyAwALc29sYXItcGFuZWwLCwAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAAABAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAMAAwAAAAAAAwABAAAAAAABAAAAAgAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAQAAAACAAAAAQAAAAAAAQAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAIAAAADAAMAAQAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+
+            //coal laser outpost
+            new Structure(null, "BgEADHRob3JpdW0td2FsbAMABmxhbmNlcgUAFGNvbWJ1c3Rpb24tZ2VuZXJhdG9yBAANY2FyYmlkZS1kcmlsbAAAA2FpcgIAC3NvbGFyLXBhbmVsBwcAAAEAAQABAQEBAQEBAAAAAQACAgMAAAACAAEAAAABAAICAAAAAAIAAQAAAAEAAQAEAQUAAQABAAAAAQACAAMBAAMCAAEAAAABAAIAAAMAAwIAAQAAAAEAAQABAwEDAQABAA=="),
+
+            //ultimate laser outpost
+            new Structure(null, "BgMABmxhbmNlcgIAEmNhcmJpZGUtd2FsbC1sYXJnZQUAEXNvbGFyLXBhbmVsLWxhcmdlAAADYWlyBAALc29sYXItcGFuZWwBAAxjYXJiaWRlLXdhbGwPDwAAAAAAAAAAAAABAwIDAAABAwAAAAAAAAAAAAAAAAAAAAACAwAAAgMAAAAAAAACAwAAAgMAAAAAAAAAAAAAAQMAAAAAAAAAAAMDAAAAAAAAAAAAAAIDAAAAAAAAAgMAAAMDAAAEAwAAAAADAwAAAwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDAAAAAAAAAgMAAAMDAAAAAAUDAAAAAAAAAAAEAwAAAAABAwEDAAAAAAAAAAAAAAAAAAAAAAUDAAADAwAAAgMAAAIDAAADAwAAAAAAAAAABAMAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAFAwAAAAAAAAAAAwMAAAIDAAABAwEDAgMAAAQDAAAAAAAAAAAFAwAAAAAAAAAAAAAAAAAAAAAAAAMDAAADAwAAAAAAAAAAAwMAAAIDAAAAAAAAAgMAAAAAAAAAAAAAAwMAAAQDAAAAAAAAAAAAAAAAAAAAAAIDAAACAwAAAAAAAAIDAAACAwAAAQMAAAAAAAABAwAAAAAAAAAAAgMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEDAAAAAAEDAAAAAAAAAAAAAA=="),
+        };
+    }
+
     public void generate(Generation gen, Team team, int coreX, int coreY, int enemyX, int enemyY){
+        init();
+
         this.enemyX = enemyX;
         this.enemyY = enemyY;
         this.coreX = coreX;
@@ -35,34 +73,69 @@ public class FortressGenerator{
     }
 
     void genOutposts(){
-        int index = 0;
-        Block turret = turretBlocks[index], drill = drillBlocks[index], armor = armorBlocks[index];
-        Item ore = Items.tungsten;
+        int padding = 10;
+        Array<Rectangle> used = new Array<>();
+        Rectangle rect = new Rectangle();
 
-        for(int x = 2; x < gen.width - 2; x++){
-            for(int y = 2; y < gen.height - 2; y++){
-                if(Vector2.dst(x, y, coreX, coreY) > minCoreDst &&
-                    gen.tiles[x][y].floor().dropsItem(ore) && gen.random.chance(0.02)){
-                    
-                    int elevation = gen.tiles[x][y].getElevation();
-                    gen.tiles[x][y].setBlock(drill, team);
+        for(Structure struct : structures){
+            for(int x = padding; x < gen.width - padding; x++){
+                loop:
+                for(int y = padding; y < gen.height - padding; y++){
+                    rect.set(x - struct.layout.length, y - struct.layout[0].length, struct.layout.length, struct.layout[0].length);
+                    if(Vector2.dst(x, y, coreX, coreY) > minCoreDst && Vector2.dst(x, y, enemyX, enemyY) > 30 &&
+                    (struct.ore == null || gen.tiles[x][y].floor().dropsItem(struct.ore)) && gen.random.chance(0.03)){
+                        for(Rectangle other : used){
+                            if(other.overlaps(rect)){
+                                continue loop;
+                            }
+                        }
+                        used.add(new Rectangle(rect.x - 1, rect.y - 1, rect.width + 2, rect.height + 2));
+                        int elevation = world.tile(x, y).getElevation();
+                        for(int cx = 0; cx < struct.layout.length; cx++){
+                            for(int cy = 0; cy < struct.layout[0].length; cy++){
+                                int wx = x + cx - struct.layout.length/2;
+                                int wy = y + cy - struct.layout[0].length/2;
+                                StructBlock block = struct.layout[cx][cy];
+                                Tile tile = world.tile(wx, wy);
+                                if(block.block != Blocks.air && tile.block().alwaysReplace){
+                                    tile.setElevation(elevation);
+                                    tile.setRotation(block.rotation);
+                                    tile.setBlock(block.block, team);
 
-                    for(GridPoint2 point : Geometry.d4){
-                        gen.tiles[x + point.x][y + point.y].setBlock(turret, team);
-                        gen.tiles[x + point.x][y + point.y].setElevation(elevation);
-                    }
-
-                    for(int cx = -2; cx <= 2; cx++){
-                        for(int cy = -2; cy <= 2; cy++){
-                            Tile tile = gen.tiles[x + cx][y + cy];
-                            if(tile.block().alwaysReplace || tile.block() == Blocks.air){
-                                tile.setElevation(elevation);
-                                tile.setBlock(armor, team);
+                                    if(block.block instanceof Turret){
+                                        fillTurret(tile);
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    void setBlock(Block block){
+
+    }
+
+    void fillTurret(Tile tile){
+        Block block = tile.block();
+        if(block instanceof PowerTurret){
+            tile.entity.power.amount = block.powerCapacity;
+        }else if(block instanceof ItemTurret){
+            ItemTurret turret = (ItemTurret)block;
+            AmmoType[] type = turret.getAmmoTypes();
+            block.handleStack(type[0].item, block.acceptStack(type[0].item, 1000, tile, null), tile, null);
+        }
+    }
+
+    static class Structure{
+        public final StructBlock[][] layout;
+        public final Item ore;
+
+        public Structure(Item ore, String encoding){
+            this.ore = ore;
+            this.layout = StructureFormat.read(encoding);
         }
     }
 }

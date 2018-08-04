@@ -20,6 +20,7 @@ public class Blocks extends BlockList implements ContentList{
         air = new Floor("air"){
             {
                 blend = false;
+                alwaysReplace = true;
             }
 
             //don't draw

@@ -27,7 +27,7 @@ public class SaveDialog extends LoadDialog{
                 ui.showTextInput("$text.save", "$text.save.newslot", "", text -> {
                     ui.loadAnd("$text.saving", () -> {
                         control.getSaves().addSave(text);
-                        setup();
+                        threads.runGraphics(() -> threads.run(() -> threads.runGraphics(this::setup)));
                     });
                 })
         ).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);

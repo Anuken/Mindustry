@@ -33,7 +33,7 @@ public class Sector{
     public transient int difficulty;
 
     public Mission currentMission(){
-        return missions.get(completedMissions);
+        return missions.get(Math.min(completedMissions, missions.size - 1));
     }
 
     public int getSeed(){

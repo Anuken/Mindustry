@@ -22,7 +22,7 @@ public class PausedDialog extends FloatingDialog{
 
     void rebuild(){
         missionTable.clear();
-        if(world.getSector() != null){
+        if(world.getSector() != null && !world.getSector().complete){
             missionTable.add("[LIGHT_GRAY]" + Bundles.format("text.mission", ""));
             missionTable.row();
             missionTable.table(t -> {
