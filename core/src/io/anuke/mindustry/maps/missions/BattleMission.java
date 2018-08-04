@@ -11,10 +11,6 @@ import io.anuke.ucore.util.Bundles;
 public class BattleMission implements Mission{
     private final static int coreX = 60, coreY = 60;
 
-    public BattleMission(){
-
-    }
-
     @Override
     public void display(Table table){
         table.add("$text.mission.battle");

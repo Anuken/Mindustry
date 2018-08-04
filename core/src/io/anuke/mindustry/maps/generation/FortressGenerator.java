@@ -32,30 +32,34 @@ public class FortressGenerator{
 
         structures = new Structure[]{
             //tiny duo outpost
-            new Structure(Items.tungsten, "BAMADnR1bmdzdGVuLWRyaWxsAgADZHVvAQANdHVuZ3N0ZW4td2FsbAAAA2FpcgMFAQABAwEDAQMBAAEAAgMDAwIDAQABAAEBAQEBAQEA"),
+            new Structure(0.03f, Items.tungsten, "BAMADnR1bmdzdGVuLWRyaWxsAgADZHVvAQANdHVuZ3N0ZW4td2FsbAAAA2FpcgMFAQABAwEDAQMBAAEAAgMDAwIDAQABAAEBAQEBAQEA"),
 
             //basic outposts with duos
-            new Structure(Items.tungsten, "BAIAA2R1bwMADWNhcmJpZGUtZHJpbGwBAA10dW5nc3Rlbi13YWxsAAADYWlyBQUAAAEAAQABAAAAAQABAAIAAQABAAEAAgADAwIAAQABAAEAAgABAAEAAAABAAEAAQAAAA=="),
+            new Structure(0.03f, Items.tungsten, "BAIAA2R1bwMADWNhcmJpZGUtZHJpbGwBAA10dW5nc3Rlbi13YWxsAAADYWlyBQUAAAEAAQABAAAAAQABAAIAAQABAAEAAgADAwIAAQABAAEAAgABAAEAAAABAAEAAQAAAA=="),
 
             //more advanced duo outpost
-            new Structure(Items.lead, "BwYADnR1bmdzdGVuLWRyaWxsAwADZHVvBAAIc3BsaXR0ZXIBAA10dW5nc3Rlbi13YWxsAgATdHVuZ3N0ZW4td2FsbC1sYXJnZQAAA2FpcgUACGNvbnZleW9yCQkAAAAAAQEBAQEBAQEBAgAAAAAAAAICAAEDAAQDAwACAgAAAAABAgACAAABAgUCAQEAAAAAAQABAgMAAQIBAgUCAQEBAQMAAQABAgQCBQMFAwYCBQEFAQQDAQABAgMAAQEBAQUAAQMBAwMAAQABAwICAAMBAQUAAQMCAgADAQMAAAAAAAIDAAQDAwAAAwADAAAAAAAAAQIBAwEDAQMBAwAAAAA="),
+            new Structure(0.04f, Items.lead, "BwYADnR1bmdzdGVuLWRyaWxsAwADZHVvBAAIc3BsaXR0ZXIBAA10dW5nc3Rlbi13YWxsAgATdHVuZ3N0ZW4td2FsbC1sYXJnZQAAA2FpcgUACGNvbnZleW9yCQkAAAAAAQEBAQEBAQEBAgAAAAAAAAICAAEDAAQDAwACAgAAAAABAgACAAABAgUCAQEAAAAAAQABAgMAAQIBAgUCAQEBAQMAAQABAgQCBQMFAwYCBQEFAQQDAQABAgMAAQEBAQUAAQMBAwMAAQABAwICAAMBAQUAAQMCAgADAQMAAAAAAAIDAAQDAwAAAwADAAAAAAAAAQIBAwEDAQMBAwAAAAA="),
 
-            //material storage
-            new Structure(Items.lead, vaults),
-            new Structure(Items.coal, vaults),
-            new Structure(Items.titanium, vaults),
+            //lead storage
+            new Structure(0.02f, Items.lead, vaults),
 
             //salvo outpost
-            new Structure(Items.tungsten, "BAIABXNhbHZvAwANY2FyYmlkZS1kcmlsbAAAA2FpcgEADGNhcmJpZGUtd2FsbAcHAAAAAAEDAQMBAwEDAAABAwEDAQMCAAAAAQMAAAEAAgAAAAAAAAABAwEDAQAAAAAAAwACAAAAAQIBAAEBAgAAAAAAAAABAgAAAQEAAAAAAQEBAQEBAAABAQEBAQEBAQAAAAA="),
+            new Structure(0.02f, Items.tungsten, "BAIABXNhbHZvAwANY2FyYmlkZS1kcmlsbAAAA2FpcgEADGNhcmJpZGUtd2FsbAcHAAAAAAEDAQMBAwEDAAABAwEDAQMCAAAAAQMAAAEAAgAAAAAAAAABAwEDAQAAAAAAAwACAAAAAQIBAAEBAgAAAAAAAAABAgAAAQEAAAAAAQEBAQEBAAABAQEBAQEBAQAAAAA="),
 
             //advanced laser outpost
-            new Structure(null, "BQIABmxhbmNlcgEAEmNhcmJpZGUtd2FsbC1sYXJnZQQAEXNvbGFyLXBhbmVsLWxhcmdlAAADYWlyAwALc29sYXItcGFuZWwLCwAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAAABAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAMAAwAAAAAAAwABAAAAAAABAAAAAgAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAQAAAACAAAAAQAAAAAAAQAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAIAAAADAAMAAQAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+            new Structure(0.03f, null, "BQIABmxhbmNlcgEAEmNhcmJpZGUtd2FsbC1sYXJnZQQAEXNvbGFyLXBhbmVsLWxhcmdlAAADYWlyAwALc29sYXItcGFuZWwLCwAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAAABAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAMAAwAAAAAAAwABAAAAAAABAAAAAgAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAQAAAACAAAAAQAAAAAAAQAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAIAAAADAAMAAQAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+
+            //titanium storage
+            new Structure(0.02f, Items.titanium, vaults),
 
             //coal laser outpost
-            new Structure(null, "BgEADHRob3JpdW0td2FsbAMABmxhbmNlcgUAFGNvbWJ1c3Rpb24tZ2VuZXJhdG9yBAANY2FyYmlkZS1kcmlsbAAAA2FpcgIAC3NvbGFyLXBhbmVsBwcAAAEAAQABAQEBAQEBAAAAAQACAgMAAAACAAEAAAABAAICAAAAAAIAAQAAAAEAAQAEAQUAAQABAAAAAQACAAMBAAMCAAEAAAABAAIAAAMAAwIAAQAAAAEAAQABAwEDAQABAA=="),
+            new Structure(0.03f, null, "BgEADHRob3JpdW0td2FsbAMABmxhbmNlcgUAFGNvbWJ1c3Rpb24tZ2VuZXJhdG9yBAANY2FyYmlkZS1kcmlsbAAAA2FpcgIAC3NvbGFyLXBhbmVsBwcAAAEAAQABAQEBAQEBAAAAAQACAgMAAAACAAEAAAABAAICAAAAAAIAAQAAAAEAAQAEAQUAAQABAAAAAQACAAMBAAMCAAEAAAABAAIAAAMAAwIAAQAAAAEAAQABAwEDAQABAA=="),
 
             //ultimate laser outpost
-            new Structure(null, "BgMABmxhbmNlcgIAEmNhcmJpZGUtd2FsbC1sYXJnZQUAEXNvbGFyLXBhbmVsLWxhcmdlAAADYWlyBAALc29sYXItcGFuZWwBAAxjYXJiaWRlLXdhbGwPDwAAAAAAAAAAAAABAwIDAAABAwAAAAAAAAAAAAAAAAAAAAACAwAAAgMAAAAAAAACAwAAAgMAAAAAAAAAAAAAAQMAAAAAAAAAAAMDAAAAAAAAAAAAAAIDAAAAAAAAAgMAAAMDAAAEAwAAAAADAwAAAwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDAAAAAAAAAgMAAAMDAAAAAAUDAAAAAAAAAAAEAwAAAAABAwEDAAAAAAAAAAAAAAAAAAAAAAUDAAADAwAAAgMAAAIDAAADAwAAAAAAAAAABAMAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAFAwAAAAAAAAAAAwMAAAIDAAABAwEDAgMAAAQDAAAAAAAAAAAFAwAAAAAAAAAAAAAAAAAAAAAAAAMDAAADAwAAAAAAAAAAAwMAAAIDAAAAAAAAAgMAAAAAAAAAAAAAAwMAAAQDAAAAAAAAAAAAAAAAAAAAAAIDAAACAwAAAAAAAAIDAAACAwAAAQMAAAAAAAABAwAAAAAAAAAAAgMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEDAAAAAAEDAAAAAAAAAAAAAA=="),
+            new Structure(0.02f, null, "BgMABmxhbmNlcgIAEmNhcmJpZGUtd2FsbC1sYXJnZQUAEXNvbGFyLXBhbmVsLWxhcmdlAAADYWlyBAALc29sYXItcGFuZWwBAAxjYXJiaWRlLXdhbGwPDwAAAAAAAAAAAAABAwIDAAABAwAAAAAAAAAAAAAAAAAAAAACAwAAAgMAAAAAAAACAwAAAgMAAAAAAAAAAAAAAQMAAAAAAAAAAAMDAAAAAAAAAAAAAAIDAAAAAAAAAgMAAAMDAAAEAwAAAAADAwAAAwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDAAAAAAAAAgMAAAMDAAAAAAUDAAAAAAAAAAAEAwAAAAABAwEDAAAAAAAAAAAAAAAAAAAAAAUDAAADAwAAAgMAAAIDAAADAwAAAAAAAAAABAMAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAFAwAAAAAAAAAAAwMAAAIDAAABAwEDAgMAAAQDAAAAAAAAAAAFAwAAAAAAAAAAAAAAAAAAAAAAAAMDAAADAwAAAAAAAAAAAwMAAAIDAAAAAAAAAgMAAAAAAAAAAAAAAwMAAAQDAAAAAAAAAAAAAAAAAAAAAAIDAAACAwAAAAAAAAIDAAACAwAAAQMAAAAAAAABAwAAAAAAAAAAAgMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEDAAAAAAEDAAAAAAAAAAAAAA=="),
+
+            //coal storage
+            new Structure(0.02f, Items.coal, vaults),
         };
     }
 
@@ -74,16 +78,25 @@ public class FortressGenerator{
 
     void genOutposts(){
         int padding = 10;
+        int maxDifficulty = 10;
+        float baseChance = 0.75f;
+        Array<Structure> selected = new Array<>();
         Array<Rectangle> used = new Array<>();
         Rectangle rect = new Rectangle();
 
-        for(Structure struct : structures){
+        int maxIndex = (int)(1 + ((float)gen.sector.difficulty / maxDifficulty * (structures.length-2)));
+
+        for(int i = maxIndex/3; i < maxIndex; i++){
+            selected.add(structures[i]);
+        }
+
+        for(Structure struct : selected){
             for(int x = padding; x < gen.width - padding; x++){
                 loop:
                 for(int y = padding; y < gen.height - padding; y++){
                     rect.set(x - struct.layout.length, y - struct.layout[0].length, struct.layout.length, struct.layout[0].length);
-                    if(Vector2.dst(x, y, coreX, coreY) > minCoreDst && Vector2.dst(x, y, enemyX, enemyY) > 30 &&
-                    (struct.ore == null || gen.tiles[x][y].floor().dropsItem(struct.ore)) && gen.random.chance(0.03)){
+                    if(Vector2.dst(x, y, coreX, coreY) > minCoreDst && Vector2.dst(x, y, enemyX, enemyY) > 30 && world.tile(x, y).floor().liquidDrop == null &&
+                    (struct.ore == null || gen.tiles[x][y].floor().dropsItem(struct.ore)) && gen.random.chance(struct.chance * baseChance)){
                         for(Rectangle other : used){
                             if(other.overlaps(rect)){
                                 continue loop;
@@ -114,10 +127,6 @@ public class FortressGenerator{
         }
     }
 
-    void setBlock(Block block){
-
-    }
-
     void fillTurret(Tile tile){
         Block block = tile.block();
         if(block instanceof PowerTurret){
@@ -132,10 +141,12 @@ public class FortressGenerator{
     static class Structure{
         public final StructBlock[][] layout;
         public final Item ore;
+        public final float chance;
 
-        public Structure(Item ore, String encoding){
+        public Structure(float chance, Item ore, String encoding){
             this.ore = ore;
             this.layout = StructureFormat.read(encoding);
+            this.chance = chance;
         }
     }
 }

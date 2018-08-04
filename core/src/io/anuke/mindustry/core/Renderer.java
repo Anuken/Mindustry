@@ -66,7 +66,6 @@ public class Renderer extends RendererModule{
     public Renderer(){
         Core.batch = new SpriteBatch(4096);
 
-        pixelate = true;
         Lines.setCircleVertices(14);
 
         Shaders.init();
@@ -221,6 +220,7 @@ public class Renderer extends RendererModule{
 
                 if(outline){
                     Shaders.outline.color.set(team.color);
+                    Shaders.outline.color.a = 0.8f;
                     Graphics.beginShaders(Shaders.outline);
                 }
 

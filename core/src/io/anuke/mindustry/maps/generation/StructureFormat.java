@@ -59,6 +59,7 @@ public class StructureFormat{
 
     public static StructBlock[][] read(byte[] bytes){
         try{
+
             DataInputStream stream = new DataInputStream(new ByteArrayInputStream(bytes));
             byte size = stream.readByte();
             IntMap<Block> map = new IntMap<>();
