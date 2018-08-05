@@ -29,11 +29,6 @@ public class Generators {
                     Color color = Color.ROYAL;
 
                     Image image = context.get(block.name);
-                    if(image.width() != block.size*8 + 2){
-                        Image resized = context.create(block.size*8 + 2, block.size*8 + 2);
-                        resized.draw(image, (resized.width() - image.width())/2, (resized.height() - image.height())/2);
-                        image = resized;
-                    }
 
                     Image read = context.create(image.width(), image.height());
                     read.draw(image);
@@ -60,11 +55,9 @@ public class Generators {
                         }
                     }
 
-                    Image padded = context.create(base.width() + 2, base.height() + 2);
-                    padded.draw(base, 1, 1);
-                    padded.draw(image, 0, 0);
+                    base.draw(image);
 
-                    padded.save("block-icon-" + block.name);
+                    base.save("block-icon-" + block.name);
                 }else {
 
                     Image image = context.get(regions[0]);

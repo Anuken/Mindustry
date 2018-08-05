@@ -9,7 +9,6 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatCategory;
@@ -26,10 +25,6 @@ public class ContentDisplay{
 
         table.table(title -> {
             int size = 8 * 6;
-
-            if(block instanceof Turret){
-                size = (8 * block.size + 2) * (7 - block.size * 2);
-            }
 
             title.addImage(Draw.region("block-icon-" + block.name)).size(size);
             title.add("[accent]" + block.formalName).padLeft(5);
