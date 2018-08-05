@@ -154,6 +154,7 @@ public class Recipes implements ContentList{
         new Recipe(liquid, LiquidBlocks.mechanicalPump, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 20))
                 .setDependencies(CraftingBlocks.smelter);
         new Recipe(liquid, LiquidBlocks.rotaryPump, new ItemStack(Items.tungsten, 140), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 70));
+        new Recipe(liquid, LiquidBlocks.thermalPump, new ItemStack(Items.tungsten, 160), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 60), new ItemStack(Items.titanium, 80), new ItemStack(Items.thorium, 70));
 
         //DEBUG
         new Recipe(units, DebugBlocks.itemSource, new ItemStack(Items.carbide, 10)).setDebug();

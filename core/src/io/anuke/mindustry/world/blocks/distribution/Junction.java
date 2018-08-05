@@ -20,8 +20,12 @@ public class Junction extends Block{
         update = true;
         solid = true;
         instantTransfer = true;
-        outputsItems = true;
         group = BlockGroup.transportation;
+    }
+
+    @Override
+    public boolean outputsItems(){
+        return true;
     }
 
     @Override

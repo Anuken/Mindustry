@@ -26,9 +26,13 @@ public class Sorter extends Block implements SelectionTrait{
         update = true;
         solid = true;
         instantTransfer = true;
-        outputsItems = true;
         group = BlockGroup.transportation;
         configurable = true;
+    }
+
+    @Override
+    public boolean outputsItems(){
+        return true;
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)

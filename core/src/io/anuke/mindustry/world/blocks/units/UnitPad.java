@@ -73,6 +73,11 @@ public class UnitPad extends Block{
     }
 
     @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
 

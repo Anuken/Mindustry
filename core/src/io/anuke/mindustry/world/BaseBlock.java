@@ -24,8 +24,6 @@ public abstract class BaseBlock{
     public boolean outputsLiquid = false;
     public boolean singleLiquid = true;
 
-    public boolean outputsItems = false;
-
     public int itemCapacity;
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
@@ -66,6 +64,10 @@ public abstract class BaseBlock{
     public void handleStack(Item item, int amount, Tile tile, Unit source){
         tile.entity.noSleep();
         tile.entity.items.add(item, amount);
+    }
+
+    public boolean outputsItems(){
+        return hasItems;
     }
 
     /**Returns offset for stack placement.*/
