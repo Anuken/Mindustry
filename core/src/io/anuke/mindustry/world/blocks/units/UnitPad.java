@@ -36,6 +36,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class UnitPad extends Block{
+    protected float gracePeriodMultiplier = 8f;
     protected UnitType type;
     protected float produceTime = 1000f;
     protected float openDuration = 50f;
@@ -101,8 +102,8 @@ public class UnitPad extends Block{
     @Override
     public TextureRegion[] getIcon(){
         return new TextureRegion[]{
-                Draw.region(name),
-                Draw.region(name + "-top")
+            Draw.region(name),
+            Draw.region(name + "-top")
         };
     }
 
@@ -159,6 +160,10 @@ public class UnitPad extends Block{
 
         boolean isEnemy = tile.getTeam() == Team.red;
 
+        if(isEnemy){
+            entity.warmup += Timers.delta();
+        }
+
         if(!isEnemy){
             //player-made spawners have default behavior
 
@@ -170,7 +175,8 @@ public class UnitPad extends Block{
             }else{
                 if(!entity.open) entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
             }
-        }else if(!entity.hasSpawned){
+            //check if grace period had passed
+        }else if(!entity.hasSpawned && entity.warmup > produceTime*gracePeriodMultiplier){
             //otherwise, it's an enemy, cheat by not requiring resources
             entity.buildTime += Timers.delta() / 4f;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
@@ -233,16 +239,19 @@ public class UnitPad extends Block{
         public float time;
         public float speedScl;
         public boolean hasSpawned;
+        public float warmup; //only for enemy spawners
 
         @Override
         public void write(DataOutputStream stream) throws IOException{
             stream.writeFloat(buildTime);
+            stream.writeFloat(warmup);
             stream.writeBoolean(hasSpawned);
         }
 
         @Override
         public void read(DataInputStream stream) throws IOException{
             buildTime = stream.readFloat();
+            warmup = stream.readFloat();
             hasSpawned = stream.readBoolean();
         }
     }

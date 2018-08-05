@@ -46,6 +46,9 @@ public class FortressGenerator{
             //tungsten duo and drone outpost
             new Structure(0.02f, Items.tungsten, "BgEADXR1bmdzdGVuLXdhbGwEAA1jYXJiaWRlLWRyaWxsAwADZHVvAgATdHVuZ3N0ZW4td2FsbC1sYXJnZQAAA2FpcgUACWRyb25lLXBhZAUHAAAAAAEDAQMCAgAAAAAAAAAAAQADAAADAAMBAgAAAAABAAQBBQAAAAECAAAAAAEAAwAAAAAAAQIAAAAAAQABAQEBAQEBAg=="),
 
+            //resupply point
+            new Structure(0.03f, Items.lead, "BgEADXR1bmdzdGVuLXdhbGwCAAtzb2xhci1wYW5lbAUAA2R1bwMADnJlc3VwcGx5LXBvaW50AAADYWlyBAANY2FyYmlkZS1kcmlsbAUFAQABAAEAAAAAAAEAAgMBAQEBAQABAAMDBAEFAQEAAQACAwEBAQEBAAEBAQEBAQAAAAA="),
+
             //lead storage
             new Structure(0.02f, Items.lead, vaults),
 
@@ -63,6 +66,9 @@ public class FortressGenerator{
 
             //2x interceptor outpost
             new Structure(0.02f, Items.lead, "CgMAEXNvbGFyLXBhbmVsLWxhcmdlBgADZHVvAgAPaW50ZXJjZXB0b3ItcGFkBAASY2FyYmlkZS13YWxsLWxhcmdlBwAOcmVzdXBwbHktcG9pbnQAAANhaXIFAAtzb2xhci1wYW5lbAEADGNhcmJpZGUtd2FsbAkAC2Rpc3RyaWJ1dG9yCAALbGFzZXItZHJpbGwKCAEAAQMBAwEDAQMBAwECAAABAAIDAAAAAAAAAAABAgAAAQAAAAAAAAADAQAAAQIBAgQDAAAFAAAAAAAAAAYCAQMAAAAABwAIAAAACQAAAAECBAMAAAEAAAAAAAABAAABAgAAAAAFAAAAAAAAAAYCAQIBAAIDAAAAAAMBAAABAgECAQAAAAAAAAAAAAAAAQIAAAEAAQEBAQEBAQEBAQEBAAA="),
+
+            //resupply point (again)
+            new Structure(0.02f, Items.lead, "BgEADXR1bmdzdGVuLXdhbGwCAAtzb2xhci1wYW5lbAUAA2R1bwMADnJlc3VwcGx5LXBvaW50AAADYWlyBAANY2FyYmlkZS1kcmlsbAUFAQABAAEAAAAAAAEAAgMBAQEBAQABAAMDBAEFAQEAAQACAwEBAQEBAAEBAQEBAQAAAAA="),
 
             //coal laser outpost
             new Structure(0.03f, null, "BgEADHRob3JpdW0td2FsbAMABmxhbmNlcgUAFGNvbWJ1c3Rpb24tZ2VuZXJhdG9yBAANY2FyYmlkZS1kcmlsbAAAA2FpcgIAC3NvbGFyLXBhbmVsBwcAAAEAAQABAQEBAQEBAAAAAQACAgMAAAACAAEAAAABAAICAAAAAAIAAQAAAAEAAQAEAQUAAQABAAAAAQACAAMBAAMCAAEAAAABAAIAAAMAAwIAAQAAAAEAAQABAwEDAQABAA=="),
@@ -123,7 +129,6 @@ public class FortressGenerator{
     void genOutposts(){
         int padding = 10;
         int maxDifficulty = 13;
-        float baseChance = 0.4f;
         Array<Structure> selected = new Array<>();
         Array<Rectangle> used = new Array<>();
         Rectangle rect = new Rectangle();
@@ -134,6 +139,8 @@ public class FortressGenerator{
         for(int i = maxIndex/2; i < maxIndex; i++){
             selected.add(structures[i]);
         }
+
+        float baseChance = 0.8f / selected.size;
 
         used.add(new Rectangle(enemyX - base.width()/2, enemyY - base.height()/2, base.width(), base.height()));
         int elev = gen.tiles[enemyX][enemyY].getElevation();
