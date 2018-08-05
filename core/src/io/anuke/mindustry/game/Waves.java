@@ -11,7 +11,7 @@ public class Waves{
 
     public static Array<SpawnGroup> getSpawns(){
         return Array.with(
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 end = 8;
                 unitScaling = 2;
             }},
@@ -21,7 +21,7 @@ public class Waves{
                 end = 14;
             }},
 
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 begin = 11;
                 unitScaling = 2;
                 spacing = 2;
@@ -36,7 +36,7 @@ public class Waves{
                 end = 30;
             }},
 
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 begin = 10;
                 unitScaling = 2;
                 unitAmount = 1;
@@ -79,7 +79,7 @@ public class Waves{
                 max = 7;
             }},
 
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 begin = 82;
                 spacing = 3;
                 unitAmount = 4;
@@ -89,7 +89,7 @@ public class Waves{
                 ammoItem = Items.silicon;
             }},
 
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 begin = 41;
                 spacing = 5;
                 unitAmount = 1;
@@ -99,7 +99,7 @@ public class Waves{
                 max = 10;
             }},
 
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 begin = 35;
                 spacing = 3;
                 unitAmount = 4;
@@ -109,7 +109,7 @@ public class Waves{
                 end = 60;
             }},
 
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 begin = 42;
                 spacing = 3;
                 unitAmount = 4;

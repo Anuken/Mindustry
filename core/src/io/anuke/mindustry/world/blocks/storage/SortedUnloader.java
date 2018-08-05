@@ -26,6 +26,7 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSortedUnloaderItem(Player player, Tile tile, Item item){
         SortedUnloaderEntity entity = tile.entity();
+        entity.items.clear();
         entity.sortItem = item;
     }
 
@@ -35,7 +36,7 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
 
         if(entity.items.total() == 0 && entity.timer.get(timerUnload, speed)){
             tile.allNearby(other -> {
-                if(other.block() instanceof StorageBlock && entity.items.total() == 0 &&
+                if(other.getTeam() == tile.getTeam() && other.block() instanceof StorageBlock && entity.items.total() == 0 &&
                 ((entity.sortItem == null && other.entity.items.total() > 0) || ((StorageBlock) other.block()).hasItem(other, entity.sortItem))){
                     offloadNear(tile, ((StorageBlock) other.block()).removeItem(other, entity.sortItem));
                 }

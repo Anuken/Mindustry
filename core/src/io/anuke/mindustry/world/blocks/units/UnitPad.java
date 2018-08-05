@@ -9,6 +9,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
@@ -39,7 +40,6 @@ public class UnitPad extends Block{
     protected float produceTime = 1000f;
     protected float openDuration = 50f;
     protected float launchVelocity = 0f;
-    protected String unitRegion;
 
     public UnitPad(String name){
         super(name);
@@ -109,7 +109,7 @@ public class UnitPad extends Block{
     @Override
     public void draw(Tile tile){
         UnitFactoryEntity entity = tile.entity();
-        TextureRegion region = Draw.region(unitRegion == null ? type.name : unitRegion);
+        TextureRegion region = type.iconRegion;
 
         Draw.rect(name(), tile.drawx(), tile.drawy());
 
@@ -135,7 +135,7 @@ public class UnitPad extends Block{
 
         Draw.reset();
 
-        Draw.rect(name + (entity.open ? "-top-open" : "-top"), tile.drawx(), tile.drawy());
+        Draw.rect(name + (entity.open || entity.hasSpawned ? "-top-open" : "-top"), tile.drawx(), tile.drawy());
     }
 
     @Override
@@ -157,21 +157,22 @@ public class UnitPad extends Block{
             }
         }
 
-        /*
-        if(!entity.hasSpawned){
-            for(BaseUnit unit : unitGroups[tile.getTeamID()].all()){
-                if(unit.getType() == type && unit.getSpawner() == null){
-                    entity.hasSpawned = true;
-                    unit.setSpawner(tile);
-                    break;
-                }
+        boolean isEnemy = tile.getTeam() == Team.red;
+
+        if(!isEnemy){
+            //player-made spawners have default behavior
+
+            if(!entity.hasSpawned && hasRequirements(entity.items, entity.buildTime / produceTime) &&
+            entity.cons.valid() && !entity.open){
+
+                entity.buildTime += Timers.delta();
+                entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
+            }else{
+                if(!entity.open) entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
             }
-        }*/
-
-        if(!entity.hasSpawned && hasRequirements(entity.items, entity.buildTime / produceTime) &&
-                entity.cons.valid() && !entity.open){
-
-            entity.buildTime += Timers.delta();
+        }else if(!entity.hasSpawned){
+            //otherwise, it's an enemy, cheat by not requiring resources
+            entity.buildTime += Timers.delta() / 4f;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
         }else{
             if(!entity.open) entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);

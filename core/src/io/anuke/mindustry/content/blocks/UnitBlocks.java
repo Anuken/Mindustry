@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.blocks.units.*;
 
 public class UnitBlocks extends BlockList implements ContentList{
     public static Block resupplyPoint, repairPoint, dronePad,
-    fabricatorPad, interceptorPad, monsoonPad, scoutPad, titanPad,
+    fabricatorPad, interceptorPad, monsoonPad, daggerPad, titanPad,
     dropPoint, reconstructor, overdriveProjector, shieldProjector, commandCenter;
 
     @Override
@@ -24,7 +24,7 @@ public class UnitBlocks extends BlockList implements ContentList{
 
         fabricatorPad = new UnitPad("fabricator-pad"){{
             type = UnitTypes.fabricator;
-            produceTime = 1600;
+            produceTime = 1400;
             size = 2;
             consumes.power(0.2f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80)});
@@ -32,10 +32,10 @@ public class UnitBlocks extends BlockList implements ContentList{
 
         interceptorPad = new UnitPad("interceptor-pad"){{
             type = UnitTypes.interceptor;
-            produceTime = 1300;
+            produceTime = 800;
             size = 2;
-            consumes.power(0.1f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 40)});
+            consumes.power(0.08f);
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 20), new ItemStack(Items.titanium, 10)});
         }};
 
         monsoonPad = new UnitPad("monsoon-pad"){{
@@ -44,7 +44,24 @@ public class UnitBlocks extends BlockList implements ContentList{
             size = 3;
             consumes.power(0.14f);
             shadow = "shadow-round-3";
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 50), new ItemStack(Items.plastanium, 50)});
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 30), new ItemStack(Items.plastanium, 20)});
+        }};
+
+        daggerPad = new UnitPad("dagger-pad"){{
+            type = UnitTypes.dagger;
+            produceTime = 600;
+            size = 2;
+            consumes.power(0.06f);
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.tungsten, 20)});
+        }};
+
+        titanPad = new UnitPad("titan-pad"){{
+            type = UnitTypes.titan;
+            produceTime = 1300;
+            size = 3;
+            consumes.power(0.15f);
+            shadow = "shadow-round-3";
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 20), new ItemStack(Items.tungsten, 30), new ItemStack(Items.thorium, 30)});
         }};
 
         resupplyPoint = new ResupplyPoint("resupply-point"){{

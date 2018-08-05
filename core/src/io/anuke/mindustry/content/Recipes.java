@@ -95,6 +95,7 @@ public class Recipes implements ContentList{
         //generators - combustion
         new Recipe(power, PowerBlocks.combustionGenerator, new ItemStack(Items.tungsten, 50), new ItemStack(Items.lead, 30));
         new Recipe(power, PowerBlocks.turbineGenerator, new ItemStack(Items.tungsten, 70), new ItemStack(Items.carbide, 50), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 60));
+        new Recipe(power, PowerBlocks.thermalGenerator, new ItemStack(Items.tungsten, 80), new ItemStack(Items.carbide, 70), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 70), new ItemStack(Items.thorium, 70));
 
         //generators - solar
         new Recipe(power, PowerBlocks.solarPanel, new ItemStack(Items.lead, 20), new ItemStack(Items.silicon, 30));
@@ -132,9 +133,13 @@ public class Recipes implements ContentList{
 
         //actual unit related stuff
         new Recipe(units, UnitBlocks.dronePad, new ItemStack(Items.tungsten, 50), new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 130));
-        new Recipe(units, UnitBlocks.fabricatorPad, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 100), new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 300));
-        new Recipe(units, UnitBlocks.interceptorPad, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 100), new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 300));
-        new Recipe(units, UnitBlocks.monsoonPad, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 100), new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 300));
+        new Recipe(units, UnitBlocks.fabricatorPad, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 60), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 200));
+
+        new Recipe(units, UnitBlocks.daggerPad, new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 70));
+        new Recipe(units, UnitBlocks.titanPad, new ItemStack(Items.thorium, 90), new ItemStack(Items.lead, 140), new ItemStack(Items.silicon, 180));
+
+        new Recipe(units, UnitBlocks.interceptorPad, new ItemStack(Items.titanium, 40), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 90));
+        new Recipe(units, UnitBlocks.monsoonPad, new ItemStack(Items.plastanium, 70), new ItemStack(Items.titanium, 100), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 220));
 
         new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));
         new Recipe(units, UnitBlocks.resupplyPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));

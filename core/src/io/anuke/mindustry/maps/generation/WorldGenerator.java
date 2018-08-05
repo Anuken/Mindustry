@@ -248,10 +248,12 @@ public class WorldGenerator{
 
         int lerpDst = 20;
         lerpDst *= lerpDst;
+        float minDst = Float.MAX_VALUE;
 
         if(detailed && spawnpoints != null){
             for(GridPoint2 p : spawnpoints){
                 float dst = Vector2.dst2(p.x, p.y, localX, localY);
+                minDst = Math.min(minDst, dst);
 
                 if(dst < lerpDst){
                     float targetElevation = Math.max(0.86f, (float)elevationOf(sectorX * sectorSize + p.x + Short.MAX_VALUE, sectorY * sectorSize + p.y + Short.MAX_VALUE, true));
@@ -273,7 +275,7 @@ public class WorldGenerator{
         }else if(temp + ridge/2f < 0.8 || elevation < 1.3){
             floor = Blocks.blackstone;
 
-            if(iceridge > 0.25){
+            if(iceridge > 0.25 && minDst > lerpDst/1.5f){
                 elevation ++;
             }
         }else{
