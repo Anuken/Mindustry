@@ -1,5 +1,7 @@
 package io.anuke.mindustry.maps.missions;
 
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.Generation;
@@ -39,5 +41,10 @@ public class WaveMission implements Mission{
     @Override
     public boolean isComplete(){
         return state.wave >= target;
+    }
+
+    @Override
+    public Array<GridPoint2> getSpawnPoints(Generation gen){
+        return Array.with(new GridPoint2(gen.width/2, gen.height/2));
     }
 }

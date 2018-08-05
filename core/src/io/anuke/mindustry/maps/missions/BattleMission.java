@@ -1,5 +1,7 @@
 package io.anuke.mindustry.maps.missions;
 
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
@@ -40,5 +42,10 @@ public class BattleMission implements Mission{
     public boolean isComplete(){
         //TODO check all enemy teams, not just the first
         return Vars.state.teams.getTeams(false).first().cores.size == 0;
+    }
+
+    @Override
+    public Array<GridPoint2> getSpawnPoints(Generation gen){
+        return Array.with(new GridPoint2(coreX, coreY), new GridPoint2(gen.width - 1 - coreX, gen.height - 1 - coreY));
     }
 }

@@ -25,8 +25,8 @@ public class WeaponBullets extends BulletList{
             {
                 bulletWidth = 8f;
                 bulletHeight = 9f;
-                bulletShrink = 0.6f;
-                lifetime = 30f;
+                bulletShrink = 0.5f;
+                lifetime = 50f;
                 drag = 0.04f;
             }
         };

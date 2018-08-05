@@ -18,7 +18,7 @@ import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
 import static io.anuke.mindustry.Vars.world;
 
 public class FortressGenerator{
-    private final static int minCoreDst = 50;
+    private final static int minCoreDst = 60;
     private static Structure[] structures;
 
     private int enemyX, enemyY, coreX, coreY;

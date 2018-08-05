@@ -1,6 +1,7 @@
 package io.anuke.mindustry.maps.generation;
 
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -183,10 +184,12 @@ public class WorldGenerator{
     public void generateMap(Tile[][] tiles, Sector sector){
         int width = tiles.length, height = tiles[0].length;
         SeedRandom rnd = new SeedRandom(sector.getSeed());
+        Generation gena = new Generation(sector, tiles, tiles.length, tiles[0].length, rnd);
+        Array<GridPoint2> spawnpoints = sector.currentMission().getSpawnPoints(gena);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                GenResult result = generateTile(sector.x, sector.y, x, y);
+                GenResult result = generateTile(this.result, sector.x, sector.y, x, y, true, spawnpoints);
                 Tile tile = new Tile(x, y, (byte)result.floor.id, (byte)result.wall.id, (byte)0, (byte)0, result.elevation);
                 tiles[x][y] = tile;
             }
@@ -227,10 +230,10 @@ public class WorldGenerator{
     }
 
     public GenResult generateTile(int sectorX, int sectorY, int localX, int localY, boolean detailed){
-        return generateTile(result, sectorX, sectorY, localX, localY, detailed);
+        return generateTile(result, sectorX, sectorY, localX, localY, detailed, null);
     }
 
-    public GenResult generateTile(GenResult result, int sectorX, int sectorY, int localX, int localY, boolean detailed){
+    public GenResult generateTile(GenResult result, int sectorX, int sectorY, int localX, int localY, boolean detailed, Array<GridPoint2> spawnpoints){
         int x = sectorX * sectorSize + localX + Short.MAX_VALUE;
         int y = sectorY * sectorSize + localY + Short.MAX_VALUE;
 
@@ -239,9 +242,23 @@ public class WorldGenerator{
 
         double ridge = rid.getValue(x, y, 1f / 400f);
         double iceridge = rid.getValue(x+99999, y, 1f / 300f) + sim3.octaveNoise2D(2, 1f, 1f/14f, x, y)/11f;
-        double elevation = sim.octaveNoise2D(detailed ? 7 : 2, 0.62, 1f / 640, x, y) * 6.1 - 1 - ridge;
+        double elevation = elevationOf(x, y, detailed);
         double temp = vn.noise(x, y, 1f / 300f) * sim3.octaveNoise2D(detailed ? 2 : 1, 1, 1f / 13f, x, y)/13f
-        + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 920f, x, y);
+            + sim3.octaveNoise2D(detailed ? 12 : 6, 0.6, 1f / 920f, x, y);
+
+        int lerpDst = 20;
+        lerpDst *= lerpDst;
+
+        if(detailed && spawnpoints != null){
+            for(GridPoint2 p : spawnpoints){
+                float dst = Vector2.dst2(p.x, p.y, localX, localY);
+
+                if(dst < lerpDst){
+                    float targetElevation = Math.max(0.86f, (float)elevationOf(sectorX * sectorSize + p.x + Short.MAX_VALUE, sectorY * sectorSize + p.y + Short.MAX_VALUE, true));
+                    elevation = Mathf.lerp((float)elevation, targetElevation, Mathf.clamp(1.5f*(1f-(dst / lerpDst))));
+                }
+            }
+        }
 
         if(elevation < 0.7){
             floor = Blocks.deepwater;
@@ -288,6 +305,11 @@ public class WorldGenerator{
         result.floor = floor;
         result.elevation = (byte) Math.max(elevation, 0);
         return result;
+    }
+
+    double elevationOf(int x, int y, boolean detailed){
+        double ridge = rid.getValue(x, y, 1f / 400f);
+        return sim.octaveNoise2D(detailed ? 7 : 2, 0.62, 1f / 640, x, y) * 6.1 - 1 - ridge;
     }
 
     public static class GenResult{

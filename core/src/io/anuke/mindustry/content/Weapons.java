@@ -46,7 +46,7 @@ public class Weapons implements ContentList{
             reload = 50f;
             roundrobin = true;
             shots = 6;
-            inaccuracy = 15f;
+            inaccuracy = 10f;
             recoil = 2f;
             velocityRnd = 0.7f;
             ejectEffect = ShootFx.shellEjectSmall;
