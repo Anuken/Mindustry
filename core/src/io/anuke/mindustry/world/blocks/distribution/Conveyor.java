@@ -299,16 +299,19 @@ public class Conveyor extends Block{
     @Override
     public synchronized int acceptStack(Item item, int amount, Tile tile, Unit source){
         ConveyorEntity entity = tile.entity();
-        return entity.minitem > itemSpace ? 1 : 0;
+        return (int)(entity.minitem / itemSpace);
     }
 
     @Override
     public synchronized void handleStack(Item item, int amount, Tile tile, Unit source){
         ConveyorEntity entity = tile.entity();
 
-        long result = ItemPos.packItem(item, 0f, 0f, (byte) Mathf.random(255));
-        entity.convey.insert(0, result);
-        entity.items.add(item, 1);
+        for(int i = amount - 1; i >= 0; i--){
+            long result = ItemPos.packItem(item, 0f, i * itemSpace, (byte) Mathf.random(255));
+            entity.convey.insert(0, result);
+            entity.items.add(item, 1);
+        }
+
         entity.noSleep();
     }
 

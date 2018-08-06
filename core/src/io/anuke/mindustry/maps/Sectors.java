@@ -140,7 +140,7 @@ public class Sectors{
         if(sector.difficulty == 0){
             sector.missions.add(new WaveMission(10));
         }else{
-            sector.missions.add(Mathf.randomSeed(sector.getSeed() + 1) < waveChance ? new WaveMission(Math.min(10 + sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 5)*5, 100))
+            sector.missions.add(Mathf.randomSeed(sector.getSeed() + 1) < waveChance ? new WaveMission(Math.min(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5, 100))
                     : new BattleMission());
         }
 

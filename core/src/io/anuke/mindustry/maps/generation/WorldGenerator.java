@@ -18,6 +18,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
 import io.anuke.ucore.noise.VoronoiNoise;
@@ -133,6 +134,10 @@ public class WorldGenerator{
                 if(tile.block() != Blocks.air && tile.hasCliffs() && !tile.block().isMultiblock() && tile.block() != Blocks.blockpart){
                     tile.setBlock(Blocks.air);
                 }
+
+                if(tile.floor() instanceof OreBlock && tile.hasCliffs()){
+                    tile.setFloor(((OreBlock)tile.floor()).base);
+                }
             }
         }
     }
@@ -205,7 +210,7 @@ public class WorldGenerator{
                     if(!Mathf.inBounds(x + point.x, y + point.y, width, height)) continue;
                     if(tiles[x + point.x][y + point.y].getElevation() < elevation){
 
-                        if(rnd.chance(0.06)){
+                        if(sim2.octaveNoise2D(1, 1, 1.0 / 8, x, y) > 0.8){
                             tile.setElevation(-1);
                         }
                         break;

@@ -57,7 +57,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     protected boolean isWave;
     protected Squad squad;
-    protected int spawner;
+    protected int spawner = -1;
 
     /**internal constructor used for deserialization, DO NOT USE*/
     public BaseUnit(){

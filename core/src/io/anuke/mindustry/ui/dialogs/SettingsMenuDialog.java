@@ -132,7 +132,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         //game.checkPref("smoothcam", true);
         game.checkPref("effects", true);
         //game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
-        game.sliderPref("saveinterval", 90, 10, 5 * 120, i -> Bundles.format("setting.seconds", i));
+        game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Bundles.format("setting.seconds", i));
 
         if(!gwt){
             graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Bundles.get("setting.fpscap.none") : Bundles.format("setting.fpscap.text", s)));
