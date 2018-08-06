@@ -37,7 +37,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class UnitPad extends Block{
-    protected float gracePeriodMultiplier = 10f;
+    protected float gracePeriodMultiplier = 15f;
+    protected float speedupTime = 60f * 60f * 16;
+
     protected UnitType type;
     protected float produceTime = 1000f;
     protected float openDuration = 50f;
@@ -48,7 +50,7 @@ public class UnitPad extends Block{
         update = true;
         hasPower = true;
         hasItems = true;
-        solidifes = true;
+        solid = false;
         itemCapacity = 10;
 
         consumes.require(ConsumeItems.class);
@@ -60,7 +62,6 @@ public class UnitPad extends Block{
         UnitPad factory = (UnitPad) tile.block();
 
         entity.buildTime = 0f;
-        entity.hasSpawned = true;
 
         Effects.shake(2f, 3f, entity);
         Effects.effect(BlockFx.producesmoke, tile.drawx(), tile.drawy());
@@ -73,10 +74,8 @@ public class UnitPad extends Block{
             unit.getVelocity().y = factory.launchVelocity;
 
             //fill inventory with 1st ammo
-            if(tile.getTeam() == Team.red){
-                AmmoType type = unit.getWeapon().getAmmoType(unit.getWeapon().getAcceptedItems().iterator().next());
-                unit.inventory.fillAmmo(type);
-            }
+            AmmoType type = unit.getWeapon().getAmmoType(unit.getWeapon().getAcceptedItems().iterator().next());
+            unit.inventory.fillAmmo(type);
         }
     }
 
@@ -90,12 +89,6 @@ public class UnitPad extends Block{
         super.setStats();
 
         stats.add(BlockStat.craftSpeed, produceTime / 60f, StatUnit.seconds);
-    }
-
-    @Override
-    public boolean isSolidFor(Tile tile){
-        UnitFactoryEntity entity = tile.entity();
-        return type.isFlying || !entity.open;
     }
 
     @Override
@@ -143,7 +136,7 @@ public class UnitPad extends Block{
 
         Draw.reset();
 
-        Draw.rect(name + (entity.open || entity.hasSpawned ? "-top-open" : "-top"), tile.drawx(), tile.drawy());
+        Draw.rect(name, tile.drawx(), tile.drawy());
     }
 
     @Override
@@ -157,7 +150,6 @@ public class UnitPad extends Block{
                 entity.openCountdown -= Timers.delta();
             }else{
                 if(type.isFlying || !Units.anyEntities(tile)){
-                    entity.open = false;
                     entity.openCountdown = -1;
                 }else{
                     entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.1f);
@@ -174,25 +166,24 @@ public class UnitPad extends Block{
         if(!isEnemy){
             //player-made spawners have default behavior
 
-            if(!entity.hasSpawned && hasRequirements(entity.items, entity.buildTime / produceTime) &&
-            entity.cons.valid() && !entity.open){
+            if(hasRequirements(entity.items, entity.buildTime / produceTime) && entity.cons.valid()){
 
                 entity.buildTime += Timers.delta();
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
             }else{
-                if(!entity.open) entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
+                entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
             }
             //check if grace period had passed
-        }else if(!entity.hasSpawned && entity.warmup > produceTime*gracePeriodMultiplier){
+        }else if(entity.warmup > produceTime*gracePeriodMultiplier){
+            float speedMultiplier = Math.min(0.1f + (entity.warmup - produceTime * gracePeriodMultiplier) / speedupTime, 4f);
             //otherwise, it's an enemy, cheat by not requiring resources
-            entity.buildTime += Timers.delta() / 4f;
+            entity.buildTime += Timers.delta() * speedMultiplier;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
         }else{
-            if(!entity.open) entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
+            entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
         }
 
-        if(entity.buildTime >= produceTime && !entity.open){
-            entity.open = true;
+        if(entity.buildTime >= produceTime){
 
             Timers.run(openDuration / 1.5f, () -> Call.onUnitFactorySpawn(tile));
             useContent(type);
@@ -241,25 +232,21 @@ public class UnitPad extends Block{
 
     public static class UnitFactoryEntity extends TileEntity{
         public float buildTime;
-        public boolean open;
         public float openCountdown;
         public float time;
         public float speedScl;
-        public boolean hasSpawned;
         public float warmup; //only for enemy spawners
 
         @Override
         public void write(DataOutputStream stream) throws IOException{
             stream.writeFloat(buildTime);
             stream.writeFloat(warmup);
-            stream.writeBoolean(hasSpawned);
         }
 
         @Override
         public void read(DataInputStream stream) throws IOException{
             buildTime = stream.readFloat();
             warmup = stream.readFloat();
-            hasSpawned = stream.readBoolean();
         }
     }
 }

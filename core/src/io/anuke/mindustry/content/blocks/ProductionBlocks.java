@@ -18,27 +18,27 @@ public class ProductionBlocks extends BlockList implements ContentList{
     public void load(){
         tungstenDrill = new Drill("tungsten-drill"){{
             tier = 2;
-            drillTime = 340;
+            drillTime = 300;
         }};
 
         carbideDrill = new Drill("carbide-drill"){{
             tier = 3;
-            drillTime = 280;
+            drillTime = 240;
         }};
 
         laserdrill = new Drill("laser-drill"){{
-            drillTime = 180;
+            drillTime = 140;
             size = 2;
             hasPower = true;
             tier = 4;
             updateEffect = BlockFx.pulverizeMedium;
             drillEffect = BlockFx.mineBig;
 
-            consumes.power(0.2f);
+            consumes.power(0.16f);
         }};
 
         blastdrill = new Drill("blast-drill"){{
-            drillTime = 120;
+            drillTime = 60;
             size = 3;
             drawRim = true;
             hasPower = true;
@@ -49,12 +49,12 @@ public class ProductionBlocks extends BlockList implements ContentList{
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
 
-            consumes.power(0.5f);
+            consumes.power(0.3f);
         }};
 
         plasmadrill = new Drill("plasma-drill"){{
             heatColor = Color.valueOf("ff461b");
-            drillTime = 90;
+            drillTime = 50;
             size = 4;
             hasLiquids = true;
             hasPower = true;
@@ -89,8 +89,8 @@ public class ProductionBlocks extends BlockList implements ContentList{
             liquidCapacity = 30f;
 
             consumes.item(Items.sand);
-            consumes.power(0.5f);
-            consumes.liquid(Liquids.water, 0.3f);
+            consumes.power(0.3f);
+            consumes.liquid(Liquids.water, 0.15f);
         }};
 
         cultivator = new Cultivator("cultivator"){{

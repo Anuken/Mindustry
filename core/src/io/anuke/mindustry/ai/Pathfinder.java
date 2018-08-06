@@ -81,7 +81,7 @@ public class Pathfinder{
     }
 
     public float getDebugValue(int x, int y){
-        return paths[Team.red.ordinal()].weights[x][y];
+        return paths[Team.blue.ordinal()].weights[x][y];
     }
 
     public float getValueforTeam(Team team, int x, int y){

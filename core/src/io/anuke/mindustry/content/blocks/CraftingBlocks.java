@@ -67,8 +67,8 @@ public class CraftingBlocks extends BlockList implements ContentList{
             craftEffect = BlockFx.formsmoke;
             updateEffect = BlockFx.plasticburn;
 
-            consumes.liquid(Liquids.oil, 0.3f);
-            consumes.power(0.4f);
+            consumes.liquid(Liquids.oil, 0.25f);
+            consumes.power(0.25f);
             consumes.item(Items.titanium, 2);
         }};
 

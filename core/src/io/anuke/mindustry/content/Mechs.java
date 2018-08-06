@@ -22,6 +22,7 @@ public class Mechs implements ContentList{
         alpha = new Mech("alpha-mech", false){{
             drillPower = 1;
             speed = 0.5f;
+            boostSpeed = 0.85f;
             weapon = Weapons.blaster;
             trailColor = Palette.lightTrail;
             maxSpeed = 4f;
@@ -30,7 +31,7 @@ public class Mechs implements ContentList{
         delta = new Mech("delta-mech", false){{
             drillPower = -1;
             speed = 0.75f;
-            boostSpeed = 0.86f;
+            boostSpeed = 0.95f;
             itemCapacity = 15;
             armor = 30f;
             weaponOffsetX = -1;

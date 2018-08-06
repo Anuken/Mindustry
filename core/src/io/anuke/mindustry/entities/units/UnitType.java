@@ -43,7 +43,7 @@ public class UnitType implements UnlockableContent{
     public float retreatPercent = 0.2f;
     public float armor = 0f;
     public float carryWeight = 1f;
-    public int ammoCapacity = 220;
+    public int ammoCapacity = 200;
     public int itemCapacity = 30;
     public ObjectSet<Item> toMine = ObjectSet.with(Items.lead, Items.tungsten);
     public float buildPower = 0.3f, minePower = 0.7f, healSpeed = 0.1f;

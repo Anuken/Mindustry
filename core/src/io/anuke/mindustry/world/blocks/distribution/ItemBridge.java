@@ -15,6 +15,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.CapStyle;
 import io.anuke.ucore.graphics.Draw;
@@ -49,6 +50,7 @@ public class ItemBridge extends Block{
         itemCapacity = 10;
         configurable = true;
         hasItems = true;
+        group = BlockGroup.transportation;
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)

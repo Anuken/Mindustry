@@ -23,6 +23,10 @@ import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.EnumSet;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import static io.anuke.mindustry.Vars.*;
 
 public class CommandCenter extends Block{
@@ -106,5 +110,15 @@ public class CommandCenter extends Block{
 
     public class CommandCenterEntity extends TileEntity{
         public UnitCommand command = UnitCommand.idle;
+
+        @Override
+        public void write(DataOutputStream stream) throws IOException{
+            stream.writeByte(command.ordinal());
+        }
+
+        @Override
+        public void read(DataInputStream stream) throws IOException{
+            command = UnitCommand.values()[stream.readByte()];
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
@@ -16,6 +17,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
         hasItems = false;
         hasLiquids = true;
         outputsLiquid = true;
+        group = BlockGroup.liquids;
     }
 
     @Override
