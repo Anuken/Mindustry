@@ -226,12 +226,12 @@ public class CraftingBlocks extends BlockList implements ContentList{
             output = Items.sand;
             health = 80;
             craftEffect = BlockFx.pulverize;
-            craftTime = 60f;
+            craftTime = 50f;
             updateEffect = BlockFx.pulverizeSmall;
             hasItems = hasPower = true;
 
             consumes.item(Items.stone, 2);
-            consumes.power(0.2f);
+            consumes.power(0.1f);
         }};
 
         solidifier = new GenericCrafter("solidifer"){{

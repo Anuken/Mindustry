@@ -37,7 +37,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class UnitPad extends Block{
-    protected float gracePeriodMultiplier = 8f;
+    protected float gracePeriodMultiplier = 10f;
     protected UnitType type;
     protected float produceTime = 1000f;
     protected float openDuration = 50f;

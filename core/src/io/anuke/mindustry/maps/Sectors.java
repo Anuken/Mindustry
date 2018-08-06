@@ -151,17 +151,17 @@ public class Sectors{
 
         //set starter items
         if(sector.difficulty > 12){ //now with titanium
-            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 150), new ItemStack(Items.lead, 460), new ItemStack(Items.carbide, 440), new ItemStack(Items.silicon, 440), new ItemStack(Items.titanium, 200));
+            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 1800), new ItemStack(Items.lead, 550), new ItemStack(Items.carbide, 470), new ItemStack(Items.silicon, 460), new ItemStack(Items.titanium, 230));
         }else if(sector.difficulty > 8){ //just more resources
-            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 1200), new ItemStack(Items.lead, 360), new ItemStack(Items.carbide, 280), new ItemStack(Items.silicon, 220));
+            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 1400), new ItemStack(Items.lead, 400), new ItemStack(Items.carbide, 340), new ItemStack(Items.silicon, 250));
         }else if(sector.difficulty > 5){ //now with silicon
-            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 800), new ItemStack(Items.lead, 260), new ItemStack(Items.carbide, 160), new ItemStack(Items.silicon, 110));
+            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 900), new ItemStack(Items.lead, 300), new ItemStack(Items.carbide, 190), new ItemStack(Items.silicon, 140));
         }else if(sector.difficulty > 3){ //now with carbide
-            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 500), new ItemStack(Items.lead, 170), new ItemStack(Items.carbide, 80));
+            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 650), new ItemStack(Items.lead, 200), new ItemStack(Items.carbide, 130));
         }else if(sector.difficulty > 1){ //more starter items for faster start
-            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 300), new ItemStack(Items.lead, 130));
+            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 400), new ItemStack(Items.lead, 150));
         }else{ //base starting items to prevent grinding much
-            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 100), new ItemStack(Items.lead, 50));
+            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 150), new ItemStack(Items.lead, 70));
         }
     }
 
