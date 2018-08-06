@@ -24,7 +24,6 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.units.CommandCenter.CommandCenterEntity;
-import io.anuke.mindustry.world.blocks.units.UnitPad.UnitFactoryEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -369,13 +368,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public void removed(){
-        Tile tile = world.tile(spawner);
-
-        if(tile != null && tile.entity instanceof UnitFactoryEntity){
-            UnitFactoryEntity factory = (UnitFactoryEntity) tile.entity;
-            factory.hasSpawned = false;
-        }
-
         spawner = -1;
     }
 

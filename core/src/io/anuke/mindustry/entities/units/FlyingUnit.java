@@ -130,8 +130,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     public void onCommand(UnitCommand command){
         state.set(command == UnitCommand.retreat ? retreat :
                  (command == UnitCommand.attack ? attack :
-                 (command == UnitCommand.idle ? idle :
-                 (null))));
+                 (null)));
     }
 
     @Override

@@ -45,6 +45,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             {
                 powerCapacity = 10000f;
                 powerSpeed = 100f;
+                maxNodes = 100;
             }
 
             @Override

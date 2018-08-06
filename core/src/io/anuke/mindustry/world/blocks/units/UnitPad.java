@@ -6,7 +6,6 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Team;
@@ -136,7 +135,7 @@ public class UnitPad extends Block{
 
         Draw.reset();
 
-        Draw.rect(name, tile.drawx(), tile.drawy());
+        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
     }
 
     @Override
@@ -144,18 +143,6 @@ public class UnitPad extends Block{
         UnitFactoryEntity entity = tile.entity();
 
         entity.time += Timers.delta() * entity.speedScl;
-
-        if(entity.openCountdown > 0){
-            if(entity.openCountdown > Timers.delta()){
-                entity.openCountdown -= Timers.delta();
-            }else{
-                if(type.isFlying || !Units.anyEntities(tile)){
-                    entity.openCountdown = -1;
-                }else{
-                    entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.1f);
-                }
-            }
-        }
 
         boolean isEnemy = tile.getTeam() == Team.red;
 
@@ -184,11 +171,10 @@ public class UnitPad extends Block{
         }
 
         if(entity.buildTime >= produceTime){
+            entity.buildTime = 0f;
 
-            Timers.run(openDuration / 1.5f, () -> Call.onUnitFactorySpawn(tile));
+            Call.onUnitFactorySpawn(tile);
             useContent(type);
-
-            entity.openCountdown = openDuration;
 
             for(ItemStack stack : consumes.items()){
                 entity.items.remove(stack.item, stack.amount);
@@ -232,7 +218,6 @@ public class UnitPad extends Block{
 
     public static class UnitFactoryEntity extends TileEntity{
         public float buildTime;
-        public float openCountdown;
         public float time;
         public float speedScl;
         public float warmup; //only for enemy spawners

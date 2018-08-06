@@ -109,7 +109,7 @@ public class CommandCenter extends Block{
     }
 
     public class CommandCenterEntity extends TileEntity{
-        public UnitCommand command = UnitCommand.idle;
+        public UnitCommand command = UnitCommand.attack;
 
         @Override
         public void write(DataOutputStream stream) throws IOException{

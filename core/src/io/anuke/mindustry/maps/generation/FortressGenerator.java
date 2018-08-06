@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.UnitBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.StructureFormat.StructBlock;
 import io.anuke.mindustry.type.AmmoType;
@@ -174,7 +175,8 @@ public class FortressGenerator{
                                 int wy = y + cy - struct.layout[0].length/2;
                                 StructBlock block = struct.layout[cx][cy];
                                 Tile tile = world.tile(wx, wy);
-                                if(block.block != Blocks.air && tile.block().alwaysReplace){
+                                //resupply points should not be placed anymore, they confuse units
+                                if(block.block != Blocks.air && tile.block().alwaysReplace && block.block != UnitBlocks.resupplyPoint){
                                     tile.setElevation(elevation);
                                     tile.setRotation(block.rotation);
                                     tile.setBlock(block.block, team);

@@ -115,8 +115,7 @@ public abstract class GroundUnit extends BaseUnit{
     public void onCommand(UnitCommand command){
         state.set(command == UnitCommand.retreat ? retreat :
                 (command == UnitCommand.attack ? attack :
-                (command == UnitCommand.idle ? resupply :
-                (null))));
+                (null)));
     }
 
     @Override

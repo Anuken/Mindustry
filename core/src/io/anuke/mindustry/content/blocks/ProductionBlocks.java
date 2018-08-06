@@ -76,7 +76,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             liquidCapacity = 30f;
             rotateSpeed = 1.4f;
 
-            consumes.power(0.2f);
+            consumes.power(0.15f);
         }};
 
         oilextractor = new Fracker("oil-extractor"){{
