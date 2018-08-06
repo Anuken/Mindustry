@@ -14,6 +14,7 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.BarType;
@@ -70,6 +71,12 @@ public class UnitPad extends Block{
             unit.set(tile.drawx(), tile.drawy());
             unit.add();
             unit.getVelocity().y = factory.launchVelocity;
+
+            //fill inventory with 1st ammo
+            if(tile.getTeam() == Team.red){
+                AmmoType type = unit.getWeapon().getAmmoType(unit.getWeapon().getAcceptedItems().iterator().next());
+                unit.inventory.fillAmmo(type);
+            }
         }
     }
 

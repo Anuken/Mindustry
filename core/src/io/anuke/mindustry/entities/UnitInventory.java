@@ -110,6 +110,12 @@ public class UnitInventory implements Saveable{
         ammos.add(entry);
     }
 
+    public void fillAmmo(AmmoType type){
+        totalAmmo = ammoCapacity();
+        ammos.clear();
+        ammos.add(new AmmoEntry(type, ammoCapacity()));
+    }
+
     public int capacity(){
         return unit.getItemCapacity();
     }

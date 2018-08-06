@@ -133,13 +133,16 @@ public class Sectors{
     }
 
     private void initSector(Sector sector){
+        double waveChance = 0.3;
+
         sector.difficulty = (int)(Mathf.dst(sector.x, sector.y));
+        sector.spawns = sector.missions.first().getWaves(sector);
 
         if(sector.difficulty == 0){
             sector.missions.add(new WaveMission(10));
         }else{
-            sector.missions.add(new BattleMission());
-            //sector.missions.add(new WaveMission(Math.min(10 + sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 5)*5, 100)));
+            sector.missions.add(Mathf.randomSeed(sector.getSeed() + 1) < waveChance ? new WaveMission(Math.min(10 + sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 5)*5, 100))
+                    : new BattleMission());
         }
 
         //add all ores for now since material differences aren't well handled yet

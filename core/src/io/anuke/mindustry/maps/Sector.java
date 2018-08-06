@@ -26,7 +26,7 @@ public class Sector{
     /**Missions of this sector-- what needs to be accomplished to unlock it.*/
     public transient Array<Mission> missions = new Array<>();
     /**Enemies spawned at this sector.*/
-    public transient Array<SpawnGroup> spawns = new Array<>();
+    public transient Array<SpawnGroup> spawns;
     /**Ores that appear in this sector.*/
     public transient Array<Item> ores = new Array<>();
     /**Difficulty of the sector, measured by calculating distance from origin and applying scaling.*/

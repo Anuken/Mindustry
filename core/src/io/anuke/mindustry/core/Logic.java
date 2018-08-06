@@ -49,9 +49,7 @@ public class Logic extends Module{
         state.set(State.playing);
         state.wavetime = wavespace * state.difficulty.timeScaling * 2;
 
-        //fill inventory with items for debugging
-
-        for(TeamData team : state.teams.getTeams()){
+        for(TeamData team : state.teams.getTeams(true)){
             for(Tile tile : team.cores){
                 if(debug){
                     for(Item item : Item.all()){
@@ -63,6 +61,13 @@ public class Logic extends Module{
                     tile.entity.items.add(Items.tungsten, 50);
                     tile.entity.items.add(Items.lead, 20);
                 }
+            }
+        }
+
+        for(TeamData team : state.teams.getTeams(false)){
+            for(Tile tile : team.cores){
+                tile.entity.items.add(Items.tungsten, 2000);
+                tile.entity.items.add(Items.blastCompound, 2000);
             }
         }
 
