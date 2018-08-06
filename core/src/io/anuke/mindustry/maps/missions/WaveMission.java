@@ -2,10 +2,7 @@ package io.anuke.mindustry.maps.missions;
 
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.game.GameMode;
-import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Waves;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -18,6 +15,19 @@ public class WaveMission implements Mission{
 
     public WaveMission(int target){
         this.target = target;
+    }
+
+    @Override
+    public Difficulty getDifficulty(Sector sector){
+        if(sector.difficulty == 0){
+            return Difficulty.easy;
+        }else if(sector.difficulty < 4){
+            return Difficulty.normal;
+        }else if(sector.difficulty < 9){
+            return Difficulty.hard;
+        }else{
+            return Difficulty.insane;
+        }
     }
 
     @Override

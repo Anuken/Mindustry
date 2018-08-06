@@ -38,22 +38,21 @@ public class Sectors{
             sector.saveID = control.getSaves().addSave("sector-" + sector.packedPosition()).index;
             world.sectors().save();
             world.setSector(sector);
-        }else{
-            try{
-                sector.getSave().load();
-                world.setSector(sector);
-                state.set(State.playing);
-            }catch(Exception e){
-                Log.err(e);
-                sector.getSave().delete();
+        }else try{
+            sector.getSave().load();
+            world.setSector(sector);
+            state.set(State.playing);
+        }catch(Exception e){
+            Log.err(e);
+            sector.getSave().delete();
 
-                playSector(sector);
+            playSector(sector);
 
-                if(!headless){
-                    threads.runGraphics(() -> ui.showError("$text.sector.corrupted"));
-                }
+            if(!headless){
+                threads.runGraphics(() -> ui.showError("$text.sector.corrupted"));
             }
         }
+
     }
 
     /**If a sector is not yet unlocked, returns null.*/

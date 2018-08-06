@@ -31,7 +31,7 @@ public class Vars{
     //respawn time in frames
     public static final float respawnduration = 60 * 4;
     //time between waves in frames (on normal mode)
-    public static final float wavespace = 60 * 60 * 2f;
+    public static final float wavespace = 60 * 60 * 1.5f;
     //set ridiculously high for now
     public static final float coreBuildRange = 800999f;
     //discord group URL

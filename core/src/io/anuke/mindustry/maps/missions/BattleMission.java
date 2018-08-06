@@ -3,8 +3,10 @@ package io.anuke.mindustry.maps.missions;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.FortressGenerator;
 import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -12,6 +14,11 @@ import io.anuke.ucore.util.Bundles;
 
 public class BattleMission implements Mission{
     private final static int coreX = 60, coreY = 60;
+
+    @Override
+    public Difficulty getDifficulty(Sector sector){
+        return Difficulty.normal;
+    }
 
     @Override
     public void display(Table table){
