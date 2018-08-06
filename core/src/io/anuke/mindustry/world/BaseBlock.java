@@ -121,7 +121,7 @@ public abstract class BaseBlock{
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
 
-            if(other.block().hasLiquids){
+            if(other.block().hasLiquids && canDumpLiquid(tile, other, liquid)){
                 float ofract = other.entity.liquids.get(liquid) / other.block().liquidCapacity;
                 float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
 
@@ -129,6 +129,10 @@ public abstract class BaseBlock{
             }
         }
 
+    }
+
+    public boolean canDumpLiquid(Tile tile, Tile to, Liquid liquid){
+        return true;
     }
 
     public void tryMoveLiquid(Tile tile, Tile tileSource, Tile next, float amount, Liquid liquid){

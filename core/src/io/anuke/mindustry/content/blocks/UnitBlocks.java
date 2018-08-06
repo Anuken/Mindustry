@@ -32,7 +32,7 @@ public class UnitBlocks extends BlockList implements ContentList{
 
         interceptorPad = new UnitPad("interceptor-pad"){{
             type = UnitTypes.interceptor;
-            produceTime = 800;
+            produceTime = 900;
             size = 2;
             consumes.power(0.08f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 20), new ItemStack(Items.titanium, 10)});
@@ -40,7 +40,7 @@ public class UnitBlocks extends BlockList implements ContentList{
 
         monsoonPad = new UnitPad("monsoon-pad"){{
             type = UnitTypes.monsoon;
-            produceTime = 1400;
+            produceTime = 1500;
             size = 3;
             consumes.power(0.14f);
             shadow = "shadow-round-3";
@@ -49,7 +49,7 @@ public class UnitBlocks extends BlockList implements ContentList{
 
         daggerPad = new UnitPad("dagger-pad"){{
             type = UnitTypes.dagger;
-            produceTime = 600;
+            produceTime = 500;
             size = 2;
             consumes.power(0.06f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.tungsten, 20)});
