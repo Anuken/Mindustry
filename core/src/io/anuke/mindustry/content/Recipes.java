@@ -132,11 +132,11 @@ public class Recipes implements ContentList{
         //new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
 
         //actual unit related stuff
-        new Recipe(units, UnitBlocks.dronePad, new ItemStack(Items.tungsten, 50), new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 130));
-        new Recipe(units, UnitBlocks.fabricatorPad, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 60), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 200));
+        new Recipe(units, UnitBlocks.dronePad, new ItemStack(Items.tungsten, 50), new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 90));
+        new Recipe(units, UnitBlocks.fabricatorPad, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 60), new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 200));
 
         new Recipe(units, UnitBlocks.daggerPad, new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 70));
-        new Recipe(units, UnitBlocks.titanPad, new ItemStack(Items.thorium, 90), new ItemStack(Items.lead, 140), new ItemStack(Items.silicon, 180));
+        new Recipe(units, UnitBlocks.titanPad, new ItemStack(Items.thorium, 90), new ItemStack(Items.lead, 140), new ItemStack(Items.silicon, 100));
 
         new Recipe(units, UnitBlocks.interceptorPad, new ItemStack(Items.titanium, 40), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 90));
         new Recipe(units, UnitBlocks.monsoonPad, new ItemStack(Items.plastanium, 70), new ItemStack(Items.titanium, 100), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 220));

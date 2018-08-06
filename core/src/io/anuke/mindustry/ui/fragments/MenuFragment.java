@@ -146,7 +146,7 @@ public class MenuFragment extends Fragment{
         dialog.addCloseButton();
         dialog.content().defaults().height(66f).width(w).padRight(5f);
 
-        dialog.content().add(new MenuButton("icon-play-2", "$text.campaign", () -> {
+        dialog.content().add(new MenuButton("icon-play-2", "$text.sectors", () -> {
             dialog.hide();
             ui.sectors.show();
         })).width(bw).colspan(2);

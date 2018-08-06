@@ -3,7 +3,6 @@ package io.anuke.mindustry.maps.missions;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
-import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
@@ -15,7 +14,6 @@ public interface Mission{
     boolean isComplete();
     String displayString();
     GameMode getMode();
-    Difficulty getDifficulty(Sector sector);
     void display(Table table);
 
     default Array<SpawnGroup> getWaves(Sector sector){

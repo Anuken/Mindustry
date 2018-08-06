@@ -18,19 +18,6 @@ public class WaveMission implements Mission{
     }
 
     @Override
-    public Difficulty getDifficulty(Sector sector){
-        if(sector.difficulty == 0){
-            return Difficulty.easy;
-        }else if(sector.difficulty < 4){
-            return Difficulty.normal;
-        }else if(sector.difficulty < 9){
-            return Difficulty.hard;
-        }else{
-            return Difficulty.insane;
-        }
-    }
-
-    @Override
     public Array<SpawnGroup> getWaves(Sector sector){
         Array<SpawnGroup> spawns = new Array<>();
         return Waves.getSpawns();
