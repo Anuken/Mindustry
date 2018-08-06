@@ -4,6 +4,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.EnumSet;
 
 public class SolarGenerator extends PowerGenerator{
     /**
@@ -13,6 +14,7 @@ public class SolarGenerator extends PowerGenerator{
 
     public SolarGenerator(String name){
         super(name);
+        flags = EnumSet.of();
     }
 
     @Override

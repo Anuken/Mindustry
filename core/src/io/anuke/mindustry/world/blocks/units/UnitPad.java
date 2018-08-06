@@ -21,6 +21,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeItems;
 import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.modules.InventoryModule;
@@ -29,6 +30,7 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInputStream;
@@ -51,6 +53,7 @@ public class UnitPad extends Block{
         hasItems = true;
         solid = false;
         itemCapacity = 10;
+        flags = EnumSet.of(BlockFlag.target);
 
         consumes.require(ConsumeItems.class);
     }

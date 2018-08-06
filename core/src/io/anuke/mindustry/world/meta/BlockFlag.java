@@ -9,6 +9,8 @@ public enum BlockFlag{
     dropPoint(Float.MAX_VALUE),
     /**Producer of important goods.*/
     producer(20),
+    /**Just a turret.*/
+    turret(20),
     /**Producer or storage unit of volatile materials.*/
     explosive(10),
     /**Repair point.*/
