@@ -1,5 +1,6 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
@@ -13,6 +14,7 @@ import io.anuke.mindustry.game.TeamInfo;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
@@ -57,9 +59,13 @@ public class Logic extends Module{
                             tile.entity.items.set(item, 1000);
                         }
                     }
-                }else if(!state.mode.infiniteResources){
-                    tile.entity.items.add(Items.tungsten, 50);
-                    tile.entity.items.add(Items.lead, 20);
+                }
+
+                if(world.getSector() != null){
+                    Array<ItemStack> items = world.getSector().startingItems;
+                    for(ItemStack stack : items){
+                        tile.entity.items.add(stack.item, stack.amount);
+                    }
                 }
             }
         }

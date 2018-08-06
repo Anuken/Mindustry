@@ -6,6 +6,7 @@ import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.maps.missions.Mission;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.ucore.util.Bits;
 
 import static io.anuke.mindustry.Vars.control;
@@ -31,6 +32,8 @@ public class Sector{
     public transient Array<Item> ores = new Array<>();
     /**Difficulty of the sector, measured by calculating distance from origin and applying scaling.*/
     public transient int difficulty;
+    /**Items the player starts with on this sector.*/
+    public transient Array<ItemStack> startingItems;
 
     public Mission currentMission(){
         return missions.get(Math.min(completedMissions, missions.size - 1));

@@ -11,6 +11,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.maps.missions.BattleMission;
 import io.anuke.mindustry.maps.missions.WaveMission;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.ucore.core.Settings;
@@ -147,6 +148,20 @@ public class Sectors{
 
         //add all ores for now since material differences aren't well handled yet
         sector.ores.addAll(Items.tungsten, Items.coal, Items.lead, Items.thorium, Items.titanium);
+
+        if(sector.difficulty > 12){ //now with titanium
+            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 600), new ItemStack(Items.lead, 450), new ItemStack(Items.carbide, 400), new ItemStack(Items.silicon, 250), new ItemStack(Items.titanium, 150));
+        }else if(sector.difficulty > 8){ //just more resources
+            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 450), new ItemStack(Items.lead, 350), new ItemStack(Items.carbide, 250), new ItemStack(Items.silicon, 160));
+        }else if(sector.difficulty > 5){ //now with silicon
+            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 350), new ItemStack(Items.lead, 250), new ItemStack(Items.carbide, 150), new ItemStack(Items.silicon, 80));
+        }else if(sector.difficulty > 3){ //now with carbide
+            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 220), new ItemStack(Items.lead, 160), new ItemStack(Items.carbide, 70));
+        }else if(sector.difficulty > 1){ //more starter items for faster start
+            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 170), new ItemStack(Items.lead, 110));
+        }else{ //base starting items to prevent grinding much
+            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 50), new ItemStack(Items.lead, 50));
+        }
     }
 
     private int round2(int i){
