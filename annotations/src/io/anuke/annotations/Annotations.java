@@ -80,9 +80,6 @@ public class Annotations{
          */
         boolean unreliable() default false;
 
-        /** The simple class name where this method is placed. */
-        String in() default "Call";
-
         /** Priority of this event. */
         PacketPriority priority() default PacketPriority.normal;
     }

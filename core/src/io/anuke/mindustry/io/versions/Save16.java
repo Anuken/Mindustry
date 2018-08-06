@@ -1,6 +1,5 @@
 package io.anuke.mindustry.io.versions;
 
-import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
@@ -12,7 +11,6 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.ucore.core.Timers;
@@ -41,6 +39,7 @@ public class Save16 extends SaveFileVersion{
         int sector = stream.readInt(); //sector ID
 
         //general state
+
         byte mode = stream.readByte();
         String mapname = stream.readUTF();
         Map map = world.maps().getByName(mapname);
@@ -58,19 +57,6 @@ public class Save16 extends SaveFileVersion{
         state.wavetime = wavetime;
 
         state.spawner.read(stream);
-
-        //block header
-
-        int blocksize = stream.readInt();
-
-        IntMap<Block> blockMap = new IntMap<>();
-
-        for(int i = 0; i < blocksize; i++){
-            String name = stream.readUTF();
-            int id = stream.readShort();
-
-            blockMap.put(id, Block.getByName(name));
-        }
 
         //entities
 
@@ -149,6 +135,18 @@ public class Save16 extends SaveFileVersion{
             tiles[x][y] = tile;
         }
 
+        for(int i = 0; i < width * height; i++){
+            boolean discovered = stream.readBoolean();
+            int consecutives = stream.readUnsignedShort();
+            if(discovered){
+                for(int j = i + 1; j < i + 1 + consecutives; j++){
+                    int newx = j % width, newy = j / width;
+                    tiles[newx][newy].setVisibility((byte) 1);
+                }
+            }
+            i += consecutives;
+        }
+
         world.endMapLoad();
     }
 
@@ -170,16 +168,6 @@ public class Save16 extends SaveFileVersion{
         stream.writeFloat(state.wavetime); //wave countdown
 
         state.spawner.write(stream);
-
-        //--BLOCK HEADER--
-
-        stream.writeInt(Block.all().size);
-
-        for(int i = 0; i < Block.all().size; i++){
-            Block block = Block.all().get(i);
-            stream.writeUTF(block.name);
-            stream.writeShort(block.id);
-        }
 
         //--ENTITIES--
 
@@ -246,6 +234,28 @@ public class Save16 extends SaveFileVersion{
                 stream.writeByte(consecutives);
                 i += consecutives;
             }
+        }
+
+        //write visibility, length-run encoded
+        for(int i = 0; i < world.width() * world.height(); i++){
+            Tile tile = world.tile(i);
+            boolean discovered = tile.discovered();
+
+            int consecutives = 0;
+
+            for(int j = i + 1; j < world.width() * world.height() && consecutives < 32767*2-1; j++){
+                Tile nextTile = world.tile(j);
+
+                if(nextTile.discovered() != discovered){
+                    break;
+                }
+
+                consecutives++;
+            }
+
+            stream.writeBoolean(discovered);
+            stream.writeShort(consecutives);
+            i += consecutives;
         }
     }
 }

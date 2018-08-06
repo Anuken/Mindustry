@@ -4,12 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.ui.dialogs.GenViewDialog;
 import io.anuke.ucore.core.Timers;
@@ -20,7 +18,6 @@ import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Log.LogHandler;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -127,12 +124,6 @@ public class DebugFragment extends Fragment{
                 t.addButton("map", () -> new GenViewDialog().show());
                 t.row();
                 t.addButton("noclip", "toggle", () -> noclip = !noclip);
-                t.row();
-                t.addButton("items", () -> {
-                    for(int i = 0; i < 10; i++){
-                        ItemDrop.create(Item.all().random(), 5, player.x, player.y, Mathf.random(360f));
-                    }
-                });
                 t.row();
                 t.addButton("team", "toggle", player::toggleTeam);
                 t.row();

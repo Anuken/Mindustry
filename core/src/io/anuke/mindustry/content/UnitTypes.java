@@ -1,13 +1,14 @@
 package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.entities.units.types.*;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
 
 public class UnitTypes implements ContentList{
-    public static UnitType drone, scout, vtol, monsoon, titan, fabricator;
+    public static UnitType drone, dagger, interceptor, monsoon, titan, fabricator;
 
     @Override
     public void load(){
@@ -22,7 +23,7 @@ public class UnitTypes implements ContentList{
             health = 45;
         }};
 
-        scout = new UnitType("scout", Scout.class, Scout::new){{
+        dagger = new UnitType("dagger", Dagger.class, Dagger::new){{
             maxVelocity = 1.1f;
             speed = 0.2f;
             drag = 0.4f;
@@ -40,7 +41,7 @@ public class UnitTypes implements ContentList{
             health = 260;
         }};
 
-        vtol = new UnitType("vtol", Vtol.class, Vtol::new){{
+        interceptor = new UnitType("interceptor", Interceptor.class, Interceptor::new){{
             speed = 0.3f;
             maxVelocity = 1.9f;
             drag = 0.01f;
@@ -54,13 +55,14 @@ public class UnitTypes implements ContentList{
             drag = 0.01f;
             isFlying = true;
             weapon = Weapons.bomber;
+            ammoCapacity = 50;
         }};
 
         fabricator = new UnitType("fabricator", Fabricator.class, Fabricator::new){{
             isFlying = true;
             drag = 0.01f;
             speed = 0.2f;
-            maxVelocity = 0.6f;
+            maxVelocity = 0.9f;
             ammoCapacity = 0;
             range = 70f;
             itemCapacity = 70;
@@ -69,6 +71,7 @@ public class UnitTypes implements ContentList{
             buildPower = 0.9f;
             minePower = 1.1f;
             healSpeed = 0.09f;
+            toMine = ObjectSet.with(Items.lead, Items.tungsten, Items.titanium);
         }};
     }
 

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import io.anuke.annotations.Annotations.Loc;
@@ -11,13 +12,14 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.ItemDrop;
-import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
@@ -39,11 +41,12 @@ public class MassDriver extends Block{
     protected float translation = 7f;
     protected int minDistribute = 10;
     protected float knockback = 4f;
-    protected float reloadTime = 80f;
+    protected float reloadTime = 100f;
     protected Effect shootEffect = ShootFx.shootBig2;
     protected Effect smokeEffect = ShootFx.shootBigSmoke2;
-    protected Effect recieveEffect = BlockFx.smeltsmoke;
+    protected Effect recieveEffect = BlockFx.mineBig;
     protected float shake = 3f;
+    protected TextureRegion turretRegion;
 
     public MassDriver(String name){
         super(name);
@@ -51,12 +54,11 @@ public class MassDriver extends Block{
         solid = true;
         configurable = true;
         hasItems = true;
-        itemCapacity = 50;
         layer = Layer.turret;
         hasPower = true;
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void linkMassDriver(Player player, Tile tile, int position){
         MassDriverEntity entity = tile.entity();
 
@@ -64,7 +66,7 @@ public class MassDriver extends Block{
         threads.run(() -> entity.link = position);
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void onMassDriverFire(Tile tile, Tile target){
         //just in case the client has invalid data
         if(!(tile.entity instanceof MassDriverEntity) || !(target.entity instanceof MassDriverEntity)) return;
@@ -98,6 +100,35 @@ public class MassDriver extends Block{
                 tile.drawy() + Angles.trnsy(angle, driver.translation), angle);
 
         Effects.shake(driver.shake, driver.shake, entity);
+    }
+
+    @Override
+    public TextureRegion[] getBlockIcon(){
+        if(blockIcon == null){
+            blockIcon = new TextureRegion[]{region, turretRegion};
+        }
+        return super.getBlockIcon();
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        turretRegion = Draw.region(name + "-turret");
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.powerShot, powerCapacity, StatUnit.powerUnits);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        viewRange = range;
     }
 
     @Override
@@ -137,7 +168,7 @@ public class MassDriver extends Block{
 
                 if(Mathf.angNear(entity.rotation, target, 1f) &&
                         Mathf.angNear(other.rotation, target + 180f, 1f)){
-                    CallBlocks.onMassDriverFire(tile, link);
+                    Call.onMassDriverFire(tile, link);
                 }
             }
         }
@@ -149,7 +180,7 @@ public class MassDriver extends Block{
     public void drawLayer(Tile tile){
         MassDriverEntity entity = tile.entity();
 
-        Draw.rect(name + "-turret",
+        Draw.rect(turretRegion,
                 tile.drawx() + Angles.trnsx(entity.rotation + 180f, entity.reload * knockback),
                 tile.drawy() + Angles.trnsy(entity.rotation + 180f, entity.reload * knockback),
                 entity.rotation - 90);
@@ -157,7 +188,11 @@ public class MassDriver extends Block{
 
     @Override
     public void drawConfigure(Tile tile){
-        super.drawConfigure(tile);
+        float sin = Mathf.absin(Timers.time(), 6f, 1f);
+
+        Draw.color(Palette.accent);
+        Lines.stroke(1f);
+        Lines.circle(tile.drawx(), tile.drawy(), (tile.block().size/2f+1) * tilesize + sin);
 
         MassDriverEntity entity = tile.entity();
 
@@ -165,8 +200,7 @@ public class MassDriver extends Block{
             Tile target = world.tile(entity.link);
 
             Draw.color(Palette.place);
-            Lines.square(target.drawx(), target.drawy(),
-                    target.block().size * tilesize / 2f + 1f);
+            Lines.circle(target.drawx(), target.drawy(), (target.block().size/2f+1) * tilesize + sin);
             Draw.reset();
         }
 
@@ -182,10 +216,10 @@ public class MassDriver extends Block{
         MassDriverEntity entity = tile.entity();
 
         if(entity.link == other.packedPosition()){
-            CallBlocks.linkMassDriver(null, tile, -1);
+            Call.linkMassDriver(null, tile, -1);
             return false;
         }else if(other.block() instanceof MassDriver && other.distanceTo(tile) <= range){
-            CallBlocks.linkMassDriver(null, tile, other.packedPosition());
+            Call.linkMassDriver(null, tile, other.packedPosition());
             return false;
         }
 
@@ -218,7 +252,6 @@ public class MassDriver extends Block{
         public void reset(){
             from = null;
             to = null;
-            ;
         }
     }
 

@@ -89,7 +89,7 @@ public class Pathfinder{
     }
 
     private boolean passable(Tile tile, Team team){
-        return (tile.block() == Blocks.air && !tile.floor().isLiquid && tile.cliffs == 0 && !tile.floor().solid && !(tile.floor().isLiquid && (tile.floor().damageTaken > 0 || tile.floor().drownTime > 0)))
+        return (tile.block() == Blocks.air && !tile.floor().isLiquid && !tile.hasCliffs() && !tile.floor().solid && !(tile.floor().isLiquid && (tile.floor().damageTaken > 0 || tile.floor().drownTime > 0)))
                 || (tile.breakable() && (tile.getTeam() != team)) || !tile.solid();
     }
 

@@ -10,8 +10,7 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.CallBlocks;
-import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
@@ -55,14 +54,14 @@ public class TileEntity extends BaseEntity implements TargetTrait{
     private boolean sleeping;
     private float sleepTime;
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void onTileDamage(Tile tile, float health){
         if(tile.entity != null){
             tile.entity.health = health;
         }
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void onTileDestroyed(Tile tile){
         if(tile.entity == null) return;
         tile.entity.onDeath();
@@ -85,30 +84,13 @@ public class TileEntity extends BaseEntity implements TargetTrait{
         return this;
     }
 
-    /**
-     * Call when nothing is happening to the entity.
-     * This increments the internal sleep timer.
-     */
+    /**Call when nothing is happening to the entity. This increments the internal sleep timer.*/
     public void sleep(){
         sleepTime += Timers.delta();
         if(!sleeping && sleepTime >= timeToSleep){
             remove();
             sleeping = true;
             sleepingEntities++;
-        }
-    }
-
-    /**
-     * Call when something just happened to the entity.
-     * If the entity was sleeping, this enables it. This also resets the sleep timer.
-     */
-    public void wakeUp(){
-        noSleep();
-
-        for(Tile tile : proximity){
-            if(tile.entity.isSleeping()){
-                tile.entity.wakeUp();
-            }
         }
     }
 
@@ -159,10 +141,10 @@ public class TileEntity extends BaseEntity implements TargetTrait{
     public void damage(float damage){
         if(dead) return;
 
-        CallBlocks.onTileDamage(tile, health - tile.block().handleDamage(tile, damage));
+        Call.onTileDamage(tile, health - tile.block().handleDamage(tile, damage));
 
         if(health <= 0){
-            CallBlocks.onTileDestroyed(tile);
+            Call.onTileDestroyed(tile);
         }
     }
 

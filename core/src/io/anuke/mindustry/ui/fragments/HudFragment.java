@@ -97,7 +97,7 @@ public class HudFragment extends Fragment{
 
             cont.row();
 
-            cont.table(this::addWaveTable).touchable(Touchable.enabled).fillX().height(66f);
+            Table waves = cont.table(this::addWaveTable).touchable(Touchable.enabled).fillX().height(66f).get();
 
             cont.row();
 
@@ -109,8 +109,10 @@ public class HudFragment extends Fragment{
                 t.label(() -> fps.get(Gdx.graphics.getFramesPerSecond())).padRight(10);
                 t.label(() -> tps.get(threads.getTPS())).visible(() -> threads.isEnabled());
                 t.row();
-                t.label(() -> ping.get(Net.getPing())).visible(() -> Net.client() && !gwt).colspan(2);
-            }).size(-1).visible(() -> Settings.getBool("fps")).get();
+                if(Net.hasClient()){
+                    t.label(() -> ping.get(Net.getPing())).visible(() -> Net.client() && !gwt).colspan(2);
+                }
+            }).size(-1).visible(() -> Settings.getBool("fps")).update(t -> t.setTranslation(0, state.mode.disableWaves ? waves.getHeight() : 0)).get();
 
             //make wave box appear below rest of menu
             cont.swapActor(wavetable, menu.getParent());
@@ -283,6 +285,7 @@ public class HudFragment extends Fragment{
         });
 
         table.add().growX();
+        table.visible(() -> !state.mode.disableWaves);
 
         playButton(uheight);
     }

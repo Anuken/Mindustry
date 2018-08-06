@@ -1,5 +1,6 @@
 package io.anuke.mindustry.game;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.world.Tile;
@@ -130,7 +131,7 @@ public class TeamInfo{
     }
 
     public class TeamData{
-        public final ThreadArray<Tile> cores = new ThreadArray<>();
+        public final Array<Tile> cores = new ThreadArray<>();
         public final Team team;
         public final boolean ally;
 

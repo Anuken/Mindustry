@@ -22,7 +22,10 @@ public class ColorMapper implements ContentList{
     }
 
     public static int colorFor(Block floor, Block wall, Team team, int elevation){
-        int color = wall.breakable ? team.intColor : getBlockColor(wall);
+        if(wall.synthetic()){
+            return team.intColor;
+        }
+        int color = getBlockColor(wall);
         if(color == 0) color = ColorMapper.getBlockColor(floor);
         if(elevation > 0){
             if(tmpColors.get() == null) tmpColors.set(new Color());

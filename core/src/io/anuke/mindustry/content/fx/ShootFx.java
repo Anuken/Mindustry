@@ -75,7 +75,7 @@ public class ShootFx extends FxList implements ContentList{
         shootSmallFlame = new Effect(30f, e -> {
             Draw.color(Palette.lightFlame, Palette.darkFlame, Color.GRAY, e.fin());
 
-            Angles.randLenVectors(e.id, 8, e.finpow() * 26f, e.rotation, 10f, (x, y) -> {
+            Angles.randLenVectors(e.id, 8, e.finpow() * 36f, e.rotation, 10f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.5f);
             });
 

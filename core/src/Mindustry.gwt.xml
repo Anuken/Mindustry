@@ -19,4 +19,6 @@
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.meta.BlockBar"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.maps.generation.WorldGenerator"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.StatusController"/>
+    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.maps.Sector"/>
+    <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.gdx.utils.Predicate"/>
 </module>

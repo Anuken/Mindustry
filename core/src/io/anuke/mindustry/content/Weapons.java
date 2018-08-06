@@ -46,7 +46,7 @@ public class Weapons implements ContentList{
             reload = 50f;
             roundrobin = true;
             shots = 6;
-            inaccuracy = 15f;
+            inaccuracy = 10f;
             recoil = 2f;
             velocityRnd = 0.7f;
             ejectEffect = ShootFx.shellEjectSmall;
@@ -93,7 +93,7 @@ public class Weapons implements ContentList{
         bomber = new Weapon("bomber"){{
             length = 0f;
             width = 2f;
-            reload = 5f;
+            reload = 7f;
             roundrobin = true;
             ejectEffect = Fx.none;
             velocityRnd = 1f;

@@ -10,9 +10,7 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
-import io.anuke.mindustry.gen.CallBlocks;
-import io.anuke.mindustry.gen.CallEntity;
-import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.type.ItemStack;
@@ -57,7 +55,7 @@ public abstract class InputHandler extends InputAdapter{
 
     //methods to override
 
-    @Remote(targets = Loc.client, called = Loc.server, in = In.entities)
+    @Remote(targets = Loc.client, called = Loc.server)
     public static void dropItem(Player player, float angle){
         if(Net.server() && !player.inventory.hasItem()){
             throw new ValidateException(player, "Player cannot drop an item.");
@@ -67,7 +65,7 @@ public abstract class InputHandler extends InputAdapter{
         player.inventory.clearItem();
     }
 
-    @Remote(targets = Loc.both, forward = true, called = Loc.server, in = In.blocks)
+    @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Tile tile){
         if(Net.server() && (!player.inventory.hasItem() || player.isTransferring)){
             throw new ValidateException(player, "Player cannot transfer an item.");
@@ -118,7 +116,7 @@ public abstract class InputHandler extends InputAdapter{
         });
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true, in = In.blocks)
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void onTileTapped(Player player, Tile tile){
         if(tile == null || player == null) return;
         tile.block().tapped(tile, player);
@@ -189,7 +187,7 @@ public abstract class InputHandler extends InputAdapter{
 
         //call tapped event
         if(tile.getTeam() == player.getTeam()){
-            CallBlocks.onTileTapped(player, tile);
+            Call.onTileTapped(player, tile);
         }
 
         //consume tap event if necessary
@@ -303,9 +301,9 @@ public abstract class InputHandler extends InputAdapter{
         ItemStack stack = player.inventory.getItem();
 
         if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.block().hasItems){
-            CallBlocks.transferInventory(player, tile);
+            Call.transferInventory(player, tile);
         }else{
-            CallEntity.dropItem(player.angleTo(x, y));
+            Call.dropItem(player.angleTo(x, y));
         }
     }
 
@@ -337,7 +335,7 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     public boolean validBreak(int x, int y){
-        return Build.validBreak(player.getTeam(), x, y);
+        return Build.validBreak(player.getTeam(), x, y) && Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
     }
 
     public void placeBlock(int x, int y, Recipe recipe, int rotation){
@@ -346,7 +344,6 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     public void breakBlock(int x, int y){
-
         //todo multiplayer support
         Tile tile = world.tile(x, y).target();
         player.addBuildRequest(new BuildRequest(tile.x, tile.y));

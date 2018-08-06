@@ -22,15 +22,19 @@ public class LiquidBlocks extends BlockList implements ContentList{
             pumpAmount = 0.25f;
             consumes.power(0.015f);
             liquidCapacity = 30f;
+            powerCapacity = 20f;
             hasPower = true;
             size = 2;
             tier = 1;
         }};
 
         thermalPump = new Pump("thermal-pump"){{
-            pumpAmount = 0.3f;
-            consumes.power(0.05f);
+            shadow = "shadow-rounded-2";
+            pumpAmount = 0.55f;
+            consumes.power(0.03f);
             liquidCapacity = 40f;
+            hasPower = true;
+            powerCapacity = 20f;
             size = 2;
             tier = 2;
         }};

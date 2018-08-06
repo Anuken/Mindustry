@@ -9,10 +9,9 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -52,7 +51,7 @@ public class ItemBridge extends Block{
         hasItems = true;
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void linkItemBridge(Player player, Tile tile, Tile other){
         ItemBridgeEntity entity = tile.entity();
         ItemBridgeEntity oe = other.entity();
@@ -60,7 +59,7 @@ public class ItemBridge extends Block{
         oe.incoming.add(tile.packedPosition());
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unlinkItemBridge(Player player, Tile tile, Tile other){
         ItemBridgeEntity entity = tile.entity();
         entity.link = -1;
@@ -85,7 +84,7 @@ public class ItemBridge extends Block{
         if(linkValid(tile, last)){
             ItemBridgeEntity entity = last.entity();
             if(!linkValid(last, world.tile(entity.link))){
-                CallBlocks.linkItemBridge(null, last, tile);
+                Call.linkItemBridge(null, last, tile);
             }
         }
         lastPlaced = tile.packedPosition();
@@ -138,9 +137,9 @@ public class ItemBridge extends Block{
 
         if(linkValid(tile, other)){
             if(entity.link == other.packedPosition()){
-                CallBlocks.unlinkItemBridge(null, tile, other);
+                Call.unlinkItemBridge(null, tile, other);
             }else{
-                CallBlocks.linkItemBridge(null, tile, other);
+                Call.linkItemBridge(null, tile, other);
             }
             return false;
         }

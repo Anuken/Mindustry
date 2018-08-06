@@ -38,6 +38,14 @@ public class Net{
 
     private static IntMap<StreamBuilder> streams = new IntMap<>();
 
+    public static boolean hasClient(){
+        return clientProvider != null;
+    }
+
+    public static boolean hasServer(){
+        return serverProvider != null;
+    }
+
     /**
      * Display a network error.
      */

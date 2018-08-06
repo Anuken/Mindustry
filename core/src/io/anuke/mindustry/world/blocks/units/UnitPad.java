@@ -9,11 +9,12 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.BarType;
@@ -35,27 +36,28 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class UnitFactory extends Block{
+public class UnitPad extends Block{
+    protected float gracePeriodMultiplier = 8f;
     protected UnitType type;
     protected float produceTime = 1000f;
     protected float openDuration = 50f;
     protected float launchVelocity = 0f;
-    protected String unitRegion;
 
-    public UnitFactory(String name){
+    public UnitPad(String name){
         super(name);
         update = true;
         hasPower = true;
         hasItems = true;
         solidifes = true;
+        itemCapacity = 10;
 
         consumes.require(ConsumeItems.class);
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void onUnitFactorySpawn(Tile tile){
         UnitFactoryEntity entity = tile.entity();
-        UnitFactory factory = (UnitFactory) tile.block();
+        UnitPad factory = (UnitPad) tile.block();
 
         entity.buildTime = 0f;
         entity.hasSpawned = true;
@@ -69,7 +71,18 @@ public class UnitFactory extends Block{
             unit.set(tile.drawx(), tile.drawy());
             unit.add();
             unit.getVelocity().y = factory.launchVelocity;
+
+            //fill inventory with 1st ammo
+            if(tile.getTeam() == Team.red){
+                AmmoType type = unit.getWeapon().getAmmoType(unit.getWeapon().getAcceptedItems().iterator().next());
+                unit.inventory.fillAmmo(type);
+            }
         }
+    }
+
+    @Override
+    public boolean outputsItems(){
+        return false;
     }
 
     @Override
@@ -96,15 +109,15 @@ public class UnitFactory extends Block{
     @Override
     public TextureRegion[] getIcon(){
         return new TextureRegion[]{
-                Draw.region(name),
-                Draw.region(name + "-top")
+            Draw.region(name),
+            Draw.region(name + "-top")
         };
     }
 
     @Override
     public void draw(Tile tile){
         UnitFactoryEntity entity = tile.entity();
-        TextureRegion region = Draw.region(unitRegion == null ? type.name : unitRegion);
+        TextureRegion region = type.iconRegion;
 
         Draw.rect(name(), tile.drawx(), tile.drawy());
 
@@ -130,7 +143,7 @@ public class UnitFactory extends Block{
 
         Draw.reset();
 
-        Draw.rect(name + (entity.open ? "-top-open" : "-top"), tile.drawx(), tile.drawy());
+        Draw.rect(name + (entity.open || entity.hasSpawned ? "-top-open" : "-top"), tile.drawx(), tile.drawy());
     }
 
     @Override
@@ -152,21 +165,27 @@ public class UnitFactory extends Block{
             }
         }
 
-        /*
-        if(!entity.hasSpawned){
-            for(BaseUnit unit : unitGroups[tile.getTeamID()].all()){
-                if(unit.getType() == type && unit.getSpawner() == null){
-                    entity.hasSpawned = true;
-                    unit.setSpawner(tile);
-                    break;
-                }
+        boolean isEnemy = tile.getTeam() == Team.red;
+
+        if(isEnemy){
+            entity.warmup += Timers.delta();
+        }
+
+        if(!isEnemy){
+            //player-made spawners have default behavior
+
+            if(!entity.hasSpawned && hasRequirements(entity.items, entity.buildTime / produceTime) &&
+            entity.cons.valid() && !entity.open){
+
+                entity.buildTime += Timers.delta();
+                entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
+            }else{
+                if(!entity.open) entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
             }
-        }*/
-
-        if(!entity.hasSpawned && hasRequirements(entity.items, entity.buildTime / produceTime) &&
-                entity.cons.valid() && !entity.open){
-
-            entity.buildTime += Timers.delta();
+            //check if grace period had passed
+        }else if(!entity.hasSpawned && entity.warmup > produceTime*gracePeriodMultiplier){
+            //otherwise, it's an enemy, cheat by not requiring resources
+            entity.buildTime += Timers.delta() / 4f;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
         }else{
             if(!entity.open) entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
@@ -175,7 +194,8 @@ public class UnitFactory extends Block{
         if(entity.buildTime >= produceTime && !entity.open){
             entity.open = true;
 
-            Timers.run(openDuration / 1.5f, () -> CallBlocks.onUnitFactorySpawn(tile));
+            Timers.run(openDuration / 1.5f, () -> Call.onUnitFactorySpawn(tile));
+            useContent(type);
 
             entity.openCountdown = openDuration;
 
@@ -188,11 +208,21 @@ public class UnitFactory extends Block{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         for(ItemStack stack : consumes.items()){
-            if(item == stack.item && tile.entity.items.get(item) <= stack.amount * 2){
+            if(item == stack.item && tile.entity.items.get(item) < stack.amount * 2){
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public int getMaximumAccepted(Tile tile, Item item){
+        for(ItemStack stack : consumes.items()){
+            if(item == stack.item){
+                return stack.amount * 2;
+            }
+        }
+        return 0;
     }
 
     @Override
@@ -216,16 +246,19 @@ public class UnitFactory extends Block{
         public float time;
         public float speedScl;
         public boolean hasSpawned;
+        public float warmup; //only for enemy spawners
 
         @Override
         public void write(DataOutputStream stream) throws IOException{
             stream.writeFloat(buildTime);
+            stream.writeFloat(warmup);
             stream.writeBoolean(hasSpawned);
         }
 
         @Override
         public void read(DataInputStream stream) throws IOException{
             buildTime = stream.readFloat();
+            warmup = stream.readFloat();
             hasSpawned = stream.readBoolean();
         }
     }

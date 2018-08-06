@@ -5,13 +5,18 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
+import io.anuke.mindustry.maps.missions.BattleMission;
+import io.anuke.mindustry.maps.missions.WaveMission;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.GridMap;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -24,6 +29,31 @@ public class Sectors{
 
     public Sectors(){
         Settings.json().addClassTag("Sector", Sector.class);
+    }
+
+    public void playSector(Sector sector){
+        if(!sector.hasSave()){
+            world.loadSector(sector);
+            logic.play();
+            sector.saveID = control.getSaves().addSave("sector-" + sector.packedPosition()).index;
+            world.sectors().save();
+            world.setSector(sector);
+        }else{
+            try{
+                sector.getSave().load();
+                world.setSector(sector);
+                state.set(State.playing);
+            }catch(Exception e){
+                Log.err(e);
+                sector.getSave().delete();
+
+                playSector(sector);
+
+                if(!headless){
+                    threads.runGraphics(() -> ui.showError("$text.sector.corrupted"));
+                }
+            }
+        }
     }
 
     /**If a sector is not yet unlocked, returns null.*/
@@ -62,6 +92,7 @@ public class Sectors{
         sector.y = (short)y;
         sector.complete = false;
         sector.size = isLarge ? 2 : 1;
+        initSector(sector);
 
         for(int cx = 0; cx < sector.size; cx++){
             for(int cy = 0; cy < sector.size; cy++){
@@ -77,6 +108,7 @@ public class Sectors{
 
         for(Sector sector : out){
             createTexture(sector);
+            initSector(sector);
             for(int cx = 0; cx < sector.size; cx++){
                 for(int cy = 0; cy < sector.size; cy++){
                     grid.put(sector.x + cx, sector.y + cy, sector);
@@ -100,10 +132,26 @@ public class Sectors{
         Settings.save();
     }
 
-    private int round2(int i){
-        if(i < 0){
-            i --;
+    private void initSector(Sector sector){
+        double waveChance = 0.3;
+
+        sector.difficulty = (int)(Mathf.dst(sector.x, sector.y));
+
+        if(sector.difficulty == 0){
+            sector.missions.add(new WaveMission(10));
+        }else{
+            sector.missions.add(Mathf.randomSeed(sector.getSeed() + 1) < waveChance ? new WaveMission(Math.min(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5, 100))
+                    : new BattleMission());
         }
+
+        sector.spawns = sector.missions.first().getWaves(sector);
+
+        //add all ores for now since material differences aren't well handled yet
+        sector.ores.addAll(Items.tungsten, Items.coal, Items.lead, Items.thorium, Items.titanium);
+    }
+
+    private int round2(int i){
+        if(i < 0) i --;
         return i/2*2;
     }
 

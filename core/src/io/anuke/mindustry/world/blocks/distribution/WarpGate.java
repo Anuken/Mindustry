@@ -9,8 +9,7 @@ import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.gen.CallBlocks;
-import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
@@ -75,7 +74,7 @@ public class WarpGate extends PowerBlock{
         configurable = true;
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setTeleporterColor(Player player, Tile tile, byte color){
         TeleporterEntity entity = tile.entity();
         entity.color = color;
@@ -88,7 +87,7 @@ public class WarpGate extends PowerBlock{
 
     @Override
     public void placed(Tile tile){
-        CallBlocks.setTeleporterColor(null, tile, lastColor);
+        Call.setTeleporterColor(null, tile, lastColor);
     }
 
     @Override
@@ -254,7 +253,7 @@ public class WarpGate extends PowerBlock{
             final int f = i;
             ImageButton button = cont.addImageButton("white", "toggle", 24, () -> {
                 lastColor = (byte) f;
-                CallBlocks.setTeleporterColor(null, tile, (byte) f);
+                Call.setTeleporterColor(null, tile, (byte) f);
             }).size(34, 38).padBottom(-5.1f).group(group).get();
             button.getStyle().imageUpColor = colorArray[f];
             button.setChecked(entity.color == f);

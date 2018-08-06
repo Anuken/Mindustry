@@ -12,6 +12,11 @@ public abstract class StorageBlock extends Block{
         hasItems = true;
     }
 
+    @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
     /**
      * Removes an item and returns it. If item is not null, it should return the item.
      * Returns null if no items are there.

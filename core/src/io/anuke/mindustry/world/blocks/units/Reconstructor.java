@@ -10,10 +10,9 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
-import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -71,7 +70,7 @@ public class Reconstructor extends Block{
         entity.link = -1;
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void reconstructPlayer(Player player, Tile tile){
         ReconstructorEntity entity = tile.entity();
 
@@ -91,7 +90,7 @@ public class Reconstructor extends Block{
         //player.setRespawning();
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void linkReconstructor(Player player, Tile tile, Tile other){
         //just in case the client has invalid data
         if(!(tile.entity instanceof ReconstructorEntity) || !(other.entity instanceof ReconstructorEntity)) return;
@@ -109,7 +108,7 @@ public class Reconstructor extends Block{
         });
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unlinkReconstructor(Player player, Tile tile, Tile other){
         //just in case the client has invalid data
         if(!(tile.entity instanceof ReconstructorEntity) || !(other.entity instanceof ReconstructorEntity)) return;
@@ -163,10 +162,10 @@ public class Reconstructor extends Block{
         ReconstructorEntity entity = tile.entity();
 
         if(entity.link == other.packedPosition()){
-            CallBlocks.unlinkReconstructor(null, tile, other);
+            Call.unlinkReconstructor(null, tile, other);
             return false;
         }else if(other.block() instanceof Reconstructor){
-            CallBlocks.linkReconstructor(null, tile, other);
+            Call.linkReconstructor(null, tile, other);
             return false;
         }
 
@@ -296,7 +295,7 @@ public class Reconstructor extends Block{
 
         if(!checkValidTap(tile, entity, player)) return;
 
-        CallBlocks.reconstructPlayer(player, tile);
+        Call.reconstructPlayer(player, tile);
     }
 
     @Override

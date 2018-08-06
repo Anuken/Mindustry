@@ -1,6 +1,8 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
+import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
@@ -47,5 +49,32 @@ public class LiquidBridge extends ItemBridge{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         return false;
+    }
+
+    @Override
+    public boolean canDumpLiquid(Tile tile, Tile to, Liquid liquid){
+        ItemBridgeEntity entity = tile.entity();
+
+        Tile other = world.tile(entity.link);
+        if(!linkValid(tile, other)){
+            int i = tile.absoluteRelativeTo(to.x, to.y);
+
+            IntSetIterator it = entity.incoming.iterator();
+
+            while(it.hasNext){
+                int v = it.next();
+                int x = v % world.width();
+                int y = v / world.width();
+                if(tile.absoluteRelativeTo(x, y) == i){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        int rel = tile.absoluteRelativeTo(other.x, other.y);
+        int rel2 = tile.relativeTo(to.x, to.y);
+
+        return rel != rel2;
     }
 }

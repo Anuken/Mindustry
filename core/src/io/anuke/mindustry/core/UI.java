@@ -43,7 +43,7 @@ public class UI extends SceneModule{
 
     public AboutDialog about;
     public RestartDialog restart;
-    public LevelDialog levels;
+    public CustomGameDialog levels;
     public MapsDialog maps;
     public LoadDialog load;
     public DiscordDialog discord;
@@ -62,26 +62,27 @@ public class UI extends SceneModule{
     public UnlocksDialog unlocks;
     public ContentInfoDialog content;
     public SectorsDialog sectors;
+    public MissionDialog missions;
 
     private Locale lastLocale;
 
     public UI(){
         Dialog.setShowAction(() -> sequence(
-                alpha(0f),
-                originCenter(),
-                moveToAligned(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, Align.center),
-                scaleTo(0.0f, 1f),
-                parallel(
-                        scaleTo(1f, 1f, 0.1f, Interpolation.fade),
-                        fadeIn(0.1f, Interpolation.fade)
-                )
+            alpha(0f),
+            originCenter(),
+            moveToAligned(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, Align.center),
+            scaleTo(0.0f, 1f),
+            parallel(
+                scaleTo(1f, 1f, 0.1f, Interpolation.fade),
+                fadeIn(0.1f, Interpolation.fade)
+            )
         ));
 
         Dialog.setHideAction(() -> sequence(
-                parallel(
-                        scaleTo(0.01f, 0.01f, 0.1f, Interpolation.fade),
-                        fadeOut(0.1f, Interpolation.fade)
-                )
+            parallel(
+                scaleTo(0.01f, 0.01f, 0.1f, Interpolation.fade),
+                fadeOut(0.1f, Interpolation.fade)
+            )
         ));
 
         TooltipManager.getInstance().animations = false;
@@ -154,7 +155,7 @@ public class UI extends SceneModule{
         join = new JoinDialog();
         discord = new DiscordDialog();
         load = new LoadDialog();
-        levels = new LevelDialog();
+        levels = new CustomGameDialog();
         language = new LanguageDialog();
         settings = new SettingsMenuDialog();
         host = new HostDialog();
@@ -169,6 +170,7 @@ public class UI extends SceneModule{
         unlocks = new UnlocksDialog();
         content = new ContentInfoDialog();
         sectors = new SectorsDialog();
+        missions = new MissionDialog();
 
         Group group = Core.scene.getRoot();
 
@@ -179,6 +181,7 @@ public class UI extends SceneModule{
         listfrag.build(group);
         debugfrag.build(group);
         loadfrag.build(group);
+
     }
 
     @Override

@@ -49,9 +49,7 @@ public class Logic extends Module{
         state.set(State.playing);
         state.wavetime = wavespace * state.difficulty.timeScaling * 2;
 
-        //fill inventory with items for debugging
-
-        for(TeamData team : state.teams.getTeams()){
+        for(TeamData team : state.teams.getTeams(true)){
             for(Tile tile : team.cores){
                 if(debug){
                     for(Item item : Item.all()){
@@ -59,10 +57,17 @@ public class Logic extends Module{
                             tile.entity.items.set(item, 1000);
                         }
                     }
-                }else{
+                }else if(!state.mode.infiniteResources){
                     tile.entity.items.add(Items.tungsten, 50);
                     tile.entity.items.add(Items.lead, 20);
                 }
+            }
+        }
+
+        for(TeamData team : state.teams.getTeams(false)){
+            for(Tile tile : team.cores){
+                tile.entity.items.add(Items.tungsten, 2000);
+                tile.entity.items.add(Items.blastCompound, 2000);
             }
         }
 
@@ -131,11 +136,11 @@ public class Logic extends Module{
 
             if(!state.is(State.paused) || Net.active()){
 
-                if(!state.mode.disableWaveTimer){
+                if(!state.mode.disableWaveTimer && !state.mode.disableWaves){
                     state.wavetime -= Timers.delta();
                 }
 
-                if(!Net.client() && state.wavetime <= 0){
+                if(!Net.client() && state.wavetime <= 0 && !state.mode.disableWaves){
                     runWave();
                 }
 

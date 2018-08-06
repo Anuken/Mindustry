@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.maps.goals.Goal;
-import io.anuke.mindustry.maps.goals.WaveGoal;
+import io.anuke.mindustry.maps.missions.Mission;
+import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.util.Bits;
 
 import static io.anuke.mindustry.Vars.control;
@@ -19,12 +19,26 @@ public class Sector{
     public int saveID = -1;
     /**Sector size; if more than 1, the coordinates are the bottom left corner.*/
     public int size = 1;
+    /**Num of missions in this sector that have been completed so far.*/
+    public int completedMissions;
     /**Display texture. Needs to be disposed.*/
     public transient Texture texture;
-    /**Goal of this sector-- what needs to be accomplished to unlock it.*/
-    public transient Goal goal = new WaveGoal(30);
+    /**Missions of this sector-- what needs to be accomplished to unlock it.*/
+    public transient Array<Mission> missions = new Array<>();
     /**Enemies spawned at this sector.*/
-    public transient Array<SpawnGroup> spawns = new Array<>();
+    public transient Array<SpawnGroup> spawns;
+    /**Ores that appear in this sector.*/
+    public transient Array<Item> ores = new Array<>();
+    /**Difficulty of the sector, measured by calculating distance from origin and applying scaling.*/
+    public transient int difficulty;
+
+    public Mission currentMission(){
+        return missions.get(Math.min(completedMissions, missions.size - 1));
+    }
+
+    public int getSeed(){
+        return Bits.packInt(x, y);
+    }
 
     public SaveSlot getSave(){
         return control.getSaves().getByID(saveID);

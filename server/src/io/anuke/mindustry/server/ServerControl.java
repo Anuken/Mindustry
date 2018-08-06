@@ -39,9 +39,9 @@ public class ServerControl extends Module{
 
     public ServerControl(String[] args){
         Settings.defaultList(
-                "shufflemode", "normal",
-                "bans", "",
-                "admins", ""
+            "shufflemode", "normal",
+            "bans", "",
+            "admins", ""
         );
 
         mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));

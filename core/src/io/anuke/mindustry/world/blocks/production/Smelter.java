@@ -27,7 +27,7 @@ public class Smelter extends Block{
     protected Item result;
 
     protected float minFlux = 0.2f;
-    protected float baseFluxChance = 0.15f;
+    protected float baseFluxChance = 0.25f;
     protected boolean useFlux = false;
 
     protected float craftTime = 20f;
@@ -75,6 +75,8 @@ public class Smelter extends Block{
                 throw new IllegalArgumentException("'" + name + "' has input item '" + item.item.name + "', which is a flux, when useFlux is enabled. To prevent ambiguous item use, either remove this flux item from the inputs, or set useFlux to false.");
             }
         }
+
+        produces.set(result);
     }
 
     @Override

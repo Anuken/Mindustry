@@ -6,10 +6,9 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
@@ -52,7 +51,7 @@ public class PowerNode extends PowerBlock{
         configurable = true;
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void linkPowerDistributors(Player player, Tile tile, Tile other){
 
         DistributorEntity entity = tile.entity();
@@ -70,7 +69,7 @@ public class PowerNode extends PowerBlock{
         }
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unlinkPowerDistributors(Player player, Tile tile, Tile other){
         DistributorEntity entity = tile.entity();
 
@@ -91,7 +90,7 @@ public class PowerNode extends PowerBlock{
     public void placed(Tile tile){
         Tile before = world.tile(lastPlaced);
         if(linkValid(tile, before) && before.block() instanceof PowerNode){
-            CallBlocks.linkPowerDistributors(null, tile, before);
+            Call.linkPowerDistributors(null, tile, before);
         }
 
         lastPlaced = tile.packedPosition();
@@ -119,9 +118,9 @@ public class PowerNode extends PowerBlock{
 
         if(linkValid(tile, other)){
             if(linked(tile, other)){
-                threads.run(() -> CallBlocks.unlinkPowerDistributors(null, tile, result));
+                threads.run(() -> Call.unlinkPowerDistributors(null, tile, result));
             }else if(entity.links.size < maxNodes){
-                threads.run(() -> CallBlocks.linkPowerDistributors(null, tile, result));
+                threads.run(() -> Call.linkPowerDistributors(null, tile, result));
             }
             return false;
         }

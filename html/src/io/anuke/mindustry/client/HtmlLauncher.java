@@ -18,7 +18,6 @@ import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.user.client.ui.*;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.function.Consumer;
 
 import java.io.ByteArrayInputStream;
@@ -94,8 +93,6 @@ public class HtmlLauncher extends GwtApplication {
                 setupResizeHook();
             }
         });
-
-        Net.setClientProvider(new WebsocketClient());
         
         Platform.instance = new Platform(){
         	DateTimeFormat format = DateTimeFormat.getFormat("EEE, dd MMM yyyy HH:mm:ss");
@@ -117,12 +114,6 @@ public class HtmlLauncher extends GwtApplication {
 			public String format(int number){
 				return NumberFormat.getDecimalFormat().format(number);
 			}
-
-			@Override
-            public boolean canJoinGame(){
-			    String ref = Document.get().getReferrer();
-			    return !ref.startsWith("https") && !ref.contains("itch.io");
-            }
 
             @Override
             public void downloadFile(String name, byte[] bytes) {

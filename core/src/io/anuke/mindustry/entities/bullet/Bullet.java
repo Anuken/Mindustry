@@ -8,7 +8,6 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
@@ -33,9 +32,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     private Object data;
     private boolean supressCollision;
 
-    /**
-     * Internal use only!
-     */
+    /**Internal use only!*/
     public Bullet(){
     }
 
@@ -85,7 +82,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         create(type, parent.owner, parent.team, x, y, angle, velocityScl);
     }
 
-    @Remote(called = Loc.server, in = In.entities)
+    @Remote(called = Loc.server)
     public static void createBullet(BulletType type, float x, float y, float angle){
         create(type, null, Team.none, x, y, angle);
     }

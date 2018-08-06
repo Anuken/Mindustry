@@ -21,6 +21,10 @@ public class ItemTurret extends CooledTurret{
         hasItems = true;
     }
 
+    public AmmoType[] getAmmoTypes(){
+        return ammoTypes;
+    }
+
     @Override
     public void setStats(){
         super.setStats();

@@ -6,8 +6,7 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.gen.CallBlocks;
-import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
@@ -28,7 +27,7 @@ import java.io.IOException;
 public class DebugBlocks extends BlockList implements ContentList{
     public static Block powerVoid, powerInfinite, itemSource, liquidSource, itemVoid;
 
-    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+    @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setLiquidSourceLiquid(Player player, Tile tile, Liquid liquid){
         LiquidSourceEntity entity = tile.entity();
         entity.source = liquid;
@@ -114,7 +113,7 @@ public class DebugBlocks extends BlockList implements ContentList{
                     if(i == 0) continue;
                     final int f = i;
                     ImageButton button = cont.addImageButton("white", "toggle", 24, () -> {
-                        CallBlocks.setLiquidSourceLiquid(null, tile, items.get(f));
+                        Call.setLiquidSourceLiquid(null, tile, items.get(f));
                     }).size(38, 42).padBottom(-5.1f).group(group).get();
                     button.getStyle().imageUpColor = items.get(i).color;
                     button.setChecked(entity.source.id == f);

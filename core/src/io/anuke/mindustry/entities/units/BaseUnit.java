@@ -16,15 +16,15 @@ import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
-import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.units.UnitFactory.UnitFactoryEntity;
+import io.anuke.mindustry.world.blocks.units.CommandCenter.CommandCenterEntity;
+import io.anuke.mindustry.world.blocks.units.UnitPad.UnitFactoryEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -41,6 +41,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
+/**Base class for AI units.*/
 public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static int timerIndex = 0;
 
@@ -56,15 +57,13 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     protected boolean isWave;
     protected Squad squad;
-    protected int spawner;
+    protected int spawner = -1;
 
-    /**
-     * internal constructor used for deserialization, DO NOT USE
-     */
+    /**internal constructor used for deserialization, DO NOT USE*/
     public BaseUnit(){
     }
 
-    @Remote(called = Loc.server, in = In.entities)
+    @Remote(called = Loc.server)
     public static void onUnitDeath(BaseUnit unit){
         if(unit == null) return;
 
@@ -86,14 +85,26 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         threads.runDelay(unit::remove);
     }
 
-    /**
-     * Initialize the type and team of this unit. Only call once!
-     */
+    /**Called when a command is recieved from the command center.*/
+    public abstract void onCommand(UnitCommand command);
+
+    /**Initialize the type and team of this unit. Only call once!*/
     public void init(UnitType type, Team team){
         if(this.type != null) throw new RuntimeException("This unit is already initialized!");
 
         this.type = type;
         this.team = team;
+    }
+
+    public boolean isCommanded(){
+        return !isWave && world.indexer().getAllied(team, BlockFlag.comandCenter).size != 0;
+    }
+
+    public UnitCommand getCommand(){
+        if(isCommanded()){
+            return world.indexer().getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
+        }
+        return null;
     }
 
     public UnitType getType(){
@@ -108,9 +119,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         this.spawner = tile.packedPosition();
     }
 
-    /**
-     * Sets this to a 'wave' unit, which means it has slightly different AI and will not run out of ammo.
-     */
+    /**Sets this to a 'wave' unit, which means it has slightly different AI and will not run out of ammo.*/
     public void setWave(){
         isWave = true;
     }
@@ -320,6 +329,10 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         if(!Net.client()){
             avoidOthers(8f);
+
+            if(spawner != -1 && (world.tile(spawner) == null || world.tile(spawner).entity == null)){
+                damage(health);
+            }
         }
 
         if(squad != null){
@@ -373,7 +386,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public void onDeath(){
-        CallEntity.onUnitDeath(this);
+        Call.onUnitDeath(this);
     }
 
     @Override
@@ -383,6 +396,10 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         state.set(getStartState());
 
         health(maxHealth());
+
+        if(isCommanded()){
+            onCommand(getCommand());
+        }
     }
 
     @Override

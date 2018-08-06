@@ -8,10 +8,8 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.gen.CallBlocks;
-import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
@@ -44,7 +42,7 @@ public class BlockInventoryFragment extends Fragment{
         this.input = input;
     }
 
-    @Remote(called = Loc.server, targets = Loc.both, in = In.blocks, forward = true)
+    @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Tile tile, Item item, int amount){
         if(player == null) return;
 
@@ -52,7 +50,7 @@ public class BlockInventoryFragment extends Fragment{
 
         player.inventory.addItem(item, removed);
         for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-            Timers.run(j * 3f, () -> CallEntity.transferItemEffect(item, tile.drawx(), tile.drawy(), player));
+            Timers.run(j * 3f, () -> Call.transferItemEffect(item, tile.drawx(), tile.drawy(), player));
         }
     }
 
@@ -99,7 +97,7 @@ public class BlockInventoryFragment extends Fragment{
 
                     if(holdTime >= holdWithdraw){
                         int amount = Math.min(tile.entity.items.get(lastItem), player.inventory.itemCapacityUsed(lastItem));
-                        CallBlocks.requestItem(player, tile, lastItem, amount);
+                        Call.requestItem(player, tile, lastItem, amount);
                         holding = false;
                         holdTime = 0f;
                     }
@@ -149,7 +147,7 @@ public class BlockInventoryFragment extends Fragment{
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                         if(!canPick.get() || !tile.entity.items.has(item)) return false;
                         int amount = Math.min(1, player.inventory.itemCapacityUsed(item));
-                        CallBlocks.requestItem(player, tile, item, amount);
+                        Call.requestItem(player, tile, item, amount);
                         lastItem = item;
                         holding = true;
                         holdTime = 0f;

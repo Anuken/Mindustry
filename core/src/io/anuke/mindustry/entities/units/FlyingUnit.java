@@ -23,6 +23,9 @@ import static io.anuke.mindustry.Vars.world;
 public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected static Translator vec = new Translator();
     protected static float wobblyness = 0.6f;
+
+    protected Trail trail = new Trail(8);
+    protected CarriableTrait carrying;
     protected final UnitState
 
     resupply = new UnitState(){
@@ -43,14 +46,16 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
     idle = new UnitState(){
         public void update(){
-            retarget(() -> {
-                targetClosest();
-                targetClosestEnemyFlag(BlockFlag.target);
+            if(!isCommanded()){
+                retarget(() -> {
+                    targetClosest();
+                    targetClosestEnemyFlag(BlockFlag.target);
 
-                if(target != null){
-                    setState(attack);
-                }
-            });
+                    if(target != null){
+                        setState(attack);
+                    }
+                });
+            }
 
             target = getClosestCore();
             if(target != null){
@@ -103,7 +108,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
         }
 
         public void update(){
-            if(health >= maxHealth()){
+            if(health >= maxHealth() && !isCommanded()){
                 state.set(attack);
             }else if(!targetHasFlag(BlockFlag.repair)){
                 retarget(() -> {
@@ -115,12 +120,18 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             }
         }
     };
-    protected Trail trail = new Trail(8);
-    protected CarriableTrait carrying;
 
     //instantiation only
     public FlyingUnit(){
 
+    }
+
+    @Override
+    public void onCommand(UnitCommand command){
+        state.set(command == UnitCommand.retreat ? retreat :
+                 (command == UnitCommand.attack ? attack :
+                 (command == UnitCommand.idle ? idle :
+                 (null))));
     }
 
     @Override
@@ -167,8 +178,8 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
     @Override
     public void behavior(){
-        if(health <= health * type.retreatPercent && !isWave &&
-        Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair)) != null){
+        if(health <= health * type.retreatPercent && !isCommanded() &&
+         Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
         }
 
