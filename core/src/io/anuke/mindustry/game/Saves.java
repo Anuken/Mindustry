@@ -33,7 +33,11 @@ public class Saves{
     public Saves(){
         Events.on(StateChangeEvent.class, (prev, state) -> {
             if(state == State.menu){
-                threads.run(() -> current = null);
+                threads.run(() -> {
+                    totalPlaytime = 0;
+                    lastTimestamp = 0;
+                    current = null;
+                });
             }
         });
     }
