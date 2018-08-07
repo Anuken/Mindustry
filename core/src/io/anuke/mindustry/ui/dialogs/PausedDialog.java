@@ -28,6 +28,8 @@ public class PausedDialog extends FloatingDialog{
             missionTable.table(t -> {
                 world.getSector().currentMission().display(t);
             });
+            missionTable.row();
+            missionTable.add(Bundles.format("text.sector", world.getSector().x + ", " + world.getSector().y));
         }
     }
 
