@@ -14,10 +14,6 @@ public class Items implements ContentList{
     @Override
     public void load(){
 
-        stone = new Item("stone", Color.valueOf("777777")){{
-            hardness = 3;
-        }};
-
         tungsten = new Item("tungsten", Color.valueOf("a0b0c8")){{
             type = ItemType.material;
             hardness = 1;
@@ -52,6 +48,10 @@ public class Items implements ContentList{
             hardness = 4;
             radioactivity = 0.5f;
             cost = 1.2f;
+        }};
+
+        stone = new Item("stone", Color.valueOf("777777")){{
+            hardness = 3;
         }};
 
         silicon = new Item("silicon", Color.valueOf("53565c")){{

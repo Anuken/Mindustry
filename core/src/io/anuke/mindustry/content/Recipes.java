@@ -109,8 +109,8 @@ public class Recipes implements ContentList{
         new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.carbide, 500), new ItemStack(Items.thorium, 350));
 
         //DRILLS, PRODUCERS
-        new Recipe(production, ProductionBlocks.tungstenDrill, new ItemStack(Items.tungsten, 15));
-        new Recipe(production, ProductionBlocks.carbideDrill, new ItemStack(Items.tungsten, 25), new ItemStack(Items.carbide, 40));
+        new Recipe(production, ProductionBlocks.tungstenDrill, new ItemStack(Items.tungsten, 40));
+        new Recipe(production, ProductionBlocks.carbideDrill, new ItemStack(Items.tungsten, 50), new ItemStack(Items.carbide, 40));
         new Recipe(production, ProductionBlocks.laserdrill, new ItemStack(Items.tungsten, 70), new ItemStack(Items.carbide, 90), new ItemStack(Items.silicon, 60), new ItemStack(Items.titanium, 50));
         new Recipe(production, ProductionBlocks.blastdrill, new ItemStack(Items.tungsten, 130), new ItemStack(Items.carbide, 180), new ItemStack(Items.silicon, 120), new ItemStack(Items.titanium, 100), new ItemStack(Items.thorium, 60));
 
