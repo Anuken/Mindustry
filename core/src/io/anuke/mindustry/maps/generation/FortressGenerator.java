@@ -150,9 +150,10 @@ public class FortressGenerator{
             for(int y = 0; y < base.height(); y++){
                 Tile tile = gen.tiles[enemyX - base.width()/2 + x][enemyY - base.height()/2 + y];
                 StructBlock block = base.layout[x][y];
+                Block result = fixBlock(block.block);
                 tile.setElevation(elev);
                 tile.setRotation(block.rotation);
-                tile.setBlock(block.block, team);
+                tile.setBlock(result, team);
             }
         }
 
@@ -177,11 +178,7 @@ public class FortressGenerator{
                                 StructBlock block = struct.layout[cx][cy];
                                 Tile tile = world.tile(wx, wy);
 
-                                Block result = block.block;
-
-                                if(result == UnitBlocks.resupplyPoint) result = DefenseBlocks.tungstenWall;
-                                if(result == UnitBlocks.monsoonPad) result = DefenseBlocks.tungstenWallLarge;
-                                if(result == UnitBlocks.fabricatorPad) result = DefenseBlocks.tungstenWallLarge;
+                                Block result = fixBlock(block.block);
 
                                 //resupply points should not be placed anymore, they confuse units
                                 if(result != Blocks.air && tile.block().alwaysReplace){
@@ -197,6 +194,13 @@ public class FortressGenerator{
                 }
             }
         }
+    }
+
+    Block fixBlock(Block result){
+        if(result == UnitBlocks.resupplyPoint) result = DefenseBlocks.tungstenWall;
+        if(result == UnitBlocks.monsoonPad) result = DefenseBlocks.tungstenWallLarge;
+        if(result == UnitBlocks.fabricatorPad) result = DefenseBlocks.tungstenWallLarge;
+        return result;
     }
 
     void fill(Tile tile){

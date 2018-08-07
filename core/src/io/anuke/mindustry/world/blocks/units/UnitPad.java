@@ -39,7 +39,7 @@ import java.io.IOException;
 
 public class UnitPad extends Block{
     protected float gracePeriodMultiplier = 16f;
-    protected float speedupTime = 60f * 60f * 16;
+    protected float speedupTime = 60f * 60f * 19;
     protected float maxSpeedup = 7f;
 
     protected UnitType type;
