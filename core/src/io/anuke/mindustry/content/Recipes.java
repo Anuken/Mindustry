@@ -121,25 +121,21 @@ public class Recipes implements ContentList{
         //UNITS
 
         //bodies
-        new Recipe(units, UpgradeBlocks.dartFactory, new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240))
-                .setDesktop(); //dart is desktop only, because it's the starter mobile ship
-
+        new Recipe(units, UpgradeBlocks.dartFactory, new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240)).setDesktop(); //dart is desktop only, because it's the starter mobile ship
         new Recipe(units, UpgradeBlocks.javelinFactory, new ItemStack(Items.lead, 200), new ItemStack(Items.silicon, 250), new ItemStack(Items.titanium, 300), new ItemStack(Items.plastanium, 200));
-
-        new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.carbide, 160), new ItemStack(Items.silicon, 220), new ItemStack(Items.titanium, 250))
-                .setDesktop();
+        new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.carbide, 160), new ItemStack(Items.silicon, 220), new ItemStack(Items.titanium, 250)).setDesktop();
 
         //new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.tungsten, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
 
         //actual unit related stuff
-        new Recipe(units, UnitBlocks.dronePad, new ItemStack(Items.tungsten, 50), new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 90));
-        new Recipe(units, UnitBlocks.fabricatorPad, new ItemStack(Items.carbide, 70), new ItemStack(Items.thorium, 60), new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 200));
+        new Recipe(units, UnitBlocks.dronePad, new ItemStack(Items.tungsten, 70), new ItemStack(Items.lead, 110), new ItemStack(Items.silicon, 130));
+        new Recipe(units, UnitBlocks.fabricatorPad, new ItemStack(Items.carbide, 90), new ItemStack(Items.thorium, 80), new ItemStack(Items.lead, 110), new ItemStack(Items.silicon, 210));
 
-        new Recipe(units, UnitBlocks.daggerPad, new ItemStack(Items.lead, 60), new ItemStack(Items.silicon, 40));
+        new Recipe(units, UnitBlocks.daggerPad, new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 80));
         new Recipe(units, UnitBlocks.titanPad, new ItemStack(Items.thorium, 90), new ItemStack(Items.lead, 140), new ItemStack(Items.silicon, 90));
 
-        new Recipe(units, UnitBlocks.interceptorPad, new ItemStack(Items.titanium, 40), new ItemStack(Items.lead, 70), new ItemStack(Items.silicon, 80));
-        new Recipe(units, UnitBlocks.monsoonPad, new ItemStack(Items.plastanium, 70), new ItemStack(Items.titanium, 100), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 220));
+        new Recipe(units, UnitBlocks.interceptorPad, new ItemStack(Items.titanium, 60), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 90));
+        new Recipe(units, UnitBlocks.monsoonPad, new ItemStack(Items.plastanium, 80), new ItemStack(Items.titanium, 100), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 220));
 
         new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));
         new Recipe(units, UnitBlocks.resupplyPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));
