@@ -1,11 +1,13 @@
 package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
@@ -13,9 +15,8 @@ import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.Minimap;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.*;
+import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
@@ -26,6 +27,7 @@ import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -40,6 +42,8 @@ public class HudFragment extends Fragment{
     private boolean shown = true;
     private float dsize = 58;
     private float isize = 40;
+    private float coreAttackTime;
+    private float lastCoreHP;
 
     public void build(Group parent){
 
@@ -126,6 +130,39 @@ public class HudFragment extends Fragment{
         parent.fill(t -> {
             t.top().visible(() -> state.is(State.paused) && !Net.active());
             t.table("pane", top -> top.add("[orange]< " + Bundles.get("text.paused") + " >").pad(6).get().setFontScale(fontScale * 1.5f));
+        });
+
+        //'core is under attack' table
+        parent.fill(t -> {
+            float notifDuration = 240f;
+
+            Events.on(StateChangeEvent.class, (from, to) -> {
+                if(to == State.menu || from == State.menu){
+                    coreAttackTime = 0f;
+                    lastCoreHP = Float.NaN;
+                }
+            });
+
+            t.top().visible(() -> {
+                if(state.is(State.menu) ||  state.teams.get(players[0].getTeam()).cores.size == 0){
+                    coreAttackTime = 0f;
+                    return false;
+                }
+
+                float curr = state.teams.get(players[0].getTeam()).cores.first().entity.health;
+                if(!Float.isNaN(lastCoreHP) && curr < lastCoreHP){
+                    coreAttackTime = notifDuration;
+                }
+                lastCoreHP = curr;
+
+                t.getColor().a = Mathf.clamp(coreAttackTime / 30f);
+
+                coreAttackTime -= Timers.delta();
+
+                return coreAttackTime > 0;
+            });
+            t.table("clear", top -> top.add("$text.coreattack").pad(6)
+            .update(label -> label.setColor(Hue.mix(Color.ORANGE, Color.SCARLET, Mathf.absin(Timers.time(), 2f, 1f)))));
         });
 
         //'saving' indicator

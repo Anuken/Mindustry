@@ -14,7 +14,6 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
@@ -104,7 +103,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public float handleDamage(Tile tile, float amount){
-        return debug && tile.getTeam() == Team.blue ? 0 : amount;
+        return amount;
     }
 
     @Override
