@@ -607,7 +607,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             movement.setZero();
         }
 
-        velocity.add(movement);
+        velocity.add(movement.scl(Timers.delta()));
 
         if(velocity.len() <= 0.2f){
             rotation += Mathf.sin(Timers.time() + id * 99, 10f, 1f);

@@ -29,7 +29,7 @@ public class UnitTypes implements ContentList{
             drag = 0.4f;
             range = 40f;
             weapon = Weapons.chainBlaster;
-            health = 70;
+            health = 90;
         }};
 
         titan = new UnitType("titan", Titan.class, Titan::new){{
@@ -38,7 +38,7 @@ public class UnitTypes implements ContentList{
             drag = 0.4f;
             range = 10f;
             weapon = Weapons.chainBlaster;
-            health = 260;
+            health = 280;
         }};
 
         interceptor = new UnitType("interceptor", Interceptor.class, Interceptor::new){{

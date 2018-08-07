@@ -43,7 +43,7 @@ public class PausedDialog extends FloatingDialog{
             if(!Net.active()) state.set(State.paused);
         });
 
-        content().table(t -> missionTable = t);
+        content().table(t -> missionTable = t).colspan(mobile ? 3 : 1);
         content().row();
 
         if(!mobile){

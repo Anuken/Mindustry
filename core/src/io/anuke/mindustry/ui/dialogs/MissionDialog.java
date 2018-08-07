@@ -15,9 +15,14 @@ public class MissionDialog extends FloatingDialog{
         buttons().clear();
         content().clear();
 
-        addCloseButton();
+        buttons().addButton("$text.nextmission", () -> {
+            hide();
+            Vars.ui.paused.runExitSave();
+            Vars.ui.sectors.show();
+        }).size(190f, 64f);
 
-        buttons().addButton("$text.quit", () -> Vars.ui.paused.runExitSave()).size(190f, 64f);
+        buttons().addButton("$text.continue", this::hide).size(190f, 64f);
+
         content().add(Bundles.format("text.mission.complete.body", sector.x, sector.y)).pad(10);
         show();
     }
