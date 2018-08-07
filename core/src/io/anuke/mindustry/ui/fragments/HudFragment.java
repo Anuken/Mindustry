@@ -42,8 +42,10 @@ public class HudFragment extends Fragment{
     private boolean shown = true;
     private float dsize = 58;
     private float isize = 40;
+
     private float coreAttackTime;
     private float lastCoreHP;
+    private float coreAttackOpacity = 0f;
 
     public void build(Group parent){
 
@@ -155,11 +157,16 @@ public class HudFragment extends Fragment{
                 }
                 lastCoreHP = curr;
 
-                t.getColor().a = Mathf.clamp(coreAttackTime / 30f);
+                t.getColor().a = coreAttackOpacity;
+                if(coreAttackTime > 0){
+                    coreAttackOpacity = Mathf.lerpDelta(coreAttackOpacity, 1f, 0.1f);
+                }else{
+                    coreAttackOpacity = Mathf.lerpDelta(coreAttackOpacity, 0f, 0.1f);
+                }
 
                 coreAttackTime -= Timers.delta();
 
-                return coreAttackTime > 0;
+                return coreAttackOpacity > 0;
             });
             t.table("clear", top -> top.add("$text.coreattack").pad(6)
             .update(label -> label.setColor(Hue.mix(Color.ORANGE, Color.SCARLET, Mathf.absin(Timers.time(), 2f, 1f)))));

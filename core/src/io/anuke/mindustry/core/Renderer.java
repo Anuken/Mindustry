@@ -263,9 +263,9 @@ public class Renderer extends RendererModule{
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
         overlays.drawTop();
 
-        Graphics.flushSurface();
-
         if(showPaths && debug) drawDebug();
+
+        Graphics.flushSurface();
 
         batch.end();
 

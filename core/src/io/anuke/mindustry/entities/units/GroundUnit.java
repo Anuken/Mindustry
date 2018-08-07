@@ -265,8 +265,9 @@ public abstract class GroundUnit extends BaseUnit{
     protected void moveAwayFromCore(){
         Tile tile = world.tileWorld(x, y);
         Tile targetTile = world.pathfinder().getTargetTile(Vars.state.teams.enemiesOf(team).first(), tile);
+        TileEntity core = getClosestCore();
 
-        if(tile == targetTile) return;
+        if(tile == targetTile || core == null || distanceTo(core) < 90f) return;
 
         vec.trns(baseRotation, type.speed);
 

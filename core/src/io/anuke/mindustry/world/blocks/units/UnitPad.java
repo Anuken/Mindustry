@@ -40,6 +40,7 @@ import java.io.IOException;
 public class UnitPad extends Block{
     protected float gracePeriodMultiplier = 16f;
     protected float speedupTime = 60f * 60f * 16;
+    protected float maxSpeedup = 7f;
 
     protected UnitType type;
     protected float produceTime = 1000f;
@@ -165,7 +166,7 @@ public class UnitPad extends Block{
             }
             //check if grace period had passed
         }else if(entity.warmup > produceTime*gracePeriodMultiplier * Vars.state.difficulty.spawnerScaling){
-            float speedMultiplier = Math.min(0.1f + (entity.warmup - produceTime * gracePeriodMultiplier * Vars.state.difficulty.spawnerScaling) / speedupTime, 4f);
+            float speedMultiplier = Math.min(0.1f + (entity.warmup - produceTime * gracePeriodMultiplier * Vars.state.difficulty.spawnerScaling) / speedupTime, maxSpeedup);
             //otherwise, it's an enemy, cheat by not requiring resources
             entity.buildTime += Timers.delta() * speedMultiplier;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);

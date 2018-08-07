@@ -90,7 +90,7 @@ public class Vars{
     //whether turrets have infinite ammo (only with debug)
     public static boolean infiniteAmmo = true;
     //whether to show paths of enemies
-    public static boolean showPaths = false;
+    public static boolean showPaths = true;
     //if false, player is always hidden
     public static boolean showPlayer = true;
     //whether to hide ui, only on debug

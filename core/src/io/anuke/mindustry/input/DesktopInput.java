@@ -149,7 +149,18 @@ public class DesktopInput extends InputHandler{
             ui.listfrag.toggle();
         }
 
-        if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return;
+        if(state.is(State.menu) || ui.hasDialog()) return;
+
+        boolean controller = KeyBinds.getSection(section).device.type == DeviceType.controller;
+
+        //zoom and rotate things
+        if(Inputs.getAxisActive("zoom") && (Inputs.keyDown(section, "zoom_hold") || controller)){
+            renderer.scaleCamera((int) Inputs.getAxisTapped(section, "zoom"));
+        }
+
+        renderer.minimap().zoomBy(-(int) Inputs.getAxisTapped(section, "zoom_minimap"));
+
+        if(player.isDead()) return;
 
         if(recipe != null && !Settings.getBool("desktop-place-help", false)){
             ui.showInfo("Desktop controls have been changed.\nTo deselect a block or stop building, [accent]use the middle mouse button[].");
@@ -175,14 +186,6 @@ public class DesktopInput extends InputHandler{
             selectScale = 0f;
         }
 
-        boolean controller = KeyBinds.getSection(section).device.type == DeviceType.controller;
-
-        //zoom and rotate things
-        if(Inputs.getAxisActive("zoom") && (Inputs.keyDown(section, "zoom_hold") || controller)){
-            renderer.scaleCamera((int) Inputs.getAxisTapped(section, "zoom"));
-        }
-
-        renderer.minimap().zoomBy(-(int) Inputs.getAxisTapped(section, "zoom_minimap"));
         rotation = Mathf.mod(rotation + (int) Inputs.getAxisTapped(section, "rotate"), 4);
 
         Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
