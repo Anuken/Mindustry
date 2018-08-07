@@ -40,11 +40,11 @@ public class UnitBlocks extends BlockList implements ContentList{
 
         monsoonPad = new UnitPad("monsoon-pad"){{
             type = UnitTypes.monsoon;
-            produceTime = 3600;
+            produceTime = 3800;
             size = 3;
             consumes.power(0.2f);
             shadow = "shadow-round-3";
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 30), new ItemStack(Items.plastanium, 10)});
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 30), new ItemStack(Items.plastanium, 20)});
         }};
 
         daggerPad = new UnitPad("dagger-pad"){{
@@ -57,7 +57,7 @@ public class UnitBlocks extends BlockList implements ContentList{
 
         titanPad = new UnitPad("titan-pad"){{
             type = UnitTypes.titan;
-            produceTime = 3700;
+            produceTime = 3600;
             size = 3;
             consumes.power(0.15f);
             shadow = "shadow-round-3";

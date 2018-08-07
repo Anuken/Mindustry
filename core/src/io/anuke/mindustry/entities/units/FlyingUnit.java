@@ -80,9 +80,9 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             }else if(target == null){
                 retarget(() -> {
                     targetClosest();
-                    targetClosestEnemyFlag(BlockFlag.target);
-                    targetClosestEnemyFlag(BlockFlag.producer);
-                    targetClosestEnemyFlag(BlockFlag.turret);
+                    if(target == null) targetClosestEnemyFlag(BlockFlag.target);
+                    if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
+                    if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
 
                     if(target == null && !isCommanded()){
                         setState(idle);

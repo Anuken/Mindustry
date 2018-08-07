@@ -133,7 +133,7 @@ public class Sectors{
     }
 
     private void initSector(Sector sector){
-        double waveChance = 0.3;
+        double waveChance = 0.2;
 
         sector.difficulty = (int)(Mathf.dst(sector.x, sector.y));
 
