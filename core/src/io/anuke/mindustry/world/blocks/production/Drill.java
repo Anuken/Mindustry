@@ -39,6 +39,8 @@ public class Drill extends Block{
     /**Speed at which the drill speeds up.*/
     protected float warmupSpeed = 0.02f;
 
+    /**Whether to draw the item this drill is mining.*/
+    protected boolean drawMineItem = false;
     /**Effect played when an item is produced. This is colored.*/
     protected Effect drillEffect = BlockFx.mine;
     /**Speed the drill bit rotates at.*/
@@ -99,9 +101,9 @@ public class Drill extends Block{
 
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
 
-        if(!isMultiblock() && isValid(tile)){
-            Draw.color(tile.floor().drops.item.color);
-            Draw.rect("blank", tile.worldx(), tile.worldy(), 2f, 2f);
+        if(entity.dominantItem != null && drawMineItem){
+            Draw.color(entity.dominantItem.color);
+            Draw.rect("blank", tile.drawx(), tile.drawy(), 2f, 2f);
             Draw.color();
         }
     }
@@ -144,6 +146,7 @@ public class Drill extends Block{
 
         float multiplier = 0f;
         float totalHardness = 0f;
+        boolean foundDominant = entity.dominantItem != null;
 
         for(Tile other : tile.getLinkedTiles(tempTiles)){
             if(isValid(other)){
@@ -151,6 +154,13 @@ public class Drill extends Block{
                 toAdd.add(drop);
                 totalHardness += drop.hardness;
                 multiplier += 1f;
+
+                if(!foundDominant){
+                    entity.dominantItem = drop;
+                    foundDominant = true;
+                }else if(entity.dominantItem != drop){
+                    entity.dominantItem = null;
+                }
             }
         }
 
@@ -226,6 +236,8 @@ public class Drill extends Block{
         public int index;
         public float warmup;
         public float drillTime;
+
+        public Item dominantItem;
     }
 
 }

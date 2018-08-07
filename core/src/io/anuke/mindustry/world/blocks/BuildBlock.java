@@ -69,7 +69,7 @@ public class BuildBlock extends Block{
     @Override
     public boolean isSolidFor(Tile tile){
         BuildEntity entity = tile.entity();
-        return entity == null || (entity.recipe != null && entity.recipe.result.solid) || entity.previous.solid;
+        return entity == null || (entity.recipe != null && entity.recipe.result.solid) || entity.previous == null || entity.previous.solid;
     }
 
     @Override

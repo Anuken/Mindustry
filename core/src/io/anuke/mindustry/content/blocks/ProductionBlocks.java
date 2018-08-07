@@ -19,11 +19,15 @@ public class ProductionBlocks extends BlockList implements ContentList{
         tungstenDrill = new Drill("tungsten-drill"){{
             tier = 2;
             drillTime = 300;
+            size = 2;
+            drawMineItem = true;
         }};
 
         carbideDrill = new Drill("carbide-drill"){{
             tier = 3;
             drillTime = 240;
+            size = 2;
+            drawMineItem = true;
         }};
 
         laserdrill = new Drill("laser-drill"){{
