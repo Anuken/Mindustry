@@ -38,7 +38,7 @@ public class CommandCenter extends Block{
     public CommandCenter(String name){
         super(name);
 
-        flags = EnumSet.of(BlockFlag.comandCenter, BlockFlag.target);
+        flags = EnumSet.of(BlockFlag.comandCenter);
         destructible = true;
         solid = true;
         configurable = true;

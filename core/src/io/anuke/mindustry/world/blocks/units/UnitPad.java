@@ -54,7 +54,7 @@ public class UnitPad extends Block{
         hasItems = true;
         solid = false;
         itemCapacity = 10;
-        flags = EnumSet.of(BlockFlag.target);
+        flags = EnumSet.of(BlockFlag.producer);
 
         consumes.require(ConsumeItems.class);
     }
