@@ -1,7 +1,6 @@
 package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Bits;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.Squad;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -10,6 +9,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
+import io.anuke.ucore.util.GridBits;
 import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
@@ -21,7 +21,7 @@ import static io.anuke.mindustry.Vars.*;
 public class WaveSpawner{
     private static final int quadsize = 4;
 
-    private Bits quadrants;
+    private GridBits quadrants;
 
     private Array<SpawnGroup> groups;
 
@@ -166,7 +166,7 @@ public class WaveSpawner{
     private void reset(){
         flySpawns.clear();
         groundSpawns.clear();
-        quadrants = new Bits(quadWidth() * quadHeight());
+        quadrants = new GridBits(quadWidth(), quadHeight());
 
         if(world.getSector() == null){
             groups = Waves.getSpawns();
@@ -176,15 +176,13 @@ public class WaveSpawner{
     }
 
     private boolean getQuad(int quadx, int quady){
-        return quadrants.get(quadx + quady * quadWidth());
+        return quadrants.get(quadx, quady);
     }
 
     private void setQuad(int quadx, int quady, boolean valid){
-        if(valid){
-            quadrants.set(quadx + quady * quadWidth());
-        }else{
-            quadrants.clear(quadx + quady * quadWidth());
-        }
+        if(quadrants == null) quadrants = new GridBits(quadWidth(), quadHeight());
+
+        quadrants.set(quadx, quady, valid);
     }
 
     //TODO instead of randomly scattering locations around the map, find spawns close to each other

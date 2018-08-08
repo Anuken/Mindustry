@@ -16,6 +16,8 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.KickReason;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
@@ -259,6 +261,20 @@ public class ServerControl extends Module{
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
             }
+        });
+
+        handler.register("fillitems", "Fill the core with 2000 items.", arg -> {
+            if(!state.is(State.playing)){
+                err("Not playing. Host first.");
+                return;
+            }
+
+            for(Item item : Item.all()){
+                if(item.type == ItemType.material){
+                    state.teams.get(Team.blue).cores.first().entity.items.add(item, 2000);
+                }
+            }
+            info("Core filled.");
         });
 
         handler.register("friendlyfire", "<on/off>", "Enable or disable friendly fire.", arg -> {
@@ -544,10 +560,12 @@ public class ServerControl extends Module{
                 return;
             }
 
-            SaveIO.loadFromSlot(slot);
-            info("Save loaded.");
-            host();
-            state.set(State.playing);
+            threads.run(() -> {
+                SaveIO.loadFromSlot(slot);
+                info("Save loaded.");
+                host();
+                state.set(State.playing);
+            });
         });
 
         handler.register("save", "<slot>", "Save game state to a slot.", arg -> {
@@ -559,11 +577,11 @@ public class ServerControl extends Module{
                 return;
             }
 
-            int slot = Strings.parseInt(arg[0]);
-
-            SaveIO.saveToSlot(slot);
-
-            info("Saved to slot {0}.", slot);
+            threads.run(() -> {
+                int slot = Strings.parseInt(arg[0]);
+                SaveIO.saveToSlot(slot);
+                info("Saved to slot {0}.", slot);
+            });
         });
 
         handler.register("griefers", "[min-break:place-ratio] [min-breakage]", "Find possible griefers currently online.", arg -> {
