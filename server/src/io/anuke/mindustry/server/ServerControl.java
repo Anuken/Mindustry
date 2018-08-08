@@ -290,6 +290,12 @@ public class ServerControl extends Module{
             }
         });
 
+        handler.register("debugmode", "<on/off>", "Disables or enables debug ode", arg -> {
+           boolean value = arg[0].equalsIgnoreCase("on");
+           debug = value;
+           info("Debug mode is now {0}.", value ? "on" : "off");
+        });
+
         handler.register("antigrief", "[on/off] [max-break] [cooldown-in-ms]", "Enable or disable anti-grief.", arg -> {
             if(arg.length == 0){
                 info("Anti-grief is currently &lc{0}.", netServer.admins.isAntiGrief() ? "on" : "off");

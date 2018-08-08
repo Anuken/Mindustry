@@ -44,7 +44,6 @@ public class UnitPad extends Block{
 
     protected UnitType type;
     protected float produceTime = 1000f;
-    protected float openDuration = 50f;
     protected float launchVelocity = 0f;
 
     public UnitPad(String name){

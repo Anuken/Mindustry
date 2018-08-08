@@ -9,7 +9,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 
 public class Fracker extends SolidPump{
-    protected float itemUseTime = 100f;
+    protected final float itemUseTime = 100f;
 
     protected TextureRegion liquidRegion;
     protected TextureRegion rotatorRegion;
@@ -63,7 +63,7 @@ public class Fracker extends SolidPump{
         FrackerEntity entity = tile.entity();
         Item item = consumes.item();
 
-        while(entity.accumulator > itemUseTime && entity.items.has(item, 1)){
+        while(entity.accumulator >= itemUseTime && entity.items.has(item, 1)){
             entity.items.remove(item, 1);
             entity.accumulator -= itemUseTime;
         }
