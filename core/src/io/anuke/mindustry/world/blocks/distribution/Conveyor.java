@@ -305,7 +305,7 @@ public class Conveyor extends Block{
     @Override
     public synchronized int acceptStack(Item item, int amount, Tile tile, Unit source){
         ConveyorEntity entity = tile.entity();
-        return (int)(entity.minitem / itemSpace);
+        return Math.min((int)(entity.minitem / itemSpace), amount);
     }
 
     @Override

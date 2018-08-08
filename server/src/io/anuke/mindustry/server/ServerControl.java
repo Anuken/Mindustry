@@ -41,7 +41,8 @@ public class ServerControl extends Module{
         Settings.defaultList(
             "shufflemode", "normal",
             "bans", "",
-            "admins", ""
+            "admins", "",
+            "sectorid", 0
         );
 
         mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));

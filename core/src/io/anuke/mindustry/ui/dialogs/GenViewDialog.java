@@ -82,7 +82,7 @@ public class GenViewDialog extends FloatingDialog{
                             for(int i = 0; i < sectorSize; i++){
                                 for(int j = 0; j < sectorSize; j++){
                                     world.generator().generateTile(result, wx, wy, i, j, true, null);
-                                    pixmap.drawPixel(i, sectorSize - 1 - j, ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation));
+                                    pixmap.drawPixel(i, sectorSize - 1 - j, ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation, (byte)0));
                                 }
                             }
                             Gdx.app.postRunnable(() -> map.put(wx, wy, new Texture(pixmap)));

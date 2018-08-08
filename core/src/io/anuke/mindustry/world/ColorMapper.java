@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.ObjectIntMap;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.ContentList;
+import io.anuke.ucore.util.Mathf;
 
 public class ColorMapper implements ContentList{
     private static IntMap<Block> blockMap = new IntMap<>();
@@ -21,7 +22,7 @@ public class ColorMapper implements ContentList{
         return colorMap.get(block, 0);
     }
 
-    public static int colorFor(Block floor, Block wall, Team team, int elevation){
+    public static int colorFor(Block floor, Block wall, Team team, int elevation, byte cliffs){
         if(wall.synthetic()){
             return team.intColor;
         }
@@ -33,6 +34,9 @@ public class ColorMapper implements ContentList{
             tmpColor.set(color);
             float maxMult = 1f/Math.max(Math.max(tmpColor.r, tmpColor.g), tmpColor.b) ;
             float mul = Math.min(1.1f + elevation / 4f, maxMult);
+            if((cliffs & Mathf.pow2(6)) != 0){
+                mul -= 0.5f;
+            }
             tmpColor.mul(mul, mul, mul, 1f);
             color = Color.rgba8888(tmpColor);
         }
