@@ -3,6 +3,7 @@ package io.anuke.mindustry.content;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
@@ -131,15 +132,15 @@ public class Recipes implements ContentList{
         new Recipe(units, UnitBlocks.dronePad, new ItemStack(Items.tungsten, 70), new ItemStack(Items.lead, 110), new ItemStack(Items.silicon, 130));
         new Recipe(units, UnitBlocks.fabricatorPad, new ItemStack(Items.carbide, 90), new ItemStack(Items.thorium, 80), new ItemStack(Items.lead, 110), new ItemStack(Items.silicon, 210));
 
-        new Recipe(units, UnitBlocks.daggerPad, new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 80));
-        new Recipe(units, UnitBlocks.titanPad, new ItemStack(Items.thorium, 90), new ItemStack(Items.lead, 140), new ItemStack(Items.silicon, 90));
+        new Recipe(units, UnitBlocks.daggerPad, new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 80)).setMode(GameMode.noWaves);
+        new Recipe(units, UnitBlocks.titanPad, new ItemStack(Items.thorium, 90), new ItemStack(Items.lead, 140), new ItemStack(Items.silicon, 90)).setMode(GameMode.noWaves);
 
-        new Recipe(units, UnitBlocks.interceptorPad, new ItemStack(Items.titanium, 60), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 90));
-        new Recipe(units, UnitBlocks.monsoonPad, new ItemStack(Items.plastanium, 80), new ItemStack(Items.titanium, 100), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 220));
+        new Recipe(units, UnitBlocks.interceptorPad, new ItemStack(Items.titanium, 60), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 90)).setMode(GameMode.noWaves);
+        new Recipe(units, UnitBlocks.monsoonPad, new ItemStack(Items.plastanium, 80), new ItemStack(Items.titanium, 100), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 220)).setMode(GameMode.noWaves);
 
         new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));
         new Recipe(units, UnitBlocks.resupplyPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.tungsten, 30), new ItemStack(Items.silicon, 30));
-        new Recipe(units, UnitBlocks.commandCenter, new ItemStack(Items.lead, 100), new ItemStack(Items.carbide, 100), new ItemStack(Items.silicon, 200));
+        new Recipe(units, UnitBlocks.commandCenter, new ItemStack(Items.lead, 100), new ItemStack(Items.carbide, 100), new ItemStack(Items.silicon, 200)).setMode(GameMode.noWaves);
 
         //LIQUIDS
         new Recipe(liquid, LiquidBlocks.conduit, new ItemStack(Items.lead, 1))

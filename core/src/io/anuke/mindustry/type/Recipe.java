@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.Block;
@@ -33,6 +34,7 @@ public class Recipe implements UnlockableContent{
     public final float cost;
 
     public boolean desktopOnly = false, debugOnly = false;
+    public GameMode targetMode;
 
     private Block[] dependencies;
     private Recipe[] recipeDependencies;
@@ -99,6 +101,11 @@ public class Recipe implements UnlockableContent{
         }else{
             return allRecipes.get(id);
         }
+    }
+
+    public Recipe setMode(GameMode mode){
+        this.targetMode = mode;
+        return this;
     }
 
     public Recipe setDesktop(){

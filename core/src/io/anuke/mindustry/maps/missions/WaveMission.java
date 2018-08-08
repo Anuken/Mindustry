@@ -19,7 +19,6 @@ public class WaveMission implements Mission{
 
     @Override
     public Array<SpawnGroup> getWaves(Sector sector){
-        Array<SpawnGroup> spawns = new Array<>();
         return Waves.getSpawns();
     }
 
