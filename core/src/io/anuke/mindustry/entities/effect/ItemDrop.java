@@ -12,8 +12,7 @@ import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.CallEntity;
-import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -69,7 +68,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
         create(item, amount, x, y, 0).getVelocity().set(velocityX, velocityY);
     }
 
-    @Remote(called = Loc.server, in = In.entities)
+    @Remote(called = Loc.server)
     public static void onPickup(int itemid){
         ItemDrop drop = itemGroup.getByID(itemid);
         if(drop != null){
@@ -133,7 +132,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
             amount -= used;
 
             if(amount <= 0){
-                CallEntity.onPickup(getID());
+                Call.onPickup(getID());
             }
         }
     }
@@ -166,14 +165,14 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
             updateVelocity(0.2f);
             updateTime();
             if(time >= lifetime()){
-                CallEntity.onPickup(getID());
+                Call.onPickup(getID());
             }
         }
 
         Tile tile = world.tileWorld(x, y);
 
         if(tile != null && tile.solid()){
-            CallEntity.onPickup(getID());
+            Call.onPickup(getID());
         }
 
         if(tile != null && tile.floor().isLiquid){

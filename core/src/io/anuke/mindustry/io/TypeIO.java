@@ -12,6 +12,7 @@ import io.anuke.mindustry.entities.traits.CarriableTrait;
 import io.anuke.mindustry.entities.traits.CarryTrait;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.net.Packets.KickReason;
@@ -183,6 +184,16 @@ public class TypeIO{
     @ReadClass(AdminAction.class)
     public static AdminAction readAction(ByteBuffer buffer){
         return AdminAction.values()[buffer.get()];
+    }
+
+    @WriteClass(UnitCommand.class)
+    public static void writeCommand(ByteBuffer buffer, UnitCommand reason){
+        buffer.put((byte) reason.ordinal());
+    }
+
+    @ReadClass(UnitCommand.class)
+    public static UnitCommand readCommand(ByteBuffer buffer){
+        return UnitCommand.values()[buffer.get()];
     }
 
     @WriteClass(Effect.class)

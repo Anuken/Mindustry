@@ -26,8 +26,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
-        aiVersion = '1.8.1'
-        uCoreVersion = 'b93d02efe3fdbe1a10b33d59597da8693d4f7de3'
+        uCoreVersion = '9969ed07b1'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -51,7 +50,7 @@ allprojects {
                 output += '"' + other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + '",'
             }
             output = (output.substring(0, output.size() - 1) + "]")
-            new File('core/assets/locales.json').text = output;
+            new File(project(':core').projectDir, 'assets/locales.json').text = output;
         }
 
         writeVersion = {
@@ -97,7 +96,6 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.0'
-        compile 'com.yuvimasory:orange-extensions:1.3.0'
     }
 }
 
@@ -113,13 +111,10 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-ai:$aiVersion:sources"
 
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion:sources"
-        compile "com.sksamuel.gwt:gwt-websockets:1.0.4"
-        compile "com.sksamuel.gwt:gwt-websockets:1.0.4:sources"
     }
 
     compileJava.options.compilerArgs = [
@@ -135,12 +130,17 @@ project(":ios") {
     dependencies {
         compile project(":core")
         implementation project(":kryonet")
+        compileOnly project(":annotations")
 
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
     }
+
+    compileJava.options.compilerArgs = [
+        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
+    ]
 }
 
 project(":core") {
@@ -154,13 +154,9 @@ project(":core") {
         compileOnly project(":annotations")
         build.finalizedBy(finish)
 
-        boolean comp = System.properties["release"] == null || System.properties["release"] == "false"
+        def comp = System.properties["release"] == null || System.properties["release"] == "false"
 
-        if(!comp){
-            println("NOTICE: Compiling release build.")
-        }else{
-            println("Compiling DEBUG build.")
-        }
+        if(!comp) println("Note: Compiling release build.")
 
         if(new File(projectDir.parent, '../uCore').exists() && comp){
             compile project(":uCore")
@@ -220,7 +216,6 @@ project(":kryonet") {
     dependencies {
         compile project(":core")
         compile 'com.github.crykn:kryonet:2.22.1'
-        compile "org.java-websocket:Java-WebSocket:1.3.7"
     }
 }
 

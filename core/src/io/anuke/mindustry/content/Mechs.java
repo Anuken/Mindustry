@@ -22,14 +22,16 @@ public class Mechs implements ContentList{
         alpha = new Mech("alpha-mech", false){{
             drillPower = 1;
             speed = 0.5f;
+            boostSpeed = 0.85f;
             weapon = Weapons.blaster;
             trailColor = Palette.lightTrail;
+            maxSpeed = 4f;
         }};
 
         delta = new Mech("delta-mech", false){{
             drillPower = -1;
-            speed = 0.63f;
-            boostSpeed = 0.86f;
+            speed = 0.75f;
+            boostSpeed = 0.95f;
             itemCapacity = 15;
             armor = 30f;
             weaponOffsetX = -1;
@@ -37,16 +39,19 @@ public class Mechs implements ContentList{
             weapon = Weapons.shockgun;
             ammoCapacity = 50;
             trailColor = Color.valueOf("d3ddff");
+            maxSpeed = 5f;
         }};
 
         tau = new Mech("tau-mech", false){{
             drillPower = 2;
             speed = 0.5f;
+            maxSpeed = 5f;
         }};
 
         omega = new Mech("omega-mech", false){{
             drillPower = 1;
             speed = 0.4f;
+            maxSpeed = 3f;
         }};
 
         dart = new Mech("dart-ship", true){{

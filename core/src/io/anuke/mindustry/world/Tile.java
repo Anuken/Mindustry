@@ -29,22 +29,23 @@ public class Tile implements PosTrait, TargetTrait{
      * This is relative to the block it is linked to; negate coords to find the link.
      */
     public byte link = 0;
-    public short x, y;
     /** Tile traversal cost. */
     public byte cost = 1;
-    /** Position of cliffs around the tile, packed into bits 0-8. */
-    public byte cliffs;
     /** Tile entity, usually null. */
     public TileEntity entity;
-    /** Block ID data. */
+    public short x, y;
+    /** Position of cliffs around the tile, packed into bits 0-8. */
+    private byte cliffs;
     private Block wall;
     private Floor floor;
-    /** Rotation, 0-3. Also used to store offload location for routers, in which case it can be any number. */
+    /** Rotation, 0-3. Also used to store offload location, in which case it can be any number. */
     private byte rotation;
     /** Team ordinal. */
     private byte team;
     /** Tile elevation. -1 means slope.*/
     private byte elevation;
+    /** Visibility status: 3 states, but saved as a single bit. 0 = unexplored, 1 = visited, 2 = currently visible (saved as 1)*/
+    private byte visibility;
 
     public Tile(int x, int y){
         this.x = (short) x;
@@ -66,6 +67,10 @@ public class Tile implements PosTrait, TargetTrait{
         this.setElevation(elevation);
         changed();
         this.team = team;
+    }
+
+    public boolean discovered(){
+        return visibility > 0;
     }
 
     public int packedPosition(){
@@ -160,6 +165,11 @@ public class Tile implements PosTrait, TargetTrait{
         }
     }
 
+    public void setBlock(Block type, Team team){
+        setBlock(type);
+        setTeam(team);
+    }
+
     public void setBlock(Block type){
         synchronized(tileSetLock){
             preChanged();
@@ -171,6 +181,14 @@ public class Tile implements PosTrait, TargetTrait{
 
     public void setFloor(Floor type){
         this.floor = type;
+    }
+
+    public byte getVisibility(){
+        return visibility;
+    }
+
+    public void setVisibility(byte visibility){
+        this.visibility = visibility;
     }
 
     public byte getRotation(){
@@ -197,6 +215,18 @@ public class Tile implements PosTrait, TargetTrait{
         this.elevation = (byte)elevation;
     }
 
+    public byte getCliffs(){
+        return cliffs;
+    }
+
+    public void setCliffs(byte cliffs){
+        this.cliffs = cliffs;
+    }
+
+    public boolean hasCliffs(){
+        return getCliffs() != 0;
+    }
+
     public boolean passable(){
         Block block = block();
         Block floor = floor();
@@ -212,7 +242,7 @@ public class Tile implements PosTrait, TargetTrait{
     public boolean solid(){
         Block block = block();
         Block floor = floor();
-        return block.solid || cliffs != 0 || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
+        return block.solid || getCliffs() != 0 || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
         || (isLinked() && getLinked().block().isSolidFor(getLinked()));
     }
 

@@ -9,6 +9,8 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
+import io.anuke.mindustry.maps.generation.StructureFormat;
+import io.anuke.mindustry.maps.generation.StructureFormat.StructBlock;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -19,7 +21,9 @@ import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.input.Input;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -61,6 +65,23 @@ public class DesktopInput extends InputHandler{
             Draw.color(Palette.remove);
             Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset(), block.size * tilesize / 2f);
         }
+    }
+
+    void printArea(NormalizeResult result){
+        StructBlock[][] blocks = new StructBlock[Math.abs(result.x2 - result.x) + 1][Math.abs(result.y2 - result.y) + 1];
+
+        for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
+            for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
+                int wx = result.x + x;
+                int wy = result.y + y;
+
+                Block block = world.tile(wx, wy).block();
+
+                blocks[x][y] = new StructBlock(block == Blocks.blockpart ? Blocks.air : block, world.tile(wx, wy).getRotation());
+            }
+        }
+
+        Log.info(StructureFormat.writeBase64(blocks));
     }
 
     @Override
@@ -128,7 +149,18 @@ public class DesktopInput extends InputHandler{
             ui.listfrag.toggle();
         }
 
-        if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return;
+        if(state.is(State.menu) || ui.hasDialog()) return;
+
+        boolean controller = KeyBinds.getSection(section).device.type == DeviceType.controller;
+
+        //zoom and rotate things
+        if(Inputs.getAxisActive("zoom") && (Inputs.keyDown(section, "zoom_hold") || controller)){
+            renderer.scaleCamera((int) Inputs.getAxisTapped(section, "zoom"));
+        }
+
+        renderer.minimap().zoomBy(-(int) Inputs.getAxisTapped(section, "zoom_minimap"));
+
+        if(player.isDead()) return;
 
         if(recipe != null && !Settings.getBool("desktop-place-help", false)){
             ui.showInfo("Desktop controls have been changed.\nTo deselect a block or stop building, [accent]use the middle mouse button[].");
@@ -154,14 +186,6 @@ public class DesktopInput extends InputHandler{
             selectScale = 0f;
         }
 
-        boolean controller = KeyBinds.getSection(section).device.type == DeviceType.controller;
-
-        //zoom and rotate things
-        if(Inputs.getAxisActive("zoom") && (Inputs.keyDown(section, "zoom_hold") || controller)){
-            renderer.scaleCamera((int) Inputs.getAxisTapped(section, "zoom"));
-        }
-
-        renderer.minimap().zoomBy(-(int) Inputs.getAxisTapped(section, "zoom_minimap"));
         rotation = Mathf.mod(rotation + (int) Inputs.getAxisTapped(section, "rotate"), 4);
 
         Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
@@ -259,12 +283,16 @@ public class DesktopInput extends InputHandler{
         }else if(mode == breaking){ //touch up while breaking, break everything in selection
             NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, false, maxLength);
 
-            for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
-                for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
-                    int wx = selectX + x * Mathf.sign(cursor.x - selectX);
-                    int wy = selectY + y * Mathf.sign(cursor.y - selectY);
+            if(debug && Inputs.keyDown(Input.CONTROL_LEFT)){
+                printArea(result);
+            }else{
+                for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
+                    for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
+                        int wx = selectX + x * Mathf.sign(cursor.x - selectX);
+                        int wy = selectY + y * Mathf.sign(cursor.y - selectY);
 
-                    tryBreakBlock(wx, wy);
+                        tryBreakBlock(wx, wy);
+                    }
                 }
             }
         }

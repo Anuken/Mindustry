@@ -14,10 +14,9 @@ import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.*;
@@ -83,7 +82,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     //region unit and event overrides, utility methods
 
-    @Remote(in = In.entities, targets = Loc.server, called = Loc.server)
+    @Remote(targets = Loc.server, called = Loc.server)
     public static void onPlayerDamage(Player player, float amount){
         if(player == null) return;
 
@@ -91,7 +90,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         player.health -= amount;
     }
 
-    @Remote(in = In.entities, targets = Loc.server, called = Loc.server)
+    @Remote(targets = Loc.server, called = Loc.server)
     public static void onPlayerDeath(Player player){
         if(player == null) return;
 
@@ -228,10 +227,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void damage(float amount){
-        CallEntity.onPlayerDamage(this, calculateDamage(amount));
+        Call.onPlayerDamage(this, calculateDamage(amount));
 
         if(health <= 0 && !dead){
-            CallEntity.onPlayerDeath(this);
+            Call.onPlayerDeath(this);
         }
     }
 
@@ -503,16 +502,15 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         if(mech.flying){
             //prevent strafing backwards, have a penalty for doing so
-            float angDist = Angles.angleDist(rotation, velocity.angle()) / 180f;
             float penalty = 0.2f; //when going 180 degrees backwards, reduce speed to 0.2x
-            speed *= Mathf.lerp(1f, penalty, angDist);
+            speed *= Mathf.lerp(1f, penalty, Angles.angleDist(rotation, velocity.angle()) / 180f);
         }
 
         //drop from carrier on key press
         if(!ui.chatfrag.chatOpen() && Inputs.keyTap("drop_unit")){
             if(!mech.flying){
                 if(getCarrier() != null){
-                    CallEntity.dropSelf(this);
+                    Call.dropSelf(this);
                 }
             }else if(getCarry() != null){
                 dropCarry();
@@ -549,7 +547,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 velocity.add(movement);
             }
             float prex = x, prey = y;
-            updateVelocityStatus(mech.drag, 10f);
+            updateVelocityStatus(mech.drag, debug ? 10f : mech.maxSpeed);
             moved = distanceTo(prex, prey) > 0.01f;
         }else{
             velocity.setZero();
@@ -609,7 +607,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             movement.setZero();
         }
 
-        velocity.add(movement);
+        velocity.add(movement.scl(Timers.delta()));
 
         if(velocity.len() <= 0.2f){
             rotation += Mathf.sin(Timers.time() + id * 99, 10f, 1f);

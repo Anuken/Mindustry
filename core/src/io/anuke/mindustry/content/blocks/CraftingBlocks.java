@@ -21,11 +21,11 @@ public class CraftingBlocks extends BlockList implements ContentList{
             health = 70;
             result = Items.carbide;
             craftTime = 45f;
-            burnDuration = 45f;
+            burnDuration = 46f;
             useFlux = true;
 
             consumes.items(new ItemStack[]{new ItemStack(Items.tungsten, 3)});
-            consumes.item(Items.coal);
+            consumes.item(Items.coal).optional(true);
         }};
 
         arcsmelter = new PowerSmelter("arc-smelter"){{
@@ -67,8 +67,8 @@ public class CraftingBlocks extends BlockList implements ContentList{
             craftEffect = BlockFx.formsmoke;
             updateEffect = BlockFx.plasticburn;
 
-            consumes.liquid(Liquids.oil, 0.3f);
-            consumes.power(0.4f);
+            consumes.liquid(Liquids.oil, 0.25f);
+            consumes.power(0.25f);
             consumes.item(Items.titanium, 2);
         }};
 
@@ -226,12 +226,12 @@ public class CraftingBlocks extends BlockList implements ContentList{
             output = Items.sand;
             health = 80;
             craftEffect = BlockFx.pulverize;
-            craftTime = 60f;
+            craftTime = 50f;
             updateEffect = BlockFx.pulverizeSmall;
             hasItems = hasPower = true;
 
             consumes.item(Items.stone, 2);
-            consumes.power(0.2f);
+            consumes.power(0.1f);
         }};
 
         solidifier = new GenericCrafter("solidifer"){{

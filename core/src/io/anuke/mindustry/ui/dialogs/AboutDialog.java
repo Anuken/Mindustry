@@ -93,7 +93,7 @@ public class AboutDialog extends FloatingDialog{
     public void showCredits(){
         FloatingDialog dialog = new FloatingDialog("$text.credits");
         dialog.addCloseButton();
-        dialog.content().add("$text.about");
+        dialog.content().add("$text.credits.text");
         dialog.show();
     }
 }

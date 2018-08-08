@@ -2,25 +2,33 @@ package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.ucore.function.Supplier;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Strings;
 
 //TODO merge unit type with mech
 public class UnitType implements UnlockableContent{
     private static byte lastid = 0;
     private static Array<UnitType> types = new Array<>();
-    public final String name;
-    public final byte id;
+
     protected final Supplier<? extends BaseUnit> constructor;
+
+    public final String name;
+    public final String description;
+    public final byte id;
     public float health = 60;
     public float hitsize = 5f;
     public float hitsizeTile = 4f;
@@ -35,9 +43,9 @@ public class UnitType implements UnlockableContent{
     public float retreatPercent = 0.2f;
     public float armor = 0f;
     public float carryWeight = 1f;
-    public int ammoCapacity = 100;
+    public int ammoCapacity = 200;
     public int itemCapacity = 30;
-    public int mineLevel = 2;
+    public ObjectSet<Item> toMine = ObjectSet.with(Items.lead, Items.tungsten);
     public float buildPower = 0.3f, minePower = 0.7f, healSpeed = 0.1f;
     public Weapon weapon = Weapons.blaster;
     public float weaponOffsetX, weaponOffsetY;
@@ -48,10 +56,16 @@ public class UnitType implements UnlockableContent{
         this.id = lastid++;
         this.name = name;
         this.constructor = mainConstructor;
+        this.description = Bundles.getOrNull("unit." + name + ".description");
 
         types.add(this);
 
         TypeTrait.registerType(type, mainConstructor);
+
+        if(!Bundles.has("unit." + this.name + ".name")){
+            Log.err("Warning: unit '" + name + "' is missing a localized name. Add the follow to bundle.properties:");
+            Log.err("unit." + this.name + ".name=" + Strings.capitalize(name.replace('-', '_')));
+        }
     }
 
     public static UnitType getByID(byte id){

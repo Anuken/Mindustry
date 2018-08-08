@@ -25,13 +25,13 @@ public class WeaponBullets extends BulletList{
             {
                 bulletWidth = 8f;
                 bulletHeight = 9f;
-                bulletShrink = 0.6f;
-                lifetime = 30f;
+                bulletShrink = 0.5f;
+                lifetime = 50f;
                 drag = 0.04f;
             }
         };
 
-        bombExplosive = new BombBulletType(20f, 20f, "shell"){
+        bombExplosive = new BombBulletType(10f, 20f, "shell"){
             {
                 bulletWidth = 9f;
                 bulletHeight = 13f;
@@ -39,7 +39,7 @@ public class WeaponBullets extends BulletList{
             }
         };
 
-        bombIncendiary = new BombBulletType(15f, 10f, "shell"){
+        bombIncendiary = new BombBulletType(7f, 10f, "shell"){
             {
                 bulletWidth = 8f;
                 bulletHeight = 12f;
@@ -63,7 +63,7 @@ public class WeaponBullets extends BulletList{
             }
         };
 
-        bombOil = new BombBulletType(3f, 3f, "shell"){
+        bombOil = new BombBulletType(2f, 3f, "shell"){
             {
                 bulletWidth = 8f;
                 bulletHeight = 12f;

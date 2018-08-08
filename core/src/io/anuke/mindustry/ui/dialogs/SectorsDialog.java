@@ -3,7 +3,6 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.ucore.core.Graphics;
@@ -13,7 +12,7 @@ import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
-import io.anuke.ucore.scene.ui.TextButton;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.scene.utils.ScissorStack;
 import io.anuke.ucore.util.Bundles;
@@ -37,28 +36,22 @@ public class SectorsDialog extends FloatingDialog{
 
         addCloseButton();
 
-        content().label(() -> Bundles.format("text.sector", selected == null ? "<none>" :
+        content().label(() -> Bundles.format("text.sector", selected == null ? Bundles.get("text.none") :
         (selected.x + ", " + selected.y + (!selected.complete && selected.saveID != -1 ? " " + Bundles.get("text.sector.locked") : ""))
                 + (selected.saveID == -1 ? " " + Bundles.get("text.sector.unexplored") :
                     (selected.hasSave() ? " [accent]/[white] " + Bundles.format("text.sector.time", selected.getSave().getPlayTime()) : ""))));
+        content().row();
+        content().label(() -> Bundles.format("text.mission", selected == null || selected.completedMissions >= selected.missions.size ? Bundles.get("text.none") : selected.missions.get(selected.completedMissions).displayString())
+                        + " [WHITE]" + (selected == null ? "" : Bundles.format("text.save.difficulty", "[LIGHT_GRAY]" + selected.getDifficulty().toString())));
         content().row();
         content().add(new SectorView()).grow();
         content().row();
         buttons().addImageTextButton("$text.sector.deploy", "icon-play",  10*3, () -> {
             hide();
 
-            ui.loadLogic(() -> {
-                if(!selected.hasSave()){
-                    world.loadSector(selected);
-                    logic.play();
-                    selected.saveID = control.getSaves().addSave("sector-" + selected.packedPosition()).index;
-                    world.sectors().save();
-                }else{
-                    control.getSaves().getByID(selected.saveID).load();
-                    state.set(State.playing);
-                }
-            });
-        }).size(230f, 64f).name("deploy-button").disabled(b -> selected == null);
+            ui.loadLogic(() -> world.sectors().playSector(selected));
+        }).size(230f, 64f).disabled(b -> selected == null)
+        .update(t -> t.setText(selected != null && selected.hasSave() ? "$text.sector.resume" : "$text.sector.deploy"));
 
         if(debug){
             buttons().addButton("unlock",  () -> world.sectors().completeSector(selected.x, selected.y)).size(230f, 64f).disabled(b -> selected == null);
@@ -66,14 +59,13 @@ public class SectorsDialog extends FloatingDialog{
     }
 
     void selectSector(Sector sector){
-        buttons().<TextButton>find("deploy-button").setText(sector.hasSave() ? "$text.sector.resume" : "$text.sector.deploy");
         selected = sector;
     }
 
     class SectorView extends Element{
         float lastX, lastY;
-        float sectorSize = 100f;
-        float sectorPadding = 14f;
+        float sectorSize = Unit.dp.scl(100f);
+        float sectorPadding = Unit.dp.scl(14f);
         boolean clicked = false;
         float panX = -sectorPadding/2f, panY = -sectorSize/2f;
 
@@ -170,13 +162,13 @@ public class SectorsDialog extends FloatingDialog{
                         Draw.color(Color.LIGHT_GRAY);
                     }
 
-                    Lines.stroke(stroke);
+                    Lines.stroke(Unit.dp.scl(stroke));
                     Lines.crect(drawX, drawY, sectorSize * size + padding, sectorSize * size + padding, (int)stroke);
                 }
             }
 
             Draw.color(Palette.accent);
-            Lines.stroke(4f);
+            Lines.stroke(Unit.dp.scl(4f));
             Lines.crect(x + width/2f, y + height/2f, clipSize, clipSize);
 
             Draw.reset();

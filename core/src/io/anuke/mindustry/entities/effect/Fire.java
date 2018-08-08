@@ -12,8 +12,7 @@ import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
-import io.anuke.mindustry.gen.CallEntity;
-import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -77,7 +76,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
         }
     }
 
-    @Remote(called = Loc.server, in = In.entities)
+    @Remote(called = Loc.server)
     public static void onFireRemoved(int fireid){
         fireGroup.removeByID(fireid);
     }
@@ -104,7 +103,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
         time = Mathf.clamp(time + Timers.delta(), 0, lifetime());
 
         if(time >= lifetime() || tile == null){
-            CallEntity.onFireRemoved(getID());
+            Call.onFireRemoved(getID());
             remove();
             return;
         }
@@ -133,7 +132,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
             create(other);
 
             if(Mathf.chance(0.05 * Timers.delta() * Mathf.clamp(flammability / 10.0))){
-                CallEntity.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f));
+                Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f));
             }
         }
 

@@ -5,8 +5,7 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.gen.CallBlocks;
-import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -27,12 +26,16 @@ public class Sorter extends Block implements SelectionTrait{
         update = true;
         solid = true;
         instantTransfer = true;
-        outputsItems = true;
         group = BlockGroup.transportation;
         configurable = true;
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, in = In.blocks, forward = true)
+    @Override
+    public boolean outputsItems(){
+        return true;
+    }
+
+    @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSorterItem(Player player, Tile tile, Item item){
         SorterEntity entity = tile.entity();
         entity.sortItem = item;
@@ -107,7 +110,7 @@ public class Sorter extends Block implements SelectionTrait{
     @Override
     public void buildTable(Tile tile, Table table){
         SorterEntity entity = tile.entity();
-        buildItemTable(table, () -> entity.sortItem, item -> CallBlocks.setSorterItem(null, tile, item));
+        buildItemTable(table, () -> entity.sortItem, item -> Call.setSorterItem(null, tile, item));
     }
 
     @Override

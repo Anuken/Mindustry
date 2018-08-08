@@ -3,6 +3,7 @@
     <source path="io/anuke/mindustry"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Tile"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.Content"/>
+    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.type.ItemStack"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.maps.Maps"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Map"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.SpawnGroup"/>
@@ -19,4 +20,6 @@
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.meta.BlockBar"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.maps.generation.WorldGenerator"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.StatusController"/>
+    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.maps.Sector"/>
+    <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.gdx.utils.Predicate"/>
 </module>

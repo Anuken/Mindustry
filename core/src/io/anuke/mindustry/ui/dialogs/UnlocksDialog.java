@@ -7,6 +7,7 @@ import io.anuke.mindustry.core.ContentLoader;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.ucore.scene.event.HandCursorListener;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.Tooltip;
@@ -56,6 +57,7 @@ public class UnlocksDialog extends FloatingDialog{
                     if(unlock.isHidden()) continue;
 
                     Image image = control.database().isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked");
+                    image.addListener(new HandCursorListener());
                     list.add(image).size(size).pad(3);
 
                     if(control.database().isUnlocked(unlock)){

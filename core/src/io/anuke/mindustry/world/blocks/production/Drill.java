@@ -21,15 +21,11 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.control;
-import static io.anuke.mindustry.Vars.headless;
-
 public class Drill extends Block{
     protected final static float hardnessDrillMultiplier = 50f;
     protected final int timerDump = timers++;
 
     protected final Array<Tile> drawTiles = new Array<>();
-    protected final Array<Item> toAdd = new Array<>();
 
     /**Maximum tier of blocks this drill can mine.*/
     protected int tier;
@@ -42,6 +38,8 @@ public class Drill extends Block{
     /**Speed at which the drill speeds up.*/
     protected float warmupSpeed = 0.02f;
 
+    /**Whether to draw the item this drill is mining.*/
+    protected boolean drawMineItem = false;
     /**Effect played when an item is produced. This is colored.*/
     protected Effect drillEffect = BlockFx.mine;
     /**Speed the drill bit rotates at.*/
@@ -102,9 +100,9 @@ public class Drill extends Block{
 
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
 
-        if(!isMultiblock() && isValid(tile)){
-            Draw.color(tile.floor().drops.item.color);
-            Draw.rect("blank", tile.worldx(), tile.worldy(), 2f, 2f);
+        if(entity.dominantItem != null && drawMineItem){
+            Draw.color(entity.dominantItem.color);
+            Draw.rect("blank", tile.drawx(), tile.drawy(), 2f, 2f);
             Draw.color();
         }
     }
@@ -141,21 +139,36 @@ public class Drill extends Block{
 
     @Override
     public void update(Tile tile){
-        toAdd.clear();
-
         DrillEntity entity = tile.entity();
 
-        float multiplier = 0f;
-        float totalHardness = 0f;
+        if(entity.dominantItem == null){
+            boolean foundDominant = false;
 
-        for(Tile other : tile.getLinkedTiles(tempTiles)){
-            if(isValid(other)){
-                Item drop = getDrop(other);
-                toAdd.add(drop);
-                totalHardness += drop.hardness;
-                multiplier += 1f;
+            for(Tile other : tile.getLinkedTiles(tempTiles)){
+                if(isValid(other)){
+                    Item drop = getDrop(other);
+
+                    if(!foundDominant){
+                        entity.dominantItem = drop;
+                        foundDominant = true;
+                    }else if(entity.dominantItem != drop && drop.id < entity.dominantItem.id){
+                        entity.dominantItem = drop;
+                    }
+                }
+            }
+
+            for(Tile other : tile.getLinkedTiles(tempTiles)){
+                if(isValid(other) && getDrop(other) == entity.dominantItem){
+                    entity.dominantItems ++;
+                }
             }
         }
+
+        if(entity.dominantItem == null){
+            return;
+        }
+
+        float totalHardness = entity.dominantItems * entity.dominantItem.hardness;
 
         if(entity.timer.get(timerDump, 15)){
             tryDump(tile);
@@ -163,7 +176,7 @@ public class Drill extends Block{
 
         entity.drillTime += entity.warmup * Timers.delta();
 
-        if(entity.items.total() < itemCapacity && toAdd.size > 0 && entity.cons.valid()){
+        if(entity.items.total() < itemCapacity && entity.dominantItems > 0 && entity.cons.valid()){
 
             float speed = 1f;
 
@@ -172,7 +185,7 @@ public class Drill extends Block{
             }
 
             entity.warmup = Mathf.lerpDelta(entity.warmup, speed, warmupSpeed);
-            entity.progress += Timers.delta() * multiplier * speed * entity.warmup;
+            entity.progress += Timers.delta() * entity.dominantItems * speed * entity.warmup;
 
             if(Mathf.chance(Timers.delta() * updateEffectChance * entity.warmup))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
@@ -181,21 +194,17 @@ public class Drill extends Block{
             return;
         }
 
-        if(toAdd.size > 0 && entity.progress >= drillTime + hardnessDrillMultiplier * Math.max(totalHardness, 1f) / multiplier
+        if(entity.dominantItems > 0 && entity.progress >= drillTime + hardnessDrillMultiplier * Math.max(totalHardness, 1f) / entity.dominantItems
                 && tile.entity.items.total() < itemCapacity){
 
-            int index = entity.index % toAdd.size;
-            offloadNear(tile, toAdd.get(index));
+            offloadNear(tile, entity.dominantItem);
 
-            //unlock item content
-            if(!headless){
-                control.database().unlockContent(toAdd.get(index));
-            }
+            useContent(entity.dominantItem);
 
             entity.index++;
             entity.progress = 0f;
 
-            Effects.effect(drillEffect, toAdd.get(index).color,
+            Effects.effect(drillEffect, entity.dominantItem.color,
                     entity.x + Mathf.range(size), entity.y + Mathf.range(size));
         }
     }
@@ -232,6 +241,9 @@ public class Drill extends Block{
         public int index;
         public float warmup;
         public float drillTime;
+
+        public int dominantItems;
+        public Item dominantItem;
     }
 
 }

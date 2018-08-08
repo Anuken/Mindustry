@@ -40,8 +40,8 @@ public abstract class LiquidTurret extends Turret{
 
         TurretEntity entity = tile.entity();
 
-        Effects.effect(shootEffect, type.liquid.color, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
-        Effects.effect(smokeEffect, type.liquid.color, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+        Effects.effect(type.shootEffect, type.liquid.color, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+        Effects.effect(type.smokeEffect, type.liquid.color, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
 
         if(shootShake > 0){
             Effects.shake(shootShake, shootShake, tile.entity);

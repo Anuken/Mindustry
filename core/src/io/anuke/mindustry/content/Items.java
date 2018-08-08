@@ -14,10 +14,6 @@ public class Items implements ContentList{
     @Override
     public void load(){
 
-        stone = new Item("stone", Color.valueOf("777777")){{
-            hardness = 3;
-        }};
-
         tungsten = new Item("tungsten", Color.valueOf("a0b0c8")){{
             type = ItemType.material;
             hardness = 1;
@@ -54,6 +50,10 @@ public class Items implements ContentList{
             cost = 1.2f;
         }};
 
+        stone = new Item("stone", Color.valueOf("777777")){{
+            hardness = 3;
+        }};
+
         silicon = new Item("silicon", Color.valueOf("53565c")){{
             type = ItemType.material;
             cost = 0.9f;
@@ -71,9 +71,16 @@ public class Items implements ContentList{
             cost = 1.5f;
         }};
 
-        surgealloy = new Item("surge-alloy", Color.valueOf("b4d5c7")){{
-            type = ItemType.material;
-        }};
+        surgealloy = new Item("surge-alloy", Color.valueOf("b4d5c7")){
+            {
+                type = ItemType.material;
+            }
+
+            @Override
+            public boolean isHidden(){
+                return true;
+            }
+        };
 
         biomatter = new Item("biomatter", Color.valueOf("648b55")){{
             flammability = 0.4f;

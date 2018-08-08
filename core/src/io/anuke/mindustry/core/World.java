@@ -219,6 +219,8 @@ public class World extends Module{
     /**Loads up a sector map. This does not call play(), but calls reset().*/
     public void loadSector(Sector sector){
         currentSector = sector;
+        state.mode = sector.missions.peek().getMode();
+        state.difficulty = sector.getDifficulty();
         Timers.mark();
         Timers.mark();
 
@@ -230,16 +232,13 @@ public class World extends Module{
 
         Tile[][] tiles = createTiles(width, height);
 
-        Map map = new Map("Sector [" + sector.x + ", " + sector.y + "]", new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
+        Map map = new Map("Sector " + sector.x + ", " + sector.y, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
         setMap(map);
 
         EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
         Timers.mark();
-        generator.generateMap(tiles, sector.x, sector.y);
-        Log.info("Time to generate base map: {0}", Timers.elapsed());
-
-        Log.info("Time to generate fully without additional events: {0}", Timers.elapsed());
+        generator.generateMap(tiles, sector);
 
         endMapLoad();
 
@@ -257,7 +256,18 @@ public class World extends Module{
 
         EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
-        generator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), 0);
+        try{
+            generator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), 0);
+        } catch(Exception e){
+            Log.err(e);
+            if(!headless){
+                ui.showError("$text.map.invalid");
+                threads.runDelay(() -> state.set(State.menu));
+                invalidMap = true;
+            }
+            generating = false;
+            return;
+        }
 
         if(!headless && state.teams.get(players[0].getTeam()).cores.size == 0){
             ui.showError("$text.map.nospawn");

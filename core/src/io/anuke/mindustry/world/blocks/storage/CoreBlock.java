@@ -14,11 +14,9 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.gen.CallBlocks;
-import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
@@ -66,7 +64,7 @@ public class CoreBlock extends StorageBlock{
         flags = EnumSet.of(BlockFlag.resupplyPoint, BlockFlag.target);
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void onUnitRespawn(Tile tile, Unit player){
         if(player == null) return;
 
@@ -82,7 +80,7 @@ public class CoreBlock extends StorageBlock{
         entity.currentUnit = null;
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void setCoreSolid(Tile tile, boolean solid){
         CoreEntity entity = tile.entity();
         entity.solid = solid;
@@ -105,7 +103,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public float handleDamage(Tile tile, float amount){
-        return debug ? 0 : amount;
+        return amount;
     }
 
     @Override
@@ -193,7 +191,7 @@ public class CoreBlock extends StorageBlock{
         CoreEntity entity = tile.entity();
 
         if(!entity.solid && !Units.anyEntities(tile)){
-            CallBlocks.setCoreSolid(tile, true);
+            Call.setCoreSolid(tile, true);
         }
 
         if(entity.currentUnit != null){
@@ -207,7 +205,7 @@ public class CoreBlock extends StorageBlock{
             }
 
             if(entity.progress >= 1f){
-                CallBlocks.onUnitRespawn(tile, entity.currentUnit);
+                Call.onUnitRespawn(tile, entity.currentUnit);
             }
         }else{
             entity.warmup += Timers.delta();
@@ -229,6 +227,8 @@ public class CoreBlock extends StorageBlock{
                     unit.setDead(true);
                     unit.add();
 
+                    useContent(droneType);
+
                     entity.droneID = unit.id;
                 }
             }
@@ -248,7 +248,7 @@ public class CoreBlock extends StorageBlock{
                     if(tile.entity.items.get(item) > 0 && unit.acceptsAmmo(item)){
                         tile.entity.items.remove(item, 1);
                         unit.addAmmo(item);
-                        CallEntity.transferAmmo(item, tile.drawx(), tile.drawy(), unit);
+                        Call.transferAmmo(item, tile.drawx(), tile.drawy(), unit);
                         return;
                     }
                 }
@@ -262,7 +262,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     /*
-        @Remote(called = Loc.server, in = In.blocks)
+        @Remote(called = Loc.server)
         public static void onCoreUnitSet(Tile tile, Unit player){
             CoreEntity entity = tile.entity();
             entity.currentUnit = player;

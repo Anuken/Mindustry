@@ -10,6 +10,7 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
+import io.anuke.mindustry.world.meta.Producers;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
@@ -23,14 +24,13 @@ public abstract class BaseBlock{
     public boolean outputsLiquid = false;
     public boolean singleLiquid = true;
 
-    public boolean outputsItems = false;
-
     public int itemCapacity;
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
     public float powerCapacity = 10f;
 
     public Consumers consumes = new Consumers();
+    public Producers produces = new Producers();
 
     public boolean shouldConsume(Tile tile){
         return true;
@@ -55,15 +55,19 @@ public abstract class BaseBlock{
      * Remove a stack from this inventory, and return the amount removed.
      */
     public int removeStack(Tile tile, Item item, int amount){
-        tile.entity.wakeUp();
+        tile.entity.noSleep();
         tile.entity.items.remove(item, amount);
         return amount;
     }
 
     /**Handle a stack input.*/
     public void handleStack(Item item, int amount, Tile tile, Unit source){
-        tile.entity.wakeUp();
+        tile.entity.noSleep();
         tile.entity.items.add(item, amount);
+    }
+
+    public boolean outputsItems(){
+        return hasItems;
     }
 
     /**Returns offset for stack placement.*/
@@ -85,8 +89,8 @@ public abstract class BaseBlock{
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         return hasLiquids && tile.entity.liquids.get(liquid) + amount < liquidCapacity &&
-                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f))
-                && (!consumes.has(ConsumeLiquid.class) || consumes.liquid() == liquid);
+                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f)) &&
+                (!consumes.has(ConsumeLiquid.class) || consumes.liquid() == liquid);
     }
 
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
@@ -117,7 +121,7 @@ public abstract class BaseBlock{
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
 
-            if(other.block().hasLiquids){
+            if(other.block().hasLiquids && canDumpLiquid(tile, other, liquid)){
                 float ofract = other.entity.liquids.get(liquid) / other.block().liquidCapacity;
                 float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
 
@@ -125,6 +129,10 @@ public abstract class BaseBlock{
             }
         }
 
+    }
+
+    public boolean canDumpLiquid(Tile tile, Tile to, Liquid liquid){
+        return true;
     }
 
     public void tryMoveLiquid(Tile tile, Tile tileSource, Tile next, float amount, Liquid liquid){

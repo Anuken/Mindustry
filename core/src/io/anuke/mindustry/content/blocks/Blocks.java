@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
 
 public class Blocks extends BlockList implements ContentList{
-    public static Block air, spawn, blockpart, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, dirt, sand, ice, snow, grass, shrub, rock, icerock, blackrock;
+    public static Block air, blockpart, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, dirt, sand, ice, snow, grass, shrub, rock, icerock, blackrock;
 
 
     @Override
@@ -20,6 +20,7 @@ public class Blocks extends BlockList implements ContentList{
         air = new Floor("air"){
             {
                 blend = false;
+                alwaysReplace = true;
             }
 
             //don't draw
@@ -114,6 +115,7 @@ public class Blocks extends BlockList implements ContentList{
             drops = new ItemStack(Items.stone, 1);
             minimapColor = Color.valueOf("252525");
             playerUnmineable = true;
+            hasOres = true;
         }};
 
         dirt = new Floor("dirt"){{
@@ -130,7 +132,7 @@ public class Blocks extends BlockList implements ContentList{
         ice = new Floor("ice"){{
             dragMultiplier = 0.3f;
             speedMultiplier = 0.4f;
-            minimapColor = Color.valueOf("c4e3e7");
+            minimapColor = Color.valueOf("b8eef8");
             hasOres = true;
         }};
 

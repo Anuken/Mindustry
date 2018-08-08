@@ -16,7 +16,10 @@ import io.anuke.ucore.util.Tmp;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class BlockFx extends FxList implements ContentList{
-    public static Effect reactorsmoke, nuclearsmoke, nuclearcloud, redgeneratespark, generatespark, fuelburn, plasticburn, pulverize, pulverizeRed, pulverizeRedder, pulverizeSmall, pulverizeMedium, producesmoke, smeltsmoke, formsmoke, blastsmoke, lava, dooropen, doorclose, dooropenlarge, doorcloselarge, purify, purifyoil, purifystone, generate, mine, mineBig, mineHuge, smelt, teleportActivate, teleport, teleportOut, ripple, bubble;
+    public static Effect reactorsmoke, nuclearsmoke, nuclearcloud, redgeneratespark, generatespark, fuelburn, plasticburn,
+    pulverize, pulverizeRed, pulverizeRedder, pulverizeSmall, pulverizeMedium, producesmoke, smeltsmoke, formsmoke, blastsmoke,
+    lava, dooropen, doorclose, dooropenlarge, doorcloselarge, purify, purifyoil, purifystone, generate, mine, mineBig, mineHuge,
+    smelt, teleportActivate, teleport, teleportOut, ripple, bubble, commandSend;
 
     @Override
     public void load(){
@@ -273,6 +276,13 @@ public class BlockFx extends FxList implements ContentList{
                 Lines.circle(e.x + x, e.y + y, 1f + e.fin() * 3f);
             });
             Draw.reset();
+        });
+
+        commandSend = new Effect(28, e -> {
+            Draw.color(Palette.command);
+            Lines.stroke(e.fout() * 2f);
+            Lines.poly(e.x, e.y, 40, 4f + e.finpow() * 120f);
+            Draw.color();
         });
     }
 }

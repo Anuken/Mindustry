@@ -565,9 +565,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             //add to selection queue if it's a valid BREAK position
             cursor = cursor.target();
             selection.add(new PlaceRequest(cursor.worldx(), cursor.worldy()));
-        }else if(!tileTapped(cursor.target()) && !canTapPlayer(worldx, worldy)){
-            tryBeginMine(cursor);
-        }else{ //else, try and carry units
+        }else if(!tileTapped(cursor.target()) && !canTapPlayer(worldx, worldy) && !tryBeginMine(cursor)){
+            //else, try and carry units
             if(player.getCarry() != null){
                 player.dropCarry(); //drop off unit
             }else{

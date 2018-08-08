@@ -13,6 +13,7 @@ gwt {
     compiler {
         strict = true
         disableCastChecking = true
+        //style = de.richsource.gradle.plugins.gwt.Style.DETAILED
     }
 }
 

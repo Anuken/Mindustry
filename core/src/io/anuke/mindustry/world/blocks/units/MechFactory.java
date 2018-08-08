@@ -11,10 +11,9 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
-import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -44,15 +43,15 @@ public class MechFactory extends Block{
         solidifes = true;
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, in = In.blocks)
+    @Remote(targets = Loc.both, called = Loc.server)
     public static void onMechFactoryTap(Player player, Tile tile){
-        if(!checkValidTap(tile, player)) return;
+        if(player == null || !checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.entity();
         player.beginRespawning(entity);
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void onMechFactoryDone(Tile tile){
         MechFactoryEntity entity = tile.entity();
 
@@ -93,7 +92,7 @@ public class MechFactory extends Block{
         if(mobile && !mech.flying) return;
 
         if(checkValidTap(tile, player)){
-            CallBlocks.onMechFactoryTap(player, tile);
+            Call.onMechFactoryTap(player, tile);
         }else if(player.isLocal && mobile){
             player.moveTarget = tile.entity;
         }
@@ -159,7 +158,7 @@ public class MechFactory extends Block{
             entity.time += 0.5f;
 
             if(entity.progress >= 1f){
-                CallBlocks.onMechFactoryDone(tile);
+                Call.onMechFactoryDone(tile);
             }
         }else{
             if(Units.anyEntities(tile, 4f, unit -> unit.getTeam() == entity.getTeam() && unit instanceof Player)){

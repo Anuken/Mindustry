@@ -11,12 +11,11 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.CallBlocks;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.CursorType;
-import io.anuke.mindustry.net.In;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.BarType;
@@ -46,13 +45,13 @@ public class BuildBlock extends Block{
         solidifes = true;
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void onDeconstructFinish(Tile tile, Block block){
         Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
         world.removeBlock(tile);
     }
 
-    @Remote(called = Loc.server, in = In.blocks)
+    @Remote(called = Loc.server)
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team){
         world.setBlock(tile, block, team);
         tile.setRotation(rotation);
@@ -70,7 +69,7 @@ public class BuildBlock extends Block{
     @Override
     public boolean isSolidFor(Tile tile){
         BuildEntity entity = tile.entity();
-        return entity == null || entity.recipe == null || entity.recipe.result.solid || entity.previous.solid;
+        return entity == null || (entity.recipe != null && entity.recipe.result.solid) || entity.previous == null || entity.previous.solid;
     }
 
     @Override
@@ -209,8 +208,8 @@ public class BuildBlock extends Block{
                 builderID = builder.getID();
             }
             
-            if(progress >= 1f || debug){
-                CallBlocks.onConstructFinish(tile, recipe.result, builderID, tile.getRotation(), tile.getTeam());
+            if(progress >= 1f || debug || state.mode.infiniteResources){
+                Call.onConstructFinish(tile, recipe.result, builderID, tile.getRotation(), builder.getTeam());
             }
         }
 
@@ -237,8 +236,8 @@ public class BuildBlock extends Block{
 
             progress = Mathf.clamp(progress - amount);
 
-            if(progress <= 0 || debug){
-                CallBlocks.onDeconstructFinish(tile, this.recipe == null ? previous : this.recipe.result);
+            if(progress <= 0 || debug || state.mode.infiniteResources){
+                Call.onDeconstructFinish(tile, this.recipe == null ? previous : this.recipe.result);
             }
         }
 

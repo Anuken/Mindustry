@@ -1,5 +1,6 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
@@ -13,6 +14,7 @@ import io.anuke.mindustry.game.TeamInfo;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
@@ -49,9 +51,7 @@ public class Logic extends Module{
         state.set(State.playing);
         state.wavetime = wavespace * state.difficulty.timeScaling * 2;
 
-        //fill inventory with items for debugging
-
-        for(TeamData team : state.teams.getTeams()){
+        for(TeamData team : state.teams.getTeams(true)){
             for(Tile tile : team.cores){
                 if(debug){
                     for(Item item : Item.all()){
@@ -59,10 +59,21 @@ public class Logic extends Module{
                             tile.entity.items.set(item, 1000);
                         }
                     }
-                }else{
-                    tile.entity.items.add(Items.tungsten, 50);
-                    tile.entity.items.add(Items.lead, 20);
                 }
+
+                if(world.getSector() != null){
+                    Array<ItemStack> items = world.getSector().startingItems;
+                    for(ItemStack stack : items){
+                        tile.entity.items.add(stack.item, stack.amount);
+                    }
+                }
+            }
+        }
+
+        for(TeamData team : state.teams.getTeams(false)){
+            for(Tile tile : team.cores){
+                tile.entity.items.add(Items.tungsten, 2000);
+                tile.entity.items.add(Items.blastCompound, 2000);
             }
         }
 
@@ -131,11 +142,11 @@ public class Logic extends Module{
 
             if(!state.is(State.paused) || Net.active()){
 
-                if(!state.mode.disableWaveTimer){
+                if(!state.mode.disableWaveTimer && !state.mode.disableWaves){
                     state.wavetime -= Timers.delta();
                 }
 
-                if(!Net.client() && state.wavetime <= 0){
+                if(!Net.client() && state.wavetime <= 0 && !state.mode.disableWaves){
                     runWave();
                 }
 

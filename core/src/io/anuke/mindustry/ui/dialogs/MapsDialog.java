@@ -14,6 +14,7 @@ import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
@@ -23,6 +24,7 @@ import java.io.DataInputStream;
 import static io.anuke.mindustry.Vars.*;
 
 public class MapsDialog extends FloatingDialog{
+    private FloatingDialog dialog;
 
     public MapsDialog(){
         super("$text.maps");
@@ -58,6 +60,11 @@ public class MapsDialog extends FloatingDialog{
         }).size(230f, 64f);
 
         shown(this::setup);
+        onResize(() -> {
+            if(dialog != null){
+                dialog.hide();
+            }
+        });
     }
 
     void setup(){
@@ -101,10 +108,10 @@ public class MapsDialog extends FloatingDialog{
     }
 
     void showMapInfo(Map map){
-        FloatingDialog dialog = new FloatingDialog("$text.editor.mapinfo");
+        dialog = new FloatingDialog("$text.editor.mapinfo");
         dialog.addCloseButton();
 
-        float mapsize = 300f;
+        float mapsize = UIUtils.portrait() ? 160f : 300f;
         Table table = dialog.content();
 
         ((Image) table.stack(new Image(map.texture), new BorderImage(map.texture)).size(mapsize).get().getChildren().first()).setScaling(Scaling.fit);

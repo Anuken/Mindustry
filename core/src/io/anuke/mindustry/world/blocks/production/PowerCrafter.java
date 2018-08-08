@@ -12,13 +12,9 @@ import io.anuke.ucore.core.Timers;
 public class PowerCrafter extends Block{
     protected final int timerDump = timers++;
 
-    /**
-     * Optional.
-     */
+    /**Optional.*/
     protected Item outputItem;
-    /**
-     * Optional. Set hasLiquids to true when using.
-     */
+    /**Optional. Set hasLiquids to true when using.*/
     protected Liquid outputLiquid;
     protected float outputLiquidAmount;
     protected float craftTime;
@@ -32,11 +28,22 @@ public class PowerCrafter extends Block{
     }
 
     @Override
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        return false;
+    }
+
+    @Override
     public void init(){
         super.init();
 
         if(outputLiquid != null){
             outputsLiquid = true;
+        }
+
+        if(outputLiquid != null){
+            produces.set(outputLiquid);
+        }else if(outputItem != null){
+            produces.set(outputItem);
         }
     }
 

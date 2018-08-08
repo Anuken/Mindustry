@@ -12,9 +12,9 @@ import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadServer;
-import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.*;
@@ -80,12 +80,22 @@ public class NetServer extends Module{
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
             String uuid = packet.uuid;
 
-            if(Net.getConnection(id) == null ||
-                    admins.isIPBanned(Net.getConnection(id).address)) return;
+            NetConnection connection = Net.getConnection(id);
+
+            if(connection == null ||
+                    admins.isIPBanned(connection.address)) return;
+
+            if(connection.hasBegunConnecting){
+                kick(id, KickReason.idInUse);
+                return;
+            }
+
+            connection.hasBegunConnecting = true;
 
             TraceInfo trace = admins.getTraceByID(uuid);
             PlayerInfo info = admins.getInfo(uuid);
             trace.uuid = uuid;
+            trace.ip = connection.address;
             trace.android = packet.mobile;
 
             if(admins.isIDBanned(uuid)){
@@ -112,7 +122,7 @@ public class NetServer extends Module{
                         return;
                     }
 
-                    if(player.uuid.equals(packet.uuid)){
+                    if(player.uuid.equals(packet.uuid) || player.usid.equals(packet.usid)){
                         kick(id, KickReason.idInUse);
                         return;
                     }
@@ -175,16 +185,14 @@ public class NetServer extends Module{
             NetConnection connection = Net.getConnection(id);
             if(player == null || connection == null || packet.snapid < connection.lastRecievedClientSnapshot) return;
 
-            boolean verifyPosition = !player.isDead() && !debug && headless && !player.mech.flying && player.getCarrier() == null;
+            boolean verifyPosition = !player.isDead() && !debug && headless && player.getCarrier() == null;
 
             if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = TimeUtils.millis() - 16;
 
             long elapsed = TimeUtils.timeSinceMillis(connection.lastRecievedClientTime);
 
-            float maxSpeed = (packet.boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed) * 2.5f;
-
-            //extra 1.1x multiplicaton is added just in case
-            float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
+            float maxSpeed = packet.boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
+            float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.2f, player.mech.maxSpeed * 1.05f);
 
             player.pointerX = packet.pointerX;
             player.pointerY = packet.pointerY;
@@ -197,12 +205,16 @@ public class NetServer extends Module{
             }
 
             vector.set(packet.x - player.getInterpolator().target.x, packet.y - player.getInterpolator().target.y);
-
             vector.limit(maxMove);
 
             float prevx = player.x, prevy = player.y;
             player.set(player.getInterpolator().target.x, player.getInterpolator().target.y);
-            player.move(vector.x, vector.y);
+            if(!player.mech.flying){
+                player.move(vector.x, vector.y);
+            }else{
+                player.x += vector.x;
+                player.y += vector.y;
+            }
             float newx = player.x, newy = player.y;
 
             if(!verifyPosition){
@@ -213,6 +225,7 @@ public class NetServer extends Module{
             }else if(Vector2.dst(packet.x, packet.y, newx, newy) > correctDist){
                 Call.onPositionSet(id, newx, newy); //teleport and correct position when necessary
             }
+
             //reset player to previous synced position so it gets interpolated
             player.x = prevx;
             player.y = prevy;
@@ -238,9 +251,16 @@ public class NetServer extends Module{
         });
     }
 
-    /**
-     * Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.
-     */
+    private float compound(float speed, float drag){
+        float total = 0f;
+        for(int i = 0; i < 20; i++){
+            total *= (1f - drag);
+            total += speed;
+        }
+        return total;
+    }
+
+    /** Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.*/
     private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID, int base){
         if(bytes.length < maxSnapshotSize){
             Call.onSnapshot(userid, bytes, snapshotID, (short) 0, bytes.length, base);
@@ -314,6 +334,8 @@ public class NetServer extends Module{
 
     @Remote(targets = Loc.client)
     public static void connectConfirm(Player player){
+        if(player.con == null || player.con.hasConnected) return;
+
         player.add();
         player.con.hasConnected = true;
         Call.sendMessage("[accent]" + player.name + " [accent]has connected.");
@@ -352,8 +374,8 @@ public class NetServer extends Module{
 
         Player player = connections.get(con.id);
 
-        if(player != null && (reason == KickReason.kick || reason == KickReason.banned) && admins.getTraceByID(getUUID(con.id)).uuid != null){
-            PlayerInfo info = admins.getInfo(admins.getTraceByID(getUUID(con.id)).uuid);
+        if(player != null && (reason == KickReason.kick || reason == KickReason.banned) && player.uuid != null){
+            PlayerInfo info = admins.getInfo(player.uuid);
             info.timesKicked++;
             info.lastKicked = TimeUtils.millis();
         }

@@ -8,22 +8,20 @@ import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.utils.Elements;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class LevelDialog extends FloatingDialog{
+public class CustomGameDialog extends FloatingDialog{
 
-    public LevelDialog(){
+    public CustomGameDialog(){
         super("$text.level.select");
         addCloseButton();
         shown(this::setup);
@@ -46,11 +44,10 @@ public class LevelDialog extends FloatingDialog{
         selmode.add("$text.level.mode").padRight(15f);
 
         for(GameMode mode : GameMode.values()){
-            TextButton[] b = {null};
-            b[0] = Elements.newButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode);
-            b[0].update(() -> b[0].setChecked(state.mode == mode));
-            group.add(b[0]);
-            selmode.add(b[0]).size(130f, 54f);
+            if(mode.hidden) continue;
+
+            selmode.addButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode)
+                .update(b -> b.setChecked(state.mode == mode)).group(group).size(130f, 54f);
         }
         selmode.addButton("?", this::displayGameModeHelp).size(50f, 54f).padLeft(18f);
 
@@ -115,31 +112,9 @@ public class LevelDialog extends FloatingDialog{
             i++;
         }
 
-        ImageButton genb = maps.addImageButton("icon-editor", "clear", 16 * 3, () -> {
-            hide();
-            //TODO
-
-            /*
-            ui.loadfrag.show();
-
-            Timers.run(5f, () -> {
-                Cursors.restoreCursor();
-                threads.run(() -> {
-                    world.loadSector(0, 0);
-                    logic.play();
-                    Gdx.app.postRunnable(ui.loadfrag::hide);
-                });
-            });*/
-        }).width(170).fillY().pad(4f).get();
-
-        genb.top();
-        genb.margin(5);
-        genb.clearChildren();
-        genb.add(new BorderImage(Draw.region("icon-generated"), 3f)).size(images);
-        genb.row();
-        genb.add("$text.map.random").growX().wrap().pad(3f).get().setAlignment(Align.center, Align.center);
-        genb.row();
-        genb.add("<generated>").pad(3f);
+        if(world.maps().all().size == 0){
+            maps.add("$text.maps.none").pad(50);
+        }
 
         content().add(pane).uniformX();
     }
@@ -153,6 +128,7 @@ public class LevelDialog extends FloatingDialog{
         pane.setFadeScrollBars(false);
         table.row();
         for(GameMode mode : GameMode.values()){
+            if(mode.hidden) continue;
             table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(400f);
             table.row();
         }

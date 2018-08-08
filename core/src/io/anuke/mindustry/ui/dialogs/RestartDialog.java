@@ -1,30 +1,50 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.ucore.scene.ui.Dialog;
+import io.anuke.mindustry.maps.Sector;
+import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class RestartDialog extends Dialog{
+public class RestartDialog extends FloatingDialog{
 
     public RestartDialog(){
-        super("$text.gameover", "dialog");
+        super("$text.gameover");
+        setFillParent(false);
+        shown(this::rebuild);
+    }
 
-        shown(() -> {
-            content().clearChildren();
+    void rebuild(){
+        buttons().clear();
+        content().clear();
+
+        buttons().margin(10);
+
+        if(world.getSector() == null){
             if(control.isHighScore()){
                 content().add("$text.highscore").pad(6);
                 content().row();
             }
-            content().add("$text.lasted").pad(12).get();
-            content().add("[accent]" + state.wave);
-            pack();
-        });
+            content().add(Bundles.format("text.wave.lasted", state.wave)).pad(12);
 
-        getButtonTable().addButton("$text.menu", () -> {
-            hide();
-            state.set(State.menu);
-            logic.reset();
-        }).size(130f, 60f);
+            buttons().addButton("$text.menu", () -> {
+                hide();
+                state.set(State.menu);
+                logic.reset();
+            }).size(130f, 60f);
+        }else{
+            content().add("$text.sector.gameover");
+            buttons().addButton("$text.menu", () -> {
+                hide();
+                state.set(State.menu);
+                logic.reset();
+            }).size(130f, 60f);
+
+            buttons().addButton("$text.sector.retry", () -> {
+                Sector sector = world.getSector();
+                ui.loadLogic(() -> world.sectors().playSector(sector));
+                hide();
+            }).size(130f, 60f);
+        }
     }
 }

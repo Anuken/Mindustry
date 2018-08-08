@@ -12,6 +12,7 @@ import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects.Effect;
+import io.anuke.ucore.function.BiPredicate;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Geometry;
@@ -60,6 +61,7 @@ public class Floor extends Block{
     protected TextureRegion[] variantRegions;
     protected Vector2[] offsets;
     protected Predicate<Floor> blends = block -> block != this && !block.blendOverride(this);
+    protected BiPredicate<Tile, Tile> tileBlends = (tile, other) -> false;
     protected boolean blend = true;
 
     public Floor(String name){
@@ -138,12 +140,12 @@ public class Floor extends Block{
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.id(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
 
-        if(tile.cliffs != 0 && cliffRegions != null){
+        if(tile.hasCliffs() && cliffRegions != null){
             for(int i = 0; i < 4; i++){
-                if((tile.cliffs & (1 << i * 2)) != 0){
+                if((tile.getCliffs() & (1 << i * 2)) != 0){
                     Draw.colorl(i > 1 ? 0.6f : 1f);
 
-                    boolean above = (tile.cliffs & (1 << ((i + 1) % 4) * 2)) != 0, below = (tile.cliffs & (1 << (Mathf.mod(i - 1, 4)) * 2)) != 0;
+                    boolean above = (tile.getCliffs() & (1 << ((i + 1) % 4) * 2)) != 0, below = (tile.getCliffs() & (1 << (Mathf.mod(i - 1, 4)) * 2)) != 0;
 
                     if(above && below){
                         Draw.rect(cliffRegions[0], tile.worldx(), tile.worldy(), i * 90);
@@ -167,7 +169,7 @@ public class Floor extends Block{
     }
 
     protected void drawEdges(Tile tile, boolean sameLayer){
-        if(!blend || tile.cliffs > 0) return;
+        if(!blend || tile.getCliffs() > 0) return;
 
         for(int i = 0; i < 8; i++){
             int dx = Geometry.d8[i].x, dy = Geometry.d8[i].y;
@@ -178,7 +180,7 @@ public class Floor extends Block{
 
             Floor floor = other.floor();
 
-            if((floor.id <= this.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || !blends.test(floor) || (floor.cacheLayer.ordinal() > this.cacheLayer.ordinal() && !sameLayer) ||
+            if((floor.id <= this.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!blends.test(floor) && !tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > this.cacheLayer.ordinal() && !sameLayer) ||
                     (sameLayer && floor.cacheLayer == this.cacheLayer)) continue;
 
             TextureRegion region = floor.edgeRegions[i];

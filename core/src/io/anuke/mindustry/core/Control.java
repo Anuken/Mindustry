@@ -13,6 +13,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentDatabase;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
@@ -48,7 +49,6 @@ public class Control extends Module{
     private ObjectMap<Sound, Long> soundMap = new ObjectMap<>();
 
     private Throwable error;
-    //private Input gdxInput;
 
     public Control(){
 
@@ -68,8 +68,6 @@ public class Control extends Module{
 
         db.load();
 
-        //gdxInput = Gdx.input;
-
         Sounds.setFalloff(9000f);
         Sounds.setPlayer((sound, volume) -> {
             long time = TimeUtils.millis();
@@ -84,14 +82,14 @@ public class Control extends Module{
         DefaultKeybinds.load();
 
         Settings.defaultList(
-                "ip", "localhost",
-                "port", port + "",
-                "color-0", Color.rgba8888(playerColors[8]),
-                "color-1", Color.rgba8888(playerColors[11]),
-                "color-2", Color.rgba8888(playerColors[13]),
-                "color-3", Color.rgba8888(playerColors[9]),
-                "name", "player",
-                "lastBuild", 0
+            "ip", "localhost",
+            "port", port + "",
+            "color-0", Color.rgba8888(playerColors[8]),
+            "color-1", Color.rgba8888(playerColors[11]),
+            "color-2", Color.rgba8888(playerColors[13]),
+            "color-3", Color.rgba8888(playerColors[9]),
+            "name", "player",
+            "lastBuild", 0
         );
 
         KeyBinds.load();
@@ -112,6 +110,12 @@ public class Control extends Module{
             }
 
             state.set(State.playing);
+
+            if(state.mode == GameMode.sandbox && !Settings.getBool("sandbox-warning", false)){
+                threads.runGraphics(() -> ui.showInfo("$mode.sandbox.warning"));
+                Settings.putBool("sandbox-warning", true);
+                Settings.save();
+            }
         });
 
         Events.on(WorldLoadGraphicsEvent.class, () -> {
@@ -144,12 +148,16 @@ public class Control extends Module{
         });
 
         Events.on(GameOverEvent.class, () -> {
-            Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+            //delete saves for game-over sectors
+            if(world.getSector() != null && world.getSector().hasSave()){
+                world.getSector().getSave().delete();
+            }
 
-            //TODO game over effect
-            ui.restart.show();
-
-            Timers.runTask(30f, () -> state.set(State.menu));
+            threads.runGraphics(() -> {
+                Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+                ui.restart.show();
+                state.set(State.menu);
+            });
         });
 
         Events.on(WorldLoadEvent.class, () -> threads.runGraphics(() -> Events.fire(WorldLoadGraphicsEvent.class)));
@@ -362,11 +370,16 @@ public class Control extends Module{
             }
 
             //check unlocked sectors
-            if(world.getSector() != null && world.getSector().goal.isComplete() && !world.getSector().complete){
-                world.sectors().completeSector(world.getSector().x, world.getSector().y);
-                world.sectors().save();
-                if(!headless){
-                    ui.showInfoFade("$text.sector.unlocked");
+            if(world.getSector() != null && !world.getSector().complete){
+                //all assigned missions are complete
+                if(world.getSector().completedMissions >= world.getSector().missions.size){
+
+                    world.sectors().completeSector(world.getSector().x, world.getSector().y);
+                    world.sectors().save();
+                    ui.missions.show(world.getSector());
+                }else if(world.getSector().currentMission().isComplete()){
+                    //increment completed missions, check next index next frame
+                    world.getSector().completedMissions ++;
                 }
             }
 
@@ -374,7 +387,7 @@ public class Control extends Module{
             if(!state.mode.infiniteResources && Timers.get("timerCheckUnlock", 120)){
                 checkUnlockableBlocks();
 
-                //save if the db changed, but don't save unlocks
+                //save if the db changed, but don't save in debug
                 if(db.isDirty() && !debug){
                     db.save();
                 }

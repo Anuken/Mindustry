@@ -33,7 +33,11 @@ public class Saves{
     public Saves(){
         Events.on(StateChangeEvent.class, (prev, state) -> {
             if(state == State.menu){
-                threads.run(() -> current = null);
+                threads.run(() -> {
+                    totalPlaytime = 0;
+                    lastTimestamp = 0;
+                    current = null;
+                });
             }
         });
     }
@@ -75,8 +79,7 @@ public class Saves{
 
                 Timers.run(2f, () -> {
                     try{
-                        SaveIO.saveToSlot(current.index);
-                        current.meta = SaveIO.getData(current.index);
+                        current.save();
                     }catch(Exception e){
                         e.printStackTrace();
                     }
@@ -108,10 +111,7 @@ public class Saves{
         slot.setName(name);
         saves.add(slot);
         saveMap.put(slot.index, slot);
-        SaveIO.saveToSlot(slot.index);
-        slot.meta = SaveIO.getData(slot.index);
-        current = slot;
-
+        slot.save();
         saveSlots();
         return slot;
     }
@@ -162,9 +162,27 @@ public class Saves{
         }
 
         public void save(){
-            SaveIO.saveToSlot(index);
-            meta = SaveIO.getData(index);
-            current = this;
+            long time = totalPlaytime;
+
+            threads.runGraphics(() -> {
+                //Renderer fog needs to be written on graphics thread, but save() can run on logic thread
+                //thus, runGraphics is required here
+                renderer.fog().writeFog();
+
+                //save on the logic thread
+                threads.run(() -> {
+                    long prev = totalPlaytime;
+                    totalPlaytime = time;
+
+                    SaveIO.saveToSlot(index);
+                    meta = SaveIO.getData(index);
+                    if(!state.is(State.menu)){
+                        current = this;
+                    }
+
+                    totalPlaytime = prev;
+                });
+            });
         }
 
         public boolean isHidden(){
@@ -209,7 +227,7 @@ public class Saves{
         }
 
         public boolean isAutosave(){
-            return Settings.getBool("save-" + index + "-autosave", !gwt);
+            return Settings.getBool("save-" + index + "-autosave", true);
         }
 
         public void setAutosave(boolean save){

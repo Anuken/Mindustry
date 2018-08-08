@@ -9,7 +9,6 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatCategory;
@@ -17,6 +16,7 @@ import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
 
 public class ContentDisplay{
 
@@ -25,10 +25,6 @@ public class ContentDisplay{
 
         table.table(title -> {
             int size = 8 * 6;
-
-            if(block instanceof Turret){
-                size = (8 * block.size + 2) * (7 - block.size * 2);
-            }
 
             title.addImage(Draw.region("block-icon-" + block.name)).size(size);
             title.add("[accent]" + block.formalName).padLeft(5);
@@ -144,6 +140,31 @@ public class ContentDisplay{
     }
 
     public static void displayUnit(Table table, UnitType unit){
+        table.table(title -> {
+            title.addImage(unit.getContentIcon()).size(8 * 6);
+            title.add("[accent]" + unit.localizedName()).padLeft(5);
+        });
 
+        table.row();
+
+        table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+
+        table.row();
+
+        if(unit.description != null){
+            table.add(unit.description).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.row();
+
+            table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+            table.row();
+        }
+
+        table.left().defaults().fillX();
+
+        table.add(Bundles.format("text.unit.health", unit.health));
+        table.row();
+        table.add(Bundles.format("text.unit.speed", Strings.toFixed(unit.speed, 1)));
+        table.row();
+        table.row();
     }
 }

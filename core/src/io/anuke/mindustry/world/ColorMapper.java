@@ -7,11 +7,12 @@ import com.badlogic.gdx.utils.ObjectIntMap;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.ContentList;
+import io.anuke.ucore.util.Mathf;
 
 public class ColorMapper implements ContentList{
     private static IntMap<Block> blockMap = new IntMap<>();
     private static ObjectIntMap<Block> colorMap = new ObjectIntMap<>();
-    private static Color tmpColor = new Color();
+    private static ThreadLocal<Color> tmpColors = new ThreadLocal<>();
 
     public static Block getByColor(int color){
         return blockMap.get(color);
@@ -21,12 +22,21 @@ public class ColorMapper implements ContentList{
         return colorMap.get(block, 0);
     }
 
-    public static int colorFor(Block floor, Block wall, Team team, int elevation){
-        int color = wall.breakable ? team.intColor : getBlockColor(wall);
+    public static int colorFor(Block floor, Block wall, Team team, int elevation, byte cliffs){
+        if(wall.synthetic()){
+            return team.intColor;
+        }
+        int color = getBlockColor(wall);
         if(color == 0) color = ColorMapper.getBlockColor(floor);
         if(elevation > 0){
-            float mul = 1.1f + elevation / 4f;
+            if(tmpColors.get() == null) tmpColors.set(new Color());
+            Color tmpColor = tmpColors.get();
             tmpColor.set(color);
+            float maxMult = 1f/Math.max(Math.max(tmpColor.r, tmpColor.g), tmpColor.b) ;
+            float mul = Math.min(1.1f + elevation / 4f, maxMult);
+            if((cliffs & Mathf.pow2(6)) != 0){
+                mul -= 0.5f;
+            }
             tmpColor.mul(mul, mul, mul, 1f);
             color = Color.rgba8888(tmpColor);
         }

@@ -1,9 +1,7 @@
 package io.anuke.mindustry.entities.units.types;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
@@ -12,9 +10,10 @@ import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnit;
+import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
-import io.anuke.mindustry.gen.CallEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -41,7 +40,6 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Drone extends FlyingUnit implements BuilderTrait{
-    protected static ObjectSet<Item> toMine;
     protected static float discoverRange = 120f;
     protected static boolean initialized;
 
@@ -77,7 +75,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
                 //if it's missing requirements, try and mine them
                 for(ItemStack stack : entity.recipe.requirements){
-                    if(!core.items.has(stack.item, stack.amount) && toMine.contains(stack.item)){
+                    if(!core.items.has(stack.item, stack.amount) && type.toMine.contains(stack.item)){
                         targetItem = stack.item;
                         getPlaceQueue().clear();
                         setState(mine);
@@ -230,7 +228,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
             if(distanceTo(target) < type.range){
                 if(tile.tile.block().acceptStack(inventory.getItem().item, inventory.getItem().amount, tile.tile, Drone.this) == inventory.getItem().amount){
-                    CallEntity.transferItemTo(inventory.getItem().item, inventory.getItem().amount, x, y, tile.tile);
+                    Call.transferItemTo(inventory.getItem().item, inventory.getItem().amount, x, y, tile.tile);
                     inventory.clearItem();
                 }
 
@@ -270,8 +268,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     private static void initEvents(){
         if(initialized) return;
 
-        toMine = ObjectSet.with(Items.lead, Items.tungsten);
-
         Events.on(BlockBuildEvent.class, (team, tile) -> {
             EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
 
@@ -293,10 +289,15 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         float dist = Math.min(entity.distanceTo(x, y) - placeDistance, 0);
 
         if(dist / type.maxVelocity < timeToBuild * 0.9f){
-            //CallEntity.onDroneBeginBuild(this, entity.tile, entity.recipe);
+            //Call.onDroneBeginBuild(this, entity.tile, entity.recipe);
             target = entity;
             setState(build);
         }
+    }
+
+    @Override
+    public void onCommand(UnitCommand command){
+        //no
     }
 
     @Override
@@ -400,7 +401,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         if(entity == null){
             return;
         }
-        targetItem = Mathf.findMin(toMine, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
+        targetItem = Mathf.findMin(type.toMine, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
     }
 
     protected boolean findItemDrop(){

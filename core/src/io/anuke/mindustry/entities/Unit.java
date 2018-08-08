@@ -214,9 +214,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         });
     }
 
-    /**
-     * Updates velocity and status effects.
-     */
+    /**Updates velocity and status effects.*/
     public void updateVelocityStatus(float drag, float maxVelocity){
         if(isCarried()){ //carried units do not take into account velocity normally
             set(carrier.getX(), carrier.getY());
@@ -280,7 +278,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             if(Math.abs(py - y) <= 0.0001f) velocity.y = 0f;
         }
 
-        velocity.scl(Mathf.clamp(1f - drag * floor.dragMultiplier * Timers.delta()));
+        velocity.scl(Mathf.clamp(1f - drag * (isFlying() ? 1f : floor.dragMultiplier) * Timers.delta()));
     }
 
     public void applyEffect(StatusEffect effect, float intensity){

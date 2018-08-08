@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
@@ -10,10 +11,26 @@ public class PausedDialog extends FloatingDialog{
     public boolean wasPaused = false;
     private SaveDialog save = new SaveDialog();
     private LoadDialog load = new LoadDialog();
+    private Table missionTable;
 
     public PausedDialog(){
         super("$text.menu");
         setup();
+
+        shown(this::rebuild);
+    }
+
+    void rebuild(){
+        missionTable.clear();
+        if(world.getSector() != null && !world.getSector().complete){
+            missionTable.add("[LIGHT_GRAY]" + Bundles.format("text.mission", ""));
+            missionTable.row();
+            missionTable.table(t -> {
+                world.getSector().currentMission().display(t);
+            });
+            missionTable.row();
+            missionTable.add(Bundles.format("text.sector", world.getSector().x + ", " + world.getSector().y));
+        }
     }
 
     void setup(){
@@ -27,6 +44,9 @@ public class PausedDialog extends FloatingDialog{
             wasPaused = state.is(State.paused);
             if(!Net.active()) state.set(State.paused);
         });
+
+        content().table(t -> missionTable = t).colspan(mobile ? 3 : 1);
+        content().row();
 
         if(!mobile){
             content().defaults().width(220).height(50);
@@ -43,19 +63,12 @@ public class PausedDialog extends FloatingDialog{
             content().row();
             content().addButton("$text.savegame", () -> {
                 save.show();
-            });
+            }).disabled(s -> world.getSector() != null);
 
             content().row();
             content().addButton("$text.loadgame", () -> {
                 load.show();
             }).disabled(b -> Net.active());
-
-            //Local multiplayer is currently functional, but disabled.
-			/*
-            content().row();
-            content().addButton("$text.addplayers", () -> {
-                ui.localplayers.show();
-            }).disabled(b -> Net.active());*/
 
             content().row();
 
@@ -63,7 +76,7 @@ public class PausedDialog extends FloatingDialog{
                 if(!gwt){
                     ui.host.show();
                 }else{
-                    ui.showInfo("$text.host.web");
+                    ui.showInfo("$text.web.unsupported");
                 }
             }).disabled(b -> Net.active());
 
@@ -88,7 +101,7 @@ public class PausedDialog extends FloatingDialog{
                     state.set(State.playing);
             });
             content().addRowImageTextButton("$text.settings", "icon-tools", isize, ui.settings::show);
-            content().addRowImageTextButton("$text.save", "icon-save", isize, save::show);
+            content().addRowImageTextButton("$text.save", "icon-save", isize, save::show).disabled(b -> world.getSector() != null);
 
             content().row();
 
@@ -104,7 +117,7 @@ public class PausedDialog extends FloatingDialog{
         }
     }
 
-    private void runExitSave(){
+    public void runExitSave(){
         if(control.getSaves().getCurrent() == null ||
                 !control.getSaves().getCurrent().isAutosave()){
             state.set(State.menu);

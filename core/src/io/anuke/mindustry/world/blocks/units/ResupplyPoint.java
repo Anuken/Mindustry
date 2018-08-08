@@ -32,7 +32,7 @@ public class ResupplyPoint extends Block{
         super(name);
         update = true;
         solid = true;
-        flags = EnumSet.of(BlockFlag.resupplyPoint, BlockFlag.target);
+        flags = EnumSet.of(BlockFlag.resupplyPoint);
         layer = Layer.laser;
         hasItems = true;
         hasPower = true;

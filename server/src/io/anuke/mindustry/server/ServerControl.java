@@ -39,17 +39,16 @@ public class ServerControl extends Module{
 
     public ServerControl(String[] args){
         Settings.defaultList(
-                "shufflemode", "normal",
-                "bans", "",
-                "admins", ""
+            "shufflemode", "normal",
+            "bans", "",
+            "admins", "",
+            "sectorid", 0
         );
 
         mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
 
-        Effects.setScreenShakeProvider((a, b) -> {
-        });
-        Effects.setEffectProvider((a, b, c, d, e, f) -> {
-        });
+        Effects.setScreenShakeProvider((a, b) -> {});
+        Effects.setEffectProvider((a, b, c, d, e, f) -> {});
         Sounds.setHeadless(true);
 
         String[] commands = {};

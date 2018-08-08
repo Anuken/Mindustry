@@ -121,7 +121,7 @@ public class Conduit extends LiquidBlock{
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        tile.entity.wakeUp();
+        tile.entity.noSleep();
         return super.acceptLiquid(tile, source, liquid, amount) && ((2 + source.relativeTo(tile.x, tile.y)) % 4 != tile.getRotation());
     }
 

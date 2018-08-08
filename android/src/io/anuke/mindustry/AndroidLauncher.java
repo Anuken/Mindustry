@@ -12,7 +12,6 @@ import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Base64Coder;
@@ -25,8 +24,8 @@ import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
-import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.game.Saves.SaveSlot;
+import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.ucore.function.Consumer;
@@ -48,19 +47,16 @@ import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class AndroidLauncher extends AndroidApplication{
+public class AndroidLauncher extends PatchedAndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
-
     boolean doubleScaleTablets = true;
     FileChooser chooser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.useImmersiveMode = true;
-
         Platform.instance = new Platform(){
             DateFormat format = SimpleDateFormat.getDateTimeInstance();
 
@@ -108,19 +104,15 @@ public class AndroidLauncher extends AndroidApplication{
             public String getUUID(){
                 try{
                     String s = Secure.getString(getContext().getContentResolver(),
-                            Secure.ANDROID_ID);
-
+                    Secure.ANDROID_ID);
                     int len = s.length();
                     byte[] data = new byte[len / 2];
                     for(int i = 0; i < len; i += 2){
                         data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                                + Character.digit(s.charAt(i + 1), 16));
+                        + Character.digit(s.charAt(i + 1), 16));
                     }
-
                     String result = new String(Base64Coder.encode(data));
-
                     if(result.equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
-
                     return result;
                 }catch(Exception e){
                     return super.getUUID();
@@ -129,28 +121,23 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public void shareFile(FileHandle file){
-
             }
 
             @Override
             public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype){
                 chooser = new FileChooser(text, file -> file.extension().equalsIgnoreCase(filetype), open, cons);
-
                 if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                        checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
+                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
                     chooser.show();
                     chooser = null;
                 }else{
                     ArrayList<String> perms = new ArrayList<>();
-
                     if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                         perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
                     }
-
                     if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                         perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
                     }
-
                     requestPermissions(perms.toArray(new String[perms.size()]), PERMISSION_REQUEST_CODE);
                 }
             }
@@ -170,7 +157,6 @@ public class AndroidLauncher extends AndroidApplication{
                 return true;
             }
         };
-
         try{
             ProviderInstaller.installIfNeeded(this);
         }catch(GooglePlayServicesRepairableException e){
@@ -179,18 +165,13 @@ public class AndroidLauncher extends AndroidApplication{
         }catch(GooglePlayServicesNotAvailableException e){
             Log.e("SecurityException", "Google Play Services not available.");
         }
-
         if(doubleScaleTablets && isTablet(this.getContext())){
             Unit.dp.addition = 0.5f;
         }
-
         config.hideStatusBar = true;
-
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());
-
         initialize(new Mindustry(), config);
-
         checkFiles(getIntent());
     }
 
@@ -200,7 +181,6 @@ public class AndroidLauncher extends AndroidApplication{
             for(int i : grantResults){
                 if(i != PackageManager.PERMISSION_GRANTED) return;
             }
-
             if(chooser != null){
                 chooser.show();
             }
@@ -220,21 +200,16 @@ public class AndroidLauncher extends AndroidApplication{
                     //error
                     return;
                 }
-
                 boolean save = uri.getPath().endsWith(saveExtension);
                 boolean map = uri.getPath().endsWith(mapExtension);
-
                 InputStream inStream;
                 if(myFile != null) inStream = new FileInputStream(myFile);
                 else inStream = getContentResolver().openInputStream(uri);
-
                 Gdx.app.postRunnable(() -> {
-
                     if(save){ //open save
                         System.out.println("Opening save.");
                         FileHandle file = Gdx.files.local("temp-save." + saveExtension);
                         file.write(inStream, false);
-
                         if(SaveIO.isSaveValid(file)){
                             try{
                                 SaveSlot slot = control.getSaves().importSave(file);
@@ -245,20 +220,17 @@ public class AndroidLauncher extends AndroidApplication{
                         }else{
                             ui.showError("$text.save.import.invalid");
                         }
-
                     }else if(map){ //open map
                         Gdx.app.postRunnable(() -> {
                             System.out.println("Opening map.");
                             if(!ui.editor.isShown()){
                                 ui.editor.show();
                             }
-
                             ui.editor.beginEditMap(inStream);
                         });
                     }
                 });
             }
-
         }catch(IOException e){
             e.printStackTrace();
         }

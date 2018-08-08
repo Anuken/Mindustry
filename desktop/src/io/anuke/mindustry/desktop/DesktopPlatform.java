@@ -108,8 +108,8 @@ public class DesktopPlatform extends Platform{
     @Override
     public boolean isDebug(){
         //honestly I'm just putting this ridiculous """anti-debug""" mess here to see if anyone bothers solving it without editing source
-        return args.length > 0 && args[0].equals("-debug_" + getUUID().hashCode() + "_"
-                + " " + System.getProperty("os.arch") + "nice" + (int)(Math.sin(System.getProperty("user.dir").hashCode()) * 100) + Thread.currentThread().getStackTrace()[1].toString()) && new File("../../desktop/build/").exists();
+        return args.length > 0 && args[0].equals(("-debug_" + getUUID().hashCode() + "_"
+                + " " + System.getProperty("os.arch") + "nice" + (int)(Math.sin(System.getProperty("user.dir").hashCode()) * 100) + Thread.currentThread().getStackTrace()[1].toString()).hashCode() + "") && new File("../../desktop/build/").exists();
     }
 
     @Override

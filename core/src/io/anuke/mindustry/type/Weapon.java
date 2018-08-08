@@ -9,8 +9,7 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
-import io.anuke.mindustry.gen.CallEntity;
-import io.anuke.mindustry.net.In;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
@@ -82,7 +81,7 @@ public class Weapon extends Upgrade{
         super(name);
     }
 
-    @Remote(targets = Loc.server, called = Loc.both, in = In.entities, unreliable = true)
+    @Remote(targets = Loc.server, called = Loc.both, unreliable = true)
     public static void onPlayerShootWeapon(Player player, float x, float y, float rotation, boolean left){
         if(player == null) return;
         //clients do not see their own shoot events: they are simulated completely clientside to prevent laggy visuals
@@ -94,7 +93,7 @@ public class Weapon extends Upgrade{
         shootDirect(player, x, y, rotation, left);
     }
 
-    @Remote(targets = Loc.server, called = Loc.both, in = In.entities, unreliable = true)
+    @Remote(targets = Loc.server, called = Loc.both, unreliable = true)
     public static void onGenericShootWeapon(ShooterTrait shooter, float x, float y, float rotation, boolean left){
         if(shooter == null) return;
         shootDirect(shooter, x, y, rotation, left);
@@ -176,9 +175,9 @@ public class Weapon extends Upgrade{
             shootDirect(p, x, y, angle, left);
         }else{
             if(p instanceof Player){ //players need special weapon handling logic
-                CallEntity.onPlayerShootWeapon((Player) p, x, y, angle, left);
+                Call.onPlayerShootWeapon((Player) p, x, y, angle, left);
             }else{
-                CallEntity.onGenericShootWeapon(p, x, y, angle, left);
+                Call.onGenericShootWeapon(p, x, y, angle, left);
             }
         }
 
