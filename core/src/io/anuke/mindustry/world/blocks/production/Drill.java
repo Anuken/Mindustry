@@ -158,7 +158,7 @@ public class Drill extends Block{
             }
 
             for(Tile other : tile.getLinkedTiles(tempTiles)){
-                if(isValid(other) && other.floor().dropsItem(entity.dominantItem)){
+                if(isValid(other) && getDrop(other) == entity.dominantItem){
                     entity.dominantItems ++;
                 }
             }

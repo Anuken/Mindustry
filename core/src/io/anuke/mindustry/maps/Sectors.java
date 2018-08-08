@@ -182,7 +182,7 @@ public class Sectors{
 
                 GenResult result = world.generator().generateTile(sector.x, sector.y, toX, toY, false);
 
-                int color = ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation);
+                int color = ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation, (byte)0);
                 pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, color);
             }
         }

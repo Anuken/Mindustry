@@ -144,7 +144,7 @@ public class MinimapRenderer implements Disposable{
 
     private int colorFor(Tile tile){
         tile = tile.target();
-        return ColorMapper.colorFor(tile.floor(), tile.block(), tile.getTeam(), tile.getElevation());
+        return ColorMapper.colorFor(tile.floor(), tile.block(), tile.getTeam(), tile.getElevation(), tile.getCliffs());
     }
 
     @Override

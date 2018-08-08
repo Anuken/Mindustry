@@ -7,11 +7,13 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
@@ -86,6 +88,8 @@ public class BlocksFragment extends Fragment{
 
             }).bottom().right().get();
         });
+
+        Events.on(WorldLoadEvent.class, this::rebuild);
 
         rebuild();
     }
@@ -165,7 +169,7 @@ public class BlocksFragment extends Fragment{
 
             //add actual recipes
             for(Recipe r : recipes){
-                if((r.debugOnly && !debug) || (r.desktopOnly && mobile)) continue;
+                if((r.debugOnly && !debug) || (r.desktopOnly && mobile) || (r.targetMode != null && r.targetMode != state.mode)) continue;
 
                 ImageButton image = new ImageButton(new TextureRegion(), "select");
 

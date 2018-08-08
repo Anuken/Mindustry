@@ -22,7 +22,7 @@ import static io.anuke.mindustry.Vars.world;
 public class Packets{
 
     public enum KickReason{
-        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true), recentKick, nameInUse, idInUse, fastShoot, nameEmpty, customClient;
+        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true), recentKick, nameInUse, idInUse, fastShoot, nameEmpty, customClient, sectorComplete(true);
         public final boolean quiet;
 
         KickReason(){
