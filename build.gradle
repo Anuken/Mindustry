@@ -126,21 +126,35 @@ project(":ios") {
     apply plugin: "java"
     apply plugin: "robovm"
 
+    task copyGen{
+        doFirst{
+            copy{
+                from ("../core/build/classes/java/main/io/anuke/mindustry/gen/"){
+                    include "**/*.java"
+                }
+
+                into "../core/src/io/anuke/mindustry/gen"
+            }
+        }
+
+        doLast{
+            delete{
+                delete "../core/src/io/anuke/mindustry/gen/"
+            }
+        }
+    }
+
+    build.finalizedBy(copyGen)
 
     dependencies {
         compile project(":core")
         implementation project(":kryonet")
-        compileOnly project(":annotations")
 
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
     }
-
-    compileJava.options.compilerArgs += [
-            "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
-    ]
 }
 
 project(":core") {
