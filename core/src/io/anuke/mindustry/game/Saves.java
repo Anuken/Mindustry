@@ -162,6 +162,8 @@ public class Saves{
         }
 
         public void save(){
+            long time = totalPlaytime;
+
             threads.runGraphics(() -> {
                 //Renderer fog needs to be written on graphics thread, but save() can run on logic thread
                 //thus, runGraphics is required here
@@ -169,9 +171,16 @@ public class Saves{
 
                 //save on the logic thread
                 threads.run(() -> {
+                    long prev = totalPlaytime;
+                    totalPlaytime = time;
+
                     SaveIO.saveToSlot(index);
                     meta = SaveIO.getData(index);
-                    current = this;
+                    if(!state.is(State.menu)){
+                        current = this;
+                    }
+
+                    totalPlaytime = prev;
                 });
             });
         }
