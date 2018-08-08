@@ -50,7 +50,7 @@ allprojects {
                 output += '"' + other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + '",'
             }
             output = (output.substring(0, output.size() - 1) + "]")
-            new File('core/assets/locales.json').text = output;
+            new File(project(':core').projectDir, 'assets/locales.json').text = output;
         }
 
         writeVersion = {
@@ -130,12 +130,17 @@ project(":ios") {
     dependencies {
         compile project(":core")
         implementation project(":kryonet")
+        compileOnly project(":annotations")
 
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
     }
+
+    compileJava.options.compilerArgs += [
+            "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
+    ]
 }
 
 project(":core") {
