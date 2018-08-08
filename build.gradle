@@ -138,8 +138,8 @@ project(":ios") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
     }
 
-    compileJava.options.compilerArgs += [
-            "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
+    compileJava.options.compilerArgs = [
+        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
     ]
 }
 
