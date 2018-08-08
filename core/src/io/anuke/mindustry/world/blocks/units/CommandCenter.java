@@ -10,6 +10,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitCommand;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
@@ -98,7 +99,9 @@ public class CommandCenter extends Block{
             }
         }
 
-        for(BaseUnit unit : unitGroups[player.getTeam().ordinal()].all()){
+        Team team = (player == null ? tile.getTeam() : player.getTeam());
+
+        for(BaseUnit unit : unitGroups[team.ordinal()].all()){
             unit.onCommand(command);
         }
     }

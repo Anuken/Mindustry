@@ -256,7 +256,18 @@ public class World extends Module{
 
         EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
-        generator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), 0);
+        try{
+            generator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), 0);
+        } catch(Exception e){
+            Log.err(e);
+            if(!headless){
+                ui.showError("$text.map.invalid");
+                threads.runDelay(() -> state.set(State.menu));
+                invalidMap = true;
+            }
+            generating = false;
+            return;
+        }
 
         if(!headless && state.teams.get(players[0].getTeam()).cores.size == 0){
             ui.showError("$text.map.nospawn");

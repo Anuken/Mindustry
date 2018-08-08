@@ -34,6 +34,7 @@ public class Recipe implements UnlockableContent{
     public final float cost;
 
     public boolean desktopOnly = false, debugOnly = false;
+    //the only gamemode in which the recipe shows up
     public GameMode targetMode;
 
     private Block[] dependencies;

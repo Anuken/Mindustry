@@ -77,6 +77,12 @@ public class Conveyor extends Block{
 
     @Override
     public void drawShadow(Tile tile){
+        //fixes build block crash
+        if(!(tile.entity instanceof ConveyorEntity)){
+            super.drawShadow(tile);
+            return;
+        }
+
         ConveyorEntity entity = tile.entity();
 
         if(entity.blendshadowrot == -1){

@@ -45,7 +45,7 @@ public class MechFactory extends Block{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void onMechFactoryTap(Player player, Tile tile){
-        if(!checkValidTap(tile, player)) return;
+        if(player == null || !checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.entity();
         player.beginRespawning(entity);

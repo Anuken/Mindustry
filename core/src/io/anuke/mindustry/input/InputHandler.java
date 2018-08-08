@@ -83,6 +83,7 @@ public abstract class InputHandler extends InputAdapter{
             int sent = Mathf.clamp(accepted / 4, 1, 8);
             int removed = accepted / sent;
             int[] remaining = {accepted, accepted};
+            Block block = tile.block();
 
             for(int i = 0; i < sent; i++){
                 boolean end = i == sent - 1;
@@ -92,6 +93,7 @@ public abstract class InputHandler extends InputAdapter{
                     ItemTransfer.create(stack.item,
                             player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
                             new Translator(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
+                                if(tile.block() != block) return;
 
                                 tile.block().handleStack(stack.item, removed, tile, player);
                                 remaining[1] -= removed;
