@@ -128,6 +128,7 @@ public class CustomGameDialog extends FloatingDialog{
         pane.setFadeScrollBars(false);
         table.row();
         for(GameMode mode : GameMode.values()){
+            if(mode.hidden) continue;
             table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(400f);
             table.row();
         }
