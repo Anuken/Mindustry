@@ -143,7 +143,7 @@ public class ServerControl extends Module{
             Log.info("Stopped server.");
         });
 
-        handler.register("host", "[mode] [mapname]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "[mapname] [mode]", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
@@ -152,39 +152,38 @@ public class ServerControl extends Module{
             Map result = null;
 
             if(arg.length > 0){
-                GameMode mode;
-                try{
-                    mode = GameMode.valueOf(arg[0]);
-                }catch(IllegalArgumentException e){
-                    err("No gamemode '{0}' found.", arg[0]);
+
+                String search = arg[0];
+                for(Map map : world.maps().all()){
+                    if(map.name.equalsIgnoreCase(search)) result = map;
+                }
+
+                if(result == null){
+                    err("No map with name &y'{0}'&lr found.", search);
                     return;
                 }
 
+
                 info("Loading map...");
-                state.mode = mode;
 
                 if(arg.length > 1){
-                    String search = arg[1];
-                    for(Map map : world.maps().all()){
-                        if(map.name.equalsIgnoreCase(search))
-                            result = map;
-                    }
-
-                    if(result == null){
-                        err("No map with name &y'{0}'&lr found.", search);
+                    GameMode mode;
+                    try{
+                        mode = GameMode.valueOf(arg[1]);
+                    }catch(IllegalArgumentException e){
+                        err("No gamemode '{0}' found.", arg[1]);
                         return;
                     }
 
-                    logic.reset();
-                    world.loadMap(result);
-                    logic.play();
-                }else{
-                    Log.info("&ly&fiNo map specified, so a procedural one was generated.");
-                    playSectorMap();
+                    state.mode = mode;
                 }
 
+                logic.reset();
+                world.loadMap(result);
+                logic.play();
+
             }else{
-                Log.info("&ly&fiNo map specified, so a procedural one was generated.");
+                Log.info("&ly&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sectorid"), 0);
                 playSectorMap();
             }
 

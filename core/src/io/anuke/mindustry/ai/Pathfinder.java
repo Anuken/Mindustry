@@ -16,7 +16,6 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
@@ -182,8 +181,6 @@ public class Pathfinder{
         }
 
         state.spawner.checkAllQuadrants();
-
-        Log.info("Elapsed calculation time: {0}", Timers.elapsed());
     }
 
     class PathData{
