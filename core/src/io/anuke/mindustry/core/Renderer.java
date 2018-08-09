@@ -278,6 +278,7 @@ public class Renderer extends RendererModule{
         drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
         EntityDraw.setClip(true);
         Graphics.end();
+        Draw.color();
     }
 
     private void drawFlyerShadows(){
