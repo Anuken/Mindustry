@@ -846,7 +846,7 @@ public class ServerControl extends Module{
             if(world.getSector().completedMissions >= world.getSector().missions.size){
                 world.sectors().completeSector(world.getSector().x, world.getSector().y);
                 world.sectors().save();
-                Settings.putInt("sectorid", world.getSector().x + 1);
+                Settings.putInt("sectorid", world.getSector().x + world.getSector().size);
                 Settings.save();
 
                 netServer.kickAll(KickReason.sectorComplete);
