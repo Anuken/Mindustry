@@ -7,7 +7,7 @@ To begin, log in to your GitHub account, or if you don't have one yet, create it
 
 Consult [this list](https://www.science.co.il/language/Locale-codes.php) to find the locale code for your language. Once you've found it, 
 head over to the translation bundle folder and check the [list of bundles](https://github.com/Anuken/Mindustry/tree/master/core/assets/bundles) that have already been created. 
-You're looking for a file called "`bundle_`(insert locale code here)`.properties`".
+You're looking for a file called "`bundle_`(insert locale code here)`.properties`". If you don't find one, create one manually (more info below).
 
 #### Editing an existing translation
 
@@ -19,7 +19,7 @@ Once this is done, all you need to do is wait for me to approve your changes.
 If a translation bundle for your language *doesn't* exist, you need to create one yourself.  
 In the folder with all the bundles in it, click the *'create new file'* button, and name it `bundle_(locale code here).properties`. 
 Then, copy-paste the entire contents of the [English translation bundle](https://raw.githubusercontent.com/Anuken/Mindustry/master/core/assets/bundles/bundle.properties) into the file, and translate all the necessary text to your language.
-Once you are done, press the *propose new file* button at the bottom, then 'create pull request twice'.  
+Once you are done, press the *propose new file* button at the bottom, then 'create pull request' twice.  
 
 #### Useful Information
 
