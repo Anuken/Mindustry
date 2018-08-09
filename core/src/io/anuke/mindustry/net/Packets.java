@@ -10,6 +10,7 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.io.IOUtils;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 import java.nio.ByteBuffer;
@@ -22,15 +23,26 @@ import static io.anuke.mindustry.Vars.world;
 public class Packets{
 
     public enum KickReason{
-        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true), recentKick, nameInUse, idInUse, fastShoot, nameEmpty, customClient, sectorComplete(true);
+        kick, clientOutdated, serverOutdated, banned, gameover(true), recentKick,
+        nameInUse, idInUse, nameEmpty, customClient, sectorComplete, serverClose;
+
         public final boolean quiet;
 
         KickReason(){
-            quiet = false;
+            this(false);
         }
 
         KickReason(boolean quiet){
             this.quiet = quiet;
+        }
+
+        @Override
+        public String toString(){
+            return Bundles.get("text.server.kicked." + name());
+        }
+
+        public String extraText(){
+            return Bundles.getOrNull("text.server.kicked." + name() + ".text");
         }
     }
 

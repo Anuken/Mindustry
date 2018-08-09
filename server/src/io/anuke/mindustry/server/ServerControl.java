@@ -53,23 +53,25 @@ public class ServerControl extends Module{
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
         Sounds.setHeadless(true);
 
-        String[] commands = {};
-
-        if(args.length > 0){
-            commands = String.join(" ", args).split(",");
-            Log.info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
-        }
-
         registerCommands();
 
-        for(String s : commands){
-            Response response = handler.handleMessage(s);
-            if(response.type != ResponseType.valid){
-                Log.err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
-                Log.err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
-                System.exit(1);
+        Gdx.app.postRunnable(() -> {
+            String[] commands = {};
+
+            if(args.length > 0){
+                commands = String.join(" ", args).split(",");
+                Log.info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
             }
-        }
+
+            for(String s : commands){
+                Response response = handler.handleMessage(s);
+                if(response.type != ResponseType.valid){
+                    Log.err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
+                    Log.err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
+                    System.exit(1);
+                }
+            }
+        });
 
         Thread thread = new Thread(this::readCommands, "Server Controls");
         thread.setDaemon(true);
@@ -82,33 +84,28 @@ public class ServerControl extends Module{
 
         Events.on(GameOverEvent.class, () -> {
             info("Game over!");
-
-            for(NetConnection connection : Net.getConnections()){
-                netServer.kick(connection.id, KickReason.gameover);
-            }
+            netServer.kickAll(KickReason.gameover);
 
             if(mode != ShuffleMode.off){
-                if(world.maps().all().size > 0){
-                    Array<Map> maps = mode == ShuffleMode.both ? world.maps().all() :
-                            mode == ShuffleMode.normal ? world.maps().defaultMaps() : world.maps().customMaps();
+                if(world.getSector() == null){
+                    if(world.maps().all().size > 0){
+                        Array<Map> maps = mode == ShuffleMode.both ? world.maps().all() :
+                        mode == ShuffleMode.normal ? world.maps().defaultMaps() : world.maps().customMaps();
 
-                    Map previous = world.getMap();
-                    Map map = previous;
-                    while(map == previous) map = maps.random();
-
-                    if(map != null){
+                        Map previous = world.getMap();
+                        Map map = previous;
+                        if(maps.size > 1){
+                            while(map == previous) map = maps.random();
+                        }
 
                         info("Selected next map to be {0}.", map.name);
-                        state.set(State.playing);
 
                         logic.reset();
                         world.loadMap(map);
-                    }else{
-                        info("Selected a procedural map.");
-                        playSectorMap();
+                        state.set(State.playing);
                     }
                 }else{
-                    info("Selected a procedural map.");
+                    info("Re-trying sector map.");
                     playSectorMap();
                 }
             }else{
@@ -290,7 +287,7 @@ public class ServerControl extends Module{
             }
         });
 
-        handler.register("debugmode", "<on/off>", "Disables or enables debug ode", arg -> {
+        handler.register("debug", "<on/off>", "Disables or enables debug ode", arg -> {
            boolean value = arg[0].equalsIgnoreCase("on");
            debug = value;
            info("Debug mode is now {0}.", value ? "on" : "off");
@@ -632,7 +629,7 @@ public class ServerControl extends Module{
             info("Core destroyed.");
         });
 
-        handler.register("debug", "Print debug info", arg -> {
+        handler.register("debuginfo", "Print debug info", arg -> {
             info(DebugFragment.debugInfo());
         });
 
@@ -829,7 +826,7 @@ public class ServerControl extends Module{
     }
 
     private void playSectorMap(){
-        world.loadSector(world.sectors().get(0, 0));
+        world.loadSector(world.sectors().get(Settings.getInt("sectorid"), 0));
         logic.play();
     }
 
@@ -839,6 +836,27 @@ public class ServerControl extends Module{
         }catch(IOException e){
             Log.err(e);
             state.set(State.menu);
+        }
+    }
+
+    @Override
+    public void update(){
+
+        if(state.is(State.playing) && world.getSector() != null){
+            //all assigned missions are complete
+            if(world.getSector().completedMissions >= world.getSector().missions.size){
+                world.sectors().completeSector(world.getSector().x, world.getSector().y);
+                world.sectors().save();
+                Settings.putInt("sectorid", world.getSector().x + 1);
+                Settings.save();
+
+                netServer.kickAll(KickReason.sectorComplete);
+                logic.reset();
+                playSectorMap();
+            }else if(world.getSector().currentMission().isComplete()){
+                //increment completed missions, check next index next frame
+                world.getSector().completedMissions ++;
+            }
         }
     }
 

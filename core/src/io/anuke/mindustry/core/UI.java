@@ -283,6 +283,13 @@ public class UI extends SceneModule{
         }}.show();
     }
 
+    public void showText(String title, String text){
+        new Dialog(title, "dialog"){{
+            content().margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
+        }}.show();
+    }
+
     public void showConfirm(String title, String text, Runnable confirmed){
         FloatingDialog dialog = new FloatingDialog(title);
         dialog.content().add(text).width(400f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);

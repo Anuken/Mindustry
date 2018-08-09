@@ -149,7 +149,13 @@ public class NetClient extends Module{
     public static void onKick(KickReason reason){
         netClient.disconnectQuietly();
         state.set(State.menu);
-        if(!reason.quiet) ui.showError("$text.server.kicked." + reason.name());
+        if(!reason.quiet){
+            if(reason.extraText() != null){
+                ui.showText(reason.toString(), reason.extraText());
+            }else{
+                ui.showText("$text.disconnect", reason.toString());
+            }
+        }
         ui.loadfrag.hide();
     }
 

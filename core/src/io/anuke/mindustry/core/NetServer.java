@@ -363,6 +363,12 @@ public class NetServer extends Module{
         admins.clearTraces();
     }
 
+    public void kickAll(KickReason reason){
+        for(NetConnection con : Net.getConnections()){
+            kick(con.id, reason);
+        }
+    }
+
     public void kick(int connection, KickReason reason){
         NetConnection con = Net.getConnection(connection);
         if(con == null){
