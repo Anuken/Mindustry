@@ -179,13 +179,13 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        driverBolt = new BulletType(5f, 50){
+        driverBolt = new BulletType(5.3f, 50){
             {
                 collidesTiles = false;
                 lifetime = 200f;
                 despawneffect = BlockFx.smeltsmoke;
                 hiteffect = BulletFx.hitBulletBig;
-                drag = 0.02f;
+                drag = 0.01f;
             }
 
             @Override
