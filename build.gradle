@@ -169,7 +169,6 @@ project(":core") {
         build.finalizedBy(finish)
 
         def comp = System.properties["release"] == null || System.properties["release"] == "false"
-
         if(!comp) println("Note: Compiling release build.")
 
         if(new File(projectDir.parent, '../uCore').exists() && comp){

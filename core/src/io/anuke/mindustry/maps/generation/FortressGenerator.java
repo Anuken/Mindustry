@@ -187,7 +187,7 @@ public class FortressGenerator{
 
     Block fixBlock(Block result){
         if(result == UnitBlocks.resupplyPoint) result = DefenseBlocks.tungstenWall;
-        if(result == UnitBlocks.monsoonPad) result = DefenseBlocks.tungstenWallLarge;
+        if(result == UnitBlocks.dronePad) result = DefenseBlocks.tungstenWallLarge;
         if(result == UnitBlocks.fabricatorPad) result = DefenseBlocks.tungstenWallLarge;
         return result;
     }
