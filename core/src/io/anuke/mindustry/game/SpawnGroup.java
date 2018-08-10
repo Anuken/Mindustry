@@ -114,12 +114,6 @@ public class SpawnGroup{
             unit.inventory.addItem(items.item, items.amount);
         }
 
-        if(ammoItem != null){
-            unit.inventory.addAmmo(unit.getWeapon().getAmmoType(ammoItem));
-        }else{
-            unit.inventory.addAmmo(unit.getWeapon().getAmmoType(unit.getWeapon().getAcceptedItems().iterator().next()));
-        }
-
         return unit;
     }
 }

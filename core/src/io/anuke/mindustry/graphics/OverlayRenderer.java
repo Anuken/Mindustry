@@ -180,9 +180,8 @@ public class OverlayRenderer{
             y = (int) (y + 0.0001f);
         }
 
-        drawEncloser(x, y - 9f, 2f);
+        drawEncloser(x, y - 8f, 1f);
         drawBar(Palette.healthstats, x, y - 8f, unit.healthf());
-        drawBar(Palette.ammo, x, y - 9f, unit.getAmmoFraction());
     }
 
     void drawBar(Color color, float x, float y, float finion){

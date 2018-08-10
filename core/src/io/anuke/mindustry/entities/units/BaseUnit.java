@@ -19,7 +19,6 @@ import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
@@ -185,7 +184,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void targetClosest(){
-        target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
+        target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
     }
 
     public TileEntity getClosestEnemyCore(){
@@ -254,11 +253,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public int getAmmoCapacity(){
-        return type.ammoCapacity;
-    }
-
-    @Override
     public boolean isInfiniteAmmo(){
         return isWave;
     }
@@ -280,16 +274,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public float getArmor(){
         return type.armor;
-    }
-
-    @Override
-    public boolean acceptsAmmo(Item item){
-        return getWeapon().getAmmoType(item) != null && inventory.canAcceptAmmo(getWeapon().getAmmoType(item));
-    }
-
-    @Override
-    public void addAmmo(Item item){
-        inventory.addAmmo(getWeapon().getAmmoType(item));
     }
 
     @Override

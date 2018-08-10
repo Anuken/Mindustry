@@ -8,8 +8,8 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.StatusEffect;
+import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.core.Effects;
@@ -300,10 +300,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
     }
 
-    public float getAmmoFraction(){
-        return inventory.totalAmmo() / (float) inventory.ammoCapacity();
-    }
-
     public void drawUnder(){
     }
 
@@ -328,15 +324,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public abstract TextureRegion getIconRegion();
 
+    public abstract Weapon getWeapon();
+
     public abstract int getItemCapacity();
 
-    public abstract int getAmmoCapacity();
-
     public abstract float getArmor();
-
-    public abstract boolean acceptsAmmo(Item item);
-
-    public abstract void addAmmo(Item item);
 
     public abstract float getMass();
 

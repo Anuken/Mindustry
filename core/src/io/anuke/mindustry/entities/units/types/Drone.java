@@ -391,11 +391,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         return isBuilding() ? placeDistance * 2f : 30f;
     }
 
-    @Override
-    public float getAmmoFraction(){
-        return inventory.getItem().amount / (float) type.itemCapacity;
-    }
-
     protected void findItem(){
         TileEntity entity = getClosestCore();
         if(entity == null){

@@ -15,7 +15,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.defense.turrets.ItemTurret;
 import io.anuke.mindustry.world.blocks.defense.turrets.PowerTurret;
-import io.anuke.mindustry.world.blocks.units.ResupplyPoint;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
@@ -186,7 +185,6 @@ public class FortressGenerator{
     }
 
     Block fixBlock(Block result){
-        if(result == UnitBlocks.resupplyPoint) result = DefenseBlocks.tungstenWall;
         if(result == UnitBlocks.dronePad) result = DefenseBlocks.tungstenWallLarge;
         if(result == UnitBlocks.fabricatorPad) result = DefenseBlocks.tungstenWallLarge;
         return result;
@@ -201,8 +199,6 @@ public class FortressGenerator{
             ItemTurret turret = (ItemTurret)block;
             AmmoType[] type = turret.getAmmoTypes();
             block.handleStack(type[0].item, block.acceptStack(type[0].item, 1000, tile, null), tile, null);
-        }else if(block instanceof ResupplyPoint){
-            tile.entity.items.add(Items.lead, tile.block().itemCapacity);
         }
     }
 
