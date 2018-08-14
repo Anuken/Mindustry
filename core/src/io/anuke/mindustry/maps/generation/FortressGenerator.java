@@ -127,8 +127,8 @@ public class FortressGenerator{
 
         int maxIndex = (int)(1 + ((float)gen.sector.difficulty / maxDifficulty * (structures.length-2)));
 
-        for(int i = maxIndex/2; i < maxIndex; i++){
-            selected.add(structures[i]);
+        for(int i =maxIndex/2; i < maxIndex; i++){
+            selected.add(structures[max(i, structures.lenght)]);
         }
 
         float baseChance = 0.8f / selected.size;
