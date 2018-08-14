@@ -132,6 +132,8 @@ public class Renderer extends RendererModule{
 
     @Override
     public void update(){
+        //TODO hack, find source of this bug
+        Color.WHITE.set(1f, 1f, 1f, 1f);
 
         if(Core.cameraScale != targetscale){
             float targetzoom = (float) Core.cameraScale / targetscale;

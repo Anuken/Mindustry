@@ -81,7 +81,7 @@ public class GenericCrafter extends Block{
     public void update(Tile tile){
         GenericCrafterEntity entity = tile.entity();
 
-        if(entity.cons.valid()){
+        if(entity.cons.valid() && tile.entity.items.get(output) < itemCapacity){
 
             entity.progress += 1f / craftTime * Timers.delta();
             entity.totalProgress += Timers.delta();

@@ -441,6 +441,13 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void update(){
         hitTime = Math.max(0f, hitTime - Timers.delta());
 
+        if(Float.isNaN(x) || Float.isNaN(y)){
+            TileEntity core = getClosestCore();
+            if(core != null){
+                set(core.x, core.y);
+            }
+        }
+
         if(isDead()){
             isBoosting = false;
             boostHeat = 0f;
