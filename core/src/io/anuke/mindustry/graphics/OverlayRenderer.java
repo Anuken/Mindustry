@@ -180,8 +180,8 @@ public class OverlayRenderer{
             y = (int) (y + 0.0001f);
         }
 
-        drawEncloser(x, y - 8f, 1f);
-        drawBar(Palette.healthstats, x, y - 8f, unit.healthf());
+        //drawEncloser(x, y - 8f, 1f);
+        //drawBar(Palette.healthstats, x, y - 8f, unit.healthf());
     }
 
     void drawBar(Color color, float x, float y, float finion){
