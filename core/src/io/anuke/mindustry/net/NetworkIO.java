@@ -185,7 +185,6 @@ public class NetworkIO{
             int height = stream.readShort();
 
             //TODO send advanced map meta such as author, etc
-            //TODO scan for cores
             Map currentMap = new Map(map, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
             currentMap.meta.tags.clear();
             currentMap.meta.tags.putAll(tags);

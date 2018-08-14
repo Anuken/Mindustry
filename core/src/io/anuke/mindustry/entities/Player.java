@@ -83,14 +83,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     //region unit and event overrides, utility methods
 
     @Remote(targets = Loc.server, called = Loc.server)
-    public static void onPlayerDamage(Player player, float amount){
-        if(player == null) return;
-
-        player.hitTime = hitDuration;
-        player.health -= amount;
-    }
-
-    @Remote(targets = Loc.server, called = Loc.server)
     public static void onPlayerDeath(Player player){
         if(player == null) return;
 
@@ -227,7 +219,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void damage(float amount){
-        Call.onPlayerDamage(this, calculateDamage(amount));
+        hitTime = hitDuration;
+        if(!Net.client()){
+            health -= amount;
+        }
 
         if(health <= 0 && !dead){
             Call.onPlayerDeath(this);
