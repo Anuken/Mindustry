@@ -11,6 +11,7 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
@@ -43,7 +44,7 @@ public class NetServer extends Module{
     public final static boolean showSnapshotSize = false;
 
     private final static byte[] reusableSnapArray = new byte[maxSnapshotSize];
-    private final static float serverSyncTime = 5, kickDuration = 30 * 1000;
+    private final static float serverSyncTime = 4, kickDuration = 30 * 1000;
     private final static Vector2 vector = new Vector2();
     /**If a play goes away of their server-side coordinates by this distance, they get teleported back.*/
     private final static float correctDist = 16f;
@@ -200,8 +201,8 @@ public class NetServer extends Module{
             player.isBoosting = packet.boosting;
             player.isShooting = packet.shooting;
             player.getPlaceQueue().clear();
-            if(packet.currentRequest != null){
-                player.getPlaceQueue().addLast(packet.currentRequest);
+            for(BuildRequest req : packet.requests){
+                player.getPlaceQueue().addLast(req);
             }
 
             vector.set(packet.x - player.getInterpolator().target.x, packet.y - player.getInterpolator().target.y);
