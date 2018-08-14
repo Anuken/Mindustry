@@ -365,9 +365,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void drawOver(){
         if(dead) return;
 
-        if(!isShooting()){
-            drawBuilding(this);
-        }
+        drawBuilding(this);
 
         if(mech.flying || boostHeat > 0.001f){
             float wobblyness = 0.6f;
@@ -478,9 +476,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             avoidOthers(8f);
         }
 
-        if(!isShooting()){
-            updateBuilding(this);
-        }
+        updateBuilding(this);
 
         x = Mathf.clamp(x, 0, world.width() * tilesize);
         y = Mathf.clamp(y, 0, world.height() * tilesize);

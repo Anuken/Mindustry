@@ -189,6 +189,7 @@ public class NetworkIO{
             Map currentMap = new Map(map, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
             currentMap.meta.tags.clear();
             currentMap.meta.tags.putAll(tags);
+            world.setSector(null);
             world.setMap(currentMap);
 
             Tile[][] tiles = world.createTiles(width, height);

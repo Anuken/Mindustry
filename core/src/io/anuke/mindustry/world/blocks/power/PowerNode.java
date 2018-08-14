@@ -60,7 +60,7 @@ public class PowerNode extends PowerBlock{
             entity.links.add(other.packedPosition());
         }
 
-        if(other.block() instanceof PowerNode){
+        if(other.getTeamID() == tile.getTeamID() && other.block() instanceof PowerNode){
             DistributorEntity oe = other.entity();
 
             if(!oe.links.contains(tile.packedPosition())){
@@ -224,12 +224,12 @@ public class PowerNode extends PowerBlock{
     }
 
     protected boolean shouldDistribute(Tile tile, Tile other){
-        return other.entity.power.amount / other.block().powerCapacity <= tile.entity.power.amount / powerCapacity &&
+        return other.getTeamID() == tile.getTeamID() && other.entity.power.amount / other.block().powerCapacity <= tile.entity.power.amount / powerCapacity &&
                 !(other.block() instanceof PowerGenerator); //do not distribute to power generators
     }
 
     protected boolean shouldLeechPower(Tile tile, Tile other){
-        return !(other.block() instanceof PowerNode)
+        return other.getTeamID() == tile.getTeamID() && !(other.block() instanceof PowerNode)
                 && other.block() instanceof PowerDistributor //only suck power from batteries and power generators
                 && other.entity.power.amount / other.block().powerCapacity > tile.entity.power.amount / powerCapacity;
     }

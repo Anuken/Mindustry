@@ -103,7 +103,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public float handleDamage(Tile tile, float amount){
-        return amount;
+        return debug ? 0 : amount;
     }
 
     @Override
