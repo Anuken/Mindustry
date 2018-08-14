@@ -96,8 +96,6 @@ public class ContentDisplay{
         table.row();
         table.add(Bundles.format("text.item.fluxiness", (int) (item.fluxiness * 100)));
         table.row();
-        table.add(Bundles.format("text.item.hardness", item.hardness));
-        table.row();
     }
 
     public static void displayLiquid(Table table, Liquid liquid){

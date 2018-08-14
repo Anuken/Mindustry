@@ -98,7 +98,7 @@ public class Conveyor extends Block{
         byte rotation = tile.getRotation();
 
         int frame = entity.clogHeat <= 0.5f ? (int) ((Timers.time() / 4f) % 4) : 0;
-        Draw.rect(regions[entity.blendbits][frame], tile.drawx(), tile.drawy(),
+        Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], tile.drawx(), tile.drawy(),
             tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation*90);
     }
 

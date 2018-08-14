@@ -202,6 +202,11 @@ public interface BuilderTrait extends Entity{
         //otherwise, update it.
         BuildEntity entity = tile.entity();
 
+        if(entity == null){
+            getPlaceQueue().removeFirst();
+            return;
+        }
+
         //deconstructing is 2x as fast
         if(current.remove){
             entity.deconstruct(unit, core, 2f / entity.buildCost * Timers.delta() * getBuildPower(tile));
