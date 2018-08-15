@@ -329,6 +329,10 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     public void update(){
         super.update();
 
+        if(target != null && target.getTeam() != team){
+            target = null;
+        }
+
         if(Net.client() && state.is(repair) && target instanceof TileEntity){
             TileEntity entity = (TileEntity) target;
             entity.health += type.healSpeed * Timers.delta();
