@@ -119,7 +119,7 @@ public class BlockIndexer{
      * Get all allied blocks with a flag.
      */
     public ObjectSet<Tile> getAllied(Team team, BlockFlag type){
-        return (state.teams.get(team).ally ? allyMap : enemyMap).get(type, emptyArray);
+        return state.teams.has(team) ? (state.teams.get(team).ally ? allyMap : enemyMap).get(type, emptyArray) : emptyArray;
     }
 
     /**
@@ -142,7 +142,7 @@ public class BlockIndexer{
                     for(int ty = ry * structQuadrantSize; ty < (ry + 1) * structQuadrantSize && ty < world.height(); ty++){
                         Tile other = world.tile(tx, ty);
 
-                        if(other == null || other.entity == null || other.getTeam() != team || !pred.test(other)) continue;
+                        if(other == null || other.entity == null || !pred.test(other)) continue;
 
                         TileEntity e = other.entity;
 

@@ -224,7 +224,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected boolean shouldDistribute(Tile tile, Tile other){
-        return other.getTeamID() == tile.getTeamID() && other.entity.power.amount / other.block().powerCapacity <= tile.entity.power.amount / powerCapacity &&
+        return other != null && other.getTeamID() == tile.getTeamID() && other.entity.power.amount / other.block().powerCapacity <= tile.entity.power.amount / powerCapacity &&
                 !(other.block() instanceof PowerGenerator); //do not distribute to power generators
     }
 
