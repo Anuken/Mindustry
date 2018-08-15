@@ -237,12 +237,9 @@ public class World extends Module{
 
         EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
-        Timers.mark();
         generator.generateMap(tiles, sector);
 
         endMapLoad();
-
-        Log.info("Full time to generate: {0}", Timers.elapsed());
     }
 
     public void loadMap(Map map){

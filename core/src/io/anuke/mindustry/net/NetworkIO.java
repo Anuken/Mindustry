@@ -129,6 +129,9 @@ public class NetworkIO{
                 }
             }
 
+            //now write a snapshot.
+            netServer.writeSnapshot(player, stream);
+
         }catch(IOException e){
             throw new RuntimeException(e);
         }
@@ -269,6 +272,9 @@ public class NetworkIO{
             }
 
             world.endMapLoad();
+
+            //read raw snapshot
+            netClient.readSnapshot(stream);
 
         }catch(IOException e){
             throw new RuntimeException(e);

@@ -37,6 +37,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.zip.DeflaterOutputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -171,7 +172,8 @@ public class NetServer extends Module{
 
             //TODO try DeflaterOutputStream
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            NetworkIO.writeWorld(player, stream);
+            DeflaterOutputStream def = new DeflaterOutputStream(stream);
+            NetworkIO.writeWorld(player, def);
             WorldStream data = new WorldStream();
             data.stream = new ByteArrayInputStream(stream.toByteArray());
             Net.sendStream(id, data);
@@ -401,6 +403,71 @@ public class NetServer extends Module{
         admins.save();
     }
 
+    public void writeSnapshot(Player player, DataOutputStream dataStream) throws IOException{
+        //write wave datas
+        dataStream.writeFloat(state.wavetime);
+        dataStream.writeInt(state.wave);
+
+        Array<Tile> cores = state.teams.get(player.getTeam()).cores;
+
+        dataStream.writeByte(cores.size);
+
+        //write all core inventory data
+        for(Tile tile : cores){
+            dataStream.writeInt(tile.packedPosition());
+            tile.entity.items.write(dataStream);
+        }
+
+        //write timestamp
+        dataStream.writeLong(TimeUtils.millis());
+
+        int totalGroups = 0;
+
+        for(EntityGroup<?> group : Entities.getAllGroups()){
+            if(!group.isEmpty() && (group.all().get(0) instanceof SyncTrait)) totalGroups++;
+        }
+
+        //write total amount of serializable groups
+        dataStream.writeByte(totalGroups);
+
+        //check for syncable groups
+        for(EntityGroup<?> group : Entities.getAllGroups()){
+            //TODO range-check sync positions to optimize?
+            if(group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
+
+            //make sure mapping is enabled for this group
+            if(!group.mappingEnabled()){
+                throw new RuntimeException("Entity group '" + group.getType() + "' contains SyncTrait entities, yet mapping is not enabled. In order for syncing to work, you must enable mapping for this group.");
+            }
+
+            int amount = 0;
+
+            for(Entity entity : group.all()){
+                if(((SyncTrait) entity).isSyncing()){
+                    amount++;
+                }
+            }
+
+            //write group ID + group size
+            dataStream.writeByte(group.getID());
+            dataStream.writeShort(amount);
+
+            for(Entity entity : group.all()){
+                if(!((SyncTrait) entity).isSyncing()) continue;
+
+                int position = syncStream.position();
+                //write all entities now
+                dataStream.writeInt(entity.getID()); //write id
+                dataStream.writeByte(((SyncTrait) entity).getTypeID()); //write type ID
+                ((SyncTrait) entity).write(dataStream); //write entity
+                int length = syncStream.position() - position; //length must always be less than 127 bytes
+                if(length > 127)
+                    throw new RuntimeException("Write size for entity of type " + group.getType() + " must not exceed 127!");
+                dataStream.writeByte(length);
+            }
+        }
+    }
+
     String getUUID(int connectionID){
         return connections.get(connectionID).uuid;
     }
@@ -472,68 +539,7 @@ public class NetServer extends Module{
                 //reset stream to begin writing
                 syncStream.reset();
 
-                //write wave datas
-                dataStream.writeFloat(state.wavetime);
-                dataStream.writeInt(state.wave);
-
-                Array<Tile> cores = state.teams.get(player.getTeam()).cores;
-
-                dataStream.writeByte(cores.size);
-
-                //write all core inventory data
-                for(Tile tile : cores){
-                    dataStream.writeInt(tile.packedPosition());
-                    tile.entity.items.write(dataStream);
-                }
-
-                //write timestamp
-                dataStream.writeLong(TimeUtils.millis());
-
-                int totalGroups = 0;
-
-                for(EntityGroup<?> group : Entities.getAllGroups()){
-                    if(!group.isEmpty() && (group.all().get(0) instanceof SyncTrait)) totalGroups++;
-                }
-
-                //write total amount of serializable groups
-                dataStream.writeByte(totalGroups);
-
-                //check for syncable groups
-                for(EntityGroup<?> group : Entities.getAllGroups()){
-                    //TODO range-check sync positions to optimize?
-                    if(group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
-
-                    //make sure mapping is enabled for this group
-                    if(!group.mappingEnabled()){
-                        throw new RuntimeException("Entity group '" + group.getType() + "' contains SyncTrait entities, yet mapping is not enabled. In order for syncing to work, you must enable mapping for this group.");
-                    }
-
-                    int amount = 0;
-
-                    for(Entity entity : group.all()){
-                        if(((SyncTrait) entity).isSyncing()){
-                            amount++;
-                        }
-                    }
-
-                    //write group ID + group size
-                    dataStream.writeByte(group.getID());
-                    dataStream.writeShort(amount);
-
-                    for(Entity entity : group.all()){
-                        if(!((SyncTrait) entity).isSyncing()) continue;
-
-                        int position = syncStream.position();
-                        //write all entities now
-                        dataStream.writeInt(entity.getID()); //write id
-                        dataStream.writeByte(((SyncTrait) entity).getTypeID()); //write type ID
-                        ((SyncTrait) entity).write(dataStream); //write entity
-                        int length = syncStream.position() - position; //length must always be less than 127 bytes
-                        if(length > 127)
-                            throw new RuntimeException("Write size for entity of type " + group.getType() + " must not exceed 127!");
-                        dataStream.writeByte(length);
-                    }
-                }
+                writeSnapshot(player, dataStream);
 
                 byte[] bytes = syncStream.toByteArray();
 
