@@ -197,6 +197,10 @@ public class Renderer extends RendererModule{
     @Override
     public void draw(){
         camera.update();
+        if(Float.isNaN(Core.camera.position.x) || Float.isNaN(Core.camera.position.y)){
+            Core.camera.position.x = players[0].x;
+            Core.camera.position.y = players[0].y;
+        }
 
         Graphics.clear(clearColor);
 
