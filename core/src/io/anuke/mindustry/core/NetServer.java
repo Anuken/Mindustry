@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Mechs;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
@@ -202,6 +203,12 @@ public class NetServer extends Module{
             player.isShooting = packet.shooting;
             player.getPlaceQueue().clear();
             for(BuildRequest req : packet.requests){
+                //auto-skip done requests
+                if(req.remove && world.tile(req.x, req.y).block() == Blocks.air){
+                    continue;
+                }else if(!req.remove && world.tile(req.x, req.y).block() == req.recipe.result && (!req.recipe.result.rotate || world.tile(req.x, req.y).getRotation() == req.rotation)){
+                    continue;
+                }
                 player.getPlaceQueue().addLast(req);
             }
 

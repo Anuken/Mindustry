@@ -108,6 +108,8 @@ public interface BuilderTrait extends Entity{
 
                 if(applyChanges){
                     getPlaceQueue().addLast(request);
+                }else if(isBuilding()){
+                    getCurrentRequest().progress = progress;
                 }
             }
         }
@@ -148,6 +150,10 @@ public interface BuilderTrait extends Entity{
                 if(request.x == place.x && request.y == place.y){
                     return;
                 }
+            }
+            Tile tile = world.tile(place.x, place.y);
+            if(tile != null && tile.entity instanceof BuildEntity){
+                place.progress = tile.<BuildEntity>entity().progress;
             }
             getPlaceQueue().addLast(place);
         }
@@ -226,6 +232,8 @@ public interface BuilderTrait extends Entity{
             }
 
             current.progress = entity.progress();
+        }else{
+            entity.progress = current.progress;
         }
     }
 

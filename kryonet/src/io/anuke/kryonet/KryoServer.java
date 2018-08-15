@@ -5,9 +5,9 @@ import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
-import io.anuke.kryonet.CustomListeners.UnreliableListener;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Net.ServerProvider;
@@ -100,7 +100,7 @@ public class KryoServer implements ServerProvider {
         };
 
         if(KryoCore.fakeLag){
-            server.addListener(new UnreliableListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, KryoCore.fakeLagDrop, KryoCore.fakeLagDuplicate, listener));
+            server.addListener(new LagListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, listener));
         }else{
             server.addListener(listener);
         }
