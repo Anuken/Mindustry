@@ -297,7 +297,7 @@ public class World extends Module{
     }
 
     public void setBlock(Tile tile, Block block, Team team){
-        tile.setBlock(block);
+        tile.setBlock(block, team);
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;
             int offsety = -(block.size - 1) / 2;

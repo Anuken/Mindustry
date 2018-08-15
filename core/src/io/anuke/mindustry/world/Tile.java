@@ -167,8 +167,13 @@ public class Tile implements PosTrait, TargetTrait{
     }
 
     public void setBlock(Block type, Team team){
-        setBlock(type);
-        setTeam(team);
+        synchronized(tileSetLock){
+            preChanged();
+            this.wall = type;
+            this.team = (byte)team.ordinal();
+            this.link = 0;
+            changed();
+        }
     }
 
     public void setBlock(Block type){
@@ -393,6 +398,7 @@ public class Tile implements PosTrait, TargetTrait{
             if(entity != null){
                 entity.removeFromProximity();
             }
+            team = 0;
         }
     }
 
@@ -403,8 +409,6 @@ public class Tile implements PosTrait, TargetTrait{
                 entity.remove();
                 entity = null;
             }
-
-            team = 0;
 
             Block block = block();
 

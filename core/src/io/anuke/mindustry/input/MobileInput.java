@@ -584,6 +584,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void update(){
+        if(state.is(State.menu)){
+            selection.clear();
+            removals.clear();
+            mode = none;
+        }
 
         //reset state when not placing
         if(mode == none){

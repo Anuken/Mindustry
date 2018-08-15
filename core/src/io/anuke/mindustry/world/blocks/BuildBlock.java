@@ -55,7 +55,6 @@ public class BuildBlock extends Block{
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team){
         tile.setRotation(rotation);
         world.setBlock(tile, block, team);
-        tile.setTeam(team);
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
 
         //last builder was this local client player, call placed()
@@ -236,7 +235,7 @@ public class BuildBlock extends Block{
 
             progress = Mathf.clamp(progress - amount);
 
-            if(progress <= 0 || debug || state.mode.infiniteResources){
+            if(progress <= 0 || state.mode.infiniteResources){
                 Call.onDeconstructFinish(tile, this.recipe == null ? previous : this.recipe.result);
             }
         }

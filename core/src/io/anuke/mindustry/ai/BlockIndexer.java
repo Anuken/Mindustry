@@ -142,7 +142,7 @@ public class BlockIndexer{
                     for(int ty = ry * structQuadrantSize; ty < (ry + 1) * structQuadrantSize && ty < world.height(); ty++){
                         Tile other = world.tile(tx, ty);
 
-                        if(other == null || other.entity == null || !pred.test(other)) continue;
+                        if(other == null || other.entity == null || other.getTeam() != team || !pred.test(other)) continue;
 
                         TileEntity e = other.entity;
 
@@ -246,7 +246,6 @@ public class BlockIndexer{
         int quadrantX = tile.x / structQuadrantSize;
         int quadrantY = tile.y / structQuadrantSize;
         int index = quadrantX + quadrantY * quadWidth();
-        //Log.info("Updating quadrant: {0} {1}", quadrantX, quadrantY);
 
         for(TeamData data : state.teams.getTeams()){
 
