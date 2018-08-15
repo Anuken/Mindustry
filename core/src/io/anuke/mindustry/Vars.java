@@ -34,6 +34,8 @@ public class Vars{
     public static final float wavespace = 60 * 60 * 1.5f;
     //set ridiculously high for now
     public static final float coreBuildRange = 800999f;
+
+    public static final float enemyCoreBuildRange = 400f;
     //discord group URL
     public static final String discordURL = "https://discord.gg/BKADYds";
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";

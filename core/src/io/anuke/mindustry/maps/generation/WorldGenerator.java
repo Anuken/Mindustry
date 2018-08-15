@@ -242,7 +242,7 @@ public class WorldGenerator{
         int x = sectorX * sectorSize + localX + Short.MAX_VALUE;
         int y = sectorY * sectorSize + localY + Short.MAX_VALUE;
 
-        Block floor = Blocks.stone;
+        Block floor;
         Block wall = Blocks.air;
 
         double ridge = rid.getValue(x, y, 1f / 400f);
@@ -285,6 +285,8 @@ public class WorldGenerator{
             }
         }else if(minDst > lerpDst/1.5f){
             floor = Blocks.lava;
+        }else{
+            floor = Blocks.blackstone;
         }
 
         if(temp < 0.6f){

@@ -142,7 +142,7 @@ public class BlockIndexer{
                     for(int ty = ry * structQuadrantSize; ty < (ry + 1) * structQuadrantSize && ty < world.height(); ty++){
                         Tile other = world.tile(tx, ty);
 
-                        if(other == null || other.entity == null || !pred.test(other)) continue;
+                        if(other == null || other.entity == null || other.getTeam() != team || !pred.test(other)) continue;
 
                         TileEntity e = other.entity;
 
