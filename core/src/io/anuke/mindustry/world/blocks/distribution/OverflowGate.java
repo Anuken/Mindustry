@@ -35,6 +35,7 @@ public class OverflowGate extends Splitter{
         int from = tile.relativeTo(src.x, src.y);
         if(from == -1) return null;
         Tile to = tile.getNearby((from + 2) % 4);
+        if(to == null) return null;
         Tile edge = Edges.getFacingEdge(tile, to);
 
         if(!to.block().acceptItem(item, to, edge) || (to.block() instanceof OverflowGate)){

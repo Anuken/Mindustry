@@ -3,6 +3,7 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.BitmapFont.Glyph;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -24,6 +25,7 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.players;
 import static io.anuke.mindustry.Vars.state;
+import static io.anuke.ucore.core.Core.font;
 import static io.anuke.ucore.core.Core.scene;
 import static io.anuke.ucore.core.Core.skin;
 
@@ -34,7 +36,7 @@ public class ChatFragment extends Table{
     private boolean chatOpen = false;
     private TextField chatfield;
     private Label fieldlabel = new Label(">");
-    private BitmapFont font;
+    //private BitmapFont font;
     private GlyphLayout layout = new GlyphLayout();
     private float offsetx = Unit.dp.scl(4), offsety = Unit.dp.scl(4), fontoffsetx = Unit.dp.scl(2), chatspace = Unit.dp.scl(50);
     private float textWidth = Unit.dp.scl(600);
@@ -54,7 +56,7 @@ public class ChatFragment extends Table{
         super();
 
         setFillParent(true);
-        font = Core.skin.getFont("default-font");
+        //font = Core.skin.getFont("default-font");
 
         visible(() -> !state.is(State.menu) && Net.active());
 
@@ -97,15 +99,31 @@ public class ChatFragment extends Table{
 
     private void setup(){
         fieldlabel.setStyle(new LabelStyle(fieldlabel.getStyle()));
-        fieldlabel.getStyle().font = font;
+        //fieldlabel.getStyle().font = font;
         fieldlabel.setStyle(fieldlabel.getStyle());
 
-        chatfield = new TextField("", new TextField.TextFieldStyle(skin.get(TextField.TextFieldStyle.class)));
+        chatfield = new TextField("", new TextField.TextFieldStyle(skin.get(TextField.TextFieldStyle.class))){
+            @Override
+            public void draw(Batch batch, float parentAlpha){
+                getStyle().font.getData().markupEnabled = false;
+                super.draw(batch, parentAlpha);
+                getStyle().font.getData().markupEnabled = true;
+            }
+        };
         chatfield.setTextFieldFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
         chatfield.getStyle().background = null;
         chatfield.getStyle().fontColor = Color.WHITE;
-        chatfield.getStyle().font = skin.getFont("default-font-chat");
         chatfield.setStyle(chatfield.getStyle());
+        chatfield.update(() -> {
+            BitmapFont font = detectFont(chatfield.getText());;
+            if(font != chatfield.getStyle().font){
+                chatfield.getStyle().font = detectFont(chatfield.getText());
+                chatfield.setStyle(chatfield.getStyle());
+                String text = chatfield.getText();
+                chatfield.clearText();
+                chatfield.appendText(text);
+            }
+        });
         Platform.instance.addDialog(chatfield, Vars.maxTextLength);
 
         bottom().left().marginBottom(offsety).marginLeft(offsetx * 2).add(fieldlabel).padBottom(4f);
@@ -127,8 +145,9 @@ public class ChatFragment extends Table{
 
         batch.setColor(shadowColor);
 
-        if(chatOpen)
+        if(chatOpen){
             batch.draw(skin.getRegion("white"), offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+        }
 
         super.draw(batch, alpha);
 
@@ -141,6 +160,7 @@ public class ChatFragment extends Table{
 
         float theight = offsety + spacing + getMarginBottom();
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || chatOpen); i++){
+            BitmapFont font = detectFont(messages.get(i).formattedMessage);
 
             layout.setText(font, messages.get(i).formattedMessage, Color.WHITE, textWidth, Align.bottomLeft, true);
             theight += layout.height + textspacing;
@@ -164,6 +184,25 @@ public class ChatFragment extends Table{
 
         if(fadetime > 0 && !chatOpen)
             fadetime -= Timers.delta() / 180f;
+    }
+
+    private BitmapFont detectFont(String text){
+        for(int i = 0; i < text.length(); i++){
+            if(isControl((int) text.charAt(i))) continue;
+            Glyph g = font.getData().getGlyph(text.charAt(i));
+            if(g == null || g == font.getData().missingGlyph){
+                for(BitmapFont font : Core.skin.getAll(BitmapFont.class).values()){
+                    if(font.getData().getGlyph(text.charAt(i)) != null){
+                        return font;
+                    }
+                }
+            }
+        }
+        return Core.font;
+    }
+
+    private boolean isControl(int var0){
+        return var0 <= 159 && (var0 >= 127 || var0 >>> 5 == 0);
     }
 
     private void sendMessage(){
