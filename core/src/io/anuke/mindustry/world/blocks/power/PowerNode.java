@@ -282,7 +282,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected boolean linkValid(Tile tile, Tile link, boolean checkMaxNodes){
-        if(!(tile != link && link != null && link.block().hasPower)) return false;
+        if(!(tile != link && link != null && link.block().hasPower) || tile.getTeamID() != link.getTeamID()) return false;
 
         if(link.block() instanceof PowerNode){
             DistributorEntity oe = link.entity();
