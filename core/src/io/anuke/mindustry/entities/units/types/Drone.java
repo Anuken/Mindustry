@@ -190,7 +190,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         public void update(){
             ItemDrop item = (ItemDrop) target;
 
-            if(inventory.isFull() || !inventory.canAcceptItem(item.getItem(), 1)){
+            if(item == null || inventory.isFull() || !inventory.canAcceptItem(item.getItem(), 1)){
                 setState(drop);
                 return;
             }
@@ -329,7 +329,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     public void update(){
         super.update();
 
-        if(target != null && target.getTeam() != team){
+        if(state.is(repair) && target != null && target.getTeam() != team){
             target = null;
         }
 

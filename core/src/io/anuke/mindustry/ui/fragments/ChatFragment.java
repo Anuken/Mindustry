@@ -61,9 +61,14 @@ public class ChatFragment extends Table{
         visible(() -> !state.is(State.menu) && Net.active());
 
         update(() -> {
-            if(!Net.active() && chatOpen){
-                hide();
+            if(!Net.active()){
+                clearMessages();
+
+                if(chatOpen){
+                    hide();
+                }
             }
+
 
             if(Net.active() && Inputs.keyTap("chat")){
                 toggle();
@@ -109,9 +114,17 @@ public class ChatFragment extends Table{
                 super.draw(batch, parentAlpha);
                 getStyle().font.getData().markupEnabled = true;
             }
+
+            @Override
+            protected void updateDisplayText(){
+                getStyle().font.getData().markupEnabled = false;
+                super.updateDisplayText();
+                getStyle().font.getData().markupEnabled = true;
+            }
         };
         chatfield.setTextFieldFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
         chatfield.getStyle().background = null;
+        chatfield.getStyle().messageFont = null;
         chatfield.getStyle().fontColor = Color.WHITE;
         chatfield.setStyle(chatfield.getStyle());
         chatfield.update(() -> {

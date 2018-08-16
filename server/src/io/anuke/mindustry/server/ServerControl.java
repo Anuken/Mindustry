@@ -269,7 +269,7 @@ public class ServerControl extends Module{
             }
         });
 
-        handler.register("setsector <x> <y>", "Sets the next sector to be played. Does not affect current game.", arg -> {
+        handler.register("setsector", "<x> <y>", "Sets the next sector to be played. Does not affect current game.", arg -> {
             try{
                 Settings.putInt("sector_x", Integer.parseInt(arg[0]));
                 Settings.putInt("sector_y", Integer.parseInt(arg[1]));
