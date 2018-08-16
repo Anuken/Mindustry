@@ -6,7 +6,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
-public class OverflowGate extends Splitter{
+public class OverflowGate extends Router{
 
     public OverflowGate(String name){
         super(name);

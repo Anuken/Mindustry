@@ -48,7 +48,7 @@ public class Recipes implements ContentList{
 
         //starter lead transporation
         new Recipe(distribution, DistributionBlocks.junction, new ItemStack(Items.lead, 2));
-        new Recipe(distribution, DistributionBlocks.splitter, new ItemStack(Items.lead, 6));
+        new Recipe(distribution, DistributionBlocks.router, new ItemStack(Items.lead, 6));
 
         //advanced carbide transporation
         new Recipe(distribution, DistributionBlocks.distributor, new ItemStack(Items.carbide, 8), new ItemStack(Items.tungsten, 8));
