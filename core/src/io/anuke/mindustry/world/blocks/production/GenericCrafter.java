@@ -114,6 +114,11 @@ public class GenericCrafter extends Block{
         return new GenericCrafterEntity();
     }
 
+    @Override
+    public int getMaximumAccepted(Tile tile, Item item){
+        return itemCapacity;
+    }
+
     public static class GenericCrafterEntity extends TileEntity{
         public float progress;
         public float totalProgress;

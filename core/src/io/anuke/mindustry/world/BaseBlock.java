@@ -84,7 +84,7 @@ public abstract class BaseBlock{
     }
 
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return tile.entity != null && consumes.has(ConsumeItem.class) && consumes.item() == item && tile.entity.items.total() < itemCapacity;
+        return tile.entity != null && consumes.has(ConsumeItem.class) && consumes.item() == item && tile.entity.items.get(item) < getMaximumAccepted(tile, item);
     }
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){

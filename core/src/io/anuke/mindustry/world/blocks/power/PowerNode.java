@@ -53,6 +53,7 @@ public class PowerNode extends PowerBlock{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void linkPowerDistributors(Player player, Tile tile, Tile other){
+        if(!(tile.entity instanceof DistributorEntity)) return;
 
         DistributorEntity entity = tile.entity();
 
@@ -71,6 +72,8 @@ public class PowerNode extends PowerBlock{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unlinkPowerDistributors(Player player, Tile tile, Tile other){
+        if(!(tile.entity instanceof DistributorEntity)) return;
+
         DistributorEntity entity = tile.entity();
 
         entity.links.removeValue(other.packedPosition());
