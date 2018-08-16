@@ -8,17 +8,11 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
 public class Items implements ContentList{
-    public static Item stone, tungsten, lead, coal, carbide, titanium, thorium, silicon, plastanium, phasematter, surgealloy,
+    public static Item stone, lead, coal, carbide, titanium, thorium, silicon, plastanium, phasematter, surgealloy,
             biomatter, sand, blastCompound, pyratite;
 
     @Override
     public void load(){
-
-        tungsten = new Item("tungsten", Color.valueOf("a0b0c8")){{
-            type = ItemType.material;
-            hardness = 1;
-            cost = 0.75f;
-        }};
 
         lead = new Item("lead", Color.valueOf("8e85a2")){{
             type = ItemType.material;
@@ -71,16 +65,9 @@ public class Items implements ContentList{
             cost = 1.5f;
         }};
 
-        surgealloy = new Item("surge-alloy", Color.valueOf("b4d5c7")){
-            {
-                type = ItemType.material;
-            }
-
-            @Override
-            public boolean isHidden(){
-                return true;
-            }
-        };
+        surgealloy = new Item("surge-alloy", Color.valueOf("b4d5c7")){{
+            type = ItemType.material;
+        }};
 
         biomatter = new Item("biomatter", Color.valueOf("648b55")){{
             flammability = 0.4f;

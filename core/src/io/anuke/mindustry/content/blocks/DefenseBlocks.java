@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.blocks.defense.PhaseWall;
 
 public class DefenseBlocks extends BlockList implements ContentList{
     public static Block tungstenWall, tungstenWallLarge, carbideWall, carbideWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge, deflectorwall, deflectorwalllarge,
-            phasewall, phasewalllarge;
+            phaseWall, phaseWallLarge;
 
     @Override
     public void load(){
@@ -52,11 +52,11 @@ public class DefenseBlocks extends BlockList implements ContentList{
             size = 2;
         }};
 
-        phasewall = new PhaseWall("phase-wall"){{
+        phaseWall = new PhaseWall("phase-wall"){{
             health = 150 * wallHealthMultiplier;
         }};
 
-        phasewalllarge = new PhaseWall("phase-wall-large"){{
+        phaseWallLarge = new PhaseWall("phase-wall-large"){{
             health = 150 * 4 * wallHealthMultiplier;
             size = 2;
             regenSpeed = 0.5f;
