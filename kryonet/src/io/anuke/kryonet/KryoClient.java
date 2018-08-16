@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.*;
 import com.esotericsoftware.minlog.Log;
-import io.anuke.kryonet.CustomListeners.UnreliableListener;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
@@ -100,7 +99,7 @@ public class KryoClient implements ClientProvider{
         };
 
         if(KryoCore.fakeLag){
-            client.addListener(new UnreliableListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, KryoCore.fakeLagDrop, KryoCore.fakeLagDuplicate, listener));
+            client.addListener(new Listener.LagListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, listener));
         }else{
             client.addListener(listener);
         }

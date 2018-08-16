@@ -7,10 +7,10 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.AmmoEntry;
@@ -37,7 +37,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class Turret extends Block{
-    protected static final int targetInterval = 15;
+    protected static final int targetInterval = 20;
 
     protected final int timerTarget = timers++;
 
@@ -188,11 +188,11 @@ public abstract class Turret extends Block{
         if(hasAmmo(tile)){
 
             if(entity.timer.get(timerTarget, targetInterval)){
-                entity.target = Units.getClosestEnemy(tile.getTeam(),
+                entity.target = Units.getClosestTarget(tile.getTeam(),
                         tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir));
             }
 
-            if(entity.target != null){
+            if(!Units.invalidateTarget(entity.target, tile.getTeam(), tile.drawx(), tile.drawy())){
                 AmmoType type = peekAmmo(tile);
                 float speed = type.bullet.speed;
                 if(speed < 0.1f) speed = 9999999f;
@@ -322,7 +322,7 @@ public abstract class Turret extends Block{
         public float recoil = 0f;
         public float heat;
         public int shots;
-        public Unit target;
+        public TargetTrait target;
 
         @Override
         public void write(DataOutputStream stream) throws IOException{

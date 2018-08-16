@@ -38,13 +38,16 @@ import static io.anuke.ucore.util.Log.*;
 public class ServerControl extends Module{
     private final CommandHandler handler = new CommandHandler("");
     private ShuffleMode mode;
+    //consecutive sector losses
+    private int gameOvers;
 
     public ServerControl(String[] args){
         Settings.defaultList(
             "shufflemode", "normal",
             "bans", "",
             "admins", "",
-            "sectorid", 0
+            "sector_x", 0,
+            "sector_y", 1
         );
 
         mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
@@ -105,8 +108,14 @@ public class ServerControl extends Module{
                         state.set(State.playing);
                     }
                 }else{
-                    info("Re-trying sector map.");
+                    if(gameOvers >= 2){
+                        Settings.putInt("sector_y", Settings.getInt("sector_y") < 0 ? Settings.getInt("sector_y") + 1 : Settings.getInt("sector_y") - 1);
+                        Settings.save();
+                        gameOvers = 0;
+                    }
+                    gameOvers ++;
                     playSectorMap();
+                    info("Re-trying sector map: {0} {1}",  Settings.getInt("sector_x"), Settings.getInt("sector_y"));
                 }
             }else{
                 state.set(State.menu);
@@ -183,7 +192,7 @@ public class ServerControl extends Module{
                 logic.play();
 
             }else{
-                Log.info("&ly&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sectorid"), 0);
+                Log.info("&ly&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sector_x"), Settings.getInt("sector_y"));
                 playSectorMap();
             }
 
@@ -256,6 +265,17 @@ public class ServerControl extends Module{
                 info("Difficulty set to '{0}'.", arg[0]);
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
+            }
+        });
+
+        handler.register("setsector", "<x> <y>", "Sets the next sector to be played. Does not affect current game.", arg -> {
+            try{
+                Settings.putInt("sector_x", Integer.parseInt(arg[0]));
+                Settings.putInt("sector_y", Integer.parseInt(arg[1]));
+                Settings.save();
+                info("Sector position set.");
+            }catch(NumberFormatException e){
+                err("Invalid coordinates.");
             }
         });
 
@@ -623,9 +643,8 @@ public class ServerControl extends Module{
                 return;
             }
 
+            info("&lyCore destroyed.");
             Events.fire(GameOverEvent.class);
-
-            info("Core destroyed.");
         });
 
         handler.register("debuginfo", "Print debug info", arg -> {
@@ -825,7 +844,11 @@ public class ServerControl extends Module{
     }
 
     private void playSectorMap(){
-        world.loadSector(world.sectors().get(Settings.getInt("sectorid"), 0));
+        int x = Settings.getInt("sector_x"), y = Settings.getInt("sector_y");
+        if(world.sectors().get(x, y) == null){
+            world.sectors().createSector(x, y);
+        }
+        world.loadSector(world.sectors().get(x, y));
         logic.play();
     }
 
@@ -846,7 +869,9 @@ public class ServerControl extends Module{
             if(world.getSector().completedMissions >= world.getSector().missions.size){
                 world.sectors().completeSector(world.getSector().x, world.getSector().y);
                 world.sectors().save();
-                Settings.putInt("sectorid", world.getSector().x + world.getSector().size);
+                gameOvers = 0;
+                Settings.putInt("sector_x", world.getSector().x + world.getSector().size);
+
                 Settings.save();
 
                 netServer.kickAll(KickReason.sectorComplete);

@@ -8,6 +8,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.InventoryModule;
@@ -166,8 +167,13 @@ public class Tile implements PosTrait, TargetTrait{
     }
 
     public void setBlock(Block type, Team team){
-        setBlock(type);
-        setTeam(team);
+        synchronized(tileSetLock){
+            preChanged();
+            this.wall = type;
+            this.team = (byte)team.ordinal();
+            this.link = 0;
+            changed();
+        }
     }
 
     public void setBlock(Block type){
@@ -392,6 +398,7 @@ public class Tile implements PosTrait, TargetTrait{
             if(entity != null){
                 entity.removeFromProximity();
             }
+            team = 0;
         }
     }
 
@@ -403,8 +410,6 @@ public class Tile implements PosTrait, TargetTrait{
                 entity = null;
             }
 
-            team = 0;
-
             Block block = block();
 
             if(block.hasEntity()){
@@ -414,7 +419,7 @@ public class Tile implements PosTrait, TargetTrait{
                 if(block.hasLiquids) entity.liquids = new LiquidModule();
                 if(block.hasPower) entity.power = new PowerModule();
                 entity.updateProximity();
-            }else{
+            }else if(!(block instanceof BlockPart)){
                 //since the entity won't update proximity for us, update proximity for all nearby tiles manually
                 for(GridPoint2 p : Geometry.d4){
                     Tile tile = world.tile(x + p.x, y + p.y);

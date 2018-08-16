@@ -74,7 +74,9 @@ public class JoinDialog extends FloatingDialog{
 
         add.shown(() -> {
             add.getTitleLabel().setText(renaming != null ? "$text.server.edit" : "$text.server.add");
-            field.setText(renaming.ip);
+            if(renaming != null){
+                field.setText(renaming.ip);
+            }
         });
 
         shown(() -> {

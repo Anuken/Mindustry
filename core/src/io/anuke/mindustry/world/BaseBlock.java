@@ -84,7 +84,7 @@ public abstract class BaseBlock{
     }
 
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return tile.entity != null && consumes.has(ConsumeItem.class) && consumes.item() == item && tile.entity.items.total() < itemCapacity;
+        return tile.entity != null && consumes.has(ConsumeItem.class) && consumes.item() == item && tile.entity.items.get(item) < getMaximumAccepted(tile, item);
     }
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
@@ -274,7 +274,7 @@ public abstract class BaseBlock{
     /** Try offloading an item to a nearby container in its facing direction. Returns true if success.*/
     public boolean offloadDir(Tile tile, Item item){
         Tile other = tile.getNearby(tile.getRotation());
-        if(other != null && other.getTeamID() == tile.getTeamID() &&  other.block().acceptItem(item, other, tile)){
+        if(other != null && other.target().getTeamID() == tile.getTeamID() &&  other.block().acceptItem(item, other, tile)){
             other.block().handleItem(item, other, tile);
             return true;
         }

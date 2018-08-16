@@ -134,9 +134,8 @@ public class Conveyor extends Block{
         Tile other = tile.getNearby(Mathf.mod(tile.getRotation() - direction, 4));
         if(other != null) other = other.target();
 
-        if(other == null || !other.block().outputsItems()) return false;
-        return (tile.getNearby(tile.getRotation()) == other)
-        || (!other.block().rotate || other.getNearby(other.getRotation()) == tile);
+        return other != null && other.block().outputsItems()
+        && ((tile.getNearby(tile.getRotation()) == other) || (!other.block().rotate || other.getNearby(other.getRotation()) == tile));
     }
 
     @Override

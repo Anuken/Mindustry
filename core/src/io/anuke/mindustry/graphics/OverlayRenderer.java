@@ -24,6 +24,7 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class OverlayRenderer{
+    private float buildFadeTime;
 
     public void drawBottom(){
         for(Player player : players){
@@ -58,6 +59,24 @@ public class OverlayRenderer{
 
             input.drawTop();
 
+            buildFadeTime = Mathf.lerpDelta(buildFadeTime, input.isPlacing() ? 1f : 0f, 0.06f);
+
+            Draw.reset();
+            Lines.stroke(buildFadeTime*2f);
+
+            if(buildFadeTime > 0.005f){
+                for(TeamData data : state.teams.enemyDataOf(player.getTeam())){
+                    for(Tile core : data.cores){
+                        float dst = Vector2.dst(player.x, player.y, core.drawx(), core.drawy());
+                        if(dst < enemyCoreBuildRange * 1.5f){
+                            Draw.color(Color.DARK_GRAY);
+                            Lines.poly(core.drawx(), core.drawy() - 2, 200, enemyCoreBuildRange);
+                            Draw.color(Palette.accent, data.team.color, 0.5f + Mathf.absin(Timers.time(), 10f, 0.5f));
+                            Lines.poly(core.drawx(), core.drawy(), 200, enemyCoreBuildRange);
+                        }
+                    }
+                }
+            }
             Draw.reset();
 
             //draw selected block bars and info

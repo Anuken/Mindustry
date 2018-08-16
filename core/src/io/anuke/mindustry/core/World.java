@@ -237,12 +237,9 @@ public class World extends Module{
 
         EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
-        Timers.mark();
         generator.generateMap(tiles, sector);
 
         endMapLoad();
-
-        Log.info("Full time to generate: {0}", Timers.elapsed());
     }
 
     public void loadMap(Map map){
@@ -300,7 +297,7 @@ public class World extends Module{
     }
 
     public void setBlock(Tile tile, Block block, Team team){
-        tile.setBlock(block);
+        tile.setBlock(block, team);
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;
             int offsety = -(block.size - 1) / 2;

@@ -53,6 +53,7 @@ public class PowerNode extends PowerBlock{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void linkPowerDistributors(Player player, Tile tile, Tile other){
+        if(!(tile.entity instanceof DistributorEntity)) return;
 
         DistributorEntity entity = tile.entity();
 
@@ -71,6 +72,8 @@ public class PowerNode extends PowerBlock{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unlinkPowerDistributors(Player player, Tile tile, Tile other){
+        if(!(tile.entity instanceof DistributorEntity)) return;
+
         DistributorEntity entity = tile.entity();
 
         entity.links.removeValue(other.packedPosition());
@@ -224,7 +227,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected boolean shouldDistribute(Tile tile, Tile other){
-        return other.getTeamID() == tile.getTeamID() && other.entity.power.amount / other.block().powerCapacity <= tile.entity.power.amount / powerCapacity &&
+        return other != null && other.getTeamID() == tile.getTeamID() && other.entity.power.amount / other.block().powerCapacity <= tile.entity.power.amount / powerCapacity &&
                 !(other.block() instanceof PowerGenerator); //do not distribute to power generators
     }
 
@@ -282,7 +285,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected boolean linkValid(Tile tile, Tile link, boolean checkMaxNodes){
-        if(!(tile != link && link != null && link.block().hasPower)) return false;
+        if(!(tile != link && link != null && link.block().hasPower) || tile.getTeamID() != link.getTeamID()) return false;
 
         if(link.block() instanceof PowerNode){
             DistributorEntity oe = link.entity();
