@@ -7,14 +7,11 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -157,31 +154,7 @@ public class OverlayRenderer{
                     Draw.color();
                 }
             }
-
         }
-
-        if((!debug || showUI) && Settings.getBool("healthbars")){
-            for(TeamData ally : (debug ? state.teams.getTeams() : state.teams.getTeams(true))){
-                renderer.drawAndInterpolate(unitGroups[ally.team.ordinal()], u -> !u.isDead(), this::drawStats);
-            }
-
-            renderer.drawAndInterpolate(playerGroup, u -> !u.isDead(), this::drawStats);
-        }
-    }
-
-    void drawStats(Unit unit){
-        if(unit.isDead()) return;
-
-        float x = unit.x;
-        float y = unit.y;
-
-        if(unit == players[0] && players.length == 1 && snapCamera){
-            x = (int) (x + 0.0001f);
-            y = (int) (y + 0.0001f);
-        }
-
-        //drawEncloser(x, y - 8f, 1f);
-        //drawBar(Palette.healthstats, x, y - 8f, unit.healthf());
     }
 
     void drawBar(Color color, float x, float y, float finion){

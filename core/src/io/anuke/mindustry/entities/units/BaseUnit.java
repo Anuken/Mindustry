@@ -253,11 +253,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public boolean isInfiniteAmmo(){
-        return isWave;
-    }
-
-    @Override
     public void interpolate(){
         super.interpolate();
 

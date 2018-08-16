@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
@@ -306,16 +307,30 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public void drawOver(){
     }
 
+    public void drawStats(){
+        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Timers.time(), healthf()*5f, 1f - healthf()));
+        Draw.alpha(hitTime);
+        Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
+        Draw.color();
+    }
+
+    public TextureRegion getPowerCellRegion(){
+        return Draw.region("power-cell");
+    }
+
+    public void drawAll(){
+        if(!isDead()){
+            draw();
+            drawStats();
+        }
+    }
+
     public void drawShadow(){
         Draw.rect(getIconRegion(), x , y, rotation - 90);
     }
 
     public void drawView(){
         Fill.circle(x, y, getViewDistance());
-    }
-
-    public boolean isInfiniteAmmo(){
-        return false;
     }
 
     public float getViewDistance(){

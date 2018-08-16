@@ -3,7 +3,6 @@ package io.anuke.mindustry.game;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.GroundUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.Weapon;
@@ -62,10 +61,6 @@ public class SpawnGroup{
      * Items this unit spawns with. Null to disable.
      */
     protected ItemStack items;
-    /**
-     * Ammo type this unit spawns with. Null to use the first available ammo.
-     */
-    protected Item ammoItem;
 
     public SpawnGroup(UnitType type){
         this.type = type;

@@ -264,6 +264,23 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
+    public void drawAll(){
+        boolean snap = snapCamera && isLocal;
+
+        float px = x, py = y;
+
+        if(snap){
+            x = (int) (x + 0.0001f);
+            y = (int) (y + 0.0001f);
+        }
+
+        super.drawAll();
+
+        x = px;
+        y = py;
+    }
+
+    @Override
     public void draw(){
         if((debug && (!showPlayer || !showUI)) || dead) return;
 
@@ -273,15 +290,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         boostHeat = Mathf.lerpDelta(boostHeat, isBoosting && ((!movement.isZero() && moved) || !isLocal) ? 1f : 0f, 0.08f);
-
-        boolean snap = snapCamera && isLocal;
-
-        float px = x, py = y;
-
-        if(snap){
-            x = (int) (x + 0.0001f);
-            y = (int) (y + 0.0001f);
-        }
 
         float ft = Mathf.sin(walktime, 6f, 2f) * (1f - boostHeat);
 
@@ -341,9 +349,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         Draw.alpha(1f);
-
-        x = px;
-        y = py;
     }
 
     @Override
