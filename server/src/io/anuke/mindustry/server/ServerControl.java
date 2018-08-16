@@ -109,14 +109,13 @@ public class ServerControl extends Module{
                     }
                 }else{
                     if(gameOvers >= 2){
-                        info("Two consecutive game-overs detected, shifting sector Y.");
-                        Settings.putInt("sector_x", Settings.getInt("sector_x") - 1);
-                        Settings.putInt("sector_y", Settings.getInt("sector_y") + 1);
+                        Settings.putInt("sector_y", Settings.getInt("sector_y") < 0 ? Settings.getInt("sector_y") + 1 : Settings.getInt("sector_y") - 1);
                         Settings.save();
+                        gameOvers = 0;
                     }
-                    info("Re-trying sector map: {0} {1}",  Settings.getInt("sector_x"), Settings.getInt("sector_y"));
                     gameOvers ++;
                     playSectorMap();
+                    info("Re-trying sector map: {0} {1}",  Settings.getInt("sector_x"), Settings.getInt("sector_y"));
                 }
             }else{
                 state.set(State.menu);
