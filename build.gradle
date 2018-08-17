@@ -194,7 +194,9 @@ project(":server") {
     apply plugin: "java"
 
     configurations {
-        compile.exclude module: android
+        if(findProject(":android") != null){
+            compile.exclude module: android
+        }
     }
     
     dependencies {
