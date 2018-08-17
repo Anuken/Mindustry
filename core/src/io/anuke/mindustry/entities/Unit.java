@@ -33,17 +33,11 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait, CarriableTrait, InventoryTrait{
-    /**
-     * total duration of hit flash effect
-     */
+    /**Total duration of hit flash effect*/
     public static final float hitDuration = 9f;
-    /**
-     * Percision divisor of velocity, used when writing. For example a value of '2' would mean the percision is 1/2 = 0.5-size chunks.
-     */
+    /**Percision divisor of velocity, used when writing. For example a value of '2' would mean the percision is 1/2 = 0.5-size chunks.*/
     public static final float velocityPercision = 8f;
-    /**
-     * Maximum absolute value of a velocity vector component.
-     */
+    /**Maximum absolute value of a velocity vector component.*/
     public static final float maxAbsVelocity = 127f / velocityPercision;
 
     private static final Vector2 moveVector = new Vector2();
