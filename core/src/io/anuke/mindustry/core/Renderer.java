@@ -331,8 +331,8 @@ public class Renderer extends RendererModule{
 
             Graphics.beginShaders(Shaders.outline);
             Graphics.shader(Shaders.mix, true);
-            drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead());
-            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team);
+            drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
+            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
             Graphics.shader();
             blocks.drawTeamBlocks(Layer.turret, team);
             Graphics.endShaders();

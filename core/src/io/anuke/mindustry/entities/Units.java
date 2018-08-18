@@ -51,7 +51,7 @@ public class Units{
      * See {@link #invalidateTarget(TargetTrait, Team, float, float, float)}
      */
     public static boolean invalidateTarget(TargetTrait target, Unit targeter){
-        return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.inventory.getAmmoRange());
+        return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.getWeapon().getAmmo().getRange());
     }
 
     /**
