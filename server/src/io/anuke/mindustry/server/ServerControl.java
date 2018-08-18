@@ -405,7 +405,6 @@ public class ServerControl extends Module{
             for(Player player : playerGroup.all()){
                 if(player.name.equalsIgnoreCase(arg[0])){
                     target = player;
-                    break;
                 }
             }
 
@@ -457,7 +456,6 @@ public class ServerControl extends Module{
                     if(player.con.address != null &&
                             player.con.address.equals(arg[0])){
                         netServer.kick(player.con.id, KickReason.banned);
-                        break;
                     }
                 }
             }else{
@@ -472,7 +470,6 @@ public class ServerControl extends Module{
                 for(Player player : playerGroup.all()){
                     if(player.uuid.equals(arg[0])){
                         netServer.kick(player.con.id, KickReason.banned);
-                        break;
                     }
                 }
             }else{

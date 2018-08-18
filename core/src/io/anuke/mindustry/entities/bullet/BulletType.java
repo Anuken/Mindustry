@@ -13,41 +13,23 @@ public abstract class BulletType extends BaseBulletType<Bullet> implements Conte
     private static Array<BulletType> types = new Array<>();
 
     public final int id;
-    /**
-     * Knockback in velocity.
-     */
+    /**Knockback in velocity.*/
     public float knockback;
-    /**
-     * Whether this bullet hits tiles.
-     */
+    /**Whether this bullet hits tiles.*/
     public boolean hitTiles = true;
-    /**
-     * Status effect applied on hit.
-     */
+    /**Status effect applied on hit.*/
     public StatusEffect status = StatusEffects.none;
-    /**
-     * Intensity of applied status effect in terms of duration.
-     */
+    /**Intensity of applied status effect in terms of duration.*/
     public float statusIntensity = 0.5f;
-    /**
-     * What fraction of armor is pierced, 0-1
-     */
+    /**What fraction of armor is pierced, 0-1*/
     public float armorPierce = 0f;
-    /**
-     * Whether to sync this bullet to clients.
-     */
+    /**Whether to sync this bullet to clients.*/
     public boolean syncable;
-    /**
-     * Whether this bullet type collides with tiles.
-     */
+    /**Whether this bullet type collides with tiles.*/
     public boolean collidesTiles = true;
-    /**
-     * Whether this bullet types collides with anything at all.
-     */
+    /**Whether this bullet types collides with anything at all.*/
     public boolean collides = true;
-    /**
-     * Whether velocity is inherited from the shooter.
-     */
+    /**Whether velocity is inherited from the shooter.*/
     public boolean keepVelocity = true;
 
     public BulletType(float speed, float damage){

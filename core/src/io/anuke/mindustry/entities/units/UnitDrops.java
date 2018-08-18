@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities.units;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.effect.ItemDrop;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.util.Mathf;
 
@@ -11,7 +12,7 @@ public class UnitDrops{
     private static Item[] dropTable;
 
     public static void dropItems(BaseUnit unit){
-        if(Vars.itemGroup.size() > maxItems){
+        if(Vars.itemGroup.size() > maxItems || unit.getTeam() != Team.red){
             return;
         }
 

@@ -130,11 +130,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
-    public int getAmmoCapacity(){
-        return mech.ammoCapacity;
-    }
-
-    @Override
     public void interpolate(){
         super.interpolate();
 
@@ -188,18 +183,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
-    public boolean acceptsAmmo(Item item){
-        return mech.weapon.getAmmoType(item) != null && inventory.canAcceptAmmo(mech.weapon.getAmmoType(item));
-    }
-
-    @Override
     public void added(){
         baseRotation = 90f;
-    }
-
-    @Override
-    public void addAmmo(Item item){
-        inventory.addAmmo(mech.weapon.getAmmoType(item));
     }
 
     @Override
@@ -274,6 +259,23 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
+    public void drawAll(){
+        boolean snap = snapCamera && isLocal;
+
+        float px = x, py = y;
+
+        if(snap){
+            x = (int) (x + 0.0001f);
+            y = (int) (y + 0.0001f);
+        }
+
+        super.drawAll();
+
+        x = px;
+        y = py;
+    }
+
+    @Override
     public void draw(){
         if((debug && (!showPlayer || !showUI)) || dead) return;
 
@@ -283,15 +285,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         boostHeat = Mathf.lerpDelta(boostHeat, isBoosting && ((!movement.isZero() && moved) || !isLocal) ? 1f : 0f, 0.08f);
-
-        boolean snap = snapCamera && isLocal;
-
-        float px = x, py = y;
-
-        if(snap){
-            x = (int) (x + 0.0001f);
-            y = (int) (y + 0.0001f);
-        }
 
         float ft = Mathf.sin(walktime, 6f, 2f) * (1f - boostHeat);
 
@@ -351,9 +344,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         Draw.alpha(1f);
-
-        x = px;
-        y = py;
     }
 
     @Override
@@ -620,20 +610,20 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         y += Mathf.cos(Timers.time() + id * 999, 25f, 0.08f);
 
         //update shooting if not building, not mining and there's ammo left
-        if(!isBuilding() && inventory.hasAmmo() && getMineTile() == null){
+        if(!isBuilding() && getMineTile() == null){
 
             //autofire: mobile only!
             if(mobile){
 
                 if(target == null){
                     isShooting = false;
-                    target = Units.getClosestTarget(team, x, y, inventory.getAmmoRange());
+                    target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
                 }else if(target.isValid()){
                     //rotate toward and shoot the target
                     rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
 
                     Vector2 intercept =
-                            Predict.intercept(x, y, target.getX(), target.getY(), target.getVelocity().x - velocity.x, target.getVelocity().y - velocity.y, inventory.getAmmo().bullet.speed);
+                            Predict.intercept(x, y, target.getX(), target.getY(), target.getVelocity().x - velocity.x, target.getVelocity().y - velocity.y, getWeapon().getAmmo().bullet.speed);
 
                     pointerX = intercept.x;
                     pointerY = intercept.y;
@@ -677,7 +667,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     public boolean isShooting(){
-        return isShooting && inventory.hasAmmo() && (!isBoosting || mech.flying);
+        return isShooting && (!isBoosting || mech.flying);
     }
 
     public void updateRespawning(){

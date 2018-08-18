@@ -26,7 +26,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
-        uCoreVersion = '2f18f69ffb'
+        uCoreVersion = 'e492954e86'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -194,7 +194,9 @@ project(":server") {
     apply plugin: "java"
 
     configurations {
-        compile.exclude module: android
+        if(findProject(":android") != null){
+            compile.exclude module: android
+        }
     }
     
     dependencies {

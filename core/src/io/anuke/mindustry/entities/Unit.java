@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
@@ -8,8 +9,8 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.StatusEffect;
+import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.core.Effects;
@@ -33,17 +34,11 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait, CarriableTrait, InventoryTrait{
-    /**
-     * total duration of hit flash effect
-     */
+    /**Total duration of hit flash effect*/
     public static final float hitDuration = 9f;
-    /**
-     * Percision divisor of velocity, used when writing. For example a value of '2' would mean the percision is 1/2 = 0.5-size chunks.
-     */
+    /**Percision divisor of velocity, used when writing. For example a value of '2' would mean the percision is 1/2 = 0.5-size chunks.*/
     public static final float velocityPercision = 8f;
-    /**
-     * Maximum absolute value of a velocity vector component.
-     */
+    /**Maximum absolute value of a velocity vector component.*/
     public static final float maxAbsVelocity = 127f / velocityPercision;
 
     private static final Vector2 moveVector = new Vector2();
@@ -300,14 +295,28 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
     }
 
-    public float getAmmoFraction(){
-        return inventory.totalAmmo() / (float) inventory.ammoCapacity();
-    }
-
     public void drawUnder(){
     }
 
     public void drawOver(){
+    }
+
+    public void drawStats(){
+        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Timers.time(), healthf()*5f, 1f - healthf()));
+        Draw.alpha(hitTime);
+        Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
+        Draw.color();
+    }
+
+    public TextureRegion getPowerCellRegion(){
+        return Draw.region("power-cell");
+    }
+
+    public void drawAll(){
+        if(!isDead()){
+            draw();
+            drawStats();
+        }
     }
 
     public void drawShadow(){
@@ -318,25 +327,17 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         Fill.circle(x, y, getViewDistance());
     }
 
-    public boolean isInfiniteAmmo(){
-        return false;
-    }
-
     public float getViewDistance(){
         return 135f;
     }
 
     public abstract TextureRegion getIconRegion();
 
+    public abstract Weapon getWeapon();
+
     public abstract int getItemCapacity();
 
-    public abstract int getAmmoCapacity();
-
     public abstract float getArmor();
-
-    public abstract boolean acceptsAmmo(Item item);
-
-    public abstract void addAmmo(Item item);
 
     public abstract float getMass();
 
