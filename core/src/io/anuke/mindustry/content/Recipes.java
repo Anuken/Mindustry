@@ -4,9 +4,8 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.GameMode;
-import io.anuke.mindustry.type.ContentList;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.Block;
 
 import static io.anuke.mindustry.type.Category.*;
 
@@ -15,6 +14,7 @@ public class Recipes implements ContentList{
     @Override
     public void load(){
         //WALLS
+
         new Recipe(defense, DefenseBlocks.tungstenWall, new ItemStack(Items.tungsten, 12));
         new Recipe(defense, DefenseBlocks.tungstenWallLarge, new ItemStack(Items.tungsten, 12 * 4));
 
@@ -165,6 +165,43 @@ public class Recipes implements ContentList{
         new Recipe(units, DebugBlocks.liquidSource, new ItemStack(Items.carbide, 10)).setDebug();
         new Recipe(units, DebugBlocks.powerVoid, new ItemStack(Items.carbide, 10)).setDebug();
         new Recipe(units, DebugBlocks.powerInfinite, new ItemStack(Items.carbide, 10), new ItemStack(Items.surgealloy, 5)).setDebug();
+    }
+
+    static void init(Object... objects){
+        Category cat = null;
+        Block block = null;
+        ItemStack stack = null;
+        Array<ItemStack> arr = new Array<>();
+        for(int i = 0; i < objects.length; i++){
+            if(objects[i] instanceof Category){
+                if(stack != null) throw new RuntimeException("Finish defining stack before beginning category");
+                if(block != null && cat != null){
+                    new Recipe(cat, block, arr.toArray(ItemStack.class));
+                    block = null;
+                    stack = null;
+                    arr.clear();
+                }
+                cat = (Category)objects[i];
+            }else if(objects[i] instanceof Block){
+                if(cat == null) throw new RuntimeException("Finish defining category before beginning blocks");
+                if(block != null){
+                    new Recipe(cat, block, arr.toArray(ItemStack.class));
+                    stack = null;
+                    arr.clear();
+                }
+                block = (Block)objects[i];
+                arr.clear();
+            }else if(objects[i] instanceof Item){
+                if(block == null) throw new RuntimeException("Finish defining block before defining item");
+                if(stack != null){
+                    arr.add(stack);
+                }
+                stack = new ItemStack((Item)objects[i], 1);
+            }else if(objects[i] instanceof Integer){
+                if(stack == null) throw new RuntimeException("Finish defining item before defining item amount");
+                stack.amount = (Integer) objects[i];
+            }
+        }
     }
 
     @Override
