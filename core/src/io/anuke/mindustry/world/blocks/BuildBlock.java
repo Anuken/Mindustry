@@ -217,6 +217,9 @@ public class BuildBlock extends Block{
 
             if(recipe != null){
                 ItemStack[] requirements = recipe.requirements;
+                if(requirements.length != accumulator.length || totalAccumulator.length != requirements.length){
+                    setDeconstruct(previous);
+                }
 
                 for(int i = 0; i < requirements.length; i++){
                     accumulator[i] += Math.min(requirements[i].amount * amount / 2f, requirements[i].amount/2f - totalAccumulator[i]); //add scaled amount progressed to the accumulator

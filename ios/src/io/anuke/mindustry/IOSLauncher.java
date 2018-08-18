@@ -32,6 +32,8 @@ import static io.anuke.mindustry.Vars.*;
 import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
 
 public class IOSLauncher extends IOSApplication.Delegate {
+    private boolean forced;
+
     @Override
     protected IOSApplication createApplication() {
         Net.setClientProvider(new KryoClient());
@@ -86,12 +88,27 @@ public class IOSLauncher extends IOSApplication.Delegate {
                 p.getPopoverPresentationController().setSourceView(UIApplication.getSharedApplication().getKeyWindow().getRootViewController().getView());
 
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
-                        .presentViewController(p, true, () -> io.anuke.ucore.util.Log.info("Success! Presented {0}", to));
+                .presentViewController(p, true, () -> io.anuke.ucore.util.Log.info("Success! Presented {0}", to));
+            }
+
+            @Override
+            public void beginForceLandscape(){
+                forced = true;
+            }
+
+            @Override
+            public void endForceLandscape(){
+                forced = false;
             }
         };
 
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
         return new IOSApplication(new Mindustry(), config);
+    }
+
+    @Override
+    public UIInterfaceOrientationMask getSupportedInterfaceOrientations(UIApplication application, UIWindow window){
+        return forced ? UIInterfaceOrientationMask.Landscape : UIInterfaceOrientationMask.All;
     }
 
     @Override

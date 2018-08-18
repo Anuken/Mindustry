@@ -106,7 +106,7 @@ public class Blocks extends BlockList implements ContentList{
         stone = new Floor("stone"){{
             hasOres = true;
             drops = new ItemStack(Items.stone, 1);
-            blends = block -> block != this && !(block instanceof Ore);
+            blends = block -> block != this && !(block instanceof OreBlock);
             minimapColor = Color.valueOf("323232");
             playerUnmineable = true;
         }};

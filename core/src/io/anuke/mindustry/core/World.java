@@ -363,6 +363,10 @@ public class World extends Module{
         return null;
     }
 
+    public void raycastEachWorld(float x0, float y0, float x1, float y1, Raycaster cons){
+        raycastEach(toTile(x0), toTile(y0), toTile(x1), toTile(y1), cons);
+    }
+
     public void raycastEach(int x0f, int y0f, int x1, int y1, Raycaster cons){
         int x0 = x0f;
         int y0 = y0f;

@@ -76,7 +76,9 @@ public class Save16 extends SaveFileVersion{
         short width = stream.readShort();
         short height = stream.readShort();
 
-        if(map == null){
+        if(world.getSector() != null){
+            world.setMap(new Map("Sector " + world.getSector().x + ", " + world.getSector().y, width, height));
+        }else if(map == null){
             world.setMap(new Map("unknown", width, height));
         }
 
