@@ -473,6 +473,9 @@ public class NetServer extends Module{
     }
 
     String fixName(String name){
+        if(name.equals("[") || name.equals("]")){
+            return "";
+        }
 
         for(int i = 0; i < name.length(); i++){
             if(name.charAt(i) == '[' && i != name.length() - 1 && name.charAt(i + 1) != '[' && (i == 0 || name.charAt(i - 1) != '[')){
