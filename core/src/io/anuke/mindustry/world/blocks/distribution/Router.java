@@ -49,7 +49,7 @@ public class Router extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         SplitterEntity entity = tile.entity();
 
-        return entity.lastItem == null;
+        return tile.getTeamID() == source.getTeamID() && entity.lastItem == null;
     }
 
     @Override

@@ -8,11 +8,16 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
 public class Items implements ContentList{
-    public static Item stone, lead, coal, carbide, titanium, thorium, silicon, plastanium, phasematter, surgealloy,
+    public static Item stone, aluminum, lead, coal, carbide, titanium, thorium, silicon, plastanium, phasematter, surgealloy,
             biomatter, sand, blastCompound, pyratite;
 
     @Override
     public void load(){
+        aluminum = new Item("aluminum", Color.valueOf("8e85a2")){{
+            type = ItemType.material;
+            hardness = 1;
+            cost = 0.6f;
+        }};
 
         lead = new Item("lead", Color.valueOf("8e85a2")){{
             type = ItemType.material;

@@ -13,7 +13,6 @@ public class Recipes implements ContentList{
     @Override
     public void load(){
         //WALLS
-
         /*
         new Recipe(defense, DefenseBlocks.tungstenWall, new ItemStack(Items.tungsten, 12));
         new Recipe(defense, DefenseBlocks.tungstenWallLarge, new ItemStack(Items.tungsten, 12 * 4));
