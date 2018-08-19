@@ -299,7 +299,7 @@ public class NetServer extends Module{
 
     public static void onDisconnect(Player player){
         if(player.con.hasConnected){
-            Call.sendMessage("[accent]" + player.name + " [accent]has disconnected.");
+            Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
             Call.onPlayerDisconnect(player.id);
         }
         player.remove();
@@ -348,7 +348,7 @@ public class NetServer extends Module{
 
         player.add();
         player.con.hasConnected = true;
-        Call.sendMessage("[accent]" + player.name + " has connected.");
+        Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
         Log.info("&y{0} has connected.", player.name);
     }
 
