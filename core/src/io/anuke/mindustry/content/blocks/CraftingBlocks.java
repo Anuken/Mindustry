@@ -163,14 +163,14 @@ public class CraftingBlocks extends BlockList implements ContentList{
         }};
 
         separator = new Separator("separator"){{
-            results = new Item[]{
-                null, null, null, null, null, null, null, null, null, null,
-                Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand,
-                Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone,
-                Items.tungsten, Items.tungsten, Items.tungsten, Items.tungsten,
-                Items.lead, Items.lead,
-                Items.coal, Items.coal,
-                Items.titanium
+            results = new ItemStack[]{
+                new ItemStack(null, 10),
+                new ItemStack(Items.sand, 10),
+                new ItemStack(Items.stone, 9),
+                new ItemStack(Items.copper, 4),
+                new ItemStack(Items.lead, 2),
+                new ItemStack(Items.coal, 2),
+                new ItemStack(Items.titanium, 1),
             };
             filterTime = 40f;
             itemCapacity = 40;
@@ -181,15 +181,15 @@ public class CraftingBlocks extends BlockList implements ContentList{
         }};
 
         centrifuge = new Separator("centrifuge"){{
-            results = new Item[]{
-                null, null, null, null, null, null, null, null, null, null, null, null, null,
-                Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand,
-                Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone,
-                Items.tungsten, Items.tungsten, Items.tungsten, Items.tungsten, Items.tungsten,
-                Items.lead, Items.lead, Items.lead,
-                Items.coal, Items.coal, Items.coal,
-                Items.titanium, Items.titanium,
-                Items.thorium,
+            results = new ItemStack[]{
+                new ItemStack(null, 13),
+                new ItemStack(Items.sand, 12),
+                new ItemStack(Items.stone, 11),
+                new ItemStack(Items.copper, 5),
+                new ItemStack(Items.lead, 3),
+                new ItemStack(Items.coal, 3),
+                new ItemStack(Items.titanium, 2),
+                new ItemStack(Items.thorium, 1)
             };
 
             hasPower = true;
