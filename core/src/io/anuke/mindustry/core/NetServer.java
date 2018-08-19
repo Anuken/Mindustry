@@ -348,7 +348,7 @@ public class NetServer extends Module{
 
         player.add();
         player.con.hasConnected = true;
-        Call.sendMessage("[accent]" + player.name + " [accent]has connected.");
+        Call.sendMessage("[accent]" + player.name + " has connected.");
         Log.info("&y{0} has connected.", player.name);
     }
 
