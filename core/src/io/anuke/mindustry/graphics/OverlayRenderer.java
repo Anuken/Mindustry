@@ -7,14 +7,12 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -24,6 +22,7 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class OverlayRenderer{
+    private float buildFadeTime;
 
     public void drawBottom(){
         for(Player player : players){
@@ -58,6 +57,24 @@ public class OverlayRenderer{
 
             input.drawTop();
 
+            buildFadeTime = Mathf.lerpDelta(buildFadeTime, input.isPlacing() ? 1f : 0f, 0.06f);
+
+            Draw.reset();
+            Lines.stroke(buildFadeTime*2f);
+
+            if(buildFadeTime > 0.005f){
+                for(TeamData data : state.teams.enemyDataOf(player.getTeam())){
+                    for(Tile core : data.cores){
+                        float dst = Vector2.dst(player.x, player.y, core.drawx(), core.drawy());
+                        if(dst < enemyCoreBuildRange * 1.5f){
+                            Draw.color(Color.DARK_GRAY);
+                            Lines.poly(core.drawx(), core.drawy() - 2, 200, enemyCoreBuildRange);
+                            Draw.color(Palette.accent, data.team.color, 0.5f + Mathf.absin(Timers.time(), 10f, 0.5f));
+                            Lines.poly(core.drawx(), core.drawy(), 200, enemyCoreBuildRange);
+                        }
+                    }
+                }
+            }
             Draw.reset();
 
             //draw selected block bars and info
@@ -157,32 +174,7 @@ public class OverlayRenderer{
                     Draw.color();
                 }
             }
-
         }
-
-        if((!debug || showUI) && Settings.getBool("healthbars")){
-            for(TeamData ally : (debug ? state.teams.getTeams() : state.teams.getTeams(true))){
-                renderer.drawAndInterpolate(unitGroups[ally.team.ordinal()], u -> !u.isDead(), this::drawStats);
-            }
-
-            renderer.drawAndInterpolate(playerGroup, u -> !u.isDead(), this::drawStats);
-        }
-    }
-
-    void drawStats(Unit unit){
-        if(unit.isDead()) return;
-
-        float x = unit.x;
-        float y = unit.y;
-
-        if(unit == players[0] && players.length == 1 && snapCamera){
-            x = (int) (x + 0.0001f);
-            y = (int) (y + 0.0001f);
-        }
-
-        drawEncloser(x, y - 9f, 2f);
-        drawBar(Palette.healthstats, x, y - 8f, unit.healthf());
-        drawBar(Palette.ammo, x, y - 9f, unit.getAmmoFraction());
     }
 
     void drawBar(Color color, float x, float y, float finion){

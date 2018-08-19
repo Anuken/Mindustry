@@ -84,7 +84,7 @@ public abstract class BaseBlock{
     }
 
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return tile.entity != null && consumes.has(ConsumeItem.class) && consumes.item() == item && tile.entity.items.total() < itemCapacity;
+        return tile.entity != null && consumes.has(ConsumeItem.class) && consumes.item() == item && tile.entity.items.get(item) < getMaximumAccepted(tile, item);
     }
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
@@ -121,7 +121,7 @@ public abstract class BaseBlock{
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
 
-            if(other.block().hasLiquids && canDumpLiquid(tile, other, liquid)){
+            if(other.getTeamID() == tile.getTeamID() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid)){
                 float ofract = other.entity.liquids.get(liquid) / other.block().liquidCapacity;
                 float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
 
@@ -149,7 +149,7 @@ public abstract class BaseBlock{
 
         next = next.target();
 
-        if(next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
+        if(next.getTeamID() == tile.getTeamID() && next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
 
             if(next.block().acceptLiquid(next, tile, liquid, 0f)){
                 float ofract = next.entity.liquids.get(liquid) / next.block().liquidCapacity;
@@ -199,7 +199,7 @@ public abstract class BaseBlock{
             incrementDump(tile, proximity.size);
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
-            if(other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+            if(other.getTeamID() == tile.getTeamID() && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                 other.block().handleItem(item, other, in);
                 return;
             }
@@ -239,7 +239,7 @@ public abstract class BaseBlock{
                 for(int ii = 0; ii < Item.all().size; ii++){
                     Item item = Item.getByID(ii);
 
-                    if(entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+                    if(other.getTeamID() == tile.getTeamID() && entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                         other.block().handleItem(item, other, in);
                         tile.entity.items.remove(item, 1);
                         incrementDump(tile, proximity.size);
@@ -248,7 +248,7 @@ public abstract class BaseBlock{
                 }
             }else{
 
-                if(other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
+                if(other.getTeamID() == tile.getTeamID() && other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
                     other.block().handleItem(todump, other, in);
                     tile.entity.items.remove(todump, 1);
                     incrementDump(tile, proximity.size);
@@ -274,7 +274,7 @@ public abstract class BaseBlock{
     /** Try offloading an item to a nearby container in its facing direction. Returns true if success.*/
     public boolean offloadDir(Tile tile, Item item){
         Tile other = tile.getNearby(tile.getRotation());
-        if(other != null && other.block().acceptItem(item, other, tile)){
+        if(other != null && other.target().getTeamID() == tile.getTeamID() &&  other.block().acceptItem(item, other, tile)){
             other.block().handleItem(item, other, tile);
             return true;
         }

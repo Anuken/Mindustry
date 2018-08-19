@@ -283,8 +283,10 @@ public class WorldGenerator{
             if(iceridge > 0.25 && minDst > lerpDst/1.5f){
                 elevation ++;
             }
-        }else{
+        }else if(minDst > lerpDst/1.5f){
             floor = Blocks.lava;
+        }else{
+            floor = Blocks.blackstone;
         }
 
         if(temp < 0.6f){

@@ -10,6 +10,8 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.Packets.StreamBegin;
 import io.anuke.mindustry.net.Packets.StreamChunk;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
@@ -88,7 +90,7 @@ public class Net{
     }
 
     /**
-     * Host a server at an address
+     * Host a server at an address.
      */
     public static void host(int port) throws IOException{
         serverProvider.host(port);
@@ -102,6 +104,10 @@ public class Net{
      * Closes the server.
      */
     public static void closeServer(){
+        for(NetConnection con : getConnections()){
+            Call.onKick(con.id, KickReason.serverClose);
+        }
+
         serverProvider.close();
         server = false;
         active = false;

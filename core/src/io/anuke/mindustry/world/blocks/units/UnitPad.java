@@ -13,7 +13,6 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.BarType;
@@ -38,13 +37,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class UnitPad extends Block{
-    protected float gracePeriodMultiplier = 19f;
-    protected float speedupTime = 60f * 60f * 19;
-    protected float maxSpeedup = 7f;
+    protected float gracePeriodMultiplier = 23f;
+    protected float speedupTime = 60f * 60f * 20;
+    protected float maxSpeedup = 2f;
 
     protected UnitType type;
     protected float produceTime = 1000f;
-    protected float openDuration = 50f;
     protected float launchVelocity = 0f;
 
     public UnitPad(String name){
@@ -75,10 +73,6 @@ public class UnitPad extends Block{
             unit.set(tile.drawx(), tile.drawy());
             unit.add();
             unit.getVelocity().y = factory.launchVelocity;
-
-            //fill inventory with 1st ammo
-            AmmoType type = unit.getWeapon().getAmmoType(unit.getWeapon().getAcceptedItems().iterator().next());
-            unit.inventory.fillAmmo(type);
         }
     }
 

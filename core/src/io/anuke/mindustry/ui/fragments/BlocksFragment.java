@@ -65,13 +65,13 @@ public class BlocksFragment extends Fragment{
 
                 //add top description table
                 descTable = new Table("button");
-                descTable.visible(() -> hoverRecipe != null || input.recipe != null); //make sure it's visible when necessary
+                descTable.visible(() -> (hoverRecipe != null || input.recipe != null) && shown); //make sure it's visible when necessary
                 descTable.update(() -> {
                     // note: This is required because there is no direct connection between input.recipe and the description ui.
                     // If input.recipe gets set to null, a proper cleanup of the ui elements is required.
                     boolean anyRecipeShown = input.recipe != null || hoverRecipe != null;
                     boolean descriptionTableClean = descTable.getChildren().size == 0;
-                    boolean cleanupRequired = !anyRecipeShown && !descriptionTableClean;
+                    boolean cleanupRequired = (!anyRecipeShown && !descriptionTableClean);
                     if(cleanupRequired){
                         descTable.clear();
                     }

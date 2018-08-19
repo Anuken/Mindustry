@@ -105,7 +105,7 @@ public class TypeIO{
 
     @WriteClass(CarryTrait.class)
     public static void writeCarry(ByteBuffer buffer, CarryTrait unit){
-        if(unit == null){
+        if(unit == null || unit.getGroup() == null){
             buffer.put((byte) -1);
             return;
         }

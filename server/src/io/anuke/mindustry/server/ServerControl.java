@@ -16,6 +16,8 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.KickReason;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
@@ -36,13 +38,16 @@ import static io.anuke.ucore.util.Log.*;
 public class ServerControl extends Module{
     private final CommandHandler handler = new CommandHandler("");
     private ShuffleMode mode;
+    //consecutive sector losses
+    private int gameOvers;
 
     public ServerControl(String[] args){
         Settings.defaultList(
             "shufflemode", "normal",
             "bans", "",
             "admins", "",
-            "sectorid", 0
+            "sector_x", 0,
+            "sector_y", 1
         );
 
         mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
@@ -51,23 +56,25 @@ public class ServerControl extends Module{
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
         Sounds.setHeadless(true);
 
-        String[] commands = {};
-
-        if(args.length > 0){
-            commands = String.join(" ", args).split(",");
-            Log.info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
-        }
-
         registerCommands();
 
-        for(String s : commands){
-            Response response = handler.handleMessage(s);
-            if(response.type != ResponseType.valid){
-                Log.err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
-                Log.err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
-                System.exit(1);
+        Gdx.app.postRunnable(() -> {
+            String[] commands = {};
+
+            if(args.length > 0){
+                commands = String.join(" ", args).split(",");
+                Log.info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
             }
-        }
+
+            for(String s : commands){
+                Response response = handler.handleMessage(s);
+                if(response.type != ResponseType.valid){
+                    Log.err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
+                    Log.err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
+                    System.exit(1);
+                }
+            }
+        });
 
         Thread thread = new Thread(this::readCommands, "Server Controls");
         thread.setDaemon(true);
@@ -80,34 +87,35 @@ public class ServerControl extends Module{
 
         Events.on(GameOverEvent.class, () -> {
             info("Game over!");
-
-            for(NetConnection connection : Net.getConnections()){
-                netServer.kick(connection.id, KickReason.gameover);
-            }
+            netServer.kickAll(KickReason.gameover);
 
             if(mode != ShuffleMode.off){
-                if(world.maps().all().size > 0){
-                    Array<Map> maps = mode == ShuffleMode.both ? world.maps().all() :
-                            mode == ShuffleMode.normal ? world.maps().defaultMaps() : world.maps().customMaps();
+                if(world.getSector() == null){
+                    if(world.maps().all().size > 0){
+                        Array<Map> maps = mode == ShuffleMode.both ? world.maps().all() :
+                        mode == ShuffleMode.normal ? world.maps().defaultMaps() : world.maps().customMaps();
 
-                    Map previous = world.getMap();
-                    Map map = previous;
-                    while(map == previous) map = maps.random();
-
-                    if(map != null){
+                        Map previous = world.getMap();
+                        Map map = previous;
+                        if(maps.size > 1){
+                            while(map == previous) map = maps.random();
+                        }
 
                         info("Selected next map to be {0}.", map.name);
-                        state.set(State.playing);
 
                         logic.reset();
                         world.loadMap(map);
-                    }else{
-                        info("Selected a procedural map.");
-                        playSectorMap();
+                        state.set(State.playing);
                     }
                 }else{
-                    info("Selected a procedural map.");
+                    if(gameOvers >= 2){
+                        Settings.putInt("sector_y", Settings.getInt("sector_y") < 0 ? Settings.getInt("sector_y") + 1 : Settings.getInt("sector_y") - 1);
+                        Settings.save();
+                        gameOvers = 0;
+                    }
+                    gameOvers ++;
                     playSectorMap();
+                    info("Re-trying sector map: {0} {1}",  Settings.getInt("sector_x"), Settings.getInt("sector_y"));
                 }
             }else{
                 state.set(State.menu);
@@ -144,7 +152,7 @@ public class ServerControl extends Module{
             Log.info("Stopped server.");
         });
 
-        handler.register("host", "[mode] [mapname]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "[mapname] [mode]", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
@@ -153,39 +161,38 @@ public class ServerControl extends Module{
             Map result = null;
 
             if(arg.length > 0){
-                GameMode mode;
-                try{
-                    mode = GameMode.valueOf(arg[0]);
-                }catch(IllegalArgumentException e){
-                    err("No gamemode '{0}' found.", arg[0]);
+
+                String search = arg[0];
+                for(Map map : world.maps().all()){
+                    if(map.name.equalsIgnoreCase(search)) result = map;
+                }
+
+                if(result == null){
+                    err("No map with name &y'{0}'&lr found.", search);
                     return;
                 }
 
+
                 info("Loading map...");
-                state.mode = mode;
 
                 if(arg.length > 1){
-                    String search = arg[1];
-                    for(Map map : world.maps().all()){
-                        if(map.name.equalsIgnoreCase(search))
-                            result = map;
-                    }
-
-                    if(result == null){
-                        err("No map with name &y'{0}'&lr found.", search);
+                    GameMode mode;
+                    try{
+                        mode = GameMode.valueOf(arg[1]);
+                    }catch(IllegalArgumentException e){
+                        err("No gamemode '{0}' found.", arg[1]);
                         return;
                     }
 
-                    logic.reset();
-                    world.loadMap(result);
-                    logic.play();
-                }else{
-                    Log.info("&ly&fiNo map specified, so a procedural one was generated.");
-                    playSectorMap();
+                    state.mode = mode;
                 }
 
+                logic.reset();
+                world.loadMap(result);
+                logic.play();
+
             }else{
-                Log.info("&ly&fiNo map specified, so a procedural one was generated.");
+                Log.info("&ly&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sector_x"), Settings.getInt("sector_y"));
                 playSectorMap();
             }
 
@@ -261,6 +268,31 @@ public class ServerControl extends Module{
             }
         });
 
+        handler.register("setsector", "<x> <y>", "Sets the next sector to be played. Does not affect current game.", arg -> {
+            try{
+                Settings.putInt("sector_x", Integer.parseInt(arg[0]));
+                Settings.putInt("sector_y", Integer.parseInt(arg[1]));
+                Settings.save();
+                info("Sector position set.");
+            }catch(NumberFormatException e){
+                err("Invalid coordinates.");
+            }
+        });
+
+        handler.register("fillitems", "Fill the core with 2000 items.", arg -> {
+            if(!state.is(State.playing)){
+                err("Not playing. Host first.");
+                return;
+            }
+
+            for(Item item : Item.all()){
+                if(item.type == ItemType.material){
+                    state.teams.get(Team.blue).cores.first().entity.items.add(item, 2000);
+                }
+            }
+            info("Core filled.");
+        });
+
         handler.register("friendlyfire", "<on/off>", "Enable or disable friendly fire.", arg -> {
             String s = arg[0];
             if(s.equalsIgnoreCase("on")){
@@ -272,6 +304,12 @@ public class ServerControl extends Module{
             }else{
                 err("Incorrect command usage.");
             }
+        });
+
+        handler.register("debug", "<on/off>", "Disables or enables debug ode", arg -> {
+           boolean value = arg[0].equalsIgnoreCase("on");
+           debug = value;
+           info("Debug mode is now {0}.", value ? "on" : "off");
         });
 
         handler.register("antigrief", "[on/off] [max-break] [cooldown-in-ms]", "Enable or disable anti-grief.", arg -> {
@@ -367,7 +405,6 @@ public class ServerControl extends Module{
             for(Player player : playerGroup.all()){
                 if(player.name.equalsIgnoreCase(arg[0])){
                     target = player;
-                    break;
                 }
             }
 
@@ -419,7 +456,6 @@ public class ServerControl extends Module{
                     if(player.con.address != null &&
                             player.con.address.equals(arg[0])){
                         netServer.kick(player.con.id, KickReason.banned);
-                        break;
                     }
                 }
             }else{
@@ -434,7 +470,6 @@ public class ServerControl extends Module{
                 for(Player player : playerGroup.all()){
                     if(player.uuid.equals(arg[0])){
                         netServer.kick(player.con.id, KickReason.banned);
-                        break;
                     }
                 }
             }else{
@@ -544,10 +579,12 @@ public class ServerControl extends Module{
                 return;
             }
 
-            SaveIO.loadFromSlot(slot);
-            info("Save loaded.");
-            host();
-            state.set(State.playing);
+            threads.run(() -> {
+                SaveIO.loadFromSlot(slot);
+                info("Save loaded.");
+                host();
+                state.set(State.playing);
+            });
         });
 
         handler.register("save", "<slot>", "Save game state to a slot.", arg -> {
@@ -559,11 +596,11 @@ public class ServerControl extends Module{
                 return;
             }
 
-            int slot = Strings.parseInt(arg[0]);
-
-            SaveIO.saveToSlot(slot);
-
-            info("Saved to slot {0}.", slot);
+            threads.run(() -> {
+                int slot = Strings.parseInt(arg[0]);
+                SaveIO.saveToSlot(slot);
+                info("Saved to slot {0}.", slot);
+            });
         });
 
         handler.register("griefers", "[min-break:place-ratio] [min-breakage]", "Find possible griefers currently online.", arg -> {
@@ -603,12 +640,11 @@ public class ServerControl extends Module{
                 return;
             }
 
+            info("&lyCore destroyed.");
             Events.fire(GameOverEvent.class);
-
-            info("Core destroyed.");
         });
 
-        handler.register("debug", "Print debug info", arg -> {
+        handler.register("debuginfo", "Print debug info", arg -> {
             info(DebugFragment.debugInfo());
         });
 
@@ -805,7 +841,11 @@ public class ServerControl extends Module{
     }
 
     private void playSectorMap(){
-        world.loadSector(world.sectors().get(0, 0));
+        int x = Settings.getInt("sector_x"), y = Settings.getInt("sector_y");
+        if(world.sectors().get(x, y) == null){
+            world.sectors().createSector(x, y);
+        }
+        world.loadSector(world.sectors().get(x, y));
         logic.play();
     }
 
@@ -815,6 +855,29 @@ public class ServerControl extends Module{
         }catch(IOException e){
             Log.err(e);
             state.set(State.menu);
+        }
+    }
+
+    @Override
+    public void update(){
+
+        if(state.is(State.playing) && world.getSector() != null){
+            //all assigned missions are complete
+            if(world.getSector().completedMissions >= world.getSector().missions.size){
+                world.sectors().completeSector(world.getSector().x, world.getSector().y);
+                world.sectors().save();
+                gameOvers = 0;
+                Settings.putInt("sector_x", world.getSector().x + world.getSector().size);
+
+                Settings.save();
+
+                netServer.kickAll(KickReason.sectorComplete);
+                logic.reset();
+                playSectorMap();
+            }else if(world.getSector().currentMission().isComplete()){
+                //increment completed missions, check next index next frame
+                world.getSector().completedMissions ++;
+            }
         }
     }
 

@@ -21,6 +21,7 @@
 /core/assets/gifexport/
 /core/assets/version.properties
 /core/assets/locales.json
+/ios/src/io/anuke/mindustry/gen/
 *.gif
 
 version.properties

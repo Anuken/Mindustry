@@ -237,12 +237,9 @@ public class World extends Module{
 
         EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
 
-        Timers.mark();
         generator.generateMap(tiles, sector);
 
         endMapLoad();
-
-        Log.info("Full time to generate: {0}", Timers.elapsed());
     }
 
     public void loadMap(Map map){
@@ -300,7 +297,7 @@ public class World extends Module{
     }
 
     public void setBlock(Tile tile, Block block, Team team){
-        tile.setBlock(block);
+        tile.setBlock(block, team);
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;
             int offsety = -(block.size - 1) / 2;
@@ -364,6 +361,10 @@ public class World extends Module{
             }
         }
         return null;
+    }
+
+    public void raycastEachWorld(float x0, float y0, float x1, float y1, Raycaster cons){
+        raycastEach(toTile(x0), toTile(y0), toTile(x1), toTile(y1), cons);
     }
 
     public void raycastEach(int x0f, int y0f, int x1, int y1, Raycaster cons){

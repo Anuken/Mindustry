@@ -51,7 +51,7 @@ public class Units{
      * See {@link #invalidateTarget(TargetTrait, Team, float, float, float)}
      */
     public static boolean invalidateTarget(TargetTrait target, Unit targeter){
-        return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.inventory.getAmmoRange());
+        return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.getWeapon().getAmmo().getRange());
     }
 
     /**
@@ -147,11 +147,14 @@ public class Units{
         }
     }
 
-    /**
-     * Returns the closest target enemy. First, units are checked, then tile entities.
-     */
+    /**Returns the closest target enemy. First, units are checked, then tile entities.*/
     public static TargetTrait getClosestTarget(Team team, float x, float y, float range){
-        Unit unit = getClosestEnemy(team, x, y, range, u -> true);
+        return getClosestTarget(team, x, y, range, u -> true);
+    }
+
+    /**Returns the closest target enemy. First, units are checked, then tile entities.*/
+    public static TargetTrait getClosestTarget(Team team, float x, float y, float range, Predicate<Unit> unitPred){
+        Unit unit = getClosestEnemy(team, x, y, range, unitPred);
         if(unit != null){
             return unit;
         }else{

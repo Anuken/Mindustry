@@ -238,7 +238,7 @@ public class MassDriver extends Block{
 
     protected boolean linkValid(Tile tile){
         MassDriverEntity entity = tile.entity();
-        if(entity.link == -1) return false;
+        if(entity == null || entity.link == -1) return false;
         Tile link = world.tile(entity.link);
 
         return link != null && link.block() instanceof MassDriver && tile.distanceTo(link) <= range;

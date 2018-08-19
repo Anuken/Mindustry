@@ -129,6 +129,9 @@ public class NetworkIO{
                 }
             }
 
+            //now write a snapshot.
+            netServer.writeSnapshot(player, stream);
+
         }catch(IOException e){
             throw new RuntimeException(e);
         }
@@ -185,10 +188,10 @@ public class NetworkIO{
             int height = stream.readShort();
 
             //TODO send advanced map meta such as author, etc
-            //TODO scan for cores
             Map currentMap = new Map(map, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
             currentMap.meta.tags.clear();
             currentMap.meta.tags.putAll(tags);
+            world.setSector(null);
             world.setMap(currentMap);
 
             Tile[][] tiles = world.createTiles(width, height);
@@ -269,6 +272,9 @@ public class NetworkIO{
             }
 
             world.endMapLoad();
+
+            //read raw snapshot
+            netClient.readSnapshot(stream);
 
         }catch(IOException e){
             throw new RuntimeException(e);

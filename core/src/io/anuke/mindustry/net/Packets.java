@@ -1,5 +1,6 @@
 package io.anuke.mindustry.net;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.Vars;
@@ -10,6 +11,7 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.io.IOUtils;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 import java.nio.ByteBuffer;
@@ -22,15 +24,26 @@ import static io.anuke.mindustry.Vars.world;
 public class Packets{
 
     public enum KickReason{
-        kick, invalidPassword, clientOutdated, serverOutdated, banned, gameover(true), recentKick, nameInUse, idInUse, fastShoot, nameEmpty, customClient, sectorComplete(true);
+        kick, clientOutdated, serverOutdated, banned, gameover(true), recentKick,
+        nameInUse, idInUse, nameEmpty, customClient, sectorComplete, serverClose;
+
         public final boolean quiet;
 
         KickReason(){
-            quiet = false;
+            this(false);
         }
 
         KickReason(boolean quiet){
             this.quiet = quiet;
+        }
+
+        @Override
+        public String toString(){
+            return Bundles.get("text.server.kicked." + name());
+        }
+
+        public String extraText(){
+            return Bundles.getOrNull("text.server.kicked." + name() + ".text");
         }
     }
 
@@ -143,7 +156,7 @@ public class Packets{
         public float x, y, pointerX, pointerY, rotation, baseRotation, xv, yv;
         public Tile mining;
         public boolean boosting, shooting;
-        public BuildRequest currentRequest;
+        public Array<BuildRequest> requests = new Array<>();
 
         @Override
         public void write(ByteBuffer buffer){
@@ -168,17 +181,14 @@ public class Packets{
 
             buffer.putInt(player.getMineTile() == null ? -1 : player.getMineTile().packedPosition());
 
-            BuildRequest request = player.getCurrentRequest();
-
-            if(request != null){
+            buffer.putShort((short)player.getPlaceQueue().size);
+            for(BuildRequest request : player.getPlaceQueue()){
                 buffer.put(request.remove ? (byte) 1 : 0);
                 buffer.putInt(world.toPacked(request.x, request.y));
                 if(!request.remove){
                     buffer.put((byte) request.recipe.id);
                     buffer.put((byte) request.rotation);
                 }
-            }else{
-                buffer.put((byte) -1);
             }
         }
 
@@ -199,10 +209,13 @@ public class Packets{
             rotation = buffer.getShort() / 2f;
             baseRotation = buffer.getShort() / 2f;
             mining = world.tile(buffer.getInt());
+            requests.clear();
 
-            byte type = buffer.get();
-            if(type != -1){
+            short reqamount = buffer.getShort();
+            for(int i = 0; i < reqamount; i++){
+                byte type = buffer.get();
                 int position = buffer.getInt();
+                BuildRequest currentRequest;
 
                 if(type == 1){ //remove
                     currentRequest = new BuildRequest(position % world.width(), position / world.width());
@@ -211,8 +224,8 @@ public class Packets{
                     byte rotation = buffer.get();
                     currentRequest = new BuildRequest(position % world.width(), position / world.width(), rotation, Recipe.getByID(recipe));
                 }
-            }else{
-                currentRequest = null;
+
+                requests.add(currentRequest);
             }
         }
     }

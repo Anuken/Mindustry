@@ -28,22 +28,6 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected CarriableTrait carrying;
     protected final UnitState
 
-    resupply = new UnitState(){
-        public void entered(){
-            target = null;
-        }
-
-        public void update(){
-            if(inventory.totalAmmo() + 10 >= inventory.ammoCapacity()){
-                state.set(attack);
-            }else if(!targetHasFlag(BlockFlag.resupplyPoint)){
-                retarget(() -> targetClosestAllyFlag(BlockFlag.resupplyPoint));
-            }else{
-                circle(20f);
-            }
-        }
-    },
-
     idle = new UnitState(){
         public void update(){
             if(!isCommanded()){
@@ -75,9 +59,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
                 target = null;
             }
 
-            if(!inventory.hasAmmo()){
-                state.set(resupply);
-            }else if(target == null){
+            if(target == null){
                 retarget(() -> {
                     targetClosest();
                     if(target == null) targetClosestEnemyFlag(BlockFlag.target);
@@ -91,10 +73,9 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             }else{
                 attack(150f);
 
-                if((Mathf.angNear(angleTo(target), rotation, 15f) || !inventory.getAmmo().bullet.keepVelocity) //bombers don't care about rotation
-                && distanceTo(target) < inventory.getAmmo().getRange()){
-                    AmmoType ammo = inventory.getAmmo();
-                    inventory.useAmmo();
+                if((Mathf.angNear(angleTo(target), rotation, 15f) || !getWeapon().getAmmo().bullet.keepVelocity) //bombers don't care about rotation
+                && distanceTo(target) < getWeapon().getAmmo().getRange()){
+                    AmmoType ammo = getWeapon().getAmmo();
 
                     Vector2 to = Predict.intercept(FlyingUnit.this, target, ammo.bullet.speed);
 

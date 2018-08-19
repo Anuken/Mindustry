@@ -164,13 +164,13 @@ public class CraftingBlocks extends BlockList implements ContentList{
 
         separator = new Separator("separator"){{
             results = new Item[]{
-                    null, null, null, null, null, null, null, null, null, null,
-                    Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand,
-                    Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone,
-                    Items.tungsten, Items.tungsten, Items.tungsten, Items.tungsten,
-                    Items.lead, Items.lead,
-                    Items.coal, Items.coal,
-                    Items.titanium
+                null, null, null, null, null, null, null, null, null, null,
+                Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand,
+                Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone,
+                Items.tungsten, Items.tungsten, Items.tungsten, Items.tungsten,
+                Items.lead, Items.lead,
+                Items.coal, Items.coal,
+                Items.titanium
             };
             filterTime = 40f;
             itemCapacity = 40;
@@ -182,14 +182,14 @@ public class CraftingBlocks extends BlockList implements ContentList{
 
         centrifuge = new Separator("centrifuge"){{
             results = new Item[]{
-                    null, null, null, null, null, null, null, null, null, null, null, null, null,
-                    Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand,
-                    Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone,
-                    Items.tungsten, Items.tungsten, Items.tungsten, Items.tungsten, Items.tungsten,
-                    Items.lead, Items.lead, Items.lead,
-                    Items.coal, Items.coal, Items.coal,
-                    Items.titanium, Items.titanium,
-                    Items.thorium,
+                null, null, null, null, null, null, null, null, null, null, null, null, null,
+                Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand, Items.sand,
+                Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone, Items.stone,
+                Items.tungsten, Items.tungsten, Items.tungsten, Items.tungsten, Items.tungsten,
+                Items.lead, Items.lead, Items.lead,
+                Items.coal, Items.coal, Items.coal,
+                Items.titanium, Items.titanium,
+                Items.thorium,
             };
 
             hasPower = true;
@@ -212,7 +212,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             itemCapacity = 50;
             craftTime = 25f;
             outputLiquid = Liquids.oil;
-            outputLiquidAmount = 0.9f;
+            outputLiquidAmount = 1.2f;
             size = 2;
             health = 320;
             hasLiquids = true;

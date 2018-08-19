@@ -59,9 +59,14 @@ public class ChatFragment extends Table{
         visible(() -> !state.is(State.menu) && Net.active());
 
         update(() -> {
-            if(!Net.active() && chatOpen){
-                hide();
+            if(!Net.active()){
+                clearMessages();
+
+                if(chatOpen){
+                    hide();
+                }
             }
+
 
             if(Net.active() && Inputs.keyTap("chat")){
                 toggle();
@@ -103,8 +108,8 @@ public class ChatFragment extends Table{
         chatfield = new TextField("", new TextField.TextFieldStyle(skin.get(TextField.TextFieldStyle.class)));
         chatfield.setTextFieldFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
         chatfield.getStyle().background = null;
-        chatfield.getStyle().fontColor = Color.WHITE;
         chatfield.getStyle().font = skin.getFont("default-font-chat");
+        chatfield.getStyle().fontColor = Color.WHITE;
         chatfield.setStyle(chatfield.getStyle());
         Platform.instance.addDialog(chatfield, Vars.maxTextLength);
 
@@ -127,8 +132,9 @@ public class ChatFragment extends Table{
 
         batch.setColor(shadowColor);
 
-        if(chatOpen)
+        if(chatOpen){
             batch.draw(skin.getRegion("white"), offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+        }
 
         super.draw(batch, alpha);
 

@@ -12,10 +12,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.style.Drawable;
-import io.anuke.ucore.scene.ui.Dialog;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.TextButton;
+import io.anuke.ucore.scene.ui.*;
 import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.UIUtils;
@@ -49,10 +46,12 @@ public class JoinDialog extends FloatingDialog{
         add = new FloatingDialog("$text.joingame.title");
         add.content().add("$text.joingame.ip").padRight(5f).left();
 
-        Platform.instance.addDialog(add.content().addField(Settings.getString("ip"), text -> {
+        TextField field = add.content().addField(Settings.getString("ip"), text -> {
             Settings.putString("ip", text);
             Settings.save();
-        }).size(320f, 54f).get(), 100);
+        }).size(320f, 54f).get();
+
+        Platform.instance.addDialog(field, 100);
 
         add.content().row();
         add.buttons().defaults().size(140f, 60f).pad(4f);
@@ -75,6 +74,9 @@ public class JoinDialog extends FloatingDialog{
 
         add.shown(() -> {
             add.getTitleLabel().setText(renaming != null ? "$text.server.edit" : "$text.server.add");
+            if(renaming != null){
+                field.setText(renaming.ip);
+            }
         });
 
         shown(() -> {

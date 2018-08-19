@@ -1,7 +1,6 @@
 package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
@@ -19,63 +18,36 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
 public class Weapon extends Upgrade{
-    /**
-     * minimum cursor distance from player, fixes 'cross-eyed' shooting.
-     */
+    /**minimum cursor distance from player, fixes 'cross-eyed' shooting.*/
     protected static float minPlayerDist = 20f;
-    public TextureRegion equipRegion, region;
-    /**
-     * ammo type map. set with setAmmo()
-     */
-    protected OrderedMap<Item, AmmoType> ammoMap = new OrderedMap<>();
-    /**
-     * shell ejection effect
-     */
+    /**ammo type map. set with setAmmo()*/
+    protected AmmoType ammo;
+    /**shell ejection effect*/
     protected Effect ejectEffect = Fx.none;
-    /**
-     * weapon reload in frames
-     */
+    /**weapon reload in frames*/
     protected float reload;
-    /**
-     * amount of shots per fire
-     */
+    /**amount of shots per fire*/
     protected int shots = 1;
-    /**
-     * spacing in degrees between multiple shots, if applicable
-     */
+    /**spacing in degrees between multiple shots, if applicable*/
     protected float spacing = 12f;
-    /**
-     * inaccuracy of degrees of each shot
-     */
+    /**inaccuracy of degrees of each shot*/
     protected float inaccuracy = 0f;
-    /**
-     * intensity and duration of each shot's screen shake
-     */
+    /**intensity and duration of each shot's screen shake*/
     protected float shake = 0f;
-    /**
-     * visual weapon knockback.
-     */
+    /**visual weapon knockback.*/
     protected float recoil = 1.5f;
-    /**
-     * shoot barrel y offset
-     */
+    /**shoot barrel y offset*/
     protected float length = 3f;
-    /**
-     * shoot barrel x offset.
-     */
+    /**shoot barrel x offset.*/
     protected float width = 4f;
-    /**
-     * fraction of velocity that is random
-     */
+    /**fraction of velocity that is random*/
     protected float velocityRnd = 0f;
-    /**
-     * whether to shoot the weapons in different arms one after another, rather than all at once
-     */
+    /**whether to shoot the weapons in different arms one after another, rather than all at once*/
     protected boolean roundrobin = false;
-    /**
-     * translator for vector calulations
-     */
+    /**translator for vector calulations*/
     protected Translator tr = new Translator();
+
+    public TextureRegion equipRegion, region;
 
     protected Weapon(String name){
         super(name);
@@ -103,12 +75,9 @@ public class Weapon extends Upgrade{
         Weapon weapon = shooter.getWeapon();
 
         Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> weapon.bullet(shooter, x, y, f + Mathf.range(weapon.inaccuracy)));
+        AmmoType ammo = weapon.ammo;
 
-        AmmoType type = shooter.getInventory().getAmmo();
-
-        if(type == null) return;
-
-        weapon.tr.trns(rotation + 180f, type.recoil);
+        weapon.tr.trns(rotation + 180f, ammo.recoil);
 
         shooter.getVelocity().add(weapon.tr);
 
@@ -116,8 +85,8 @@ public class Weapon extends Upgrade{
 
         Effects.shake(weapon.shake, weapon.shake, x, y);
         Effects.effect(weapon.ejectEffect, x, y, rotation * -Mathf.sign(left));
-        Effects.effect(type.shootEffect, x + weapon.tr.x, y + weapon.tr.y, rotation, shooter);
-        Effects.effect(type.smokeEffect, x + weapon.tr.x, y + weapon.tr.y, rotation, shooter);
+        Effects.effect(ammo.shootEffect, x + weapon.tr.x, y + weapon.tr.y, rotation, shooter);
+        Effects.effect(ammo.smokeEffect, x + weapon.tr.x, y + weapon.tr.y, rotation, shooter);
 
         //reset timer for remote players
         shooter.getTimer().get(shooter.getShootTimer(left), weapon.reload);
@@ -134,13 +103,17 @@ public class Weapon extends Upgrade{
         return "weapon";
     }
 
+    public AmmoType getAmmo(){
+        return ammo;
+    }
+
     public void update(ShooterTrait shooter, float pointerX, float pointerY){
         update(shooter, true, pointerX, pointerY);
         update(shooter, false, pointerX, pointerY);
     }
 
     private void update(ShooterTrait shooter, boolean left, float pointerX, float pointerY){
-        if(shooter.getInventory().hasAmmo() && shooter.getTimer().get(shooter.getShootTimer(left), reload)){
+        if(shooter.getTimer().get(shooter.getShootTimer(left), reload)){
             if(roundrobin){
                 shooter.getTimer().reset(shooter.getShootTimer(!left), reload / 2f);
             }
@@ -180,29 +153,13 @@ public class Weapon extends Upgrade{
                 Call.onGenericShootWeapon(p, x, y, angle, left);
             }
         }
-
-        p.getInventory().useAmmo();
-    }
-
-    public Iterable<Item> getAcceptedItems(){
-        return ammoMap.orderedKeys();
-    }
-
-    public AmmoType getAmmoType(Item item){
-        return ammoMap.get(item);
-    }
-
-    protected void setAmmo(AmmoType... types){
-        for(AmmoType type : types){
-            ammoMap.put(type.item, type);
-        }
     }
 
     void bullet(ShooterTrait owner, float x, float y, float angle){
-        if(owner == null || !owner.getInventory().hasAmmo()) return;
+        if(owner == null) return;
 
         tr.trns(angle, 3f);
-        Bullet.create(owner.getInventory().getAmmo().bullet,
+        Bullet.create(ammo.bullet,
                 owner, owner.getTeam(), x + tr.x, y + tr.y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd));
     }
 }
