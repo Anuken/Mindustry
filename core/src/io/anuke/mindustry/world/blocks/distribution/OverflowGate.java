@@ -41,8 +41,8 @@ public class OverflowGate extends Splitter{
         if(!to.block().acceptItem(item, to, edge) || (to.block() instanceof OverflowGate)){
             Tile a = tile.getNearby(Mathf.mod(from - 1, 4));
             Tile b = tile.getNearby(Mathf.mod(from + 1, 4));
-            boolean ac = a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate);
-            boolean bc = b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate);
+            boolean ac = a != null && a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate);
+            boolean bc = b != null && b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate);
 
             if(!ac && !bc){
                 return null;
