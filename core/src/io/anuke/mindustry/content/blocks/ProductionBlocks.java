@@ -12,18 +12,18 @@ import io.anuke.mindustry.world.blocks.production.Fracker;
 import io.anuke.mindustry.world.blocks.production.SolidPump;
 
 public class ProductionBlocks extends BlockList implements ContentList{
-    public static Block tungstenDrill, carbideDrill, laserdrill, blastdrill, plasmadrill, waterextractor, oilextractor, cultivator;
+    public static Block mechanicalDrill, pneumaticDrill, laserdrill, blastdrill, plasmadrill, waterextractor, oilextractor, cultivator;
 
     @Override
     public void load(){
-        tungstenDrill = new Drill("tungsten-drill"){{
+        mechanicalDrill = new Drill("mechanical-drill"){{
             tier = 2;
             drillTime = 300;
             size = 2;
             drawMineItem = true;
         }};
 
-        carbideDrill = new Drill("carbide-drill"){{
+        pneumaticDrill = new Drill("carbide-drill"){{
             tier = 3;
             drillTime = 240;
             size = 2;

@@ -9,18 +9,18 @@ import io.anuke.mindustry.world.blocks.defense.Door;
 import io.anuke.mindustry.world.blocks.defense.PhaseWall;
 
 public class DefenseBlocks extends BlockList implements ContentList{
-    public static Block tungstenWall, tungstenWallLarge, carbideWall, carbideWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge, deflectorwall, deflectorwalllarge,
+    public static Block copperWall, copperWallLarge, carbideWall, carbideWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge, deflectorwall, deflectorwalllarge,
             phaseWall, phaseWallLarge;
 
     @Override
     public void load(){
         int wallHealthMultiplier = 4;
 
-        tungstenWall = new Wall("tungsten-wall"){{
+        copperWall = new Wall("copper-wall"){{
             health = 80 * wallHealthMultiplier;
         }};
 
-        tungstenWallLarge = new Wall("tungsten-wall-large"){{
+        copperWallLarge = new Wall("copper-wall-large"){{
             health = 80 * 4 * wallHealthMultiplier;
             size = 2;
         }};

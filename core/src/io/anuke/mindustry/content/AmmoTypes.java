@@ -10,7 +10,7 @@ import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.ContentList;
 
 public class AmmoTypes implements ContentList{
-    public static AmmoType bulletTungsten, bulletLead, bulletCarbide, bulletThorium, bulletSilicon, bulletPyratite,
+    public static AmmoType bulletCopper, bulletCarbide, bulletThorium, bulletSilicon, bulletPyratite,
             shotgunTungsten, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite, weaponMissile,
             flakLead, flakExplosive, flakPlastic, flakSurge, missileExplosive, missileIncindiary, missileSurge,
             artilleryCarbide, artilleryPlastic, artilleryHoming, artilleryIncindiary, artilleryExplosive,
@@ -21,37 +21,37 @@ public class AmmoTypes implements ContentList{
 
         //weapon specific
 
-        shotgunTungsten = new AmmoType(Items.tungsten, WeaponBullets.tungstenShotgun, 2){{
+        shotgunTungsten = new AmmoType(WeaponBullets.tungstenShotgun){{
             shootEffect = ShootFx.shootBig;
             smokeEffect = ShootFx.shootBigSmoke;
             recoil = 1f;
         }};
 
-        shellCarbide = new AmmoType(Items.carbide, WeaponBullets.shellCarbide, 2){{
+        shellCarbide = new AmmoType(WeaponBullets.shellCarbide){{
             shootEffect = ShootFx.shootBig;
             smokeEffect = ShootFx.shootBigSmoke;
         }};
 
-        bombExplosive = new AmmoType(Items.blastCompound, WeaponBullets.bombExplosive, 3){{
+        bombExplosive = new AmmoType(WeaponBullets.bombExplosive){{
             shootEffect = Fx.none;
             smokeEffect = Fx.none;
         }};
 
-        bombIncendiary = new AmmoType(Items.pyratite, WeaponBullets.bombIncendiary, 3){{
+        bombIncendiary = new AmmoType(WeaponBullets.bombIncendiary){{
             shootEffect = Fx.none;
             smokeEffect = Fx.none;
         }};
 
-        bombOil = new AmmoType(Items.coal, WeaponBullets.bombOil, 3){{
+        bombOil = new AmmoType(WeaponBullets.bombOil){{
             shootEffect = Fx.none;
             smokeEffect = Fx.none;
         }};
 
-        flamerThermite = new AmmoType(Items.pyratite, TurretBullets.basicFlame, 3){{
+        flamerThermite = new AmmoType(TurretBullets.basicFlame){{
             shootEffect = ShootFx.shootSmallFlame;
         }};
 
-        weaponMissile = new AmmoType(Items.carbide, MissileBullets.javelin, 2){{
+        weaponMissile = new AmmoType(MissileBullets.javelin){{
             shootEffect = BulletFx.hitBulletSmall;
             smokeEffect = Fx.none;
             reloadMultiplier = 1.2f;
@@ -59,17 +59,11 @@ public class AmmoTypes implements ContentList{
 
         //bullets
 
-        bulletLead = new AmmoType(Items.lead, StandardBullets.lead, 5){{
+        bulletCopper = new AmmoType(Items.copper, StandardBullets.copper, 5){{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
-            reloadMultiplier = 1.6f;
+            reloadMultiplier = 1f;
             inaccuracy = 5f;
-        }};
-
-        bulletTungsten = new AmmoType(Items.tungsten, StandardBullets.tungsten, 2){{
-            shootEffect = ShootFx.shootSmall;
-            smokeEffect = ShootFx.shootSmallSmoke;
-            reloadMultiplier = 0.8f;
         }};
 
         bulletCarbide = new AmmoType(Items.carbide, StandardBullets.carbide, 2){{
@@ -183,7 +177,7 @@ public class AmmoTypes implements ContentList{
 
         meltdownLaser = new AmmoType(TurretBullets.lancerLaser);
 
-        fuseShotgun = new AmmoType(Items.tungsten, TurretBullets.fuseShot, 0.1f);
+        fuseShotgun = new AmmoType(Items.copper, TurretBullets.fuseShot, 0.1f);
 
         //liquid
 
