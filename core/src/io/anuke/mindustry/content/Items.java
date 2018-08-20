@@ -8,21 +8,26 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
 public class Items implements ContentList{
-    public static Item stone, copper, lead, coal, titanium, thorium, silicon, plastanium, phasematter, surgealloy,
+    public static Item stone, copper, lead, densealloy, coal, titanium, thorium, silicon, plastanium, phasematter, surgealloy,
             biomatter, sand, blastCompound, pyratite;
 
     @Override
     public void load(){
-        copper = new Item("copper", Color.valueOf("8e85a2")){{
+        copper = new Item("copper", Color.valueOf("d99d73")){{
             type = ItemType.material;
             hardness = 1;
             cost = 0.6f;
         }};
 
-        lead = new Item("lead", Color.valueOf("8e85a2")){{
+        lead = new Item("lead", Color.valueOf("8c7fa9")){{
             type = ItemType.material;
             hardness = 1;
             cost = 0.6f;
+        }};
+
+        densealloy = new Item("dense-alloy", Color.valueOf("b2c6d2")){{
+            type = ItemType.material;
+            cost = 1.2f;
         }};
 
         coal = new Item("coal", Color.valueOf("272727")){{
@@ -54,7 +59,7 @@ public class Items implements ContentList{
             cost = 0.9f;
         }};
 
-        plastanium = new Item("plastanium", Color.valueOf("e9ead3")){{
+        plastanium = new Item("plastanium", Color.valueOf("cbd97f")){{
             type = ItemType.material;
             flammability = 0.1f;
             explosiveness = 0.1f;
@@ -66,7 +71,7 @@ public class Items implements ContentList{
             cost = 1.5f;
         }};
 
-        surgealloy = new Item("surge-alloy", Color.valueOf("b4d5c7")){{
+        surgealloy = new Item("surge-alloy", Color.valueOf("f3e979")){{
             type = ItemType.material;
         }};
 

@@ -10,10 +10,10 @@ import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.ContentList;
 
 public class AmmoTypes implements ContentList{
-    public static AmmoType bulletCopper, bulletCarbide, bulletThorium, bulletSilicon, bulletPyratite,
+    public static AmmoType bulletCopper, bulletDense, bulletThorium, bulletSilicon, bulletPyratite,
             shotgunTungsten, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite, weaponMissile,
             flakLead, flakExplosive, flakPlastic, flakSurge, missileExplosive, missileIncindiary, missileSurge,
-            artilleryCarbide, artilleryPlastic, artilleryHoming, artilleryIncindiary, artilleryExplosive,
+    artilleryDense, artilleryPlastic, artilleryHoming, artilleryIncindiary, artilleryExplosive,
             basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid;
 
     @Override
@@ -66,7 +66,7 @@ public class AmmoTypes implements ContentList{
             inaccuracy = 5f;
         }};
 
-        bulletCarbide = new AmmoType(Items.carbide, StandardBullets.carbide, 2){{
+        bulletDense = new AmmoType(Items.densealloy, StandardBullets.dense, 2){{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
             reloadMultiplier = 0.6f;
@@ -132,7 +132,7 @@ public class AmmoTypes implements ContentList{
 
         //artillery
 
-        artilleryCarbide = new AmmoType(Items.carbide, ArtilleryBullets.carbide, 2){{
+        artilleryDense = new AmmoType(Items.densealloy, ArtilleryBullets.dense, 2){{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
         }};

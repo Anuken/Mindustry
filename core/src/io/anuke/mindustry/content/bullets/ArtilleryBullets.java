@@ -8,12 +8,12 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
 
 public class ArtilleryBullets extends BulletList implements ContentList{
-    public static BulletType carbide, plastic, plasticFrag, homing, incindiary, explosive, surge;
+    public static BulletType dense, plastic, plasticFrag, homing, incindiary, explosive, surge;
 
     @Override
     public void load(){
 
-        carbide = new ArtilleryBulletType(3f, 0, "shell"){
+        dense = new ArtilleryBulletType(3f, 0, "shell"){
             {
                 hiteffect = BulletFx.flakExplosion;
                 knockback = 0.8f;

@@ -5,7 +5,6 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.type.ContentList;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.production.*;
@@ -19,26 +18,26 @@ public class CraftingBlocks extends BlockList implements ContentList{
     public void load(){
         smelter = new Smelter("smelter"){{
             health = 70;
-            result = Items.carbide;
+            result = Items.densealloy;
             craftTime = 45f;
             burnDuration = 46f;
             useFlux = true;
 
-            consumes.items(new ItemStack[]{new ItemStack(Items.tungsten, 3)});
+            consumes.items(new ItemStack[]{new ItemStack(Items.copper, 1), new ItemStack(Items.lead, 2)});
             consumes.item(Items.coal).optional(true);
         }};
 
         arcsmelter = new PowerSmelter("arc-smelter"){{
             health = 90;
             craftEffect = BlockFx.smeltsmoke;
-            result = Items.carbide;
+            result = Items.densealloy;
             craftTime = 30f;
             size = 2;
 
             useFlux = true;
             fluxNeeded = 2;
 
-            consumes.items(new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.tungsten, 2)});
+            consumes.items(new ItemStack[]{new ItemStack(Items.copper, 1), new ItemStack(Items.lead, 2)});
             consumes.power(0.1f);
         }};
 

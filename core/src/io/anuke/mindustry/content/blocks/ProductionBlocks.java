@@ -23,7 +23,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             drawMineItem = true;
         }};
 
-        pneumaticDrill = new Drill("carbide-drill"){{
+        pneumaticDrill = new Drill("pneumatic-drill"){{
             tier = 3;
             drillTime = 240;
             size = 2;

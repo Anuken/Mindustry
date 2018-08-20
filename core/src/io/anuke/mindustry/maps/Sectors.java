@@ -147,21 +147,21 @@ public class Sectors{
         sector.spawns = sector.missions.first().getWaves(sector);
 
         //add all ores for now since material differences aren't well handled yet
-        sector.ores.addAll(Items.tungsten, Items.coal, Items.lead, Items.thorium, Items.titanium);
+        sector.ores.addAll(Items.copper, Items.coal, Items.lead, Items.thorium, Items.titanium);
 
         //set starter items
         if(sector.difficulty > 12){ //now with titanium
-            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 1900), new ItemStack(Items.lead, 600), new ItemStack(Items.carbide, 470), new ItemStack(Items.silicon, 460), new ItemStack(Items.titanium, 230));
+            sector.startingItems = Array.with(new ItemStack(Items.copper, 1900), new ItemStack(Items.lead, 500), new ItemStack(Items.densealloy, 470), new ItemStack(Items.silicon, 460), new ItemStack(Items.titanium, 230));
         }else if(sector.difficulty > 8){ //just more resources
-            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 1500), new ItemStack(Items.lead, 450), new ItemStack(Items.carbide, 340), new ItemStack(Items.silicon, 250));
+            sector.startingItems = Array.with(new ItemStack(Items.copper, 1500), new ItemStack(Items.lead, 400), new ItemStack(Items.densealloy, 340), new ItemStack(Items.silicon, 250));
         }else if(sector.difficulty > 5){ //now with silicon
-            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 950), new ItemStack(Items.lead, 350), new ItemStack(Items.carbide, 190), new ItemStack(Items.silicon, 140));
+            sector.startingItems = Array.with(new ItemStack(Items.copper, 950), new ItemStack(Items.lead, 300), new ItemStack(Items.densealloy, 190), new ItemStack(Items.silicon, 140));
         }else if(sector.difficulty > 3){ //now with carbide
-            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 700), new ItemStack(Items.lead, 250), new ItemStack(Items.carbide, 130));
+            sector.startingItems = Array.with(new ItemStack(Items.copper, 700), new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 130));
         }else if(sector.difficulty > 1){ //more starter items for faster start
-            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 500), new ItemStack(Items.lead, 180));
+            sector.startingItems = Array.with(new ItemStack(Items.copper, 500), new ItemStack(Items.lead, 100));
         }else{ //base starting items to prevent grinding much
-            sector.startingItems = Array.with(new ItemStack(Items.tungsten, 170), new ItemStack(Items.lead, 70));
+            sector.startingItems = Array.with(new ItemStack(Items.copper, 170));
         }
     }
 

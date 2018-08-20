@@ -3,7 +3,6 @@ package io.anuke.mindustry.maps.generation;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.DefenseBlocks;
 import io.anuke.mindustry.content.blocks.UnitBlocks;
@@ -33,6 +32,7 @@ public class FortressGenerator{
         if(structures != null) return;
 
         structures = new Structure[]{
+        /*
             //tiny duo outpost
             new Structure(0.03f, Items.tungsten, "BAMADnR1bmdzdGVuLWRyaWxsAgADZHVvAQANdHVuZ3N0ZW4td2FsbAAAA2FpcgMFAQABAwEDAQMBAAEAAgMDAwIDAQABAAEBAQEBAQEA"),
 
@@ -71,6 +71,7 @@ public class FortressGenerator{
 
             //fabricator outpost
             new Structure(0.02f, Items.tungsten, "BgUADWNhcmJpZGUtZHJpbGwBABJ0aG9yaXVtLXdhbGwtbGFyZ2UCAAx0aG9yaXVtLXdhbGwEAANkdW8AAANhaXIDAA5mYWJyaWNhdG9yLXBhZAkJAAAAAAEDAAACAwEDAAAAAAAAAAACAwADAAMCAwADAAMCAgAAAQMAAAMCAAACAAMCAAABAwAAAAAAAAAAAAAEAgAAAAAAAgAAAgMCAAIBBAIFAAQCAgMCAgIDAQMAAAMCAAAEAgMCAAABAwAAAAAAAAAAAAACAQAAAAAAAgAAAAACAAEDAAECAQEDAAECAQAAAAAAAAAAAAACAwACAAAAAAAA"),
+            */
         };
 
         bases = new Structure[]{
@@ -185,8 +186,8 @@ public class FortressGenerator{
     }
 
     Block fixBlock(Block result){
-        if(result == UnitBlocks.dronePad) result = DefenseBlocks.tungstenWallLarge;
-        if(result == UnitBlocks.fabricatorPad) result = DefenseBlocks.tungstenWallLarge;
+        if(result == UnitBlocks.dronePad) result = DefenseBlocks.copperWallLarge;
+        if(result == UnitBlocks.fabricatorPad) result = DefenseBlocks.copperWallLarge;
         return result;
     }
 

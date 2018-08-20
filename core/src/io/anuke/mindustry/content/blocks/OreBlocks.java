@@ -19,7 +19,7 @@ public class OreBlocks extends BlockList{
 
     @Override
     public void load(){
-        Item[] ores = {Items.tungsten, Items.lead, Items.coal, Items.titanium, Items.thorium};
+        Item[] ores = {Items.copper, Items.lead, Items.coal, Items.titanium, Items.thorium};
 
         for(Item item : ores){
             ObjectMap<Block, Block> map = new ObjectMap<>();
