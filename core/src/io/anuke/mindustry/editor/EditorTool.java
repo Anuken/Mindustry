@@ -100,6 +100,10 @@ public enum EditorTool{
             dest = floor ? bf : bw;
             byte draw = (byte) editor.getDrawBlock().id;
 
+            if(dest == draw){
+                return;
+            }
+
             width = editor.getMap().width();
             int height = editor.getMap().height();
 
@@ -154,44 +158,6 @@ public enum EditorTool{
                     x1++;
                 }
             }
-
-            /*
-            IntSet set = new IntSet();
-            IntArray points = new IntArray();
-            points.add(asInt(x, y, editor.getMap().width()));
-
-            while(points.size != 0){
-                int pos = points.pop();
-                int px = pos % width;
-                int py = pos / width;
-                set.add(pos);
-
-                byte nbf = editor.getMap().read(px, py, DataPosition.floor);
-                byte nbw = editor.getMap().read(px, py, DataPosition.wall);
-                byte nbe = editor.getMap().read(px, py, DataPosition.elevation);
-
-                if((floor ? nbf : nbw) == dest && nbe == be){
-                    TileDataMarker prev = editor.getPrev(px, py, false);
-
-                    if(floor){
-                        editor.getMap().write(px, py, DataPosition.floor, draw);
-                    }else{
-                        editor.getMap().write(px, py, DataPosition.wall, draw);
-                    }
-
-                    if(synth){
-                        editor.getMap().write(px, py, DataPosition.rotationTeam, brt);
-                    }
-
-                    if(px > 0 && !set.contains(asInt(px - 1, py, width))) points.add(asInt(px - 1, py, width));
-                    if(py > 0 && !set.contains(asInt(px, py - 1, width))) points.add(asInt(px, py - 1, width));
-                    if(px < width - 1 && !set.contains(asInt(px + 1, py, width))) points.add(asInt(px + 1, py, width));
-                    if(py < height - 1 && !set.contains(asInt(px, py + 1, width))) points.add(asInt(px, py + 1, width));
-
-                    editor.onWrite(px, py, prev);
-                }
-            }
-            */
         }
 
         boolean eq(int px, int py){
