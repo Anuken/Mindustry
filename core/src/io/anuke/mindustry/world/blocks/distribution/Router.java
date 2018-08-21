@@ -10,10 +10,10 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Timers;
 
-public class Splitter extends Block{
+public class Router extends Block{
     protected float speed = 8f;
 
-    public Splitter(String name){
+    public Router(String name){
         super(name);
         solid = true;
         update = true;
@@ -36,7 +36,7 @@ public class Splitter extends Block{
             entity.time += 1f/speed * Timers.delta();
             Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
 
-            if(target != null && (entity.time >= 1f || !(target.block() instanceof Splitter))){
+            if(target != null && (entity.time >= 1f || !(target.block() instanceof Router))){
                 getTileTarget(tile, entity.lastItem, entity.lastInput, true);
                 target.block().handleItem(entity.lastItem, target, Edges.getFacingEdge(tile, target));
                 entity.items.remove(entity.lastItem, 1);
@@ -49,7 +49,7 @@ public class Splitter extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         SplitterEntity entity = tile.entity();
 
-        return entity.lastItem == null;
+        return tile.getTeamID() == source.getTeamID() && entity.lastItem == null;
     }
 
     @Override

@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -119,7 +118,7 @@ public class Sorter extends Block implements SelectionTrait{
     }
 
     public static class SorterEntity extends TileEntity{
-        public Item sortItem = Items.tungsten;
+        public Item sortItem = Item.getByID(0);
 
         @Override
         public void write(DataOutputStream stream) throws IOException{

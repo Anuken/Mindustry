@@ -52,7 +52,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 1800;
             size = 2;
             consumes.power(0.05f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.tungsten, 15)});
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.copper, 15)});
         }};
 
         titanPad = new UnitPad("titan-pad"){{

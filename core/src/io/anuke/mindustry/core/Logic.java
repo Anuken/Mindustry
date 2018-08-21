@@ -2,7 +2,6 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
@@ -67,13 +66,6 @@ public class Logic extends Module{
                         tile.entity.items.add(stack.item, stack.amount);
                     }
                 }
-            }
-        }
-
-        for(TeamData team : state.teams.getTeams(false)){
-            for(Tile tile : team.cores){
-                tile.entity.items.add(Items.tungsten, 2000);
-                tile.entity.items.add(Items.blastCompound, 2000);
             }
         }
 
