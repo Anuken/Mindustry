@@ -11,7 +11,7 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public class UnitFx extends FxList implements ContentList{
-    public static Effect vtolHover, unitDrop, unitPickup, pickup;
+    public static Effect vtolHover, unitDrop, unitPickup, unitLand, pickup;
 
     @Override
     public void load(){
@@ -28,6 +28,14 @@ public class UnitFx extends FxList implements ContentList{
             Draw.color(Palette.lightishGray);
             Angles.randLenVectors(e.id, 9, 3 + 20f * e.finpow(), (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.4f);
+            });
+            Draw.reset();
+        });
+
+        unitLand = new GroundEffect(30, e -> {
+            Draw.color(Palette.lightishGray, e.color, e.rotation);
+            Angles.randLenVectors(e.id, 6, 17f * e.finpow(), (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.3f);
             });
             Draw.reset();
         });

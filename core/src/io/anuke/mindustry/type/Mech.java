@@ -24,7 +24,6 @@ public class Mech extends Upgrade implements UnlockableContent{
     public int drillPower = -1;
     public float carryWeight = 10f;
     public float buildPower = 1f;
-    public boolean canRepair = false;
     public Color trailColor = Palette.boostFrom;
     public Color trailColorTo = Palette.boostTo;
 

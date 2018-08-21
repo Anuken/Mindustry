@@ -10,6 +10,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
+import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.traits.*;
@@ -19,16 +20,16 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
-import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Mech;
+import io.anuke.mindustry.type.Upgrade;
+import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock.CoreEntity;
 import io.anuke.mindustry.world.blocks.units.MechFactory;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
@@ -46,6 +47,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public static final int timerSync = 2;
     private static final int timerShootLeft = 0;
     private static final int timerShootRight = 1;
+    private static final float liftoffBoost = 0.2f;
 
     //region instance variables, constructor
     public float baseRotation;
@@ -55,6 +57,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile;
     public float boostHeat;
+    public boolean achievedFlight;
     public Color color = new Color();
     public Mech mech;
     public int spawner;
@@ -195,7 +198,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public boolean isFlying(){
-        return mech.flying || boostHeat > 0.2f || isCarried();
+        return mech.flying || boostHeat > liftoffBoost || isCarried();
     }
 
     @Override
@@ -276,8 +279,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             walktime += Timers.delta() * movement.len() / 0.7f * getFloorOn().speedMultiplier;
             baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
         }
-
-        boostHeat = Mathf.lerpDelta(boostHeat, isBoosting && ((!movement.isZero() && moved) || !isLocal) ? 1f : 0f, 0.08f);
 
         float ft = Mathf.sin(walktime, 6f, 2f) * (1f - boostHeat);
 
@@ -487,6 +488,17 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     protected void updateMech(){
         Tile tile = world.tileWorld(x, y);
+
+        boostHeat = Mathf.lerpDelta(boostHeat, isBoosting && ((!movement.isZero() && moved) || !isLocal) ? 1f : 0f, 0.08f);
+
+        if(boostHeat > liftoffBoost + 0.1f){
+            achievedFlight = true;
+        }
+
+        if(boostHeat <= liftoffBoost + 0.05f && achievedFlight){
+            if(tile != null) Effects.effect(UnitFx.unitLand, tile.floor().minimapColor, x, y, tile.floor().isLiquid ? 1f : 0.5f);
+            achievedFlight = false;
+        }
 
         //if player is in solid block
         if(tile != null && tile.solid() && !isFlying()){

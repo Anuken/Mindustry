@@ -27,9 +27,9 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.entities.EntityDraw;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.BaseEntity;
 import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
+import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
@@ -88,8 +88,8 @@ public class Renderer extends RendererModule{
                         entity.data = data;
                         entity.id++;
                         entity.set(x, y);
-                        if(data instanceof BaseEntity){
-                            entity.setParent((BaseEntity) data);
+                        if(data instanceof Entity){
+                            entity.setParent((Entity) data);
                         }
                         threads.runGraphics(() -> effectGroup.add(entity));
                     }else{
@@ -100,6 +100,9 @@ public class Renderer extends RendererModule{
                         entity.id++;
                         entity.data = data;
                         entity.set(x, y);
+                        if(data instanceof Entity){
+                            entity.setParent((Entity) data);
+                        }
                         threads.runGraphics(() -> groundEffectGroup.add(entity));
                     }
                 }
