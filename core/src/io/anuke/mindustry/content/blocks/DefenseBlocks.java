@@ -14,7 +14,7 @@ public class DefenseBlocks extends BlockList implements ContentList{
 
     @Override
     public void load(){
-        int wallHealthMultiplier = 4;
+        int wallHealthMultiplier = 3;
 
         copperWall = new Wall("copper-wall"){{
             health = 80 * wallHealthMultiplier;
