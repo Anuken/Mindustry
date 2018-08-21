@@ -147,7 +147,7 @@ public class WorldGenerator{
 
         if(genOres){
             Array<OreEntry> baseOres = Array.with(
-            new OreEntry(Items.tungsten, 0.3f, seed),
+            new OreEntry(Items.copper, 0.3f, seed),
             new OreEntry(Items.coal, 0.284f, seed),
             new OreEntry(Items.lead, 0.28f, seed),
             new OreEntry(Items.titanium, 0.27f, seed),

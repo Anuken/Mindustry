@@ -9,27 +9,27 @@ import io.anuke.mindustry.world.blocks.defense.Door;
 import io.anuke.mindustry.world.blocks.defense.PhaseWall;
 
 public class DefenseBlocks extends BlockList implements ContentList{
-    public static Block tungstenWall, tungstenWallLarge, carbideWall, carbideWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge, deflectorwall, deflectorwalllarge,
-            phasewall, phasewalllarge;
+    public static Block copperWall, copperWallLarge, compositeWall, compositeWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge, deflectorwall, deflectorwalllarge,
+            phaseWall, phaseWallLarge;
 
     @Override
     public void load(){
-        int wallHealthMultiplier = 4;
+        int wallHealthMultiplier = 3;
 
-        tungstenWall = new Wall("tungsten-wall"){{
+        copperWall = new Wall("copper-wall"){{
             health = 80 * wallHealthMultiplier;
         }};
 
-        tungstenWallLarge = new Wall("tungsten-wall-large"){{
+        copperWallLarge = new Wall("copper-wall-large"){{
             health = 80 * 4 * wallHealthMultiplier;
             size = 2;
         }};
 
-        carbideWall = new Wall("carbide-wall"){{
+        compositeWall = new Wall("composite-wall"){{
             health = 110 * wallHealthMultiplier;
         }};
 
-        carbideWallLarge = new Wall("carbide-wall-large"){{
+        compositeWallLarge = new Wall("composite-wall-large"){{
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
         }};
@@ -52,11 +52,11 @@ public class DefenseBlocks extends BlockList implements ContentList{
             size = 2;
         }};
 
-        phasewall = new PhaseWall("phase-wall"){{
+        phaseWall = new PhaseWall("phase-wall"){{
             health = 150 * wallHealthMultiplier;
         }};
 
-        phasewalllarge = new PhaseWall("phase-wall-large"){{
+        phaseWallLarge = new PhaseWall("phase-wall-large"){{
             health = 150 * 4 * wallHealthMultiplier;
             size = 2;
             regenSpeed = 0.5f;

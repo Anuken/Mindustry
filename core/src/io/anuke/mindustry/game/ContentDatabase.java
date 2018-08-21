@@ -8,6 +8,8 @@ import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 
+import static io.anuke.mindustry.Vars.debug;
+
 public class ContentDatabase{
     /** Maps unlockable type names to a set of unlocked content.*/
     private ObjectMap<String, ObjectSet<String>> unlocked = new ObjectMap<>();
@@ -16,6 +18,8 @@ public class ContentDatabase{
 
     /** Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(UnlockableContent content){
+        if(debug) return true;
+
         if(!unlocked.containsKey(content.getContentTypeName())){
             unlocked.put(content.getContentTypeName(), new ObjectSet<>());
         }

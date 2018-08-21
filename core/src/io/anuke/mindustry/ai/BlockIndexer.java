@@ -43,7 +43,7 @@ public class BlockIndexer{
     /**
      * Set of all ores that are being scanned.
      */
-    private final ObjectSet<Item> scanOres = ObjectSet.with(Items.tungsten, Items.coal, Items.lead, Items.thorium, Items.titanium);
+    private final ObjectSet<Item> scanOres = ObjectSet.with(Items.copper, Items.coal, Items.lead, Items.thorium, Items.titanium);
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
     /**
      * Stores all ore quadtrants on the map.

@@ -19,7 +19,7 @@ public class Weapons implements ContentList{
             reload = 15f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
-            ammo = AmmoTypes.bulletLead;
+            ammo = AmmoTypes.bulletCopper;
         }};
 
         missiles = new Weapon("missiles"){{
@@ -38,7 +38,7 @@ public class Weapons implements ContentList{
             reload = 28f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
-            ammo = AmmoTypes.bulletLead;
+            ammo = AmmoTypes.bulletCopper;
         }};
 
         shockgun = new Weapon("shockgun"){{
@@ -79,7 +79,7 @@ public class Weapons implements ContentList{
             reload = 12f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
-            ammo = AmmoTypes.bulletCarbide;
+            ammo = AmmoTypes.bulletDense;
         }};
 
         swarmer = new Weapon("swarmer"){{
