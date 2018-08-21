@@ -151,7 +151,7 @@ public class NetClient extends Module{
 
     @Remote(variants = Variant.both)
     public static void onInfoMessage(String message){
-        threads.runGraphics(() -> ui.showInfo(message));
+        threads.runGraphics(() -> ui.showText("", message));
     }
 
     @Remote(variants = Variant.both)
