@@ -168,8 +168,6 @@ public class DesktopInput extends InputHandler{
             Settings.save();
         }
 
-        player.isBoosting = Inputs.keyDown("dash");
-
         //deslect if not placing
         if(!isPlacing() && mode == placing){
             mode = none;

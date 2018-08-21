@@ -500,9 +500,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             achievedFlight = false;
         }
 
+        isBoosting = Inputs.keyDown("dash") && !mech.flying;
+
         //if player is in solid block
-        if(tile != null && tile.solid() && !isFlying()){
-            damage(health + 1); //die instantly
+        if(tile != null && tile.solid()){
+            isBoosting = true;
         }
 
         float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
@@ -526,8 +528,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             }else if(getCarry() != null){
                 dropCarry();
             }else{
-                Unit unit = Units.getClosest(team, x, y, 8f,
-                        u -> !u.isFlying() && u.getMass() <= mech.carryWeight);
+                Unit unit = Units.getClosest(team, x, y, 8f, u -> !u.isFlying() && u.getMass() <= mech.carryWeight);
 
                 if(unit != null){
                     carry(unit);
