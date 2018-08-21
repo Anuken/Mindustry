@@ -118,6 +118,8 @@ public class NetworkIO{
                 i += consecutives;
             }
 
+            stream.write(Team.all.length);
+
             //write team data
             for(Team team : Team.all){
                 TeamData data = state.teams.get(team);

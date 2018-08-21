@@ -9,13 +9,16 @@ import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.net.Administration;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
+import io.anuke.mindustry.net.EditLog;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.KickReason;
+import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
@@ -87,9 +90,9 @@ public class ServerControl extends Module{
 
         Events.on(GameOverEvent.class, () -> {
             info("Game over!");
-            netServer.kickAll(KickReason.gameover);
 
             if(mode != ShuffleMode.off){
+                Call.onInfoMessage("Game over!");
                 if(world.getSector() == null){
                     if(world.maps().all().size > 0){
                         Array<Map> maps = mode == ShuffleMode.both ? world.maps().all() :
@@ -103,9 +106,9 @@ public class ServerControl extends Module{
 
                         info("Selected next map to be {0}.", map.name);
 
-                        logic.reset();
-                        world.loadMap(map);
-                        state.set(State.playing);
+                        Map fmap = map;
+
+                        play(() -> world.loadMap(fmap));
                     }
                 }else{
                     if(gameOvers >= 2){
@@ -118,6 +121,7 @@ public class ServerControl extends Module{
                     info("Re-trying sector map: {0} {1}",  Settings.getInt("sector_x"), Settings.getInt("sector_y"));
                 }
             }else{
+                netServer.kickAll(KickReason.gameover);
                 state.set(State.menu);
                 Net.closeServer();
             }
@@ -845,8 +849,26 @@ public class ServerControl extends Module{
         if(world.sectors().get(x, y) == null){
             world.sectors().createSector(x, y);
         }
-        world.loadSector(world.sectors().get(x, y));
+
+        world.sectors().get(x, y).completedMissions = 0;
+
+        play(() -> world.loadSector(world.sectors().get(x, y)));
+    }
+
+    private void play(Runnable run){
+        Array<Player> players = new Array<>();
+        for(Player p : playerGroup.all()){
+            players.add(p);
+            p.setDead(true);
+        }
+        logic.reset();
+        Call.onWorldDataBegin();
+        run.run();
         logic.play();
+        for(Player p : players){
+            p.add();
+            netServer.sendWorldData(p, p.con.id);
+        }
     }
 
     private void host(){
@@ -864,6 +886,7 @@ public class ServerControl extends Module{
         if(state.is(State.playing) && world.getSector() != null){
             //all assigned missions are complete
             if(world.getSector().completedMissions >= world.getSector().missions.size){
+                Log.info("Mission complete.");
                 world.sectors().completeSector(world.getSector().x, world.getSector().y);
                 world.sectors().save();
                 gameOvers = 0;

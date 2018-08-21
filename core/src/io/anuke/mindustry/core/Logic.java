@@ -66,8 +66,6 @@ public class Logic extends Module{
             }
         }
 
-
-
         Events.fire(PlayEvent.class);
     }
 

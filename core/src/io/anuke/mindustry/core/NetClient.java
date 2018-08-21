@@ -80,18 +80,8 @@ public class NetClient extends Module{
 
             player.isAdmin = false;
 
-            Net.setClientLoaded(false);
-            removed.clear();
-            timeoutTime = 0f;
-            connecting = true;
-            quiet = false;
-            lastSent = 0;
-            lastSnapshotBase = null;
-            currentSnapshot = null;
-            currentSnapshotID = -1;
-            lastSnapshotBaseID = -1;
+            reset();
 
-            ui.chatfrag.clearMessages();
             ui.loadfrag.hide();
             ui.loadfrag.show("$text.connecting.data");
 
@@ -101,8 +91,6 @@ public class NetClient extends Module{
                 quiet = true;
                 Net.disconnect();
             });
-
-            Entities.clear();
 
             ConnectPacket c = new ConnectPacket();
             c.name = player.name;
@@ -159,6 +147,29 @@ public class NetClient extends Module{
             }
         }
         ui.loadfrag.hide();
+    }
+
+    @Remote(variants = Variant.both)
+    public static void onInfoMessage(String message){
+        threads.runGraphics(() -> ui.showInfo(message));
+    }
+
+    @Remote(variants = Variant.both)
+    public static void onWorldDataBegin(){
+        Entities.clear();
+        ui.chatfrag.clearMessages();
+        Net.setClientLoaded(false);
+
+        threads.runGraphics(() -> {
+            ui.loadfrag.show("$text.connecting.data");
+
+            ui.loadfrag.setButton(() -> {
+                ui.loadfrag.hide();
+                netClient.connecting = false;
+                netClient.quiet = true;
+                Net.disconnect();
+            });
+        });
     }
 
     @Remote(variants = Variant.one)
@@ -285,7 +296,6 @@ public class NetClient extends Module{
 
             //go through each entity
             for(int j = 0; j < amount; j++){
-                int position = netClient.byteStream.position(); //save position to check read/write correctness
                 int id = input.readInt();
                 byte typeID = input.readByte();
 
@@ -303,11 +313,6 @@ public class NetClient extends Module{
 
                 //read the entity
                 entity.read(input, timestamp);
-
-                byte readLength = input.readByte();
-                //if(netClient.byteStream.position() - position - 1 != readLength){
-                //    throw new RuntimeException("Error reading entity of type '" + group.getType() + "': Read length mismatch [write=" + readLength + ", read=" + (netClient.byteStream.position() - position - 1) + "]");
-                //}
 
                 if(add){
                     entity.add();
@@ -350,6 +355,22 @@ public class NetClient extends Module{
         Net.setClientLoaded(true);
         Gdx.app.postRunnable(Call::connectConfirm);
         Timers.runTask(40f, Platform.instance::updateRPC);
+    }
+
+    private void reset(){
+        Net.setClientLoaded(false);
+        removed.clear();
+        timeoutTime = 0f;
+        connecting = true;
+        quiet = false;
+        lastSent = 0;
+        lastSnapshotBase = null;
+        currentSnapshot = null;
+        currentSnapshotID = -1;
+        lastSnapshotBaseID = -1;
+
+        Entities.clear();
+        ui.chatfrag.clearMessages();
     }
 
     public void beginConnecting(){

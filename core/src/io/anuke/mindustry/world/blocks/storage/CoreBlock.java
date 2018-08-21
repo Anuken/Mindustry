@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.storage;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
@@ -38,12 +37,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
-    private static Rectangle rect = new Rectangle();
-
-    protected int timerSupply = timers++;
-
     protected float supplyRadius = 50f;
-    protected float supplyInterval = 5f;
     protected float droneRespawnDuration = 60 * 6;
     protected UnitType droneType = UnitTypes.drone;
 
