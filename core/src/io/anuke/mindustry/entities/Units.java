@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
@@ -12,6 +11,7 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
+import io.anuke.ucore.util.EnumSet;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -106,13 +106,7 @@ public class Units{
      * Returns the neareset ally tile in a range.
      */
     public static TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
-        for(Team enemy : state.teams.alliesOf(team)){
-            TileEntity entity = world.indexer().findTile(enemy, x, y, range, pred);
-            if(entity != null){
-                return entity;
-            }
-        }
-        return null;
+        return world.indexer().findTile(team, x, y, range, pred);
     }
 
     /**
@@ -271,7 +265,7 @@ public class Units{
      * Iterates over all units that are enemies of this team.
      */
     public static void getNearbyEnemies(Team team, Rectangle rect, Consumer<Unit> cons){
-        ObjectSet<Team> targets = state.teams.enemiesOf(team);
+        EnumSet<Team> targets = state.teams.enemiesOf(team);
 
         for(Team other : targets){
             EntityGroup<BaseUnit> group = unitGroups[other.ordinal()];

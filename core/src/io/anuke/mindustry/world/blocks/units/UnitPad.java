@@ -8,7 +8,6 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
@@ -35,6 +34,9 @@ import io.anuke.ucore.util.Mathf;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.waveTeam;
 
 public class UnitPad extends Block{
     protected float gracePeriodMultiplier = 23f;
@@ -142,7 +144,7 @@ public class UnitPad extends Block{
 
         entity.time += Timers.delta() * entity.speedScl;
 
-        boolean isEnemy = tile.getTeam() == Team.red;
+        boolean isEnemy = tile.getTeam() == waveTeam && state.mode.autoSpawn;
 
         if(isEnemy){
             entity.warmup += Timers.delta();

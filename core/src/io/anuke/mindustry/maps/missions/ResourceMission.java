@@ -27,7 +27,7 @@ public class ResourceMission implements Mission{
 
     @Override
     public boolean isComplete(){
-        return Vars.state.teams.getTeams(true).first().cores.first().entity.items.has(item, amount);
+        return Vars.state.teams.get(Vars.defaultTeam).cores.first().entity.items.has(item, amount);
     }
 
     @Override

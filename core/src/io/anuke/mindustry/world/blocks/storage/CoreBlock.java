@@ -176,9 +176,7 @@ public class CoreBlock extends StorageBlock{
         //TODO more dramatic effects
         super.onDestroyed(tile);
 
-        if(state.teams.has(tile.getTeam())){
-            state.teams.get(tile.getTeam()).cores.removeValue(tile, true);
-        }
+        state.teams.get(tile.getTeam()).cores.removeValue(tile, true);
     }
 
     @Override

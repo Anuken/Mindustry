@@ -18,6 +18,8 @@ public enum BlockFlag{
     /**Special flag for command center blocks.*/
     comandCenter(Float.MAX_VALUE);
 
+    public final static BlockFlag[] all = values();
+
     public final float cost;
 
     BlockFlag(float cost){

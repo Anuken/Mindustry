@@ -14,6 +14,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadServer;
@@ -31,6 +32,7 @@ import io.anuke.ucore.io.delta.ByteMatcherHash;
 import io.anuke.ucore.io.delta.DEZEncoder;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Mathf;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -166,6 +168,24 @@ public class NetServer extends Module{
             player.setNet(player.x, player.y);
             player.color.set(packet.color);
             player.color.a = 1f;
+
+            if(state.mode.isPvp){
+                //find team with minimum amount of players and auto-assign player to that.
+                Team min = Mathf.findMin(Team.all, team -> {
+                    if(state.teams.isActive(team)){
+                        int count = 0;
+                        for(Player other : playerGroup.all()){
+                            if(other.getTeam() == team){
+                                count ++;
+                            }
+                        }
+                        return count;
+                    }
+                    return Integer.MAX_VALUE;
+                });
+                player.setTeam(min);
+            }
+
             connections.put(id, player);
 
             trace.playerid = player.id;

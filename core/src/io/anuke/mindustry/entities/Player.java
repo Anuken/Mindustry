@@ -244,6 +244,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         return playerGroup;
     }
 
+    public void setTeam(Team team){
+        this.team = team;
+    }
+
     //endregion
 
     //region draw methods

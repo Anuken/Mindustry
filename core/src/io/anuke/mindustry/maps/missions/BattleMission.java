@@ -39,8 +39,12 @@ public class BattleMission implements Mission{
 
     @Override
     public boolean isComplete(){
-        //TODO check all enemy teams, not just the first
-        return Vars.state.teams.getTeams(false).first().cores.size == 0;
+        for(Team team : Vars.state.teams.enemiesOf(Vars.defaultTeam)){
+            if(Vars.state.teams.isActive(team)){
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

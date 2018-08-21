@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -63,13 +63,13 @@ public class OverlayRenderer{
             Lines.stroke(buildFadeTime*2f);
 
             if(buildFadeTime > 0.005f){
-                for(TeamData data : state.teams.enemyDataOf(player.getTeam())){
-                    for(Tile core : data.cores){
+                for(Team enemy : state.teams.enemiesOf(player.getTeam())){
+                    for(Tile core : state.teams.get(enemy).cores){
                         float dst = Vector2.dst(player.x, player.y, core.drawx(), core.drawy());
                         if(dst < enemyCoreBuildRange * 1.5f){
                             Draw.color(Color.DARK_GRAY);
                             Lines.poly(core.drawx(), core.drawy() - 2, 200, enemyCoreBuildRange);
-                            Draw.color(Palette.accent, data.team.color, 0.5f + Mathf.absin(Timers.time(), 10f, 0.5f));
+                            Draw.color(Palette.accent, enemy.color, 0.5f + Mathf.absin(Timers.time(), 10f, 0.5f));
                             Lines.poly(core.drawx(), core.drawy(), 200, enemyCoreBuildRange);
                         }
                     }

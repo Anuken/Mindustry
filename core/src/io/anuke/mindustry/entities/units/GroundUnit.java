@@ -241,8 +241,18 @@ public abstract class GroundUnit extends BaseUnit{
     }
 
     protected void moveAwayFromCore(){
+        Team enemy = null;
+        for(Team team : Vars.state.teams.enemiesOf(team)){
+            if(Vars.state.teams.isActive(team)){
+                enemy = team;
+                break;
+            }
+        }
+
+        if(enemy == null) return;
+
         Tile tile = world.tileWorld(x, y);
-        Tile targetTile = world.pathfinder().getTargetTile(Vars.state.teams.enemiesOf(team).first(), tile);
+        Tile targetTile = world.pathfinder().getTargetTile(enemy, tile);
         TileEntity core = getClosestCore();
 
         if(tile == targetTile || core == null || distanceTo(core) < 90f) return;

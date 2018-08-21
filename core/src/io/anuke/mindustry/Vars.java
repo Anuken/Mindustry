@@ -34,6 +34,10 @@ public class Vars{
     public static final float wavespace = 60 * 60 * 1.5f;
     //set ridiculously high for now
     public static final float coreBuildRange = 800999f;
+    //team of the player by default
+    public static final Team defaultTeam = Team.blue;
+    //team of the enemy in waves
+    public static final Team waveTeam = Team.red;
 
     public static final float enemyCoreBuildRange = 400f;
     //discord group URL

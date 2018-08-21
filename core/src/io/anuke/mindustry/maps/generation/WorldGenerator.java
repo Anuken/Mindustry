@@ -84,8 +84,7 @@ public class WorldGenerator{
 
                 Team team = tile.getTeam();
 
-                if(tile.block() == StorageBlocks.core &&
-                        state.teams.has(team)){
+                if(tile.block() == StorageBlocks.core){
                     state.teams.get(team).cores.add(tile);
                 }
 

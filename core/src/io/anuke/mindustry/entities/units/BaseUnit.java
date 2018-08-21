@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
@@ -15,7 +14,6 @@ import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
@@ -188,16 +186,14 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public TileEntity getClosestEnemyCore(){
-        if(Vars.state.teams.has(team)){
-            ObjectSet<TeamData> datas = Vars.state.teams.enemyDataOf(team);
 
-            for(TeamData data : datas){
-                Tile tile = Geometry.findClosest(x, y, data.cores);
-                if(tile != null){
-                    return tile.entity;
-                }
+        for(Team enemy : Vars.state.teams.enemiesOf(team)){
+            Tile tile = Geometry.findClosest(x, y, Vars.state.teams.get(enemy).cores);
+            if(tile != null){
+                return tile.entity;
             }
         }
+
         return null;
     }
 

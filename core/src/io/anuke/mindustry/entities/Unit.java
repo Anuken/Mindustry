@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
+import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.StatusEffect;
@@ -179,17 +179,13 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public TileEntity getClosestCore(){
-        if(state.teams.has(team)){
-            TeamData data = state.teams.get(team);
+        TeamData data = state.teams.get(team);
 
-            Tile tile = Geometry.findClosest(x, y, data.cores);
-            if(tile == null){
-                return null;
-            }else{
-                return tile.entity;
-            }
-        }else{
+        Tile tile = Geometry.findClosest(x, y, data.cores);
+        if(tile == null){
             return null;
+        }else{
+            return tile.entity;
         }
     }
 

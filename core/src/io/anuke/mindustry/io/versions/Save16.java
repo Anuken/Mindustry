@@ -117,8 +117,7 @@ public class Save16 extends SaveFileVersion{
 
                 tile.entity.read(stream);
 
-                if(tile.block() == StorageBlocks.core &&
-                        state.teams.has(t)){
+                if(tile.block() == StorageBlocks.core){
                     state.teams.get(t).cores.add(tile);
                 }
             }else if(wallid == 0){

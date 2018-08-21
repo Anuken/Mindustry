@@ -14,11 +14,15 @@ public enum GameMode{
     noWaves{{
         disableWaves = true;
         hidden = true;
+        autoSpawn = true;
+    }},
+    pvp{{
+        disableWaves = true;
+        isPvp = true;
+        hidden = true;
     }};
-    public boolean infiniteResources;
-    public boolean disableWaveTimer;
-    public boolean disableWaves;
-    public boolean hidden;
+
+    public boolean infiniteResources, disableWaveTimer, disableWaves, hidden, autoSpawn, isPvp;
 
     public String description(){
         return Bundles.get("mode." + name() + ".description");

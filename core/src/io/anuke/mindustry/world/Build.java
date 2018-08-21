@@ -6,7 +6,6 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Events;
@@ -138,8 +137,8 @@ public class Build{
         }
 
         //check for enemy cores
-        for(TeamData data : state.teams.enemyDataOf(team)){
-            for(Tile core : data.cores){
+        for(Team enemy : state.teams.enemiesOf(team)){
+            for(Tile core : state.teams.get(enemy).cores){
                 if(Vector2.dst(x*tilesize + type.offset(), y*tilesize + type.offset(), core.drawx(), core.drawy()) < enemyCoreBuildRange + type.size*tilesize/2f){
                     return false;
                 }
