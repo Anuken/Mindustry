@@ -32,6 +32,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.*;
 
@@ -194,7 +195,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public boolean isFlying(){
-        return mech.flying || noclip || isCarried();
+        return mech.flying || boostHeat > 0.2f || isCarried();
     }
 
     @Override
@@ -258,30 +259,18 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
-    public void drawShadow(){
-        Draw.rect(mech.iconRegion, x , y, rotation - 90);
-    }
+    public void drawShadow(float offsetX, float offsetY){
+        float x = snappedX(), y = snappedY();
+        float scl = mech.flying ? 1f : boostHeat/2f;
 
-    @Override
-    public void drawAll(){
-        boolean snap = snapCamera && isLocal;
-
-        float px = x, py = y;
-
-        if(snap){
-            x = (int) (x + 0.0001f);
-            y = (int) (y + 0.0001f);
-        }
-
-        super.drawAll();
-
-        x = px;
-        y = py;
+        Draw.rect(mech.iconRegion, x + offsetX*scl, y + offsetY*scl, rotation - 90);
     }
 
     @Override
     public void draw(){
         if((debug && (!showPlayer || !showUI)) || dead) return;
+
+        float x = snappedX(), y = snappedY();
 
         if(!movement.isZero() && moved && !state.isPaused()){
             walktime += Timers.delta() * movement.len() / 0.7f * getFloorOn().speedMultiplier;
@@ -351,6 +340,16 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
+    public void drawStats(){
+        float x = snappedX(), y = snappedY();
+
+        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Timers.time(), healthf()*5f, 1f - healthf()));
+        Draw.alpha(hitTime);
+        Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
+        Draw.color();
+    }
+
+    @Override
     public void drawOver(){
         if(dead) return;
 
@@ -360,10 +359,18 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             float wobblyness = 0.6f;
             trail.update(x + Angles.trnsx(rotation + 180f, 5f) + Mathf.range(wobblyness),
                     y + Angles.trnsy(rotation + 180f, 5f) + Mathf.range(wobblyness));
-            trail.draw(mech.trailColor, 5f * (isFlying() ? 1f : boostHeat));
+            trail.draw(Hue.mix(mech.trailColor, mech.trailColorTo, boostHeat, Tmp.c1), 5f * (isFlying() ? 1f : boostHeat));
         }else{
             trail.clear();
         }
+    }
+
+    float snappedX(){
+        return snapCamera && isLocal ? (int) (x + 0.0001f) : x;
+    }
+
+    float snappedY(){
+        return snapCamera && isLocal ? (int) (y + 0.0001f) : y;
     }
 
     public void drawName(){
@@ -482,11 +489,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         Tile tile = world.tileWorld(x, y);
 
         //if player is in solid block
-        if(!mech.flying && tile != null && tile.solid() && !noclip){
+        if(tile != null && tile.solid() && !isFlying()){
             damage(health + 1); //die instantly
         }
 
-        float speed = isBoosting && !mech.flying ? debug ? 5f : mech.boostSpeed : mech.speed;
+        float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
         //fraction of speed when at max load
         float carrySlowdown = 0.7f;
 

@@ -47,8 +47,8 @@ public class Weapons implements ContentList{
             roundrobin = true;
             shots = 6;
             inaccuracy = 10f;
-            recoil = 2f;
             velocityRnd = 0.7f;
+            shake = 2f;
             ejectEffect = ShootFx.shellEjectSmall;
             ammo = AmmoTypes.shotgunTungsten;
         }};

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -24,7 +25,8 @@ public class Mech extends Upgrade implements UnlockableContent{
     public float carryWeight = 10f;
     public float buildPower = 1f;
     public boolean canRepair = false;
-    public Color trailColor = Color.valueOf("ffd37f");
+    public Color trailColor = Palette.boostFrom;
+    public Color trailColorTo = Palette.boostTo;
 
     public float weaponOffsetX, weaponOffsetY;
 

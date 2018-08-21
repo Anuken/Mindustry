@@ -28,6 +28,9 @@ public class Palette{
     lightishGray = Color.valueOf("a2a2a2"),
     darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f),
 
+    boostTo = Color.valueOf("ffad4d"),
+    boostFrom = Color.valueOf("ff7f57"),
+
     lancerLaser = Color.valueOf("a9d8ff"),
 
     stoneGray = Color.valueOf("8f8f8f"),

@@ -315,8 +315,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
     }
 
-    public void drawShadow(){
-        Draw.rect(getIconRegion(), x , y, rotation - 90);
+    public void drawShadow(float offsetX, float offsetY){
+        Draw.rect(getIconRegion(), x + offsetX, y + offsetY, rotation - 90);
     }
 
     public void drawView(){

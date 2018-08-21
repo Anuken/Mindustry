@@ -21,6 +21,7 @@ public class Mechs implements ContentList{
 
         alpha = new Mech("alpha-mech", false){{
             drillPower = 1;
+            mineSpeed = 1.5f;
             speed = 0.5f;
             boostSpeed = 0.85f;
             weapon = Weapons.blaster;
@@ -56,6 +57,7 @@ public class Mechs implements ContentList{
 
         dart = new Mech("dart-ship", true){{
             drillPower = 1;
+            mineSpeed = 0.9f;
             speed = 0.4f;
             maxSpeed = 3f;
             drag = 0.1f;
