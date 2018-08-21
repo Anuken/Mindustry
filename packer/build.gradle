@@ -29,7 +29,7 @@ task swapColors(){
                     for (y in (0..img.getHeight()-1)) {
                         def c = img.getRGB(x, y)
                         Color.argb8888ToColor(tmpc, c)
-                        if(tmpc.a < 0.1f) continue;
+                        if(tmpc.a < 0.1f) continue
                         if(map.containsKey(c)){
                             img.setRGB(x, y, (int)map.get(c))
                         }
