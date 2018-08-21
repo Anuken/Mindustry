@@ -16,10 +16,10 @@ public class Weapons implements ContentList{
 
         blaster = new Weapon("blaster"){{
             length = 1.5f;
-            reload = 15f;
+            reload = 14f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
-            ammo = AmmoTypes.bulletCopper;
+            ammo = AmmoTypes.bulletMech;
         }};
 
         missiles = new Weapon("missiles"){{

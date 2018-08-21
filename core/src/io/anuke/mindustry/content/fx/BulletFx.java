@@ -19,9 +19,16 @@ public class BulletFx extends FxList implements ContentList{
 
         hitBulletSmall = new Effect(14, e -> {
             Draw.color(Color.WHITE, Palette.lightOrange, e.fin());
+
+            e.scaled(7f, s -> {
+                Lines.stroke(0.5f + s.fout());
+                Lines.circle(e.x, e.y, s.fin()*5f);
+            });
+
+
             Lines.stroke(0.5f + e.fout());
 
-            Angles.randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 50f, (x, y) -> {
+            Angles.randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> {
                 float ang = Mathf.atan2(x, y);
                 Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
             });

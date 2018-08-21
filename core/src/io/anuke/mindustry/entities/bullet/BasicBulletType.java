@@ -102,6 +102,7 @@ public class BasicBulletType extends BulletType{
 
     @Override
     public void despawned(Bullet b){
+        super.despawned(b);
         if(fragBullet != null || splashDamageRadius > 0){
             hit(b);
         }

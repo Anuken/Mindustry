@@ -1,12 +1,13 @@
 package io.anuke.mindustry.content.bullets;
 
+import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.bullet.BasicBulletType;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
 
 public class StandardBullets extends BulletList implements ContentList{
-    public static BulletType copper, dense, thorium, homing, tracer;
+    public static BulletType copper, dense, thorium, homing, tracer, mechSmall;
 
     @Override
     public void load(){
@@ -51,6 +52,15 @@ public class StandardBullets extends BulletList implements ContentList{
                 incendSpread = 3f;
                 incendAmount = 1;
                 incendChance = 0.3f;
+            }
+        };
+
+        mechSmall = new BasicBulletType(4f, 9, "bullet"){
+            {
+                bulletWidth = 11f;
+                bulletHeight = 14f;
+                lifetime = 40f;
+                despawneffect = BulletFx.hitBulletSmall;
             }
         };
     }
