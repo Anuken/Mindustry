@@ -24,8 +24,8 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.thoriumWallLarge, new ItemStack(Items.thorium, 12 * 4));
 
         //TODO will be added once sprites are ready
-        //new Recipe(defense, DefenseBlocks.phaseWall, new ItemStack(Items.phasematter, 12));
-        //new Recipe(defense, DefenseBlocks.phaseWallLarge, new ItemStack(Items.phasematter, 12 * 4));
+        new Recipe(defense, DefenseBlocks.phaseWall, new ItemStack(Items.phasematter, 12));
+        new Recipe(defense, DefenseBlocks.phaseWallLarge, new ItemStack(Items.phasematter, 12 * 4));
 
         new Recipe(defense, DefenseBlocks.door, new ItemStack(Items.densealloy, 12), new ItemStack(Items.silicon, 8));
         new Recipe(defense, DefenseBlocks.doorLarge, new ItemStack(Items.densealloy, 12 * 4), new ItemStack(Items.silicon, 8 * 4));

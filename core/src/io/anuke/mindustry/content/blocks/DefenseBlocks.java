@@ -6,7 +6,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Wall;
 import io.anuke.mindustry.world.blocks.defense.DeflectorWall;
 import io.anuke.mindustry.world.blocks.defense.Door;
-import io.anuke.mindustry.world.blocks.defense.PhaseWall;
 
 public class DefenseBlocks extends BlockList implements ContentList{
     public static Block copperWall, copperWallLarge, compositeWall, compositeWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge, deflectorwall, deflectorwalllarge,
@@ -52,14 +51,13 @@ public class DefenseBlocks extends BlockList implements ContentList{
             size = 2;
         }};
 
-        phaseWall = new PhaseWall("phase-wall"){{
+        phaseWall = new DeflectorWall("phase-wall"){{
             health = 150 * wallHealthMultiplier;
         }};
 
-        phaseWallLarge = new PhaseWall("phase-wall-large"){{
+        phaseWallLarge = new DeflectorWall("phase-wall-large"){{
             health = 150 * 4 * wallHealthMultiplier;
             size = 2;
-            regenSpeed = 0.5f;
         }};
 
         door = new Door("door"){{
