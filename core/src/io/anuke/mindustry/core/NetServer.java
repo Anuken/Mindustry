@@ -507,7 +507,12 @@ public class NetServer extends Module{
             }
         }
 
-        return name.substring(0, Math.min(name.length(), maxNameLength));
+        StringBuilder result = new StringBuilder();
+        int curChar = 0;
+        while(curChar < name.length() && result.toString().getBytes().length < maxNameLength){
+            result.append(name.charAt(curChar++));
+        }
+        return result.toString();
     }
 
     String checkColor(String str){
