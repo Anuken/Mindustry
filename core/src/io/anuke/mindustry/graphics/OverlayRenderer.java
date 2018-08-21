@@ -66,11 +66,11 @@ public class OverlayRenderer{
                 for(Team enemy : state.teams.enemiesOf(player.getTeam())){
                     for(Tile core : state.teams.get(enemy).cores){
                         float dst = Vector2.dst(player.x, player.y, core.drawx(), core.drawy());
-                        if(dst < enemyCoreBuildRange * 1.5f){
+                        if(dst < state.mode.enemyCoreBuildRadius * 1.5f){
                             Draw.color(Color.DARK_GRAY);
-                            Lines.poly(core.drawx(), core.drawy() - 2, 200, enemyCoreBuildRange);
+                            Lines.poly(core.drawx(), core.drawy() - 2, 200, state.mode.enemyCoreBuildRadius);
                             Draw.color(Palette.accent, enemy.color, 0.5f + Mathf.absin(Timers.time(), 10f, 0.5f));
-                            Lines.poly(core.drawx(), core.drawy(), 200, enemyCoreBuildRange);
+                            Lines.poly(core.drawx(), core.drawy(), 200, state.mode.enemyCoreBuildRadius);
                         }
                     }
                 }

@@ -20,9 +20,11 @@ public enum GameMode{
         disableWaves = true;
         isPvp = true;
         hidden = true;
+        enemyCoreBuildRadius = 600f;
     }};
 
     public boolean infiniteResources, disableWaveTimer, disableWaves, hidden, autoSpawn, isPvp;
+    public float enemyCoreBuildRadius = 400f;
 
     public String description(){
         return Bundles.get("mode." + name() + ".description");

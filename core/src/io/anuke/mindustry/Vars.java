@@ -39,7 +39,6 @@ public class Vars{
     //team of the enemy in waves
     public static final Team waveTeam = Team.red;
 
-    public static final float enemyCoreBuildRange = 400f;
     //discord group URL
     public static final String discordURL = "https://discord.gg/BKADYds";
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
