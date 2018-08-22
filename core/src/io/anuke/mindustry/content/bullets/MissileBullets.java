@@ -52,7 +52,7 @@ public class MissileBullets extends BulletList implements ContentList{
             }
         };
 
-        javelin = new MissileBulletType(2.5f, 10, "missile"){
+        javelin = new MissileBulletType(2.5f, 14, "missile"){
             {
                 bulletWidth = 8f;
                 bulletHeight = 8f;
@@ -60,22 +60,23 @@ public class MissileBullets extends BulletList implements ContentList{
                 drag = -0.02f;
                 keepVelocity = false;
                 splashDamageRadius = 25f;
-                splashDamage = 15f;
+                splashDamage = 11f;
                 lifetime = 90f;
                 hiteffect = BulletFx.blastExplosion;
                 despawneffect = BulletFx.blastExplosion;
             }
         };
 
-        swarm = new MissileBulletType(2.7f, 10, "missile"){
+        swarm = new MissileBulletType(2.7f, 14, "missile"){
             {
                 bulletWidth = 8f;
                 bulletHeight = 8f;
                 bulletShrink = 0f;
                 drag = -0.003f;
+                homingRange = 60f;
                 keepVelocity = false;
                 splashDamageRadius = 25f;
-                splashDamage = 15f;
+                splashDamage = 11f;
                 lifetime = 120f;
                 trailColor = Color.GRAY;
                 backColor = Palette.bulletYellowBack;

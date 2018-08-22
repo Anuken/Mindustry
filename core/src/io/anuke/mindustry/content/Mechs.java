@@ -1,12 +1,19 @@
 package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Upgrade;
+import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 
 public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, halberd;
@@ -52,19 +59,61 @@ public class Mechs implements ContentList{
             armor = 30f;
         }};
 
-        omega = new Mech("omega-mech", false){{
-            drillPower = 2;
-            mineSpeed = 1.5f;
-            itemCapacity = 50;
-            speed = 0.36f;
-            boostSpeed = 0.6f;
-            shake = 4f;
-            weaponOffsetX = 1;
-            weaponOffsetY = 0;
-            weapon = Weapons.swarmer;
-            maxSpeed = 3.5f;
-            armor = 70f;
-        }};
+        omega = new Mech("omega-mech", false){
+            protected TextureRegion armorRegion;
+            {
+                drillPower = 2;
+                mineSpeed = 1.5f;
+                itemCapacity = 50;
+                speed = 0.36f;
+                boostSpeed = 0.6f;
+                shake = 4f;
+                weaponOffsetX = 1;
+                weaponOffsetY = 0;
+                weapon = Weapons.swarmer;
+                trailColorTo = Color.valueOf("feb380");
+                maxSpeed = 3.5f;
+                armor = 50f;
+            }
+
+            @Override
+            public float spreadX(Player player){
+                return player.altHeat*2f;
+            }
+
+            @Override
+            public void load(){
+                super.load();
+                armorRegion = Draw.region(name + "-armor");
+            }
+
+            @Override
+            public void updateAlt(Player player){
+                float scl = 1f - player.altHeat/2f;
+                player.getVelocity().scl(scl);
+            }
+
+            @Override
+            public float getExtraArmor(Player player){
+                return player.altHeat * 40f;
+            }
+
+            @Override
+            public void draw(Player player){
+                if(player.altHeat <= 0.01f) return;
+
+                float alpha = Core.batch.getColor().a;
+                Shaders.build.progress = player.altHeat;
+                Shaders.build.region = armorRegion;
+                Shaders.build.time = Timers.time() / 10f;
+                Shaders.build.color.set(Palette.accent).a = player.altHeat;
+                Graphics.shader(Shaders.build);
+                Draw.alpha(1f);
+                Draw.rect(armorRegion, player.snappedX(), player.snappedY(), player.rotation);
+                Graphics.shader(Shaders.mix);
+                Draw.color(1f, 1f, 1f, alpha);
+            }
+        };
 
         dart = new Mech("dart-ship", true){{
             drillPower = 1;

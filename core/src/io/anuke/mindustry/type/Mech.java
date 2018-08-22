@@ -3,6 +3,7 @@ package io.anuke.mindustry.type;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Weapons;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.ContentDisplay;
@@ -21,6 +22,7 @@ public class Mech extends Upgrade implements UnlockableContent{
     public float shake = 0f;
     public float armor = 1f;
 
+    public float altChargeAlpha = 0.1f;
     public float mineSpeed = 1f;
     public int drillPower = -1;
     public float carryWeight = 10f;
@@ -30,7 +32,6 @@ public class Mech extends Upgrade implements UnlockableContent{
     public int itemCapacity = 30;
 
     public float weaponOffsetX, weaponOffsetY;
-
     public Weapon weapon = Weapons.blaster;
 
     public TextureRegion baseRegion, legRegion, region, iconRegion;
@@ -38,6 +39,18 @@ public class Mech extends Upgrade implements UnlockableContent{
     public Mech(String name, boolean flying){
         super(name);
         this.flying = flying;
+    }
+
+    public void updateAlt(Player player){}
+
+    public void draw(Player player){}
+
+    public float getExtraArmor(Player player){
+        return 0f;
+    }
+
+    public float spreadX(Player player){
+        return 0f;
     }
 
     @Override

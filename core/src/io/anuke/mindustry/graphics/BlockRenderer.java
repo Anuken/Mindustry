@@ -88,14 +88,13 @@ public class BlockRenderer{
 
         int shadowW = rangex * tilesize*2, shadowH = rangey * tilesize*2;
 
-        if(shadows.width() != shadowW || shadows.height() != shadowH){
-            shadows.setSize(shadowW, shadowH);
-        }
-
         teamChecks.clear();
         requestidx = 0;
 
         Graphics.end();
+        if(shadows.width() != shadowW || shadows.height() != shadowH){
+            shadows.setSize(shadowW, shadowH);
+        }
         Core.batch.getProjectionMatrix().setToOrtho2D(Mathf.round(Core.camera.position.x, tilesize)-shadowW/2f, Mathf.round(Core.camera.position.y, tilesize)-shadowH/2f, shadowW, shadowH);
         Graphics.surface(shadows);
 

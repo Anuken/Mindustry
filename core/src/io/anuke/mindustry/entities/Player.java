@@ -56,7 +56,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public String name = "name";
     public String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isAlt, isMobile;
-    public float boostHeat;
+    public float boostHeat, altHeat;
     public boolean achievedFlight;
     public Color color = new Color();
     public Mech mech;
@@ -183,7 +183,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public float getArmor(){
-        return mech.armor;
+        return mech.armor + mech.getExtraArmor(this);
     }
 
     @Override
@@ -210,7 +210,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void damage(float amount){
         hitTime = hitDuration;
         if(!Net.client()){
-            health -= amount;
+            health -= calculateDamage(amount);
         }
 
         if(health <= 0 && !dead){
@@ -314,12 +314,14 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         Draw.rect(mech.region, x, y, rotation - 90);
 
+        mech.draw(this);
+
         for(int i : Mathf.signs){
             float tra = rotation - 90, trY = -mech.weapon.getRecoil(this, i > 0) + mech.weaponOffsetY;
             float w = i > 0 ? -mech.weapon.equipRegion.getRegionWidth() : mech.weapon.equipRegion.getRegionWidth();
             Draw.rect(mech.weapon.equipRegion,
-                    x + Angles.trnsx(tra, mech.weaponOffsetX * i, trY),
-                    y + Angles.trnsy(tra, mech.weaponOffsetX * i, trY), w, mech.weapon.equipRegion.getRegionHeight(), rotation - 90);
+                    x + Angles.trnsx(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY),
+                    y + Angles.trnsy(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY), w, mech.weapon.equipRegion.getRegionHeight(), rotation - 90);
         }
 
         float backTrns = 4f, itemSize = 5f;
@@ -366,11 +368,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
     }
 
-    float snappedX(){
+    public float snappedX(){
         return snapCamera && isLocal ? (int) (x + 0.0001f) : x;
     }
 
-    float snappedY(){
+    public float snappedY(){
         return snapCamera && isLocal ? (int) (y + 0.0001f) : y;
     }
 
@@ -489,7 +491,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     protected void updateMech(){
         Tile tile = world.tileWorld(x, y);
 
+        altHeat = Mathf.lerpDelta(altHeat, isAlt ? 1f : 0f, mech.altChargeAlpha);
         boostHeat = Mathf.lerpDelta(boostHeat, isBoosting && ((!movement.isZero() && moved) || !isLocal) ? 1f : 0f, 0.08f);
+
+        mech.updateAlt(this);
 
         if(boostHeat > liftoffBoost + 0.1f){
             achievedFlight = true;
@@ -505,7 +510,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             achievedFlight = false;
         }
 
-        isBoosting = Inputs.keyDown("dash") && !mech.flying;
+        isBoosting = Inputs.keyDown("dash") && !mech.flying && !isAlt;
         isAlt = Inputs.keyDown("ability") && !mech.flying;
 
         //if player is in solid block
@@ -771,7 +776,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
         buffer.writeUTF(name); //TODO writing strings is very inefficient
-        buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2));
+        buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2)| (Bits.toByte(isAlt) << 3));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? -1 : mining.packedPosition());
@@ -790,6 +795,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         isAdmin = (bools & 1) != 0;
         dead = (bools & 2) != 0;
         boolean boosting = (bools & 4) != 0;
+        boolean alt = (bools & 8) != 0;
         color.set(buffer.readInt());
         mech = Upgrade.getByID(buffer.readByte());
         int mine = buffer.readInt();
@@ -807,6 +813,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }else{
             mining = world.tile(mine);
             isBoosting = boosting;
+            isAlt = alt;
         }
     }
 
