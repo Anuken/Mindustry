@@ -18,6 +18,7 @@ public class Mech extends Upgrade implements UnlockableContent{
     public float boostSpeed = 0.75f;
     public float drag = 0.4f;
     public float mass = 1f;
+    public float shake = 0f;
     public float armor = 1f;
 
     public float mineSpeed = 1f;
@@ -26,13 +27,11 @@ public class Mech extends Upgrade implements UnlockableContent{
     public float buildPower = 1f;
     public Color trailColor = Palette.boostFrom;
     public Color trailColorTo = Palette.boostTo;
+    public int itemCapacity = 30;
 
     public float weaponOffsetX, weaponOffsetY;
 
     public Weapon weapon = Weapons.blaster;
-
-    public int itemCapacity = 30;
-    public int ammoCapacity = 100;
 
     public TextureRegion baseRegion, legRegion, region, iconRegion;
 

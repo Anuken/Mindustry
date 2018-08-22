@@ -179,7 +179,7 @@ public class BulletFx extends FxList implements ContentList{
         });
 
         missileTrail = new Effect(50, e -> {
-            Draw.color(Palette.missileYellowBack);
+            Draw.color(e.color);
             Fill.circle(e.x, e.y, e.rotation * e.fout());
             Draw.reset();
         });

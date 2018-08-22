@@ -50,12 +50,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     private static final float liftoffBoost = 0.2f;
 
     //region instance variables, constructor
-    public float baseRotation;
 
+    public float baseRotation;
     public float pointerX, pointerY;
     public String name = "name";
     public String uuid, usid;
-    public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile;
+    public boolean isAdmin, isTransferring, isShooting, isBoosting, isAlt, isMobile;
     public float boostHeat;
     public boolean achievedFlight;
     public Color color = new Color();
@@ -300,7 +300,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 Draw.rect(mech.legRegion,
                         x + Angles.trnsx(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
                         y + Angles.trnsy(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
-                        12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90 + boostAng * i);
+                mech.legRegion.getRegionWidth() * i, mech.legRegion.getRegionHeight() - Mathf.clamp(ft * i, 0, 2), baseRotation - 90 + boostAng * i);
             }
 
             Draw.rect(mech.baseRegion, x, y, baseRotation - 90);
@@ -316,10 +316,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         for(int i : Mathf.signs){
             float tra = rotation - 90, trY = -mech.weapon.getRecoil(this, i > 0) + mech.weaponOffsetY;
-            float w = i > 0 ? -12 : 12;
+            float w = i > 0 ? -mech.weapon.equipRegion.getRegionWidth() : mech.weapon.equipRegion.getRegionWidth();
             Draw.rect(mech.weapon.equipRegion,
                     x + Angles.trnsx(tra, mech.weaponOffsetX * i, trY),
-                    y + Angles.trnsy(tra, mech.weaponOffsetX * i, trY), w, 12, rotation - 90);
+                    y + Angles.trnsy(tra, mech.weaponOffsetX * i, trY), w, mech.weapon.equipRegion.getRegionHeight(), rotation - 90);
         }
 
         float backTrns = 4f, itemSize = 5f;
@@ -496,11 +496,17 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         if(boostHeat <= liftoffBoost + 0.05f && achievedFlight){
-            if(tile != null) Effects.effect(UnitFx.unitLand, tile.floor().minimapColor, x, y, tile.floor().isLiquid ? 1f : 0.5f);
+            if(tile != null){
+                if(mech.shake > 1f){
+                    Effects.shake(mech.shake, mech.shake, this);
+                }
+                Effects.effect(UnitFx.unitLand, tile.floor().minimapColor, x, y, tile.floor().isLiquid ? 1f : 0.5f);
+            }
             achievedFlight = false;
         }
 
         isBoosting = Inputs.keyDown("dash") && !mech.flying;
+        isAlt = Inputs.keyDown("ability") && !mech.flying;
 
         //if player is in solid block
         if(tile != null && tile.solid()){

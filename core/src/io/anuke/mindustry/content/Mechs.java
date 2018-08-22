@@ -11,9 +11,7 @@ import io.anuke.mindustry.type.Upgrade;
 public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, halberd;
 
-    /**
-     * These are not new mechs, just re-assignments for convenience.
-     */
+    /**These are not new mechs, just re-assignments for convenience.*/
     public static Mech starterDesktop, starterMobile;
 
     @Override
@@ -25,7 +23,6 @@ public class Mechs implements ContentList{
             speed = 0.5f;
             boostSpeed = 0.85f;
             weapon = Weapons.blaster;
-            trailColor = Palette.lightTrail;
             maxSpeed = 4f;
         }};
 
@@ -36,23 +33,37 @@ public class Mechs implements ContentList{
             itemCapacity = 15;
             armor = 30f;
             weaponOffsetX = -1;
+            itemCapacity = 15;
             weaponOffsetY = -1;
             weapon = Weapons.shockgun;
-            ammoCapacity = 50;
-            trailColor = Color.valueOf("d3ddff");
+            trailColorTo = Color.valueOf("d3ddff");
             maxSpeed = 5f;
         }};
 
         tau = new Mech("tau-mech", false){{
-            drillPower = 2;
-            speed = 0.5f;
+            drillPower = 3;
+            mineSpeed = 3f;
+            itemCapacity = 70;
+            speed = 0.44f;
+            drag = 0.35f;
+            boostSpeed = 0.8f;
+            weapon = Weapons.blaster;
             maxSpeed = 5f;
+            armor = 30f;
         }};
 
         omega = new Mech("omega-mech", false){{
-            drillPower = 1;
-            speed = 0.4f;
-            maxSpeed = 3f;
+            drillPower = 2;
+            mineSpeed = 1.5f;
+            itemCapacity = 50;
+            speed = 0.36f;
+            boostSpeed = 0.6f;
+            shake = 4f;
+            weaponOffsetX = 1;
+            weaponOffsetY = 0;
+            weapon = Weapons.swarmer;
+            maxSpeed = 3.5f;
+            armor = 70f;
         }};
 
         dart = new Mech("dart-ship", true){{

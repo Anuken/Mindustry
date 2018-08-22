@@ -33,6 +33,19 @@ public class Weapons implements ContentList{
             ammo = AmmoTypes.weaponMissile;
         }};
 
+        swarmer = new Weapon("swarmer"){{
+            length = 1.5f;
+            recoil = 4f;
+            reload = 60f;
+            shots = 4;
+            inaccuracy = 8f;
+            roundrobin = false;
+            roundrobin = true;
+            ejectEffect = Fx.none;
+            shake = 3f;
+            ammo = AmmoTypes.weaponMissileSwarm;
+        }};
+
         chainBlaster = new Weapon("chain-blaster"){{
             length = 1.5f;
             reload = 28f;
@@ -80,14 +93,6 @@ public class Weapons implements ContentList{
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
             ammo = AmmoTypes.bulletDense;
-        }};
-
-        swarmer = new Weapon("swarmer"){{
-            length = 1.5f;
-            reload = 10f;
-            roundrobin = true;
-            ejectEffect = ShootFx.shellEjectSmall;
-            ammo = AmmoTypes.bulletPyratite;
         }};
 
         bomber = new Weapon("bomber"){{

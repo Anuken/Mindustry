@@ -3,8 +3,8 @@ package io.anuke.mindustry.entities.bullet;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -70,7 +70,7 @@ public class BasicBulletType extends BulletType{
         super.update(b);
 
         if(homingPower > 0.0001f){
-            Unit target = Units.getClosestEnemy(b.getTeam(), b.x, b.y, homingRange, unit -> true);
+            TargetTrait target = Units.getClosestTarget(b.getTeam(), b.x, b.y, homingRange);
             if(target != null){
                 b.getVelocity().setAngle(Angles.moveToward(b.getVelocity().angle(), b.angleTo(target), homingPower * Timers.delta()));
             }

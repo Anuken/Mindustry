@@ -24,6 +24,7 @@ public class DefaultKeybinds{
                     //"shoot", Input.MOUSE_LEFT,
                     "rotate", new Axis(Input.SCROLL),
                     "dash", Input.SHIFT_LEFT,
+                    "ability", Input.SPACE,
                     "drop_unit", Input.SHIFT_LEFT,
                     new Category("view"),
                     "zoom_hold", Input.CONTROL_LEFT,

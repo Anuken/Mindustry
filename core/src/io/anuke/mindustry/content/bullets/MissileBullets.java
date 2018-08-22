@@ -1,5 +1,6 @@
 package io.anuke.mindustry.content.bullets;
 
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.bullet.MissileBulletType;
@@ -7,7 +8,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
 
 public class MissileBullets extends BulletList implements ContentList{
-    public static BulletType explosive, incindiary, surge, javelin;
+    public static BulletType explosive, incindiary, surge, javelin, swarm;
 
     @Override
     public void load(){
@@ -61,6 +62,24 @@ public class MissileBullets extends BulletList implements ContentList{
                 splashDamageRadius = 25f;
                 splashDamage = 15f;
                 lifetime = 90f;
+                hiteffect = BulletFx.blastExplosion;
+                despawneffect = BulletFx.blastExplosion;
+            }
+        };
+
+        swarm = new MissileBulletType(2.7f, 10, "missile"){
+            {
+                bulletWidth = 8f;
+                bulletHeight = 8f;
+                bulletShrink = 0f;
+                drag = -0.003f;
+                keepVelocity = false;
+                splashDamageRadius = 25f;
+                splashDamage = 15f;
+                lifetime = 120f;
+                trailColor = Color.GRAY;
+                backColor = Palette.bulletYellowBack;
+                frontColor = Palette.bulletYellow;
                 hiteffect = BulletFx.blastExplosion;
                 despawneffect = BulletFx.blastExplosion;
             }
