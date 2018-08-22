@@ -190,7 +190,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         public void update(){
             ItemDrop item = (ItemDrop) target;
 
-            if(inventory.isFull() || !inventory.canAcceptItem(item.getItem(), 1)){
+            if(item == null || inventory.isFull() || !inventory.canAcceptItem(item.getItem(), 1)){
                 setState(drop);
                 return;
             }
@@ -329,6 +329,10 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     public void update(){
         super.update();
 
+        if(state.is(repair) && target != null && target.getTeam() != team){
+            target = null;
+        }
+
         if(Net.client() && state.is(repair) && target instanceof TileEntity){
             TileEntity entity = (TileEntity) target;
             entity.health += type.healSpeed * Timers.delta();
@@ -391,11 +395,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         return isBuilding() ? placeDistance * 2f : 30f;
     }
 
-    @Override
-    public float getAmmoFraction(){
-        return inventory.getItem().amount / (float) type.itemCapacity;
-    }
-
     protected void findItem(){
         TileEntity entity = getClosestCore();
         if(entity == null){
@@ -429,7 +428,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     @Override
     public void write(DataOutput data) throws IOException{
         super.write(data);
-        data.writeInt(mineTile == null ? -1 : mineTile.packedPosition());
+        data.writeInt(mineTile == null || !state.is(mine) ? -1 : mineTile.packedPosition());
         data.writeInt(state.is(repair) && target instanceof TileEntity ? ((TileEntity)target).tile.packedPosition() : -1);
         writeBuilding(data);
     }

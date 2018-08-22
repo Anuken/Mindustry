@@ -3,7 +3,6 @@ package io.anuke.mindustry.maps.generation;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.DefenseBlocks;
 import io.anuke.mindustry.content.blocks.UnitBlocks;
@@ -15,7 +14,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.defense.turrets.ItemTurret;
 import io.anuke.mindustry.world.blocks.defense.turrets.PowerTurret;
-import io.anuke.mindustry.world.blocks.units.ResupplyPoint;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
@@ -34,6 +32,7 @@ public class FortressGenerator{
         if(structures != null) return;
 
         structures = new Structure[]{
+        /*
             //tiny duo outpost
             new Structure(0.03f, Items.tungsten, "BAMADnR1bmdzdGVuLWRyaWxsAgADZHVvAQANdHVuZ3N0ZW4td2FsbAAAA2FpcgMFAQABAwEDAQMBAAEAAgMDAwIDAQABAAEBAQEBAQEA"),
 
@@ -72,9 +71,11 @@ public class FortressGenerator{
 
             //fabricator outpost
             new Structure(0.02f, Items.tungsten, "BgUADWNhcmJpZGUtZHJpbGwBABJ0aG9yaXVtLXdhbGwtbGFyZ2UCAAx0aG9yaXVtLXdhbGwEAANkdW8AAANhaXIDAA5mYWJyaWNhdG9yLXBhZAkJAAAAAAEDAAACAwEDAAAAAAAAAAACAwADAAMCAwADAAMCAgAAAQMAAAMCAAACAAMCAAABAwAAAAAAAAAAAAAEAgAAAAAAAgAAAgMCAAIBBAIFAAQCAgMCAgIDAQMAAAMCAAAEAgMCAAABAwAAAAAAAAAAAAACAQAAAAAAAgAAAAACAAEDAAECAQEDAAECAQAAAAAAAAAAAAACAwACAAAAAAAA"),
+            */
         };
 
         bases = new Structure[]{
+        /*
             //primitive 4-spawner base
             new Structure("CAQADXR1bmdzdGVuLXdhbGwFAANkdW8HAARjb3JlAQAKZGFnZ2VyLXBhZAYACHVubG9hZGVyAgAMcmVwYWlyLXBvaW50AAADYWlyAwALc29sYXItcGFuZWwJBwAAAQMAAAIDAQMAAAAAAAAAAAAAAwIAAAAAAAAEAAQBBAEEAQQBBAEEAgQABQIAAAAAAAAFAgQCBAAGAwAABwAAAAYDBAAEAAUCAAAAAAAABQIEAAQABAMEAwQDBAMEAAQAAAABAwAAAwIBAwAAAAAAAAAAAAACAwAAAAAAAA=="),
 
@@ -101,6 +102,7 @@ public class FortressGenerator{
 
             //welcome to unit hell
             new Structure("DQoACHNwbGl0dGVyBAAMdGhvcml1bS13YWxsDAAEY29yZQEACmRhZ2dlci1wYWQHAAttb25zb29uLXBhZAsACHVubG9hZGVyCAAPaW50ZXJjZXB0b3ItcGFkBQARdGl0YW5pdW0tY29udmV5b3IJAAxyZXBhaXItcG9pbnQDAAVzYWx2bwAAA2FpcgIACXRpdGFuLXBhZAYAC3NvbGFyLXBhbmVsFRUAAAAAAAAAAAAAAAABAQAAAQEAAAAAAQEAAAEBAAAAAAAAAAAAAAAAAAAAAAIBAAAAAAIBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIBAAAAAAIBAAAAAAAAAAAAAAAAAAADAQAABAAEAAAABAAEAAMBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQMGAAAABgAFAQAAAAAAAAAAAAAAAAAAAAAAAAIBAAAAAAcDAAAIAwAABQIJAAAACQAFAggDAAAAAAcDAAAAAAIBAAAAAAAAAAAAAAAAAAAAAAAABQIKAAACCgAFAgAAAAAAAAAAAAAAAAAAAAABAQAAAwEAAAgDAAAAAAAAAAAFAgACBQIAAAAAAAAIAwAAAwEAAAEBAAAAAAAAAAAAAAAAAAAAAAcDAAAFAgACBQIAAAcDAAAAAAAAAAAAAAAAAAABAQAABAMFAgUDBQMAAAAAAAALAQACCwEAAAAAAAAFAQUBBQIEAQEBAAAAAAAABAMGAAkACgAFAwUDCwIAAAAAAAALAQUBBQEKAAkABgAEAQAAAAAAAAAAAAAAAAAAAAMAAwADAAIAAAwAAAAAAgABAAEAAQAAAAAAAAAAAAABAQAABAMGAAkACgAFAwUDCwAAAAAAAAALAgUBBQEKAAkABgAEAQEBAAAAAAAABAMFAAUDBQMAAAAAAAALAQABCwAAAAAAAAAFAQUBBQAEAQAAAAABAQAAAwEAAAgDAAAAAAcDAAAFAAAABQAAAAcDAAAIAwAAAwEAAAEBAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAwAABQAKAAAACgAFAAgDAAAAAAAAAAAAAAAAAAAAAAIBAAAAAAcDAAAAAAAABQAJAAAACQAFAAAAAAAAAAcDAAAAAAIBAAAAAAAAAAAAAAAAAAADAQAABQMGAAAABgAFAQMBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAEAAAABAAEAAAAAAAAAAAAAAAAAAAAAAAAAAIBAAAAAAIBAAEBAQAAAQEAAAAAAQEAAAEBAAAAAAIBAAAAAAIBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAA=")
+            */
         };
     }
 
@@ -128,7 +130,7 @@ public class FortressGenerator{
         int maxIndex = (int)(1 + ((float)gen.sector.difficulty / maxDifficulty * (structures.length-2)));
 
         for(int i = maxIndex/2; i < maxIndex; i++){
-            selected.add(structures[i]);
+            selected.add(structures[Math.min(i, structures.length-1)]);
         }
 
         float baseChance = 0.8f / selected.size;
@@ -186,9 +188,8 @@ public class FortressGenerator{
     }
 
     Block fixBlock(Block result){
-        if(result == UnitBlocks.resupplyPoint) result = DefenseBlocks.tungstenWall;
-        if(result == UnitBlocks.monsoonPad) result = DefenseBlocks.tungstenWallLarge;
-        if(result == UnitBlocks.fabricatorPad) result = DefenseBlocks.tungstenWallLarge;
+        if(result == UnitBlocks.dronePad) result = DefenseBlocks.copperWallLarge;
+        if(result == UnitBlocks.fabricatorPad) result = DefenseBlocks.copperWallLarge;
         return result;
     }
 
@@ -201,8 +202,6 @@ public class FortressGenerator{
             ItemTurret turret = (ItemTurret)block;
             AmmoType[] type = turret.getAmmoTypes();
             block.handleStack(type[0].item, block.acceptStack(type[0].item, 1000, tile, null), tile, null);
-        }else if(block instanceof ResupplyPoint){
-            tile.entity.items.add(Items.lead, tile.block().itemCapacity);
         }
     }
 

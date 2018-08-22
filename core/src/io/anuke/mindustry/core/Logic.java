@@ -2,7 +2,6 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
@@ -10,8 +9,7 @@ import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.ResetEvent;
 import io.anuke.mindustry.game.EventType.WaveEvent;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TeamInfo;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
+import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -51,32 +49,22 @@ public class Logic extends Module{
         state.set(State.playing);
         state.wavetime = wavespace * state.difficulty.timeScaling * 2;
 
-        for(TeamData team : state.teams.getTeams(true)){
-            for(Tile tile : team.cores){
-                if(debug){
-                    for(Item item : Item.all()){
-                        if(item.type == ItemType.material){
-                            tile.entity.items.set(item, 1000);
-                        }
-                    }
-                }
-
-                if(world.getSector() != null){
-                    Array<ItemStack> items = world.getSector().startingItems;
-                    for(ItemStack stack : items){
-                        tile.entity.items.add(stack.item, stack.amount);
+        for(Tile tile : state.teams.get(defaultTeam).cores){
+            if(debug){
+                for(Item item : Item.all()){
+                    if(item.type == ItemType.material){
+                        tile.entity.items.set(item, 1000);
                     }
                 }
             }
-        }
 
-        for(TeamData team : state.teams.getTeams(false)){
-            for(Tile tile : team.cores){
-                tile.entity.items.add(Items.tungsten, 2000);
-                tile.entity.items.add(Items.blastCompound, 2000);
+            if(world.getSector() != null){
+                Array<ItemStack> items = world.getSector().startingItems;
+                for(ItemStack stack : items){
+                    tile.entity.items.add(stack.item, stack.amount);
+                }
             }
         }
-
 
         Events.fire(PlayEvent.class);
     }
@@ -85,9 +73,7 @@ public class Logic extends Module{
         state.wave = 1;
         state.wavetime = wavespace * state.difficulty.timeScaling;
         state.gameOver = false;
-        state.teams = new TeamInfo();
-        state.teams.add(Team.blue, true);
-        state.teams.add(Team.red, false);
+        state.teams = new Teams();
 
         Timers.clear();
         Entities.clear();
@@ -104,11 +90,12 @@ public class Logic extends Module{
         Events.fire(WaveEvent.class);
     }
 
+    //for gameOver to trigger, there must not be no cores remaining at all; obviously this never triggers in PvP
     private void checkGameOver(){
         boolean gameOver = true;
 
-        for(TeamData data : state.teams.getTeams(true)){
-            if(data.cores.size > 0){
+        for(Team team : Team.all){
+            if(state.teams.get(team).cores.size > 0){
                 gameOver = false;
                 break;
             }

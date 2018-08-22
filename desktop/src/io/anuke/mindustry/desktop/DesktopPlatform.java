@@ -11,6 +11,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.ucore.function.Consumer;
@@ -78,14 +79,24 @@ public class DesktopPlatform extends Platform{
         DiscordRichPresence presence = new DiscordRichPresence();
 
         if(!state.is(State.menu)){
-            presence.state = Strings.capitalize(state.mode.name()) + ", Solo";
-            presence.details = Strings.capitalize(world.getMap().name) + " | Wave " + state.wave;
-            presence.largeImageText = "Wave " + state.wave;
+            presence.state = Strings.capitalize(state.mode.name());
+            if(state.mode == GameMode.noWaves){
+                presence.details = Strings.capitalize(world.getMap().name);
+            }else{
+                presence.details = Strings.capitalize(world.getMap().name) + " | Wave " + state.wave;
+                presence.largeImageText = "Wave " + state.wave;
+            }
+
+            if(state.mode != GameMode.noWaves){
+                presence.state = Strings.capitalize(state.mode.name());
+            }else{
+                presence.state = unitGroups[players[0].getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
+                (unitGroups[players[0].getTeam().ordinal()].size() + " Units Active");
+            }
 
             if(Net.active()){
                 presence.partyMax = 16;
                 presence.partySize = playerGroup.size();
-                presence.state = Strings.capitalize(state.mode.name());
             }
         }else{
             if(ui.editor != null && ui.editor.isShown()){

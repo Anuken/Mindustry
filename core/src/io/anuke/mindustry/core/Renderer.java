@@ -132,6 +132,8 @@ public class Renderer extends RendererModule{
 
     @Override
     public void update(){
+        //TODO hack, find source of this bug
+        Color.WHITE.set(1f, 1f, 1f, 1f);
 
         if(Core.cameraScale != targetscale){
             float targetzoom = (float) Core.cameraScale / targetscale;
@@ -195,6 +197,10 @@ public class Renderer extends RendererModule{
     @Override
     public void draw(){
         camera.update();
+        if(Float.isNaN(Core.camera.position.x) || Float.isNaN(Core.camera.position.y)){
+            Core.camera.position.x = players[0].x;
+            Core.camera.position.y = players[0].y;
+        }
 
         Graphics.clear(clearColor);
 
@@ -278,6 +284,7 @@ public class Renderer extends RendererModule{
         drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
         EntityDraw.setClip(true);
         Graphics.end();
+        Draw.color();
     }
 
     private void drawFlyerShadows(){
@@ -324,8 +331,8 @@ public class Renderer extends RendererModule{
 
             Graphics.beginShaders(Shaders.outline);
             Graphics.shader(Shaders.mix, true);
-            drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead());
-            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team);
+            drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
+            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
             Graphics.shader();
             blocks.drawTeamBlocks(Layer.turret, team);
             Graphics.endShaders();

@@ -19,7 +19,7 @@ public class Weapons implements ContentList{
             reload = 15f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
-            setAmmo(AmmoTypes.bulletLead);
+            ammo = AmmoTypes.bulletCopper;
         }};
 
         missiles = new Weapon("missiles"){{
@@ -30,7 +30,7 @@ public class Weapons implements ContentList{
             roundrobin = false;
             roundrobin = true;
             ejectEffect = Fx.none;
-            setAmmo(AmmoTypes.weaponMissile);
+            ammo = AmmoTypes.weaponMissile;
         }};
 
         chainBlaster = new Weapon("chain-blaster"){{
@@ -38,7 +38,7 @@ public class Weapons implements ContentList{
             reload = 28f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
-            setAmmo(AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletTungsten, AmmoTypes.bulletSilicon, AmmoTypes.bulletThorium);
+            ammo = AmmoTypes.bulletCopper;
         }};
 
         shockgun = new Weapon("shockgun"){{
@@ -50,7 +50,7 @@ public class Weapons implements ContentList{
             recoil = 2f;
             velocityRnd = 0.7f;
             ejectEffect = ShootFx.shellEjectSmall;
-            setAmmo(AmmoTypes.shotgunTungsten);
+            ammo = AmmoTypes.shotgunTungsten;
         }};
 
         flakgun = new Weapon("flakgun"){{
@@ -62,7 +62,7 @@ public class Weapons implements ContentList{
             recoil = 3f;
             velocityRnd = 0.1f;
             ejectEffect = ShootFx.shellEjectMedium;
-            setAmmo(AmmoTypes.shellCarbide);
+            ammo = AmmoTypes.shellCarbide;
         }};
 
         flamethrower = new Weapon("flamethrower"){{
@@ -71,7 +71,7 @@ public class Weapons implements ContentList{
             roundrobin = true;
             recoil = 1f;
             ejectEffect = Fx.none;
-            setAmmo(AmmoTypes.flamerThermite);
+            ammo = AmmoTypes.flamerThermite;
         }};
 
         sapper = new Weapon("sapper"){{
@@ -79,7 +79,7 @@ public class Weapons implements ContentList{
             reload = 12f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
-            setAmmo(AmmoTypes.bulletCarbide);
+            ammo = AmmoTypes.bulletDense;
         }};
 
         swarmer = new Weapon("swarmer"){{
@@ -87,7 +87,7 @@ public class Weapons implements ContentList{
             reload = 10f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
-            setAmmo(AmmoTypes.bulletPyratite);
+            ammo = AmmoTypes.bulletPyratite;
         }};
 
         bomber = new Weapon("bomber"){{
@@ -98,7 +98,7 @@ public class Weapons implements ContentList{
             ejectEffect = Fx.none;
             velocityRnd = 1f;
             inaccuracy = 40f;
-            setAmmo(AmmoTypes.bombExplosive, AmmoTypes.bombIncendiary, AmmoTypes.bombOil);
+            ammo = AmmoTypes.bombExplosive;
         }};
     }
 

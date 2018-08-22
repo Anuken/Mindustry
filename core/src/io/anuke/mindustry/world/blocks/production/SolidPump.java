@@ -107,6 +107,7 @@ public class SolidPump extends Pump{
 
     @Override
     protected boolean isValid(Tile tile){
+        if(tile == null) return false;
         return !tile.floor().isLiquid;
     }
 

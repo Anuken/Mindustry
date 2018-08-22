@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.storage;
 
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Edges;
@@ -68,7 +67,7 @@ public class Vault extends StorageBlock{
                     }
                 }
             }else{
-                todump = Items.tungsten;
+                todump = Item.getByID(0);
 
                 if(other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
                     other.block().handleItem(removeItem(tile, null), other, in);

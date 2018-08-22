@@ -76,7 +76,9 @@ public class Save16 extends SaveFileVersion{
         short width = stream.readShort();
         short height = stream.readShort();
 
-        if(map == null){
+        if(world.getSector() != null){
+            world.setMap(new Map("Sector " + world.getSector().x + ", " + world.getSector().y, width, height));
+        }else if(map == null){
             world.setMap(new Map("unknown", width, height));
         }
 
@@ -115,8 +117,7 @@ public class Save16 extends SaveFileVersion{
 
                 tile.entity.read(stream);
 
-                if(tile.block() == StorageBlocks.core &&
-                        state.teams.has(t)){
+                if(tile.block() == StorageBlocks.core){
                     state.teams.get(t).cores.add(tile);
                 }
             }else if(wallid == 0){

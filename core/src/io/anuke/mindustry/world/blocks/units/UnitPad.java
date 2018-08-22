@@ -8,12 +8,10 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.BarType;
@@ -37,10 +35,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.waveTeam;
+
 public class UnitPad extends Block{
     protected float gracePeriodMultiplier = 23f;
     protected float speedupTime = 60f * 60f * 20;
-    protected float maxSpeedup = 7f;
+    protected float maxSpeedup = 2f;
 
     protected UnitType type;
     protected float produceTime = 1000f;
@@ -74,10 +75,6 @@ public class UnitPad extends Block{
             unit.set(tile.drawx(), tile.drawy());
             unit.add();
             unit.getVelocity().y = factory.launchVelocity;
-
-            //fill inventory with 1st ammo
-            AmmoType type = unit.getWeapon().getAmmoType(unit.getWeapon().getAcceptedItems().iterator().next());
-            unit.inventory.fillAmmo(type);
         }
     }
 
@@ -147,7 +144,7 @@ public class UnitPad extends Block{
 
         entity.time += Timers.delta() * entity.speedScl;
 
-        boolean isEnemy = tile.getTeam() == Team.red;
+        boolean isEnemy = tile.getTeam() == waveTeam && state.mode.autoSpawn;
 
         if(isEnemy){
             entity.warmup += Timers.delta();

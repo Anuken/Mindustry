@@ -7,11 +7,11 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TeamInfo;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
+import io.anuke.mindustry.game.Teams;
+import io.anuke.mindustry.game.Teams.TeamData;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
-import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.ucore.core.Core;
@@ -118,16 +118,26 @@ public class NetworkIO{
                 i += consecutives;
             }
 
+            stream.write(Team.all.length);
+
             //write team data
-            stream.writeByte(state.teams.getTeams().size);
-            for(TeamData data : state.teams.getTeams()){
+            for(Team team : Team.all){
+                TeamData data = state.teams.get(team);
                 stream.writeByte(data.team.ordinal());
-                stream.writeBoolean(data.ally);
-                stream.writeShort(data.cores.size);
+
+                stream.writeByte(data.enemies.size());
+                for(Team enemy : data.enemies){
+                    stream.writeByte(enemy.ordinal());
+                }
+
+                stream.writeByte(data.cores.size);
                 for(Tile tile : data.cores){
                     stream.writeInt(tile.packedPosition());
                 }
             }
+
+            //now write a snapshot.
+            netServer.writeSnapshot(player, stream);
 
         }catch(IOException e){
             throw new RuntimeException(e);
@@ -185,10 +195,10 @@ public class NetworkIO{
             int height = stream.readShort();
 
             //TODO send advanced map meta such as author, etc
-            //TODO scan for cores
             Map currentMap = new Map(map, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
             currentMap.meta.tags.clear();
             currentMap.meta.tags.putAll(tags);
+            world.setSector(null);
             world.setMap(currentMap);
 
             Tile[][] tiles = world.createTiles(width, height);
@@ -250,14 +260,21 @@ public class NetworkIO{
             }
 
             player.reset();
-            state.teams = new TeamInfo();
+            state.teams = new Teams();
 
             byte teams = stream.readByte();
             for(int i = 0; i < teams; i++){
                 Team team = Team.all[stream.readByte()];
-                boolean ally = stream.readBoolean();
-                short cores = stream.readShort();
-                state.teams.add(team, ally);
+
+                byte enemies = stream.readByte();
+                Team[] enemyArr = new Team[enemies];
+                for(int j = 0; j < enemies; j++){
+                    enemyArr[j] = Team.all[stream.readByte()];
+                }
+
+                state.teams.add(team, enemyArr);
+
+                byte cores = stream.readByte();
 
                 for(int j = 0; j < cores; j++){
                     state.teams.get(team).cores.add(world.tile(stream.readInt()));
@@ -269,6 +286,9 @@ public class NetworkIO{
             }
 
             world.endMapLoad();
+
+            //read raw snapshot
+            netClient.readSnapshot(stream);
 
         }catch(IOException e){
             throw new RuntimeException(e);

@@ -42,7 +42,7 @@ public class Block extends BaseBlock implements Content{
     /** internal ID */
     public final int id;
     /** display name */
-    public final String formalName;
+    public String formalName;
     /** Detailed description of the block. Can be as long as necesary. */
     public final String fullDescription;
     /** whether this block has a tile entity that updates */

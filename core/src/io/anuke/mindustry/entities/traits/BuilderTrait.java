@@ -10,6 +10,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Build;
@@ -71,6 +72,7 @@ public interface BuilderTrait extends Entity{
         if(request != null){
             output.writeByte(request.remove ? 1 : 0);
             output.writeInt(world.toPacked(request.x, request.y));
+            output.writeFloat(request.progress);
             if(!request.remove){
                 output.writeByte(request.recipe.id);
                 output.writeByte(request.rotation);
@@ -91,6 +93,7 @@ public interface BuilderTrait extends Entity{
             byte type = input.readByte();
             if(type != -1){
                 int position = input.readInt();
+                float progress = input.readFloat();
                 BuildRequest request;
 
                 if(type == 1){ //remove
@@ -101,8 +104,12 @@ public interface BuilderTrait extends Entity{
                     request = new BuildRequest(position % world.width(), position / world.width(), rotation, Recipe.getByID(recipe));
                 }
 
+                request.progress = progress;
+
                 if(applyChanges){
                     getPlaceQueue().addLast(request);
+                }else if(isBuilding()){
+                    getCurrentRequest().progress = progress;
                 }
             }
         }
@@ -143,6 +150,10 @@ public interface BuilderTrait extends Entity{
                 if(request.x == place.x && request.y == place.y){
                     return;
                 }
+            }
+            Tile tile = world.tile(place.x, place.y);
+            if(tile != null && tile.entity instanceof BuildEntity){
+                place.progress = tile.<BuildEntity>entity().progress;
             }
             getPlaceQueue().addLast(place);
         }
@@ -202,17 +213,28 @@ public interface BuilderTrait extends Entity{
         //otherwise, update it.
         BuildEntity entity = tile.entity();
 
-        //deconstructing is 2x as fast
-        if(current.remove){
-            entity.deconstruct(unit, core, 2f / entity.buildCost * Timers.delta() * getBuildPower(tile));
-        }else{
-            entity.construct(unit, core, 1f / entity.buildCost * Timers.delta() * getBuildPower(tile));
+        if(entity == null){
+            getPlaceQueue().removeFirst();
+            return;
         }
 
         if(unit.distanceTo(tile) <= placeDistance){
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
         }
-        current.progress = entity.progress();
+
+        //progress is synced, thus not updated clientside
+        if(!Net.client()){
+            //deconstructing is 2x as fast
+            if(current.remove){
+                entity.deconstruct(unit, core, 2f / entity.buildCost * Timers.delta() * getBuildPower(tile));
+            }else{
+                entity.construct(unit, core, 1f / entity.buildCost * Timers.delta() * getBuildPower(tile));
+            }
+
+            current.progress = entity.progress();
+        }else{
+            entity.progress = current.progress;
+        }
     }
 
     /**Do not call directly.*/

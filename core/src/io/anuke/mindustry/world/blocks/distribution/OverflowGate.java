@@ -6,7 +6,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
-public class OverflowGate extends Splitter{
+public class OverflowGate extends Router{
 
     public OverflowGate(String name){
         super(name);
@@ -35,13 +35,14 @@ public class OverflowGate extends Splitter{
         int from = tile.relativeTo(src.x, src.y);
         if(from == -1) return null;
         Tile to = tile.getNearby((from + 2) % 4);
+        if(to == null) return null;
         Tile edge = Edges.getFacingEdge(tile, to);
 
         if(!to.block().acceptItem(item, to, edge) || (to.block() instanceof OverflowGate)){
             Tile a = tile.getNearby(Mathf.mod(from - 1, 4));
             Tile b = tile.getNearby(Mathf.mod(from + 1, 4));
-            boolean ac = a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate);
-            boolean bc = b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate);
+            boolean ac = a != null && a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate);
+            boolean bc = b != null && b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate);
 
             if(!ac && !bc){
                 return null;

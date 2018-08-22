@@ -145,7 +145,6 @@ public class DebugFragment extends Fragment{
                     for(UnitType type : UnitType.all()){
                         dialog.content().addImageButton("white", 40, () -> {
                             BaseUnit unit = type.create(player.getTeam());
-                            unit.inventory.addAmmo(type.weapon.getAmmoType(type.weapon.getAcceptedItems().iterator().next()));
                             unit.setWave();
                             unit.set(player.x, player.y);
                             unit.add();

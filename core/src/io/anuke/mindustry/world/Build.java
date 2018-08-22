@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
@@ -130,6 +131,15 @@ public class Build{
 
                     if(result[0]) return false;
                 }catch(Exception e){
+                    return false;
+                }
+            }
+        }
+
+        //check for enemy cores
+        for(Team enemy : state.teams.enemiesOf(team)){
+            for(Tile core : state.teams.get(enemy).cores){
+                if(Vector2.dst(x*tilesize + type.offset(), y*tilesize + type.offset(), core.drawx(), core.drawy()) < state.mode.enemyCoreBuildRadius + type.size*tilesize/2f){
                     return false;
                 }
             }

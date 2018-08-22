@@ -98,7 +98,7 @@ public class Conveyor extends Block{
         byte rotation = tile.getRotation();
 
         int frame = entity.clogHeat <= 0.5f ? (int) ((Timers.time() / 4f) % 4) : 0;
-        Draw.rect(regions[entity.blendbits][frame], tile.drawx(), tile.drawy(),
+        Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], tile.drawx(), tile.drawy(),
             tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation*90);
     }
 
@@ -134,9 +134,8 @@ public class Conveyor extends Block{
         Tile other = tile.getNearby(Mathf.mod(tile.getRotation() - direction, 4));
         if(other != null) other = other.target();
 
-        if(other == null || !other.block().outputsItems()) return false;
-        return (tile.getNearby(tile.getRotation()) == other)
-        || (!other.block().rotate || other.getNearby(other.getRotation()) == tile);
+        return other != null && other.block().outputsItems()
+        && ((tile.getNearby(tile.getRotation()) == other) || (!other.block().rotate || other.getNearby(other.getRotation()) == tile));
     }
 
     @Override

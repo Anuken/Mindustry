@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.storage;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
@@ -38,12 +37,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
-    private static Rectangle rect = new Rectangle();
-
-    protected int timerSupply = timers++;
-
     protected float supplyRadius = 50f;
-    protected float supplyInterval = 5f;
     protected float droneRespawnDuration = 60 * 6;
     protected UnitType droneType = UnitTypes.drone;
 
@@ -103,7 +97,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public float handleDamage(Tile tile, float amount){
-        return amount;
+        return debug ? 0 : amount;
     }
 
     @Override
@@ -176,9 +170,7 @@ public class CoreBlock extends StorageBlock{
         //TODO more dramatic effects
         super.onDestroyed(tile);
 
-        if(state.teams.has(tile.getTeam())){
-            state.teams.get(tile.getTeam()).cores.removeValue(tile, true);
-        }
+        state.teams.get(tile.getTeam()).cores.removeValue(tile, true);
     }
 
     @Override
@@ -197,7 +189,7 @@ public class CoreBlock extends StorageBlock{
         if(entity.currentUnit != null){
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += Timers.delta();
-            entity.progress += 1f / (entity.currentUnit instanceof Player ? respawnduration : droneRespawnDuration) * Timers.delta();
+            entity.progress += 1f / (entity.currentUnit instanceof Player ? state.mode.respawnTime : droneRespawnDuration) * Timers.delta();
 
             //instant build for fast testing.
             if(debug){
@@ -235,25 +227,6 @@ public class CoreBlock extends StorageBlock{
 
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
         }
-
-        if(entity.solid && tile.entity.timer.get(timerSupply, supplyInterval)){
-            rect.setSize(supplyRadius * 2).setCenter(tile.drawx(), tile.drawy());
-
-            Units.getNearby(tile.getTeam(), rect, unit -> {
-                if(unit.isDead() || unit.distanceTo(tile.drawx(), tile.drawy()) > supplyRadius || unit.getGroup() == null)
-                    return;
-
-                for(int i = 0; i < Item.all().size; i++){
-                    Item item = Item.getByID(i);
-                    if(tile.entity.items.get(item) > 0 && unit.acceptsAmmo(item)){
-                        tile.entity.items.remove(item, 1);
-                        unit.addAmmo(item);
-                        Call.transferAmmo(item, tile.drawx(), tile.drawy(), unit);
-                        return;
-                    }
-                }
-            });
-        }
     }
 
     @Override
@@ -261,19 +234,6 @@ public class CoreBlock extends StorageBlock{
         return new CoreEntity();
     }
 
-    /*
-        @Remote(called = Loc.server)
-        public static void onCoreUnitSet(Tile tile, Unit player){
-            CoreEntity entity = tile.entity();
-            entity.currentUnit = player;
-            entity.progress = 0f;
-            player.set(tile.drawx(), tile.drawy());
-
-            if(player instanceof Player){
-                ((Player) player).setRespawning(true);
-            }
-        }
-    */
     public class CoreEntity extends TileEntity implements SpawnerTrait{
         public Unit currentUnit;
         int droneID = -1;

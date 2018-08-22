@@ -8,7 +8,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.units.*;
 
 public class UnitBlocks extends BlockList implements ContentList{
-    public static Block resupplyPoint, repairPoint, dronePad,
+    public static Block repairPoint, dronePad,
     fabricatorPad, interceptorPad, monsoonPad, daggerPad, titanPad,
     dropPoint, reconstructor, overdriveProjector, shieldProjector, commandCenter;
 
@@ -52,7 +52,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 1800;
             size = 2;
             consumes.power(0.05f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.tungsten, 15)});
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.copper, 15)});
         }};
 
         titanPad = new UnitPad("titan-pad"){{
@@ -62,11 +62,6 @@ public class UnitBlocks extends BlockList implements ContentList{
             consumes.power(0.15f);
             shadow = "shadow-round-3";
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 20), new ItemStack(Items.thorium, 30)});
-        }};
-
-        resupplyPoint = new ResupplyPoint("resupply-point"){{
-            shadow = "shadow-round-1";
-            itemCapacity = 30;
         }};
 
         dropPoint = new DropPoint("drop-point"){{

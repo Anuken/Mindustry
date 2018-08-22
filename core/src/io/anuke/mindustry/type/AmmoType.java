@@ -11,42 +11,26 @@ public class AmmoType implements Content{
     private static Array<AmmoType> allTypes = new Array<>(32);
 
     public final byte id;
-    /**
-     * The item used. Always null if liquid isn't.
-     */
+    /**The item used. Always null if liquid isn't.*/
     public final Item item;
-    /**
-     * The liquid used. Always null if item isn't.
-     */
+    /**The liquid used. Always null if item isn't.*/
     public final Liquid liquid;
-    /**
-     * The resulting bullet. Never null.
-     */
+    /**The resulting bullet. Never null.*/
     public final BulletType bullet;
     /**
      * For item ammo, this is amount given per ammo item.
      * For liquid ammo, this is amount used per shot.
      */
     public final float quantityMultiplier;
-    /**
-     * Reload speed multiplier.
-     */
+    /**Reload speed multiplier.*/
     public float reloadMultiplier = 1f;
-    /**
-     * Bullet recoil strength.
-     */
+    /**Bullet recoil strength.*/
     public float recoil = 0f;
-    /**
-     * Additional inaccuracy in degrees.
-     */
+    /**Additional inaccuracy in degrees.*/
     public float inaccuracy;
-    /**
-     * Effect created when shooting.
-     */
+    /**Effect created when shooting.*/
     public Effect shootEffect = Fx.none;
-    /**
-     * Extra smoke effect created when shooting.
-     */
+    /**Extra smoke effect created when shooting.*/
     public Effect smokeEffect = Fx.none;
 
     {

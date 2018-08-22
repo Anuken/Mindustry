@@ -8,32 +8,32 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
 public class Items implements ContentList{
-    public static Item stone, tungsten, lead, coal, carbide, titanium, thorium, silicon, plastanium, phasematter, surgealloy,
+    public static Item stone, copper, lead, densealloy, coal, titanium, thorium, silicon, plastanium, phasematter, surgealloy,
             biomatter, sand, blastCompound, pyratite;
 
     @Override
     public void load(){
-
-        tungsten = new Item("tungsten", Color.valueOf("a0b0c8")){{
-            type = ItemType.material;
-            hardness = 1;
-            cost = 0.75f;
-        }};
-
-        lead = new Item("lead", Color.valueOf("8e85a2")){{
+        copper = new Item("copper", Color.valueOf("d99d73")){{
             type = ItemType.material;
             hardness = 1;
             cost = 0.6f;
+        }};
+
+        lead = new Item("lead", Color.valueOf("8c7fa9")){{
+            type = ItemType.material;
+            hardness = 1;
+            cost = 0.6f;
+        }};
+
+        densealloy = new Item("dense-alloy", Color.valueOf("b2c6d2")){{
+            type = ItemType.material;
+            cost = 1.2f;
         }};
 
         coal = new Item("coal", Color.valueOf("272727")){{
             explosiveness = 0.2f;
             flammability = 0.5f;
             hardness = 2;
-        }};
-
-        carbide = new Item("carbide", Color.valueOf("e2e2e2")){{
-            type = ItemType.material;
         }};
 
         titanium = new Item("titanium", Color.valueOf("8da1e3")){{
@@ -59,7 +59,7 @@ public class Items implements ContentList{
             cost = 0.9f;
         }};
 
-        plastanium = new Item("plastanium", Color.valueOf("e9ead3")){{
+        plastanium = new Item("plastanium", Color.valueOf("cbd97f")){{
             type = ItemType.material;
             flammability = 0.1f;
             explosiveness = 0.1f;
@@ -71,16 +71,9 @@ public class Items implements ContentList{
             cost = 1.5f;
         }};
 
-        surgealloy = new Item("surge-alloy", Color.valueOf("b4d5c7")){
-            {
-                type = ItemType.material;
-            }
-
-            @Override
-            public boolean isHidden(){
-                return true;
-            }
-        };
+        surgealloy = new Item("surge-alloy", Color.valueOf("f3e979")){{
+            type = ItemType.material;
+        }};
 
         biomatter = new Item("biomatter", Color.valueOf("648b55")){{
             flammability = 0.4f;

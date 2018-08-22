@@ -28,12 +28,15 @@ import io.anuke.ucore.util.Translator;
 import java.util.Locale;
 
 public class Vars{
-    //respawn time in frames
-    public static final float respawnduration = 60 * 4;
     //time between waves in frames (on normal mode)
     public static final float wavespace = 60 * 60 * 1.5f;
     //set ridiculously high for now
-    public static final float coreBuildRange = 800999f;
+    public static final float coreBuildRange = 999999f;
+    //team of the player by default
+    public static final Team defaultTeam = Team.blue;
+    //team of the enemy in waves
+    public static final Team waveTeam = Team.red;
+
     //discord group URL
     public static final String discordURL = "https://discord.gg/BKADYds";
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";

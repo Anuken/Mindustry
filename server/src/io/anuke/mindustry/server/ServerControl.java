@@ -9,13 +9,16 @@ import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.net.Administration;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
+import io.anuke.mindustry.net.EditLog;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.KickReason;
+import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.ui.fragments.DebugFragment;
@@ -36,15 +39,20 @@ import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.util.Log.*;
 
 public class ServerControl extends Module{
+    private static final int roundExtraTime = 12;
+
     private final CommandHandler handler = new CommandHandler("");
     private ShuffleMode mode;
+    private int gameOvers;
+    private boolean inExtraRound;
 
     public ServerControl(String[] args){
         Settings.defaultList(
             "shufflemode", "normal",
             "bans", "",
             "admins", "",
-            "sectorid", 0
+            "sector_x", 0,
+            "sector_y", 1
         );
 
         mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
@@ -83,8 +91,8 @@ public class ServerControl extends Module{
         }
 
         Events.on(GameOverEvent.class, () -> {
+            if(inExtraRound) return;
             info("Game over!");
-            netServer.kickAll(KickReason.gameover);
 
             if(mode != ShuffleMode.off){
                 if(world.getSector() == null){
@@ -98,17 +106,29 @@ public class ServerControl extends Module{
                             while(map == previous) map = maps.random();
                         }
 
+                        Call.onInfoMessage("[SCARLET]Game over![]\nNext selected map:[accent] "+map.name+"[]"
+                        + (map.meta.author() != null ? " by[accent] " + map.meta.author() + "[]" : "") + "."+
+                        "\nNew game begins in " + roundExtraTime + " seconds.");
+
                         info("Selected next map to be {0}.", map.name);
 
-                        logic.reset();
-                        world.loadMap(map);
-                        state.set(State.playing);
+                        Map fmap = map;
+
+                        play(true, () -> world.loadMap(fmap));
                     }
                 }else{
-                    info("Re-trying sector map.");
+                    Call.onInfoMessage("Sector has been lost.\nRe-deploying in " + roundExtraTime + " seconds.");
+                    if(gameOvers >= 2){
+                        Settings.putInt("sector_y", Settings.getInt("sector_y") < 0 ? Settings.getInt("sector_y") + 1 : Settings.getInt("sector_y") - 1);
+                        Settings.save();
+                        gameOvers = 0;
+                    }
+                    gameOvers ++;
                     playSectorMap();
+                    info("Re-trying sector map: {0} {1}",  Settings.getInt("sector_x"), Settings.getInt("sector_y"));
                 }
             }else{
+                netServer.kickAll(KickReason.gameover);
                 state.set(State.menu);
                 Net.closeServer();
             }
@@ -183,8 +203,8 @@ public class ServerControl extends Module{
                 logic.play();
 
             }else{
-                Log.info("&ly&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sectorid"), 0);
-                playSectorMap();
+                Log.info("&ly&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sector_x"), Settings.getInt("sector_y"));
+                playSectorMap(false);
             }
 
             info("Map loaded.");
@@ -256,6 +276,17 @@ public class ServerControl extends Module{
                 info("Difficulty set to '{0}'.", arg[0]);
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
+            }
+        });
+
+        handler.register("setsector", "<x> <y>", "Sets the next sector to be played. Does not affect current game.", arg -> {
+            try{
+                Settings.putInt("sector_x", Integer.parseInt(arg[0]));
+                Settings.putInt("sector_y", Integer.parseInt(arg[1]));
+                Settings.save();
+                info("Sector position set.");
+            }catch(NumberFormatException e){
+                err("Invalid coordinates.");
             }
         });
 
@@ -385,7 +416,6 @@ public class ServerControl extends Module{
             for(Player player : playerGroup.all()){
                 if(player.name.equalsIgnoreCase(arg[0])){
                     target = player;
-                    break;
                 }
             }
 
@@ -437,7 +467,6 @@ public class ServerControl extends Module{
                     if(player.con.address != null &&
                             player.con.address.equals(arg[0])){
                         netServer.kick(player.con.id, KickReason.banned);
-                        break;
                     }
                 }
             }else{
@@ -452,7 +481,6 @@ public class ServerControl extends Module{
                 for(Player player : playerGroup.all()){
                     if(player.uuid.equals(arg[0])){
                         netServer.kick(player.con.id, KickReason.banned);
-                        break;
                     }
                 }
             }else{
@@ -623,9 +651,8 @@ public class ServerControl extends Module{
                 return;
             }
 
+            info("&lyCore destroyed.");
             Events.fire(GameOverEvent.class);
-
-            info("Core destroyed.");
         });
 
         handler.register("debuginfo", "Print debug info", arg -> {
@@ -825,8 +852,44 @@ public class ServerControl extends Module{
     }
 
     private void playSectorMap(){
-        world.loadSector(world.sectors().get(Settings.getInt("sectorid"), 0));
-        logic.play();
+        playSectorMap(true);
+    }
+
+    private void playSectorMap(boolean wait){
+        int x = Settings.getInt("sector_x"), y = Settings.getInt("sector_y");
+        if(world.sectors().get(x, y) == null){
+            world.sectors().createSector(x, y);
+        }
+
+        world.sectors().get(x, y).completedMissions = 0;
+
+        play(wait, () -> world.loadSector(world.sectors().get(x, y)));
+    }
+
+    private void play(boolean wait, Runnable run){
+        inExtraRound = true;
+        Runnable r = () -> {
+            Array<Player> players = new Array<>();
+            for(Player p : playerGroup.all()){
+                players.add(p);
+                p.setDead(true);
+            }
+            logic.reset();
+            Call.onWorldDataBegin();
+            run.run();
+            logic.play();
+            for(Player p : players){
+                p.reset();
+                netServer.sendWorldData(p, p.con.id);
+            }
+            inExtraRound = false;
+        };
+
+        if(wait){
+            Timers.runTask(60f * roundExtraTime, r);
+        }else{
+            r.run();
+        }
     }
 
     private void host(){
@@ -844,13 +907,15 @@ public class ServerControl extends Module{
         if(state.is(State.playing) && world.getSector() != null){
             //all assigned missions are complete
             if(world.getSector().completedMissions >= world.getSector().missions.size){
+                Log.info("Mission complete.");
                 world.sectors().completeSector(world.getSector().x, world.getSector().y);
                 world.sectors().save();
-                Settings.putInt("sectorid", world.getSector().x + 1);
+                gameOvers = 0;
+                Settings.putInt("sector_x", world.getSector().x + world.getSector().size);
                 Settings.save();
 
-                netServer.kickAll(KickReason.sectorComplete);
-                logic.reset();
+                Call.onInfoMessage("[accent]Sector conquered![]\n" + roundExtraTime + " seconds until deployment in next sector.");
+
                 playSectorMap();
             }else if(world.getSector().currentMission().isComplete()){
                 //increment completed missions, check next index next frame

@@ -41,7 +41,6 @@ public class Waves{
                 unitScaling = 2;
                 unitAmount = 1;
                 spacing = 2;
-                ammoItem = Items.tungsten;
                 end = 30;
             }},
 
@@ -86,7 +85,6 @@ public class Waves{
                 groupAmount = 2;
                 unitScaling = 3;
                 effect = StatusEffects.overdrive;
-                ammoItem = Items.silicon;
             }},
 
             new SpawnGroup(UnitTypes.dagger){{
@@ -95,7 +93,6 @@ public class Waves{
                 unitAmount = 1;
                 unitScaling = 3;
                 effect = StatusEffects.shielded;
-                ammoItem = Items.thorium;
                 max = 10;
             }},
 
@@ -121,7 +118,6 @@ public class Waves{
 
             new SpawnGroup(UnitTypes.monsoon){{
                 begin = 40;
-                ammoItem = Items.blastCompound;
                 unitAmount = 2;
                 spacing = 2;
                 unitScaling = 3;
@@ -140,7 +136,6 @@ public class Waves{
 
             new SpawnGroup(UnitTypes.monsoon){{
                 begin = 53;
-                ammoItem = Items.pyratite;
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 4;
@@ -150,7 +145,6 @@ public class Waves{
 
             new SpawnGroup(UnitTypes.monsoon){{
                 begin = 53;
-                ammoItem = Items.coal;
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 4;
@@ -174,10 +168,6 @@ public class Waves{
 
                     if(spawn.weapon != null){
                         System.out.print(":" + spawn.weapon.name);
-                    }
-
-                    if(spawn.ammoItem != null){
-                        System.out.print(":" + spawn.ammoItem.name);
                     }
 
                     System.out.print(" ");

@@ -53,9 +53,8 @@ public class BuildBlock extends Block{
 
     @Remote(called = Loc.server)
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team){
-        world.setBlock(tile, block, team);
         tile.setRotation(rotation);
-        tile.setTeam(team);
+        world.setBlock(tile, block, team);
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
 
         //last builder was this local client player, call placed()
@@ -218,6 +217,9 @@ public class BuildBlock extends Block{
 
             if(recipe != null){
                 ItemStack[] requirements = recipe.requirements;
+                if(requirements.length != accumulator.length || totalAccumulator.length != requirements.length){
+                    setDeconstruct(previous);
+                }
 
                 for(int i = 0; i < requirements.length; i++){
                     accumulator[i] += Math.min(requirements[i].amount * amount / 2f, requirements[i].amount/2f - totalAccumulator[i]); //add scaled amount progressed to the accumulator
@@ -225,7 +227,7 @@ public class BuildBlock extends Block{
 
                     int accumulated = (int) (accumulator[i]); //get amount
 
-                    if(amount > 0){ //if it's positive, add it to the core
+                    if(amount > 0 && accumulated > 0){ //if it's positive, add it to the core
                         int accepting = core.tile.block().acceptStack(requirements[i].item, accumulated, core.tile, builder);
                         core.tile.block().handleStack(requirements[i].item, accepting, core.tile, builder);
 

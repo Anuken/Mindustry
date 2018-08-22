@@ -19,7 +19,7 @@ public class TurretBlocks extends BlockList implements ContentList{
     @Override
     public void load(){
         duo = new DoubleTurret("duo"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletPyratite, AmmoTypes.bulletSilicon};
+            ammoTypes = new AmmoType[]{AmmoTypes.bulletCopper, AmmoTypes.bulletDense, AmmoTypes.bulletPyratite, AmmoTypes.bulletSilicon};
             reload = 25f;
             restitution = 0.03f;
             range = 90f;
@@ -43,7 +43,7 @@ public class TurretBlocks extends BlockList implements ContentList{
 		}};*/
 
         hail = new ArtilleryTurret("hail"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.artilleryCarbide, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
+            ammoTypes = new AmmoType[]{AmmoTypes.artilleryDense, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
             reload = 100f;
             recoil = 2f;
             range = 200f;
@@ -134,7 +134,7 @@ public class TurretBlocks extends BlockList implements ContentList{
         salvo = new BurstTurret("salvo"){{
             size = 2;
             range = 120f;
-            ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletCarbide, AmmoTypes.bulletPyratite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
+            ammoTypes = new AmmoType[]{AmmoTypes.bulletCopper, AmmoTypes.bulletDense, AmmoTypes.bulletPyratite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
             reload = 40f;
             restitution = 0.03f;
             ammoEjectBack = 3f;
@@ -162,7 +162,7 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         ripple = new ArtilleryTurret("ripple"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.artilleryCarbide, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary, AmmoTypes.artilleryExplosive, AmmoTypes.artilleryPlastic};
+            ammoTypes = new AmmoType[]{AmmoTypes.artilleryDense, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary, AmmoTypes.artilleryExplosive, AmmoTypes.artilleryPlastic};
             size = 3;
             shots = 4;
             inaccuracy = 12f;
@@ -191,7 +191,7 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         spectre = new ItemTurret("spectre"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.bulletTungsten, AmmoTypes.bulletLead, AmmoTypes.bulletCarbide, AmmoTypes.bulletPyratite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
+            ammoTypes = new AmmoType[]{AmmoTypes.bulletCopper, AmmoTypes.bulletDense, AmmoTypes.bulletPyratite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
             reload = 25f;
             restitution = 0.03f;
             ammoUseEffect = ShootFx.shellEjectSmall;
