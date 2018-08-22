@@ -456,6 +456,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             spawner = -1;
         }
 
+        Tile tile = world.tileWorld(x, y);
+
+        altHeat = Mathf.lerpDelta(altHeat, isAlt ? 1f : 0f, mech.altChargeAlpha);
+        boostHeat = Mathf.lerpDelta(boostHeat, (tile != null && tile.solid()) || (isBoosting && ((!movement.isZero() && moved) || !isLocal)) ? 1f : 0f, 0.08f);
+
         if(!isLocal){
             interpolate();
             updateBuilding(this); //building happens even with non-locals
@@ -491,9 +496,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     protected void updateMech(){
         Tile tile = world.tileWorld(x, y);
 
-        altHeat = Mathf.lerpDelta(altHeat, isAlt ? 1f : 0f, mech.altChargeAlpha);
-        boostHeat = Mathf.lerpDelta(boostHeat, isBoosting && ((!movement.isZero() && moved) || !isLocal) ? 1f : 0f, 0.08f);
-
         mech.updateAlt(this);
 
         if(boostHeat > liftoffBoost + 0.1f){
@@ -510,8 +512,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             achievedFlight = false;
         }
 
-        isBoosting = Inputs.keyDown("dash") && !mech.flying && !isAlt;
-        isAlt = Inputs.keyDown("ability") && !mech.flying;
+        isBoosting = Inputs.keyDown("dash") && !mech.flying;
+        isAlt = Inputs.keyDown("ability") && !mech.flying && !isBoosting;
 
         //if player is in solid block
         if(tile != null && tile.solid()){
