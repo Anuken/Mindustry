@@ -21,10 +21,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EntityDraw;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.EffectEntity;
@@ -253,11 +250,14 @@ public class Renderer extends RendererModule{
         blocks.drawBlocks(Layer.overlay);
 
         if(itemGroup.size() > 0){
-            Shaders.outline.color.set(Team.none.color);
-
-            Graphics.beginShaders(Shaders.outline);
+            Graphics.surface(effectSurface);
             drawAndInterpolate(itemGroup);
-            Graphics.endShaders();
+            Graphics.surface();
+
+            Draw.color(0, 0, 0, 0.2f);
+            Draw.rect(effectSurface, -1, -1);
+            Draw.color();
+            Draw.rect(effectSurface, 0, 0);
         }
 
         drawAllTeams(false);

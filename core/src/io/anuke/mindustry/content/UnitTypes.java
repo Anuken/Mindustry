@@ -45,6 +45,7 @@ public class UnitTypes implements ContentList{
             speed = 0.3f;
             maxVelocity = 1.9f;
             drag = 0.01f;
+            weapon = Weapons.chainBlaster;
             isFlying = true;
         }};
 

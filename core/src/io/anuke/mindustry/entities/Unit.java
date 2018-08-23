@@ -45,6 +45,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public UnitInventory inventory = new UnitInventory(this);
     public float rotation;
+    public float hitTime;
 
     protected Interpolator interpolator = new Interpolator();
     protected StatusController status = new StatusController();
@@ -52,7 +53,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     protected CarryTrait carrier;
     protected Vector2 velocity = new Translator(0f, 0.0001f);
-    protected float hitTime;
     protected float drownTime;
 
     @Override

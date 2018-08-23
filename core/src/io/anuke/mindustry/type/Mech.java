@@ -53,6 +53,8 @@ public class Mech extends Upgrade implements UnlockableContent{
         return 0f;
     }
 
+    public float getRotationAlpha(Player player){return 1f;}
+
     @Override
     public void displayInfo(Table table){
         ContentDisplay.displayMech(table, this);

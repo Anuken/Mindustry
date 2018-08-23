@@ -2,18 +2,29 @@ package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Upgrade;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, halberd;
@@ -33,34 +44,98 @@ public class Mechs implements ContentList{
             maxSpeed = 4f;
         }};
 
-        delta = new Mech("delta-mech", false){{
-            drillPower = -1;
-            speed = 0.75f;
-            boostSpeed = 0.95f;
-            itemCapacity = 15;
-            armor = 30f;
-            weaponOffsetX = -1;
-            itemCapacity = 15;
-            weaponOffsetY = -1;
-            weapon = Weapons.shockgun;
-            trailColorTo = Color.valueOf("d3ddff");
-            maxSpeed = 5f;
-        }};
+        delta = new Mech("delta-mech", false){
+            {
+                drillPower = -1;
+                speed = 0.75f;
+                boostSpeed = 0.95f;
+                itemCapacity = 15;
+                armor = 30f;
+                weaponOffsetX = -1;
+                itemCapacity = 15;
+                weaponOffsetY = -1;
+                weapon = Weapons.shockgun;
+                trailColorTo = Color.valueOf("d3ddff");
+                maxSpeed = 5f;
+                altChargeAlpha = 0.05f;
+            }
 
-        tau = new Mech("tau-mech", false){{
-            drillPower = 3;
-            mineSpeed = 3f;
-            itemCapacity = 70;
-            speed = 0.44f;
-            drag = 0.35f;
-            boostSpeed = 0.8f;
-            weapon = Weapons.blaster;
-            maxSpeed = 5f;
-            armor = 30f;
-        }};
+            @Override
+            public void updateAlt(Player player){
+                if(player.altHeat > 0.01f){
+                    player.applyEffect(StatusEffects.overdrive, 0.1f);
+                }
+            }
+
+            @Override
+            public void draw(Player player){
+                super.draw(player);
+                player.hitTime = Math.max(player.hitTime, player.altHeat * Unit.hitDuration);
+            }
+        };
+
+        tau = new Mech("tau-mech", false){
+            protected float healRange = 60f;
+            protected float healAmount = 10f;
+
+            protected Rectangle rect = new Rectangle();
+
+            {
+                drillPower = 4;
+                mineSpeed = 3f;
+                itemCapacity = 70;
+                weaponOffsetY = -1;
+                weaponOffsetX = 1;
+                speed = 0.44f;
+                drag = 0.35f;
+                boostSpeed = 0.8f;
+                weapon = Weapons.healBlaster;
+                maxSpeed = 5f;
+                armor = 30f;
+                altChargeAlpha = 0.05f;
+                trailColorTo = Palette.heal;
+            }
+
+            @Override
+            public void draw(Player player){
+                super.draw(player);
+                player.hitTime = Math.max(player.hitTime, player.altHeat * Unit.hitDuration);
+            }
+
+            @Override
+            public void updateAlt(Player player){
+                if(player.altHeat >= 0.91f){
+                    Effects.effect(UnitFx.healWave, player);
+                    rect.setSize(healRange*2f).setCenter(player.x, player.y);
+                    Units.getNearby(player.getTeam(), rect, unit -> {
+                        if(unit.distanceTo(player) <= healRange){
+                            if(unit.health < unit.maxHealth()){
+                                Effects.effect(UnitFx.heal, unit);
+                            }
+                            unit.healBy(healAmount);
+                        }
+                    });
+
+                    int blockRange = (int)(healRange/tilesize);
+                    int px = world.toTile(player.x), py = world.toTile(player.y);
+
+                    for(int x = -blockRange; x <= blockRange; x++){
+                        for(int y = -blockRange; y <= blockRange; y++){
+                            if(Mathf.dst(x, y) > blockRange) continue;
+                            Tile tile = world.tile(px + x, py + y);
+                            if(tile != null){
+                                Fire.extinguish(tile, 1000f);
+                            }
+                        }
+                    }
+                    player.altHeat = 0f;
+                }
+            }
+        };
 
         omega = new Mech("omega-mech", false){
             protected TextureRegion armorRegion;
+
             {
                 drillPower = 2;
                 mineSpeed = 1.5f;
@@ -74,6 +149,11 @@ public class Mechs implements ContentList{
                 trailColorTo = Color.valueOf("feb380");
                 maxSpeed = 3.5f;
                 armor = 50f;
+            }
+
+            @Override
+            public float getRotationAlpha(Player player){
+                return 0.6f - player.altHeat * 0.3f;
             }
 
             @Override

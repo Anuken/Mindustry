@@ -129,6 +129,7 @@ public class Recipes implements ContentList{
         new Recipe(units, UpgradeBlocks.javelinFactory, new ItemStack(Items.lead, 200), new ItemStack(Items.silicon, 250), new ItemStack(Items.titanium, 300), new ItemStack(Items.plastanium, 200));
         new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.densealloy, 160), new ItemStack(Items.silicon, 220), new ItemStack(Items.titanium, 250)).setDesktop();
         new Recipe(units, UpgradeBlocks.omegaFactory, new ItemStack(Items.densealloy, 160), new ItemStack(Items.silicon, 220), new ItemStack(Items.titanium, 250)).setDesktop();
+        new Recipe(units, UpgradeBlocks.tauFactory, new ItemStack(Items.densealloy, 160), new ItemStack(Items.silicon, 220), new ItemStack(Items.titanium, 250)).setDesktop();
 
         //new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.copper, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
 

@@ -45,6 +45,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTrait{
     public static final int timerSync = 2;
+    public static final int timerAbility = 3;
     private static final int timerShootLeft = 0;
     private static final int timerShootRight = 1;
     private static final float liftoffBoost = 0.2f;
@@ -581,13 +582,14 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         if(!ui.chatfrag.chatOpen()){
+            float baseLerp = mech.getRotationAlpha(this);
             if(!isShooting()){
                 if(!movement.isZero()){
-                    rotation = Mathf.slerpDelta(rotation, movement.angle(), 0.13f);
+                    rotation = Mathf.slerpDelta(rotation, movement.angle(), 0.13f * baseLerp);
                 }
             }else{
                 float angle = control.input(playerIndex).mouseAngle(x, y);
-                this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f);
+                this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f * baseLerp);
             }
         }
     }

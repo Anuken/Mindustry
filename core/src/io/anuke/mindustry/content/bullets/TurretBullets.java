@@ -30,10 +30,40 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.world;
 
 public class TurretBullets extends BulletList implements ContentList{
-    public static BulletType fireball, basicFlame, lancerLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt;
+    public static BulletType fireball, basicFlame, lancerLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt, healBullet;
 
     @Override
     public void load(){
+
+        healBullet = new BulletType(5.2f, 25){
+            float healAmount = 14f;
+            {
+                hiteffect = BulletFx.hitLaser;
+                despawneffect = BulletFx.hitLaser;
+                collidesTeam = true;
+            }
+
+            @Override
+            public void draw(Bullet b){
+                Draw.color(Palette.heal);
+                Lines.stroke(2f);
+                Lines.lineAngleCenter(b.x, b.y, b.angle(), 7f);
+                Draw.color(Color.WHITE);
+                Lines.lineAngleCenter(b.x, b.y, b.angle(), 3f);
+                Draw.reset();
+            }
+
+            @Override
+            public void hitTile(Bullet b, Tile tile){
+                super.hit(b);
+
+                if(tile.getTeam() == b.getTeam()){
+                    Effects.effect(BlockFx.healBlock, tile.drawx(), tile.drawy(), tile.block().size);
+                    tile.entity.health += healAmount;
+                    tile.entity.health = Mathf.clamp(tile.entity.health, 0, tile.block().health);
+                }
+            }
+        };
 
         fireball = new BulletType(1f, 4){
             {

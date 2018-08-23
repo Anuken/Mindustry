@@ -19,8 +19,10 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInputStream;
@@ -79,6 +81,16 @@ public class MechFactory extends Block{
         MechFactoryEntity entity = tile.entity();
         return Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
                 Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.player == null;
+    }
+
+    @Override
+    public void drawSelect(Tile tile){
+        Draw.color(Palette.accent);
+        for(int i = 0; i < 4; i ++){
+            float length = tilesize * size/2f + 3 + Mathf.absin(Timers.time(), 5f, 2f);
+            Draw.rect("transfer-arrow", tile.drawx() + Geometry.d4[i].x * length, tile.drawy() + Geometry.d4[i].y * length, (i+2) * 90);
+        }
+        Draw.color();
     }
 
     @Override

@@ -9,7 +9,7 @@ import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.type.Weapon;
 
 public class Weapons implements ContentList{
-    public static Weapon blaster, chainBlaster, shockgun, sapper, swarmer, bomber, flakgun, flamethrower, missiles;
+    public static Weapon blaster, healBlaster, chainBlaster, shockgun, sapper, swarmer, bomber, flakgun, flamethrower, missiles;
 
     @Override
     public void load(){
@@ -20,6 +20,15 @@ public class Weapons implements ContentList{
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;
             ammo = AmmoTypes.bulletMech;
+        }};
+
+        healBlaster = new Weapon("heal-blaster"){{
+            length = 1.5f;
+            reload = 30f;
+            roundrobin = false;
+            ejectEffect = Fx.none;
+            recoil = 2f;
+            ammo = AmmoTypes.healBlaster;
         }};
 
         missiles = new Weapon("missiles"){{

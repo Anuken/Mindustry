@@ -42,6 +42,8 @@ public class Palette{
     powerLaserFrom = Color.valueOf("e3e3e3"),
     powerLaserTo = Color.valueOf("ffe7a8"),
 
+    heal = Color.valueOf("98ffa9"),
+
     description = Color.WHITE,
     turretinfo = Color.ORANGE,
     iteminfo = Color.LIGHT_GRAY,
