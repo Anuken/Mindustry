@@ -36,7 +36,8 @@ public class TurretBullets extends BulletList implements ContentList{
     public void load(){
 
         healBullet = new BulletType(5.2f, 25){
-            float healAmount = 14f;
+            float healAmount = 20f;
+
             {
                 hiteffect = BulletFx.hitLaser;
                 despawneffect = BulletFx.hitLaser;
