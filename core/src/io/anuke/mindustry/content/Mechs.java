@@ -4,11 +4,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.Fire;
+import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
@@ -57,13 +59,17 @@ public class Mechs implements ContentList{
                 weapon = Weapons.shockgun;
                 trailColorTo = Color.valueOf("d3ddff");
                 maxSpeed = 5f;
-                altChargeAlpha = 0.05f;
+                altChargeAlpha = 0.03f;
             }
 
             @Override
             public void updateAlt(Player player){
-                if(player.altHeat > 0.01f){
-                    player.applyEffect(StatusEffects.overdrive, 0.1f);
+                if(player.altHeat >= 0.91f){
+                    Effects.shake(3f, 3f, player);
+                    for(int i = 0; i < 8; i++){
+                        Timers.run(Mathf.random(5f), () -> Lightning.create(player.getTeam(), BulletFx.hitLancer, player.getTeam().color, 10f, player.x, player.y, Mathf.random(360f), 20));
+                    }
+                    player.altHeat = 0f;
                 }
             }
 

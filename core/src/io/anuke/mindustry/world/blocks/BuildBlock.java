@@ -157,7 +157,7 @@ public class BuildBlock extends Block{
 
         if(recipe != null){
             Draw.rect(recipe.result.shadowRegion, tile.drawx(), tile.drawy());
-        }else if(previous != null){
+        }else if(previous != null && !(previous instanceof BuildBlock)){
             previous.drawShadow(tile);
         }
     }

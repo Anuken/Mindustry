@@ -36,10 +36,9 @@ public class AmmoTypes implements ContentList{
             inaccuracy = 2f;
         }};
 
-        shotgunTungsten = new AmmoType(WeaponBullets.tungstenShotgun){{
-            shootEffect = ShootFx.shootBig;
-            smokeEffect = ShootFx.shootBigSmoke;
-            recoil = 1f;
+        shotgunTungsten = new AmmoType(TurretBullets.lightning){{
+            shootEffect = BulletFx.hitLancer;
+            smokeEffect = Fx.none;
         }};
 
         shellCarbide = new AmmoType(WeaponBullets.shellCarbide){{

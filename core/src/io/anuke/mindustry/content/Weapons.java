@@ -65,13 +65,12 @@ public class Weapons implements ContentList{
 
         shockgun = new Weapon("shockgun"){{
             length = 1f;
-            reload = 50f;
+            reload = 40f;
             roundrobin = true;
-            shots = 6;
-            inaccuracy = 10f;
-            velocityRnd = 0.7f;
-            shake = 2f;
-            ejectEffect = ShootFx.shellEjectSmall;
+            shots = 1;
+            inaccuracy = 0f;
+            velocityRnd = 0.2f;
+            ejectEffect = Fx.none;
             ammo = AmmoTypes.shotgunTungsten;
         }};
 

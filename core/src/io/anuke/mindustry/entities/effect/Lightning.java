@@ -9,7 +9,6 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
@@ -26,14 +25,10 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.SeedRandom;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import static io.anuke.mindustry.Vars.bulletGroup;
 
 //TODO utterly broken
-public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncTrait{
+public class Lightning extends TimedEntity implements Poolable, DrawTrait{
     private static Array<SolidTrait> entities = new Array<>();
     private static Rectangle rect = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
@@ -67,7 +62,7 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
         l.random.setSeed(seed);
         l.color = color;
 
-        float step = 3f;
+        float step = 4f;
         float range = 6f;
         float attractRange = 20f;
 
@@ -111,7 +106,7 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
             });
 
             if(l.random.chance(0.1f)){
-                createLighting(l.random.nextInt(), team, effect, color, damage, x2, y2, angle + l.random.range(100f), length / 3);
+                createLighting(l.random.nextInt(), team, effect, color, damage, x2, y2, angle + l.random.range(30f), length / 3);
             }
 
             x = x2;
@@ -123,33 +118,20 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
     }
 
     @Override
-    public boolean isSyncing(){
-        return false;
-    }
-
-    @Override
-    public void write(DataOutput data) throws IOException{
-
-    }
-
-    @Override
-    public void read(DataInput data, long time) throws IOException{
-
-    }
-
-    @Override
     public float lifetime(){
         return 10;
     }
 
     @Override
     public void reset(){
+        super.reset();
         color = Palette.lancerLaser;
         lines.clear();
     }
 
     @Override
     public void removed(){
+        super.removed();
         Pooling.free(this);
     }
 
