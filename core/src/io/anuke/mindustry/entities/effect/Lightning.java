@@ -12,6 +12,7 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.EntityGroup;
@@ -26,6 +27,7 @@ import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.SeedRandom;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
+import static io.anuke.mindustry.Vars.world;
 
 //TODO utterly broken
 public class Lightning extends TimedEntity implements Poolable, DrawTrait{
@@ -107,6 +109,12 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait{
 
             if(l.random.chance(0.1f)){
                 createLighting(l.random.nextInt(), team, effect, color, damage, x2, y2, angle + l.random.range(30f), length / 3);
+            }
+
+            Tile tile = world.tileWorld(x, y);
+            if(tile != null && tile.entity != null && tile.getTeamID() != team.ordinal()){
+                Effects.effect(effect, x, y, fangle);
+                tile.entity.damage(damage/4f);
             }
 
             x = x2;
