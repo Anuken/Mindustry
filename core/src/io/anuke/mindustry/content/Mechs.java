@@ -45,13 +45,12 @@ public class Mechs implements ContentList{
                 weapon = Weapons.blaster;
                 maxSpeed = 4f;
                 altChargeAlpha = 0.03f;
+                armor = 15f;
             }
 
             @Override
             public void updateAlt(Player player){
-                if(player.altHeat >= 0.91f){
 
-                }
             }
         };
 
@@ -119,6 +118,9 @@ public class Mechs implements ContentList{
 
             @Override
             public void updateAlt(Player player){
+                //idle regen
+                player.healBy(0.01f * Timers.delta());
+
                 if(player.altHeat >= 0.91f){
                     Effects.effect(UnitFx.healWave, player);
                     rect.setSize(healRange*2f).setCenter(player.x, player.y);

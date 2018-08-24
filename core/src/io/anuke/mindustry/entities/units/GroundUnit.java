@@ -80,7 +80,7 @@ public abstract class GroundUnit extends BaseUnit{
         }
 
         public void update(){
-            if(health >= health && !isCommanded()){
+            if(health >= maxHealth() && !isCommanded()){
                 state.set(attack);
             }
 

@@ -15,6 +15,7 @@ import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Strings;
 
@@ -119,8 +120,9 @@ public class DesktopPlatform extends Platform{
     @Override
     public boolean isDebug(){
         //honestly I'm just putting this ridiculous """anti-debug""" mess here to see if anyone bothers solving it without editing source
-        return args.length > 0 && args[0].equals(("-debug_" + "12312333_"
-                + " " + System.getProperty("os.arch") + "nice" + (int)(Math.sin(System.getProperty("user.dir").hashCode()) * 100) + Thread.currentThread().getStackTrace()[1].toString()).hashCode() + "") && new File("../../desktop/build/").exists();
+        boolean eq = args.length > 0 && args[0].equals(("-debug_12312333_" + System.getProperty("os.arch") + "nice" + (int)(Math.sin(System.getProperty("user.dir").hashCode()) * 100) + Thread.currentThread().getStackTrace()[1].toString()).hashCode() + "") && new File("../../desktop/build/").exists();
+        if(eq) Log.info("--DEBUG MODE ACTIVE--");
+        return eq;
     }
 
     @Override
