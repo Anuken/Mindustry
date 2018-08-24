@@ -1,12 +1,14 @@
 package io.anuke.mindustry.entities.units.types;
 
 import com.badlogic.gdx.math.Vector2;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.units.FlyingUnit;
 import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.entities.units.UnitState;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.ucore.util.Mathf;
 
@@ -72,5 +74,9 @@ public class AlphaDrone extends FlyingUnit {
     @Override
     public void readSave(DataInput stream) throws IOException {
         super.readSave(stream);
+
+        if(!Net.active()){
+            leader = Vars.players[0];
+        }
     }
 }
