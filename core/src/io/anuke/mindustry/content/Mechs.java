@@ -11,9 +11,12 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
+import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.units.types.AlphaDrone;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Tile;
@@ -24,8 +27,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, halberd;
@@ -37,6 +39,7 @@ public class Mechs implements ContentList{
     public void load(){
 
         alpha = new Mech("alpha-mech", false){
+            int maxDrones = 3;
             {
                 drillPower = 1;
                 mineSpeed = 1.5f;
@@ -44,14 +47,41 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.85f;
                 weapon = Weapons.blaster;
                 maxSpeed = 4f;
-                altChargeAlpha = 0.03f;
+                altChargeAlpha = 0.04f;
+                trailColorTo = Color.valueOf("ffd37f");
             }
 
             @Override
             public void updateAlt(Player player){
-                if(player.altHeat >= 0.91f){
-
+                if(getDrones(player) >= maxDrones){
+                    player.altHeat = 0f;
                 }
+
+                if(player.altHeat >= 0.91f){
+                    if(!Net.client()) {
+                        AlphaDrone drone = (AlphaDrone) UnitTypes.alphaDrone.create(player.getTeam());
+                        drone.leader = player;
+                        drone.set(player.x, player.y);
+                        drone.add();
+                        Effects.effect(UnitFx.unitLand, player);
+                    }
+                    player.altHeat = 0f;
+                }
+            }
+
+            @Override
+            public void draw(Player player){
+                if(getDrones(player) < maxDrones){
+                    player.hitTime = Math.max(player.hitTime, player.altHeat * Unit.hitDuration);
+                }
+            }
+
+            int getDrones(Player player){
+                int sum = 0;
+                for(BaseUnit unit : unitGroups[player.getTeam().ordinal()].all()){
+                    if(unit instanceof AlphaDrone && ((AlphaDrone) unit).leader == player) sum ++;
+                }
+                return sum;
             }
         };
 

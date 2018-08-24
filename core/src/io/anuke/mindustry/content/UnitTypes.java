@@ -1,5 +1,6 @@
 package io.anuke.mindustry.content;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.units.UnitType;
@@ -8,7 +9,7 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentList;
 
 public class UnitTypes implements ContentList{
-    public static UnitType drone, dagger, interceptor, monsoon, titan, fabricator;
+    public static UnitType drone, alphaDrone, dagger, interceptor, monsoon, titan, fabricator;
 
     @Override
     public void load(){
@@ -17,11 +18,28 @@ public class UnitTypes implements ContentList{
             drag = 0.01f;
             speed = 0.2f;
             maxVelocity = 0.8f;
-            ammoCapacity = 0;
             range = 50f;
             healSpeed = 0.05f;
             health = 60;
         }};
+
+        alphaDrone = new UnitType("alpha-drone", AlphaDrone.class, AlphaDrone::new){
+            {
+                isFlying = true;
+                drag = 0.005f;
+                speed = 0.5f;
+                maxVelocity = 1.6f;
+                range = 40f;
+                health = 15;
+                weapon = Weapons.droneBlaster;
+                trailColor = Color.valueOf("ffd37f");
+            }
+
+            @Override
+            public boolean isHidden() {
+                return true;
+            }
+        };
 
         dagger = new UnitType("dagger", Dagger.class, Dagger::new){{
             maxVelocity = 1.1f;
@@ -57,7 +75,6 @@ public class UnitTypes implements ContentList{
             drag = 0.01f;
             isFlying = true;
             weapon = Weapons.bomber;
-            ammoCapacity = 50;
         }};
 
         fabricator = new UnitType("fabricator", Fabricator.class, Fabricator::new){{
@@ -65,7 +82,6 @@ public class UnitTypes implements ContentList{
             drag = 0.01f;
             speed = 0.2f;
             maxVelocity = 0.9f;
-            ammoCapacity = 0;
             range = 70f;
             itemCapacity = 70;
             health = 220;

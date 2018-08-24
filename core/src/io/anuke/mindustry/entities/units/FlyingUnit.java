@@ -5,7 +5,6 @@ import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.CarriableTrait;
 import io.anuke.mindustry.entities.traits.CarryTrait;
-import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
@@ -154,7 +153,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
     @Override
     public void drawOver(){
-        trail.draw(Palette.lightTrail, 5f);
+        trail.draw(type.trailColor, 5f);
     }
 
     @Override

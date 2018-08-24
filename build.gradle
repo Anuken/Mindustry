@@ -44,7 +44,7 @@ allprojects {
 
         generateLocales = {
             def output = '["en",'
-            def bundles = new File('core/assets/bundles/')
+            def bundles = new File(project(':core').projectDir, 'assets/bundles/')
             bundles.listFiles().each { other ->
                 if(other.name == "bundle.properties") return;
                 output += '"' + other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + '",'
@@ -54,7 +54,7 @@ allprojects {
         }
 
         writeVersion = {
-            def pfile = new File('core/assets/version.properties')
+            def pfile = new File(project(':core').projectDir, 'assets/version.properties')
             def props = new Properties()
 
             try{
