@@ -5,11 +5,12 @@ buildscript {
         google()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://jitpack.io" }
+        maven { url "https://dl.bintray.com/konsoletyper/teavm" }
         jcenter()
     }
     dependencies {
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
-        classpath 'com.github.Anuken:teavm-gradle-plugin:051b21eee1'
+        classpath 'com.github.Anuken:teavm-gradle-plugin:7fe4290459'
         classpath 'com.android.tools.build:gradle:3.1.3'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
     }
@@ -84,6 +85,7 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url 'https://jitpack.io' }
+        maven { url "https://dl.bintray.com/konsoletyper/teavm" }
     }
 }
 
@@ -107,7 +109,7 @@ project(":html") {
     dependencies {
         compile project(":core")
 
-        compile "com.github.Anuken:teavm-libgdx:81dc01f859"
+        compile "com.github.Anuken:teavm-libgdx:ccc364e2a0"
     }
 }
 

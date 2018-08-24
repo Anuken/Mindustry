@@ -8,6 +8,6 @@ teavmc {
     mainClassName = "io.anuke.mindustry.teavm.TeaVMLauncher"
     installDirectory "html/webapp/"
     targetFileName "app.js"
-    minified true
+    minified false
     runtime org.teavm.tooling.RuntimeCopyOperation.MERGED
 }
