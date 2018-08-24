@@ -14,7 +14,7 @@ public class MissileBulletType extends BasicBulletType{
         super(speed, damage, bulletSprite);
         backColor = Palette.missileYellowBack;
         frontColor = Palette.missileYellow;
-        homingPower = 6f;
+        homingPower = 7f;
     }
 
     @Override

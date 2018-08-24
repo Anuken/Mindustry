@@ -149,7 +149,7 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait{
         Draw.color(color, Color.WHITE, fin());
         for(int i = 0; i < lines.size; i++){
             Vector2 v = lines.get(i);
-            Lines.stroke(fout() * 3f + 1f - (float) i / lines.size);
+            Lines.stroke(fout() * 3f * (1.5f - (float) i / lines.size));
             Lines.line(lx, ly, v.x, v.y);
             lx = v.x;
             ly = v.y;

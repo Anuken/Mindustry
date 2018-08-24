@@ -32,7 +32,7 @@ public class Weapons implements ContentList{
 
         healBlaster = new Weapon("heal-blaster"){{
             length = 1.5f;
-            reload = 30f;
+            reload = 24f;
             roundrobin = false;
             ejectEffect = Fx.none;
             recoil = 2f;
@@ -41,12 +41,14 @@ public class Weapons implements ContentList{
 
         missiles = new Weapon("missiles"){{
             length = 1.5f;
-            reload = 40f;
-            shots = 2;
-            inaccuracy = 10f;
+            reload = 60f;
+            shots = 4;
+            inaccuracy = 2f;
             roundrobin = false;
             roundrobin = true;
             ejectEffect = Fx.none;
+            velocityRnd = 0.2f;
+            spacing = 1f;
             ammo = AmmoTypes.weaponMissile;
         }};
 
@@ -55,6 +57,7 @@ public class Weapons implements ContentList{
             recoil = 4f;
             reload = 60f;
             shots = 4;
+            spacing = 8f;
             inaccuracy = 8f;
             roundrobin = false;
             roundrobin = true;

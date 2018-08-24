@@ -36,7 +36,7 @@ public class BasicBulletType extends BulletType{
     public float incendChance = 1f;
 
     public float homingPower = 0f;
-    public float homingRange = 40f;
+    public float homingRange = 50f;
 
     public TextureRegion backRegion;
     public TextureRegion frontRegion;

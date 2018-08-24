@@ -360,9 +360,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         if(mech.flying || boostHeat > 0.001f){
             float wobblyness = 0.6f;
-            trail.update(x + Angles.trnsx(rotation + 180f, 5f) + Mathf.range(wobblyness),
+            if(!state.isPaused()) trail.update(x + Angles.trnsx(rotation + 180f, 5f) + Mathf.range(wobblyness),
                     y + Angles.trnsy(rotation + 180f, 5f) + Mathf.range(wobblyness));
-            trail.draw(Hue.mix(mech.trailColor, mech.trailColorTo, boostHeat, Tmp.c1), 5f * (isFlying() ? 1f : boostHeat));
+            trail.draw(Hue.mix(mech.trailColor, mech.trailColorTo, mech.flying ? 0f : boostHeat, Tmp.c1), 5f * (isFlying() ? 1f : boostHeat));
         }else{
             trail.clear();
         }
@@ -587,7 +587,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             float baseLerp = mech.getRotationAlpha(this);
             if(!isShooting()){
                 if(!movement.isZero()){
-                    rotation = Mathf.slerpDelta(rotation, movement.angle(), 0.13f * baseLerp);
+                    rotation = Mathf.slerpDelta(rotation, mech.flying ? velocity.angle() : movement.angle(), 0.13f * baseLerp);
                 }
             }else{
                 float angle = control.input(playerIndex).mouseAngle(x, y);

@@ -255,14 +255,60 @@ public class Mechs implements ContentList{
             trailColor = Palette.lightTrail;
         }};
 
-        javelin = new Mech("javelin-ship", true){{
-            drillPower = -1;
-            speed = 0.4f;
-            maxSpeed = 3.6f;
-            drag = 0.09f;
-            weapon = Weapons.missiles;
-            trailColor = Color.valueOf("d3ddff");
-        }};
+        javelin = new Mech("javelin-ship", true){
+            float minV = 3.6f;
+            float maxV = 6f;
+            TextureRegion shield;
+            {
+                drillPower = -1;
+                speed = 0.11f;
+                maxSpeed = 3.4f;
+                drag = 0.01f;
+                weapon = Weapons.missiles;
+                trailColor = Color.valueOf("d3ddff");
+            }
+
+            @Override
+            public void load(){
+                super.load();
+                shield = Draw.region(name + "-shield");
+            }
+
+            @Override
+            public float getRotationAlpha(Player player){
+                return 0.5f;
+            }
+
+            @Override
+            public void updateAlt(Player player){
+                float scl = scld(player);
+                if(Mathf.chance(Timers.delta() * (0.15*scl))){
+                    Effects.effect(BulletFx.hitLancer, Palette.lancerLaser, player.x, player.y);
+                    Lightning.create(player.getTeam(), BulletFx.hitLancer, Palette.lancerLaser, 10f,
+                    player.x + player.getVelocity().x, player.y + player.getVelocity().y, player.rotation, 14);
+                }
+            }
+
+            @Override
+            public void draw(Player player){
+                float scl = scld(player);
+                if(scl < 0.01f) return;
+                float alpha = Core.batch.getColor().a;
+                Graphics.shader();
+                Graphics.setAdditiveBlending();
+                Draw.color(Palette.lancerLaser);
+                Draw.alpha(scl/2f);
+                Draw.rect(shield, player.snappedX() + Mathf.range(scl/2f), player.snappedY() + Mathf.range(scl/2f), player.rotation - 90);
+                Graphics.setNormalBlending();
+                Graphics.shader(Shaders.mix);
+                Draw.color();
+                Draw.alpha(alpha);
+            }
+
+            float scld(Player player){
+                return Mathf.clamp((player.getVelocity().len() - minV) / (maxV - minV));
+            }
+        };
 
         trident = new Mech("trident-ship", true){{
             drillPower = 1;

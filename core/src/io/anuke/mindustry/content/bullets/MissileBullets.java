@@ -2,10 +2,13 @@ package io.anuke.mindustry.content.bullets;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.fx.BulletFx;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.bullet.MissileBulletType;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
+import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Mathf;
 
 public class MissileBullets extends BulletList implements ContentList{
     public static BulletType explosive, incindiary, surge, javelin, swarm;
@@ -52,18 +55,27 @@ public class MissileBullets extends BulletList implements ContentList{
             }
         };
 
-        javelin = new MissileBulletType(2.5f, 14, "missile"){
+        javelin = new MissileBulletType(5f, 10.5f, "missile"){
             {
                 bulletWidth = 8f;
                 bulletHeight = 8f;
                 bulletShrink = 0f;
-                drag = -0.02f;
+                drag = -0.003f;
                 keepVelocity = false;
-                splashDamageRadius = 25f;
-                splashDamage = 11f;
+                splashDamageRadius = 20f;
+                splashDamage = 3f;
                 lifetime = 90f;
+                trailColor = Color.valueOf("b6c6fd");
                 hiteffect = BulletFx.blastExplosion;
                 despawneffect = BulletFx.blastExplosion;
+                backColor = Palette.bulletYellowBack;
+                frontColor = Palette.bulletYellow;
+            }
+
+            @Override
+            public void update(Bullet b){
+                super.update(b);
+                b.getVelocity().rotate(Mathf.sin(Timers.time() + b.id * 4422, 8f, 2f));
             }
         };
 
@@ -83,6 +95,12 @@ public class MissileBullets extends BulletList implements ContentList{
                 frontColor = Palette.bulletYellow;
                 hiteffect = BulletFx.blastExplosion;
                 despawneffect = BulletFx.blastExplosion;
+            }
+
+            @Override
+            public void update(Bullet b){
+                super.update(b);
+                b.getVelocity().rotate(Mathf.sin(Timers.time() + b.id * 4422, 8f, 2f));
             }
         };
     }
