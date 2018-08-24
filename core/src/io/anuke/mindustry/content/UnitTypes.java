@@ -20,7 +20,7 @@ public class UnitTypes implements ContentList{
             ammoCapacity = 0;
             range = 50f;
             healSpeed = 0.05f;
-            health = 45;
+            health = 60;
         }};
 
         dagger = new UnitType("dagger", Dagger.class, Dagger::new){{
@@ -29,7 +29,7 @@ public class UnitTypes implements ContentList{
             drag = 0.4f;
             range = 40f;
             weapon = Weapons.chainBlaster;
-            health = 90;
+            health = 180;
         }};
 
         titan = new UnitType("titan", Titan.class, Titan::new){{
@@ -37,8 +37,8 @@ public class UnitTypes implements ContentList{
             speed = 0.18f;
             drag = 0.4f;
             range = 10f;
-            weapon = Weapons.chainBlaster;
-            health = 280;
+            weapon = Weapons.flamethrower;
+            health = 500;
         }};
 
         interceptor = new UnitType("interceptor", Interceptor.class, Interceptor::new){{
@@ -47,10 +47,11 @@ public class UnitTypes implements ContentList{
             drag = 0.01f;
             weapon = Weapons.chainBlaster;
             isFlying = true;
+            health = 70;
         }};
 
         monsoon = new UnitType("monsoon", Monsoon.class, Monsoon::new){{
-            health = 230;
+            health = 250;
             speed = 0.2f;
             maxVelocity = 1.4f;
             drag = 0.01f;
@@ -67,8 +68,7 @@ public class UnitTypes implements ContentList{
             ammoCapacity = 0;
             range = 70f;
             itemCapacity = 70;
-            health = 120;
-            health = 45;
+            health = 220;
             buildPower = 0.9f;
             minePower = 1.1f;
             healSpeed = 0.09f;

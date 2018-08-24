@@ -139,7 +139,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
 
         if(!gwt){
-            graphics.checkPref("multithread", true, threads::setEnabled);
+            graphics.checkPref("multithread", mobile, threads::setEnabled);
 
             if(Settings.getBool("multithread")){
                 threads.setEnabled(true);

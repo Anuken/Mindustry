@@ -16,7 +16,6 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.type.Mech;
-import io.anuke.mindustry.type.Upgrade;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Effects;
@@ -45,6 +44,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.85f;
                 weapon = Weapons.blaster;
                 maxSpeed = 4f;
+                altChargeAlpha = 0.03f;
             }
 
             @Override
@@ -250,6 +250,6 @@ public class Mechs implements ContentList{
 
     @Override
     public Array<? extends Content> getAll(){
-        return Upgrade.all();
+        return Mech.all();
     }
 }

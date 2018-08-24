@@ -223,7 +223,7 @@ public class TypeIO{
 
     @ReadClass(Weapon.class)
     public static Weapon readWeapon(ByteBuffer buffer){
-        return Upgrade.getByID(buffer.get());
+        return Weapon.getByID(buffer.get());
     }
 
     @WriteClass(Mech.class)
@@ -233,7 +233,7 @@ public class TypeIO{
 
     @ReadClass(Mech.class)
     public static Mech readMech(ByteBuffer buffer){
-        return Upgrade.getByID(buffer.get());
+        return Mech.getByID(buffer.get());
     }
 
     @WriteClass(Liquid.class)
