@@ -37,14 +37,23 @@ public class Mechs implements ContentList{
     @Override
     public void load(){
 
-        alpha = new Mech("alpha-mech", false){{
-            drillPower = 1;
-            mineSpeed = 1.5f;
-            speed = 0.5f;
-            boostSpeed = 0.85f;
-            weapon = Weapons.blaster;
-            maxSpeed = 4f;
-        }};
+        alpha = new Mech("alpha-mech", false){
+            {
+                drillPower = 1;
+                mineSpeed = 1.5f;
+                speed = 0.5f;
+                boostSpeed = 0.85f;
+                weapon = Weapons.blaster;
+                maxSpeed = 4f;
+            }
+
+            @Override
+            public void updateAlt(Player player){
+                if(player.altHeat >= 0.91f){
+
+                }
+            }
+        };
 
         delta = new Mech("delta-mech", false){
             {

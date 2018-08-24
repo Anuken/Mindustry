@@ -10,6 +10,8 @@ import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 
+import static io.anuke.mindustry.Vars.mobile;
+
 //TODO merge unit type with mech
 public class Mech extends Upgrade implements UnlockableContent{
     public boolean flying;
@@ -54,6 +56,11 @@ public class Mech extends Upgrade implements UnlockableContent{
     }
 
     public float getRotationAlpha(Player player){return 1f;}
+
+    @Override
+    public boolean isHidden() {
+        return !flying && mobile;
+    }
 
     @Override
     public void displayInfo(Table table){

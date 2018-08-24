@@ -476,6 +476,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 updateShooting(); //server simulates player shooting
             }
             return;
+        }else{
+            //unlock mech when used
+            control.database().unlockContent(mech);
         }
 
         if(mobile){
