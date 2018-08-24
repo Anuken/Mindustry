@@ -480,6 +480,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             control.database().unlockContent(mech);
         }
 
+        mech.updateAlt(this);
+
         if(mobile){
             updateFlying();
         }else{
@@ -498,8 +500,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     protected void updateMech(){
         Tile tile = world.tileWorld(x, y);
-
-        mech.updateAlt(this);
 
         if(boostHeat > liftoffBoost + 0.1f){
             achievedFlight = true;

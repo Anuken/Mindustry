@@ -49,6 +49,7 @@ public class Mechs implements ContentList{
                 maxSpeed = 4f;
                 altChargeAlpha = 0.04f;
                 trailColorTo = Color.valueOf("ffd37f");
+                armor = 20f;
             }
 
             @Override
@@ -149,6 +150,9 @@ public class Mechs implements ContentList{
 
             @Override
             public void updateAlt(Player player){
+                //idle regen
+                player.healBy(0.01f * Timers.delta());
+
                 if(player.altHeat >= 0.91f){
                     Effects.effect(UnitFx.healWave, player);
                     rect.setSize(healRange*2f).setCenter(player.x, player.y);
