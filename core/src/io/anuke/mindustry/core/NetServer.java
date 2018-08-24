@@ -190,15 +190,7 @@ public class NetServer extends Module{
 
             trace.playerid = player.id;
 
-            //TODO try DeflaterOutputStream
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            DeflaterOutputStream def = new DeflaterOutputStream(stream);
-            NetworkIO.writeWorld(player, def);
-            WorldStream data = new WorldStream();
-            data.stream = new ByteArrayInputStream(stream.toByteArray());
-            Net.sendStream(id, data);
-
-            Log.info("Packed {0} uncompressed bytes of WORLD data.", stream.size());
+            sendWorldData(player, id);
 
             Platform.instance.updateRPC();
         });
@@ -315,6 +307,17 @@ public class NetServer extends Module{
                 chunkid++;
             }
         }
+    }
+
+    public void sendWorldData(Player player, int clientID){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        DeflaterOutputStream def = new DeflaterOutputStream(stream);
+        NetworkIO.writeWorld(player, def);
+        WorldStream data = new WorldStream();
+        data.stream = new ByteArrayInputStream(stream.toByteArray());
+        Net.sendStream(clientID, data);
+
+        Log.info("Packed {0} compressed bytes of world data.", stream.size());
     }
 
     public static void onDisconnect(Player player){
@@ -483,7 +486,6 @@ public class NetServer extends Module{
                 int length = syncStream.position() - position; //length must always be less than 127 bytes
                 if(length > 127)
                     throw new RuntimeException("Write size for entity of type " + group.getType() + " must not exceed 127!");
-                dataStream.writeByte(length);
             }
         }
     }

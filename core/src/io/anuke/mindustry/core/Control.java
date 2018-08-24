@@ -352,7 +352,7 @@ public class Control extends Module{
             throw new RuntimeException(error);
         }
 
-        if(Inputs.keyTap("console")){
+        if(debug && Inputs.keyTap("console")){
             console = !console;
         }
 

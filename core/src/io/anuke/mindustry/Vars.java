@@ -28,12 +28,10 @@ import io.anuke.ucore.util.Translator;
 import java.util.Locale;
 
 public class Vars{
-    //respawn time in frames
-    public static final float respawnduration = 60 * 4;
     //time between waves in frames (on normal mode)
     public static final float wavespace = 60 * 60 * 1.5f;
     //set ridiculously high for now
-    public static final float coreBuildRange = 800999f;
+    public static final float coreBuildRange = 999999f;
     //team of the player by default
     public static final Team defaultTeam = Team.blue;
     //team of the enemy in waves

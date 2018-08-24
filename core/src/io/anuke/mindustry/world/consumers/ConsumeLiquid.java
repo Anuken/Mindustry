@@ -43,7 +43,7 @@ public class ConsumeLiquid extends Consume{
 
     @Override
     public boolean valid(Block block, TileEntity entity){
-        return entity.liquids.get(liquid) >= use(block);
+        return entity != null && entity.liquids != null && entity.liquids.get(liquid) >= use(block);
     }
 
     @Override

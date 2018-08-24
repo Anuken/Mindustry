@@ -119,7 +119,7 @@ public class DesktopPlatform extends Platform{
     @Override
     public boolean isDebug(){
         //honestly I'm just putting this ridiculous """anti-debug""" mess here to see if anyone bothers solving it without editing source
-        return args.length > 0 && args[0].equals(("-debug_" + getUUID().hashCode() + "_"
+        return args.length > 0 && args[0].equals(("-debug_" + "12312333_"
                 + " " + System.getProperty("os.arch") + "nice" + (int)(Math.sin(System.getProperty("user.dir").hashCode()) * 100) + Thread.currentThread().getStackTrace()[1].toString()).hashCode() + "") && new File("../../desktop/build/").exists();
     }
 
@@ -133,8 +133,7 @@ public class DesktopPlatform extends Platform{
         try{
             Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
             NetworkInterface out;
-            for(out = e.nextElement(); out.getHardwareAddress() == null && e.hasMoreElements() && validAddress(out.getHardwareAddress()); out = e.nextElement())
-                ;
+            for(out = e.nextElement(); out.getHardwareAddress() == null && e.hasMoreElements() && validAddress(out.getHardwareAddress()); out = e.nextElement()) ;
 
             byte[] bytes = out.getHardwareAddress();
             byte[] result = new byte[8];
@@ -151,6 +150,7 @@ public class DesktopPlatform extends Platform{
     }
 
     private boolean validAddress(byte[] bytes){
+        if(bytes == null) return false;
         byte[] result = new byte[8];
         System.arraycopy(bytes, 0, result, 0, bytes.length);
         return !new String(Base64Coder.encode(result)).equals("AAAAAAAAAOA=");
