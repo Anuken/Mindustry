@@ -77,6 +77,7 @@ public class MassDriver extends Block{
         MassDriverEntity other = target.entity();
 
         entity.reload = 1f;
+        entity.power.amount = 0f;
 
         DriverBulletData data = Pooling.obtain(DriverBulletData.class);
         data.from = entity;

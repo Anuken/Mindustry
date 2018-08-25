@@ -250,6 +250,7 @@ public class Mechs implements ContentList{
             speed = 0.4f;
             maxSpeed = 3f;
             drag = 0.1f;
+            armor = 10f;
             weaponOffsetX = -1;
             weaponOffsetY = -1;
             trailColor = Palette.lightTrail;
@@ -264,6 +265,7 @@ public class Mechs implements ContentList{
                 speed = 0.11f;
                 maxSpeed = 3.4f;
                 drag = 0.01f;
+                armor = 5f;
                 weapon = Weapons.missiles;
                 trailColor = Color.valueOf("d3ddff");
             }
@@ -310,12 +312,18 @@ public class Mechs implements ContentList{
             }
         };
 
-        trident = new Mech("trident-ship", true){{
-            drillPower = 1;
-            speed = 0.4f;
-            maxSpeed = 3f;
-            drag = 0.1f;
-        }};
+        trident = new Mech("trident-ship", true){
+            {
+                drillPower = 4;
+                speed = 0.12f;
+                maxSpeed = 3.4f;
+                drag = 0.035f;
+                turnCursor = false;
+                armor = 30f;
+                trailColor = Color.valueOf("84f491");
+                weapon = Weapons.bomberTrident;
+            }
+        };
 
         halberd = new Mech("halberd-ship", true){{
             drillPower = 2;

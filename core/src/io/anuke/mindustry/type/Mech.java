@@ -41,6 +41,7 @@ public class Mech implements UnlockableContent{
     public Color trailColor = Palette.boostFrom;
     public Color trailColorTo = Palette.boostTo;
     public int itemCapacity = 30;
+    public  boolean turnCursor = true;
 
     public float weaponOffsetX, weaponOffsetY;
     public Weapon weapon = Weapons.blaster;

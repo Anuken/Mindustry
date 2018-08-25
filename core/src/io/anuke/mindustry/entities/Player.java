@@ -585,7 +585,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         if(!ui.chatfrag.chatOpen()){
             float baseLerp = mech.getRotationAlpha(this);
-            if(!isShooting()){
+            if(!isShooting() || !mech.turnCursor){
                 if(!movement.isZero()){
                     rotation = Mathf.slerpDelta(rotation, mech.flying ? velocity.angle() : movement.angle(), 0.13f * baseLerp);
                 }
@@ -661,7 +661,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                     target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
                 }else if(target.isValid()){
                     //rotate toward and shoot the target
-                    rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
+                    if(mech.turnCursor){
+                        rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
+                    }
 
                     Vector2 intercept =
                             Predict.intercept(x, y, target.getX(), target.getY(), target.getVelocity().x - velocity.x, target.getVelocity().y - velocity.y, getWeapon().getAmmo().bullet.speed);
