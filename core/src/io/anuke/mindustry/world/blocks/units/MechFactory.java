@@ -17,6 +17,7 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
@@ -49,6 +50,12 @@ public class MechFactory extends Block{
     public void init(){
         consumes.power(powerCapacity * 0.8f);
         super.init();
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        stats.remove(BlockStat.powerUse);
     }
 
     @Override

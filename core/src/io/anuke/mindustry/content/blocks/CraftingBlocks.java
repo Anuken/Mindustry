@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.production.*;
 
 public class CraftingBlocks extends BlockList implements ContentList{
-    public static Block smelter, arcsmelter, siliconsmelter, plastaniumCompressor, phaseWeaver, alloysmelter, alloyfuser,
+    public static Block smelter, arcsmelter, siliconsmelter, plastaniumCompressor, phaseWeaver, alloySmelter, alloyfuser,
             pyratiteMixer, blastMixer,
             cryofluidmixer, melter, separator, centrifuge, biomatterCompressor, pulverizer, solidifier, incinerator;
 
@@ -82,7 +82,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             consumes.power(0.5f);
         }};
 
-        alloysmelter = new PowerSmelter("alloy-smelter"){{
+        alloySmelter = new PowerSmelter("alloy-smelter"){{
             health = 90;
             craftEffect = BlockFx.smeltsmoke;
             result = Items.surgealloy;
@@ -92,8 +92,8 @@ public class CraftingBlocks extends BlockList implements ContentList{
             useFlux = true;
             fluxNeeded = 4;
 
-            consumes.power(0.3f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.plastanium, 2)});
+            consumes.power(0.4f);
+            consumes.items(new ItemStack[]{new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 2)});
         }};
 
         alloyfuser = new PowerSmelter("alloy-fuser"){{
