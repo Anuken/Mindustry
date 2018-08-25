@@ -312,16 +312,23 @@ public class Mechs implements ContentList{
             }
         };
 
-        trident = new Mech("trident-ship", true){{
-            drillPower = 2;
-            speed = 0.12f;
-            maxSpeed = 3.4f;
-            drag = 0.035f;
-            turnCursor = false;
-            armor = 20f;
-            trailColor = Color.valueOf("84f491");
-            weapon = Weapons.bomberTrident;
-        }};
+        trident = new Mech("trident-ship", true){
+            {
+                drillPower = 2;
+                speed = 0.12f;
+                maxSpeed = 3.4f;
+                drag = 0.035f;
+                turnCursor = false;
+                armor = 20f;
+                trailColor = Color.valueOf("84f491");
+                weapon = Weapons.bomberTrident;
+            }
+
+            @Override
+            public boolean canShoot(Player player){
+                return player.getVelocity().len() > 1.2f;
+            }
+        };
 
         halberd = new Mech("halberd-ship", true){
             {

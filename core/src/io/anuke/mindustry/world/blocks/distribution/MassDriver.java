@@ -193,7 +193,7 @@ public class MassDriver extends Block{
 
         Draw.color(Palette.accent);
         Lines.stroke(1f);
-        Lines.circle(tile.drawx(), tile.drawy(), (tile.block().size/2f+1) * tilesize + sin);
+        Lines.poly(tile.drawx(), tile.drawy(), 20, (tile.block().size/2f+1) * tilesize + sin);
 
         MassDriverEntity entity = tile.entity();
 
@@ -201,7 +201,7 @@ public class MassDriver extends Block{
             Tile target = world.tile(entity.link);
 
             Draw.color(Palette.place);
-            Lines.circle(target.drawx(), target.drawy(), (target.block().size/2f+1) * tilesize + sin);
+            Lines.poly(target.drawx(), target.drawy(), 20, (target.block().size/2f+1) * tilesize + sin);
             Draw.reset();
         }
 

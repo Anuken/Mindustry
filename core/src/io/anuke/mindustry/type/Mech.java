@@ -83,6 +83,10 @@ public class Mech implements UnlockableContent{
 
     public float getRotationAlpha(Player player){return 1f;}
 
+    public boolean canShoot(Player player){
+        return true;
+    }
+
     @Override
     public boolean isHidden() {
         return !flying && mobile;

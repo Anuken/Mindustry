@@ -41,8 +41,19 @@ public class MechFactory extends Block{
     public MechFactory(String name){
         super(name);
         update = true;
-        consumesTap = true;
         solidifes = true;
+        hasPower = true;
+    }
+
+    @Override
+    public void init(){
+        consumes.power(powerCapacity * 0.8f);
+        super.init();
+    }
+
+    @Override
+    public boolean shouldConsume(Tile tile){
+        return false;
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
@@ -50,6 +61,7 @@ public class MechFactory extends Block{
         if(player == null || !checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.entity();
+        entity.power.amount = 0f;
         player.beginRespawning(entity);
     }
 
@@ -80,7 +92,7 @@ public class MechFactory extends Block{
     protected static boolean checkValidTap(Tile tile, Player player){
         MechFactoryEntity entity = tile.entity();
         return Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
-                Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.player == null;
+                Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.cons.valid() && entity.player == null;
     }
 
     @Override
@@ -173,7 +185,7 @@ public class MechFactory extends Block{
                 Call.onMechFactoryDone(tile);
             }
         }else{
-            if(Units.anyEntities(tile, 4f, unit -> unit.getTeam() == entity.getTeam() && unit instanceof Player)){
+            if(entity.cons.valid() && Units.anyEntities(tile, 4f, unit -> unit.getTeam() == entity.getTeam() && unit instanceof Player)){
                 entity.open = true;
             }
 

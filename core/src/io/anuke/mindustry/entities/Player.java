@@ -597,7 +597,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     protected void updateShooting(){
-        if(isShooting()){
+        if(isShooting() && mech.canShoot(this)){
             mech.weapon.update(this, pointerX, pointerY);
         }
     }

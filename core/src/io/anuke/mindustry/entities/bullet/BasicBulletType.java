@@ -25,9 +25,7 @@ public class BasicBulletType extends BulletType{
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
     public BulletType fragBullet = null;
 
-    /**
-     * Use a negative value to disable splash damage.
-     */
+    /**Use a negative value to disable splash damage.*/
     public float splashDamageRadius = -1f;
     public float splashDamage = 6f;
 
