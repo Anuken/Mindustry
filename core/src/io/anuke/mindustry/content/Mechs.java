@@ -312,25 +312,29 @@ public class Mechs implements ContentList{
             }
         };
 
-        trident = new Mech("trident-ship", true){
+        trident = new Mech("trident-ship", true){{
+            drillPower = 2;
+            speed = 0.12f;
+            maxSpeed = 3.4f;
+            drag = 0.035f;
+            turnCursor = false;
+            armor = 20f;
+            trailColor = Color.valueOf("84f491");
+            weapon = Weapons.bomberTrident;
+        }};
+
+        halberd = new Mech("halberd-ship", true){
             {
+                weapon = Weapons.halberdBlaster;
                 drillPower = 4;
-                speed = 0.12f;
-                maxSpeed = 3.4f;
-                drag = 0.035f;
-                turnCursor = false;
+                mineSpeed = 1.3f;
+                speed = 0.3f;
+                maxSpeed = 3f;
+                drag = 0.06f;
                 armor = 30f;
-                trailColor = Color.valueOf("84f491");
-                weapon = Weapons.bomberTrident;
+                trailColor = Color.valueOf("feb380");
             }
         };
-
-        halberd = new Mech("halberd-ship", true){{
-            drillPower = 2;
-            speed = 0.4f;
-            maxSpeed = 3f;
-            drag = 0.1f;
-        }};
 
         starterDesktop = alpha;
         starterMobile = dart;

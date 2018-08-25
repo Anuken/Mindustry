@@ -12,7 +12,7 @@ import io.anuke.mindustry.type.ContentList;
 public class AmmoTypes implements ContentList{
     public static AmmoType bulletCopper, bulletDense, bulletThorium, bulletSilicon, bulletPyratite,
             shotgunTungsten, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite, weaponMissile, weaponMissileSwarm, bulletMech,
-            healBlaster,
+            healBlaster, bulletHalberd,
             flakLead, flakExplosive, flakPlastic, flakSurge, missileExplosive, missileIncindiary, missileSurge,
     artilleryDense, artilleryPlastic, artilleryHoming, artilleryIncindiary, artilleryExplosive,
             basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid;
@@ -27,6 +27,13 @@ public class AmmoTypes implements ContentList{
             smokeEffect = ShootFx.shootSmallSmoke;
             reloadMultiplier = 1f;
             inaccuracy = 5f;
+        }};
+
+
+        bulletHalberd = new AmmoType(Items.pyratite, StandardBullets.halberd, 3){{
+            shootEffect = ShootFx.shootSmall;
+            smokeEffect = ShootFx.shootSmallSmoke;
+            inaccuracy = 3f;
         }};
 
         healBlaster = new AmmoType(TurretBullets.healBullet){{

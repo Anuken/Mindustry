@@ -41,7 +41,7 @@ public abstract class BulletType extends BaseBulletType<Bullet> implements Conte
         this.damage = damage;
         lifetime = 40f;
         hiteffect = BulletFx.hitBulletSmall;
-        despawneffect = BulletFx.despawn;
+        despawneffect = BulletFx.hitBulletSmall;
 
         types.add(this);
     }
