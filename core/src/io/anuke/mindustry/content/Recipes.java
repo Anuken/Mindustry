@@ -23,7 +23,6 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.thoriumWall, new ItemStack(Items.thorium, 12));
         new Recipe(defense, DefenseBlocks.thoriumWallLarge, new ItemStack(Items.thorium, 12 * 4));
 
-        //TODO will be added once sprites are ready
         new Recipe(defense, DefenseBlocks.phaseWall, new ItemStack(Items.phasematter, 12));
         new Recipe(defense, DefenseBlocks.phaseWallLarge, new ItemStack(Items.phasematter, 12 * 4));
 
@@ -125,14 +124,14 @@ public class Recipes implements ContentList{
         //UNITS
 
         //bodies
-        new Recipe(units, UpgradeBlocks.dartFactory, new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240)).setDesktop(); //dart is desktop only, because it's the starter mobile ship
-        new Recipe(units, UpgradeBlocks.javelinFactory, new ItemStack(Items.lead, 200), new ItemStack(Items.silicon, 250), new ItemStack(Items.titanium, 300), new ItemStack(Items.plastanium, 200));
-        new Recipe(units, UpgradeBlocks.tridentFactory, new ItemStack(Items.lead, 200), new ItemStack(Items.silicon, 250), new ItemStack(Items.titanium, 300), new ItemStack(Items.plastanium, 200));
-        new Recipe(units, UpgradeBlocks.glaiveFactory, new ItemStack(Items.lead, 200), new ItemStack(Items.silicon, 250), new ItemStack(Items.titanium, 300), new ItemStack(Items.plastanium, 200));
+        new Recipe(units, UpgradeBlocks.dartFactory, new ItemStack(Items.lead, 150), new ItemStack(Items.copper, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240)).setDesktop(); //dart is desktop only, because it's the starter mobile ship
+        new Recipe(units, UpgradeBlocks.tridentFactory, new ItemStack(Items.lead, 250), new ItemStack(Items.copper, 250), new ItemStack(Items.silicon, 250), new ItemStack(Items.titanium, 300), new ItemStack(Items.plastanium, 200));
+        new Recipe(units, UpgradeBlocks.javelinFactory, new ItemStack(Items.lead, 350), new ItemStack(Items.copper, 400), new ItemStack(Items.silicon, 450), new ItemStack(Items.titanium, 500), new ItemStack(Items.plastanium, 400), new ItemStack(Items.phasematter, 200));
+        new Recipe(units, UpgradeBlocks.glaiveFactory, new ItemStack(Items.lead, 450), new ItemStack(Items.copper, 500), new ItemStack(Items.silicon, 650), new ItemStack(Items.titanium, 700), new ItemStack(Items.plastanium, 600), new ItemStack(Items.surgealloy, 200));
 
-        new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.densealloy, 160), new ItemStack(Items.silicon, 220), new ItemStack(Items.titanium, 250)).setDesktop();
-        new Recipe(units, UpgradeBlocks.omegaFactory, new ItemStack(Items.densealloy, 160), new ItemStack(Items.silicon, 220), new ItemStack(Items.titanium, 250)).setDesktop();
-        new Recipe(units, UpgradeBlocks.tauFactory, new ItemStack(Items.densealloy, 160), new ItemStack(Items.silicon, 220), new ItemStack(Items.titanium, 250)).setDesktop();
+        new Recipe(units, UpgradeBlocks.tauFactory, new ItemStack(Items.lead, 250), new ItemStack(Items.densealloy, 250), new ItemStack(Items.copper, 250), new ItemStack(Items.silicon, 250));
+        new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.lead, 350), new ItemStack(Items.densealloy, 350), new ItemStack(Items.copper, 400), new ItemStack(Items.silicon, 450), new ItemStack(Items.thorium, 300));
+        new Recipe(units, UpgradeBlocks.omegaFactory, new ItemStack(Items.lead, 450), new ItemStack(Items.densealloy, 550), new ItemStack(Items.copper, 500), new ItemStack(Items.silicon, 650), new ItemStack(Items.thorium, 600), new ItemStack(Items.surgealloy, 240));
 
         //new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.copper, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
 
