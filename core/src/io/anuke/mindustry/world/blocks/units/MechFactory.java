@@ -132,7 +132,7 @@ public class MechFactory extends Block{
     public void draw(Tile tile){
         MechFactoryEntity entity = tile.entity();
 
-        Draw.rect(entity.open ? openRegion : Draw.region(name), tile.drawx(), tile.drawy());
+        Draw.rect(Draw.region(name), tile.drawx(), tile.drawy(), entity.open ? 180f : 0f);
 
         if(entity.player != null){
             TextureRegion region = mech.iconRegion;

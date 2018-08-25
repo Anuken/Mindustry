@@ -8,7 +8,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
 
 public class StandardBullets extends BulletList implements ContentList{
-    public static BulletType copper, dense, thorium, homing, tracer, mechSmall, halberd;
+    public static BulletType copper, dense, thorium, homing, tracer, mechSmall, glaive;
 
     @Override
     public void load(){
@@ -56,7 +56,7 @@ public class StandardBullets extends BulletList implements ContentList{
             }
         };
 
-        halberd = new BasicBulletType(3.2f, 6, "bullet"){
+        glaive = new BasicBulletType(4f, 6, "bullet"){
             {
                 bulletWidth = 10f;
                 bulletHeight = 12f;

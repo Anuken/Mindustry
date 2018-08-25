@@ -118,7 +118,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            boolean preventDuplicates = headless;
+            boolean preventDuplicates = headless && !debug;
 
             if(preventDuplicates){
                 for(Player player : playerGroup.all()){

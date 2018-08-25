@@ -30,7 +30,7 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class Mechs implements ContentList{
-    public static Mech alpha, delta, tau, omega, dart, javelin, trident, halberd;
+    public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
 
     /**These are not new mechs, just re-assignments for convenience.*/
     public static Mech starterDesktop, starterMobile;
@@ -320,6 +320,7 @@ public class Mechs implements ContentList{
                 drag = 0.035f;
                 turnCursor = false;
                 armor = 20f;
+                itemCapacity = 30;
                 trailColor = Color.valueOf("84f491");
                 weapon = Weapons.bomberTrident;
             }
@@ -330,15 +331,16 @@ public class Mechs implements ContentList{
             }
         };
 
-        halberd = new Mech("halberd-ship", true){
+        glaive = new Mech("glaive-ship", true){
             {
-                weapon = Weapons.halberdBlaster;
+                weapon = Weapons.glaiveBlaster;
                 drillPower = 4;
                 mineSpeed = 1.3f;
-                speed = 0.3f;
+                speed = 0.32f;
                 maxSpeed = 3f;
                 drag = 0.06f;
                 armor = 30f;
+                itemCapacity = 60;
                 trailColor = Color.valueOf("feb380");
             }
         };
