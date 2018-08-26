@@ -47,7 +47,7 @@ import static io.anuke.mindustry.Vars.*;
 public class NetServer extends Module{
     public final static int maxSnapshotSize = 2047;
 
-    public final static boolean debugSnapshots = true;
+    public final static boolean debugSnapshots = false;
     public final static float maxSnapshotDelay = 200;
     public final static float snapshotDropchance = 0.01f;
 
