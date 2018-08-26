@@ -72,7 +72,6 @@ public class CraftingBlocks extends BlockList implements ContentList{
         }};
 
         phaseWeaver = new PhaseWeaver("phase-weaver"){{
-            health = 90;
             craftEffect = BlockFx.smeltsmoke;
             result = Items.phasematter;
             craftTime = 120f;
@@ -83,7 +82,6 @@ public class CraftingBlocks extends BlockList implements ContentList{
         }};
 
         alloySmelter = new PowerSmelter("alloy-smelter"){{
-            health = 90;
             craftEffect = BlockFx.smeltsmoke;
             result = Items.surgealloy;
             craftTime = 50f;
@@ -97,7 +95,6 @@ public class CraftingBlocks extends BlockList implements ContentList{
         }};
 
         alloyfuser = new PowerSmelter("alloy-fuser"){{
-            health = 90;
             craftEffect = BlockFx.smeltsmoke;
             result = Items.surgealloy;
             craftTime = 30f;
@@ -111,7 +108,6 @@ public class CraftingBlocks extends BlockList implements ContentList{
         }};
 
         cryofluidmixer = new LiquidMixer("cryofluidmixer"){{
-            health = 200;
             outputLiquid = Liquids.cryofluid;
             liquidPerItem = 50f;
             itemCapacity = 50;
