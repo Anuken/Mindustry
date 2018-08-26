@@ -83,7 +83,6 @@ public class Control extends Module{
 
         Settings.defaultList(
             "ip", "localhost",
-            "port", port + "",
             "color-0", Color.rgba8888(playerColors[8]),
             "color-1", Color.rgba8888(playerColors[11]),
             "color-2", Color.rgba8888(playerColors[13]),

@@ -21,6 +21,7 @@ import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.port;
 
 public class JoinDialog extends FloatingDialog{
     Array<Server> servers = new Array<>();
@@ -58,13 +59,14 @@ public class JoinDialog extends FloatingDialog{
         add.buttons().addButton("$text.cancel", add::hide);
         add.buttons().addButton("$text.ok", () -> {
             if(renaming == null){
-                Server server = new Server(Settings.getString("ip"), Strings.parseInt(Settings.getString("port")));
+                Server server = new Server();
+                server.setIP(Settings.getString("ip"));
                 servers.add(server);
                 saveServers();
                 setupRemote();
                 refreshRemote();
             }else{
-                renaming.ip = Settings.getString("ip");
+                renaming.setIP(Settings.getString("ip"));
                 saveServers();
                 setupRemote();
                 refreshRemote();
@@ -75,7 +77,7 @@ public class JoinDialog extends FloatingDialog{
         add.shown(() -> {
             add.getTitleLabel().setText(renaming != null ? "$text.server.edit" : "$text.server.add");
             if(renaming != null){
-                field.setText(renaming.ip);
+                field.setText(renaming.displayIP());
             }
         });
 
@@ -94,8 +96,10 @@ public class JoinDialog extends FloatingDialog{
             //why are java lambdas this bad
             TextButton[] buttons = {null};
 
-            TextButton button = buttons[0] = remote.addButton("[accent]" + server.ip, "clear", () -> {
-                if(!buttons[0].childrenPressed()) connect(server.ip, Vars.port);
+            TextButton button = buttons[0] = remote.addButton("[accent]" + server.displayIP(), "clear", () -> {
+                if(!buttons[0].childrenPressed()){
+                    connect(server.ip, server.port);
+                }
             }).width(targetWidth()).height(150f).pad(4f).get();
 
             button.getLabel().setWrap(true);
@@ -228,7 +232,7 @@ public class JoinDialog extends FloatingDialog{
             button.update(() -> button.getStyle().imageUpColor = player.color);
         }).width(w).height(70f).pad(4);
         content().row();
-        content().add(pane).width(w + 34).pad(0);
+        content().add(pane).width(w + 38).pad(0).padRight(22);
         content().row();
         content().addCenteredImageTextButton("$text.server.add", "icon-add", "clear", 14 * 3, () -> {
             renaming = null;
@@ -262,9 +266,8 @@ public class JoinDialog extends FloatingDialog{
             local.addImageButton("icon-loading", 16 * 2f, this::refreshLocal).pad(-10f).padLeft(0).padTop(-6).size(70f, 74f);
         }else{
             for(Host a : array){
-                TextButton button = local.addButton("[accent]" + a.name, "clear", () -> {
-                    connect(a.address, Vars.port);
-                }).width(w).height(80f).pad(4f).get();
+                TextButton button = local.addButton("[accent]" + a.name, "clear", () -> connect(a.address, port))
+                    .width(w).height(80f).pad(4f).get();
                 button.left();
                 button.row();
                 button.add("[lightgray]" + (a.players != 1 ? Bundles.format("text.players", a.players) :
@@ -338,12 +341,25 @@ public class JoinDialog extends FloatingDialog{
         transient Host host;
         transient Table content;
 
-        Server(String ip, int port){
-            this.ip = ip;
-            this.port = port;
+        void setIP(String ip){
+            //parse ip:port, if unsuccessful, use default values
+            if(ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length()-1){
+                try{
+                    int idx = ip.lastIndexOf(':');
+                    this.ip = ip.substring(0, idx);
+                    this.port = Integer.parseInt(ip.substring(idx + 1));
+                }catch(Exception e){
+                    this.ip = ip;
+                    this.port = Vars.port;
+                }
+
+            }
         }
 
-        Server(){
+        String displayIP(){
+            return ip + (port != Vars.port ? ":" + port : "");
         }
+
+        Server(){}
     }
 }

@@ -53,11 +53,13 @@ public class ServerControl extends Module{
             "bans", "",
             "admins", "",
             "sector_x", 0,
-            "sector_y", 1
+            "sector_y", 1,
+            "port", port
         );
 
         mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
 
+        Timers.setDeltaProvider(() -> Gdx.graphics.getDeltaTime() * 60f);
         Effects.setScreenShakeProvider((a, b) -> {});
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
         Sounds.setHeadless(true);
@@ -206,7 +208,7 @@ public class ServerControl extends Module{
                 logic.play();
 
             }else{
-                Log.info("&ly&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sector_x"), Settings.getInt("sector_y"));
+                info("&ly&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sector_x"), Settings.getInt("sector_y"));
                 playSectorMap(false);
             }
 
@@ -215,10 +217,25 @@ public class ServerControl extends Module{
             host();
         });
 
+        handler.register("port", "[port]", "Sets or displays the port for hosting the server.", arg -> {
+            if(arg.length == 0){
+                info("&lyPort: &lc{0}", Settings.getInt("port"));
+            }else{
+                int port = Strings.parseInt(arg[0]);
+                if(port < 0 || port > 65535){
+                    err("Port must be a number between 0 and 65535.");
+                    return;
+                }
+                info("&lyPort set to {0}.", port);
+                Settings.putInt("port", port);
+                Settings.save();
+            }
+        });
+
         handler.register("maps", "Display all available maps.", arg -> {
-            Log.info("Maps:");
+            info("Maps:");
             for(Map map : world.maps().all()){
-                Log.info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
+                info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
             }
         });
 
@@ -897,7 +914,8 @@ public class ServerControl extends Module{
 
     private void host(){
         try{
-            Net.host(port);
+            Net.host(Settings.getInt("port"));
+            info("&lcOpened a server on port {0}.", Settings.getInt("port"));
         }catch(IOException e){
             Log.err(e);
             state.set(State.menu);
@@ -926,13 +944,14 @@ public class ServerControl extends Module{
     @Override
     public void update(){
 
-        if(state.is(State.playing) && world.getSector() != null){
+        if(state.is(State.playing) && world.getSector() != null && !inExtraRound && !debug){
             //all assigned missions are complete
             if(world.getSector().completedMissions >= world.getSector().missions.size){
                 Log.info("Mission complete.");
                 world.sectors().completeSector(world.getSector().x, world.getSector().y);
                 world.sectors().save();
                 gameOvers = 0;
+                inExtraRound = true;
                 Settings.putInt("sector_x", world.getSector().x + world.getSector().size);
                 Settings.save();
 
