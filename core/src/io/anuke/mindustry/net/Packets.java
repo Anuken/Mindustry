@@ -251,7 +251,7 @@ public class Packets{
         public void read(ByteBuffer buffer){
             id = buffer.getInt();
             total = buffer.getInt();
-            type = (Class<? extends Streamable>) Registrator.getByID(buffer.get());
+            type = (Class<? extends Streamable>) Registrator.getByID(buffer.get()).type;
         }
     }
 
