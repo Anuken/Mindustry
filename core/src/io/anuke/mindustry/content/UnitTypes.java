@@ -30,7 +30,7 @@ public class UnitTypes implements ContentList{
                 speed = 0.5f;
                 maxVelocity = 1.6f;
                 range = 40f;
-                health = 20;
+                health = 30;
                 weapon = Weapons.droneBlaster;
                 trailColor = Color.valueOf("ffd37f");
             }

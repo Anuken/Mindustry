@@ -23,7 +23,7 @@ public class AlphaDrone extends FlyingUnit {
     public final UnitState attack = new UnitState() {
         @Override
         public void update() {
-            if(leader == null || leader.isDead()){
+            if(leader == null || leader.isDead() || !leader.isAdded()){
                 damage(99999f);
                 return;
             }
@@ -67,12 +67,19 @@ public class AlphaDrone extends FlyingUnit {
     }
 
     @Override
-    public void writeSave(DataOutput stream) throws IOException {
-        super.writeSave(stream);
+    public void write(DataOutput stream) throws IOException {
+        super.write(stream);
+        stream.writeInt(leader == null ? -1 : leader.id);
     }
 
     @Override
-    public void readSave(DataInput stream) throws IOException {
+    public void read(DataInput stream, long time) throws IOException {
+        super.read(stream, time);
+        leader = Vars.playerGroup.getByID(stream.readInt());
+    }
+
+    @Override
+    public void readSave(DataInput stream) throws IOException{
         super.readSave(stream);
 
         if(!Net.active()){

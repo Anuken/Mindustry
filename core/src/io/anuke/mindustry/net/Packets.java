@@ -155,7 +155,7 @@ public class Packets{
         //player snapshot data
         public float x, y, pointerX, pointerY, rotation, baseRotation, xv, yv;
         public Tile mining;
-        public boolean boosting, shooting;
+        public boolean boosting, shooting, alting;
         public Array<BuildRequest> requests = new Array<>();
 
         @Override
@@ -172,6 +172,7 @@ public class Packets{
             buffer.putFloat(player.pointerY);
             buffer.put(player.isBoosting ? (byte) 1 : 0);
             buffer.put(player.isShooting ? (byte) 1 : 0);
+            buffer.put(player.isAlt ? (byte) 1 : 0);
 
             buffer.put((byte) (Mathf.clamp(player.getVelocity().x, -Unit.maxAbsVelocity, Unit.maxAbsVelocity) * Unit.velocityPercision));
             buffer.put((byte) (Mathf.clamp(player.getVelocity().y, -Unit.maxAbsVelocity, Unit.maxAbsVelocity) * Unit.velocityPercision));
@@ -204,6 +205,7 @@ public class Packets{
             pointerY = buffer.getFloat();
             boosting = buffer.get() == 1;
             shooting = buffer.get() == 1;
+            alting = buffer.get() == 1;
             xv = buffer.get() / Unit.velocityPercision;
             yv = buffer.get() / Unit.velocityPercision;
             rotation = buffer.getShort() / 2f;

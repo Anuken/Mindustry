@@ -47,7 +47,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.85f;
                 weapon = Weapons.blaster;
                 maxSpeed = 4f;
-                altChargeAlpha = 0.04f;
+                altChargeAlpha = 0.02f;
                 trailColorTo = Color.valueOf("ffd37f");
                 armor = 20f;
             }
@@ -64,8 +64,8 @@ public class Mechs implements ContentList{
                         drone.leader = player;
                         drone.set(player.x, player.y);
                         drone.add();
-                        Effects.effect(UnitFx.unitLand, player);
                     }
+                    Effects.effect(UnitFx.unitLand, player);
                     player.altHeat = 0f;
                 }
             }

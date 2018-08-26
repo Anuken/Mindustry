@@ -179,6 +179,10 @@ public class CoreBlock extends StorageBlock{
         }
 
         if(entity.currentUnit != null){
+            if(!entity.currentUnit.isDead()){
+                entity.currentUnit = null;
+                return;
+            }
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += Timers.delta();
             entity.progress += 1f / (entity.currentUnit instanceof Player ? state.mode.respawnTime : droneRespawnDuration) * Timers.delta();

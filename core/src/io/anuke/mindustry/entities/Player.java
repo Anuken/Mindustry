@@ -460,6 +460,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         altHeat = Mathf.lerpDelta(altHeat, isAlt ? 1f : 0f, mech.altChargeAlpha);
         boostHeat = Mathf.lerpDelta(boostHeat, (tile != null && tile.solid()) || (isBoosting && ((!movement.isZero() && moved) || !isLocal)) ? 1f : 0f, 0.08f);
+        mech.updateAlt(this); //updated regardless
 
         if(!isLocal){
             interpolate();
@@ -479,8 +480,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             //unlock mech when used
             control.database().unlockContent(mech);
         }
-
-        mech.updateAlt(this);
 
         if(mobile){
             updateFlying();

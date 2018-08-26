@@ -81,7 +81,10 @@ public class Weapon implements Content{
         shootDirect(shooter, x, y, rotation, left);
     }
 
-    public static void shootDirect(ShooterTrait shooter, float x, float y, float rotation, boolean left){
+    public static void shootDirect(ShooterTrait shooter, float offsetX, float offsetY, float rotation, boolean left){
+        float x = shooter.getX() + offsetX;
+        float y = shooter.getY() + offsetY;
+
         Weapon weapon = shooter.getWeapon();
 
         Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> weapon.bullet(shooter, x, y, f + Mathf.range(weapon.inaccuracy)));
@@ -149,7 +152,7 @@ public class Weapon implements Content{
             float ang = tr.angle();
             tr.trns(ang - 90, width * Mathf.sign(left), length);
 
-            shoot(shooter, shooter.getX() + tr.x, shooter.getY() + tr.y, Angles.angle(shooter.getX() + tr.x, shooter.getY() + tr.y, cx, cy), left);
+            shoot(shooter, tr.x, tr.y, Angles.angle(shooter.getX() + tr.x, shooter.getY() + tr.y, cx, cy), left);
         }
     }
 

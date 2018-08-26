@@ -163,6 +163,7 @@ public class ServerControl extends Module{
 
         handler.register("stop", "Stop hosting the server.", arg -> {
             Net.closeServer();
+            Timers.clear();
             state.set(State.menu);
             netServer.reset();
             Log.info("Stopped server.");
@@ -889,6 +890,7 @@ public class ServerControl extends Module{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
+
             Array<Player> players = new Array<>();
             for(Player p : playerGroup.all()){
                 players.add(p);
@@ -906,7 +908,7 @@ public class ServerControl extends Module{
         };
 
         if(wait){
-            Timers.runTask(60f * roundExtraTime, r);
+            Timers.run(60f * roundExtraTime, r);
         }else{
             r.run();
         }

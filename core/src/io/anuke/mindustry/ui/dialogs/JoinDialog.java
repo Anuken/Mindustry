@@ -352,7 +352,9 @@ public class JoinDialog extends FloatingDialog{
                     this.ip = ip;
                     this.port = Vars.port;
                 }
-
+            }else{
+                this.ip = ip;
+                this.port = Vars.port;
             }
         }
 

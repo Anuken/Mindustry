@@ -19,7 +19,7 @@ public class Interpolator{
     public void read(float cx, float cy, float x, float y, long sent, float... target1ds){
         if(lastUpdated != 0) updateSpacing = TimeUtils.timeSinceMillis(lastUpdated);
 
-        lastUpdated = sent;
+        lastUpdated = TimeUtils.millis();
 
         targets = target1ds;
         last.set(cx, cy);
