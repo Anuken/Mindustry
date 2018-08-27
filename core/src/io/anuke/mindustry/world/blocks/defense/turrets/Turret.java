@@ -193,6 +193,7 @@ public abstract class Turret extends Block{
             }
 
             if(!Units.invalidateTarget(entity.target, tile.getTeam(), tile.drawx(), tile.drawy())){
+
                 AmmoType type = peekAmmo(tile);
                 float speed = type.bullet.speed;
                 if(speed < 0.1f) speed = 9999999f;
@@ -208,13 +209,19 @@ public abstract class Turret extends Block{
                     entity.rotation = 0;
                 }
 
-                entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * Timers.delta());
+                if(shouldTurn(tile)){
+                    entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * Timers.delta());
+                }
 
                 if(Angles.angleDist(entity.rotation, targetRot) < shootCone){
                     updateShooting(tile);
                 }
             }
         }
+    }
+
+    public boolean shouldTurn(Tile tile){
+        return true;
     }
 
     /**
@@ -314,7 +321,6 @@ public abstract class Turret extends Block{
     }
 
     public static class TurretEntity extends TileEntity{
-        public TileEntity blockTarget;
         public Array<AmmoEntry> ammo = new ThreadArray<>();
         public int totalAmmo;
         public float reload;
