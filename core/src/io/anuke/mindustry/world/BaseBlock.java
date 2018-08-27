@@ -48,7 +48,7 @@ public abstract class BaseBlock{
     }
 
     public int getMaximumAccepted(Tile tile, Item item){
-        return itemCapacity - tile.entity.items.total();
+        return itemCapacity - (tile.entity.items.total() - tile.entity.items.get(item));
     }
 
     /**

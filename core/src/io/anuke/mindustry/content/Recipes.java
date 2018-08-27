@@ -29,6 +29,9 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.door, new ItemStack(Items.densealloy, 12), new ItemStack(Items.silicon, 8));
         new Recipe(defense, DefenseBlocks.doorLarge, new ItemStack(Items.densealloy, 12 * 4), new ItemStack(Items.silicon, 8 * 4));
 
+        //cores
+        new Recipe(defense, DefenseBlocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
+
         //TURRETS
         new Recipe(weapon, TurretBlocks.duo, new ItemStack(Items.copper, 40));
         new Recipe(weapon, TurretBlocks.scorch, new ItemStack(Items.copper, 50), new ItemStack(Items.densealloy, 20));

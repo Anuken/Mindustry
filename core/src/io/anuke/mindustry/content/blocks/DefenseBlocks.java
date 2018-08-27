@@ -1,15 +1,17 @@
 package io.anuke.mindustry.content.blocks;
 
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Wall;
 import io.anuke.mindustry.world.blocks.defense.DeflectorWall;
 import io.anuke.mindustry.world.blocks.defense.Door;
+import io.anuke.mindustry.world.blocks.defense.MendProjector;
 
 public class DefenseBlocks extends BlockList implements ContentList{
     public static Block copperWall, copperWallLarge, compositeWall, compositeWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge, deflectorwall, deflectorwalllarge,
-            phaseWall, phaseWallLarge;
+            phaseWall, phaseWallLarge, mendProjector;
 
     @Override
     public void load(){
@@ -69,6 +71,13 @@ public class DefenseBlocks extends BlockList implements ContentList{
             closefx = BlockFx.doorcloselarge;
             health = 100 * 4 * wallHealthMultiplier;
             size = 2;
+        }};
+
+        mendProjector = new MendProjector("mend-projector"){{
+            consumes.power(0.25f);
+            health = 100 * 4 * wallHealthMultiplier;
+            size = 2;
+            consumes.item(Items.phasematter).optional(true);
         }};
     }
 }

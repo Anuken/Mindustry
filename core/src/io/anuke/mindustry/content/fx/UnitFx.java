@@ -11,7 +11,7 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public class UnitFx extends FxList implements ContentList{
-    public static Effect vtolHover, unitDrop, unitPickup, unitLand, pickup, healWave, heal;
+    public static Effect vtolHover, unitDrop, unitPickup, unitLand, pickup, healWave, healWaveMend, heal;
 
     @Override
     public void load(){
@@ -58,6 +58,13 @@ public class UnitFx extends FxList implements ContentList{
             Draw.color(Palette.heal);
             Lines.stroke(e.fout() * 2f);
             Lines.poly(e.x, e.y, 30, 4f + e.finpow() * 60f);
+            Draw.color();
+        });
+
+        healWaveMend = new Effect(40, e -> {
+            Draw.color(e.color);
+            Lines.stroke(e.fout() * 2f);
+            Lines.poly(e.x, e.y, 30, e.finpow() * e.rotation);
             Draw.color();
         });
 
