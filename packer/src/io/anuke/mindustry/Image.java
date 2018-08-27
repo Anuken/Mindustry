@@ -67,6 +67,16 @@ public class Image {
         draw(region, 0, 0, false, false);
     }
 
+    /**Draws a region at the center.*/
+    public void drawCenter(TextureRegion region){
+        draw(region, (width() - region.getRegionWidth())/2, (height() - region.getRegionHeight())/2, false, false);
+    }
+
+    /**Draws a region at the center.*/
+    public void drawCenter(TextureRegion region, boolean flipx, boolean flipy){
+        draw(region, (width() - region.getRegionWidth())/2, (height() - region.getRegionHeight())/2, flipx, flipy);
+    }
+
     /**Draws an image at the top left corner.*/
     public void draw(Image image){
         draw(image, 0, 0);

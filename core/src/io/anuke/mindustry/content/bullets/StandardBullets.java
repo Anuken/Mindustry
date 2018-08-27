@@ -56,7 +56,7 @@ public class StandardBullets extends BulletList implements ContentList{
             }
         };
 
-        glaive = new BasicBulletType(4f, 6, "bullet"){
+        glaive = new BasicBulletType(4f, 7.5f, "bullet"){
             {
                 bulletWidth = 10f;
                 bulletHeight = 12f;

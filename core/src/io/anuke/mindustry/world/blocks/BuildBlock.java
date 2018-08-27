@@ -260,7 +260,6 @@ public class BuildBlock extends Block{
                     //move max progress down if this fraction is less than 1
                     maxProgress = Math.min(maxProgress, maxProgress * fraction);
 
-                    //TODO uncomment?
                     accumulator[i] -= maxUse;
 
                     //remove stuff that is actually used

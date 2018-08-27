@@ -79,14 +79,16 @@ public class Generators {
                 Image image = context.get(mech.region);
 
                 if(!mech.flying){
-                    image.draw(mech.baseRegion);
-                    image.draw(mech.legRegion);
-                    image.draw(mech.legRegion, true, false);
-                    image.draw(mech.region);
+                    image.drawCenter(mech.baseRegion);
+                    image.drawCenter(mech.legRegion);
+                    image.drawCenter(mech.legRegion, true, false);
+                    image.drawCenter(mech.region);
                 }
 
-                image.draw(mech.weapon.equipRegion, -(int)mech.weaponOffsetX, (int)mech.weaponOffsetY, false, false);
-                image.draw(mech.weapon.equipRegion, (int)mech.weaponOffsetX, (int)mech.weaponOffsetY, true, false);
+                int off = (image.width() - mech.weapon.equipRegion.getRegionWidth())/2;
+
+                image.draw(mech.weapon.equipRegion, -(int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, false, false);
+                image.draw(mech.weapon.equipRegion, (int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, true, false);
 
 
                 image.save("mech-icon-" + mech.name);

@@ -155,12 +155,26 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        //TODO stat list goes here
-        //table.add(Bundles.format("text.mech.armor", mech.armor));
+        if(Bundles.has("mech." + mech.name + ".weapon")){
+            table.add(Bundles.format("text.mech.weapon", Bundles.get("mech." + mech.name + ".weapon")));
+            table.row();
+        }
+        if(Bundles.has("mech." + mech.name + ".ability")){
+            table.add(Bundles.format("text.mech.ability", Bundles.get("mech." + mech.name + ".ability")));
+            table.row();
+        }
+        table.add(Bundles.format("text.mech.armor", mech.armor));
         table.row();
-        //table.add(Bundles.format("text.unit.speed", Strings.toFixed(mech.speed, 1)));
+        table.add(Bundles.format("text.mech.itemcapacity", mech.itemCapacity));
         table.row();
-        table.row();
+
+        if(mech.drillPower > 0){
+            table.add(Bundles.format("text.mech.minespeed", (int) (mech.mineSpeed * 10)));
+            table.row();
+            table.add(Bundles.format("text.mech.minepower", mech.drillPower));
+            table.row();
+        }
+
     }
 
     public static void displayUnit(Table table, UnitType unit){
