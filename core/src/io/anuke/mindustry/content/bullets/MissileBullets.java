@@ -63,7 +63,7 @@ public class MissileBullets extends BulletList implements ContentList{
                 drag = -0.003f;
                 keepVelocity = false;
                 splashDamageRadius = 20f;
-                splashDamage = 3f;
+                splashDamage = 1f;
                 lifetime = 90f;
                 trailColor = Color.valueOf("b6c6fd");
                 hiteffect = BulletFx.blastExplosion;

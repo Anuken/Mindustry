@@ -702,6 +702,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         dead = true;
         trail.clear();
         health = maxHealth();
+        altHeat = boostHeat = drownTime = hitTime = 0f;
         mech = (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
         placeQueue.clear();
 
