@@ -188,7 +188,7 @@ public class OverlayRenderer{
 
                 Tile tile = world.tileWorld(v.x, v.y);
                 if(tile != null) tile = tile.target();
-                if(tile != null && tile.block().acceptStack(player.inventory.getItem().item, player.inventory.getItem().amount, tile, player) > 0){
+                if(tile != null && tile.getTeam() == player.getTeam() && tile.block().acceptStack(player.inventory.getItem().item, player.inventory.getItem().amount, tile, player) > 0){
                     Draw.color(Palette.place);
                     Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1 + Mathf.absin(Timers.time(), 5f, 1f));
                     Draw.color();
