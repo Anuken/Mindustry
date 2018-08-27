@@ -29,6 +29,7 @@ import java.nio.ByteBuffer;
 import static io.anuke.mindustry.Vars.*;
 
 /** Class for specifying read/write methods for code generation.*/
+@SuppressWarnings("unused")
 public class TypeIO{
 
     @WriteClass(Player.class)

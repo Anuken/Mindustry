@@ -12,7 +12,7 @@ import io.anuke.ucore.util.Mathf;
 
 public class BulletFx extends FxList implements ContentList{
     public static Effect hitBulletSmall, hitBulletBig, hitFlameSmall, hitLiquid, hitLaser, hitLancer, despawn, flakExplosion, blastExplosion, plasticExplosion,
-            artilleryTrail, incendTrail, missileTrail;
+            artilleryTrail, incendTrail, missileTrail, absorb;
 
     @Override
     public void load(){
@@ -188,6 +188,13 @@ public class BulletFx extends FxList implements ContentList{
         missileTrail = new Effect(50, e -> {
             Draw.color(e.color);
             Fill.circle(e.x, e.y, e.rotation * e.fout());
+            Draw.reset();
+        });
+
+        absorb = new Effect(12, e -> {
+            Draw.color(Palette.accent);
+            Lines.stroke(2f * e.fout());
+            Lines.circle(e.x, e.y, 5f * e.fout());
             Draw.reset();
         });
     }

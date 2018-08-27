@@ -8,12 +8,14 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.storage.CoreBlock.CoreEntity;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.EntityGroup;
@@ -31,10 +33,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.bulletGroup;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
-//TODO utterly broken
 public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncTrait{
     private static Array<SolidTrait> entities = new Array<>();
     private static Rectangle rect = new Rectangle();
@@ -47,15 +47,11 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
     private Color color = Palette.lancerLaser;
     private SeedRandom random = new SeedRandom();
 
-    /**
-     * For pooling use only. Do not call directly!
-     */
+    /**For pooling use only. Do not call directly!*/
     public Lightning(){
     }
 
-    /**
-     * Create a lighting branch at a location. Use Team.none to damage everyone.
-     */
+    /**Create a lighting branch at a location. Use Team.none to damage everyone.*/
     public static void create(Team team, Effect effect, Color color, float damage, float x, float y, float targetAngle, int length){
         Call.createLighting(lastSeed++, team, effect, color, damage, x, y, targetAngle, length);
     }
@@ -63,6 +59,9 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
     @Remote(called = Loc.server)
     public static void createLighting(int seed, Team team, Effect effect, Color color, float damage, float x, float y, float targetAngle, int length){
         Lightning l = Pooling.obtain(Lightning.class);
+
+        //TODO hacky workaround
+        if(checkShield(team, x, y)) return;
 
         l.x = x;
         l.y = y;
@@ -84,9 +83,10 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
             float fx = x, fy = y;
             float x2 = x + Angles.trnsx(angle, step);
             float y2 = y + Angles.trnsy(angle, step);
+            if(checkShield(team, x2, y2)) break;
             float fangle = angle;
-            angle += Mathf.range(30f);
 
+            angle += Mathf.range(30f);
             rect.setSize(attractRange).setCenter(x, y);
 
             Units.getNearbyEnemies(team, rect, entity -> {
@@ -128,6 +128,21 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
 
         l.lines.add(new Vector2(x, y));
         l.add();
+    }
+
+    private static boolean checkShield(Team team, float x, float y){
+        if(team != Team.none){
+            for(Team enemy : state.teams.enemiesOf(team)) {
+                for (Tile core : state.teams.get(enemy).cores) {
+                    if(core.distanceTo(x, y) <= state.mode.enemyCoreShieldRadius){
+                        core.<CoreEntity>entity().shieldHeat = 1f;
+                        Effects.effect(BulletFx.absorb, x, y);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @Override

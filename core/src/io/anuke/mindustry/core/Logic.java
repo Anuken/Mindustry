@@ -130,12 +130,13 @@ public class Logic extends Module{
                 if(!Entities.defaultGroup().isEmpty())
                     throw new RuntimeException("Do not add anything to the default group!");
 
-                Entities.update(bulletGroup);
+
                 for(EntityGroup group : unitGroups){
                     Entities.update(group);
                 }
                 Entities.update(puddleGroup);
                 Entities.update(tileGroup);
+                Entities.update(bulletGroup);
                 Entities.update(fireGroup);
                 Entities.update(playerGroup);
                 Entities.update(itemGroup);
