@@ -127,7 +127,7 @@ public class NetServer extends Module{
 
             if(preventDuplicates){
                 for(Player player : playerGroup.all()){
-                    if(player.name.equalsIgnoreCase(packet.name)){
+                    if(player.name.trim().equalsIgnoreCase(packet.name.trim())){
                         kick(id, KickReason.nameInUse);
                         return;
                     }
@@ -518,6 +518,7 @@ public class NetServer extends Module{
     }
 
     String fixName(String name){
+        name = name.trim();
         if(name.equals("[") || name.equals("]")){
             return "";
         }

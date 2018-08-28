@@ -22,14 +22,18 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.compositeWall, new ItemStack(Items.densealloy, 12));
         new Recipe(defense, DefenseBlocks.compositeWallLarge, new ItemStack(Items.densealloy, 12 * 4));
 
+        new Recipe(defense, DefenseBlocks.door, new ItemStack(Items.densealloy, 12), new ItemStack(Items.silicon, 8));
+        new Recipe(defense, DefenseBlocks.doorLarge, new ItemStack(Items.densealloy, 12 * 4), new ItemStack(Items.silicon, 8 * 4));
+
         new Recipe(defense, DefenseBlocks.thoriumWall, new ItemStack(Items.thorium, 12));
         new Recipe(defense, DefenseBlocks.thoriumWallLarge, new ItemStack(Items.thorium, 12 * 4));
 
         new Recipe(defense, DefenseBlocks.phaseWall, new ItemStack(Items.phasematter, 12));
         new Recipe(defense, DefenseBlocks.phaseWallLarge, new ItemStack(Items.phasematter, 12 * 4));
 
-        new Recipe(defense, DefenseBlocks.door, new ItemStack(Items.densealloy, 12), new ItemStack(Items.silicon, 8));
-        new Recipe(defense, DefenseBlocks.doorLarge, new ItemStack(Items.densealloy, 12 * 4), new ItemStack(Items.silicon, 8 * 4));
+        new Recipe(defense, DefenseBlocks.surgeWall, new ItemStack(Items.surgealloy, 12));
+        new Recipe(defense, DefenseBlocks.surgeWallLarge, new ItemStack(Items.surgealloy, 12 * 4));
+
 
         //projectors
         new Recipe(defense, DefenseBlocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
@@ -38,12 +42,13 @@ public class Recipes implements ContentList{
         new Recipe(weapon, TurretBlocks.duo, new ItemStack(Items.copper, 40));
         new Recipe(weapon, TurretBlocks.scorch, new ItemStack(Items.copper, 50), new ItemStack(Items.densealloy, 20));
         new Recipe(weapon, TurretBlocks.hail, new ItemStack(Items.copper, 60), new ItemStack(Items.densealloy, 35));
-
         new Recipe(weapon, TurretBlocks.lancer, new ItemStack(Items.copper, 50), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 90));
         new Recipe(weapon, TurretBlocks.wave, new ItemStack(Items.densealloy, 60), new ItemStack(Items.titanium, 70), new ItemStack(Items.lead, 150));
-        new Recipe(weapon, TurretBlocks.swarmer, new ItemStack(Items.densealloy, 70), new ItemStack(Items.titanium, 70), new ItemStack(Items.plastanium, 90), new ItemStack(Items.silicon, 60));
         new Recipe(weapon, TurretBlocks.salvo, new ItemStack(Items.copper, 210), new ItemStack(Items.densealloy, 190), new ItemStack(Items.thorium, 130));
+        new Recipe(weapon, TurretBlocks.swarmer, new ItemStack(Items.densealloy, 70), new ItemStack(Items.titanium, 70), new ItemStack(Items.plastanium, 90), new ItemStack(Items.silicon, 60));
         new Recipe(weapon, TurretBlocks.ripple, new ItemStack(Items.copper, 300), new ItemStack(Items.densealloy, 220), new ItemStack(Items.thorium, 120));
+        new Recipe(weapon, TurretBlocks.cyclone, new ItemStack(Items.copper, 210), new ItemStack(Items.densealloy, 190), new ItemStack(Items.thorium, 130));
+        new Recipe(weapon, TurretBlocks.fuse, new ItemStack(Items.copper, 300), new ItemStack(Items.densealloy, 220), new ItemStack(Items.thorium, 120));
 
         //DISTRIBUTION
         new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.copper, 1));

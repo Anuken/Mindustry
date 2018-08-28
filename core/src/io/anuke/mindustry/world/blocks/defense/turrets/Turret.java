@@ -58,6 +58,7 @@ public abstract class Turret extends Block{
     protected float rotatespeed = 5f; //in degrees per tick
     protected float shootCone = 8f;
     protected float shootShake = 0f;
+    protected float xRand = 0f;
     protected boolean targetAir = true;
 
     protected Translator tr = new Translator();
@@ -274,13 +275,13 @@ public abstract class Turret extends Block{
         entity.heat = 1f;
 
         AmmoType type = peekAmmo(tile);
-        useAmmo(tile);
 
-        tr.trns(entity.rotation, size * tilesize / 2);
+        tr.trns(entity.rotation, size * tilesize / 2, Mathf.range(xRand));
 
         bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy));
 
         effects(tile);
+        useAmmo(tile);
     }
 
     protected void bullet(Tile tile, BulletType type, float angle){

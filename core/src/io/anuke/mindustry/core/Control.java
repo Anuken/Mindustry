@@ -368,6 +368,11 @@ public class Control extends Module{
                 input.update();
             }
 
+            //auto-update rpc every 5 seconds
+            if(Timers.get("rpcUpdate", 60 * 5)){
+                Platform.instance.updateRPC();
+            }
+
             //check unlocked sectors
             if(world.getSector() != null && !world.getSector().complete){
                 //all assigned missions are complete

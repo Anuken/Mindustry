@@ -13,8 +13,9 @@ public class AmmoTypes implements ContentList{
     public static AmmoType bulletCopper, bulletDense, bulletThorium, bulletSilicon, bulletPyratite,
             shotgunTungsten, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite, weaponMissile, weaponMissileSwarm, bulletMech,
             healBlaster, bulletGlaive,
-            flakLead, flakExplosive, flakPlastic, flakSurge, missileExplosive, missileIncindiary, missileSurge,
-    artilleryDense, artilleryPlastic, artilleryHoming, artilleryIncindiary, artilleryExplosive,
+            flakExplosive, flakPlastic, flakSurge,
+            missileExplosive, missileIncindiary, missileSurge,
+            artilleryDense, artilleryPlastic, artilleryHoming, artilleryIncindiary, artilleryExplosive,
             basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid;
 
     @Override
@@ -28,7 +29,6 @@ public class AmmoTypes implements ContentList{
             reloadMultiplier = 1f;
             inaccuracy = 5f;
         }};
-
 
         bulletGlaive = new AmmoType(Items.pyratite, StandardBullets.glaive, 3){{
             shootEffect = ShootFx.shootSmall;
@@ -118,24 +118,19 @@ public class AmmoTypes implements ContentList{
 
         //flak
 
-        flakLead = new AmmoType(Items.lead, FlakBullets.lead, 5){{
-            shootEffect = ShootFx.shootSmall;
-            smokeEffect = ShootFx.shootSmallSmoke;
-        }};
-
         flakExplosive = new AmmoType(Items.blastCompound, FlakBullets.explosive, 5){{
-            shootEffect = ShootFx.shootSmall;
-            smokeEffect = ShootFx.shootSmallSmoke;
+            shootEffect = ShootFx.shootBig;
+            smokeEffect = ShootFx.shootBigSmoke;
         }};
 
         flakPlastic = new AmmoType(Items.plastanium, FlakBullets.plastic, 5){{
-            shootEffect = ShootFx.shootSmall;
-            smokeEffect = ShootFx.shootSmallSmoke;
+            shootEffect = ShootFx.shootBig;
+            smokeEffect = ShootFx.shootBigSmoke;
         }};
 
         flakSurge = new AmmoType(Items.surgealloy, FlakBullets.surge, 5){{
-            shootEffect = ShootFx.shootSmall;
-            smokeEffect = ShootFx.shootSmallSmoke;
+            shootEffect = ShootFx.shootBig;
+            smokeEffect = ShootFx.shootBigSmoke;
         }};
 
         //missiles

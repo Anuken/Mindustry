@@ -251,6 +251,7 @@ public abstract class GroundUnit extends BaseUnit{
         if(enemy == null) return;
 
         Tile tile = world.tileWorld(x, y);
+        if(tile == null) return;
         Tile targetTile = world.pathfinder().getTargetTile(enemy, tile);
         TileEntity core = getClosestCore();
 

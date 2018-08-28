@@ -68,6 +68,8 @@ public class Palette{
 
     lightTrail = Color.valueOf("ffe2a9"),
 
+    surge = Color.valueOf("f3e979"),
+
     redSpark = Color.valueOf("fbb97f"),
     orangeSpark = Color.valueOf("d2b29c"),
 

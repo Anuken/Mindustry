@@ -12,7 +12,7 @@ import io.anuke.ucore.util.Mathf;
 
 public class BulletFx extends FxList implements ContentList{
     public static Effect hitBulletSmall, hitBulletBig, hitFlameSmall, hitLiquid, hitLaser, hitLancer, despawn, flakExplosion, blastExplosion, plasticExplosion,
-            artilleryTrail, incendTrail, missileTrail, absorb;
+            artilleryTrail, incendTrail, missileTrail, absorb, flakExplosionBig;
 
     @Override
     public void load(){
@@ -195,6 +195,30 @@ public class BulletFx extends FxList implements ContentList{
             Draw.color(Palette.accent);
             Lines.stroke(2f * e.fout());
             Lines.circle(e.x, e.y, 5f * e.fout());
+            Draw.reset();
+        });
+
+        flakExplosionBig = new Effect(30, e -> {
+
+            Draw.color(Palette.bulletYellowBack);
+            e.scaled(6, i -> {
+                Lines.stroke(3f * i.fout());
+                Lines.circle(e.x, e.y, 3f + i.fin() * 25f);
+            });
+
+            Draw.color(Color.GRAY);
+
+            Angles.randLenVectors(e.id, 6, 2f + 23f * e.finpow(), (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
+            });
+
+            Draw.color(Palette.bulletYellow);
+            Lines.stroke(1f * e.fout());
+
+            Angles.randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), 1f + e.fout() * 3f);
+            });
+
             Draw.reset();
         });
     }

@@ -108,6 +108,10 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         return data;
     }
 
+    public void setData(Object data){
+        this.data = data;
+    }
+
     @Override
     public float getDamage(){
         if(owner instanceof Unit){

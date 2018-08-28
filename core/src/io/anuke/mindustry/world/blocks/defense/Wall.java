@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks;
+package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockGroup;

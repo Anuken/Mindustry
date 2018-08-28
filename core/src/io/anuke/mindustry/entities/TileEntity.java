@@ -14,7 +14,7 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Wall;
+import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.InventoryModule;

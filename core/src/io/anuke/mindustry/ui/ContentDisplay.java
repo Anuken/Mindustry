@@ -174,7 +174,6 @@ public class ContentDisplay{
             table.add(Bundles.format("text.mech.minepower", mech.drillPower));
             table.row();
         }
-
     }
 
     public static void displayUnit(Table table, UnitType unit){

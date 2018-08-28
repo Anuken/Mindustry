@@ -248,7 +248,7 @@ public class WorldGenerator{
         double iceridge = rid.getValue(x+99999, y, 1f / 300f) + sim3.octaveNoise2D(2, 1f, 1f/14f, x, y)/11f;
         double elevation = elevationOf(x, y, detailed);
         double temp = vn.noise(x, y, 1f / 300f) * sim3.octaveNoise2D(detailed ? 2 : 1, 1, 1f / 13f, x, y)/13f
-            + sim3.octaveNoise2D(detailed ? 12 : 9, 0.6, 1f / 1020f, x, y);
+            + sim3.octaveNoise2D(detailed ? 12 : 9, 0.6, 1f / 1100f, x, y);
 
         int lerpDst = 20;
         lerpDst *= lerpDst;
@@ -272,7 +272,7 @@ public class WorldGenerator{
             floor = Blocks.water;
         }else if(elevation < 0.85){
             floor = Blocks.sand;
-        }else if (elevation < 2.5 && temp > 0.4){
+        }else if (elevation < 2.5 && temp > 0.5){
             floor = Blocks.sand;
         }else if(temp < 0.42){
             floor = Blocks.snow;
@@ -313,7 +313,7 @@ public class WorldGenerator{
 
     double elevationOf(int x, int y, boolean detailed){
         double ridge = rid.getValue(x, y, 1f / 400f);
-        return sim.octaveNoise2D(detailed ? 7 : 4, 0.62, 1f / 740, x, y) * 6.1 - 1 - ridge;
+        return sim.octaveNoise2D(detailed ? 7 : 4, 0.62, 1f / 800, x, y) * 6.1 - 1 - ridge;
     }
 
     public static class GenResult{
