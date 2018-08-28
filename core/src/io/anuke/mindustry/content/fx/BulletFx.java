@@ -11,7 +11,7 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public class BulletFx extends FxList implements ContentList{
-    public static Effect hitBulletSmall, hitBulletBig, hitFlameSmall, hitLiquid, hitLaser, hitLancer, despawn, flakExplosion, blastExplosion, plasticExplosion,
+    public static Effect hitBulletSmall, hitFuse, hitBulletBig, hitFlameSmall, hitLiquid, hitLaser, hitLancer, despawn, flakExplosion, blastExplosion, plasticExplosion,
             artilleryTrail, incendTrail, missileTrail, absorb, flakExplosionBig, plasticExplosionFlak;
 
     @Override
@@ -29,6 +29,25 @@ public class BulletFx extends FxList implements ContentList{
             Lines.stroke(0.5f + e.fout());
 
             Angles.randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> {
+                float ang = Mathf.atan2(x, y);
+                Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
+            });
+
+            Draw.reset();
+        });
+
+        hitFuse = new Effect(14, e -> {
+            Draw.color(Color.WHITE, Palette.surge, e.fin());
+
+            e.scaled(7f, s -> {
+                Lines.stroke(0.5f + s.fout());
+                Lines.circle(e.x, e.y, s.fin()*7f);
+            });
+
+
+            Lines.stroke(0.5f + e.fout());
+
+            Angles.randLenVectors(e.id, 6, e.fin() * 15f, (x, y) -> {
                 float ang = Mathf.atan2(x, y);
                 Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
             });

@@ -160,13 +160,13 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        fuseShot = new BulletType(0.01f, 0){
+        fuseShot = new BulletType(0.01f, 60){
             int rays = 3;
             float raySpace = 2f;
-            float rayLength = 70f;
+            float rayLength = 80f;
             {
-                hiteffect = BulletFx.hitBulletBig;
-                lifetime = 10f;
+                hiteffect = BulletFx.hitFuse;
+                lifetime = 13f;
                 despawneffect = Fx.none;
                 pierce = true;
             }
@@ -184,7 +184,14 @@ public class TurretBullets extends BulletList implements ContentList{
             public void draw(Bullet b) {
                 super.draw(b);
                 Draw.color(Color.WHITE, Palette.surge, b.fin());
-                Shapes.tri(b.x, b.y, 12f, (rayLength+10) * b.fout(), b.angle());
+                for(int i = 0; i < 7; i++){
+                    vector.trns(b.angle(), i * 8f);
+                    float sl = Mathf.clamp(b.fout()-0.5f) * (80f - i *10);
+                    Shapes.tri(b.x + vector.x, b.y + vector.y, 4f, sl, b.angle() + 90);
+                    Shapes.tri(b.x + vector.x, b.y + vector.y, 4f, sl, b.angle() - 90);
+                }
+                Shapes.tri(b.x, b.y, 13f, (rayLength+50) * b.fout(), b.angle());
+                Shapes.tri(b.x, b.y, 13f, 10f * b.fout(), b.angle() + 180f);
                 Draw.reset();
             }
 

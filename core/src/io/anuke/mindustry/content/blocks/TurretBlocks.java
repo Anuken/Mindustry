@@ -207,8 +207,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             range = 140f;
             size = 3;
             recoil = 3f;
-            shots = 2;
-            rotatespeed = 20f;
+            rotatespeed = 10f;
             inaccuracy = 13f;
             shootCone = 30f;
         }};
@@ -218,7 +217,9 @@ public class TurretBlocks extends BlockList implements ContentList{
             ammoTypes = new AmmoType[]{AmmoTypes.fuseShotgun};
             reload = 50f;
             shootShake = 4f;
-            range = 70f;
+            range = 80f;
+            recoil = 5f;
+            restitution = 0.1f;
             size = 3;
         }};
 

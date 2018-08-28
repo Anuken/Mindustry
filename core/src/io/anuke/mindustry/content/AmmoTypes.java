@@ -131,7 +131,7 @@ public class AmmoTypes implements ContentList{
         flakSurge = new AmmoType(Items.surgealloy, FlakBullets.surge, 5){{
             shootEffect = ShootFx.shootBig;
             smokeEffect = ShootFx.shootBigSmoke;
-            reloadMultiplier = 2f;
+            reloadMultiplier = 1/2f;
         }};
 
         //missiles
@@ -201,7 +201,7 @@ public class AmmoTypes implements ContentList{
         meltdownLaser = new AmmoType(TurretBullets.lancerLaser);
 
         fuseShotgun = new AmmoType(Items.densealloy, TurretBullets.fuseShot, 1f){{
-            shootEffect = ShootFx.shootBig2;
+            shootEffect = Fx.none;
             smokeEffect = ShootFx.shootBigSmoke2;
         }};
 

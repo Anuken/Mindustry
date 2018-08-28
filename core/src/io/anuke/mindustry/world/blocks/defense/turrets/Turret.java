@@ -52,6 +52,7 @@ public abstract class Turret extends Block{
     protected float reload = 10f;
     protected float inaccuracy = 0f;
     protected int shots = 1;
+    protected float spread = 4f;
     protected float recoil = 1f;
     protected float restitution = 0.02f;
     protected float cooldown = 0.02f;
@@ -278,7 +279,9 @@ public abstract class Turret extends Block{
 
         tr.trns(entity.rotation, size * tilesize / 2, Mathf.range(xRand));
 
-        bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy));
+        for(int i = 0; i < shots; i++){
+            bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i-shots/2) * spread);
+        }
 
         effects(tile);
         useAmmo(tile);
