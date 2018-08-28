@@ -216,6 +216,9 @@ public class TurretBlocks extends BlockList implements ContentList{
         fuse = new ItemTurret("fuse"){{
             //TODO make it use power
             ammoTypes = new AmmoType[]{AmmoTypes.fuseShotgun};
+            reload = 50f;
+            shootShake = 4f;
+            range = 70f;
             size = 3;
         }};
 

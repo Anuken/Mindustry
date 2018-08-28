@@ -24,6 +24,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
@@ -159,7 +160,34 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        fuseShot = new BulletType(0.01f, 100){
+        fuseShot = new BulletType(0.01f, 0){
+            int rays = 3;
+            float raySpace = 2f;
+            float rayLength = 70f;
+            {
+                hiteffect = BulletFx.hitBulletBig;
+                lifetime = 10f;
+                despawneffect = Fx.none;
+                pierce = true;
+            }
+
+            @Override
+            public void init(Bullet b) {
+                for (int i = 0; i < rays; i++) {
+                    float offset = (i-rays/2)*raySpace;
+                    vector.trns(b.angle(), 0.01f, offset);
+                    Damage.collideLine(b, b.getTeam(), hiteffect, b.x, b.y, b.angle(), rayLength - Math.abs(i - (rays/2))*20f);
+                }
+            }
+
+            @Override
+            public void draw(Bullet b) {
+                super.draw(b);
+                Draw.color(Color.WHITE, Palette.surge, b.fin());
+                Shapes.tri(b.x, b.y, 12f, (rayLength+10) * b.fout(), b.angle());
+                Draw.reset();
+            }
+
             //TODO
         };
 

@@ -200,7 +200,10 @@ public class AmmoTypes implements ContentList{
 
         meltdownLaser = new AmmoType(TurretBullets.lancerLaser);
 
-        fuseShotgun = new AmmoType(Items.copper, TurretBullets.fuseShot, 0.1f);
+        fuseShotgun = new AmmoType(Items.densealloy, TurretBullets.fuseShot, 1f){{
+            shootEffect = ShootFx.shootBig2;
+            smokeEffect = ShootFx.shootBigSmoke2;
+        }};
 
         //liquid
 
