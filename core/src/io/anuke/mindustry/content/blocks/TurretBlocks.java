@@ -11,7 +11,6 @@ import io.anuke.mindustry.world.blocks.defense.turrets.*;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
 
 public class TurretBlocks extends BlockList implements ContentList{
     public static Block duo, /*scatter,*/
@@ -142,35 +141,46 @@ public class TurretBlocks extends BlockList implements ContentList{
             health = 380;
         }};
 
-        salvo = new BurstTurret("salvo"){{
-            size = 2;
-            range = 120f;
-            ammoTypes = new AmmoType[]{AmmoTypes.bulletCopper, AmmoTypes.bulletDense, AmmoTypes.bulletPyratite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
-            reload = 40f;
-            restitution = 0.03f;
-            ammoEjectBack = 3f;
-            cooldown = 0.03f;
-            recoil = 3f;
-            shootShake = 2f;
-            burstSpacing = 4;
-            shots = 3;
-            ammoUseEffect = ShootFx.shellEjectBig;
+        salvo = new BurstTurret("salvo"){
+            TextureRegion[] panels = new TextureRegion[2];
 
-            drawer = (tile, entity) -> {
-                Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-                float offsetx = (int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 3f);
-                float offsety = -(int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 2f);
+            @Override
+            public void load() {
+                super.load();
+                panels[0] = Draw.region(name + "-panel-left");
+                panels[1] = Draw.region(name + "-panel-right");
+            }
 
-                for(int i : Mathf.signs){
-                    float rot = entity.rotation + 90 * i;
-                    Draw.rect(name + "-panel-" + Strings.dir(i),
-                            tile.drawx() + tr2.x + Angles.trnsx(rot, offsetx, offsety),
-                            tile.drawy() + tr2.y + Angles.trnsy(rot, -offsetx, offsety), entity.rotation - 90);
-                }
-            };
+            {
+                size = 2;
+                range = 120f;
+                ammoTypes = new AmmoType[]{AmmoTypes.bulletCopper, AmmoTypes.bulletDense, AmmoTypes.bulletPyratite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
+                reload = 40f;
+                restitution = 0.03f;
+                ammoEjectBack = 3f;
+                cooldown = 0.03f;
+                recoil = 3f;
+                shootShake = 2f;
+                burstSpacing = 4;
+                shots = 3;
+                ammoUseEffect = ShootFx.shellEjectBig;
 
-            health = 360;
-        }};
+                drawer = (tile, entity) -> {
+                    Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+                    float offsetx = (int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 3f);
+                    float offsety = -(int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 2f);
+
+                    for(int i : Mathf.signs){
+                        float rot = entity.rotation + 90 * i;
+                        Draw.rect(panels[i == -1 ? 0 : 1],
+                                tile.drawx() + tr2.x + Angles.trnsx(rot, offsetx, offsety),
+                                tile.drawy() + tr2.y + Angles.trnsy(rot, -offsetx, offsety), entity.rotation - 90);
+                    }
+                };
+
+                health = 360;
+            }
+        };
 
         ripple = new ArtilleryTurret("ripple"){{
             ammoTypes = new AmmoType[]{AmmoTypes.artilleryDense, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary, AmmoTypes.artilleryExplosive, AmmoTypes.artilleryPlastic};
@@ -193,7 +203,7 @@ public class TurretBlocks extends BlockList implements ContentList{
         cyclone = new ItemTurret("cyclone"){{
             ammoTypes = new AmmoType[]{AmmoTypes.flakExplosive, AmmoTypes.flakPlastic, AmmoTypes.flakSurge};
             xRand = 4f;
-            reload = 8f;
+            reload = 10f;
             range = 140f;
             size = 3;
             recoil = 3f;

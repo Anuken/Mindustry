@@ -1,6 +1,7 @@
 package io.anuke.mindustry.content.bullets;
 
 import io.anuke.mindustry.content.fx.BulletFx;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.ArtilleryBulletType;
 import io.anuke.mindustry.entities.bullet.BasicBulletType;
 import io.anuke.mindustry.entities.bullet.BulletType;
@@ -33,6 +34,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
                 lifetime = 15f;
                 backColor = Palette.plastaniumBack;
                 frontColor = Palette.plastaniumFront;
+                despawneffect = Fx.none;
             }
         };
 

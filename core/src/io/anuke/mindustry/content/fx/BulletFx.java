@@ -12,7 +12,7 @@ import io.anuke.ucore.util.Mathf;
 
 public class BulletFx extends FxList implements ContentList{
     public static Effect hitBulletSmall, hitBulletBig, hitFlameSmall, hitLiquid, hitLaser, hitLancer, despawn, flakExplosion, blastExplosion, plasticExplosion,
-            artilleryTrail, incendTrail, missileTrail, absorb, flakExplosionBig;
+            artilleryTrail, incendTrail, missileTrail, absorb, flakExplosionBig, plasticExplosionFlak;
 
     @Override
     public void load(){
@@ -143,6 +143,30 @@ public class BulletFx extends FxList implements ContentList{
             Lines.stroke(1f * e.fout());
 
             Angles.randLenVectors(e.id + 1, 4, 1f + 25f * e.finpow(), (x, y) -> {
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), 1f + e.fout() * 3f);
+            });
+
+            Draw.reset();
+        });
+
+        plasticExplosionFlak = new Effect(28, e -> {
+
+            Draw.color(Palette.plastaniumFront);
+            e.scaled(7, i -> {
+                Lines.stroke(3f * i.fout());
+                Lines.circle(e.x, e.y, 3f + i.fin() * 34f);
+            });
+
+            Draw.color(Color.GRAY);
+
+            Angles.randLenVectors(e.id, 7, 2f + 30f * e.finpow(), (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
+            });
+
+            Draw.color(Palette.plastaniumBack);
+            Lines.stroke(1f * e.fout());
+
+            Angles.randLenVectors(e.id + 1, 4, 1f + 30f * e.finpow(), (x, y) -> {
                 Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), 1f + e.fout() * 3f);
             });
 
