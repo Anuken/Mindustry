@@ -151,6 +151,7 @@ public class AmmoTypes implements ContentList{
         missileSurge = new AmmoType(Items.surgealloy, MissileBullets.surge, 1){{
             shootEffect = ShootFx.shootBig2;
             smokeEffect = ShootFx.shootBigSmoke2;
+            reloadMultiplier = 1.1f;
         }};
 
         //artillery

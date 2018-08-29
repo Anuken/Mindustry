@@ -5,6 +5,7 @@ import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.bullet.MissileBulletType;
+import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
 import io.anuke.ucore.core.Timers;
@@ -48,10 +49,26 @@ public class MissileBullets extends BulletList implements ContentList{
             }
         };
 
-        surge = new MissileBulletType(3f, 5, "bullet"){
+        surge = new MissileBulletType(3.5f, 15, "bullet"){
             {
-                bulletWidth = 7f;
-                bulletHeight = 9f;
+                bulletWidth = 8f;
+                bulletHeight = 8f;
+                bulletShrink = 0f;
+                drag = -0.01f;
+                splashDamageRadius = 30f;
+                splashDamage = 22f;
+                lifetime = 150f;
+                hiteffect = BulletFx.blastExplosion;
+                despawneffect = BulletFx.blastExplosion;
+            }
+
+            @Override
+            public void hit(Bullet b) {
+                super.hit(b);
+
+                for (int i = 0; i < 2; i++) {
+                    Lightning.create(b.getTeam(), BulletFx.hitLancer, Palette.surge, damage, b.x, b.y, Mathf.random(360f), 14);
+                }
             }
         };
 

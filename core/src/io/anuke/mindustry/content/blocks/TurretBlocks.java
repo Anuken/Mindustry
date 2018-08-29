@@ -130,7 +130,7 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         swarmer = new BurstTurret("swarmer"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.missileExplosive, AmmoTypes.missileIncindiary/*, AmmoTypes.missileSurge*/};
+            ammoTypes = new AmmoType[]{AmmoTypes.missileExplosive, AmmoTypes.missileIncindiary, AmmoTypes.missileSurge};
             reload = 60f;
             shots = 4;
             burstSpacing = 5;
