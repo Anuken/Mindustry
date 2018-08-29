@@ -35,7 +35,15 @@ public class Generation{
                     int worldx = dx + offsetx + x;
                     int worldy = dy + offsety + y;
                     if(!Mathf.inBounds(worldx, worldy, tiles)){
-                        continue;
+                        return null;
+                    }
+
+                    if(!block.isValid(tiles[worldx][worldy])) continue;
+
+                    Item drop = tiles[worldx][worldy].floor().drops.item;
+
+                    if(result == null || drop.id < result.id){
+                        result = drop;
                     }
 
                 }
@@ -45,6 +53,8 @@ public class Generation{
             return tiles[x][y].floor().drops == null ? null : tiles[x][y].floor().drops.item;
         }
     }
+
+
 
     public boolean canPlace(int x, int y, Block block){
         if(block.isMultiblock()){
