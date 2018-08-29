@@ -15,6 +15,11 @@ Font: {
 		markupEnabled: true,
 		scale: 0.5
 	},
+	simp-chinese: {
+		file: simp_chinese.fnt,
+		markupEnabled: true,
+		scale: 0.5
+	},
 	trad-chinese: {
 		file: trad_chinese.fnt,
 		markupEnabled: true,
@@ -93,7 +98,8 @@ LabelStyle: {
 TextFieldStyle: {
 	default: {font: default-font-chat, fontColor: white, disabledFontColor: gray, selection: selection, background: button, cursor: cursor, messageFont: default-font, messageFontColor: gray }
 	textarea: {font: default-font-chat, fontColor: white, disabledFontColor: gray, selection: selection, background: textarea, cursor: cursor, messageFont: default-font, messageFontColor: gray }
-},
+}
+
 CheckBoxStyle: {
 	default: {checkboxOn: check-on, checkboxOff: check-off, checkboxOnOver: check-on-over, checkboxOver: check-over, font: default-font, fontColor: white, disabledFontColor: gray }
 }
