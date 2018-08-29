@@ -80,7 +80,7 @@ public class MendProjector extends Block{
                         if(other == null) continue;
                         other = other.target();
 
-                        if(!healed.contains(other.packedPosition()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
+                        if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.packedPosition()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
                             other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat*phaseBoost)/100f);
                             Effects.effect(BlockFx.healBlockFull, Hue.mix(color, phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
                             healed.add(other.packedPosition());

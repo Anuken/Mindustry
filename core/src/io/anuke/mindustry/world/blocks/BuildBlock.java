@@ -192,6 +192,11 @@ public class BuildBlock extends Block{
         private float[] totalAccumulator;
 
         public void construct(Unit builder, TileEntity core, float amount){
+            if(recipe == null){
+                damage(99999);
+                return;
+            }
+
             float maxProgress = checkRequired(core.items, amount, false);
 
             for(int i = 0; i < recipe.requirements.length; i++){
