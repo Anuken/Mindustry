@@ -24,7 +24,7 @@ public class DefaultKeybinds{
                 "break", Input.MOUSE_RIGHT,
                 "rotate", new Axis(Input.SCROLL),
                 "dash", Input.SHIFT_LEFT,
-                "ability", Input.Q,
+                "ability", Input.E,
                 "drop_unit", Input.SHIFT_LEFT,
                 new Category("view"),
                 "zoom_hold", Input.CONTROL_LEFT,
