@@ -48,8 +48,6 @@ public class NetworkIO{
             stream.writeInt(state.wave); //wave
             stream.writeFloat(state.wavetime); //wave countdown
 
-            stream.writeBoolean(state.friendlyFire); //friendly fire state
-
             stream.writeInt(player.id);
             player.write(stream);
 
@@ -180,7 +178,6 @@ public class NetworkIO{
             state.wave = wave;
             state.wavetime = wavetime;
             state.mode = GameMode.values()[mode];
-            state.friendlyFire = friendlyfire;
 
             Entities.clear();
             int id = stream.readInt();

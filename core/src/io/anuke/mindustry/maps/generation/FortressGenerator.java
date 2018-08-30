@@ -41,6 +41,12 @@ public class FortressGenerator{
                 if(Vector2.dst(x, y, enemyX, enemyY) > coreDst){
                     continue;
                 }
+
+                Block turret =  turrets.first();
+
+                if(gen.random.chance(0.01) && gen.canPlace(x, y, turret)){
+                    gen.setBlock(x, y, turret, team);
+                }
             }
         }
 
