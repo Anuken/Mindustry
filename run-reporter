@@ -1,2 +1,0 @@
-./gradlew reporter:dist
-java -jar reporter/build/libs/reporter-release.jar

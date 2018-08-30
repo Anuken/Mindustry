@@ -51,6 +51,7 @@ public class Control extends Module{
     private Throwable error;
 
     public Control(){
+        //TODO remove; only for testing
         if(true) throw new RuntimeException("This should crash.");
 
         saves = new Saves();
