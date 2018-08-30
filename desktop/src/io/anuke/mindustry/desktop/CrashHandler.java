@@ -1,5 +1,6 @@
 package io.anuke.mindustry.desktop;
 
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
@@ -13,7 +14,6 @@ import java.util.Date;
 public class CrashHandler{
 
     public static void handle(Throwable e){
-        //TODO send full error report to server via HTTP
         e.printStackTrace();
 
         boolean netActive = false, netServer = false;
@@ -28,7 +28,7 @@ public class CrashHandler{
         }
 
         //don't create crash logs for me (anuke), as it's expected
-        if(System.getProperty("user.name").equals("anuke")) return;
+        //if(System.getProperty("user.name").equals("anuke")) return;
 
         String header = "--CRASH REPORT--\n";
 
@@ -49,6 +49,8 @@ public class CrashHandler{
         boolean failed = false;
 
         String filename = "";
+
+        Net.http(Vars.crashReportURL, "POST", result, r -> {}, Throwable::printStackTrace);
 
         //try to write it
         try{

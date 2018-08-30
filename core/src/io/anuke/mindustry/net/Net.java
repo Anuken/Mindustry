@@ -309,8 +309,12 @@ public class Net{
     }
 
     public static void http(String url, String method, Consumer<String> listener, Consumer<Throwable> failure){
+        http(url, method, null, listener, failure);
+    }
+
+    public static void http(String url, String method, String body, Consumer<String> listener, Consumer<Throwable> failure){
         HttpRequest req = new HttpRequestBuilder().newRequest()
-                .method(method).url(url).build();
+        .method(method).url(url).content(body).build();
 
         Gdx.net.sendHttpRequest(req, new HttpResponseListener(){
             @Override

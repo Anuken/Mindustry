@@ -232,6 +232,10 @@ project(":kryonet") {
     }
 }
 
+project(":reporter"){
+    apply plugin: "java"
+}
+
 tasks.eclipse.doLast {
     delete ".project"
 }

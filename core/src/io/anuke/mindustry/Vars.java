@@ -40,6 +40,7 @@ public class Vars{
     //discord group URL
     public static final String discordURL = "https://discord.gg/BKADYds";
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
+    public static final String crashReportURL = "http://localhost:8080/report";
     public static final int maxTextLength = 150;
     public static final int maxNameLength = 40;
     public static final float itemSize = 5f;
