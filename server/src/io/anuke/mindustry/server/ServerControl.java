@@ -54,6 +54,7 @@ public class ServerControl extends Module{
             "admins", "",
             "sector_x", 0,
             "sector_y", 1,
+            "crashreport", false,
             "port", port
         );
 
@@ -338,7 +339,14 @@ public class ServerControl extends Module{
             }
         });
 
-        handler.register("debug", "<on/off>", "Disables or enables debug ode", arg -> {
+        handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
+            boolean value = arg[0].equalsIgnoreCase("on");
+            Settings.putBool("crashreport", value);
+            Settings.save();
+            info("Crash reporting is now {0}.", value ? "on" : "off");
+        });
+
+        handler.register("debug", "<on/off>", "Disables or enables debug mode", arg -> {
            boolean value = arg[0].equalsIgnoreCase("on");
            debug = value;
            info("Debug mode is now {0}.", value ? "on" : "off");
