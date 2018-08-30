@@ -1,4 +1,4 @@
-package io.anuke.mindustry.desktop;
+package io.anuke.mindustry.server;
 
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonValue.ValueType;
@@ -21,12 +21,15 @@ public class CrashHandler{
         //also don't create logs for custom builds
         if(System.getProperty("user.name").equals("anuke") || Version.build == -1) return;
 
-        boolean netActive = false, netServer = false;
+        //if getting the crash report property failed, OR if it set to false... don't send it
+        try{
+            if(!Settings.getBool("crashreport")) return;
+        }catch(Throwable ignored){
+            return;
+        }
 
         //attempt to close connections, if applicable
         try{
-            netActive = Net.active();
-            netServer = Net.server();
             Net.dispose();
         }catch(Throwable p){
             p.printStackTrace();
@@ -34,18 +37,15 @@ public class CrashHandler{
 
         JsonValue value = new JsonValue(ValueType.object);
 
-        boolean fn = netActive, fs = netServer;
-
         //add all relevant info, ignoring exceptions
         ex(() -> value.addChild("build", new JsonValue(Version.build)));
-        ex(() -> value.addChild("net", new JsonValue(fn)));
-        ex(() -> value.addChild("server", new JsonValue(fs)));
-        ex(() -> value.addChild("gamemode", new JsonValue(Vars.state.mode.toString())));
+        ex(() -> value.addChild("mode", new JsonValue(Vars.state.mode.toString())));
+        ex(() -> value.addChild("difficulty", new JsonValue(Vars.state.difficulty.toString())));
+        ex(() -> value.addChild("players", new JsonValue(Vars.playerGroup.size())));
         ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name"))));
-        ex(() -> value.addChild("multithreading", new JsonValue(Settings.getBool("multithread"))));
         ex(() -> value.addChild("trace", new JsonValue(parseException(e))));
 
-        Log.info("Sending crash report.");
+        Log.info("&lcSending crash report.");
         //post to crash report URL
         Net.http(Vars.crashReportURL, "POST", value.toJson(OutputType.json), r -> System.exit(1), t -> System.exit(1));
 
