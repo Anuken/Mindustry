@@ -38,8 +38,7 @@ public class DefaultKeybinds{
                 "chat", Input.ENTER,
                 "chat_history_prev", Input.UP,
                 "chat_history_next", Input.DOWN,
-                "chat_scroll", new Axis(Input.SCROLL),
-                "console", Input.GRAVE
+                "chat_scroll", new Axis(Input.SCROLL)
             );
 
             KeyBinds.defaultSection(section, DeviceType.controller,

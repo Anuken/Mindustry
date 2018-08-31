@@ -351,7 +351,7 @@ public class Control extends Module{
             throw new RuntimeException(error);
         }
 
-        if(debug && Inputs.keyTap("console")){
+        if(debug && Inputs.keyTap(io.anuke.ucore.input.Input.GRAVE)){
             console = !console;
         }
 

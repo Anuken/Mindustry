@@ -326,19 +326,6 @@ public class ServerControl extends Module{
             info("Core filled.");
         });
 
-        handler.register("friendlyfire", "<on/off>", "Enable or disable friendly fire.", arg -> {
-            String s = arg[0];
-            if(s.equalsIgnoreCase("on")){
-                state.friendlyFire = true;
-                info("Friendly fire enabled.");
-            }else if(s.equalsIgnoreCase("off")){
-                state.friendlyFire = false;
-                info("Friendly fire disabled.");
-            }else{
-                err("Incorrect command usage.");
-            }
-        });
-
         handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
             boolean value = arg[0].equalsIgnoreCase("on");
             Settings.putBool("crashreport", value);

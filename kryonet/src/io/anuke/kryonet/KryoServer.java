@@ -2,12 +2,14 @@ package io.anuke.kryonet;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import com.dosse.upnp.UPnP;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Net.ServerProvider;
@@ -129,6 +131,15 @@ public class KryoServer implements ServerProvider {
 
     @Override
     public void host(int port) throws IOException {
+        //attempt to open default ports if they're not already open
+        //this only opens the default port due to security concerns (?)
+        if(port == Vars.port){
+            async(() -> {
+                if(!UPnP.isMappedTCP(port)) UPnP.openPortTCP(port);
+                if(!UPnP.isMappedUDP(port)) UPnP.openPortUDP(port);
+            });
+        }
+
         lastconnection = 0;
         connections.clear();
         missing.clear();
