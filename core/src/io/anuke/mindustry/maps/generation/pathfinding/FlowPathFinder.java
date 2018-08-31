@@ -22,7 +22,7 @@ public class FlowPathFinder extends TilePathfinder{
         for(int i = 0; i < weights.length; i++){
             for(int j = 0; j < weights[0].length; j++){
                 if(result.test(tiles[i][j])){
-                    weights[i][j] = Float.MAX_VALUE;
+                    weights[i][j] = 100000;
                     queue.addLast(tiles[i][j]);
                 }else{
                     weights[i][j] = 0f;
@@ -37,6 +37,9 @@ public class FlowPathFinder extends TilePathfinder{
                 if(inBounds(nx, ny) && weights[nx][ny] < weights[tile.x][tile.y] && tiles[nx][ny].passable()){
                     weights[nx][ny] = weights[tile.x][tile.y] - 1;
                     queue.addLast(tiles[nx][ny]);
+                    if(result.test(tiles[nx][ny])){
+                        break;
+                    }
                 }
             }
         }
@@ -46,14 +49,14 @@ public class FlowPathFinder extends TilePathfinder{
             Tile tile = out.peek();
 
             Tile max = null;
-            float maxf = 0f;
+            float maxf = weights[tile.x][tile.y];
             for(GridPoint2 point : Geometry.d4){
                 int nx = tile.x + point.x, ny = tile.y + point.y;
-                if(inBounds(nx, ny) && (weights[nx][ny] > maxf || max == null)){
+                if(inBounds(nx, ny) && (weights[nx][ny] > maxf)){
                     max = tiles[nx][ny];
                     maxf = weights[nx][ny];
 
-                    if(MathUtils.isEqual(maxf, Float.MAX_VALUE)){
+                    if(MathUtils.isEqual(maxf, 100000)){
                         out.add(max);
                         return;
                     }

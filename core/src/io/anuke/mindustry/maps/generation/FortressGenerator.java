@@ -1,27 +1,26 @@
 package io.anuke.mindustry.maps.generation;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Predicate;
 import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.blocks.DistributionBlocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.maps.generation.pathfinding.FlowPathFinder;
+import io.anuke.mindustry.maps.generation.pathfinding.TilePathfinder;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.defense.Door;
 import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.mindustry.world.blocks.defense.turrets.ItemTurret;
 import io.anuke.mindustry.world.blocks.defense.turrets.PowerTurret;
-import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
-import io.anuke.mindustry.world.blocks.power.PowerGenerator;
 import io.anuke.mindustry.world.blocks.power.SolarGenerator;
 import io.anuke.mindustry.world.blocks.production.Drill;
 import io.anuke.mindustry.world.consumers.ConsumePower;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 public class FortressGenerator{
@@ -54,6 +53,18 @@ public class FortressGenerator{
 
         Block wall = walls.get((int)(difficultyScl * walls.size));
         Drill drill = (Drill) drills.get((int)(difficultyScl * drills.size));
+
+        TilePathfinder finder = new FlowPathFinder(gen.tiles);
+        Array<Tile> out = new Array<>();
+        finder.search(gen.tile(enemyX, enemyY - 1), t -> t.block().dropsItem(Items.copper), out);
+        for (int i = 0; i < out.size - 1; i++) {
+            Tile current = out.get(i);
+            Tile next = out.get(i + 1);
+            byte rotation = next.relativeTo(current.x, current.y);
+            current.setBlock(DistributionBlocks.conveyor, team);
+            current.setRotation(rotation);
+        }
+        /*
 
         //place down drills
         for(int x = 0; x < gen.width; x++){
@@ -132,7 +143,7 @@ public class FortressGenerator{
                     gen.setBlock(x, y, wall, team);
                 }
             }
-        }
+        }*/
     }
 
     boolean accepts(AmmoType[] types, Item item){
