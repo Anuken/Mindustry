@@ -40,7 +40,7 @@ public class FogRenderer implements Disposable{
     private boolean dirty;
 
     public FogRenderer(){
-        Events.on(WorldLoadGraphicsEvent.class, () -> {
+        Events.on(WorldLoadGraphicsEvent.class, event -> {
             dispose();
 
             padding = world.getSector() != null ? mapPadding + extraPadding : 0;
@@ -66,9 +66,9 @@ public class FogRenderer implements Disposable{
             dirty = true;
         });
 
-        Events.on(TileChangeEvent.class, tile -> threads.runGraphics(() -> {
-            if(tile.getTeam() == players[0].getTeam() && tile.block().synthetic() && tile.block().viewRange > 0){
-                changeQueue.add(tile);
+        Events.on(TileChangeEvent.class, event -> threads.runGraphics(() -> {
+            if(event.tile.getTeam() == players[0].getTeam() && event.tile.block().synthetic() && event.tile.block().viewRange > 0){
+                changeQueue.add(event.tile);
             }
         }));
     }

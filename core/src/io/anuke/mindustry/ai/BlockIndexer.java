@@ -50,18 +50,18 @@ public class BlockIndexer{
     private Array<Tile> returnArray = new ThreadArray<>();
 
     public BlockIndexer(){
-        Events.on(TileChangeEvent.class, tile -> {
-            if(typeMap.get(tile.packedPosition()) != null){
-                TileIndex index = typeMap.get(tile.packedPosition());
+        Events.on(TileChangeEvent.class, event -> {
+            if(typeMap.get(event.tile.packedPosition()) != null){
+                TileIndex index = typeMap.get(event.tile.packedPosition());
                 for(BlockFlag flag : index.flags){
-                    getFlagged(index.team)[flag.ordinal()].remove(tile);
+                    getFlagged(index.team)[flag.ordinal()].remove(event.tile);
                 }
             }
-            process(tile);
-            updateQuadrant(tile);
+            process(event.tile);
+            updateQuadrant(event.tile);
         });
 
-        Events.on(WorldLoadEvent.class, () -> {
+        Events.on(WorldLoadEvent.class, event -> {
             flagMap = new ObjectSet[Team.all.length][BlockFlag.all.length];
             for(int i = 0; i < flagMap.length; i++){
                 for(int j = 0; j < BlockFlag.all.length; j++){

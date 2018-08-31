@@ -138,8 +138,8 @@ public class HudFragment extends Fragment{
         parent.fill(t -> {
             float notifDuration = 240f;
 
-            Events.on(StateChangeEvent.class, (from, to) -> {
-                if(to == State.menu || from == State.menu){
+            Events.on(StateChangeEvent.class, event -> {
+                if(event.to == State.menu || event.from == State.menu){
                     coreAttackTime = 0f;
                     lastCoreHP = Float.NaN;
                 }

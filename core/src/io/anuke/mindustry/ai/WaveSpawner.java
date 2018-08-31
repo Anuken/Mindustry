@@ -163,7 +163,7 @@ public class WaveSpawner{
         }
     }
 
-    private void reset(){
+    private void reset(WorldLoadEvent event){
         flySpawns.clear();
         groundSpawns.clear();
         quadrants = new GridBits(quadWidth(), quadHeight());

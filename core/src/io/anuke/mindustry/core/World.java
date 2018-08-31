@@ -213,7 +213,7 @@ public class World extends Module{
         EntityPhysics.resizeTree(0, 0, tiles.length * tilesize, tiles[0].length * tilesize);
 
         generating = false;
-        Events.fire(WorldLoadEvent.class);
+        Events.fire(new WorldLoadEvent());
     }
 
     /**Loads up a sector map. This does not call play(), but calls reset().*/
@@ -279,7 +279,7 @@ public class World extends Module{
 
     public void notifyChanged(Tile tile){
         if(!generating){
-            threads.runDelay(() -> Events.fire(TileChangeEvent.class, tile));
+            threads.runDelay(() -> Events.fire(new TileChangeEvent(tile)));
         }
     }
 

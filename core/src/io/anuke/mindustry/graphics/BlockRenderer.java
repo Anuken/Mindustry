@@ -40,18 +40,18 @@ public class BlockRenderer{
             requests.set(i, new BlockRequest());
         }
 
-        Events.on(WorldLoadGraphicsEvent.class, () -> {
+        Events.on(WorldLoadGraphicsEvent.class, event -> {
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
         });
 
-        Events.on(TileChangeEvent.class, tile -> {
+        Events.on(TileChangeEvent.class, event -> {
             threads.runGraphics(() -> {
                 int avgx = Mathf.scl(camera.position.x, tilesize);
                 int avgy = Mathf.scl(camera.position.y, tilesize);
                 int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
                 int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
 
-                if(Math.abs(avgx - tile.x) <= rangex && Math.abs(avgy - tile.y) <= rangey){
+                if(Math.abs(avgx - event.tile.x) <= rangex && Math.abs(avgy - event.tile.y) <= rangey){
                     lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
                 }
             });

@@ -48,7 +48,7 @@ public class ContentDatabase{
         //fire unlock event so other classes can use it
         if(ret){
             content.onUnlock();
-            Events.fire(UnlockEvent.class, content);
+            Events.fire(new UnlockEvent(content));
             dirty = true;
         }
 

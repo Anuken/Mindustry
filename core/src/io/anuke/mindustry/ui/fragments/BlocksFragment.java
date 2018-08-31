@@ -89,14 +89,12 @@ public class BlocksFragment extends Fragment{
             }).bottom().right().get();
         });
 
-        Events.on(WorldLoadEvent.class, this::rebuild);
+        Events.on(WorldLoadEvent.class, event -> rebuild());
 
         rebuild();
     }
 
-    /**
-     * Rebuilds the whole placement menu, attempting to preserve previous state.
-     */
+    /**Rebuilds the whole placement menu, attempting to preserve previous state.*/
     void rebuild(){
         selectTable.clear();
 

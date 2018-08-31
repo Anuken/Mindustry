@@ -193,7 +193,7 @@ public class UI extends SceneModule{
     public void resize(int width, int height){
         super.resize(width, height);
 
-        Events.fire(ResizeEvent.class);
+        Events.fire(new ResizeEvent());
     }
 
     public Locale getLocale(){

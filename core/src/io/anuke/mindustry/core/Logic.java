@@ -65,7 +65,7 @@ public class Logic extends Module{
             }
         }
 
-        Events.fire(PlayEvent.class);
+        Events.fire(new PlayEvent());
     }
 
     public void reset(){
@@ -78,7 +78,7 @@ public class Logic extends Module{
         Entities.clear();
         TileEntity.sleepingEntities = 0;
 
-        Events.fire(ResetEvent.class);
+        Events.fire(new ResetEvent());
     }
 
     public void runWave(){
@@ -86,14 +86,14 @@ public class Logic extends Module{
         state.wave++;
         state.wavetime = wavespace * state.difficulty.timeScaling;
 
-        Events.fire(WaveEvent.class);
+        Events.fire(new WaveEvent());
     }
 
     //this never triggers in PvP; only for checking sector game-overs
     private void checkGameOver(){
         if(state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
             state.gameOver = true;
-            Events.fire(GameOverEvent.class);
+            Events.fire(new GameOverEvent());
         }
     }
 

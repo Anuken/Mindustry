@@ -27,7 +27,7 @@ public class MenuFragment extends Fragment{
                 buildDesktop();
             }else{
                 buildMobile();
-                Events.on(ResizeEvent.class, this::buildMobile);
+                Events.on(ResizeEvent.class, event -> buildMobile());
             }
         });
 

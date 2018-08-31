@@ -99,7 +99,7 @@ public class Build{
         }
 
 
-        threads.runDelay(() -> Events.fire(BlockBuildEvent.class, team, tile));
+        threads.runDelay(() -> Events.fire(new BlockBuildEvent(tile, team)));
     }
 
     /**Returns whether a tile can be placed at this location by this team.*/

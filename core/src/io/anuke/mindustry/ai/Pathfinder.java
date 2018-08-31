@@ -25,18 +25,18 @@ public class Pathfinder{
     private IntArray blocked = new IntArray();
 
     public Pathfinder(){
-        Events.on(WorldLoadEvent.class, this::clear);
-        Events.on(TileChangeEvent.class, tile -> {
+        Events.on(WorldLoadEvent.class, event -> clear());
+        Events.on(TileChangeEvent.class, event -> {
             if(Net.client()) return;
 
             for(Team team : Team.all){
                 TeamData data = state.teams.get(team);
-                if(state.teams.isActive(team) && data.team != tile.getTeam() && paths[data.team.ordinal()].weights[tile.x][tile.y] >= Float.MAX_VALUE){
-                    update(tile, data.team);
+                if(state.teams.isActive(team) && data.team != event.tile.getTeam() && paths[data.team.ordinal()].weights[event.tile.x][event.tile.y] >= Float.MAX_VALUE){
+                    update(event.tile, data.team);
                 }
             }
 
-            update(tile, tile.getTeam());
+            update(event.tile, event.tile.getTeam());
         });
     }
 

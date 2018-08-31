@@ -8,7 +8,6 @@
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Map"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.SpawnGroup"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.core.GameState"/>
-    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.EventType"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.io.SaveFileVersion"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.ucore.entities.impl.EffectEntity"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Packets"/>

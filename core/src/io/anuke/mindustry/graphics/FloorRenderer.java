@@ -42,7 +42,7 @@ public class FloorRenderer{
     private IntArray drawnLayers = new IntArray();
 
     public FloorRenderer(){
-        Events.on(WorldLoadGraphicsEvent.class, this::clearTiles);
+        Events.on(WorldLoadGraphicsEvent.class, event -> clearTiles());
 
         gutterTile = new Tile(0, 0){
             @Override

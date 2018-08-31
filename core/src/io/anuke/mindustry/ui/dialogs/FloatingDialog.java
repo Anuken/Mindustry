@@ -34,7 +34,7 @@ public class FloatingDialog extends Dialog{
     }
 
     protected void onResize(Runnable run){
-        Events.on(ResizeEvent.class, () -> {
+        Events.on(ResizeEvent.class, event -> {
             if(isShown()){
                 run.run();
             }

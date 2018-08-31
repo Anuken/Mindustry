@@ -31,8 +31,8 @@ public class Saves{
     private long lastTimestamp;
 
     public Saves(){
-        Events.on(StateChangeEvent.class, (prev, state) -> {
-            if(state == State.menu){
+        Events.on(StateChangeEvent.class, event -> {
+            if(event.to == State.menu){
                 threads.run(() -> {
                     totalPlaytime = 0;
                     lastTimestamp = 0;

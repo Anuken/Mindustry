@@ -94,7 +94,7 @@ public class ServerControl extends Module{
             "&lrWARNING: &lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly so that clients know which version you are using.");
         }
 
-        Events.on(GameOverEvent.class, () -> {
+        Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
             info("Game over!");
 

@@ -268,11 +268,11 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     private static void initEvents(){
         if(initialized) return;
 
-        Events.on(BlockBuildEvent.class, (team, tile) -> {
-            EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
+        Events.on(BlockBuildEvent.class, event -> {
+            EntityGroup<BaseUnit> group = unitGroups[event.team.ordinal()];
 
-            if(!(tile.entity instanceof BuildEntity)) return;
-            BuildEntity entity = tile.entity();
+            if(!(event.tile.entity instanceof BuildEntity)) return;
+            BuildEntity entity = event.tile.entity();
 
             for(BaseUnit unit : group.all()){
                 if(unit instanceof Drone){
