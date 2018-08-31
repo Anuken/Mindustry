@@ -23,6 +23,13 @@ public class Generation{
         this.random = random;
     }
 
+    Tile tile(int x, int y){
+        if(!Mathf.inBounds(x, y, tiles)){
+            return null;
+        }
+        return tiles[x][y];
+    }
+
     //TODO implement
     Item drillItem(int x, int y, Drill block){
         if(block.isMultiblock()){
