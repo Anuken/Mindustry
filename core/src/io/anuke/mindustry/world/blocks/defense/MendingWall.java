@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Wall;
 import io.anuke.mindustry.world.blocks.defense.DeflectorWall.DeflectorEntity;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
@@ -13,10 +12,10 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class PhaseWall extends Wall{
+public class MendingWall extends Wall{
     protected float regenSpeed = 0.25f;
 
-    public PhaseWall(String name){
+    public MendingWall(String name){
         super(name);
         update = true;
     }

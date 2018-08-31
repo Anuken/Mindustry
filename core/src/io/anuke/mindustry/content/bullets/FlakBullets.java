@@ -1,40 +1,50 @@
 package io.anuke.mindustry.content.bullets;
 
-import io.anuke.mindustry.entities.bullet.BasicBulletType;
+import io.anuke.mindustry.content.fx.BulletFx;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.bullet.FlakBulletType;
+import io.anuke.mindustry.entities.effect.Lightning;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
+import io.anuke.ucore.util.Mathf;
 
 public class FlakBullets extends BulletList implements ContentList{
-    public static BulletType lead, plastic, explosive, surge;
+    public static BulletType plastic, explosive, surge;
 
     @Override
     public void load(){
 
-        lead = new BasicBulletType(3f, 5, "bullet"){
+
+        plastic = new FlakBulletType(4f, 5){
             {
-                bulletWidth = 7f;
-                bulletHeight = 9f;
+                splashDamageRadius = 40f;
+                fragBullet = ArtilleryBullets.plasticFrag;
+                fragBullets = 4;
+                hiteffect = BulletFx.plasticExplosion;
+                frontColor = Palette.plastaniumFront;
+                backColor = Palette.plastaniumBack;
             }
         };
 
-        plastic = new BasicBulletType(3f, 5, "bullet"){
+        explosive = new FlakBulletType(4f, 5){
             {
-                bulletWidth = 7f;
-                bulletHeight = 9f;
+                //default bullet type, no changes
             }
         };
 
-        explosive = new BasicBulletType(3f, 5, "bullet"){
+        surge = new FlakBulletType(4f, 7){
             {
-                bulletWidth = 7f;
-                bulletHeight = 9f;
+                splashDamage = 33f;
             }
-        };
 
-        surge = new BasicBulletType(3f, 5, "bullet"){
-            {
-                bulletWidth = 7f;
-                bulletHeight = 9f;
+            @Override
+            public void despawned(Bullet b) {
+                super.despawned(b);
+
+                for (int i = 0; i < 2; i++) {
+                    Lightning.create(b.getTeam(), BulletFx.hitLancer, Palette.surge, damage, b.x, b.y, Mathf.random(360f), 12);
+                }
             }
         };
     }

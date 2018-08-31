@@ -11,6 +11,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.storage.CoreBlock.CoreEntity;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
@@ -75,6 +76,25 @@ public class OverlayRenderer{
                     }
                 }
             }
+
+            for(Team enemy : state.teams.enemiesOf(player.getTeam())){
+                synchronized (Tile.tileSetLock){
+                    for(Tile core : state.teams.get(enemy).cores){
+                        CoreEntity entity = core.entity();
+
+                        if(entity.shieldHeat > 0.01f){
+                            Draw.alpha(1f);
+                            Draw.tint(Color.DARK_GRAY);
+                            Lines.stroke(entity.shieldHeat * 2f);
+                            Lines.poly(core.drawx(), core.drawy() - 2, 200, state.mode.enemyCoreShieldRadius);
+                            Draw.tint(Palette.accent, enemy.color, 1f-entity.shieldHeat);
+                            Lines.poly(core.drawx(), core.drawy(), 200, state.mode.enemyCoreShieldRadius);
+                        }
+                        entity.shieldHeat = Mathf.lerpDelta(entity.shieldHeat, 0f, 0.1f);
+                    }
+                }
+            }
+
             Draw.reset();
 
             //draw selected block bars and info
@@ -168,7 +188,7 @@ public class OverlayRenderer{
 
                 Tile tile = world.tileWorld(v.x, v.y);
                 if(tile != null) tile = tile.target();
-                if(tile != null && tile.block().acceptStack(player.inventory.getItem().item, player.inventory.getItem().amount, tile, player) > 0){
+                if(tile != null && tile.getTeam() == player.getTeam() && tile.block().acceptStack(player.inventory.getItem().item, player.inventory.getItem().amount, tile, player) > 0){
                     Draw.color(Palette.place);
                     Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1 + Mathf.absin(Timers.time(), 5f, 1f));
                     Draw.color();

@@ -28,6 +28,9 @@ public class Palette{
     lightishGray = Color.valueOf("a2a2a2"),
     darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f),
 
+    boostTo = Color.valueOf("ffad4d"),
+    boostFrom = Color.valueOf("ff7f57"),
+
     lancerLaser = Color.valueOf("a9d8ff"),
 
     stoneGray = Color.valueOf("8f8f8f"),
@@ -38,6 +41,8 @@ public class Palette{
 
     powerLaserFrom = Color.valueOf("e3e3e3"),
     powerLaserTo = Color.valueOf("ffe7a8"),
+
+    heal = Color.valueOf("98ffa9"),
 
     description = Color.WHITE,
     turretinfo = Color.ORANGE,
@@ -62,6 +67,8 @@ public class Palette{
     placing = Color.valueOf("616161"),
 
     lightTrail = Color.valueOf("ffe2a9"),
+
+    surge = Color.valueOf("f3e979"),
 
     redSpark = Color.valueOf("fbb97f"),
     orangeSpark = Color.valueOf("d2b29c"),

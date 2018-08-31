@@ -26,6 +26,7 @@ public enum GameMode{
 
     public boolean infiniteResources, disableWaveTimer, disableWaves, hidden, autoSpawn, isPvp;
     public float enemyCoreBuildRadius = 400f;
+    public float enemyCoreShieldRadius = 140f;
     public float respawnTime = 60 * 4;
 
     public String description(){

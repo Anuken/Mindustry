@@ -302,7 +302,7 @@ public abstract class InputHandler extends InputAdapter{
 
         ItemStack stack = player.inventory.getItem();
 
-        if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.block().hasItems){
+        if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.getTeam() == player.getTeam() && tile.block().hasItems){
             Call.transferInventory(player, tile);
         }else{
             Call.dropItem(player.angleTo(x, y));

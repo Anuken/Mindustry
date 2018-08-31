@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.units;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -43,12 +44,12 @@ public class UnitType implements UnlockableContent{
     public float retreatPercent = 0.2f;
     public float armor = 0f;
     public float carryWeight = 1f;
-    public int ammoCapacity = 200;
     public int itemCapacity = 30;
     public ObjectSet<Item> toMine = ObjectSet.with(Items.lead, Items.copper);
     public float buildPower = 0.3f, minePower = 0.7f, healSpeed = 0.1f;
     public Weapon weapon = Weapons.blaster;
     public float weaponOffsetX, weaponOffsetY;
+    public Color trailColor = Color.valueOf("ffa665");
 
     public TextureRegion iconRegion, legRegion, baseRegion, region;
 

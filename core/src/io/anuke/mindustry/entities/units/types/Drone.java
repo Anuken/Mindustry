@@ -244,7 +244,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         }
 
         public void update(){
-            if(health >= health){
+            if(health >= maxHealth()){
                 state.set(attack);
             }else if(!targetHasFlag(BlockFlag.repair)){
                 if(timer.get(timerTarget, 20)){

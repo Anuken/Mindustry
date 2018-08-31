@@ -46,6 +46,7 @@ public class UnitPad extends Block{
     protected UnitType type;
     protected float produceTime = 1000f;
     protected float launchVelocity = 0f;
+    protected TextureRegion topRegion;
 
     public UnitPad(String name){
         super(name);
@@ -76,6 +77,13 @@ public class UnitPad extends Block{
             unit.add();
             unit.getVelocity().y = factory.launchVelocity;
         }
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        topRegion = Draw.region(name + "-top");
     }
 
     @Override
@@ -135,7 +143,7 @@ public class UnitPad extends Block{
 
         Draw.reset();
 
-        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+        Draw.rect(topRegion, tile.drawx(), tile.drawy());
     }
 
     @Override

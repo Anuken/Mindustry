@@ -53,7 +53,7 @@ public class Pathfinder{
     public Tile getTargetTile(Team team, Tile tile){
         float[][] values = paths[team.ordinal()].weights;
 
-        if(values == null) return tile;
+        if(values == null || tile == null) return tile;
 
         float value = values[tile.x][tile.y];
 

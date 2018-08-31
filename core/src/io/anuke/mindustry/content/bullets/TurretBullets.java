@@ -24,16 +24,48 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
 public class TurretBullets extends BulletList implements ContentList{
-    public static BulletType fireball, basicFlame, lancerLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt;
+    public static BulletType fireball, basicFlame, lancerLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt, healBullet;
 
     @Override
     public void load(){
+
+        healBullet = new BulletType(5.2f, 19){
+            float healAmount = 21f;
+
+            {
+                hiteffect = BulletFx.hitLaser;
+                despawneffect = BulletFx.hitLaser;
+                collidesTeam = true;
+            }
+
+            @Override
+            public void draw(Bullet b){
+                Draw.color(Palette.heal);
+                Lines.stroke(2f);
+                Lines.lineAngleCenter(b.x, b.y, b.angle(), 7f);
+                Draw.color(Color.WHITE);
+                Lines.lineAngleCenter(b.x, b.y, b.angle(), 3f);
+                Draw.reset();
+            }
+
+            @Override
+            public void hitTile(Bullet b, Tile tile){
+                super.hit(b);
+
+                if(tile.getTeam() == b.getTeam()){
+                    Effects.effect(BlockFx.healBlock, tile.drawx(), tile.drawy(), tile.block().size);
+                    tile.entity.health += healAmount;
+                    tile.entity.health = Mathf.clamp(tile.entity.health, 0, tile.block().health);
+                }
+            }
+        };
 
         fireball = new BulletType(1f, 4){
             {
@@ -92,11 +124,11 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        lancerLaser = new BulletType(0.001f, 110){
+        lancerLaser = new BulletType(0.001f, 140){
             Color[] colors = {Palette.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Palette.lancerLaser, Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
             float[] lenscales = {1f, 1.1f, 1.13f, 1.14f};
-            float length = 90f;
+            float length = 100f;
 
             {
                 hiteffect = BulletFx.hitLancer;
@@ -128,7 +160,41 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        fuseShot = new BulletType(0.01f, 100){
+        fuseShot = new BulletType(0.01f, 70){
+            int rays = 3;
+            float raySpace = 2f;
+            float rayLength = 80f;
+            {
+                hiteffect = BulletFx.hitFuse;
+                lifetime = 13f;
+                despawneffect = Fx.none;
+                pierce = true;
+            }
+
+            @Override
+            public void init(Bullet b) {
+                for (int i = 0; i < rays; i++) {
+                    float offset = (i-rays/2)*raySpace;
+                    vector.trns(b.angle(), 0.01f, offset);
+                    Damage.collideLine(b, b.getTeam(), hiteffect, b.x, b.y, b.angle(), rayLength - Math.abs(i - (rays/2))*20f);
+                }
+            }
+
+            @Override
+            public void draw(Bullet b) {
+                super.draw(b);
+                Draw.color(Color.WHITE, Palette.surge, b.fin());
+                for(int i = 0; i < 7; i++){
+                    vector.trns(b.angle(), i * 8f);
+                    float sl = Mathf.clamp(b.fout()-0.5f) * (80f - i *10);
+                    Shapes.tri(b.x + vector.x, b.y + vector.y, 4f, sl, b.angle() + 90);
+                    Shapes.tri(b.x + vector.x, b.y + vector.y, 4f, sl, b.angle() - 90);
+                }
+                Shapes.tri(b.x, b.y, 13f, (rayLength+50) * b.fout(), b.angle());
+                Shapes.tri(b.x, b.y, 13f, 10f * b.fout(), b.angle() + 180f);
+                Draw.reset();
+            }
+
             //TODO
         };
 

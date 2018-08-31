@@ -45,6 +45,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public UnitInventory inventory = new UnitInventory(this);
     public float rotation;
+    public float hitTime;
 
     protected Interpolator interpolator = new Interpolator();
     protected StatusController status = new StatusController();
@@ -52,7 +53,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     protected CarryTrait carrier;
     protected Vector2 velocity = new Translator(0f, 0.0001f);
-    protected float hitTime;
     protected float drownTime;
 
     @Override
@@ -315,8 +315,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
     }
 
-    public void drawShadow(){
-        Draw.rect(getIconRegion(), x , y, rotation - 90);
+    public void drawShadow(float offsetX, float offsetY){
+        Draw.rect(getIconRegion(), x + offsetX, y + offsetY, rotation - 90);
     }
 
     public void drawView(){

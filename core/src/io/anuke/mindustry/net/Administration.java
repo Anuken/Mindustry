@@ -63,55 +63,6 @@ public class Administration{
         return editLogs;
     }
 
-    /*
-    public void rollbackWorld(int rollbackTimes) {
-        for(IntMap.Entry<Array<EditLog>> editLog : editLogs.entries()) {
-            int coords = editLog.key;
-            Array<EditLog> logs = editLog.value;
-
-            for(int i = 0; i < rollbackTimes; i++) {
-
-                EditLog log = logs.get(logs.size - 1);
-
-                int x = coords % world.width();
-                int y = coords / world.width();
-                Block result = log.block;
-                int rotation = log.rotation;
-
-                //TODO fix this mess, broken with 4.0
-
-                if(log.action == EditLog.EditAction.PLACE) {
-                   // Build.breakBlock(x, y, false, false);
-
-                    Packets.BreakPacket packet = new Packets.BreakPacket();
-                    packet.x = (short) x;
-                    packet.y = (short) y;
-                    packet.playerid = 0;
-
-                    Net.send(packet, Net.SendMode.tcp);
-                }
-                else if(log.action == EditLog.EditAction.BREAK) {
-                    //Build.placeBlock(x, y, result, rotation, false, false);
-
-                    Packets.PlacePacket packet = new Packets.PlacePacket();
-                    packet.x = (short) x;
-                    packet.y = (short) y;
-                    packet.rotation = (byte) rotation;
-                    packet.playerid = 0;
-                    //packet.block = result.id;
-
-                    Net.send(packet, Net.SendMode.tcp);
-                }
-
-                logs.removeIndex(logs.size - 1);
-                if(logs.size == 0) {
-                    editLogs.remove(coords);
-                    break;
-                }
-            }
-        }
-    }*/
-
     public boolean validateBreak(String id, String ip){
         if(!isAntiGrief() || isAdmin(id, ip)) return true;
 

@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -24,7 +25,7 @@ public class LaserTurret extends PowerTurret{
 
     @Override
     public void shoot(Tile tile, AmmoType ammo){
-        TurretEntity entity = tile.entity();
+        LaserTurretEntity entity = tile.entity();
 
         useAmmo(tile);
 
@@ -39,6 +40,8 @@ public class LaserTurret extends PowerTurret{
             });
         }
 
+        entity.shooting = true;
+
         Timers.run(chargeTime, () -> {
             if(!isTurret(tile)) return;
             tr.trns(entity.rotation, size * tilesize / 2);
@@ -46,6 +49,22 @@ public class LaserTurret extends PowerTurret{
             entity.heat = 1f;
             bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy));
             effects(tile);
+            entity.shooting = false;
         });
+    }
+
+    @Override
+    public boolean shouldTurn(Tile tile){
+        LaserTurretEntity entity = tile.entity();
+        return !entity.shooting;
+    }
+
+    @Override
+    public TileEntity getEntity(){
+        return new LaserTurretEntity();
+    }
+
+    public class LaserTurretEntity extends TurretEntity{
+        public boolean shooting;
     }
 }

@@ -26,7 +26,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
-        uCoreVersion = 'd30ec505beb78da25fea3a5aa78f79260f2fb65b'
+        uCoreVersion = '4d8019c8f37fdc2a7a64cbd55ef6ee30fb9f1ba5'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -44,7 +44,7 @@ allprojects {
 
         generateLocales = {
             def output = '["en",'
-            def bundles = new File('core/assets/bundles/')
+            def bundles = new File(project(':core').projectDir, 'assets/bundles/')
             bundles.listFiles().each { other ->
                 if(other.name == "bundle.properties") return;
                 output += '"' + other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + '",'
@@ -54,7 +54,7 @@ allprojects {
         }
 
         writeVersion = {
-            def pfile = new File('core/assets/version.properties')
+            def pfile = new File(project(':core').projectDir, 'assets/version.properties')
             def props = new Properties()
 
             try{
@@ -229,7 +229,12 @@ project(":kryonet") {
     dependencies {
         compile project(":core")
         compile 'com.github.crykn:kryonet:2.22.1'
+        compile 'com.github.Anuken:WaifUPnP:05eb46bc577fd7674596946ba288c96c0cedd893'
     }
+}
+
+project(":reporter"){
+    apply plugin: "java"
 }
 
 tasks.eclipse.doLast {

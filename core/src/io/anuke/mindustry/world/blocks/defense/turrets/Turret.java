@@ -52,12 +52,14 @@ public abstract class Turret extends Block{
     protected float reload = 10f;
     protected float inaccuracy = 0f;
     protected int shots = 1;
+    protected float spread = 4f;
     protected float recoil = 1f;
     protected float restitution = 0.02f;
     protected float cooldown = 0.02f;
     protected float rotatespeed = 5f; //in degrees per tick
     protected float shootCone = 8f;
     protected float shootShake = 0f;
+    protected float xRand = 0f;
     protected boolean targetAir = true;
 
     protected Translator tr = new Translator();
@@ -193,6 +195,7 @@ public abstract class Turret extends Block{
             }
 
             if(!Units.invalidateTarget(entity.target, tile.getTeam(), tile.drawx(), tile.drawy())){
+
                 AmmoType type = peekAmmo(tile);
                 float speed = type.bullet.speed;
                 if(speed < 0.1f) speed = 9999999f;
@@ -208,13 +211,19 @@ public abstract class Turret extends Block{
                     entity.rotation = 0;
                 }
 
-                entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * Timers.delta());
+                if(shouldTurn(tile)){
+                    entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * Timers.delta());
+                }
 
                 if(Angles.angleDist(entity.rotation, targetRot) < shootCone){
                     updateShooting(tile);
                 }
             }
         }
+    }
+
+    public boolean shouldTurn(Tile tile){
+        return true;
     }
 
     /**
@@ -267,13 +276,15 @@ public abstract class Turret extends Block{
         entity.heat = 1f;
 
         AmmoType type = peekAmmo(tile);
-        useAmmo(tile);
 
-        tr.trns(entity.rotation, size * tilesize / 2);
+        tr.trns(entity.rotation, size * tilesize / 2, Mathf.range(xRand));
 
-        bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy));
+        for(int i = 0; i < shots; i++){
+            bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i-shots/2) * spread);
+        }
 
         effects(tile);
+        useAmmo(tile);
     }
 
     protected void bullet(Tile tile, BulletType type, float angle){
@@ -314,7 +325,6 @@ public abstract class Turret extends Block{
     }
 
     public static class TurretEntity extends TileEntity{
-        public TileEntity blockTarget;
         public Array<AmmoEntry> ammo = new ThreadArray<>();
         public int totalAmmo;
         public float reload;

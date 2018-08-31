@@ -45,6 +45,7 @@ public class ServerControl extends Module{
     private ShuffleMode mode;
     private int gameOvers;
     private boolean inExtraRound;
+    private Team winnerTeam;
 
     public ServerControl(String[] args){
         Settings.defaultList(
@@ -52,11 +53,14 @@ public class ServerControl extends Module{
             "bans", "",
             "admins", "",
             "sector_x", 0,
-            "sector_y", 1
+            "sector_y", 1,
+            "crashreport", false,
+            "port", port
         );
 
         mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
 
+        Timers.setDeltaProvider(() -> Gdx.graphics.getDeltaTime() * 60f);
         Effects.setScreenShakeProvider((a, b) -> {});
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
         Sounds.setHeadless(true);
@@ -106,7 +110,9 @@ public class ServerControl extends Module{
                             while(map == previous) map = maps.random();
                         }
 
-                        Call.onInfoMessage("[SCARLET]Game over![]\nNext selected map:[accent] "+map.name+"[]"
+                        Call.onInfoMessage((state.mode.isPvp && winnerTeam != null
+                        ? "[YELLOW]The " + winnerTeam.name() + " team is victorious![]" : "[SCARLET]Game over![]")
+                        + "\nNext selected map:[accent] "+map.name+"[]"
                         + (map.meta.author() != null ? " by[accent] " + map.meta.author() + "[]" : "") + "."+
                         "\nNew game begins in " + roundExtraTime + " seconds.");
 
@@ -158,6 +164,7 @@ public class ServerControl extends Module{
 
         handler.register("stop", "Stop hosting the server.", arg -> {
             Net.closeServer();
+            Timers.clear();
             state.set(State.menu);
             netServer.reset();
             Log.info("Stopped server.");
@@ -203,7 +210,7 @@ public class ServerControl extends Module{
                 logic.play();
 
             }else{
-                Log.info("&ly&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sector_x"), Settings.getInt("sector_y"));
+                info("&ly&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sector_x"), Settings.getInt("sector_y"));
                 playSectorMap(false);
             }
 
@@ -212,10 +219,25 @@ public class ServerControl extends Module{
             host();
         });
 
+        handler.register("port", "[port]", "Sets or displays the port for hosting the server.", arg -> {
+            if(arg.length == 0){
+                info("&lyPort: &lc{0}", Settings.getInt("port"));
+            }else{
+                int port = Strings.parseInt(arg[0]);
+                if(port < 0 || port > 65535){
+                    err("Port must be a number between 0 and 65535.");
+                    return;
+                }
+                info("&lyPort set to {0}.", port);
+                Settings.putInt("port", port);
+                Settings.save();
+            }
+        });
+
         handler.register("maps", "Display all available maps.", arg -> {
-            Log.info("Maps:");
+            info("Maps:");
             for(Map map : world.maps().all()){
-                Log.info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
+                info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
             }
         });
 
@@ -304,20 +326,14 @@ public class ServerControl extends Module{
             info("Core filled.");
         });
 
-        handler.register("friendlyfire", "<on/off>", "Enable or disable friendly fire.", arg -> {
-            String s = arg[0];
-            if(s.equalsIgnoreCase("on")){
-                state.friendlyFire = true;
-                info("Friendly fire enabled.");
-            }else if(s.equalsIgnoreCase("off")){
-                state.friendlyFire = false;
-                info("Friendly fire disabled.");
-            }else{
-                err("Incorrect command usage.");
-            }
+        handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
+            boolean value = arg[0].equalsIgnoreCase("on");
+            Settings.putBool("crashreport", value);
+            Settings.save();
+            info("Crash reporting is now {0}.", value ? "on" : "off");
         });
 
-        handler.register("debug", "<on/off>", "Disables or enables debug ode", arg -> {
+        handler.register("debug", "<on/off>", "Disables or enables debug mode", arg -> {
            boolean value = arg[0].equalsIgnoreCase("on");
            debug = value;
            info("Debug mode is now {0}.", value ? "on" : "off");
@@ -869,6 +885,7 @@ public class ServerControl extends Module{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
+
             Array<Player> players = new Array<>();
             for(Player p : playerGroup.all()){
                 players.add(p);
@@ -886,7 +903,7 @@ public class ServerControl extends Module{
         };
 
         if(wait){
-            Timers.runTask(60f * roundExtraTime, r);
+            Timers.run(60f * roundExtraTime, r);
         }else{
             r.run();
         }
@@ -894,23 +911,44 @@ public class ServerControl extends Module{
 
     private void host(){
         try{
-            Net.host(port);
+            Net.host(Settings.getInt("port"));
+            info("&lcOpened a server on port {0}.", Settings.getInt("port"));
         }catch(IOException e){
             Log.err(e);
             state.set(State.menu);
         }
     }
 
+    private void checkPvPGameOver(){
+        Team alive = null;
+
+        for(Team team : Team.all){
+            if(state.teams.get(team).cores.size > 0){
+                if(alive != null){
+                    return;
+                }
+                alive = team;
+            }
+        }
+
+        if(alive != null && !state.gameOver){
+            state.gameOver = true;
+            winnerTeam = alive;
+            Events.fire(GameOverEvent.class);
+        }
+    }
+
     @Override
     public void update(){
 
-        if(state.is(State.playing) && world.getSector() != null){
+        if(state.is(State.playing) && world.getSector() != null && !inExtraRound && !debug){
             //all assigned missions are complete
             if(world.getSector().completedMissions >= world.getSector().missions.size){
                 Log.info("Mission complete.");
                 world.sectors().completeSector(world.getSector().x, world.getSector().y);
                 world.sectors().save();
                 gameOvers = 0;
+                inExtraRound = true;
                 Settings.putInt("sector_x", world.getSector().x + world.getSector().size);
                 Settings.save();
 

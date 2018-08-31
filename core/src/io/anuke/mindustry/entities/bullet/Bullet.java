@@ -108,6 +108,10 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         return data;
     }
 
+    public void setData(Object data){
+        this.data = data;
+    }
+
     @Override
     public float getDamage(){
         if(owner instanceof Unit){
@@ -184,11 +188,13 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
                 if(tile == null) return false;
                 tile = tile.target();
 
-                if(tile.entity != null && tile.entity.collide(this) && !tile.entity.isDead() && tile.entity.tile.getTeam() != team){
-                    tile.entity.collision(this);
+                if(tile.entity != null && tile.entity.collide(this) && !tile.entity.isDead() && (type.collidesTeam || tile.entity.tile.getTeam() != team)){
+                    if(tile.entity.getTeam() != team){
+                        tile.entity.collision(this);
+                    }
 
                     if(!supressCollision){
-                        type.hit(this);
+                        type.hitTile(this, tile);
                         remove();
                     }
 

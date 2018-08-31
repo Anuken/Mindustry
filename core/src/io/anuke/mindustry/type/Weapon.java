@@ -1,6 +1,7 @@
 package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
@@ -8,6 +9,7 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
+import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Effects;
@@ -17,7 +19,13 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
-public class Weapon extends Upgrade{
+public class Weapon implements Content{
+    private static Array<Weapon> weapons = new Array<>();
+    private static byte lastid;
+
+    public final byte id;
+    public final String name;
+
     /**minimum cursor distance from player, fixes 'cross-eyed' shooting.*/
     protected static float minPlayerDist = 20f;
     /**ammo type map. set with setAmmo()*/
@@ -50,7 +58,9 @@ public class Weapon extends Upgrade{
     public TextureRegion equipRegion, region;
 
     protected Weapon(String name){
-        super(name);
+        this.id = lastid ++;
+        this.name = name;
+        weapons.add(this);
     }
 
     @Remote(targets = Loc.server, called = Loc.both, unreliable = true)
@@ -71,7 +81,10 @@ public class Weapon extends Upgrade{
         shootDirect(shooter, x, y, rotation, left);
     }
 
-    public static void shootDirect(ShooterTrait shooter, float x, float y, float rotation, boolean left){
+    public static void shootDirect(ShooterTrait shooter, float offsetX, float offsetY, float rotation, boolean left){
+        float x = shooter.getX() + offsetX;
+        float y = shooter.getY() + offsetY;
+
         Weapon weapon = shooter.getWeapon();
 
         Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> weapon.bullet(shooter, x, y, f + Mathf.range(weapon.inaccuracy)));
@@ -92,6 +105,14 @@ public class Weapon extends Upgrade{
         shooter.getTimer().get(shooter.getShootTimer(left), weapon.reload);
     }
 
+    public static Array<Weapon> all() {
+        return weapons;
+    }
+
+    public static Weapon getByID(int id){
+        return weapons.get(id);
+    }
+
     @Override
     public void load(){
         equipRegion = Draw.region(name + "-equip");
@@ -101,6 +122,11 @@ public class Weapon extends Upgrade{
     @Override
     public String getContentTypeName(){
         return "weapon";
+    }
+
+    @Override
+    public Array<? extends Content> getAll() {
+        return weapons;
     }
 
     public AmmoType getAmmo(){
@@ -126,7 +152,7 @@ public class Weapon extends Upgrade{
             float ang = tr.angle();
             tr.trns(ang - 90, width * Mathf.sign(left), length);
 
-            shoot(shooter, shooter.getX() + tr.x, shooter.getY() + tr.y, Angles.angle(shooter.getX() + tr.x, shooter.getY() + tr.y, cx, cy), left);
+            shoot(shooter, tr.x, tr.y, Angles.angle(shooter.getX() + tr.x, shooter.getY() + tr.y, cx, cy), left);
         }
     }
 

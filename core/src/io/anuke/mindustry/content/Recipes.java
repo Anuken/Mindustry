@@ -13,33 +13,42 @@ public class Recipes implements ContentList{
 
     @Override
     public void load(){
-        //WALLS
+        //DEFENSE
+
+        //walls
         new Recipe(defense, DefenseBlocks.copperWall, new ItemStack(Items.copper, 12));
         new Recipe(defense, DefenseBlocks.copperWallLarge, new ItemStack(Items.copper, 12 * 4));
 
         new Recipe(defense, DefenseBlocks.compositeWall, new ItemStack(Items.densealloy, 12));
         new Recipe(defense, DefenseBlocks.compositeWallLarge, new ItemStack(Items.densealloy, 12 * 4));
 
+        new Recipe(defense, DefenseBlocks.door, new ItemStack(Items.densealloy, 12), new ItemStack(Items.silicon, 8));
+        new Recipe(defense, DefenseBlocks.doorLarge, new ItemStack(Items.densealloy, 12 * 4), new ItemStack(Items.silicon, 8 * 4));
+
         new Recipe(defense, DefenseBlocks.thoriumWall, new ItemStack(Items.thorium, 12));
         new Recipe(defense, DefenseBlocks.thoriumWallLarge, new ItemStack(Items.thorium, 12 * 4));
 
-        //TODO will be added once sprites are ready
         new Recipe(defense, DefenseBlocks.phaseWall, new ItemStack(Items.phasematter, 12));
         new Recipe(defense, DefenseBlocks.phaseWallLarge, new ItemStack(Items.phasematter, 12 * 4));
 
-        new Recipe(defense, DefenseBlocks.door, new ItemStack(Items.densealloy, 12), new ItemStack(Items.silicon, 8));
-        new Recipe(defense, DefenseBlocks.doorLarge, new ItemStack(Items.densealloy, 12 * 4), new ItemStack(Items.silicon, 8 * 4));
+        new Recipe(defense, DefenseBlocks.surgeWall, new ItemStack(Items.surgealloy, 12));
+        new Recipe(defense, DefenseBlocks.surgeWallLarge, new ItemStack(Items.surgealloy, 12 * 4));
+
+
+        //projectors
+        new Recipe(defense, DefenseBlocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
 
         //TURRETS
         new Recipe(weapon, TurretBlocks.duo, new ItemStack(Items.copper, 40));
         new Recipe(weapon, TurretBlocks.scorch, new ItemStack(Items.copper, 50), new ItemStack(Items.densealloy, 20));
         new Recipe(weapon, TurretBlocks.hail, new ItemStack(Items.copper, 60), new ItemStack(Items.densealloy, 35));
-
         new Recipe(weapon, TurretBlocks.lancer, new ItemStack(Items.copper, 50), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 90));
         new Recipe(weapon, TurretBlocks.wave, new ItemStack(Items.densealloy, 60), new ItemStack(Items.titanium, 70), new ItemStack(Items.lead, 150));
-        new Recipe(weapon, TurretBlocks.swarmer, new ItemStack(Items.densealloy, 70), new ItemStack(Items.titanium, 70), new ItemStack(Items.plastanium, 90), new ItemStack(Items.silicon, 60));
         new Recipe(weapon, TurretBlocks.salvo, new ItemStack(Items.copper, 210), new ItemStack(Items.densealloy, 190), new ItemStack(Items.thorium, 130));
+        new Recipe(weapon, TurretBlocks.swarmer, new ItemStack(Items.densealloy, 70), new ItemStack(Items.titanium, 70), new ItemStack(Items.plastanium, 90), new ItemStack(Items.silicon, 60));
         new Recipe(weapon, TurretBlocks.ripple, new ItemStack(Items.copper, 300), new ItemStack(Items.densealloy, 220), new ItemStack(Items.thorium, 120));
+        new Recipe(weapon, TurretBlocks.cyclone, new ItemStack(Items.copper, 400), new ItemStack(Items.densealloy, 400), new ItemStack(Items.surgealloy, 200), new ItemStack(Items.plastanium, 150));
+        new Recipe(weapon, TurretBlocks.fuse, new ItemStack(Items.copper, 450), new ItemStack(Items.densealloy, 450), new ItemStack(Items.surgealloy, 250));
 
         //DISTRIBUTION
         new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.copper, 1));
@@ -69,7 +78,7 @@ public class Recipes implements ContentList{
         new Recipe(crafting, CraftingBlocks.phaseWeaver, new ItemStack(Items.silicon, 260), new ItemStack(Items.lead, 240), new ItemStack(Items.thorium, 150));
 
         //TODO implement alloy smelter
-        //new Recipe(crafting, CraftingBlocks.alloySmelter, new ItemStack(Items.silicon, 160), new ItemStack(Items.lead, 160), new ItemStack(Items.thorium, 140));
+        new Recipe(crafting, CraftingBlocks.alloySmelter, new ItemStack(Items.silicon, 160), new ItemStack(Items.lead, 160), new ItemStack(Items.thorium, 140));
 
         //misc
         new Recipe(crafting, CraftingBlocks.pulverizer, new ItemStack(Items.copper, 60), new ItemStack(Items.lead, 50));
@@ -125,11 +134,14 @@ public class Recipes implements ContentList{
         //UNITS
 
         //bodies
-        new Recipe(units, UpgradeBlocks.dartFactory, new ItemStack(Items.lead, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240)).setDesktop(); //dart is desktop only, because it's the starter mobile ship
-        new Recipe(units, UpgradeBlocks.javelinFactory, new ItemStack(Items.lead, 200), new ItemStack(Items.silicon, 250), new ItemStack(Items.titanium, 300), new ItemStack(Items.plastanium, 200));
-        new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.densealloy, 160), new ItemStack(Items.silicon, 220), new ItemStack(Items.titanium, 250)).setDesktop();
+        new Recipe(units, UpgradeBlocks.dartFactory, new ItemStack(Items.lead, 150), new ItemStack(Items.copper, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240)).setDesktop(); //dart is desktop only, because it's the starter mobile ship
+        new Recipe(units, UpgradeBlocks.tridentFactory, new ItemStack(Items.lead, 250), new ItemStack(Items.copper, 250), new ItemStack(Items.silicon, 250), new ItemStack(Items.titanium, 300), new ItemStack(Items.plastanium, 200));
+        new Recipe(units, UpgradeBlocks.javelinFactory, new ItemStack(Items.lead, 350), new ItemStack(Items.silicon, 450), new ItemStack(Items.titanium, 500), new ItemStack(Items.plastanium, 400), new ItemStack(Items.phasematter, 200));
+        new Recipe(units, UpgradeBlocks.glaiveFactory, new ItemStack(Items.lead, 450), new ItemStack(Items.silicon, 650), new ItemStack(Items.titanium, 700), new ItemStack(Items.plastanium, 600), new ItemStack(Items.surgealloy, 200));
 
-        //new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.copper, 30), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 30));
+        new Recipe(units, UpgradeBlocks.tauFactory, new ItemStack(Items.lead, 250), new ItemStack(Items.densealloy, 250), new ItemStack(Items.copper, 250), new ItemStack(Items.silicon, 250));
+        new Recipe(units, UpgradeBlocks.deltaFactory, new ItemStack(Items.lead, 350), new ItemStack(Items.densealloy, 350), new ItemStack(Items.copper, 400), new ItemStack(Items.silicon, 450), new ItemStack(Items.thorium, 300));
+        new Recipe(units, UpgradeBlocks.omegaFactory, new ItemStack(Items.lead, 450), new ItemStack(Items.densealloy, 550), new ItemStack(Items.silicon, 650), new ItemStack(Items.thorium, 600), new ItemStack(Items.surgealloy, 240));
 
         //actual unit related stuff
         new Recipe(units, UnitBlocks.dronePad, new ItemStack(Items.copper, 70), new ItemStack(Items.lead, 110), new ItemStack(Items.silicon, 130));

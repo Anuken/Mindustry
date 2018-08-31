@@ -1,7 +1,6 @@
 package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
@@ -149,6 +148,10 @@ public class DesktopInput extends InputHandler{
             ui.listfrag.toggle();
         }
 
+        if(Inputs.keyRelease(section, "select")){
+            player.isShooting = false;
+        }
+
         if(state.is(State.menu) || ui.hasDialog()) return;
 
         boolean controller = KeyBinds.getSection(section).device.type == DeviceType.controller;
@@ -162,15 +165,15 @@ public class DesktopInput extends InputHandler{
 
         if(player.isDead()) return;
 
+        pollInput();
+
         if(recipe != null && !Settings.getBool("desktop-place-help", false)){
-            ui.showInfo("Desktop controls have been changed.\nTo deselect a block or stop building, [accent]use the middle mouse button[].");
+            ui.showInfo("$text.construction.desktop");
             Settings.putBool("desktop-place-help", true);
             Settings.save();
         }
 
-        player.isBoosting = Inputs.keyDown("dash");
-
-        //deslect if not placing
+        //deselect if not placing
         if(!isPlacing() && mode == placing){
             mode = none;
         }
@@ -217,91 +220,75 @@ public class DesktopInput extends InputHandler{
         cursorType = normal;
     }
 
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button){
-        if(player.isDead() || state.is(State.menu) || ui.hasDialog() || ui.hasMouse()) return false;
-
-        Tile cursor = tileAt(screenX, screenY);
-        if(cursor == null) return false;
-
-        float worldx = Graphics.world(screenX, screenY).x, worldy = Graphics.world(screenX, screenY).y;
-
-        if(button == Buttons.LEFT){ //left = begin placing
-            if(isPlacing()){
-                selectX = cursor.x;
-                selectY = cursor.y;
-                mode = placing;
-            }else{
-                //only begin shooting if there's no cursor event
-                if(!tileTapped(cursor) && !tryTapPlayer(worldx, worldy) && player.getPlaceQueue().size == 0 && !droppingItem &&
-                        !tryBeginMine(cursor) && player.getMineTile() == null){
-                    player.isShooting = true;
-                }
-            }
-        }else if(button == Buttons.RIGHT){ //right = begin breaking
-            selectX = cursor.x;
-            selectY = cursor.y;
-            mode = breaking;
-        }else if(button == Buttons.MIDDLE){ //middle button = cancel placing
-            if(recipe == null){
-                player.clearBuilding();
-            }
-
-            recipe = null;
-            mode = none;
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button){
-        if(button == Buttons.LEFT){
-            player.isShooting = false;
-        }
-
-        if(player.isDead() || state.is(State.menu) || ui.hasDialog()) return false;
-
-        Tile cursor = tileAt(screenX, screenY);
-
+    void pollInput(){
+        Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
         if(cursor == null){
             mode = none;
-            return false;
+            return;
         }
 
-        if(mode == placing){ //touch up while placing, place everything in selection
-            NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, true, maxLength);
+        if(!ui.hasMouse()){
+            if(Inputs.keyTap(section, "select")){
+                if(isPlacing()){
+                    selectX = cursor.x;
+                    selectY = cursor.y;
+                    mode = placing;
+                }else{
+                    //only begin shooting if there's no cursor event
+                    if (!tileTapped(cursor) && !tryTapPlayer(Graphics.mouseWorld().x, Graphics.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
+                            !tryBeginMine(cursor) && player.getMineTile() == null) {
+                        player.isShooting = true;
+                    }
+                }
+            }else if(Inputs.keyTap(section, "deselect") && (recipe != null || mode != none || player.isBuilding())){
+                if(recipe == null){
+                    player.clearBuilding();
+                }
 
-            for(int i = 0; i <= result.getLength(); i += recipe.result.size){
-                int x = selectX + i * Mathf.sign(cursor.x - selectX) * Mathf.bool(result.isX());
-                int y = selectY + i * Mathf.sign(cursor.y - selectY) * Mathf.bool(!result.isX());
-
-                rotation = result.rotation;
-
-                tryPlaceBlock(x, y);
+                recipe = null;
+                mode = none;
+            }else if(Inputs.keyTap(section, "break")){
+                selectX = cursor.x;
+                selectY = cursor.y;
+                mode = breaking;
             }
-        }else if(mode == breaking){ //touch up while breaking, break everything in selection
-            NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, false, maxLength);
+        }
 
-            if(debug && Inputs.keyDown(Input.CONTROL_LEFT)){
-                printArea(result);
-            }else{
-                for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
-                    for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
-                        int wx = selectX + x * Mathf.sign(cursor.x - selectX);
-                        int wy = selectY + y * Mathf.sign(cursor.y - selectY);
+        if(Inputs.keyRelease(section, "break") || Inputs.keyRelease(section, "select")){
 
-                        tryBreakBlock(wx, wy);
+            if(mode == placing){ //touch up while placing, place everything in selection
+                NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, true, maxLength);
+
+                for(int i = 0; i <= result.getLength(); i += recipe.result.size){
+                    int x = selectX + i * Mathf.sign(cursor.x - selectX) * Mathf.bool(result.isX());
+                    int y = selectY + i * Mathf.sign(cursor.y - selectY) * Mathf.bool(!result.isX());
+
+                    rotation = result.rotation;
+
+                    tryPlaceBlock(x, y);
+                }
+            }else if(mode == breaking){ //touch up while breaking, break everything in selection
+                NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, false, maxLength);
+
+                if(debug && Inputs.keyDown(Input.CONTROL_LEFT)){
+                    printArea(result);
+                }else{
+                    for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
+                        for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
+                            int wx = selectX + x * Mathf.sign(cursor.x - selectX);
+                            int wy = selectY + y * Mathf.sign(cursor.y - selectY);
+
+                            tryBreakBlock(wx, wy);
+                        }
                     }
                 }
             }
+
+            tryDropItems(cursor.target(), Graphics.mouseWorld().x, Graphics.mouseWorld().y);
+
+            mode = none;
         }
-
-        tryDropItems(cursor.target(), Graphics.world(screenX, screenY).x, Graphics.world(screenX, screenY).y);
-
-        mode = none;
-
-        return false;
+        
     }
 
     @Override

@@ -16,7 +16,7 @@ public class UnitBlocks extends BlockList implements ContentList{
     public void load(){
         dronePad = new UnitPad("drone-pad"){{
             type = UnitTypes.drone;
-            produceTime = 4300;
+            produceTime = 5500;
             size = 2;
             consumes.power(0.08f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30)});
@@ -24,7 +24,7 @@ public class UnitBlocks extends BlockList implements ContentList{
 
         fabricatorPad = new UnitPad("fabricator-pad"){{
             type = UnitTypes.fabricator;
-            produceTime = 5000;
+            produceTime = 7000;
             size = 2;
             consumes.power(0.2f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80)});

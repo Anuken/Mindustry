@@ -88,7 +88,7 @@ public class Damage{
         tr.trns(angle, length);
         world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
             Tile tile = world.tile(cx, cy);
-            if(tile != null && tile.entity != null && tile.entity.collide(hitter)){
+            if(tile != null && tile.entity != null && tile.target().getTeamID() != team.ordinal() && tile.entity.collide(hitter)){
                 tile.entity.collision(hitter);
                 Effects.effect(effect, tile.worldx(), tile.worldy());
             }

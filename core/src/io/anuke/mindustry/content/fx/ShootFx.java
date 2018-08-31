@@ -13,7 +13,7 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public class ShootFx extends FxList implements ContentList{
-    public static Effect shootSmall, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke, shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium, shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot;
+    public static Effect shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke, shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium, shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot;
 
     @Override
     public void load(){
@@ -23,6 +23,14 @@ public class ShootFx extends FxList implements ContentList{
             float w = 1f + 5 * e.fout();
             Shapes.tri(e.x, e.y, w, 15f * e.fout(), e.rotation);
             Shapes.tri(e.x, e.y, w, 3f * e.fout(), e.rotation + 180f);
+            Draw.reset();
+        });
+
+        shootHeal = new Effect(8, e -> {
+            Draw.color(Palette.heal);
+            float w = 1f + 5 * e.fout();
+            Shapes.tri(e.x, e.y, w, 17f * e.fout(), e.rotation);
+            Shapes.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
             Draw.reset();
         });
 

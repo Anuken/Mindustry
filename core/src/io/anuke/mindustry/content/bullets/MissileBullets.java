@@ -1,13 +1,18 @@
 package io.anuke.mindustry.content.bullets;
 
+import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.fx.BulletFx;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.bullet.MissileBulletType;
+import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentList;
+import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.util.Mathf;
 
 public class MissileBullets extends BulletList implements ContentList{
-    public static BulletType explosive, incindiary, surge, javelin;
+    public static BulletType explosive, incindiary, surge, javelin, swarm;
 
     @Override
     public void load(){
@@ -44,25 +49,75 @@ public class MissileBullets extends BulletList implements ContentList{
             }
         };
 
-        surge = new MissileBulletType(3f, 5, "bullet"){
-            {
-                bulletWidth = 7f;
-                bulletHeight = 9f;
-            }
-        };
-
-        javelin = new MissileBulletType(2.5f, 10, "missile"){
+        surge = new MissileBulletType(3.5f, 15, "bullet"){
             {
                 bulletWidth = 8f;
                 bulletHeight = 8f;
                 bulletShrink = 0f;
-                drag = -0.02f;
-                keepVelocity = false;
-                splashDamageRadius = 25f;
-                splashDamage = 15f;
-                lifetime = 90f;
+                drag = -0.01f;
+                splashDamageRadius = 30f;
+                splashDamage = 22f;
+                lifetime = 150f;
                 hiteffect = BulletFx.blastExplosion;
                 despawneffect = BulletFx.blastExplosion;
+            }
+
+            @Override
+            public void hit(Bullet b) {
+                super.hit(b);
+
+                for (int i = 0; i < 2; i++) {
+                    Lightning.create(b.getTeam(), BulletFx.hitLancer, Palette.surge, damage, b.x, b.y, Mathf.random(360f), 14);
+                }
+            }
+        };
+
+        javelin = new MissileBulletType(5f, 10.5f, "missile"){
+            {
+                bulletWidth = 8f;
+                bulletHeight = 8f;
+                bulletShrink = 0f;
+                drag = -0.003f;
+                keepVelocity = false;
+                splashDamageRadius = 20f;
+                splashDamage = 1f;
+                lifetime = 90f;
+                trailColor = Color.valueOf("b6c6fd");
+                hiteffect = BulletFx.blastExplosion;
+                despawneffect = BulletFx.blastExplosion;
+                backColor = Palette.bulletYellowBack;
+                frontColor = Palette.bulletYellow;
+            }
+
+            @Override
+            public void update(Bullet b){
+                super.update(b);
+                b.getVelocity().rotate(Mathf.sin(Timers.time() + b.id * 4422, 8f, 2f));
+            }
+        };
+
+        swarm = new MissileBulletType(2.7f, 14, "missile"){
+            {
+                bulletWidth = 8f;
+                bulletHeight = 8f;
+                bulletShrink = 0f;
+                drag = -0.003f;
+                homingRange = 60f;
+                keepVelocity = false;
+                splashDamageRadius = 25f;
+                splashDamage = 11f;
+                lifetime = 120f;
+                trailColor = Color.GRAY;
+                backColor = Palette.bulletYellowBack;
+                frontColor = Palette.bulletYellow;
+                hiteffect = BulletFx.blastExplosion;
+                despawneffect = BulletFx.blastExplosion;
+            }
+
+            @Override
+            public void update(Bullet b){
+                super.update(b);
+                b.getVelocity().rotate(Mathf.sin(Timers.time() + b.id * 4422, 8f, 2f));
             }
         };
     }

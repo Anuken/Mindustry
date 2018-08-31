@@ -5,6 +5,7 @@ import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.StatusEffect;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.impl.BaseBulletType;
 
@@ -27,6 +28,8 @@ public abstract class BulletType extends BaseBulletType<Bullet> implements Conte
     public boolean syncable;
     /**Whether this bullet type collides with tiles.*/
     public boolean collidesTiles = true;
+    /**Whether this bullet type collides with tiles that are of the same team.*/
+    public boolean collidesTeam = false;
     /**Whether this bullet types collides with anything at all.*/
     public boolean collides = true;
     /**Whether velocity is inherited from the shooter.*/
@@ -38,7 +41,7 @@ public abstract class BulletType extends BaseBulletType<Bullet> implements Conte
         this.damage = damage;
         lifetime = 40f;
         hiteffect = BulletFx.hitBulletSmall;
-        despawneffect = BulletFx.despawn;
+        despawneffect = BulletFx.hitBulletSmall;
 
         types.add(this);
     }
@@ -49,6 +52,10 @@ public abstract class BulletType extends BaseBulletType<Bullet> implements Conte
 
     public static Array<BulletType> all(){
         return types;
+    }
+
+    public void hitTile(Bullet b, Tile tile){
+        hit(b);
     }
 
     @Override

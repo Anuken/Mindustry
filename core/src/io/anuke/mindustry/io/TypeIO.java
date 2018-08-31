@@ -29,6 +29,7 @@ import java.nio.ByteBuffer;
 import static io.anuke.mindustry.Vars.*;
 
 /** Class for specifying read/write methods for code generation.*/
+@SuppressWarnings("unused")
 public class TypeIO{
 
     @WriteClass(Player.class)
@@ -223,7 +224,7 @@ public class TypeIO{
 
     @ReadClass(Weapon.class)
     public static Weapon readWeapon(ByteBuffer buffer){
-        return Upgrade.getByID(buffer.get());
+        return Weapon.getByID(buffer.get());
     }
 
     @WriteClass(Mech.class)
@@ -233,7 +234,7 @@ public class TypeIO{
 
     @ReadClass(Mech.class)
     public static Mech readMech(ByteBuffer buffer){
-        return Upgrade.getByID(buffer.get());
+        return Mech.getByID(buffer.get());
     }
 
     @WriteClass(Liquid.class)

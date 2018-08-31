@@ -83,7 +83,6 @@ public class Control extends Module{
 
         Settings.defaultList(
             "ip", "localhost",
-            "port", port + "",
             "color-0", Color.rgba8888(playerColors[8]),
             "color-1", Color.rgba8888(playerColors[11]),
             "color-2", Color.rgba8888(playerColors[13]),
@@ -352,7 +351,7 @@ public class Control extends Module{
             throw new RuntimeException(error);
         }
 
-        if(debug && Inputs.keyTap("console")){
+        if(debug && Inputs.keyTap(io.anuke.ucore.input.Input.GRAVE)){
             console = !console;
         }
 
@@ -367,6 +366,11 @@ public class Control extends Module{
         if(!state.is(State.menu)){
             for(InputHandler input : inputs){
                 input.update();
+            }
+
+            //auto-update rpc every 5 seconds
+            if(Timers.get("rpcUpdate", 60 * 5)){
+                Platform.instance.updateRPC();
             }
 
             //check unlocked sectors

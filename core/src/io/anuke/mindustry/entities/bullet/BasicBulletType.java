@@ -3,8 +3,8 @@ package io.anuke.mindustry.entities.bullet;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -25,9 +25,7 @@ public class BasicBulletType extends BulletType{
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
     public BulletType fragBullet = null;
 
-    /**
-     * Use a negative value to disable splash damage.
-     */
+    /**Use a negative value to disable splash damage.*/
     public float splashDamageRadius = -1f;
     public float splashDamage = 6f;
 
@@ -36,7 +34,7 @@ public class BasicBulletType extends BulletType{
     public float incendChance = 1f;
 
     public float homingPower = 0f;
-    public float homingRange = 40f;
+    public float homingRange = 50f;
 
     public TextureRegion backRegion;
     public TextureRegion frontRegion;
@@ -70,7 +68,7 @@ public class BasicBulletType extends BulletType{
         super.update(b);
 
         if(homingPower > 0.0001f){
-            Unit target = Units.getClosestEnemy(b.getTeam(), b.x, b.y, homingRange, unit -> true);
+            TargetTrait target = Units.getClosestTarget(b.getTeam(), b.x, b.y, homingRange);
             if(target != null){
                 b.getVelocity().setAngle(Angles.moveToward(b.getVelocity().angle(), b.angleTo(target), homingPower * Timers.delta()));
             }
@@ -102,6 +100,7 @@ public class BasicBulletType extends BulletType{
 
     @Override
     public void despawned(Bullet b){
+        super.despawned(b);
         if(fragBullet != null || splashDamageRadius > 0){
             hit(b);
         }

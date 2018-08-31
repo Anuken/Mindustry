@@ -14,7 +14,6 @@ public class GameState{
     public boolean gameOver = false;
     public GameMode mode = GameMode.waves;
     public Difficulty difficulty = Difficulty.normal;
-    public boolean friendlyFire;
     public WaveSpawner spawner = new WaveSpawner();
     public Teams teams = new Teams();
     private State state = State.menu;

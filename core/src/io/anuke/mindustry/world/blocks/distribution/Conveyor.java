@@ -49,7 +49,7 @@ public class Conveyor extends Block{
         itemCapacity = 4;
     }
 
-    private static int compareItems(Long a, Long b){
+    private static int compareItems(long a, long b){
         pos1.set(a, ItemPos.packShorts);
         pos2.set(b, ItemPos.packShorts);
         return Float.compare(pos1.y, pos2.y);

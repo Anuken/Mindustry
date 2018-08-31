@@ -42,7 +42,7 @@ void main() {
 
     if(c.a > 0.01 || outline){
         float f = abs(sin(coords.x*2.0 + u_time));
-        if(f > 0.9 || (f > 0.7 && rand(t) > 0.6))
+        if(f > 0.9 )
             f = 1.0;
         else
             f = 0.0;

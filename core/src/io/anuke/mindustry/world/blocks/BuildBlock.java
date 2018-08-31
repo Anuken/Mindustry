@@ -157,7 +157,7 @@ public class BuildBlock extends Block{
 
         if(recipe != null){
             Draw.rect(recipe.result.shadowRegion, tile.drawx(), tile.drawy());
-        }else if(previous != null){
+        }else if(previous != null && !(previous instanceof BuildBlock)){
             previous.drawShadow(tile);
         }
     }
@@ -192,6 +192,11 @@ public class BuildBlock extends Block{
         private float[] totalAccumulator;
 
         public void construct(Unit builder, TileEntity core, float amount){
+            if(recipe == null){
+                damage(99999);
+                return;
+            }
+
             float maxProgress = checkRequired(core.items, amount, false);
 
             for(int i = 0; i < recipe.requirements.length; i++){
@@ -260,7 +265,6 @@ public class BuildBlock extends Block{
                     //move max progress down if this fraction is less than 1
                     maxProgress = Math.min(maxProgress, maxProgress * fraction);
 
-                    //TODO uncomment?
                     accumulator[i] -= maxUse;
 
                     //remove stuff that is actually used

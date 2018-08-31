@@ -134,7 +134,46 @@ public class ContentDisplay{
     }
 
     public static void displayMech(Table table, Mech mech){
+        table.table(title -> {
+            title.addImage(mech.getContentIcon()).size(8 * 6);
+            title.add("[accent]" + mech.localizedName()).padLeft(5);
+        });
 
+        table.row();
+
+        table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+
+        table.row();
+
+        if(mech.description != null){
+            table.add(mech.description).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.row();
+
+            table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+            table.row();
+        }
+
+        table.left().defaults().fillX();
+
+        if(Bundles.has("mech." + mech.name + ".weapon")){
+            table.add(Bundles.format("text.mech.weapon", Bundles.get("mech." + mech.name + ".weapon")));
+            table.row();
+        }
+        if(Bundles.has("mech." + mech.name + ".ability")){
+            table.add(Bundles.format("text.mech.ability", Bundles.get("mech." + mech.name + ".ability")));
+            table.row();
+        }
+        table.add(Bundles.format("text.mech.armor", mech.armor));
+        table.row();
+        table.add(Bundles.format("text.mech.itemcapacity", mech.itemCapacity));
+        table.row();
+
+        if(mech.drillPower > 0){
+            table.add(Bundles.format("text.mech.minespeed", (int) (mech.mineSpeed * 10)));
+            table.row();
+            table.add(Bundles.format("text.mech.minepower", mech.drillPower));
+            table.row();
+        }
     }
 
     public static void displayUnit(Table table, UnitType unit){

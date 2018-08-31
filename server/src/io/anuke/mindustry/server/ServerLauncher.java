@@ -52,20 +52,24 @@ public class ServerLauncher extends HeadlessApplication{
     }
 
     public static void main(String[] args){
+        try{
 
-        Net.setClientProvider(new KryoClient());
-        Net.setServerProvider(new KryoServer());
+            Net.setClientProvider(new KryoClient());
+            Net.setServerProvider(new KryoServer());
 
-        HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-        config.preferencesDirectory = OS.getAppDataDirectoryString("Mindustry");
+            HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
+            config.preferencesDirectory = OS.getAppDataDirectoryString("Mindustry");
 
-        new ServerLauncher(new MindustryServer(args), config);
+            new ServerLauncher(new MindustryServer(args), config);
+        }catch(Throwable t){
+            CrashHandler.handle(t);
+        }
 
         //find and handle uncaught exceptions in libGDX thread
         for(Thread thread : Thread.getAllStackTraces().keySet()){
             if(thread.getName().equals("HeadlessApplication")){
                 thread.setUncaughtExceptionHandler((t, throwable) -> {
-                    throwable.printStackTrace();
+                    CrashHandler.handle(throwable);
                     System.exit(-1);
                 });
                 break;

@@ -233,7 +233,7 @@ public class Drill extends Block{
         return tile.floor().drops.item;
     }
 
-    protected boolean isValid(Tile tile){
+    public boolean isValid(Tile tile){
         if(tile == null) return false;
         ItemStack drops = tile.floor().drops;
         return drops != null && drops.item.hardness <= tier;

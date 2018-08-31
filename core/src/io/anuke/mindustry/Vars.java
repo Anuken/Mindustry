@@ -40,6 +40,7 @@ public class Vars{
     //discord group URL
     public static final String discordURL = "https://discord.gg/BKADYds";
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
+    public static final String crashReportURL = "http://mindustry.us.to/report";
     public static final int maxTextLength = 150;
     public static final int maxNameLength = 40;
     public static final float itemSize = 5f;
@@ -49,22 +50,22 @@ public class Vars{
     public static final int invalidSector = Integer.MAX_VALUE;
     public static Locale[] locales;
     public static final Color[] playerColors = {
-            Color.valueOf("82759a"),
-            Color.valueOf("c0c1c5"),
-            Color.valueOf("fff0e7"),
-            Color.valueOf("7d2953"),
-            Color.valueOf("ff074e"),
-            Color.valueOf("ff072a"),
-            Color.valueOf("ff76a6"),
-            Color.valueOf("a95238"),
-            Color.valueOf("ffa108"),
-            Color.valueOf("feeb2c"),
-            Color.valueOf("ffcaa8"),
-            Color.valueOf("008551"),
-            Color.valueOf("00e339"),
-            Color.valueOf("423c7b"),
-            Color.valueOf("4b5ef1"),
-            Color.valueOf("2cabfe"),
+        Color.valueOf("82759a"),
+        Color.valueOf("c0c1c5"),
+        Color.valueOf("fff0e7"),
+        Color.valueOf("7d2953"),
+        Color.valueOf("ff074e"),
+        Color.valueOf("ff072a"),
+        Color.valueOf("ff76a6"),
+        Color.valueOf("a95238"),
+        Color.valueOf("ffa108"),
+        Color.valueOf("feeb2c"),
+        Color.valueOf("ffcaa8"),
+        Color.valueOf("008551"),
+        Color.valueOf("00e339"),
+        Color.valueOf("423c7b"),
+        Color.valueOf("4b5ef1"),
+        Color.valueOf("2cabfe"),
     };
     //server port
     public static final int port = 6567;

@@ -14,7 +14,7 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Wall;
+import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.InventoryModule;
@@ -24,6 +24,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.BaseEntity;
+import io.anuke.ucore.entities.trait.HealthTrait;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
@@ -34,7 +35,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.tileGroup;
 import static io.anuke.mindustry.Vars.world;
 
-public class TileEntity extends BaseEntity implements TargetTrait{
+public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public static final float timeToSleep = 60f * 4; //4 seconds to fall asleep
     private static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
     /**This value is only used for debugging.*/
@@ -118,18 +119,6 @@ public class TileEntity extends BaseEntity implements TargetTrait{
     public void read(DataInputStream stream) throws IOException{
     }
 
-    private void onDeath(){
-        if(!dead){
-            dead = true;
-            Block block = tile.block();
-
-            block.onDestroyed(tile);
-            world.removeBlock(tile);
-            block.afterDestroyed(tile, this);
-            remove();
-        }
-    }
-
     public boolean collide(Bullet other){
         return true;
     }
@@ -204,6 +193,39 @@ public class TileEntity extends BaseEntity implements TargetTrait{
 
     public Array<Tile> proximity(){
         return proximity;
+    }
+
+    @Override
+    public void health(float health){
+        this.health = health;
+    }
+
+    @Override
+    public float health(){
+        return health;
+    }
+
+    @Override
+    public float maxHealth(){
+        return tile.block().health;
+    }
+
+    @Override
+    public void setDead(boolean dead){
+        this.dead = dead;
+    }
+
+    @Override
+    public void onDeath(){
+        if(!dead){
+            dead = true;
+            Block block = tile.block();
+
+            block.onDestroyed(tile);
+            world.removeBlock(tile);
+            block.afterDestroyed(tile, this);
+            remove();
+        }
     }
 
     @Override

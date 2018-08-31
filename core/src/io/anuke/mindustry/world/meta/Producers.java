@@ -12,4 +12,8 @@ public class Producers{
     public Content get(){
         return output;
     }
+
+    public boolean is(Content content){
+        return content == output;
+    }
 }
