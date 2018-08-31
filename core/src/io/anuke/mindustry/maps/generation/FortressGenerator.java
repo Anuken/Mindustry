@@ -9,6 +9,7 @@ import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
@@ -44,7 +45,7 @@ public class FortressGenerator{
     void gen(){
         gen.setBlock(enemyX, enemyY, StorageBlocks.core, team);
 
-        float difficultyScl = Mathf.clamp(gen.sector.difficulty / 25f + Mathf.range(1f/2f), 0f, 0.9999f);
+        float difficultyScl = Mathf.clamp(gen.sector.difficulty / 20f + gen.random.range(1f/2f), 0f, 0.9999f);
 
         Array<Block> turrets = find(b -> (b instanceof ItemTurret && accepts(((ItemTurret) b).getAmmoTypes(), Items.copper) || b instanceof PowerTurret));
         Array<Block> drills = find(b -> b instanceof Drill && !b.consumes.has(ConsumePower.class));
@@ -62,42 +63,49 @@ public class FortressGenerator{
                 }
 
                 Item item = gen.drillItem(x, y, drill);
+                Block generator = gens.get(gen.random.random(0, gens.size-1));
 
-                if(item != null && item == Items.copper && gen.canPlace(x, y, drill)){
+                if(item != null && item == Items.copper && gen.canPlace(x, y, drill) && !gen.random.chance(0.5)){
                     gen.setBlock(x, y, drill, team);
+                }else if(gen.canPlace(x, y, generator) && gen.random.chance(0.01)){
+                    gen.setBlock(x, y, generator, team);
                 }
             }
         }
 
-        Turret turret = (Turret) turrets.first();
+        //Turret turret = (Turret) turrets.first();
 
         //place down turrets
         for(int x = 0; x < gen.width; x++){
             for(int y = 0; y < gen.height; y++){
-                if(Vector2.dst(x, y, enemyX, enemyY) > coreDst + 4 || !gen.canPlace(x, y, turret)){
-                    continue;
-                }
+                for(Block block : turrets){
+                    Turret turret = (Turret)block;
+                    if(Vector2.dst(x, y, enemyX, enemyY) > coreDst + 4 || !gen.canPlace(x, y, turret) || !gen.random.chance(0.5)){
+                        continue;
+                    }
 
-                boolean found = false;
+                    boolean found = false;
 
-                for(GridPoint2 point : Edges.getEdges(turret.size)){
-                    Tile tile = gen.tile(x + point.x, y + point.y);
+                    for(GridPoint2 point : Edges.getEdges(turret.size)){
+                        Tile tile = gen.tile(x + point.x, y + point.y);
 
-                    if(tile != null){
-                        tile = tile.target();
+                        if(tile != null){
+                            tile = tile.target();
 
-                        if(turret instanceof PowerTurret && tile.target().block() instanceof PowerGenerator){
-                            found = true;
-                            break;
-                        }else if(turret instanceof ItemTurret && tile.block() instanceof Drill && accepts(((ItemTurret) turret).getAmmoTypes(), gen.drillItem(tile.x, tile.y, (Drill) tile.block()))){
-                            found = true;
-                            break;
+                            if(turret instanceof PowerTurret && tile.target().block() instanceof PowerGenerator){
+                                found = true;
+                                break;
+                            }else if(turret instanceof ItemTurret && tile.block() instanceof Drill && accepts(((ItemTurret) turret).getAmmoTypes(), gen.drillItem(tile.x, tile.y, (Drill) tile.block()))){
+                                found = true;
+                                break;
+                            }
                         }
                     }
-                }
 
-                if(found){
-                    gen.setBlock(x, y, turret, team);
+                    if(found){
+                        gen.setBlock(x, y, turret, team);
+                        break;
+                    }
                 }
             }
         }
@@ -125,7 +133,6 @@ public class FortressGenerator{
                 }
             }
         }
-
     }
 
     boolean accepts(AmmoType[] types, Item item){
@@ -140,7 +147,7 @@ public class FortressGenerator{
     Array<Block> find(Predicate<Block> pred){
         Array<Block> out = new Array<>();
         for(Block block : Block.all()){
-            if(pred.evaluate(block)){
+            if(pred.evaluate(block) && Recipe.getByResult(block) != null){
                 out.add(block);
             }
         }
