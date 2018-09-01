@@ -54,7 +54,7 @@ public class PowerBlocks extends BlockList implements ContentList{
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
             size = 3;
             health = 700;
-            powerMultiplier = 0.8f;
+            powerMultiplier = 1.1f;
         }};
 
         fusionReactor = new FusionReactor("fusion-reactor"){{

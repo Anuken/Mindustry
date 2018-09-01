@@ -226,10 +226,10 @@ public abstract class Turret extends Block{
         return true;
     }
 
-    /**
-     * Consume ammo and return a type.
-     */
+    /**Consume ammo and return a type.*/
     public AmmoType useAmmo(Tile tile){
+        if(tile.isEnemyCheat()) return peekAmmo(tile);
+
         TurretEntity entity = tile.entity();
         AmmoEntry entry = entity.ammo.peek();
         entry.amount -= ammoPerShot;

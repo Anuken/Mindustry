@@ -53,6 +53,7 @@ public abstract class LiquidTurret extends Turret{
     @Override
     public AmmoType useAmmo(Tile tile){
         TurretEntity entity = tile.entity();
+        if(tile.isEnemyCheat()) return liquidAmmoMap.get(entity.liquids.current());
         AmmoType type = liquidAmmoMap.get(entity.liquids.current());
         entity.liquids.remove(type.liquid, type.quantityMultiplier);
         return type;

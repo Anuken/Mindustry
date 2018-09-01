@@ -35,9 +35,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.waveTeam;
-
 public class UnitPad extends Block{
     protected float gracePeriodMultiplier = 23f;
     protected float speedupTime = 60f * 60f * 20;
@@ -152,13 +149,11 @@ public class UnitPad extends Block{
 
         entity.time += Timers.delta() * entity.speedScl;
 
-        boolean isEnemy = tile.getTeam() == waveTeam && state.mode.autoSpawn;
-
-        if(isEnemy){
+        if(tile.isEnemyCheat()){
             entity.warmup += Timers.delta();
         }
 
-        if(!isEnemy){
+        if(!tile.isEnemyCheat()){
             //player-made spawners have default behavior
 
             if(hasRequirements(entity.items, entity.buildTime / produceTime) && entity.cons.valid()){
