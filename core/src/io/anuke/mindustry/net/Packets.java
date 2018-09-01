@@ -240,20 +240,20 @@ public class Packets{
 
         public int id = lastid++;
         public int total;
-        public Class<? extends Streamable> type;
+        public byte type;
 
         @Override
         public void write(ByteBuffer buffer){
             buffer.putInt(id);
             buffer.putInt(total);
-            buffer.put(Registrator.getID(type));
+            buffer.put(type);
         }
 
         @Override
         public void read(ByteBuffer buffer){
             id = buffer.getInt();
             total = buffer.getInt();
-            type = (Class<? extends Streamable>) Registrator.getByID(buffer.get()).type;
+            type = buffer.get();
         }
     }
 

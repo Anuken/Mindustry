@@ -220,6 +220,14 @@ public class WorldGenerator{
 
         generateOres(tiles, sector.getSeed(), true, sector.ores);
 
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
+
+                tile.updateOcclusion();
+            }
+        }
+
         Generation gen = new Generation(sector, tiles, tiles.length, tiles[0].length, random);
 
         for(Mission mission : sector.missions){

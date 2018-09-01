@@ -1,13 +1,13 @@
 package io.anuke.mindustry.maps.generation;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Predicate;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.DistributionBlocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.generation.pathfinding.FlowPathFinder;
-import io.anuke.mindustry.maps.generation.pathfinding.TilePathfinder;
+import io.anuke.mindustry.maps.generation.pathfinding.AStarPathFinder;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
@@ -17,10 +17,10 @@ import io.anuke.mindustry.world.blocks.defense.Door;
 import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.mindustry.world.blocks.defense.turrets.ItemTurret;
 import io.anuke.mindustry.world.blocks.defense.turrets.PowerTurret;
+import io.anuke.mindustry.world.blocks.distribution.Conveyor;
 import io.anuke.mindustry.world.blocks.power.SolarGenerator;
 import io.anuke.mindustry.world.blocks.production.Drill;
 import io.anuke.mindustry.world.consumers.ConsumePower;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 public class FortressGenerator{
@@ -53,18 +53,9 @@ public class FortressGenerator{
 
         Block wall = walls.get((int)(difficultyScl * walls.size));
         Drill drill = (Drill) drills.get((int)(difficultyScl * drills.size));
+        Item[] items = {Items.copper, Items.lead};
 
-        TilePathfinder finder = new FlowPathFinder(gen.tiles);
-        Array<Tile> out = new Array<>();
-        finder.search(gen.tile(enemyX, enemyY - 1), t -> t.block().dropsItem(Items.copper), out);
-        for (int i = 0; i < out.size - 1; i++) {
-            Tile current = out.get(i);
-            Tile next = out.get(i + 1);
-            byte rotation = next.relativeTo(current.x, current.y);
-            current.setBlock(DistributionBlocks.conveyor, team);
-            current.setRotation(rotation);
-        }
-        /*
+        AStarPathFinder finder = new AStarPathFinder(gen.tiles);
 
         //place down drills
         for(int x = 0; x < gen.width; x++){
@@ -76,13 +67,47 @@ public class FortressGenerator{
                 Item item = gen.drillItem(x, y, drill);
                 Block generator = gens.get(gen.random.random(0, gens.size-1));
 
-                if(item != null && item == Items.copper && gen.canPlace(x, y, drill) && !gen.random.chance(0.5)){
+                boolean contains = false;
+                if(item != null){
+                    for(Item other : items){
+                        if(other == item){
+                            contains = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(item != null && contains && gen.canPlace(x, y, drill) && !gen.random.chance(0.5)){
+                    Array<Tile> out = new Array<>();
+                    finder.search(gen.tile(x, y), gen.tile(enemyX, enemyY - 2),
+                    tile -> (tile.block() instanceof Conveyor || (Math.abs(tile.x - enemyX) <= 2 && Math.abs(tile.y - enemyY) <= 2))
+                    && (Math.abs(tile.x - enemyX) != Math.abs(tile.y - enemyY)),
+                    out);
+
+                    byte last = 0;
+                    for (int i = 0; i < out.size; i++) {
+                        Tile current = out.get(i);
+
+                        if(i != out.size - 1){
+                            Tile next = out.get(i + 1);
+                            byte rotation = current.relativeTo(next.x, next.y);
+                            current.setBlock(DistributionBlocks.conveyor, team);
+                            current.setRotation(rotation);
+                            last = rotation;
+                        }else{
+                            current.setBlock(DistributionBlocks.conveyor, team);
+                            current.setRotation(last);
+                        }
+                    }
+
                     gen.setBlock(x, y, drill, team);
                 }else if(gen.canPlace(x, y, generator) && gen.random.chance(0.01)){
                     gen.setBlock(x, y, generator, team);
                 }
             }
         }
+
+        /*
 
         //Turret turret = (Turret) turrets.first();
 

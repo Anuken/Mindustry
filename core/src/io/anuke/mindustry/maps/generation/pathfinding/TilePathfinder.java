@@ -2,7 +2,6 @@ package io.anuke.mindustry.maps.generation.pathfinding;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.Mathf;
 
 public abstract class TilePathfinder{
@@ -16,5 +15,5 @@ public abstract class TilePathfinder{
         return Mathf.inBounds(x, y, tiles);
     }
 
-    public abstract void search(Tile start, Predicate<Tile> result, Array<Tile> out);
+    public abstract void search(Tile start, Tile end, Array<Tile> out);
 }

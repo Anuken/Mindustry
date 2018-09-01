@@ -1,8 +1,8 @@
 package io.anuke.mindustry.maps.generation.pathfinding;
 
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BinaryHeap;
-import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -13,9 +13,10 @@ import io.anuke.ucore.util.Mathf;
 
 //TODO
 public class AStarPathFinder extends TilePathfinder{
-    IntMap<NodeRecord> records = new IntMap<>();
+    NodeRecord[] records;
     BinaryHeap<NodeRecord> openList;
     NodeRecord current;
+    Predicate<Tile> goal;
 
     private int searchId;
     private Tile end;
@@ -28,12 +29,18 @@ public class AStarPathFinder extends TilePathfinder{
 
     public AStarPathFinder(Tile[][] tiles) {
         super(tiles);
+        this.records = new NodeRecord[tiles.length * tiles[0].length];
         this.openList = new BinaryHeap<>();
     }
 
     @Override
-    public void search(Tile start, Predicate<Tile> result, Array<Tile> out){
+    public void search(Tile start, Tile end, Array<Tile> out){
 
+    }
+
+    public void search(Tile start, Tile end, Predicate<Tile> pred, Array<Tile> out){
+        this.goal = pred;
+        searchNodePath(start, end, out);
     }
 
     public boolean searchNodePath(Tile startNode, Tile endNode, Array<Tile> outPath) {
@@ -61,7 +68,7 @@ public class AStarPathFinder extends TilePathfinder{
             current.category = CLOSED;
 
             // Terminate if we reached the goal node
-            if (current.node == endNode) return true;
+            if (current.node == endNode || goal.test(current.node)) return true;
 
             visitChildren(endNode);
 
@@ -126,7 +133,7 @@ public class AStarPathFinder extends TilePathfinder{
         // Initialize the record for the start node and add it to the open list
         NodeRecord startRecord = getNodeRecord(startNode);
         startRecord.node = startNode;
-        //startRecord.connection = null;
+        startRecord.from = null;
         startRecord.costSoFar = 0;
         addToOpenList(startRecord, estimate(startNode, endNode));
 
@@ -185,32 +192,28 @@ public class AStarPathFinder extends TilePathfinder{
 
     protected void nodes(Tile current, Consumer<Tile> cons){
         if(obstacle(current)) return;
-        for(int i = 0; i < 4; i ++){
-            Tile n = current.getNearby(i);
+        for(GridPoint2 p : Geometry.d4){
+            int wx = current.x + p.x, wy = current.y + p.y;
+            Tile n = Mathf.inBounds(wx, wy, tiles) ? tiles[wx][wy] : null;
             if(!obstacle(n)) cons.accept(n);
         }
     }
 
-    protected Tile rel(Tile tile, int i){
-        return tile.getNearby(Geometry.d8[Mathf.mod(i, 8)]);
-    }
-
     protected boolean obstacle(Tile tile){
-        return tile == null || (tile.solid() && end.target() != tile && tile.target() != end);
+        return tile == null || (tile.solid() && end.target() != tile && tile.target() != end) || !tile.block().alwaysReplace;
     }
 
     protected float estimate(Tile tile, Tile other){
-        return Math.abs(tile.worldx() - other.worldx()) + Math.abs(tile.worldy() - other.worldy());
-        // (tile.occluded ? tilesize : 0) + (other.occluded ? tilesize : 0);
+        return goal.test(other) || goal.test(tile) ? Float.MIN_VALUE : Math.abs(tile.worldx() - other.worldx()) + Math.abs(tile.worldy() - other.worldy());
     }
 
     protected void generateNodePath(Tile startNode, Array<Tile> outPath) {
 
         // Work back along the path, accumulating nodes
-        // outPath.clear();
+        outPath.clear();
         while (current.from != null) {
             outPath.add(current.node);
-            current = records.get(indexOf(current.from));
+            current = records[(indexOf(current.from))];
         }
         outPath.add(startNode);
 
@@ -224,14 +227,14 @@ public class AStarPathFinder extends TilePathfinder{
     }
 
     protected NodeRecord getNodeRecord(Tile node) {
-        if(!records.containsKey(indexOf(node))){
+        if(records[indexOf(node)] == null){
             NodeRecord record = new NodeRecord();
             record.node = node;
             record.searchId = searchId;
-            records.put(indexOf(node), record);
+            records[indexOf(node)] = record;
             return record;
         }else{
-            NodeRecord record =  records.get(indexOf(node));
+            NodeRecord record = records[indexOf(node)];
             if(record.searchId != searchId){
                 record.category = UNVISITED;
                 record.searchId = searchId;

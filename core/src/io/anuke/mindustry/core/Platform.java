@@ -37,8 +37,6 @@ public abstract class Platform {
     public boolean canDonate(){
         return false;
     }
-    /**Whether the user has Discord installed. Defaults to true if unknown.*/
-    public boolean hasDiscord(){return true;}
     /**Return the localized name for the locale. This is basically a workaround for GWT not supporting getName().*/
     public String getLocaleName(Locale locale){
         return locale.toString();

@@ -61,11 +61,6 @@ public class AndroidLauncher extends PatchedAndroidApplication{
             DateFormat format = SimpleDateFormat.getDateTimeInstance();
 
             @Override
-            public boolean hasDiscord(){
-                return isPackageInstalled("com.discord");
-            }
-
-            @Override
             public String format(Date date){
                 return format.format(date);
             }

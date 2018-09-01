@@ -16,6 +16,11 @@ public class FlowPathFinder extends TilePathfinder{
         this.weights = new float[tiles.length][tiles[0].length];
     }
 
+    @Override
+    public void search(Tile start, Tile end, Array<Tile> out){
+
+    }
+
     public void search(Tile start, Predicate<Tile> result, Array<Tile> out){
         Queue<Tile> queue = new Queue<>();
 
@@ -34,7 +39,7 @@ public class FlowPathFinder extends TilePathfinder{
             Tile tile = queue.first();
             for(GridPoint2 point : Geometry.d4){
                 int nx = tile.x + point.x, ny = tile.y + point.y;
-                if(inBounds(nx, ny) && weights[nx][ny] < weights[tile.x][tile.y] && tiles[nx][ny].passable()){
+                if(inBounds(nx, ny) && weights[nx][ny] < weights[tile.x][tile.y] - 1f && tiles[nx][ny].passable()){
                     weights[nx][ny] = weights[tile.x][tile.y] - 1;
                     queue.addLast(tiles[nx][ny]);
                     if(result.test(tiles[nx][ny])){
