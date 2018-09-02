@@ -9,7 +9,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 public class ConsumePower extends Consume{
-    private final float use;
+    protected final float use;
 
     public ConsumePower(float use){
         this.use = use;
@@ -40,7 +40,7 @@ public class ConsumePower extends Consume{
         stats.add(BlockStat.powerUse, use * 60f, StatUnit.powerSecond);
     }
 
-    float use(Block block){
+    protected float use(Block block){
         return Math.min(use * Timers.delta(), block.powerCapacity);
     }
 }
