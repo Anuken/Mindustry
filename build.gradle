@@ -4,11 +4,13 @@ buildscript {
         mavenCentral()
         google()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://jitpack.io" }
+        maven { url "https://dl.bintray.com/konsoletyper/teavm" }
         jcenter()
     }
     dependencies {
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
-        classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
+        classpath 'com.github.Anuken:teavm-gradle-plugin:7fe4290459'
         classpath 'com.android.tools.build:gradle:3.1.3'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
     }
@@ -83,6 +85,7 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url 'https://jitpack.io' }
+        maven { url "https://dl.bintray.com/konsoletyper/teavm" }
     }
 }
 
@@ -100,26 +103,14 @@ project(":desktop") {
 }
 
 project(":html") {
-    apply plugin: "gwt"
-    apply plugin: "war"
+    apply plugin: "com.edibleday.teavm"
 
 
     dependencies {
         compile project(":core")
-        compileOnly project(":annotations")
 
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-
-        compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion:sources"
+        compile "com.github.Anuken:teavm-libgdx:ccc364e2a0"
     }
-
-    compileJava.options.compilerArgs = [
-        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
-    ]
 }
 
 project(":ios") {
