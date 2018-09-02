@@ -253,7 +253,7 @@ public class ItemBridge extends Block{
 
             if(rel == rel2) return false;
         }else{
-            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>entity().link == tile.packedPosition();
+            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>entity().link == tile.packedPosition() && tile.entity.items.total() < itemCapacity;
         }
 
         return tile.entity.items.total() < itemCapacity;
