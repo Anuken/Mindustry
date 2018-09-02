@@ -224,7 +224,7 @@ public class Mechs implements ContentList{
 
             @Override
             public float getExtraArmor(Player player){
-                return player.altHeat * 40f;
+                return player.altHeat * 30f;
             }
 
             @Override

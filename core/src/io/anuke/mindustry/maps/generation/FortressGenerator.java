@@ -9,7 +9,6 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.generation.pathfinding.AStarPathFinder;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
@@ -84,11 +83,10 @@ public class FortressGenerator{
         Drill powerDrill = (Drill) powerDrills.get((int)(difficultyScl * powerDrills.size));
 
         Turret powerTurret = (Turret) powerTurrets.get((int)(difficultyScl * powerTurrets.size));
-        Turret bigTurret = (Turret) turrets.get(Mathf.clamp((int)((difficultyScl+0.3f+gen.random.range(0.2f)) * turrets.size), 0, turrets.size-1));
+        Turret bigTurret = (Turret) turrets.get(Mathf.clamp((int)((difficultyScl+0.2f+gen.random.range(0.2f)) * turrets.size), 0, turrets.size-1));
         Turret turret1 = (Turret) turrets.get(Mathf.clamp((int)((difficultyScl+gen.random.range(0.2f)) * turrets.size), 0, turrets.size-1));
         Turret turret2 = (Turret) turrets.get(Mathf.clamp((int)((difficultyScl+gen.random.range(0.2f)) * turrets.size), 0, turrets.size-1));
-
-        AStarPathFinder finder = new AStarPathFinder(gen.tiles);
+        float placeChance = difficultyScl*0.75f+0.25f;
 
         IntIntMap ammoPerType = new IntIntMap();
         for(Block turret : turrets){
@@ -112,7 +110,7 @@ public class FortressGenerator{
         };
 
         BiFunction<Block, Predicate<Tile>, IntPositionConsumer> seeder = (block, pred) -> (x, y) -> {
-            if(gen.canPlace(x, y, block) && ((block instanceof Wall && block.size == 1) || gen.random.chance(difficultyScl/2f+0.5f)) && checker.get(gen.tile(x, y), block, pred)){
+            if(gen.canPlace(x, y, block) && ((block instanceof Wall && block.size == 1) || gen.random.chance(placeChance)) && checker.get(gen.tile(x, y), block, pred)){
                 gen.setBlock(x, y, block, team);
             }
         };
@@ -122,7 +120,7 @@ public class FortressGenerator{
             (x, y) -> {
                 Block block = PowerBlocks.largeSolarPanel;
 
-                if(gen.random.chance(0.001) && gen.canPlace(x, y, block)){
+                if(gen.random.chance(0.001*placeChance) && gen.canPlace(x, y, block)){
                     gen.setBlock(x, y, block, team);
                 }
             },
@@ -132,7 +130,7 @@ public class FortressGenerator{
 
             //drills (not powered)
             (x, y) -> {
-                if(!gen.random.chance(0.1)) return;
+                if(!gen.random.chance(0.1*placeChance)) return;
 
                 Item item = gen.drillItem(x, y, drill);
                 if(item != null && item != Items.stone && item != Items.sand && gen.canPlace(x, y, drill)){
@@ -142,7 +140,7 @@ public class FortressGenerator{
 
             //drills (not powered)
             (x, y) -> {
-                if(!gen.random.chance(0.1)) return;
+                if(!gen.random.chance(0.1*placeChance)) return;
 
                 if(gen.tile(x, y).floor().isLiquid && gen.tile(x, y).floor().liquidDrop == Liquids.water){
                     gen.setBlock(x, y, LiquidBlocks.mechanicalPump, team);
@@ -154,7 +152,7 @@ public class FortressGenerator{
 
             //drills (powered)
             (x, y) -> {
-                if(gen.random.chance(0.4) && gen.canPlace(x, y, powerDrill) && gen.drillItem(x, y, powerDrill) == Items.thorium  && checker.get(gen.tile(x, y), powerDrill, other -> other.block() instanceof PowerGenerator)){
+                if(gen.random.chance(0.4*placeChance) && gen.canPlace(x, y, powerDrill) && gen.drillItem(x, y, powerDrill) == Items.thorium  && checker.get(gen.tile(x, y), powerDrill, other -> other.block() instanceof PowerGenerator)){
                     gen.setBlock(x, y, powerDrill, team);
                 }
             },

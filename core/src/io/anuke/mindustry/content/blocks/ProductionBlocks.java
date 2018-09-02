@@ -88,7 +88,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             updateEffect = BlockFx.pulverize;
             liquidCapacity = 50f;
             updateEffectChance = 0.05f;
-            pumpAmount = 0.08f;
+            pumpAmount = 0.09f;
             size = 3;
             liquidCapacity = 30f;
 

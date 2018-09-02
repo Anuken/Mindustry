@@ -207,7 +207,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             itemCapacity = 50;
             craftTime = 25f;
             outputLiquid = Liquids.oil;
-            outputLiquidAmount = 1.4f;
+            outputLiquidAmount = 1.5f;
             size = 2;
             health = 320;
             hasLiquids = true;

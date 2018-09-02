@@ -16,7 +16,7 @@ public class UnitBlocks extends BlockList implements ContentList{
     public void load(){
         dronePad = new UnitPad("drone-pad"){{
             type = UnitTypes.drone;
-            produceTime = 5500;
+            produceTime = 5700;
             size = 2;
             consumes.power(0.08f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30)});
@@ -24,7 +24,7 @@ public class UnitBlocks extends BlockList implements ContentList{
 
         fabricatorPad = new UnitPad("fabricator-pad"){{
             type = UnitTypes.fabricator;
-            produceTime = 7000;
+            produceTime = 7300;
             size = 2;
             consumes.power(0.2f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80)});
@@ -32,7 +32,7 @@ public class UnitBlocks extends BlockList implements ContentList{
 
         interceptorPad = new UnitPad("interceptor-pad"){{
             type = UnitTypes.interceptor;
-            produceTime = 1900;
+            produceTime = 1800;
             size = 2;
             consumes.power(0.1f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.titanium, 10)});
@@ -40,7 +40,7 @@ public class UnitBlocks extends BlockList implements ContentList{
 
         monsoonPad = new UnitPad("monsoon-pad"){{
             type = UnitTypes.monsoon;
-            produceTime = 3800;
+            produceTime = 3600;
             size = 3;
             consumes.power(0.2f);
             shadow = "shadow-round-3";
@@ -49,15 +49,15 @@ public class UnitBlocks extends BlockList implements ContentList{
 
         daggerPad = new UnitPad("dagger-pad"){{
             type = UnitTypes.dagger;
-            produceTime = 1800;
+            produceTime = 1700;
             size = 2;
             consumes.power(0.05f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.copper, 15)});
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.copper, 10)});
         }};
 
         titanPad = new UnitPad("titan-pad"){{
             type = UnitTypes.titan;
-            produceTime = 3600;
+            produceTime = 3400;
             size = 3;
             consumes.power(0.15f);
             shadow = "shadow-round-3";

@@ -39,7 +39,7 @@ public class Weapons implements ContentList{
 
         droneBlaster = new Weapon("blaster"){{
             length = 2f;
-            reload = 30f;
+            reload = 25f;
             width = 1f;
             roundrobin = true;
             ejectEffect = ShootFx.shellEjectSmall;

@@ -24,7 +24,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Sectors{
     private static final int sectorImageSize = 32;
-    private static final float sectorLargeChance = 0.23f;
+    private static final float sectorLargeChance = 0.24f;
 
     private GridMap<Sector> grid = new GridMap<>();
 
@@ -133,7 +133,7 @@ public class Sectors{
     }
 
     private void initSector(Sector sector){
-        double waveChance = 0.2;
+        double waveChance = 0.3;
 
         sector.difficulty = (int)(Mathf.dst(sector.x, sector.y));
 

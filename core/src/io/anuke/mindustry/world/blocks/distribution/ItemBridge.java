@@ -246,30 +246,17 @@ public class ItemBridge extends Block{
 
         ItemBridgeEntity entity = tile.entity();
         Tile other = world.tile(entity.link);
-        boolean linked = false;
 
         if(linkValid(tile, other)){
-            linked = true;
             int rel = tile.absoluteRelativeTo(other.x, other.y);
             int rel2 = tile.relativeTo(source.x, source.y);
 
             if(rel == rel2) return false;
         }else{
-            int i = tile.relativeTo(source.x, source.y);
-
-            IntSetIterator it = entity.incoming.iterator();
-
-            while(it.hasNext){
-                int v = it.next();
-                int x = v % world.width();
-                int y = v / world.width();
-                if(tile.absoluteRelativeTo(x, y) == i){
-                    return false;
-                }
-            }
+            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>entity().link == tile.packedPosition();
         }
 
-        return tile.entity.items.total() < itemCapacity && (linked || source.block() instanceof ItemBridge);
+        return tile.entity.items.total() < itemCapacity;
     }
 
     @Override
