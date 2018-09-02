@@ -110,7 +110,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     }
 
     public boolean isDead(){
-        return dead;
+        return dead || tile.entity != this;
     }
 
     public void write(DataOutputStream stream) throws IOException{

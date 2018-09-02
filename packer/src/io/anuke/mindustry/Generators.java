@@ -111,11 +111,11 @@ public class Generators {
 
                     image.draw(type.weapon.equipRegion,
                             -(int)type.weaponOffsetX + (image.width() - type.weapon.equipRegion.getRegionWidth())/2,
-                            (int)type.weaponOffsetY - (image.height() - type.weapon.equipRegion.getRegionHeight())/2,
+                            (int)type.weaponOffsetY - (image.height() - type.weapon.equipRegion.getRegionHeight())/2 + 1,
                             false, false);
                     image.draw(type.weapon.equipRegion,
                             (int)type.weaponOffsetX + (image.width() - type.weapon.equipRegion.getRegionWidth())/2,
-                            (int)type.weaponOffsetY - (image.height() - type.weapon.equipRegion.getRegionHeight())/2,
+                            (int)type.weaponOffsetY - (image.height() - type.weapon.equipRegion.getRegionHeight())/2 + 1,
                             true, false);
                 }
 
