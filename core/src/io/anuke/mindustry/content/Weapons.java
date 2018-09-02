@@ -60,7 +60,6 @@ public class Weapons implements ContentList{
             reload = 60f;
             shots = 4;
             inaccuracy = 2f;
-            roundrobin = false;
             roundrobin = true;
             ejectEffect = Fx.none;
             velocityRnd = 0.2f;
@@ -75,7 +74,6 @@ public class Weapons implements ContentList{
             shots = 4;
             spacing = 8f;
             inaccuracy = 8f;
-            roundrobin = false;
             roundrobin = true;
             ejectEffect = Fx.none;
             shake = 3f;
