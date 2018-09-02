@@ -13,7 +13,7 @@ public class Changelogs{
     public static void getChangelog(Consumer<Array<VersionInfo>> success, Consumer<Throwable> fail){
         Net.http(releasesURL, "GET", result -> {
             Json j = new Json();
-            Array<JsonValue> list = j.fromJson(null, result);
+            Array<JsonValue> list = j.fromJson(Array.class, result);
             Array<VersionInfo> out = new Array<>();
             for(JsonValue value : list){
                 String name = value.getString("name");

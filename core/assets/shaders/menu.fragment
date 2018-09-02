@@ -4,27 +4,29 @@ precision mediump int;
 #endif
 
 uniform sampler2D u_texture;
-uniform float resolution;
-uniform vec4 u_color;
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform vec2 u_uv;
+uniform vec2 u_uv2;
 
 varying vec4 v_color;
 varying vec2 v_texCoord;
 
-bool hex(vec2 p) {
-    p.x *= 0.57735*2.0;
-    p.y += mod(floor(p.x), 2.0)*0.5;
-    p = abs((mod(p, 1.0) - 0.5));
-    return abs(max(p.x*1.5 + p.y, p.y*2.0) - 1.0) > 0.1;
-}
-
-vec3 palette(float i) {
-    return vec3(1.0, 1.0, 1.0);
-}
-
 void main() {
+    vec2 coords = ((v_texCoord.xy - u_uv) / (u_uv2 - u_uv) - vec2(0.5, 0.5)) * u_resolution;
 
-	bool h = hex(v_texCoord.xy/100.0);
+	float roundx = 8.0;
+	float roundy = roundx;
+	float roundm = 0.2;
 
-    gl_FragColor.rgb = vec3(h,h,h);
-    gl_FragColor.a = 1.0;
+	coords.x = float(int(coords.x / roundx)) * roundx;
+	coords.y = float(int(coords.y / roundy)) * roundy;
+
+	float d = abs(coords.x) - abs(coords.y);
+
+	float m = abs(sin(-u_time/50.0 + d/120.0));
+	m = float(int(m / roundm)) * roundm + roundm;
+
+    gl_FragColor.rgb = mix(v_color.rgb, vec3(0.0), m);
+    gl_FragColor.a = mod(abs(coords.x) + abs(coords.y), 100.0) < 30.0 ? 1.0 : 0.0;
 }

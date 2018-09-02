@@ -107,7 +107,7 @@ public class Pump extends LiquidBlock{
     }
 
     protected boolean isValid(Tile tile){
-        return tile.floor().liquidDrop != null && tier >= tile.floor().liquidDrop.tier;
+        return tile != null && tile.floor().liquidDrop != null && tier >= tile.floor().liquidDrop.tier;
     }
 
 }

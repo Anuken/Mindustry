@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.FloatArray;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Shader;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
@@ -25,6 +26,7 @@ public class Shaders{
     public static MixShader mix;
     public static Shader fullMix;
     public static FogShader fog;
+    public static MenuShader menu;
 
     public static void init(){
         outline = new Outline();
@@ -39,6 +41,23 @@ public class Shaders{
         mix = new MixShader();
         fog = new FogShader();
         fullMix = new Shader("fullmix", "default");
+        menu = new MenuShader();
+    }
+
+    public static class MenuShader extends Shader{
+        float time = 0f;
+
+        public MenuShader(){
+            super("menu", "default");
+        }
+
+        @Override
+        public void apply(){
+            shader.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            shader.setUniformf("u_time", time += Gdx.graphics.getDeltaTime() * 60f);
+            shader.setUniformf("u_uv", Draw.getBlankRegion().getU(), Draw.getBlankRegion().getV());
+            shader.setUniformf("u_uv2", Draw.getBlankRegion().getU2(), Draw.getBlankRegion().getV2());
+        }
     }
 
     public static class FogShader extends Shader{
