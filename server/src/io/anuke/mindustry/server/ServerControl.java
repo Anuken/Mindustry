@@ -668,7 +668,7 @@ public class ServerControl extends Module{
             }
 
             info("&lyCore destroyed.");
-            Events.fire(GameOverEvent.class);
+            Events.fire(new GameOverEvent());
         });
 
         handler.register("debuginfo", "Print debug info", arg -> {
@@ -934,7 +934,7 @@ public class ServerControl extends Module{
         if(alive != null && !state.gameOver){
             state.gameOver = true;
             winnerTeam = alive;
-            Events.fire(GameOverEvent.class);
+            Events.fire(new GameOverEvent());
         }
     }
 

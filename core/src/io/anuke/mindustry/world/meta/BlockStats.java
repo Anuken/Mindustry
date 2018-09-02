@@ -14,7 +14,7 @@ import io.anuke.ucore.util.Log;
  * Hold and organizes a list of block stats.
  */
 public class BlockStats{
-    private static final boolean errorWhenMissing = true;
+    private static final boolean errorWhenMissing = false;
 
     private final OrderedMap<StatCategory, OrderedMap<BlockStat, StatValue>> map = new OrderedMap<>();
     private final Block block;
