@@ -19,7 +19,7 @@ public class CrashHandler{
 
         //don't create crash logs for me (anuke), as it's expected
         //also don't create logs for custom builds
-        //if(System.getProperty("user.name").equals("anuke") || Version.build == -1) return;
+        if(System.getProperty("user.name").equals("anuke") || Version.build == -1) return;
 
         boolean netActive = false, netServer = false;
 
