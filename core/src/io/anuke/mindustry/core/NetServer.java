@@ -482,7 +482,7 @@ public class NetServer extends Module{
 
         //check for syncable groups
         for(EntityGroup<?> group : Entities.getAllGroups()){
-            //TODO range-check sync positions to optimize?
+            //TODO screen-check sync positions to optimize?
             if(group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
 
             //make sure mapping is enabled for this group

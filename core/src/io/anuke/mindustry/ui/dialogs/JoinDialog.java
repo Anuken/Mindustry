@@ -232,7 +232,7 @@ public class JoinDialog extends FloatingDialog{
             button.update(() -> button.getStyle().imageUpColor = player.color);
         }).width(w).height(70f).pad(4);
         content().row();
-        content().add(pane).width(w + 38).pad(0).padRight(22);
+        content().add(pane).width(w + 38).pad(0);
         content().row();
         content().addCenteredImageTextButton("$text.server.add", "icon-add", "clear", 14 * 3, () -> {
             renaming = null;

@@ -123,7 +123,7 @@ public class ServerControl extends Module{
                         play(true, () -> world.loadMap(fmap));
                     }
                 }else{
-                    Call.onInfoMessage("Sector has been lost.\nRe-deploying in " + roundExtraTime + " seconds.");
+                    Call.onInfoMessage("[SCARLET]Sector has been lost.[]\nRe-deploying in " + roundExtraTime + " seconds.");
                     if(gameOvers >= 2){
                         Settings.putInt("sector_y", Settings.getInt("sector_y") < 0 ? Settings.getInt("sector_y") + 1 : Settings.getInt("sector_y") - 1);
                         Settings.save();

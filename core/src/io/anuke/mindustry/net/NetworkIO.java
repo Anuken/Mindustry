@@ -121,7 +121,7 @@ public class NetworkIO{
             //write team data
             for(Team team : Team.all){
                 TeamData data = state.teams.get(team);
-                stream.writeByte(data.team.ordinal());
+                stream.writeByte(team.ordinal());
 
                 stream.writeByte(data.enemies.size());
                 for(Team enemy : data.enemies){
@@ -172,8 +172,6 @@ public class NetworkIO{
 
             int wave = stream.readInt();
             float wavetime = stream.readFloat();
-
-            boolean friendlyfire = stream.readBoolean();
 
             state.wave = wave;
             state.wavetime = wavetime;
