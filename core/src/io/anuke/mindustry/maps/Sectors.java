@@ -159,9 +159,9 @@ public class Sectors{
         }else if(sector.difficulty > 3){ //now with carbide
             sector.startingItems = Array.with(new ItemStack(Items.copper, 700), new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 130));
         }else if(sector.difficulty > 1){ //more starter items for faster start
-            sector.startingItems = Array.with(new ItemStack(Items.copper, 500), new ItemStack(Items.lead, 100));
+            sector.startingItems = Array.with(new ItemStack(Items.copper, 400), new ItemStack(Items.lead, 100));
         }else{ //base starting items to prevent grinding much
-            sector.startingItems = Array.with(new ItemStack(Items.copper, 170));
+            sector.startingItems = Array.with(new ItemStack(Items.copper, 130));
         }
     }
 

@@ -16,13 +16,9 @@ public class Pump extends LiquidBlock{
     protected final Array<Tile> drawTiles = new Array<>();
     protected final Array<Tile> updateTiles = new Array<>();
 
-    /**
-     * Pump amount per tile this block is on.
-     */
+    /**Pump amount per tile this block is on.*/
     protected float pumpAmount = 1f;
-    /**
-     * Maximum liquid tier this pump can use.
-     */
+    /**Maximum liquid tier this pump can use.*/
     protected int tier = 0;
 
     public Pump(String name){

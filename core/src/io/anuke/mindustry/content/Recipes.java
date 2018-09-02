@@ -69,15 +69,14 @@ public class Recipes implements ContentList{
         //CRAFTING
 
         //smelting
-        new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.copper, 70));
-        new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.copper, 90), new ItemStack(Items.densealloy, 60), new ItemStack(Items.lead, 50));
+        new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.copper, 100));
+        new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.copper, 110), new ItemStack(Items.densealloy, 70), new ItemStack(Items.lead, 50));
         new Recipe(crafting, CraftingBlocks.siliconsmelter, new ItemStack(Items.copper, 60), new ItemStack(Items.lead, 50));
 
         //advanced fabrication
         new Recipe(crafting, CraftingBlocks.plastaniumCompressor, new ItemStack(Items.silicon, 160), new ItemStack(Items.lead, 230), new ItemStack(Items.densealloy, 120), new ItemStack(Items.titanium, 160));
         new Recipe(crafting, CraftingBlocks.phaseWeaver, new ItemStack(Items.silicon, 260), new ItemStack(Items.lead, 240), new ItemStack(Items.thorium, 150));
 
-        //TODO implement alloy smelter
         new Recipe(crafting, CraftingBlocks.alloySmelter, new ItemStack(Items.silicon, 160), new ItemStack(Items.lead, 160), new ItemStack(Items.thorium, 140));
 
         //misc
@@ -147,7 +146,7 @@ public class Recipes implements ContentList{
         new Recipe(units, UnitBlocks.dronePad, new ItemStack(Items.copper, 70), new ItemStack(Items.lead, 110), new ItemStack(Items.silicon, 130));
         new Recipe(units, UnitBlocks.fabricatorPad, new ItemStack(Items.densealloy, 90), new ItemStack(Items.thorium, 80), new ItemStack(Items.lead, 110), new ItemStack(Items.silicon, 210));
 
-        new Recipe(units, UnitBlocks.daggerPad, new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 80)).setMode(GameMode.noWaves);
+        new Recipe(units, UnitBlocks.daggerPad, new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 70)).setMode(GameMode.noWaves);
         new Recipe(units, UnitBlocks.titanPad, new ItemStack(Items.thorium, 90), new ItemStack(Items.lead, 140), new ItemStack(Items.silicon, 90)).setMode(GameMode.noWaves);
 
         new Recipe(units, UnitBlocks.interceptorPad, new ItemStack(Items.titanium, 60), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 90)).setMode(GameMode.noWaves);

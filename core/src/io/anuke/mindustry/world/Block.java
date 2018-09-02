@@ -66,7 +66,7 @@ public class Block extends BaseBlock implements Content{
     /** base block explosiveness */
     public float baseExplosiveness = 0f;
     /** whether this block can be placed on liquids. */
-    public boolean floating = true;
+    public boolean floating = false;
     /** stuff that drops when broken */
     public ItemStack drops = null;
     /** multiblock size */
