@@ -163,6 +163,8 @@ public class NetClient extends Module{
     @Remote(variants = Variant.both)
     public static void onWorldDataBegin(){
         Entities.clear();
+        netClient.removed.clear();
+
         ui.chatfrag.clearMessages();
         Net.setClientLoaded(false);
 

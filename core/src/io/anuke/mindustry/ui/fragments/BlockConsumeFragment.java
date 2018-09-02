@@ -42,7 +42,7 @@ public class BlockConsumeFragment extends Fragment{
 
         table.update(() -> {
 
-            if(tile.entity == null){
+            if(tile.entity == null || state.is(State.menu)){
                 hide();
                 return;
             }
