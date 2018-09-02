@@ -1,6 +1,6 @@
 #ifdef GL_ES
-precision mediump float;
-precision mediump int;
+precision highp float;
+precision highp int;
 #endif
 
 uniform sampler2D u_texture;
@@ -8,12 +8,13 @@ uniform vec2 u_resolution;
 uniform float u_time;
 uniform vec2 u_uv;
 uniform vec2 u_uv2;
+uniform float u_scl;
 
 varying vec4 v_color;
 varying vec2 v_texCoord;
 
 void main() {
-    vec2 coords = ((v_texCoord.xy - u_uv) / (u_uv2 - u_uv) - vec2(0.5, 0.5)) * u_resolution;
+    vec2 coords = ((v_texCoord.xy - u_uv) / (u_uv2 - u_uv) - vec2(0.5, 0.5)) * u_resolution/u_scl;
 
 	float roundx = 8.0;
 	float roundy = roundx;

@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.maps.missions.BattleMission;
 import io.anuke.mindustry.maps.missions.WaveMission;
@@ -33,12 +34,19 @@ public class Sectors{
     }
 
     public void playSector(Sector sector){
+        if(sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
+            sector.getSave().delete();
+            ui.showInfo("$text.save.old");
+        }
+
         if(!sector.hasSave()){
             world.loadSector(sector);
             logic.play();
             sector.saveID = control.getSaves().addSave("sector-" + sector.packedPosition()).index;
             world.sectors().save();
             world.setSector(sector);
+        }else if(SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
+            ui.showInfo("$text.save.old");
         }else try{
             sector.getSave().load();
             world.setSector(sector);
