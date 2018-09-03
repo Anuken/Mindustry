@@ -3,6 +3,7 @@ package io.anuke.mindustry.graphics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
@@ -28,7 +29,7 @@ public class Trail{
 
         points.add(curx, cury);
 
-        if(points.size > length * 2){
+        if(points.size > (int)(length * 2 / Math.min(Timers.delta(), 1f))){
             float[] items = points.items;
             System.arraycopy(items, 2, items, 0, points.size - 2);
             points.size -= 2;
