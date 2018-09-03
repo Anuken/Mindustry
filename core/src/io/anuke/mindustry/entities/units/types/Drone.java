@@ -191,7 +191,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         public void update(){
             ItemDrop item = (ItemDrop) target;
 
-            if(item == null || inventory.isFull() || !inventory.canAcceptItem(item.getItem(), 1)){
+            if(item == null || inventory.isFull() || item.getItem().type != ItemType.material || !inventory.canAcceptItem(item.getItem(), 1)){
                 setState(drop);
                 return;
             }
