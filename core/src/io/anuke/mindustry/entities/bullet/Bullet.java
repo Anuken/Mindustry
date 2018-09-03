@@ -163,7 +163,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
     @Override
     public boolean collides(SolidTrait other){
-        return type.collides && super.collides(other);
+        return type.collides && super.collides(other) && !supressCollision;
     }
 
     @Override
@@ -206,6 +206,14 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         }
 
         supressCollision = false;
+    }
+
+    @Override
+    protected void updateLife(){
+        if(time >= type.lifetime){
+            if(!supressCollision) type.despawned(this);
+            remove();
+        }
     }
 
     @Override
