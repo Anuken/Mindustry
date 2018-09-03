@@ -79,7 +79,7 @@ public class CoreBlock extends StorageBlock{
     @Remote(called = Loc.server)
     public static void setCoreSolid(Tile tile, boolean solid){
         CoreEntity entity = tile.entity();
-        entity.solid = solid;
+        if(entity != null) entity.solid = solid;
     }
 
     @Override

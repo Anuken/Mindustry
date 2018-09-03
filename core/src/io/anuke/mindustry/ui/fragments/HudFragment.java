@@ -146,7 +146,8 @@ public class HudFragment extends Fragment{
             });
 
             t.top().visible(() -> {
-                if(state.is(State.menu) ||  state.teams.get(players[0].getTeam()).cores.size == 0){
+                if(state.is(State.menu) || state.teams.get(players[0].getTeam()).cores.size == 0 ||
+                state.teams.get(players[0].getTeam()).cores.first().entity == null){
                     coreAttackTime = 0f;
                     return false;
                 }

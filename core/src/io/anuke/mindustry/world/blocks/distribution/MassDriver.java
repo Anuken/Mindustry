@@ -264,7 +264,7 @@ public class MassDriver extends Block{
         //whether this mass driver is waiting for a bullet to hit it and deliver items
         public boolean isRecieving;
         //whether this driver just recieved some items and is now unloading
-        public boolean isUnloading;
+        public boolean isUnloading = true;
 
         public float reload = 0f;
 

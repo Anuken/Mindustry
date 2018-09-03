@@ -53,6 +53,7 @@ public class BuildBlock extends Block{
 
     @Remote(called = Loc.server)
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team){
+        if(tile == null) return;
         tile.setRotation(rotation);
         world.setBlock(tile, block, team);
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
