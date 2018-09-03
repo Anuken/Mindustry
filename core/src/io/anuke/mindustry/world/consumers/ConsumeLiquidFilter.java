@@ -56,7 +56,7 @@ public class ConsumeLiquidFilter extends Consume{
 
     @Override
     public boolean valid(Block block, TileEntity entity){
-        return filter.test(entity.liquids.current()) && entity.liquids.currentAmount() >= use(block);
+        return entity.liquids != null && filter.test(entity.liquids.current()) && entity.liquids.currentAmount() >= use(block);
     }
 
     @Override

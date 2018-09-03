@@ -48,7 +48,7 @@ public class ConsumeItemFilter extends Consume{
     public boolean valid(Block block, TileEntity entity){
         for(int i = 0; i < Item.all().size; i++){
             Item item = Item.getByID(i);
-            if(entity.items.has(item) && this.filter.test(item)){
+            if(entity.items != null && entity.items.has(item) && this.filter.test(item)){
                 return true;
             }
         }
