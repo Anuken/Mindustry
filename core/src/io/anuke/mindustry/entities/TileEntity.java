@@ -127,6 +127,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         tile.block().handleBulletHit(this, other);
     }
 
+    public void kill(){
+        Call.onTileDestroyed(tile);
+    }
+
     public void damage(float damage){
         if(dead) return;
 

@@ -121,8 +121,8 @@ public class NuclearReactor extends PowerGenerator{
 
         entity.heat = Mathf.clamp(entity.heat);
 
-        if(entity.heat >= 1f){
-            entity.damage((int) entity.health);
+        if(entity.heat >= 0.999f){
+            entity.kill();
         }else{
             distributePower(tile);
         }
@@ -141,9 +141,7 @@ public class NuclearReactor extends PowerGenerator{
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
         Effects.effect(ExplosionFx.nuclearShockwave, tile.worldx(), tile.worldy());
         for(int i = 0; i < 6; i++){
-            Timers.run(Mathf.random(40), () -> {
-                Effects.effect(BlockFx.nuclearcloud, tile.worldx(), tile.worldy());
-            });
+            Timers.run(Mathf.random(40), () -> Effects.effect(BlockFx.nuclearcloud, tile.worldx(), tile.worldy()));
         }
 
         Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);

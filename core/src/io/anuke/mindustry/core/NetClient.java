@@ -217,7 +217,7 @@ public class NetClient extends Module{
                 int totalChunks = Mathf.ceil((float) totalLength / NetServer.maxSnapshotSize);
 
                 //reset status when a new snapshot sending begins
-                if(netClient.currentSnapshotID != snapshotID || netClient.recievedChunks == null){
+                if(netClient.currentSnapshotID != snapshotID || netClient.recievedChunks == null || netClient.recievedChunks.length != totalChunks){
                     netClient.currentSnapshotID = snapshotID;
                     netClient.currentSnapshot = new byte[totalLength];
                     netClient.recievedChunkCounter = 0;
