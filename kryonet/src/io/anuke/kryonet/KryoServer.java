@@ -132,8 +132,10 @@ public class KryoServer implements ServerProvider {
         //this only opens the default port due to security concerns (?)
         if(port == Vars.port){
             async(() -> {
-                if(!UPnP.isMappedTCP(port)) UPnP.openPortTCP(port);
-                if(!UPnP.isMappedUDP(port)) UPnP.openPortUDP(port);
+                try{
+                    if(!UPnP.isMappedTCP(port)) UPnP.openPortTCP(port);
+                    if(!UPnP.isMappedUDP(port)) UPnP.openPortUDP(port);
+                }catch(Throwable ignored){}
             });
         }
 
