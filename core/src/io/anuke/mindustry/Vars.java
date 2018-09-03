@@ -25,6 +25,7 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Translator;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 public class Vars{
@@ -145,6 +146,8 @@ public class Vars{
                 locales[i] = new Locale(code);
             }
         }
+
+        Arrays.sort(locales, (l1, l2) -> Platform.instance.getLocaleName(l1).compareTo(Platform.instance.getLocaleName(l2)));
 
         Version.init();
 
