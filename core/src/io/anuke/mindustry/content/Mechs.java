@@ -137,7 +137,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.8f;
                 weapon = Weapons.healBlaster;
                 maxSpeed = 5f;
-                armor = 20f;
+                armor = 15f;
                 altChargeAlpha = 0.05f;
                 trailColorTo = Palette.heal;
             }
