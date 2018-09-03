@@ -11,18 +11,23 @@ public class LiquidModule extends BlockModule{
     private float total;
     private Liquid current = Liquid.getByID(0);
 
-    /**
-     * Returns total amount of liquids.
-     */
+    /**Returns total amount of liquids.*/
     public float total(){
         return total;
     }
 
-    /**
-     * Last recieved or loaded liquid. Only valid for liquid modules with 1 type of liquid.
-     */
+    /**Last recieved or loaded liquid. Only valid for liquid modules with 1 type of liquid.*/
     public Liquid current(){
         return current;
+    }
+
+    public void reset(Liquid liquid, float amount){
+        for(int i = 0; i < liquids.length; i++){
+            liquids[i] = 0f;
+        }
+        liquids[liquid.id] = amount;
+        total = amount;
+        current = liquid;
     }
 
     public float currentAmount(){

@@ -101,9 +101,7 @@ public abstract class BaseBlock{
         return true;
     }
 
-    /**
-     * Returns how much power is accepted.
-     */
+    /**Returns how much power is accepted.*/
     public float addPower(Tile tile, float amount){
         float canAccept = Math.min(powerCapacity - tile.entity.power.amount, amount);
 
