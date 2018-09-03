@@ -415,9 +415,7 @@ public class Renderer extends RendererModule{
     public Vector2 averagePosition(){
         avgPosition.setZero();
 
-        drawAndInterpolate(playerGroup, p -> p.isLocal, p -> {
-            avgPosition.add(p.x, p.y);
-        });
+        drawAndInterpolate(playerGroup, p -> p.isLocal, p -> avgPosition.add(p.x, p.y));
 
         avgPosition.scl(1f / players.length);
         return avgPosition;

@@ -96,7 +96,7 @@ public class MissileBullets extends BulletList implements ContentList{
             }
         };
 
-        swarm = new MissileBulletType(2.7f, 14, "missile"){
+        swarm = new MissileBulletType(2.7f, 12, "missile"){
             {
                 bulletWidth = 8f;
                 bulletHeight = 8f;
@@ -105,7 +105,7 @@ public class MissileBullets extends BulletList implements ContentList{
                 homingRange = 60f;
                 keepVelocity = false;
                 splashDamageRadius = 25f;
-                splashDamage = 11f;
+                splashDamage = 10f;
                 lifetime = 120f;
                 trailColor = Color.GRAY;
                 backColor = Palette.bulletYellowBack;

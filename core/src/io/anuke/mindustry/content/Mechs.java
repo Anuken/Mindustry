@@ -137,7 +137,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.8f;
                 weapon = Weapons.healBlaster;
                 maxSpeed = 5f;
-                armor = 35f;
+                armor = 20f;
                 altChargeAlpha = 0.05f;
                 trailColorTo = Palette.heal;
             }
@@ -150,8 +150,6 @@ public class Mechs implements ContentList{
 
             @Override
             public void updateAlt(Player player){
-                //idle regen
-                player.healBy(0.01f * Timers.delta());
 
                 if(player.altHeat >= 0.91f){
                     Effects.effect(UnitFx.healWave, player);
@@ -197,7 +195,7 @@ public class Mechs implements ContentList{
                 weapon = Weapons.swarmer;
                 trailColorTo = Color.valueOf("feb380");
                 maxSpeed = 3.5f;
-                armor = 50f;
+                armor = 45f;
             }
 
             @Override

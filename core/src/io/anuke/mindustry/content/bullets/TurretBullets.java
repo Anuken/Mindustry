@@ -36,7 +36,7 @@ public class TurretBullets extends BulletList implements ContentList{
     @Override
     public void load(){
 
-        healBullet = new BulletType(5.2f, 19){
+        healBullet = new BulletType(5.2f, 16){
             float healAmount = 21f;
 
             {

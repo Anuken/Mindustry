@@ -37,7 +37,6 @@ public class Vars{
     //team of the enemy in waves
     public static final Team waveTeam = Team.red;
 
-    //discord group URL
     public static final String discordURL = "https://discord.gg/mindustry";
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
     public static final String crashReportURL = "http://mindustry.us.to/report";
