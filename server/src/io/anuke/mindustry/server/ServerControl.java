@@ -336,7 +336,7 @@ public class ServerControl extends Module{
            boolean value = arg[0].equalsIgnoreCase("on");
            debug = value;
            info("Debug mode is now {0}.", value ? "on" : "off");
-        });.0
+        });
 
         handler.register("allow-custom-clients", "[on/off]", "Allow or disallow custom clients.", arg -> {
             if(arg.length == 0){
