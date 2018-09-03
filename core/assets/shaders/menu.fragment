@@ -1,11 +1,11 @@
 #ifdef GL_ES
-precision highp float;
-precision highp int;
+precision mediump float;
+precision mediump int;
 #endif
 
 uniform sampler2D u_texture;
 uniform vec2 u_resolution;
-uniform float u_time;
+uniform int u_time;
 uniform vec2 u_uv;
 uniform vec2 u_uv2;
 uniform float u_scl;
@@ -25,7 +25,7 @@ void main() {
 
 	float d = (abs(float(coords.x)) - abs(float(coords.y)));
 
-	float m = abs(sin(-u_time/50.0 + d/120.0));
+	float m = abs(sin(-float(u_time)/50.0 + d/120.0));
 	m = float(int(m / roundm)) * roundm + roundm;
 
     gl_FragColor.rgb = mix(v_color.rgb, vec3(0.0), m);

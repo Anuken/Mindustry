@@ -53,8 +53,10 @@ public class Shaders{
 
         @Override
         public void apply(){
+            time = time % 158;
+
             shader.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            shader.setUniformf("u_time", time += Gdx.graphics.getDeltaTime() * 60f);
+            shader.setUniformi("u_time", (int)(time += Gdx.graphics.getDeltaTime() * 60f));
             shader.setUniformf("u_uv", Draw.getBlankRegion().getU(), Draw.getBlankRegion().getV());
             shader.setUniformf("u_scl", Unit.dp.scl(1f));
             shader.setUniformf("u_uv2", Draw.getBlankRegion().getU2(), Draw.getBlankRegion().getV2());

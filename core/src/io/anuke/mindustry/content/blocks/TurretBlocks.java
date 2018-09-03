@@ -44,10 +44,10 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         hail = new ArtilleryTurret("hail"){{
             ammoTypes = new AmmoType[]{AmmoTypes.artilleryDense, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
-            reload = 100f;
+            reload = 80f;
             recoil = 2f;
-            range = 200f;
-            inaccuracy = 5f;
+            range = 230f;
+            inaccuracy = 1f;
             health = 120;
         }};
 
@@ -195,7 +195,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             restitution = 0.02f;
             recoil = 6f;
             shootShake = 2f;
-            range = 300f;
+            range = 320f;
 
             health = 550;
         }};
