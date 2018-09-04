@@ -18,7 +18,7 @@ public class NetEvents{
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
 
-        Log.info("&y{0}: &lb{1}", (player.name == null ? "" : player.name), message);
+        Log.info("&y{0}: &lb{1}", (player == null || player.name == null ? "" : player.name), message);
 
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message, player == null ? null : colorizeName(player.id, player.name));

@@ -95,7 +95,7 @@ public class DesktopInput extends InputHandler{
         if(cursor == null) return;
 
         //draw selection(s)
-        if(mode == placing){
+        if(mode == placing && recipe != null){
             NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, true, maxLength);
 
             for(int i = 0; i <= result.getLength(); i += recipe.result.size){
