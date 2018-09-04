@@ -1,19 +1,21 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.Packets.AdminAction;
-import io.anuke.mindustry.ui.BorderImage;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
@@ -21,7 +23,6 @@ import static io.anuke.mindustry.Vars.*;
 public class PlayerListFragment extends Fragment{
     private boolean visible = false;
     private Table content = new Table().marginRight(13f).marginLeft(13f);
-    private ObjectMap<Player, Boolean> checkmap = new ObjectMap<>();
 
     @Override
     public void build(Group parent){
@@ -30,24 +31,11 @@ public class PlayerListFragment extends Fragment{
             cont.update(() -> {
                 if(!(Net.active() && !state.is(State.menu))){
                     visible = false;
+                    return;
                 }
-                boolean rebuild = false;
-                for(Player player : playerGroup.all()){
-                    if(!checkmap.containsKey(player) || checkmap.get(player, false) != player.isAdmin){
-                        rebuild = true;
-                    }
-                }
-                for(Player player : checkmap.keys()){
-                    if(!player.isAdded()){
-                        rebuild = true;
-                    }
-                }
-                if(rebuild){
+
+                if(visible && Timers.get("player-list-rebuild", 20)){
                     rebuild();
-                    checkmap.clear();
-                    for(Player player : playerGroup.all()){
-                        checkmap.put(player, player.isAdmin);
-                    }
                 }
             });
 
@@ -86,14 +74,21 @@ public class PlayerListFragment extends Fragment{
             button.left();
             button.margin(5).marginBottom(10);
 
-            Stack stack = new Stack();
-            BorderImage image = new BorderImage(Draw.region(player.mech.name), 3f);
+            Table table = new Table(){
+                @Override
+                public void draw(Batch batch, float parentAlpha){
+                    super.draw(batch, parentAlpha);
+                    Draw.color(Palette.accent);
+                    Draw.alpha(parentAlpha);
+                    Lines.stroke(Unit.dp.scl(3f));
+                    Lines.rect(x, y, width, height);
+                    Draw.reset();
+                }
+            };
+            table.margin(8);
+            table.add(new Image(player.mech.iconRegion)).grow();
 
-            stack.add(image);
-
-            stack.add(new Image(player.mech.iconRegion));
-
-            button.add(stack).size(h);
+            button.add(table).size(h);
             button.labelWrap("[#" + player.color.toString().toUpperCase() + "]" + player.name).width(170f).pad(10);
             button.add().grow();
 
@@ -106,13 +101,11 @@ public class PlayerListFragment extends Fragment{
 
                 button.table(t -> {
                     t.defaults().size(bs - 1, bs + 3);
-                    //TODO requests.
 
-                    t.addImageButton("icon-ban", 14 * 2, () -> {
-                        ui.showConfirm("$text.confirm", "$text.confirmban", () -> Call.onAdminRequest(player, AdminAction.ban));
-                    }).padBottom(-5.1f);
-
-                    t.addImageButton("icon-cancel", 14 * 2, () -> Call.onAdminRequest(player, AdminAction.kick)).padBottom(-5.1f);
+                    t.addImageButton("icon-ban", 14 * 2,
+                        () -> ui.showConfirm("$text.confirm", "$text.confirmban", () -> Call.onAdminRequest(player, AdminAction.ban))).padBottom(-5.1f);
+                    t.addImageButton("icon-cancel", 14 * 2,
+                        () -> ui.showConfirm("$text.confirm", "$text.confirmkick", () -> Call.onAdminRequest(player, AdminAction.kick))).padBottom(-5.1f);
 
                     t.row();
 
@@ -122,13 +115,9 @@ public class PlayerListFragment extends Fragment{
                         String id = netServer.admins.getTraceByID(player.uuid).uuid;
 
                         if(netServer.admins.isAdmin(id, connection.address)){
-                            ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
-                                netServer.admins.unAdminPlayer(id);
-                            });
+                            ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> netServer.admins.unAdminPlayer(id));
                         }else{
-                            ui.showConfirm("$text.confirm", "$text.confirmadmin", () -> {
-                                netServer.admins.adminPlayer(id, player.usid);
-                            });
+                            ui.showConfirm("$text.confirm", "$text.confirmadmin", () -> netServer.admins.adminPlayer(id, player.usid));
                         }
                     }).update(b -> {
                         b.setChecked(player.isAdmin);
@@ -151,6 +140,9 @@ public class PlayerListFragment extends Fragment{
 
     public void toggle(){
         visible = !visible;
+        if(visible){
+            rebuild();
+        }
     }
 
 }
