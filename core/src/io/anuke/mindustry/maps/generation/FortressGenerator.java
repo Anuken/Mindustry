@@ -32,6 +32,7 @@ import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.ucore.function.BiFunction;
 import io.anuke.ucore.function.IntPositionConsumer;
 import io.anuke.ucore.function.TriFunction;
+import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
 public class FortressGenerator{
@@ -196,11 +197,21 @@ public class FortressGenerator{
             //big turrets
             seeder.get(bigTurret, tile -> tile.block() instanceof StorageBlock && gen.random.chance(0.65)),
 
-            //walls (large)
-            seeder.get(wallLarge, tile -> !(tile.block() instanceof Wall) && !(tile.block() instanceof UnitPad)),
-
             //walls
-            seeder.get(wall, tile -> !(tile.block() instanceof Wall) && !(tile.block() instanceof UnitPad)),
+            (x, y) -> {
+                if(!gen.canPlace(x, y, wall)) return;
+
+                for(GridPoint2 point : Geometry.d8){
+                    Tile tile = gen.tile(x + point.x, y + point.y);
+                    if(tile != null){
+                        tile = tile.target();
+                        if(tile.getTeamID() == team.ordinal() && !(tile.block() instanceof Wall) && !(tile.block() instanceof UnitPad)){
+                            gen.setBlock(x, y, wall, team);
+                            break;
+                        }
+                    }
+                }
+            },
 
             //fill up turrets w/ ammo
             (x, y) -> {
