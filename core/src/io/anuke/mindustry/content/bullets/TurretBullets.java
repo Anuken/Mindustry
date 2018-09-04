@@ -74,6 +74,7 @@ public class TurretBullets extends BulletList implements ContentList{
                 collides = false;
                 collidesTiles = false;
                 drag = 0.03f;
+                hiteffect = despawneffect = Fx.none;
             }
 
             @Override

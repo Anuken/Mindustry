@@ -67,6 +67,10 @@ public class Liquid implements UnlockableContent{
         Liquid.liquids.add(this);
     }
 
+    public boolean canExtinguish(){
+        return flammability < 0.1f && temperature <= 0.5f;
+    }
+
     public static Array<Liquid> all(){
         return Liquid.liquids;
     }

@@ -190,11 +190,10 @@ public abstract class Turret extends Block{
         if(hasAmmo(tile)){
 
             if(entity.timer.get(timerTarget, targetInterval)){
-                entity.target = Units.getClosestTarget(tile.getTeam(),
-                        tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir));
+                findTarget(tile);
             }
 
-            if(!Units.invalidateTarget(entity.target, tile.getTeam(), tile.drawx(), tile.drawy())){
+            if(validateTarget(tile)){
 
                 AmmoType type = peekAmmo(tile);
                 float speed = type.bullet.speed;
@@ -220,6 +219,18 @@ public abstract class Turret extends Block{
                 }
             }
         }
+    }
+
+    protected boolean validateTarget(Tile tile){
+        TurretEntity entity = tile.entity();
+        return !Units.invalidateTarget(entity.target, tile.getTeam(), tile.drawx(), tile.drawy());
+    }
+
+    protected void findTarget(Tile tile){
+        TurretEntity entity = tile.entity();
+
+        entity.target = Units.getClosestTarget(tile.getTeam(),
+                tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir));
     }
 
     public boolean shouldTurn(Tile tile){
