@@ -96,7 +96,7 @@ public class Weapons implements ContentList{
             inaccuracy = 0f;
             velocityRnd = 0.2f;
             ejectEffect = Fx.none;
-            ammo = AmmoTypes.shotgunTungsten;
+            ammo = AmmoTypes.shock;
         }};
 
         flakgun = new Weapon("flakgun"){{

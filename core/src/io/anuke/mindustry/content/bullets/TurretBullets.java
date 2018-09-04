@@ -229,7 +229,7 @@ public class TurretBullets extends BulletList implements ContentList{
                 statusIntensity = 0.5f;
             }
         };
-        lightning = new BulletType(0.001f, 10){
+        lightning = new BulletType(0.001f, 14){
             {
                 lifetime = 1;
                 despawneffect = Fx.none;

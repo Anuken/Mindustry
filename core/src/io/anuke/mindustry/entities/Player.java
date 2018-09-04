@@ -302,7 +302,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         if(floor.isLiquid){
-            Draw.tint(Color.WHITE, floor.liquidColor, drownTime);
+            Draw.tint(Color.WHITE, floor.liquidColor, Mathf.clamp(drownTime));
         }else{
             Draw.tint(Color.WHITE);
         }
@@ -461,6 +461,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             interpolate();
             updateBuilding(this); //building happens even with non-locals
             status.update(this); //status effect updating also happens with non locals for effect purposes
+            updateVelocityStatus(mech.drag, mech.maxSpeed); //velocity too, for visual purposes
 
             if(getCarrier() != null){
                 x = getCarrier().getX();

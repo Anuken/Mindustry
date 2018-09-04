@@ -11,7 +11,7 @@ import io.anuke.mindustry.type.ContentList;
 
 public class AmmoTypes implements ContentList{
     public static AmmoType bulletCopper, bulletDense, bulletThorium, bulletSilicon, bulletPyratite,
-            shotgunTungsten, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite, weaponMissile, weaponMissileSwarm, bulletMech,
+    shock, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite, weaponMissile, weaponMissileSwarm, bulletMech,
             healBlaster, bulletGlaive,
             flakExplosive, flakPlastic, flakSurge,
             missileExplosive, missileIncindiary, missileSurge,
@@ -43,7 +43,7 @@ public class AmmoTypes implements ContentList{
             inaccuracy = 2f;
         }};
 
-        shotgunTungsten = new AmmoType(TurretBullets.lightning){{
+        shock = new AmmoType(TurretBullets.lightning){{
             shootEffect = BulletFx.hitLancer;
             smokeEffect = Fx.none;
         }};

@@ -27,6 +27,7 @@ public class Smelter extends Block{
     protected Item result;
 
     protected float minFlux = 0.2f;
+    protected float fluxSpeedMult = 0.75f;
     protected float baseFluxChance = 0.25f;
     protected boolean useFlux = false;
 
@@ -107,9 +108,17 @@ public class Smelter extends Block{
             return;
         }
 
+        float baseSmeltSpeed = 1f;
+        for(Item item : Item.all()){
+            if(item.fluxiness >= minFlux && tile.entity.items.get(item) > 0){
+                baseSmeltSpeed = fluxSpeedMult;
+                break;
+            }
+        }
+
         if(entity.items.get(result) >= itemCapacity //output full
                 || entity.burnTime <= 0 //not burning
-                || !entity.timer.get(timerCraft, craftTime)){ //not yet time
+                || !entity.timer.get(timerCraft, craftTime*baseSmeltSpeed)){ //not yet time
             return;
         }
 

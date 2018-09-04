@@ -31,6 +31,7 @@ public class PowerSmelter extends PowerBlock{
 
     protected float minFlux = 0.2f;
     protected int fluxNeeded = 1;
+    protected float fluxSpeedMult = 0.75f;
     protected float baseFluxChance = 0.25f;
     protected boolean useFlux = false;
 
@@ -111,9 +112,17 @@ public class PowerSmelter extends PowerBlock{
             return;
         }
 
+        float baseSmeltSpeed = 1f;
+        for(Item item : Item.all()){
+            if(item.fluxiness >= minFlux && tile.entity.items.get(item) > 0){
+                baseSmeltSpeed = fluxSpeedMult;
+                break;
+            }
+        }
+
         if(entity.items.get(result) >= itemCapacity //output full
                 || entity.heat <= minHeat //not burning
-                || !entity.timer.get(timerCraft, craftTime)){ //not yet time
+                || !entity.timer.get(timerCraft, craftTime*baseSmeltSpeed)){ //not yet time
             return;
         }
 

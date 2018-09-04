@@ -107,7 +107,7 @@ public class Mechs implements ContentList{
                 if(player.altHeat >= 0.91f){
                     Effects.shake(3f, 3f, player);
                     for(int i = 0; i < 8; i++){
-                        Timers.run(Mathf.random(5f), () -> Lightning.create(player.getTeam(), BulletFx.hitLancer, player.getTeam().color, 10f, player.x, player.y, Mathf.random(360f), 20));
+                        Timers.run(Mathf.random(5f), () -> Lightning.create(player.getTeam(), BulletFx.hitLancer, player.getTeam().color, 15f, player.x, player.y, Mathf.random(360f), 20));
                     }
                     player.altHeat = 0f;
                 }

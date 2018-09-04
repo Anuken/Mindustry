@@ -151,7 +151,7 @@ public class ServerControl extends Module{
         });
 
         handler.register("version", "Displays server version info.", arg -> {
-            info("&lmVersion: &lyMindustry {0} {1} / {2}", Version.code, Version.type, Version.buildName);
+            info("&lmVersion: &lyMindustry {0}-{1} {2} / build {3}", Version.number, Version.modifier, Version.type, Version.build);
             info("&lmJava Version: &ly{0}", System.getProperty("java.version"));
         });
 
