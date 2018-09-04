@@ -242,10 +242,12 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 Effects.effect(floor.walkEffect, floor.liquidColor, x, y);
             }
 
-            status.handleApply(this, floor.status, floor.statusIntensity);
+            if(onLiquid){
+                status.handleApply(this, floor.status, floor.statusIntensity);
 
-            if(floor.damageTaken > 0f){
-                damagePeriodic(floor.damageTaken);
+                if(floor.damageTaken > 0f){
+                    damagePeriodic(floor.damageTaken);
+                }
             }
 
             if(onLiquid && floor.drownTime > 0){

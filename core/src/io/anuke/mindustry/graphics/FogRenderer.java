@@ -29,13 +29,14 @@ import static io.anuke.mindustry.Vars.*;
 /**Used for rendering fog of war. A framebuffer is used for this.*/
 public class FogRenderer implements Disposable{
     private static final int extraPadding = 3;
-    private static final int shadowPadding = 1;
+    private static final int fshadowPadding = 1;
 
     private TextureRegion region = new TextureRegion();
     private FrameBuffer buffer;
     private ByteBuffer pixelBuffer;
     private Array<Tile> changeQueue = new Array<>();
     private int padding;
+    private int shadowPadding;
     private Rectangle rect = new Rectangle();
     private boolean dirty;
 
@@ -44,6 +45,7 @@ public class FogRenderer implements Disposable{
             dispose();
 
             padding = world.getSector() != null ? mapPadding + extraPadding : 0;
+            shadowPadding = world.getSector() != null ? fshadowPadding : -1;
 
             buffer = new FrameBuffer(Format.RGBA8888, world.width() + padding*2, world.height() + padding*2, false);
             changeQueue.clear();

@@ -160,13 +160,8 @@ public class Renderer extends RendererModule{
             }else if(!mobile){
                 setCamera(position.x + 0.0001f, position.y + 0.0001f);
             }
-
-            if(world.getSector() == null){
-                clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, world.height() * tilesize - tilesize / 2f);
-            }else{
-                camera.position.x = Mathf.clamp(camera.position.x, -tilesize / 2f, world.width() * tilesize - tilesize / 2f);
-                camera.position.y = Mathf.clamp(camera.position.y, -tilesize / 2f, world.height() * tilesize - tilesize / 2f);
-            }
+            camera.position.x = Mathf.clamp(camera.position.x, -tilesize / 2f, world.width() * tilesize - tilesize / 2f);
+            camera.position.y = Mathf.clamp(camera.position.y, -tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
             float prex = camera.position.x, prey = camera.position.y;
             updateShake(0.75f);
