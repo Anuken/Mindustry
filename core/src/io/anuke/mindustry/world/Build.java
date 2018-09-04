@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world;
 
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
@@ -10,6 +11,7 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.util.Geometry;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -154,6 +156,10 @@ public class Build{
                 return true;
             }
 
+            if(!contactsGround(tile.x, tile.y, type)){
+                return false;
+            }
+
             if(!type.canPlaceOn(tile)){
                 return false;
             }
@@ -173,12 +179,34 @@ public class Build{
             return true;
         }else{
             return (tile.getTeam() == Team.none || tile.getTeam() == team)
+                    && contactsGround(tile.x, tile.y, type)
                     && (!tile.floor().isLiquid || type.floating)
                     && tile.floor().placeableOn && !tile.hasCliffs()
                     && ((type.canReplace(tile.block())
                     && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
                     && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
         }
+    }
+
+    private static boolean contactsGround(int x, int y, Block block){
+        if(block.isMultiblock()){
+            for(GridPoint2 point : Edges.getInsideEdges(block.size)){
+                Tile tile = world.tile(x + point.x, y + point.y);
+                if(tile != null && !tile.floor().isLiquid) return true;
+            }
+
+            for(GridPoint2 point : Edges.getEdges(block.size)){
+                Tile tile = world.tile(x + point.x, y + point.y);
+                if(tile != null && !tile.floor().isLiquid) return true;
+            }
+        }else{
+            for(GridPoint2 point : Geometry.d4){
+                Tile tile = world.tile(x + point.x, y + point.y);
+                if(tile != null && !tile.floor().isLiquid) return true;
+            }
+            return world.tile(x, y) != null && !world.tile(x, y).floor().isLiquid;
+        }
+        return false;
     }
 
     /**Returns whether the tile at this position is breakable by this team*/
