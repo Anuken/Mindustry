@@ -9,11 +9,14 @@ import io.anuke.ucore.util.Strings;
 import java.io.IOException;
 
 public class Version{
-    public static String name;
+    /**Build type. 'official' for official releases; 'custom' or 'bleeding edge' are also used.*/
     public static String type;
-    public static String code;
+    /**Number specifying the major version, e.g. '4.0'*/
+    public static String number;
+    /**Build modifier, e.g. 'alpha' or 'release'*/
+    public static String modifier;
+    /**Build number, e.g. '43'. set to '-1' for custom builds.*/
     public static int build = 0;
-    public static String buildName;
 
     public static void init(){
         try{
@@ -22,12 +25,10 @@ public class Version{
             ObjectMap<String, String> map = new ObjectMap<>();
             PropertiesUtils.load(map, file.reader());
 
-            name = map.get("name");
-            type = map.get("version");
-            code = map.get("code");
+            type = map.get("type");
+            number = map.get("number");
+            modifier = map.get("modifier");
             build = Strings.canParseInt(map.get("build")) ? Integer.parseInt(map.get("build")) : -1;
-            buildName = build == -1 ? map.get("build") : "build " + build;
-
         }catch(IOException e){
             throw new RuntimeException(e);
         }
