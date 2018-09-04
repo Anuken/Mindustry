@@ -70,7 +70,7 @@ public class DeflectorWall extends Wall{
         bullet.updateVelocity(0f);
         bullet.resetOwner(entity, Team.none);
         bullet.scaleTime(1f);
-        bullet.supressCollision();
+        bullet.supress();
 
         ((DeflectorEntity) entity).hit = 1f;
     }

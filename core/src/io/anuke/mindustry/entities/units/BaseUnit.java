@@ -284,11 +284,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public void update(){
-        if(hitTime > 0){
-            hitTime -= Timers.delta();
-        }
-
-        if(hitTime < 0) hitTime = 0;
+        hitTime -= Timers.delta();
 
         if(isDead()){
             updateRespawning();

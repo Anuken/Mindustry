@@ -30,7 +30,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     public Timer timer = new Timer(3);
     private Team team;
     private Object data;
-    private boolean supressCollision;
+    private boolean supressCollision, supressOnce, initialized;
 
     /**Internal use only!*/
     public Bullet(){
@@ -91,8 +91,14 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         return type.collidesTiles;
     }
 
-    public void supressCollision(){
+    public void supress(){
         supressCollision = true;
+        supressOnce = true;
+    }
+
+    public void absorb(){
+        supressCollision = true;
+        remove();
     }
 
     public void resetOwner(Entity entity, Team team){
@@ -181,7 +187,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     public void update(){
         super.update();
 
-        if(type.hitTiles && collidesTiles() && !supressCollision){
+        if(type.hitTiles && collidesTiles() && !supressCollision && !initialized){
             world.raycastEach(world.toTile(lastPosition().x), world.toTile(lastPosition().y), world.toTile(x), world.toTile(y), (x, y) -> {
 
                 Tile tile = world.tile(x, y);
@@ -205,7 +211,12 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
             });
         }
 
-        supressCollision = false;
+        if(supressOnce){
+            supressCollision = false;
+            supressOnce = false;
+        }
+
+        initialized = true;
     }
 
     @Override
@@ -222,6 +233,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         timer.clear();
         team = null;
         data = null;
+        initialized = false;
     }
 
     @Override

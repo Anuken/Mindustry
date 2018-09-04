@@ -342,7 +342,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         float x = snappedX(), y = snappedY();
 
         Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Timers.time(), healthf()*5f, 1f - healthf()));
-        Draw.alpha(hitTime);
+        Draw.alpha(hitTime / hitDuration);
         Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
         Draw.color();
     }
@@ -433,7 +433,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void update(){
-        hitTime = Math.max(0f, hitTime - Timers.delta());
+        hitTime -= Timers.delta();
 
         if(Float.isNaN(x) || Float.isNaN(y)){
             TileEntity core = getClosestCore();

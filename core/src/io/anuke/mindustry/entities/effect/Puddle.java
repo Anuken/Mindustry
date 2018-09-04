@@ -51,6 +51,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     private int loadedPosition = -1;
 
     private float updateTime;
+    private float lastRipple;
     private Tile tile;
     private Liquid liquid;
     private float amount, targetAmount;
@@ -89,9 +90,12 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
             reactPuddle(tile.floor().liquidDrop, liquid, amount, tile,
                     (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
 
-            if(generation == 0 && Timers.get(tile, "ripple", 50)){
+            Puddle p = map.get(tile.packedPosition());
+
+            if(generation == 0 && p != null && p.lastRipple <= Timers.time() - 40f){
                 Effects.effect(BlockFx.ripple, tile.floor().liquidDrop.color,
                         (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
+                p.lastRipple = Timers.time();
             }
             return;
         }
@@ -111,8 +115,9 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
 
-            if(generation == 0 && Timers.get(p, "ripple2", 50) && p.amount >= maxLiquid / 2f){
+            if(generation == 0  && p.lastRipple <= Timers.time() - 40f && p.amount >= maxLiquid / 2f){
                 Effects.effect(BlockFx.ripple, p.liquid.color, (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
+                p.lastRipple = Timers.time();
             }
         }else{
             p.amount -= reactPuddle(p.liquid, liquid, amount, p.tile, p.x, p.y);

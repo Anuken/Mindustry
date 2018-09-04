@@ -187,8 +187,7 @@ public class CoreBlock extends StorageBlock{
             if(bullet.getOwner() instanceof Player && bullet.getTeam() != tile.getTeam()){
                 Effects.effect(BulletFx.absorb, bullet);
                 entity.shieldHeat = 1f;
-                bullet.supressCollision();
-                bullet.remove();
+                bullet.absorb();
             }
         });
 
