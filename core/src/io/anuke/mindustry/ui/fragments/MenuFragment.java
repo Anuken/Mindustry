@@ -42,8 +42,11 @@ public class MenuFragment extends Fragment{
         }
 
         //version info
-        parent.fill(c -> c.bottom().left().add("Mindustry " + Version.number + "-" + Version.modifier + " " + Version.type + " / " + (Version.build == -1 ? "custom build" : "build " + Version.build))
-                .visible(() -> state.is(State.menu)));
+        parent.fill(c -> c.bottom().left().add(
+            "Mindustry " + Version.number + "-" + Version.modifier + " " + Version.type + " / " +
+            (Version.build == -1 ? "custom build" : "build " + Version.build) +
+            (Version.commit != null ? " commit " + Version.commit : "")
+        ).visible(() -> state.is(State.menu)));
     }
 
     private void buildMobile(){

@@ -156,6 +156,10 @@ public class NetServer extends Module{
                 kick(id, packet.version > Version.build ? KickReason.serverOutdated : KickReason.clientOutdated);
                 return;
             }
+            if (Version.commit != null && !Version.commit.equals(packet.commit)) {
+                kick(id, KickReason.commitMismatch);
+                return;
+            }
 
             if(packet.version == -1){
                 trace.modclient = true;

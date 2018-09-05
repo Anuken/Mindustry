@@ -17,6 +17,8 @@ public class Version{
     public static String modifier;
     /**Build number, e.g. '43'. set to '-1' for custom builds.*/
     public static int build = 0;
+    /** Commit which this build was built from */
+    public static String commit;
 
     public static void init(){
         try{
@@ -29,6 +31,8 @@ public class Version{
             number = map.get("number");
             modifier = map.get("modifier");
             build = Strings.canParseInt(map.get("build")) ? Integer.parseInt(map.get("build")) : -1;
+            commit = map.get("commit");
+
         }catch(IOException e){
             throw new RuntimeException(e);
         }
