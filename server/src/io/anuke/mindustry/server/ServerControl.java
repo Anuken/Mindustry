@@ -2,6 +2,8 @@ package io.anuke.mindustry.server;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
@@ -43,6 +45,7 @@ public class ServerControl extends Module{
     private int gameOvers;
     private boolean inExtraRound;
     private Team winnerTeam;
+    private Task lastTask;
 
     public ServerControl(String[] args){
         Settings.defaultList(
@@ -161,7 +164,7 @@ public class ServerControl extends Module{
 
         handler.register("stop", "Stop hosting the server.", arg -> {
             Net.closeServer();
-            Timers.clear();
+            if(lastTask != null) lastTask.cancel();
             state.set(State.menu);
             netServer.reset();
             Log.info("Stopped server.");
@@ -172,6 +175,8 @@ public class ServerControl extends Module{
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
             }
+
+            if(lastTask != null) lastTask.cancel();
 
             Map result = null;
 
@@ -636,6 +641,7 @@ public class ServerControl extends Module{
             }
 
             info("&lyCore destroyed.");
+            inExtraRound = false;
             Events.fire(new GameOverEvent());
         });
 
@@ -849,7 +855,14 @@ public class ServerControl extends Module{
         };
 
         if(wait){
-            Timers.run(60f * roundExtraTime, r);
+            lastTask = new Task(){
+                @Override
+                public void run(){
+                    r.run();
+                }
+            };
+
+            Timer.schedule(lastTask, roundExtraTime);
         }else{
             r.run();
         }
@@ -886,7 +899,7 @@ public class ServerControl extends Module{
 
     @Override
     public void update(){
-        if(!inExtraRound){
+        if(!inExtraRound && state.mode.isPvp){
             checkPvPGameOver();
         }
 

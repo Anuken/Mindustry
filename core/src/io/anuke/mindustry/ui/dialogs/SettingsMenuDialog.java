@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
@@ -16,6 +17,7 @@ import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.SettingsDialog;
+import io.anuke.ucore.scene.ui.SettingsDialog.SettingsTable.Setting;
 import io.anuke.ucore.scene.ui.Slider;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
@@ -133,6 +135,44 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("effects", true);
         //game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
         game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Bundles.format("setting.seconds", i));
+        game.pref(new Setting(){
+            @Override
+            public void add(SettingsTable table){
+                table.addButton("$text.settings.cleardata", () -> {
+                    FloatingDialog dialog = new FloatingDialog("$text.settings.cleardata");
+                    dialog.setFillParent(false);
+                    dialog.content().defaults().size(230f, 50f).pad(3);
+                    dialog.addCloseButton();
+                    dialog.content().addButton("$text.settings.clearsectors", () -> {
+                        ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
+                            Settings.putString("sectors", "{}");
+                            Settings.save();
+                        });
+                    });
+                    dialog.content().row();
+                    dialog.content().addButton("$text.settings.clearunlocks", () -> {
+                        ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
+                            Settings.putString("unlocks", "{}");
+                            Settings.save();
+                        });
+                    });
+                    dialog.content().row();
+                    dialog.content().addButton("$text.settings.clearall", () -> {
+                        ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
+                            for(SaveSlot slot : control.getSaves().getSaveSlots()){
+                                slot.delete();
+                            }
+                            Settings.prefs().clear();
+                            Settings.save();
+                        });
+                    });
+                    dialog.content().row();
+                    dialog.show();
+                }).size(220f, 60f).pad(6).left();
+                table.add();
+                table.row();
+            }
+        });
 
         if(!gwt){
             graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Bundles.get("setting.fpscap.none") : Bundles.format("setting.fpscap.text", s)));
