@@ -107,6 +107,8 @@ public class Block extends BaseBlock implements Content{
     public float viewRange = 10;
     /**Whether the top icon is outlined, like a turret.*/
     public boolean turretIcon = false;
+    /**Whether units target this block.*/
+    public boolean targetable = true;
 
     protected Array<Tile> tempTiles = new Array<>();
     protected Color tempColor = new Color();

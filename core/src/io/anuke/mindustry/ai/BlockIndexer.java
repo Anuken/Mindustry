@@ -128,7 +128,7 @@ public class BlockIndexer{
                     for(int ty = ry * structQuadrantSize; ty < (ry + 1) * structQuadrantSize && ty < world.height(); ty++){
                         Tile other = world.tile(tx, ty);
 
-                        if(other == null || other.entity == null || other.getTeam() != team || !pred.test(other)) continue;
+                        if(other == null || other.entity == null || other.getTeam() != team || !pred.test(other) || !other.block().targetable) continue;
 
                         TileEntity e = other.entity;
 
@@ -233,7 +233,7 @@ public class BlockIndexer{
             TeamData data = state.teams.get(team);
 
             //fast-set this quadrant to 'occupied' if the tile just placed is already of this team
-            if(tile.getTeam() == data.team && tile.entity != null){
+            if(tile.getTeam() == data.team && tile.entity != null && tile.block().targetable){
                 structQuadrants[data.team.ordinal()].set(index);
                 continue; //no need to process futher
             }

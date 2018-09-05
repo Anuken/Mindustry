@@ -187,7 +187,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     public void update(){
         super.update();
 
-        if(type.hitTiles && collidesTiles() && !supressCollision && !initialized){
+        if(type.hitTiles && collidesTiles() && !supressCollision && initialized){
             world.raycastEach(world.toTile(lastPosition().x), world.toTile(lastPosition().y), world.toTile(x), world.toTile(y), (x, y) -> {
 
                 Tile tile = world.tile(x, y);

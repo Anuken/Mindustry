@@ -36,8 +36,8 @@ public class Recipe implements UnlockableContent{
     //the only gamemode in which the recipe shows up
     public boolean isPad;
 
-    private Block[] dependencies;
-    private Recipe[] recipeDependencies;
+    private UnlockableContent[] dependencies;
+    private Block[] blockDependencies;
 
     public Recipe(Category category, Block result, ItemStack... requirements){
         this.id = lastid++;
@@ -175,19 +175,23 @@ public class Recipe implements UnlockableContent{
 
     @Override
     public UnlockableContent[] getDependencies(){
-        if(dependencies == null){
-            return null;
-        }else if(recipeDependencies == null){
-            recipeDependencies = new Recipe[dependencies.length];
-            for(int i = 0; i < recipeDependencies.length; i++){
-                recipeDependencies[i] = Recipe.getByResult(dependencies[i]);
+        if(blockDependencies != null && dependencies == null){
+            dependencies = new UnlockableContent[blockDependencies.length];
+            for(int i = 0; i < dependencies.length; i++){
+                dependencies[i] = Recipe.getByResult(blockDependencies[i]);
             }
+            return dependencies;
         }
-        return recipeDependencies;
+        return dependencies;
     }
 
-    public Recipe setDependencies(Block... blocks){
-        this.dependencies = blocks;
+    public Recipe setDependencies(UnlockableContent... dependencies){
+        this.dependencies = dependencies;
+        return this;
+    }
+
+    public Recipe setDependencies(Block... dependencies){
+        this.blockDependencies = dependencies;
         return this;
     }
 
