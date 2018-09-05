@@ -79,10 +79,10 @@ public class DefenseBlocks extends BlockList implements ContentList{
 
         shockMine = new ShockMine("shock-mine"){{
             health = 40;
-            damage = 10;
-            tileDamage = 5f;
+            damage = 11;
+            tileDamage = 6f;
             length = 10;
-            tendrils = 6;
+            tendrils = 5;
         }};
     }
 }
