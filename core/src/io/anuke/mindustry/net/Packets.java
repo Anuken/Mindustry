@@ -24,8 +24,9 @@ import static io.anuke.mindustry.Vars.world;
 public class Packets{
 
     public enum KickReason{
-        kick, clientOutdated, serverOutdated, banned, gameover(true), recentKick,
-        nameInUse, idInUse, nameEmpty, customClient, sectorComplete, serverClose;
+        kick, clientOutdated, serverOutdated, commitMismatch, banned,
+        gameover(true), recentKick, nameInUse, idInUse, nameEmpty,
+        customClient, sectorComplete, serverClose;
 
         public final boolean quiet;
 
@@ -76,6 +77,7 @@ public class Packets{
 
     public static class ConnectPacket implements Packet{
         public int version;
+        public String commit;
         public String name, uuid, usid;
         public boolean mobile;
         public int color;
@@ -83,6 +85,8 @@ public class Packets{
         @Override
         public void write(ByteBuffer buffer){
             buffer.putInt(Version.build);
+            if (Version.commit != null) IOUtils.writeString(buffer, Version.commit);
+            else IOUtils.writeString(buffer, "null");
             IOUtils.writeString(buffer, name);
             IOUtils.writeString(buffer, usid);
             buffer.put(mobile ? (byte) 1 : 0);
@@ -93,6 +97,7 @@ public class Packets{
         @Override
         public void read(ByteBuffer buffer){
             version = buffer.getInt();
+            commit = IOUtils.readString(buffer);
             name = IOUtils.readString(buffer);
             usid = IOUtils.readString(buffer);
             mobile = buffer.get() == 1;
