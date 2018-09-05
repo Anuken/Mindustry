@@ -76,6 +76,8 @@ public class Vars{
     public static boolean android;
     //shorthand for whether or not this is running on GWT
     public static boolean gwt;
+    //main data directory
+    public static FileHandle dataDirectory;
     //directory for user-created map data
     public static FileHandle customMapDirectory;
     //save file directory
@@ -181,8 +183,9 @@ public class Vars{
         gwt = Gdx.app.getType() == ApplicationType.WebGL;
 
         if(!gwt){
-            customMapDirectory = OS.getAppDataDirectory("Mindustry").child("maps/");
-            saveDirectory = OS.getAppDataDirectory("Mindustry").child("saves/");
+            dataDirectory = OS.getAppDataDirectory("Mindustry");
+            customMapDirectory = dataDirectory.child("maps/");
+            saveDirectory = dataDirectory.child("saves/");
         }
 
         fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f);

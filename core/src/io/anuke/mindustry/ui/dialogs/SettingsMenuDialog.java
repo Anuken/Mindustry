@@ -2,10 +2,10 @@ package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
@@ -141,29 +141,38 @@ public class SettingsMenuDialog extends SettingsDialog{
                 table.addButton("$text.settings.cleardata", () -> {
                     FloatingDialog dialog = new FloatingDialog("$text.settings.cleardata");
                     dialog.setFillParent(false);
-                    dialog.content().defaults().size(230f, 50f).pad(3);
+                    dialog.content().defaults().size(230f, 60f).pad(3);
                     dialog.addCloseButton();
-                    dialog.content().addButton("$text.settings.clearsectors", () -> {
+                    dialog.content().addButton("$text.settings.clearsectors", "clear", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
                             Settings.putString("sectors", "{}");
                             Settings.save();
+                            world.sectors().load();
+                            dialog.hide();
                         });
                     });
                     dialog.content().row();
-                    dialog.content().addButton("$text.settings.clearunlocks", () -> {
+                    dialog.content().addButton("$text.settings.clearunlocks", "clear", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
                             Settings.putString("unlocks", "{}");
                             Settings.save();
+                            dialog.hide();
                         });
                     });
                     dialog.content().row();
-                    dialog.content().addButton("$text.settings.clearall", () -> {
-                        ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
-                            for(SaveSlot slot : control.getSaves().getSaveSlots()){
-                                slot.delete();
-                            }
+                    dialog.content().addButton("$text.settings.clearall", "clear", () -> {
+                        ui.showConfirm("$text.confirm", "$text.settings.clearall.confirm", () -> {
                             Settings.prefs().clear();
                             Settings.save();
+
+                            if(!gwt){
+                                Settings.prefs().clear();
+                                for(FileHandle file : dataDirectory.list()){
+                                    file.deleteDirectory();
+                                }
+                            }
+
+                            Gdx.app.exit();
                         });
                     });
                     dialog.content().row();
