@@ -22,6 +22,7 @@ public class UnlocksDialog extends FloatingDialog{
         super("$text.unlocks");
 
         addCloseButton();
+        shouldPause = true;
         shown(this::rebuild);
         onResize(this::rebuild);
     }

@@ -90,13 +90,13 @@ public class HudFragment extends Fragment{
                             ui.chatfrag.toggle();
                         }
                     }else{
-                        ui.settings.show();
+                        ui.unlocks.show();
                     }
                 }).update(i -> {
                     if(Net.active() && mobile){
                         i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
                     }else{
-                        i.getStyle().imageUp = Core.skin.getDrawable("icon-settings");
+                        i.getStyle().imageUp = Core.skin.getDrawable("icon-unlocks");
                     }
                 }).get();
             });

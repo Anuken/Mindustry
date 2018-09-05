@@ -23,6 +23,9 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static io.anuke.mindustry.Vars.*;
 
 public class SettingsMenuDialog extends SettingsDialog{
@@ -162,7 +165,14 @@ public class SettingsMenuDialog extends SettingsDialog{
                     dialog.content().row();
                     dialog.content().addButton("$text.settings.clearall", "clear", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clearall.confirm", () -> {
+                            Map<String, Object> map = new HashMap<>();
+                            for(String value : Settings.prefs().get().keySet()){
+                                if(value.contains("usid") || value.contains("uuid")){
+                                    map.put(value, Settings.prefs().getString(value));
+                                }
+                            }
                             Settings.prefs().clear();
+                            Settings.prefs().put(map);
                             Settings.save();
 
                             if(!gwt){
