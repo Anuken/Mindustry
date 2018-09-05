@@ -158,5 +158,9 @@ public class Logic extends Module{
                 world.pathfinder().update();
             }
         }
+
+        if(threads.isEnabled()){
+            netServer.update();
+        }
     }
 }

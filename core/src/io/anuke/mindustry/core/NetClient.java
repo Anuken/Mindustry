@@ -235,7 +235,7 @@ public class NetClient extends Module{
                 }
 
                 //when all chunks have been recieved, begin
-                if(netClient.recievedChunkCounter >= totalChunks){
+                if(netClient.recievedChunkCounter >= totalChunks && netClient.currentSnapshot != null){
                     snapshot = netClient.currentSnapshot;
                 }else{
                     return;
