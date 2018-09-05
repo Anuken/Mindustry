@@ -23,6 +23,7 @@ public enum GameMode{
         isPvp = true;
         hidden = true;
         enemyCoreBuildRadius = 600f;
+        enemyCoreShieldRadius = 0f;
         respawnTime = 60 * 10;
     }};
 

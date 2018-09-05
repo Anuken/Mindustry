@@ -2,7 +2,6 @@ package io.anuke.mindustry.server;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
@@ -14,7 +13,6 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
-import io.anuke.mindustry.net.EditLog;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.TraceInfo;
@@ -778,28 +776,6 @@ public class ServerControl extends Module{
                 info("Nobody with that name could be found.");
             }
         });
-
-        handler.register("rollback", "<amount>", "Rollback the block edits in the world", arg -> {
-            if(!state.is(State.playing)){
-                err("Open the server first.");
-                return;
-            }
-
-            if(!Strings.canParsePostiveInt(arg[0])){
-                err("Please input a valid, positive, number of times to rollback");
-                return;
-            }
-
-            int rollbackTimes = Integer.valueOf(arg[0]);
-            IntMap<Array<EditLog>> editLogs = netServer.admins.getEditLogs();
-            if(editLogs.size == 0){
-                err("Nothing to rollback!");
-                return;
-            }
-
-            //netServer.admins.rollbackWorld(rollbackTimes);
-            info("Rollback done!");
-        });
     }
 
     private void readCommands(){
@@ -910,6 +886,9 @@ public class ServerControl extends Module{
 
     @Override
     public void update(){
+        if(!inExtraRound){
+            checkPvPGameOver();
+        }
 
         if(state.is(State.playing) && world.getSector() != null && !inExtraRound && !debug){
             //all assigned missions are complete
