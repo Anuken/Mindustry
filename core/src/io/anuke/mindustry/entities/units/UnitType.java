@@ -10,6 +10,7 @@ import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.ui.ContentDisplay;
@@ -78,6 +79,11 @@ public class UnitType implements UnlockableContent{
     }
 
     @Override
+    public int getID() {
+        return id;
+    }
+
+    @Override
     public void displayInfo(Table table){
         ContentDisplay.displayUnit(table, this);
     }
@@ -104,8 +110,8 @@ public class UnitType implements UnlockableContent{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "unit-type";
+    public ContentType getContentType(){
+        return ContentType.unit;
     }
 
     @Override

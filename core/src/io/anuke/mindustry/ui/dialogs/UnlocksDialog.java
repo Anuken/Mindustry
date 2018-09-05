@@ -7,6 +7,7 @@ import io.anuke.mindustry.core.ContentLoader;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.ucore.scene.event.HandCursorListener;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ScrollPane;
@@ -34,9 +35,9 @@ public class UnlocksDialog extends FloatingDialog{
         table.margin(20);
         ScrollPane pane = new ScrollPane(table, "clear-black");
 
-        OrderedMap<String, Array<Content>> allContent = ContentLoader.getContentMap();
+        OrderedMap<ContentType, Array<Content>> allContent = ContentLoader.getContentMap();
 
-        for(String key : allContent.orderedKeys()){
+        for(ContentType key : allContent.orderedKeys()){
             Array<Content> array = allContent.get(key);
             if(array.size == 0 || !(array.first() instanceof UnlockableContent)) continue;
 

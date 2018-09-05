@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
@@ -69,8 +70,8 @@ public abstract class BulletType extends BaseBulletType<Bullet> implements Conte
     }
 
     @Override
-    public String getContentTypeName(){
-        return "bullettype";
+    public ContentType getContentType(){
+        return ContentType.bullet;
     }
 
     @Override

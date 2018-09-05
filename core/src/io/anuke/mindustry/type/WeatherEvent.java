@@ -27,8 +27,8 @@ public class WeatherEvent implements Content{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "weatherevent";
+    public ContentType getContentType(){
+        return ContentType.weather;
     }
 
     @Override

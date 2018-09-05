@@ -1,6 +1,7 @@
 package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.type.ContentType;
 
 /**
  * Base interface for a content type that is loaded in {@link io.anuke.mindustry.core.ContentLoader}.
@@ -11,7 +12,7 @@ public interface Content{
      * Returns the type name of this piece of content.
      * This should return the same value for all instances of this content type.
      */
-    String getContentTypeName();
+    ContentType getContentType();
 
     /**
      * Returns a list of all instances of this content.

@@ -13,11 +13,13 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.MappableContent;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.CursorType;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.meta.*;
@@ -32,7 +34,7 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Block extends BaseBlock implements Content{
+public class Block extends BaseBlock implements MappableContent {
     private static int lastid;
     private static Array<Block> blocks = new Array<>(140);
     private static ObjectMap<String, Block> map = new ObjectMap<>();
@@ -207,6 +209,16 @@ public class Block extends BaseBlock implements Content{
         if(!headless){
             control.database().unlockContent(content);
         }
+    }
+
+    @Override
+    public int getID() {
+        return id;
+    }
+
+    @Override
+    public String getContentName() {
+        return name;
     }
 
     /** Called after all blocks are created. */
@@ -495,8 +507,8 @@ public class Block extends BaseBlock implements Content{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "block";
+    public ContentType getContentType(){
+        return ContentType.block;
     }
 
     @Override

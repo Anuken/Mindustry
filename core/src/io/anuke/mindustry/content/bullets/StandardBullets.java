@@ -5,7 +5,7 @@ import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.bullet.BasicBulletType;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 
 public class StandardBullets extends BulletList implements ContentList{
     public static BulletType copper, dense, thorium, homing, tracer, mechSmall, glaive;

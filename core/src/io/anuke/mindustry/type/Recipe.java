@@ -119,6 +119,11 @@ public class Recipe implements UnlockableContent{
     }
 
     @Override
+    public int getID() {
+        return id;
+    }
+
+    @Override
     public boolean isHidden(){
         return debugOnly || (desktopOnly && mobile);
     }
@@ -154,8 +159,8 @@ public class Recipe implements UnlockableContent{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "recipe";
+    public ContentType getContentType(){
+        return ContentType.recipe;
     }
 
     @Override

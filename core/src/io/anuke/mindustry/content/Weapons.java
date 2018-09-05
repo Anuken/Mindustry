@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.Weapon;
 
 public class Weapons implements ContentList{

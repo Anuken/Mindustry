@@ -85,8 +85,8 @@ public class StatusEffect implements Content{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "statuseffect";
+    public ContentType getContentType(){
+        return ContentType.status;
     }
 
     @Override

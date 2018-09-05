@@ -70,6 +70,11 @@ public class Item implements Comparable<Item>, UnlockableContent{
     }
 
     @Override
+    public int getID() {
+        return id;
+    }
+
+    @Override
     public void displayInfo(Table table){
         ContentDisplay.displayItem(table, this);
     }
@@ -100,8 +105,8 @@ public class Item implements Comparable<Item>, UnlockableContent{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "item";
+    public ContentType getContentType(){
+        return ContentType.item;
     }
 
     @Override

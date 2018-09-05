@@ -1,9 +1,6 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.OrderedMap;
-import com.badlogic.gdx.utils.OrderedSet;
+import com.badlogic.gdx.utils.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.content.bullets.*;
@@ -18,6 +15,8 @@ import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.game.MappableContent;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
@@ -32,7 +31,8 @@ import io.anuke.ucore.util.Log;
 public class ContentLoader{
     private static boolean loaded = false;
     private static ObjectSet<Array<? extends Content>> contentSet = new OrderedSet<>();
-    private static OrderedMap<String, Array<Content>> contentMap = new OrderedMap<>();
+    private static OrderedMap<ContentType, Array<Content>> contentMap = new OrderedMap<>();
+    private static ObjectMap<ContentType, ObjectMap<String, MappableContent>> contentNameMap = new ObjectMap<>();
     private static ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
     private static ContentList[] content = {
         //effects
@@ -107,19 +107,25 @@ public class ContentLoader{
 
         registerTypes();
 
-        for(ContentList list : content){
+        for(io.anuke.mindustry.game.ContentList list : content){
             list.load();
         }
 
         for(ContentList list : content){
             if(list.getAll().size != 0){
-                String type = list.getAll().first().getContentTypeName();
+                ContentType type = list.getAll().first().getContentType();
 
                 if(!contentMap.containsKey(type)){
                     contentMap.put(type, new Array<>());
+                    contentNameMap.put(type, new ObjectMap<>());
                 }
 
                 contentMap.get(type).addAll(list.getAll());
+                for(Content c : list.getAll()){
+                    if(c instanceof MappableContent){
+                        contentNameMap.get(type).put(((MappableContent) c).getContentName(), (MappableContent) c);
+                    }
+                }
             }
             contentSet.add(list.getAll());
         }
@@ -157,8 +163,15 @@ public class ContentLoader{
         //TODO clear all content.
     }
 
-    public static OrderedMap<String, Array<Content>> getContentMap(){
+    public static OrderedMap<ContentType, Array<Content>> getContentMap(){
         return contentMap;
+    }
+
+    public static MappableContent getByName(ContentType type, String name){
+        if(!contentNameMap.containsKey(type)){
+            return null;
+        }
+        return contentNameMap.get(type).get(name);
     }
 
     /**

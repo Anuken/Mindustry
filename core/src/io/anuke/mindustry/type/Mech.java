@@ -88,6 +88,11 @@ public class Mech implements UnlockableContent{
     }
 
     @Override
+    public int getID() {
+        return id;
+    }
+
+    @Override
     public boolean isHidden() {
         return !flying && mobile;
     }
@@ -108,8 +113,8 @@ public class Mech implements UnlockableContent{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "mech";
+    public ContentType getContentType(){
+        return ContentType.mech;
     }
 
     @Override

@@ -17,7 +17,7 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;

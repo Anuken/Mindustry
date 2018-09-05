@@ -80,6 +80,11 @@ public class Liquid implements UnlockableContent{
     }
 
     @Override
+    public int getID() {
+        return id;
+    }
+
+    @Override
     public void load(){
         iconRegion = Draw.region("liquid-icon-" + name);
     }
@@ -110,8 +115,8 @@ public class Liquid implements UnlockableContent{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "liquid";
+    public ContentType getContentType(){
+        return ContentType.liquid;
     }
 
     @Override

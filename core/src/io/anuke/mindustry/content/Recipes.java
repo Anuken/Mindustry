@@ -3,7 +3,7 @@ package io.anuke.mindustry.content;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 

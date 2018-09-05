@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.entities.units.types.*;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 
 public class UnitTypes implements ContentList{
     public static UnitType drone, alphaDrone, dagger, interceptor, monsoon, titan, fabricator;

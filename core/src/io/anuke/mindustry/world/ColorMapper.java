@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.ucore.util.Mathf;
 
 public class ColorMapper implements ContentList{

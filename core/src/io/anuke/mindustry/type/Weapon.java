@@ -120,8 +120,8 @@ public class Weapon implements Content{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "weapon";
+    public ContentType getContentType(){
+        return ContentType.weapon;
     }
 
     @Override

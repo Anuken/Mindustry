@@ -6,7 +6,7 @@ import io.anuke.mindustry.entities.bullet.ArtilleryBulletType;
 import io.anuke.mindustry.entities.bullet.BasicBulletType;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 
 public class ArtilleryBullets extends BulletList implements ContentList{
     public static BulletType dense, plastic, plasticFrag, homing, incindiary, explosive, surge;

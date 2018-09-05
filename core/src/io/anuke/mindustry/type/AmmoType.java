@@ -6,7 +6,7 @@ import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.Content;
 import io.anuke.ucore.core.Effects.Effect;
 
-public class AmmoType implements Content{
+public class AmmoType implements Content {
     private static int lastID = 0;
     private static Array<AmmoType> allTypes = new Array<>(32);
 
@@ -85,8 +85,8 @@ public class AmmoType implements Content{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "ammotype";
+    public ContentType getContentType(){
+        return ContentType.ammo;
     }
 
     @Override
