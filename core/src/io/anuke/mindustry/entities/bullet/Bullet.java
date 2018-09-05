@@ -194,10 +194,8 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
                 if(tile == null) return false;
                 tile = tile.target();
 
-                if(tile.entity != null && tile.entity.collide(this) && !tile.entity.isDead() && (type.collidesTeam || tile.entity.tile.getTeam() != team)){
-                    if(tile.entity.getTeam() != team){
-                        tile.entity.collision(this);
-                    }
+                if(tile.entity != null && tile.entity.collide(this) && !tile.entity.isDead() && (type.collidesTeam || tile.getTeam() != team)){
+                    tile.entity.collision(this);
 
                     if(!supressCollision){
                         type.hitTile(this, tile);
@@ -233,6 +231,8 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         timer.clear();
         team = null;
         data = null;
+        supressCollision = false;
+        supressOnce = false;
         initialized = false;
     }
 
