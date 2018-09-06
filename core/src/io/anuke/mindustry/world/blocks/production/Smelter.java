@@ -20,6 +20,8 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.*;
+
 public class Smelter extends Block{
     protected final int timerDump = timers++;
     protected final int timerCraft = timers++;
@@ -109,7 +111,7 @@ public class Smelter extends Block{
         }
 
         float baseSmeltSpeed = 1f;
-        for(Item item : Item.all()){
+        for(Item item : content.items()){
             if(item.fluxiness >= minFlux && tile.entity.items.get(item) > 0){
                 baseSmeltSpeed = fluxSpeedMult;
                 break;
@@ -126,7 +128,7 @@ public class Smelter extends Block{
 
         if(useFlux){
             //remove flux materials if present
-            for(Item item : Item.all()){
+            for(Item item : content.items()){
                 if(item.fluxiness >= minFlux && tile.entity.items.get(item) > 0){
                     tile.entity.items.remove(item, 1);
 

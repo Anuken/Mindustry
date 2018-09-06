@@ -34,6 +34,7 @@ import io.anuke.ucore.function.IntPositionConsumer;
 import io.anuke.ucore.function.TriFunction;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
+import static io.anuke.mindustry.Vars.content;
 
 public class FortressGenerator{
     private final static int coreDst = 120;
@@ -246,7 +247,7 @@ public class FortressGenerator{
 
     Array<Block> find(Predicate<Block> pred){
         Array<Block> out = new Array<>();
-        for(Block block : Block.all()){
+        for(Block block : content.blocks()){
             if(pred.evaluate(block) && Recipe.getByResult(block) != null){
                 out.add(block);
             }

@@ -337,8 +337,8 @@ public class BuildBlock extends Block{
                 }
             }
 
-            if(pid != -1) previous = Block.getByID(pid);
-            if(rid != -1) recipe = Recipe.getByResult(Block.getByID(rid));
+            if(pid != -1) previous = content.block(pid);
+            if(rid != -1) recipe = Recipe.getByResult(content.block(rid));
         }
     }
 }

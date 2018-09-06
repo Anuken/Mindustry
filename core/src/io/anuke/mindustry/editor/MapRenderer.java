@@ -17,6 +17,7 @@ import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class MapRenderer implements Disposable{
@@ -108,8 +109,8 @@ public class MapRenderer implements Disposable{
         byte rotation = Bits.getLeftByte(btr);
         Team team = Team.all[Bits.getRightByte(btr)];
 
-        Block floor = Block.getByID(bf);
-        Block wall = Block.getByID(bw);
+        Block floor = content.block(bf);
+        Block wall = content.block(bw);
 
         TextureRegion region;
 

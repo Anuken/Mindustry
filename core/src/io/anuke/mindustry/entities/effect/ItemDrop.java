@@ -228,7 +228,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
     public void readSave(DataInput data) throws IOException{
         x = data.readFloat();
         y = data.readFloat();
-        item = Item.getByID(data.readByte());
+        item = content.item(data.readByte());
         amount = data.readShort();
         add();
     }
@@ -244,7 +244,7 @@ public class ItemDrop extends SolidEntity implements SaveTrait, SyncTrait, DrawT
     @Override
     public void read(DataInput data, long time) throws IOException{
         interpolator.read(x, y, data.readFloat(), data.readFloat(), time);
-        item = Item.getByID(data.readByte());
+        item = content.item(data.readByte());
         amount = data.readShort();
     }
 }

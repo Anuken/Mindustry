@@ -2,86 +2,45 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.ThreadArray;
 
-public class Liquid implements UnlockableContent{
-    private static final Array<Liquid> liquids = new ThreadArray<>();
-
+public class Liquid extends UnlockableContent{
     public final Color color;
     public final String name;
     public final String description;
-    public final int id;
 
-    /**
-     * 0-1, 0 is completely inflammable, anything above that may catch fire when exposed to heat, 0.5+ is very flammable.
-     */
+    /**0-1, 0 is completely inflammable, anything above that may catch fire when exposed to heat, 0.5+ is very flammable.*/
     public float flammability;
-    /**
-     * temperature: 0.5 is 'room' temperature, 0 is very cold, 1 is molten hot
-     */
+    /**temperature: 0.5 is 'room' temperature, 0 is very cold, 1 is molten hot*/
     public float temperature = 0.5f;
-    /**
-     * how much heat this liquid can store. 0.75=water (high), anything lower is probably less dense and bad at cooling.
-     */
+    /**how much heat this liquid can store. 0.75=water (high), anything lower is probably less dense and bad at cooling.*/
     public float heatCapacity = 0.5f;
-    /**
-     * how thick this liquid is. 0.5=water (relatively viscous), 1 would be something like tar (very slow)
-     */
+    /**how thick this liquid is. 0.5=water (relatively viscous), 1 would be something like tar (very slow)*/
     public float viscosity = 0.5f;
-    /**
-     * how prone to exploding this liquid is, when heated. 0 = nothing, 1 = nuke
-     */
+    /**how prone to exploding this liquid is, when heated. 0 = nothing, 1 = nuke*/
     public float explosiveness;
-    /**
-     * the burning color of this liquid
-     */
+    /**the burning color of this liquid*/
     public Color flameColor = Color.valueOf("ffb763");
-    /**
-     * The associated status effect.
-     */
+    /**The associated status effect.*/
     public StatusEffect effect = StatusEffects.none;
-    /**
-     * Pump tier. Controls which pumps can use this liquid.
-     */
+    /**Pump tier. Controls which pumps can use this liquid.*/
     public int tier;
-    /**
-     * Displayed icon.
-     */
+    /**Displayed icon.*/
     public TextureRegion iconRegion;
 
     public Liquid(String name, Color color){
         this.name = name;
         this.color = new Color(color);
-
-        this.id = liquids.size;
         this.description = Bundles.getOrNull("liquid." + name + ".description");
-
-        Liquid.liquids.add(this);
     }
 
     public boolean canExtinguish(){
         return flammability < 0.1f && temperature <= 0.5f;
-    }
-
-    public static Array<Liquid> all(){
-        return Liquid.liquids;
-    }
-
-    public static Liquid getByID(int id){
-        return liquids.get(id);
-    }
-
-    @Override
-    public int getID() {
-        return id;
     }
 
     @Override
@@ -117,10 +76,5 @@ public class Liquid implements UnlockableContent{
     @Override
     public ContentType getContentType(){
         return ContentType.liquid;
-    }
-
-    @Override
-    public Array<? extends Content> getAll(){
-        return all();
     }
 }

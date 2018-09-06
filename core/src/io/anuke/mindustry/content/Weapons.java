@@ -1,10 +1,9 @@
 package io.anuke.mindustry.content;
 
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.content.fx.ShootFx;
-import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
 
 public class Weapons implements ContentList{
@@ -153,7 +152,7 @@ public class Weapons implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll(){
-        return Weapon.all();
+    public ContentType type(){
+        return ContentType.weapon;
     }
 }

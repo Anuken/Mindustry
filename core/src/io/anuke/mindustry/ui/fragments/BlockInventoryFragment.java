@@ -105,8 +105,8 @@ public class BlockInventoryFragment extends Fragment{
 
                 updateTablePosition();
                 if(tile.block().hasItems){
-                    for(int i = 0; i < Item.all().size; i++){
-                        boolean has = tile.entity.items.has(Item.getByID(i));
+                    for(int i = 0; i < content.items().size; i++){
+                        boolean has = tile.entity.items.has(content.item(i));
                         if(has != container.contains(i)){
                             rebuild(false);
                         }
@@ -123,8 +123,8 @@ public class BlockInventoryFragment extends Fragment{
 
         if(tile.block().hasItems){
 
-            for(int i = 0; i < Item.all().size; i++){
-                Item item = Item.getByID(i);
+            for(int i = 0; i < content.items().size; i++){
+                Item item = content.item(i);
                 if(!tile.entity.items.has(item)) continue;
 
                 container.add(i);

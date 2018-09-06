@@ -7,15 +7,16 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
+import static io.anuke.mindustry.Vars.content;
 
 public class InventoryModule extends BlockModule{
-    private int[] items = new int[Item.all().size];
+    private int[] items = new int[content.items().size];
     private int total;
 
     public void forEach(ItemConsumer cons){
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
-                cons.accept(Item.getByID(i), items[i]);
+                cons.accept(content.item(i), items[i]);
             }
         }
     }
@@ -24,7 +25,7 @@ public class InventoryModule extends BlockModule{
         float sum = 0f;
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
-                sum += calc.get(Item.getByID(i), items[i]);
+                sum += calc.get(content.item(i), items[i]);
             }
         }
         return sum;
@@ -71,7 +72,7 @@ public class InventoryModule extends BlockModule{
             if(items[i] > 0){
                 items[i]--;
                 total--;
-                return Item.getByID(i);
+                return content.item(i);
             }
         }
         return null;
@@ -132,7 +133,7 @@ public class InventoryModule extends BlockModule{
         for(int j = 0; j < count; j++){
             int itemid = stream.readByte();
             int itemamount = stream.readInt();
-            items[itemid] = itemamount;
+            items[content.item(itemid).id] = itemamount;
             total += itemamount;
         }
     }

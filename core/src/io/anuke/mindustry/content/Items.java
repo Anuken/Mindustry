@@ -1,9 +1,8 @@
 package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
@@ -96,7 +95,7 @@ public class Items implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll(){
-        return Item.all();
+    public ContentType type(){
+        return ContentType.item;
     }
 }

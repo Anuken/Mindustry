@@ -23,6 +23,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.*;
+
 public class PowerSmelter extends PowerBlock{
     protected final int timerDump = timers++;
     protected final int timerCraft = timers++;
@@ -113,7 +115,7 @@ public class PowerSmelter extends PowerBlock{
         }
 
         float baseSmeltSpeed = 1f;
-        for(Item item : Item.all()){
+        for(Item item : content.items()){
             if(item.fluxiness >= minFlux && tile.entity.items.get(item) > 0){
                 baseSmeltSpeed = fluxSpeedMult;
                 break;
@@ -130,7 +132,7 @@ public class PowerSmelter extends PowerBlock{
 
         if(useFlux){
             //remove flux materials if present
-            for(Item item : Item.all()){
+            for(Item item : content.items()){
                 if(item.fluxiness >= minFlux && tile.entity.items.get(item) >= fluxNeeded){
                     tile.entity.items.remove(item, fluxNeeded);
 

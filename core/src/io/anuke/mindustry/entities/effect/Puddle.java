@@ -36,6 +36,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.puddleGroup;
 import static io.anuke.mindustry.Vars.world;
 
@@ -261,7 +262,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         this.loadedPosition = stream.readInt();
         this.x = stream.readFloat();
         this.y = stream.readFloat();
-        this.liquid = Liquid.getByID(stream.readByte());
+        this.liquid = content.liquid(stream.readByte());
         this.amount = stream.readFloat();
         this.generation = stream.readByte();
         add();
@@ -304,7 +305,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     public void read(DataInput data, long time) throws IOException{
         x = data.readFloat();
         y = data.readFloat();
-        liquid = Liquid.getByID(data.readByte());
+        liquid = content.liquid(data.readByte());
         targetAmount = data.readShort() / 4f;
         tile = world.tile(data.readInt());
 

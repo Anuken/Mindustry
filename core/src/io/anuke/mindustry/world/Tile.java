@@ -54,15 +54,15 @@ public class Tile implements PosTrait, TargetTrait{
 
     public Tile(int x, int y, byte floor, byte wall){
         this(x, y);
-        this.floor = (Floor) Block.getByID(floor);
-        this.wall = Block.getByID(wall);
+        this.floor = (Floor) content.block(floor);
+        this.wall = content.block(wall);
         changed();
     }
 
     public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team, byte elevation){
         this(x, y);
-        this.floor = (Floor) Block.getByID(floor);
-        this.wall = Block.getByID(wall);
+        this.floor = (Floor) content.block(floor);
+        this.wall = content.block(wall);
         this.rotation = rotation;
         this.setElevation(elevation);
         changed();

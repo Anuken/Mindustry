@@ -1,16 +1,16 @@
 package io.anuke.mindustry.io.versions;
 
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.Difficulty;
+import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.ucore.core.Timers;
@@ -56,8 +56,7 @@ public class Save16 extends SaveFileVersion{
         state.wave = wave;
         state.wavetime = wavetime;
 
-        ObjectMap<ContentType, IntMap<MappableContent>> contentMap = readContentHeader(stream);
-        //TODO implement
+        content.setTemporaryMapper(readContentHeader(stream));
 
         state.spawner.read(stream);
 
@@ -151,6 +150,7 @@ public class Save16 extends SaveFileVersion{
             i += consecutives;
         }
 
+        content.setTemporaryMapper(null);
         world.endMapLoad();
     }
 

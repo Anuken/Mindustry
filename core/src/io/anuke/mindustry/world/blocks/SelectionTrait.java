@@ -11,6 +11,7 @@ import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.*;
 
 public interface SelectionTrait{
 
@@ -20,7 +21,7 @@ public interface SelectionTrait{
 
     default void buildItemTable(Table table, boolean nullItem, Supplier<Item> holder, Consumer<Item> consumer){
 
-        Array<Item> items = Item.all();
+        Array<Item> items = content.items();
 
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         Table cont = new Table();

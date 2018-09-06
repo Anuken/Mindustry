@@ -1,13 +1,14 @@
 package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.ucore.util.Mathf;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class ColorMapper implements ContentList{
     private static IntMap<Block> blockMap = new IntMap<>();
@@ -45,7 +46,7 @@ public class ColorMapper implements ContentList{
 
     @Override
     public void load(){
-        for(Block block : Block.all()){
+        for(Block block : content.blocks()){
             int color = Color.rgba8888(block.minimapColor);
             if(color == 0) continue; //skip blocks that are not mapped
 
@@ -55,7 +56,7 @@ public class ColorMapper implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll(){
-        return new Array<>();
+    public ContentType type(){
+        return ContentType.mech;
     }
 }

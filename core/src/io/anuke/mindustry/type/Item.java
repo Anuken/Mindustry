@@ -2,8 +2,6 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.ContentDisplay;
@@ -12,12 +10,8 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.ThreadArray;
 
-public class Item implements Comparable<Item>, UnlockableContent{
-    private static final ThreadArray<Item> items = new ThreadArray<>();
-
-    public final int id;
+public class Item extends UnlockableContent implements Comparable<Item>{
     public final String name;
     public final String description;
     public final Color color;
@@ -44,12 +38,9 @@ public class Item implements Comparable<Item>, UnlockableContent{
     public float cost = 3f;
 
     public Item(String name, Color color){
-        this.id = items.size;
         this.name = name;
         this.color = color;
         this.description = Bundles.getOrNull("item." + this.name + ".description");
-
-        items.add(this);
 
         if(!Bundles.has("item." + this.name + ".name")){
             Log.err("Warning: item '" + name + "' is missing a localized name. Add the follow to bundle.properties:");
@@ -57,21 +48,8 @@ public class Item implements Comparable<Item>, UnlockableContent{
         }
     }
 
-    public static Array<Item> all(){
-        return Item.items;
-    }
-
-    public static Item getByID(int id){
-        return items.get(id);
-    }
-
     public void load(){
         this.region = Draw.region("item-" + name);
-    }
-
-    @Override
-    public int getID() {
-        return id;
     }
 
     @Override
@@ -107,10 +85,5 @@ public class Item implements Comparable<Item>, UnlockableContent{
     @Override
     public ContentType getContentType(){
         return ContentType.item;
-    }
-
-    @Override
-    public Array<? extends Content> getAll(){
-        return all();
     }
 }

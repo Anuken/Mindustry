@@ -7,6 +7,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Events;
@@ -34,7 +35,7 @@ public class Build{
 
         Block previous = tile.block();
 
-        Block sub = Block.getByName("build" + previous.size);
+        Block sub = content.getByName(ContentType.block, "build" + previous.size);
 
         tile.setBlock(sub);
         tile.<BuildEntity>entity().setDeconstruct(previous);
@@ -75,7 +76,7 @@ public class Build{
         Block result = recipe.result;
         Block previous = tile.block();
 
-        Block sub = Block.getByName("build" + result.size);
+        Block sub = content.getByName(ContentType.block, "build" + result.size);
 
         tile.setBlock(sub, rotation);
         tile.<BuildEntity>entity().setConstruct(previous, recipe);

@@ -15,6 +15,7 @@ import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.AmmoEntry;
 import io.anuke.mindustry.type.AmmoType;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -34,6 +35,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class Turret extends Block{
@@ -358,7 +360,7 @@ public abstract class Turret extends Block{
         public void read(DataInputStream stream) throws IOException{
             byte amount = stream.readByte();
             for(int i = 0; i < amount; i++){
-                AmmoType type = AmmoType.getByID(stream.readByte());
+                AmmoType type = content.getByID(ContentType.ammo, stream.readByte());
                 short ta = stream.readShort();
                 ammo.add(new AmmoEntry(type, ta));
                 totalAmmo += ta;

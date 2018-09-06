@@ -21,7 +21,7 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
-
+import static io.anuke.mindustry.Vars.content;
 public class Drill extends Block{
     protected final static float hardnessDrillMultiplier = 50f;
     protected final int timerDump = timers++;
@@ -120,7 +120,7 @@ public class Drill extends Block{
         stats.add(BlockStat.drillTier, table -> {
             Array<Item> list = new Array<>();
 
-            for(Item item : Item.all()){
+            for(Item item : content.items()){
                 if(tier >= item.hardness && Draw.hasRegion(item.name + "1")){
                     list.add(item);
                 }

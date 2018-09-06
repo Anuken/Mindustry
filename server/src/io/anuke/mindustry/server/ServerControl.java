@@ -320,7 +320,7 @@ public class ServerControl extends Module{
                 return;
             }
 
-            for(Item item : Item.all()){
+            for(Item item : content.items()){
                 if(item.type == ItemType.material){
                     state.teams.get(Team.blue).cores.first().entity.items.add(item, 2000);
                 }

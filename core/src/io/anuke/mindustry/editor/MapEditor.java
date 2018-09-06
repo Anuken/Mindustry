@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
-
+import static io.anuke.mindustry.Vars.content;
 public class MapEditor{
     public static final int minMapSize = 128, maxMapSize = 512;
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15};
@@ -137,7 +137,7 @@ public class MapEditor{
 
                                 if(link != 0){
                                     removeLinked(worldx - (Bits.getLeftByte(link) - 8), worldy - (Bits.getRightByte(link) - 8));
-                                }else if(Block.getByID(block).isMultiblock()){
+                                }else if(content.block(block).isMultiblock()){
                                     removeLinked(worldx, worldy);
                                 }
                             }
@@ -217,7 +217,7 @@ public class MapEditor{
     }
 
     private void removeLinked(int x, int y){
-        Block block = Block.getByID(map.read(x, y, DataPosition.wall));
+        Block block = content.block(map.read(x, y, DataPosition.wall));
 
         int offsetx = -(block.size - 1) / 2;
         int offsety = -(block.size - 1) / 2;

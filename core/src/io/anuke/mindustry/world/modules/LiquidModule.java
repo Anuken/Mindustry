@@ -5,11 +5,12 @@ import io.anuke.mindustry.type.Liquid;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import static io.anuke.mindustry.Vars.content;
 
 public class LiquidModule extends BlockModule{
-    private float[] liquids = new float[Liquid.all().size];
+    private float[] liquids = new float[content.liquids().size];
     private float total;
-    private Liquid current = Liquid.getByID(0);
+    private Liquid current = content.liquid(0);
 
     /**Returns total amount of liquids.*/
     public float total(){
@@ -51,7 +52,7 @@ public class LiquidModule extends BlockModule{
     public void forEach(LiquidConsumer cons){
         for(int i = 0; i < liquids.length; i++){
             if(liquids[i] > 0){
-                cons.accept(Liquid.getByID(i), liquids[i]);
+                cons.accept(content.liquid(i), liquids[i]);
             }
         }
     }
@@ -60,7 +61,7 @@ public class LiquidModule extends BlockModule{
         float sum = 0f;
         for(int i = 0; i < liquids.length; i++){
             if(liquids[i] > 0){
-                sum += calc.get(Liquid.getByID(i), liquids[i]);
+                sum += calc.get(content.liquid(i), liquids[i]);
             }
         }
         return sum;
@@ -92,7 +93,7 @@ public class LiquidModule extends BlockModule{
             float amount = stream.readFloat();
             liquids[liquidid] = amount;
             if(amount > 0){
-                current = Liquid.getByID(liquidid);
+                current = content.liquid(liquidid);
             }
             this.total += amount;
         }

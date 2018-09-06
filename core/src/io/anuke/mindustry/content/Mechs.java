@@ -3,7 +3,6 @@ package io.anuke.mindustry.content;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Player;
@@ -13,11 +12,11 @@ import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.types.AlphaDrone;
-import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
@@ -349,7 +348,7 @@ public class Mechs implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll(){
-        return Mech.all();
+    public ContentType type(){
+        return ContentType.mech;
     }
 }

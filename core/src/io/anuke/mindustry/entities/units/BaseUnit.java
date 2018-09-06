@@ -385,7 +385,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         this.isWave = stream.readBoolean();
         this.spawner = stream.readInt();
 
-        this.type = UnitType.getByID(type);
+        this.type = content.unit(type);
         add();
     }
 
@@ -400,7 +400,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void read(DataInput data, long time) throws IOException{
         float lastx = x, lasty = y, lastrot = rotation;
         super.readSave(data);
-        this.type = UnitType.getByID(data.readByte());
+        this.type = content.unit(data.readByte());
         this.spawner = data.readInt();
 
         interpolator.read(lastx, lasty, x, y, time, rotation);

@@ -1,9 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.ContentLoader;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
@@ -15,6 +13,7 @@ import io.anuke.ucore.scene.ui.Tooltip;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.UIUtils;
 
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.control;
 
 public class UnlocksDialog extends FloatingDialog{
@@ -35,13 +34,15 @@ public class UnlocksDialog extends FloatingDialog{
         table.margin(20);
         ScrollPane pane = new ScrollPane(table, "clear-black");
 
-        OrderedMap<ContentType, Array<Content>> allContent = ContentLoader.getContentMap();
+        Array<Content>[] allContent = content.getContentMap();
 
-        for(ContentType key : allContent.orderedKeys()){
-            Array<Content> array = allContent.get(key);
+        for(int j =0; j< allContent.length; j ++){
+            ContentType type = ContentType.values()[j];
+
+            Array<Content> array = allContent[j];
             if(array.size == 0 || !(array.first() instanceof UnlockableContent)) continue;
 
-            table.add("$content." + key + ".name").growX().left().color(Palette.accent);
+            table.add("$content." + type.name() + ".name").growX().left().color(Palette.accent);
             table.row();
             table.addImage("white").growX().pad(5).padLeft(0).padRight(0).height(3).color(Palette.accent);
             table.row();

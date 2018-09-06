@@ -17,7 +17,7 @@ public class Generators {
     public static void generate(ImageContext context){
 
         context.generate("block-icons", () -> {
-            for(Block block : Block.all()){
+            for(Block block : content.blocks()){
                 TextureRegion[] regions = block.getBlockIcon();
 
                 if(regions.length == 0){
@@ -139,7 +139,7 @@ public class Generators {
         });
 
         context.generate("block-edges", () -> {
-            for(Block block : Block.all()){
+            for(Block block : content.blocks()){
                 if(!(block instanceof Floor)) continue;
                 Floor floor = (Floor)block;
                 if(floor.getIcon().length > 0 && !Draw.hasRegion(floor.name + "-cliff-side")){
@@ -166,7 +166,7 @@ public class Generators {
         });
 
         context.generate("ore-icons", () -> {
-            for(Block block : Block.all()){
+            for(Block block : content.blocks()){
                 if(!(block instanceof OreBlock)) continue;
 
                 OreBlock ore = (OreBlock)block;

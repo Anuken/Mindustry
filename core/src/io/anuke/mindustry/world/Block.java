@@ -3,7 +3,6 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
@@ -13,7 +12,6 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.MappableContent;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
@@ -34,15 +32,9 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Block extends BaseBlock implements MappableContent {
-    private static int lastid;
-    private static Array<Block> blocks = new Array<>(140);
-    private static ObjectMap<String, Block> map = new ObjectMap<>();
-
+public class Block extends BaseBlock {
     /** internal name */
     public final String name;
-    /** internal ID */
-    public final int id;
     /** display name */
     public String formalName;
     /** Detailed description of the block. Can be as long as necesary. */
@@ -127,39 +119,13 @@ public class Block extends BaseBlock implements MappableContent {
         this.formalName = Bundles.get("block." + name + ".name", name);
         this.fullDescription = Bundles.getOrNull("block." + name + ".description");
         this.solid = false;
-        this.id = lastid++;
-
-        if(map.containsKey(name)){
-            throw new RuntimeException("Two blocks cannot have the same names! Problematic block: " + name);
-        }
-
-        map.put(name, this);
-        blocks.add(this);
-    }
-
-    public static Array<Block> all(){
-        return blocks;
-    }
-
-    public static Block getByName(String name){
-        return map.get(name);
-    }
-
-    public static Block getByID(int id){
-        if(id < 0){ //offset negative values by 256, as they are a product of byte overflow
-            id += 256;
-        }
-        if(id >= blocks.size || id < 0){
-            throw new RuntimeException("No block with ID '" + id + "' found!");
-        }
-        return blocks.get(id);
     }
 
     /**Populates the array with all blocks that produce this content.*/
-    public static void getByProduction(Array<Block> arr, Content content){
+    public static void getByProduction(Array<Block> arr, Content result){
         arr.clear();
-        for(Block block : Block.all()){
-            if(block.produces.get() == content){
+        for(Block block : content.<Block>getBy(ContentType.block)){
+            if(block.produces.get() == result){
                 arr.add(block);
             }
         }
@@ -212,8 +178,8 @@ public class Block extends BaseBlock implements MappableContent {
     }
 
     @Override
-    public int getID() {
-        return id;
+    public ContentType getContentType(){
+        return ContentType.block;
     }
 
     @Override
@@ -350,7 +316,7 @@ public class Block extends BaseBlock implements MappableContent {
         tempColor.set(Palette.darkFlame);
 
         if(hasItems){
-            for(Item item : Item.all()){
+            for(Item item : content.items()){
                 int amount = tile.entity.items.get(item);
                 explosiveness += item.explosiveness * amount;
                 flammability += item.flammability * amount;
@@ -504,20 +470,5 @@ public class Block extends BaseBlock implements MappableContent {
                 "entity.id", tile.entity.id,
                 "entity.items.total", hasItems ? tile.entity.items.total() : null
         );
-    }
-
-    @Override
-    public ContentType getContentType(){
-        return ContentType.block;
-    }
-
-    @Override
-    public Array<? extends Content> getAll(){
-        return all();
-    }
-
-    @Override
-    public String toString(){
-        return name;
     }
 }

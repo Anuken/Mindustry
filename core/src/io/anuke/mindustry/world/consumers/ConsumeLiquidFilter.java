@@ -11,6 +11,7 @@ import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.scene.ui.layout.Table;
+import static io.anuke.mindustry.Vars.*;
 
 public class ConsumeLiquidFilter extends Consume{
     private final Predicate<Liquid> filter;
@@ -31,7 +32,7 @@ public class ConsumeLiquidFilter extends Consume{
     public void buildTooltip(Table table){
         Array<Liquid> list = new Array<>();
 
-        for(Liquid item : Liquid.all()){
+        for(Liquid item : content.liquids()){
             if(!item.isHidden() && filter.test(item)) list.add(item);
         }
 

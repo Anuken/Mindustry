@@ -8,7 +8,6 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.io.IOUtils;
 import io.anuke.ucore.util.Bundles;
@@ -16,6 +15,7 @@ import io.anuke.ucore.util.Mathf;
 
 import java.nio.ByteBuffer;
 
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
 /**
@@ -187,7 +187,7 @@ public class Packets{
                 buffer.put(request.remove ? (byte) 1 : 0);
                 buffer.putInt(world.toPacked(request.x, request.y));
                 if(!request.remove){
-                    buffer.put((byte) request.recipe.id);
+                    buffer.put(request.recipe.id);
                     buffer.put((byte) request.rotation);
                 }
             }
@@ -224,7 +224,7 @@ public class Packets{
                 }else{ //place
                     byte recipe = buffer.get();
                     byte rotation = buffer.get();
-                    currentRequest = new BuildRequest(position % world.width(), position / world.width(), rotation, Recipe.getByID(recipe));
+                    currentRequest = new BuildRequest(position % world.width(), position / world.width(), rotation, content.recipe(recipe));
                 }
 
                 requests.add(currentRequest);

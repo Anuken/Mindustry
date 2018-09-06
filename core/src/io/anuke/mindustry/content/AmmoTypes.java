@@ -1,13 +1,12 @@
 package io.anuke.mindustry.content;
 
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.bullets.*;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.content.fx.ShootFx;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.type.AmmoType;
+import io.anuke.mindustry.type.ContentType;
 
 public class AmmoTypes implements ContentList{
     public static AmmoType bulletCopper, bulletDense, bulletThorium, bulletSilicon, bulletPyratite,
@@ -219,7 +218,7 @@ public class AmmoTypes implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll(){
-        return AmmoType.all();
+    public ContentType type(){
+        return ContentType.ammo;
     }
 }

@@ -9,6 +9,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.content;
+
 public class UnitInventory implements Saveable{
     private final Unit unit;
     private ItemStack item = new ItemStack(Items.stone, 0);
@@ -32,7 +34,7 @@ public class UnitInventory implements Saveable{
         short iamount = stream.readShort();
         byte iid = stream.readByte();
 
-        item.item = Item.getByID(iid);
+        item.item = content.item(iid);
         item.amount = iamount;
     }
 

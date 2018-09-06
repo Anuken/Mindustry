@@ -23,6 +23,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
 public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait{
@@ -149,7 +150,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         velocity.x = data.readFloat();
         velocity.y = data.readFloat();
         team = Team.all[data.readByte()];
-        type = BulletType.getByID(data.readByte());
+        type = content.bullet(data.readByte());
     }
 
     @Override

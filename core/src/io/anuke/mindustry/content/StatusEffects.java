@@ -1,11 +1,10 @@
 package io.anuke.mindustry.content;
 
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.StatusController.StatusEntry;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -149,7 +148,7 @@ public class StatusEffects implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll(){
-        return StatusEffect.all();
+    public ContentType type(){
+        return ContentType.status;
     }
 }

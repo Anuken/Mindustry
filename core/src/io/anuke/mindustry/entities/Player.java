@@ -20,6 +20,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Weapon;
@@ -765,13 +766,13 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             byte mechid = stream.readByte();
             int index = stream.readByte();
             players[index].readSaveSuper(stream);
-            players[index].mech = Mech.getByID(mechid);
+            players[index].mech = content.getByID(ContentType.mech, mechid);
             players[index].dead = false;
         }else if(local){
             byte mechid = stream.readByte();
             stream.readByte();
             readSaveSuper(stream);
-            mech = Mech.getByID(mechid);
+            mech = content.getByID(ContentType.mech, mechid);
             dead = false;
         }
     }
@@ -807,7 +808,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         boolean boosting = (bools & 4) != 0;
         boolean alt = (bools & 8) != 0;
         color.set(buffer.readInt());
-        mech = Mech.getByID(buffer.readByte());
+        mech = content.getByID(ContentType.mech, buffer.readByte());
         int mine = buffer.readInt();
         spawner = buffer.readInt();
         float baseRotation = buffer.readShort() / 2f;

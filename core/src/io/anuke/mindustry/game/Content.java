@@ -1,34 +1,37 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.type.ContentType;
 
-/**
- * Base interface for a content type that is loaded in {@link io.anuke.mindustry.core.ContentLoader}.
- */
-public interface Content{
+
+/**Base class for a content type that is loaded in {@link io.anuke.mindustry.core.ContentLoader}.*/
+public abstract class Content{
+    public final byte id;
+
+    public Content(){
+        this.id = (byte)Vars.content.getBy(getContentType()).size;
+        Vars.content.handleContent(this);
+    }
 
     /**
      * Returns the type name of this piece of content.
      * This should return the same value for all instances of this content type.
      */
-    ContentType getContentType();
+    public abstract ContentType getContentType();
 
-    /**
-     * Returns a list of all instances of this content.
-     */
-    Array<? extends Content> getAll();
-
-    /**
-     * Called after all content is created. Do not use to load regions or texture data!
-     */
-    default void init(){
+    /**Called after all content is created. Do not use to load regions or texture data!*/
+    public void init(){
     }
 
     /**
      * Called after all content is created, only on non-headless versions.
      * Use for loading regions or other image data.
      */
-    default void load(){
+    public void load(){
+    }
+
+    @Override
+    public String toString(){
+        return getContentType().name() + "#" + id;
     }
 }

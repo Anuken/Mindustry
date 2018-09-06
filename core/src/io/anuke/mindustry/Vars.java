@@ -109,6 +109,7 @@ public class Vars{
     public static float baseControllerSpeed = 11f;
     //only if smoothCamera
     public static boolean snapCamera = true;
+    public static ContentLoader content;
     public static GameState state;
     public static ThreadHandler threads;
 
@@ -152,6 +153,8 @@ public class Vars{
         Arrays.sort(locales, (l1, l2) -> Platform.instance.getLocaleName(l1).compareTo(Platform.instance.getLocaleName(l2)));
 
         Version.init();
+
+        content = new ContentLoader();
 
         playerGroup = Entities.addGroup(Player.class).enableMapping();
         tileGroup = Entities.addGroup(TileEntity.class, false);

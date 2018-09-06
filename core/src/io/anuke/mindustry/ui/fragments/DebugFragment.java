@@ -149,7 +149,7 @@ public class DebugFragment extends Fragment{
                 t.row();
                 t.addButton("spawn", () -> {
                     FloatingDialog dialog = new FloatingDialog("debug spawn");
-                    for(UnitType type : UnitType.all()){
+                    for(UnitType type : content.units()){
                         dialog.content().addImageButton("white", 40, () -> {
                             BaseUnit unit = type.create(player.getTeam());
                             unit.setWave();
