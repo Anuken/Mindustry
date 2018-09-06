@@ -10,6 +10,7 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.ui.dialogs.GenViewDialog;
 import io.anuke.ucore.core.Timers;
@@ -149,7 +150,7 @@ public class DebugFragment extends Fragment{
                 t.row();
                 t.addButton("spawn", () -> {
                     FloatingDialog dialog = new FloatingDialog("debug spawn");
-                    for(UnitType type : content.units()){
+                    for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
                         dialog.content().addImageButton("white", 40, () -> {
                             BaseUnit unit = type.create(player.getTeam());
                             unit.setWave();

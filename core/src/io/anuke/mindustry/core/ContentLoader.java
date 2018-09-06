@@ -16,7 +16,6 @@ import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.TypeTrait;
-import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.MappableContent;
@@ -204,9 +203,9 @@ public class ContentLoader{
             return (T)temporaryMapper.get(type.ordinal()).get(id);
         }
 
-        if(id < 0){ //offset negative values by 256, as they are probably a product of byte overflow
-            id += 256;
-        }
+        //offset negative values by 256, as they are probably a product of byte overflow
+        if(id < 0) id += 256;
+
         if(id >= contentMap[type.ordinal()].size || id < 0){
             throw new RuntimeException("No " + type.name() + " with ID '" + id + "' found!");
         }
@@ -236,7 +235,7 @@ public class ContentLoader{
     }
 
     public Array<Item> items(){
-        return getBy(ContentType.block);
+        return getBy(ContentType.item);
     }
 
     public Item item(int id){
@@ -257,14 +256,6 @@ public class ContentLoader{
 
     public BulletType bullet(int id){
         return (BulletType) getByID(ContentType.bullet, id);
-    }
-
-    public Array<UnitType> units(){
-        return getBy(ContentType.unit);
-    }
-
-    public UnitType unit(int id){
-        return (UnitType) getByID(ContentType.unit, id);
     }
 
     /**

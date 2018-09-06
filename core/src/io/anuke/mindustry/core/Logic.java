@@ -91,7 +91,7 @@ public class Logic extends Module{
 
     //this never triggers in PvP; only for checking sector game-overs
     private void checkGameOver(){
-        if(state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
+        if(!state.mode.isPvp && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
             state.gameOver = true;
             Events.fire(new GameOverEvent());
         }

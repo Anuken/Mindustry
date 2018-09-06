@@ -17,6 +17,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
@@ -385,7 +386,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         this.isWave = stream.readBoolean();
         this.spawner = stream.readInt();
 
-        this.type = content.unit(type);
+        this.type = content.getByID(ContentType.unit, type);
         add();
     }
 
@@ -400,7 +401,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void read(DataInput data, long time) throws IOException{
         float lastx = x, lasty = y, lastrot = rotation;
         super.readSave(data);
-        this.type = content.unit(data.readByte());
+        this.type = content.getByID(ContentType.unit, data.readByte());
         this.spawner = data.readInt();
 
         interpolator.read(lastx, lasty, x, y, time, rotation);
