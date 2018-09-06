@@ -3,6 +3,7 @@ package io.anuke.mindustry;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
@@ -11,6 +12,7 @@ import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
+import static io.anuke.mindustry.Vars.*;
 
 public class Generators {
 
@@ -71,7 +73,7 @@ public class Generators {
         });
 
         context.generate("mech-icons", () -> {
-            for(Mech mech : Mech.all()){
+            for(Mech mech : content.<Mech>getBy(ContentType.mech)){
 
                 mech.load();
                 mech.weapon.load();
@@ -96,7 +98,7 @@ public class Generators {
         });
 
         context.generate("unit-icons", () -> {
-            for(UnitType type : UnitType.all()){
+            for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
 
                 type.load();
                 type.weapon.load();
@@ -124,7 +126,7 @@ public class Generators {
         });
 
         context.generate("liquid-icons", () -> {
-            for(Liquid liquid : Liquid.all()){
+            for(Liquid liquid : content.liquids()){
                 Image image = context.get("liquid-icon");
                 for (int x = 0; x < image.width(); x++) {
                     for (int y = 0; y < image.height(); y++) {

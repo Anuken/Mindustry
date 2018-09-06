@@ -35,6 +35,7 @@ public class Recipes implements ContentList{
 
         //projectors
         new Recipe(defense, DefenseBlocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
+        new Recipe(defense, DefenseBlocks.overdriveProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
 
         //extra blocks
         new Recipe(defense, DefenseBlocks.shockMine, new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 25))

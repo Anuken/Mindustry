@@ -8,7 +8,7 @@ import io.anuke.mindustry.world.blocks.defense.*;
 
 public class DefenseBlocks extends BlockList implements ContentList{
     public static Block copperWall, copperWallLarge, compositeWall, compositeWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
-            phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, shockMine;
+            phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, overdriveProjector, shockMine;
 
     @Override
     public void load(){
@@ -72,7 +72,12 @@ public class DefenseBlocks extends BlockList implements ContentList{
 
         mendProjector = new MendProjector("mend-projector"){{
             consumes.power(0.25f);
-            health = 100 * 4 * wallHealthMultiplier;
+            size = 2;
+            consumes.item(Items.phasematter).optional(true);
+        }};
+
+        overdriveProjector = new OverdriveProjector("overdrive-projector"){{
+            consumes.power(0.25f);
             size = 2;
             consumes.item(Items.phasematter).optional(true);
         }};

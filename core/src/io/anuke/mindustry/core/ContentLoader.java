@@ -1,7 +1,6 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.content.*;
@@ -38,7 +37,7 @@ public class ContentLoader{
 
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
     private Array<Content>[] contentMap = new Array[ContentType.values().length];
-    private IntMap<IntMap<MappableContent>> temporaryMapper;
+    private MappableContent[][] temporaryMapper;
     private ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
         //effects
@@ -183,7 +182,7 @@ public class ContentLoader{
         contentMap[content.getContentType().ordinal()].add(content);
     }
 
-    public void setTemporaryMapper(IntMap<IntMap<MappableContent>> temporaryMapper){
+    public void setTemporaryMapper(MappableContent[][] temporaryMapper){
         this.temporaryMapper = temporaryMapper;
     }
 
@@ -199,12 +198,12 @@ public class ContentLoader{
     }
 
     public <T extends Content> T getByID(ContentType type, int id){
-        if(temporaryMapper != null && temporaryMapper.containsKey(type.ordinal()) && temporaryMapper.get(type.ordinal()).containsKey(id)){
-            return (T)temporaryMapper.get(type.ordinal()).get(id);
-        }
-
         //offset negative values by 256, as they are probably a product of byte overflow
         if(id < 0) id += 256;
+
+        if(temporaryMapper != null && temporaryMapper[type.ordinal()] != null){
+            return (T)temporaryMapper[type.ordinal()][id];
+        }
 
         if(id >= contentMap[type.ordinal()].size || id < 0){
             throw new RuntimeException("No " + type.name() + " with ID '" + id + "' found!");

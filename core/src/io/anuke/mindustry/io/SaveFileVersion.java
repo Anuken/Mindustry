@@ -1,7 +1,6 @@
 package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.MappableContent;
@@ -32,19 +31,20 @@ public abstract class SaveFileVersion{
         return new SaveMeta(version, time, playtime, build, sector, mode, map, wave, Difficulty.values()[difficulty]);
     }
 
-    public IntMap<IntMap<MappableContent>> readContentHeader(DataInputStream stream) throws IOException{
-        IntMap<IntMap<MappableContent>> map = new IntMap<>();
+    public MappableContent[][] readContentHeader(DataInputStream stream) throws IOException{
 
         byte mapped = stream.readByte();
+
+        MappableContent[][] map = new MappableContent[mapped][0];
+
         for (int i = 0; i < mapped; i++) {
             ContentType type = ContentType.values()[stream.readByte()];
-            map.put(type.ordinal(), new IntMap<>());
             short total = stream.readShort();
+            map[i] = new MappableContent[total];
+
             for (int j = 0; j < total; j++) {
-                int id = stream.readUnsignedByte();
                 String name = stream.readUTF();
-                if(content.getContentMap()[type.ordinal()].size == 0) continue;
-                map.get(type.ordinal()).put(id, content.getByName(type, name));
+                map[i][j] = content.getByName(type, name);
             }
         }
 
@@ -69,10 +69,7 @@ public abstract class SaveFileVersion{
                 stream.writeByte(arr.first().getContentType().ordinal());
                 stream.writeShort(arr.size);
                 for(Content c : arr){
-                    MappableContent m = (MappableContent)c;
-                    if(m.id > 255) throw new RuntimeException("Content " + c + " has ID > 255!");
-                    stream.writeByte(m.id);
-                    stream.writeUTF(m.getContentName());
+                    stream.writeUTF(((MappableContent)c).getContentName());
                 }
             }
         }
