@@ -344,7 +344,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Timers.time(), healthf()*5f, 1f - healthf()));
         Draw.alpha(hitTime / hitDuration);
-        Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
+        Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.color();
     }
 

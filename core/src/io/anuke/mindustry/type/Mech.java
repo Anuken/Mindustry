@@ -28,6 +28,7 @@ public class Mech extends UnlockableContent{
     public float armor = 1f;
 
     public float altChargeAlpha = 0.1f;
+    public float cellTrnsY = 0f;
     public float mineSpeed = 1f;
     public int drillPower = -1;
     public float carryWeight = 10f;

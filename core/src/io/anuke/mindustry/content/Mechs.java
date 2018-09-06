@@ -252,6 +252,7 @@ public class Mechs implements ContentList{
             weaponOffsetX = -1;
             weaponOffsetY = -1;
             trailColor = Palette.lightTrail;
+            cellTrnsY = 1f;
         }};
 
         javelin = new Mech("javelin-ship", true){
@@ -266,6 +267,7 @@ public class Mechs implements ContentList{
                 armor = 5f;
                 weapon = Weapons.missiles;
                 trailColor = Color.valueOf("d3ddff");
+                cellTrnsY = 1f;
             }
 
             @Override
@@ -321,6 +323,7 @@ public class Mechs implements ContentList{
                 itemCapacity = 30;
                 trailColor = Color.valueOf("84f491");
                 weapon = Weapons.bomberTrident;
+                cellTrnsY = 1f;
             }
 
             @Override
@@ -340,6 +343,7 @@ public class Mechs implements ContentList{
                 armor = 30f;
                 itemCapacity = 60;
                 trailColor = Color.valueOf("feb380");
+                cellTrnsY = 1f;
             }
         };
 
