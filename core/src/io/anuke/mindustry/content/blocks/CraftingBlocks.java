@@ -4,13 +4,13 @@ import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.production.*;
 
 public class CraftingBlocks extends BlockList implements ContentList{
-    public static Block smelter, arcsmelter, siliconsmelter, plastaniumCompressor, phaseWeaver, alloySmelter, alloyfuser,
+    public static Block smelter, arcsmelter, siliconsmelter, plastaniumCompressor, phaseWeaver, alloySmelter,
             pyratiteMixer, blastMixer,
             cryofluidmixer, melter, separator, centrifuge, biomatterCompressor, pulverizer, solidifier, incinerator;
 
@@ -84,27 +84,14 @@ public class CraftingBlocks extends BlockList implements ContentList{
         alloySmelter = new PowerSmelter("alloy-smelter"){{
             craftEffect = BlockFx.smeltsmoke;
             result = Items.surgealloy;
-            craftTime = 50f;
+            craftTime = 75f;
             size = 2;
 
             useFlux = true;
-            fluxNeeded = 4;
+            fluxNeeded = 3;
 
             consumes.power(0.4f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 2)});
-        }};
-
-        alloyfuser = new PowerSmelter("alloy-fuser"){{
-            craftEffect = BlockFx.smeltsmoke;
-            result = Items.surgealloy;
-            craftTime = 30f;
-            size = 3;
-
-            useFlux = true;
-            fluxNeeded = 4;
-
-            consumes.items(new ItemStack[]{new ItemStack(Items.titanium, 3), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.plastanium, 2)});
-            consumes.power(0.4f);
+            consumes.items(new ItemStack[]{new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 3)});
         }};
 
         cryofluidmixer = new LiquidMixer("cryofluidmixer"){{

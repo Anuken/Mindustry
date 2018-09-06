@@ -20,21 +20,22 @@ public class Changelogs{
                 String description = value.getString("body").replace("\r", "");
                 int id = value.getInt("id");
                 int build = Integer.parseInt(value.getString("tag_name").substring(1));
-                out.add(new VersionInfo(name, description, id, build));
+                out.add(new VersionInfo(name, description, id, build, value.getString("published_at")));
             }
             success.accept(out);
         }, fail);
     }
 
     public static class VersionInfo{
-        public final String name, description;
+        public final String name, description, date;
         public final int id, build;
 
-        public VersionInfo(String name, String description, int id, int build){
+        public VersionInfo(String name, String description, int id, int build, String date){
             this.name = name;
             this.description = description;
             this.id = id;
             this.build = build;
+            this.date = date;
         }
 
         @Override

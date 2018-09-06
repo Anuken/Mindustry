@@ -180,7 +180,13 @@ public class WaveSpawner{
     }
 
     private void setQuad(int quadx, int quady, boolean valid){
-        if(quadrants == null) quadrants = new GridBits(quadWidth(), quadHeight());
+        if(quadrants == null){
+            quadrants = new GridBits(quadWidth(), quadHeight());
+        }
+
+        if(!Mathf.inBounds(quadx, quady, quadWidth(), quadHeight())){
+            return;
+        }
 
         quadrants.set(quadx, quady, valid);
     }

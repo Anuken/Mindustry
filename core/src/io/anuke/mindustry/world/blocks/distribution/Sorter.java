@@ -17,6 +17,7 @@ import io.anuke.ucore.util.Mathf;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import static io.anuke.mindustry.Vars.*;
 
 public class Sorter extends Block implements SelectionTrait{
 
@@ -118,7 +119,7 @@ public class Sorter extends Block implements SelectionTrait{
     }
 
     public static class SorterEntity extends TileEntity{
-        public Item sortItem = Item.getByID(0);
+        public Item sortItem = content.item(0);
 
         @Override
         public void write(DataOutputStream stream) throws IOException{
@@ -127,7 +128,7 @@ public class Sorter extends Block implements SelectionTrait{
 
         @Override
         public void read(DataInputStream stream) throws IOException{
-            sortItem = Item.all().get(stream.readByte());
+            sortItem = content.items().get(stream.readByte());
         }
     }
 }

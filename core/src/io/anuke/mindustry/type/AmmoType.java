@@ -1,16 +1,11 @@
 package io.anuke.mindustry.type;
 
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.Content;
 import io.anuke.ucore.core.Effects.Effect;
 
-public class AmmoType implements Content{
-    private static int lastID = 0;
-    private static Array<AmmoType> allTypes = new Array<>(32);
-
-    public final byte id;
+public class AmmoType extends Content {
     /**The item used. Always null if liquid isn't.*/
     public final Item item;
     /**The liquid used. Always null if item isn't.*/
@@ -32,11 +27,6 @@ public class AmmoType implements Content{
     public Effect shootEffect = Fx.none;
     /**Extra smoke effect created when shooting.*/
     public Effect smokeEffect = Fx.none;
-
-    {
-        this.id = (byte) (lastID++);
-        allTypes.add(this);
-    }
 
     /**
      * Creates an AmmoType with no liquid or item. Used for power-based ammo.
@@ -69,14 +59,6 @@ public class AmmoType implements Content{
         this.quantityMultiplier = multiplier;
     }
 
-    public static Array<AmmoType> all(){
-        return allTypes;
-    }
-
-    public static AmmoType getByID(int id){
-        return allTypes.get(id);
-    }
-
     /**
      * Returns maximum distance the bullet this ammo type has can travel.
      */
@@ -85,12 +67,7 @@ public class AmmoType implements Content{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "ammotype";
-    }
-
-    @Override
-    public Array<? extends Content> getAll(){
-        return allTypes;
+    public ContentType getContentType(){
+        return ContentType.ammo;
     }
 }

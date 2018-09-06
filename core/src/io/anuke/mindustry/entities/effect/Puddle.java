@@ -36,6 +36,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.puddleGroup;
 import static io.anuke.mindustry.Vars.world;
 
@@ -51,6 +52,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     private int loadedPosition = -1;
 
     private float updateTime;
+    private float lastRipple;
     private Tile tile;
     private Liquid liquid;
     private float amount, targetAmount;
@@ -89,9 +91,12 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
             reactPuddle(tile.floor().liquidDrop, liquid, amount, tile,
                     (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
 
-            if(generation == 0 && Timers.get(tile, "ripple", 50)){
+            Puddle p = map.get(tile.packedPosition());
+
+            if(generation == 0 && p != null && p.lastRipple <= Timers.time() - 40f){
                 Effects.effect(BlockFx.ripple, tile.floor().liquidDrop.color,
                         (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
+                p.lastRipple = Timers.time();
             }
             return;
         }
@@ -111,8 +116,9 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
 
-            if(generation == 0 && Timers.get(p, "ripple2", 50) && p.amount >= maxLiquid / 2f){
+            if(generation == 0  && p.lastRipple <= Timers.time() - 40f && p.amount >= maxLiquid / 2f){
                 Effects.effect(BlockFx.ripple, p.liquid.color, (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
+                p.lastRipple = Timers.time();
             }
         }else{
             p.amount -= reactPuddle(p.liquid, liquid, amount, p.tile, p.x, p.y);
@@ -256,7 +262,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         this.loadedPosition = stream.readInt();
         this.x = stream.readFloat();
         this.y = stream.readFloat();
-        this.liquid = Liquid.getByID(stream.readByte());
+        this.liquid = content.liquid(stream.readByte());
         this.amount = stream.readFloat();
         this.generation = stream.readByte();
         add();
@@ -299,7 +305,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     public void read(DataInput data, long time) throws IOException{
         x = data.readFloat();
         y = data.readFloat();
-        liquid = Liquid.getByID(data.readByte());
+        liquid = content.liquid(data.readByte());
         targetAmount = data.readShort() / 4f;
         tile = world.tile(data.readInt());
 

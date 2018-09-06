@@ -17,6 +17,7 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.ConsumePowerExact;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
@@ -48,7 +49,7 @@ public class MechFactory extends Block{
 
     @Override
     public void init(){
-        consumes.power(powerCapacity * 0.8f);
+        consumes.add(new ConsumePowerExact(powerCapacity * 0.8f));
         super.init();
     }
 

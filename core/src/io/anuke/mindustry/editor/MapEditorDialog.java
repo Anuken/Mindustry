@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Team;
@@ -362,7 +363,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     public void updateSelectedBlock(){
         Block block = editor.getDrawBlock();
-        for(int j = 0; j < Block.all().size; j++){
+        for(int j = 0; j < content.blocks().size; j++){
             if(block.id == j && j < blockgroup.getButtons().size){
                 blockgroup.getButtons().get(j).setChecked(true);
                 break;
@@ -564,7 +565,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         int i = 0;
 
-        for(Block block : Block.all()){
+        for(Block block : Vars.content.blocks()){
             TextureRegion[] regions = block.getCompactIcon();
             if((block.synthetic() && (Recipe.getByResult(block) == null || !control.database().isUnlocked(Recipe.getByResult(block))))
                     && !debug && block != StorageBlocks.core){

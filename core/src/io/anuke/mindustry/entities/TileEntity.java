@@ -110,7 +110,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     }
 
     public boolean isDead(){
-        return dead;
+        return dead || tile.entity != this;
     }
 
     public void write(DataOutputStream stream) throws IOException{
@@ -125,6 +125,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     public void collision(Bullet other){
         tile.block().handleBulletHit(this, other);
+    }
+
+    public void kill(){
+        Call.onTileDestroyed(tile);
     }
 
     public void damage(float damage){
@@ -251,9 +255,9 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             if(health <= 0){
                 onDeath();
             }
-
+            Block previous = tile.block();
             tile.block().update(tile);
-            if(cons != null){
+            if(tile.block() == previous && cons != null){
                 cons.update(this);
             }
         }

@@ -23,7 +23,8 @@ public class ImageContext {
 
     public void load() throws IOException{
         Log.setLogger(new NoopLogHandler());
-        ContentLoader.load();
+        Vars.content = new ContentLoader();
+        Vars.content.load();
         Log.setLogger(new LogHandler());
 
         String spritesFolder = new File("../../../assets/sprites").getAbsolutePath();

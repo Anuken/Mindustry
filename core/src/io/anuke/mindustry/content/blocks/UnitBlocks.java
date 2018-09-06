@@ -2,7 +2,7 @@ package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.units.*;
@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.blocks.units.*;
 public class UnitBlocks extends BlockList implements ContentList{
     public static Block repairPoint, dronePad,
     fabricatorPad, interceptorPad, monsoonPad, daggerPad, titanPad,
-    dropPoint, reconstructor, overdriveProjector, shieldProjector, commandCenter;
+    reconstructor, commandCenter;
 
     @Override
     public void load(){
@@ -64,25 +64,12 @@ public class UnitBlocks extends BlockList implements ContentList{
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 20), new ItemStack(Items.thorium, 30)});
         }};
 
-        dropPoint = new DropPoint("drop-point"){{
-            shadow = "shadow-round-1";
-            itemCapacity = 40;
-        }};
-
         repairPoint = new RepairPoint("repair-point"){{
             shadow = "shadow-round-1";
             repairSpeed = 0.1f;
         }};
 
         reconstructor = new Reconstructor("reconstructor"){{
-            size = 2;
-        }};
-
-        overdriveProjector = new OverdriveProjector("overdrive-projector"){{
-            size = 2;
-        }};
-
-        shieldProjector = new ShieldProjector("shield-projector"){{
             size = 2;
         }};
 

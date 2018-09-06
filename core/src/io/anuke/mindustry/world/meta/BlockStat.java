@@ -2,6 +2,8 @@ package io.anuke.mindustry.world.meta;
 
 import io.anuke.ucore.util.Bundles;
 
+import java.util.Locale;
+
 /**
  * Describes one type of stat for a block.
  */
@@ -53,6 +55,6 @@ public enum BlockStat{
     }
 
     public String localized(){
-        return Bundles.get("text.blocks." + name().toLowerCase());
+        return Bundles.get("text.blocks." + name().toLowerCase(Locale.ROOT));
     }
 }

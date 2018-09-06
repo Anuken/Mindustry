@@ -60,10 +60,10 @@ public class Control extends Module{
 
         Effects.setShakeFalloff(10000f);
 
-        ContentLoader.initialize(Content::init);
+        content.initialize(Content::init);
         Core.atlas = new Atlas("sprites.atlas");
         Core.atlas.setErrorRegion("error");
-        ContentLoader.initialize(Content::load);
+        content.initialize(Content::load);
 
         db.load();
 
@@ -270,9 +270,9 @@ public class Control extends Module{
             control.database().unlockContent(players[0].inventory.getItem().item);
         }
 
-        for(int i = 0; i < Recipe.all().size; i++){
-            Recipe recipe = Recipe.all().get(i);
-            if(!recipe.debugOnly && entity.items.has(recipe.requirements, 1.4f)){
+        for(int i = 0; i < content.recipes().size; i ++){
+            Recipe recipe = content.recipes().get(i);
+            if(!recipe.debugOnly && recipe.requirements != null && entity.items.has(recipe.requirements, 1.4f)){
                 if(control.database().unlockContent(recipe)){
                     ui.hudfrag.showUnlock(recipe);
                 }
@@ -283,7 +283,7 @@ public class Control extends Module{
     @Override
     public void dispose(){
         Platform.instance.onGameExit();
-        ContentLoader.dispose();
+        content.dispose();
         Net.dispose();
         ui.editor.dispose();
         inputs = new InputHandler[]{};

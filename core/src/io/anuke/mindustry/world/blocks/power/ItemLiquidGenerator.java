@@ -10,6 +10,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class ItemLiquidGenerator extends ItemGenerator{
@@ -33,7 +34,7 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
         ItemGeneratorEntity entity = tile.entity();
 
         Liquid liquid = null;
-        for(Liquid other : Liquid.all()){
+        for(Liquid other : content.liquids()){
             if(entity.liquids.get(other) >= 0.001f && getLiquidEfficiency(other) >= minLiquidEfficiency){
                 liquid = other;
                 break;

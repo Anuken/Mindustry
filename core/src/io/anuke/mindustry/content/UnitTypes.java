@@ -1,12 +1,11 @@
 package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.entities.units.types.*;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.type.ContentType;
 
 public class UnitTypes implements ContentList{
     public static UnitType drone, alphaDrone, dagger, interceptor, monsoon, titan, fabricator;
@@ -93,7 +92,7 @@ public class UnitTypes implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll(){
-        return UnitType.all();
+    public ContentType type(){
+        return ContentType.unit;
     }
 }

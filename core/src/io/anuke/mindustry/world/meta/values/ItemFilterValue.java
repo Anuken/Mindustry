@@ -5,6 +5,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.scene.ui.layout.Table;
+import static io.anuke.mindustry.Vars.*;
 
 public class ItemFilterValue implements StatValue{
     private final Predicate<Item> filter;
@@ -17,7 +18,7 @@ public class ItemFilterValue implements StatValue{
     public void display(Table table){
         Array<Item> list = new Array<>();
 
-        for(Item item : Item.all()){
+        for(Item item : content.items()){
             if(filter.test(item)) list.add(item);
         }
 

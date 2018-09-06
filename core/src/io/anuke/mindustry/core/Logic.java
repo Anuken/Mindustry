@@ -50,7 +50,7 @@ public class Logic extends Module{
 
         for(Tile tile : state.teams.get(defaultTeam).cores){
             if(debug){
-                for(Item item : Item.all()){
+                for(Item item : content.items()){
                     if(item.type == ItemType.material){
                         tile.entity.items.set(item, 1000);
                     }
@@ -91,7 +91,7 @@ public class Logic extends Module{
 
     //this never triggers in PvP; only for checking sector game-overs
     private void checkGameOver(){
-        if(state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
+        if(!state.mode.isPvp && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
             state.gameOver = true;
             Events.fire(new GameOverEvent());
         }
@@ -157,6 +157,10 @@ public class Logic extends Module{
 
                 world.pathfinder().update();
             }
+        }
+
+        if(threads.isEnabled()){
+            netServer.update();
         }
     }
 }

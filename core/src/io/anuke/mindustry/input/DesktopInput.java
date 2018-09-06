@@ -8,8 +8,6 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
-import io.anuke.mindustry.maps.generation.StructureFormat;
-import io.anuke.mindustry.maps.generation.StructureFormat.StructBlock;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -20,9 +18,7 @@ import io.anuke.ucore.core.KeyBinds;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.input.Input;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -66,23 +62,6 @@ public class DesktopInput extends InputHandler{
         }
     }
 
-    void printArea(NormalizeResult result){
-        StructBlock[][] blocks = new StructBlock[Math.abs(result.x2 - result.x) + 1][Math.abs(result.y2 - result.y) + 1];
-
-        for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
-            for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
-                int wx = result.x + x;
-                int wy = result.y + y;
-
-                Block block = world.tile(wx, wy).block();
-
-                blocks[x][y] = new StructBlock(block == Blocks.blockpart ? Blocks.air : block, world.tile(wx, wy).getRotation());
-            }
-        }
-
-        Log.info(StructureFormat.writeBase64(blocks));
-    }
-
     @Override
     public boolean isDrawing(){
         return mode != none || recipe != null;
@@ -95,7 +74,7 @@ public class DesktopInput extends InputHandler{
         if(cursor == null) return;
 
         //draw selection(s)
-        if(mode == placing){
+        if(mode == placing && recipe != null){
             NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, true, maxLength);
 
             for(int i = 0; i <= result.getLength(); i += recipe.result.size){
@@ -269,17 +248,12 @@ public class DesktopInput extends InputHandler{
                 }
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
                 NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursor.x, cursor.y, rotation, false, maxLength);
+                for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
+                    for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
+                        int wx = selectX + x * Mathf.sign(cursor.x - selectX);
+                        int wy = selectY + y * Mathf.sign(cursor.y - selectY);
 
-                if(debug && Inputs.keyDown(Input.CONTROL_LEFT)){
-                    printArea(result);
-                }else{
-                    for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
-                        for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
-                            int wx = selectX + x * Mathf.sign(cursor.x - selectX);
-                            int wy = selectY + y * Mathf.sign(cursor.y - selectY);
-
-                            tryBreakBlock(wx, wy);
-                        }
+                        tryBreakBlock(wx, wy);
                     }
                 }
             }

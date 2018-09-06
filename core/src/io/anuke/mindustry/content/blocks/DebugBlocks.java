@@ -7,7 +7,7 @@ import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
@@ -23,6 +23,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import static io.anuke.mindustry.Vars.*;
 
 public class DebugBlocks extends BlockList implements ContentList{
     public static Block powerVoid, powerInfinite, itemSource, liquidSource, itemVoid;
@@ -105,7 +106,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             public void buildTable(Tile tile, Table table){
                 LiquidSourceEntity entity = tile.entity();
 
-                Array<Liquid> items = Liquid.all();
+                Array<Liquid> items = content.liquids();
 
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
                 Table cont = new Table();
@@ -159,7 +160,7 @@ public class DebugBlocks extends BlockList implements ContentList{
 
         @Override
         public void read(DataInputStream stream) throws IOException{
-            source = Liquid.getByID(stream.readByte());
+            source = content.liquid(stream.readByte());
         }
     }
 }

@@ -34,9 +34,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.tmptr;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 /**
  * Interface for units that build, break or mine things.
@@ -101,7 +99,7 @@ public interface BuilderTrait extends Entity{
                 }else{ //place
                     byte recipe = input.readByte();
                     byte rotation = input.readByte();
-                    request = new BuildRequest(position % world.width(), position / world.width(), rotation, Recipe.getByID(recipe));
+                    request = new BuildRequest(position % world.width(), position / world.width(), rotation, content.recipe(recipe));
                 }
 
                 request.progress = progress;

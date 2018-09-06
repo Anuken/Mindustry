@@ -25,6 +25,7 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Translator;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 public class Vars{
@@ -37,7 +38,6 @@ public class Vars{
     //team of the enemy in waves
     public static final Team waveTeam = Team.red;
 
-    //discord group URL
     public static final String discordURL = "https://discord.gg/mindustry";
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
     public static final String crashReportURL = "http://mindustry.us.to/report";
@@ -76,6 +76,8 @@ public class Vars{
     public static boolean android;
     //shorthand for whether or not this is running on GWT
     public static boolean gwt;
+    //main data directory
+    public static FileHandle dataDirectory;
     //directory for user-created map data
     public static FileHandle customMapDirectory;
     //save file directory
@@ -107,6 +109,7 @@ public class Vars{
     public static float baseControllerSpeed = 11f;
     //only if smoothCamera
     public static boolean snapCamera = true;
+    public static ContentLoader content;
     public static GameState state;
     public static ThreadHandler threads;
 
@@ -147,7 +150,11 @@ public class Vars{
             }
         }
 
+        Arrays.sort(locales, (l1, l2) -> Platform.instance.getLocaleName(l1).compareTo(Platform.instance.getLocaleName(l2)));
+
         Version.init();
+
+        content = new ContentLoader();
 
         playerGroup = Entities.addGroup(Player.class).enableMapping();
         tileGroup = Entities.addGroup(TileEntity.class, false);
@@ -179,8 +186,9 @@ public class Vars{
         gwt = Gdx.app.getType() == ApplicationType.WebGL;
 
         if(!gwt){
-            customMapDirectory = OS.getAppDataDirectory("Mindustry").child("maps/");
-            saveDirectory = OS.getAppDataDirectory("Mindustry").child("saves/");
+            dataDirectory = OS.getAppDataDirectory("Mindustry");
+            customMapDirectory = dataDirectory.child("maps/");
+            saveDirectory = dataDirectory.child("saves/");
         }
 
         fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f);

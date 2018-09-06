@@ -1,7 +1,6 @@
 package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
@@ -19,11 +18,7 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
-public class Weapon implements Content{
-    private static Array<Weapon> weapons = new Array<>();
-    private static byte lastid;
-
-    public final byte id;
+public class Weapon extends Content{
     public final String name;
 
     /**minimum cursor distance from player, fixes 'cross-eyed' shooting.*/
@@ -58,9 +53,7 @@ public class Weapon implements Content{
     public TextureRegion equipRegion, region;
 
     protected Weapon(String name){
-        this.id = lastid ++;
         this.name = name;
-        weapons.add(this);
     }
 
     @Remote(targets = Loc.server, called = Loc.both, unreliable = true)
@@ -105,14 +98,6 @@ public class Weapon implements Content{
         shooter.getTimer().get(shooter.getShootTimer(left), weapon.reload);
     }
 
-    public static Array<Weapon> all() {
-        return weapons;
-    }
-
-    public static Weapon getByID(int id){
-        return weapons.get(id);
-    }
-
     @Override
     public void load(){
         equipRegion = Draw.region(name + "-equip");
@@ -120,13 +105,8 @@ public class Weapon implements Content{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "weapon";
-    }
-
-    @Override
-    public Array<? extends Content> getAll() {
-        return weapons;
+    public ContentType getContentType(){
+        return ContentType.weapon;
     }
 
     public AmmoType getAmmo(){

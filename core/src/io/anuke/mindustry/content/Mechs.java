@@ -3,7 +3,6 @@ package io.anuke.mindustry.content;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Player;
@@ -13,11 +12,11 @@ import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.types.AlphaDrone;
-import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
@@ -107,7 +106,7 @@ public class Mechs implements ContentList{
                 if(player.altHeat >= 0.91f){
                     Effects.shake(3f, 3f, player);
                     for(int i = 0; i < 8; i++){
-                        Timers.run(Mathf.random(5f), () -> Lightning.create(player.getTeam(), BulletFx.hitLancer, player.getTeam().color, 10f, player.x, player.y, Mathf.random(360f), 20));
+                        Timers.run(Mathf.random(5f), () -> Lightning.create(player.getTeam(), BulletFx.hitLancer, player.getTeam().color, 15f, player.x, player.y, Mathf.random(360f), 20));
                     }
                     player.altHeat = 0f;
                 }
@@ -137,7 +136,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.8f;
                 weapon = Weapons.healBlaster;
                 maxSpeed = 5f;
-                armor = 35f;
+                armor = 15f;
                 altChargeAlpha = 0.05f;
                 trailColorTo = Palette.heal;
             }
@@ -150,8 +149,6 @@ public class Mechs implements ContentList{
 
             @Override
             public void updateAlt(Player player){
-                //idle regen
-                player.healBy(0.01f * Timers.delta());
 
                 if(player.altHeat >= 0.91f){
                     Effects.effect(UnitFx.healWave, player);
@@ -197,7 +194,7 @@ public class Mechs implements ContentList{
                 weapon = Weapons.swarmer;
                 trailColorTo = Color.valueOf("feb380");
                 maxSpeed = 3.5f;
-                armor = 50f;
+                armor = 45f;
             }
 
             @Override
@@ -255,6 +252,7 @@ public class Mechs implements ContentList{
             weaponOffsetX = -1;
             weaponOffsetY = -1;
             trailColor = Palette.lightTrail;
+            cellTrnsY = 1f;
         }};
 
         javelin = new Mech("javelin-ship", true){
@@ -269,6 +267,7 @@ public class Mechs implements ContentList{
                 armor = 5f;
                 weapon = Weapons.missiles;
                 trailColor = Color.valueOf("d3ddff");
+                cellTrnsY = 1f;
             }
 
             @Override
@@ -324,6 +323,7 @@ public class Mechs implements ContentList{
                 itemCapacity = 30;
                 trailColor = Color.valueOf("84f491");
                 weapon = Weapons.bomberTrident;
+                cellTrnsY = 1f;
             }
 
             @Override
@@ -343,6 +343,7 @@ public class Mechs implements ContentList{
                 armor = 30f;
                 itemCapacity = 60;
                 trailColor = Color.valueOf("feb380");
+                cellTrnsY = 1f;
             }
         };
 
@@ -351,7 +352,7 @@ public class Mechs implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll(){
-        return Mech.all();
+    public ContentType type(){
+        return ContentType.mech;
     }
 }

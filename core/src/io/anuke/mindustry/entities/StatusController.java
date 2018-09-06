@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.traits.Saveable;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Pooling;
@@ -11,7 +12,7 @@ import io.anuke.ucore.util.ThreadArray;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-
+import static io.anuke.mindustry.Vars.content;
 /**
  * Class for controlling status effects on an entity.
  */
@@ -129,7 +130,7 @@ public class StatusController implements Saveable{
             byte id = stream.readByte();
             float time = stream.readShort() / 2f;
             StatusEntry entry = Pooling.obtain(StatusEntry.class);
-            entry.set(StatusEffect.getByID(id), time);
+            entry.set(content.getByID(ContentType.status, id), time);
             statuses.add(entry);
         }
     }

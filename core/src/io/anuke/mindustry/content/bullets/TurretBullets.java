@@ -14,9 +14,8 @@ import io.anuke.mindustry.entities.bullet.LiquidBulletType;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Lightning;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.type.ContentList;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 import io.anuke.ucore.core.Effects;
@@ -28,6 +27,7 @@ import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
 public class TurretBullets extends BulletList implements ContentList{
@@ -36,7 +36,7 @@ public class TurretBullets extends BulletList implements ContentList{
     @Override
     public void load(){
 
-        healBullet = new BulletType(5.2f, 19){
+        healBullet = new BulletType(5.2f, 13){
             float healAmount = 21f;
 
             {
@@ -74,6 +74,7 @@ public class TurretBullets extends BulletList implements ContentList{
                 collides = false;
                 collidesTiles = false;
                 drag = 0.03f;
+                hiteffect = despawneffect = Fx.none;
             }
 
             @Override
@@ -228,7 +229,7 @@ public class TurretBullets extends BulletList implements ContentList{
                 statusIntensity = 0.5f;
             }
         };
-        lightning = new BulletType(0.001f, 10){
+        lightning = new BulletType(0.001f, 14){
             {
                 lifetime = 1;
                 despawneffect = Fx.none;
@@ -327,7 +328,7 @@ public class TurretBullets extends BulletList implements ContentList{
                     if(amountDropped > 0){
                         float angle = b.angle() + Mathf.range(100f);
                         float vs = Mathf.random(0f, 4f);
-                        ItemDrop.create(Item.getByID(i), amountDropped, b.x, b.y, Angles.trnsx(angle, vs), Angles.trnsy(angle, vs));
+                        ItemDrop.create(content.item(i), amountDropped, b.x, b.y, Angles.trnsx(angle, vs), Angles.trnsy(angle, vs));
                     }
                 }
             }

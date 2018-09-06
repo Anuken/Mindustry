@@ -1,10 +1,9 @@
 package io.anuke.mindustry.content;
 
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.content.fx.ShootFx;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
 
 public class Weapons implements ContentList{
@@ -60,7 +59,6 @@ public class Weapons implements ContentList{
             reload = 60f;
             shots = 4;
             inaccuracy = 2f;
-            roundrobin = false;
             roundrobin = true;
             ejectEffect = Fx.none;
             velocityRnd = 0.2f;
@@ -75,7 +73,6 @@ public class Weapons implements ContentList{
             shots = 4;
             spacing = 8f;
             inaccuracy = 8f;
-            roundrobin = false;
             roundrobin = true;
             ejectEffect = Fx.none;
             shake = 3f;
@@ -98,7 +95,7 @@ public class Weapons implements ContentList{
             inaccuracy = 0f;
             velocityRnd = 0.2f;
             ejectEffect = Fx.none;
-            ammo = AmmoTypes.shotgunTungsten;
+            ammo = AmmoTypes.shock;
         }};
 
         flakgun = new Weapon("flakgun"){{
@@ -155,7 +152,7 @@ public class Weapons implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll(){
-        return Weapon.all();
+    public ContentType type(){
+        return ContentType.weapon;
     }
 }

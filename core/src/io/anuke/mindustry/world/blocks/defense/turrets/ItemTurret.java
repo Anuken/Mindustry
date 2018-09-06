@@ -61,6 +61,7 @@ public class ItemTurret extends CooledTurret{
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
         TurretEntity entity = tile.entity();
+        if(entity == null) return;
 
         AmmoType type = ammoMap.get(item);
         entity.totalAmmo += type.quantityMultiplier;

@@ -90,13 +90,13 @@ public class HudFragment extends Fragment{
                             ui.chatfrag.toggle();
                         }
                     }else{
-                        ui.settings.show();
+                        ui.unlocks.show();
                     }
                 }).update(i -> {
                     if(Net.active() && mobile){
                         i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
                     }else{
-                        i.getStyle().imageUp = Core.skin.getDrawable("icon-settings");
+                        i.getStyle().imageUp = Core.skin.getDrawable("icon-unlocks");
                     }
                 }).get();
             });
@@ -146,7 +146,8 @@ public class HudFragment extends Fragment{
             });
 
             t.top().visible(() -> {
-                if(state.is(State.menu) ||  state.teams.get(players[0].getTeam()).cores.size == 0){
+                if(state.is(State.menu) || state.teams.get(players[0].getTeam()).cores.size == 0 ||
+                state.teams.get(players[0].getTeam()).cores.first().entity == null){
                     coreAttackTime = 0f;
                     return false;
                 }

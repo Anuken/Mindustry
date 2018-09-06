@@ -79,7 +79,7 @@ public class CoreBlock extends StorageBlock{
     @Remote(called = Loc.server)
     public static void setCoreSolid(Tile tile, boolean solid){
         CoreEntity entity = tile.entity();
-        entity.solid = solid;
+        if(entity != null) entity.solid = solid;
     }
 
     @Override
@@ -187,8 +187,7 @@ public class CoreBlock extends StorageBlock{
             if(bullet.getOwner() instanceof Player && bullet.getTeam() != tile.getTeam()){
                 Effects.effect(BulletFx.absorb, bullet);
                 entity.shieldHeat = 1f;
-                bullet.supressCollision();
-                bullet.remove();
+                bullet.absorb();
             }
         });
 

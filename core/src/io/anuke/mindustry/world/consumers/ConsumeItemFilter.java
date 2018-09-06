@@ -9,6 +9,7 @@ import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.scene.ui.layout.Table;
+import static io.anuke.mindustry.Vars.*;
 
 public class ConsumeItemFilter extends Consume{
     private final Predicate<Item> filter;
@@ -21,7 +22,7 @@ public class ConsumeItemFilter extends Consume{
     public void buildTooltip(Table table){
         Array<Item> list = new Array<>();
 
-        for(Item item : Item.all()){
+        for(Item item : content.items()){
             if(filter.test(item)) list.add(item);
         }
 
@@ -46,9 +47,9 @@ public class ConsumeItemFilter extends Consume{
 
     @Override
     public boolean valid(Block block, TileEntity entity){
-        for(int i = 0; i < Item.all().size; i++){
-            Item item = Item.getByID(i);
-            if(entity.items.has(item) && this.filter.test(item)){
+        for(int i = 0; i < content.items().size; i++){
+            Item item = content.item(i);
+            if(entity.items != null && entity.items.has(item) && this.filter.test(item)){
                 return true;
             }
         }

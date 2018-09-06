@@ -45,7 +45,7 @@ public class Generation{
                         return null;
                     }
 
-                    if(!block.isValid(tiles[worldx][worldy])) continue;
+                    if(!block.isValid(tiles[worldx][worldy]) || tiles[worldx][worldy].floor().drops == null) continue;
 
                     Item drop = tiles[worldx][worldy].floor().drops.item;
 

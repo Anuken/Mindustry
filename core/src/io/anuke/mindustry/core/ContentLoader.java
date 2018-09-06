@@ -1,9 +1,8 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.OrderedMap;
-import com.badlogic.gdx.utils.OrderedSet;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.content.bullets.*;
@@ -16,12 +15,15 @@ import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.TypeTrait;
-import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.game.MappableContent;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Log;
 
@@ -29,12 +31,15 @@ import io.anuke.ucore.util.Log;
  * Loads all game content.
  * Call load() before doing anything with content.
  */
+@SuppressWarnings("unchecked")
 public class ContentLoader{
-    private static boolean loaded = false;
-    private static ObjectSet<Array<? extends Content>> contentSet = new OrderedSet<>();
-    private static OrderedMap<String, Array<Content>> contentMap = new OrderedMap<>();
-    private static ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
-    private static ContentList[] content = {
+    private boolean loaded = false;
+
+    private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
+    private Array<Content>[] contentMap = new Array[ContentType.values().length];
+    private MappableContent[][] temporaryMapper;
+    private ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
+    private ContentList[] content = {
         //effects
         new BlockFx(),
         new BulletFx(),
@@ -96,10 +101,8 @@ public class ContentLoader{
         new Recipes(),
     };
 
-    /**
-     * Creates all content types.
-     */
-    public static void load(){
+    /**Creates all content types.*/
+    public void load(){
         if(loaded){
             Log.info("Content already loaded, skipping.");
             return;
@@ -107,45 +110,63 @@ public class ContentLoader{
 
         registerTypes();
 
+        for(ContentType type : ContentType.values()){
+            contentMap[type.ordinal()] = new Array<>();
+            contentNameMap[type.ordinal()] =  new ObjectMap<>();
+        }
+
         for(ContentList list : content){
             list.load();
         }
 
-        for(ContentList list : content){
-            if(list.getAll().size != 0){
-                String type = list.getAll().first().getContentTypeName();
+        int total = 0;
 
-                if(!contentMap.containsKey(type)){
-                    contentMap.put(type, new Array<>());
+        for(ContentType type : ContentType.values()){
+
+            for(Content c : contentMap[type.ordinal()]){
+                if(c instanceof MappableContent){
+                    String name = ((MappableContent) c).getContentName();
+                    if(contentNameMap[type.ordinal()].containsKey(name)){
+                        throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + name + "')");
+                    }
+                    contentNameMap[type.ordinal()].put(name, (MappableContent) c);
                 }
-
-                contentMap.get(type).addAll(list.getAll());
+                total ++;
             }
-            contentSet.add(list.getAll());
         }
 
-        if(Block.all().size >= 256){
-            throw new IllegalArgumentException("THE TIME HAS COME. More than 256 blocks have been created.");
+        //set up ID mapping
+        for(int k = 0; k < contentMap.length; k ++){
+            Array<Content> arr = contentMap[k];
+            for(int i = 0; i < arr.size; i++){
+                int id = arr.get(i).id;
+                if(id < 0) id += 256;
+                if(id != i){
+                    throw new IllegalArgumentException("Out-of-order IDs for content '" + arr.get(i) + "' (expected " + i + " but got " + id + ")");
+                }
+            }
+        }
+
+        if(blocks().size >= 256){
+            throw new ImpendingDoomException("THE TIME HAS COME. More than 256 blocks have been created.");
         }
 
         Log.info("--- CONTENT INFO ---");
-        Log.info("Blocks loaded: {0}\nItems loaded: {1}\nLiquids loaded: {2}\nUpgrades loaded: {3}\nUnits loaded: {4}\nAmmo types loaded: {5}\nBullet types loaded: {6}\nStatus effects loaded: {7}\nRecipes loaded: {8}\nEffects loaded: {9}\nTotal content classes: {10}",
-                Block.all().size, Item.all().size, Liquid.all().size, Mech.all().size, UnitType.all().size,
-                AmmoType.all().size, BulletType.all().size, StatusEffect.all().size, Recipe.all().size, Effects.all().size, content.length);
-
+        for(int k = 0; k < contentMap.length; k ++){
+            Log.info("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);
+        }
+        Log.info("Total content loaded: {0}", total);
         Log.info("-------------------");
 
         loaded = true;
     }
 
-    /**
-     * Initializes all content with the specified function.
-     */
-    public static void initialize(Consumer<Content> callable){
+    /**Initializes all content with the specified function.*/
+    public void initialize(Consumer<Content> callable){
         if(initialization.contains(callable)) return;
 
-        for(Array<? extends Content> arr : contentSet){
-            for(Content content : arr){
+        for(ContentType type : ContentType.values()){
+            for(Content content : contentMap[type.ordinal()]){
                 callable.accept(content);
             }
         }
@@ -153,24 +174,103 @@ public class ContentLoader{
         initialization.add(callable);
     }
 
-    public static void dispose(){
+    public void dispose(){
         //TODO clear all content.
     }
 
-    public static OrderedMap<String, Array<Content>> getContentMap(){
+    public void handleContent(Content content){
+        contentMap[content.getContentType().ordinal()].add(content);
+    }
+
+    public void setTemporaryMapper(MappableContent[][] temporaryMapper){
+        this.temporaryMapper = temporaryMapper;
+    }
+
+    public Array<Content>[] getContentMap(){
         return contentMap;
+    }
+
+    public <T extends MappableContent> T getByName(ContentType type, String name){
+        if(contentNameMap[type.ordinal()] == null){
+            return null;
+        }
+        return (T)contentNameMap[type.ordinal()].get(name);
+    }
+
+    public <T extends Content> T getByID(ContentType type, int id){
+        //offset negative values by 256, as they are probably a product of byte overflow
+        if(id < 0) id += 256;
+
+        if(temporaryMapper != null && temporaryMapper[type.ordinal()] != null){
+            return (T)temporaryMapper[type.ordinal()][id];
+        }
+
+        if(id >= contentMap[type.ordinal()].size || id < 0){
+            throw new RuntimeException("No " + type.name() + " with ID '" + id + "' found!");
+        }
+        return (T)contentMap[type.ordinal()].get(id);
+    }
+
+    public <T extends Content> Array<T> getBy(ContentType type){
+        return (Array<T>) contentMap[type.ordinal()];
+    }
+
+    //utility methods, just makes things a bit shorter
+
+    public Array<Block> blocks(){
+        return getBy(ContentType.block);
+    }
+
+    public Block block(int id){
+        return (Block) getByID(ContentType.block, id);
+    }
+
+    public Array<Recipe> recipes(){
+        return getBy(ContentType.recipe);
+    }
+
+    public Recipe recipe(int id){
+        return (Recipe) getByID(ContentType.recipe, id);
+    }
+
+    public Array<Item> items(){
+        return getBy(ContentType.item);
+    }
+
+    public Item item(int id){
+        return (Item) getByID(ContentType.item, id);
+    }
+
+    public Array<Liquid> liquids(){
+        return getBy(ContentType.liquid);
+    }
+
+    public Liquid liquid(int id){
+        return (Liquid) getByID(ContentType.liquid, id);
+    }
+
+    public Array<BulletType> bullets(){
+        return getBy(ContentType.bullet);
+    }
+
+    public BulletType bullet(int id){
+        return (BulletType) getByID(ContentType.bullet, id);
     }
 
     /**
      * Registers sync IDs for all types of sync entities.
      * Do not register units here!
      */
-    private static void registerTypes(){
+    private void registerTypes(){
         TypeTrait.registerType(Player.class, Player::new);
         TypeTrait.registerType(ItemDrop.class, ItemDrop::new);
         TypeTrait.registerType(Fire.class, Fire::new);
         TypeTrait.registerType(Puddle.class, Puddle::new);
         TypeTrait.registerType(Bullet.class, Bullet::new);
         TypeTrait.registerType(Lightning.class, Lightning::new);
+    }
+
+    private class ImpendingDoomException extends RuntimeException{
+        public ImpendingDoomException(String s){ super(s); }
     }
 }

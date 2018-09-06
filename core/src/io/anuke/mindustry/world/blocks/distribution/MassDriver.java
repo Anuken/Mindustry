@@ -82,8 +82,8 @@ public class MassDriver extends Block{
         DriverBulletData data = Pooling.obtain(DriverBulletData.class);
         data.from = entity;
         data.to = other;
-        for(int i = 0; i < Item.all().size; i++){
-            data.items[i] = entity.items.get(Item.getByID(i));
+        for(int i = 0; i < content.items().size; i++){
+            data.items[i] = entity.items.get(content.item(i));
         }
         entity.items.clear();
 
@@ -247,7 +247,7 @@ public class MassDriver extends Block{
 
     public static class DriverBulletData implements Poolable{
         public MassDriverEntity from, to;
-        public int[] items = new int[Item.all().size];
+        public int[] items = new int[content.items().size];
 
         @Override
         public void reset(){
@@ -264,7 +264,7 @@ public class MassDriver extends Block{
         //whether this mass driver is waiting for a bullet to hit it and deliver items
         public boolean isRecieving;
         //whether this driver just recieved some items and is now unloading
-        public boolean isUnloading;
+        public boolean isUnloading = true;
 
         public float reload = 0f;
 
@@ -274,7 +274,7 @@ public class MassDriver extends Block{
             //add all the items possible
             for(int i = 0; i < data.items.length; i++){
                 int maxAdd = Math.min(data.items[i], itemCapacity - totalItems);
-                items.add(Item.getByID(i), maxAdd);
+                items.add(content.item(i), maxAdd);
                 data.items[i] -= maxAdd;
                 totalItems += maxAdd;
 
@@ -289,7 +289,7 @@ public class MassDriver extends Block{
                 if(amountDropped > 0){
                     float angle = Mathf.range(180f);
                     float vs = Mathf.random(0f, 4f);
-                    ItemDrop.create(Item.getByID(i), amountDropped, bullet.x, bullet.y, Angles.trnsx(angle, vs), Angles.trnsy(angle, vs));
+                    ItemDrop.create(content.item(i), amountDropped, bullet.x, bullet.y, Angles.trnsx(angle, vs), Angles.trnsy(angle, vs));
                 }
             }
 

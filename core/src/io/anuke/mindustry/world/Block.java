@@ -3,7 +3,6 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
@@ -18,6 +17,7 @@ import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.CursorType;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.meta.*;
@@ -32,15 +32,9 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Block extends BaseBlock implements Content{
-    private static int lastid;
-    private static Array<Block> blocks = new Array<>(140);
-    private static ObjectMap<String, Block> map = new ObjectMap<>();
-
+public class Block extends BaseBlock {
     /** internal name */
     public final String name;
-    /** internal ID */
-    public final int id;
     /** display name */
     public String formalName;
     /** Detailed description of the block. Can be as long as necesary. */
@@ -107,6 +101,8 @@ public class Block extends BaseBlock implements Content{
     public float viewRange = 10;
     /**Whether the top icon is outlined, like a turret.*/
     public boolean turretIcon = false;
+    /**Whether units target this block.*/
+    public boolean targetable = true;
 
     protected Array<Tile> tempTiles = new Array<>();
     protected Color tempColor = new Color();
@@ -123,39 +119,13 @@ public class Block extends BaseBlock implements Content{
         this.formalName = Bundles.get("block." + name + ".name", name);
         this.fullDescription = Bundles.getOrNull("block." + name + ".description");
         this.solid = false;
-        this.id = lastid++;
-
-        if(map.containsKey(name)){
-            throw new RuntimeException("Two blocks cannot have the same names! Problematic block: " + name);
-        }
-
-        map.put(name, this);
-        blocks.add(this);
-    }
-
-    public static Array<Block> all(){
-        return blocks;
-    }
-
-    public static Block getByName(String name){
-        return map.get(name);
-    }
-
-    public static Block getByID(int id){
-        if(id < 0){ //offset negative values by 256, as they are a product of byte overflow
-            id += 256;
-        }
-        if(id >= blocks.size || id < 0){
-            throw new RuntimeException("No block with ID '" + id + "' found!");
-        }
-        return blocks.get(id);
     }
 
     /**Populates the array with all blocks that produce this content.*/
-    public static void getByProduction(Array<Block> arr, Content content){
+    public static void getByProduction(Array<Block> arr, Content result){
         arr.clear();
-        for(Block block : Block.all()){
-            if(block.produces.get() == content){
+        for(Block block : content.<Block>getBy(ContentType.block)){
+            if(block.produces.get() == result){
                 arr.add(block);
             }
         }
@@ -205,6 +175,16 @@ public class Block extends BaseBlock implements Content{
         if(!headless){
             control.database().unlockContent(content);
         }
+    }
+
+    @Override
+    public ContentType getContentType(){
+        return ContentType.block;
+    }
+
+    @Override
+    public String getContentName() {
+        return name;
     }
 
     /** Called after all blocks are created. */
@@ -336,7 +316,7 @@ public class Block extends BaseBlock implements Content{
         tempColor.set(Palette.darkFlame);
 
         if(hasItems){
-            for(Item item : Item.all()){
+            for(Item item : content.items()){
                 int amount = tile.entity.items.get(item);
                 explosiveness += item.explosiveness * amount;
                 flammability += item.flammability * amount;
@@ -490,20 +470,5 @@ public class Block extends BaseBlock implements Content{
                 "entity.id", tile.entity.id,
                 "entity.items.total", hasItems ? tile.entity.items.total() : null
         );
-    }
-
-    @Override
-    public String getContentTypeName(){
-        return "block";
-    }
-
-    @Override
-    public Array<? extends Content> getAll(){
-        return all();
-    }
-
-    @Override
-    public String toString(){
-        return name;
     }
 }

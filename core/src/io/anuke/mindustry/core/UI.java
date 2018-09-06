@@ -117,7 +117,7 @@ public class UI extends SceneModule{
             font.setUseIntegerPositions(false);
             font.getData().setScale(Vars.fontScale);
             font.getData().down += Unit.dp.scl(4f);
-            font.getData().lineHeight -= Unit.dp.scl(2f);
+            font.getData().lineHeight -= Unit.dp.scl(4.3f);
         }, skin.font(), skin.getFont("default-font-chat"), skin.getFont("korean"), skin.getFont("trad-chinese"), skin.getFont("simp-chinese"));
     }
 
@@ -294,6 +294,7 @@ public class UI extends SceneModule{
         FloatingDialog dialog = new FloatingDialog(title);
         dialog.content().add(text).width(400f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons().defaults().size(200f, 54f).pad(2f);
+        dialog.setFillParent(false);
         dialog.buttons().addButton("$text.cancel", dialog::hide);
         dialog.buttons().addButton("$text.ok", () -> {
             dialog.hide();

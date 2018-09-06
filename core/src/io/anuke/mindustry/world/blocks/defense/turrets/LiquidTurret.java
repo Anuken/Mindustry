@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
@@ -10,6 +11,9 @@ import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
 import io.anuke.ucore.core.Effects;
+
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public abstract class LiquidTurret extends Turret{
     protected AmmoType[] ammoTypes;
@@ -25,6 +29,33 @@ public abstract class LiquidTurret extends Turret{
         super.setStats();
 
         stats.add(BlockStat.inputLiquid, new LiquidFilterValue(item -> liquidAmmoMap.containsKey(item)));
+    }
+
+    @Override
+    protected boolean validateTarget(Tile tile) {
+        TurretEntity entity = tile.entity();
+        if(entity.liquids.current().canExtinguish() && entity.target instanceof Tile){
+            return Fire.has(((Tile) entity.target).x, ((Tile) entity.target).y);
+        }
+        return super.validateTarget(tile);
+    }
+
+    @Override
+    protected void findTarget(Tile tile) {
+        TurretEntity entity = tile.entity();
+        if(entity.liquids.current().canExtinguish()){
+            int tr = (int)(range / tilesize);
+            for (int x = -tr; x <= tr; x++) {
+                for (int y = -tr; y <= tr; y++) {
+                    if(Fire.has(x + tile.x, y + tile.y)){
+                        entity.target = world.tile(x + tile.x, y + tile.y);
+                        return;
+                    }
+                }
+            }
+        }
+
+        super.findTarget(tile);
     }
 
     @Override

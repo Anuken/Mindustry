@@ -18,6 +18,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
@@ -190,7 +191,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         public void update(){
             ItemDrop item = (ItemDrop) target;
 
-            if(item == null || inventory.isFull() || !inventory.canAcceptItem(item.getItem(), 1)){
+            if(item == null || inventory.isFull() || item.getItem().type != ItemType.material || !inventory.canAcceptItem(item.getItem(), 1)){
                 setState(drop);
                 return;
             }
@@ -216,6 +217,12 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
         public void update(){
             if(inventory.isEmpty()){
+                setState(mine);
+                return;
+            }
+
+            if(inventory.getItem().item.type != ItemType.material){
+                inventory.clearItem();
                 setState(mine);
                 return;
             }

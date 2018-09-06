@@ -15,6 +15,7 @@ import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.AmmoEntry;
 import io.anuke.mindustry.type.AmmoType;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -34,6 +35,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class Turret extends Block{
@@ -190,11 +192,10 @@ public abstract class Turret extends Block{
         if(hasAmmo(tile)){
 
             if(entity.timer.get(timerTarget, targetInterval)){
-                entity.target = Units.getClosestTarget(tile.getTeam(),
-                        tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir));
+                findTarget(tile);
             }
 
-            if(!Units.invalidateTarget(entity.target, tile.getTeam(), tile.drawx(), tile.drawy())){
+            if(validateTarget(tile)){
 
                 AmmoType type = peekAmmo(tile);
                 float speed = type.bullet.speed;
@@ -220,6 +221,18 @@ public abstract class Turret extends Block{
                 }
             }
         }
+    }
+
+    protected boolean validateTarget(Tile tile){
+        TurretEntity entity = tile.entity();
+        return !Units.invalidateTarget(entity.target, tile.getTeam(), tile.drawx(), tile.drawy());
+    }
+
+    protected void findTarget(Tile tile){
+        TurretEntity entity = tile.entity();
+
+        entity.target = Units.getClosestTarget(tile.getTeam(),
+                tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir));
     }
 
     public boolean shouldTurn(Tile tile){
@@ -347,7 +360,7 @@ public abstract class Turret extends Block{
         public void read(DataInputStream stream) throws IOException{
             byte amount = stream.readByte();
             for(int i = 0; i < amount; i++){
-                AmmoType type = AmmoType.getByID(stream.readByte());
+                AmmoType type = content.getByID(ContentType.ammo, stream.readByte());
                 short ta = stream.readShort();
                 ammo.add(new AmmoEntry(type, ta));
                 totalAmmo += ta;

@@ -15,6 +15,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.TargetTrait;
@@ -89,13 +90,14 @@ public class MobileInput extends InputHandler implements GestureListener{
             Unit unit = Units.getClosestEnemy(player.getTeam(), x, y, 20f, u -> true);
 
             if(unit != null){
-                player.target = unit;
+                threads.run(() -> player.target = unit);
             }else{
                 Tile tile = world.tileWorld(x, y);
                 if(tile != null) tile = tile.target();
 
                 if(tile != null && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
-                    player.target = tile.entity;
+                    TileEntity entity = tile.entity;
+                    threads.run(() -> player.target = entity);
                 }
             }
         }

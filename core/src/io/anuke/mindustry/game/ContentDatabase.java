@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 
@@ -12,19 +13,19 @@ import static io.anuke.mindustry.Vars.debug;
 
 public class ContentDatabase{
     /** Maps unlockable type names to a set of unlocked content.*/
-    private ObjectMap<String, ObjectSet<String>> unlocked = new ObjectMap<>();
+    private ObjectMap<ContentType, ObjectSet<String>> unlocked = new ObjectMap<>();
     /** Whether unlockables have changed since the last save.*/
     private boolean dirty;
-
+    
     /** Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(UnlockableContent content){
         if(debug) return true;
 
-        if(!unlocked.containsKey(content.getContentTypeName())){
-            unlocked.put(content.getContentTypeName(), new ObjectSet<>());
+        if(!unlocked.containsKey(content.getContentType())){
+            unlocked.put(content.getContentType(), new ObjectSet<>());
         }
 
-        ObjectSet<String> set = unlocked.get(content.getContentTypeName());
+        ObjectSet<String> set = unlocked.get(content.getContentType());
 
         return set.contains(content.getContentName());
     }
@@ -39,11 +40,11 @@ public class ContentDatabase{
     public boolean unlockContent(UnlockableContent content){
         if(!content.canBeUnlocked()) return false;
 
-        if(!unlocked.containsKey(content.getContentTypeName())){
-            unlocked.put(content.getContentTypeName(), new ObjectSet<>());
+        if(!unlocked.containsKey(content.getContentType())){
+            unlocked.put(content.getContentType(), new ObjectSet<>());
         }
 
-        boolean ret = unlocked.get(content.getContentTypeName()).add(content.getContentName());
+        boolean ret = unlocked.get(content.getContentType()).add(content.getContentName());
 
         //fire unlock event so other classes can use it
         if(ret){
@@ -67,9 +68,9 @@ public class ContentDatabase{
     }
 
     public void load(){
-        ObjectMap<String, Array<String>> result = Settings.getJson("content-database", ObjectMap.class);
+        ObjectMap<ContentType, Array<String>> result = Settings.getJson("content-database", ObjectMap.class);
 
-        for(Entry<String, Array<String>> entry : result.entries()){
+        for(Entry<ContentType, Array<String>> entry : result.entries()){
             ObjectSet<String> set = new ObjectSet<>();
             set.addAll(entry.value);
             unlocked.put(entry.key, set);
@@ -80,9 +81,9 @@ public class ContentDatabase{
 
     public void save(){
 
-        ObjectMap<String, Array<String>> write = new ObjectMap<>();
+        ObjectMap<ContentType, Array<String>> write = new ObjectMap<>();
 
-        for(Entry<String, ObjectSet<String>> entry : unlocked.entries()){
+        for(Entry<ContentType, ObjectSet<String>> entry : unlocked.entries()){
             write.put(entry.key, entry.value.iterator().toArray());
         }
 

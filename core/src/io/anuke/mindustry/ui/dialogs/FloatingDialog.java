@@ -3,14 +3,21 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.utils.Align;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.ScrollPane;
 
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.ui;
+
 public class FloatingDialog extends Dialog{
+    private boolean wasPaused;
+    protected boolean shouldPause;
 
     public FloatingDialog(String title){
         super(title, "dialog");
@@ -19,6 +26,24 @@ public class FloatingDialog extends Dialog{
         getTitleTable().row();
         getTitleTable().addImage("white", Palette.accent)
                 .growX().height(3f).pad(4f);
+
+        hidden(() -> {
+            if(shouldPause && !state.is(State.menu)){
+                if(!wasPaused || Net.active())
+                    state.set(State.playing);
+            }
+        });
+
+        shown(() -> {
+            if(shouldPause && !state.is(State.menu)){
+                wasPaused = state.is(State.paused);
+                if(ui.paused.getScene() != null){
+                    wasPaused = ui.paused.wasPaused;
+                }
+                if(!Net.active()) state.set(State.paused);
+                ui.paused.hide();
+            }
+        });
 
         boolean[] done = {false};
 

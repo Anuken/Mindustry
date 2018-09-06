@@ -23,6 +23,8 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.itemSize;
 import static io.anuke.mindustry.Vars.tilesize;
 
+import static io.anuke.mindustry.Vars.*;
+
 public class Conveyor extends Block{
     private static final float itemSpace = 0.135f * 2.2f;
     private static final float offsetScl = 128f * 3f;
@@ -473,10 +475,10 @@ public class Conveyor extends Block{
         ItemPos set(long lvalue, short[] values){
             Bits.getShorts(lvalue, values);
 
-            if(values[0] >= Item.all().size || values[0] < 0)
+            if(values[0] >= content.items().size || values[0] < 0)
                 item = null;
             else
-                item = Item.all().get(values[0]);
+                item = content.items().get(values[0]);
 
             x = values[1] / (float) Short.MAX_VALUE;
             y = ((float) values[2]) / Short.MAX_VALUE + 1f;

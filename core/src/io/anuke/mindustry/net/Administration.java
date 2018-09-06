@@ -3,7 +3,6 @@ package io.anuke.mindustry.net;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.ucore.core.Settings;
 
 import static io.anuke.mindustry.Vars.headless;
@@ -31,15 +30,6 @@ public class Administration{
         load();
     }
 
-    public boolean isAntiGrief(){
-        return Settings.getBool("antigrief");
-    }
-
-    public void setAntiGrief(boolean antiGrief){
-        Settings.putBool("antigrief", antiGrief);
-        Settings.save();
-    }
-
     public boolean allowsCustomClients(){
         return Settings.getBool("allow-custom", !headless);
     }
@@ -47,10 +37,6 @@ public class Administration{
     public void setCustomClients(boolean allowed){
         Settings.putBool("allow-custom", allowed);
         Settings.save();
-    }
-
-    public boolean isValidateReplace(){
-        return false;
     }
 
     public void setAntiGriefParams(int maxBreak, int cooldown){
@@ -61,42 +47,6 @@ public class Administration{
 
     public IntMap<Array<EditLog>> getEditLogs(){
         return editLogs;
-    }
-
-    public boolean validateBreak(String id, String ip){
-        if(!isAntiGrief() || isAdmin(id, ip)) return true;
-
-        PlayerInfo info = getCreateInfo(id);
-
-        if(info.lastBroken == null || info.lastBroken.length != Settings.getInt("antigrief-max")){
-            info.lastBroken = new long[Settings.getInt("antigrief-max")];
-        }
-
-        long[] breaks = info.lastBroken;
-
-        int shiftBy = 0;
-        for(int i = 0; i < breaks.length && breaks[i] != 0; i++){
-            if(TimeUtils.timeSinceMillis(breaks[i]) >= Settings.getInt("antigrief-cooldown")){
-                shiftBy = i;
-            }
-        }
-
-        for(int i = 0; i < breaks.length; i++){
-            breaks[i] = (i + shiftBy >= breaks.length) ? 0 : breaks[i + shiftBy];
-        }
-
-        int remaining = 0;
-        for(int i = 0; i < breaks.length; i++){
-            if(breaks[i] == 0){
-                remaining = breaks.length - i;
-                break;
-            }
-        }
-
-        if(remaining == 0) return false;
-
-        breaks[breaks.length - remaining] = TimeUtils.millis();
-        return true;
     }
 
     /**
@@ -348,8 +298,6 @@ public class Administration{
         public int totalBlocksBroken;
         public boolean banned, admin;
         public long lastKicked; //last kicked timestamp
-
-        public long[] lastBroken;
 
         PlayerInfo(String id){
             this.id = id;

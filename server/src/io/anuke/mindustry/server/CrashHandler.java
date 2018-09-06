@@ -39,8 +39,9 @@ public class CrashHandler{
 
         //add all relevant info, ignoring exceptions
         ex(() -> value.addChild("build", new JsonValue(Version.build)));
-        ex(() -> value.addChild("mode", new JsonValue(Vars.state.mode.toString())));
-        ex(() -> value.addChild("difficulty", new JsonValue(Vars.state.difficulty.toString())));
+        ex(() -> value.addChild("mode", new JsonValue(Vars.state.mode.name())));
+        ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
+        ex(() -> value.addChild("difficulty", new JsonValue(Vars.state.difficulty.name())));
         ex(() -> value.addChild("players", new JsonValue(Vars.playerGroup.size())));
         ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name"))));
         ex(() -> value.addChild("trace", new JsonValue(parseException(e))));

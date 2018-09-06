@@ -42,7 +42,7 @@ public class MenuFragment extends Fragment{
         }
 
         //version info
-        parent.fill(c -> c.bottom().left().add("Mindustry " + Version.code + " " + Version.type + " / " + Version.buildName)
+        parent.fill(c -> c.bottom().left().add("Mindustry " + Version.number + "-" + Version.modifier + " " + Version.type + " / " + (Version.build == -1 ? "custom build" : "build " + Version.build))
                 .visible(() -> state.is(State.menu)));
     }
 

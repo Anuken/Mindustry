@@ -56,6 +56,8 @@ public class Save16 extends SaveFileVersion{
         state.wave = wave;
         state.wavetime = wavetime;
 
+        content.setTemporaryMapper(readContentHeader(stream));
+
         state.spawner.read(stream);
 
         //entities
@@ -148,6 +150,7 @@ public class Save16 extends SaveFileVersion{
             i += consecutives;
         }
 
+        content.setTemporaryMapper(null);
         world.endMapLoad();
     }
 
@@ -168,7 +171,9 @@ public class Save16 extends SaveFileVersion{
         stream.writeByte(state.difficulty.ordinal()); //difficulty ordinal
         stream.writeFloat(state.wavetime); //wave countdown
 
-        state.spawner.write(stream);
+        writeContentHeader(stream);
+
+        state.spawner.write(stream); //spawnes
 
         //--ENTITIES--
 

@@ -199,8 +199,10 @@ public class NetClient extends Module{
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
     public static void onSnapshot(byte[] chunk, int snapshotID, short chunkID, int totalLength, int base){
+        int totalChunks = Mathf.ceil((float) totalLength / NetServer.maxSnapshotSize);
+
         if(NetServer.debugSnapshots)
-            Log.info("Recieved snapshot: len {0} ID {1} chunkID {2} totalLength {3} base {4} client-base {5}", chunk.length, snapshotID, chunkID, totalLength, base, netClient.lastSnapshotBaseID);
+            Log.info("Recieved snapshot: len {0} ID {1} chunkID {2} / "+totalChunks+" totalLength {3} base {4} client-base {5}", chunk.length, snapshotID, chunkID, totalLength, base, netClient.lastSnapshotBaseID);
 
         //skip snapshot IDs that have already been recieved OR snapshots that are too far in front
         if(base != -1 && (snapshotID < netClient.lastSnapshotBaseID || !netClient.recievedSnapshots.containsKey(base))){
@@ -214,10 +216,9 @@ public class NetClient extends Module{
             //total length exceeds that needed to hold one snapshot, therefore, it is split into chunks
             if(totalLength > NetServer.maxSnapshotSize){
                 //total amount of chunks to recieve
-                int totalChunks = Mathf.ceil((float) totalLength / NetServer.maxSnapshotSize);
 
                 //reset status when a new snapshot sending begins
-                if(netClient.currentSnapshotID != snapshotID){
+                if(netClient.currentSnapshotID != snapshotID || netClient.recievedChunks == null || netClient.recievedChunks.length != totalChunks){
                     netClient.currentSnapshotID = snapshotID;
                     netClient.currentSnapshot = new byte[totalLength];
                     netClient.recievedChunkCounter = 0;
@@ -234,7 +235,7 @@ public class NetClient extends Module{
                 }
 
                 //when all chunks have been recieved, begin
-                if(netClient.recievedChunkCounter >= totalChunks){
+                if(netClient.recievedChunkCounter >= totalChunks && netClient.currentSnapshot != null){
                     snapshot = netClient.currentSnapshot;
                 }else{
                     return;

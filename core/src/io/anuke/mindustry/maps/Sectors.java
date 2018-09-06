@@ -112,6 +112,11 @@ public class Sectors{
     }
 
     public void load(){
+        for(Sector sector : grid.values()){
+            sector.texture.dispose();
+        }
+        grid.clear();
+
         Array<Sector> out = Settings.getJson("sectors", Array.class);
 
         for(Sector sector : out){

@@ -238,19 +238,21 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 }
             }
 
-            if(onLiquid && velocity.len() > 0.4f && Timers.get(this, "flooreffect", 14 - (velocity.len() * floor.speedMultiplier) * 2f)){
+            if(onLiquid && velocity.len() > 0.4f && Mathf.chance((velocity.len() * floor.speedMultiplier) * 0.06f * Timers.delta())){
                 Effects.effect(floor.walkEffect, floor.liquidColor, x, y);
             }
 
-            status.handleApply(this, floor.status, floor.statusIntensity);
+            if(onLiquid){
+                status.handleApply(this, floor.status, floor.statusIntensity);
 
-            if(floor.damageTaken > 0f){
-                damagePeriodic(floor.damageTaken);
+                if(floor.damageTaken > 0f){
+                    damagePeriodic(floor.damageTaken);
+                }
             }
 
             if(onLiquid && floor.drownTime > 0){
                 drownTime += Timers.delta() * 1f / floor.drownTime;
-                if(Timers.get(this, "drowneffect", 15)){
+                if(Mathf.chance(Timers.delta() * 0.05f)){
                     Effects.effect(floor.drownUpdateEffect, floor.liquidColor, x, y);
                 }
             }else{
@@ -259,7 +261,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
             drownTime = Mathf.clamp(drownTime);
 
-            if(drownTime >= 1f){
+            if(drownTime >= 0.999f){
                 damage(health + 1);
             }
 
@@ -278,7 +280,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void damagePeriodic(float amount){
-        damage(amount * Timers.delta(), Timers.get(this, "damageeffect", 20));
+        damage(amount * Timers.delta(), hitTime <= -20 + hitDuration);
     }
 
     public void damage(float amount, boolean withEffect){

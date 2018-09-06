@@ -6,6 +6,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
+import static io.anuke.mindustry.Vars.*;
 
 public class Vault extends StorageBlock{
 
@@ -56,8 +57,8 @@ public class Vault extends StorageBlock{
 
             if(!(other.block() instanceof Vault)){
 
-                for(int ii = 0; ii < Item.all().size; ii++){
-                    Item item = Item.getByID(ii);
+                for(int ii = 0; ii < content.items().size; ii++){
+                    Item item = content.item(ii);
 
                     if(entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                         other.block().handleItem(item, other, in);
@@ -67,7 +68,7 @@ public class Vault extends StorageBlock{
                     }
                 }
             }else{
-                todump = Item.getByID(0);
+                todump = content.item(0);
 
                 if(other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
                     other.block().handleItem(removeItem(tile, null), other, in);

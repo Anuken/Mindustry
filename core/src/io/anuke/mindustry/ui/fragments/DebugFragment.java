@@ -2,12 +2,15 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.ui.dialogs.GenViewDialog;
 import io.anuke.ucore.core.Timers;
@@ -18,6 +21,7 @@ import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Log.LogHandler;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -123,7 +127,11 @@ public class DebugFragment extends Fragment{
                 t.row();
                 t.addButton("map", () -> new GenViewDialog().show());
                 t.row();
-                t.addButton("noclip", "toggle", () -> noclip = !noclip);
+                t.addButton("fire", () -> {
+                    for (int i = 0; i < 20; i++) {
+                        Bullet.create(TurretBullets.fireball, player, player.x, player.y, Mathf.random(360f));
+                    }
+                });
                 t.row();
                 t.addButton("team", "toggle", player::toggleTeam);
                 t.row();
@@ -142,7 +150,7 @@ public class DebugFragment extends Fragment{
                 t.row();
                 t.addButton("spawn", () -> {
                     FloatingDialog dialog = new FloatingDialog("debug spawn");
-                    for(UnitType type : UnitType.all()){
+                    for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
                         dialog.content().addImageButton("white", 40, () -> {
                             BaseUnit unit = type.create(player.getTeam());
                             unit.setWave();

@@ -31,6 +31,7 @@ public class SectorsDialog extends FloatingDialog{
     }
 
     void setup(){
+        selected = null;
         content().clear();
         buttons().clear();
 

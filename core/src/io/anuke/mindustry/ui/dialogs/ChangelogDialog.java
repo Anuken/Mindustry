@@ -63,7 +63,7 @@ public class ChangelogDialog extends FloatingDialog{
                 Table in = new Table("clear");
                 in.top().left().margin(10);
 
-                in.add("[accent]" + info.name);
+                in.add("[accent]" + info.name + "[LIGHT_GRAY]  | " + info.date);
                 if(info.build == Version.build){
                     in.row();
                     in.add("$text.changelog.current");

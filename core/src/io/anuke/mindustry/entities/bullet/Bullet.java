@@ -23,6 +23,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
 public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait{
@@ -30,7 +31,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     public Timer timer = new Timer(3);
     private Team team;
     private Object data;
-    private boolean supressCollision;
+    private boolean supressCollision, supressOnce, initialized;
 
     /**Internal use only!*/
     public Bullet(){
@@ -69,7 +70,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         bullet.lastPosition().set(x - bullet.velocity.x * backDelta, y - bullet.velocity.y * backDelta, bullet.angle());
         bullet.setLastUpdated(TimeUtils.millis());
         bullet.setUpdateSpacing((long) ((Timers.delta() / 60f) * 1000));
-        bullet.set(x - bullet.velocity.x * backDelta, y - bullet.velocity.y * backDelta);
+        bullet.set(x, y);
 
         bullet.add();
     }
@@ -91,8 +92,14 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         return type.collidesTiles;
     }
 
-    public void supressCollision(){
+    public void supress(){
         supressCollision = true;
+        supressOnce = true;
+    }
+
+    public void absorb(){
+        supressCollision = true;
+        remove();
     }
 
     public void resetOwner(Entity entity, Team team){
@@ -143,7 +150,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         velocity.x = data.readFloat();
         velocity.y = data.readFloat();
         team = Team.all[data.readByte()];
-        type = BulletType.getByID(data.readByte());
+        type = content.bullet(data.readByte());
     }
 
     @Override
@@ -163,7 +170,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
     @Override
     public boolean collides(SolidTrait other){
-        return type.collides && super.collides(other);
+        return type.collides && super.collides(other) && !supressCollision;
     }
 
     @Override
@@ -181,17 +188,15 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     public void update(){
         super.update();
 
-        if(type.hitTiles && collidesTiles() && !supressCollision){
+        if(type.hitTiles && collidesTiles() && !supressCollision && initialized){
             world.raycastEach(world.toTile(lastPosition().x), world.toTile(lastPosition().y), world.toTile(x), world.toTile(y), (x, y) -> {
 
                 Tile tile = world.tile(x, y);
                 if(tile == null) return false;
                 tile = tile.target();
 
-                if(tile.entity != null && tile.entity.collide(this) && !tile.entity.isDead() && (type.collidesTeam || tile.entity.tile.getTeam() != team)){
-                    if(tile.entity.getTeam() != team){
-                        tile.entity.collision(this);
-                    }
+                if(tile.entity != null && tile.entity.collide(this) && !tile.entity.isDead() && (type.collidesTeam || tile.getTeam() != team)){
+                    tile.entity.collision(this);
 
                     if(!supressCollision){
                         type.hitTile(this, tile);
@@ -205,7 +210,20 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
             });
         }
 
-        supressCollision = false;
+        if(supressOnce){
+            supressCollision = false;
+            supressOnce = false;
+        }
+
+        initialized = true;
+    }
+
+    @Override
+    protected void updateLife(){
+        if(time >= type.lifetime){
+            if(!supressCollision) type.despawned(this);
+            remove();
+        }
     }
 
     @Override
@@ -214,6 +232,9 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         timer.clear();
         team = null;
         data = null;
+        supressCollision = false;
+        supressOnce = false;
+        initialized = false;
     }
 
     @Override

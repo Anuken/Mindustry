@@ -2,14 +2,13 @@ package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.traits.TypeTrait;
-import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.ui.ContentDisplay;
@@ -21,15 +20,11 @@ import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 //TODO merge unit type with mech
-public class UnitType implements UnlockableContent{
-    private static byte lastid = 0;
-    private static Array<UnitType> types = new Array<>();
-
+public class UnitType extends UnlockableContent{
     protected final Supplier<? extends BaseUnit> constructor;
 
     public final String name;
     public final String description;
-    public final byte id;
     public float health = 60;
     public float hitsize = 5f;
     public float hitsizeTile = 4f;
@@ -54,12 +49,9 @@ public class UnitType implements UnlockableContent{
     public TextureRegion iconRegion, legRegion, baseRegion, region;
 
     public <T extends BaseUnit> UnitType(String name, Class<T> type, Supplier<T> mainConstructor){
-        this.id = lastid++;
         this.name = name;
         this.constructor = mainConstructor;
         this.description = Bundles.getOrNull("unit." + name + ".description");
-
-        types.add(this);
 
         TypeTrait.registerType(type, mainConstructor);
 
@@ -67,14 +59,6 @@ public class UnitType implements UnlockableContent{
             Log.err("Warning: unit '" + name + "' is missing a localized name. Add the follow to bundle.properties:");
             Log.err("unit." + this.name + ".name=" + Strings.capitalize(name.replace('-', '_')));
         }
-    }
-
-    public static UnitType getByID(byte id){
-        return types.get(id);
-    }
-
-    public static Array<UnitType> all(){
-        return types;
     }
 
     @Override
@@ -104,18 +88,13 @@ public class UnitType implements UnlockableContent{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "unit-type";
+    public ContentType getContentType(){
+        return ContentType.unit;
     }
 
     @Override
     public String getContentName(){
         return name;
-    }
-
-    @Override
-    public Array<? extends Content> getAll(){
-        return types;
     }
 
     public BaseUnit create(Team team){

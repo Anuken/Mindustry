@@ -87,7 +87,7 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
             if(checkShield(team, x2, y2)) break;
             float fangle = angle;
 
-            angle += Mathf.range(30f);
+            angle += Mathf.range(15f);
             rect.setSize(attractRange).setCenter(x, y);
 
             Units.getNearbyEnemies(team, rect, entity -> {

@@ -155,20 +155,13 @@ public class Renderer extends RendererModule{
         }else{
             Vector2 position = averagePosition();
 
-            if(!mobile){
-                if(players[0].isDead()){
-                    smoothCamera(position.x + 0.0001f, position.y + 0.0001f, 0.08f);
-                }else{
-                    setCamera(position.x + 0.0001f, position.y + 0.0001f);
-                }
+            if(players[0].isDead()){
+                smoothCamera(position.x + 0.0001f, position.y + 0.0001f, 0.08f);
+            }else if(!mobile){
+                setCamera(position.x + 0.0001f, position.y + 0.0001f);
             }
-
-            if(world.getSector() == null){
-                clampCamera(-tilesize / 2f, -tilesize / 2f + 1, world.width() * tilesize - tilesize / 2f, world.height() * tilesize - tilesize / 2f);
-            }else{
-                camera.position.x = Mathf.clamp(camera.position.x, -tilesize / 2f, world.width() * tilesize - tilesize / 2f);
-                camera.position.y = Mathf.clamp(camera.position.y, -tilesize / 2f, world.height() * tilesize - tilesize / 2f);
-            }
+            camera.position.x = Mathf.clamp(camera.position.x, -tilesize / 2f, world.width() * tilesize - tilesize / 2f);
+            camera.position.y = Mathf.clamp(camera.position.y, -tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
             float prex = camera.position.x, prey = camera.position.y;
             updateShake(0.75f);
@@ -417,9 +410,7 @@ public class Renderer extends RendererModule{
     public Vector2 averagePosition(){
         avgPosition.setZero();
 
-        drawAndInterpolate(playerGroup, p -> p.isLocal, p -> {
-            avgPosition.add(p.x, p.y);
-        });
+        drawAndInterpolate(playerGroup, p -> p.isLocal, p -> avgPosition.add(p.x, p.y));
 
         avgPosition.scl(1f / players.length);
         return avgPosition;

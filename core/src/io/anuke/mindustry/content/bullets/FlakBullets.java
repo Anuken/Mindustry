@@ -6,7 +6,7 @@ import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.bullet.FlakBulletType;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.ucore.util.Mathf;
 
 public class FlakBullets extends BulletList implements ContentList{

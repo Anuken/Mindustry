@@ -217,7 +217,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
         vec.set(target.getX() - x, target.getY() - y);
 
-        float length = Mathf.clamp((distanceTo(target) - circleLength) / 100f, -1f, 1f);
+        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((distanceTo(target) - circleLength) / 100f, -1f, 1f);
 
         vec.setLength(type.speed * Timers.delta() * length);
         if(length < 0) vec.rotate(180f);

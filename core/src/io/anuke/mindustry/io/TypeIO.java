@@ -154,7 +154,7 @@ public class TypeIO{
 
     @ReadClass(Block.class)
     public static Block readBlock(ByteBuffer buffer){
-        return Block.getByID(buffer.get());
+        return content.block(buffer.get());
     }
 
     @WriteClass(KickReason.class)
@@ -224,7 +224,7 @@ public class TypeIO{
 
     @ReadClass(Weapon.class)
     public static Weapon readWeapon(ByteBuffer buffer){
-        return Weapon.getByID(buffer.get());
+        return content.getByID(ContentType.weapon, buffer.get());
     }
 
     @WriteClass(Mech.class)
@@ -234,7 +234,7 @@ public class TypeIO{
 
     @ReadClass(Mech.class)
     public static Mech readMech(ByteBuffer buffer){
-        return Mech.getByID(buffer.get());
+        return content.getByID(ContentType.mech, buffer.get());
     }
 
     @WriteClass(Liquid.class)
@@ -244,7 +244,7 @@ public class TypeIO{
 
     @ReadClass(Liquid.class)
     public static Liquid readLiquid(ByteBuffer buffer){
-        return Liquid.getByID(buffer.get());
+        return content.liquid(buffer.get());
     }
 
     @WriteClass(AmmoType.class)
@@ -254,7 +254,7 @@ public class TypeIO{
 
     @ReadClass(AmmoType.class)
     public static AmmoType readAmmo(ByteBuffer buffer){
-        return AmmoType.getByID(buffer.get());
+        return content.getByID(ContentType.weapon, buffer.get());
     }
 
     @WriteClass(BulletType.class)
@@ -264,7 +264,7 @@ public class TypeIO{
 
     @ReadClass(BulletType.class)
     public static BulletType readBulletType(ByteBuffer buffer){
-        return BulletType.getByID(buffer.get());
+        return content.getByID(ContentType.bullet, buffer.get());
     }
 
     @WriteClass(Item.class)
@@ -275,7 +275,7 @@ public class TypeIO{
     @ReadClass(Item.class)
     public static Item readItem(ByteBuffer buffer){
         byte id = buffer.get();
-        return id == -1 ? null : Item.getByID(id);
+        return id == -1 ? null : content.item(id);
     }
 
     @WriteClass(Recipe.class)
@@ -285,7 +285,7 @@ public class TypeIO{
 
     @ReadClass(Recipe.class)
     public static Recipe readRecipe(ByteBuffer buffer){
-        return Recipe.getByID(buffer.get());
+        return content.recipe(buffer.get());
     }
 
     @WriteClass(String.class)
@@ -356,9 +356,9 @@ public class TypeIO{
         info.android = buffer.get() == 1;
         info.totalBlocksBroken = buffer.getInt();
         info.structureBlocksBroken = buffer.getInt();
-        info.lastBlockBroken = Block.getByID(buffer.getInt());
+        info.lastBlockBroken = content.block(buffer.getInt());
         info.totalBlocksPlaced = buffer.getInt();
-        info.lastBlockPlaced = Block.getByID(buffer.getInt());
+        info.lastBlockPlaced = content.block(buffer.getInt());
         byte[] uuid = new byte[8];
         buffer.get(uuid);
 

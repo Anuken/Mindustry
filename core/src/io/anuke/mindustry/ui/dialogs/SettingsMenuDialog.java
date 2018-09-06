@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
@@ -16,10 +17,14 @@ import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.SettingsDialog;
+import io.anuke.ucore.scene.ui.SettingsDialog.SettingsTable.Setting;
 import io.anuke.ucore.scene.ui.Slider;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -133,6 +138,60 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("effects", true);
         //game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
         game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Bundles.format("setting.seconds", i));
+        game.pref(new Setting(){
+            @Override
+            public void add(SettingsTable table){
+                table.addButton("$text.settings.cleardata", () -> {
+                    FloatingDialog dialog = new FloatingDialog("$text.settings.cleardata");
+                    dialog.setFillParent(false);
+                    dialog.content().defaults().size(230f, 60f).pad(3);
+                    dialog.addCloseButton();
+                    dialog.content().addButton("$text.settings.clearsectors", "clear", () -> {
+                        ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
+                            Settings.putString("sectors", "{}");
+                            Settings.save();
+                            world.sectors().load();
+                            dialog.hide();
+                        });
+                    });
+                    dialog.content().row();
+                    dialog.content().addButton("$text.settings.clearunlocks", "clear", () -> {
+                        ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
+                            Settings.putString("unlocks", "{}");
+                            Settings.save();
+                            dialog.hide();
+                        });
+                    });
+                    dialog.content().row();
+                    dialog.content().addButton("$text.settings.clearall", "clear", () -> {
+                        ui.showConfirm("$text.confirm", "$text.settings.clearall.confirm", () -> {
+                            Map<String, Object> map = new HashMap<>();
+                            for(String value : Settings.prefs().get().keySet()){
+                                if(value.contains("usid") || value.contains("uuid")){
+                                    map.put(value, Settings.prefs().getString(value));
+                                }
+                            }
+                            Settings.prefs().clear();
+                            Settings.prefs().put(map);
+                            Settings.save();
+
+                            if(!gwt){
+                                Settings.prefs().clear();
+                                for(FileHandle file : dataDirectory.list()){
+                                    file.deleteDirectory();
+                                }
+                            }
+
+                            Gdx.app.exit();
+                        });
+                    });
+                    dialog.content().row();
+                    dialog.show();
+                }).size(220f, 60f).pad(6).left();
+                table.add();
+                table.row();
+            }
+        });
 
         if(!gwt){
             graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Bundles.get("setting.fpscap.none") : Bundles.format("setting.fpscap.text", s)));

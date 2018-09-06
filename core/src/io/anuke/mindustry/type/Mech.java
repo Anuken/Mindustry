@@ -2,10 +2,8 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.ContentDisplay;
@@ -16,11 +14,7 @@ import io.anuke.ucore.util.Bundles;
 import static io.anuke.mindustry.Vars.mobile;
 
 //TODO merge unit type with mech
-public class Mech implements UnlockableContent{
-    private static Array<Mech> mechs = new Array<>();
-    private static byte lastid;
-
-    public final byte id;
+public class Mech extends UnlockableContent{
     public final String name;
     public final String description;
 
@@ -34,6 +28,7 @@ public class Mech implements UnlockableContent{
     public float armor = 1f;
 
     public float altChargeAlpha = 0.1f;
+    public float cellTrnsY = 0f;
     public float mineSpeed = 1f;
     public int drillPower = -1;
     public float carryWeight = 10f;
@@ -50,19 +45,8 @@ public class Mech implements UnlockableContent{
 
     public Mech(String name, boolean flying){
         this.flying = flying;
-        this.id = lastid++;
         this.name = name;
         this.description = Bundles.get("mech." + name + ".description");
-
-        mechs.add(this);
-    }
-
-    public static Array<Mech> all() {
-        return mechs;
-    }
-
-    public static Mech getByID(int id){
-        return mechs.get(id);
     }
 
     public String localizedName(){
@@ -108,8 +92,8 @@ public class Mech implements UnlockableContent{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "mech";
+    public ContentType getContentType(){
+        return ContentType.mech;
     }
 
     @Override
@@ -126,10 +110,5 @@ public class Mech implements UnlockableContent{
     @Override
     public String toString(){
         return localizedName();
-    }
-
-    @Override
-    public Array<? extends Content> getAll(){
-        return all();
     }
 }

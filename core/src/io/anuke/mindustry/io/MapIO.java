@@ -13,6 +13,7 @@ import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 
@@ -20,6 +21,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import static io.anuke.mindustry.Vars.content;
 
 /**
  * Reads and writes map files.
@@ -29,7 +31,7 @@ public class MapIO{
     private static IntIntMap defaultBlockMap = new IntIntMap();
 
     private static void loadDefaultBlocks(){
-        for(Block block : Block.all()){
+        for(Block block : content.blocks()){
             defaultBlockMap.put(block.id, block.id);
         }
     }
@@ -44,8 +46,8 @@ public class MapIO{
         for(int y = 0; y < data.height(); y++){
             for(int x = 0; x < data.width(); x++){
                 data.read(marker);
-                Block floor = Block.getByID(marker.floor);
-                Block wall = Block.getByID(marker.wall);
+                Block floor = content.block(marker.floor);
+                Block wall = content.block(marker.wall);
                 int wallc = ColorMapper.getBlockColor(wall);
                 if(wallc == 0 && (wall.update || wall.solid || wall.breakable)) wallc = Team.all[marker.team].intColor;
                 wallc = wallc == 0 ? ColorMapper.getBlockColor(floor) : wallc;
@@ -146,7 +148,7 @@ public class MapIO{
         for(int i = 0; i < blocks; i++){
             short id = stream.readShort();
             String name = stream.readUTF();
-            Block block = Block.getByName(name);
+            Block block = content.getByName(ContentType.block, name);
             if(block == null){
                 //Log.info("Map load info: No block with name {0} found.", name);
                 block = Blocks.air;
@@ -169,8 +171,8 @@ public class MapIO{
             stream.writeUTF(entry.value);
         }
 
-        stream.writeShort(Block.all().size);
-        for(Block block : Block.all()){
+        stream.writeShort(content.blocks().size);
+        for(Block block : content.blocks()){
             stream.writeShort(block.id);
             stream.writeUTF(block.name);
         }

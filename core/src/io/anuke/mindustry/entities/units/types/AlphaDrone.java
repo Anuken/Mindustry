@@ -16,6 +16,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.headless;
+import static io.anuke.mindustry.Vars.players;
+
 public class AlphaDrone extends FlyingUnit {
     static final float followDistance = 80f;
 
@@ -82,8 +85,8 @@ public class AlphaDrone extends FlyingUnit {
     public void readSave(DataInput stream) throws IOException{
         super.readSave(stream);
 
-        if(!Net.active()){
-            leader = Vars.players[0];
+        if(!Net.active() && !headless){
+            leader = players[0];
         }
     }
 }

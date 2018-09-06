@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.AmmoTypes;
 import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.type.AmmoType;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
 import io.anuke.ucore.graphics.Draw;
@@ -44,10 +44,11 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         hail = new ArtilleryTurret("hail"){{
             ammoTypes = new AmmoType[]{AmmoTypes.artilleryDense, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
-            reload = 100f;
+            reload = 70f;
             recoil = 2f;
-            range = 200f;
-            inaccuracy = 5f;
+            range = 230f;
+            inaccuracy = 1f;
+            shootCone = 10f;
             health = 120;
         }};
 
@@ -195,7 +196,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             restitution = 0.02f;
             recoil = 6f;
             shootShake = 2f;
-            range = 300f;
+            range = 320f;
 
             health = 550;
         }};

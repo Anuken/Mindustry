@@ -5,8 +5,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.Block;
@@ -22,12 +20,9 @@ import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Recipe implements UnlockableContent{
-    private static int lastid;
-    private static Array<Recipe> allRecipes = new Array<>();
+public class Recipe extends UnlockableContent{
     private static ObjectMap<Block, Recipe> recipeMap = new ObjectMap<>();
 
-    public final int id;
     public final Block result;
     public final ItemStack[] requirements;
     public final Category category;
@@ -35,13 +30,12 @@ public class Recipe implements UnlockableContent{
 
     public boolean desktopOnly = false, debugOnly = false;
     //the only gamemode in which the recipe shows up
-    public GameMode targetMode;
+    public boolean isPad;
 
-    private Block[] dependencies;
-    private Recipe[] recipeDependencies;
+    private UnlockableContent[] dependencies;
+    private Block[] blockDependencies;
 
     public Recipe(Category category, Block result, ItemStack... requirements){
-        this.id = lastid++;
         this.result = result;
         this.requirements = requirements;
         this.category = category;
@@ -55,7 +49,6 @@ public class Recipe implements UnlockableContent{
 
         this.cost = timeToPlace;
 
-        allRecipes.add(this);
         recipeMap.put(result, this);
     }
 
@@ -69,7 +62,7 @@ public class Recipe implements UnlockableContent{
         }
 
         r.clear();
-        for(Recipe recipe : allRecipes){
+        for(Recipe recipe : content.recipes()){
             if(recipe.category == category && (Vars.control.database().isUnlocked(recipe) || (debug && recipe.debugOnly))){
                 r.add(recipe);
             }
@@ -81,31 +74,19 @@ public class Recipe implements UnlockableContent{
      */
     public static void getByCategory(Category category, Array<Recipe> r){
         r.clear();
-        for(Recipe recipe : allRecipes){
+        for(Recipe recipe : content.recipes()){
             if(recipe.category == category){
                 r.add(recipe);
             }
         }
     }
 
-    public static Array<Recipe> all(){
-        return allRecipes;
-    }
-
     public static Recipe getByResult(Block block){
         return recipeMap.get(block);
     }
 
-    public static Recipe getByID(int id){
-        if(id < 0 || id >= allRecipes.size){
-            return null;
-        }else{
-            return allRecipes.get(id);
-        }
-    }
-
-    public Recipe setMode(GameMode mode){
-        this.targetMode = mode;
+    public Recipe setPad(){
+        this.isPad = true;
         return this;
     }
 
@@ -155,8 +136,8 @@ public class Recipe implements UnlockableContent{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "recipe";
+    public ContentType getContentType(){
+        return ContentType.recipe;
     }
 
     @Override
@@ -176,24 +157,23 @@ public class Recipe implements UnlockableContent{
 
     @Override
     public UnlockableContent[] getDependencies(){
-        if(dependencies == null){
-            return null;
-        }else if(recipeDependencies == null){
-            recipeDependencies = new Recipe[dependencies.length];
-            for(int i = 0; i < recipeDependencies.length; i++){
-                recipeDependencies[i] = Recipe.getByResult(dependencies[i]);
+        if(blockDependencies != null && dependencies == null){
+            dependencies = new UnlockableContent[blockDependencies.length];
+            for(int i = 0; i < dependencies.length; i++){
+                dependencies[i] = Recipe.getByResult(blockDependencies[i]);
             }
+            return dependencies;
         }
-        return recipeDependencies;
+        return dependencies;
     }
 
-    public Recipe setDependencies(Block... blocks){
-        this.dependencies = blocks;
+    public Recipe setDependencies(UnlockableContent... dependencies){
+        this.dependencies = dependencies;
         return this;
     }
 
-    @Override
-    public Array<? extends Content> getAll(){
-        return allRecipes;
+    public Recipe setDependencies(Block... dependencies){
+        this.blockDependencies = dependencies;
+        return this;
     }
 }
