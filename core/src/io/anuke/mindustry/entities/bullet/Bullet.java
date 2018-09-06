@@ -70,7 +70,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         bullet.lastPosition().set(x - bullet.velocity.x * backDelta, y - bullet.velocity.y * backDelta, bullet.angle());
         bullet.setLastUpdated(TimeUtils.millis());
         bullet.setUpdateSpacing((long) ((Timers.delta() / 60f) * 1000));
-        bullet.set(x - bullet.velocity.x * backDelta, y - bullet.velocity.y * backDelta);
+        bullet.set(x, y);
 
         bullet.add();
     }

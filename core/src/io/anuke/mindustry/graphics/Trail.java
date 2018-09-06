@@ -29,7 +29,7 @@ public class Trail{
 
         points.add(curx, cury);
 
-        if(points.size > (int)(length * 2 / Math.min(Timers.delta(), 1f))){
+        while(points.size > (int)(length * 2 / Math.min(Timers.delta(), 1f))){
             float[] items = points.items;
             System.arraycopy(items, 2, items, 0, points.size - 2);
             points.size -= 2;
