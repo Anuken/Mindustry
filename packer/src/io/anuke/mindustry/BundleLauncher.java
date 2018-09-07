@@ -33,7 +33,7 @@ public class BundleLauncher {
                 removals.clear();
 
                 for(String key : other.orderedKeys()){
-                    if(!base.containsKey(key)){
+                    if(!base.containsKey(key) && !key.contains(".description")){
                         removals.add(key);
                         Log.info("&lr- Removing unused key '{0}'...", key);
                     }
