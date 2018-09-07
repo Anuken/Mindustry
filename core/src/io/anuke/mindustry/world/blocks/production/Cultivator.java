@@ -101,7 +101,7 @@ public class Cultivator extends Drill{
 
     @Override
     public boolean isValid(Tile tile){
-        return tile.floor() == Blocks.grass;
+        return tile != null && tile.floor() == Blocks.grass;
     }
 
     @Override
