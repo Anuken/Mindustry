@@ -201,7 +201,7 @@ public class ContentLoader{
         //offset negative values by 256, as they are probably a product of byte overflow
         if(id < 0) id += 256;
 
-        if(temporaryMapper != null && temporaryMapper[type.ordinal()] != null){
+        if(temporaryMapper != null && temporaryMapper[type.ordinal()] != null && temporaryMapper[type.ordinal()].length != 0){
             return (T)temporaryMapper[type.ordinal()][id];
         }
 
