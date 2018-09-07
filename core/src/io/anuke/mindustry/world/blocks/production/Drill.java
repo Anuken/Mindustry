@@ -175,7 +175,7 @@ public class Drill extends Block{
             tryDump(tile);
         }
 
-        entity.drillTime += entity.warmup * Timers.delta();
+        entity.drillTime += entity.warmup * entity.delta();
 
         if(entity.items.total() < itemCapacity && entity.dominantItems > 0 && entity.cons.valid()){
 
@@ -186,7 +186,8 @@ public class Drill extends Block{
             }
 
             entity.warmup = Mathf.lerpDelta(entity.warmup, speed, warmupSpeed);
-            entity.progress += Timers.delta() * entity.dominantItems * speed * entity.warmup;
+            entity.progress += entity.delta()
+            * entity.dominantItems * speed * entity.warmup;
 
             if(Mathf.chance(Timers.delta() * updateEffectChance * entity.warmup))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));

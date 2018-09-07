@@ -146,7 +146,7 @@ public class MassDriver extends Block{
         }
 
         if(entity.reload > 0f){
-            entity.reload = Mathf.clamp(entity.reload - Timers.delta() / reloadTime);
+            entity.reload = Mathf.clamp(entity.reload - entity.delta() / reloadTime);
         }
 
         if(!entity.isRecieving){

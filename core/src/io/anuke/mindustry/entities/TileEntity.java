@@ -40,9 +40,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     private static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
     /**This value is only used for debugging.*/
     public static int sleepingEntities = 0;
+
     public Tile tile;
     public Timer timer;
     public float health;
+    public float timeScale = 1f, timeScaleDuration;
 
     public PowerModule power;
     public InventoryModule items;
@@ -83,6 +85,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         }
 
         return this;
+    }
+
+    /**Scaled delta.*/
+    public float delta(){
+        return Timers.delta() * timeScale;
     }
 
     /**Call when nothing is happening to the entity. This increments the internal sleep timer.*/
@@ -250,6 +257,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
                     Mathf.chance(0.009f * Timers.delta() * (1f - health / tile.block().health))){
 
                 Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
+            }
+
+            timeScaleDuration -= Timers.delta();
+            if(timeScaleDuration <= 0f){
+                timeScale = 1f;
             }
 
             if(health <= 0){

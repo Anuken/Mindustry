@@ -87,8 +87,8 @@ public class NuclearReactor extends PowerGenerator{
         float fullness = (float) fuel / itemCapacity;
 
         if(fuel > 0){
-            entity.heat += fullness * heating * Math.min(Timers.delta(), 4f);
-            entity.power.amount += powerMultiplier * fullness * Timers.delta();
+            entity.heat += fullness * heating * Math.min(entity.delta(), 4f);
+            entity.power.amount += powerMultiplier * fullness * entity.delta();
             entity.power.amount = Mathf.clamp(entity.power.amount, 0f, powerCapacity);
             if(entity.timer.get(timerFuel, fuelUseTime)){
                 entity.items.remove(consumes.item(), 1);
@@ -100,12 +100,12 @@ public class NuclearReactor extends PowerGenerator{
 
             if(liquid.temperature <= 0.5f){ //is coolant
                 float pow = coolantPower * (liquid.heatCapacity + 0.5f / liquid.temperature); //heat depleted per unit of liquid
-                float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), entity.heat / pow), maxLiquidUse * Timers.delta()); //max that can be cooled in terms of liquid
+                float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), entity.heat / pow), maxLiquidUse * entity.delta()); //max that can be cooled in terms of liquid
                 entity.heat -= maxUsed * pow;
                 entity.liquids.remove(liquid, maxUsed);
             }else{ //is heater
                 float heat = coolantPower * liquid.heatCapacity / 4f; //heat created per unit of liquid
-                float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), (1f - entity.heat) / heat), maxLiquidUse * Timers.delta()); //max liquid used
+                float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), (1f - entity.heat) / heat), maxLiquidUse * entity.delta()); //max liquid used
                 entity.heat += maxUsed * heat;
                 entity.liquids.remove(liquid, maxUsed);
             }
@@ -113,7 +113,7 @@ public class NuclearReactor extends PowerGenerator{
 
         if(entity.heat > smokeThreshold){
             float smoke = 1.0f + (entity.heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
-            if(Mathf.chance(smoke / 20.0 * Timers.delta())){
+            if(Mathf.chance(smoke / 20.0 * entity.delta())){
                 Effects.effect(BlockFx.reactorsmoke, tile.worldx() + Mathf.range(size * tilesize / 2f),
                         tile.worldy() + Mathf.random(size * tilesize / 2f));
             }

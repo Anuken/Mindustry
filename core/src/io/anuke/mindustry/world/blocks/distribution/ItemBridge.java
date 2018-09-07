@@ -152,8 +152,8 @@ public class ItemBridge extends Block{
     public void update(Tile tile){
         ItemBridgeEntity entity = tile.entity();
 
-        entity.time += entity.cycleSpeed * Timers.delta();
-        entity.time2 += (entity.cycleSpeed - 1f) * Timers.delta();
+        entity.time += entity.cycleSpeed * entity.delta();
+        entity.time2 += (entity.cycleSpeed - 1f) * entity.delta();
 
         removals.clear();
 

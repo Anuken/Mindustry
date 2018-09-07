@@ -6,7 +6,6 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
@@ -44,26 +43,26 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
         //liquid takes priority over solids
         if(liquid != null && entity.liquids.get(liquid) >= 0.001f && entity.cons.valid()){
             float powerPerLiquid = getLiquidEfficiency(liquid) * this.powerPerLiquid;
-            float used = Math.min(entity.liquids.get(liquid), maxLiquidGenerate * Timers.delta());
+            float used = Math.min(entity.liquids.get(liquid), maxLiquidGenerate * entity.delta());
             used = Math.min(used, (powerCapacity - entity.power.amount) / powerPerLiquid);
 
             entity.liquids.remove(liquid, used);
             entity.power.amount += used * powerPerLiquid;
 
-            if(used > 0.001f && Mathf.chance(0.05 * Timers.delta())){
+            if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
             }
         }else if(entity.cons.valid()){
 
-            float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * Timers.delta()) * entity.efficiency;
+            float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * entity.delta()) * entity.efficiency;
             float mfract = maxPower / (powerOutput);
 
             if(entity.generateTime > 0f){
-                entity.generateTime -= 1f / itemDuration * mfract;
+                entity.generateTime -= 1f / itemDuration * mfract * entity.delta();
                 entity.power.amount += maxPower;
                 entity.generateTime = Mathf.clamp(entity.generateTime);
 
-                if(Mathf.chance(Timers.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
+                if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
                     entity.damage(Mathf.random(8f));
                     Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
                 }

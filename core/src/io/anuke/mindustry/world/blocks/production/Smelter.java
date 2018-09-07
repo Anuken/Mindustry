@@ -24,7 +24,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Smelter extends Block{
     protected final int timerDump = timers++;
-    protected final int timerCraft = timers++;
 
     protected Item result;
 
@@ -99,10 +98,10 @@ public class Smelter extends Block{
 
         //decrement burntime
         if(entity.burnTime > 0){
-            entity.burnTime -= Timers.delta();
-            entity.heat = Mathf.lerp(entity.heat, 1f, 0.02f);
+            entity.burnTime -= entity.delta();
+            entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.02f);
         }else{
-            entity.heat = Mathf.lerp(entity.heat, 0f, 0.02f);
+            entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.02f);
         }
 
         //make sure it has all the items
@@ -118,11 +117,15 @@ public class Smelter extends Block{
             }
         }
 
+        entity.craftTime += entity.delta();
+
         if(entity.items.get(result) >= itemCapacity //output full
                 || entity.burnTime <= 0 //not burning
-                || !entity.timer.get(timerCraft, craftTime*baseSmeltSpeed)){ //not yet time
+                || entity.craftTime < craftTime*baseSmeltSpeed){ //not yet time
             return;
         }
+
+        entity.craftTime = 0f;
 
         boolean consumeInputs = true;
 
@@ -198,5 +201,6 @@ public class Smelter extends Block{
     public class SmelterEntity extends TileEntity{
         public float burnTime;
         public float heat;
+        public float craftTime;
     }
 }

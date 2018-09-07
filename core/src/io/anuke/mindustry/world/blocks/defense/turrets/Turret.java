@@ -213,7 +213,7 @@ public abstract class Turret extends Block{
                 }
 
                 if(shouldTurn(tile)){
-                    entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * Timers.delta());
+                    entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * entity.delta());
                 }
 
                 if(Angles.angleDist(entity.rotation, targetRot) < shootCone){
@@ -278,7 +278,7 @@ public abstract class Turret extends Block{
 
             entity.reload = 0f;
         }else{
-            entity.reload += Timers.delta() * peekAmmo(tile).reloadMultiplier;
+            entity.reload += tile.entity.delta() * peekAmmo(tile).reloadMultiplier;
         }
     }
 

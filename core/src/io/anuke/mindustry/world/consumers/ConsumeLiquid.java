@@ -6,7 +6,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 public class ConsumeLiquid extends Consume{
@@ -38,12 +37,12 @@ public class ConsumeLiquid extends Consume{
 
     @Override
     public void update(Block block, TileEntity entity){
-        entity.liquids.remove(liquid, Math.min(use(block), entity.liquids.get(liquid)));
+        entity.liquids.remove(liquid, Math.min(use(block, entity), entity.liquids.get(liquid)));
     }
 
     @Override
     public boolean valid(Block block, TileEntity entity){
-        return entity != null && entity.liquids != null && entity.liquids.get(liquid) >= use(block);
+        return entity != null && entity.liquids != null && entity.liquids.get(liquid) >= use(block, entity);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class ConsumeLiquid extends Consume{
         stats.add(BlockStat.inputLiquid, liquid);
     }
 
-    float use(Block block){
-        return Math.min(use * Timers.delta(), block.liquidCapacity);
+    float use(Block block, TileEntity entity){
+        return Math.min(use * entity.delta(), block.liquidCapacity);
     }
 }

@@ -12,7 +12,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
@@ -85,10 +84,10 @@ public class Separator extends Block{
     public void update(Tile tile){
         GenericCrafterEntity entity = tile.entity();
 
-        entity.totalProgress += entity.warmup * Timers.delta();
+        entity.totalProgress += entity.warmup * entity.delta();
 
         if(entity.cons.valid()){
-            entity.progress += 1f / filterTime;
+            entity.progress += 1f / filterTime*entity.delta();
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);

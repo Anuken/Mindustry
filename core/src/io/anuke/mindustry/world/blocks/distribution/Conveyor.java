@@ -204,7 +204,7 @@ public class Conveyor extends Block{
         entity.carrying += unit.getMass();
 
         if(entity.convey.size * itemSpace < 0.9f){
-            unit.getVelocity().add((tx * speed + centerx) * Timers.delta(), (ty * speed + centery) * Timers.delta());
+            unit.getVelocity().add((tx * speed + centerx) * entity.delta(), (ty * speed + centery) * entity.delta());
         }
     }
 
@@ -231,7 +231,7 @@ public class Conveyor extends Block{
             if(entity.minCarry >= pos.y && entity.minCarry <= nextpos){
                 nextpos = entity.minCarry;
             }
-            float maxmove = Math.min(nextpos - pos.y, speed * Timers.delta());
+            float maxmove = Math.min(nextpos - pos.y, speed * entity.delta());
 
             if(maxmove > minmove){
                 pos.y += maxmove;

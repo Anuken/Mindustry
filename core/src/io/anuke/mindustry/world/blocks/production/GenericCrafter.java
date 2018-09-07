@@ -83,9 +83,9 @@ public class GenericCrafter extends Block{
 
         if(entity.cons.valid() && tile.entity.items.get(output) < itemCapacity){
 
-            entity.progress += 1f / craftTime * Timers.delta();
-            entity.totalProgress += Timers.delta();
-            entity.warmup = Mathf.lerp(entity.warmup, 1f, 0.02f);
+            entity.progress += 1f / craftTime * entity.delta();
+            entity.totalProgress += entity.delta();
+            entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
 
             if(Mathf.chance(Timers.delta() * updateEffectChance))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 4f), entity.y + Mathf.range(size * 4));

@@ -19,7 +19,7 @@ public class BlockFx extends FxList implements ContentList{
     public static Effect reactorsmoke, nuclearsmoke, nuclearcloud, redgeneratespark, generatespark, fuelburn, plasticburn,
     pulverize, pulverizeRed, pulverizeRedder, pulverizeSmall, pulverizeMedium, producesmoke, smeltsmoke, formsmoke, blastsmoke,
     lava, dooropen, doorclose, dooropenlarge, doorcloselarge, purify, purifyoil, purifystone, generate, mine, mineBig, mineHuge,
-    smelt, teleportActivate, teleport, teleportOut, ripple, bubble, commandSend, healBlock, healBlockFull, healWaveMend, overdriveWave;
+    smelt, teleportActivate, teleport, teleportOut, ripple, bubble, commandSend, healBlock, healBlockFull, healWaveMend, overdriveWave, overdriveBlockFull;
 
     @Override
     public void load(){
@@ -309,6 +309,13 @@ public class BlockFx extends FxList implements ContentList{
         healBlockFull = new Effect(20, e -> {
             Draw.color(e.color);
             Draw.alpha(e.fout());
+            Fill.square(e.x, e.y, e.rotation * tilesize);
+            Draw.color();
+        });
+
+        overdriveBlockFull = new Effect(60, e -> {
+            Draw.color(e.color);
+            Draw.alpha(e.fslope() * 0.5f);
             Fill.square(e.x, e.y, e.rotation * tilesize);
             Draw.color();
         });
