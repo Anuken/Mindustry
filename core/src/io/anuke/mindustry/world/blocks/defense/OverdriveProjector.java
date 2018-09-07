@@ -3,16 +3,13 @@ package io.anuke.mindustry.world.blocks.defense;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
@@ -21,12 +18,12 @@ public class OverdriveProjector extends Block{
     private static Color phase = Color.valueOf("ffd59e");
 
     protected int timerUse = timers ++;
+    protected int timerApply = timers ++;
 
     protected TextureRegion topRegion;
-    protected float reload = 250f;
-    protected float range = 50f;
-    protected float healPercent = 6f;
-    protected float phaseBoost = 10f;
+    protected float reload = 60f;
+    protected float range = 100f;
+    protected float phaseBoost = 30f;
     protected float useTime = 300f;
 
     public OverdriveProjector(String name){
@@ -47,28 +44,28 @@ public class OverdriveProjector extends Block{
     @Override
     public void update(Tile tile){
         OverdriveEntity entity = tile.entity();
-        entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() ? 1f : 0f, 0.08f);
-        entity.charge += entity.heat * Timers.delta();
 
+        entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() ? 1f : 0f, 0.08f);
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, (float)entity.items.get(consumes.item()) / itemCapacity, 0.1f);
 
         if(entity.timer.get(timerUse, useTime) && entity.items.total() > 0){
             entity.items.remove(consumes.item(), 1);
         }
 
-        if(entity.charge >= reload){
-            float realRange = range + entity.phaseHeat * 20f;
+        if(entity.heat > 0.5f && entity.timer.get(timerApply, 10)){
+            float realRange = range + entity.phaseHeat * phaseBoost;
 
-            Effects.effect(BlockFx.commandSend, Hue.mix(color, phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
-            Units.getNearby(tile.getTeam(), tile.drawx(), tile.drawy(), realRange, unit -> unit.applyEffect(StatusEffects.overdrive, 1f));
-            entity.charge = 0f;
+            Units.getNearby(tile.getTeam(), tile.drawx(), tile.drawy(), realRange, unit -> unit.applyEffect(StatusEffects.overdrive, 1f + entity.phaseHeat));
         }
     }
 
     @Override
     public void drawSelect(Tile tile){
+        OverdriveEntity entity = tile.entity();
+        float realRange = range + entity.phaseHeat * phaseBoost;
+
         Draw.color(color);
-        Lines.dashCircle(tile.drawx(), tile.drawy() - 1f, range);
+        Lines.poly(tile.drawx(), tile.drawy(), 300, realRange);
         Draw.color();
     }
 
@@ -99,7 +96,6 @@ public class OverdriveProjector extends Block{
 
     class OverdriveEntity extends TileEntity{
         float heat;
-        float charge;
         float phaseHeat;
     }
 }

@@ -35,16 +35,16 @@ public abstract class SaveFileVersion{
 
         byte mapped = stream.readByte();
 
-        MappableContent[][] map = new MappableContent[mapped][0];
+        MappableContent[][] map = new MappableContent[ContentType.values().length][0];
 
         for (int i = 0; i < mapped; i++) {
             ContentType type = ContentType.values()[stream.readByte()];
             short total = stream.readShort();
-            map[i] = new MappableContent[total];
+            map[type.ordinal()] = new MappableContent[total];
 
             for (int j = 0; j < total; j++) {
                 String name = stream.readUTF();
-                map[i][j] = content.getByName(type, name);
+                map[type.ordinal()][j] = content.getByName(type, name);
             }
         }
 

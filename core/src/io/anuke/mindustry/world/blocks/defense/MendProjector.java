@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -64,7 +63,7 @@ public class MendProjector extends Block{
         if(entity.charge >= reload){
             float realRange = range + entity.phaseHeat * 20f;
 
-            Effects.effect(UnitFx.healWaveMend, Hue.mix(color, phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
+            Effects.effect(BlockFx.healWaveMend, Hue.mix(color, phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
             entity.charge = 0f;
 
             Timers.run(10f, () -> {

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.traits.Saveable;
@@ -8,10 +9,12 @@ import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.ThreadArray;
+import io.anuke.ucore.util.Tmp;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
 import static io.anuke.mindustry.Vars.content;
 /**
  * Class for controlling status effects on an entity.
@@ -57,6 +60,20 @@ public class StatusController implements Saveable{
         StatusEntry entry = Pooling.obtain(StatusEntry.class);
         entry.set(effect, newTime);
         statuses.add(entry);
+    }
+
+    public Color getStatusColor(){
+        if(statuses.size == 0){
+            return Tmp.c1.set(Color.WHITE);
+        }
+
+        float r = 0f, g = 0f, b = 0f;
+        for(StatusEntry entry : statuses){
+            r += entry.effect.color.r;
+            g += entry.effect.color.g;
+            b += entry.effect.color.b;
+        }
+        return Tmp.c1.set(r / statuses.size, g / statuses.size, b / statuses.size, 1f);
     }
 
     public void clear(){

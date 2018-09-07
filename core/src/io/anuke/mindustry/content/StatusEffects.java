@@ -121,10 +121,10 @@ public class StatusEffects implements ContentList{
             }
         };
 
-        overdrive = new StatusEffect(6f){
+        overdrive = new StatusEffect(60f*15){
             {
                 armorMultiplier = 0.95f;
-                speedMultiplier = 1.05f;
+                speedMultiplier = 1.15f;
                 damageMultiplier = 1.4f;
             }
 
@@ -132,6 +132,10 @@ public class StatusEffects implements ContentList{
             public void update(Unit unit, float time){
                 //idle regen boosted
                 unit.health += 0.01f * Timers.delta();
+
+                if(Mathf.chance(Timers.delta() * 0.25f)){
+                    Effects.effect(EnvironmentFx.overdriven, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f), 0f, unit);
+                }
             }
         };
 
