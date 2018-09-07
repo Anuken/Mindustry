@@ -36,6 +36,7 @@ public class Recipes implements ContentList{
         //projectors
         new Recipe(defense, DefenseBlocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
         new Recipe(defense, DefenseBlocks.overdriveProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
+        new Recipe(defense, DefenseBlocks.forceProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
 
         //extra blocks
         new Recipe(defense, DefenseBlocks.shockMine, new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 25))
@@ -58,7 +59,7 @@ public class Recipes implements ContentList{
         new Recipe(distribution, DistributionBlocks.titaniumconveyor, new ItemStack(Items.copper, 2), new ItemStack(Items.titanium, 1));
         new Recipe(distribution, DistributionBlocks.phaseConveyor, new ItemStack(Items.phasematter, 10), new ItemStack(Items.silicon, 15), new ItemStack(Items.lead, 20), new ItemStack(Items.densealloy, 20));
 
-        //starter lead transporation
+        //starter lead transportation
         new Recipe(distribution, DistributionBlocks.junction, new ItemStack(Items.copper, 2));
         new Recipe(distribution, DistributionBlocks.router, new ItemStack(Items.copper, 6));
 

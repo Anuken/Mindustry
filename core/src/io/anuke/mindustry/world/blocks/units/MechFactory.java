@@ -75,6 +75,8 @@ public class MechFactory extends Block{
 
     @Remote(called = Loc.server)
     public static void onMechFactoryDone(Tile tile){
+        if(!(tile.entity instanceof MechFactoryEntity)) return;
+
         MechFactoryEntity entity = tile.entity();
 
         Effects.effect(Fx.spawn, entity);
