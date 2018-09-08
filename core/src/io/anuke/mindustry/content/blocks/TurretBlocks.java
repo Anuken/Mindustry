@@ -29,18 +29,6 @@ public class TurretBlocks extends BlockList implements ContentList{
             inaccuracy = 2f;
             rotatespeed = 10f;
         }};
-/*
-		scatter = new BurstTurret("scatter") {{
-			ammoTypes = new AmmoType[]{AmmoTypes.flakLead, AmmoTypes.flakExplosive, AmmoTypes.flakPlastic};
-			ammoPerShot = 1;
-			shots = 3;
-			reload = 60f;
-			restitution = 0.03f;
-			recoil = 1.5f;
-			burstSpacing = 1f;
-			inaccuracy = 7f;
-			ammoUseEffect = ShootFx.shellEjectSmall;
-		}};*/
 
         hail = new ArtilleryTurret("hail"){{
             ammoTypes = new AmmoType[]{AmmoTypes.artilleryDense, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
@@ -70,7 +58,7 @@ public class TurretBlocks extends BlockList implements ContentList{
                 health = 160;
 
                 drawer = (tile, entity) -> Draw.rect(entity.target != null ? shootRegion : region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-                }
+            }
         };
 
         wave = new LiquidTurret("wave"){{
@@ -115,19 +103,15 @@ public class TurretBlocks extends BlockList implements ContentList{
             health = 320;
         }};
 
-        arc = new LaserTurret("arc"){{
-            shootType = AmmoTypes.lightning;
-            reload = 100f;
-            chargeTime = 70f;
+        arc = new PowerTurret("arc"){{
+            shootType = AmmoTypes.arc;
+            reload = 30f;
             shootShake = 1f;
-            chargeMaxDelay = 30f;
-            chargeEffects = 7;
+            range = 60f;
             shootEffect = ShootFx.lightningShoot;
-            chargeEffect = ShootFx.lightningCharge;
-            chargeBeginEffect = ShootFx.lancerLaserChargeBegin;
             heatColor = Color.RED;
-            recoil = 3f;
-            size = 2;
+            recoil = 1f;
+            size = 1;
         }};
 
         swarmer = new BurstTurret("swarmer"){{

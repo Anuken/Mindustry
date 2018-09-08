@@ -15,7 +15,7 @@ public class AmmoTypes implements ContentList{
             flakExplosive, flakPlastic, flakSurge,
             missileExplosive, missileIncindiary, missileSurge,
             artilleryDense, artilleryPlastic, artilleryHoming, artilleryIncindiary, artilleryExplosive,
-            basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid;
+            basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid, arc;
 
     @Override
     public void load(){
@@ -195,6 +195,8 @@ public class AmmoTypes implements ContentList{
         lancerLaser = new AmmoType(TurretBullets.lancerLaser);
 
         lightning = new AmmoType(TurretBullets.lightning);
+
+        arc = new AmmoType(TurretBullets.arc);
 
         spectreLaser = new AmmoType(TurretBullets.lancerLaser);
 

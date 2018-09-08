@@ -31,7 +31,7 @@ import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
 public class TurretBullets extends BulletList implements ContentList{
-    public static BulletType fireball, basicFlame, lancerLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt, healBullet;
+    public static BulletType fireball, basicFlame, lancerLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt, healBullet, arc;
 
     @Override
     public void load(){
@@ -229,6 +229,7 @@ public class TurretBullets extends BulletList implements ContentList{
                 statusIntensity = 0.5f;
             }
         };
+
         lightning = new BulletType(0.001f, 14){
             {
                 lifetime = 1;
@@ -243,6 +244,23 @@ public class TurretBullets extends BulletList implements ContentList{
             @Override
             public void init(Bullet b){
                 Lightning.create(b.getTeam(), hiteffect, Palette.lancerLaser, damage, b.x, b.y, b.angle(), 30);
+            }
+        };
+
+        arc = new BulletType(0.001f, 11){
+            {
+                lifetime = 1;
+                despawneffect = Fx.none;
+                hiteffect = BulletFx.hitLancer;
+            }
+
+            @Override
+            public void draw(Bullet b){
+            }
+
+            @Override
+            public void init(Bullet b){
+                Lightning.create(b.getTeam(), hiteffect, Palette.lancerLaser, damage, b.x, b.y, b.angle(), 25);
             }
         };
 

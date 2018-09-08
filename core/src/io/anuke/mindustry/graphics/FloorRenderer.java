@@ -253,8 +253,6 @@ public class FloorRenderer{
     public void clearTiles(){
         if(cbatch != null) cbatch.dispose();
 
-        Timers.mark();
-
         if(world.getSector() != null){
             gutter = mapPadding;
         }else{
@@ -265,8 +263,6 @@ public class FloorRenderer{
             chunksy = Mathf.ceil((float) (world.height() + gutter) / chunksize) ;
         cache = new Chunk[chunksx][chunksy];
         cbatch = new CacheBatch(world.width() * world.height() * 4 * 4);
-
-        Log.info("Time to create: {0}", Timers.elapsed());
 
         Timers.mark();
 
