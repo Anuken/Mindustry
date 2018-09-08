@@ -46,10 +46,14 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     }
 
     public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl){
-        create(type, owner, team, x, y, angle, velocityScl, null);
+        create(type, owner, team, x, y, angle, velocityScl, 1f, null);
     }
 
-    public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, Object data){
+    public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
+        create(type, owner, team, x, y, angle, velocityScl, lifetimeScl, null);
+    }
+
+    public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Object data){
         Bullet bullet = Pooling.obtain(Bullet.class);
         bullet.type = type;
         bullet.owner = owner;
@@ -63,6 +67,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
         bullet.team = team;
         bullet.type = type;
+        bullet.time(type.lifetime() * (1f - lifetimeScl));
 
         //translate bullets backwards, purely for visual reasons
         float backDelta = Timers.delta();

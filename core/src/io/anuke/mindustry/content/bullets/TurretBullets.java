@@ -247,7 +247,7 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        arc = new BulletType(0.001f, 11){
+        arc = new BulletType(0.001f, 7){
             {
                 lifetime = 1;
                 despawneffect = Fx.none;

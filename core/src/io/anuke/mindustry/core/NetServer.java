@@ -27,6 +27,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.Entity;
+import io.anuke.ucore.io.ByteBufferOutput;
 import io.anuke.ucore.io.CountableByteArrayOutputStream;
 import io.anuke.ucore.io.delta.ByteDeltaEncoder;
 import io.anuke.ucore.io.delta.ByteMatcherHash;
@@ -39,6 +40,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.zip.DeflaterOutputStream;
 
@@ -63,6 +65,9 @@ public class NetServer extends Module{
     /**Maps connection IDs to players.*/
     private IntMap<Player> connections = new IntMap<>();
     private boolean closing = false;
+
+    private ByteBuffer writeBuffer = ByteBuffer.allocate(127);
+    private ByteBufferOutput outputBuffer = new ByteBufferOutput(writeBuffer);
 
     /**Stream for writing player sync data to.*/
     private CountableByteArrayOutputStream syncStream = new CountableByteArrayOutputStream();
@@ -173,6 +178,15 @@ public class NetServer extends Module{
             player.setNet(player.x, player.y);
             player.color.set(packet.color);
             player.color.a = 1f;
+
+            try{
+                writeBuffer.position(0);
+                player.write(outputBuffer);
+            }catch(Throwable t){
+                t.printStackTrace();
+                kick(id, KickReason.nameEmpty);
+                return;
+            }
 
             if(state.mode.isPvp){
                 //find team with minimum amount of players and auto-assign player to that.

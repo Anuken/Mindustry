@@ -8,7 +8,7 @@ import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.ContentType;
 
 public class UnitTypes implements ContentList{
-    public static UnitType drone, alphaDrone, dagger, interceptor, monsoon, titan, fabricator;
+    public static UnitType drone, alphaDrone, dagger, interceptor, monsoon, titan, fortress, fabricator;
 
     @Override
     public void load(){
@@ -50,6 +50,15 @@ public class UnitTypes implements ContentList{
         }};
 
         titan = new UnitType("titan", Titan.class, Titan::new){{
+            maxVelocity = 0.8f;
+            speed = 0.18f;
+            drag = 0.4f;
+            range = 10f;
+            weapon = Weapons.flamethrower;
+            health = 500;
+        }};
+
+        fortress = new UnitType("fortress", Fortress.class, Fortress::new){{
             maxVelocity = 0.8f;
             speed = 0.18f;
             drag = 0.4f;

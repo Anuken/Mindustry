@@ -107,6 +107,8 @@ public class TurretBlocks extends BlockList implements ContentList{
             shootType = AmmoTypes.arc;
             reload = 30f;
             shootShake = 1f;
+            powerUsed = 5f;
+            powerCapacity = 30f;
             range = 60f;
             shootEffect = ShootFx.lightningShoot;
             heatColor = Color.RED;

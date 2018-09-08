@@ -92,7 +92,7 @@ public class MassDriver extends Block{
         other.isRecieving = true;
         Bullet.create(TurretBullets.driverBolt, entity, entity.getTeam(),
                 tile.drawx() + Angles.trnsx(angle, driver.translation), tile.drawy() + Angles.trnsy(angle, driver.translation),
-                angle, 1f, data);
+                angle, 1f, 1f, data);
 
         Effects.effect(driver.shootEffect, tile.drawx() + Angles.trnsx(angle, driver.translation),
                 tile.drawy() + Angles.trnsy(angle, driver.translation), angle);
