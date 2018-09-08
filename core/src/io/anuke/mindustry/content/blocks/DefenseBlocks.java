@@ -77,13 +77,13 @@ public class DefenseBlocks extends BlockList implements ContentList{
         }};
 
         overdriveProjector = new OverdriveProjector("overdrive-projector"){{
-            consumes.power(0.25f);
+            consumes.power(0.35f);
             size = 2;
             consumes.item(Items.phasematter).optional(true);
         }};
 
         forceProjector = new ForceProjector("force-projector"){{
-            consumes.power(0.25f);
+            consumes.power(0.2f);
             size = 3;
             consumes.item(Items.phasematter).optional(true);
         }};

@@ -170,7 +170,7 @@ public class Shaders{
     public static class Shield extends Shader{
         public static final int MAX_HITS = 3 * 64;
         public Color color = new Color();
-        public FloatArray hits;
+        public FloatArray hits = new FloatArray();
 
         public Shield(){
             super("shield", "default");

@@ -23,6 +23,7 @@ public enum BlockStat{
 
     powerCapacity(StatCategory.power),
     powerUse(StatCategory.power),
+    powerDamage(StatCategory.power),
     powerRange(StatCategory.power),
     powerTransferSpeed(StatCategory.power),
     maxPowerGeneration(StatCategory.power),

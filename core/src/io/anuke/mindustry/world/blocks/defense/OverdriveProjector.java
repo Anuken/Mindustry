@@ -27,9 +27,9 @@ public class OverdriveProjector extends Block{
     protected int timerUse = timers ++;
 
     protected TextureRegion topRegion;
-    protected float reload = 250f;
+    protected float reload = 260f;
     protected float range = 80f;
-    protected float speedBoost = 2f;
+    protected float speedBoost = 1.5f;
     protected float speedBoostPhase = 0.5f;
     protected float useTime = 300f;
 
@@ -39,6 +39,7 @@ public class OverdriveProjector extends Block{
         update = true;
         hasPower = true;
         hasItems = true;
+        canOverdrive = false;
         itemCapacity = 10;
     }
 
@@ -67,28 +68,26 @@ public class OverdriveProjector extends Block{
             Effects.effect(BlockFx.overdriveWave, Hue.mix(color, phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
             entity.charge = 0f;
 
-            Timers.run(10f, () -> {
-                int tileRange = (int)(realRange / tilesize);
-                healed.clear();
+            int tileRange = (int)(realRange / tilesize);
+            healed.clear();
 
-                for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
-                    for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                        if(Vector2.dst(x, y, tile.x, tile.y) > realRange) continue;
+            for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
+                for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
+                    if(Vector2.dst(x, y, tile.x, tile.y) > realRange) continue;
 
-                        Tile other = world.tile(x, y);
+                    Tile other = world.tile(x, y);
 
-                        if(other == null) continue;
-                        other = other.target();
+                    if(other == null) continue;
+                    other = other.target();
 
-                        if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.packedPosition()) && other.entity != null){
-                            other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
-                            other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
-                            Effects.effect(BlockFx.overdriveBlockFull, Hue.mix(color, phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
-                            healed.add(other.packedPosition());
-                        }
+                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.packedPosition()) && other.entity != null){
+                        other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
+                        other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
+                        Effects.effect(BlockFx.overdriveBlockFull, Hue.mix(color, phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
+                        healed.add(other.packedPosition());
                     }
                 }
-            });
+            }
         }
     }
 

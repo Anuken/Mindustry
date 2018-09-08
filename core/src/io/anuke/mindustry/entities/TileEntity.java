@@ -260,7 +260,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             }
 
             timeScaleDuration -= Timers.delta();
-            if(timeScaleDuration <= 0f){
+            if(timeScaleDuration <= 0f || !tile.block().canOverdrive){
                 timeScale = 1f;
             }
 

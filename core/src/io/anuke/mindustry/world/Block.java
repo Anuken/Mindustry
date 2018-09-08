@@ -103,6 +103,8 @@ public class Block extends BaseBlock {
     public boolean turretIcon = false;
     /**Whether units target this block.*/
     public boolean targetable = true;
+    /**Whether the overdrive core has any effect on this block.*/
+    public boolean canOverdrive = true;
 
     protected Array<Tile> tempTiles = new Array<>();
     protected Color tempColor = new Color();

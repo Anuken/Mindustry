@@ -20,8 +20,12 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.entities.EntityDraw;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.EffectEntity;
@@ -268,6 +272,13 @@ public class Renderer extends RendererModule{
         overlays.drawBottom();
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
         overlays.drawTop();
+
+        Shaders.shield.color.set(Palette.accent);
+
+        Graphics.beginShaders(Shaders.shield);
+        EntityDraw.draw(shieldGroup);
+        EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
+        Graphics.endShaders();
 
         if(showPaths && debug) drawDebug();
 

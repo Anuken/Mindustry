@@ -17,6 +17,7 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.EffectEntity;
@@ -129,7 +130,7 @@ public class Vars{
     public static EntityGroup<EffectEntity> effectGroup;
     public static EntityGroup<DrawTrait> groundEffectGroup;
     public static EntityGroup<ItemDrop> itemGroup;
-
+    public static EntityGroup<ShieldEntity> shieldGroup;
     public static EntityGroup<Puddle> puddleGroup;
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<BaseUnit>[] unitGroups;
@@ -163,6 +164,7 @@ public class Vars{
         groundEffectGroup = Entities.addGroup(DrawTrait.class, false);
         puddleGroup = Entities.addGroup(Puddle.class, false).enableMapping();
         itemGroup = Entities.addGroup(ItemDrop.class).enableMapping();
+        shieldGroup = Entities.addGroup(ShieldEntity.class);
         fireGroup = Entities.addGroup(Fire.class, false).enableMapping();
         unitGroups = new EntityGroup[Team.all.length];
 
