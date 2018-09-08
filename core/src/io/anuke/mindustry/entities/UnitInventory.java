@@ -25,13 +25,13 @@ public class UnitInventory implements Saveable{
 
     @Override
     public void writeSave(DataOutput stream) throws IOException{
-        stream.writeShort(item.amount);
+        stream.writeByte(item.amount);
         stream.writeByte(item.item.id);
     }
 
     @Override
     public void readSave(DataInput stream) throws IOException{
-        short iamount = stream.readShort();
+        int iamount = stream.readUnsignedByte();
         byte iid = stream.readByte();
 
         item.item = content.item(iid);

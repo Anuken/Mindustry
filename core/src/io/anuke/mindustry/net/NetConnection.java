@@ -1,28 +1,12 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.net.Net.SendMode;
 
 public abstract class NetConnection{
     public final int id;
     public final String address;
 
-    /**
-     * The current base snapshot that the client is absolutely confirmed to have recieved.
-     * All sent snapshots should be taking the diff from this base snapshot, if it isn't null.
-     */
-    //public byte[] currentBaseSnapshot;
-    /**
-     * ID of the current base snapshot.
-     */
-   // public int currentBaseID = -1;
-
-    //public int lastSentBase = -1;
-   // public byte[] lastSentSnapshot;
-    //public byte[] lastSentRawSnapshot;
-    public int lastRecievedSnapshotID = -1;
     public int lastSentSnapshotID = -1;
-    public IntMap<byte[]> sent = new IntMap<>();
 
     /**ID of last recieved client snapshot.*/
     public int lastRecievedClientSnapshot = -1;
@@ -31,6 +15,7 @@ public abstract class NetConnection{
 
     public boolean hasConnected = false;
     public boolean hasBegunConnecting = false;
+    public float viewWidth, viewHeight, viewX, viewY;
 
     public NetConnection(int id, String address){
         this.id = id;

@@ -135,6 +135,10 @@ public class NetworkIO{
             }
 
             //now write a snapshot.
+            player.con.viewX = world.width() * tilesize/2f;
+            player.con.viewY = world.height() * tilesize/2f;
+            player.con.viewWidth = world.width() * tilesize;
+            player.con.viewHeight = world.height() * tilesize;
             netServer.writeSnapshot(player, stream);
 
         }catch(IOException e){
