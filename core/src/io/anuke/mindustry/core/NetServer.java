@@ -228,9 +228,9 @@ public class NetServer extends Module{
     }
 
     /** Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.*/
-    private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID){
+    private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID, int uncompressedLength){
         if(bytes.length < maxSnapshotSize){
-            scheduleSnapshot(() -> Call.onSnapshot(userid, bytes, snapshotID, (short) 0, bytes.length));
+            scheduleSnapshot(() -> Call.onSnapshot(userid, bytes, snapshotID, (short) 0, bytes.length, uncompressedLength));
         }else{
             int remaining = bytes.length;
             int offset = 0;
@@ -247,7 +247,7 @@ public class NetServer extends Module{
                 }
 
                 short fchunk = (short)chunkid;
-                scheduleSnapshot(() -> Call.onSnapshot(userid, toSend, snapshotID, fchunk, bytes.length));
+                scheduleSnapshot(() -> Call.onSnapshot(userid, toSend, snapshotID, fchunk, bytes.length, uncompressedLength));
 
                 remaining -= used;
                 offset += used;
@@ -608,10 +608,12 @@ public class NetServer extends Module{
                 dataStream.close();
 
                 byte[] bytes = syncStream.toByteArray();
+                int uncompressed = bytes.length;
+                bytes = Net.compressSnapshot(bytes);
                 int snapid = connection.lastSentSnapshotID ++;
 
                 if(debugSnapshots) Log.info("Sent snapshot: {0} bytes.", bytes.length);
-                sendSplitSnapshot(connection.id, bytes, snapid);
+                sendSplitSnapshot(connection.id, bytes, snapid, uncompressed);
             }
 
         }catch(IOException e){

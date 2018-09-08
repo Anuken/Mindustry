@@ -119,6 +119,14 @@ public class Net{
         active = false;
     }
 
+    public static byte[] compressSnapshot(byte[] input){
+        return serverProvider.compressSnapshot(input);
+    }
+
+    public static byte[] decompressSnapshot(byte[] input, int size){
+        return clientProvider.decompressSnapshot(input, size);
+    }
+
     /**
      * Starts discovering servers on a different thread. Does not work with GWT.
      * Callback is run on the main libGDX thread.
@@ -337,34 +345,25 @@ public class Net{
         tcp, udp
     }
 
-    /**
-     * Client implementation.
-     */
+    /**Client implementation.*/
     public interface ClientProvider{
-        /**
-         * Connect to a server.
-         */
+        /**Connect to a server.*/
         void connect(String ip, int port) throws IOException;
 
-        /**
-         * Send an object to the server.
-         */
+        /**Send an object to the server.*/
         void send(Object object, SendMode mode);
 
-        /**
-         * Update the ping. Should be done every second or so.
-         */
+        /**Update the ping. Should be done every second or so.*/
         void updatePing();
 
-        /**
-         * Get ping in milliseconds. Will only be valid after a call to updatePing.
-         */
+        /**Get ping in milliseconds. Will only be valid after a call to updatePing.*/
         int getPing();
 
-        /**
-         * Disconnect from the server.
-         */
+        /**Disconnect from the server.*/
         void disconnect();
+
+        /**Decompress an input snapshot byte array.*/
+        byte[] decompressSnapshot(byte[] input, int size);
 
         /**
          * Discover servers. This should run the callback regardless of whether any servers are found. Should not block.
@@ -372,64 +371,43 @@ public class Net{
          */
         void discover(Consumer<Array<Host>> callback);
 
-        /**
-         * Ping a host. If an error occured, failed() should be called with the exception.
-         */
+        /**Ping a host. If an error occured, failed() should be called with the exception.*/
         void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed);
 
-        /**
-         * Close all connections.
-         */
+        /**Close all connections.*/
         void dispose();
     }
 
-    /**
-     * Server implementation.
-     */
+    /**Server implementation.*/
     public interface ServerProvider{
-        /**
-         * Host a server at specified port.
-         */
+        /**Host a server at specified port.*/
         void host(int port) throws IOException;
 
-        /**
-         * Sends a large stream of data to a specific client.
-         */
+        /**Sends a large stream of data to a specific client.*/
         void sendStream(int id, Streamable stream);
 
-        /**
-         * Send an object to everyone connected.
-         */
+        /**Send an object to everyone connected.*/
         void send(Object object, SendMode mode);
 
-        /**
-         * Send an object to a specific client ID.
-         */
+        /**Send an object to a specific client ID.*/
         void sendTo(int id, Object object, SendMode mode);
 
-        /**
-         * Send an object to everyone <i>except</i> a client ID.
-         */
+        /**Send an object to everyone <i>except</i> a client ID.*/
         void sendExcept(int id, Object object, SendMode mode);
 
-        /**
-         * Close the server connection.
-         */
+        /**Close the server connection.*/
         void close();
 
-        /**
-         * Return all connected users.
-         */
+        /**Compress an input snapshot byte array.*/
+        byte[] compressSnapshot(byte[] input);
+
+        /**Return all connected users.*/
         Array<? extends NetConnection> getConnections();
 
-        /**
-         * Returns a connection by ID.
-         */
+        /**Returns a connection by ID.*/
         NetConnection getByID(int id);
 
-        /**
-         * Close all connections.
-         */
+        /**Close all connections.*/
         void dispose();
     }
 }

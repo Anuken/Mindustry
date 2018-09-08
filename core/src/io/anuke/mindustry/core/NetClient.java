@@ -190,7 +190,7 @@ public class NetClient extends Module{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void onSnapshot(byte[] chunk, int snapshotID, short chunkID, int totalLength){
+    public static void onSnapshot(byte[] chunk, int snapshotID, short chunkID, int totalLength, int uncompressedLength){
         int totalChunks = Mathf.ceil((float) totalLength / NetServer.maxSnapshotSize);
 
         if(NetServer.debugSnapshots)
@@ -234,8 +234,8 @@ public class NetClient extends Module{
             if(NetServer.debugSnapshots)
                 Log.info("Finished recieving snapshot ID {0} length {1}", snapshotID, chunk.length);
 
-            byte[] result = snapshot;
-            int length = snapshot.length;
+            byte[] result = Net.decompressSnapshot(snapshot, uncompressedLength);
+            int length = result.length;
 
             netClient.lastSnapshotBaseID = snapshotID;
 

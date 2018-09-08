@@ -16,6 +16,8 @@ import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.Strings;
+import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.lz4.LZ4FastDecompressor;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -32,6 +34,7 @@ public class KryoClient implements ClientProvider{
     Client client;
     ObjectMap<InetAddress, Host> addresses = new ObjectMap<>();
     ClientDiscoveryHandler handler;
+    LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
 
     public KryoClient(){
         KryoCore.init();
@@ -103,6 +106,13 @@ public class KryoClient implements ClientProvider{
         }else{
             client.addListener(listener);
         }
+    }
+
+    @Override
+    public byte[] decompressSnapshot(byte[] input, int size){
+        byte[] result = new byte[size];
+        decompressor.decompress(input, result);
+        return result;
     }
 
     @Override

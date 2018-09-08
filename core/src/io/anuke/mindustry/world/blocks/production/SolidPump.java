@@ -80,13 +80,13 @@ public class SolidPump extends Pump{
             float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction);
             tile.entity.liquids.add(result, maxPump);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
-            if(Mathf.chance(Timers.delta() * updateEffectChance))
+            if(Mathf.chance(entity.delta() * updateEffectChance))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
         }
 
-        entity.pumpTime += entity.warmup * Timers.delta();
+        entity.pumpTime += entity.warmup * entity.delta();
 
         tryDumpLiquid(tile, result);
     }

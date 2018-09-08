@@ -101,7 +101,7 @@ public class PowerSmelter extends PowerBlock{
         //heat it up if there's enough power
         if(entity.cons.valid()){
             entity.heat += 1f / heatUpTime * entity.delta();
-            if(Mathf.chance(Timers.delta() * burnEffectChance))
+            if(Mathf.chance(entity.delta() * burnEffectChance))
                 Effects.effect(burnEffect, entity.x + Mathf.range(size * 4f), entity.y + Mathf.range(size * 4));
         }else{
             entity.heat -= 1f / heatUpTime * Timers.delta();
@@ -121,6 +121,8 @@ public class PowerSmelter extends PowerBlock{
                 break;
             }
         }
+
+        entity.craftTime += entity.delta();
 
         if(entity.items.get(result) >= itemCapacity //output full
                 || entity.heat <= minHeat //not burning

@@ -5,7 +5,6 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeItem;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 
 public class Fracker extends SolidPump{
@@ -70,7 +69,7 @@ public class Fracker extends SolidPump{
 
         if(entity.cons.valid() && entity.accumulator < itemUseTime){
             super.update(tile);
-            entity.accumulator += Timers.delta();
+            entity.accumulator += entity.delta();
         }else{
             tryDumpLiquid(tile, result);
         }

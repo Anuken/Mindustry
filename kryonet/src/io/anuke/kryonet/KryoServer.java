@@ -20,6 +20,8 @@ import io.anuke.mindustry.net.Packets.StreamChunk;
 import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
+import net.jpountz.lz4.LZ4Compressor;
+import net.jpountz.lz4.LZ4Factory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -33,6 +35,7 @@ public class KryoServer implements ServerProvider {
     final CopyOnWriteArrayList<KryoConnection> connections = new CopyOnWriteArrayList<>();
     final CopyOnWriteArraySet<Integer> missing = new CopyOnWriteArraySet<>();
     final Array<KryoConnection> array = new Array<>();
+    final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
     Thread serverThread;
 
     int lastconnection = 0;
@@ -103,6 +106,11 @@ public class KryoServer implements ServerProvider {
         }else{
             server.addListener(listener);
         }
+    }
+
+    @Override
+    public byte[] compressSnapshot(byte[] input){
+        return compressor.compress(input);
     }
 
     @Override
