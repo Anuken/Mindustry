@@ -29,11 +29,15 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ForceProjector extends Block {
+    protected int timerUse = timers ++;
+    protected float phaseUseTime = 250f;
+
+    protected float phaseRadiusBoost = 60f;
     protected float radius = 100f;
-    protected float breakage = 500f;
-    protected float cooldownNormal = 1.5f;
+    protected float breakage = 550f;
+    protected float cooldownNormal = 1.75f;
     protected float cooldownLiquid = 1.5f;
-    protected float cooldownBrokenBase = 0.3f;
+    protected float cooldownBrokenBase = 0.35f;
     protected float powerDamage = 0.1f;
     protected TextureRegion topRegion;
 
@@ -45,6 +49,8 @@ public class ForceProjector extends Block {
         canOverdrive = false;
         hasLiquids = true;
         powerCapacity = 60f;
+        hasItems = true;
+        itemCapacity = 10;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).optional(true).update(false);
     }
 
@@ -68,6 +74,12 @@ public class ForceProjector extends Block {
         if(entity.shield == null){
             entity.shield = new ShieldEntity(tile);
             entity.shield.add();
+        }
+
+        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, (float)entity.items.get(consumes.item()) / itemCapacity, 0.1f);
+
+        if(!entity.broken && entity.timer.get(timerUse, phaseUseTime) && entity.items.total() > 0){
+            entity.items.remove(consumes.item(), 1);
         }
 
         entity.radscl = Mathf.lerpDelta(entity.radscl, entity.broken ? 0f : 1f, 0.05f);
@@ -111,9 +123,11 @@ public class ForceProjector extends Block {
             entity.hit -= 1f/5f * Timers.delta();
         }
 
+        float realRadius = realRadius(entity);
+
         if(!entity.broken){
-            EntityPhysics.getNearby(bulletGroup, tile.drawx(), tile.drawy(), radius * entity.radscl*2f, bullet -> {
-                if(bullet instanceof Bullet && ((Bullet) bullet).getTeam() != tile.getTeam() && isInsideHexagon(bullet.getX(), bullet.getY(), radius * 2f * entity.radscl, tile.drawx(), tile.drawy())){
+            EntityPhysics.getNearby(bulletGroup, tile.drawx(), tile.drawy(), realRadius*2f, bullet -> {
+                if(bullet instanceof Bullet && ((Bullet) bullet).getTeam() != tile.getTeam() && isInsideHexagon(bullet.getX(), bullet.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
                     ((Bullet) bullet).absorb();
                     Effects.effect(BulletFx.absorb, bullet);
                     float hit = ((Bullet) bullet).getDamage()*powerDamage;
@@ -123,6 +137,10 @@ public class ForceProjector extends Block {
                 }
             });
         }
+    }
+
+    float realRadius(ForceEntity entity){
+        return (radius+entity.phaseHeat*phaseRadiusBoost) * entity.radscl;
     }
 
     boolean isInsideHexagon(float x0, float y0, float d, float x, float y) {
@@ -160,6 +178,7 @@ public class ForceProjector extends Block {
         float radscl = 0f;
         float hit;
         float warmup;
+        float phaseHeat;
 
         @Override
         public void write(DataOutputStream stream) throws IOException{
@@ -167,6 +186,7 @@ public class ForceProjector extends Block {
             stream.writeFloat(buildup);
             stream.writeFloat(radscl);
             stream.writeFloat(warmup);
+            stream.writeFloat(phaseHeat);
         }
 
         @Override
@@ -175,6 +195,7 @@ public class ForceProjector extends Block {
             buildup = stream.readFloat();
             radscl = stream.readFloat();
             warmup = stream.readFloat();
+            phaseHeat = stream.readFloat();
         }
     }
 
@@ -195,13 +216,13 @@ public class ForceProjector extends Block {
 
         @Override
         public float drawSize(){
-            return radius*2f+2f*entity.radscl;
+            return realRadius(entity)*2f+2f;
         }
 
         @Override
         public void draw(){
             Draw.color(Palette.accent);
-            Fill.polyTri(x, y, 6, radius*entity.radscl);
+            Fill.polyTri(x, y, 6, realRadius(entity));
             Draw.color();
         }
 
@@ -210,7 +231,7 @@ public class ForceProjector extends Block {
 
             Draw.color(Color.WHITE);
             Draw.alpha(entity.hit);
-            Fill.polyTri(x, y, 6, radius*entity.radscl);
+            Fill.polyTri(x, y, 6, realRadius(entity));
             Draw.color();
         }
 
