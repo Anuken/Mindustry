@@ -134,6 +134,7 @@ public class Logic extends Module{
                 for(EntityGroup group : unitGroups){
                     Entities.update(group);
                 }
+
                 Entities.update(puddleGroup);
                 Entities.update(tileGroup);
                 Entities.update(shieldGroup);

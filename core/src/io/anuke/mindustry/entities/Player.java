@@ -641,7 +641,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         if(velocity.len() <= 0.2f){
             rotation += Mathf.sin(Timers.time() + id * 99, 10f, 1f);
-        }else{
+        }else if(target == null){
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), velocity.len() / 10f);
         }
 

@@ -346,9 +346,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             entity.health = Mathf.clamp(entity.health, 0, entity.tile.block().health);
         }
 
-        x += Mathf.sin(Timers.time() + id * 999, 25f, 0.07f);
-        y += Mathf.cos(Timers.time() + id * 999, 25f, 0.07f);
-
         updateBuilding(this);
     }
 
@@ -358,10 +355,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.3f);
         }else{
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), 0.3f);
-        }
-
-        if(velocity.len() <= 0.2f && !(state.is(repair) && target != null)){
-            rotation += Mathf.sin(Timers.time() + id * 99, 10f, 5f);
         }
     }
 

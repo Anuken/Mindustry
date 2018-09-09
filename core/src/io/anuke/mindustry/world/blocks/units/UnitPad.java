@@ -25,7 +25,6 @@ import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.EnumSet;
@@ -59,6 +58,8 @@ public class UnitPad extends Block{
 
     @Remote(called = Loc.server)
     public static void onUnitFactorySpawn(Tile tile){
+        if(!(tile.entity instanceof UnitFactoryEntity) || !(tile.block() instanceof UnitPad)) return;
+
         UnitFactoryEntity entity = tile.entity();
         UnitPad factory = (UnitPad) tile.block();
 

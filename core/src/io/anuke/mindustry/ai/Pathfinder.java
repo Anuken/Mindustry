@@ -83,7 +83,7 @@ public class Pathfinder{
     }
 
     public float getValueforTeam(Team team, int x, int y){
-        return paths == null ? 0 : paths[team.ordinal()].weights[x][y];
+        return paths == null || team.ordinal() >= paths.length ? 0 : paths[team.ordinal()].weights[x][y];
     }
 
     private boolean passable(Tile tile, Team team){

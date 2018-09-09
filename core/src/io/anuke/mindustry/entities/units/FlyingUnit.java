@@ -12,10 +12,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -182,11 +179,11 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected void wobble(){
         if(Net.client()) return;
 
-        x += Mathf.sin(Timers.time() + id * 999, 25f, 0.07f);
-        y += Mathf.cos(Timers.time() + id * 999, 25f, 0.07f);
+        x += Mathf.sin(Timers.time() + id * 999, 25f, 0.07f)*Timers.delta();
+        y += Mathf.cos(Timers.time() + id * 999, 25f, 0.07f)*Timers.delta();
 
-        if(velocity.len() <= 0.2f){
-            rotation += Mathf.sin(Timers.time() + id * 99, 10f, 8f);
+        if(velocity.len() <= 0.05f){
+            rotation += Mathf.sin(Timers.time() + id * 99, 10f, 5f)*Timers.delta();
         }
     }
 

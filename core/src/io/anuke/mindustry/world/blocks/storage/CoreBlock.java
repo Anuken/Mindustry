@@ -62,7 +62,7 @@ public class CoreBlock extends StorageBlock{
 
     @Remote(called = Loc.server)
     public static void onUnitRespawn(Tile tile, Unit player){
-        if(player == null) return;
+        if(player == null || tile.entity == null) return;
 
         CoreEntity entity = tile.entity();
         Effects.effect(Fx.spawn, entity);
