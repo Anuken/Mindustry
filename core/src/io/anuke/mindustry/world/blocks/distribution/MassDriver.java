@@ -79,7 +79,7 @@ public class MassDriver extends Block{
         entity.reload = 1f;
         entity.power.amount = 0f;
 
-        DriverBulletData data = Pooling.obtain(DriverBulletData.class);
+        DriverBulletData data = Pooling.obtain(DriverBulletData.class, DriverBulletData::new);
         data.from = entity;
         data.to = other;
         for(int i = 0; i < content.items().size; i++){

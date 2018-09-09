@@ -58,7 +58,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     }
 
     public static void create(Item item, float fromx, float fromy, PosTrait to, Runnable done){
-        ItemTransfer tr = Pooling.obtain(ItemTransfer.class);
+        ItemTransfer tr = Pooling.obtain(ItemTransfer.class, ItemTransfer::new);
         tr.item = item;
         tr.from.set(fromx, fromy);
         tr.to = to;

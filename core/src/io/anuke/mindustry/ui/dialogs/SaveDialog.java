@@ -1,6 +1,5 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.ucore.core.Timers;
@@ -55,7 +54,7 @@ public class SaveDialog extends LoadDialog{
                 e.printStackTrace();
                 e = (e.getCause() == null ? e : e.getCause());
 
-                ui.showError("[orange]" + Bundles.get("text.savefail") + "\n[white]" + ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" + "at " + e.getStackTrace()[0].getFileName() + ":" + e.getStackTrace()[0].getLineNumber());
+                ui.showError("[orange]" + Bundles.get("text.savefail"));
             }
         });
     }

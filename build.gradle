@@ -225,8 +225,8 @@ project(":kryonet") {
 
     dependencies {
         compile project(":core")
-        compile 'com.github.crykn:kryonet:2.22.1'
         compile "org.lz4:lz4-java:1.4.1"
+        compile 'com.github.Anuken:kryonet:53b10247b1'
         compile 'com.github.Anuken:WaifUPnP:05eb46bc577fd7674596946ba288c96c0cedd893'
     }
 }

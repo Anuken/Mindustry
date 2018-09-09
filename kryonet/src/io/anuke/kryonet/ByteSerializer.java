@@ -1,16 +1,17 @@
 package io.anuke.kryonet;
 
-import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.serialization.Serialization;
 import io.anuke.mindustry.net.Packet;
 import io.anuke.mindustry.net.Registrator;
+import io.anuke.ucore.function.Supplier;
 import io.anuke.ucore.util.Pooling;
 
 import java.nio.ByteBuffer;
 
 import static io.anuke.mindustry.net.Net.packetPoolLock;
 
+@SuppressWarnings("unchecked")
 public class ByteSerializer implements Serialization {
 
     @Override
@@ -23,7 +24,7 @@ public class ByteSerializer implements Serialization {
                 throw new RuntimeException("All sent objects must implement be Packets! Class: " + o.getClass());
             byte id = Registrator.getID(o.getClass());
             if (id == -1)
-                throw new RuntimeException("Unregistered class: " + ClassReflection.getSimpleName(o.getClass()));
+                throw new RuntimeException("Unregistered class: " + o.getClass());
             byteBuffer.put(id);
             ((Packet) o).write(byteBuffer);
         }
@@ -36,7 +37,7 @@ public class ByteSerializer implements Serialization {
            return FrameworkSerializer.read(byteBuffer);
         }else{
             synchronized (packetPoolLock) {
-                Packet packet = (Packet) Pooling.obtain(Registrator.getByID(id).type);
+                Packet packet = Pooling.obtain((Class<Packet>) Registrator.getByID(id).type, (Supplier<Packet>) Registrator.getByID(id).constructor);
                 packet.read(byteBuffer);
                 return packet;
             }

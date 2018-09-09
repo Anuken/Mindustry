@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.consumers;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
@@ -22,7 +21,7 @@ public class Consumers{
     public void checkRequired(Block block){
         for(Class<? extends Consume> c : required){
             if(!map.containsKey(c)){
-                throw new RuntimeException("Missing required consumer of type \"" + ClassReflection.getSimpleName(c) + "\" in block \"" + block.name + "\"!");
+                throw new RuntimeException("Missing required consumer of type \"" + c + "\" in block \"" + block.name + "\"!");
             }
         }
 

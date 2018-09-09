@@ -82,7 +82,7 @@ public class Renderer extends RendererModule{
                 if(view.overlaps(pos)){
 
                     if(!(effect instanceof GroundEffect)){
-                        EffectEntity entity = Pooling.obtain(EffectEntity.class);
+                        EffectEntity entity = Pooling.obtain(EffectEntity.class, EffectEntity::new);
                         entity.effect = effect;
                         entity.color = color;
                         entity.rotation = rotation;
@@ -94,7 +94,7 @@ public class Renderer extends RendererModule{
                         }
                         threads.runGraphics(() -> effectGroup.add(entity));
                     }else{
-                        GroundEffectEntity entity = Pooling.obtain(GroundEffectEntity.class);
+                        GroundEffectEntity entity = Pooling.obtain(GroundEffectEntity.class, GroundEffectEntity::new);
                         entity.effect = effect;
                         entity.color = color;
                         entity.rotation = rotation;

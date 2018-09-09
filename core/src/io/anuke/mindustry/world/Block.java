@@ -3,7 +3,6 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -466,7 +465,7 @@ public class Block extends BaseBlock {
                 "floor", tile.floor().name,
                 "x", tile.x,
                 "y", tile.y,
-                "entity.name", ClassReflection.getSimpleName(tile.entity.getClass()),
+                "entity.name", tile.entity.getClass(),
                 "entity.x", tile.entity.x,
                 "entity.y", tile.entity.y,
                 "entity.id", tile.entity.id,

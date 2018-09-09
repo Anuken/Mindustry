@@ -57,7 +57,7 @@ public class StatusController implements Saveable{
         }
 
         //otherwise, no opposites found, add direct effect
-        StatusEntry entry = Pooling.obtain(StatusEntry.class);
+        StatusEntry entry = Pooling.obtain(StatusEntry.class, StatusEntry::new);
         entry.set(effect, newTime);
         statuses.add(entry);
     }
@@ -146,7 +146,7 @@ public class StatusController implements Saveable{
         for(int i = 0; i < amount; i++){
             byte id = stream.readByte();
             float time = stream.readShort() / 2f;
-            StatusEntry entry = Pooling.obtain(StatusEntry.class);
+            StatusEntry entry = Pooling.obtain(StatusEntry.class, StatusEntry::new);
             entry.set(content.getByID(ContentType.status, id), time);
             statuses.add(entry);
         }

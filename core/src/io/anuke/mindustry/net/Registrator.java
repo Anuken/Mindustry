@@ -3,7 +3,6 @@ package io.anuke.mindustry.net;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.ucore.function.Supplier;
-import io.anuke.ucore.util.Pooling;
 
 public class Registrator{
     private static ClassEntry[] classes = {
@@ -18,7 +17,6 @@ public class Registrator{
     static{
         if(classes.length > 127) throw new RuntimeException("Can't have more than 127 registered classes!");
         for(int i = 0; i < classes.length; i++){
-            Pooling.registerType((Class<Packet>) classes[i].type, (Supplier<Packet>) classes[i].constructor);
             ids.put(classes[i].type, i);
         }
     }

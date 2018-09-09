@@ -56,7 +56,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
         Fire fire = map.get(tile.packedPosition());
 
         if(fire == null){
-            fire = Pooling.obtain(Fire.class);
+            fire = Pooling.obtain(Fire.class, Fire::new);
             fire.tile = tile;
             fire.lifetime = baseLifetime;
             fire.set(tile.worldx(), tile.worldy());

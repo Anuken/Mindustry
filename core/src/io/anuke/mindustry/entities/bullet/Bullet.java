@@ -54,7 +54,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     }
 
     public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Object data){
-        Bullet bullet = Pooling.obtain(Bullet.class);
+        Bullet bullet = Pooling.obtain(Bullet.class, Bullet::new);
         bullet.type = type;
         bullet.owner = owner;
         bullet.data = data;

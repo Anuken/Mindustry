@@ -105,7 +105,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         if(p == null){
             if(Net.client()) return; //not clientside.
 
-            Puddle puddle = Pooling.obtain(Puddle.class);
+            Puddle puddle = Pooling.obtain(Puddle.class, Puddle::new);
             puddle.tile = tile;
             puddle.liquid = liquid;
             puddle.amount = amount;

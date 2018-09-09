@@ -8,7 +8,6 @@ import com.badlogic.gdx.net.HttpRequestBuilder;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Packets.KickReason;
@@ -68,7 +67,7 @@ public class Net{
         if(loaded){
             //handle all packets that were skipped while loading
             for(int i = 0; i < packetQueue.size; i++){
-                Log.info("Processing {0} packet post-load.", ClassReflection.getSimpleName(packetQueue.get(i).getClass()));
+                Log.info("Processing {0} packet post-load.", packetQueue.get(i).getClass());
                 handleClientReceived(packetQueue.get(i));
             }
         }
@@ -238,14 +237,14 @@ public class Net{
                 }
             }else if(!((object instanceof Packet) && ((Packet) object).isUnimportant())){
                 packetQueue.add(object);
-                Log.info("Queuing packet {0}.", ClassReflection.getSimpleName(object.getClass()));
+                Log.info("Queuing packet {0}.", object);
             }else{
                 synchronized(packetPoolLock){
                     Pooling.free(object);
                 }
             }
         }else{
-            Log.err("Unhandled packet type: '{0}'!", ClassReflection.getSimpleName(object.getClass()));
+            Log.err("Unhandled packet type: '{0}'!", object);
         }
     }
 
@@ -261,7 +260,7 @@ public class Net{
                 Pooling.free(object);
             }
         }else{
-            Log.err("Unhandled packet type: '{0}'!", ClassReflection.getSimpleName(object.getClass()));
+            Log.err("Unhandled packet type: '{0}'!", object.getClass());
         }
     }
 

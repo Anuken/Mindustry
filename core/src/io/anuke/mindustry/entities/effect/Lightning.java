@@ -59,7 +59,7 @@ public class Lightning extends TimedEntity implements Poolable, DrawTrait, SyncT
     /**Do not invoke!*/
     @Remote(called = Loc.server)
     public static void createLighting(int seed, Team team, Effect effect, Color color, float damage, float x, float y, float targetAngle, int length){
-        Lightning l = Pooling.obtain(Lightning.class);
+        Lightning l = Pooling.obtain(Lightning.class, Lightning::new);
 
         //TODO hacky workaround
         if(checkShield(team, x, y)) return;
