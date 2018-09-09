@@ -29,10 +29,6 @@ public class Sectors{
 
     private GridMap<Sector> grid = new GridMap<>();
 
-    public Sectors(){
-        Settings.json().addClassTag("Sector", Sector.class);
-    }
-
     public void playSector(Sector sector){
         if(sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
             sector.getSave().delete();
@@ -117,7 +113,7 @@ public class Sectors{
         }
         grid.clear();
 
-        Array<Sector> out = Settings.getJson("sectors", Array.class);
+        Array<Sector> out = Settings.getBinary("sectors", Array.class, () -> new Array<>());
 
         for(Sector sector : out){
             createTexture(sector);
@@ -141,7 +137,7 @@ public class Sectors{
             out.add(sector);
         }
 
-        Settings.putJson("sectors", out);
+        Settings.putBinary("sectors", out);
         Settings.save();
     }
 

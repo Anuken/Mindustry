@@ -3,6 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.entities.Player;
@@ -326,22 +327,24 @@ public class JoinDialog extends FloatingDialog{
     }
 
     private void loadServers(){
-        servers = Settings.getJson("server-list", Array.class);
+        servers = Settings.getBinary("server-list", Array.class, () -> new Array<>());
     }
 
     private void saveServers(){
-        Settings.putJson("server-list", servers);
+        Settings.putBinary("server-list", servers);
         Settings.save();
     }
 
-    static class Server{
-        String ip;
-        int port;
+    @Serialize
+    public static class Server{
+        public String ip;
+        public int port;
 
         transient Host host;
         transient Table content;
 
         void setIP(String ip){
+
             //parse ip:port, if unsuccessful, use default values
             if(ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length()-1){
                 try{
@@ -362,6 +365,6 @@ public class JoinDialog extends FloatingDialog{
             return ip + (port != Vars.port ? ":" + port : "");
         }
 
-        Server(){}
+        public Server(){}
     }
 }

@@ -11,6 +11,13 @@ import java.lang.annotation.Target;
  */
 public class Annotations{
 
+    /** Marks a class as serializable.*/
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.CLASS)
+    public @interface Serialize{
+
+    }
+
     public enum PacketPriority{
         /** Gets put in a queue and processed if not connected. */
         normal,

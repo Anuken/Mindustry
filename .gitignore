@@ -21,7 +21,7 @@
 /android/assets/mindustry-saves/
 /core/assets/gifexport/
 /core/assets/version.properties
-/core/assets/locales.json
+/core/assets/locales
 /ios/src/io/anuke/mindustry/gen/
 *.gif
 

@@ -4,7 +4,6 @@ import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Json;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -16,6 +15,7 @@ import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
 import io.anuke.ucore.entities.Entities;
@@ -138,9 +138,10 @@ public class Vars{
     public static final Translator[] tmptr = new Translator[]{new Translator(), new Translator(), new Translator(), new Translator()};
 
     public static void init(){
+        Serialization.init();
 
         //load locales
-        String[] stra = new Json().fromJson(String[].class, Gdx.files.internal("locales.json"));
+        String[] stra = Gdx.files.internal("locales").readString().split("\n");
         locales = new Locale[stra.length];
         for(int i = 0; i < locales.length; i++){
             String code = stra[i];

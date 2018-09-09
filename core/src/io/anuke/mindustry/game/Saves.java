@@ -2,6 +2,7 @@ package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
@@ -44,9 +45,10 @@ public class Saves{
 
     public void load(){
         saves.clear();
-        int[] slots = Settings.getJson("save-slots", int[].class);
+        IntArray slots = Settings.getBinary("save-slots", IntArray.class, IntArray::new);
 
-        for(int index : slots){
+        for(int i = 0; i < slots.size; i ++){
+            int index = slots.get(i);
             if(SaveIO.isSaveValid(index)){
                 SaveSlot slot = new SaveSlot(index);
                 saves.add(slot);
@@ -138,11 +140,10 @@ public class Saves{
     }
 
     private void saveSlots(){
-        int[] result = new int[saves.size];
-        for(int i = 0; i < result.length; i++){
-            result[i] = saves.get(i).index;
-        }
-        Settings.putJson("save-slots", result);
+        IntArray result = new IntArray(saves.size);
+        for(int i = 0; i < saves.size; i++) result.add(saves.get(i).index);
+
+        Settings.putBinary("save-slots", result);
         Settings.save();
     }
 

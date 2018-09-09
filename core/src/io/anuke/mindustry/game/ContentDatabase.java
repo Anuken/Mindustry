@@ -68,7 +68,7 @@ public class ContentDatabase{
     }
 
     public void load(){
-        ObjectMap<ContentType, Array<String>> result = Settings.getJson("content-database", ObjectMap.class);
+        ObjectMap<ContentType, Array<String>> result = Settings.getBinary("content-database", ObjectMap.class, () -> new ObjectMap<>());
 
         for(Entry<ContentType, Array<String>> entry : result.entries()){
             ObjectSet<String> set = new ObjectSet<>();
@@ -87,7 +87,7 @@ public class ContentDatabase{
             write.put(entry.key, entry.value.iterator().toArray());
         }
 
-        Settings.putJson("content-database", write);
+        Settings.putBinary("content-database", write);
         Settings.save();
         dirty = false;
     }

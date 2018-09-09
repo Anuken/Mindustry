@@ -27,7 +27,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
-        uCoreVersion = '7aa05daa277ffb67cda3d2d047c37b2f441e4e4e'
+        uCoreVersion = '7fafee20b6bf5615e009d2be20d1c1331d1e66c1'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -44,14 +44,13 @@ allprojects {
         }
 
         generateLocales = {
-            def output = '["en",'
+            def output = 'en\n'
             def bundles = new File(project(':core').projectDir, 'assets/bundles/')
             bundles.listFiles().each { other ->
                 if(other.name == "bundle.properties") return;
-                output += '"' + other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + '",'
+                output += other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + "\n"
             }
-            output = (output.substring(0, output.size() - 1) + "]")
-            new File(project(':core').projectDir, 'assets/locales.json').text = output;
+            new File(project(':core').projectDir, 'assets/locales').text = output;
         }
 
         writeVersion = {
@@ -118,9 +117,6 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion:sources"
     }
 
-    compileJava.options.compilerArgs = [
-        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
-    ]
 }
 
 project(":ios") {
@@ -185,7 +181,7 @@ project(":core") {
     }
 
     compileJava.options.compilerArgs = [
-        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor"
+        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor,io.anuke.annotations.SerializeAnnotationProcessor"
     ]
 }
 

@@ -3,6 +3,7 @@ package io.anuke.mindustry.net;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.ucore.core.Settings;
 
 import static io.anuke.mindustry.Vars.headless;
@@ -276,16 +277,17 @@ public class Administration{
     }
 
     public void save(){
-        Settings.putJson("player-info", playerInfo);
-        Settings.putJson("banned-ips", bannedIPs);
+        Settings.putBinary("player-info", playerInfo);
+        Settings.putBinary("banned-ips", bannedIPs);
         Settings.save();
     }
 
     private void load(){
-        playerInfo = Settings.getJson("player-info", ObjectMap.class);
-        bannedIPs = Settings.getJson("banned-ips", Array.class);
+        playerInfo = Settings.getBinary("player-info", ObjectMap.class, () -> new ObjectMap<>());
+        bannedIPs = Settings.getBinary("banned-ips", Array.class, () -> new Array<>());
     }
 
+    @Serialize
     public static class PlayerInfo{
         public String id;
         public String lastName = "<unknown>", lastIP = "<unknown>";
@@ -303,7 +305,7 @@ public class Administration{
             this.id = id;
         }
 
-        private PlayerInfo(){
+        public PlayerInfo(){
         }
     }
 

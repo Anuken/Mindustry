@@ -2,6 +2,7 @@ package io.anuke.mindustry.maps;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
@@ -12,6 +13,7 @@ import io.anuke.ucore.util.Bits;
 
 import static io.anuke.mindustry.Vars.control;
 
+@Serialize
 public class Sector{
     /**Position on the map, can be positive or negative.*/
     public short x, y;
