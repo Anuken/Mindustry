@@ -38,6 +38,9 @@ public class CrashHandler{
         JsonValue value = new JsonValue(ValueType.object);
 
         //add all relevant info, ignoring exceptions
+        ex(() -> value.addChild("versionType", new JsonValue(Version.type)));
+        ex(() -> value.addChild("versionNumber", new JsonValue(Version.number)));
+        ex(() -> value.addChild("versionModifier", new JsonValue(Version.modifier)));
         ex(() -> value.addChild("build", new JsonValue(Version.build)));
         ex(() -> value.addChild("mode", new JsonValue(Vars.state.mode.name())));
         ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
