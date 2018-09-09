@@ -111,7 +111,14 @@ public class SaveIO{
     }
 
     public static void write(FileHandle file){
-        write(new DeflaterOutputStream(file.write(false)));
+        write(new DeflaterOutputStream(file.write(false)){
+            byte[] tmp = {0};
+
+            public void write(int var1) throws IOException {
+                tmp[0] = (byte)(var1 & 255);
+                this.write(tmp, 0, 1);
+            }
+        });
     }
 
     public static void write(OutputStream os){
