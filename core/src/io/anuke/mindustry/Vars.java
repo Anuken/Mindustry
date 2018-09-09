@@ -162,10 +162,10 @@ public class Vars{
         bulletGroup = Entities.addGroup(Bullet.class).enableMapping();
         effectGroup = Entities.addGroup(EffectEntity.class, false);
         groundEffectGroup = Entities.addGroup(DrawTrait.class, false);
-        puddleGroup = Entities.addGroup(Puddle.class, false).enableMapping();
+        puddleGroup = Entities.addGroup(Puddle.class).enableMapping();
         itemGroup = Entities.addGroup(ItemDrop.class).enableMapping();
-        shieldGroup = Entities.addGroup(ShieldEntity.class);
-        fireGroup = Entities.addGroup(Fire.class, false).enableMapping();
+        shieldGroup = Entities.addGroup(ShieldEntity.class, false);
+        fireGroup = Entities.addGroup(Fire.class).enableMapping();
         unitGroups = new EntityGroup[Team.all.length];
 
         for(Team team : Team.all){
