@@ -17,7 +17,6 @@ import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.mindustry.net.Packets.StreamBegin;
 import io.anuke.mindustry.net.Packets.StreamChunk;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
 import net.jpountz.lz4.LZ4Compressor;

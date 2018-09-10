@@ -2,32 +2,32 @@
 Font: {
 	default-font: {
 		file: square.fnt,
-		markupEnabled: true,
+		markup: true,
 		scale: 0.5
 	},
 	default-font-chat: {
 		file: square.fnt,
-		markupEnabled: false,
+		markup: false,
 		scale: 0.5
 	},
 	korean: {
 		file: korean.fnt,
-		markupEnabled: true,
+		markup: true,
 		scale: 0.5
 	},
 	trad-chinese: {
 		file: trad_chinese.fnt,
-		markupEnabled: true,
+		markup: true,
 		scale: 0.5
 	},
 	simp-chinese: {
 		file: simp_chinese.fnt,
-		markupEnabled: true,
+		markup: true,
 		scale: 0.5
 	},
 	title: {
 		file: title.fnt,
-		markupEnabled: true,
+		markup: true,
 		scale: 2
 	}
 },

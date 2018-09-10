@@ -16,6 +16,10 @@ public class ContentDatabase{
     private ObjectMap<ContentType, ObjectSet<String>> unlocked = new ObjectMap<>();
     /** Whether unlockables have changed since the last save.*/
     private boolean dirty;
+
+    static{
+        Settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
+    }
     
     /** Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(UnlockableContent content){
