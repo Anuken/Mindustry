@@ -335,10 +335,10 @@ public class ServerControl extends Module{
             info("Crash reporting is now {0}.", value ? "on" : "off");
         });
 
-        handler.register("debug", "<on/off>", "Disables or enables debug mode", arg -> {
+        handler.register("strict", "<on/off>", "Disables or enables strict mode", arg -> {
            boolean value = arg[0].equalsIgnoreCase("on");
-           debug = value;
-           info("Debug mode is now {0}.", value ? "on" : "off");
+           Settings.putBool("strict", value);
+           info("Debug mode is now {0}.", Settings.getBool("strict", true) ? "on" : "off");
         });
 
         handler.register("allow-custom-clients", "[on/off]", "Allow or disallow custom clients.", arg -> {
@@ -903,7 +903,7 @@ public class ServerControl extends Module{
             checkPvPGameOver();
         }
 
-        if(state.is(State.playing) && world.getSector() != null && !inExtraRound && !debug){
+        if(state.is(State.playing) && world.getSector() != null && !inExtraRound){
             //all assigned missions are complete
             if(world.getSector().completedMissions >= world.getSector().missions.size){
                 Log.info("Mission complete.");

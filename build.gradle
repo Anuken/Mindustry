@@ -92,6 +92,8 @@ project(":desktop") {
     dependencies {
         compile project(":core")
         compile project(":kryonet")
+        if(new File(projectDir.parent, '../debug').exists()) compile project(":debug")
+
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"

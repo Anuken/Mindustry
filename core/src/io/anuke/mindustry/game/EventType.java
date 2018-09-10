@@ -6,6 +6,10 @@ import io.anuke.ucore.function.Event;
 
 public class EventType{
 
+    public static class GameLoadEvent implements Event{
+
+    }
+
     public static class PlayEvent implements Event{
 
     }
