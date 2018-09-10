@@ -109,7 +109,7 @@ public class Build{
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
         Recipe recipe = Recipe.getByResult(type);
 
-        if(recipe == null || (recipe.debugOnly && !debug)){
+        if(recipe == null || (recipe.mode != null && recipe.mode != state.mode)){
             return false;
         }
 

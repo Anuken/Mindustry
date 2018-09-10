@@ -15,11 +15,9 @@ import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Strings;
 
-import java.io.File;
 import java.net.NetworkInterface;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -39,7 +37,7 @@ public class DesktopPlatform extends Platform{
     public DesktopPlatform(String[] args){
         this.args = args;
 
-        Vars.testMobile = isDebug() && Array.with(args).contains("-testMobile", false);
+        Vars.testMobile = Array.with(args).contains("-testMobile", false);
 
         if(useDiscord){
             DiscordEventHandlers handlers = new DiscordEventHandlers();
@@ -115,14 +113,6 @@ public class DesktopPlatform extends Platform{
     @Override
     public void onGameExit(){
         if(useDiscord) DiscordRPC.INSTANCE.Discord_Shutdown();
-    }
-
-    @Override
-    public boolean isDebug(){
-        //honestly I'm just putting this ridiculous """anti-debug""" mess here to see if anyone bothers solving it without editing source
-        boolean eq = args.length > 0 && args[0].equals(("-debug_12312333_" + System.getProperty("os.arch") + "nice" + (int)(Math.sin(System.getProperty("user.dir").hashCode()) * 100) + Thread.currentThread().getStackTrace()[1].toString()).hashCode() + "") && new File("../../desktop/build/").exists();
-        if(eq) Log.info("--DEBUG MODE ACTIVE--");
-        return eq;
     }
 
     @Override

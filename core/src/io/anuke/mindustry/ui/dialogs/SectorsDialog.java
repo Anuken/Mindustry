@@ -54,10 +54,6 @@ public class SectorsDialog extends FloatingDialog{
             ui.loadLogic(() -> world.sectors().playSector(selected));
         }).size(230f, 64f).disabled(b -> selected == null)
         .update(t -> t.setText(selected != null && selected.hasSave() ? "$text.sector.resume" : "$text.sector.deploy"));
-
-        if(debug){
-            buttons().addButton("unlock",  () -> world.sectors().completeSector(selected.x, selected.y)).size(230f, 64f).disabled(b -> selected == null);
-        }
     }
 
     void selectSector(Sector sector){

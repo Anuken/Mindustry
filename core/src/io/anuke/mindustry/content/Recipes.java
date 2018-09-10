@@ -2,6 +2,7 @@ package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
@@ -175,11 +176,11 @@ public class Recipes implements ContentList{
         new Recipe(liquid, LiquidBlocks.thermalPump, new ItemStack(Items.copper, 160), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 60), new ItemStack(Items.titanium, 80), new ItemStack(Items.thorium, 70));
 
         //DEBUG
-        new Recipe(units, DebugBlocks.itemSource).setDebug();
-        new Recipe(units, DebugBlocks.itemVoid).setDebug();
-        new Recipe(units, DebugBlocks.liquidSource).setDebug();
-        new Recipe(units, DebugBlocks.powerVoid).setDebug();
-        new Recipe(units, DebugBlocks.powerInfinite).setDebug();
+        new Recipe(units, DebugBlocks.itemSource).setMode(GameMode.sandbox).setHidden(true);
+        new Recipe(units, DebugBlocks.itemVoid).setMode(GameMode.sandbox).setHidden(true);
+        new Recipe(units, DebugBlocks.liquidSource).setMode(GameMode.sandbox).setHidden(true);
+        new Recipe(units, DebugBlocks.powerVoid).setMode(GameMode.sandbox).setHidden(true);
+        new Recipe(units, DebugBlocks.powerInfinite).setMode(GameMode.sandbox).setHidden(true);
     }
 
     @Override

@@ -16,8 +16,6 @@ public class Mindustry extends ModuleCore{
 
         Vars.init();
 
-        debug = Platform.instance.isDebug();
-
         Log.setUseColors(false);
         BundleLoader.load();
         content.load();

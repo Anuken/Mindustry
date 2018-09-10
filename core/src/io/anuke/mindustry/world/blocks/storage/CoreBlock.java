@@ -98,11 +98,6 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public float handleDamage(Tile tile, float amount){
-        return debug ? 0 : amount;
-    }
-
-    @Override
     public void draw(Tile tile){
         CoreEntity entity = tile.entity();
 
@@ -199,11 +194,6 @@ public class CoreBlock extends StorageBlock{
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += entity.delta();
             entity.progress += 1f / (entity.currentUnit instanceof Player ? state.mode.respawnTime : droneRespawnDuration) * entity.delta();
-
-            //instant build for fast testing.
-            if(debug){
-                entity.progress = 1f;
-            }
 
             if(entity.progress >= 1f){
                 Call.onUnitRespawn(tile, entity.currentUnit);

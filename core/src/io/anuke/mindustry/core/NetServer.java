@@ -23,6 +23,7 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
@@ -125,7 +126,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            boolean preventDuplicates = headless && !debug;
+            boolean preventDuplicates = headless && isStrict();
 
             if(preventDuplicates){
                 for(Player player : playerGroup.all()){
@@ -266,6 +267,10 @@ public class NetServer extends Module{
         }
     }
 
+    public static boolean isStrict(){
+        return Settings.getBool("strict", true);
+    }
+
     public void sendWorldData(Player player, int clientID){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         DeflaterOutputStream def = new DeflaterOutputStream(stream);
@@ -302,7 +307,7 @@ public class NetServer extends Module{
         NetConnection connection = player.con;
         if(connection == null || snapshotID < connection.lastRecievedClientSnapshot) return;
 
-        boolean verifyPosition = !player.isDead() && !debug && headless && player.getCarrier() == null;
+        boolean verifyPosition = !player.isDead() && isStrict() && headless && player.getCarrier() == null;
 
         if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = TimeUtils.millis() - 16;
 

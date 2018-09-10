@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.Block;
@@ -28,9 +28,11 @@ public class Recipe extends UnlockableContent{
     public final Category category;
     public final float cost;
 
-    public boolean desktopOnly = false, debugOnly = false;
+    public boolean desktopOnly = false;
     //the only gamemode in which the recipe shows up
+    public GameMode mode;
     public boolean isPad;
+    public boolean hidden;
 
     private UnlockableContent[] dependencies;
     private Block[] blockDependencies;
@@ -58,12 +60,12 @@ public class Recipe extends UnlockableContent{
      */
     public static void getUnlockedByCategory(Category category, Array<Recipe> r){
         if(headless){
-            throw new RuntimeException("Not enabled on the headless backend!");
+            throw new RuntimeException("Not implemented on the headless backend!");
         }
 
         r.clear();
         for(Recipe recipe : content.recipes()){
-            if(recipe.category == category && (Vars.control.database().isUnlocked(recipe) || (debug && recipe.debugOnly))){
+            if(recipe.category == category && (control.database().isUnlocked(recipe))){
                 r.add(recipe);
             }
         }
@@ -95,14 +97,24 @@ public class Recipe extends UnlockableContent{
         return this;
     }
 
-    public Recipe setDebug(){
-        debugOnly = true;
+    public Recipe setMode(GameMode mode){
+        this.mode = mode;
+        return this;
+    }
+
+    public Recipe setHidden(boolean hidden){
+        this.hidden = hidden;
         return this;
     }
 
     @Override
+    public boolean alwaysUnlocked(){
+        return hidden;
+    }
+
+    @Override
     public boolean isHidden(){
-        return debugOnly || (desktopOnly && mobile);
+        return (desktopOnly && mobile) || hidden;
     }
 
     @Override

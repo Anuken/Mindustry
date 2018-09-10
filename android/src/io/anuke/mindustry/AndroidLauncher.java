@@ -91,11 +91,6 @@ public class AndroidLauncher extends PatchedAndroidApplication{
             }
 
             @Override
-            public boolean isDebug(){
-                return false;
-            }
-
-            @Override
             public String getUUID(){
                 try{
                     String s = Secure.getString(getContext().getContentResolver(),

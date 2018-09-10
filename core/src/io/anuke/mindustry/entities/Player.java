@@ -266,7 +266,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void draw(){
-        if((debug && (!showPlayer || !showUI)) || dead) return;
+        if(dead) return;
 
         float x = snappedX(), y = snappedY();
 
@@ -518,7 +518,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             isBoosting = true;
         }
 
-        float speed = isBoosting && !mech.flying ? debug ? 5f : mech.boostSpeed : mech.speed;
+        float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
         //fraction of speed when at max load
         float carrySlowdown = 0.7f;
 
@@ -570,7 +570,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 velocity.add(movement);
             }
             float prex = x, prey = y;
-            updateVelocityStatus(mech.drag, debug ? 10f : mech.maxSpeed);
+            updateVelocityStatus(mech.drag, mech.maxSpeed);
             moved = distanceTo(prex, prey) > 0.01f;
         }else{
             velocity.setZero();

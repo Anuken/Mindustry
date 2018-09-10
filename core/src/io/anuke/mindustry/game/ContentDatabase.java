@@ -9,8 +9,6 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 
-import static io.anuke.mindustry.Vars.debug;
-
 public class ContentDatabase{
     /** Maps unlockable type names to a set of unlocked content.*/
     private ObjectMap<ContentType, ObjectSet<String>> unlocked = new ObjectMap<>();
@@ -23,7 +21,7 @@ public class ContentDatabase{
     
     /** Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(UnlockableContent content){
-        if(debug) return true;
+        if(content.alwaysUnlocked()) return true;
 
         if(!unlocked.containsKey(content.getContentType())){
             unlocked.put(content.getContentType(), new ObjectSet<>());

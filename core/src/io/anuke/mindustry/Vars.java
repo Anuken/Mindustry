@@ -89,20 +89,7 @@ public class Vars{
     public static float fontScale;
     //camera zoom displayed on startup
     public static int baseCameraScale;
-    //if true, player speed will be increased, massive amounts of resources will be given on start, and other debug options will be available
-    public static boolean debug = false;
     public static boolean console = false;
-    //whether the player can clip through walls
-    public static boolean noclip = false;
-    //whether turrets have infinite ammo (only with debug)
-    public static boolean infiniteAmmo = true;
-    //whether to show paths of enemies
-    public static boolean showPaths = false;
-    //if false, player is always hidden
-    public static boolean showPlayer = true;
-    //whether to hide ui, only on debug
-    public static boolean showUI = true;
-    //whether to show block debug
     public static boolean showBlockDebug = false;
     public static boolean showFog = true;
     public static boolean headless = false;
