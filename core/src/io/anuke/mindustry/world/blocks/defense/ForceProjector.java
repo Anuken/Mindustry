@@ -222,7 +222,7 @@ public class ForceProjector extends Block {
         @Override
         public void draw(){
             Draw.color(Palette.accent);
-            Fill.polyTri(x, y, 6, realRadius(entity));
+            Fill.poly(x, y, 6, realRadius(entity));
             Draw.color();
         }
 
@@ -231,7 +231,7 @@ public class ForceProjector extends Block {
 
             Draw.color(Color.WHITE);
             Draw.alpha(entity.hit);
-            Fill.polyTri(x, y, 6, realRadius(entity));
+            Fill.poly(x, y, 6, realRadius(entity));
             Draw.color();
         }
 
