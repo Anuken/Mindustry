@@ -52,7 +52,6 @@ public class CoreBlock extends StorageBlock{
         solid = false;
         solidifes = true;
         update = true;
-        unbreakable = true;
         size = 3;
         hasItems = true;
         itemCapacity = 2000;
@@ -80,6 +79,16 @@ public class CoreBlock extends StorageBlock{
     public static void setCoreSolid(Tile tile, boolean solid){
         CoreEntity entity = tile.entity();
         if(entity != null) entity.solid = solid;
+    }
+
+    @Override
+    public boolean canBreak(Tile tile){
+        return state.teams.get(tile.getTeam()).cores.size > 1;
+    }
+
+    @Override
+    public void placed(Tile tile){
+        state.teams.get(tile.getTeam()).cores.add(tile);
     }
 
     @Override

@@ -42,8 +42,6 @@ public class Block extends BaseBlock {
     public boolean update;
     /** whether this block has health and can be destroyed */
     public boolean destructible;
-    /** if true, this block cannot be broken by normal means. */
-    public boolean unbreakable;
     /** whether this is solid */
     public boolean solid;
     /** whether this block CAN be solid. */
@@ -132,6 +130,10 @@ public class Block extends BaseBlock {
         }
     }
 
+    public boolean canBreak(Tile tile){
+        return true;
+    }
+
     public boolean dropsItem(Item item){
         return drops != null && drops.item == item;
     }
@@ -158,7 +160,11 @@ public class Block extends BaseBlock {
     public void drawPlace(int x, int y, int rotation, boolean valid){
     }
 
-    /** Called after the block is placed. */
+    /** Called after the block is placed by this client. */
+    public void playerPlaced(Tile tile){
+    }
+
+    /** Called after the block is placed by anyone. */
     public void placed(Tile tile){
     }
 

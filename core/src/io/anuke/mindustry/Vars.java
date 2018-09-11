@@ -30,6 +30,9 @@ import java.util.Arrays;
 import java.util.Locale;
 
 public class Vars{
+    public static final String discordURL = "https://discord.gg/mindustry";
+    public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
+    public static final String crashReportURL = "http://mindustry.us.to/report";
     //time between waves in frames (on normal mode)
     public static final float wavespace = 60 * 60 * 1.5f;
     //set ridiculously high for now
@@ -38,10 +41,7 @@ public class Vars{
     public static final Team defaultTeam = Team.blue;
     //team of the enemy in waves
     public static final Team waveTeam = Team.red;
-
-    public static final String discordURL = "https://discord.gg/mindustry";
-    public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
-    public static final String crashReportURL = "http://mindustry.us.to/report";
+    public static final float unlockResourceScaling = 1.5f;
     public static final int maxTextLength = 150;
     public static final int maxNameLength = 40;
     public static final float itemSize = 5f;

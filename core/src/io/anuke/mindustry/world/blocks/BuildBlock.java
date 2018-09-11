@@ -57,12 +57,13 @@ public class BuildBlock extends Block{
         tile.setRotation(rotation);
         world.setBlock(tile, block, team);
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
+        threads.runDelay(() -> tile.block().placed(tile));
 
         //last builder was this local client player, call placed()
         if(!headless && builderID == players[0].id){
             //this is run delayed, since if this is called on the server, all clients need to recieve the onBuildFinish()
             //event first before they can recieve the placed() event modification results
-            threads.runDelay(() -> tile.block().placed(tile));
+            threads.runDelay(() -> tile.block().playerPlaced(tile));
         }
     }
 

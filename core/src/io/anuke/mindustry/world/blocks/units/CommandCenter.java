@@ -46,7 +46,7 @@ public class CommandCenter extends Block{
     }
 
     @Override
-    public void placed(Tile tile){
+    public void playerPlaced(Tile tile){
         ObjectSet<Tile> set = world.indexer().getAllied(tile.getTeam(), BlockFlag.comandCenter);
 
         if(set.size > 0){

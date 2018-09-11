@@ -122,9 +122,13 @@ public class Recipes implements ContentList{
         new Recipe(power, PowerBlocks.thoriumReactor, new ItemStack(Items.lead, 600), new ItemStack(Items.silicon, 400), new ItemStack(Items.densealloy, 300), new ItemStack(Items.thorium, 300));
         new Recipe(power, PowerBlocks.rtgGenerator, new ItemStack(Items.lead, 200), new ItemStack(Items.silicon, 150), new ItemStack(Items.phasematter, 50), new ItemStack(Items.plastanium, 150), new ItemStack(Items.thorium, 100));
 
-        //new Recipe(distribution, StorageBlocks.core, new ItemStack(Items.densealloy, 50));
         new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.densealloy, 40), new ItemStack(Items.silicon, 50));
         new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.densealloy, 500), new ItemStack(Items.thorium, 350));
+        new Recipe(distribution, StorageBlocks.core,
+            new ItemStack(Items.copper, 2000), new ItemStack(Items.densealloy, 1500),
+            new ItemStack(Items.silicon, 1500), new ItemStack(Items.thorium, 500),
+            new ItemStack(Items.surgealloy, 500), new ItemStack(Items.phasematter, 750)
+        );
 
         //DRILLS, PRODUCERS
         new Recipe(production, ProductionBlocks.mechanicalDrill, new ItemStack(Items.copper, 50));

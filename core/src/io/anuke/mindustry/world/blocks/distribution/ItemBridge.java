@@ -81,7 +81,7 @@ public class ItemBridge extends Block{
     }
 
     @Override
-    public void placed(Tile tile){
+    public void playerPlaced(Tile tile){
         Tile last = world.tile(lastPlaced);
         if(linkValid(tile, last)){
             ItemBridgeEntity entity = last.entity();

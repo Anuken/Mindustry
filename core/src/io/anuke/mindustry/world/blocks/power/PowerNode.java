@@ -90,7 +90,7 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void placed(Tile tile){
+    public void playerPlaced(Tile tile){
         Tile before = world.tile(lastPlaced);
         if(linkValid(tile, before) && before.block() instanceof PowerNode){
             Call.linkPowerDistributors(null, tile, before);
