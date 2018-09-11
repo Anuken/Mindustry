@@ -5,9 +5,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.PacketPriority;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.annotations.Annotations.Variant;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -21,6 +23,7 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.TraceInfo;
+import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
@@ -131,6 +134,32 @@ public class NetClient extends Module{
             packet.writeBuffer.position(0);
             RemoteReadClient.readPacket(packet.writeBuffer, packet.type);
         });
+    }
+
+    @Remote(called = Loc.server, targets = Loc.both, forward = true)
+    public static void sendMessage(Player player, String message){
+        if(message.length() > maxTextLength){
+            throw new ValidateException(player, "Player has sent a message above the text limit.");
+        }
+
+        Log.info("&y{0}: &lb{1}", (player == null || player.name == null ? "" : player.name), message);
+
+        if(Vars.ui != null){
+            Vars.ui.chatfrag.addMessage(message, player == null ? null : colorizeName(player.id, player.name));
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, forward = true)
+    public static void sendMessage(String message){
+        if(Vars.ui != null){
+            Vars.ui.chatfrag.addMessage(message, null);
+        }
+    }
+
+    private static String colorizeName(int id, String name){
+        Player player = playerGroup.getByID(id);
+        if(name == null || player == null) return null;
+        return "[#" + player.color.toString().toUpperCase() + "]" + name;
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.high)
