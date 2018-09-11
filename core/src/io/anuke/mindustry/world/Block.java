@@ -164,6 +164,9 @@ public class Block extends BaseBlock {
     public void playerPlaced(Tile tile){
     }
 
+    public void removed(Tile tile){
+    }
+
     /** Called after the block is placed by anyone. */
     public void placed(Tile tile){
     }

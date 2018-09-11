@@ -397,6 +397,7 @@ public class Tile implements PosTrait, TargetTrait{
 
     private void preChanged(){
         synchronized(tileSetLock){
+            block().removed(this);
             if(entity != null){
                 entity.removeFromProximity();
             }

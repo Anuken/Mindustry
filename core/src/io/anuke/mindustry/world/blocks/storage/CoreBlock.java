@@ -87,6 +87,11 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
+    public void removed(Tile tile){
+        state.teams.get(tile.getTeam()).cores.removeValue(tile, true);
+    }
+
+    @Override
     public void placed(Tile tile){
         state.teams.get(tile.getTeam()).cores.add(tile);
     }
@@ -166,10 +171,8 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void onDestroyed(Tile tile){
-        //TODO more dramatic effects
         super.onDestroyed(tile);
-
-        state.teams.get(tile.getTeam()).cores.removeValue(tile, true);
+        //TODO more dramatic effects
     }
 
     @Override
