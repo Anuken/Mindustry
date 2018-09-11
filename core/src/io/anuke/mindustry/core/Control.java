@@ -13,7 +13,6 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentDatabase;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
@@ -110,9 +109,9 @@ public class Control extends Module{
 
             state.set(State.playing);
 
-            if(state.mode == GameMode.sandbox && !Settings.getBool("sandbox-warning", false)){
-                threads.runGraphics(() -> ui.showInfo("$mode.sandbox.warning"));
-                Settings.putBool("sandbox-warning", true);
+            if(world.getSector() == null && !Settings.getBool("custom-warning", false)){
+                threads.runGraphics(() -> ui.showInfo("$mode.custom.warning"));
+                Settings.putBool("custom-warning", true);
                 Settings.save();
             }
         });
@@ -388,7 +387,7 @@ public class Control extends Module{
             }
 
             //check unlocks every 2 seconds
-            if(!state.mode.infiniteResources && Timers.get("timerCheckUnlock", 120)){
+            if(world.getSector() != null && Timers.get("timerCheckUnlock", 120)){
                 checkUnlockableBlocks();
 
                 //save if the db changed
