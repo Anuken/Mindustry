@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.production;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectIntMap;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
@@ -21,12 +22,15 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
+
 import static io.anuke.mindustry.Vars.content;
 public class Drill extends Block{
     protected final static float hardnessDrillMultiplier = 50f;
     protected final int timerDump = timers++;
 
     protected final Array<Tile> drawTiles = new Array<>();
+    protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
+    protected final Array<Item> itemArray = new Array<>();
 
     /**Maximum tier of blocks this drill can mine.*/
     protected int tier;
@@ -143,30 +147,28 @@ public class Drill extends Block{
         DrillEntity entity = tile.entity();
 
         if(entity.dominantItem == null){
-            boolean foundDominant = false;
+            oreCount.clear();
+            itemArray.clear();
 
             for(Tile other : tile.getLinkedTiles(tempTiles)){
                 if(isValid(other)){
-                    Item drop = getDrop(other);
-
-                    if(!foundDominant){
-                        entity.dominantItem = drop;
-                        foundDominant = true;
-                    }else if(entity.dominantItem != drop && drop.id < entity.dominantItem.id){
-                        entity.dominantItem = drop;
-                    }
+                    oreCount.getAndIncrement(getDrop(other), 0, 1);
                 }
             }
 
-            for(Tile other : tile.getLinkedTiles(tempTiles)){
-                if(isValid(other) && getDrop(other) == entity.dominantItem){
-                    entity.dominantItems ++;
-                }
+            for(Item item : oreCount.keys()){
+                itemArray.add(item);
             }
-        }
 
-        if(entity.dominantItem == null){
-            return;
+            itemArray.sort((item1, item2) -> Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0)));
+            itemArray.sort((item1, item2) -> item1.genOre && !item2.genOre ? 1 : item1.genOre == item2.genOre ? 0 : -1);
+
+            if(itemArray.size == 0){
+                return;
+            }
+
+            entity.dominantItem = itemArray.peek();
+            entity.dominantItems = oreCount.get(itemArray.peek(), 0);
         }
 
         float totalHardness = entity.dominantItems * entity.dominantItem.hardness;

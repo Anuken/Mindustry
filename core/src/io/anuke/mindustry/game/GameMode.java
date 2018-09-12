@@ -23,13 +23,11 @@ public enum GameMode{
         isPvp = true;
         hidden = true;
         enemyCoreBuildRadius = 600f;
-        enemyCoreShieldRadius = 0f;
         respawnTime = 60 * 10;
     }};
 
     public boolean infiniteResources, disableWaveTimer, disableWaves, hidden, enemyCheat, isPvp, showPads;
     public float enemyCoreBuildRadius = 400f;
-    public float enemyCoreShieldRadius = 140f;
     public float respawnTime = 60 * 4;
 
     public String description(){

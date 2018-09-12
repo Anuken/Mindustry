@@ -35,6 +35,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class BuildBlock extends Block{
+
     public BuildBlock(String name){
         super(name);
         update = true;

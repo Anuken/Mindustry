@@ -1,12 +1,12 @@
 package io.anuke.mindustry.content.blocks;
 
 import com.badlogic.gdx.utils.ObjectMap;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import static io.anuke.mindustry.Vars.*;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class OreBlocks extends BlockList{
     private static final ObjectMap<Item, ObjectMap<Block, Block>> oreBlockMap = new ObjectMap<>();
@@ -20,9 +20,9 @@ public class OreBlocks extends BlockList{
 
     @Override
     public void load(){
-        Item[] ores = {Items.copper, Items.lead, Items.coal, Items.titanium, Items.thorium};
 
-        for(Item item : ores){
+        for(Item item : content.items()){
+            if(!item.genOre) continue;
             ObjectMap<Block, Block> map = new ObjectMap<>();
             oreBlockMap.put(item, map);
 

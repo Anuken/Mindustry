@@ -36,6 +36,8 @@ public class Item extends UnlockableContent implements Comparable<Item>{
      * 1 cost = 1 tick added to build time
      */
     public float cost = 3f;
+    /**Whether this item has ores generated for it.*/
+    public boolean genOre = false;
 
     public Item(String name, Color color){
         this.name = name;

@@ -123,7 +123,7 @@ public class Block extends BaseBlock {
     /**Populates the array with all blocks that produce this content.*/
     public static void getByProduction(Array<Block> arr, Content result){
         arr.clear();
-        for(Block block : content.<Block>getBy(ContentType.block)){
+        for(Block block : content.blocks()){
             if(block.produces.get() == result){
                 arr.add(block);
             }

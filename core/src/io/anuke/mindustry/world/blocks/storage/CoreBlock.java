@@ -5,13 +5,11 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
@@ -27,7 +25,6 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.EnumSet;
@@ -37,7 +34,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.unitGroups;
 
 public class CoreBlock extends StorageBlock{
     protected float droneRespawnDuration = 60 * 6;
@@ -187,16 +185,6 @@ public class CoreBlock extends StorageBlock{
         if(!entity.solid && !Units.anyEntities(tile)){
             Call.setCoreSolid(tile, true);
         }
-
-        EntityPhysics.getNearby(bulletGroup, tile.drawx(), tile.drawy(), state.mode.enemyCoreShieldRadius*2f, e -> {
-            if(e.distanceTo(tile) > state.mode.enemyCoreShieldRadius) return;
-            Bullet bullet = (Bullet)e;
-            if(bullet.getOwner() instanceof Player && bullet.getTeam() != tile.getTeam()){
-                Effects.effect(BulletFx.absorb, bullet);
-                entity.shieldHeat = 1f;
-                bullet.absorb();
-            }
-        });
 
         if(entity.currentUnit != null){
             if(!entity.currentUnit.isDead()){

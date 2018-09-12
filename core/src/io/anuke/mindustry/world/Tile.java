@@ -77,11 +77,11 @@ public class Tile implements PosTrait, TargetTrait{
     }
 
     public byte getBlockID(){
-        return (byte) wall.id;
+        return wall.id;
     }
 
     public byte getFloorID(){
-        return (byte) floor.id;
+        return floor.id;
     }
 
     /** Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile. */
