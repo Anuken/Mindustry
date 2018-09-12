@@ -20,7 +20,6 @@ import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
-import io.anuke.mindustry.ui.fragments.DebugFragment;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.modules.Module;
@@ -643,10 +642,6 @@ public class ServerControl extends Module{
             info("&lyCore destroyed.");
             inExtraRound = false;
             Events.fire(new GameOverEvent());
-        });
-
-        handler.register("debuginfo", "Print debug info", arg -> {
-            info(DebugFragment.debugInfo());
         });
 
         handler.register("traceblock", "<x> <y>", "Prints debug info about a block", arg -> {
