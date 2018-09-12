@@ -245,7 +245,7 @@ public class Mechs implements ContentList{
             drillPower = 1;
             mineSpeed = 0.9f;
             speed = 0.4f;
-            maxSpeed = 3f;
+            maxSpeed = 10f;
             drag = 0.1f;
             armor = 10f;
             weapon = Weapons.blasterSmall;
@@ -262,7 +262,7 @@ public class Mechs implements ContentList{
             {
                 drillPower = -1;
                 speed = 0.11f;
-                maxSpeed = 3.4f;
+                maxSpeed = 10f;
                 drag = 0.01f;
                 armor = 5f;
                 weapon = Weapons.missiles;
@@ -316,7 +316,7 @@ public class Mechs implements ContentList{
             {
                 drillPower = 2;
                 speed = 0.12f;
-                maxSpeed = 3.4f;
+                maxSpeed = 10f;
                 drag = 0.035f;
                 turnCursor = false;
                 armor = 20f;
@@ -338,7 +338,7 @@ public class Mechs implements ContentList{
                 drillPower = 4;
                 mineSpeed = 1.3f;
                 speed = 0.32f;
-                maxSpeed = 3f;
+                maxSpeed = 10f;
                 drag = 0.06f;
                 armor = 30f;
                 itemCapacity = 60;

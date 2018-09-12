@@ -23,7 +23,6 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
@@ -126,7 +125,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            boolean preventDuplicates = headless && isStrict();
+            boolean preventDuplicates = headless && netServer.admins.getStrict();
 
             if(preventDuplicates){
                 for(Player player : playerGroup.all()){
@@ -219,15 +218,6 @@ public class NetServer extends Module{
         });
     }
 
-    private static float compound(float speed, float drag){
-        float total = 0f;
-        for(int i = 0; i < 20; i++){
-            total *= (1f - drag);
-            total += speed;
-        }
-        return total;
-    }
-
     /** Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.*/
     private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID, int uncompressedLength){
         if(bytes.length < maxSnapshotSize){
@@ -267,10 +257,6 @@ public class NetServer extends Module{
         }
     }
 
-    public static boolean isStrict(){
-        return Settings.getBool("strict", true);
-    }
-
     public void sendWorldData(Player player, int clientID){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         DeflaterOutputStream def = new DeflaterOutputStream(stream);
@@ -291,6 +277,15 @@ public class NetServer extends Module{
         netServer.connections.remove(player.con.id);
     }
 
+    private static float compound(float speed, float drag){
+        float total = 0f;
+        for(int i = 0; i < 50; i++){
+            total *= (1f - drag);
+            total += speed;
+        }
+        return total;
+    }
+
     @Remote(targets = Loc.client, unreliable = true)
     public static void onClientShapshot(
         Player player,
@@ -307,7 +302,7 @@ public class NetServer extends Module{
         NetConnection connection = player.con;
         if(connection == null || snapshotID < connection.lastRecievedClientSnapshot) return;
 
-        boolean verifyPosition = !player.isDead() && isStrict() && headless && player.getCarrier() == null;
+        boolean verifyPosition = !player.isDead() && netServer.admins.getStrict() && headless && player.getCarrier() == null;
 
         if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = TimeUtils.millis() - 16;
 
@@ -319,7 +314,7 @@ public class NetServer extends Module{
         long elapsed = TimeUtils.timeSinceMillis(connection.lastRecievedClientTime);
 
         float maxSpeed = boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
-        float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.2f, player.mech.maxSpeed * 1.05f);
+        float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.25f, player.mech.maxSpeed * 1.1f);
 
         player.pointerX = pointerX;
         player.pointerY = pointerY;

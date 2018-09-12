@@ -18,17 +18,23 @@ public class Administration{
     private ObjectMap<String, TraceInfo> traceInfo = new ObjectMap<>();
     /** Maps packed coordinates to logs for that coordinate*/
     private IntMap<Array<EditLog>> editLogs = new IntMap<>();
-
     private Array<String> bannedIPs = new Array<>();
 
     public Administration(){
         Settings.defaultList(
-            "antigrief", false,
-            "antigrief-max", defaultMaxBrokenBlocks,
-            "antigrief-cooldown", defaultBreakCooldown
+            "strict", true
         );
 
         load();
+    }
+
+    public void setStrict(boolean on){
+        Settings.putBool("strict", on);
+        Settings.save();
+    }
+
+    public boolean getStrict(){
+        return Settings.getBool("strict");
     }
 
     public boolean allowsCustomClients(){

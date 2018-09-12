@@ -337,8 +337,8 @@ public class ServerControl extends Module{
 
         handler.register("strict", "<on/off>", "Disables or enables strict mode", arg -> {
            boolean value = arg[0].equalsIgnoreCase("on");
-           Settings.putBool("strict", value);
-           info("Debug mode is now {0}.", Settings.getBool("strict", true) ? "on" : "off");
+           netServer.admins.setStrict(value);
+           info("Strict mode is now {0}.", netServer.admins.getStrict() ? "on" : "off");
         });
 
         handler.register("allow-custom-clients", "[on/off]", "Allow or disallow custom clients.", arg -> {
@@ -903,7 +903,7 @@ public class ServerControl extends Module{
             checkPvPGameOver();
         }
 
-        if(state.is(State.playing) && world.getSector() != null && !inExtraRound){
+        if(state.is(State.playing) && world.getSector() != null && !inExtraRound && netServer.admins.getStrict()){
             //all assigned missions are complete
             if(world.getSector().completedMissions >= world.getSector().missions.size){
                 Log.info("Mission complete.");

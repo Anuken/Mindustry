@@ -89,7 +89,6 @@ public class Vars{
     public static float fontScale;
     //camera zoom displayed on startup
     public static int baseCameraScale;
-    public static boolean console = false;
     public static boolean showBlockDebug = false;
     public static boolean showFog = true;
     public static boolean headless = false;

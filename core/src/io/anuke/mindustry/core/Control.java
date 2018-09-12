@@ -356,10 +356,6 @@ public class Control extends Module{
             throw new RuntimeException(error);
         }
 
-        if(Inputs.keyTap(io.anuke.ucore.input.Input.GRAVE)){
-            console = !console;
-        }
-
         saves.update();
 
         triggerUpdateInput();

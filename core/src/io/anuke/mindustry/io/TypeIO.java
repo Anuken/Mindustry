@@ -26,6 +26,7 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entities;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -329,7 +330,7 @@ public class TypeIO{
     @WriteClass(String.class)
     public static void writeString(ByteBuffer buffer, String string){
         if(string != null){
-            byte[] bytes = string.getBytes();
+            byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
             buffer.putShort((short) bytes.length);
             buffer.put(bytes);
         }else{
@@ -343,7 +344,7 @@ public class TypeIO{
         if(length != -1){
             byte[] bytes = new byte[length];
             buffer.get(bytes);
-            return new String(bytes);
+            return new String(bytes, StandardCharsets.UTF_8);
         }else{
             return null;
         }
