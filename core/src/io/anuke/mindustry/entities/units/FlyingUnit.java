@@ -80,6 +80,11 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             }
         }
     },
+    patrol = new UnitState(){
+        public void update(){
+            //TODO
+        }
+    },
     retreat = new UnitState(){
         public void entered(){
             target = null;
@@ -107,8 +112,9 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     @Override
     public void onCommand(UnitCommand command){
         state.set(command == UnitCommand.retreat ? retreat :
-                 (command == UnitCommand.attack ? attack :
-                 (null)));
+                (command == UnitCommand.attack ? attack :
+                (command == UnitCommand.patrol ? patrol :
+                (null))));
     }
 
     @Override

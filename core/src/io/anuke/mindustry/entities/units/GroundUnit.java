@@ -76,6 +76,11 @@ public abstract class GroundUnit extends BaseUnit{
             }
         }
     },
+    patrol = new UnitState(){
+        public void update(){
+            //TODO
+        }
+    },
     retreat = new UnitState(){
         public void entered(){
             target = null;
@@ -94,7 +99,8 @@ public abstract class GroundUnit extends BaseUnit{
     public void onCommand(UnitCommand command){
         state.set(command == UnitCommand.retreat ? retreat :
                 (command == UnitCommand.attack ? attack :
-                (null)));
+                (command == UnitCommand.patrol ? patrol :
+                (null))));
     }
 
     @Override
