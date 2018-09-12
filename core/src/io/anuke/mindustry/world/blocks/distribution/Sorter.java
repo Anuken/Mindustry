@@ -38,7 +38,7 @@ public class Sorter extends Block implements SelectionTrait{
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSorterItem(Player player, Tile tile, Item item){
         SorterEntity entity = tile.entity();
-        entity.sortItem = item;
+        if(entity != null) entity.sortItem = item;
     }
 
     @Override
