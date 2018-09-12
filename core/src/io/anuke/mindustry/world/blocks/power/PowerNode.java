@@ -49,6 +49,7 @@ public class PowerNode extends PowerBlock{
         layer = Layer.power;
         powerCapacity = 5f;
         configurable = true;
+        outputsPower = true;
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)

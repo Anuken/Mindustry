@@ -25,6 +25,7 @@ public abstract class BaseBlock extends MappableContent{
 
     public boolean outputsLiquid = false;
     public boolean singleLiquid = true;
+    public boolean outputsPower = false;
 
     public int itemCapacity;
     public float liquidCapacity = 10f;

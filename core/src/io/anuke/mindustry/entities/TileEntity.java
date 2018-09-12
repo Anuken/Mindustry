@@ -179,19 +179,19 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         for(GridPoint2 point : nearby){
             Tile other = world.tile(tile.x + point.x, tile.y + point.y);
 
-            if(other != null){
-                other.block().onProximityUpdate(other);
-                other = other.target();
+            if(other == null || other.entity == null || other.getTeamID() != tile.getTeamID()) continue;
+            other = other.target();
+
+            if(other.entity.power != null) other.block().updatePowerGraph(other);
+            other.block().onProximityUpdate(other);
+
+            tmpTiles.add(other);
+
+            //add this tile to proximity of nearby tiles
+            if(!other.entity.proximity.contains(tile, true)){
+                other.entity.proximity.add(tile);
             }
 
-            if(other != null && other.entity != null){
-                tmpTiles.add(other);
-
-                //add this tile to proximity of nearby tiles
-                if(!other.entity.proximity.contains(tile, true)){
-                    other.entity.proximity.add(tile);
-                }
-            }
         }
 
         //using a set to prevent duplicates
@@ -199,6 +199,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             proximity.add(tile);
         }
 
+        if(power != null) tile.block().updatePowerGraph(tile);
         tile.block().onProximityUpdate(tile);
     }
 
