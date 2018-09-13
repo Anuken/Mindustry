@@ -119,7 +119,6 @@ public class AmmoTypes implements ContentList{
         bulletDenseBig = new AmmoType(Items.densealloy, StandardBullets.denseBig, 1){{
             shootEffect = ShootFx.shootBig;
             smokeEffect = ShootFx.shootBigSmoke;
-            reloadMultiplier = 0.6f;
         }};
 
         bulletThoriumBig = new AmmoType(Items.thorium, StandardBullets.thoriumBig, 1){{

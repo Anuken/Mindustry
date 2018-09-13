@@ -197,6 +197,8 @@ public class TurretBlocks extends BlockList implements ContentList{
             rotatespeed = 10f;
             inaccuracy = 13f;
             shootCone = 30f;
+
+            health = 145 * size * size;
         }};
 
         fuse = new ItemTurret("fuse"){{
@@ -208,20 +210,25 @@ public class TurretBlocks extends BlockList implements ContentList{
             recoil = 5f;
             restitution = 0.1f;
             size = 3;
+
+            health = 155 * size * size;
         }};
 
         spectre = new DoubleTurret("spectre"){{
             ammoTypes = new AmmoType[]{AmmoTypes.bulletDenseBig, AmmoTypes.bulletPyratiteBig, AmmoTypes.bulletThoriumBig};
-            reload = 3f;
+            reload = 4f;
             restitution = 0.03f;
             ammoUseEffect = ShootFx.shellEjectMedium;
             range = 200f;
-            recoil = 2f;
+            recoil = 3f;
             xRand = 3f;
             shotWidth = 4f;
-            shootShake = 1.5f;
+            shootShake = 2f;
             shots = 2;
             size = 4;
+            shootCone = 24f;
+
+            health = 155 * size * size;
         }};
 
         meltdown = new PowerTurret("meltdown"){{

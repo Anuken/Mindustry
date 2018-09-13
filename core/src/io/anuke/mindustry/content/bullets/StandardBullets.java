@@ -77,30 +77,30 @@ public class StandardBullets extends BulletList implements ContentList{
             }
         };
 
-        denseBig = new BasicBulletType(10f, 36, "bullet"){
+        denseBig = new BasicBulletType(7f, 42, "bullet"){
             {
-                bulletWidth = 16f;
+                bulletWidth = 15f;
                 bulletHeight = 21f;
                 armorPierce = 0.2f;
             }
         };
 
-        thoriumBig = new BasicBulletType(11f, 58, "bullet"){
+        thoriumBig = new BasicBulletType(8f, 65, "bullet"){
             {
-                bulletWidth = 17f;
+                bulletWidth = 16f;
                 bulletHeight = 23f;
                 armorPierce = 0.5f;
             }
         };
 
-        tracerBig = new BasicBulletType(9f, 22, "bullet"){
+        tracerBig = new BasicBulletType(7f, 38, "bullet"){
             {
-                bulletWidth = 17f;
+                bulletWidth = 16f;
                 bulletHeight = 21f;
                 frontColor = Palette.lightishOrange;
                 backColor = Palette.lightOrange;
                 incendSpread = 3f;
-                incendAmount = 1;
+                incendAmount = 2;
                 incendChance = 0.3f;
             }
         };
