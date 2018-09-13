@@ -217,9 +217,10 @@ public class TurretBlocks extends BlockList implements ContentList{
         spectre = new DoubleTurret("spectre"){{
             ammoTypes = new AmmoType[]{AmmoTypes.bulletDenseBig, AmmoTypes.bulletPyratiteBig, AmmoTypes.bulletThoriumBig};
             reload = 4f;
-            restitution = 0.03f;
+            restitution = 0.1f;
             ammoUseEffect = ShootFx.shellEjectMedium;
             range = 200f;
+            inaccuracy = 4f;
             recoil = 3f;
             xRand = 3f;
             shotWidth = 4f;
