@@ -10,6 +10,7 @@ import io.anuke.mindustry.type.ContentType;
 
 public class AmmoTypes implements ContentList{
     public static AmmoType bulletCopper, bulletDense, bulletThorium, bulletSilicon, bulletPyratite,
+    bulletDenseBig, bulletPyratiteBig, bulletThoriumBig,
     shock, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite, weaponMissile, weaponMissileSwarm, bulletMech,
             healBlaster, bulletGlaive,
             flakExplosive, flakPlastic, flakSurge,
@@ -112,6 +113,23 @@ public class AmmoTypes implements ContentList{
         bulletPyratite = new AmmoType(Items.pyratite, StandardBullets.tracer, 3){{
             shootEffect = ShootFx.shootSmall;
             smokeEffect = ShootFx.shootSmallSmoke;
+            inaccuracy = 3f;
+        }};
+
+        bulletDenseBig = new AmmoType(Items.densealloy, StandardBullets.denseBig, 1){{
+            shootEffect = ShootFx.shootBig;
+            smokeEffect = ShootFx.shootBigSmoke;
+            reloadMultiplier = 0.6f;
+        }};
+
+        bulletThoriumBig = new AmmoType(Items.thorium, StandardBullets.thoriumBig, 1){{
+            shootEffect = ShootFx.shootBig;
+            smokeEffect = ShootFx.shootBigSmoke;
+        }};
+
+        bulletPyratiteBig = new AmmoType(Items.pyratite, StandardBullets.tracerBig, 2){{
+            shootEffect = ShootFx.shootBig;
+            smokeEffect = ShootFx.shootBigSmoke;
             inaccuracy = 3f;
         }};
 

@@ -8,7 +8,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.game.ContentList;
 
 public class StandardBullets extends BulletList implements ContentList{
-    public static BulletType copper, dense, thorium, homing, tracer, mechSmall, glaive;
+    public static BulletType copper, dense, thorium, homing, tracer, mechSmall, glaive, denseBig, thoriumBig, tracerBig;
 
     @Override
     public void load(){
@@ -74,6 +74,34 @@ public class StandardBullets extends BulletList implements ContentList{
                 bulletHeight = 14f;
                 lifetime = 40f;
                 despawneffect = BulletFx.hitBulletSmall;
+            }
+        };
+
+        denseBig = new BasicBulletType(10f, 36, "bullet"){
+            {
+                bulletWidth = 16f;
+                bulletHeight = 21f;
+                armorPierce = 0.2f;
+            }
+        };
+
+        thoriumBig = new BasicBulletType(11f, 58, "bullet"){
+            {
+                bulletWidth = 17f;
+                bulletHeight = 23f;
+                armorPierce = 0.5f;
+            }
+        };
+
+        tracerBig = new BasicBulletType(9f, 22, "bullet"){
+            {
+                bulletWidth = 17f;
+                bulletHeight = 21f;
+                frontColor = Palette.lightishOrange;
+                backColor = Palette.lightOrange;
+                incendSpread = 3f;
+                incendAmount = 1;
+                incendChance = 0.3f;
             }
         };
     }
