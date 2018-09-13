@@ -61,7 +61,7 @@ public abstract class LiquidGenerator extends PowerGenerator{
             }
         }
 
-        distributePower(tile);
+        tile.entity.power.graph.update();
     }
 
     @Override

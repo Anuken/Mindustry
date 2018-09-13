@@ -110,7 +110,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void update(Tile tile){
-        distributeLaserPower(tile);
+        tile.entity.power.graph.update();
     }
 
     @Override
@@ -225,56 +225,6 @@ public class PowerNode extends PowerBlock{
         entity.powerRecieved += canAccept;
 
         return canAccept;
-    }
-
-    protected boolean shouldDistribute(Tile tile, Tile other){
-        return other != null && other.entity != null && other.block().hasPower && other.getTeamID() == tile.getTeamID() && other.entity.power.amount / other.block().powerCapacity <= tile.entity.power.amount / powerCapacity &&
-                !(other.block() instanceof PowerGenerator); //do not distribute to power generators
-    }
-
-    protected boolean shouldLeechPower(Tile tile, Tile other){
-        return other.getTeamID() == tile.getTeamID() && !(other.block() instanceof PowerNode)
-                && other.block() instanceof PowerDistributor //only suck power from batteries and power generators
-                && other.entity.power.amount / other.block().powerCapacity > tile.entity.power.amount / powerCapacity;
-    }
-
-    protected void distributeLaserPower(Tile tile){
-        DistributorEntity entity = tile.entity();
-
-        if(Float.isNaN(entity.power.amount)){
-            entity.power.amount = 0f;
-        }
-
-        int targets = 0;
-
-        //validate everything first.
-        for(int i = 0; i < entity.links.size; i++){
-            Tile target = world.tile(entity.links.get(i));
-            if(!linkValid(tile, target)){
-                entity.links.removeIndex(i);
-                i--;
-            }else if(shouldDistribute(tile, target)){
-                targets++;
-            }
-        }
-
-        float result = Math.min(entity.power.amount / targets, powerSpeed * Timers.delta());
-
-        for(int i = 0; i < entity.links.size; i++){
-            Tile target = world.tile(entity.links.get(i));
-            if(targets > 0 && shouldDistribute(tile, target)){
-
-                float transmit = Math.min(result, entity.power.amount);
-                if(target.block().acceptPower(target, tile, transmit)){
-                    entity.power.amount -= target.block().addPower(target, transmit);
-                }
-            }else if(shouldLeechPower(tile, target)){
-                float diff = (target.entity.power.amount / target.block().powerCapacity - tile.entity.power.amount / powerCapacity) / 1.4f;
-                float transmit = Math.min(Math.min(target.block().powerCapacity * diff, target.entity.power.amount), powerCapacity - tile.entity.power.amount);
-                entity.power.amount += transmit;
-                target.entity.power.amount -= transmit;
-            }
-        }
     }
 
     protected boolean linked(Tile tile, Tile other){

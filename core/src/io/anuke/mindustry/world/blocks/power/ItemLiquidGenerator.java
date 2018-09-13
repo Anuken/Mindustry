@@ -77,7 +77,7 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
             }
         }
 
-        distributePower(tile);
+        tile.entity.power.graph.update();
     }
 
     @Override

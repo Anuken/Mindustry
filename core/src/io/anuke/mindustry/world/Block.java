@@ -152,7 +152,7 @@ public class Block extends BaseBlock {
                 }
             }
 
-            entity.power.graph = new PowerGraph();
+            entity.power.graph = new PowerGraph(entity);
             entity.power.graph.add(tile);
         }else{
             //TODO

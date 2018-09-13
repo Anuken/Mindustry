@@ -12,6 +12,6 @@ public class PowerDistributor extends PowerBlock{
 
     @Override
     public void update(Tile tile){
-        tile.entity.power.graph.distribute(tile);
+        tile.entity.power.graph.update();
     }
 }

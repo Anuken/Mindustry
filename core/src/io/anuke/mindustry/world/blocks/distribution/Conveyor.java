@@ -366,11 +366,11 @@ public class Conveyor extends Block{
         ConveyorEntity entity = tile.entity();
         Array<Object> arr = super.getDebugInfo(tile);
         arr.addAll(Array.with(
-                "mincarry", entity.minCarry,
-                "minitem", entity.minCarry,
-                "carrying", entity.carrying,
-                "clogHeat", entity.clogHeat,
-                "sleeping", entity.isSleeping()
+            "mincarry", entity.minCarry,
+            "minitem", entity.minCarry,
+            "carrying", entity.carrying,
+            "clogHeat", entity.clogHeat,
+            "sleeping", entity.isSleeping()
         ));
         return arr;
     }

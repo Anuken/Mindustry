@@ -106,8 +106,7 @@ public abstract class ItemGenerator extends PowerGenerator{
             entity.generateTime = 1f;
         }
 
-        distributePower(tile);
-
+        tile.entity.power.graph.update();
     }
 
     protected abstract float getItemEfficiency(Item item);

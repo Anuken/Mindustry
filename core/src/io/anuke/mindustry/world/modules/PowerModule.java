@@ -22,7 +22,6 @@ public class PowerModule extends BlockModule{
         }
 
         float canAccept = Math.min(capacity - amount, add);
-
         amount += canAccept;
 
         return canAccept;
