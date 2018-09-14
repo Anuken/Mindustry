@@ -57,7 +57,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
         plastaniumCompressor = new PlastaniumCompressor("plastanium-compressor"){{
             hasItems = true;
             liquidCapacity = 60f;
-            craftTime = 80f;
+            craftTime = 60f;
             output = Items.plastanium;
             itemCapacity = 30;
             size = 2;
@@ -67,7 +67,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             updateEffect = BlockFx.plasticburn;
 
             consumes.liquid(Liquids.oil, 0.25f);
-            consumes.power(0.25f);
+            consumes.power(0.3f);
             consumes.item(Items.titanium, 2);
         }};
 

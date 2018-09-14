@@ -82,6 +82,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         threads.runDelay(unit::remove);
     }
 
+    @Override
+    public float getDrag(){
+        return type.drag;
+    }
+
     /**Called when a command is recieved from the command center.*/
     public abstract void onCommand(UnitCommand command);
 

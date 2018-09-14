@@ -114,10 +114,9 @@ public class DebugBlocks extends BlockList implements ContentList{
                 for(int i = 0; i < items.size; i++){
                     if(i == 0) continue;
                     final int f = i;
-                    ImageButton button = cont.addImageButton("white", "toggle", 24, () -> {
+                    ImageButton button = cont.addImageButton("liquid-icon-" + items.get(i).name, "toggle", 24, () -> {
                         Call.setLiquidSourceLiquid(null, tile, items.get(f));
                     }).size(38, 42).padBottom(-5.1f).group(group).get();
-                    button.getStyle().imageUpColor = items.get(i).color;
                     button.setChecked(entity.source.id == f);
 
                     if(i % 4 == 3){

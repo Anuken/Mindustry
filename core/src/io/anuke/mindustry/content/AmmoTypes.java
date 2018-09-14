@@ -217,7 +217,7 @@ public class AmmoTypes implements ContentList{
 
         spectreLaser = new AmmoType(TurretBullets.lancerLaser);
 
-        meltdownLaser = new AmmoType(TurretBullets.lancerLaser);
+        meltdownLaser = new AmmoType(TurretBullets.meltdownLaser);
 
         fuseShotgun = new AmmoType(Items.densealloy, TurretBullets.fuseShot, 1f){{
             shootEffect = Fx.none;

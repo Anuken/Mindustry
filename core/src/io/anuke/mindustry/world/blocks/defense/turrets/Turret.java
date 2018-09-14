@@ -213,7 +213,7 @@ public abstract class Turret extends Block{
                 }
 
                 if(shouldTurn(tile)){
-                    entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * entity.delta());
+                    turnToTarget(tile, targetRot);
                 }
 
                 if(Angles.angleDist(entity.rotation, targetRot) < shootCone){
@@ -233,6 +233,12 @@ public abstract class Turret extends Block{
 
         entity.target = Units.getClosestTarget(tile.getTeam(),
                 tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir));
+    }
+
+    protected void turnToTarget(Tile tile, float targetRot){
+        TurretEntity entity = tile.entity();
+
+        entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * entity.delta());
     }
 
     public boolean shouldTurn(Tile tile){

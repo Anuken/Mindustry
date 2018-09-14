@@ -103,6 +103,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
+    public float getDrag(){
+        return mech.drag;
+    }
+
+    @Override
     public Timer getTimer(){
         return timer;
     }
@@ -430,6 +435,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     //endregion
 
     //region update methods
+
+    float lastx, lasty;
 
     @Override
     public void update(){

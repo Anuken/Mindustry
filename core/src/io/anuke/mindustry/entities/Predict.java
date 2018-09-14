@@ -53,7 +53,9 @@ public class Predict{
      * See {@link #intercept(float, float, float, float, float, float, float)}.
      */
     public static Vector2 intercept(TargetTrait src, TargetTrait dst, float v){
-        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.getVelocity().x - src.getVelocity().x, dst.getVelocity().x - src.getVelocity().y, v);
+        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(),
+            dst.getTargetVelocityX() - src.getTargetVelocityX(),
+            dst.getTargetVelocityY() - src.getTargetVelocityY(), v);
     }
 
     private static Vector2 quad(float a, float b, float c){
