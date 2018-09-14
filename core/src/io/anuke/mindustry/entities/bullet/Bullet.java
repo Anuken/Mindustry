@@ -37,23 +37,23 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     public Bullet(){
     }
 
-    public static void create(BulletType type, TeamTrait owner, float x, float y, float angle){
-        create(type, owner, owner.getTeam(), x, y, angle);
+    public static Bullet create(BulletType type, TeamTrait owner, float x, float y, float angle){
+        return create(type, owner, owner.getTeam(), x, y, angle);
     }
 
-    public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle){
-        create(type, owner, team, x, y, angle, 1f);
+    public static Bullet create(BulletType type, Entity owner, Team team, float x, float y, float angle){
+        return create(type, owner, team, x, y, angle, 1f);
     }
 
-    public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl){
-        create(type, owner, team, x, y, angle, velocityScl, 1f, null);
+    public static Bullet create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl){
+        return create(type, owner, team, x, y, angle, velocityScl, 1f, null);
     }
 
-    public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
-        create(type, owner, team, x, y, angle, velocityScl, lifetimeScl, null);
+    public static Bullet create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
+        return create(type, owner, team, x, y, angle, velocityScl, lifetimeScl, null);
     }
 
-    public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Object data){
+    public static Bullet create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Object data){
         Bullet bullet = Pooling.obtain(Bullet.class, Bullet::new);
         bullet.type = type;
         bullet.owner = owner;
@@ -78,14 +78,15 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         bullet.set(x, y);
 
         bullet.add();
+        return bullet;
     }
 
-    public static void create(BulletType type, Bullet parent, float x, float y, float angle){
-        create(type, parent.owner, parent.team, x, y, angle);
+    public static Bullet create(BulletType type, Bullet parent, float x, float y, float angle){
+        return create(type, parent.owner, parent.team, x, y, angle);
     }
 
-    public static void create(BulletType type, Bullet parent, float x, float y, float angle, float velocityScl){
-        create(type, parent.owner, parent.team, x, y, angle, velocityScl);
+    public static Bullet create(BulletType type, Bullet parent, float x, float y, float angle, float velocityScl){
+        return create(type, parent.owner, parent.team, x, y, angle, velocityScl);
     }
 
     @Remote(called = Loc.server)

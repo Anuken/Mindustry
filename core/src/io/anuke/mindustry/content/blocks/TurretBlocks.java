@@ -82,7 +82,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             };
         }};
 
-        lancer = new LaserTurret("lancer"){{
+        lancer = new ChargeTurret("lancer"){{
             range = 90f;
             chargeTime = 60f;
             chargeMaxDelay = 30f;
@@ -105,7 +105,7 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         arc = new PowerTurret("arc"){{
             shootType = AmmoTypes.arc;
-            reload = 30f;
+            reload = 40f;
             shootShake = 1f;
             powerUsed = 5f;
             powerCapacity = 30f;
@@ -218,7 +218,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             ammoTypes = new AmmoType[]{AmmoTypes.bulletDenseBig, AmmoTypes.bulletPyratiteBig, AmmoTypes.bulletThoriumBig};
             reload = 4f;
             restitution = 0.1f;
-            ammoUseEffect = ShootFx.shellEjectMedium;
+            ammoUseEffect = ShootFx.shellEjectBig;
             range = 200f;
             inaccuracy = 4f;
             recoil = 3f;
@@ -232,9 +232,15 @@ public class TurretBlocks extends BlockList implements ContentList{
             health = 155 * size * size;
         }};
 
-        meltdown = new PowerTurret("meltdown"){{
+        meltdown = new LaserTurret("meltdown"){{
             shootType = AmmoTypes.meltdownLaser;
+            shootCone = 40f;
             size = 4;
+            powerUsed = 10f;
+            range = 140f;
+            reload = 60f;
+            shootDuration = 60f;
+            powerCapacity = 50f;
         }};
     }
 }
