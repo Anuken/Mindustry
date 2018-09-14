@@ -15,7 +15,7 @@ public class CooledTurret extends Turret{
     /**How much reload is lowered by for each unit of liquid of heat capacity 1.*/
     protected float coolantMultiplier = 1f;
     /**Max coolant used per tick.*/
-    protected float maxUsed = 1f;
+    protected float maxCoolantUsed = 1f;
     protected Effect coolEffect = BlockFx.fuelburn;
 
     public CooledTurret(String name){
@@ -33,7 +33,7 @@ public class CooledTurret extends Turret{
         TurretEntity entity = tile.entity();
         Liquid liquid = entity.liquids.current();
 
-        float used = Math.min(Math.min(entity.liquids.get(liquid), maxUsed * Timers.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity));
+        float used = Math.min(Math.min(entity.liquids.get(liquid), maxCoolantUsed * Timers.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity));
         entity.reload += (used * liquid.heatCapacity) / liquid.heatCapacity;
         entity.liquids.remove(liquid, used);
 

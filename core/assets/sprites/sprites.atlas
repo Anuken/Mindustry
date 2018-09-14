@@ -2622,79 +2622,51 @@ command-center
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-icon-composite-wall
-  rotate: false
-  xy: 999, 443
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-composite-wall
-  rotate: false
-  xy: 999, 443
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-block-icon-composite-wall-large
-  rotate: false
-  xy: 421, 340
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-composite-wall-large
-  rotate: false
-  xy: 421, 340
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
 block-icon-conduit
   rotate: false
-  xy: 619, 431
+  xy: 999, 443
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 block-icon-conveyor
   rotate: false
-  xy: 619, 421
+  xy: 619, 431
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 conveyor-0-0
   rotate: false
-  xy: 619, 421
+  xy: 619, 431
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 block-icon-copper-wall
   rotate: false
-  xy: 629, 431
+  xy: 619, 421
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 copper-wall
   rotate: false
-  xy: 629, 431
+  xy: 619, 421
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 block-icon-copper-wall-large
   rotate: false
-  xy: 439, 435
+  xy: 421, 340
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 copper-wall-large
   rotate: false
-  xy: 439, 435
+  xy: 421, 340
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2715,14 +2687,14 @@ core
   index: -1
 block-icon-cryofluidmixer
   rotate: false
-  xy: 439, 417
+  xy: 439, 435
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 block-icon-cultivator
   rotate: false
-  xy: 457, 435
+  xy: 439, 417
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2736,47 +2708,75 @@ block-icon-cyclone
   index: -1
 block-icon-dagger-pad
   rotate: false
-  xy: 439, 399
+  xy: 457, 435
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 block-icon-dart-ship-factory
   rotate: false
-  xy: 457, 417
+  xy: 439, 399
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 dart-ship-factory
   rotate: false
-  xy: 457, 417
+  xy: 439, 399
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 block-icon-deepwater
   rotate: false
-  xy: 619, 411
+  xy: 629, 431
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 deepwater
   rotate: false
-  xy: 619, 411
+  xy: 629, 431
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 block-icon-delta-mech-factory
   rotate: false
-  xy: 475, 435
+  xy: 457, 417
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 delta-mech-factory
+  rotate: false
+  xy: 457, 417
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+block-icon-dense-alloy-wall
+  rotate: false
+  xy: 619, 411
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+dense-alloy-wall
+  rotate: false
+  xy: 619, 411
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+block-icon-dense-alloy-wall-large
+  rotate: false
+  xy: 475, 435
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+dense-alloy-wall-large
   rotate: false
   xy: 475, 435
   size: 16, 16
