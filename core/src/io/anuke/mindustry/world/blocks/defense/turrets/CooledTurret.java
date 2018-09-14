@@ -37,7 +37,7 @@ public class CooledTurret extends Turret{
         entity.reload += (used * liquid.heatCapacity) / liquid.heatCapacity;
         entity.liquids.remove(liquid, used);
 
-        if(Mathf.chance(0.04 * used)){
+        if(Mathf.chance(0.06 * used)){
             Effects.effect(coolEffect, tile.drawx() + Mathf.range(size * tilesize / 2f), tile.drawy() + Mathf.range(size * tilesize / 2f));
         }
     }

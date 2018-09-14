@@ -4,9 +4,13 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.type.AmmoType;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -16,10 +20,16 @@ public class LaserTurret extends PowerTurret{
 
     public LaserTurret(String name){
         super(name);
+        canOverdrive = false;
+
+        consumes.remove(ConsumeLiquidFilter.class);
+        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.01f)).update(false);
     }
 
     @Override
-    protected void updateShooting(Tile tile){
+    public void update(Tile tile) {
+        super.update(tile);
+
         LaserTurretEntity entity = tile.entity();
 
         if(entity.bulletLife > 0 && entity.bullet != null){
@@ -33,17 +43,33 @@ public class LaserTurret extends PowerTurret{
             if(entity.bulletLife <= 0f){
                 entity.bullet = null;
             }
+        }
+    }
+
+    @Override
+    protected void updateShooting(Tile tile){
+        LaserTurretEntity entity = tile.entity();
+
+        if(entity.bulletLife > 0 && entity.bullet != null){
             return;
         }
 
-        if(entity.reload >= reload){
+        if(entity.reload >= reload && entity.cons.valid()){
             AmmoType type = peekAmmo(tile);
 
             shoot(tile, type);
 
             entity.reload = 0f;
         }else{
-            entity.reload += tile.entity.delta() * peekAmmo(tile).reloadMultiplier;
+            Liquid liquid = entity.liquids.current();
+
+            float used = Math.min(Math.min(entity.liquids.get(liquid), maxCoolantUsed * Timers.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity));
+            entity.reload += (used * liquid.heatCapacity) / liquid.heatCapacity;
+            entity.liquids.remove(liquid, used);
+
+            if(Mathf.chance(0.06 * used)){
+                Effects.effect(coolEffect, tile.drawx() + Mathf.range(size * tilesize / 2f), tile.drawy() + Mathf.range(size * tilesize / 2f));
+            }
         }
     }
 

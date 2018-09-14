@@ -170,6 +170,7 @@ public class TurretBullets extends BulletList implements ContentList{
                 hiteffect = BulletFx.hitMeltdown;
                 despawneffect = Fx.none;
                 hitsize = 4;
+                drawSize = 420f;
                 lifetime = 16f;
                 pierce = true;
             }

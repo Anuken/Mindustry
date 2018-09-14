@@ -126,6 +126,11 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     }
 
     @Override
+    public float drawSize(){
+        return type.drawSize;
+    }
+
+    @Override
     public float getDamage(){
         if(owner instanceof Unit){
             return super.getDamage() * ((Unit) owner).getDamageMultipler();
@@ -167,11 +172,6 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     @Override
     public void draw(){
         type.draw(this);
-    }
-
-    @Override
-    public float drawSize(){
-        return 8;
     }
 
     @Override
