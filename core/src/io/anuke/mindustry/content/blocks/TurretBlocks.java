@@ -216,7 +216,7 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         spectre = new DoubleTurret("spectre"){{
             ammoTypes = new AmmoType[]{AmmoTypes.bulletDenseBig, AmmoTypes.bulletPyratiteBig, AmmoTypes.bulletThoriumBig};
-            reload = 4f;
+            reload = 6f;
             coolantMultiplier = 0.5f;
             maxCoolantUsed = 1.5f;
             restitution = 0.1f;
@@ -236,12 +236,16 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         meltdown = new LaserTurret("meltdown"){{
             shootType = AmmoTypes.meltdownLaser;
+            shootEffect = ShootFx.shootBigSmoke2;
             shootCone = 40f;
+            recoil = 4f;
             size = 4;
+            shootShake = 2f;
             powerUsed = 10f;
-            range = 140f;
-            reload = 60f;
-            shootDuration = 60f;
+            range = 160f;
+            reload = 130f;
+            firingMoveFract = 0.25f;
+            shootDuration = 180f;
             powerCapacity = 50f;
         }};
     }

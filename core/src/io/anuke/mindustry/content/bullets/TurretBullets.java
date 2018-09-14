@@ -20,10 +20,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.graphics.Shapes;
+import io.anuke.ucore.graphics.*;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
@@ -161,14 +158,16 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        meltdownLaser = new BulletType(0.001f, 140){
-            Color[] colors = {Palette.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Palette.lancerLaser, Color.WHITE};
+        meltdownLaser = new BulletType(0.001f, 20){
+            Color tmpColor = new Color();
+            Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
-            float[] lenscales = {1f, 1.1f, 1.13f, 1.14f};
-            float length = 100f;
+            float[] strokes = {2f, 1.5f, 1f, 0.3f};
+            float[] lenscales = {1f, 1.12f, 1.15f, 1.17f};
+            float length = 200f;
 
             {
-                hiteffect = BulletFx.hitLancer;
+                hiteffect = BulletFx.hitMeltdown;
                 despawneffect = Fx.none;
                 hitsize = 4;
                 lifetime = 16f;
@@ -177,19 +176,31 @@ public class TurretBullets extends BulletList implements ContentList{
 
             @Override
             public void update(Bullet b){
-                Damage.collideLine(b, b.getTeam(), hiteffect, b.x, b.y, b.angle(), length);
+                if(b.timer.get(1, 5f)){
+                    Damage.collideLine(b, b.getTeam(), hiteffect, b.x, b.y, b.angle(), length);
+                }
+                Effects.shake(1f, 1f, b.x, b.y);
+            }
+
+            @Override
+            public void hit(Bullet b, float hitx, float hity){
+                Effects.effect(hiteffect, colors[2], hitx, hity);
+                if(Mathf.chance(0.4)){
+                    Fire.create(world.tileWorld(hitx, hity));
+                }
             }
 
             @Override
             public void draw(Bullet b){
-                float baseLen = length * b.fout();
+                float baseLen = (length) * b.fout();
 
                 Lines.lineAngle(b.x, b.y, b.angle(), baseLen);
-                for(int s = 0; s < 3; s++){
-                    Draw.color(colors[s]);
+                for(int s = 0; s < colors.length; s++){
+                    Draw.color(tmpColor.set(colors[s]).mul(1f + Mathf.absin(Timers.time(), 1f, 0.1f)));
                     for(int i = 0; i < tscales.length; i++){
-                        Lines.stroke(7f * b.fout() * (s == 0 ? 1.5f : s == 1 ? 1f : 0.3f) * tscales[i]);
-                        Lines.lineAngle(b.x, b.y, b.angle(), baseLen * lenscales[i]);
+                        vector.trns(b.angle() + 180f, (lenscales[i] - 1f) * 35f);
+                        Lines.stroke((9f + Mathf.absin(Timers.time(), 0.8f, 1.5f)) * b.fout() * strokes[s] * tscales[i]);
+                        Lines.lineAngle(b.x + vector.x, b.y + vector.y, b.angle(), baseLen * lenscales[i], CapStyle.none);
                     }
                 }
                 Draw.reset();

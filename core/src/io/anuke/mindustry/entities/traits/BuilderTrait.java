@@ -238,19 +238,20 @@ public interface BuilderTrait extends Entity{
     /**Do not call directly.*/
     default void updateMining(Unit unit){
         Tile tile = getMineTile();
+        TileEntity core = unit.getClosestCore();
 
-        if(tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance || !unit.inventory.canAcceptItem(tile.floor().drops.item)){
+        if(core == null || tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance || !unit.inventory.canAcceptItem(tile.floor().drops.item)){
             setMineTile(null);
         }else{
             Item item = tile.floor().drops.item;
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.worldx(), tile.worldy()), 0.4f);
 
-            if(unit.inventory.canAcceptItem(item) &&
+            if(core.items.get(item) < core.tile.block().getMaximumAccepted(core.tile, item) &&
                     Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
-                Call.transferItemToUnit(item,
-                        tile.worldx() + Mathf.range(tilesize / 2f),
-                        tile.worldy() + Mathf.range(tilesize / 2f),
-                        unit);
+
+                Call.transferItemTo(item, 1,
+                tile.worldx() + Mathf.range(tilesize / 2f),
+                tile.worldy() + Mathf.range(tilesize / 2f), core.tile);
             }
 
             if(Mathf.chance(0.06 * Timers.delta())){
