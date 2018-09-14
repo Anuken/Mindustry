@@ -241,12 +241,14 @@ public class TurretBlocks extends BlockList implements ContentList{
             recoil = 4f;
             size = 4;
             shootShake = 2f;
-            powerUsed = 10f;
+            powerUsed = 60f;
+            powerCapacity = 120f;
             range = 160f;
             reload = 200f;
             firingMoveFract = 0.25f;
             shootDuration = 180f;
-            powerCapacity = 50f;
+
+            health = 165 * size * size;
         }};
     }
 }
