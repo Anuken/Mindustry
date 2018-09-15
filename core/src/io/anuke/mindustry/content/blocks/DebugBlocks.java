@@ -62,6 +62,11 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
+            public boolean outputsItems(){
+                return true;
+            }
+
+            @Override
             public void update(Tile tile){
                 SorterEntity entity = tile.entity();
                 entity.items.set(entity.sortItem, 1);
@@ -81,6 +86,7 @@ public class DebugBlocks extends BlockList implements ContentList{
                 hasLiquids = true;
                 liquidCapacity = 100f;
                 configurable = true;
+                outputsLiquid = true;
             }
 
             @Override

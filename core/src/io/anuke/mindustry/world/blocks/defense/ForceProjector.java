@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.traits.AbsorbTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
@@ -127,13 +127,14 @@ public class ForceProjector extends Block {
 
         if(!entity.broken){
             EntityPhysics.getNearby(bulletGroup, tile.drawx(), tile.drawy(), realRadius*2f, bullet -> {
-                if(bullet instanceof Bullet && ((Bullet) bullet).getTeam() != tile.getTeam() && isInsideHexagon(bullet.getX(), bullet.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
-                    ((Bullet) bullet).absorb();
-                    Effects.effect(BulletFx.absorb, bullet);
-                    float hit = ((Bullet) bullet).getDamage()*powerDamage;
+                AbsorbTrait trait = (AbsorbTrait)bullet;
+                if(trait.canBeAbsorbed() && trait.getTeam() != tile.getTeam() && isInsideHexagon(trait.getX(), trait.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
+                    trait.absorb();
+                    Effects.effect(BulletFx.absorb, trait);
+                    float hit = trait.getDamage()*powerDamage;
                     entity.hit = 1f;
                     entity.power.amount -= Math.min(hit, entity.power.amount);
-                    entity.buildup += ((Bullet) bullet).getDamage() * entity.warmup;
+                    entity.buildup += trait.getDamage() * entity.warmup;
                 }
             });
         }

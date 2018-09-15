@@ -128,7 +128,7 @@ public class MenuFragment extends Fragment{
 
             out.add(new MenuButton("icon-menu", "$text.changelog.title", ui.changelog::show));
 
-            out.add(new MenuButton("icon-unlocks", "$text.unlocks", ui.unlocks::show));
+            out.add(new MenuButton("icon-unlocks", "$text.unlocks", ui.graph::show));
 
             out.row();
 

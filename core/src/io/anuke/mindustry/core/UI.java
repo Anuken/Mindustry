@@ -62,6 +62,7 @@ public class UI extends SceneModule{
     public ContentInfoDialog content;
     public SectorsDialog sectors;
     public MissionDialog missions;
+    public UnlockGraphDialog graph;
 
     private Locale lastLocale;
 
@@ -168,6 +169,7 @@ public class UI extends SceneModule{
         content = new ContentInfoDialog();
         sectors = new SectorsDialog();
         missions = new MissionDialog();
+        graph = new UnlockGraphDialog();
 
         Group group = Core.scene.getRoot();
 

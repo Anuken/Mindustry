@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.traits.AbsorbTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
@@ -26,7 +27,7 @@ import static io.anuke.mindustry.Vars.bulletGroup;
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
-public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait{
+public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait, AbsorbTrait{
     private static Vector2 vector = new Vector2();
     public Timer timer = new Timer(3);
     private Team team;
