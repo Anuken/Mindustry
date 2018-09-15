@@ -99,7 +99,7 @@ public class WorldGenerator{
             int pos = multiblocks.get(i);
 
             int x = pos % tiles.length;
-            int y = pos / tiles[0].length;
+            int y = pos / tiles.length;
 
             Block result = tiles[x][y].block();
             Team team = tiles[x][y].getTeam();

@@ -158,7 +158,7 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        meltdownLaser = new BulletType(0.001f, 20){
+        meltdownLaser = new BulletType(0.001f, 26){
             Color tmpColor = new Color();
             Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
@@ -187,7 +187,7 @@ public class TurretBullets extends BulletList implements ContentList{
             public void hit(Bullet b, float hitx, float hity){
                 Effects.effect(hiteffect, colors[2], hitx, hity);
                 if(Mathf.chance(0.4)){
-                    Fire.create(world.tileWorld(hitx, hity));
+                    Fire.create(world.tileWorld(hitx+Mathf.range(5f), hity+Mathf.range(5f)));
                 }
             }
 
