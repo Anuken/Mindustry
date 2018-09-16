@@ -163,6 +163,11 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
+    public int getMaximumAccepted(Tile tile, Item item){
+        return itemCapacity;
+    }
+
+    @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         return tile.entity.items.get(item) < itemCapacity && item.type == ItemType.material;
     }

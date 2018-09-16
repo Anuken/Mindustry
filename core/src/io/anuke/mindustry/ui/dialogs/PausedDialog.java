@@ -106,7 +106,7 @@ public class PausedDialog extends FloatingDialog{
             content().row();
 
             content().addRowImageTextButton("$text.load", "icon-load", isize, load::show).disabled(b -> Net.active());
-            content().addRowImageTextButton("$text.host", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
+            content().addRowImageTextButton("$text.hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
             content().addRowImageTextButton("$text.quit", "icon-quit", isize, () -> {
                 ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
                     if(Net.client()) netClient.disconnectQuietly();

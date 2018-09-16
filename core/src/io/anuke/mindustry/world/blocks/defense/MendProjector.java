@@ -16,6 +16,10 @@ import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
@@ -126,5 +130,17 @@ public class MendProjector extends Block{
         float heat;
         float charge;
         float phaseHeat;
+
+        @Override
+        public void write(DataOutputStream stream) throws IOException{
+            stream.writeFloat(heat);
+            stream.writeFloat(phaseHeat);
+        }
+
+        @Override
+        public void read(DataInputStream stream) throws IOException{
+            heat = stream.readFloat();
+            phaseHeat = stream.readFloat();
+        }
     }
 }

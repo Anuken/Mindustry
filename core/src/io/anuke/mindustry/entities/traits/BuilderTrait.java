@@ -24,10 +24,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -246,12 +243,18 @@ public interface BuilderTrait extends Entity{
             Item item = tile.floor().drops.item;
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.worldx(), tile.worldy()), 0.4f);
 
-            if(core.items.get(item) < core.tile.block().getMaximumAccepted(core.tile, item) &&
-                    Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
+            if(Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
 
-                Call.transferItemTo(item, 1,
-                tile.worldx() + Mathf.range(tilesize / 2f),
-                tile.worldy() + Mathf.range(tilesize / 2f), core.tile);
+                if(unit.distanceTo(core) < mineTransferRange && core.items.get(item) < core.tile.block().getMaximumAccepted(core.tile, item)){
+                    Call.transferItemTo(item, 1,
+                        tile.worldx() + Mathf.range(tilesize / 2f),
+                        tile.worldy() + Mathf.range(tilesize / 2f), core.tile);
+                }else if(unit.inventory.canAcceptItem(item)){
+                    Call.transferItemToUnit(item,
+                        tile.worldx() + Mathf.range(tilesize / 2f),
+                        tile.worldy() + Mathf.range(tilesize / 2f),
+                        unit);
+                }
             }
 
             if(Mathf.chance(0.06 * Timers.delta())){

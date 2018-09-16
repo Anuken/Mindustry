@@ -169,7 +169,6 @@ public class UI extends SceneModule{
         content = new ContentInfoDialog();
         sectors = new SectorsDialog();
         missions = new MissionDialog();
-        graph = new UnlockGraphDialog();
 
         Group group = Core.scene.getRoot();
 

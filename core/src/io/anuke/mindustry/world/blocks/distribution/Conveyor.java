@@ -185,23 +185,15 @@ public class Conveyor extends Block{
         float centerDstScl = 3f;
         float tx = Geometry.d4[tile.getRotation()].x, ty = Geometry.d4[tile.getRotation()].y;
 
-        float min;
         float centerx = 0f, centery = 0f;
 
         if(Math.abs(tx) > Math.abs(ty)){
-            float rx = tile.worldx() - tx / 2f * tilesize;
-            min = Mathf.clamp((unit.x - rx) * tx / tilesize);
             centery = Mathf.clamp((tile.worldy() - unit.y) / centerDstScl, -centerSpeed, centerSpeed);
             if(Math.abs(tile.worldy() - unit.y) < 1f) centery = 0f;
         }else{
-            float ry = tile.worldy() - ty / 2f * tilesize;
-            min = Mathf.clamp((unit.y - ry) * ty / tilesize);
             centerx = Mathf.clamp((tile.worldx() - unit.x) / centerDstScl, -centerSpeed, centerSpeed);
             if(Math.abs(tile.worldx() - unit.x) < 1f) centerx = 0f;
         }
-
-        entity.minCarry = Math.min(entity.minCarry, min);
-        entity.carrying += unit.getMass();
 
         if(entity.convey.size * itemSpace < 0.9f){
             unit.getVelocity().add((tx * speed + centerx) * entity.delta(), (ty * speed + centery) * entity.delta());
@@ -215,7 +207,6 @@ public class Conveyor extends Block{
         entity.minitem = 1f;
 
         int minremove = Integer.MAX_VALUE;
-        float speed = Math.max(this.speed - (1f - (carryCapacity - entity.carrying) / carryCapacity), 0f);
 
         for(int i = entity.convey.size - 1; i >= 0; i--){
             long value = entity.convey.get(i);
@@ -228,9 +219,6 @@ public class Conveyor extends Block{
             }
 
             float nextpos = (i == entity.convey.size - 1 ? 100f : pos2.set(entity.convey.get(i + 1), ItemPos.updateShorts).y) - itemSpace;
-            if(entity.minCarry >= pos.y && entity.minCarry <= nextpos){
-                nextpos = entity.minCarry;
-            }
             float maxmove = Math.min(nextpos - pos.y, speed * entity.delta());
 
             if(maxmove > minmove){
@@ -259,9 +247,6 @@ public class Conveyor extends Block{
         }else{
             entity.clogHeat = Mathf.lerpDelta(entity.clogHeat, 0f, 1f);
         }
-
-        entity.carrying = 0f;
-        entity.minCarry = 2f;
 
         if(entity.items.total() == 0){
             entity.sleep();
@@ -366,9 +351,6 @@ public class Conveyor extends Block{
         ConveyorEntity entity = tile.entity();
         Array<Object> arr = super.getDebugInfo(tile);
         arr.addAll(Array.with(
-                "mincarry", entity.minCarry,
-                "minitem", entity.minCarry,
-                "carrying", entity.carrying,
                 "clogHeat", entity.clogHeat,
                 "sleeping", entity.isSleeping()
         ));
@@ -384,8 +366,6 @@ public class Conveyor extends Block{
 
         LongArray convey = new LongArray();
         float minitem = 1;
-        float carrying;
-        float minCarry = 2f;
 
         int blendshadowrot = -1;
         int blendbits;

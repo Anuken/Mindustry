@@ -7,7 +7,8 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
 
 public class Weapons implements ContentList{
-    public static Weapon blaster, blasterSmall, glaiveBlaster, droneBlaster, healBlaster, chainBlaster, shockgun, sapper, swarmer, bomber, bomberTrident, flakgun, flamethrower, missiles;
+    public static Weapon blaster, blasterSmall, glaiveBlaster, droneBlaster, healBlaster, chainBlaster, shockgun,
+    sapper, swarmer, bomber, bomberTrident, flakgun, flamethrower, missiles, artillery;
 
     @Override
     public void load(){
@@ -117,6 +118,15 @@ public class Weapons implements ContentList{
             recoil = 1f;
             ejectEffect = Fx.none;
             ammo = AmmoTypes.flamerThermite;
+        }};
+
+        artillery = new Weapon("artillery"){{
+            length = 1f;
+            reload = 60f;
+            roundrobin = true;
+            recoil = 1f;
+            ejectEffect = ShootFx.shellEjectMedium;
+            ammo = AmmoTypes.artilleryExplosive;
         }};
 
         sapper = new Weapon("sapper"){{

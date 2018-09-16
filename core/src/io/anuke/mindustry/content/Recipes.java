@@ -35,7 +35,7 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.surgeWallLarge, new ItemStack(Items.surgealloy, 12 * 4));
 
         //projectors
-        new Recipe(defense, DefenseBlocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 50), new ItemStack(Items.silicon, 250));
+        new Recipe(defense, DefenseBlocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 50), new ItemStack(Items.silicon, 180));
         new Recipe(defense, DefenseBlocks.overdriveProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
         new Recipe(defense, DefenseBlocks.forceProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
 
@@ -54,8 +54,8 @@ public class Recipes implements ContentList{
         new Recipe(weapon, TurretBlocks.ripple, new ItemStack(Items.copper, 300), new ItemStack(Items.densealloy, 220), new ItemStack(Items.thorium, 120));
         new Recipe(weapon, TurretBlocks.cyclone, new ItemStack(Items.copper, 400), new ItemStack(Items.densealloy, 400), new ItemStack(Items.surgealloy, 200), new ItemStack(Items.plastanium, 150));
         new Recipe(weapon, TurretBlocks.fuse, new ItemStack(Items.copper, 450), new ItemStack(Items.densealloy, 450), new ItemStack(Items.surgealloy, 250));
-        new Recipe(weapon, TurretBlocks.spectre, new ItemStack(Items.copper, 700), new ItemStack(Items.densealloy, 600), new ItemStack(Items.surgealloy, 400), new ItemStack(Items.plastanium, 350), new ItemStack(Items.thorium, 400));
-        new Recipe(weapon, TurretBlocks.meltdown, new ItemStack(Items.copper, 500), new ItemStack(Items.lead, 700), new ItemStack(Items.densealloy, 500), new ItemStack(Items.surgealloy, 600), new ItemStack(Items.silicon, 550));
+        new Recipe(weapon, TurretBlocks.spectre, new ItemStack(Items.copper, 700), new ItemStack(Items.densealloy, 600), new ItemStack(Items.surgealloy, 500), new ItemStack(Items.plastanium, 350), new ItemStack(Items.thorium, 500));
+        new Recipe(weapon, TurretBlocks.meltdown, new ItemStack(Items.copper, 500), new ItemStack(Items.lead, 700), new ItemStack(Items.densealloy, 600), new ItemStack(Items.surgealloy, 650), new ItemStack(Items.silicon, 650));
 
         //DISTRIBUTION
         new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.copper, 1));

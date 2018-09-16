@@ -30,8 +30,8 @@ public class UnitBlocks extends BlockList implements ContentList{
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80)});
         }};
 
-        interceptorPad = new UnitPad("interceptor-pad"){{
-            type = UnitTypes.interceptor;
+        interceptorPad = new UnitPad("wraith-pad"){{
+            type = UnitTypes.wraith;
             produceTime = 1800;
             size = 2;
             consumes.power(0.1f);

@@ -35,6 +35,8 @@ public class Vars{
     public static final String crashReportURL = "http://mindustry.us.to/report";
     //time between waves in frames (on normal mode)
     public static final float wavespace = 60 * 60 * 1.5f;
+
+    public static final float mineTransferRange = 300f;
     //set ridiculously high for now
     public static final float coreBuildRange = 999999f;
     //team of the player by default

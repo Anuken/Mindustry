@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities.units.types;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.ItemDrop;
@@ -23,6 +24,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
@@ -43,6 +45,7 @@ import static io.anuke.mindustry.Vars.*;
 public class Drone extends FlyingUnit implements BuilderTrait{
     protected static float discoverRange = 120f;
     protected static boolean initialized;
+    protected static int timerRepairEffect = timerIndex++;
 
     protected Item targetItem;
     protected Tile mineTile;
@@ -116,8 +119,11 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                 circle(type.range);
             }else{
                 TileEntity entity = (TileEntity) target;
-                entity.health += type.healSpeed * Timers.delta();
-                entity.health = Mathf.clamp(entity.health, 0, entity.tile.block().health);
+                entity.healBy(type.healSpeed * entity.tile.block().health / 100f * Timers.delta());
+
+                if(timer.get(timerRepairEffect, 30)){
+                    Effects.effect(BlockFx.healBlockFull, Palette.heal, entity.x, entity.y, entity.tile.block().size);
+                }
             }
         }
     },

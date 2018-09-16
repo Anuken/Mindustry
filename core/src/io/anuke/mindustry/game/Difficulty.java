@@ -3,7 +3,8 @@ package io.anuke.mindustry.game;
 import io.anuke.ucore.util.Bundles;
 
 public enum Difficulty{
-    easy(1.2f, 1.5f),
+    training(3f, 3f),
+    easy(1.4f, 1.5f),
     normal(1f, 1f),
     hard(0.5f, 0.75f),
     insane(0.25f, 0.5f);
