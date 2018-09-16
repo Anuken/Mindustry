@@ -1,30 +1,43 @@
 package io.anuke.mindustry.entities.units;
 
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
+import io.anuke.ucore.util.Mathf;
 
 public class UnitDrops{
-    private static final int maxItems = 200;
     private static Item[] dropTable;
 
     public static void dropItems(BaseUnit unit){
-        //just don't drop anything for now
-        /*
-        if(Vars.itemGroup.size() > maxItems || unit.getTeam() != Team.red){
+        //items only dropped in waves for enemy team
+        if(unit.getTeam() != Vars.waveTeam || Vars.state.mode.disableWaves){
+            return;
+        }
+
+        TileEntity core = unit.getClosestEnemyCore();
+
+        if(core == null){
             return;
         }
 
         if(dropTable == null){
-            dropTable = new Item[]{Items.densealloy, Items.lead, Items.copper};
+            dropTable = new Item[]{Items.densealloy, Items.silicon, Items.lead, Items.copper};
         }
 
         for(int i = 0; i < 3; i++){
             for(Item item : dropTable){
+                //only drop unlocked items
+                if(!Vars.headless && !Vars.control.database().isUnlocked(item)){
+                    continue;
+                }
+
                 if(Mathf.chance(0.03)){
                     int amount = Mathf.random(20, 40);
-                    ItemDrop.create(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f),
-                            unit.getVelocity().x + Mathf.range(3f), unit.getVelocity().y + Mathf.range(3f));
+                    Call.transferItemTo(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), core.tile);
                 }
             }
-        }*/
+        }
     }
 }

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Pool.Poolable;
@@ -7,6 +8,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -279,6 +281,16 @@ public class MassDriver extends Block{
 
                 if(totalItems >= itemCapacity){
                     break;
+                }
+            }
+
+            //drop all items remaining on the ground
+            for(int i = 0; i < data.items.length; i++){
+                int amountDropped = Mathf.random(0, data.items[i]);
+                if(amountDropped > 0){
+                    float angle = Mathf.range(180f);
+                    float vs = Mathf.random(0f, 4f);
+                    Effects.effect(EnvironmentFx.dropItem, Color.WHITE, bullet.x, bullet.y, angle, content.item(i));
                 }
             }
 
