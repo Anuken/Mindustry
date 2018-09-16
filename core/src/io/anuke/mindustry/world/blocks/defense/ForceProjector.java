@@ -6,7 +6,6 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.AbsorbTrait;
-import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -24,7 +23,9 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -200,7 +201,7 @@ public class ForceProjector extends Block {
         }
     }
 
-    public class ShieldEntity extends BaseEntity implements DrawTrait, SyncTrait{
+    public class ShieldEntity extends BaseEntity implements DrawTrait{
         final ForceEntity entity;
 
         public ShieldEntity(Tile tile){
@@ -240,16 +241,5 @@ public class ForceProjector extends Block {
         public EntityGroup targetGroup(){
             return shieldGroup;
         }
-
-        @Override
-        public boolean isSyncing(){
-            return false;
-        }
-
-        @Override
-        public void write(DataOutput data) throws IOException{}
-
-        @Override
-        public void read(DataInput data, long time) throws IOException{}
     }
 }
