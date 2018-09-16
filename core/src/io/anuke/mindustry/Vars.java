@@ -9,7 +9,6 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
-import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
@@ -117,7 +116,6 @@ public class Vars{
     public static EntityGroup<Bullet> bulletGroup;
     public static EntityGroup<EffectEntity> effectGroup;
     public static EntityGroup<DrawTrait> groundEffectGroup;
-    public static EntityGroup<ItemDrop> itemGroup;
     public static EntityGroup<ShieldEntity> shieldGroup;
     public static EntityGroup<Puddle> puddleGroup;
     public static EntityGroup<Fire> fireGroup;
@@ -152,7 +150,6 @@ public class Vars{
         effectGroup = Entities.addGroup(EffectEntity.class, false);
         groundEffectGroup = Entities.addGroup(DrawTrait.class, false);
         puddleGroup = Entities.addGroup(Puddle.class).enableMapping();
-        itemGroup = Entities.addGroup(ItemDrop.class).enableMapping();
         shieldGroup = Entities.addGroup(ShieldEntity.class, false);
         fireGroup = Entities.addGroup(Fire.class).enableMapping();
         unitGroups = new EntityGroup[Team.all.length];

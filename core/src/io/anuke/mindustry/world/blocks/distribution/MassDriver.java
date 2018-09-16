@@ -11,7 +11,6 @@ import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
@@ -280,16 +279,6 @@ public class MassDriver extends Block{
 
                 if(totalItems >= itemCapacity){
                     break;
-                }
-            }
-
-            //drop all items remaining on the ground
-            for(int i = 0; i < data.items.length; i++){
-                int amountDropped = Mathf.random(0, data.items[i]);
-                if(amountDropped > 0){
-                    float angle = Mathf.range(180f);
-                    float vs = Mathf.random(0f, 4f);
-                    ItemDrop.create(content.item(i), amountDropped, bullet.x, bullet.y, Angles.trnsx(angle, vs), Angles.trnsy(angle, vs));
                 }
             }
 

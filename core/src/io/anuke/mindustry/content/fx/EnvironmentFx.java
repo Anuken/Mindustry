@@ -2,8 +2,9 @@ package io.anuke.mindustry.content.fx;
 
 import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -11,7 +12,7 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
 public class EnvironmentFx extends FxList implements ContentList{
-    public static Effect burning, fire, smoke, steam, fireballsmoke, ballfire, freezing, melting, wet, oily, overdriven;
+    public static Effect burning, fire, smoke, steam, fireballsmoke, ballfire, freezing, melting, wet, oily, overdriven, dropItem;
 
     @Override
     public void load(){
@@ -124,6 +125,13 @@ public class EnvironmentFx extends FxList implements ContentList{
             });
 
             Draw.color();
+        });
+
+        dropItem = new Effect(20f, e -> {
+            float length = 20f * e.finpow();
+            float size = 7f * e.fout();
+
+            Draw.rect(((Item) e.data).region, e.x + Angles.trnsx(e.rotation, length), e.y + Angles.trnsy(e.rotation, length), size, size);
         });
     }
 }

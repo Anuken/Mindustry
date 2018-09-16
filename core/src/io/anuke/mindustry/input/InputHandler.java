@@ -1,13 +1,14 @@
 package io.anuke.mindustry.input;
 
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.gen.Call;
@@ -19,10 +20,7 @@ import io.anuke.mindustry.ui.fragments.OverlayFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.core.*;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
@@ -61,7 +59,7 @@ public abstract class InputHandler extends InputAdapter{
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        ItemDrop.create(player.inventory.getItem().item, player.inventory.getItem().amount, player.x, player.y, angle);
+        Effects.effect(EnvironmentFx.dropItem, Color.WHITE, player.x, player.y, angle, player.inventory.getItem().item);
         player.inventory.clearItem();
     }
 

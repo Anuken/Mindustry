@@ -11,7 +11,6 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.effect.Fire;
-import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.TypeTrait;
@@ -263,7 +262,6 @@ public class ContentLoader{
      */
     private void registerTypes(){
         TypeTrait.registerType(Player.class, Player::new);
-        TypeTrait.registerType(ItemDrop.class, ItemDrop::new);
         TypeTrait.registerType(Fire.class, Fire::new);
         TypeTrait.registerType(Puddle.class, Puddle::new);
         TypeTrait.registerType(Bullet.class, Bullet::new);

@@ -246,17 +246,6 @@ public class Renderer extends RendererModule{
 
         blocks.drawBlocks(Layer.overlay);
 
-        if(itemGroup.size() > 0){
-            Graphics.surface(effectSurface);
-            drawAndInterpolate(itemGroup);
-            Graphics.surface();
-
-            Draw.color(0, 0, 0, 0.2f);
-            Draw.rect(effectSurface, -1, -1);
-            Draw.color();
-            Draw.rect(effectSurface, 0, 0);
-        }
-
         drawAllTeams(false);
 
         blocks.skipLayer(Layer.turret);

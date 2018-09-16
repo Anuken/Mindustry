@@ -10,7 +10,6 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.fx.UnitFx;
-import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
@@ -220,11 +219,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         if(health <= 0 && !dead){
             Call.onPlayerDeath(this);
         }
-    }
-
-    @Override
-    public boolean collides(SolidTrait other){
-        return super.collides(other) || other instanceof ItemDrop;
     }
 
     @Override

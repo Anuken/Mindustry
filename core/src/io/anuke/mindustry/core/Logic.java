@@ -131,7 +131,6 @@ public class Logic extends Module{
                 Entities.update(bulletGroup);
                 Entities.update(fireGroup);
                 Entities.update(playerGroup);
-                Entities.update(itemGroup);
 
                 //effect group only contains item drops in the headless version, update it!
                 if(headless){
@@ -145,7 +144,6 @@ public class Logic extends Module{
                 }
 
                 EntityPhysics.collideGroups(bulletGroup, playerGroup);
-                EntityPhysics.collideGroups(itemGroup, playerGroup);
 
                 world.pathfinder().update();
             }

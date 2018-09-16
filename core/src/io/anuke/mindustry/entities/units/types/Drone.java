@@ -6,7 +6,6 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
@@ -158,10 +157,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                 }
 
                 retarget(() -> {
-                    if(findItemDrop()){
-                        return;
-                    }
-
                     if(getMineTile() == null){
                         findItem();
                     }
@@ -187,33 +182,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
         public void exited(){
             setMineTile(null);
-        }
-    },
-    pickup = new UnitState(){
-        public void entered(){
-            target = null;
-        }
-
-        public void update(){
-            ItemDrop item = (ItemDrop) target;
-
-            if(item == null || inventory.isFull() || item.getItem().type != ItemType.material || !inventory.canAcceptItem(item.getItem(), 1)){
-                setState(drop);
-                return;
-            }
-
-            if(distanceTo(item) < 4){
-                item.collision(Drone.this, x, y);
-            }
-
-            //item has been picked up
-            if(item.getAmount() == 0){
-                if(!findItemDrop()){
-                    setState(drop);
-                }
-            }
-
-            moveTo(0f);
         }
     },
     drop = new UnitState(){
@@ -407,23 +375,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             return;
         }
         targetItem = Mathf.findMin(type.toMine, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
-    }
-
-    protected boolean findItemDrop(){
-        TileEntity core = getClosestCore();
-
-        if(core == null) return false;
-
-        //find nearby dropped items to pick up if applicable
-        ItemDrop drop = EntityPhysics.getClosest(itemGroup, x, y, 60f,
-                item -> core.tile.block().acceptStack(item.getItem(), item.getAmount(), core.tile, Drone.this) == item.getAmount() &&
-                        inventory.canAcceptItem(item.getItem(), 1));
-        if(drop != null){
-            setState(pickup);
-            target = drop;
-            return true;
-        }
-        return false;
     }
 
     @Override
