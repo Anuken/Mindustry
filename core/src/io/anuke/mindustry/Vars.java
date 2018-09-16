@@ -28,6 +28,7 @@ import io.anuke.ucore.util.Translator;
 import java.util.Arrays;
 import java.util.Locale;
 
+@SuppressWarnings("unchecked")
 public class Vars{
     public static final String discordURL = "https://discord.gg/mindustry";
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
@@ -139,7 +140,6 @@ public class Vars{
         }
 
         Arrays.sort(locales, (l1, l2) -> Platform.instance.getLocaleName(l1).compareTo(Platform.instance.getLocaleName(l2)));
-
         Version.init();
 
         content = new ContentLoader();

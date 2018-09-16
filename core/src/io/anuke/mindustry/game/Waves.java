@@ -116,7 +116,7 @@ public class Waves{
                 end = 130;
             }},
 
-            new SpawnGroup(UnitTypes.monsoon){{
+            new SpawnGroup(UnitTypes.ghoul){{
                 begin = 40;
                 unitAmount = 2;
                 spacing = 2;
@@ -134,7 +134,7 @@ public class Waves{
                 max = 8;
             }},
 
-            new SpawnGroup(UnitTypes.monsoon){{
+            new SpawnGroup(UnitTypes.ghoul){{
                 begin = 53;
                 unitAmount = 2;
                 unitScaling = 3;
@@ -143,7 +143,7 @@ public class Waves{
                 end = 74;
             }},
 
-            new SpawnGroup(UnitTypes.monsoon){{
+            new SpawnGroup(UnitTypes.ghoul){{
                 begin = 53;
                 unitAmount = 2;
                 unitScaling = 3;

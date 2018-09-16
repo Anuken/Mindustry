@@ -290,10 +290,6 @@ public class Renderer extends RendererModule{
 
         float trnsX = -12, trnsY = -13;
 
-        //Graphics.end();
-        //Core.batch.getTransformMatrix().translate(trnsX, trnsY, 0);
-        //Graphics.begin();
-
         for(EntityGroup<? extends BaseUnit> group : unitGroups){
             if(!group.isEmpty()){
                 drawAndInterpolate(group, unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
@@ -304,11 +300,6 @@ public class Renderer extends RendererModule{
             drawAndInterpolate(playerGroup, unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
         }
 
-        //Graphics.end();
-        //Core.batch.getTransformMatrix().translate(-trnsX, -trnsY, 0);
-        //Graphics.begin();
-
-        //TODO this actually isn't necessary
         Draw.color(0, 0, 0, 0.15f);
         Graphics.flushSurface();
         Draw.color();

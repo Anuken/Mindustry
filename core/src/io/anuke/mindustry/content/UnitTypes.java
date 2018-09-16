@@ -8,20 +8,14 @@ import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.ContentType;
 
 public class UnitTypes implements ContentList{
-    public static UnitType drone, alphaDrone, dagger, wraith, monsoon, revenant, titan, fortress, fabricator;
+    public static UnitType
+        spirit, phantom,
+        alphaDrone,
+        wraith, ghoul, revenant,
+        dagger, titan, fortress;
 
     @Override
     public void load(){
-        drone = new UnitType("drone", Drone.class, Drone::new){{
-            isFlying = true;
-            drag = 0.01f;
-            speed = 0.2f;
-            maxVelocity = 0.8f;
-            range = 50f;
-            healSpeed = 0.25f;
-            health = 60;
-        }};
-
         alphaDrone = new UnitType("alpha-drone", AlphaDrone.class, AlphaDrone::new){
             {
                 isFlying = true;
@@ -39,6 +33,16 @@ public class UnitTypes implements ContentList{
                 return true;
             }
         };
+
+        spirit = new UnitType("spirit", Spirit.class, Spirit::new){{
+            isFlying = true;
+            drag = 0.01f;
+            speed = 0.2f;
+            maxVelocity = 0.8f;
+            range = 50f;
+            healSpeed = 0.25f;
+            health = 60;
+        }};
 
         dagger = new UnitType("dagger", Dagger.class, Dagger::new){{
             maxVelocity = 1.1f;
@@ -76,7 +80,7 @@ public class UnitTypes implements ContentList{
             health = 70;
         }};
 
-        monsoon = new UnitType("monsoon", Monsoon.class, Monsoon::new){{
+        ghoul = new UnitType("ghoul", Ghoul.class, Ghoul::new){{
             health = 250;
             speed = 0.2f;
             maxVelocity = 1.4f;
@@ -94,7 +98,7 @@ public class UnitTypes implements ContentList{
             weapon = Weapons.bomber;
         }};
 
-        fabricator = new UnitType("fabricator", Fabricator.class, Fabricator::new){{
+        phantom = new UnitType("phantom", Phantom.class, Phantom::new){{
             isFlying = true;
             drag = 0.01f;
             speed = 0.2f;

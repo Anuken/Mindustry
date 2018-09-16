@@ -2,53 +2,53 @@ package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.units.MechFactory;
+import io.anuke.mindustry.world.blocks.units.MechPad;
 
 public class UpgradeBlocks extends BlockList{
-    public static Block deltaFactory, tauFactory, omegaFactory, dartFactory, javelinFactory, tridentFactory, glaiveFactory;
+    public static Block deltaPad, tauPad, omegaPad, dartPad, javelinPad, tridentPad, glaivePad;
 
     @Override
     public void load(){
-        deltaFactory = new MechFactory("delta-mech-factory"){{
+        deltaPad = new MechPad("delta-mech-pad"){{
             mech = Mechs.delta;
             size = 2;
             powerCapacity = 70f;
         }};
 
-        tauFactory = new MechFactory("tau-mech-factory"){{
+        tauPad = new MechPad("tau-mech-pad"){{
             mech = Mechs.tau;
             size = 2;
             powerCapacity = 100f;
         }};
 
-        omegaFactory = new MechFactory("omega-mech-factory"){{
+        omegaPad = new MechPad("omega-mech-pad"){{
             mech = Mechs.omega;
             size = 3;
             powerCapacity = 120f;
         }};
 
-        dartFactory = new MechFactory("dart-ship-factory"){{
+        dartPad = new MechPad("dart-ship-pad"){{
             mech = Mechs.dart;
             size = 2;
             powerCapacity = 50f;
             shadow = "shadow-rounded-2";
         }};
 
-        javelinFactory = new MechFactory("javelin-ship-factory"){{
+        javelinPad = new MechPad("javelin-ship-pad"){{
             mech = Mechs.javelin;
             size = 2;
             powerCapacity = 80f;
             shadow = "shadow-rounded-2";
         }};
 
-        tridentFactory = new MechFactory("trident-ship-factory"){{
+        tridentPad = new MechPad("trident-ship-pad"){{
             mech = Mechs.trident;
             size = 2;
             powerCapacity = 100f;
             shadow = "shadow-rounded-2";
         }};
 
-        glaiveFactory = new MechFactory("glaive-ship-factory"){{
+        glaivePad = new MechPad("glaive-ship-pad"){{
             mech = Mechs.glaive;
             size = 3;
             powerCapacity = 120f;

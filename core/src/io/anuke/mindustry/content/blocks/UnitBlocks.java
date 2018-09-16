@@ -8,29 +8,31 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.units.*;
 
 public class UnitBlocks extends BlockList implements ContentList{
-    public static Block repairPoint, dronePad,
-    fabricatorPad, interceptorPad, monsoonPad, daggerPad, titanPad,
-    reconstructor, commandCenter;
+    public static Block
+        spiritPad, phantomPad,
+        interceptorPad, monsoonPad, revenantPad,
+        daggerPad, titanPad,
+        reconstructor, repairPoint, commandCenter;
 
     @Override
     public void load(){
-        dronePad = new UnitPad("drone-pad"){{
-            type = UnitTypes.drone;
+        spiritPad = new UnitFactory("spirit-factory"){{
+            type = UnitTypes.spirit;
             produceTime = 5700;
             size = 2;
             consumes.power(0.08f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30)});
         }};
 
-        fabricatorPad = new UnitPad("fabricator-pad"){{
-            type = UnitTypes.fabricator;
+        phantomPad = new UnitFactory("phantom-factory"){{
+            type = UnitTypes.phantom;
             produceTime = 7300;
             size = 2;
             consumes.power(0.2f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80)});
         }};
 
-        interceptorPad = new UnitPad("wraith-pad"){{
+        interceptorPad = new UnitFactory("wraith-factory"){{
             type = UnitTypes.wraith;
             produceTime = 1800;
             size = 2;
@@ -38,8 +40,8 @@ public class UnitBlocks extends BlockList implements ContentList{
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.titanium, 10)});
         }};
 
-        monsoonPad = new UnitPad("monsoon-pad"){{
-            type = UnitTypes.monsoon;
+        monsoonPad = new UnitFactory("ghoul-factory"){{
+            type = UnitTypes.ghoul;
             produceTime = 3600;
             size = 3;
             consumes.power(0.2f);
@@ -47,7 +49,16 @@ public class UnitBlocks extends BlockList implements ContentList{
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 30), new ItemStack(Items.plastanium, 20)});
         }};
 
-        daggerPad = new UnitPad("dagger-pad"){{
+        revenantPad = new UnitFactory("revenant-factory"){{
+            type = UnitTypes.revenant;
+            produceTime = 3600;
+            size = 4;
+            consumes.power(0.2f);
+            shadow = "shadow-round-3";
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 30), new ItemStack(Items.plastanium, 20)});
+        }};
+
+        daggerPad = new UnitFactory("dagger-factory"){{
             type = UnitTypes.dagger;
             produceTime = 1700;
             size = 2;
@@ -55,7 +66,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.copper, 10)});
         }};
 
-        titanPad = new UnitPad("titan-pad"){{
+        titanPad = new UnitFactory("titan-factory"){{
             type = UnitTypes.titan;
             produceTime = 3400;
             size = 3;
