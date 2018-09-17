@@ -293,10 +293,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void drawOutlined(){
-
-        //Draw.color(Palette.placing);
-        //Lines.poly(player.x, player.y, 100, Player.placeDistance);
-        //Draw.color();
+        Lines.stroke(1f);
 
         Shaders.mix.color.set(Palette.accent);
         Graphics.shader(Shaders.mix);
