@@ -90,7 +90,8 @@ public class Damage{
             Tile tile = world.tile(cx, cy);
             if(tile != null && tile.entity != null && tile.target().getTeamID() != team.ordinal() && tile.entity.collide(hitter)){
                 tile.entity.collision(hitter);
-                Effects.effect(effect, tile.worldx(), tile.worldy());
+                hitter.getBulletType().hit(hitter, tile.worldx(), tile.worldy());
+                //Effects.effect(effect, tile.worldx(), tile.worldy());
             }
             return false;
         });

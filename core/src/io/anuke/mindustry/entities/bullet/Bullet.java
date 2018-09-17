@@ -95,6 +95,10 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         create(type, null, Team.none, x, y, angle);
     }
 
+    public BulletType getBulletType(){
+        return type;
+    }
+
     public boolean collidesTiles(){
         return type.collidesTiles;
     }
