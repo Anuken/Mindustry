@@ -16,6 +16,7 @@ import io.anuke.ucore.entities.impl.BulletEntity;
 import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.entities.trait.VelocityTrait;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.Timer;
 
@@ -23,13 +24,12 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.bulletGroup;
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait, AbsorbTrait{
     private static Vector2 vector = new Vector2();
     public Timer timer = new Timer(3);
+    private float lifeScl;
     private Team team;
     private Object data;
     private boolean supressCollision, supressOnce, initialized;
@@ -68,7 +68,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
         bullet.team = team;
         bullet.type = type;
-        bullet.time(type.lifetime() * (1f - lifetimeScl));
+        bullet.lifeScl = lifetimeScl;
 
         //translate bullets backwards, purely for visual reasons
         float backDelta = Timers.delta();
@@ -227,6 +227,9 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
     @Override
     protected void updateLife(){
+        time += Timers.delta() * 1f/(lifeScl);
+        time = Mathf.clamp(time, 0, type.lifetime());
+
         if(time >= type.lifetime){
             if(!supressCollision) type.despawned(this);
             remove();
@@ -237,6 +240,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     public void reset(){
         super.reset();
         timer.clear();
+        lifeScl = 1f;
         team = null;
         data = null;
         supressCollision = false;

@@ -255,7 +255,7 @@ public class WorldGenerator{
         double ridge = rid.getValue(x, y, 1f / 400f);
         double iceridge = rid.getValue(x+99999, y, 1f / 300f) + sim3.octaveNoise2D(2, 1f, 1f/14f, x, y)/11f;
         double elevation = elevationOf(x, y, detailed);
-        double temp = vn.noise(x, y, 1f / 300f) * sim3.octaveNoise2D(detailed ? 2 : 1, 1, 1f / 13f, x, y)/13f
+        double temp =
             + sim3.octaveNoise2D(detailed ? 12 : 9, 0.6, 1f / 1100f, x, y);
 
         int lerpDst = 20;
@@ -321,7 +321,7 @@ public class WorldGenerator{
 
     double elevationOf(int x, int y, boolean detailed){
         double ridge = rid.getValue(x, y, 1f / 400f);
-        return sim.octaveNoise2D(detailed ? 7 : 4, 0.62, 1f / 800, x, y) * 6.1 - 1 - ridge;
+        return sim.octaveNoise2D(detailed ? 7 : 5, 0.62, 1f / 800, x, y) * 6.1 - 1 - ridge;
     }
 
     public static class GenResult{
