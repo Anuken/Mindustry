@@ -169,16 +169,16 @@ public class FortressGenerator{
             seeder.get(DefenseBlocks.mendProjector, tile -> tile.block() instanceof PowerGenerator && gen.random.chance(0.03)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.daggerPad, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.3)),
+            seeder.get(UnitBlocks.daggerFactory, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.3)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.interceptorPad, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.3)),
+            seeder.get(UnitBlocks.wraithFactory, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.3)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.titanPad, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.23)),
+            seeder.get(UnitBlocks.titanFactory, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.23)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.monsoonPad, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.23)),
+            seeder.get(UnitBlocks.ghoulFactory, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.23)),
 
             //power turrets
             seeder.get(powerTurret, tile -> tile.block() instanceof PowerGenerator && gen.random.chance(0.04)),

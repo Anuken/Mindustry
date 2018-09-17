@@ -155,14 +155,15 @@ public class Recipes implements ContentList{
         new Recipe(units, UpgradeBlocks.omegaPad, new ItemStack(Items.lead, 450), new ItemStack(Items.densealloy, 550), new ItemStack(Items.silicon, 650), new ItemStack(Items.thorium, 600), new ItemStack(Items.surgealloy, 240)).setDesktop();
 
         //actual unit related stuff
-        new Recipe(units, UnitBlocks.spiritPad, new ItemStack(Items.copper, 70), new ItemStack(Items.lead, 110), new ItemStack(Items.silicon, 130));
-        new Recipe(units, UnitBlocks.phantomPad, new ItemStack(Items.densealloy, 90), new ItemStack(Items.thorium, 80), new ItemStack(Items.lead, 110), new ItemStack(Items.silicon, 210));
+        new Recipe(units, UnitBlocks.spiritFactory, new ItemStack(Items.copper, 70), new ItemStack(Items.lead, 110), new ItemStack(Items.silicon, 130));
+        new Recipe(units, UnitBlocks.phantomFactory, new ItemStack(Items.densealloy, 90), new ItemStack(Items.thorium, 80), new ItemStack(Items.lead, 110), new ItemStack(Items.silicon, 210));
 
-        new Recipe(units, UnitBlocks.daggerPad, new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 70));
-        new Recipe(units, UnitBlocks.titanPad, new ItemStack(Items.thorium, 90), new ItemStack(Items.lead, 140), new ItemStack(Items.silicon, 90));
+        new Recipe(units, UnitBlocks.daggerFactory, new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 70));
+        new Recipe(units, UnitBlocks.titanFactory, new ItemStack(Items.thorium, 90), new ItemStack(Items.lead, 140), new ItemStack(Items.silicon, 90));
 
-        new Recipe(units, UnitBlocks.interceptorPad, new ItemStack(Items.titanium, 60), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 90));
-        new Recipe(units, UnitBlocks.monsoonPad, new ItemStack(Items.plastanium, 80), new ItemStack(Items.titanium, 100), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 220));
+        new Recipe(units, UnitBlocks.wraithFactory, new ItemStack(Items.titanium, 60), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 90));
+        new Recipe(units, UnitBlocks.ghoulFactory, new ItemStack(Items.plastanium, 80), new ItemStack(Items.titanium, 100), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 220));
+        new Recipe(units, UnitBlocks.revenantFactory, new ItemStack(Items.plastanium, 300), new ItemStack(Items.titanium, 400), new ItemStack(Items.lead, 300), new ItemStack(Items.silicon, 400), new ItemStack(Items.surgealloy, 100));
 
         new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.copper, 30), new ItemStack(Items.silicon, 30));
         new Recipe(units, UnitBlocks.commandCenter, new ItemStack(Items.lead, 100), new ItemStack(Items.densealloy, 100), new ItemStack(Items.silicon, 200));
