@@ -546,13 +546,13 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         float worldx = Graphics.world(x, y).x, worldy = Graphics.world(x, y).y;
 
-        checkTargets(worldx, worldy);
-
         //get tile on cursor
         Tile cursor = tileAt(x, y);
 
         //ignore off-screen taps
         if(cursor == null || ui.hasMouse(x, y)) return false;
+
+        checkTargets(worldx, worldy);
 
         //remove if request present
         if(hasRequest(cursor)){
