@@ -159,6 +159,10 @@ public class Block extends BaseBlock {
         }
     }
 
+    public void powerGraphRemoved(Tile tile){
+        tile.entity.power.graph.remove(tile);
+    }
+
     public boolean isLayer(Tile tile){
         return true;
     }

@@ -66,7 +66,7 @@ public class PowerGraph{
     }
 
     public void remove(Tile tile){
-        all.add(tile);
+        all.remove(tile);
         producers.remove(tile);
         consumers.remove(tile);
     }
