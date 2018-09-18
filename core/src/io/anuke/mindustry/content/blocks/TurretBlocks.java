@@ -82,7 +82,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             };
         }};
 
-        lancer = new LaserTurret("lancer"){{
+        lancer = new ChargeTurret("lancer"){{
             range = 90f;
             chargeTime = 60f;
             chargeMaxDelay = 30f;
@@ -105,7 +105,7 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         arc = new PowerTurret("arc"){{
             shootType = AmmoTypes.arc;
-            reload = 30f;
+            reload = 40f;
             shootShake = 1f;
             powerUsed = 5f;
             powerCapacity = 30f;
@@ -197,6 +197,8 @@ public class TurretBlocks extends BlockList implements ContentList{
             rotatespeed = 10f;
             inaccuracy = 13f;
             shootCone = 30f;
+
+            health = 145 * size * size;
         }};
 
         fuse = new ItemTurret("fuse"){{
@@ -208,19 +210,45 @@ public class TurretBlocks extends BlockList implements ContentList{
             recoil = 5f;
             restitution = 0.1f;
             size = 3;
+
+            health = 155 * size * size;
         }};
 
-        spectre = new ItemTurret("spectre"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.bulletCopper, AmmoTypes.bulletDense, AmmoTypes.bulletPyratite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
-            reload = 25f;
-            restitution = 0.03f;
-            ammoUseEffect = ShootFx.shellEjectSmall;
+        spectre = new DoubleTurret("spectre"){{
+            ammoTypes = new AmmoType[]{AmmoTypes.bulletDenseBig, AmmoTypes.bulletPyratiteBig, AmmoTypes.bulletThoriumBig};
+            reload = 6f;
+            coolantMultiplier = 0.5f;
+            maxCoolantUsed = 1.5f;
+            restitution = 0.1f;
+            ammoUseEffect = ShootFx.shellEjectBig;
+            range = 200f;
+            inaccuracy = 3f;
+            recoil = 3f;
+            xRand = 3f;
+            shotWidth = 4f;
+            shootShake = 2f;
+            shots = 2;
             size = 4;
+            shootCone = 24f;
+
+            health = 155 * size * size;
         }};
 
-        meltdown = new PowerTurret("meltdown"){{
+        meltdown = new LaserTurret("meltdown"){{
             shootType = AmmoTypes.meltdownLaser;
+            shootEffect = ShootFx.shootBigSmoke2;
+            shootCone = 40f;
+            recoil = 4f;
             size = 4;
+            shootShake = 2f;
+            powerUsed = 60f;
+            powerCapacity = 120f;
+            range = 160f;
+            reload = 200f;
+            firingMoveFract = 0.1f;
+            shootDuration = 220f;
+
+            health = 165 * size * size;
         }};
     }
 }

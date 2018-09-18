@@ -24,10 +24,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -184,12 +181,7 @@ public interface BuilderTrait extends Entity{
             setMineTile(null);
         }
 
-        TileEntity core = unit.getClosestCore();
 
-        //if there is no core to build with, stop building!
-        if(core == null){
-            return;
-        }
 
         Tile tile = world.tile(current.x, current.y);
 
@@ -206,6 +198,13 @@ public interface BuilderTrait extends Entity{
                 getPlaceQueue().removeFirst();
                 return;
             }
+        }
+
+        TileEntity core = unit.getClosestCore();
+
+        //if there is no core to build with, stop building!
+        if(core == null){
+            return;
         }
 
         //otherwise, update it.
@@ -238,19 +237,26 @@ public interface BuilderTrait extends Entity{
     /**Do not call directly.*/
     default void updateMining(Unit unit){
         Tile tile = getMineTile();
+        TileEntity core = unit.getClosestCore();
 
-        if(tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance || !unit.inventory.canAcceptItem(tile.floor().drops.item)){
+        if(core == null || tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance || !unit.inventory.canAcceptItem(tile.floor().drops.item)){
             setMineTile(null);
         }else{
             Item item = tile.floor().drops.item;
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.worldx(), tile.worldy()), 0.4f);
 
-            if(unit.inventory.canAcceptItem(item) &&
-                    Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
-                Call.transferItemToUnit(item,
+            if(Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
+
+                if(unit.distanceTo(core) < mineTransferRange && core.items.get(item) < core.tile.block().getMaximumAccepted(core.tile, item)){
+                    Call.transferItemTo(item, 1,
+                        tile.worldx() + Mathf.range(tilesize / 2f),
+                        tile.worldy() + Mathf.range(tilesize / 2f), core.tile);
+                }else if(unit.inventory.canAcceptItem(item)){
+                    Call.transferItemToUnit(item,
                         tile.worldx() + Mathf.range(tilesize / 2f),
                         tile.worldy() + Mathf.range(tilesize / 2f),
                         unit);
+                }
             }
 
             if(Mathf.chance(0.06 * Timers.delta())){

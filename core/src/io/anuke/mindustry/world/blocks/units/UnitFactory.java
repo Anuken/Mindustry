@@ -34,7 +34,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class UnitPad extends Block{
+public class UnitFactory extends Block{
     protected float gracePeriodMultiplier = 23f;
     protected float speedupTime = 60f * 60f * 20;
     protected float maxSpeedup = 2f;
@@ -44,7 +44,7 @@ public class UnitPad extends Block{
     protected float launchVelocity = 0f;
     protected TextureRegion topRegion;
 
-    public UnitPad(String name){
+    public UnitFactory(String name){
         super(name);
         update = true;
         hasPower = true;
@@ -58,10 +58,10 @@ public class UnitPad extends Block{
 
     @Remote(called = Loc.server)
     public static void onUnitFactorySpawn(Tile tile){
-        if(!(tile.entity instanceof UnitFactoryEntity) || !(tile.block() instanceof UnitPad)) return;
+        if(!(tile.entity instanceof UnitFactoryEntity) || !(tile.block() instanceof UnitFactory)) return;
 
         UnitFactoryEntity entity = tile.entity();
-        UnitPad factory = (UnitPad) tile.block();
+        UnitFactory factory = (UnitFactory) tile.block();
 
         entity.buildTime = 0f;
 

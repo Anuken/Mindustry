@@ -5,8 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.entities.traits.AbsorbTrait;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -24,7 +23,9 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -127,13 +128,14 @@ public class ForceProjector extends Block {
 
         if(!entity.broken){
             EntityPhysics.getNearby(bulletGroup, tile.drawx(), tile.drawy(), realRadius*2f, bullet -> {
-                if(bullet instanceof Bullet && ((Bullet) bullet).getTeam() != tile.getTeam() && isInsideHexagon(bullet.getX(), bullet.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
-                    ((Bullet) bullet).absorb();
-                    Effects.effect(BulletFx.absorb, bullet);
-                    float hit = ((Bullet) bullet).getDamage()*powerDamage;
+                AbsorbTrait trait = (AbsorbTrait)bullet;
+                if(trait.canBeAbsorbed() && trait.getTeam() != tile.getTeam() && isInsideHexagon(trait.getX(), trait.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
+                    trait.absorb();
+                    Effects.effect(BulletFx.absorb, trait);
+                    float hit = trait.getDamage()*powerDamage;
                     entity.hit = 1f;
                     entity.power.amount -= Math.min(hit, entity.power.amount);
-                    entity.buildup += ((Bullet) bullet).getDamage() * entity.warmup;
+                    entity.buildup += trait.getDamage() * entity.warmup;
                 }
             });
         }
@@ -199,7 +201,7 @@ public class ForceProjector extends Block {
         }
     }
 
-    public class ShieldEntity extends BaseEntity implements DrawTrait, SyncTrait{
+    public class ShieldEntity extends BaseEntity implements DrawTrait{
         final ForceEntity entity;
 
         public ShieldEntity(Tile tile){
@@ -239,16 +241,5 @@ public class ForceProjector extends Block {
         public EntityGroup targetGroup(){
             return shieldGroup;
         }
-
-        @Override
-        public boolean isSyncing(){
-            return false;
-        }
-
-        @Override
-        public void write(DataOutput data) throws IOException{}
-
-        @Override
-        public void read(DataInput data, long time) throws IOException{}
     }
 }

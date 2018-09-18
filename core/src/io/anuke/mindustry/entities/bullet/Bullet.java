@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.traits.AbsorbTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
@@ -15,6 +16,7 @@ import io.anuke.ucore.entities.impl.BulletEntity;
 import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.entities.trait.VelocityTrait;
+import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.Timer;
 
@@ -22,13 +24,12 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.bulletGroup;
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
-public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait{
+public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait, AbsorbTrait{
     private static Vector2 vector = new Vector2();
     public Timer timer = new Timer(3);
+    private float lifeScl;
     private Team team;
     private Object data;
     private boolean supressCollision, supressOnce, initialized;
@@ -37,23 +38,23 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     public Bullet(){
     }
 
-    public static void create(BulletType type, TeamTrait owner, float x, float y, float angle){
-        create(type, owner, owner.getTeam(), x, y, angle);
+    public static Bullet create(BulletType type, TeamTrait owner, float x, float y, float angle){
+        return create(type, owner, owner.getTeam(), x, y, angle);
     }
 
-    public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle){
-        create(type, owner, team, x, y, angle, 1f);
+    public static Bullet create(BulletType type, Entity owner, Team team, float x, float y, float angle){
+        return create(type, owner, team, x, y, angle, 1f);
     }
 
-    public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl){
-        create(type, owner, team, x, y, angle, velocityScl, 1f, null);
+    public static Bullet create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl){
+        return create(type, owner, team, x, y, angle, velocityScl, 1f, null);
     }
 
-    public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
-        create(type, owner, team, x, y, angle, velocityScl, lifetimeScl, null);
+    public static Bullet create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
+        return create(type, owner, team, x, y, angle, velocityScl, lifetimeScl, null);
     }
 
-    public static void create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Object data){
+    public static Bullet create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Object data){
         Bullet bullet = Pooling.obtain(Bullet.class, Bullet::new);
         bullet.type = type;
         bullet.owner = owner;
@@ -67,7 +68,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
         bullet.team = team;
         bullet.type = type;
-        bullet.time(type.lifetime() * (1f - lifetimeScl));
+        bullet.lifeScl = lifetimeScl;
 
         //translate bullets backwards, purely for visual reasons
         float backDelta = Timers.delta();
@@ -78,14 +79,15 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         bullet.set(x, y);
 
         bullet.add();
+        return bullet;
     }
 
-    public static void create(BulletType type, Bullet parent, float x, float y, float angle){
-        create(type, parent.owner, parent.team, x, y, angle);
+    public static Bullet create(BulletType type, Bullet parent, float x, float y, float angle){
+        return create(type, parent.owner, parent.team, x, y, angle);
     }
 
-    public static void create(BulletType type, Bullet parent, float x, float y, float angle, float velocityScl){
-        create(type, parent.owner, parent.team, x, y, angle, velocityScl);
+    public static Bullet create(BulletType type, Bullet parent, float x, float y, float angle, float velocityScl){
+        return create(type, parent.owner, parent.team, x, y, angle, velocityScl);
     }
 
     @Remote(called = Loc.server)
@@ -107,6 +109,10 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         remove();
     }
 
+    public BulletType getBulletType(){
+        return type;
+    }
+
     public void resetOwner(Entity entity, Team team){
         this.owner = entity;
         this.team = team;
@@ -122,6 +128,11 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
     public void setData(Object data){
         this.data = data;
+    }
+
+    @Override
+    public float drawSize(){
+        return type.drawSize;
     }
 
     @Override
@@ -166,11 +177,6 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     @Override
     public void draw(){
         type.draw(this);
-    }
-
-    @Override
-    public float drawSize(){
-        return 8;
     }
 
     @Override
@@ -225,6 +231,9 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
     @Override
     protected void updateLife(){
+        time += Timers.delta() * 1f/(lifeScl);
+        time = Mathf.clamp(time, 0, type.lifetime());
+
         if(time >= type.lifetime){
             if(!supressCollision) type.despawned(this);
             remove();
@@ -235,6 +244,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     public void reset(){
         super.reset();
         timer.clear();
+        lifeScl = 1f;
         team = null;
         data = null;
         supressCollision = false;

@@ -34,13 +34,13 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.mobile;
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class MechFactory extends Block{
+public class MechPad extends Block{
     protected Mech mech;
     protected float buildTime = 60 * 5;
 
     protected TextureRegion openRegion;
 
-    public MechFactory(String name){
+    public MechPad(String name){
         super(name);
         update = true;
         solidifes = true;
@@ -83,7 +83,7 @@ public class MechFactory extends Block{
 
         if(entity.player == null) return;
 
-        Mech result = ((MechFactory) tile.block()).mech;
+        Mech result = ((MechPad) tile.block()).mech;
 
         if(entity.player.mech == result){
             entity.player.mech = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);

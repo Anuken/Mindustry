@@ -27,7 +27,7 @@ import io.anuke.mindustry.world.blocks.production.Drill;
 import io.anuke.mindustry.world.blocks.production.Pump;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.storage.StorageBlock;
-import io.anuke.mindustry.world.blocks.units.UnitPad;
+import io.anuke.mindustry.world.blocks.units.UnitFactory;
 import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.ucore.function.BiFunction;
 import io.anuke.ucore.function.IntPositionConsumer;
@@ -169,16 +169,16 @@ public class FortressGenerator{
             seeder.get(DefenseBlocks.mendProjector, tile -> tile.block() instanceof PowerGenerator && gen.random.chance(0.03)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.daggerPad, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.3)),
+            seeder.get(UnitBlocks.daggerFactory, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.3)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.interceptorPad, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.3)),
+            seeder.get(UnitBlocks.wraithFactory, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.3)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.titanPad, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.23)),
+            seeder.get(UnitBlocks.titanFactory, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.23)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.monsoonPad, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.23)),
+            seeder.get(UnitBlocks.ghoulFactory, tile -> tile.block() instanceof MendProjector && gen.random.chance(0.23)),
 
             //power turrets
             seeder.get(powerTurret, tile -> tile.block() instanceof PowerGenerator && gen.random.chance(0.04)),
@@ -206,7 +206,7 @@ public class FortressGenerator{
                     Tile tile = gen.tile(x + point.x, y + point.y);
                     if(tile != null){
                         tile = tile.target();
-                        if(tile.getTeamID() == team.ordinal() && !(tile.block() instanceof Wall) && !(tile.block() instanceof UnitPad)){
+                        if(tile.getTeamID() == team.ordinal() && !(tile.block() instanceof Wall) && !(tile.block() instanceof UnitFactory)){
                             gen.setBlock(x, y, wall, team);
                             break;
                         }

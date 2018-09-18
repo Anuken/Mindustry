@@ -39,7 +39,7 @@ import static io.anuke.mindustry.Vars.unitGroups;
 
 public class CoreBlock extends StorageBlock{
     protected float droneRespawnDuration = 60 * 6;
-    protected UnitType droneType = UnitTypes.drone;
+    protected UnitType droneType = UnitTypes.spirit;
 
     protected TextureRegion openRegion;
     protected TextureRegion topRegion;
@@ -160,6 +160,11 @@ public class CoreBlock extends StorageBlock{
         }else{
             return 0;
         }
+    }
+
+    @Override
+    public int getMaximumAccepted(Tile tile, Item item){
+        return itemCapacity;
     }
 
     @Override

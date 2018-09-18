@@ -60,6 +60,10 @@ public class SectorsDialog extends FloatingDialog{
         selected = sector;
     }
 
+    public Sector getSelected(){
+        return selected;
+    }
+
     class SectorView extends Element{
         float lastX, lastY;
         float sectorSize = Unit.dp.scl(32*4);

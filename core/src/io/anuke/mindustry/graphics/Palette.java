@@ -13,6 +13,8 @@ public class Palette{
     missileYellow = Color.valueOf("ffd2ae"),
     missileYellowBack = Color.valueOf("e58956"),
 
+    meltdownHit = Color.valueOf("ffb98b"),
+
     plastaniumBack = Color.valueOf("d8d97f"),
     plastaniumFront = Color.valueOf("fffac6"),
 

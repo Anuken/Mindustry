@@ -9,7 +9,6 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
-import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
@@ -29,12 +28,15 @@ import io.anuke.ucore.util.Translator;
 import java.util.Arrays;
 import java.util.Locale;
 
+@SuppressWarnings("unchecked")
 public class Vars{
     public static final String discordURL = "https://discord.gg/mindustry";
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
     public static final String crashReportURL = "http://mindustry.us.to/report";
     //time between waves in frames (on normal mode)
     public static final float wavespace = 60 * 60 * 1.5f;
+
+    public static final float mineTransferRange = 310f;
     //set ridiculously high for now
     public static final float coreBuildRange = 999999f;
     //team of the player by default
@@ -115,7 +117,6 @@ public class Vars{
     public static EntityGroup<Bullet> bulletGroup;
     public static EntityGroup<EffectEntity> effectGroup;
     public static EntityGroup<DrawTrait> groundEffectGroup;
-    public static EntityGroup<ItemDrop> itemGroup;
     public static EntityGroup<ShieldEntity> shieldGroup;
     public static EntityGroup<Puddle> puddleGroup;
     public static EntityGroup<Fire> fireGroup;
@@ -139,7 +140,6 @@ public class Vars{
         }
 
         Arrays.sort(locales, (l1, l2) -> Platform.instance.getLocaleName(l1).compareTo(Platform.instance.getLocaleName(l2)));
-
         Version.init();
 
         content = new ContentLoader();
@@ -150,7 +150,6 @@ public class Vars{
         effectGroup = Entities.addGroup(EffectEntity.class, false);
         groundEffectGroup = Entities.addGroup(DrawTrait.class, false);
         puddleGroup = Entities.addGroup(Puddle.class).enableMapping();
-        itemGroup = Entities.addGroup(ItemDrop.class).enableMapping();
         shieldGroup = Entities.addGroup(ShieldEntity.class, false);
         fireGroup = Entities.addGroup(Fire.class).enableMapping();
         unitGroups = new EntityGroup[Team.all.length];

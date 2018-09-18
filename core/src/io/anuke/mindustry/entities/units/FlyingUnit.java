@@ -136,11 +136,13 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     public void update(){
         super.update();
 
-        updateRotation();
+        if(!Net.client()){
+            updateRotation();
+            wobble();
+        }
+
         trail.update(x + Angles.trnsx(rotation + 180f, 6f) + Mathf.range(wobblyness),
         y + Angles.trnsy(rotation + 180f, 6f) + Mathf.range(wobblyness));
-
-        wobble();
     }
 
     @Override
@@ -185,11 +187,11 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected void wobble(){
         if(Net.client()) return;
 
-        x += Mathf.sin(Timers.time() + id * 999, 25f, 0.07f)*Timers.delta();
-        y += Mathf.cos(Timers.time() + id * 999, 25f, 0.07f)*Timers.delta();
+        x += Mathf.sin(Timers.time() + id * 999, 25f, 0.08f)*Timers.delta();
+        y += Mathf.cos(Timers.time() + id * 999, 25f, 0.08f)*Timers.delta();
 
         if(velocity.len() <= 0.05f){
-            rotation += Mathf.sin(Timers.time() + id * 99, 10f, 5f)*Timers.delta();
+            rotation += Mathf.sin(Timers.time() + id * 99, 10f, 2.5f)*Timers.delta();
         }
     }
 

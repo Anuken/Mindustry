@@ -12,7 +12,6 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.bullet.LiquidBulletType;
 import io.anuke.mindustry.entities.effect.Fire;
-import io.anuke.mindustry.entities.effect.ItemDrop;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
@@ -20,10 +19,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.graphics.Shapes;
+import io.anuke.ucore.graphics.*;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 
@@ -31,7 +27,7 @@ import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
 public class TurretBullets extends BulletList implements ContentList{
-    public static BulletType fireball, basicFlame, lancerLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt, healBullet, arc;
+    public static BulletType fireball, basicFlame, lancerLaser, meltdownLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt, healBullet, arc;
 
     @Override
     public void load(){
@@ -155,6 +151,56 @@ public class TurretBullets extends BulletList implements ContentList{
                     for(int i = 0; i < tscales.length; i++){
                         Lines.stroke(7f * b.fout() * (s == 0 ? 1.5f : s == 1 ? 1f : 0.3f) * tscales[i]);
                         Lines.lineAngle(b.x, b.y, b.angle(), baseLen * lenscales[i]);
+                    }
+                }
+                Draw.reset();
+            }
+        };
+
+        meltdownLaser = new BulletType(0.001f, 26){
+            Color tmpColor = new Color();
+            Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.WHITE};
+            float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
+            float[] strokes = {2f, 1.5f, 1f, 0.3f};
+            float[] lenscales = {1f, 1.12f, 1.15f, 1.17f};
+            float length = 200f;
+
+            {
+                hiteffect = BulletFx.hitMeltdown;
+                despawneffect = Fx.none;
+                hitsize = 4;
+                drawSize = 420f;
+                lifetime = 16f;
+                pierce = true;
+            }
+
+            @Override
+            public void update(Bullet b){
+                if(b.timer.get(1, 5f)){
+                    Damage.collideLine(b, b.getTeam(), hiteffect, b.x, b.y, b.angle(), length);
+                }
+                Effects.shake(1f, 1f, b.x, b.y);
+            }
+
+            @Override
+            public void hit(Bullet b, float hitx, float hity){
+                Effects.effect(hiteffect, colors[2], hitx, hity);
+                if(Mathf.chance(0.4)){
+                    Fire.create(world.tileWorld(hitx+Mathf.range(5f), hity+Mathf.range(5f)));
+                }
+            }
+
+            @Override
+            public void draw(Bullet b){
+                float baseLen = (length) * b.fout();
+
+                Lines.lineAngle(b.x, b.y, b.angle(), baseLen);
+                for(int s = 0; s < colors.length; s++){
+                    Draw.color(tmpColor.set(colors[s]).mul(1f + Mathf.absin(Timers.time(), 1f, 0.1f)));
+                    for(int i = 0; i < tscales.length; i++){
+                        vector.trns(b.angle() + 180f, (lenscales[i] - 1f) * 35f);
+                        Lines.stroke((9f + Mathf.absin(Timers.time(), 0.8f, 1.5f)) * b.fout() * strokes[s] * tscales[i]);
+                        Lines.lineAngle(b.x + vector.x, b.y + vector.y, b.angle(), baseLen * lenscales[i], CapStyle.none);
                     }
                 }
                 Draw.reset();
@@ -345,8 +391,7 @@ public class TurretBullets extends BulletList implements ContentList{
                     int amountDropped = Mathf.random(0, data.items[i]);
                     if(amountDropped > 0){
                         float angle = b.angle() + Mathf.range(100f);
-                        float vs = Mathf.random(0f, 4f);
-                        ItemDrop.create(content.item(i), amountDropped, b.x, b.y, Angles.trnsx(angle, vs), Angles.trnsy(angle, vs));
+                        Effects.effect(EnvironmentFx.dropItem, Color.WHITE, b.x, b.y, angle, content.item(i));
                     }
                 }
             }

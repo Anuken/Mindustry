@@ -7,7 +7,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.defense.*;
 
 public class DefenseBlocks extends BlockList implements ContentList{
-    public static Block copperWall, copperWallLarge, compositeWall, compositeWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
+    public static Block copperWall, copperWallLarge, denseAlloyWall, denseAlloyWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
             phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, overdriveProjector, forceProjector, shockMine;
 
     @Override
@@ -23,11 +23,11 @@ public class DefenseBlocks extends BlockList implements ContentList{
             size = 2;
         }};
 
-        compositeWall = new Wall("composite-wall"){{
+        denseAlloyWall = new Wall("dense-alloy-wall"){{
             health = 110 * wallHealthMultiplier;
         }};
 
-        compositeWallLarge = new Wall("composite-wall-large"){{
+        denseAlloyWallLarge = new Wall("dense-alloy-wall-large"){{
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
         }};
