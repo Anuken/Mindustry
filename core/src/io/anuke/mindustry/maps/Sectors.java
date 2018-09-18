@@ -75,19 +75,14 @@ public class Sectors{
         Sector sector = get(x, y);
         sector.complete = true;
 
-        for(GridPoint2 point : Edges.getEdges(sector.size)){
+        //TODO work for unique width + height?
+        for(GridPoint2 point : Edges.getEdges(sector.width)){
             createSector(sector.x + point.x, sector.y + point.y);
         }
     }
 
     /**Creates a sector at a location if it is not present, but does not unlock it.*/
     public void createSector(int x, int y){
-        boolean isLarge = Mathf.randomSeed(3+Bits.packInt((short)round2(x), (short)round2(y))) < sectorLargeChance;
-
-        if(isLarge){
-            x = round2(x);
-            y = round2(y);
-        }
 
         if(grid.containsKey(x, y)) return;
 
@@ -95,11 +90,11 @@ public class Sectors{
         sector.x = (short)x;
         sector.y = (short)y;
         sector.complete = false;
-        sector.size = isLarge ? 2 : 1;
+        sector.width = sector.height = 1;
         initSector(sector);
 
-        for(int cx = 0; cx < sector.size; cx++){
-            for(int cy = 0; cy < sector.size; cy++){
+        for(int cx = 0; cx < sector.width; cx++){
+            for(int cy = 0; cy < sector.height; cy++){
                 grid.put(x + cx, y + cy, sector);
             }
         }
@@ -118,8 +113,8 @@ public class Sectors{
         for(Sector sector : out){
             createTexture(sector);
             initSector(sector);
-            for(int cx = 0; cx < sector.size; cx++){
-                for(int cy = 0; cy < sector.size; cy++){
+            for(int cx = 0; cx < sector.width; cx++){
+                for(int cy = 0; cy < sector.height; cy++){
                     grid.put(sector.x + cx, sector.y + cy, sector);
                 }
             }
@@ -155,8 +150,7 @@ public class Sectors{
 
         sector.spawns = sector.missions.first().getWaves(sector);
 
-        //add all ores for now since material differences aren't well handled yet
-        sector.ores.addAll(Items.copper, Items.coal, Items.lead, Items.thorium, Items.titanium);
+        sector.ores.addAll(Items.copper);
 
         //set starter items
         if(sector.difficulty > 12){ //now with titanium
@@ -174,15 +168,10 @@ public class Sectors{
         }
     }
 
-    private int round2(int i){
-        if(i < 0) i --;
-        return i/2*2;
-    }
-
     private void createTexture(Sector sector){
         if(headless) return; //obviously not created or needed on server
 
-        Pixmap pixmap = new Pixmap(sectorImageSize * sector.size, sectorImageSize * sector.size, Format.RGBA8888);
+        Pixmap pixmap = new Pixmap(sectorImageSize * sector.width, sectorImageSize * sector.height, Format.RGBA8888);
 
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
