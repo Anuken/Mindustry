@@ -14,7 +14,6 @@ import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.PowerType;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
@@ -51,7 +50,8 @@ public class PowerNode extends PowerBlock{
         layer = Layer.power;
         powerCapacity = 5f;
         configurable = true;
-        powerType = PowerType.bridge;
+        consumesPower = false;
+        outputsPower = false;
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)

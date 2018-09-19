@@ -155,7 +155,7 @@ public class Block extends BaseBlock {
     public Array<Tile> getPowerConnections(Tile tile, Array<Tile> out){
         out.clear();
         for(Tile other : tile.entity.proximity()){
-            if(other.entity.power != null && !(powerType == PowerType.consumer && other.block().powerType == PowerType.consumer)){
+            if(other.entity.power != null && !(consumesPower && other.block().consumesPower)){
                 out.add(other);
             }
         }

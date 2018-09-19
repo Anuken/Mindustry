@@ -12,7 +12,6 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
-import io.anuke.mindustry.world.meta.PowerType;
 import io.anuke.mindustry.world.meta.Producers;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -26,7 +25,8 @@ public abstract class BaseBlock extends MappableContent{
 
     public boolean outputsLiquid = false;
     public boolean singleLiquid = true;
-    public PowerType powerType = PowerType.consumer;
+    public boolean consumesPower = true;
+    public boolean outputsPower;
 
     public int itemCapacity;
     public float liquidCapacity = 10f;

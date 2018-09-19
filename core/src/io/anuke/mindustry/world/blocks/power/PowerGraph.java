@@ -4,7 +4,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.PowerType;
 
 import static io.anuke.mindustry.Vars.threads;
 
@@ -74,9 +73,12 @@ public class PowerGraph{
     public void add(Tile tile){
         tile.entity.power.graph = this;
         all.add(tile);
-        if(tile.block().powerType == PowerType.producer){
+
+        if(tile.block().outputsPower){
             producers.add(tile);
-        }else if(tile.block().powerType == PowerType.consumer){
+        }
+
+        if(tile.block().consumesPower){
             consumers.add(tile);
         }
     }

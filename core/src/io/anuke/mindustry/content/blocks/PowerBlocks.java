@@ -65,11 +65,15 @@ public class PowerBlocks extends BlockList implements ContentList{
 
         battery = new PowerDistributor("battery"){{
             powerCapacity = 320f;
+            outputsPower = true;
+            consumesPower = true;
         }};
 
         batteryLarge = new PowerDistributor("battery-large"){{
             size = 3;
             powerCapacity = 2000f;
+            outputsPower = true;
+            consumesPower = true;
         }};
 
         powerNode = new PowerNode("power-node"){{
