@@ -81,6 +81,30 @@ public class PowerGraph{
         }
     }
 
+    public void clear(){
+        for(Tile other : all){
+            other.entity.power.graph = null;
+        }
+        all.clear();
+        producers.clear();
+        consumers.clear();
+    }
+
+    public void reflow(Tile tile){
+        queue.clear();
+        queue.addLast(tile);
+        while(queue.size > 0){
+            Tile child = queue.removeFirst();
+            child.entity.power.graph = this;
+            add(child);
+            for(Tile next : child.block().getPowerConnections(child, outArray2)){
+                if(next.entity.power != null && next.entity.power.graph == null){
+                    queue.addLast(next);
+                }
+            }
+        }
+    }
+
     public void remove(Tile tile){
         for(Tile other : all){
             other.entity.power.graph = null;

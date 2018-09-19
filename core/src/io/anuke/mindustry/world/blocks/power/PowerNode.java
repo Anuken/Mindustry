@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
@@ -54,37 +55,50 @@ public class PowerNode extends PowerBlock{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void linkPowerDistributors(Player player, Tile tile, Tile other){
-        if(!(tile.entity instanceof DistributorEntity)) return;
+    public static void linkPowerNodes(Player player, Tile tile, Tile other){
+        if(!(tile.entity instanceof NodeEntity)) return;
 
-        DistributorEntity entity = tile.entity();
+        NodeEntity entity = tile.entity();
 
         if(!entity.links.contains(other.packedPosition())){
             entity.links.add(other.packedPosition());
         }
 
         if(other.getTeamID() == tile.getTeamID() && other.block() instanceof PowerNode){
-            DistributorEntity oe = other.entity();
+            NodeEntity oe = other.entity();
 
             if(!oe.links.contains(tile.packedPosition())){
                 oe.links.add(tile.packedPosition());
             }
         }
+
+        entity.power.graph.add(other.entity.power.graph);
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void unlinkPowerDistributors(Player player, Tile tile, Tile other){
-        if(!(tile.entity instanceof DistributorEntity)) return;
+    public static void unlinkPowerNodes(Player player, Tile tile, Tile other){
+        if(!(tile.entity instanceof NodeEntity)) return;
 
-        DistributorEntity entity = tile.entity();
+        NodeEntity entity = tile.entity();
 
         entity.links.removeValue(other.packedPosition());
 
         if(other.block() instanceof PowerNode){
-            DistributorEntity oe = other.entity();
+            NodeEntity oe = other.entity();
 
             oe.links.removeValue(tile.packedPosition());
         }
+
+        //clear all graph data first
+        PowerGraph tg = entity.power.graph;
+        tg.clear();
+        //reflow from this point, covering all tiles on this side
+        tg.reflow(tile);
+
+        //create new graph for other end
+        PowerGraph og = new PowerGraph();
+        //reflow from other end
+        og.reflow(other);
     }
 
     @Override
@@ -95,7 +109,7 @@ public class PowerNode extends PowerBlock{
     public void playerPlaced(Tile tile){
         Tile before = world.tile(lastPlaced);
         if(linkValid(tile, before) && before.block() instanceof PowerNode){
-            Call.linkPowerDistributors(null, tile, before);
+            Call.linkPowerNodes(null, tile, before);
         }
 
         lastPlaced = tile.packedPosition();
@@ -116,16 +130,16 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public boolean onConfigureTileTapped(Tile tile, Tile other){
-        DistributorEntity entity = tile.entity();
+        NodeEntity entity = tile.entity();
         other = other.target();
 
         Tile result = other;
 
         if(linkValid(tile, other)){
             if(linked(tile, other)){
-                threads.run(() -> Call.unlinkPowerDistributors(null, tile, result));
+                threads.run(() -> Call.unlinkPowerNodes(null, tile, result));
             }else if(entity.links.size < maxNodes){
-                threads.run(() -> Call.linkPowerDistributors(null, tile, result));
+                threads.run(() -> Call.linkPowerNodes(null, tile, result));
             }
             return false;
         }
@@ -146,7 +160,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void drawConfigure(Tile tile){
-        DistributorEntity entity = tile.entity();
+        NodeEntity entity = tile.entity();
 
         Draw.color(Palette.accent);
 
@@ -172,7 +186,7 @@ public class PowerNode extends PowerBlock{
                     Lines.square(link.drawx(), link.drawy(),
                             link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Timers.time(), 4f, 1f)));
 
-                    if((entity.links.size >= maxNodes || (link.block() instanceof PowerNode && ((DistributorEntity) link.entity).links.size >= ((PowerNode) link.block()).maxNodes)) && !linked){
+                    if((entity.links.size >= maxNodes || (link.block() instanceof PowerNode && ((NodeEntity) link.entity).links.size >= ((PowerNode) link.block()).maxNodes)) && !linked){
                         Draw.color();
                         Draw.rect("cross-" + link.block().size, link.drawx(), link.drawy());
                     }
@@ -197,11 +211,9 @@ public class PowerNode extends PowerBlock{
     public void drawLayer(Tile tile){
         if(!Settings.getBool("lasers")) return;
 
-        DistributorEntity entity = tile.entity();
+        NodeEntity entity = tile.entity();
 
-        entity.laserColor = Mathf.lerpDelta(entity.laserColor, Mathf.clamp(entity.powerRecieved / (powerSpeed)), 0.08f);
-
-        Draw.color(Palette.powerLaserFrom, Palette.powerLaserTo, entity.laserColor * (1f - flashScl) + Mathf.sin(Timers.time(), 1.7f, flashScl));
+        Draw.color(Palette.powerLaserFrom, Palette.powerLaserTo, 0f * (1f - flashScl) + Mathf.sin(Timers.time(), 1.7f, flashScl));
 
         for(int i = 0; i < entity.links.size; i++){
             Tile link = world.tile(entity.links.get(i));
@@ -212,24 +224,19 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public float addPower(Tile tile, float amount){
-        DistributorEntity entity = tile.entity();
+    public Array<Tile> getPowerConnections(Tile tile, Array<Tile> out){
+        super.getPowerConnections(tile, out);
+        NodeEntity entity = tile.entity();
 
-        if(entity.lastRecieved != threads.getFrameID()){
-            entity.lastRecieved = threads.getFrameID();
-            entity.powerRecieved = 0f;
+        for(int i = 0; i < entity.links.size; i++){
+            Tile link = world.tile(entity.links.get(i));
+            if(linkValid(tile, link)) out.add(link);
         }
-
-        float canAccept = Math.min(powerCapacity * Timers.delta() - tile.entity.power.amount, amount);
-
-        tile.entity.power.amount += canAccept;
-        entity.powerRecieved += canAccept;
-
-        return canAccept;
+        return out;
     }
 
     protected boolean linked(Tile tile, Tile other){
-        return tile.<DistributorEntity>entity().links.contains(other.packedPosition());
+        return tile.<NodeEntity>entity().links.contains(other.packedPosition());
     }
 
     protected boolean linkValid(Tile tile, Tile link){
@@ -240,7 +247,7 @@ public class PowerNode extends PowerBlock{
         if(!(tile != link && link != null && link.block().hasPower) || tile.getTeamID() != link.getTeamID()) return false;
 
         if(link.block() instanceof PowerNode){
-            DistributorEntity oe = link.entity();
+            NodeEntity oe = link.entity();
 
             return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
                     ((PowerNode) link.block()).laserRange * tilesize) - tilesize / 2f
@@ -268,13 +275,10 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public TileEntity getEntity(){
-        return new DistributorEntity();
+        return new NodeEntity();
     }
 
-    public static class DistributorEntity extends TileEntity{
-        public float laserColor = 0f;
-        public float powerRecieved = 0f;
-        public long lastRecieved = 0;
+    public static class NodeEntity extends TileEntity{
         public IntArray links = new IntArray();
 
         @Override
