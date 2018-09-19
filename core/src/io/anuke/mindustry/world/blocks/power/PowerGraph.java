@@ -1,14 +1,17 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.util.Log;
+import io.anuke.mindustry.world.meta.PowerType;
 
 import static io.anuke.mindustry.Vars.threads;
 
 public class PowerGraph{
     private final static Queue<Tile> queue = new Queue<>();
+    private final static Array<Tile> outArray1 = new Array<>();
+    private final static Array<Tile> outArray2 = new Array<>();
 
     private final ObjectSet<Tile> producers = new ObjectSet<>();
     private final ObjectSet<Tile> consumers = new ObjectSet<>();
@@ -71,12 +74,11 @@ public class PowerGraph{
     public void add(Tile tile){
         tile.entity.power.graph = this;
         all.add(tile);
-        if(tile.block().outputsPower){
+        if(tile.block().powerType == PowerType.producer){
             producers.add(tile);
-        }else{
+        }else if(tile.block().powerType == PowerType.consumer){
             consumers.add(tile);
         }
-        Log.info("New graph: {0} produce {1} consume {2} total", producers.size, consumers.size, all.size);
     }
 
     public void remove(Tile tile){
@@ -88,8 +90,8 @@ public class PowerGraph{
         producers.remove(tile);
         consumers.remove(tile);
 
-        for(Tile other : tile.entity.proximity()){
-            if(other.entity.power == null || (other.entity.power != null && other.entity.power.graph != null)) continue;
+        for(Tile other : tile.block().getPowerConnections(tile, outArray1)){
+            if(other.entity.power == null || other.entity.power.graph != null) continue;
             PowerGraph graph = new PowerGraph();
             queue.clear();
             queue.addLast(other);
@@ -97,7 +99,7 @@ public class PowerGraph{
                 Tile child = queue.removeFirst();
                 child.entity.power.graph = graph;
                 add(child);
-                for(Tile next : child.entity.proximity()){
+                for(Tile next : child.block().getPowerConnections(child, outArray2)){
                     if(next != tile && next.entity.power != null && next.entity.power.graph == null){
                         queue.addLast(next);
                     }

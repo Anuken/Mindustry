@@ -141,7 +141,7 @@ public class Block extends BaseBlock {
     public void updatePowerGraph(Tile tile){
         TileEntity entity = tile.entity();
 
-        for(Tile other : entity.proximity()){
+        for(Tile other : getPowerConnections(tile, tempTiles)){
             if(other.entity.power != null){
                 other.entity.power.graph.add(entity.power.graph);
             }
@@ -150,6 +150,16 @@ public class Block extends BaseBlock {
 
     public void powerGraphRemoved(Tile tile){
         tile.entity.power.graph.remove(tile);
+    }
+
+    public Array<Tile> getPowerConnections(Tile tile, Array<Tile> out){
+        out.clear();
+        for(Tile other : tile.entity.proximity()){
+            if(other.entity.power != null && !(powerType == PowerType.consumer && other.block().powerType == PowerType.consumer)){
+                out.add(other);
+            }
+        }
+        return out;
     }
 
     public boolean isLayer(Tile tile){

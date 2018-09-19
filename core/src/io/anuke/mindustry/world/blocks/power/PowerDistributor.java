@@ -2,12 +2,13 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
+import io.anuke.mindustry.world.meta.PowerType;
 
 public class PowerDistributor extends PowerBlock{
 
     public PowerDistributor(String name){
         super(name);
-        outputsPower = true;
+        powerType = PowerType.producer;
     }
 
     @Override
