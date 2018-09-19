@@ -148,11 +148,12 @@ public class Block extends BaseBlock {
                 other = other.target();
                 if(other.entity.power != null){
                     entity.power.graph = other.entity.power.graph;
+                    entity.power.graph.add(tile);
                     return;
                 }
             }
 
-            entity.power.graph = new PowerGraph(entity);
+            entity.power.graph = new PowerGraph();
             entity.power.graph.add(tile);
         }else{
             //TODO

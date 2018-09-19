@@ -1,28 +1,22 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import com.badlogic.gdx.utils.ObjectSet;
-import io.anuke.mindustry.entities.TileEntity;
+import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.threads;
 
 public class PowerGraph{
+    private final static Queue<Tile> queue = new Queue<>();
+
     private final ObjectSet<Tile> producers = new ObjectSet<>();
     private final ObjectSet<Tile> consumers = new ObjectSet<>();
     private final ObjectSet<Tile> all = new ObjectSet<>();
-    private final TileEntity seed;
 
     private long lastFrameUpdated;
 
-    public PowerGraph(TileEntity seed){
-        this.seed = seed;
-    }
-
-    public boolean isSeed(TileEntity entity){
-        return seed == entity;
-    }
-
     public void update(){
+        //Log.info("producers {0}\nconsumers {1}\nall {2}", producers, consumers, all);
         if(threads.getFrameID() == lastFrameUpdated || consumers.size == 0 || producers.size == 0){
             return;
         }
@@ -66,8 +60,29 @@ public class PowerGraph{
     }
 
     public void remove(Tile tile){
+        for(Tile other : all){
+            other.entity.power.graph = null;
+        }
+
         all.remove(tile);
         producers.remove(tile);
         consumers.remove(tile);
+
+        for(Tile other : tile.entity.proximity()){
+            if(other.entity.power.graph != null) continue;
+            PowerGraph graph = new PowerGraph();
+            queue.clear();
+            queue.addLast(other);
+            while(queue.size > 0){
+                Tile child = queue.removeFirst();
+                child.entity.power.graph = graph;
+                add(child);
+                for(Tile next : child.entity.proximity()){
+                    if(next != tile && next.entity.power != null && next.entity.power.graph == null){
+                        queue.addLast(next);
+                    }
+                }
+            }
+        }
     }
 }
