@@ -19,7 +19,6 @@ import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.world.blocks.power.PowerGraph;
 import io.anuke.mindustry.world.meta.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -142,21 +141,10 @@ public class Block extends BaseBlock {
     public void updatePowerGraph(Tile tile){
         TileEntity entity = tile.entity();
 
-        if(entity.power.graph == null){
-
-            for(Tile other : entity.proximity()){
-                other = other.target();
-                if(other.entity.power != null){
-                    entity.power.graph = other.entity.power.graph;
-                    entity.power.graph.add(tile);
-                    return;
-                }
+        for(Tile other : entity.proximity()){
+            if(other.entity.power != null){
+                other.entity.power.graph.add(entity.power.graph);
             }
-
-            entity.power.graph = new PowerGraph();
-            entity.power.graph.add(tile);
-        }else{
-            //TODO
         }
     }
 
@@ -504,7 +492,8 @@ public class Block extends BaseBlock {
                 "entity.x", tile.entity.x,
                 "entity.y", tile.entity.y,
                 "entity.id", tile.entity.id,
-                "entity.items.total", hasItems ? tile.entity.items.total() : null
+                "entity.items.total", hasItems ? tile.entity.items.total() : null,
+                "entity.graph", tile.entity.power != null && tile.entity.power.graph != null ? tile.entity.power.graph.getID() : null
         );
     }
 }

@@ -186,7 +186,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             if(other == null || other.entity == null || other.getTeamID() != tile.getTeamID()) continue;
             other = other.target();
 
-            if(other.block().hasPower) other.block().updatePowerGraph(other);
             other.block().onProximityUpdate(other);
 
             tmpTiles.add(other);

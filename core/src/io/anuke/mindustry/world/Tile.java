@@ -420,8 +420,13 @@ public class Tile implements PosTrait, TargetTrait{
                 entity.cons = new ConsumeModule();
                 if(block.hasItems) entity.items = new InventoryModule();
                 if(block.hasLiquids) entity.liquids = new LiquidModule();
-                if(block.hasPower) entity.power = new PowerModule();
-                entity.updateProximity();
+                if(block.hasPower){
+                    entity.power = new PowerModule();
+                    entity.power.graph.add(this);
+                }
+                if(!world.isGenerating()){
+                    entity.updateProximity();
+                }
             }else if(!(block instanceof BlockPart)){
                 //since the entity won't update proximity for us, update proximity for all nearby tiles manually
                 for(GridPoint2 p : Geometry.d4){
