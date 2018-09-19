@@ -183,8 +183,9 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         for(GridPoint2 point : nearby){
             Tile other = world.tile(tile.x + point.x, tile.y + point.y);
 
-            if(other == null || other.entity == null || other.getTeamID() != tile.getTeamID()) continue;
+            if(other == null) continue;
             other = other.target();
+            if(other.entity == null || other.getTeamID() != tile.getTeamID()) continue;
 
             other.block().onProximityUpdate(other);
 
