@@ -108,13 +108,7 @@ public class PowerGraph{
     }
 
     public void remove(Tile tile){
-        for(Tile other : all){
-            other.entity.power.graph = null;
-        }
-
-        all.remove(tile);
-        producers.remove(tile);
-        consumers.remove(tile);
+        clear();
 
         for(Tile other : tile.block().getPowerConnections(tile, outArray1)){
             if(other.entity.power == null || other.entity.power.graph != null) continue;
@@ -124,7 +118,7 @@ public class PowerGraph{
             while(queue.size > 0){
                 Tile child = queue.removeFirst();
                 child.entity.power.graph = graph;
-                add(child);
+                graph.add(child);
                 for(Tile next : child.block().getPowerConnections(child, outArray2)){
                     if(next != tile && next.entity.power != null && next.entity.power.graph == null){
                         queue.addLast(next);
