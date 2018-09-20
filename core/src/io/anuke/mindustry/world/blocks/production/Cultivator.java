@@ -95,7 +95,7 @@ public class Cultivator extends Drill{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new CultivatorEntity();
     }
 

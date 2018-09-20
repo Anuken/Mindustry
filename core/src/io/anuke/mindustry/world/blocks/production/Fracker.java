@@ -76,7 +76,7 @@ public class Fracker extends SolidPump{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new FrackerEntity();
     }
 

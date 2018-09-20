@@ -81,7 +81,7 @@ public class Door extends Wall{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new DoorEntity();
     }
 

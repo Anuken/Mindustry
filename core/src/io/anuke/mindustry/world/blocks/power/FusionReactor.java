@@ -108,7 +108,7 @@ public class FusionReactor extends PowerGenerator{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new FusionReactorEntity();
     }
 

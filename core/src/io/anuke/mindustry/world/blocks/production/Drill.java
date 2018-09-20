@@ -228,7 +228,7 @@ public class Drill extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new DrillEntity();
     }
 

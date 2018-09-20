@@ -172,12 +172,12 @@ public class UI extends SceneModule{
         Group group = Core.scene.getRoot();
 
         backfrag.build(group);
+        control.input(0).getFrag().build(Core.scene.getRoot());
         hudfrag.build(group);
         menufrag.build(group);
         chatfrag.container().build(group);
         listfrag.build(group);
         loadfrag.build(group);
-
     }
 
     @Override

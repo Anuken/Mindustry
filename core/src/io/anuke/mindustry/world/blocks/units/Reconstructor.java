@@ -299,7 +299,7 @@ public class Reconstructor extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new ReconstructorEntity();
     }
 

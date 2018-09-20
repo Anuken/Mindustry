@@ -85,7 +85,7 @@ public class PowerCrafter extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new GenericCrafterEntity();
     }
 }

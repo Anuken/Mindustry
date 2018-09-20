@@ -67,7 +67,7 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new SortedUnloaderEntity();
     }
 

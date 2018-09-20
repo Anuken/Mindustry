@@ -134,7 +134,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public TileEntity getEntity(){
+            public TileEntity newEntity(){
                 return new LiquidSourceEntity();
             }
         };

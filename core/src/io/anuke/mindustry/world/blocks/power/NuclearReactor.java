@@ -193,7 +193,7 @@ public class NuclearReactor extends PowerGenerator{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new NuclearReactorEntity();
     }
 

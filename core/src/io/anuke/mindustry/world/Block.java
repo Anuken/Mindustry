@@ -159,6 +159,11 @@ public class Block extends BaseBlock {
                 out.add(other);
             }
         }
+
+        for(int i = 0; i < tile.entity.power.links.size; i++){
+            Tile link = world.tile(tile.entity.power.links.get(i));
+            if(link != null) out.add(link);
+        }
         return out;
     }
 
@@ -468,7 +473,7 @@ public class Block extends BaseBlock {
         return destructible || update;
     }
 
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new TileEntity();
     }
 

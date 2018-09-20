@@ -1,8 +1,6 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Player;
@@ -23,10 +21,6 @@ import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -60,15 +54,14 @@ public class PowerNode extends PowerBlock{
 
         NodeEntity entity = tile.entity();
 
-        if(!entity.links.contains(other.packedPosition())){
-            entity.links.add(other.packedPosition());
+        if(!entity.power.links.contains(other.packedPosition())){
+            entity.power.links.add(other.packedPosition());
         }
 
-        if(other.getTeamID() == tile.getTeamID() && other.block() instanceof PowerNode){
-            NodeEntity oe = other.entity();
+        if(other.getTeamID() == tile.getTeamID()){
 
-            if(!oe.links.contains(tile.packedPosition())){
-                oe.links.add(tile.packedPosition());
+            if(!other.entity.power.links.contains(tile.packedPosition())){
+                other.entity.power.links.add(tile.packedPosition());
             }
         }
 
@@ -81,12 +74,10 @@ public class PowerNode extends PowerBlock{
 
         NodeEntity entity = tile.entity();
 
-        entity.links.removeValue(other.packedPosition());
+        entity.power.links.removeValue(other.packedPosition());
 
         if(other.block() instanceof PowerNode){
-            NodeEntity oe = other.entity();
-
-            oe.links.removeValue(tile.packedPosition());
+            other.entity.power.links.removeValue(tile.packedPosition());
         }
 
         //clear all graph data first
@@ -138,7 +129,7 @@ public class PowerNode extends PowerBlock{
         if(linkValid(tile, other)){
             if(linked(tile, other)){
                 threads.run(() -> Call.unlinkPowerNodes(null, tile, result));
-            }else if(entity.links.size < maxNodes){
+            }else if(entity.power.links.size < maxNodes){
                 threads.run(() -> Call.linkPowerNodes(null, tile, result));
             }
             return false;
@@ -186,7 +177,7 @@ public class PowerNode extends PowerBlock{
                     Lines.square(link.drawx(), link.drawy(),
                             link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Timers.time(), 4f, 1f)));
 
-                    if((entity.links.size >= maxNodes || (link.block() instanceof PowerNode && ((NodeEntity) link.entity).links.size >= ((PowerNode) link.block()).maxNodes)) && !linked){
+                    if((entity.power.links.size >= maxNodes || (link.block() instanceof PowerNode && ((NodeEntity) link.entity).power.links.size >= ((PowerNode) link.block()).maxNodes)) && !linked){
                         Draw.color();
                         Draw.rect("cross-" + link.block().size, link.drawx(), link.drawy());
                     }
@@ -215,28 +206,16 @@ public class PowerNode extends PowerBlock{
 
         Draw.color(Palette.powerLaserFrom, Palette.powerLaserTo, 0f * (1f - flashScl) + Mathf.sin(Timers.time(), 1.7f, flashScl));
 
-        for(int i = 0; i < entity.links.size; i++){
-            Tile link = world.tile(entity.links.get(i));
+        for(int i = 0; i < entity.power.links.size; i++){
+            Tile link = world.tile(entity.power.links.get(i));
             if(linkValid(tile, link)) drawLaser(tile, link);
         }
 
         Draw.color();
     }
 
-    @Override
-    public Array<Tile> getPowerConnections(Tile tile, Array<Tile> out){
-        super.getPowerConnections(tile, out);
-        NodeEntity entity = tile.entity();
-
-        for(int i = 0; i < entity.links.size; i++){
-            Tile link = world.tile(entity.links.get(i));
-            if(linkValid(tile, link)) out.add(link);
-        }
-        return out;
-    }
-
     protected boolean linked(Tile tile, Tile other){
-        return tile.<NodeEntity>entity().links.contains(other.packedPosition());
+        return tile.<NodeEntity>entity().power.links.contains(other.packedPosition());
     }
 
     protected boolean linkValid(Tile tile, Tile link){
@@ -252,7 +231,7 @@ public class PowerNode extends PowerBlock{
             return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
                     ((PowerNode) link.block()).laserRange * tilesize) - tilesize / 2f
                     + (link.block().size - 1) * tilesize / 2f + (tile.block().size - 1) * tilesize / 2f &&
-                    (!checkMaxNodes || (oe.links.size < ((PowerNode) link.block()).maxNodes || oe.links.contains(tile.packedPosition())));
+                    (!checkMaxNodes || (oe.power.links.size < ((PowerNode) link.block()).maxNodes || oe.power.links.contains(tile.packedPosition())));
         }else{
             return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
                     <= laserRange * tilesize - tilesize / 2f + (link.block().size - 1) * tilesize;
@@ -274,28 +253,12 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new NodeEntity();
     }
 
     public static class NodeEntity extends TileEntity{
-        public IntArray links = new IntArray();
 
-        @Override
-        public void write(DataOutputStream stream) throws IOException{
-            stream.writeShort(links.size);
-            for(int i = 0; i < links.size; i++){
-                stream.writeInt(links.get(i));
-            }
-        }
-
-        @Override
-        public void read(DataInputStream stream) throws IOException{
-            short amount = stream.readShort();
-            for(int i = 0; i < amount; i++){
-                links.add(stream.readInt());
-            }
-        }
     }
 
 }

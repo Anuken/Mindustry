@@ -35,6 +35,12 @@ public class PowerGraph{
 
         lastFrameUpdated = threads.getFrameID();
 
+        float totalInput = 0f;
+
+        for(Tile producer : producers){
+            totalInput += producer.entity.power.amount;
+        }
+
         for(Tile producer : producers){
             float accumulator = producer.entity.power.amount;
 
@@ -55,7 +61,7 @@ public class PowerGraph{
             }
 
             for(Tile tile : consumers){
-                float used = Math.min(tile.block().powerCapacity - tile.entity.power.amount, finalEach);
+                float used = Math.min(tile.block().powerCapacity - tile.entity.power.amount, finalEach) * accumulator / totalInput;
                 buffer += used;
                 tile.entity.power.amount += used;
             }

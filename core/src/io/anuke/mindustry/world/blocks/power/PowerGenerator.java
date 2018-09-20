@@ -18,7 +18,7 @@ public class PowerGenerator extends PowerDistributor{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new GeneratorEntity();
     }
 

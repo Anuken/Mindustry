@@ -194,7 +194,7 @@ public class Smelter extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new SmelterEntity();
     }
 

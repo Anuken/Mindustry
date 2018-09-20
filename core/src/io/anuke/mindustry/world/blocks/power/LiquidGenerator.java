@@ -70,7 +70,7 @@ public abstract class LiquidGenerator extends PowerGenerator{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new ItemGeneratorEntity();
     }
 

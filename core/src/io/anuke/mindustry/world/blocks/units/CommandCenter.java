@@ -107,7 +107,7 @@ public class CommandCenter extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new CommandCenterEntity();
     }
 

@@ -112,7 +112,7 @@ public abstract class ItemGenerator extends PowerGenerator{
     protected abstract float getItemEfficiency(Item item);
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new ItemGeneratorEntity();
     }
 

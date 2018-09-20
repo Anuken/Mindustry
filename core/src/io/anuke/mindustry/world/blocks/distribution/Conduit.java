@@ -127,7 +127,7 @@ public class Conduit extends LiquidBlock{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new ConduitEntity();
     }
 

@@ -234,7 +234,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new CoreEntity();
     }
 
