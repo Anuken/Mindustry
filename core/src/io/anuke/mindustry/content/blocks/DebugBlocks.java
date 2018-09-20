@@ -10,6 +10,7 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
@@ -39,6 +40,13 @@ public class DebugBlocks extends BlockList implements ContentList{
         powerVoid = new PowerBlock("powervoid"){
             {
                 powerCapacity = Float.MAX_VALUE;
+                shadow = "shadow-round-1";
+            }
+
+            @Override
+            public void setBars(){
+                super.setBars();
+                bars.remove(BarType.power);
             }
         };
 
@@ -47,6 +55,9 @@ public class DebugBlocks extends BlockList implements ContentList{
                 powerCapacity = 10000f;
                 powerSpeed = 100f;
                 maxNodes = 100;
+                outputsPower = true;
+                consumesPower = false;
+                shadow = "shadow-round-1";
             }
 
             @Override
