@@ -150,12 +150,18 @@ public class Block extends BaseBlock {
 
     public void powerGraphRemoved(Tile tile){
         tile.entity.power.graph.remove(tile);
+        for(int i = 0; i < tile.entity.power.links.size; i++){
+            Tile other = world.tile(tile.entity.power.links.get(i));
+            if(other != null && other.entity != null && other.entity.power != null){
+                other.entity.power.links.removeValue(tile.packedPosition());
+            }
+        }
     }
 
     public Array<Tile> getPowerConnections(Tile tile, Array<Tile> out){
         out.clear();
         for(Tile other : tile.entity.proximity()){
-            if(other.entity.power != null && !(consumesPower && other.block().consumesPower)){
+            if(other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)){
                 out.add(other);
             }
         }
