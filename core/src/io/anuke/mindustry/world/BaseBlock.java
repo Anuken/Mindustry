@@ -44,7 +44,7 @@ public abstract class BaseBlock extends MappableContent{
      * Returns the amount of items this block can accept.
      */
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
-        if(acceptItem(item, tile, tile) && hasItems && source.getTeam() == tile.getTeam()){
+        if(acceptItem(item, tile, tile) && hasItems && (source == null || source.getTeam() == tile.getTeam())){
             return Math.min(getMaximumAccepted(tile, item), amount);
         }else{
             return 0;
