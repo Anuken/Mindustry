@@ -223,7 +223,10 @@ public class Conveyor extends Block{
 
             if(maxmove > minmove){
                 pos.y += maxmove;
-                pos.x = Mathf.lerpDelta(pos.x, 0, 0.06f);
+                if(Mathf.in(pos.x, 0, 0.1f)){
+                    pos.x = 0f;
+                }
+                pos.x = Mathf.lerpDelta(pos.x, 0, 0.1f);
             }else{
                 pos.x = Mathf.lerpDelta(pos.x, pos.seed / offsetScl, 0.1f);
             }
@@ -235,16 +238,12 @@ public class Conveyor extends Block{
                 if(next.block() instanceof Conveyor){
                     ConveyorEntity othere = next.entity();
 
-                    ItemPos ni = pos2.set(othere.convey.first(), ItemPos.updateShorts);
+                    ItemPos ni = pos2.set(othere.convey.get(othere.lastInserted), ItemPos.updateShorts);
 
-                    if(Mathf.mod(next.getRotation() - tile.getRotation(), 2) == 0){
+                    if(next.getRotation() == tile.getRotation()){
                         ni.x = pos.x;
-                    }else if((tile.getRotation() + 1) % 4 == next.getRotation()){
-                        ni.y = (pos.x + 1f)/2f;
-                    }else{
-                        ni.y = 1f-(pos.x + 1f)/2f;
                     }
-                    othere.convey.set(0, ni.pack());
+                    othere.convey.set(othere.lastInserted, ni.pack());
                 }
                 minremove = Math.min(i, minremove);
                 tile.entity.items.remove(pos.item, 1);
@@ -343,22 +342,20 @@ public class Conveyor extends Block{
         ConveyorEntity entity = tile.entity();
         entity.noSleep();
         long result = ItemPos.packItem(item, y * 0.9f, pos, (byte) Mathf.random(255));
-        boolean inserted = false;
 
         tile.entity.items.add(item, 1);
 
         for(int i = 0; i < entity.convey.size; i++){
             if(compareItems(result, entity.convey.get(i)) < 0){
                 entity.convey.insert(i, result);
-                inserted = true;
-                break;
+                entity.lastInserted = (byte)i;
+                return;
             }
         }
 
         //this item must be greater than anything there...
-        if(!inserted){
-            entity.convey.add(result);
-        }
+        entity.convey.add(result);
+        entity.lastInserted = (byte)(entity.convey.size-1);
     }
 
     @Override
@@ -380,6 +377,7 @@ public class Conveyor extends Block{
     public static class ConveyorEntity extends TileEntity{
 
         LongArray convey = new LongArray();
+        byte lastInserted;
         float minitem = 1;
 
         int blendshadowrot = -1;
