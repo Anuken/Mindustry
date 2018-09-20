@@ -130,7 +130,7 @@ public class SectorsDialog extends FloatingDialog{
                     float drawY = y + height/2f + sectorY * padSectorSize - offsetY * padSectorSize - panY % padSectorSize;
 
                     Sector sector = world.sectors().get(sectorX, sectorY);
-                    int size = (sector == null ? 1 : sector.size);
+                    int size = (sector == null ? 1 : sector.width);
                     float padding = (size-1) * sectorPadding;
 
                     if(sector != null && (sector.x != sectorX || sector.y != sectorY)){
