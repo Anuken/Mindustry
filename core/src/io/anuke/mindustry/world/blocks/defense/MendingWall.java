@@ -52,7 +52,7 @@ public class MendingWall extends Wall{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new DeflectorEntity();
     }
 }

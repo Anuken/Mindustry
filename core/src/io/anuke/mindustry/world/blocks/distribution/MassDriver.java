@@ -234,7 +234,7 @@ public class MassDriver extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new MassDriverEntity();
     }
 

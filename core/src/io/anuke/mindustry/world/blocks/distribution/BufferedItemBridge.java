@@ -41,7 +41,7 @@ public class BufferedItemBridge extends ExtendingItemBridge{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new BufferedItemBridgeEntity();
     }
 

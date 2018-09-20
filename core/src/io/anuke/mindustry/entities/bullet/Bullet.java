@@ -109,6 +109,10 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         remove();
     }
 
+    public BulletType getBulletType(){
+        return type;
+    }
+
     public void resetOwner(Entity entity, Team team){
         this.owner = entity;
         this.team = team;

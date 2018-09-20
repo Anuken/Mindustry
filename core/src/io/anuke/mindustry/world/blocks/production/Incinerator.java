@@ -94,7 +94,7 @@ public class Incinerator extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new IncineratorEntity();
     }
 

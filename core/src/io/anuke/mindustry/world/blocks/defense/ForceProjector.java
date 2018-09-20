@@ -169,7 +169,7 @@ public class ForceProjector extends Block {
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new ForceEntity();
     }
 

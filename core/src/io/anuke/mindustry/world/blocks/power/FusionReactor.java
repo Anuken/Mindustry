@@ -50,7 +50,7 @@ public class FusionReactor extends PowerGenerator{
         entity.power.amount += powerAdded;
         entity.totalProgress += entity.warmup * Timers.delta();
 
-        distributePower(tile);
+        tile.entity.power.graph.update();
     }
 
     @Override
@@ -108,7 +108,7 @@ public class FusionReactor extends PowerGenerator{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new FusionReactorEntity();
     }
 

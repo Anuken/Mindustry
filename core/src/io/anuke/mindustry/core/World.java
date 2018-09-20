@@ -216,6 +216,10 @@ public class World extends Module{
         Events.fire(new WorldLoadEvent());
     }
 
+    public boolean isGenerating(){
+        return generating;
+    }
+
     /**Loads up a sector map. This does not call play(), but calls reset().*/
     public void loadSector(Sector sector){
         currentSector = sector;

@@ -113,7 +113,7 @@ public class RepairPoint extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new RepairPointEntity();
     }
 

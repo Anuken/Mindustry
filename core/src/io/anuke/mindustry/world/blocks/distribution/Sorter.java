@@ -114,7 +114,7 @@ public class Sorter extends Block implements SelectionTrait{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new SorterEntity();
     }
 

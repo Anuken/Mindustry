@@ -86,7 +86,7 @@ public class Router extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new SplitterEntity();
     }
 

@@ -48,7 +48,6 @@ public abstract class InputHandler extends InputAdapter{
     public InputHandler(Player player){
         this.player = player;
         this.section = "player_" + (player.playerIndex + 1);
-        Timers.run(1f, () -> frag.build(Core.scene.getRoot()));
     }
 
     //methods to override
@@ -120,6 +119,10 @@ public abstract class InputHandler extends InputAdapter{
     public static void onTileTapped(Player player, Tile tile){
         if(tile == null || player == null) return;
         tile.block().tapped(tile, player);
+    }
+
+    public OverlayFragment getFrag(){
+        return frag;
     }
 
     public void update(){

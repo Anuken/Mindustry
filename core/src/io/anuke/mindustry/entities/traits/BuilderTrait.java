@@ -181,12 +181,7 @@ public interface BuilderTrait extends Entity{
             setMineTile(null);
         }
 
-        TileEntity core = unit.getClosestCore();
 
-        //if there is no core to build with, stop building!
-        if(core == null){
-            return;
-        }
 
         Tile tile = world.tile(current.x, current.y);
 
@@ -203,6 +198,13 @@ public interface BuilderTrait extends Entity{
                 getPlaceQueue().removeFirst();
                 return;
             }
+        }
+
+        TileEntity core = unit.getClosestCore();
+
+        //if there is no core to build with, stop building!
+        if(core == null){
+            return;
         }
 
         //otherwise, update it.

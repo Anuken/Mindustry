@@ -13,6 +13,13 @@ public class Recipes implements ContentList{
 
     @Override
     public void load(){
+        //DEBUG
+        new Recipe(distribution, DebugBlocks.itemSource).setMode(GameMode.sandbox).setHidden(true);
+        new Recipe(distribution, DebugBlocks.itemVoid).setMode(GameMode.sandbox).setHidden(true);
+        new Recipe(liquid, DebugBlocks.liquidSource).setMode(GameMode.sandbox).setHidden(true);
+        new Recipe(power, DebugBlocks.powerVoid).setMode(GameMode.sandbox).setHidden(true);
+        new Recipe(power, DebugBlocks.powerInfinite).setMode(GameMode.sandbox).setHidden(true);
+
         //DEFENSE
 
         //walls
@@ -181,13 +188,6 @@ public class Recipes implements ContentList{
         new Recipe(liquid, LiquidBlocks.mechanicalPump, new ItemStack(Items.copper, 30), new ItemStack(Items.lead, 20)).setDependencies(CraftingBlocks.smelter);
         new Recipe(liquid, LiquidBlocks.rotaryPump, new ItemStack(Items.copper, 140), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 70));
         new Recipe(liquid, LiquidBlocks.thermalPump, new ItemStack(Items.copper, 160), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 60), new ItemStack(Items.titanium, 80), new ItemStack(Items.thorium, 70));
-
-        //DEBUG
-        new Recipe(units, DebugBlocks.itemSource).setMode(GameMode.sandbox).setHidden(true);
-        new Recipe(units, DebugBlocks.itemVoid).setMode(GameMode.sandbox).setHidden(true);
-        new Recipe(units, DebugBlocks.liquidSource).setMode(GameMode.sandbox).setHidden(true);
-        new Recipe(units, DebugBlocks.powerVoid).setMode(GameMode.sandbox).setHidden(true);
-        new Recipe(units, DebugBlocks.powerInfinite).setMode(GameMode.sandbox).setHidden(true);
     }
 
     @Override
