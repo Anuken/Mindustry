@@ -231,6 +231,21 @@ public class Conveyor extends Block{
             pos.y = Mathf.clamp(pos.y);
 
             if(pos.y >= 0.9999f && offloadDir(tile, pos.item)){
+                Tile next = tile.getNearby(tile.getRotation());
+                if(next.block() instanceof Conveyor){
+                    ConveyorEntity othere = next.entity();
+
+                    ItemPos ni = pos2.set(othere.convey.first(), ItemPos.updateShorts);
+
+                    if(Mathf.mod(next.getRotation() - tile.getRotation(), 2) == 0){
+                        ni.x = pos.x;
+                    }else if((tile.getRotation() + 1) % 4 == next.getRotation()){
+                        ni.y = (pos.x + 1f)/2f;
+                    }else{
+                        ni.y = 1f-(pos.x + 1f)/2f;
+                    }
+                    othere.convey.set(0, ni.pack());
+                }
                 minremove = Math.min(i, minremove);
                 tile.entity.items.remove(pos.item, 1);
             }else{
