@@ -28,7 +28,7 @@ public class PowerGraph{
         return graphID;
     }
 
-    public void update(){
+    public synchronized void update(){
         if(threads.getFrameID() == lastFrameUpdated || consumers.size == 0 || producers.size == 0){
             return;
         }
@@ -70,13 +70,13 @@ public class PowerGraph{
         }
     }
 
-    public void add(PowerGraph graph){
+    public synchronized void add(PowerGraph graph){
         for(Tile tile : graph.all){
             add(tile);
         }
     }
 
-    public void add(Tile tile){
+    public synchronized void add(Tile tile){
         tile.entity.power.graph = this;
         all.add(tile);
 
@@ -89,7 +89,7 @@ public class PowerGraph{
         }
     }
 
-    public void clear(){
+    public synchronized void clear(){
         for(Tile other : all){
             other.entity.power.graph = null;
         }
@@ -98,7 +98,7 @@ public class PowerGraph{
         consumers.clear();
     }
 
-    public void reflow(Tile tile){
+    public synchronized void reflow(Tile tile){
         queue.clear();
         queue.addLast(tile);
         while(queue.size > 0){
@@ -113,7 +113,7 @@ public class PowerGraph{
         }
     }
 
-    public void remove(Tile tile){
+    public synchronized void remove(Tile tile){
         clear();
 
         for(Tile other : tile.block().getPowerConnections(tile, outArray1)){
