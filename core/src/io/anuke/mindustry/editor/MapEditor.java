@@ -105,8 +105,8 @@ public class MapEditor{
             return;
         }
 
-        byte writeID = (byte) drawBlock.id;
-        byte partID = (byte) Blocks.blockpart.id;
+        byte writeID = drawBlock.id;
+        byte partID = Blocks.blockpart.id;
         byte rotationTeam = Bits.packByte(drawBlock.rotate ? (byte) rotation : 0, drawBlock.synthetic() ? (byte) drawTeam.ordinal() : 0);
 
         boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
@@ -171,7 +171,9 @@ public class MapEditor{
                         if(!isfloor){
                             byte link = map.read(wx, wy, DataPosition.link);
 
-                            if(link != 0){
+                            if(content.block(map.read(wx, wy, DataPosition.wall)).isMultiblock()){
+                                removeLinked(wx, wy);
+                            }else if(link != 0){
                                 removeLinked(wx - (Bits.getLeftByte(link) - 8), wy - (Bits.getRightByte(link) - 8));
                             }
                         }
