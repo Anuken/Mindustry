@@ -50,9 +50,9 @@ public class PowerNode extends PowerBlock{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void linkPowerNodes(Player player, Tile tile, Tile other){
-        if(!(tile.entity instanceof NodeEntity)) return;
+        if(tile.entity.power == null) return;
 
-        NodeEntity entity = tile.entity();
+        TileEntity entity = tile.entity();
 
         if(!entity.power.links.contains(other.packedPosition())){
             entity.power.links.add(other.packedPosition());
@@ -70,9 +70,9 @@ public class PowerNode extends PowerBlock{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unlinkPowerNodes(Player player, Tile tile, Tile other){
-        if(!(tile.entity instanceof NodeEntity)) return;
+        if(tile.entity.power == null) return;
 
-        NodeEntity entity = tile.entity();
+        TileEntity entity = tile.entity();
 
         entity.power.links.removeValue(other.packedPosition());
 
@@ -121,7 +121,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public boolean onConfigureTileTapped(Tile tile, Tile other){
-        NodeEntity entity = tile.entity();
+        TileEntity entity = tile.entity();
         other = other.target();
 
         Tile result = other;
@@ -151,7 +151,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void drawConfigure(Tile tile){
-        NodeEntity entity = tile.entity();
+        TileEntity entity = tile.entity();
 
         Draw.color(Palette.accent);
 
@@ -177,7 +177,7 @@ public class PowerNode extends PowerBlock{
                     Lines.square(link.drawx(), link.drawy(),
                             link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Timers.time(), 4f, 1f)));
 
-                    if((entity.power.links.size >= maxNodes || (link.block() instanceof PowerNode && ((NodeEntity) link.entity).power.links.size >= ((PowerNode) link.block()).maxNodes)) && !linked){
+                    if((entity.power.links.size >= maxNodes || (link.block() instanceof PowerNode && link.entity.power.links.size >= ((PowerNode) link.block()).maxNodes)) && !linked){
                         Draw.color();
                         Draw.rect("cross-" + link.block().size, link.drawx(), link.drawy());
                     }
@@ -202,7 +202,7 @@ public class PowerNode extends PowerBlock{
     public void drawLayer(Tile tile){
         if(!Settings.getBool("lasers")) return;
 
-        NodeEntity entity = tile.entity();
+        TileEntity entity = tile.entity();
 
         Draw.color(Palette.powerLaserFrom, Palette.powerLaserTo, 0f * (1f - flashScl) + Mathf.sin(Timers.time(), 1.7f, flashScl));
 
@@ -215,7 +215,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected boolean linked(Tile tile, Tile other){
-        return tile.<NodeEntity>entity().power.links.contains(other.packedPosition());
+        return tile.entity.power.links.contains(other.packedPosition());
     }
 
     protected boolean linkValid(Tile tile, Tile link){
@@ -226,7 +226,7 @@ public class PowerNode extends PowerBlock{
         if(!(tile != link && link != null && link.block().hasPower) || tile.getTeamID() != link.getTeamID()) return false;
 
         if(link.block() instanceof PowerNode){
-            NodeEntity oe = link.entity();
+            TileEntity oe = link.entity();
 
             return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
                     ((PowerNode) link.block()).laserRange * tilesize) - tilesize / 2f
@@ -250,15 +250,6 @@ public class PowerNode extends PowerBlock{
 
         Shapes.laser("laser", "laser-end", x1 + t1.x, y1 + t1.y,
                 x2 + t2.x, y2 + t2.y, thicknessScl);
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new NodeEntity();
-    }
-
-    public static class NodeEntity extends TileEntity{
-
     }
 
 }
