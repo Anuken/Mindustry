@@ -80,8 +80,6 @@ public class Sectors{
      * @param expandX spaces in X coordinate to expand, can be negative
      * @param expandY spaces in Y coordinate to expand, can be negative*/
     public boolean expandSector(Sector sector, int expandX, int expandY){
-        sector.width += expandX;
-        sector.height += expandY;
 
         //remove old sector data to clear things up
         for(int x = sector.x; x < sector.x+sector.width; x++){
@@ -131,17 +129,17 @@ public class Sectors{
         //create *new* tile array
         Tile[][] newTiles = new Tile[sector.width * sectorSize][sector.height * sectorSize];
 
-        world.beginMapLoad(newTiles);
-
         //shift existing tiles to new array
-        for (int x = 0; x < (sector.width - Math.abs(expandX)); x++) {
-            for (int y = 0; y < (sector.height - Math.abs(expandY)); y++) {
+        for (int x = 0; x < (sector.width - Math.abs(expandX))*sectorSize; x++) {
+            for (int y = 0; y < (sector.height - Math.abs(expandY))*sectorSize; y++) {
                 Tile tile = world.rawTile(x, y);
                 tile.x = (short)(x + shiftX);
                 tile.y = (short)(y + shiftY);
                 newTiles[x + shiftX][y + shiftY] = tile;
             }
         }
+
+        world.beginMapLoad(newTiles);
 
         //create new tiles
         for (int sx = 0; sx < sector.width; sx++) {
