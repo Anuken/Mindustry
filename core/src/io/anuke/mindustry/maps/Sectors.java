@@ -70,11 +70,16 @@ public class Sectors{
     }
 
     /**Tries to a sector in a specific direciton, specified by expandX and expandY.
+     * The player *must* currently be playing in this sector.
      * If a sector is in that direction, this method will return false (failure)
      * @param sector the sector to expand
      * @param expandX spaces in X coordinate to expand, can be negative
      * @param expandY spaces in Y coordinate to expand, can be negative*/
     public boolean expandSector(Sector sector, int expandX, int expandY){
+        if(world.getSector() != sector){
+            throw new IllegalArgumentException("Sector is not being played in!");
+        }
+
         sector.width += expandX;
         sector.height += expandY;
 
