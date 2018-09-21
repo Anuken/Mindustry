@@ -15,7 +15,11 @@ import io.anuke.mindustry.maps.missions.WaveMission;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Edges;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.entities.EntityGroup;
+import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.GridMap;
 import io.anuke.ucore.util.Log;
@@ -25,6 +29,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Sectors{
     private static final int sectorImageSize = 32;
+    private static final boolean checkExpansion = false;
     private static final float sectorLargeChance = 0.24f;
 
     private GridMap<Sector> grid = new GridMap<>();
@@ -80,9 +85,7 @@ public class Sectors{
             throw new IllegalArgumentException("Sector is not being played in!");
         }
 
-        sector.width += expandX;
-        sector.height += expandY;
-
+        //remove old sector data to clear things up
         for(int x = sector.x; x < sector.x+sector.width; x++){
             for(int y = sector.y; y < sector.y+sector.height; y++){
                 grid.put(x, y, null);
@@ -92,13 +95,80 @@ public class Sectors{
         if(expandX < 0) sector.x += expandX;
         if(expandY < 0) sector.y += expandY;
 
+        sector.width += Math.abs(expandX);
+        sector.height += Math.abs(expandY);
+
+        if(checkExpansion) {
+            for (int x = sector.x; x < sector.x + sector.width; x++) {
+                for (int y = sector.y; y < sector.y + sector.height; y++) {
+                    if (grid.get(x, y) != null && grid.get(x, y).complete) {
+                        //if a completed sector is hit, expansion failed
+                        if (expandX < 0) sector.x -= expandX;
+                        if (expandY < 0) sector.y -= expandY;
+                        sector.width -= Math.abs(expandX);
+                        sector.height -= Math.abs(expandY);
+                        return false;
+                    }
+                }
+            }
+        }
+
+        //add new sector spaces
         for(int x = sector.x; x < sector.x+sector.width; x++){
             for(int y = sector.y; y < sector.y+sector.height; y++){
                 grid.put(x, y, sector);
             }
         }
 
-        return false;
+        //sector map data should now be shifted and generated
+        int shiftX = expandX < 0 ? -expandX*sectorSize : 0;
+        int shiftY = expandY < 0 ? -expandY*sectorSize : 0;
+
+        for(EntityGroup<?> group : Entities.getAllGroups()){
+            for(Entity entity : group.all()){
+                entity.set(entity.getX() + shiftX * tilesize, entity.getY() + shiftY * tilesize);
+            }
+        }
+
+        if(!headless){
+            renderer.fog().setLoadingOffset(shiftX, shiftY);
+        }
+
+        //create *new* tile array
+        Tile[][] newTiles = new Tile[sector.width * sectorSize][sector.height * sectorSize];
+
+        //shift existing tiles to new array
+        for (int x = 0; x < (sector.width - Math.abs(expandX))*sectorSize; x++) {
+            for (int y = 0; y < (sector.height - Math.abs(expandY))*sectorSize; y++) {
+                Tile tile = world.rawTile(x, y);
+                tile.x = (short)(x + shiftX);
+                tile.y = (short)(y + shiftY);
+                newTiles[x + shiftX][y + shiftY] = tile;
+            }
+        }
+
+        world.beginMapLoad(newTiles);
+
+        //create new tiles
+        for (int sx = 0; sx < sector.width; sx++) {
+            for (int sy = 0; sy < sector.height; sy++) {
+                //if this sector is a 'new sector (not part of the current save data...)
+                if(sx < -expandX || sy < -expandY || sx >= sector.width - expandX || sy >= sector.height - expandY){
+                    //gen tiles in sector
+                    for (int x = 0; x < sectorSize; x++) {
+                        for (int y = 0; y < sectorSize; y++) {
+                            GenResult result = world.generator().generateTile(sx + sector.x, sy + sector.y, x, y);
+                            newTiles[sx * sectorSize + x][sy * sectorSize + y] = new Tile(x + sx * sectorSize, y + sy*sectorSize, result.floor.id, result.wall.id, (byte)0, (byte)0, result.elevation);
+                        }
+                    }
+                }
+            }
+        }
+
+        //end loading of map
+        world.endMapLoad();
+
+        return true;
     }
 
     /**Unlocks a sector. This shows nearby sectors.*/

@@ -195,6 +195,12 @@ public class World extends Module{
         generating = true;
     }
 
+    /**Call to signal the beginning of loading the map with a custom set of tiles.*/
+    public void beginMapLoad(Tile[][] tiles){
+        this.tiles = tiles;
+        generating = true;
+    }
+
     /**
      * Call to signify the end of map loading. Updates tile occlusions and sets up physics for the world.
      * A WorldLoadEvent will be fire.
