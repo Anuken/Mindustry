@@ -69,6 +69,16 @@ public class Sectors{
         return grid.get(Bits.getLeftShort(position), Bits.getRightShort(position));
     }
 
+    /**Tries to a sector in a specific direciton, specified by expandX and expandY.
+     * If a sector is in that direction, this method will return false (failure)
+     * @param sector the sector to expand
+     * @param expandX spaces in X coordinate to expand, can be negative
+     * @param expandY spaces in Y coordinate to expand, can be negative*/
+    public boolean expandSector(Sector sector, int expandX, int expandY){
+
+        return false;
+    }
+
     /**Unlocks a sector. This shows nearby sectors.*/
     public void completeSector(int x, int y){
         createSector(x, y);
