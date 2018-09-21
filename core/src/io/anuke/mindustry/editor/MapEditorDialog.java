@@ -95,7 +95,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             "$text.editor.importmap", "$text.editor.importmap.description", "icon-load-map", (Runnable) loadDialog::show,
                             "$text.editor.importfile", "$text.editor.importfile.description", "icon-file", (Runnable) () -> {
                                 Platform.instance.showFileChooser("$text.loadimage", "Map Files", file -> {
-                                    ui.loadAnd(() -> {
+                                    ui.loadGraphics(() -> {
                                         try{
                                             DataInputStream stream = new DataInputStream(file.read());
 
@@ -116,7 +116,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 								ui.showError("$text.web.unsupported");
 							}else {
 								Platform.instance.showFileChooser("$text.loadimage", "Image Files", file -> {
-									ui.loadAnd(() -> {
+									ui.loadGraphics(() -> {
 										try{
 											MapTileData data = MapIO.readPixmap(new Pixmap(file));
 
@@ -137,7 +137,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             Platform.instance.showFileChooser("$text.saveimage", "Map Files", file -> {
                                 file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
                                 FileHandle result = file;
-                                ui.loadAnd(() -> {
+                                ui.loadGraphics(() -> {
 
                                     try{
                                         if(!editor.getTags().containsKey("name")){
@@ -168,7 +168,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 							Platform.instance.showFileChooser("$text.saveimage", "Image Files", file -> {
 								file = file.parent().child(file.nameWithoutExtension() + ".png");
 								FileHandle result = file;
-								ui.loadAnd(() -> {
+								ui.loadGraphics(() -> {
 									try{
 										Pixmaps.write(MapIO.generatePixmap(editor.getMap()), result);
 									}catch (Exception e){
@@ -194,7 +194,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         resizeDialog = new MapResizeDialog(editor, (x, y) -> {
             if(!(editor.getMap().width() == x && editor.getMap().height() == y)){
-                ui.loadAnd(() -> {
+                ui.loadGraphics(() -> {
                     editor.resize(x, y);
                     view.clearStack();
                 });
@@ -203,7 +203,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         loadDialog = new MapLoadDialog(map -> {
 
-            ui.loadAnd(() -> {
+            ui.loadGraphics(() -> {
                 try(DataInputStream stream = new DataInputStream(map.stream.get())){
                     MapMeta meta = MapIO.readMapMeta(stream);
                     MapTileData data = MapIO.readTileData(stream, meta, false);
@@ -338,7 +338,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     public void beginEditMap(InputStream is){
-        ui.loadAnd(() -> {
+        ui.loadGraphics(() -> {
             try{
                 shownWithMap = true;
                 DataInputStream stream = new DataInputStream(is);

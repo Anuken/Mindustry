@@ -24,7 +24,7 @@ public class SaveDialog extends LoadDialog{
         slots.row();
         slots.addImageTextButton("$text.save.new", "icon-add", "clear", 14 * 3, () ->
                 ui.showTextInput("$text.save", "$text.save.newslot", "", text -> {
-                    ui.loadAnd("$text.saving", () -> {
+                    ui.loadGraphics("$text.saving", () -> {
                         control.getSaves().addSave(text);
                         threads.runGraphics(() -> threads.run(() -> threads.runGraphics(this::setup)));
                     });

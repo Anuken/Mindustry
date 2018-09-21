@@ -7,6 +7,7 @@ import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.maps.missions.Mission;
+import io.anuke.mindustry.maps.missions.VictoryMission;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.ucore.util.Bits;
@@ -15,6 +16,8 @@ import static io.anuke.mindustry.Vars.control;
 
 @Serialize
 public class Sector{
+    private static final Mission victoryMission = new VictoryMission();
+
     /**Position on the map, can be positive or negative.*/
     public short x, y;
     /**Whether this sector has already been completed.*/
@@ -52,7 +55,7 @@ public class Sector{
     }
 
     public Mission currentMission(){
-        return missions.get(Math.min(completedMissions, missions.size - 1));
+        return completedMissions >= missions.size ? victoryMission : missions.get(completedMissions);
     }
 
     public int getSeed(){

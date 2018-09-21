@@ -20,7 +20,6 @@ import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
-import io.anuke.ucore.noise.VoronoiNoise;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.SeedRandom;
@@ -37,15 +36,12 @@ public class WorldGenerator{
     private Simplex sim2 = new Simplex(baseSeed + 1);
     private Simplex sim3 = new Simplex(baseSeed + 2);
     private RidgedPerlin rid = new RidgedPerlin(baseSeed + 4, 1);
-    private VoronoiNoise vn = new VoronoiNoise(baseSeed + 2, (short)0);
     private SeedRandom random = new SeedRandom(baseSeed + 3);
 
     private GenResult result = new GenResult();
     private ObjectMap<Block, Block> decoration;
 
     public WorldGenerator(){
-        vn.setUseDistance(true);
-
         decoration = Mathf.map(
             Blocks.grass, Blocks.shrub,
             Blocks.stone, Blocks.rock,

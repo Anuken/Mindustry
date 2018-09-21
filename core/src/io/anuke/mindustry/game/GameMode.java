@@ -17,6 +17,12 @@ public enum GameMode{
         enemyCheat = true;
         showPads = true;
     }},
+    victory{{
+        disableWaves = true;
+        hidden = true;
+        enemyCheat = false;
+        showPads = true;
+    }},
     pvp{{
         showPads = true;
         disableWaves = true;

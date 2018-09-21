@@ -210,11 +210,11 @@ public class UI extends SceneModule{
         }
     }
 
-    public void loadAnd(Runnable call){
-        loadAnd("$text.loading", call);
+    public void loadGraphics(Runnable call){
+        loadGraphics("$text.loading", call);
     }
 
-    public void loadAnd(String text, Runnable call){
+    public void loadGraphics(String text, Runnable call){
         loadfrag.show(text);
         Timers.runTask(7f, () -> {
             call.run();

@@ -2,10 +2,12 @@ package io.anuke.mindustry.maps.missions;
 
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.game.SpawnGroup;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
-import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.state;
@@ -26,11 +28,6 @@ public class WaveMission implements Mission{
     public void generate(Generation gen){
         int coreX = gen.width/2, coreY = gen.height/2;
         generateCoreAt(gen, coreX, coreY, Team.blue);
-    }
-
-    @Override
-    public void display(Table table){
-        table.add(Bundles.format("text.mission.wave", target));
     }
 
     @Override

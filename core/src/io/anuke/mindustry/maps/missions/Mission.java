@@ -14,7 +14,10 @@ public interface Mission{
     boolean isComplete();
     String displayString();
     GameMode getMode();
-    void display(Table table);
+
+    default void display(Table table){
+        table.add(displayString());
+    }
 
     default Array<SpawnGroup> getWaves(Sector sector){
         return new Array<>();

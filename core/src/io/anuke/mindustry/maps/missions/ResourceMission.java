@@ -3,9 +3,12 @@ package io.anuke.mindustry.maps.missions;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.type.Item;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.Bundles;
 
+import static io.anuke.mindustry.Vars.state;
+
+/**A mission that is completed when the player obtains items in their core.*/
 public class ResourceMission implements Mission{
     private final Item item;
     private final int amount;
@@ -16,18 +19,18 @@ public class ResourceMission implements Mission{
     }
 
     @Override
-    public void display(Table table){
-
-    }
-
-    @Override
     public GameMode getMode(){
         return GameMode.waves;
     }
 
     @Override
     public boolean isComplete(){
-        return Vars.state.teams.get(Vars.defaultTeam).cores.first().entity.items.has(item, amount);
+        for(Tile tile : state.teams.get(Vars.defaultTeam).cores){
+            if(tile.entity.items.has(item, amount)){
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

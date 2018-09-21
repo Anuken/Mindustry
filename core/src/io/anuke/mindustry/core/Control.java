@@ -13,6 +13,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentDatabase;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
@@ -378,11 +379,13 @@ public class Control extends Module{
             if(world.getSector() != null && !world.getSector().complete){
                 //all assigned missions are complete
                 if(world.getSector().completedMissions >= world.getSector().missions.size){
+                    state.mode = GameMode.victory;
 
                     world.sectors().completeSector(world.getSector().x, world.getSector().y);
                     world.sectors().save();
                     ui.missions.show(world.getSector());
                 }else if(world.getSector().currentMission().isComplete()){
+                    state.mode = world.getSector().currentMission().getMode();
                     //increment completed missions, check next index next frame
                     world.getSector().completedMissions ++;
                 }
