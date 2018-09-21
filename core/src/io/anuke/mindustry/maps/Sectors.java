@@ -75,6 +75,23 @@ public class Sectors{
      * @param expandX spaces in X coordinate to expand, can be negative
      * @param expandY spaces in Y coordinate to expand, can be negative*/
     public boolean expandSector(Sector sector, int expandX, int expandY){
+        sector.width += expandX;
+        sector.height += expandY;
+
+        for(int x = sector.x; x < sector.x+sector.width; x++){
+            for(int y = sector.y; y < sector.y+sector.height; y++){
+                grid.put(x, y, null);
+            }
+        }
+        
+        if(expandX < 0) sector.x += expandX;
+        if(expandY < 0) sector.y += expandY;
+
+        for(int x = sector.x; x < sector.x+sector.width; x++){
+            for(int y = sector.y; y < sector.y+sector.height; y++){
+                grid.put(x, y, sector);
+            }
+        }
 
         return false;
     }
