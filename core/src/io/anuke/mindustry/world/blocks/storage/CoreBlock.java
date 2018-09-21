@@ -80,6 +80,14 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
+    public void onProximityUpdate(Tile tile) {
+        //add cores
+        if(!state.teams.get(tile.getTeam()).cores.contains(tile, true)){
+            state.teams.get(tile.getTeam()).cores.add(tile);
+        }
+    }
+
+    @Override
     public boolean canBreak(Tile tile){
         return state.teams.get(tile.getTeam()).cores.size > 1;
     }

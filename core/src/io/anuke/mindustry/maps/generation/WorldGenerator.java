@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.OreBlocks;
-import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
@@ -26,7 +25,8 @@ import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.SeedRandom;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.sectorSize;
+import static io.anuke.mindustry.Vars.world;
 
 
 public class WorldGenerator{
@@ -73,6 +73,11 @@ public class WorldGenerator{
         generateOres(tiles, seed, genOres, null);
     }
 
+    /**'Prepares' a tile array by:<br>
+    * - setting up multiblocks<br>
+    * - updating cliff data<br>
+    * - removing ores on cliffs<br>
+    * Usually used before placing structures on a tile array.*/
     public void prepareTiles(Tile[][] tiles){
 
         //find multiblocks
@@ -82,14 +87,8 @@ public class WorldGenerator{
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
 
-                Team team = tile.getTeam();
-
-                if(tile.block() == StorageBlocks.core){
-                    state.teams.get(team).cores.add(tile);
-                }
-
-                if(tiles[x][y].block().isMultiblock()){
-                    multiblocks.add(tiles[x][y].packedPosition());
+                if(tile.block().isMultiblock()){
+                    multiblocks.add(tile.packedPosition());
                 }
             }
         }
@@ -134,6 +133,7 @@ public class WorldGenerator{
                     tile.setBlock(Blocks.air);
                 }
 
+                //remove ore veins on cliffs
                 if(tile.floor() instanceof OreBlock && tile.hasCliffs()){
                     tile.setFloor(((OreBlock)tile.floor()).base);
                 }
@@ -245,6 +245,17 @@ public class WorldGenerator{
         return generateTile(result, sectorX, sectorY, localX, localY, detailed, null);
     }
 
+    /**
+     * Gets the generation result from a specific sector at specific coordinates.
+     * @param result where to put the generation results
+     * @param sectorX X of the sector in terms of sector coordinates
+     * @param sectorY Y of the sector in terms of sector coordinates
+     * @param localX X in terms of local sector tile coordinates
+     * @param localY Y in terms of local sector tile coordinates
+     * @param detailed whether the tile result is 'detailed' (e.g. previews should not be detailed)
+     * @param spawnpoints list of player spawnpoints, can be null
+     * @return the GenResult passed in with its values modified
+     */
     public GenResult generateTile(GenResult result, int sectorX, int sectorY, int localX, int localY, boolean detailed, Array<GridPoint2> spawnpoints){
         int x = sectorX * sectorSize + localX + Short.MAX_VALUE;
         int y = sectorY * sectorSize + localY + Short.MAX_VALUE;
