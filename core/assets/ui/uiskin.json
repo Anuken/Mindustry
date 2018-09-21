@@ -10,11 +10,6 @@ Font: {
 		markup: false,
 		scale: 0.5
 	},
-	korean: {
-		file: korean.fnt,
-		markup: true,
-		scale: 0.5
-	},
 	trad-chinese: {
 		file: trad_chinese.fnt,
 		markup: true,

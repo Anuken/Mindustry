@@ -122,7 +122,7 @@ public class MendProjector extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new MendEntity();
     }
 

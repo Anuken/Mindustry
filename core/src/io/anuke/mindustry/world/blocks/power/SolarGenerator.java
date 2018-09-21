@@ -28,7 +28,7 @@ public class SolarGenerator extends PowerGenerator{
     public void update(Tile tile){
         addPower(tile, generation * Timers.delta());
 
-        distributePower(tile);
+        tile.entity.power.graph.update();
     }
 
 }

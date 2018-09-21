@@ -207,7 +207,7 @@ public class UnitFactory extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new UnitFactoryEntity();
     }
 

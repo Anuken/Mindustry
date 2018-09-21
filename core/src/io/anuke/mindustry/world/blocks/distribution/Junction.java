@@ -92,7 +92,7 @@ public class Junction extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new JunctionEntity();
     }
 

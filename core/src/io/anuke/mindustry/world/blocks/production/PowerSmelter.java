@@ -203,7 +203,7 @@ public class PowerSmelter extends PowerBlock{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new PowerSmelterEntity();
     }
 

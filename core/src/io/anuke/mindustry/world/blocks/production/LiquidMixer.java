@@ -89,7 +89,7 @@ public class LiquidMixer extends LiquidBlock{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new LiquidMixerEntity();
     }
 

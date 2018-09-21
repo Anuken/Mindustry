@@ -124,7 +124,7 @@ public class NuclearReactor extends PowerGenerator{
         if(entity.heat >= 0.999f){
             entity.kill();
         }else{
-            distributePower(tile);
+            tile.entity.power.graph.update();
         }
     }
 
@@ -193,7 +193,7 @@ public class NuclearReactor extends PowerGenerator{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new NuclearReactorEntity();
     }
 

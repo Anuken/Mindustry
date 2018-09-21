@@ -273,7 +273,7 @@ public class WarpGate extends PowerBlock{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new TeleporterEntity();
     }
 

@@ -339,7 +339,7 @@ public abstract class Turret extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new TurretEntity();
     }
 

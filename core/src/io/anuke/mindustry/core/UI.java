@@ -62,7 +62,6 @@ public class UI extends SceneModule{
     public ContentInfoDialog content;
     public SectorsDialog sectors;
     public MissionDialog missions;
-    public UnlockGraphDialog graph;
 
     private Locale lastLocale;
 
@@ -118,7 +117,7 @@ public class UI extends SceneModule{
             font.getData().setScale(Vars.fontScale);
             font.getData().down += Unit.dp.scl(4f);
             font.getData().lineHeight -= Unit.dp.scl(4.3f);
-        }, skin.font(), skin.getFont("default-font-chat"), skin.getFont("korean"), skin.getFont("trad-chinese"), skin.getFont("simp-chinese"));
+        }, skin.font(), skin.getFont("default-font-chat"), skin.getFont("trad-chinese"), skin.getFont("simp-chinese"));
     }
 
     @Override
@@ -173,12 +172,12 @@ public class UI extends SceneModule{
         Group group = Core.scene.getRoot();
 
         backfrag.build(group);
+        control.input(0).getFrag().build(Core.scene.getRoot());
         hudfrag.build(group);
         menufrag.build(group);
         chatfrag.container().build(group);
         listfrag.build(group);
         loadfrag.build(group);
-
     }
 
     @Override

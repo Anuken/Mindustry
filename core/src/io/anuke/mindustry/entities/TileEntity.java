@@ -157,6 +157,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     }
 
     public void removeFromProximity(){
+        if(power != null){
+            tile.block().powerGraphRemoved(tile);
+        }
+
         GridPoint2[] nearby = Edges.getEdges(tile.block().size);
         for(GridPoint2 point : nearby){
             Tile other = world.tile(tile.x + point.x, tile.y + point.y);
@@ -179,18 +183,17 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         for(GridPoint2 point : nearby){
             Tile other = world.tile(tile.x + point.x, tile.y + point.y);
 
-            if(other != null){
-                other.block().onProximityUpdate(other);
-                other = other.target();
-            }
+            if(other == null) continue;
+            other = other.target();
+            if(other.entity == null || other.getTeamID() != tile.getTeamID()) continue;
 
-            if(other != null && other.entity != null){
-                tmpTiles.add(other);
+            other.block().onProximityUpdate(other);
 
-                //add this tile to proximity of nearby tiles
-                if(!other.entity.proximity.contains(tile, true)){
-                    other.entity.proximity.add(tile);
-                }
+            tmpTiles.add(other);
+
+            //add this tile to proximity of nearby tiles
+            if(!other.entity.proximity.contains(tile, true)){
+                other.entity.proximity.add(tile);
             }
         }
 
@@ -199,6 +202,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             proximity.add(tile);
         }
 
+        if(tile.block().hasPower) tile.block().updatePowerGraph(tile);
         tile.block().onProximityUpdate(tile);
     }
 

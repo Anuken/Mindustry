@@ -112,7 +112,7 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new SolidPumpEntity();
     }
 

@@ -89,7 +89,7 @@ public class LaserTurret extends PowerTurret{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new LaserTurretEntity();
     }
 

@@ -22,7 +22,7 @@ public class Sector{
     /**Slot ID of this sector's save. -1 means no save has been created.*/
     public int saveID = -1;
     /**Sector size; if more than 1, the coordinates are the bottom left corner.*/
-    public int size = 1;
+    public int width = 1, height = 1;
     /**Num of missions in this sector that have been completed so far.*/
     public int completedMissions;
     /**Display texture. Needs to be disposed.*/
