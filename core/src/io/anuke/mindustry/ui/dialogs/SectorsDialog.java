@@ -75,6 +75,7 @@ public class SectorsDialog extends FloatingDialog{
             addListener(new InputListener(){
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+                    if(pointer != 0) return false;
                     Cursors.setHand();
                     lastX = x;
                     lastY = y;
@@ -83,6 +84,7 @@ public class SectorsDialog extends FloatingDialog{
 
                 @Override
                 public void touchDragged(InputEvent event, float x, float y, int pointer){
+                    if(pointer != 0) return;
                     panX -= x - lastX;
                     panY -= y - lastY;
 
@@ -92,6 +94,7 @@ public class SectorsDialog extends FloatingDialog{
 
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button){
+                    if(pointer != 0) return;
                     Cursors.restoreCursor();
                 }
             });
