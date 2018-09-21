@@ -126,6 +126,10 @@ public class Sectors{
             }
         }
 
+        if(!headless){
+            renderer.fog().setLoadingOffset(shiftX, shiftY);
+        }
+
         //create *new* tile array
         Tile[][] newTiles = new Tile[sector.width * sectorSize][sector.height * sectorSize];
 
@@ -150,7 +154,7 @@ public class Sectors{
                     for (int x = 0; x < sectorSize; x++) {
                         for (int y = 0; y < sectorSize; y++) {
                             GenResult result = world.generator().generateTile(sx + sector.x, sy + sector.y, x, y);
-                            newTiles[sx * sectorSize + x][sy * sectorSize + y] = new Tile(x + sx * tilesize, y + sy*tilesize, result.floor.id, result.wall.id, (byte)0, (byte)0, result.elevation);
+                            newTiles[sx * sectorSize + x][sy * sectorSize + y] = new Tile(x + sx * sectorSize, y + sy*sectorSize, result.floor.id, result.wall.id, (byte)0, (byte)0, result.elevation);
                         }
                     }
                 }
