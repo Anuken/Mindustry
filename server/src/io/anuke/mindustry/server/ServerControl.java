@@ -913,6 +913,7 @@ public class ServerControl extends Module{
 
                 playSectorMap();
             }else if(world.getSector().currentMission().isComplete()){
+                world.getSector().currentMission().onComplete();
                 //increment completed missions, check next index next frame
                 world.getSector().completedMissions ++;
             }

@@ -375,6 +375,7 @@ public class Control extends Module{
                 Platform.instance.updateRPC();
             }
 
+            //TODO move sector code into logic class
             //check unlocked sectors
             if(world.getSector() != null && !world.getSector().complete){
                 //all assigned missions are complete
@@ -385,9 +386,10 @@ public class Control extends Module{
                     world.sectors().save();
                     ui.missions.show(world.getSector());
                 }else if(world.getSector().currentMission().isComplete()){
-                    state.mode = world.getSector().currentMission().getMode();
+                    world.getSector().currentMission().onComplete();
                     //increment completed missions, check next index next frame
                     world.getSector().completedMissions ++;
+                    state.mode = world.getSector().currentMission().getMode();
                 }
             }
 

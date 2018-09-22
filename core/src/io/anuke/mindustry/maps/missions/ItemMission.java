@@ -9,11 +9,11 @@ import io.anuke.ucore.util.Bundles;
 import static io.anuke.mindustry.Vars.state;
 
 /**A mission that is completed when the player obtains items in their core.*/
-public class ResourceMission implements Mission{
+public class ItemMission implements Mission{
     private final Item item;
     private final int amount;
 
-    public ResourceMission(Item item, int amount){
+    public ItemMission(Item item, int amount){
         this.item = item;
         this.amount = amount;
     }

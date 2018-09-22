@@ -241,6 +241,7 @@ public class WorldGenerator{
         return generateTile(result, sectorX, sectorY, localX, localY, detailed, null);
     }
 
+    //TODO include tile in result
     /**
      * Gets the generation result from a specific sector at specific coordinates.
      * @param result where to put the generation results

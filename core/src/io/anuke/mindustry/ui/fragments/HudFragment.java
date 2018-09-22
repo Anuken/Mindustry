@@ -320,17 +320,9 @@ public class HudFragment extends Fragment{
         IntFormat timef = new IntFormat("text.wave.waiting");
 
         table.background("button");
-        table.left().table(text -> {
-            text.left();
-            text.label(() -> wavef.get(state.wave)).left().get().setFontScale(fontScale * 1.5f);
-            text.row();
-            text.label(() -> unitGroups[Team.red.ordinal()].size() > 0 && state.mode.disableWaveTimer ?
-                getEnemiesRemaining() : (state.mode.disableWaveTimer) ? "$text.waiting" :
-                timef.get((int) (state.wavetime / 60f))).minWidth(126).left();
-        });
+        table.left().labelWrap(() -> world.getSector() == null ? wavef.get(state.wave) : world.getSector().currentMission().displayString()).left().growX();
 
-        table.add().growX();
-        table.visible(() -> !state.mode.disableWaves);
+        table.visible(() -> !((world.getSector() == null && state.mode.disableWaves) || !state.mode.showMission));
 
         playButton(uheight);
     }

@@ -2,6 +2,7 @@ package io.anuke.mindustry.maps.missions;
 
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.SpawnGroup;
@@ -13,7 +14,16 @@ import io.anuke.ucore.scene.ui.layout.Table;
 public interface Mission{
     boolean isComplete();
     String displayString();
-    GameMode getMode();
+
+    default GameMode getMode(){
+        return GameMode.noWaves;
+    }
+
+    default void onComplete(){
+        if(!Vars.headless){
+            //TODO show 'mission complete' message somewhere
+        }
+    }
 
     default void display(Table table){
         table.add(displayString());

@@ -3,18 +3,17 @@ package io.anuke.mindustry.maps;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.UnitTypes;
+import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
-import io.anuke.mindustry.maps.missions.BattleMission;
-import io.anuke.mindustry.maps.missions.WaveMission;
+import io.anuke.mindustry.maps.missions.*;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.ColorMapper;
-import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.entities.Entities;
@@ -177,9 +176,16 @@ public class Sectors{
         Sector sector = get(x, y);
         sector.complete = true;
 
-        //TODO work for unique width + height?
-        for(GridPoint2 point : Edges.getEdges(sector.width)){
-            createSector(sector.x + point.x, sector.y + point.y);
+        for(int sx = 0; sx < sector.width + 2; sx++){
+            for(int sy = 0; sy < sector.height + 2; sy++){
+                if((sx == 0 || sy == 0 || sx == sector.width + 1 || sy == sector.height + 1) &&
+                     !((sx == 0 && sy == 0)
+                    || (sx == 0 && sy == sector.height+1)
+                    || (sx == sector.width+1 && sy == 0)
+                    || (sx == sector.width+1 && sy == sector.height+1))){
+                    createSector(sector.x + sx - 1, sector.y + sy - 1);
+                }
+            }
         }
     }
 
@@ -244,7 +250,27 @@ public class Sectors{
         sector.difficulty = (int)(Mathf.dst(sector.x, sector.y));
 
         if(sector.difficulty == 0){
-            sector.missions.add(new WaveMission(10));
+            //TODO make specfic expansion sector have specific ores
+            sector.missions.addAll(Array.with(
+                new ItemMission(Items.copper, 30),
+                new BlockMission(ProductionBlocks.mechanicalDrill),
+                new BlockMission(DistributionBlocks.conveyor),
+                new ItemMission(Items.copper, 40),
+                new BlockMission(TurretBlocks.duo),
+                new WaveMission(5),
+                new ExpandMission(1, 0),
+                new ItemMission(Items.lead, 30),
+                new BlockMission(CraftingBlocks.smelter),
+                new ItemMission(Items.densealloy, 30),
+                new BlockMission(PowerBlocks.combustionGenerator),
+                new BlockMission(PowerBlocks.powerNode),
+                new BlockMission(CraftingBlocks.siliconsmelter),
+                new ItemMission(Items.silicon, 30),
+                new BlockMission(UnitBlocks.daggerFactory),
+                new UnitMission(UnitTypes.dagger),
+                new ExpandMission(0, 1),
+                new BattleMission()
+            ));
         }else{
             sector.missions.add(Mathf.randomSeed(sector.getSeed() + 1) < waveChance ? new WaveMission(Math.min(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5, 100))
                     : new BattleMission());
@@ -265,8 +291,8 @@ public class Sectors{
             sector.startingItems = Array.with(new ItemStack(Items.copper, 700), new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 130));
         }else if(sector.difficulty > 1){ //more starter items for faster start
             sector.startingItems = Array.with(new ItemStack(Items.copper, 400), new ItemStack(Items.lead, 100));
-        }else{ //base starting items to prevent grinding much
-            sector.startingItems = Array.with(new ItemStack(Items.copper, 130));
+        }else{ //empty default
+            sector.startingItems = Array.with();
         }
     }
 

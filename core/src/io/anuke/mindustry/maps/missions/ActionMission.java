@@ -14,11 +14,12 @@ public abstract class ActionMission implements Mission{
     }
 
     @Override
+    public void onComplete(){
+        threads.run(runner);
+    }
+
+    @Override
     public boolean isComplete(){
-        if(runner != null){
-            threads.run(runner);
-            runner = null;
-        }
         return true;
     }
 
