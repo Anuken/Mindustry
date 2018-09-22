@@ -260,6 +260,7 @@ public class Sectors{
                 new WaveMission(5),
                 new ExpandMission(1, 0),
                 new ItemMission(Items.lead, 30),
+                new ItemMission(Items.copper, 150),
                 new BlockMission(CraftingBlocks.smelter),
                 new ItemMission(Items.densealloy, 30),
                 new BlockMission(PowerBlocks.combustionGenerator),
@@ -268,7 +269,7 @@ public class Sectors{
                 new ItemMission(Items.silicon, 30),
                 new BlockMission(UnitBlocks.daggerFactory),
                 new UnitMission(UnitTypes.dagger),
-                new ExpandMission(0, 1),
+                new ExpandMission(-1, 0),
                 new BattleMission()
             ));
         }else{

@@ -13,7 +13,14 @@ import io.anuke.ucore.scene.ui.layout.Table;
 
 public interface Mission{
     boolean isComplete();
+
+    /**Returns the string that is displayed in-game near the menu.*/
     String displayString();
+
+    /**Returns the info string displayed in the sector dialog (menu)*/
+    default String menuDisplayString(){
+        return displayString();
+    }
 
     default GameMode getMode(){
         return GameMode.noWaves;

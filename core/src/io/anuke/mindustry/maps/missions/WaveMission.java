@@ -37,7 +37,12 @@ public class WaveMission implements Mission{
 
     @Override
     public String displayString(){
-        return Bundles.format("text.mission.wave", state.wave);
+        return Bundles.format("text.mission.wave", state.wave, target);
+    }
+
+    @Override
+    public String menuDisplayString(){
+        return Bundles.format("text.mission.wave.menu", target);
     }
 
     @Override

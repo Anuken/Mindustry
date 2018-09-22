@@ -43,7 +43,7 @@ public class SectorsDialog extends FloatingDialog{
                     (selected.hasSave() ? "  [accent]/[white] " + Bundles.format("text.sector.time", selected.getSave().getPlayTime()) : ""))));
         content().row();
         content().label(() -> Bundles.format("text.mission", selected == null || selected.completedMissions >= selected.missions.size
-        ? Bundles.get("text.none") : selected.missions.get(selected.completedMissions).displayString())
+        ? Bundles.get("text.none") : selected.missions.get(selected.completedMissions).menuDisplayString())
                         + "[WHITE] " + (selected == null ? "" : Bundles.format("text.save.difficulty", "[LIGHT_GRAY]" + selected.getDifficulty().toString())));
         content().row();
         content().add(new SectorView()).grow();

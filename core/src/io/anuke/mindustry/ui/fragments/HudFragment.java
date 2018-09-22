@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.core.GameState.State;
@@ -320,7 +321,9 @@ public class HudFragment extends Fragment{
         IntFormat timef = new IntFormat("text.wave.waiting");
 
         table.background("button");
-        table.left().labelWrap(() -> world.getSector() == null ? wavef.get(state.wave) : world.getSector().currentMission().displayString()).left().growX();
+        table.labelWrap(() -> world.getSector() == null ? wavef.get(state.wave) :
+                Bundles.format("text.mission.display", world.getSector().currentMission().displayString())).growX()
+        .get().setAlignment(Align.center, Align.center);
 
         table.visible(() -> !((world.getSector() == null && state.mode.disableWaves) || !state.mode.showMission));
 
