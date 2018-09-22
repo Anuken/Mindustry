@@ -44,6 +44,7 @@ public class Sectors{
             sector.saveID = control.getSaves().addSave("sector-" + sector.packedPosition()).index;
             world.sectors().save();
             world.setSector(sector);
+            sector.currentMission().onBegin();
         }else if(SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
             ui.showInfo("$text.save.old");
         }else try{
