@@ -6,7 +6,7 @@ import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.ucore.util.Bundles;
 
-public class UnitMission implements Mission{
+public class UnitMission extends Mission{
     private final UnitType type;
 
     public UnitMission(UnitType type){

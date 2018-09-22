@@ -2,7 +2,6 @@ package io.anuke.mindustry.maps.missions;
 
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.SpawnGroup;
@@ -10,43 +9,70 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Bundles;
 
-public interface Mission{
-    boolean isComplete();
+import static io.anuke.mindustry.Vars.headless;
+import static io.anuke.mindustry.Vars.ui;
+
+public abstract class Mission{
+    private String extraMessage;
+
+    public abstract boolean isComplete();
 
     /**Returns the string that is displayed in-game near the menu.*/
-    String displayString();
+    public abstract String displayString();
 
     /**Returns the info string displayed in the sector dialog (menu)*/
-    default String menuDisplayString(){
+    public String menuDisplayString(){
         return displayString();
     }
 
-    default GameMode getMode(){
+    public GameMode getMode(){
         return GameMode.noWaves;
     }
 
-    default void onComplete(){
-        if(!Vars.headless){
-            //TODO show 'mission complete' message somewhere
+    /**Sets the message displayed on mission begin. Returns this mission for chaining.*/
+    public Mission setMessage(String message){
+        this.extraMessage = message;
+        return this;
+    }
+
+    /**Shows the unique sector message.*/
+    public void showMessage(){
+        if(!headless && extraMessage != null){
+            ui.hudfrag.showTextDialog(extraMessage);
         }
     }
 
-    default void display(Table table){
+    public boolean hasMessage(){
+        return extraMessage != null;
+    }
+
+    public void onBegin(){
+        showMessage();
+    }
+
+    public void onComplete(){
+        if(!headless){
+            ui.hudfrag.showText("[LIGHT_GRAY]"+menuDisplayString() + ":\n" + Bundles.get("text.mission.complete"));
+        }
+    }
+
+    public void display(Table table){
         table.add(displayString());
     }
 
-    default Array<SpawnGroup> getWaves(Sector sector){
+    public Array<SpawnGroup> getWaves(Sector sector){
         return new Array<>();
     }
 
-    default Array<GridPoint2> getSpawnPoints(Generation gen){
+    public Array<GridPoint2> getSpawnPoints(Generation gen){
         return Array.with();
     }
 
-    default void generate(Generation gen){}
+    public void generate(Generation gen){}
 
-    default void generateCoreAt(Generation gen, int coreX, int coreY, Team team){
+    public void generateCoreAt(Generation gen, int coreX, int coreY, Team team){
         gen.tiles[coreX][coreY].setBlock(StorageBlocks.core);
         gen.tiles[coreX][coreY].setTeam(team);
     }

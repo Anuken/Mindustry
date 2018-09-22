@@ -10,7 +10,7 @@ import static io.anuke.mindustry.Vars.defaultTeam;
 import static io.anuke.mindustry.Vars.world;
 
 /**A mission in which the player must place a block.*/
-public class BlockMission implements Mission{
+public class BlockMission extends Mission{
     private final Block block;
     private boolean complete;
 

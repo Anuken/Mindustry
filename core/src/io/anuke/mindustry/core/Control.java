@@ -338,7 +338,6 @@ public class Control extends Module{
                 dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
                 dialog.content().add("You might have noticed that 4.0 does not have any sound.\nThis is [orange]intentional![] Sound will be added in a later update.\n\n[LIGHT_GRAY](now stop reporting this as a bug)").wrap().width(400f);
                 dialog.show();
-
             });
         }
     }
@@ -347,6 +346,29 @@ public class Control extends Module{
     public void runUpdateLogic(){
         if(!state.is(State.menu)){
             renderer.minimap().updateUnitArray();
+        }
+    }
+
+    private void updateSectors(){
+        if(world.getSector() == null) return;
+
+        //TODO move sector code into logic class
+        //check unlocked sectors
+        while(!world.getSector().complete && world.getSector().currentMission().isComplete()){
+            world.getSector().currentMission().onComplete();
+            world.getSector().completedMissions ++;
+
+            state.mode = world.getSector().currentMission().getMode();
+            world.getSector().currentMission().onBegin();
+        }
+
+        //check if all assigned missions are complete
+        if(!world.getSector().complete && world.getSector().completedMissions >= world.getSector().missions.size){
+            state.mode = GameMode.victory;
+
+            world.sectors().completeSector(world.getSector().x, world.getSector().y);
+            world.sectors().save();
+            ui.missions.show(world.getSector());
         }
     }
 
@@ -375,23 +397,7 @@ public class Control extends Module{
                 Platform.instance.updateRPC();
             }
 
-            //TODO move sector code into logic class
-            //check unlocked sectors
-            if(world.getSector() != null && !world.getSector().complete){
-                //all assigned missions are complete
-                if(world.getSector().completedMissions >= world.getSector().missions.size){
-                    state.mode = GameMode.victory;
-
-                    world.sectors().completeSector(world.getSector().x, world.getSector().y);
-                    world.sectors().save();
-                    ui.missions.show(world.getSector());
-                }else if(world.getSector().currentMission().isComplete()){
-                    world.getSector().currentMission().onComplete();
-                    //increment completed missions, check next index next frame
-                    world.getSector().completedMissions ++;
-                    state.mode = world.getSector().currentMission().getMode();
-                }
-            }
+            updateSectors();
 
             //check unlocks every 2 seconds
             if(world.getSector() != null && Timers.get("timerCheckUnlock", 120)){

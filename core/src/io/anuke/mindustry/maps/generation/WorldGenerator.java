@@ -190,7 +190,7 @@ public class WorldGenerator{
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 GenResult result = generateTile(this.result, sector.x, sector.y, x, y, true, spawnpoints);
-                Tile tile = new Tile(x, y, (byte)result.floor.id, (byte)result.wall.id, (byte)0, (byte)0, result.elevation);
+                Tile tile = new Tile(x, y, result.floor.id, result.wall.id, (byte)0, (byte)0, result.elevation);
                 tiles[x][y] = tile;
             }
         }
@@ -241,7 +241,7 @@ public class WorldGenerator{
         return generateTile(result, sectorX, sectorY, localX, localY, detailed, null);
     }
 
-    //TODO include tile in result
+    //TODO include ore in result
     /**
      * Gets the generation result from a specific sector at specific coordinates.
      * @param result where to put the generation results

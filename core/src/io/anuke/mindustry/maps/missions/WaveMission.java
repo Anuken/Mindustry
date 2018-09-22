@@ -12,7 +12,7 @@ import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.state;
 
-public class WaveMission implements Mission{
+public class WaveMission extends Mission{
     private final int target;
 
     public WaveMission(int target){
@@ -37,7 +37,7 @@ public class WaveMission implements Mission{
 
     @Override
     public String displayString(){
-        return Bundles.format("text.mission.wave", state.wave, target);
+        return Bundles.format("text.mission.wave", state.wave, target, (int)(state.wavetime/60));
     }
 
     @Override

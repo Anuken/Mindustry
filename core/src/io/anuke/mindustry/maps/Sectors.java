@@ -5,13 +5,12 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
-import io.anuke.mindustry.maps.missions.*;
+import io.anuke.mindustry.maps.missions.BattleMission;
+import io.anuke.mindustry.maps.missions.WaveMission;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Tile;
@@ -251,27 +250,7 @@ public class Sectors{
 
         if(sector.difficulty == 0){
             //TODO make specfic expansion sector have specific ores
-            sector.missions.addAll(Array.with(
-                new ItemMission(Items.copper, 30),
-                new BlockMission(ProductionBlocks.mechanicalDrill),
-                new BlockMission(DistributionBlocks.conveyor),
-                new ItemMission(Items.copper, 40),
-                new BlockMission(TurretBlocks.duo),
-                new WaveMission(5),
-                new ExpandMission(1, 0),
-                new ItemMission(Items.lead, 30),
-                new ItemMission(Items.copper, 150),
-                new BlockMission(CraftingBlocks.smelter),
-                new ItemMission(Items.densealloy, 30),
-                new BlockMission(PowerBlocks.combustionGenerator),
-                new BlockMission(PowerBlocks.powerNode),
-                new BlockMission(CraftingBlocks.siliconsmelter),
-                new ItemMission(Items.silicon, 30),
-                new BlockMission(UnitBlocks.daggerFactory),
-                new UnitMission(UnitTypes.dagger),
-                new ExpandMission(-1, 0),
-                new BattleMission()
-            ));
+            sector.missions.addAll(TutorialSector.getMissions());
         }else{
             sector.missions.add(Mathf.randomSeed(sector.getSeed() + 1) < waveChance ? new WaveMission(Math.min(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5, 100))
                     : new BattleMission());

@@ -9,7 +9,7 @@ import io.anuke.mindustry.maps.generation.FortressGenerator;
 import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.ucore.util.Bundles;
 
-public class BattleMission implements Mission{
+public class BattleMission extends Mission{
     private final static int coreX = 60, coreY = 60;
 
     @Override
