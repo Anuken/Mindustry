@@ -13,7 +13,7 @@ public class Waves{
         return Array.with(
             new SpawnGroup(UnitTypes.dagger){{
                 end = 8;
-                unitScaling = 1;
+                unitScaling = 3;
             }},
 
             new SpawnGroup(UnitTypes.wraith){{

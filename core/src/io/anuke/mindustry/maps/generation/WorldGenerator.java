@@ -322,13 +322,13 @@ public class WorldGenerator{
             wall = decoration.get(floor);
         }
 
-        if(ores != null && ((Floor) floor).hasOres && wall == Blocks.air){
-            int offsetX = 10 + x, offsetY = 10 + y;
+        if(ores != null && ((Floor) floor).hasOres){
+            int offsetX = x + 1, offsetY = y + 15;
             for(int i = ores.size - 1; i >= 0; i--){
                 Item entry = ores.get(i);
-                if(sim.octaveNoise2D(1, 0.7, 1f / (10 + i * 3), offsetX, offsetY) / 4f +
-                Math.abs(0.5f - sim.octaveNoise2D(2, 0.7, 1f / (50 + i * 2), offsetX, offsetY)) > 0.35f &&
-                Math.abs(0.5f - sim2.octaveNoise2D(1, 1, 1f / (55 + i * 4), offsetX, offsetY)) > 0.33f){
+                if(
+                Math.abs(0.5f - sim.octaveNoise2D(2, 0.7, 1f / (50 + i * 2), offsetX, offsetY)) > 0.23f &&
+                Math.abs(0.5f - sim2.octaveNoise2D(1, 1, 1f / (40 + i * 4), offsetX, offsetY)) > 0.32f){
                     floor = OreBlocks.get(floor, entry);
                     break;
                 }

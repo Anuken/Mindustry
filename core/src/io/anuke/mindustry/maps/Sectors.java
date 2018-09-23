@@ -270,6 +270,8 @@ public class Sectors{
                     : new BattleMission());
         }
 
+        sector.spawns = new Array<>();
+
         for(Mission mission : sector.missions){
             sector.spawns.addAll(mission.getWaves(sector));
         }
@@ -296,6 +298,7 @@ public class Sectors{
         if(headless) return; //obviously not created or needed on server
 
         Pixmap pixmap = new Pixmap(sectorImageSize * sector.width, sectorImageSize * sector.height, Format.RGBA8888);
+        GenResult secResult = new GenResult();
 
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
@@ -303,8 +306,9 @@ public class Sectors{
                 int toY = y * sectorSize / sectorImageSize;
 
                 GenResult result = world.generator().generateTile(sector.x, sector.y, toX, toY, false);
+                world.generator().generateTile(secResult, sector.x, sector.y, toX, toY + sectorSize / sectorImageSize, false, null, null);
 
-                int color = ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation, (byte)0);
+                int color = ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation, secResult.elevation > result.elevation ? (byte)(1 << 6) : (byte)0);
                 pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, color);
             }
         }

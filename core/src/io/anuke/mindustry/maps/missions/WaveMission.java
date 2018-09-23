@@ -11,6 +11,8 @@ import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.waveTeam;
+import static io.anuke.mindustry.Vars.world;
 
 public class WaveMission extends Mission{
     private final int target;
@@ -28,6 +30,13 @@ public class WaveMission extends Mission{
     public void generate(Generation gen){
         int coreX = gen.width/2, coreY = gen.height/2;
         generateCoreAt(gen, coreX, coreY, Team.blue);
+    }
+
+    @Override
+    public void onBegin(){
+        super.onBegin();
+
+        world.pathfinder().activateTeamPath(waveTeam);
     }
 
     @Override

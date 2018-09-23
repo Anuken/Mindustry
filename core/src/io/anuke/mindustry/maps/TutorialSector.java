@@ -49,6 +49,10 @@ public class TutorialSector{
         );
     }
 
+    public static boolean supressDrone(){
+        return world.getSector() != null && world.getSector().x == 0 && world.getSector().y == 0;
+    }
+
     private static void generateBase(){
         int x = sectorSize/2, y = sectorSize/2;
         world.setBlock(world.tile(x, y), StorageBlocks.core, waveTeam);
