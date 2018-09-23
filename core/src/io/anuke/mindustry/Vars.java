@@ -48,7 +48,7 @@ public class Vars{
     public static final int maxNameLength = 40;
     public static final float itemSize = 5f;
     public static final int tilesize = 8;
-    public static final int sectorSize = 130;
+    public static final int sectorSize = 120;
     public static final int mapPadding = 3;
     public static final int invalidSector = Integer.MAX_VALUE;
     public static Locale[] locales;

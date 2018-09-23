@@ -4,7 +4,10 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.content.blocks.*;
+import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.mindustry.maps.missions.*;
+
+import static io.anuke.mindustry.Vars.*;
 
 /**Just a class for returning the list of tutorial missions.*/
 public class TutorialSector{
@@ -30,7 +33,31 @@ public class TutorialSector{
             new BlockMission(UnitBlocks.daggerFactory).setMessage("$tutorial.daggerfactory"),
             new UnitMission(UnitTypes.dagger).setMessage("$tutorial.dagger"),
             new ExpandMission(-1, 0),
-            new BattleMission().setMessage("$tutorial.battle")
+            new BattleMission(){
+                public void generate(Generation gen){}
+
+                @Override
+                public boolean isComplete(){
+                    return false;
+                }
+
+                public void onBegin(){
+                    super.onBegin();
+                    generateBase();
+                }
+            }.setMessage("$tutorial.battle")
         );
+    }
+
+    private static void generateBase(){
+        int x = sectorSize/2, y = sectorSize/2;
+        world.setBlock(world.tile(x, y), StorageBlocks.core, waveTeam);
+        world.setBlock(world.tile(x + 1, y + 2), TurretBlocks.duo, waveTeam);
+        world.setBlock(world.tile(x + 1, y - 2), TurretBlocks.duo, waveTeam);
+        world.setBlock(world.tile(x - 1, y + 2), UnitBlocks.daggerFactory, waveTeam);
+        world.setBlock(world.tile(x - 1, y - 3), UnitBlocks.daggerFactory, waveTeam);
+
+        //since placed() is not called here, add core manually
+        state.teams.get(waveTeam).cores.add(world.tile(x, y));
     }
 }

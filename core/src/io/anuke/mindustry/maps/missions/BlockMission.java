@@ -33,6 +33,12 @@ public class BlockMission extends Mission{
     }
 
     @Override
+    public void onComplete(){
+        super.onComplete();
+        complete = false;
+    }
+
+    @Override
     public boolean isComplete(){
         return complete;
     }

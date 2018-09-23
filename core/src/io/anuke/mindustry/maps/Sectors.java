@@ -11,6 +11,7 @@ import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.maps.missions.BattleMission;
 import io.anuke.mindustry.maps.missions.WaveMission;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Tile;
@@ -153,10 +154,12 @@ public class Sectors{
             for (int sy = 0; sy < sector.height; sy++) {
                 //if this sector is a 'new sector (not part of the current save data...)
                 if(sx < -expandX || sy < -expandY || sx >= sector.width - expandX || sy >= sector.height - expandY){
+                    GenResult result = new GenResult();
+                    Array<Item> ores = getOres(sx + sector.x, sy + sector.y);
                     //gen tiles in sector
                     for (int x = 0; x < sectorSize; x++) {
                         for (int y = 0; y < sectorSize; y++) {
-                            GenResult result = world.generator().generateTile(sx + sector.x, sy + sector.y, x, y);
+                            world.generator().generateTile(result, sx + sector.x, sy + sector.y, x, y, true, null, ores);
                             newTiles[sx * sectorSize + x][sy * sectorSize + y] = new Tile(x + sx * sectorSize, y + sy*sectorSize, result.floor.id, result.wall.id, (byte)0, (byte)0, result.elevation);
                         }
                     }
@@ -168,6 +171,15 @@ public class Sectors{
         world.endMapLoad();
 
         return true;
+    }
+
+    public Array<Item> getOres(int x, int y){
+        if(x == 0 && y == 0){
+            return Array.with(Items.copper);
+        }else if(x == 1 && y == 0){
+            return Array.with(Items.copper, Items.lead, Items.coal);
+        }
+        return Array.with(Items.copper);
     }
 
     /**Unlocks a sector. This shows nearby sectors.*/
@@ -259,7 +271,7 @@ public class Sectors{
 
         sector.spawns = sector.missions.first().getWaves(sector);
 
-        sector.ores.addAll(Items.copper);
+        //sector.ores.addAll(Items.copper);
 
         //set starter items
         if(sector.difficulty > 12){ //now with titanium

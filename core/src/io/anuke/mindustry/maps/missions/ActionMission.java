@@ -7,10 +7,13 @@ import static io.anuke.mindustry.Vars.threads;
 
 /**A mission which simply runs a single action and is completed instantly.*/
 public abstract class ActionMission extends Mission{
-    private Runnable runner;
+    protected Runnable runner;
 
     public ActionMission(Runnable runner){
         this.runner = runner;
+    }
+
+    public ActionMission(){
     }
 
     @Override

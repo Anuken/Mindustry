@@ -186,10 +186,11 @@ public class WorldGenerator{
         SeedRandom rnd = new SeedRandom(sector.getSeed());
         Generation gena = new Generation(sector, tiles, tiles.length, tiles[0].length, rnd);
         Array<GridPoint2> spawnpoints = sector.currentMission().getSpawnPoints(gena);
+        Array<Item> ores = world.sectors().getOres(sector.x, sector.y);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                GenResult result = generateTile(this.result, sector.x, sector.y, x, y, true, spawnpoints);
+                GenResult result = generateTile(this.result, sector.x, sector.y, x, y, true, spawnpoints, ores);
                 Tile tile = new Tile(x, y, result.floor.id, result.wall.id, (byte)0, (byte)0, result.elevation);
                 tiles[x][y] = tile;
             }
@@ -214,7 +215,7 @@ public class WorldGenerator{
             }
         }
 
-        generateOres(tiles, sector.getSeed(), true, sector.ores);
+        //generateOres(tiles, sector.getSeed(), true, ores);
 
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
@@ -238,7 +239,7 @@ public class WorldGenerator{
     }
 
     public GenResult generateTile(int sectorX, int sectorY, int localX, int localY, boolean detailed){
-        return generateTile(result, sectorX, sectorY, localX, localY, detailed, null);
+        return generateTile(result, sectorX, sectorY, localX, localY, detailed, null, null);
     }
 
     //TODO include ore in result
@@ -253,7 +254,7 @@ public class WorldGenerator{
      * @param spawnpoints list of player spawnpoints, can be null
      * @return the GenResult passed in with its values modified
      */
-    public GenResult generateTile(GenResult result, int sectorX, int sectorY, int localX, int localY, boolean detailed, Array<GridPoint2> spawnpoints){
+    public GenResult generateTile(GenResult result, int sectorX, int sectorY, int localX, int localY, boolean detailed, Array<GridPoint2> spawnpoints, Array<Item> ores){
         int x = sectorX * sectorSize + localX + Short.MAX_VALUE;
         int y = sectorY * sectorSize + localY + Short.MAX_VALUE;
 
@@ -319,6 +320,19 @@ public class WorldGenerator{
 
         if(detailed && wall == Blocks.air && decoration.containsKey(floor) && random.chance(0.03)){
             wall = decoration.get(floor);
+        }
+
+        if(ores != null && ((Floor) floor).hasOres && wall == Blocks.air){
+            int offsetX = 10 + x, offsetY = 10 + y;
+            for(int i = ores.size - 1; i >= 0; i--){
+                Item entry = ores.get(i);
+                if(sim.octaveNoise2D(1, 0.7, 1f / (10 + i * 3), offsetX, offsetY) / 4f +
+                Math.abs(0.5f - sim.octaveNoise2D(2, 0.7, 1f / (50 + i * 2), offsetX, offsetY)) > 0.35f &&
+                Math.abs(0.5f - sim2.octaveNoise2D(1, 1, 1f / (55 + i * 4), offsetX, offsetY)) > 0.33f){
+                    floor = OreBlocks.get(floor, entry);
+                    break;
+                }
+            }
         }
 
         result.wall = wall;

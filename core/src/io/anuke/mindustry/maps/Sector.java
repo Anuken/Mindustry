@@ -8,7 +8,6 @@ import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.maps.missions.Mission;
 import io.anuke.mindustry.maps.missions.VictoryMission;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.ucore.util.Bits;
 
@@ -35,7 +34,7 @@ public class Sector{
     /**Enemies spawned at this sector.*/
     public transient Array<SpawnGroup> spawns;
     /**Ores that appear in this sector.*/
-    public transient Array<Item> ores = new Array<>();
+    //public transient Array<Item> ores = new Array<>();
     /**Difficulty of the sector, measured by calculating distance from origin and applying scaling.*/
     public transient int difficulty;
     /**Items the player starts with on this sector.*/
