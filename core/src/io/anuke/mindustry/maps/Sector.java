@@ -33,8 +33,6 @@ public class Sector{
     public transient Array<Mission> missions = new Array<>();
     /**Enemies spawned at this sector.*/
     public transient Array<SpawnGroup> spawns;
-    /**Ores that appear in this sector.*/
-    //public transient Array<Item> ores = new Array<>();
     /**Difficulty of the sector, measured by calculating distance from origin and applying scaling.*/
     public transient int difficulty;
     /**Items the player starts with on this sector.*/

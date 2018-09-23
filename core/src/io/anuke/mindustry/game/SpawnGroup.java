@@ -85,7 +85,6 @@ public class SpawnGroup{
         if(wave < begin || wave > end || (wave - begin) % spacing != 0){
             return 0;
         }
-        float scaling = this.groupScaling;
 
         return Math.min(groupAmount - 1 + Math.max((int) ((wave / spacing) / groupScaling), 1), max);
     }

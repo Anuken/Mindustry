@@ -132,7 +132,7 @@ public class Logic extends Module{
                 Entities.update(fireGroup);
                 Entities.update(playerGroup);
 
-                //effect group only contains item drops in the headless version, update it!
+                //effect group only contains item transfers in the headless version, update it!
                 if(headless){
                     Entities.update(effectGroup);
                 }

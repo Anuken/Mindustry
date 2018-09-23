@@ -10,6 +10,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.maps.missions.BattleMission;
+import io.anuke.mindustry.maps.missions.Mission;
 import io.anuke.mindustry.maps.missions.WaveMission;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -269,7 +270,9 @@ public class Sectors{
                     : new BattleMission());
         }
 
-        sector.spawns = sector.missions.first().getWaves(sector);
+        for(Mission mission : sector.missions){
+            sector.spawns.addAll(mission.getWaves(sector));
+        }
 
         //sector.ores.addAll(Items.copper);
 
