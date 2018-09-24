@@ -6,7 +6,7 @@ import io.anuke.mindustry.game.GameMode;
 import static io.anuke.mindustry.Vars.threads;
 
 /**A mission which simply runs a single action and is completed instantly.*/
-public abstract class ActionMission extends Mission{
+public class ActionMission extends Mission{
     protected Runnable runner;
 
     public ActionMission(Runnable runner){

@@ -5,10 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Goal: To create a system to send events to the server from the client and vice versa, without creating a new packet type each time.<br>
- * These events may optionally also trigger on the caller client/server as well.<br>
- */
 public class Annotations{
 
     /** Marks a class as serializable.*/
