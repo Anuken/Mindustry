@@ -8,6 +8,7 @@ import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
@@ -16,6 +17,7 @@ import static io.anuke.mindustry.Vars.ui;
 
 public abstract class Mission{
     private String extraMessage;
+    private boolean showComplete =true;
 
     public abstract boolean isComplete();
 
@@ -37,6 +39,16 @@ public abstract class Mission{
         return this;
     }
 
+    public Mission setShowComplete(boolean complete){
+        this.showComplete = complete;
+        return this;
+    }
+
+    /**Draw mission overlay.*/
+    public void drawOverlay(){
+
+    }
+
     /**Shows the unique sector message.*/
     public void showMessage(){
         if(!headless && extraMessage != null){
@@ -49,11 +61,11 @@ public abstract class Mission{
     }
 
     public void onBegin(){
-        showMessage();
+        Timers.runTask(60f, this::showMessage);
     }
 
     public void onComplete(){
-        if(!headless){
+        if(showComplete && !headless){
             ui.hudfrag.showText("[LIGHT_GRAY]"+menuDisplayString() + ":\n" + Bundles.get("text.mission.complete"));
         }
     }

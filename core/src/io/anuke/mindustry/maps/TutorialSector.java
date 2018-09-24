@@ -13,23 +13,36 @@ import static io.anuke.mindustry.Vars.*;
 public class TutorialSector{
 
     public static Array<Mission> getMissions(){
+        int x = sectorSize/2, y = sectorSize/2;
+
         return Array.with(
             new ItemMission(Items.copper, 30).setMessage("$tutorial.begin"),
-            new BlockMission(ProductionBlocks.mechanicalDrill).setMessage("$tutorial.drill"),
-            new BlockMission(DistributionBlocks.conveyor).setMessage("$tutorial.conveyor"),
+
+            new BlockLocMission(ProductionBlocks.mechanicalDrill, 55, 62).setMessage("$tutorial.drill"),
+
+            new BlockLocMission(DistributionBlocks.conveyor, 57, 62, 0).setShowComplete(false).setMessage("$tutorial.conveyor"),
+            new BlockLocMission(DistributionBlocks.conveyor, 58, 62, 0).setShowComplete(false),
+            new BlockLocMission(DistributionBlocks.conveyor, 59, 62, 0).setShowComplete(false),
+            new BlockLocMission(DistributionBlocks.conveyor, 60, 62, 3).setShowComplete(false),
+
             new ItemMission(Items.copper, 50).setMessage("$tutorial.morecopper"),
-            new BlockMission(TurretBlocks.duo).setMessage("$tutorial.turret"),
-            new BlockMission(ProductionBlocks.mechanicalDrill).setMessage("$tutorial.drillturret"),
+
+            new BlockLocMission(TurretBlocks.duo, 56, 59).setMessage("$tutorial.turret"),
+            new BlockLocMission(ProductionBlocks.mechanicalDrill, 55, 60).setMessage("$tutorial.drillturret"),
+
             new WaveMission(5).setMessage("$tutorial.waves"),
             new ExpandMission(1, 0),
             new ItemMission(Items.lead, 30).setMessage("$tutorial.lead"),
             new ItemMission(Items.copper, 150).setMessage("$tutorial.morecopper"),
+
             new BlockMission(CraftingBlocks.smelter).setMessage("$tutorial.smelter"),
             new ItemMission(Items.densealloy, 30).setMessage("$tutorial.densealloy"),
             new BlockMission(CraftingBlocks.siliconsmelter).setMessage("$tutorial.siliconsmelter"),
             new BlockMission(PowerBlocks.combustionGenerator).setMessage("$tutorial.generator"),
             new BlockMission(PowerBlocks.powerNode).setMessage("$tutorial.node"),
+
             new ItemMission(Items.silicon, 30).setMessage("$tutorial.silicon"),
+
             new BlockMission(UnitBlocks.daggerFactory).setMessage("$tutorial.daggerfactory"),
             new UnitMission(UnitTypes.dagger).setMessage("$tutorial.dagger"),
             new ExpandMission(-1, 0),
@@ -56,10 +69,14 @@ public class TutorialSector{
     private static void generateBase(){
         int x = sectorSize/2, y = sectorSize/2;
         world.setBlock(world.tile(x, y), StorageBlocks.core, waveTeam);
-        world.setBlock(world.tile(x + 1, y + 2), TurretBlocks.duo, waveTeam);
-        world.setBlock(world.tile(x + 1, y - 2), TurretBlocks.duo, waveTeam);
+       // world.setBlock(world.tile(x + 1, y + 2), TurretBlocks.duo, waveTeam);
+        //world.setBlock(world.tile(x + 1, y - 2), TurretBlocks.duo, waveTeam);
         world.setBlock(world.tile(x - 1, y + 2), UnitBlocks.daggerFactory, waveTeam);
         world.setBlock(world.tile(x - 1, y - 3), UnitBlocks.daggerFactory, waveTeam);
+
+        //fill turret ammo
+        //world.tile(x + 1, y + 2).block().handleStack(Items.copper, 1, world.tile(x + 1, y + 2), null);
+        //world.tile(x + 1, y - 2).block().handleStack(Items.copper, 1, world.tile(x + 1, y - 2), null);
 
         //since placed() is not called here, add core manually
         state.teams.get(waveTeam).cores.add(world.tile(x, y));

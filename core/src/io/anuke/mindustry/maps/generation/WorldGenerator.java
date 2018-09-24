@@ -323,7 +323,7 @@ public class WorldGenerator{
         }
 
         if(ores != null && ((Floor) floor).hasOres){
-            int offsetX = x + 1, offsetY = y + 15;
+            int offsetX = x - 4, offsetY = y + 23;
             for(int i = ores.size - 1; i >= 0; i--){
                 Item entry = ores.get(i);
                 if(

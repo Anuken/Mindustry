@@ -28,6 +28,10 @@ public class OverlayRenderer{
         for(Player player : players){
             InputHandler input = control.input(player.playerIndex);
 
+            if(world.getSector() != null){
+                world.getSector().currentMission().drawOverlay();
+            }
+
             if(!input.isDrawing() || player.isDead()) continue;
 
             Shaders.outline.color.set(Palette.accent);
