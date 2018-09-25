@@ -40,7 +40,6 @@ public class ServerControl extends Module{
     private static final int roundExtraTime = 12;
 
     private final CommandHandler handler = new CommandHandler("");
-    private ShuffleMode mode;
     private int gameOvers;
     private boolean inExtraRound;
     private Team winnerTeam;
@@ -53,11 +52,10 @@ public class ServerControl extends Module{
             "admins", "",
             "sector_x", 0,
             "sector_y", 1,
+            "shuffle", true,
             "crashreport", false,
             "port", port
         );
-
-        mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
 
         Timers.setDeltaProvider(() -> Gdx.graphics.getDeltaTime() * 60f);
         Effects.setScreenShakeProvider((a, b) -> {});
@@ -97,11 +95,10 @@ public class ServerControl extends Module{
             if(inExtraRound) return;
             info("Game over!");
 
-            if(mode != ShuffleMode.off){
+            if(Settings.getBool("shuffle")){
                 if(world.getSector() == null){
                     if(world.maps().all().size > 0){
-                        Array<Map> maps = mode == ShuffleMode.both ? world.maps().all() :
-                        mode == ShuffleMode.normal ? world.maps().defaultMaps() : world.maps().customMaps();
+                        Array<Map> maps = world.maps().all();
 
                         Map previous = world.getMap();
                         Map map = previous;
@@ -358,16 +355,14 @@ public class ServerControl extends Module{
             }
         });
 
-        handler.register("shuffle", "<normal/custom/both/off>", "Set map shuffling.", arg -> {
-
-            try{
-                mode = ShuffleMode.valueOf(arg[0]);
-                Settings.putString("shufflemode", arg[0]);
-                Settings.save();
-                info("Shuffle mode set to '{0}'.", arg[0]);
-            }catch(Exception e){
-                err("Unknown shuffle mode '{0}'.", arg[0]);
+        handler.register("shuffle", "<on/off>", "Set map shuffling.", arg -> {
+            if(!arg[0].equals("on") && !arg[0].equals("off")){
+                err("Invalid shuffle mode.");
+                return;
             }
+            Settings.putBool("shuffle", arg[0].equals("on"));
+            Settings.save();
+            info("Shuffle mode set to '{0}'.", arg[0]);
         });
 
         handler.register("kick", "<username...>", "Kick a person by name.", arg -> {
@@ -898,6 +893,8 @@ public class ServerControl extends Module{
             checkPvPGameOver();
         }
 
+        //TODO re implement sector shuffle
+        /*
         if(state.is(State.playing) && world.getSector() != null && !inExtraRound && netServer.admins.getStrict()){
             //all assigned missions are complete
             if(world.getSector().completedMissions >= world.getSector().missions.size){
@@ -917,10 +914,6 @@ public class ServerControl extends Module{
                 //increment completed missions, check next index next frame
                 world.getSector().completedMissions ++;
             }
-        }
-    }
-
-    enum ShuffleMode{
-        normal, custom, both, off
+        }*/
     }
 }

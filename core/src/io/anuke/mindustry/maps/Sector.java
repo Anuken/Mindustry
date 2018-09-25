@@ -3,7 +3,6 @@ package io.anuke.mindustry.maps;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.annotations.Annotations.Serialize;
-import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.maps.missions.Mission;
@@ -37,21 +36,6 @@ public class Sector{
     public transient int difficulty;
     /**Items the player starts with on this sector.*/
     public transient Array<ItemStack> startingItems;
-
-    /**Returns scaled difficulty. This is not just the difficulty ordinal.*/
-    public Difficulty getDifficulty(){
-        if(difficulty == 0){
-            //yes, this means insane tutorial difficulty
-            //(((have fun)))
-            return Difficulty.hard;
-        }else if(difficulty < 4){
-            return Difficulty.normal;
-        }else if(difficulty < 9){
-            return Difficulty.hard;
-        }else{
-            return Difficulty.insane;
-        }
-    }
 
     public Mission currentMission(){
         return completedMissions >= missions.size ? victoryMission : missions.get(completedMissions);

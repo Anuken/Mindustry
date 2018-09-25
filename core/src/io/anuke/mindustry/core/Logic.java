@@ -8,6 +8,7 @@ import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.ResetEvent;
 import io.anuke.mindustry.game.EventType.WaveEvent;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ItemStack;
@@ -87,6 +88,33 @@ public class Logic extends Module{
         }
     }
 
+    private void updateSectors(){
+        if(world.getSector() == null) return;
+
+        world.getSector().currentMission().update();
+
+        //check unlocked sectors
+        while(!world.getSector().complete && world.getSector().currentMission().isComplete()){
+            world.getSector().currentMission().onComplete();
+            world.getSector().completedMissions ++;
+
+            state.mode = world.getSector().currentMission().getMode();
+            world.getSector().currentMission().onBegin();
+            world.sectors().save();
+        }
+
+        //check if all assigned missions are complete
+        if(!world.getSector().complete && world.getSector().completedMissions >= world.getSector().missions.size){
+            state.mode = GameMode.victory;
+
+            world.sectors().completeSector(world.getSector().x, world.getSector().y);
+            world.sectors().save();
+            if(!headless){
+                ui.missions.show(world.getSector());
+            }
+        }
+    }
+
     @Override
     public void update(){
         if(threads.isEnabled() && !threads.isOnThread()) return;
@@ -102,6 +130,8 @@ public class Logic extends Module{
             if(!state.is(State.paused) || Net.active()){
                 Timers.update();
             }
+
+            updateSectors();
 
             if(!Net.client() && !world.isInvalidMap()){
                 checkGameOver();

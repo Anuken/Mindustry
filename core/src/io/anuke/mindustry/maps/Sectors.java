@@ -7,10 +7,10 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
-import io.anuke.mindustry.maps.missions.BattleMission;
 import io.anuke.mindustry.maps.missions.Mission;
 import io.anuke.mindustry.maps.missions.WaveMission;
 import io.anuke.mindustry.type.Item;
@@ -189,6 +189,20 @@ public class Sectors{
         return true;
     }
 
+    public Difficulty getDifficulty(Sector sector){
+        if(sector.difficulty == 0){
+            //yes, this means hard tutorial difficulty
+            //(((have fun)))
+            return Difficulty.hard;
+        }else if(sector.difficulty < 4){
+            return Difficulty.normal;
+        }else if(sector.difficulty < 9){
+            return Difficulty.hard;
+        }else{
+            return Difficulty.insane;
+        }
+    }
+
     public Array<Item> getOres(int x, int y){
         if(x == 0 && y == 0){
             return Array.with(Items.copper);
@@ -281,8 +295,7 @@ public class Sectors{
             //TODO make specfic expansion sector have specific ores
             sector.missions.addAll(TutorialSector.getMissions());
         }else{
-            sector.missions.add(Mathf.randomSeed(sector.getSeed() + 1) < waveChance ? new WaveMission(Math.min(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5, 100))
-                    : new BattleMission());
+            sector.missions.add(new WaveMission(Math.min(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5, 100)));
         }
 
         sector.spawns = new Array<>();
@@ -325,7 +338,7 @@ public class Sectors{
                 int toY = y * sectorSize / sectorImageSize;
 
                 GenResult result = world.generator().generateTile(sector.x, sector.y, toX, toY, false);
-                world.generator().generateTile(secResult, sector.x, sector.y, toX, toY + sectorSize / sectorImageSize, false, null, null);
+                world.generator().generateTile(secResult, sector.x, sector.y, toX, ((y+1) * sectorSize / sectorImageSize), false, null, null);
 
                 int color = ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation, secResult.elevation > result.elevation ? (byte)(1 << 6) : (byte)0);
                 pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, color);

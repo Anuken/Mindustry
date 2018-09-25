@@ -236,7 +236,7 @@ public class World extends Module{
     public void loadSector(Sector sector){
         currentSector = sector;
         state.mode = sector.missions.peek().getMode();
-        state.difficulty = sector.getDifficulty();
+        state.difficulty = sectors.getDifficulty(sector);
         Timers.mark();
         Timers.mark();
 
