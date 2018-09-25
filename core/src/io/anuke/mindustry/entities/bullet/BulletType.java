@@ -78,7 +78,7 @@ public abstract class BulletType extends Content implements BaseBulletType<Bulle
 
     @Override
     public float hitSize(){
-        return hitSize();
+        return hitsize;
     }
 
     @Override
