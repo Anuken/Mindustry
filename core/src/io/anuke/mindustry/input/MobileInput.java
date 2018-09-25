@@ -468,7 +468,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     int y = lineStartY + i * Mathf.sign(tile.y - lineStartY) * Mathf.bool(!result.isX());
 
                     if(!checkOverlapPlacement(x, y, recipe.result) && validPlace(x, y, recipe.result, result.rotation)){
-                        PlaceRequest request = new PlaceRequest(x * tilesize, y * tilesize, recipe, result.rotation);
+                        PlaceRequest request = new PlaceRequest(x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(), recipe, result.rotation);
                         request.scale = 1f;
                         selection.add(request);
                     }
@@ -557,7 +557,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             removeRequest(getRequest(cursor));
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, recipe.result, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, recipe.result)){
             //add to selection queue if it's a valid place position
-            selection.add(lastPlaced = new PlaceRequest(cursor.worldx(), cursor.worldy(), recipe, rotation));
+            selection.add(lastPlaced = new PlaceRequest(cursor.worldx() + recipe.result.offset(), cursor.worldy() + recipe.result.offset(), recipe, rotation));
         }else if(mode == breaking && validBreak(cursor.target().x, cursor.target().y) && !hasRequest(cursor.target())){
             //add to selection queue if it's a valid BREAK position
             cursor = cursor.target();

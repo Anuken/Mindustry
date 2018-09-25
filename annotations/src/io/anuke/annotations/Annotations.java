@@ -9,7 +9,7 @@ public class Annotations{
 
     /** Marks a class as serializable.*/
     @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.SOURCE)
     public @interface Serialize{
 
     }
@@ -63,7 +63,7 @@ public class Annotations{
 
     /** Marks a method as invokable remotely across a server/client connection. */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.SOURCE)
     public @interface Remote{
         /** Specifies the locations from which this method can be invoked. */
         Loc targets() default Loc.server;
@@ -93,7 +93,7 @@ public class Annotations{
      * being the type returned by {@link #value()}.
      */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.SOURCE)
     public @interface WriteClass{
         Class<?> value();
     }
@@ -104,7 +104,7 @@ public class Annotations{
      * and have one parameter, being of type {@link java.nio.ByteBuffer}.
      */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.SOURCE)
     public @interface ReadClass{
         Class<?> value();
     }
