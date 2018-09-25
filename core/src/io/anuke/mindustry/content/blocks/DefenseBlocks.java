@@ -71,7 +71,7 @@ public class DefenseBlocks extends BlockList implements ContentList{
         }};
 
         mendProjector = new MendProjector("mend-projector"){{
-            consumes.power(0.25f);
+            consumes.power(0.2f);
             size = 2;
             consumes.item(Items.phasematter).optional(true);
         }};

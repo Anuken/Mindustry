@@ -287,12 +287,9 @@ public class Sectors{
     }
 
     private void initSector(Sector sector){
-        double waveChance = 0.3;
-
         sector.difficulty = (int)(Mathf.dst(sector.x, sector.y));
 
         if(sector.difficulty == 0){
-            //TODO make specfic expansion sector have specific ores
             sector.missions.addAll(TutorialSector.getMissions());
         }else{
             sector.missions.add(new WaveMission(Math.min(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5, 100)));
@@ -303,8 +300,6 @@ public class Sectors{
         for(Mission mission : sector.missions){
             sector.spawns.addAll(mission.getWaves(sector));
         }
-
-        //sector.ores.addAll(Items.copper);
 
         //set starter items
         if(sector.difficulty > 12){ //now with titanium
