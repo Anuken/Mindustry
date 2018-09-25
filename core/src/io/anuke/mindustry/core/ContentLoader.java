@@ -25,6 +25,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.ThreadArray;
 
 /**
  * Loads all game content.
@@ -110,7 +111,7 @@ public class ContentLoader{
         registerTypes();
 
         for(ContentType type : ContentType.values()){
-            contentMap[type.ordinal()] = new Array<>();
+            contentMap[type.ordinal()] = new ThreadArray<>();
             contentNameMap[type.ordinal()] =  new ObjectMap<>();
         }
 
