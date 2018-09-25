@@ -5,6 +5,7 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
+import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.maps.missions.*;
 import io.anuke.mindustry.type.Item;
@@ -66,7 +67,7 @@ public class TutorialSector{
                 });
             }),
 
-            new ItemMission(Items.lead, 90).setMessage("$tutorial.lead"),
+            new ItemMission(Items.lead, 150).setMessage("$tutorial.lead"),
             new ItemMission(Items.copper, 250).setMessage("$tutorial.morecopper"),
 
             new BlockLocMission(CraftingBlocks.smelter, 58, 69).setMessage("$tutorial.smelter"),
@@ -129,7 +130,9 @@ public class TutorialSector{
                     generateBase();
                 }
             },
-            new BattleMission().setMessage("$tutorial.battle")
+            new BattleMission(){
+                public void generate(Generation gen){} //no
+            }.setMessage("$tutorial.battle")
         );
 
         //find drone marker mission

@@ -206,6 +206,10 @@ public class DesktopInput extends InputHandler{
             return;
         }
 
+        if(Inputs.keyTap(section, "deselect")){
+            player.setMineTile(null);
+        }
+
         if(!ui.hasMouse()){
             if(Inputs.keyTap(section, "select")){
                 if(isPlacing()){

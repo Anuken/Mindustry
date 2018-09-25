@@ -2,7 +2,6 @@ package io.anuke.mindustry.maps.missions;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.Bundles;
@@ -17,11 +16,6 @@ public class ItemMission extends Mission{
     public ItemMission(Item item, int amount){
         this.item = item;
         this.amount = amount;
-    }
-
-    @Override
-    public GameMode getMode(){
-        return GameMode.waves;
     }
 
     @Override

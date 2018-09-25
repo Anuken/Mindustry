@@ -121,6 +121,10 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         this.spawner = tile.packedPosition();
     }
 
+    public void setIntSpawner(int pos){
+        this.spawner = pos;
+    }
+
     /**Sets this to a 'wave' unit, which means it has slightly different AI and will not run out of ammo.*/
     public void setWave(){
         isWave = true;

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
@@ -132,6 +133,13 @@ public class Sectors{
         for(EntityGroup<?> group : Entities.getAllGroups()){
             for(Entity entity : group.all()){
                 entity.set(entity.getX() + shiftX * tilesize, entity.getY() + shiftY * tilesize);
+
+                if(entity instanceof BaseUnit){
+                    Tile spawner = ((BaseUnit) entity).getSpawner();
+                    if(spawner == null) continue;
+                    int i = spawner.packedPosition();
+                    ((BaseUnit) entity).setIntSpawner(world.transform(i, world.width(), world.height(), sector.width*sectorSize, shiftX, shiftY));
+                }
             }
         }
 

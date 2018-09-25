@@ -3,7 +3,6 @@ package io.anuke.mindustry.maps.missions;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.ucore.util.Bundles;
 
 public class UnitMission extends Mission{
@@ -26,10 +25,5 @@ public class UnitMission extends Mission{
     @Override
     public String displayString(){
         return Bundles.format("text.mission.unit", type.localizedName());
-    }
-
-    @Override
-    public GameMode getMode(){
-        return GameMode.noWaves;
     }
 }
