@@ -64,7 +64,6 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         if(type.keepVelocity){
             bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait) owner).getVelocity() : Vector2.Zero);
         }
-        bullet.hitbox.setSize(type.hitsize);
 
         bullet.team = team;
         bullet.type = type;

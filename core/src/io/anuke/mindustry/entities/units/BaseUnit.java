@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
@@ -43,7 +44,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static int timerIndex = 0;
 
     protected static final int timerTarget = timerIndex++;
-
     protected static final int timerShootLeft = timerIndex++;
     protected static final int timerShootRight = timerIndex++;
 
@@ -364,8 +364,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public void added(){
-        hitbox.setSize(type.hitsize);
-        hitboxTile.setSize(type.hitsizeTile);
         state.set(getStartState());
 
         health(maxHealth());
@@ -373,6 +371,16 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         if(isCommanded()){
             onCommand(getCommand());
         }
+    }
+
+    @Override
+    public void getHitbox(Rectangle rectangle){
+        rectangle.setSize(type.hitsize).setCenter(x, y);
+    }
+
+    @Override
+    public void getHitboxTile(Rectangle rectangle){
+        rectangle.setSize(type.hitsizeTile).setCenter(x, y);
     }
 
     @Override

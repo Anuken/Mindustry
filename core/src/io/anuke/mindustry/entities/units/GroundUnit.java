@@ -98,9 +98,9 @@ public abstract class GroundUnit extends BaseUnit{
     @Override
     public void onCommand(UnitCommand command){
         state.set(command == UnitCommand.retreat ? retreat :
-                (command == UnitCommand.attack ? attack :
-                (command == UnitCommand.patrol ? patrol :
-                (null))));
+                  command == UnitCommand.attack ? attack :
+                  command == UnitCommand.patrol ? patrol :
+                  null);
     }
 
     @Override

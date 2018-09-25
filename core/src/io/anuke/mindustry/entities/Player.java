@@ -3,6 +3,7 @@ package io.anuke.mindustry.entities;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.annotations.Annotations.Loc;
@@ -28,7 +29,6 @@ import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock.CoreEntity;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
@@ -47,7 +47,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     private static final int timerShootRight = 1;
     private static final float liftoffBoost = 0.2f;
 
-    //region instance variables, constructor
+    //region instance variables
 
     public float baseRotation;
     public float pointerX, pointerY;
@@ -75,11 +75,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     private Vector2 movement = new Translator();
     private boolean moved;
 
-    public Player(){
-        hitbox.setSize(5);
-        hitboxTile.setSize(4f);
-    }
-
     //endregion
 
     //region unit and event overrides, utility methods
@@ -99,6 +94,16 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         ScorchDecal.create(player.x, player.y);
         player.onDeath();
+    }
+
+    @Override
+    public void getHitbox(Rectangle rectangle){
+        rectangle.setSize(5).setCenter(x, y);
+    }
+
+    @Override
+    public void getHitboxTile(Rectangle rectangle){
+        rectangle.setSize(4).setCenter(x, y);
     }
 
     @Override

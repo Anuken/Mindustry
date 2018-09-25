@@ -20,6 +20,7 @@ public class DeflectorWall extends Wall{
 
     protected float maxDamageDeflect = 10f;
     protected Rectangle rect = new Rectangle();
+    protected Rectangle rect2 = new Rectangle();
 
     public DeflectorWall(String name){
         super(name);
@@ -54,8 +55,10 @@ public class DeflectorWall extends Wall{
 
         float penX = Math.abs(entity.x - bullet.x), penY = Math.abs(entity.y - bullet.y);
 
+        bullet.getHitbox(rect2);
+
         Vector2 position = Physics.raycastRect(bullet.lastPosition().x, bullet.lastPosition().y, bullet.x, bullet.y,
-                rect.setCenter(entity.x, entity.y).setSize(size * tilesize + bullet.hitbox.width + bullet.hitbox.height));
+                rect.setCenter(entity.x, entity.y).setSize(size * tilesize + rect2.width + rect2.height));
 
         if(position != null){
             bullet.set(position.x, position.y);

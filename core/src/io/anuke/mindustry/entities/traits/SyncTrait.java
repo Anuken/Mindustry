@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.traits;
 
-import com.badlogic.gdx.Gdx;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.ucore.entities.trait.Entity;
 
@@ -8,14 +7,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.threads;
-
 public interface SyncTrait extends Entity, TypeTrait{
-
-    /**Whether smoothing of entities is enabled when using multithreading; not yet implemented.*/
-    static boolean isSmoothing(){
-        return threads.isEnabled() && threads.getTPS() <= Gdx.graphics.getFramesPerSecond() / 2f;
-    }
 
     /**Sets the position of this entity and updated the interpolator.*/
     default void setNet(float x, float y){

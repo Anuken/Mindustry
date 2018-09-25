@@ -40,7 +40,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public static final float velocityPercision = 8f;
     /**Maximum absolute value of a velocity vector component.*/
     public static final float maxAbsVelocity = 127f / velocityPercision;
-
     private static final Vector2 moveVector = new Vector2();
 
     public UnitInventory inventory = new UnitInventory(this);
