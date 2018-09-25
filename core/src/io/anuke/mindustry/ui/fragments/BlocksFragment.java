@@ -81,14 +81,16 @@ public class BlocksFragment extends Fragment{
                     }
                 });
 
-                container.add(descTable).fillX().uniformX();
+                float w = 246f;
 
-                container.row();
+                main.add(descTable).width(w);
+
+                main.row();
 
                 //now add the block selection menu
                 selectTable = main.table("pane", select -> {})
                 .margin(10f).marginLeft(0f).marginRight(0f).marginTop(-5)
-                .touchable(Touchable.enabled).right().bottom().get();
+                .touchable(Touchable.enabled).right().bottom().width(w).get();
 
             }).bottom().right().get();
         });

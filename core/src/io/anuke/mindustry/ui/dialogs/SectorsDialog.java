@@ -44,7 +44,7 @@ public class SectorsDialog extends FloatingDialog{
         content().row();
         content().label(() -> Bundles.format("text.mission", selected == null || selected.completedMissions >= selected.missions.size
         ? Bundles.get("text.none") : selected.missions.get(selected.completedMissions).menuDisplayString())
-                        + "[WHITE] " + (selected == null ? "" : Bundles.format("text.save.difficulty", "[LIGHT_GRAY]" + selected.getDifficulty().toString())));
+                        + "[WHITE] " /*+ (selected == null ? "" : Bundles.format("text.save.difficulty", "[LIGHT_GRAY]" + selected.getDifficulty().toString()))*/);
         content().row();
         content().add(new SectorView()).grow();
         content().row();

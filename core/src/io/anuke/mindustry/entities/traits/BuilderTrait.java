@@ -311,9 +311,6 @@ public interface BuilderTrait extends Entity{
 
         Draw.alpha(0.3f + Mathf.absin(Timers.time(), 0.9f, 0.2f));
 
-        Fill.tri(px, py, x2, y2, x1, y1);
-        Fill.tri(px, py, x2, y2, x3, y3);
-
         Draw.alpha(1f);
 
         Lines.line(px, py, x1, y1);

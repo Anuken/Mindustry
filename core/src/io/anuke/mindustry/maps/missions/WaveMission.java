@@ -2,6 +2,7 @@ package io.anuke.mindustry.maps.missions;
 
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
@@ -46,7 +47,9 @@ public class WaveMission extends Mission{
 
     @Override
     public String displayString(){
-        return Bundles.format("text.mission.wave", state.wave, target, (int)(state.wavetime/60));
+        return state.wave > target ?
+        Bundles.format("text.mission.wave.enemies", state.wave, target, Vars.unitGroups[Vars.waveTeam.ordinal()].size()) :
+        Bundles.format("text.mission.wave", state.wave, target, (int)(state.wavetime/60));
     }
 
     @Override
@@ -55,8 +58,15 @@ public class WaveMission extends Mission{
     }
 
     @Override
+    public void update(){
+        if(state.wave > target){
+            state.mode = GameMode.noWaves;
+        }
+    }
+
+    @Override
     public boolean isComplete(){
-        return state.wave >= target;
+        return state.wave > target && Vars.unitGroups[Vars.waveTeam.ordinal()].size() == 0;
     }
 
     @Override

@@ -334,6 +334,15 @@ public class World extends Module{
         }
     }
 
+    public int transform(int packed, int oldWidth, int oldHeight, int newWidth, int shiftX, int shiftY){
+        int x = packed % oldWidth;
+        int y = packed / oldWidth;
+        if(!Mathf.inBounds(x, y, oldWidth, oldHeight)) return -1;
+        x += shiftX;
+        y += shiftY;
+        return y*newWidth + x;
+    }
+
     /**
      * Raycast, but with world coordinates.
      */

@@ -41,7 +41,9 @@ public class Sector{
     /**Returns scaled difficulty. This is not just the difficulty ordinal.*/
     public Difficulty getDifficulty(){
         if(difficulty == 0){
-            return Difficulty.easy;
+            //yes, this means insane tutorial difficulty
+            //(((have fun)))
+            return Difficulty.hard;
         }else if(difficulty < 4){
             return Difficulty.normal;
         }else if(difficulty < 9){

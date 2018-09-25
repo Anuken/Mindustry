@@ -10,6 +10,7 @@ import static io.anuke.mindustry.Vars.defaultTeam;
 import static io.anuke.mindustry.Vars.world;
 
 /**A mission in which the player must place a block.*/
+@Deprecated
 public class BlockMission extends Mission{
     private final Block block;
     private boolean complete;
@@ -33,8 +34,7 @@ public class BlockMission extends Mission{
     }
 
     @Override
-    public void onComplete(){
-        super.onComplete();
+    public void reset(){
         complete = false;
     }
 

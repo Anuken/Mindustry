@@ -49,6 +49,14 @@ public abstract class Mission{
 
     }
 
+    public void update(){
+
+    }
+
+    public void reset(){
+
+    }
+
     /**Shows the unique sector message.*/
     public void showMessage(){
         if(!headless && extraMessage != null){

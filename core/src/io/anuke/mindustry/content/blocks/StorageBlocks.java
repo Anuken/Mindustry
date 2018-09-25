@@ -12,7 +12,7 @@ public class StorageBlocks extends BlockList implements ContentList{
     @Override
     public void load(){
         core = new CoreBlock("core"){{
-            health = 1400;
+            health = 1100;
         }};
 
         vault = new Vault("vault"){{

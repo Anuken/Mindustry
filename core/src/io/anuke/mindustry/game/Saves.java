@@ -79,7 +79,7 @@ public class Saves{
             if(time > Settings.getInt("saveinterval") * 60){
                 saving = true;
 
-                Timers.run(2f, () -> {
+                Timers.runTask(2f, () -> {
                     try{
                         current.save();
                     }catch(Exception e){

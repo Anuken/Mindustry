@@ -215,8 +215,6 @@ public class WorldGenerator{
             }
         }
 
-        //generateOres(tiles, sector.getSeed(), true, ores);
-
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
@@ -242,7 +240,6 @@ public class WorldGenerator{
         return generateTile(result, sectorX, sectorY, localX, localY, detailed, null, null);
     }
 
-    //TODO include ore in result
     /**
      * Gets the generation result from a specific sector at specific coordinates.
      * @param result where to put the generation results
@@ -265,7 +262,7 @@ public class WorldGenerator{
         double iceridge = rid.getValue(x+99999, y, 1f / 300f) + sim3.octaveNoise2D(2, 1f, 1f/14f, x, y)/11f;
         double elevation = elevationOf(x, y, detailed);
         double temp =
-            + sim3.octaveNoise2D(detailed ? 12 : 9, 0.6, 1f / 1100f, x, y);
+            + sim3.octaveNoise2D(detailed ? 12 : 9, 0.6, 1f / 1100f, x - 120, y);
 
         int lerpDst = 20;
         lerpDst *= lerpDst;

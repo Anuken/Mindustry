@@ -41,6 +41,9 @@ public class Sectors{
         }
 
         if(!sector.hasSave()){
+            for(Mission mission : sector.missions){
+                mission.reset();
+            }
             world.loadSector(sector);
             logic.play();
             sector.saveID = control.getSaves().addSave("sector-" + sector.packedPosition()).index;
@@ -53,6 +56,7 @@ public class Sectors{
             sector.getSave().load();
             world.setSector(sector);
             state.set(State.playing);
+            sector.currentMission().onBegin();
         }catch(Exception e){
             Log.err(e);
             sector.getSave().delete();
@@ -145,6 +149,7 @@ public class Sectors{
                 tile.x = (short)(x + shiftX);
                 tile.y = (short)(y + shiftY);
                 newTiles[x + shiftX][y + shiftY] = tile;
+                tile.block().transformLinks(tile, world.width(), world.height(), sector.width*sectorSize, sector.height*sectorSize, shiftX, shiftY);
             }
         }
 
@@ -170,6 +175,8 @@ public class Sectors{
 
         //end loading of map
         world.endMapLoad();
+
+        threads.runGraphics(() -> createTexture(sector));
 
         return true;
     }
@@ -296,6 +303,10 @@ public class Sectors{
 
     private void createTexture(Sector sector){
         if(headless) return; //obviously not created or needed on server
+
+        if(sector.texture != null){
+            sector.texture.dispose();
+        }
 
         Pixmap pixmap = new Pixmap(sectorImageSize * sector.width, sectorImageSize * sector.height, Format.RGBA8888);
         GenResult secResult = new GenResult();

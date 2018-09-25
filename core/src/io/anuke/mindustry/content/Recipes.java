@@ -14,17 +14,17 @@ public class Recipes implements ContentList{
     @Override
     public void load(){
         //DEBUG
-        new Recipe(distribution, DebugBlocks.itemSource).setMode(GameMode.sandbox).setHidden(true);
-        new Recipe(distribution, DebugBlocks.itemVoid).setMode(GameMode.sandbox).setHidden(true);
-        new Recipe(liquid, DebugBlocks.liquidSource).setMode(GameMode.sandbox).setHidden(true);
-        new Recipe(power, DebugBlocks.powerVoid).setMode(GameMode.sandbox).setHidden(true);
-        new Recipe(power, DebugBlocks.powerInfinite).setMode(GameMode.sandbox).setHidden(true);
+        new Recipe(distribution, DebugBlocks.itemSource).setMode(GameMode.sandbox).setHidden(true).setAlwaysUnlocked(true);
+        new Recipe(distribution, DebugBlocks.itemVoid).setMode(GameMode.sandbox).setHidden(true).setAlwaysUnlocked(true);
+        new Recipe(liquid, DebugBlocks.liquidSource).setMode(GameMode.sandbox).setHidden(true).setAlwaysUnlocked(true);
+        new Recipe(power, DebugBlocks.powerVoid).setMode(GameMode.sandbox).setHidden(true).setAlwaysUnlocked(true);
+        new Recipe(power, DebugBlocks.powerInfinite).setMode(GameMode.sandbox).setHidden(true).setAlwaysUnlocked(true);
 
         //DEFENSE
 
         //walls
-        new Recipe(defense, DefenseBlocks.copperWall, new ItemStack(Items.copper, 12));
-        new Recipe(defense, DefenseBlocks.copperWallLarge, new ItemStack(Items.copper, 12 * 4));
+        new Recipe(defense, DefenseBlocks.copperWall, new ItemStack(Items.copper, 12)).setAlwaysUnlocked(true);
+        new Recipe(defense, DefenseBlocks.copperWallLarge, new ItemStack(Items.copper, 12 * 4)).setAlwaysUnlocked(true);
 
         new Recipe(defense, DefenseBlocks.denseAlloyWall, new ItemStack(Items.densealloy, 12));
         new Recipe(defense, DefenseBlocks.denseAlloyWallLarge, new ItemStack(Items.densealloy, 12 * 4));
@@ -51,7 +51,7 @@ public class Recipes implements ContentList{
             .setDependencies(Items.blastCompound);
 
         //TURRETS
-        new Recipe(weapon, TurretBlocks.duo, new ItemStack(Items.copper, 40));
+        new Recipe(weapon, TurretBlocks.duo, new ItemStack(Items.copper, 40)).setAlwaysUnlocked(true);
         new Recipe(weapon, TurretBlocks.arc, new ItemStack(Items.copper, 50), new ItemStack(Items.lead, 30), new ItemStack(Items.silicon, 20));
         new Recipe(weapon, TurretBlocks.hail, new ItemStack(Items.copper, 60), new ItemStack(Items.densealloy, 35));
         new Recipe(weapon, TurretBlocks.lancer, new ItemStack(Items.copper, 50), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 90));
@@ -65,13 +65,13 @@ public class Recipes implements ContentList{
         new Recipe(weapon, TurretBlocks.meltdown, new ItemStack(Items.copper, 500), new ItemStack(Items.lead, 700), new ItemStack(Items.densealloy, 600), new ItemStack(Items.surgealloy, 650), new ItemStack(Items.silicon, 650));
 
         //DISTRIBUTION
-        new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.copper, 1));
+        new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.copper, 1)).setAlwaysUnlocked(true);
         new Recipe(distribution, DistributionBlocks.titaniumconveyor, new ItemStack(Items.copper, 2), new ItemStack(Items.titanium, 1));
         new Recipe(distribution, DistributionBlocks.phaseConveyor, new ItemStack(Items.phasematter, 10), new ItemStack(Items.silicon, 15), new ItemStack(Items.lead, 20), new ItemStack(Items.densealloy, 20));
 
         //starter lead transportation
-        new Recipe(distribution, DistributionBlocks.junction, new ItemStack(Items.copper, 2));
-        new Recipe(distribution, DistributionBlocks.router, new ItemStack(Items.copper, 6));
+        new Recipe(distribution, DistributionBlocks.junction, new ItemStack(Items.copper, 2)).setAlwaysUnlocked(true);
+        new Recipe(distribution, DistributionBlocks.router, new ItemStack(Items.copper, 6)).setAlwaysUnlocked(true);
 
         //advanced densealloy transporation
         new Recipe(distribution, DistributionBlocks.distributor, new ItemStack(Items.densealloy, 8), new ItemStack(Items.copper, 8));
@@ -140,7 +140,7 @@ public class Recipes implements ContentList{
         );
 
         //DRILLS, PRODUCERS
-        new Recipe(production, ProductionBlocks.mechanicalDrill, new ItemStack(Items.copper, 50));
+        new Recipe(production, ProductionBlocks.mechanicalDrill, new ItemStack(Items.copper, 45)).setAlwaysUnlocked(true);
         new Recipe(production, ProductionBlocks.pneumaticDrill, new ItemStack(Items.copper, 60), new ItemStack(Items.densealloy, 50));
         new Recipe(production, ProductionBlocks.laserdrill, new ItemStack(Items.copper, 70), new ItemStack(Items.densealloy, 90), new ItemStack(Items.silicon, 60), new ItemStack(Items.titanium, 50));
         new Recipe(production, ProductionBlocks.blastdrill, new ItemStack(Items.copper, 130), new ItemStack(Items.densealloy, 180), new ItemStack(Items.silicon, 120), new ItemStack(Items.titanium, 100), new ItemStack(Items.thorium, 60));

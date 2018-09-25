@@ -2,6 +2,7 @@ package io.anuke.mindustry.maps.missions;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
+import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.threads;
 
@@ -28,7 +29,7 @@ public class ActionMission extends Mission{
 
     @Override
     public String displayString(){
-        return "";
+        return Bundles.get("text.loading");
     }
 
     @Override
