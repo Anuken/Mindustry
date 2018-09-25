@@ -42,9 +42,7 @@ public class EventType{
 
     }
 
-    /**
-     * Called from the logic thread. Do not access graphics here!
-     */
+    /**Called from the logic thread. Do not access graphics here!*/
     public static class TileChangeEvent implements Event{
         public final Tile tile;
 

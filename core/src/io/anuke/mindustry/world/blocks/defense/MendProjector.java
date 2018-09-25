@@ -34,7 +34,8 @@ public class MendProjector extends Block{
     protected float reload = 250f;
     protected float range = 50f;
     protected float healPercent = 6f;
-    protected float phaseBoost = 10f;
+    protected float phaseBoost = 12f;
+    protected float phaseRangeBoost = 40f;
     protected float useTime = 300f;
 
     public MendProjector(String name){
@@ -65,7 +66,7 @@ public class MendProjector extends Block{
         }
 
         if(entity.charge >= reload){
-            float realRange = range + entity.phaseHeat * 20f;
+            float realRange = range + entity.phaseHeat * phaseRangeBoost;
 
             Effects.effect(BlockFx.healWaveMend, Hue.mix(color, phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
             entity.charge = 0f;

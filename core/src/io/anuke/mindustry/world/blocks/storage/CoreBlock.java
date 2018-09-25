@@ -16,6 +16,7 @@ import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.maps.TutorialSector;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
@@ -77,6 +78,14 @@ public class CoreBlock extends StorageBlock{
     public static void setCoreSolid(Tile tile, boolean solid){
         CoreEntity entity = tile.entity();
         if(entity != null) entity.solid = solid;
+    }
+
+    @Override
+    public void onProximityUpdate(Tile tile) {
+        //add cores
+        if(!state.teams.get(tile.getTeam()).cores.contains(tile, true)){
+            state.teams.get(tile.getTeam()).cores.add(tile);
+        }
     }
 
     @Override
@@ -217,7 +226,7 @@ public class CoreBlock extends StorageBlock{
                     }
                 }
 
-                if(!found){
+                if(!found && !TutorialSector.supressDrone()){
                     BaseUnit unit = droneType.create(tile.getTeam());
                     unit.setSpawner(tile);
                     unit.setDead(true);

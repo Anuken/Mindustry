@@ -40,7 +40,7 @@ public class ContentDatabase{
      * @return whether or not this content was newly unlocked.
      */
     public boolean unlockContent(UnlockableContent content){
-        if(!content.canBeUnlocked()) return false;
+        if(!content.canBeUnlocked() || content.alwaysUnlocked()) return false;
 
         if(!unlocked.containsKey(content.getContentType())){
             unlocked.put(content.getContentType(), new ObjectSet<>());

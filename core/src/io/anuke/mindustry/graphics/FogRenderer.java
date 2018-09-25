@@ -40,12 +40,19 @@ public class FogRenderer implements Disposable{
     private Rectangle rect = new Rectangle();
     private boolean dirty;
 
+    private boolean isOffseted;
+    private int offsettedX, offsettedY;
+
     public FogRenderer(){
         Events.on(WorldLoadGraphicsEvent.class, event -> {
-            dispose();
+            if(!isOffseted){
+                dispose();
+            }
 
             padding = world.getSector() != null ? mapPadding + extraPadding : 0;
             shadowPadding = world.getSector() != null ? fshadowPadding : -1;
+
+            FrameBuffer lastBuffer = buffer;
 
             buffer = new FrameBuffer(Format.RGBA8888, world.width() + padding*2, world.height() + padding*2, false);
             changeQueue.clear();
@@ -53,7 +60,19 @@ public class FogRenderer implements Disposable{
             //clear buffer to black
             buffer.begin();
             Graphics.clear(0, 0, 0, 1f);
+
+            if(isOffseted){
+                Core.batch.getProjectionMatrix().setToOrtho2D(-padding, -padding, buffer.getWidth(), buffer.getHeight());
+                Core.batch.begin();
+                Core.batch.draw(lastBuffer.getColorBufferTexture(), offsettedX, offsettedY + lastBuffer.getColorBufferTexture().getHeight(),
+                            lastBuffer.getColorBufferTexture().getWidth(), -lastBuffer.getColorBufferTexture().getHeight());
+                Core.batch.end();
+            }
             buffer.end();
+
+            if(isOffseted){
+                lastBuffer.dispose();
+            }
 
             for(int x = 0; x < world.width(); x++){
                 for(int y = 0; y < world.height(); y++){
@@ -66,6 +85,8 @@ public class FogRenderer implements Disposable{
 
             pixelBuffer = ByteBuffer.allocateDirect(world.width() * world.height() * 4);
             dirty = true;
+
+            isOffseted = false;
         });
 
         Events.on(TileChangeEvent.class, event -> threads.runGraphics(() -> {
@@ -73,6 +94,12 @@ public class FogRenderer implements Disposable{
                 changeQueue.add(event.tile);
             }
         }));
+    }
+
+    public void setLoadingOffset(int x, int y){
+        isOffseted = true;
+        offsettedX = x;
+        offsettedY = y;
     }
 
     public void writeFog(){

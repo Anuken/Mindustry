@@ -40,7 +40,7 @@ public class UnitTypes implements ContentList{
             speed = 0.2f;
             maxVelocity = 0.8f;
             range = 50f;
-            healSpeed = 0.25f;
+            healSpeed = 0.22f;
             health = 60;
         }};
 
@@ -50,7 +50,7 @@ public class UnitTypes implements ContentList{
             drag = 0.4f;
             range = 40f;
             weapon = Weapons.chainBlaster;
-            health = 150;
+            health = 130;
         }};
 
         titan = new UnitType("titan", Titan.class, Titan::new){{
@@ -108,7 +108,7 @@ public class UnitTypes implements ContentList{
             health = 220;
             buildPower = 0.9f;
             minePower = 1.1f;
-            healSpeed = 0.55f;
+            healSpeed = 0.5f;
             toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium);
         }};
     }

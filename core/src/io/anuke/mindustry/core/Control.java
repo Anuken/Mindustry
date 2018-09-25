@@ -13,6 +13,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentDatabase;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
@@ -315,29 +316,20 @@ public class Control extends Module{
 
         Platform.instance.updateRPC();
 
-        if(!Settings.has("4.0-warning")){
-            Settings.putBool("4.0-warning", true);
+        if(!Settings.getBool("4.0-warning-2", false)){
 
             Timers.run(5f, () -> {
                 FloatingDialog dialog = new FloatingDialog("[orange]WARNING![]");
-                dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
-                dialog.content().add("The beta version you are about to play should be considered very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
-                        "A large portion of content is still unimplemented. \nAll current art and UI is temporary, and will be re-drawn before release. " +
-                        "\n\n[accent]Saves and maps may be corrupted without warning between updates.[] You have been warned!").wrap().width(400f);
+                dialog.buttons().addButton("$text.ok", () -> {
+                    dialog.hide();
+                    Settings.putBool("4.0-warning-2", true);
+                    Settings.save();
+                }).size(100f, 60f);
+                dialog.content().add("Reminder: The beta version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
+                        "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
+                        "All current art and UI is temporary, and will be re-drawn before release. " +
+                        "\n\n[accent]Saves and maps may be corrupted without warning between updates.").wrap().width(400f);
                 dialog.show();
-
-            });
-        }
-
-        if(!Settings.has("4.0-no-sound")){
-            Settings.putBool("4.0-no-sound", true);
-
-            Timers.run(4f, () -> {
-                FloatingDialog dialog = new FloatingDialog("[orange]Attention![]");
-                dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
-                dialog.content().add("You might have noticed that 4.0 does not have any sound.\nThis is [orange]intentional![] Sound will be added in a later update.\n\n[LIGHT_GRAY](now stop reporting this as a bug)").wrap().width(400f);
-                dialog.show();
-
             });
         }
     }
@@ -346,6 +338,32 @@ public class Control extends Module{
     public void runUpdateLogic(){
         if(!state.is(State.menu)){
             renderer.minimap().updateUnitArray();
+        }
+    }
+
+    private void updateSectors(){
+        if(world.getSector() == null) return;
+
+        world.getSector().currentMission().update();
+
+        //TODO move sector code into logic class
+        //check unlocked sectors
+        while(!world.getSector().complete && world.getSector().currentMission().isComplete()){
+            world.getSector().currentMission().onComplete();
+            world.getSector().completedMissions ++;
+
+            state.mode = world.getSector().currentMission().getMode();
+            world.getSector().currentMission().onBegin();
+            world.sectors().save();
+        }
+
+        //check if all assigned missions are complete
+        if(!world.getSector().complete && world.getSector().completedMissions >= world.getSector().missions.size){
+            state.mode = GameMode.victory;
+
+            world.sectors().completeSector(world.getSector().x, world.getSector().y);
+            world.sectors().save();
+            ui.missions.show(world.getSector());
         }
     }
 
@@ -374,19 +392,7 @@ public class Control extends Module{
                 Platform.instance.updateRPC();
             }
 
-            //check unlocked sectors
-            if(world.getSector() != null && !world.getSector().complete){
-                //all assigned missions are complete
-                if(world.getSector().completedMissions >= world.getSector().missions.size){
-
-                    world.sectors().completeSector(world.getSector().x, world.getSector().y);
-                    world.sectors().save();
-                    ui.missions.show(world.getSector());
-                }else if(world.getSector().currentMission().isComplete()){
-                    //increment completed missions, check next index next frame
-                    world.getSector().completedMissions ++;
-                }
-            }
+            updateSectors();
 
             //check unlocks every 2 seconds
             if(world.getSector() != null && Timers.get("timerCheckUnlock", 120)){

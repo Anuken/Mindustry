@@ -19,7 +19,7 @@ public class OreBlock extends Floor{
         this.base = base;
         this.variants = 3;
         this.minimapColor = ore.color;
-        this.blends = block -> block instanceof OreBlock && ((OreBlock) block).base != base;
+        this.blends = block -> (block instanceof OreBlock && ((OreBlock) block).base != base) || (!(block instanceof OreBlock) && block != base);
         this.tileBlends = (tile, other) -> tile.getElevation() < other.getElevation();
         this.edge = base.name;
     }

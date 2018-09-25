@@ -63,7 +63,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 1700;
             size = 2;
             consumes.power(0.05f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.copper, 10)});
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10)});
         }};
 
         titanFactory = new UnitFactory("titan-factory"){{

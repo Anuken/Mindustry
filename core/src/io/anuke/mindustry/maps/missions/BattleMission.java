@@ -7,15 +7,10 @@ import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.FortressGenerator;
 import io.anuke.mindustry.maps.generation.Generation;
-import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
-public class BattleMission implements Mission{
+public class BattleMission extends Mission{
     private final static int coreX = 60, coreY = 60;
-    @Override
-    public void display(Table table){
-        table.add("$text.mission.battle");
-    }
 
     @Override
     public GameMode getMode(){

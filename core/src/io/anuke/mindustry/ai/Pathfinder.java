@@ -40,6 +40,10 @@ public class Pathfinder{
         });
     }
 
+    public void activateTeamPath(Team team){
+        createFor(team);
+    }
+
     public void update(){
         if(Net.client()) return;
 

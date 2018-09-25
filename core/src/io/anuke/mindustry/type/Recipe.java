@@ -33,6 +33,7 @@ public class Recipe extends UnlockableContent{
     public GameMode mode;
     public boolean isPad;
     public boolean hidden;
+    public boolean alwaysUnlocked;
 
     private UnlockableContent[] dependencies;
     private Block[] blockDependencies;
@@ -58,15 +59,16 @@ public class Recipe extends UnlockableContent{
      * Returns unlocked recipes in a category.
      * Do not call on the server backend, as unlocking does not exist!
      */
-    public static void getUnlockedByCategory(Category category, Array<Recipe> r){
+    public static void getUnlockedByCategory(Category category, Array<Recipe> arr){
         if(headless){
             throw new RuntimeException("Not implemented on the headless backend!");
         }
 
-        r.clear();
-        for(Recipe recipe : content.recipes()){
-            if(recipe.category == category && (control.database().isUnlocked(recipe))){
-                r.add(recipe);
+        arr.clear();
+        for(Recipe r : content.recipes()){
+            if(r.category == category && (control.database().isUnlocked(r)) &&
+            !((r.mode != null && r.mode != state.mode) || (r.desktopOnly && mobile) || (r.isPad && !state.mode.showPads))){
+                arr.add(r);
             }
         }
     }
@@ -107,9 +109,15 @@ public class Recipe extends UnlockableContent{
         return this;
     }
 
+    public Recipe setAlwaysUnlocked(boolean unlocked){
+        this.alwaysUnlocked = unlocked;
+        return this;
+    }
+
+
     @Override
     public boolean alwaysUnlocked(){
-        return hidden;
+        return alwaysUnlocked;
     }
 
     @Override

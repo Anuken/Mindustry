@@ -36,19 +36,19 @@ public class Vars{
     //time between waves in frames (on normal mode)
     public static final float wavespace = 60 * 60 * 1.5f;
 
-    public static final float mineTransferRange = 310f;
+    public static final float mineTransferRange = 220f;
     //set ridiculously high for now
     public static final float coreBuildRange = 999999f;
     //team of the player by default
     public static final Team defaultTeam = Team.blue;
     //team of the enemy in waves
     public static final Team waveTeam = Team.red;
-    public static final float unlockResourceScaling = 1.5f;
+    public static final float unlockResourceScaling = 1f;
     public static final int maxTextLength = 150;
     public static final int maxNameLength = 40;
     public static final float itemSize = 5f;
     public static final int tilesize = 8;
-    public static final int sectorSize = 300;
+    public static final int sectorSize = 120;
     public static final int mapPadding = 3;
     public static final int invalidSector = Integer.MAX_VALUE;
     public static Locale[] locales;
