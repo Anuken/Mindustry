@@ -163,9 +163,7 @@ public class TutorialSector{
         //world.tile(x + 1, y - 2).block().handleStack(Items.copper, 1, world.tile(x + 1, y - 2), null);
 
         //since placed() is not called here, add core manually
-        if(!state.teams.get(waveTeam).cores.contains(world.tile(x, y), true)){
-            state.teams.get(waveTeam).cores.add(world.tile(x, y));
-        }
+        state.teams.get(waveTeam).cores.add(world.tile(x, y));
     }
 
     private static class MarkerBlockMission extends BlockLocMission{
