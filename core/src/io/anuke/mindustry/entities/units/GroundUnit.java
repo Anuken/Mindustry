@@ -80,7 +80,13 @@ public abstract class GroundUnit extends BaseUnit{
         public void update(){
             target = getClosestCore();
             if(target != null){
-                circle(60f + Mathf.absin(Timers.time() + id*23525, 70f, 1200f));
+                vec.trns(baseRotation, type.speed);
+                velocity.add(vec.x, vec.y);
+                vec.trns(baseRotation, type.hitsizeTile);
+                Tile tile = world.tileWorld(x + vec.x, y + vec.y);
+                if((tile == null || tile.solid()) || distanceTo(target) > 400f + Mathf.randomSeed(id)*350f){
+                    baseRotation += Mathf.sign(id % 2 - 0.5f) * Timers.delta() * 3f;
+                }
             }
         }
     },
