@@ -27,7 +27,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
-        uCoreVersion = '115a42ff7d5bca0a6073b5f1e0b67cc4464c560e'
+        uCoreVersion = '1a357ce1714f20663ec1680f64f4ff43631de07d'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -92,7 +92,7 @@ project(":desktop") {
     dependencies {
         compile project(":core")
         compile project(":kryonet")
-        if(new File(projectDir.parent, '../debug').exists()) compile project(":debug")
+        if(new File(projectDir.parent, '../debug').exists() && System.properties["release"] == null) compile project(":debug")
 
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"

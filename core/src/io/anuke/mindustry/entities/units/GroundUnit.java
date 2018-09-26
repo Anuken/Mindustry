@@ -78,7 +78,10 @@ public abstract class GroundUnit extends BaseUnit{
     },
     patrol = new UnitState(){
         public void update(){
-            //TODO
+            target = getClosestCore();
+            if(target != null){
+                //circle(60f + Mathf.absin(Timers.time() + id*23525, 70f, 1200f));
+            }
         }
     },
     retreat = new UnitState(){
