@@ -29,6 +29,7 @@ public abstract class GroundUnit extends BaseUnit{
     protected static Translator vec = new Translator();
 
     protected float walkTime;
+    protected float stuckTime;
     protected float baseRotation;
     protected Weapon weapon;
 
@@ -80,12 +81,16 @@ public abstract class GroundUnit extends BaseUnit{
         public void update(){
             target = getClosestCore();
             if(target != null){
-                vec.trns(baseRotation, type.speed);
-                velocity.add(vec.x, vec.y);
-                vec.trns(baseRotation, type.hitsizeTile);
-                Tile tile = world.tileWorld(x + vec.x, y + vec.y);
-                if((tile == null || tile.solid()) || distanceTo(target) > 400f + Mathf.randomSeed(id)*350f){
-                    baseRotation += Mathf.sign(id % 2 - 0.5f) * Timers.delta() * 3f;
+                if(distanceTo(target) > 400f){
+                    moveAwayFromCore();
+                }else{
+                    vec.trns(baseRotation, type.speed);
+                    velocity.add(vec.x, vec.y);
+                    vec.trns(baseRotation, type.hitsizeTile);
+                    Tile tile = world.tileWorld(x + vec.x, y + vec.y);
+                    if((tile == null || tile.solid() || tile.floor().drownTime > 0) || stuckTime > 10f){
+                        baseRotation += Mathf.sign(id % 2 - 0.5f) * Timers.delta() * 3f;
+                    }
                 }
             }
         }
@@ -143,6 +148,8 @@ public abstract class GroundUnit extends BaseUnit{
     @Override
     public void update(){
         super.update();
+
+        stuckTime = !vec.set(x, y).sub(lastPosition().x, lastPosition().y).isZero(0.0001f) ? 0f : stuckTime + Timers.delta();
 
         if(!velocity.isZero(0.0001f) && (Units.invalidateTarget(target, this) || (distanceTo(target) > getWeapon().getAmmo().getRange()))){
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), 0.2f);
