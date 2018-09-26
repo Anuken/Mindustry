@@ -80,7 +80,13 @@ public abstract class GroundUnit extends BaseUnit{
         public void update(){
             target = getClosestCore();
             if(target != null){
-                //circle(60f + Mathf.absin(Timers.time() + id*23525, 70f, 1200f));
+                vec.trns(baseRotation, type.speed);
+                velocity.add(vec.x, vec.y);
+                vec.trns(baseRotation, type.hitsizeTile);
+                Tile tile = world.tileWorld(x + vec.x, y + vec.y);
+                if((tile == null || tile.solid()) || distanceTo(target) > 400f + Mathf.randomSeed(id)*350f){
+                    baseRotation += Mathf.sign(id % 2 - 0.5f) * Timers.delta() * 3f;
+                }
             }
         }
     },
@@ -138,7 +144,7 @@ public abstract class GroundUnit extends BaseUnit{
     public void update(){
         super.update();
 
-        if(!velocity.isZero(0.0001f) && (target == null || (distanceTo(target) > getWeapon().getAmmo().getRange()))){
+        if(!velocity.isZero(0.0001f) && (Units.invalidateTarget(target, this) || (distanceTo(target) > getWeapon().getAmmo().getRange()))){
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), 0.2f);
         }
     }
@@ -234,6 +240,20 @@ public abstract class GroundUnit extends BaseUnit{
     public void readSave(DataInput stream) throws IOException{
         weapon = content.getByID(ContentType.weapon, stream.readByte());
         super.readSave(stream);
+    }
+
+    protected void circle(float circleLength){
+        if(target == null) return;
+
+        vec.set(target.getX() - x, target.getY() - y);
+
+        if(vec.len() < circleLength){
+            vec.rotate((circleLength - vec.len()) / circleLength * 180f);
+        }
+
+        vec.setLength(type.speed * Timers.delta());
+
+        velocity.add(vec);
     }
 
     protected void moveToCore(){

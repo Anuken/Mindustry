@@ -141,7 +141,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public boolean targetHasFlag(BlockFlag flag){
         return target instanceof TileEntity && ((TileEntity) target).tile.block().flags != null &&
-                ((TileEntity) target).tile.block().flags.contains(flag);
+            ((TileEntity) target).tile.block().flags.contains(flag);
     }
 
     public void updateRespawning(){
@@ -167,16 +167,14 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
     }
 
-    /**
-     * Only runs when the unit has a target.
-     */
+    /**Only runs when the unit has a target.*/
     public void behavior(){
 
     }
 
     public void updateTargeting(){
         if(target == null || (target instanceof Unit && (target.isDead() || target.getTeam() == team))
-                || (target instanceof TileEntity && ((TileEntity) target).tile.entity == null)){
+        || (target instanceof TileEntity && ((TileEntity) target).tile.entity == null)){
             target = null;
         }
     }
@@ -221,9 +219,9 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
                 float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 60f);
                 float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 3, 1f) - 1f;
                 Draw.rect(stack.item.region,
-                        x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
-                        y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
-                        itemSize, itemSize, rotation);
+                    x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
+                    y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
+                    itemSize, itemSize, rotation);
             }
         }
     }

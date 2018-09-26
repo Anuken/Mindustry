@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
@@ -473,7 +474,7 @@ public class NetServer extends Module{
         dataStream.writeFloat(state.wavetime);
         dataStream.writeInt(state.wave);
 
-        Array<Tile> cores = state.teams.get(player.getTeam()).cores;
+        ObjectSet<Tile> cores = state.teams.get(player.getTeam()).cores;
 
         dataStream.writeByte(cores.size);
 
