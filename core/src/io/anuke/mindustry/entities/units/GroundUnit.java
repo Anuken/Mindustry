@@ -46,40 +46,16 @@ public abstract class GroundUnit extends BaseUnit{
 
             if(core != null && dst < getWeapon().getAmmo().getRange() / 1.1f){
                 target = core;
-            }else{
-                retarget(() -> targetClosest());
             }
 
-            if(target != null){
-                if(core != null){
-                    if(dst > getWeapon().getAmmo().getRange() * 0.5f){
-                        moveToCore();
-                    }
-
-                }else{
-                    moveToCore();
-                }
-
-                if(distanceTo(target) < getWeapon().getAmmo().getRange()){
-                    rotate(angleTo(target));
-
-                    if(Mathf.angNear(angleTo(target), rotation, 13f)){
-                        AmmoType ammo = getWeapon().getAmmo();
-
-                        Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.bullet.speed);
-
-                        getWeapon().update(GroundUnit.this, to.x, to.y);
-                    }
-                }
-
-            }else{
+            if(dst > getWeapon().getAmmo().getRange() * 0.5f){
                 moveToCore();
             }
         }
     },
     patrol = new UnitState(){
         public void update(){
-            target = getClosestCore();
+            TileEntity target = getClosestCore();
             if(target != null){
                 if(distanceTo(target) > 400f){
                     moveAwayFromCore();
@@ -214,6 +190,20 @@ public abstract class GroundUnit extends BaseUnit{
         if(health <= health * type.retreatPercent && !isCommanded()){
             setState(retreat);
         }
+
+        if(!Units.invalidateTarget(target, this)){
+            if(distanceTo(target) < getWeapon().getAmmo().getRange()){
+                rotate(angleTo(target));
+
+                if(Mathf.angNear(angleTo(target), rotation, 13f)){
+                    AmmoType ammo = getWeapon().getAmmo();
+
+                    Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.bullet.speed);
+
+                    getWeapon().update(GroundUnit.this, to.x, to.y);
+                }
+            }
+        }
     }
 
     @Override
@@ -223,6 +213,8 @@ public abstract class GroundUnit extends BaseUnit{
         if(Units.invalidateTarget(target, team, x, y, Float.MAX_VALUE)){
             target = null;
         }
+
+        retarget(this::targetClosest);
     }
 
     @Override
