@@ -14,8 +14,9 @@ android:
     - addon-google_apis-google-27
     - build-tools-27.0.3
 
-script: 
+script:
     - ./gradlew desktop:dist
+    - ./gradlew server:dist
 
 after_success:
     - chmod +x upload-build.sh

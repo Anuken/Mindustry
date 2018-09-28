@@ -4,16 +4,14 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.ObjectSet;
-import io.anuke.mindustry.game.EventType.UnlockEvent;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Settings;
 
+import static io.anuke.mindustry.Vars.*;
+
 public class ContentDatabase{
-    /** Maps unlockable type names to a set of unlocked content.*/
-    private ObjectMap<ContentType, ObjectSet<String>> unlocked = new ObjectMap<>();
-    /** Whether unlockables have changed since the last save.*/
-    private boolean dirty;
+    private ObjectMap<String, ContentUnlockSet> sets = new ObjectMap<>();
 
     static{
         Settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
@@ -21,15 +19,7 @@ public class ContentDatabase{
     
     /** Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(UnlockableContent content){
-        if(content.alwaysUnlocked()) return true;
-
-        if(!unlocked.containsKey(content.getContentType())){
-            unlocked.put(content.getContentType(), new ObjectSet<>());
-        }
-
-        ObjectSet<String> set = unlocked.get(content.getContentType());
-
-        return set.contains(content.getContentName());
+        return rootSet().isUnlocked(content) || currentSet().isUnlocked(content);
     }
 
     /**
@@ -40,58 +30,81 @@ public class ContentDatabase{
      * @return whether or not this content was newly unlocked.
      */
     public boolean unlockContent(UnlockableContent content){
-        if(!content.canBeUnlocked() || content.alwaysUnlocked()) return false;
+        if(rootSet().isUnlocked(content)) return false;
+        return currentSet().unlockContent(content);
+    }
 
-        if(!unlocked.containsKey(content.getContentType())){
-            unlocked.put(content.getContentType(), new ObjectSet<>());
+    private ContentUnlockSet currentSet(){
+        //client connected to server: always return the IP-specific set
+        if(Net.client()){
+            return getSet(Net.getLastIP());
+        }else if(world.getSector() != null || state.mode.infiniteResources){ //sector-sandbox have shared set
+            return rootSet();
+        }else if(control != null && control.getSaves().getCurrent() != null){ //per-save set
+            return getSet(String.valueOf(control.getSaves().getCurrent().index));
+        }else{ //dedicated server set
+            return rootSet();
         }
+    }
 
-        boolean ret = unlocked.get(content.getContentType()).add(content.getContentName());
+    private ContentUnlockSet rootSet(){
+        return getSet("root");
+    }
 
-        //fire unlock event so other classes can use it
-        if(ret){
-            content.onUnlock();
-            Events.fire(new UnlockEvent(content));
-            dirty = true;
+    private ContentUnlockSet getSet(String name){
+        if(!sets.containsKey(name)){
+            sets.put(name, new ContentUnlockSet());
         }
-
-        return ret;
+        return sets.get(name);
     }
 
     /** Returns whether unlockables have changed since the last save.*/
     public boolean isDirty(){
-        return dirty;
+        for(ContentUnlockSet set : sets.values()){
+            if(set.isDirty()){
+                return true;
+            }
+        }
+        return false;
     }
 
-    /** Clears all unlocked content.*/
+    /** Clears all unlocked content. Automatically saves.*/
     public void reset(){
-        unlocked.clear();
-        dirty = true;
+        sets.clear();
+        save();
     }
 
     public void load(){
-        ObjectMap<ContentType, Array<String>> result = Settings.getBinary("content-database", ObjectMap.class, () -> new ObjectMap<>());
+        sets.clear();
 
-        for(Entry<ContentType, Array<String>> entry : result.entries()){
-            ObjectSet<String> set = new ObjectSet<>();
-            set.addAll(entry.value);
-            unlocked.put(entry.key, set);
+        ObjectMap<String, ObjectMap<ContentType, Array<String>>> result = Settings.getBinary("content-database", ObjectMap.class, () -> new ObjectMap<>());
+
+        for(Entry<String, ObjectMap<ContentType, Array<String>>> outer : result.entries()){
+            ContentUnlockSet cset = new ContentUnlockSet();
+            for (Entry<ContentType, Array<String>> entry : outer.value.entries()){
+                ObjectSet<String> set = new ObjectSet<>();
+                set.addAll(entry.value);
+                cset.getUnlocked().put(entry.key, set);
+            }
+            sets.put(outer.key, cset);
         }
-
-        dirty = false;
     }
 
     public void save(){
+        ObjectMap<String, ObjectMap<ContentType, Array<String>>> output = new ObjectMap<>();
 
-        ObjectMap<ContentType, Array<String>> write = new ObjectMap<>();
+        for(Entry<String, ContentUnlockSet> centry : sets.entries()){
+            ObjectMap<ContentType, Array<String>> write = new ObjectMap<>();
 
-        for(Entry<ContentType, ObjectSet<String>> entry : unlocked.entries()){
-            write.put(entry.key, entry.value.iterator().toArray());
+            for(Entry<ContentType, ObjectSet<String>> entry : centry.value.getUnlocked().entries()){
+                write.put(entry.key, entry.value.iterator().toArray());
+            }
+
+            output.put(centry.key, write);
         }
 
-        Settings.putBinary("content-database", write);
+        Settings.putBinary("content-database", output);
         Settings.save();
-        dirty = false;
     }
 
 }

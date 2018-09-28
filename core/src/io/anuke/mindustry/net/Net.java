@@ -31,6 +31,7 @@ public class Net{
     private static boolean server;
     private static boolean active;
     private static boolean clientLoaded;
+    private static String lastIP;
     private static Array<Object> packetQueue = new Array<>();
     private static ObjectMap<Class<?>, Consumer> clientListeners = new ObjectMap<>();
     private static ObjectMap<Class<?>, BiConsumer<Integer, Object>> serverListeners = new ObjectMap<>();
@@ -79,6 +80,7 @@ public class Net{
      * Connect to an address.
      */
     public static void connect(String ip, int port) throws IOException{
+        lastIP = ip + ":" + port;
         if(!active){
             clientProvider.connect(ip, port);
             active = true;
@@ -86,6 +88,11 @@ public class Net{
         }else{
             throw new IOException("Already connected!");
         }
+    }
+
+    /**Returns the last IP connected to.*/
+    public static String getLastIP() {
+        return lastIP;
     }
 
     /**
