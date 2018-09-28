@@ -366,7 +366,7 @@ public class Control extends Module{
             }
 
             //check unlocks every 2 seconds
-            if(world.getSector() != null && Timers.get("timerCheckUnlock", 120)){
+            if(!state.mode.infiniteResources && Timers.get("timerCheckUnlock", 120)){
                 checkUnlockableBlocks();
 
                 //save if the db changed

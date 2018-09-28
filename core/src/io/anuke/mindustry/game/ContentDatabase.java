@@ -77,7 +77,7 @@ public class ContentDatabase{
     public void load(){
         sets.clear();
 
-        ObjectMap<String, ObjectMap<ContentType, Array<String>>> result = Settings.getBinary("content-database", ObjectMap.class, () -> new ObjectMap<>());
+        ObjectMap<String, ObjectMap<ContentType, Array<String>>> result = Settings.getBinary("content-sets", ObjectMap.class, () -> new ObjectMap<>());
 
         for(Entry<String, ObjectMap<ContentType, Array<String>>> outer : result.entries()){
             ContentUnlockSet cset = new ContentUnlockSet();
@@ -103,7 +103,7 @@ public class ContentDatabase{
             output.put(centry.key, write);
         }
 
-        Settings.putBinary("content-database", output);
+        Settings.putBinary("content-sets", output);
         Settings.save();
     }
 
