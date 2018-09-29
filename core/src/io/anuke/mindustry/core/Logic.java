@@ -125,8 +125,6 @@ public class Logic extends Module{
 
         if(!state.is(State.menu)){
 
-            if(control != null) control.triggerUpdateInput();
-
             if(!state.is(State.paused) || Net.active()){
                 Timers.update();
             }

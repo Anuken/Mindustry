@@ -69,7 +69,7 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void drawOutlined(){
-        Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
+        Tile cursor = tileAt(Gdx.input.getX(), Gdx.input.getY());
 
         if(cursor == null) return;
 
@@ -170,7 +170,7 @@ public class DesktopInput extends InputHandler{
 
         rotation = Mathf.mod(rotation + (int) Inputs.getAxisTapped(section, "rotate"), 4);
 
-        Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
+        Tile cursor = tileAt(Gdx.input.getX(), Gdx.input.getY());
 
         if(player.isDead()){
             cursorType = normal;
@@ -200,7 +200,7 @@ public class DesktopInput extends InputHandler{
     }
 
     void pollInput(){
-        Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
+        Tile cursor = tileAt(Gdx.input.getX(), Gdx.input.getY());
         if(cursor == null){
             mode = none;
             return;
@@ -271,12 +271,12 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public float getMouseX(){
-        return !controlling ? control.gdxInput().getX() : controlx;
+        return !controlling ? Gdx.input.getX() : controlx;
     }
 
     @Override
     public float getMouseY(){
-        return !controlling ? control.gdxInput().getY() : controly;
+        return !controlling ? Gdx.input.getY() : controly;
     }
 
     @Override
@@ -329,8 +329,8 @@ public class DesktopInput extends InputHandler{
         }
 
         if(!controlling){
-            controlx = control.gdxInput().getX();
-            controly = control.gdxInput().getY();
+            controlx = Gdx.input.getX();
+            controly = Gdx.input.getY();
         }
     }
 

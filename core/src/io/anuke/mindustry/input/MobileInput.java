@@ -338,7 +338,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //Draw lines
         if(lineMode){
-            Tile tile = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
+            Tile tile = tileAt(Gdx.input.getX(), Gdx.input.getY());
 
             if(tile != null){
 

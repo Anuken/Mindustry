@@ -219,7 +219,7 @@ public class Block extends BaseBlock {
     /**Call when some content is produced. This unlocks the content if it is applicable.*/
     public void useContent(UnlockableContent content){
         if(!headless){
-            control.database().unlockContent(content);
+            control.unlocks().unlockContent(content);
         }
     }
 

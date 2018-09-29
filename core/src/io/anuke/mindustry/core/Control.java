@@ -1,7 +1,6 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -11,7 +10,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.ContentDatabase;
+import io.anuke.mindustry.game.Unlocks;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.input.DefaultKeybinds;
@@ -44,7 +43,7 @@ public class Control extends Module{
     private boolean hiscore = false;
     private boolean wasPaused = false;
     private Saves saves;
-    private ContentDatabase db;
+    private Unlocks unlocks;
     private InputHandler[] inputs = {};
     private ObjectMap<Sound, Long> soundMap = new ObjectMap<>();
 
@@ -53,7 +52,7 @@ public class Control extends Module{
     public Control(){
 
         saves = new Saves();
-        db = new ContentDatabase();
+        unlocks = new Unlocks();
 
         Inputs.useControllers(!gwt);
 
@@ -66,7 +65,7 @@ public class Control extends Module{
         Core.atlas.setErrorRegion("error");
         content.initialize(Content::load);
 
-        db.load();
+        unlocks.load();
 
         Sounds.setFalloff(9000f);
         Sounds.setPlayer((sound, volume) -> {
@@ -219,12 +218,8 @@ public class Control extends Module{
         System.arraycopy(oldi, 0, inputs, 0, inputs.length);
     }
 
-    public ContentDatabase database(){
-        return db;
-    }
-
-    public Input gdxInput(){
-        return Gdx.input;
+    public Unlocks unlocks(){
+        return unlocks;
     }
 
     public void setError(Throwable error){
@@ -237,10 +232,6 @@ public class Control extends Module{
 
     public InputHandler input(int index){
         return inputs[index];
-    }
-
-    public void triggerUpdateInput(){
-        //Gdx.input = proxy;
     }
 
     public void playMap(Map map){
@@ -265,10 +256,10 @@ public class Control extends Module{
 
         if(entity == null) return;
 
-        entity.items.forEach((item, amount) -> control.database().unlockContent(item));
+        entity.items.forEach((item, amount) -> control.unlocks().unlockContent(item));
 
         if(players[0].inventory.hasItem()){
-            control.database().unlockContent(players[0].inventory.getItem().item);
+            control.unlocks().unlockContent(players[0].inventory.getItem().item);
         }
 
         outer:
@@ -279,7 +270,7 @@ public class Control extends Module{
                     if(!entity.items.has(stack.item, Math.min((int) (stack.amount * unlockResourceScaling), 2000))) continue outer;
                 }
 
-                if(control.database().unlockContent(recipe)){
+                if(control.unlocks().unlockContent(recipe)){
                     ui.hudfrag.showUnlock(recipe);
                 }
             }
@@ -349,8 +340,6 @@ public class Control extends Module{
 
         saves.update();
 
-        triggerUpdateInput();
-
         for(InputHandler inputHandler : inputs){
             inputHandler.updateController();
         }
@@ -369,9 +358,9 @@ public class Control extends Module{
             if(!state.mode.infiniteResources && Timers.get("timerCheckUnlock", 120)){
                 checkUnlockableBlocks();
 
-                //save if the db changed
-                if(db.isDirty()){
-                    db.save();
+                //save if the unlocks changed
+                if(unlocks.isDirty()){
+                    unlocks.save();
                 }
             }
 

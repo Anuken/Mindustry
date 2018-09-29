@@ -232,11 +232,3 @@ project(":kryonet") {
         compile 'com.github.Anuken:WaifUPnP:05eb46bc577fd7674596946ba288c96c0cedd893'
     }
 }
-
-project(":reporter"){
-    apply plugin: "java"
-}
-
-tasks.eclipse.doLast {
-    delete ".project"
-}

@@ -480,7 +480,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             return;
         }else{
             //unlock mech when used
-            control.database().unlockContent(mech);
+            control.unlocks().unlockContent(mech);
         }
 
         if(mobile){

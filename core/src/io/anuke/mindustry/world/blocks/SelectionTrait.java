@@ -38,7 +38,7 @@ public interface SelectionTrait{
         }
 
         for(Item item : items){
-            if(!control.database().isUnlocked(item)) continue;
+            if(!control.unlocks().isUnlocked(item)) continue;
 
             ImageButton button = cont.addImageButton("white", "toggle", 24, () -> consumer.accept(item))
                     .group(group).get();

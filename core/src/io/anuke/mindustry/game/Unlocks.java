@@ -10,7 +10,8 @@ import io.anuke.ucore.core.Settings;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class ContentDatabase{
+/**Stores player unlocks. Clientside only.*/
+public class Unlocks{
     private ObjectMap<String, ContentUnlockSet> sets = new ObjectMap<>();
 
     static{
@@ -40,10 +41,8 @@ public class ContentDatabase{
             return getSet(Net.getLastIP());
         }else if(world.getSector() != null || state.mode.infiniteResources){ //sector-sandbox have shared set
             return rootSet();
-        }else if(control != null && control.getSaves().getCurrent() != null){ //per-save set
-            return getSet(String.valueOf(control.getSaves().getCurrent().index));
-        }else{ //dedicated server set
-            return rootSet();
+        }else{ //per-mode set
+            return getSet(state.mode.name());
         }
     }
 
