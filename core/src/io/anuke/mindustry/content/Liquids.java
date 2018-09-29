@@ -17,6 +17,11 @@ public class Liquids implements ContentList{
                 tier = 0;
                 effect = StatusEffects.wet;
             }
+
+            @Override
+            public boolean alwaysUnlocked() {
+                return true;
+            }
         };
 
         lava = new Liquid("lava", Color.valueOf("e37341")){

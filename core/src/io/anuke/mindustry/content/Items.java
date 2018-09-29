@@ -17,6 +17,7 @@ public class Items implements ContentList{
             hardness = 1;
             cost = 0.6f;
             genOre = true;
+            alwaysUnlocked = true;
         }};
 
         lead = new Item("lead", Color.valueOf("8c7fa9")){{

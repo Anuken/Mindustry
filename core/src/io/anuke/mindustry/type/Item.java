@@ -38,6 +38,8 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     public float cost = 3f;
     /**Whether this item has ores generated for it.*/
     public boolean genOre = false;
+    /**If true, item is always unlocked.*/
+    public boolean alwaysUnlocked = false;
 
     public Item(String name, Color color){
         this.name = name;
@@ -45,13 +47,18 @@ public class Item extends UnlockableContent implements Comparable<Item>{
         this.description = Bundles.getOrNull("item." + this.name + ".description");
 
         if(!Bundles.has("item." + this.name + ".name")){
-            Log.err("Warning: item '" + name + "' is missing a localized name. Add the follow to bundle.properties:");
+            Log.err("Warning: item '" + name + "' is missing a localized name. Add the following to bundle.properties:");
             Log.err("item." + this.name + ".name=" + Strings.capitalize(name.replace('-', '_')));
         }
     }
 
     public void load(){
         this.region = Draw.region("item-" + name);
+    }
+
+    @Override
+    public boolean alwaysUnlocked() {
+        return alwaysUnlocked;
     }
 
     @Override
