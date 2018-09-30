@@ -53,8 +53,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public float pointerX, pointerY;
     public String name = "name";
     public String uuid, usid;
-    public boolean isAdmin, isTransferring, isShooting, isBoosting, isAlt, isMobile;
-    public float boostHeat, altHeat;
+    public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile;
+    public float boostHeat, shootHeat;
     public boolean achievedFlight;
     public Color color = new Color();
     public Mech mech;
@@ -435,8 +435,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     //region update methods
 
-    float lastx, lasty;
-
     @Override
     public void update(){
         hitTime -= Timers.delta();
@@ -459,8 +457,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         Tile tile = world.tileWorld(x, y);
 
-        altHeat = Mathf.lerpDelta(altHeat, isAlt ? 1f : 0f, mech.altChargeAlpha);
         boostHeat = Mathf.lerpDelta(boostHeat, (tile != null && tile.solid()) || (isBoosting && ((!movement.isZero() && moved) || !isLocal)) ? 1f : 0f, 0.08f);
+        shootHeat = Mathf.lerpDelta(shootHeat, isShooting() ? 1f : 0f, 0.06f);
         mech.updateAlt(this); //updated regardless
 
         if(!isLocal){
@@ -513,11 +511,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 }
                 Effects.effect(UnitFx.unitLand, tile.floor().minimapColor, x, y, tile.floor().isLiquid ? 1f : 0.5f);
             }
+            mech.onLand(this);
             achievedFlight = false;
         }
 
         isBoosting = Inputs.keyDown("dash") && !mech.flying;
-        isAlt = Inputs.keyDown("ability") && !mech.flying && !isBoosting;
 
         //if player is in solid block
         if(tile != null && tile.solid()){
@@ -712,7 +710,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         trail.clear();
         carrier = null;
         health = maxHealth();
-        altHeat = boostHeat = drownTime = hitTime = 0f;
+        boostHeat = drownTime = hitTime = 0f;
         mech = (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
         placeQueue.clear();
 
@@ -794,7 +792,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
         buffer.writeUTF(name); //TODO writing strings is very inefficient
-        buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2)| (Bits.toByte(isAlt) << 3));
+        buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? -1 : mining.packedPosition());
@@ -813,7 +811,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         isAdmin = (bools & 1) != 0;
         dead = (bools & 2) != 0;
         boolean boosting = (bools & 4) != 0;
-        boolean alt = (bools & 8) != 0;
         color.set(buffer.readInt());
         mech = content.getByID(ContentType.mech, buffer.readByte());
         int mine = buffer.readInt();
@@ -831,7 +828,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }else{
             mining = world.tile(mine);
             isBoosting = boosting;
-            isAlt = alt;
         }
     }
 

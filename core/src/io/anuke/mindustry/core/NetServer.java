@@ -296,7 +296,7 @@ public class NetServer extends Module{
         float rotation, float baseRotation,
         float xVelocity, float yVelocity,
         Tile mining,
-        boolean boosting, boolean shooting, boolean alting,
+        boolean boosting, boolean shooting,
         BuildRequest[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
@@ -322,7 +322,6 @@ public class NetServer extends Module{
         player.setMineTile(mining);
         player.isBoosting = boosting;
         player.isShooting = shooting;
-        player.isAlt = alting;
         player.getPlaceQueue().clear();
         for(BuildRequest req : requests){
             //auto-skip done requests

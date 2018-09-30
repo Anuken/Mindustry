@@ -6,19 +6,17 @@ import com.badlogic.gdx.math.Rectangle;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.types.AlphaDrone;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.maps.TutorialSector;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Mech;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
@@ -26,7 +24,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.unitGroups;
 
 public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
@@ -39,6 +37,8 @@ public class Mechs implements ContentList{
 
         alpha = new Mech("alpha-mech", false){
             int maxDrones = 3;
+            float buildTime = 100f;
+
             {
                 drillPower = 1;
                 mineSpeed = 1.5f;
@@ -46,18 +46,14 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.85f;
                 weapon = Weapons.blaster;
                 maxSpeed = 4f;
-                altChargeAlpha = 0.02f;
                 trailColorTo = Color.valueOf("ffd37f");
                 armor = 20f;
             }
 
             @Override
             public void updateAlt(Player player){
-                if(getDrones(player) >= maxDrones){
-                    player.altHeat = 0f;
-                }
 
-                if(player.altHeat >= 0.91f){
+                if(getDrones(player) < maxDrones && !TutorialSector.supressDrone() && player.timer.get(Player.timerAbility, buildTime)){
                     if(!Net.client()) {
                         AlphaDrone drone = (AlphaDrone) UnitTypes.alphaDrone.create(player.getTeam());
                         drone.leader = player;
@@ -65,14 +61,6 @@ public class Mechs implements ContentList{
                         drone.add();
                     }
                     Effects.effect(UnitFx.unitLand, player);
-                    player.altHeat = 0f;
-                }
-            }
-
-            @Override
-            public void draw(Player player){
-                if(getDrones(player) < maxDrones){
-                    player.hitTime = Math.max(player.hitTime, player.altHeat * Unit.hitDuration);
                 }
             }
 
@@ -86,6 +74,8 @@ public class Mechs implements ContentList{
         };
 
         delta = new Mech("delta-mech", false){
+            float cooldown = 120;
+
             {
                 drillPower = -1;
                 speed = 0.75f;
@@ -98,32 +88,26 @@ public class Mechs implements ContentList{
                 weapon = Weapons.shockgun;
                 trailColorTo = Color.valueOf("d3ddff");
                 maxSpeed = 5f;
-                altChargeAlpha = 0.03f;
             }
 
             @Override
-            public void updateAlt(Player player){
-                if(player.altHeat >= 0.91f){
-                    Effects.shake(3f, 3f, player);
+            public void onLand(Player player){
+                if(player.timer.get(Player.timerAbility, cooldown)){
+                    Effects.shake(1f, 1f, player);
+                    Effects.effect(UnitFx.landShock, player);
                     for(int i = 0; i < 8; i++){
-                        Timers.run(Mathf.random(5f), () -> Lightning.create(player.getTeam(), BulletFx.hitLancer, player.getTeam().color, 15f, player.x, player.y, Mathf.random(360f), 20));
+                        Timers.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), BulletFx.hitLancer, player.getTeam().color, 17f, player.x, player.y, Mathf.random(360f), 14));
                     }
-                    player.altHeat = 0f;
                 }
-            }
-
-            @Override
-            public void draw(Player player){
-                super.draw(player);
-                player.hitTime = Math.max(player.hitTime, player.altHeat * Unit.hitDuration);
             }
         };
 
         tau = new Mech("tau-mech", false){
-            protected float healRange = 60f;
-            protected float healAmount = 10f;
-
-            protected Rectangle rect = new Rectangle();
+            float healRange = 60f;
+            float healAmount = 10f;
+            float healReload = 160f;
+            Rectangle rect = new Rectangle();
+            boolean wasHeadled;
 
             {
                 drillPower = 4;
@@ -137,44 +121,29 @@ public class Mechs implements ContentList{
                 weapon = Weapons.healBlaster;
                 maxSpeed = 5f;
                 armor = 15f;
-                altChargeAlpha = 0.05f;
                 trailColorTo = Palette.heal;
-            }
-
-            @Override
-            public void draw(Player player){
-                super.draw(player);
-                player.hitTime = Math.max(player.hitTime, player.altHeat * Unit.hitDuration);
             }
 
             @Override
             public void updateAlt(Player player){
 
-                if(player.altHeat >= 0.91f){
-                    Effects.effect(UnitFx.healWave, player);
+                if(player.timer.get(Player.timerAbility, healReload)){
+                    wasHeadled = false;
+
                     rect.setSize(healRange*2f).setCenter(player.x, player.y);
                     Units.getNearby(player.getTeam(), rect, unit -> {
                         if(unit.distanceTo(player) <= healRange){
                             if(unit.health < unit.maxHealth()){
                                 Effects.effect(UnitFx.heal, unit);
+                                wasHeadled = true;
                             }
                             unit.healBy(healAmount);
                         }
                     });
 
-                    int blockRange = (int)(healRange/tilesize);
-                    int px = world.toTile(player.x), py = world.toTile(player.y);
-
-                    for(int x = -blockRange; x <= blockRange; x++){
-                        for(int y = -blockRange; y <= blockRange; y++){
-                            if(Mathf.dst(x, y) > blockRange) continue;
-                            Tile tile = world.tile(px + x, py + y);
-                            if(tile != null){
-                                Fire.extinguish(tile, 1000f);
-                            }
-                        }
+                    if(wasHeadled){
+                        Effects.effect(UnitFx.healWave, player);
                     }
-                    player.altHeat = 0f;
                 }
             }
         };
@@ -199,12 +168,12 @@ public class Mechs implements ContentList{
 
             @Override
             public float getRotationAlpha(Player player){
-                return 0.6f - player.altHeat * 0.3f;
+                return 0.6f - player.shootHeat * 0.3f;
             }
 
             @Override
             public float spreadX(Player player){
-                return player.altHeat*2f;
+                return player.shootHeat*2f;
             }
 
             @Override
@@ -215,24 +184,24 @@ public class Mechs implements ContentList{
 
             @Override
             public void updateAlt(Player player){
-                float scl = 1f - player.altHeat/2f;
+                float scl = 1f - player.shootHeat/2f;
                 player.getVelocity().scl(scl);
             }
 
             @Override
             public float getExtraArmor(Player player){
-                return player.altHeat * 30f;
+                return player.shootHeat * 30f;
             }
 
             @Override
             public void draw(Player player){
-                if(player.altHeat <= 0.01f) return;
+                if(player.shootHeat <= 0.01f) return;
 
                 float alpha = Core.batch.getColor().a;
-                Shaders.build.progress = player.altHeat;
+                Shaders.build.progress = player.shootHeat;
                 Shaders.build.region = armorRegion;
                 Shaders.build.time = Timers.time() / 10f;
-                Shaders.build.color.set(Palette.accent).a = player.altHeat;
+                Shaders.build.color.set(Palette.accent).a = player.shootHeat;
                 Graphics.shader(Shaders.build);
                 Draw.alpha(1f);
                 Draw.rect(armorRegion, player.snappedX(), player.snappedY(), player.rotation);
