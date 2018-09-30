@@ -83,8 +83,11 @@ public class MassDriver extends Block{
         DriverBulletData data = Pooling.obtain(DriverBulletData.class, DriverBulletData::new);
         data.from = entity;
         data.to = other;
+        int totalUsed = 0;
         for(int i = 0; i < content.items().size; i++){
-            data.items[i] = entity.items.get(content.item(i));
+            int maxTransfer = Math.min(entity.items.get(content.item(i)), ((MassDriver) tile.block()).itemCapacity - totalUsed);
+            data.items[i] = maxTransfer;
+            totalUsed += maxTransfer;
         }
         entity.items.clear();
 
@@ -148,6 +151,11 @@ public class MassDriver extends Block{
 
         if(entity.reload > 0f){
             entity.reload = Mathf.clamp(entity.reload - entity.delta() / reloadTime);
+        }
+
+        //unload when dest is full
+        if(!linkValid(tile) || (link.entity.items.total() >= itemCapacity) && entity.items.total() > 0){
+            entity.isUnloading = true;
         }
 
         if(!entity.isRecieving){
@@ -282,12 +290,12 @@ public class MassDriver extends Block{
 
             //add all the items possible
             for(int i = 0; i < data.items.length; i++){
-                int maxAdd = Math.min(data.items[i], itemCapacity - totalItems);
+                int maxAdd = Math.min(data.items[i], itemCapacity*2 - totalItems);
                 items.add(content.item(i), maxAdd);
                 data.items[i] -= maxAdd;
                 totalItems += maxAdd;
 
-                if(totalItems >= itemCapacity){
+                if(totalItems >= itemCapacity*2){
                     break;
                 }
             }
@@ -297,7 +305,6 @@ public class MassDriver extends Block{
                 int amountDropped = Mathf.random(0, data.items[i]);
                 if(amountDropped > 0){
                     float angle = Mathf.range(180f);
-                    float vs = Mathf.random(0f, 4f);
                     Effects.effect(EnvironmentFx.dropItem, Color.WHITE, bullet.x, bullet.y, angle, content.item(i));
                 }
             }
@@ -317,11 +324,13 @@ public class MassDriver extends Block{
         @Override
         public void write(DataOutputStream stream) throws IOException{
             stream.writeInt(link);
+            stream.writeFloat(rotation);
         }
 
         @Override
         public void read(DataInputStream stream) throws IOException{
             link = stream.readInt();
+            rotation = stream.readFloat();
         }
     }
 }
