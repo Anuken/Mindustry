@@ -43,7 +43,7 @@ public class Tile implements PosTrait, TargetTrait{
     private byte team;
     /** Tile elevation. -1 means slope.*/
     private byte elevation;
-    /** Visibility status: 3 states, but saved as a single bit. 0 = unexplored, 1 = visited, 2 = currently visible (saved as 1)*/
+    /** Fog visibility status: 3 states, but saved as a single bit. 0 = unexplored, 1 = visited, 2 = currently visible (saved as 1)*/
     private byte visibility;
 
     public Tile(int x, int y){

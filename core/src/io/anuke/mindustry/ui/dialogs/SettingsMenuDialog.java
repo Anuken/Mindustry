@@ -136,6 +136,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.screenshakePref();
         //game.checkPref("smoothcam", true);
         game.checkPref("effects", true);
+        if(mobile){
+            game.checkPref("autotarget", true);
+        }
         //game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
         game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Bundles.format("setting.seconds", i));
         game.pref(new Setting(){

@@ -210,32 +210,31 @@ public class DesktopInput extends InputHandler{
             player.setMineTile(null);
         }
 
-        if(!ui.hasMouse()){
-            if(Inputs.keyTap(section, "select")){
-                if(isPlacing()){
-                    selectX = cursor.x;
-                    selectY = cursor.y;
-                    mode = placing;
-                }else{
-                    //only begin shooting if there's no cursor event
-                    if (!tileTapped(cursor) && !tryTapPlayer(Graphics.mouseWorld().x, Graphics.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
-                            !tryBeginMine(cursor) && player.getMineTile() == null) {
-                        player.isShooting = true;
-                    }
-                }
-            }else if(Inputs.keyTap(section, "deselect") && (recipe != null || mode != none || player.isBuilding())){
-                if(recipe == null){
-                    player.clearBuilding();
-                }
-
-                recipe = null;
-                mode = none;
-            }else if(Inputs.keyTap(section, "break")){
+        if(Inputs.keyTap(section, "select") && !ui.hasMouse()){
+            if(isPlacing()){
                 selectX = cursor.x;
                 selectY = cursor.y;
-                mode = breaking;
+                mode = placing;
+            }else{
+                //only begin shooting if there's no cursor event
+                if (!tileTapped(cursor) && !tryTapPlayer(Graphics.mouseWorld().x, Graphics.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
+                        !tryBeginMine(cursor) && player.getMineTile() == null) {
+                    player.isShooting = true;
+                }
             }
+        }else if(Inputs.keyTap(section, "deselect") && (recipe != null || mode != none || player.isBuilding())){
+            if(recipe == null){
+                player.clearBuilding();
+            }
+
+            recipe = null;
+            mode = none;
+        }else if(Inputs.keyTap(section, "break") && !ui.hasMouse()){
+            selectX = cursor.x;
+            selectY = cursor.y;
+            mode = breaking;
         }
+
 
         if(Inputs.keyRelease(section, "break") || Inputs.keyRelease(section, "select")){
 

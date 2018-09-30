@@ -664,7 +664,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
                 if(target == null){
                     isShooting = false;
-                    target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
+                    if(Settings.getBool("autotarget")){
+                        target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
+                    }
                 }else if(target.isValid()){
                     //rotate toward and shoot the target
                     if(mech.turnCursor){
