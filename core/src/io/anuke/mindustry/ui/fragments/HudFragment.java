@@ -103,8 +103,16 @@ public class HudFragment extends Fragment{
 
             cont.row();
 
-            TextButton waves = cont.addButton("", ()->{}).fillX().height(66f).get();
+            Stack stack = new Stack();
+            TextButton waves = new TextButton("");
+            Table btable = new Table();
+
+            stack.add(waves);
+            stack.add(btable);
+
             addWaveTable(waves);
+            addPlayButton(btable);
+            cont.add(stack).fillX().height(66f);
 
             cont.row();
 
@@ -335,28 +343,30 @@ public class HudFragment extends Fragment{
         }
     }
 
-    private String getEnemiesRemaining(){
-        int enemies = unitGroups[Team.red.ordinal()].size();
-        if(enemies == 1){
-            return Bundles.format("text.enemies.single", enemies);
-        }else{
-            return Bundles.format("text.enemies", enemies);
-        }
-    }
-
     private void addWaveTable(TextButton table){
         wavetable = table;
-        float uheight = 66f;
 
         IntFormat wavef = new IntFormat("text.wave");
-        IntFormat timef = new IntFormat("text.wave.waiting");
+        IntFormat waitf = new IntFormat("text.wave.waiting");
+        IntFormat enemyf = new IntFormat("text.wave.enemy");
+        IntFormat enemiesf = new IntFormat("text.wave.enemies");
 
         table.clearChildren();
         table.setTouchable(Touchable.enabled);
 
         table.background("button");
-        table.labelWrap(() -> world.getSector() == null ? wavef.get(state.wave) :
-                Bundles.format("text.mission.display", world.getSector().currentMission().displayString())).growX();
+
+        table.labelWrap(() ->
+            world.getSector() == null ?
+                (unitGroups[waveTeam.ordinal()].size() > 0 && state.mode.disableWaveTimer ?
+                wavef.get(state.wave) + "\n" + (unitGroups[waveTeam.ordinal()].size() == 1 ?
+                    enemyf.get(unitGroups[waveTeam.ordinal()].size()) :
+                    enemiesf.get(unitGroups[waveTeam.ordinal()].size())) :
+                wavef.get(state.wave) + "\n" +
+                    (!state.mode.disableWaveTimer ?
+                    Bundles.format("text.wave.waiting", (int)(state.wavetime/60)) :
+                    Bundles.get("text.waiting"))) :
+            Bundles.format("text.mission.display", world.getSector().currentMission().displayString())).growX();
 
         table.clicked(() -> {
             if(world.getSector() != null && world.getSector().currentMission().hasMessage()){
@@ -366,18 +376,16 @@ public class HudFragment extends Fragment{
 
         table.setDisabled(() -> !(world.getSector() != null && world.getSector().currentMission().hasMessage()));
         table.visible(() -> !((world.getSector() == null && state.mode.disableWaves) || !state.mode.showMission));
-
-        //playButton(uheight);
     }
 
-    private void playButton(float uheight){
-        wavetable.addImageButton("icon-play", 30f, () -> {
+    private void addPlayButton(Table table){
+        table.right().addImageButton("icon-play", 30f, () -> {
             if(Net.client() && players[0].isAdmin){
                 Call.onAdminRequest(players[0], AdminAction.wave);
             }else{
                 state.wavetime = 0f;
             }
-        }).height(uheight).fillX().right().padTop(-8f).padBottom(-12f).padLeft(-15).padRight(-10).width(40f).update(l -> {
+        }).growY().fillX().right().width(40f).update(l -> {
             boolean vis = state.mode.disableWaveTimer && ((Net.server() || players[0].isAdmin) || !Net.active());
             boolean paused = state.is(State.paused) || !vis;
 

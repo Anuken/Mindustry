@@ -32,10 +32,6 @@ public class Maps implements Disposable{
     /**Used for storing a list of custom map names for GWT.*/
     private Array<String> customMapNames;
 
-    public Maps(){
-
-    }
-
     /**Returns a list of all maps, including custom ones.*/
     public Array<Map> all(){
         return allMaps;

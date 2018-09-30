@@ -136,7 +136,7 @@ public class Control extends Module{
 
             int last = Settings.getInt("hiscore" + world.getMap().name, 0);
 
-            if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer){
+            if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer && world.getSector() == null){
                 Settings.putInt("hiscore" + world.getMap().name, state.wave);
                 Settings.save();
                 hiscore = true;
