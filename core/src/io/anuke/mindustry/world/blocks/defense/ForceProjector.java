@@ -16,7 +16,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.entities.impl.BaseEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.graphics.Draw;
@@ -127,7 +127,7 @@ public class ForceProjector extends Block {
         float realRadius = realRadius(entity);
 
         if(!entity.broken){
-            EntityPhysics.getNearby(bulletGroup, tile.drawx(), tile.drawy(), realRadius*2f, bullet -> {
+            EntityQuery.getNearby(bulletGroup, tile.drawx(), tile.drawy(), realRadius*2f, bullet -> {
                 AbsorbTrait trait = (AbsorbTrait)bullet;
                 if(trait.canBeAbsorbed() && trait.getTeam() != tile.getTeam() && isInsideHexagon(trait.getX(), trait.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
                     trait.absorb();

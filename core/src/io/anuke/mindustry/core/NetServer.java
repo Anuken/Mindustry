@@ -27,7 +27,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.io.ByteBufferOutput;
 import io.anuke.ucore.io.CountableByteArrayOutputStream;
@@ -508,7 +508,7 @@ public class NetServer extends Module{
 
             returnArray.clear();
             if(represent.isClipped()){
-                EntityPhysics.getNearby(group, viewport, entity -> {
+                EntityQuery.getNearby(group, viewport, entity -> {
                     if(((SyncTrait) entity).isSyncing() && viewport.contains(entity.getX(), entity.getY())){
                         returnArray.add(entity);
                     }

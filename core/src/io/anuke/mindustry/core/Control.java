@@ -24,7 +24,7 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Atlas;
 
@@ -302,7 +302,7 @@ public class Control extends Module{
 
     @Override
     public void init(){
-        EntityPhysics.initPhysics();
+        EntityQuery.init();
 
         Platform.instance.updateRPC();
 

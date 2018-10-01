@@ -487,10 +487,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             updateMech();
         }
 
-        if(isLocal){
-            avoidOthers(8f);
-        }
-
         updateBuilding(this);
 
         x = Mathf.clamp(x, 0, world.width() * tilesize);

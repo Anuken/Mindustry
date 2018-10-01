@@ -18,7 +18,7 @@ import io.anuke.mindustry.maps.generation.WorldGenerator;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
@@ -222,7 +222,7 @@ public class World extends Module{
             }
         }
 
-        EntityPhysics.resizeTree(0, 0, tiles.length * tilesize, tiles[0].length * tilesize);
+        EntityQuery.resizeTree(0, 0, tiles.length * tilesize, tiles[0].length * tilesize);
 
         generating = false;
         Events.fire(new WorldLoadEvent());
@@ -251,7 +251,7 @@ public class World extends Module{
         Map map = new Map("Sector " + sector.x + ", " + sector.y, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
         setMap(map);
 
-        EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
+        EntityQuery.resizeTree(0, 0, width * tilesize, height * tilesize);
 
         generator.generateMap(tiles, sector);
 
@@ -267,7 +267,7 @@ public class World extends Module{
 
         createTiles(width, height);
 
-        EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
+        EntityQuery.resizeTree(0, 0, width * tilesize, height * tilesize);
 
         try{
             generator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), 0);

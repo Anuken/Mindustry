@@ -15,7 +15,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.entities.impl.DestructibleEntity;
 import io.anuke.ucore.entities.trait.DamageTrait;
 import io.anuke.ucore.entities.trait.DrawTrait;
@@ -191,17 +190,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public Floor getFloorOn(){
         Tile tile = world.tileWorld(x, y);
         return tile == null ? (Floor) Blocks.air : tile.floor();
-    }
-
-    public void avoidOthers(float avoidRange){
-
-        EntityPhysics.getNearby(getGroup(), x, y, avoidRange * 2f, t -> {
-            if(t == this || (t instanceof Unit && (((Unit) t).isDead() || (((Unit) t).isFlying() != isFlying()) || ((Unit) t).getCarrier() == this) || getCarrier() == t))
-                return;
-            float dst = distanceTo(t);
-            if(dst > avoidRange) return;
-            velocity.add(moveVector.set(x, y).sub(t.getX(), t.getY()).setLength(1f * (1f - (dst / avoidRange)) / getMass()));
-        });
     }
 
     /**Updates velocity and status effects.*/
