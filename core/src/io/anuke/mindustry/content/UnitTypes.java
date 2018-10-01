@@ -96,7 +96,8 @@ public class UnitTypes implements ContentList{
 
         revenant = new UnitType("revenant", Revenant.class, Revenant::new){{
             health = 250;
-            speed = 0.2f;
+            mass = 4f;
+            speed = 0.14f*mass;
             maxVelocity = 1.4f;
             drag = 0.01f;
             isFlying = true;

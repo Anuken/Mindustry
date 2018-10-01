@@ -200,7 +200,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 return;
             float dst = distanceTo(t);
             if(dst > avoidRange) return;
-            velocity.add(moveVector.set(x, y).sub(t.getX(), t.getY()).setLength(1f * (1f - (dst / avoidRange))));
+            velocity.add(moveVector.set(x, y).sub(t.getX(), t.getY()).setLength(1f * (1f - (dst / avoidRange)) / getMass()));
         });
     }
 
