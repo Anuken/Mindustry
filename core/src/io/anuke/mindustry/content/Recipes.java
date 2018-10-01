@@ -167,6 +167,7 @@ public class Recipes implements ContentList{
 
         new Recipe(units, UnitBlocks.daggerFactory, new ItemStack(Items.lead, 90), new ItemStack(Items.silicon, 70));
         new Recipe(units, UnitBlocks.titanFactory, new ItemStack(Items.thorium, 90), new ItemStack(Items.lead, 140), new ItemStack(Items.silicon, 90));
+        new Recipe(units, UnitBlocks.fortressFactory, new ItemStack(Items.thorium, 200), new ItemStack(Items.lead, 220), new ItemStack(Items.silicon, 150), new ItemStack(Items.surgealloy, 100), new ItemStack(Items.phasematter, 50));
 
         new Recipe(units, UnitBlocks.wraithFactory, new ItemStack(Items.titanium, 60), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 90));
         new Recipe(units, UnitBlocks.ghoulFactory, new ItemStack(Items.plastanium, 80), new ItemStack(Items.titanium, 100), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 220));

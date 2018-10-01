@@ -60,13 +60,7 @@ public abstract class GroundUnit extends BaseUnit{
                 if(distanceTo(target) > 400f){
                     moveAwayFromCore();
                 }else{
-                    vec.trns(baseRotation, type.speed);
-                    velocity.add(vec.x, vec.y);
-                    vec.trns(baseRotation, type.hitsizeTile);
-                    Tile tile = world.tileWorld(x + vec.x, y + vec.y);
-                    if((tile == null || tile.solid() || tile.floor().drownTime > 0) || stuckTime > 10f){
-                        baseRotation += Mathf.sign(id % 2 - 0.5f) * Timers.delta() * 3f;
-                    }
+                    patrol();
                 }
             }
         }
@@ -128,7 +122,11 @@ public abstract class GroundUnit extends BaseUnit{
         stuckTime = !vec.set(x, y).sub(lastPosition().x, lastPosition().y).isZero(0.0001f) ? 0f : stuckTime + Timers.delta();
 
         if(!velocity.isZero(0.0001f) && (Units.invalidateTarget(target, this) || (distanceTo(target) > getWeapon().getAmmo().getRange()))){
-            rotation = Mathf.slerpDelta(rotation, velocity.angle(), 0.2f);
+            rotation = Mathf.slerpDelta(rotation, velocity.angle(), type.rotatespeed);
+        }
+
+        if(stuckTime < 1f){
+            walkTime += Timers.delta();
         }
     }
 
@@ -145,9 +143,7 @@ public abstract class GroundUnit extends BaseUnit{
     public void draw(){
         Draw.alpha(hitTime / hitDuration);
 
-        float walktime = walkTime;
-
-        float ft = Mathf.sin(walktime, 6f, 2f);
+        float ft = Mathf.sin(walkTime * type.speed*5f, 6f, 2f);
 
         Floor floor = getFloorOn();
 
@@ -241,6 +237,16 @@ public abstract class GroundUnit extends BaseUnit{
         super.readSave(stream);
     }
 
+    protected void patrol(){
+        vec.trns(baseRotation, type.speed);
+        velocity.add(vec.x, vec.y);
+        vec.trns(baseRotation, type.hitsizeTile);
+        Tile tile = world.tileWorld(x + vec.x, y + vec.y);
+        if((tile == null || tile.solid() || tile.floor().drownTime > 0) || stuckTime > 10f){
+            baseRotation += Mathf.sign(id % 2 - 0.5f) * Timers.delta() * 3f;
+        }
+    }
+
     protected void circle(float circleLength){
         if(target == null) return;
 
@@ -265,7 +271,6 @@ public abstract class GroundUnit extends BaseUnit{
         vec.trns(baseRotation, type.speed);
 
         baseRotation = Mathf.slerpDelta(baseRotation, angleTo(targetTile), 0.05f);
-        walkTime += Timers.delta();
         velocity.add(vec);
     }
 
@@ -290,7 +295,6 @@ public abstract class GroundUnit extends BaseUnit{
         vec.trns(baseRotation, type.speed);
 
         baseRotation = Mathf.slerpDelta(baseRotation, angleTo(targetTile), 0.05f);
-        walkTime += Timers.delta();
         velocity.add(vec);
     }
 }

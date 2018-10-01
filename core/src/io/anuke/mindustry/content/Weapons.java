@@ -124,9 +124,10 @@ public class Weapons implements ContentList{
             length = 1f;
             reload = 60f;
             roundrobin = true;
-            recoil = 1f;
+            recoil = 5f;
+            shake = 2f;
             ejectEffect = ShootFx.shellEjectMedium;
-            ammo = AmmoTypes.artilleryExplosive;
+            ammo = AmmoTypes.unitArtillery;
         }};
 
         sapper = new Weapon("sapper"){{

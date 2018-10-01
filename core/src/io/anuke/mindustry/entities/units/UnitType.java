@@ -30,10 +30,11 @@ public class UnitType extends UnlockableContent{
     public float hitsizeTile = 4f;
     public float speed = 0.4f;
     public float range = 160;
-    public float rotatespeed = 0.1f;
+    public float rotatespeed = 0.2f;
     public float baseRotateSpeed = 0.1f;
     public float mass = 1f;
     public boolean isFlying;
+    public boolean targetAir = true;
     public float drag = 0.1f;
     public float maxVelocity = 5f;
     public float retreatPercent = 0.2f;

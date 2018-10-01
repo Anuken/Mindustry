@@ -58,17 +58,21 @@ public class UnitTypes implements ContentList{
             speed = 0.18f;
             drag = 0.4f;
             range = 10f;
+            rotatespeed = 0.1f;
             weapon = Weapons.flamethrower;
             health = 440;
         }};
 
         fortress = new UnitType("fortress", Fortress.class, Fortress::new){{
             maxVelocity = 0.8f;
-            speed = 0.18f;
+            speed = 0.15f;
             drag = 0.4f;
             range = 10f;
+            rotatespeed = 0.06f;
+            weaponOffsetX = 1;
+            targetAir = false;
             weapon = Weapons.artillery;
-            health = 500;
+            health = 800;
         }};
 
         wraith = new UnitType("wraith", Wraith.class, Wraith::new){{
@@ -86,6 +90,7 @@ public class UnitTypes implements ContentList{
             maxVelocity = 1.4f;
             drag = 0.01f;
             isFlying = true;
+            targetAir = false;
             weapon = Weapons.bomber;
         }};
 

@@ -107,7 +107,7 @@ public class Mechs implements ContentList{
             float healAmount = 10f;
             float healReload = 160f;
             Rectangle rect = new Rectangle();
-            boolean wasHeadled;
+            boolean wasHealed;
 
             {
                 drillPower = 4;
@@ -128,20 +128,20 @@ public class Mechs implements ContentList{
             public void updateAlt(Player player){
 
                 if(player.timer.get(Player.timerAbility, healReload)){
-                    wasHeadled = false;
+                    wasHealed = false;
 
                     rect.setSize(healRange*2f).setCenter(player.x, player.y);
                     Units.getNearby(player.getTeam(), rect, unit -> {
                         if(unit.distanceTo(player) <= healRange){
                             if(unit.health < unit.maxHealth()){
                                 Effects.effect(UnitFx.heal, unit);
-                                wasHeadled = true;
+                                wasHealed = true;
                             }
                             unit.healBy(healAmount);
                         }
                     });
 
-                    if(wasHeadled){
+                    if(wasHealed){
                         Effects.effect(UnitFx.healWave, player);
                     }
                 }
