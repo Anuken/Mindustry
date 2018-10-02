@@ -217,7 +217,9 @@ public class AmmoTypes implements ContentList{
 
         //power
 
-        lancerLaser = new AmmoType(TurretBullets.lancerLaser);
+        lancerLaser = new AmmoType(TurretBullets.lancerLaser){{
+            range = 60f;
+        }};
 
         lightning = new AmmoType(TurretBullets.lightning);
 

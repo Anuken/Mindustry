@@ -98,10 +98,11 @@ public class UnitTypes implements ContentList{
             health = 250;
             mass = 4f;
             speed = 0.14f*mass;
+            hitsize = 12f;
             maxVelocity = 1.4f;
             drag = 0.01f;
             isFlying = true;
-            weapon = Weapons.bomber;
+            weapon = Weapons.laserBurster;
         }};
 
         phantom = new UnitType("phantom", Phantom.class, Phantom::new){{
