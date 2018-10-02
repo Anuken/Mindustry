@@ -166,8 +166,14 @@ public class Logic extends Module{
                 }
 
                 for(EntityGroup group : unitGroups){
-                    if(!group.isEmpty()){
-                        EntityQuery.collideGroups(bulletGroup, group);
+                    if(group.isEmpty()) continue;
+
+                    EntityQuery.collideGroups(bulletGroup, group);
+                    EntityQuery.collideGroups(group, playerGroup);
+
+                    for(EntityGroup other : unitGroups){
+                        if(other == group || other.isEmpty()) continue;
+                        EntityQuery.collideGroups(group, other);
                     }
                 }
 

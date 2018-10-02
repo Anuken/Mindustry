@@ -319,7 +319,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         updateTargeting();
 
         state.update();
-        updateVelocityStatus(type.drag, type.maxVelocity);
+        updateVelocityStatus();
 
         if(target != null) behavior();
 
@@ -342,6 +342,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public void drawOver(){
 
+    }
+
+    @Override
+    public float getMaxVelocity(){
+        return type.maxVelocity;
     }
 
     @Override

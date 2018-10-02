@@ -119,7 +119,7 @@ public abstract class GroundUnit extends BaseUnit{
     public void update(){
         super.update();
 
-        stuckTime = !vec.set(x, y).sub(lastPosition().x, lastPosition().y).isZero(0.0001f) ? 0f : stuckTime + Timers.delta();
+        stuckTime = !getVelocity().isZero(0.0001f) ? 0f : stuckTime + Timers.delta();
 
         if(!velocity.isZero(0.0001f) && (Units.invalidateTarget(target, this) || (distanceTo(target) > getWeapon().getAmmo().getRange()))){
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), type.rotatespeed);

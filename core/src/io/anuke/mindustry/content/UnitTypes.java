@@ -67,6 +67,7 @@ public class UnitTypes implements ContentList{
             maxVelocity = 0.8f;
             speed = 0.15f;
             drag = 0.4f;
+            mass = 4f;
             range = 10f;
             rotatespeed = 0.06f;
             weaponOffsetX = 1;
@@ -97,7 +98,8 @@ public class UnitTypes implements ContentList{
         revenant = new UnitType("revenant", Revenant.class, Revenant::new){{
             health = 250;
             mass = 4f;
-            speed = 0.14f*mass;
+            hitsize = 12f;
+            speed = 0.14f;
             maxVelocity = 1.4f;
             drag = 0.01f;
             isFlying = true;
