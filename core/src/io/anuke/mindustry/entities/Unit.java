@@ -16,6 +16,7 @@ import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.impl.DestructibleEntity;
+import io.anuke.ucore.entities.trait.DamageTrait;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.graphics.Draw;
@@ -48,6 +49,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     protected CarryTrait carrier;
     protected float drownTime;
+
+    @Override
+    public boolean movable(){
+        return true;
+    }
 
     @Override
     public UnitInventory getInventory(){
@@ -94,8 +100,13 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public boolean collides(SolidTrait other){
-        return true;//other instanceof DamageTrait && other
-               // instanceof TeamTrait && state.teams.areEnemies((((TeamTrait) other).getTeam()), team) && !isDead();
+        if(isDead()) return true;
+
+        if(other instanceof DamageTrait){
+            return other instanceof TeamTrait && state.teams.areEnemies((((TeamTrait) other).getTeam()), team);
+        }else{
+            return other instanceof Unit && ((Unit) other).isFlying() == isFlying();
+        }
     }
 
     @Override

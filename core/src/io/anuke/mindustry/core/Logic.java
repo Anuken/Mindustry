@@ -172,12 +172,13 @@ public class Logic extends Module{
                     EntityQuery.collideGroups(group, playerGroup);
 
                     for(EntityGroup other : unitGroups){
-                        if(other == group || other.isEmpty()) continue;
+                        if(other.isEmpty()) continue;
                         EntityQuery.collideGroups(group, other);
                     }
                 }
 
                 EntityQuery.collideGroups(bulletGroup, playerGroup);
+                EntityQuery.collideGroups(playerGroup, playerGroup);
 
                 world.pathfinder().update();
             }

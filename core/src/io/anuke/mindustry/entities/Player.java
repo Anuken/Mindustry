@@ -98,7 +98,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void getHitbox(Rectangle rectangle){
-        rectangle.setSize(5).setCenter(x, y);
+        rectangle.setSize(mech.hitsize).setCenter(x, y);
     }
 
     @Override

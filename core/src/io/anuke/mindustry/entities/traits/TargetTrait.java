@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities.traits;
 
 import io.anuke.mindustry.game.Team;
 import io.anuke.ucore.entities.trait.PosTrait;
+import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.entities.trait.VelocityTrait;
 
 /**
@@ -14,10 +15,16 @@ public interface TargetTrait extends PosTrait, VelocityTrait{
     Team getTeam();
 
     default float getTargetVelocityX(){
+        if(this instanceof SolidTrait){
+            return ((SolidTrait) this).getDeltaX();
+        }
         return getVelocity().x;
     }
 
     default float getTargetVelocityY(){
+        if(this instanceof SolidTrait){
+            return ((SolidTrait) this).getDeltaY();
+        }
         return getVelocity().y;
     }
 

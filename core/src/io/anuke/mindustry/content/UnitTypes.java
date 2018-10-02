@@ -48,6 +48,7 @@ public class UnitTypes implements ContentList{
             maxVelocity = 1.1f;
             speed = 0.2f;
             drag = 0.4f;
+            mass = 1.75f;
             range = 40f;
             weapon = Weapons.chainBlaster;
             health = 130;
@@ -57,7 +58,9 @@ public class UnitTypes implements ContentList{
             maxVelocity = 0.8f;
             speed = 0.18f;
             drag = 0.4f;
+            mass = 3f;
             range = 10f;
+            hitsize = 8f;
             rotatespeed = 0.1f;
             weapon = Weapons.flamethrower;
             health = 440;
@@ -67,7 +70,8 @@ public class UnitTypes implements ContentList{
             maxVelocity = 0.8f;
             speed = 0.15f;
             drag = 0.4f;
-            mass = 4f;
+            mass = 4.5f;
+            hitsize = 10f;
             range = 10f;
             rotatespeed = 0.06f;
             weaponOffsetX = 1;
@@ -89,6 +93,7 @@ public class UnitTypes implements ContentList{
             health = 250;
             speed = 0.2f;
             maxVelocity = 1.4f;
+            mass = 3f;
             drag = 0.01f;
             isFlying = true;
             targetAir = false;
@@ -97,7 +102,7 @@ public class UnitTypes implements ContentList{
 
         revenant = new UnitType("revenant", Revenant.class, Revenant::new){{
             health = 250;
-            mass = 4f;
+            mass = 5f;
             hitsize = 12f;
             speed = 0.14f;
             maxVelocity = 1.4f;
@@ -109,6 +114,7 @@ public class UnitTypes implements ContentList{
         phantom = new UnitType("phantom", Phantom.class, Phantom::new){{
             isFlying = true;
             drag = 0.01f;
+            mass = 2f;
             speed = 0.2f;
             maxVelocity = 0.9f;
             range = 70f;
