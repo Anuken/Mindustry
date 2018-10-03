@@ -206,8 +206,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         velocity.limit(getMaxVelocity()).scl(status.getSpeedMultiplier());
 
         if(isFlying()){
-            x += velocity.x / getMass() * Timers.delta();
-            y += velocity.y / getMass() * Timers.delta();
+            x += velocity.x * Timers.delta();
+            y += velocity.y * Timers.delta();
         }else{
             boolean onLiquid = floor.isLiquid;
 

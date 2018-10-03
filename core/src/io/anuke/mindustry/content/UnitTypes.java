@@ -24,6 +24,8 @@ public class UnitTypes implements ContentList{
                 maxVelocity = 1.7f;
                 range = 40f;
                 health = 45;
+                hitsize = 4f;
+                mass = 0.1f;
                 weapon = Weapons.droneBlaster;
                 trailColor = Color.valueOf("ffd37f");
             }
@@ -84,6 +86,7 @@ public class UnitTypes implements ContentList{
             speed = 0.3f;
             maxVelocity = 1.9f;
             drag = 0.01f;
+            mass = 1.5f;
             weapon = Weapons.chainBlaster;
             isFlying = true;
             health = 70;

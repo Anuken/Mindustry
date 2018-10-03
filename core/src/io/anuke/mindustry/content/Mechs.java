@@ -46,7 +46,6 @@ public class Mechs implements ContentList{
                 speed = 0.5f;
                 boostSpeed = 0.85f;
                 weapon = Weapons.blaster;
-                maxSpeed = 4f;
                 trailColorTo = Color.valueOf("ffd37f");
                 armor = 20f;
             }
@@ -89,7 +88,6 @@ public class Mechs implements ContentList{
                 weaponOffsetY = -1;
                 weapon = Weapons.shockgun;
                 trailColorTo = Color.valueOf("d3ddff");
-                maxSpeed = 5f;
             }
 
             @Override
@@ -122,7 +120,6 @@ public class Mechs implements ContentList{
                 drag = 0.35f;
                 boostSpeed = 0.8f;
                 weapon = Weapons.healBlaster;
-                maxSpeed = 5f;
                 armor = 15f;
                 trailColorTo = Palette.heal;
             }
@@ -166,7 +163,6 @@ public class Mechs implements ContentList{
                 weaponOffsetY = 0;
                 weapon = Weapons.swarmer;
                 trailColorTo = Color.valueOf("feb380");
-                maxSpeed = 3.5f;
                 armor = 45f;
             }
 
@@ -218,7 +214,6 @@ public class Mechs implements ContentList{
             drillPower = 1;
             mineSpeed = 0.9f;
             speed = 0.4f;
-            maxSpeed = 10f;
             drag = 0.1f;
             armor = 10f;
             weapon = Weapons.blasterSmall;
@@ -235,7 +230,6 @@ public class Mechs implements ContentList{
             {
                 drillPower = -1;
                 speed = 0.11f;
-                maxSpeed = 10f;
                 drag = 0.01f;
                 mass = 2f;
                 armor = 5f;
@@ -290,7 +284,6 @@ public class Mechs implements ContentList{
             {
                 drillPower = 2;
                 speed = 0.12f;
-                maxSpeed = 10f;
                 drag = 0.035f;
                 mass = 2.5f;
                 turnCursor = false;
@@ -313,7 +306,6 @@ public class Mechs implements ContentList{
                 drillPower = 4;
                 mineSpeed = 1.3f;
                 speed = 0.32f;
-                maxSpeed = 10f;
                 drag = 0.06f;
                 mass = 3f;
                 armor = 30f;

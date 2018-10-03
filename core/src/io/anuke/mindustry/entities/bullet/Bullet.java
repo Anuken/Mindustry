@@ -68,7 +68,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         bullet.type = type;
         bullet.lifeScl = lifetimeScl;
 
-        bullet.set(x, y);
+        bullet.set(x - bullet.velocity.x * Timers.delta(), y - bullet.velocity.y * Timers.delta());
         bullet.add();
 
         return bullet;
@@ -192,7 +192,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         super.update();
 
         if(type.hitTiles && collidesTiles() && !supressCollision && initialized){
-            world.raycastEach(world.toTile(x), world.toTile(y), world.toTile(x + velocity.x), world.toTile(y + velocity.y), (x, y) -> {
+            world.raycastEach(world.toTile(lastPosition().x), world.toTile(lastPosition().y), world.toTile(x), world.toTile(y), (x, y) -> {
 
                 Tile tile = world.tile(x, y);
                 if(tile == null) return false;

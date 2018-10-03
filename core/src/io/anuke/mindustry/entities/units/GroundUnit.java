@@ -125,6 +125,10 @@ public abstract class GroundUnit extends BaseUnit{
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), type.rotatespeed);
         }
 
+        if(!velocity.isZero()){
+            baseRotation = Mathf.slerpDelta(baseRotation, velocity.angle(), 0.05f);
+        }
+
         if(stuckTime < 1f){
             walkTime += Timers.delta();
         }
@@ -268,10 +272,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         if(tile == targetTile) return;
 
-        vec.trns(baseRotation, type.speed);
-
-        baseRotation = Mathf.slerpDelta(baseRotation, angleTo(targetTile), 0.05f);
-        velocity.add(vec);
+        velocity.add(vec.trns(angleTo(targetTile), type.speed));
     }
 
     protected void moveAwayFromCore(){
@@ -292,9 +293,6 @@ public abstract class GroundUnit extends BaseUnit{
 
         if(tile == targetTile || core == null || distanceTo(core) < 90f) return;
 
-        vec.trns(baseRotation, type.speed);
-
-        baseRotation = Mathf.slerpDelta(baseRotation, angleTo(targetTile), 0.05f);
-        velocity.add(vec);
+        velocity.add(vec.trns(angleTo(targetTile), type.speed));
     }
 }

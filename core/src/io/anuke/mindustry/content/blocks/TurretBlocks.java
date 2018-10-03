@@ -190,8 +190,8 @@ public class TurretBlocks extends BlockList implements ContentList{
         cyclone = new ItemTurret("cyclone"){{
             ammoTypes = new AmmoType[]{AmmoTypes.flakExplosive, AmmoTypes.flakPlastic, AmmoTypes.flakSurge};
             xRand = 4f;
-            reload = 10f;
-            range = 140f;
+            reload = 8f;
+            range = 145f;
             size = 3;
             recoil = 3f;
             rotatespeed = 10f;
