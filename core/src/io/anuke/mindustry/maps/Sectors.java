@@ -249,7 +249,9 @@ public class Sectors{
             }
         }
 
-        if(sector.texture == null) createTexture(sector);
+        if(sector.texture == null){
+            threads.runGraphics(() -> createTexture(sector));
+        }
     }
 
     public void load(){

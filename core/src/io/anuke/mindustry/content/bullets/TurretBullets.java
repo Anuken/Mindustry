@@ -27,7 +27,7 @@ import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
 public class TurretBullets extends BulletList implements ContentList{
-    public static BulletType fireball, basicFlame, lancerLaser, meltdownLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt, healBullet, arc;
+    public static BulletType fireball, basicFlame, lancerLaser, burstLaser, meltdownLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt, healBullet, arc;
 
     @Override
     public void load(){
