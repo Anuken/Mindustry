@@ -1,9 +1,9 @@
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 public class Tests{
 
-    @Test
-    void testThings(){
+    @BeforeEach
+    void launchApplication(){
 
     }
 }
