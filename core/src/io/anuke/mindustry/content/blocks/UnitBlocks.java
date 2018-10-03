@@ -54,7 +54,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 8000;
             size = 4;
             consumes.power(0.3f);
-            shadow = "shadow-round-3";
+            shadow = "shadow-round-4";
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 80), new ItemStack(Items.titanium, 80), new ItemStack(Items.plastanium, 50)});
         }};
 

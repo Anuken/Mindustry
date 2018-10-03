@@ -109,6 +109,7 @@ public class UnitTypes implements ContentList{
             mass = 5f;
             hitsize = 12f;
             speed = 0.14f;
+            maxVelocity = 1.3f;
             drag = 0.01f;
             isFlying = true;
             weapon = Weapons.laserBurster;
