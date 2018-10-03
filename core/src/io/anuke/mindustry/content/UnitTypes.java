@@ -50,6 +50,7 @@ public class UnitTypes implements ContentList{
             maxVelocity = 1.1f;
             speed = 0.2f;
             drag = 0.4f;
+            hitsize = 8f;
             mass = 1.75f;
             range = 40f;
             weapon = Weapons.chainBlaster;
@@ -60,9 +61,9 @@ public class UnitTypes implements ContentList{
             maxVelocity = 0.8f;
             speed = 0.18f;
             drag = 0.4f;
-            mass = 3f;
+            mass = 3.5f;
             range = 10f;
-            hitsize = 8f;
+            hitsize = 9f;
             rotatespeed = 0.1f;
             weapon = Weapons.flamethrower;
             health = 440;
@@ -72,7 +73,7 @@ public class UnitTypes implements ContentList{
             maxVelocity = 0.8f;
             speed = 0.15f;
             drag = 0.4f;
-            mass = 4.5f;
+            mass = 5f;
             hitsize = 10f;
             range = 10f;
             rotatespeed = 0.06f;
