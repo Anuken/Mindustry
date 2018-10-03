@@ -105,7 +105,6 @@ project(":html") {
     apply plugin: "gwt"
     apply plugin: "war"
 
-
     dependencies {
         compile project(":core")
         compileOnly project(":annotations")
@@ -118,7 +117,20 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion:sources"
     }
+}
 
+project(":tests"){
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":core")
+        testImplementation('org.junit.jupiter:junit-jupiter-api:5.1.0')
+        testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.1.0')
+    }
+
+    test {
+        useJUnitPlatform()
+    }
 }
 
 project(":ios") {
@@ -206,7 +218,7 @@ project(":server") {
     }
 }
 
-project(":packer") {
+project(":tools") {
     apply plugin: "java"
 
     dependencies {
