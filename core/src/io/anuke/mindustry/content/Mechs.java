@@ -42,10 +42,10 @@ public class Mechs implements ContentList{
             {
                 drillPower = 1;
                 mineSpeed = 1.5f;
+                mass = 1.2f;
                 speed = 0.5f;
                 boostSpeed = 0.85f;
                 weapon = Weapons.blaster;
-                maxSpeed = 4f;
                 trailColorTo = Color.valueOf("ffd37f");
                 armor = 20f;
             }
@@ -81,13 +81,13 @@ public class Mechs implements ContentList{
                 speed = 0.75f;
                 boostSpeed = 0.95f;
                 itemCapacity = 15;
+                mass = 0.9f;
                 armor = 30f;
                 weaponOffsetX = -1;
                 itemCapacity = 15;
                 weaponOffsetY = -1;
                 weapon = Weapons.shockgun;
                 trailColorTo = Color.valueOf("d3ddff");
-                maxSpeed = 5f;
             }
 
             @Override
@@ -115,11 +115,11 @@ public class Mechs implements ContentList{
                 itemCapacity = 70;
                 weaponOffsetY = -1;
                 weaponOffsetX = 1;
+                mass = 1.75f;
                 speed = 0.44f;
                 drag = 0.35f;
                 boostSpeed = 0.8f;
                 weapon = Weapons.healBlaster;
-                maxSpeed = 5f;
                 armor = 15f;
                 trailColorTo = Palette.heal;
             }
@@ -157,12 +157,12 @@ public class Mechs implements ContentList{
                 itemCapacity = 50;
                 speed = 0.36f;
                 boostSpeed = 0.6f;
+                mass = 4f;
                 shake = 4f;
                 weaponOffsetX = 1;
                 weaponOffsetY = 0;
                 weapon = Weapons.swarmer;
                 trailColorTo = Color.valueOf("feb380");
-                maxSpeed = 3.5f;
                 armor = 45f;
             }
 
@@ -214,7 +214,6 @@ public class Mechs implements ContentList{
             drillPower = 1;
             mineSpeed = 0.9f;
             speed = 0.4f;
-            maxSpeed = 10f;
             drag = 0.1f;
             armor = 10f;
             weapon = Weapons.blasterSmall;
@@ -231,8 +230,8 @@ public class Mechs implements ContentList{
             {
                 drillPower = -1;
                 speed = 0.11f;
-                maxSpeed = 10f;
                 drag = 0.01f;
+                mass = 2f;
                 armor = 5f;
                 weapon = Weapons.missiles;
                 trailColor = Color.valueOf("d3ddff");
@@ -285,8 +284,8 @@ public class Mechs implements ContentList{
             {
                 drillPower = 2;
                 speed = 0.12f;
-                maxSpeed = 10f;
                 drag = 0.035f;
+                mass = 2.5f;
                 turnCursor = false;
                 armor = 20f;
                 itemCapacity = 30;
@@ -307,8 +306,8 @@ public class Mechs implements ContentList{
                 drillPower = 4;
                 mineSpeed = 1.3f;
                 speed = 0.32f;
-                maxSpeed = 10f;
                 drag = 0.06f;
+                mass = 3f;
                 armor = 30f;
                 itemCapacity = 60;
                 trailColor = Color.valueOf("feb380");

@@ -98,7 +98,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void getHitbox(Rectangle rectangle){
-        rectangle.setSize(5).setCenter(x, y);
+        rectangle.setSize(mech.hitsize).setCenter(x, y);
     }
 
     @Override
@@ -230,6 +230,21 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void set(float x, float y){
         this.x = x;
         this.y = y;
+    }
+
+    @Override
+    public float getMaxVelocity(){
+        return mech.maxSpeed;
+    }
+
+    @Override
+    public Queue<BuildRequest> getPlaceQueue(){
+        return placeQueue;
+    }
+
+    @Override
+    public String toString(){
+        return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}\n";
     }
 
     @Override
@@ -440,10 +455,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         hitTime -= Timers.delta();
 
         if(Float.isNaN(x) || Float.isNaN(y)){
-            TileEntity core = getClosestCore();
-            if(core != null){
-                set(core.x, core.y);
-            }
+            //throw new RuntimeException("NaN found!");
+            velocity.set(0f, 0f);
+            x = 0;
+            y = 0;
+            setDead(true);
         }
 
         if(isDead()){
@@ -465,7 +481,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             interpolate();
             updateBuilding(this); //building happens even with non-locals
             status.update(this); //status effect updating also happens with non locals for effect purposes
-            updateVelocityStatus(mech.drag, mech.maxSpeed); //velocity too, for visual purposes
+            updateVelocityStatus(); //velocity too, for visual purposes
 
             if(getCarrier() != null){
                 x = getCarrier().getX();
@@ -485,10 +501,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             updateFlying();
         }else{
             updateMech();
-        }
-
-        if(isLocal){
-            avoidOthers(8f);
         }
 
         updateBuilding(this);
@@ -574,7 +586,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 velocity.add(movement);
             }
             float prex = x, prey = y;
-            updateVelocityStatus(mech.drag, mech.maxSpeed);
+            updateVelocityStatus();
             moved = distanceTo(prex, prey) > 0.01f;
         }else{
             velocity.setZero();
@@ -648,7 +660,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), velocity.len() / 10f);
         }
 
-        updateVelocityStatus(mech.drag, mech.maxSpeed);
+        updateVelocityStatus();
 
         //hovering effect
         x += Mathf.sin(Timers.time() + id * 999, 25f, 0.08f);
@@ -736,16 +748,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void beginRespawning(SpawnerTrait spawner){
         this.spawner = spawner.getTile().packedPosition();
         this.dead = true;
-    }
-
-    @Override
-    public Queue<BuildRequest> getPlaceQueue(){
-        return placeQueue;
-    }
-
-    @Override
-    public String toString(){
-        return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}\n";
     }
 
     //endregion

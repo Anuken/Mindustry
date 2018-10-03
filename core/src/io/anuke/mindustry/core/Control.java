@@ -10,9 +10,9 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.Unlocks;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves;
+import io.anuke.mindustry.game.Unlocks;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
@@ -24,7 +24,7 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Atlas;
 
@@ -302,7 +302,7 @@ public class Control extends Module{
 
     @Override
     public void init(){
-        EntityPhysics.initPhysics();
+        EntityQuery.init();
 
         Platform.instance.updateRPC();
 

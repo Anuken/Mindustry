@@ -8,7 +8,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.EnumSet;
@@ -213,11 +213,11 @@ public class Units{
 
         EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
         if(!group.isEmpty()){
-            EntityPhysics.getNearby(group, rect, entity -> cons.accept((Unit) entity));
+            EntityQuery.getNearby(group, rect, entity -> cons.accept((Unit) entity));
         }
 
         //now check all players
-        EntityPhysics.getNearby(playerGroup, rect, player -> {
+        EntityQuery.getNearby(playerGroup, rect, player -> {
             if(((Unit) player).team == team) cons.accept((Unit) player);
         });
     }
@@ -230,7 +230,7 @@ public class Units{
 
         EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
         if(!group.isEmpty()){
-            EntityPhysics.getNearby(group, rect, entity -> {
+            EntityQuery.getNearby(group, rect, entity -> {
                 if(entity.distanceTo(x, y) <= radius){
                     cons.accept((Unit) entity);
                 }
@@ -238,7 +238,7 @@ public class Units{
         }
 
         //now check all players
-        EntityPhysics.getNearby(playerGroup, rect, player -> {
+        EntityQuery.getNearby(playerGroup, rect, player -> {
             if(((Unit) player).team == team && player.distanceTo(x, y) <= radius){
                 cons.accept((Unit) player);
             }
@@ -253,12 +253,12 @@ public class Units{
         for(Team team : Team.all){
             EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
             if(!group.isEmpty()){
-                EntityPhysics.getNearby(group, rect, entity -> cons.accept((Unit) entity));
+                EntityQuery.getNearby(group, rect, entity -> cons.accept((Unit) entity));
             }
         }
 
         //now check all enemy players
-        EntityPhysics.getNearby(playerGroup, rect, player -> cons.accept((Unit) player));
+        EntityQuery.getNearby(playerGroup, rect, player -> cons.accept((Unit) player));
     }
 
     /**
@@ -270,12 +270,12 @@ public class Units{
         for(Team other : targets){
             EntityGroup<BaseUnit> group = unitGroups[other.ordinal()];
             if(!group.isEmpty()){
-                EntityPhysics.getNearby(group, rect, entity -> cons.accept((Unit) entity));
+                EntityQuery.getNearby(group, rect, entity -> cons.accept((Unit) entity));
             }
         }
 
         //now check all enemy players
-        EntityPhysics.getNearby(playerGroup, rect, player -> {
+        EntityQuery.getNearby(playerGroup, rect, player -> {
             if(targets.contains(((Player) player).team)){
                 cons.accept((Unit) player);
             }

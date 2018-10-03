@@ -114,6 +114,8 @@ public class Lightning extends SolidEntity implements Poolable, DrawTrait, SyncT
         return l;
     }
 
+
+
     @Override
     public void getHitbox(Rectangle rectangle){}
 

@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -31,7 +30,6 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.graphics.Draw;
@@ -340,45 +338,7 @@ public class Renderer extends RendererModule{
     }
 
     public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
-        EntityDraw.drawWith(group, toDraw, t -> {
-            float lastx = t.getX(), lasty = t.getY(), lastrot = 0f;
-
-            if(threads.doInterpolate() && threads.isEnabled() && t instanceof SolidTrait){
-                SolidTrait s = (SolidTrait) t;
-
-                lastrot = s.getRotation();
-
-                if(s.lastUpdated() != 0){
-                    float timeSinceUpdate = TimeUtils.timeSinceMillis(s.lastUpdated());
-                    float alpha = Math.min(timeSinceUpdate / s.updateSpacing(), 1f);
-
-                    tmpVector1.set(s.lastPosition().x, s.lastPosition().y)
-                            .lerp(tmpVector2.set(lastx, lasty), alpha);
-                    s.setRotation(Mathf.slerp(s.lastPosition().z, lastrot, alpha));
-
-                    s.setX(tmpVector1.x);
-                    s.setY(tmpVector1.y);
-                }
-            }
-
-            //TODO extremely hacky
-            if(t instanceof Player && ((Player) t).getCarry() != null && ((Player) t).getCarry() instanceof Player && ((Player) ((Player) t).getCarry()).isLocal){
-                ((Player) t).x = ((Player) t).getCarry().getX();
-                ((Player) t).y = ((Player) t).getCarry().getY();
-            }
-
-            drawer.accept(t);
-
-            t.setX(lastx);
-            t.setY(lasty);
-
-            if(threads.doInterpolate() && threads.isEnabled()){
-
-                if(t instanceof SolidTrait){
-                    ((SolidTrait) t).setRotation(lastrot);
-                }
-            }
-        });
+        EntityDraw.drawWith(group, toDraw, drawer);
     }
 
     @Override

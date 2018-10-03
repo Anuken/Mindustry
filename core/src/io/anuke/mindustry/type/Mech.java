@@ -20,13 +20,14 @@ public class Mech extends UnlockableContent{
 
     public boolean flying;
     public float speed = 1.1f;
-    public float maxSpeed = 1.1f;
+    public float maxSpeed = 10f;
     public float boostSpeed = 0.75f;
     public float drag = 0.4f;
     public float mass = 1f;
     public float shake = 0f;
     public float armor = 1f;
 
+    public float hitsize = 6f;
     public float cellTrnsY = 0f;
     public float mineSpeed = 1f;
     public int drillPower = -1;

@@ -57,7 +57,7 @@ public class DeflectorWall extends Wall{
 
         bullet.getHitbox(rect2);
 
-        Vector2 position = Physics.raycastRect(bullet.lastPosition().x, bullet.lastPosition().y, bullet.x, bullet.y,
+        Vector2 position = Physics.raycastRect(bullet.x, bullet.y, bullet.x + bullet.getVelocity().x, bullet.y + bullet.getVelocity().y,
                 rect.setCenter(entity.x, entity.y).setSize(size * tilesize + rect2.width + rect2.height));
 
         if(position != null){
@@ -70,7 +70,7 @@ public class DeflectorWall extends Wall{
             bullet.getVelocity().y *= -1;
         }
 
-        bullet.updateVelocity(0f);
+        bullet.updateVelocity();
         bullet.resetOwner(entity, Team.none);
         bullet.scaleTime(1f);
         bullet.supress();

@@ -119,10 +119,14 @@ public abstract class GroundUnit extends BaseUnit{
     public void update(){
         super.update();
 
-        stuckTime = !vec.set(x, y).sub(lastPosition().x, lastPosition().y).isZero(0.0001f) ? 0f : stuckTime + Timers.delta();
+        stuckTime = !vec.set(x, y).sub(lastPosition()).isZero(0.0001f) ? 0f : stuckTime + Timers.delta();
 
         if(!velocity.isZero(0.0001f) && (Units.invalidateTarget(target, this) || (distanceTo(target) > getWeapon().getAmmo().getRange()))){
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), type.rotatespeed);
+        }
+
+        if(!velocity.isZero()){
+            baseRotation = Mathf.slerpDelta(baseRotation, velocity.angle(), 0.05f);
         }
 
         if(stuckTime < 1f){
@@ -268,10 +272,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         if(tile == targetTile) return;
 
-        vec.trns(baseRotation, type.speed);
-
-        baseRotation = Mathf.slerpDelta(baseRotation, angleTo(targetTile), 0.05f);
-        velocity.add(vec);
+        velocity.add(vec.trns(angleTo(targetTile), type.speed));
     }
 
     protected void moveAwayFromCore(){
@@ -292,9 +293,6 @@ public abstract class GroundUnit extends BaseUnit{
 
         if(tile == targetTile || core == null || distanceTo(core) < 90f) return;
 
-        vec.trns(baseRotation, type.speed);
-
-        baseRotation = Mathf.slerpDelta(baseRotation, angleTo(targetTile), 0.05f);
-        velocity.add(vec);
+        velocity.add(vec.trns(angleTo(targetTile), type.speed));
     }
 }
