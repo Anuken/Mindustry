@@ -270,14 +270,14 @@ public class Administration{
     }
 
     public void save(){
-        Settings.putBinary("player-info", playerInfo);
-        Settings.putBinary("banned-ips", bannedIPs);
+        Settings.putObject("player-info", playerInfo);
+        Settings.putObject("banned-ips", bannedIPs);
         Settings.save();
     }
 
     private void load(){
-        playerInfo = Settings.getBinary("player-info", ObjectMap.class, () -> new ObjectMap<>());
-        bannedIPs = Settings.getBinary("banned-ips", Array.class, () -> new Array<>());
+        playerInfo = Settings.getObject("player-info", ObjectMap.class, () -> new ObjectMap<>());
+        bannedIPs = Settings.getObject("banned-ips", Array.class, () -> new Array<>());
     }
 
     @Serialize

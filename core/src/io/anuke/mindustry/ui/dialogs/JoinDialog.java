@@ -327,11 +327,11 @@ public class JoinDialog extends FloatingDialog{
     }
 
     private void loadServers(){
-        servers = Settings.getBinary("server-list", Array.class, () -> new Array<>());
+        servers = Settings.getObject("server-list", Array.class, () -> new Array<>());
     }
 
     private void saveServers(){
-        Settings.putBinary("server-list", servers);
+        Settings.putObject("server-list", servers);
         Settings.save();
     }
 

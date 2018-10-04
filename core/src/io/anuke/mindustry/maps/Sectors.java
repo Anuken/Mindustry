@@ -262,7 +262,7 @@ public class Sectors{
         }
         grid.clear();
 
-        Array<Sector> out = Settings.getBinary("sectors", Array.class, () -> new Array<>());
+        Array<Sector> out = Settings.getObject("sectors", Array.class, () -> new Array<>());
 
         for(Sector sector : out){
             createTexture(sector);
@@ -286,7 +286,7 @@ public class Sectors{
             out.add(sector);
         }
 
-        Settings.putBinary("sectors", out);
+        Settings.putObject("sectors", out);
         Settings.save();
     }
 

@@ -45,7 +45,7 @@ public class Saves{
 
     public void load(){
         saves.clear();
-        IntArray slots = Settings.getBinary("save-slots", IntArray.class, IntArray::new);
+        IntArray slots = Settings.getObject("save-slots", IntArray.class, IntArray::new);
 
         for(int i = 0; i < slots.size; i ++){
             int index = slots.get(i);
@@ -143,7 +143,7 @@ public class Saves{
         IntArray result = new IntArray(saves.size);
         for(int i = 0; i < saves.size; i++) result.add(saves.get(i).index);
 
-        Settings.putBinary("save-slots", result);
+        Settings.putObject("save-slots", result);
         Settings.save();
     }
 

@@ -30,6 +30,7 @@ import java.util.Locale;
 
 @SuppressWarnings("unchecked")
 public class Vars{
+    public static final String appName = "Mindustry";
     public static final String discordURL = "https://discord.gg/mindustry";
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
     public static final String crashReportURL = "http://mindustry.us.to/report";
@@ -174,7 +175,7 @@ public class Vars{
         gwt = Gdx.app.getType() == ApplicationType.WebGL;
 
         if(!gwt){
-            dataDirectory = OS.getAppDataDirectory("Mindustry");
+            dataDirectory = OS.getAppDataDirectory(appName);
             customMapDirectory = dataDirectory.child("maps/");
             saveDirectory = dataDirectory.child("saves/");
         }
