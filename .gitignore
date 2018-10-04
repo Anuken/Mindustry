@@ -14,8 +14,10 @@
 /core/assets-raw/sprites/generated/
 /annotations/build/
 /kryonet/build/
-/packer/build/
+/tools/build/
+/tests/build/
 /server/build/
+/test_files/
 /annotations/build/
 /android/assets/mindustry-maps/
 /android/assets/mindustry-saves/

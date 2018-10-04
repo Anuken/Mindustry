@@ -27,7 +27,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
-        uCoreVersion = '00d05bd7d3e943c8a454ccf2cb69cdffb23afbb7'
+        uCoreVersion = '220916714cbe63664c34f95a9dc50a362feca732'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -119,20 +119,6 @@ project(":html") {
     }
 }
 
-project(":tests"){
-    apply plugin: "java"
-
-    dependencies {
-        compile project(":core")
-        testImplementation('org.junit.jupiter:junit-jupiter-api:5.1.0')
-        testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.1.0')
-    }
-
-    test {
-        useJUnitPlatform()
-    }
-}
-
 project(":ios") {
     apply plugin: "java"
     apply plugin: "robovm"
@@ -215,6 +201,23 @@ project(":server") {
         compile project(":kryonet")
         compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    }
+}
+
+project(":tests"){
+    apply plugin: "java"
+
+    dependencies {
+        testImplementation project(":core")
+        testImplementation('org.junit.jupiter:junit-jupiter-api:5.1.0')
+        testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.1.0')
+        testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    }
+
+    test {
+        useJUnitPlatform()
+        workingDir = new File("../core/assets")
     }
 }
 

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.server;
 
 import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
@@ -13,6 +12,7 @@ import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.io.BinaryPreferences;
+import io.anuke.ucore.util.EmptyLogger;
 import io.anuke.ucore.util.OS;
 
 import java.io.File;
@@ -24,31 +24,7 @@ public class ServerLauncher extends HeadlessApplication{
         super(listener, config);
 
         //don't do anything at all for GDX logging: don't want controller info and such
-        Gdx.app.setApplicationLogger(new ApplicationLogger(){
-            @Override
-            public void log(String tag, String message){
-            }
-
-            @Override
-            public void log(String tag, String message, Throwable exception){
-            }
-
-            @Override
-            public void error(String tag, String message){
-            }
-
-            @Override
-            public void error(String tag, String message, Throwable exception){
-            }
-
-            @Override
-            public void debug(String tag, String message){
-            }
-
-            @Override
-            public void debug(String tag, String message, Throwable exception){
-            }
-        });
+        Gdx.app.setApplicationLogger(new EmptyLogger());
     }
 
     public static void main(String[] args){

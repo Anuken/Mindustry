@@ -47,7 +47,9 @@ public class Sectors{
             }
             world.loadSector(sector);
             logic.play();
-            sector.saveID = control.getSaves().addSave("sector-" + sector.packedPosition()).index;
+            if(!headless){
+                sector.saveID = control.getSaves().addSave("sector-" + sector.packedPosition()).index;
+            }
             world.sectors().save();
             world.setSector(sector);
             sector.currentMission().onBegin();

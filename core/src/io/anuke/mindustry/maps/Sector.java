@@ -11,6 +11,7 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.ucore.util.Bits;
 
 import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.headless;
 
 @Serialize
 public class Sector{
@@ -46,11 +47,11 @@ public class Sector{
     }
 
     public SaveSlot getSave(){
-        return control.getSaves().getByID(saveID);
+        return !hasSave() ? null : control.getSaves().getByID(saveID);
     }
 
     public boolean hasSave(){
-        return control.getSaves().getByID(saveID) != null;
+        return !headless && control.getSaves().getByID(saveID) != null;
     }
 
     public int packedPosition(){

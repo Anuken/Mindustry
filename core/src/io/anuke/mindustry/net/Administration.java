@@ -1,7 +1,6 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.ucore.core.Settings;
@@ -16,8 +15,6 @@ public class Administration{
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     /**Maps UUIDs to trace infos. This is wiped when a player logs off.*/
     private ObjectMap<String, TraceInfo> traceInfo = new ObjectMap<>();
-    /** Maps packed coordinates to logs for that coordinate*/
-    private IntMap<Array<EditLog>> editLogs = new IntMap<>();
     private Array<String> bannedIPs = new Array<>();
 
     public Administration(){
@@ -44,16 +41,6 @@ public class Administration{
     public void setCustomClients(boolean allowed){
         Settings.putBool("allow-custom", allowed);
         Settings.save();
-    }
-
-    public void setAntiGriefParams(int maxBreak, int cooldown){
-        Settings.putInt("antigrief-max", maxBreak);
-        Settings.putInt("antigrief-cooldown", cooldown);
-        Settings.save();
-    }
-
-    public IntMap<Array<EditLog>> getEditLogs(){
-        return editLogs;
     }
 
     /**
