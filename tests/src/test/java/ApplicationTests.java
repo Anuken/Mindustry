@@ -95,6 +95,11 @@ public class ApplicationTests{
     }
 
     @Test
+    void tryFail(){
+        fail("a");
+    }
+
+    @Test
     void initialization(){
         assertTrue(logic != null);
         assertTrue(world != null);
