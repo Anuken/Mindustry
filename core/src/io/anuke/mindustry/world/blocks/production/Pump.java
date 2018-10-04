@@ -101,6 +101,11 @@ public class Pump extends LiquidBlock{
         tryDumpLiquid(tile, tile.entity.liquids.current());
     }
 
+    @Override
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        return false;
+    }
+
     protected boolean isValid(Tile tile){
         return tile != null && tile.floor().liquidDrop != null && tier >= tile.floor().liquidDrop.tier;
     }

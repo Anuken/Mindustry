@@ -1,6 +1,7 @@
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
+import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
@@ -14,6 +15,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.modules.ModuleCore;
@@ -200,5 +202,17 @@ public class ApplicationTests{
         assertTrue(world.getMap() == map);
         assertTrue(world.width() == map.meta.width);
         assertTrue(world.height() == map.meta.height);
+    }
+
+    @Test
+    void edgeTest(){
+        GridPoint2[] edges = Edges.getEdges(1);
+        assertTrue(edges[0].equals(new GridPoint2(1, 0)));
+        assertTrue(edges[1].equals(new GridPoint2(0, 1)));
+        assertTrue(edges[2].equals(new GridPoint2(-1, 0)));
+        assertTrue(edges[3].equals(new GridPoint2(0, -1)));
+
+        GridPoint2[] edges2 = Edges.getEdges(2);
+        assertTrue(edges2.length == 8);
     }
 }

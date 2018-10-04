@@ -31,7 +31,6 @@ import static io.anuke.mindustry.Vars.*;
 public class Sectors{
     private static final int sectorImageSize = 32;
     private static final boolean checkExpansion = false;
-    private static final float sectorLargeChance = 0.24f;
 
     private GridMap<Sector> grid = new GridMap<>();
 
