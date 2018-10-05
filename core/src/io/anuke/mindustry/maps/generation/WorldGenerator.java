@@ -20,6 +20,7 @@ import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.SeedRandom;
@@ -42,7 +43,7 @@ public class WorldGenerator{
     private ObjectMap<Block, Block> decoration;
 
     public WorldGenerator(){
-        decoration = Mathf.map(
+        decoration = Structs.map(
             Blocks.grass, Blocks.shrub,
             Blocks.stone, Blocks.rock,
             Blocks.ice, Blocks.icerock,
@@ -203,7 +204,7 @@ public class WorldGenerator{
                 byte elevation = tile.getElevation();
 
                 for(GridPoint2 point : Geometry.d4){
-                    if(!Mathf.inBounds(x + point.x, y + point.y, width, height)) continue;
+                    if(!Structs.inBounds(x + point.x, y + point.y, width, height)) continue;
                     if(tiles[x + point.x][y + point.y].getElevation() < elevation){
 
                         if(sim2.octaveNoise2D(1, 1, 1.0 / 8, x, y) > 0.8){

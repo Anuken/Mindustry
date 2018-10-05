@@ -2,7 +2,7 @@ package io.anuke.mindustry;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Structs;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -44,7 +44,7 @@ public class Image {
     }
 
     public boolean isEmpty(int x, int y){
-        if(!Mathf.inBounds(x, y, width(), height())){
+        if(!Structs.inBounds(x, y, width(), height())){
             return true;
         }
         Color color = getColor(x, y);

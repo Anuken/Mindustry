@@ -25,7 +25,7 @@ import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
 import io.anuke.ucore.scene.ui.TooltipManager;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Structs;
 
 import java.util.Locale;
 
@@ -112,7 +112,7 @@ public class UI extends SceneModule{
     @Override
     protected void loadSkin(){
         skin = new Skin(Gdx.files.internal("ui/uiskin.json"), Core.atlas);
-        Mathf.each(font -> {
+        Structs.each(font -> {
             font.setUseIntegerPositions(false);
             font.getData().setScale(Vars.fontScale);
             font.getData().down += Unit.dp.scl(4f);

@@ -20,6 +20,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.TimedEntity;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Pooling;
@@ -69,7 +70,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     }
 
     public static boolean has(int x, int y){
-        return Mathf.inBounds(x, y, world.width(), world.height()) && map.containsKey(x + y * world.width());
+        return Structs.inBounds(x, y, world.width(), world.height()) && map.containsKey(x + y * world.width());
     }
 
     /**

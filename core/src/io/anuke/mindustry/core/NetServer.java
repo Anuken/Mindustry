@@ -32,6 +32,7 @@ import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.io.ByteBufferOutput;
 import io.anuke.ucore.io.CountableByteArrayOutputStream;
 import io.anuke.ucore.modules.Module;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
@@ -188,7 +189,7 @@ public class NetServer extends Module{
 
             if(state.mode.isPvp){
                 //find team with minimum amount of players and auto-assign player to that.
-                Team min = Mathf.findMin(Team.all, team -> {
+                Team min = Structs.findMin(Team.all, team -> {
                     if(state.teams.isActive(team)){
                         int count = 0;
                         for(Player other : playerGroup.all()){

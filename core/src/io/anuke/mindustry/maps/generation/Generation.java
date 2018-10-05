@@ -6,7 +6,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.Drill;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.SeedRandom;
 
 public class Generation{
@@ -24,7 +24,7 @@ public class Generation{
     }
 
     Tile tile(int x, int y){
-        if(!Mathf.inBounds(x, y, tiles)){
+        if(!Structs.inBounds(x, y, tiles)){
             return null;
         }
         return tiles[x][y];
@@ -41,7 +41,7 @@ public class Generation{
                 for(int dy = 0; dy < block.size; dy++){
                     int worldx = dx + offsetx + x;
                     int worldy = dy + offsety + y;
-                    if(!Mathf.inBounds(worldx, worldy, tiles)){
+                    if(!Structs.inBounds(worldx, worldy, tiles)){
                         return null;
                     }
 
@@ -72,7 +72,7 @@ public class Generation{
                 for(int dy = 0; dy < block.size; dy++){
                     int worldx = dx + offsetx + x;
                     int worldy = dy + offsety + y;
-                    if(!Mathf.inBounds(worldx, worldy, tiles) || !tiles[worldx][worldy].block().alwaysReplace){
+                    if(!Structs.inBounds(worldx, worldy, tiles) || !tiles[worldx][worldy].block().alwaysReplace){
                         return false;
                     }
                 }
@@ -93,7 +93,7 @@ public class Generation{
                 for(int dy = 0; dy < block.size; dy++){
                     int worldx = dx + offsetx + x;
                     int worldy = dy + offsety + y;
-                    if(!(worldx == x && worldy == y) && Mathf.inBounds(worldx, worldy, tiles)){
+                    if(!(worldx == x && worldy == y) && Structs.inBounds(worldx, worldy, tiles)){
                         Tile toplace = tiles[worldx][worldy];
                         if(toplace != null){
                             toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));

@@ -20,6 +20,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
@@ -89,7 +90,7 @@ public class FloorRenderer{
                 int worldx = camx + x;
                 int worldy = camy + y;
 
-                if(!Mathf.inBounds(worldx, worldy, cache))
+                if(!Structs.inBounds(worldx, worldy, cache))
                     continue;
 
                 Chunk chunk = cache[worldx][worldy];
@@ -159,7 +160,7 @@ public class FloorRenderer{
                 int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
                 int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
 
-                if(!Mathf.inBounds(worldx, worldy, cache)){
+                if(!Structs.inBounds(worldx, worldy, cache)){
                     continue;
                 }
 

@@ -8,8 +8,8 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
 
 //TODO
 public class AStarPathFinder extends TilePathfinder{
@@ -194,7 +194,7 @@ public class AStarPathFinder extends TilePathfinder{
         if(obstacle(current)) return;
         for(GridPoint2 p : Geometry.d4){
             int wx = current.x + p.x, wy = current.y + p.y;
-            Tile n = Mathf.inBounds(wx, wy, tiles) ? tiles[wx][wy] : null;
+            Tile n = Structs.inBounds(wx, wy, tiles) ? tiles[wx][wy] : null;
             if(!obstacle(n)) cons.accept(n);
         }
     }

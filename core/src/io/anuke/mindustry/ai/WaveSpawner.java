@@ -9,6 +9,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.GridBits;
 import io.anuke.ucore.util.Mathf;
 
@@ -184,7 +185,7 @@ public class WaveSpawner{
             quadrants = new GridBits(quadWidth(), quadHeight());
         }
 
-        if(!Mathf.inBounds(quadx, quady, quadWidth(), quadHeight())){
+        if(!Structs.inBounds(quadx, quady, quadWidth(), quadHeight())){
             return;
         }
 

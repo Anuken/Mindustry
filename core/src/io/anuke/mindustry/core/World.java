@@ -20,10 +20,7 @@ import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadArray;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.ucore.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -140,7 +137,7 @@ public class World extends Module{
         if(tiles == null){
             return null;
         }
-        if(!Mathf.inBounds(x, y, tiles)) return null;
+        if(!Structs.inBounds(x, y, tiles)) return null;
         return tiles[x][y];
     }
 
@@ -235,7 +232,7 @@ public class World extends Module{
     /**Loads up a sector map. This does not call play(), but calls reset().*/
     public void loadSector(Sector sector){
         currentSector = sector;
-        state.mode = sector.missions.peek().getMode();
+        state.mode = sector.mode;
         state.difficulty = sectors.getDifficulty(sector);
         Timers.mark();
         Timers.mark();
@@ -337,7 +334,7 @@ public class World extends Module{
     public int transform(int packed, int oldWidth, int oldHeight, int newWidth, int shiftX, int shiftY){
         int x = packed % oldWidth;
         int y = packed / oldWidth;
-        if(!Mathf.inBounds(x, y, oldWidth, oldHeight)) return -1;
+        if(!Structs.inBounds(x, y, oldWidth, oldHeight)) return -1;
         x += shiftX;
         y += shiftY;
         return y*newWidth + x;

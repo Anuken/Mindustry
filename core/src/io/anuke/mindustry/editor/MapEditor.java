@@ -10,6 +10,7 @@ import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.content;
@@ -124,7 +125,7 @@ public class MapEditor{
                         int worldx = dx + offsetx + x;
                         int worldy = dy + offsety + y;
 
-                        if(Mathf.inBounds(worldx, worldy, map.width(), map.height())){
+                        if(Structs.inBounds(worldx, worldy, map.width(), map.height())){
                             TileDataMarker prev = getPrev(worldx, worldy, false);
 
                             if(i == 1){
@@ -226,7 +227,7 @@ public class MapEditor{
         for(int dx = 0; dx < block.size; dx++){
             for(int dy = 0; dy < block.size; dy++){
                 int worldx = x + dx + offsetx, worldy = y + dy + offsety;
-                if(Mathf.inBounds(worldx, worldy, map.width(), map.height())){
+                if(Structs.inBounds(worldx, worldy, map.width(), map.height())){
                     TileDataMarker prev = getPrev(worldx, worldy, false);
 
                     map.write(worldx, worldy, DataPosition.link, (byte) 0);

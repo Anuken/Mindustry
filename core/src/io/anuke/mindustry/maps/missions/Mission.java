@@ -30,7 +30,7 @@ public abstract class Mission{
     }
 
     public GameMode getMode(){
-        return GameMode.noWaves;
+        return null;
     }
 
     /**Sets the message displayed on mission begin. Returns this mission for chaining.*/
