@@ -9,8 +9,7 @@ import io.anuke.ucore.util.Bundles;
 import static io.anuke.mindustry.Vars.defaultTeam;
 import static io.anuke.mindustry.Vars.world;
 
-/**A mission in which the player must place a block.*/
-@Deprecated
+/**A mission in which the player must place a block somewhere.*/
 public class BlockMission extends Mission{
     private final Block block;
     private boolean complete;

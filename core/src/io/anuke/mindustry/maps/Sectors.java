@@ -32,7 +32,20 @@ public class Sectors{
     private static final int sectorImageSize = 32;
     private static final boolean checkExpansion = false;
 
-    private GridMap<Sector> grid = new GridMap<>();
+    private final GridMap<Sector> grid = new GridMap<>();
+
+    private final GridMap<Array<Mission>> presets = new GridMap<Array<Mission>>(){{
+        put(0, 0, TutorialSector.getMissions());
+
+        //water mission
+        put(-2, 0, Array.with());
+        //command center mission
+        put(0, 1, Array.with());
+        //reconstructor mission
+        put(0, -1, Array.with());
+        //oil mission
+        put(1, 0, Array.with());
+    }};
 
     public void playSector(Sector sector){
         if(sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
@@ -292,10 +305,10 @@ public class Sectors{
     private void initSector(Sector sector){
         sector.difficulty = (int)(Mathf.dst(sector.x, sector.y));
 
-        if(sector.difficulty == 0){
-            sector.missions.addAll(TutorialSector.getMissions());
+        if(presets.containsKey(sector.x, sector.y)){
+            sector.missions.addAll(presets.get(sector.x, sector.y));
         }else{
-            sector.missions.add(new WaveMission(Math.min(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5, 100)));
+            genMissions(sector);
         }
 
         sector.spawns = new Array<>();
@@ -318,6 +331,10 @@ public class Sectors{
         }else{ //empty default
             sector.startingItems = Array.with();
         }
+    }
+
+    private void genMissions(Sector sector){
+        sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5));
     }
 
     private void createTexture(Sector sector){

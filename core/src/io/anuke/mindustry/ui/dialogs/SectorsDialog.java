@@ -146,7 +146,7 @@ public class SectorsDialog extends FloatingDialog{
                     drawY += (height-1)/2f*padSectorSize;
 
                     if(sector != null && sector.texture != null){
-                        Draw.color(Color.WHITE);
+                        Draw.colorl(!sector.complete ? 0.3f : 1f);
                         Draw.rect(sector.texture, drawX, drawY, sectorSize * width + paddingx, sectorSize * height + paddingy);
                     }
 
