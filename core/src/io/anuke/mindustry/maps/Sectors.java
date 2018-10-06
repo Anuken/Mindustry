@@ -5,17 +5,15 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.blocks.UnitBlocks;
-import io.anuke.mindustry.content.blocks.UpgradeBlocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.units.BaseUnit;
-import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.maps.SectorPresets.SectorPreset;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
-import io.anuke.mindustry.maps.missions.*;
+import io.anuke.mindustry.maps.missions.Mission;
+import io.anuke.mindustry.maps.missions.WaveMission;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.ColorMapper;
@@ -24,7 +22,10 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.GridMap;
+import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -33,24 +34,7 @@ public class Sectors{
     private static final boolean checkExpansion = false;
 
     private final GridMap<Sector> grid = new GridMap<>();
-
-    private final GridMap<SectorPreset> presets = new GridMap<SectorPreset>(){{
-        put(0, 0, new SectorPreset(TutorialSector.getMissions(), Array.with(Items.copper), 1));
-
-        //water mission
-        put(-2, 0, new SectorPreset(Array.with(), Array.with(Items.copper), 1));
-        //command center mission
-        //TODO generate enemy base
-        //TODO make 2x2
-        //TODO more gen info
-        put(0, 1, new SectorPreset(Structs.array(new BlockMission(UnitBlocks.daggerFactory), Missions.blockRecipe(UnitBlocks.commandCenter),
-                new CommandMission(UnitCommand.retreat), new CommandMission(UnitCommand.attack), new BattleMission()), Array.with(Items.copper), 1));
-        //reconstructor mission
-        put(0, -1, new SectorPreset(Structs.array(Missions.blockRecipe(mobile ? UpgradeBlocks.tridentPad : UpgradeBlocks.deltaPad),
-                new MechMission(Mechs.delta)), Array.with(Items.copper), 1));
-        //oil mission
-        put(1, 0, new SectorPreset(Array.with(), Array.with(Items.copper), 1));
-    }};
+    private final SectorPresets presets = new SectorPresets();
 
     public void playSector(Sector sector){
         if(sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
@@ -310,7 +294,7 @@ public class Sectors{
     private void initSector(Sector sector){
         sector.difficulty = (int)(Mathf.dst(sector.x, sector.y));
 
-        if(presets.containsKey(sector.x, sector.y)){
+        if(presets.get(sector.x, sector.y) != null){
             SectorPreset p = presets.get(sector.x, sector.y);
             sector.missions.addAll(p.missions);
         }else{
@@ -370,19 +354,5 @@ public class Sectors{
         pixmap.dispose();
     }
 
-    private class SectorPreset{
-        private final Array<Mission> missions;
-        private final Array<Item> ores;
-        private final int size;
 
-        public SectorPreset(Array<Mission> missions, Array<Item> ores, int size){
-            this.missions = missions;
-            this.ores = ores;
-            this.size = size;
-        }
-
-        void generate(Sector sector){
-
-        }
-    }
 }
