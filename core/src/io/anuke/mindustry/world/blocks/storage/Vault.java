@@ -29,11 +29,6 @@ public class Vault extends StorageBlock{
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source){
-        super.handleItem(item, tile, source);
-    }
-
-    @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         return tile.entity.items.total() < itemCapacity;
     }

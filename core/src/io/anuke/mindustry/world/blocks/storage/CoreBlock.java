@@ -180,12 +180,6 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public void onDestroyed(Tile tile){
-        super.onDestroyed(tile);
-        //TODO more dramatic effects
-    }
-
-    @Override
     public void handleItem(Item item, Tile tile, Tile source){
         if(Net.server() || !Net.active()) super.handleItem(item, tile, source);
     }

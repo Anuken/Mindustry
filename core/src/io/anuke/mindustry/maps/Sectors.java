@@ -207,12 +207,7 @@ public class Sectors{
     }
 
     public Array<Item> getOres(int x, int y){
-        if(x == 0 && y == 0){
-            return Array.with(Items.copper);
-        }else if(x == 1 && y == 0){
-            return Array.with(Items.copper, Items.lead, Items.coal);
-        }
-        return Array.with(Items.copper);
+        return presets.getOres(x, y) == null ? Array.with(Items.copper) : presets.getOres(x, y);
     }
 
     /**Unlocks a sector. This shows nearby sectors.*/
@@ -263,7 +258,7 @@ public class Sectors{
         }
         grid.clear();
 
-        Array<Sector> out = Settings.getObject("sectors", Array.class, () -> new Array<>());
+        Array<Sector> out = Settings.getObject("sectors", Array.class, Array::new);
 
         for(Sector sector : out){
             createTexture(sector);
@@ -297,6 +292,7 @@ public class Sectors{
         if(presets.get(sector.x, sector.y) != null){
             SectorPreset p = presets.get(sector.x, sector.y);
             sector.missions.addAll(p.missions);
+            sector.width = sector.height = p.size;
         }else{
             genMissions(sector);
         }

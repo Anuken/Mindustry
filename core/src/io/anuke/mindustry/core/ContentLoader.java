@@ -136,8 +136,7 @@ public class ContentLoader{
         }
 
         //set up ID mapping
-        for(int k = 0; k < contentMap.length; k ++){
-            Array<Content> arr = contentMap[k];
+        for(Array<Content> arr : contentMap){
             for(int i = 0; i < arr.size; i++){
                 int id = arr.get(i).id;
                 if(id < 0) id += 256;

@@ -19,8 +19,7 @@ public abstract class Platform {
     public String format(Date date){return "invalid";}
     /**Format a number by adding in commas or periods where needed.*/
     public String format(int number){return "invalid";}
-    /**Show a native error dialog.*/
-    public void showError(String text){}
+
     /**Add a text input dialog that should show up after the field is tapped.*/
     public void addDialog(TextField field){
         addDialog(field, 16);

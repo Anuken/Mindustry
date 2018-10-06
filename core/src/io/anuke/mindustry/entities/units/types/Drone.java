@@ -39,7 +39,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Drone extends FlyingUnit implements BuilderTrait{
     protected static float discoverRange = 120f;
-    protected static boolean initialized;
     protected static int timerRepairEffect = timerIndex++;
 
     protected Item targetItem;
@@ -234,17 +233,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         }
     };
 
-    {
-        initEvents();
-    }
-
-    /**
-     * Initialize placement event notifier system.
-     * Static initialization is to be avoided, thus, this is done lazily.
-     */
-    private static void initEvents(){
-        if(initialized) return;
-
+    static{
         Events.on(BlockBuildEvent.class, event -> {
             EntityGroup<BaseUnit> group = unitGroups[event.team.ordinal()];
 
@@ -257,8 +246,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                 }
             }
         });
-
-        initialized = true;
     }
 
     private void notifyPlaced(BuildEntity entity){

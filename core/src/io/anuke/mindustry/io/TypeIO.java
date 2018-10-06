@@ -152,7 +152,7 @@ public class TypeIO{
 
     @WriteClass(Block.class)
     public static void writeBlock(ByteBuffer buffer, Block block){
-        buffer.put((byte) block.id);
+        buffer.put(block.id);
     }
 
     @ReadClass(Block.class)
@@ -278,7 +278,7 @@ public class TypeIO{
 
     @WriteClass(Liquid.class)
     public static void writeLiquid(ByteBuffer buffer, Liquid liquid){
-        buffer.put((byte) liquid.id);
+        buffer.put(liquid.id);
     }
 
     @ReadClass(Liquid.class)
@@ -298,7 +298,7 @@ public class TypeIO{
 
     @WriteClass(BulletType.class)
     public static void writeBulletType(ByteBuffer buffer, BulletType type){
-        buffer.put((byte) type.id);
+        buffer.put(type.id);
     }
 
     @ReadClass(BulletType.class)
@@ -308,7 +308,7 @@ public class TypeIO{
 
     @WriteClass(Item.class)
     public static void writeItem(ByteBuffer buffer, Item item){
-        buffer.put(item == null ? -1 : (byte) item.id);
+        buffer.put(item == null ? -1 : item.id);
     }
 
     @ReadClass(Item.class)
@@ -319,7 +319,7 @@ public class TypeIO{
 
     @WriteClass(Recipe.class)
     public static void writeRecipe(ByteBuffer buffer, Recipe recipe){
-        buffer.put((byte) recipe.id);
+        buffer.put(recipe.id);
     }
 
     @ReadClass(Recipe.class)

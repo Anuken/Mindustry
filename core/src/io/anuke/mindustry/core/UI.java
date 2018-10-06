@@ -181,11 +181,6 @@ public class UI extends SceneModule{
     }
 
     @Override
-    public boolean hasMouse(){
-        return super.hasMouse();
-    }
-
-    @Override
     public void resize(int width, int height){
         super.resize(width, height);
 

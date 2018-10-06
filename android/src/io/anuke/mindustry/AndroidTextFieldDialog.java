@@ -59,7 +59,7 @@ public class AndroidTextFieldDialog{
         while(!isBuild){
             try{
                 Thread.sleep(10);
-            }catch(InterruptedException e){
+            }catch(InterruptedException ignored){
             }
         }
 

@@ -27,7 +27,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
-        uCoreVersion = 'e0789c76198a90cb115e12f03d44ddec35b35a6e'
+        uCoreVersion = '4bee866809b94c7fac6c83620b05bed4650cca26'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -47,10 +47,10 @@ allprojects {
             def output = 'en\n'
             def bundles = new File(project(':core').projectDir, 'assets/bundles/')
             bundles.listFiles().each { other ->
-                if(other.name == "bundle.properties") return;
+                if(other.name == "bundle.properties") return
                 output += other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + "\n"
             }
-            new File(project(':core').projectDir, 'assets/locales').text = output;
+            new File(project(':core').projectDir, 'assets/locales').text = output
         }
 
         writeVersion = {
@@ -59,7 +59,7 @@ allprojects {
 
             try{
                 pfile.createNewFile()
-            }catch (Exception e){}
+            }catch (Exception ignored){}
 
             if(pfile.exists()) {
 

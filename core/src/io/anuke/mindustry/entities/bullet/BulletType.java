@@ -12,14 +12,14 @@ import io.anuke.ucore.entities.impl.BaseBulletType;
 import io.anuke.ucore.util.Translator;
 
 public abstract class BulletType extends Content implements BaseBulletType<Bullet>{
-    public float lifetime = 100;
-    public float speed = 1f;
-    public float damage = 1;
+    public float lifetime;
+    public float speed;
+    public float damage;
     public float hitsize = 4;
     public float drawSize = 20f;
     public float drag = 0f;
     public boolean pierce;
-    public Effect hiteffect = null, despawneffect = null;
+    public Effect hiteffect, despawneffect;
 
     /**Knockback in velocity.*/
     public float knockback;

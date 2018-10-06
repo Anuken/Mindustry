@@ -10,7 +10,6 @@ import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.*;
 
 public interface SelectionTrait{

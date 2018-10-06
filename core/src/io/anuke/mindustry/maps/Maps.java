@@ -159,7 +159,7 @@ public class Maps implements Disposable{
             }
 
         }else{
-            customMapNames = Settings.getObject("custom-maps", Array.class, () -> new Array<>());
+            customMapNames = Settings.getObject("custom-maps", Array.class, Array::new);
 
             for(String name : customMapNames){
                 try{

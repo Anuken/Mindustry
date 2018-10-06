@@ -74,12 +74,12 @@ public class MapIO{
                 Block block = ColorMapper.getByColor(pixmap.getPixel(y, pixmap.getWidth() - 1 - x));
 
                 if(block == null){
-                    data.write(x, y, DataPosition.floor, (byte) Blocks.stone.id);
+                    data.write(x, y, DataPosition.floor, Blocks.stone.id);
                 }else{
-                    data.write(x, y, DataPosition.floor, (byte) block.id);
+                    data.write(x, y, DataPosition.floor, block.id);
                 }
 
-                data.write(x, y, DataPosition.wall, (byte) Blocks.air.id);
+                data.write(x, y, DataPosition.wall, Blocks.air.id);
             }
         }
 

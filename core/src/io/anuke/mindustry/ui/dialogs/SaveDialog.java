@@ -52,7 +52,6 @@ public class SaveDialog extends LoadDialog{
                 slot.save();
             }catch(Throwable e){
                 e.printStackTrace();
-                e = (e.getCause() == null ? e : e.getCause());
 
                 ui.showError("[orange]" + Bundles.get("text.savefail"));
             }

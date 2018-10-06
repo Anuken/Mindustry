@@ -291,8 +291,7 @@ public class ServerControl extends Module{
 
         handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
             try{
-                Difficulty diff = Difficulty.valueOf(arg[0]);
-                state.difficulty = diff;
+                state.difficulty = Difficulty.valueOf(arg[0]);
                 info("Difficulty set to '{0}'.", arg[0]);
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);

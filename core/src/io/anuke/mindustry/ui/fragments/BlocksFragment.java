@@ -313,8 +313,8 @@ public class BlocksFragment extends Fragment{
 
         descTable.row();
 
-        descTable.add(requirements);
         descTable.left();
+        descTable.add(requirements);
 
         for(ItemStack stack : recipe.requirements){
             requirements.addImage(stack.item.region).size(8 * 3);

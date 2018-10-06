@@ -102,7 +102,7 @@ public enum EditorTool{
             byte brt = Bits.packByte((byte) editor.getDrawRotation(), (byte) editor.getDrawTeam().ordinal());
 
             dest = floor ? bf : bw;
-            byte draw = (byte) editor.getDrawBlock().id;
+            byte draw = editor.getDrawBlock().id;
 
             if(dest == draw){
                 return;

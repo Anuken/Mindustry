@@ -46,13 +46,10 @@ public class DonationsActivity extends FragmentActivity{
 
     public void onStart(){
         super.onStart();
-        Button b = ((Button) findViewById(org.sufficientlysecure.donations.R.id.donations__google_android_market_donate_button));
-        b.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                donationsFragment.donateGoogleOnClick(donationsFragment.getView());
-                b.setEnabled(false);
-            }
+        Button b = findViewById(org.sufficientlysecure.donations.R.id.donations__google_android_market_donate_button);
+        b.setOnClickListener(view -> {
+            donationsFragment.donateGoogleOnClick(donationsFragment.getView());
+            b.setEnabled(false);
         });
     }
 
@@ -64,7 +61,7 @@ public class DonationsActivity extends FragmentActivity{
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-        Button b = ((Button) findViewById(org.sufficientlysecure.donations.R.id.donations__google_android_market_donate_button));
+        Button b = findViewById(org.sufficientlysecure.donations.R.id.donations__google_android_market_donate_button);
         b.setEnabled(true);
 
         FragmentManager fragmentManager = getSupportFragmentManager();

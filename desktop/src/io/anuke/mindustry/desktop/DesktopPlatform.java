@@ -61,11 +61,6 @@ public class DesktopPlatform extends Platform{
     }
 
     @Override
-    public void showError(String text){
-
-    }
-
-    @Override
     public String getLocaleName(Locale locale){
         return locale.getDisplayName(locale);
     }

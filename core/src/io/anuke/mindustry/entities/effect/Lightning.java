@@ -32,7 +32,6 @@ import io.anuke.ucore.util.SeedRandom;
 
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
 import static io.anuke.mindustry.Vars.world;
@@ -161,14 +160,10 @@ public class Lightning extends SolidEntity implements Poolable, DrawTrait, SyncT
     }
 
     @Override
-    public void write(DataOutput data) throws IOException{
-
-    }
+    public void write(DataOutput data){}
 
     @Override
-    public void read(DataInput data, long time) throws IOException{
-
-    }
+    public void read(DataInput data, long time){}
 
     @Override
     public float lifetime(){

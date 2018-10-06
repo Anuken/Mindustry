@@ -97,7 +97,7 @@ task packrCmd() {
                     "--mainclass", project.ext.mainClassName,
                     "--jdk", PACKR_DIR + "jdk-" + getPlatform() + ".zip",
                     "--icon", ICON_DIR.getAbsolutePath(),
-                    "--vmargs", (getPlatform().equals("mac") ? "XstartOnFirstThread" : "Xms256m"),
+                    "--vmargs", (getPlatform() == "mac" ? "XstartOnFirstThread" : "Xms256m"),
                     "Djava.net.preferIPv4Stack=true",
                     "--classpath", "--", PACKR_DIR + "config.json")
         }

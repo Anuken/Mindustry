@@ -335,16 +335,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public void drawUnder(){
-
-    }
-
-    @Override
-    public void drawOver(){
-
-    }
-
-    @Override
     public float getMaxVelocity(){
         return type.maxVelocity;
     }

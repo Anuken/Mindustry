@@ -31,8 +31,7 @@ public class Unlocks{
      * @return whether or not this content was newly unlocked.
      */
     public boolean unlockContent(UnlockableContent content){
-        if(rootSet().isUnlocked(content)) return false;
-        return currentSet().unlockContent(content);
+        return !rootSet().isUnlocked(content) && currentSet().unlockContent(content);
     }
 
     private ContentUnlockSet currentSet(){
@@ -76,7 +75,7 @@ public class Unlocks{
     public void load(){
         sets.clear();
 
-        ObjectMap<String, ObjectMap<ContentType, Array<String>>> result = Settings.getObject("content-sets", ObjectMap.class, () -> new ObjectMap<>());
+        ObjectMap<String, ObjectMap<ContentType, Array<String>>> result = Settings.getObject("content-sets", ObjectMap.class, ObjectMap::new);
 
         for(Entry<String, ObjectMap<ContentType, Array<String>>> outer : result.entries()){
             ContentUnlockSet cset = new ContentUnlockSet();

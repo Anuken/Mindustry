@@ -22,7 +22,6 @@ import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.Vars.port;
 
 public class JoinDialog extends FloatingDialog{
     Array<Server> servers = new Array<>();
@@ -327,7 +326,7 @@ public class JoinDialog extends FloatingDialog{
     }
 
     private void loadServers(){
-        servers = Settings.getObject("server-list", Array.class, () -> new Array<>());
+        servers = Settings.getObject("server-list", Array.class, Array::new);
     }
 
     private void saveServers(){

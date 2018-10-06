@@ -252,7 +252,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 act.addImageButton("icon-arrow", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
                         .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center))
                         .disabled(i -> recipe == null || !recipe.result.rotate);
-            }).visible(() -> mode != none).touchable(Touchable.enabled);;
+            }).visible(() -> mode != none).touchable(Touchable.enabled);
 
             c.row();
 
@@ -267,7 +267,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                         showGuide("deconstruction");
                     }
                 }).update(l -> l.setChecked(mode == breaking));
-            }).margin(5).touchable(Touchable.enabled);;
+            }).margin(5).touchable(Touchable.enabled);
 
             c.table("pane", cancel -> {
                 cancel.defaults().size(60f);
