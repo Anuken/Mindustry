@@ -1,10 +1,8 @@
 package io.anuke.mindustry.desktop;
 
 import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.Mindustry;
@@ -12,7 +10,6 @@ import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.Net;
 
 public class DesktopLauncher extends Lwjgl3Application{
-    ObjectMap<String, Preferences> prefmap;
 
     public DesktopLauncher(ApplicationListener listener, Lwjgl3ApplicationConfiguration config){
         super(listener, config);

@@ -15,6 +15,16 @@ import java.io.StringWriter;
 public class CrashHandler{
 
     public static void handle(Throwable e){
+        if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
+            try{
+                javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+            }catch(Throwable ignored){}
+            javax.swing.JOptionPane.showMessageDialog(null, "Your graphics card does not support OpenGL 2.0!\n" +
+                "Try to update your graphics drivers.\n\n" +
+                "(If that doesn't work, your computer just doesn't support Mindustry.)",
+                "oh no", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
+
         e.printStackTrace();
 
         //don't create crash logs for me (anuke), as it's expected
