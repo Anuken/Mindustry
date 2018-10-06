@@ -572,7 +572,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 continue;
             }
 
-            if(Recipe.getByResult(block) != null && Recipe.getByResult(block).desktopOnly && mobile){
+            if(Recipe.getByResult(block) != null && !Recipe.getByResult(block).visibility.shown()){
                 continue;
             }
 
