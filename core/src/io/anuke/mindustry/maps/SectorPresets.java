@@ -25,10 +25,10 @@ public class SectorPresets{
         //TODO make 2x2
         //TODO more gen info
         put(0, 1, new SectorPreset(Structs.array(new BlockMission(UnitBlocks.daggerFactory), Missions.blockRecipe(UnitBlocks.commandCenter),
-        new CommandMission(UnitCommand.retreat), new CommandMission(UnitCommand.attack), new BattleMission()), Array.with(Items.copper), 1));
+            new CommandMission(UnitCommand.retreat), new CommandMission(UnitCommand.attack), new BattleMission()), Array.with(Items.copper), 1));
         //reconstructor mission
         put(0, -1, new SectorPreset(Structs.array(Missions.blockRecipe(mobile ? UpgradeBlocks.tridentPad : UpgradeBlocks.deltaPad),
-        new MechMission(Mechs.delta)), Array.with(Items.copper), 1));
+            new MechMission(Mechs.delta)), Array.with(Items.copper), 1));
         //oil mission
         put(1, 0, new SectorPreset(Array.with(), Array.with(Items.copper), 1));
     }};
