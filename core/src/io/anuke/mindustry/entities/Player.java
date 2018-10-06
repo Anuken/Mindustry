@@ -669,7 +669,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         rect.width += expansion*2f;
         rect.height += expansion*2f;
 
-        isBoosting = EntityQuery.collisions().overlapsTile(rect);
+        isBoosting = EntityQuery.collisions().overlapsTile(rect) || distanceTo(targetX, targetY) > 85f;
 
         velocity.add(movement.scl(Timers.delta()));
 
