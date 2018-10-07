@@ -5,14 +5,14 @@ jdk:
 
 android:
   components:
-    - android-27
+    - android-28
 
     # Additional components
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
-    - addon-google_apis-google-27
-    - build-tools-27.0.3
+    - addon-google_apis-google-28
+    - build-tools-28.0.2
 
 script:
     - ./gradlew test
