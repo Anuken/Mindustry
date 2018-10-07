@@ -36,8 +36,8 @@ task deploy(type: Copy){
 }
 
 android {
-    buildToolsVersion '27.0.3'
-    compileSdkVersion 27
+    buildToolsVersion '28.0.2'
+    compileSdkVersion 28
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -137,6 +137,7 @@ task copyAndroidNatives() {
         }
     }
 }
+
 task run(type: Exec) {
     def path
     def localProperties = project.file("../local.properties")
@@ -158,36 +159,7 @@ task run(type: Exec) {
     def adb = path + "/platform-tools/adb"
     commandLine "$adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/io.anuke.mindustry.AndroidLauncher'
 }
-// sets up the Android Eclipse project, using the old Ant based build.
-eclipse {
-    // need to specify Java source sets explicitly, SpringSource Gradle Eclipse plugin
-    // ignores any nodes added in classpath.file.withXml
-    sourceSets {
-        main {
-            java.srcDirs "src", 'gen'
-        }
-    }
 
-    jdt {
-        sourceCompatibility = 1.7
-        targetCompatibility = 1.7
-    }
-
-    classpath {
-        plusConfigurations += [project.configurations.compile]
-        containers 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK', 'com.android.ide.eclipse.adt.LIBRARIES'
-    }
-
-    project {
-        name = appName + "-android"
-        natures 'com.android.ide.eclipse.adt.AndroidNature'
-        buildCommands.clear()
-        buildCommand "com.android.ide.eclipse.adt.ResourceManagerBuilder"
-        buildCommand "com.android.ide.eclipse.adt.PreCompilerBuilder"
-        buildCommand "org.eclipse.jdt.core.javabuilder"
-        buildCommand "com.android.ide.eclipse.adt.ApkBuilder"
-    }
-}
 // sets up the Android Idea project, using the old Ant based build.
 idea {
     module {

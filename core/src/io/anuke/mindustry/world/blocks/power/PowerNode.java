@@ -74,22 +74,22 @@ public class PowerNode extends PowerBlock{
 
         TileEntity entity = tile.entity();
 
-        entity.power.links.removeValue(other.packedPosition());
-
-        if(other.block() instanceof PowerNode){
-            other.entity.power.links.removeValue(tile.packedPosition());
-        }
-
         //clear all graph data first
         PowerGraph tg = entity.power.graph;
         tg.clear();
+
+        entity.power.links.removeValue(other.packedPosition());
+        other.entity.power.links.removeValue(tile.packedPosition());
+
         //reflow from this point, covering all tiles on this side
         tg.reflow(tile);
 
-        //create new graph for other end
-        PowerGraph og = new PowerGraph();
-        //reflow from other end
-        og.reflow(other);
+        if(other.entity.power.graph != tg){
+            //create new graph for other end
+            PowerGraph og = new PowerGraph();
+            //reflow from other end
+            og.reflow(other);
+        }
     }
 
     @Override
