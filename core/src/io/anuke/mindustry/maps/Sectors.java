@@ -293,6 +293,8 @@ public class Sectors{
             SectorPreset p = presets.get(sector.x, sector.y);
             sector.missions.addAll(p.missions);
             sector.width = sector.height = p.size;
+            sector.x = (short)p.x;
+            sector.y = (short)p.y;
         }else{
             genMissions(sector);
         }

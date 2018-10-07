@@ -37,7 +37,7 @@ public class Mechs implements ContentList{
 
         alpha = new Mech("alpha-mech", false){
             int maxDrones = 3;
-            float buildTime = 100f;
+            float buildTime = 200f;
 
             {
                 drillPower = 1;

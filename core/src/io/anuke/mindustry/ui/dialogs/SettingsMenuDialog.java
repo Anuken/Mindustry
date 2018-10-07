@@ -151,7 +151,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                     dialog.addCloseButton();
                     dialog.content().addButton("$text.settings.clearsectors", "clear", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
-                            Settings.putString("sectors", "{}");
+                            Settings.clearBytes("sectors");
                             Settings.save();
                             world.sectors().load();
                             dialog.hide();
@@ -160,7 +160,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                     dialog.content().row();
                     dialog.content().addButton("$text.settings.clearunlocks", "clear", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
-                            Settings.putString("unlocks", "{}");
+                            Settings.clearBytes("unlocks");
                             Settings.save();
                             dialog.hide();
                         });
