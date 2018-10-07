@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.units.BaseUnit;
@@ -71,7 +72,6 @@ public class Sectors{
                 threads.runGraphics(() -> ui.showError("$text.sector.corrupted"));
             }
         }
-
     }
 
     /**If a sector is not yet unlocked, returns null.*/
@@ -243,7 +243,7 @@ public class Sectors{
 
         for(int cx = 0; cx < sector.width; cx++){
             for(int cy = 0; cy < sector.height; cy++){
-                grid.put(x + cx, y + cy, sector);
+                grid.put(sector.x + cx, sector.y + cy, sector);
             }
         }
 

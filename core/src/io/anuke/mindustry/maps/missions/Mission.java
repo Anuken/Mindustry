@@ -6,6 +6,7 @@ import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.ucore.core.Timers;
@@ -41,6 +42,11 @@ public abstract class Mission{
     public Mission setShowComplete(boolean complete){
         this.showComplete = complete;
         return this;
+    }
+
+    /**Called when a specified piece of content is 'used' by a block.*/
+    public void onContentUsed(UnlockableContent content){
+
     }
 
     /**Draw mission overlay.*/

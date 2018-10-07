@@ -203,7 +203,7 @@ public class Drill extends Block{
 
             offloadNear(tile, entity.dominantItem);
 
-            useContent(entity.dominantItem);
+            useContent(tile, entity.dominantItem);
 
             entity.index++;
             entity.progress = 0f;

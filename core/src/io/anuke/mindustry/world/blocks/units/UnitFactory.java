@@ -178,7 +178,7 @@ public class UnitFactory extends Block{
             entity.buildTime = 0f;
 
             Call.onUnitFactorySpawn(tile);
-            useContent(type);
+            useContent(tile, type);
 
             for(ItemStack stack : consumes.items()){
                 entity.items.remove(stack.item, stack.amount);

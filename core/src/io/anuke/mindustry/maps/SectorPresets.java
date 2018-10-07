@@ -2,6 +2,7 @@ package io.anuke.mindustry.maps;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.entities.units.UnitCommand;
@@ -24,15 +25,6 @@ public class SectorPresets{
             Array.with(),
             1));
 
-        //water mission
-        add(new SectorPreset(-2, 0,
-            Structs.array(
-                Missions.blockRecipe(LiquidBlocks.mechanicalPump),
-                Missions.blockRecipe(ProductionBlocks.cultivator)
-            ),
-            Array.with(Items.copper, Items.lead, Items.copper),
-            2));
-
         //command center mission
         add(new SectorPreset(2, 0,
             Structs.array(
@@ -45,7 +37,7 @@ public class SectorPresets{
             Array.with(Items.copper, Items.lead, Items.copper),
             2));
 
-        //reconstructor mission
+        //pad mission
         add(new SectorPreset(0, -2,
             Structs.array(
                 Missions.blockRecipe(mobile ? UpgradeBlocks.tridentPad : UpgradeBlocks.deltaPad),
@@ -56,10 +48,13 @@ public class SectorPresets{
             2));
 
         //oil mission
-        add(new SectorPreset(0, 1,
+        add(new SectorPreset(-2, 0,
             Structs.array(
                 Missions.blockRecipe(ProductionBlocks.cultivator),
-                Missions.blockRecipe(CraftingBlocks.biomatterCompressor)
+                Missions.blockRecipe(ProductionBlocks.waterExtractor),
+                new ContentMission(Items.biomatter),
+                Missions.blockRecipe(CraftingBlocks.biomatterCompressor),
+                new ContentMission(Liquids.oil)
             ),
             Array.with(Items.copper, Items.lead, Items.copper, Items.titanium),
             2));

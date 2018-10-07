@@ -163,7 +163,7 @@ public class FortressGenerator{
             seeder.get(PowerBlocks.thoriumReactor, tile -> tile.block() instanceof Drill && gen.random.chance(0.2) && gen.drillItem(tile.x, tile.y, (Drill)tile.block()) == Items.thorium && gen.random.chance(0.3)),
 
             //water extractors
-            seeder.get(ProductionBlocks.waterextractor, tile -> tile.block() instanceof NuclearReactor && gen.random.chance(0.5)),
+            seeder.get(ProductionBlocks.waterExtractor, tile -> tile.block() instanceof NuclearReactor && gen.random.chance(0.5)),
 
             //mend cores
             seeder.get(DefenseBlocks.mendProjector, tile -> tile.block() instanceof PowerGenerator && gen.random.chance(0.03)),

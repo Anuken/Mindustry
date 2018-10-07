@@ -15,6 +15,8 @@ public class Pump extends LiquidBlock{
     protected final Array<Tile> drawTiles = new Array<>();
     protected final Array<Tile> updateTiles = new Array<>();
 
+    protected int timerContentCheck = timers++;
+
     /**Pump amount per tile this block is on.*/
     protected float pumpAmount = 1f;
     /**Maximum liquid tier this pump can use.*/
@@ -96,6 +98,10 @@ public class Pump extends LiquidBlock{
         if(tile.entity.cons.valid() && liquidDrop != null){
             float maxPump = Math.min(liquidCapacity - tile.entity.liquids.total(), tiles * pumpAmount * tile.entity.delta());
             tile.entity.liquids.add(liquidDrop, maxPump);
+        }
+
+        if(tile.entity.liquids.currentAmount() > 0f && tile.entity.timer.get(timerContentCheck, 10)){
+            useContent(tile, tile.entity.liquids.current());
         }
 
         tryDumpLiquid(tile, tile.entity.liquids.current());

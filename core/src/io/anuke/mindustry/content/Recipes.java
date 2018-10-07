@@ -141,12 +141,12 @@ public class Recipes implements ContentList{
         //DRILLS, PRODUCERS
         new Recipe(production, ProductionBlocks.mechanicalDrill, new ItemStack(Items.copper, 45)).setAlwaysUnlocked(true);
         new Recipe(production, ProductionBlocks.pneumaticDrill, new ItemStack(Items.copper, 60), new ItemStack(Items.densealloy, 50));
-        new Recipe(production, ProductionBlocks.laserdrill, new ItemStack(Items.copper, 70), new ItemStack(Items.densealloy, 90), new ItemStack(Items.silicon, 60), new ItemStack(Items.titanium, 50));
-        new Recipe(production, ProductionBlocks.blastdrill, new ItemStack(Items.copper, 130), new ItemStack(Items.densealloy, 180), new ItemStack(Items.silicon, 120), new ItemStack(Items.titanium, 100), new ItemStack(Items.thorium, 60));
+        new Recipe(production, ProductionBlocks.laserDrill, new ItemStack(Items.copper, 70), new ItemStack(Items.densealloy, 90), new ItemStack(Items.silicon, 60), new ItemStack(Items.titanium, 50));
+        new Recipe(production, ProductionBlocks.blastDrill, new ItemStack(Items.copper, 130), new ItemStack(Items.densealloy, 180), new ItemStack(Items.silicon, 120), new ItemStack(Items.titanium, 100), new ItemStack(Items.thorium, 60));
 
-        new Recipe(production, ProductionBlocks.waterextractor, new ItemStack(Items.copper, 50), new ItemStack(Items.densealloy, 50), new ItemStack(Items.lead, 40));
+        new Recipe(production, ProductionBlocks.waterExtractor, new ItemStack(Items.copper, 50), new ItemStack(Items.densealloy, 50), new ItemStack(Items.lead, 40));
         new Recipe(production, ProductionBlocks.cultivator, new ItemStack(Items.copper, 20), new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 20));
-        new Recipe(production, ProductionBlocks.oilextractor, new ItemStack(Items.copper, 300), new ItemStack(Items.densealloy, 350), new ItemStack(Items.lead, 230), new ItemStack(Items.thorium, 230), new ItemStack(Items.silicon, 150));
+        new Recipe(production, ProductionBlocks.oilExtractor, new ItemStack(Items.copper, 300), new ItemStack(Items.densealloy, 350), new ItemStack(Items.lead, 230), new ItemStack(Items.thorium, 230), new ItemStack(Items.silicon, 150));
 
         //UNITS
 

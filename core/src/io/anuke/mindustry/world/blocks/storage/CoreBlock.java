@@ -224,7 +224,7 @@ public class CoreBlock extends StorageBlock{
                     unit.setDead(true);
                     unit.add();
 
-                    useContent(droneType);
+                    useContent(tile, droneType);
 
                     entity.droneID = unit.id;
                 }

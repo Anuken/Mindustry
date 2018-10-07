@@ -17,6 +17,14 @@ public class Unlocks{
     static{
         Settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
     }
+
+    /**Handles the event of content being used by either the player or some block.*/
+    public void handleContentUsed(UnlockableContent content){
+        if(world.getSector() != null){
+            world.getSector().currentMission().onContentUsed(content);
+        }
+        unlockContent(content);
+    }
     
     /** Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(UnlockableContent content){

@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.blocks.production.Fracker;
 import io.anuke.mindustry.world.blocks.production.SolidPump;
 
 public class ProductionBlocks extends BlockList implements ContentList{
-    public static Block mechanicalDrill, pneumaticDrill, laserdrill, blastdrill, plasmadrill, waterextractor, oilextractor, cultivator;
+    public static Block mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, plasmaDrill, waterExtractor, oilExtractor, cultivator;
 
     @Override
     public void load(){
@@ -30,7 +30,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             drawMineItem = true;
         }};
 
-        laserdrill = new Drill("laser-drill"){{
+        laserDrill = new Drill("laser-drill"){{
             drillTime = 140;
             size = 2;
             hasPower = true;
@@ -41,7 +41,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             consumes.power(0.16f);
         }};
 
-        blastdrill = new Drill("blast-drill"){{
+        blastDrill = new Drill("blast-drill"){{
             drillTime = 60;
             size = 3;
             drawRim = true;
@@ -56,7 +56,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             consumes.power(0.3f);
         }};
 
-        plasmadrill = new Drill("plasma-drill"){{
+        plasmaDrill = new Drill("plasma-drill"){{
             heatColor = Color.valueOf("ff461b");
             drillTime = 50;
             size = 4;
@@ -73,7 +73,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             consumes.power(0.7f);
         }};
 
-        waterextractor = new SolidPump("water-extractor"){{
+        waterExtractor = new SolidPump("water-extractor"){{
             result = Liquids.water;
             pumpAmount = 0.065f;
             size = 2;
@@ -83,7 +83,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             consumes.power(0.13f);
         }};
 
-        oilextractor = new Fracker("oil-extractor"){{
+        oilExtractor = new Fracker("oil-extractor"){{
             result = Liquids.oil;
             updateEffect = BlockFx.pulverize;
             liquidCapacity = 50f;
