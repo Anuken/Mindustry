@@ -52,7 +52,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public boolean movable(){
-        return true;
+        return !isDead();
     }
 
     @Override

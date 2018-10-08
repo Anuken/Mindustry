@@ -34,7 +34,7 @@ public class SectorPresets{
                 new CommandMission(UnitCommand.attack),
                 new BattleMission()
             ),
-            Array.with(Items.copper, Items.lead, Items.copper),
+            Array.with(Items.copper, Items.lead, Items.coal),
             2));
 
         //pad mission
@@ -44,7 +44,7 @@ public class SectorPresets{
                 new MechMission(Mechs.delta),
                 new WaveMission(15)
             ),
-            Array.with(Items.copper, Items.lead, Items.copper, Items.titanium),
+            Array.with(Items.copper, Items.lead, Items.coal, Items.titanium),
             2));
 
         //oil mission
@@ -56,7 +56,7 @@ public class SectorPresets{
                 Missions.blockRecipe(CraftingBlocks.biomatterCompressor),
                 new ContentMission(Liquids.oil)
             ),
-            Array.with(Items.copper, Items.lead, Items.copper, Items.titanium),
+            Array.with(Items.copper, Items.lead, Items.coal, Items.titanium),
             2));
 
         //tutorial ore presets
