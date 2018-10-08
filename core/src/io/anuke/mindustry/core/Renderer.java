@@ -373,7 +373,7 @@ public class Renderer extends RendererModule{
         ObjectIntMap<Tile> seen = new ObjectIntMap<>();
 
         for(BlockFlag flag : BlockFlag.values()){
-            for(Tile tile : world.indexer().getEnemy(Team.blue, flag)){
+            for(Tile tile : world.indexer.getEnemy(Team.blue, flag)){
                 int index = seen.getAndIncrement(tile, 0, 1);
                 Draw.tscl(0.125f);
                 Draw.text(flag.name(), tile.drawx(), tile.drawy() + tile.block().size * tilesize / 2f + 4 + index * 3);

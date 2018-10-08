@@ -12,9 +12,9 @@ import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.maps.generation.WorldGenerator;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.maps.generation.WorldGenerator;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
@@ -28,12 +28,12 @@ public class World extends Module{
     public final Maps maps = new Maps();
     public final Sectors sectors = new Sectors();
     public final WorldGenerator generator = new WorldGenerator();
+    public final BlockIndexer indexer = new BlockIndexer();
+    public final Pathfinder pathfinder = new Pathfinder();
 
     private Map currentMap;
     private Sector currentSector;
     private Tile[][] tiles;
-    private Pathfinder pathfinder = new Pathfinder();
-    private BlockIndexer indexer = new BlockIndexer();
 
     private Array<Tile> tempTiles = new ThreadArray<>();
     private boolean generating, invalidMap;
@@ -50,26 +50,6 @@ public class World extends Module{
     @Override
     public void dispose(){
         maps.dispose();
-    }
-
-    public WorldGenerator generator(){
-        return generator;
-    }
-
-    public Sectors sectors(){
-        return sectors;
-    }
-
-    public Maps maps(){
-        return maps;
-    }
-
-    public BlockIndexer indexer(){
-        return indexer;
-    }
-
-    public Pathfinder pathfinder(){
-        return pathfinder;
     }
 
     public boolean isInvalidMap(){

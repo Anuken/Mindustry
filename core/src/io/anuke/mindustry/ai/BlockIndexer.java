@@ -159,7 +159,7 @@ public class BlockIndexer{
      * Find the closest ore block relative to a position.
      */
     public Tile findClosestOre(float xp, float yp, Item item){
-        Tile tile = Geometry.findClosest(xp, yp, world.indexer().getOrePositions(item));
+        Tile tile = Geometry.findClosest(xp, yp, world.indexer.getOrePositions(item));
 
         if(tile == null) return null;
 

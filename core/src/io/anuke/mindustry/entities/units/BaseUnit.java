@@ -99,12 +99,12 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public boolean isCommanded(){
-        return !isWave && world.indexer().getAllied(team, BlockFlag.comandCenter).size != 0;
+        return !isWave && world.indexer.getAllied(team, BlockFlag.comandCenter).size != 0;
     }
 
     public UnitCommand getCommand(){
         if(isCommanded()){
-            return world.indexer().getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
+            return world.indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
         }
         return null;
     }
@@ -180,12 +180,12 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void targetClosestAllyFlag(BlockFlag flag){
-        Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, flag));
+        Tile target = Geometry.findClosest(x, y, world.indexer.getAllied(team, flag));
         if(target != null) this.target = target.entity;
     }
 
     public void targetClosestEnemyFlag(BlockFlag flag){
-        Tile target = Geometry.findClosest(x, y, world.indexer().getEnemy(team, flag));
+        Tile target = Geometry.findClosest(x, y, world.indexer.getEnemy(team, flag));
         if(target != null) this.target = target.entity;
     }
 

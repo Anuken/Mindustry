@@ -111,7 +111,7 @@ public class Pathfinder{
 
             path.lastSearchTime = TimeUtils.millis();
 
-            Array<Tile> set = world.indexer().getEnemy(team, BlockFlag.target);
+            Array<Tile> set = world.indexer.getEnemy(team, BlockFlag.target);
             for(Tile other : set){
                 path.weights[other.x][other.y] = 0;
                 path.searches[other.x][other.y] = path.search;
