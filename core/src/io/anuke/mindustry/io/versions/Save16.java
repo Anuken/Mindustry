@@ -42,10 +42,10 @@ public class Save16 extends SaveFileVersion{
 
         byte mode = stream.readByte();
         String mapname = stream.readUTF();
-        Map map = world.maps().getByName(mapname);
+        Map map = world.maps.getByName(mapname);
         world.setMap(map);
 
-        world.setSector(world.sectors().get(sector));
+        world.setSector(world.sectors.get(sector));
 
         int wave = stream.readInt();
         byte difficulty = stream.readByte();

@@ -105,20 +105,20 @@ public class ApplicationTests{
 
     @Test
     void loadSector(){
-        world.sectors().createSector(0, 0);
-        world.sectors().playSector(world.sectors().get(0, 0));
+        world.sectors.createSector(0, 0);
+        world.sectors.playSector(world.sectors.get(0, 0));
     }
 
     @Test
     void playMap(){
-        assertTrue(world.maps().all().size > 0);
+        assertTrue(world.maps.all().size > 0);
 
-        world.loadMap(world.maps().all().first());
+        world.loadMap(world.maps.all().first());
     }
 
     @Test
     void spawnWaves(){
-        world.loadMap(world.maps().all().first());
+        world.loadMap(world.maps.all().first());
         logic.runWave();
         unitGroups[waveTeam.ordinal()].updateEvents();
         assertFalse(unitGroups[waveTeam.ordinal()].isEmpty());
@@ -126,7 +126,7 @@ public class ApplicationTests{
 
     @Test
     void createMap(){
-        assertTrue(world.maps().all().size > 0);
+        assertTrue(world.maps.all().size > 0);
 
         Tile[][] tiles = world.createTiles(8, 8);
 
@@ -182,17 +182,17 @@ public class ApplicationTests{
 
     @Test
     void save(){
-        assertTrue(world.maps().all().size > 0);
+        assertTrue(world.maps.all().size > 0);
 
-        world.loadMap(world.maps().all().first());
+        world.loadMap(world.maps.all().first());
         SaveIO.saveToSlot(0);
     }
 
     @Test
     void load(){
-        assertTrue(world.maps().all().size > 0);
+        assertTrue(world.maps.all().size > 0);
 
-        world.loadMap(world.maps().all().first());
+        world.loadMap(world.maps.all().first());
         Map map = world.getMap();
 
         SaveIO.saveToSlot(0);

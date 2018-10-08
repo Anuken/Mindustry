@@ -51,7 +51,7 @@ public class SectorsDialog extends FloatingDialog{
         buttons().addImageTextButton("$text.sector.deploy", "icon-play",  10*3, () -> {
             hide();
 
-            ui.loadLogic(() -> world.sectors().playSector(selected));
+            ui.loadLogic(() -> world.sectors.playSector(selected));
         }).size(230f, 64f).disabled(b -> selected == null)
         .update(t -> t.setText(selected != null && selected.hasSave() ? "$text.sector.resume" : "$text.sector.deploy"));
     }
@@ -132,7 +132,7 @@ public class SectorsDialog extends FloatingDialog{
                     float drawX = x + width/2f+ sectorX * padSectorSize - offsetX * padSectorSize - panX % padSectorSize;
                     float drawY = y + height/2f + sectorY * padSectorSize - offsetY * padSectorSize - panY % padSectorSize;
 
-                    Sector sector = world.sectors().get(sectorX, sectorY);
+                    Sector sector = world.sectors.get(sectorX, sectorY);
                     int width = (sector == null ? 1 : sector.width);
                     int height = (sector == null ? 1 : sector.height);
                     float paddingx = (width-1) * sectorPadding;

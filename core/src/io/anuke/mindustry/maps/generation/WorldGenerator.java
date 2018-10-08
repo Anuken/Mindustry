@@ -187,7 +187,7 @@ public class WorldGenerator{
         SeedRandom rnd = new SeedRandom(sector.getSeed());
         Generation gena = new Generation(sector, tiles, tiles.length, tiles[0].length, rnd);
         Array<GridPoint2> spawnpoints = sector.currentMission().getSpawnPoints(gena);
-        Array<Item> ores = world.sectors().getOres(sector.x, sector.y);
+        Array<Item> ores = world.sectors.getOres(sector.x, sector.y);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){

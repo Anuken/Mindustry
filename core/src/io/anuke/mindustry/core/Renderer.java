@@ -360,7 +360,7 @@ public class Renderer extends RendererModule{
 
                 if(world.tile(worldx, worldy) == null) continue;
 
-                float value = world.pathfinder().getDebugValue(worldx, worldy);
+                float value = world.pathfinder.getDebugValue(worldx, worldy);
                 Draw.color(Color.PURPLE);
                 Draw.alpha((value % 10f) / 10f);
                 Lines.square(worldx * tilesize, worldy * tilesize, 4f);

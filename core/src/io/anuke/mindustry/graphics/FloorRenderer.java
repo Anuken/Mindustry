@@ -49,7 +49,7 @@ public class FloorRenderer{
             @Override
             public Tile getNearby(int dx, int dy){
                 Sector sec = world.getSector();
-                GenResult result = world.generator().generateTile(sec.x, sec.y, x + dx, y + dy);
+                GenResult result = world.generator.generateTile(sec.x, sec.y, x + dx, y + dy);
                 gutterNearTile.x = (short)(x + dx);
                 gutterNearTile.y = (short)(y + dy);
                 gutterNearTile.setElevation(result.elevation);
@@ -192,7 +192,7 @@ public class FloorRenderer{
                 Floor floor = null;
 
                 if(tile == null && sector != null && tilex < world.width() + gutter*2 && tiley < world.height() + gutter*2){
-                    GenResult result = world.generator().generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
+                    GenResult result = world.generator.generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
                     floor = (Floor) result.floor;
                 }else if(tile != null){
                     floor = tile.floor();
@@ -223,7 +223,7 @@ public class FloorRenderer{
 
                 if(tile == null){
                     if(sector != null && tilex < world.width() + gutter*2 && tiley < world.height() + gutter*2){
-                        GenResult result = world.generator().generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
+                        GenResult result = world.generator.generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
                         floor = (Floor)result.floor;
                         gutterTile.setFloor(floor);
                         gutterTile.x = (short)(tilex - gutter);
