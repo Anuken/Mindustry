@@ -28,52 +28,44 @@ public class Minimap extends Table{
         Image image = new Image(new TextureRegionDrawable(new TextureRegion())){
             @Override
             public void draw(Batch batch, float parentAlpha){
-                if(renderer.minimap().getRegion() == null) return;
+                if(renderer.minimap.getRegion() == null) return;
 
                 TextureRegionDrawable draw = (TextureRegionDrawable) getDrawable();
-                draw.getRegion().setRegion(renderer.minimap().getRegion());
+                draw.getRegion().setRegion(renderer.minimap.getRegion());
                 super.draw(batch, parentAlpha);
-                if(renderer.minimap().getTexture() != null){
-                    renderer.minimap().drawEntities(x, y, width, height);
+                if(renderer.minimap.getTexture() != null){
+                    renderer.minimap.drawEntities(x, y, width, height);
                 }
 
                 if(showFog){
-                    renderer.fog().getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+                    renderer.fog.getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
                     TextureRegion r = draw.getRegion();
-                    float pad = renderer.fog().getPadding();
+                    float pad = renderer.fog.getPadding();
 
                     float px = r.getU() * world.width() + pad;
                     float py = r.getV() * world.height() + pad;
                     float px2 = r.getU2() * world.width() + pad;
                     float py2 = r.getV2() * world.height() + pad;
 
-                    r.setTexture(renderer.fog().getTexture());
+                    r.setTexture(renderer.fog.getTexture());
                     r.setU(px / (world.width() + pad*2f));
                     r.setV(1f - py / (world.height() + pad*2f));
                     r.setU2(px2 / (world.width() + pad*2f));
                     r.setV2(1f - py2 / (world.height() + pad*2f));
 
-                    //r.setV(1f - draw.getRegion().getV());
-                    //r.setV2(1f - draw.getRegion().getV2());
-
-                    //r.setU(r.getU() + renderer.fog().getPadding()/(float)(world.width() + renderer.fog().getPadding()*2) * renderer.minimap().getZoom());
-                    //r.setV(r.getV() - renderer.fog().getPadding()/(float)(world.height() + renderer.fog().getPadding()*2) * renderer.minimap().getZoom());
-                    //r.setU2(r.getU2() - renderer.fog().getPadding()/(float)(world.width() + renderer.fog().getPadding()*2) * renderer.minimap().getZoom());
-                    //r.setV2(r.getV2() + renderer.fog().getPadding()/(float)(world.height() + renderer.fog().getPadding()*2) * renderer.minimap().getZoom());
-
                     Graphics.shader(Shaders.fog);
                     super.draw(batch, parentAlpha);
                     Graphics.shader();
 
-                    renderer.fog().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+                    renderer.fog.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
                 }
             }
         };
 
         addListener(new InputListener(){
             public boolean scrolled(InputEvent event, float x, float y, int amount){
-                renderer.minimap().zoomBy(amount);
+                renderer.minimap.zoomBy(amount);
                 return true;
             }
         });

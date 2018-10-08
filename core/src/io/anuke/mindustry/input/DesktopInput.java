@@ -140,7 +140,7 @@ public class DesktopInput extends InputHandler{
             renderer.scaleCamera((int) Inputs.getAxisTapped(section, "zoom"));
         }
 
-        renderer.minimap().zoomBy(-(int) Inputs.getAxisTapped(section, "zoom_minimap"));
+        renderer.minimap.zoomBy(-(int) Inputs.getAxisTapped(section, "zoom_minimap"));
 
         if(player.isDead()) return;
 

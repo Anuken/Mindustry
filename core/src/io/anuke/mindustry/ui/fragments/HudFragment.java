@@ -184,7 +184,7 @@ public class HudFragment extends Fragment{
 
         //'saving' indicator
         parent.fill(t -> {
-            t.bottom().visible(() -> !state.is(State.menu) && control.getSaves().isSaving());
+            t.bottom().visible(() -> !state.is(State.menu) && control.saves.isSaving());
             t.add("$text.saveload");
         });
 

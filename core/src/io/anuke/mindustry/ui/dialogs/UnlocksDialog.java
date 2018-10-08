@@ -59,11 +59,11 @@ public class UnlocksDialog extends FloatingDialog{
 
                     if(unlock.isHidden()) continue;
 
-                    Image image = control.unlocks().isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked");
+                    Image image = control.unlocks.isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked");
                     image.addListener(new HandCursorListener());
                     list.add(image).size(size).pad(3);
 
-                    if(control.unlocks().isUnlocked(unlock)){
+                    if(control.unlocks.isUnlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));
                         image.addListener(new Tooltip<>(new Table("clear"){{
                             add(unlock.localizedName());

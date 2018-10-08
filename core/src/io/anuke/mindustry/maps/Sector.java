@@ -48,11 +48,11 @@ public class Sector{
     }
 
     public SaveSlot getSave(){
-        return !hasSave() ? null : control.getSaves().getByID(saveID);
+        return !hasSave() ? null : control.saves.getByID(saveID);
     }
 
     public boolean hasSave(){
-        return !headless && control.getSaves().getByID(saveID) != null;
+        return !headless && control.saves.getByID(saveID) != null;
     }
 
     public int packedPosition(){

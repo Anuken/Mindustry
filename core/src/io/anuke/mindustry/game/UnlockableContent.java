@@ -41,7 +41,7 @@ public abstract class UnlockableContent extends MappableContent{
             return true;
         }else{
             for(UnlockableContent cont : depend){
-                if(!control.unlocks().isUnlocked(cont)){
+                if(!control.unlocks.isUnlocked(cont)){
                     return false;
                 }
             }

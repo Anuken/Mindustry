@@ -50,7 +50,7 @@ public class Sectors{
             world.loadSector(sector);
             logic.play();
             if(!headless){
-                sector.saveID = control.getSaves().addSave("sector-" + sector.packedPosition()).index;
+                sector.saveID = control.saves.addSave("sector-" + sector.packedPosition()).index;
             }
             world.sectors().save();
             world.setSector(sector);
@@ -147,7 +147,7 @@ public class Sectors{
         }
 
         if(!headless){
-            renderer.fog().setLoadingOffset(shiftX, shiftY);
+            renderer.fog.setLoadingOffset(shiftX, shiftY);
         }
 
         //create *new* tile array

@@ -168,7 +168,7 @@ public class Saves{
             threads.runGraphics(() -> {
                 //Renderer fog needs to be written on graphics thread, but save() can run on logic thread
                 //thus, runGraphics is required here
-                renderer.fog().writeFog();
+                renderer.fog.writeFog();
 
                 //save on the logic thread
                 threads.run(() -> {

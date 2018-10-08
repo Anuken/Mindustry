@@ -2,8 +2,6 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -33,7 +31,6 @@ import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
@@ -47,20 +44,15 @@ import static io.anuke.ucore.core.Core.batch;
 import static io.anuke.ucore.core.Core.camera;
 
 public class Renderer extends RendererModule{
-    public Surface effectSurface;
+    public final Surface effectSurface;
+    public final BlockRenderer blocks = new BlockRenderer();
+    public final MinimapRenderer minimap = new MinimapRenderer();
+    public final OverlayRenderer overlays = new OverlayRenderer();
+    public final FogRenderer fog = new FogRenderer();
 
     private int targetscale = baseCameraScale;
-    private Texture background = new Texture("sprites/background.png");
-
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
     private Vector2 avgPosition = new Translator();
-    private Vector2 tmpVector1 = new Translator();
-    private Vector2 tmpVector2 = new Translator();
-
-    private BlockRenderer blocks = new BlockRenderer();
-    private MinimapRenderer minimap = new MinimapRenderer();
-    private OverlayRenderer overlays = new OverlayRenderer();
-    private FogRenderer fog = new FogRenderer();
 
     public Renderer(){
         Core.batch = new SpriteBatch(4096);
@@ -118,18 +110,14 @@ public class Renderer extends RendererModule{
         Cursors.loadCustom("drill");
         Cursors.loadCustom("unload");
 
-        clearColor = Hue.lightness(0f);
-        clearColor.a = 1f;
+        clearColor = new Color(0f, 0f, 0f, 1f);
 
-        background.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+        effectSurface = Graphics.createSurface(Core.cameraScale);
+        pixelSurface = Graphics.createSurface(Core.cameraScale);
     }
 
     @Override
     public void init(){
-        int scale = Core.cameraScale;
-
-        effectSurface = Graphics.createSurface(scale);
-        pixelSurface = Graphics.createSurface(scale);
     }
 
     @Override
@@ -208,8 +196,6 @@ public class Renderer extends RendererModule{
         Graphics.surface(pixelSurface, false);
 
         Graphics.clear(clearColor);
-
-        drawPadding();
 
         blocks.drawFloor();
 
@@ -352,7 +338,6 @@ public class Renderer extends RendererModule{
 
     @Override
     public void dispose(){
-        background.dispose();
         fog.dispose();
     }
 
@@ -363,37 +348,6 @@ public class Renderer extends RendererModule{
 
         avgPosition.scl(1f / players.length);
         return avgPosition;
-    }
-
-    public FogRenderer fog(){
-        return fog;
-    }
-
-    public MinimapRenderer minimap(){
-        return minimap;
-    }
-
-    void drawPadding(){
-        float vw = world.width() * tilesize;
-        float cw = camera.viewportWidth * camera.zoom;
-        float ch = camera.viewportHeight * camera.zoom;
-        if(vw < cw){
-            batch.draw(background,
-                    camera.position.x + vw / 2,
-                    Mathf.round(camera.position.y - ch / 2, tilesize),
-                    (cw - vw) / 2,
-                    ch + tilesize,
-                    0, 0,
-                    ((cw - vw) / 2 / tilesize), -ch / tilesize + 1);
-
-            batch.draw(background,
-                    camera.position.x - vw / 2,
-                    Mathf.round(camera.position.y - ch / 2, tilesize),
-                    -(cw - vw) / 2,
-                    ch + tilesize,
-                    0, 0,
-                    -((cw - vw) / 2 / tilesize), -ch / tilesize + 1);
-        }
     }
 
     void drawDebug(){
@@ -430,10 +384,6 @@ public class Renderer extends RendererModule{
         Draw.tcolor();
 
         Draw.color();
-    }
-
-    public BlockRenderer getBlocks(){
-        return blocks;
     }
 
     public void setCameraScale(int amount){

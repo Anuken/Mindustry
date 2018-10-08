@@ -25,14 +25,15 @@ import io.anuke.ucore.util.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class World extends Module{
+    public final Maps maps = new Maps();
+    public final Sectors sectors = new Sectors();
+    public final WorldGenerator generator = new WorldGenerator();
+
     private Map currentMap;
     private Sector currentSector;
     private Tile[][] tiles;
     private Pathfinder pathfinder = new Pathfinder();
     private BlockIndexer indexer = new BlockIndexer();
-    private Maps maps = new Maps();
-    private Sectors sectors = new Sectors();
-    private WorldGenerator generator = new WorldGenerator();
 
     private Array<Tile> tempTiles = new ThreadArray<>();
     private boolean generating, invalidMap;
