@@ -97,8 +97,8 @@ public class ServerControl extends Module{
 
             if(Settings.getBool("shuffle")){
                 if(world.getSector() == null){
-                    if(world.maps().all().size > 0){
-                        Array<Map> maps = world.maps().all();
+                    if(world.maps.all().size > 0){
+                        Array<Map> maps = world.maps.all();
 
                         Map previous = world.getMap();
                         Map map = previous;
@@ -179,7 +179,7 @@ public class ServerControl extends Module{
             if(arg.length > 0){
 
                 String search = arg[0];
-                for(Map map : world.maps().all()){
+                for(Map map : world.maps.all()){
                     if(map.name.equalsIgnoreCase(search)) result = map;
                 }
 
@@ -234,7 +234,7 @@ public class ServerControl extends Module{
 
         handler.register("maps", "Display all available maps.", arg -> {
             info("Maps:");
-            for(Map map : world.maps().all()){
+            for(Map map : world.maps.all()){
                 info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
             }
         });
@@ -814,13 +814,13 @@ public class ServerControl extends Module{
 
     private void playSectorMap(boolean wait){
         int x = Settings.getInt("sector_x"), y = Settings.getInt("sector_y");
-        if(world.sectors().get(x, y) == null){
-            world.sectors().createSector(x, y);
+        if(world.sectors.get(x, y) == null){
+            world.sectors.createSector(x, y);
         }
 
-        world.sectors().get(x, y).completedMissions = 0;
+        world.sectors.get(x, y).completedMissions = 0;
 
-        play(wait, () -> world.loadSector(world.sectors().get(x, y)));
+        play(wait, () -> world.loadSector(world.sectors.get(x, y)));
     }
 
     private void play(boolean wait, Runnable run){
@@ -898,8 +898,8 @@ public class ServerControl extends Module{
             //all assigned missions are complete
             if(world.getSector().completedMissions >= world.getSector().missions.size){
                 Log.info("Mission complete.");
-                world.sectors().completeSector(world.getSector().x, world.getSector().y);
-                world.sectors().save();
+                world.sectors.completeSector(world.getSector().x, world.getSector().y);
+                world.sectors.save();
                 gameOvers = 0;
                 inExtraRound = true;
                 Settings.putInt("sector_x", world.getSector().x + world.getSector().size);

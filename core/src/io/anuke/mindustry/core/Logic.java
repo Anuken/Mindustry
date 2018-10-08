@@ -100,15 +100,15 @@ public class Logic extends Module{
 
             state.mode = world.getSector().currentMission().getMode();
             world.getSector().currentMission().onBegin();
-            world.sectors().save();
+            world.sectors.save();
         }
 
         //check if all assigned missions are complete
         if(!world.getSector().complete && world.getSector().completedMissions >= world.getSector().missions.size){
             state.mode = GameMode.victory;
 
-            world.sectors().completeSector(world.getSector().x, world.getSector().y);
-            world.sectors().save();
+            world.sectors.completeSector(world.getSector().x, world.getSector().y);
+            world.sectors.save();
             if(!headless){
                 ui.missions.show(world.getSector());
             }
@@ -180,7 +180,7 @@ public class Logic extends Module{
                 EntityQuery.collideGroups(bulletGroup, playerGroup);
                 EntityQuery.collideGroups(playerGroup, playerGroup);
 
-                world.pathfinder().update();
+                world.pathfinder.update();
             }
         }
 

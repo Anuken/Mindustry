@@ -266,11 +266,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
         if(name.isEmpty()){
             ui.showError("$text.editor.save.noname");
         }else{
-            Map map = world.maps().getByName(name);
+            Map map = world.maps.getByName(name);
             if(map != null && !map.custom){
                 ui.showError("$text.editor.save.overwrite");
             }else{
-                world.maps().saveMap(name, editor.getMap(), editor.getTags());
+                world.maps.saveMap(name, editor.getMap(), editor.getTags());
                 ui.showInfoFade("$text.editor.saved");
             }
         }

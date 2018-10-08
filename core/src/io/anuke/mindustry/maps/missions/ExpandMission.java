@@ -13,11 +13,11 @@ public class ExpandMission extends ActionMission{
 
         runner = () -> {
             if(headless){
-                world.sectors().expandSector(world.getSector(), expandX, expandY);
+                world.sectors.expandSector(world.getSector(), expandX, expandY);
                 done = true;
             }else{
                 ui.loadLogic(() -> {
-                    world.sectors().expandSector(world.getSector(), expandX, expandY);
+                    world.sectors.expandSector(world.getSector(), expandX, expandY);
                     done = true;
                 });
             }

@@ -156,7 +156,7 @@ public class WaveSpawner{
             for(int y = quady * quadsize; y < world.height() && y < (quady + 1) * quadsize; y++){
                 Tile tile = world.tile(x, y);
 
-                if(tile == null || tile.solid() || world.pathfinder().getValueforTeam(Team.red, x, y) == Float.MAX_VALUE){
+                if(tile == null || tile.solid() || world.pathfinder.getValueforTeam(Team.red, x, y) == Float.MAX_VALUE){
                     setQuad(quadx, quady, false);
                     break outer;
                 }

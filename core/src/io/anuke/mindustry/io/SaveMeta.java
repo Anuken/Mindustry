@@ -27,7 +27,7 @@ public class SaveMeta{
         this.timePlayed = timePlayed;
         this.sector = sector;
         this.mode = GameMode.values()[mode];
-        this.map = world.maps().getByName(map);
+        this.map = world.maps.getByName(map);
         this.wave = wave;
         this.difficulty = difficulty;
     }

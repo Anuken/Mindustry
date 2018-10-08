@@ -49,7 +49,7 @@ public class TutorialSector{
                         for(int x = 0; x < world.width(); x++){
                             for(int y = 0; y < world.height(); y++){
                                 Tile tile = world.tile(x, y);
-                                world.generator().generateTile(res, 0, 0, x, y, true, null, ores);
+                                world.generator.generateTile(res, 0, 0, x, y, true, null, ores);
                                 if(!tile.hasCliffs()){
                                     tile.setFloor((Floor) res.floor);
                                 }

@@ -106,7 +106,7 @@ public class Units{
      * Returns the neareset ally tile in a range.
      */
     public static TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
-        return world.indexer().findTile(team, x, y, range, pred);
+        return world.indexer.findTile(team, x, y, range, pred);
     }
 
     /**
@@ -114,7 +114,7 @@ public class Units{
      */
     public static TileEntity findEnemyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
         for(Team enemy : state.teams.enemiesOf(team)){
-            TileEntity entity = world.indexer().findTile(enemy, x, y, range, pred);
+            TileEntity entity = world.indexer.findTile(enemy, x, y, range, pred);
             if(entity != null){
                 return entity;
             }

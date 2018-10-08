@@ -268,7 +268,7 @@ public abstract class GroundUnit extends BaseUnit{
     protected void moveToCore(){
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = world.pathfinder().getTargetTile(team, tile);
+        Tile targetTile = world.pathfinder.getTargetTile(team, tile);
 
         if(tile == targetTile) return;
 
@@ -288,7 +288,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = world.pathfinder().getTargetTile(enemy, tile);
+        Tile targetTile = world.pathfinder.getTargetTile(enemy, tile);
         TileEntity core = getClosestCore();
 
         if(tile == targetTile || core == null || distanceTo(core) < 90f) return;

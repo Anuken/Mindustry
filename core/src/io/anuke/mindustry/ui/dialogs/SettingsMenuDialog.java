@@ -153,7 +153,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                         ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
                             Settings.clearBytes("sectors");
                             Settings.save();
-                            world.sectors().load();
+                            world.sectors.load();
                             dialog.hide();
                         });
                     });

@@ -51,7 +51,7 @@ public class Sectors{
             if(!headless){
                 sector.saveID = control.saves.addSave("sector-" + sector.packedPosition()).index;
             }
-            world.sectors().save();
+            world.sectors.save();
             world.setSector(sector);
             sector.currentMission().onBegin();
         }else if(SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
@@ -169,7 +169,7 @@ public class Sectors{
                     //gen tiles in sector
                     for (int x = 0; x < sectorSize; x++) {
                         for (int y = 0; y < sectorSize; y++) {
-                            world.generator().generateTile(result, sx + sector.x, sy + sector.y, x, y, true, null, ores);
+                            world.generator.generateTile(result, sx + sector.x, sy + sector.y, x, y, true, null, ores);
                             newTiles[sx * sectorSize + x][sy * sectorSize + y] = new Tile(x + sx * sectorSize, y + sy*sectorSize, result.floor.id, result.wall.id, (byte)0, (byte)0, result.elevation);
                         }
                     }
@@ -405,8 +405,8 @@ public class Sectors{
                 int toX = x * sectorSize / sectorImageSize;
                 int toY = y * sectorSize / sectorImageSize;
 
-                GenResult result = world.generator().generateTile(sector.x, sector.y, toX, toY, false);
-                world.generator().generateTile(secResult, sector.x, sector.y, toX, ((y+1) * sectorSize / sectorImageSize), false, null, null);
+                GenResult result = world.generator.generateTile(sector.x, sector.y, toX, toY, false);
+                world.generator.generateTile(secResult, sector.x, sector.y, toX, ((y+1) * sectorSize / sectorImageSize), false, null, null);
 
                 int color = ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation, secResult.elevation > result.elevation ? (byte)(1 << 6) : (byte)0);
                 pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, color);

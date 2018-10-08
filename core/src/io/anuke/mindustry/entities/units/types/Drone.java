@@ -158,7 +158,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
                     if(targetItem == null) return;
 
-                    target = world.indexer().findClosestOre(x, y, targetItem);
+                    target = world.indexer.findClosestOre(x, y, targetItem);
                 });
 
                 if(target instanceof Tile){
@@ -224,7 +224,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                 state.set(attack);
             }else if(!targetHasFlag(BlockFlag.repair)){
                 if(timer.get(timerTarget, 20)){
-                    Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair));
+                    Tile target = Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair));
                     if(target != null) Drone.this.target = target.entity;
                 }
             }else{
@@ -318,7 +318,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     @Override
     public void behavior(){
         if(health <= health * type.retreatPercent &&
-                Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair)) != null){
+                Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
         }
     }
