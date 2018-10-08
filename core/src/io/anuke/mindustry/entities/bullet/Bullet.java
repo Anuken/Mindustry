@@ -172,6 +172,11 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     }
 
     @Override
+    public float getShieldDamage(){
+        return Math.max(getDamage(), type.splashDamage);
+    }
+
+    @Override
     public boolean collides(SolidTrait other){
         return type.collides && super.collides(other) && !supressCollision && !(other instanceof Unit && ((Unit) other).isFlying() && !type.collidesAir);
     }

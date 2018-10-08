@@ -27,7 +27,6 @@ public class BasicBulletType extends BulletType{
 
     /**Use a negative value to disable splash damage.*/
     public float splashDamageRadius = -1f;
-    public float splashDamage = 6f;
 
     public int incendAmount = 0;
     public float incendSpread = 8f;

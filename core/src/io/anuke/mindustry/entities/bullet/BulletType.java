@@ -21,6 +21,7 @@ public abstract class BulletType extends Content implements BaseBulletType<Bulle
     public boolean pierce;
     public Effect hiteffect, despawneffect;
 
+    public float splashDamage = 0f;
     /**Knockback in velocity.*/
     public float knockback;
     /**Whether this bullet hits tiles.*/

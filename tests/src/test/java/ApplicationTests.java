@@ -98,8 +98,8 @@ public class ApplicationTests{
 
     @Test
     void initialization(){
-        assertTrue(logic != null);
-        assertTrue(world != null);
+        assertNotNull(logic);
+        assertNotNull(world);
         assertTrue(content.getContentMap().length > 0);
     }
 
@@ -145,11 +145,11 @@ public class ApplicationTests{
         int bx = 4;
         int by = 4;
         world.setBlock(world.tile(bx, by), StorageBlocks.core, Team.blue);
-        assertTrue(world.tile(bx, by).getTeam() == Team.blue);
+        assertEquals(world.tile(bx, by).getTeam(), Team.blue);
         for(int x = bx-1; x <= bx + 1; x++){
             for(int y = by-1; y <= by + 1; y++){
                 if(x == bx && by == y){
-                    assertTrue(world.tile(x, y).block() == StorageBlocks.core);
+                    assertEquals(world.tile(x, y).block(), StorageBlocks.core);
                 }else{
                     assertTrue(world.tile(x, y).block() == Blocks.blockpart && world.tile(x, y).getLinked() == world.tile(bx, by));
                 }
@@ -163,10 +163,10 @@ public class ApplicationTests{
         Tile tile = world.tile(4, 4);
         tile.entity.items.add(Items.coal, 5);
         tile.entity.items.add(Items.titanium, 50);
-        assertTrue(tile.entity.items.total() == 55);
+        assertEquals(tile.entity.items.total(), 55);
         tile.entity.items.remove(Items.phasematter, 10);
         tile.entity.items.remove(Items.titanium, 10);
-        assertTrue(tile.entity.items.total() == 45);
+        assertEquals(tile.entity.items.total(), 45);
     }
 
     @Test
@@ -199,20 +199,20 @@ public class ApplicationTests{
         resetWorld();
         SaveIO.loadFromSlot(0);
 
-        assertTrue(world.getMap() == map);
-        assertTrue(world.width() == map.meta.width);
-        assertTrue(world.height() == map.meta.height);
+        assertEquals(world.getMap(), map);
+        assertEquals(world.width(), map.meta.width);
+        assertEquals(world.height(), map.meta.height);
     }
 
     @Test
     void edgeTest(){
         GridPoint2[] edges = Edges.getEdges(1);
-        assertTrue(edges[0].equals(new GridPoint2(1, 0)));
-        assertTrue(edges[1].equals(new GridPoint2(0, 1)));
-        assertTrue(edges[2].equals(new GridPoint2(-1, 0)));
-        assertTrue(edges[3].equals(new GridPoint2(0, -1)));
+        assertEquals(edges[0], new GridPoint2(1, 0));
+        assertEquals(edges[1], new GridPoint2(0, 1));
+        assertEquals(edges[2], new GridPoint2(-1, 0));
+        assertEquals(edges[3], new GridPoint2(0, -1));
 
         GridPoint2[] edges2 = Edges.getEdges(2);
-        assertTrue(edges2.length == 8);
+        assertEquals(8, edges2.length);
     }
 }

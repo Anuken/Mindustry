@@ -132,10 +132,10 @@ public class ForceProjector extends Block {
                 if(trait.canBeAbsorbed() && trait.getTeam() != tile.getTeam() && isInsideHexagon(trait.getX(), trait.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
                     trait.absorb();
                     Effects.effect(BulletFx.absorb, trait);
-                    float hit = trait.getDamage()*powerDamage;
+                    float hit = trait.getShieldDamage()*powerDamage;
                     entity.hit = 1f;
                     entity.power.amount -= Math.min(hit, entity.power.amount);
-                    entity.buildup += trait.getDamage() * entity.warmup;
+                    entity.buildup += trait.getShieldDamage() * entity.warmup;
                 }
             });
         }

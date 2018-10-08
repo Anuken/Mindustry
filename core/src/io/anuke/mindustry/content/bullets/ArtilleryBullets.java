@@ -106,6 +106,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
                 lifetime = 90f;
                 bulletWidth = bulletHeight = 14f;
                 collides = true;
+                collidesTiles = true;
                 splashDamageRadius = 45f;
                 splashDamage = 50f;
                 backColor = Palette.bulletYellowBack;
