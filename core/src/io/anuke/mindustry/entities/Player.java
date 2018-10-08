@@ -103,7 +103,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void getHitboxTile(Rectangle rectangle){
-        rectangle.setSize(4).setCenter(x, y);
+        rectangle.setSize(mech.hitsize * 2f / 3f).setCenter(x, y);
     }
 
     @Override
@@ -412,9 +412,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         Draw.tscl(fontScale);
     }
 
-    /**
-     * Draw all current build requests. Does not draw the beam effect, only the positions.
-     */
+    /**Draw all current build requests. Does not draw the beam effect, only the positions.*/
     public void drawBuildRequests(){
         synchronized(getPlaceQueue()){
             for(BuildRequest request : getPlaceQueue()){
@@ -455,7 +453,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         hitTime -= Timers.delta();
 
         if(Float.isNaN(x) || Float.isNaN(y)){
-            //throw new RuntimeException("NaN found!");
             velocity.set(0f, 0f);
             x = 0;
             y = 0;

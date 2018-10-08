@@ -4,7 +4,11 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.blocks.*;
+import io.anuke.mindustry.content.UnitTypes;
+import io.anuke.mindustry.content.blocks.CraftingBlocks;
+import io.anuke.mindustry.content.blocks.ProductionBlocks;
+import io.anuke.mindustry.content.blocks.UnitBlocks;
+import io.anuke.mindustry.content.blocks.UpgradeBlocks;
 import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.maps.missions.*;
 import io.anuke.mindustry.type.Item;
@@ -26,9 +30,10 @@ public class SectorPresets{
             1));
 
         //command center mission
-        add(new SectorPreset(2, 0,
+        add(new SectorPreset(0, 1,
             Structs.array(
-                new BlockMission(UnitBlocks.daggerFactory),
+                Missions.blockRecipe(UnitBlocks.daggerFactory),
+                new UnitMission(UnitTypes.dagger),
                 Missions.blockRecipe(UnitBlocks.commandCenter),
                 new CommandMission(UnitCommand.retreat),
                 new CommandMission(UnitCommand.attack),

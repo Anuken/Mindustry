@@ -24,17 +24,13 @@ import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 
-/**
- * Utility class for damaging in an area.
- */
+/**Utility class for damaging in an area.*/
 public class Damage{
     private static Rectangle rect = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
     private static Translator tr = new Translator();
 
-    /**
-     * Creates a dynamic explosion based on specified parameters.
-     */
+    /**Creates a dynamic explosion based on specified parameters.*/
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
         for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
             int branches = 5 + Mathf.clamp((int) (power / 30), 1, 20);
@@ -43,7 +39,7 @@ public class Damage{
         }
 
         for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
-            Timers.run(i / 2, () -> Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f)));
+            Timers.run(i / 2f, () -> Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f)));
         }
 
         int waves = Mathf.clamp((int) (explosiveness / 4), 0, 30);
@@ -135,9 +131,7 @@ public class Damage{
         Units.getNearbyEnemies(team, rect, cons);
     }
 
-    /**
-     * Damages all entities and blocks in a radius that are enemies of the team.
-     */
+    /**Damages all entities and blocks in a radius that are enemies of the team.*/
     public static void damageUnits(Team team, float x, float y, float size, float damage, Predicate<Unit> predicate, Consumer<Unit> acceptor){
         Consumer<Unit> cons = entity -> {
             if(!predicate.test(entity)) return;
@@ -158,16 +152,12 @@ public class Damage{
         }
     }
 
-    /**
-     * Damages everything in a radius.
-     */
+    /**Damages everything in a radius.*/
     public static void damage(float x, float y, float radius, float damage){
         damage(null, x, y, radius, damage);
     }
 
-    /**
-     * Damages all entities and blocks in a radius that are enemies of the team.
-     */
+    /**Damages all entities and blocks in a radius that are enemies of the team.*/
     public static void damage(Team team, float x, float y, float radius, float damage){
         Consumer<Unit> cons = entity -> {
             if(entity.team == team || entity.distanceTo(x, y) > radius){
