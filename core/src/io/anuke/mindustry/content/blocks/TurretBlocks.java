@@ -117,11 +117,11 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         arc = new PowerTurret("arc"){{
             shootType = AmmoTypes.arc;
-            reload = 60f;
+            reload = 55f;
             shootShake = 1f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUsed = 5f;
+            powerUsed = 7f;
             powerCapacity = 30f;
             range = 130f;
             shootEffect = ShootFx.lightningShoot;

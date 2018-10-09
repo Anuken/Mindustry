@@ -316,7 +316,7 @@ public class TurretBullets extends BulletList implements ContentList{
 
             @Override
             public void init(Bullet b){
-                Lightning.create(b.getTeam(), Palette.lancerLaser, damage, b.x, b.y, b.angle(), 34);
+                Lightning.create(b.getTeam(), Palette.lancerLaser, damage, b.x, b.y, b.angle(), 36);
             }
         };
 
