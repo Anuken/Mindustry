@@ -112,15 +112,18 @@ public class TurretBlocks extends BlockList implements ContentList{
             heatColor = Color.RED;
             size = 2;
             health = 320;
+            targetAir = false;
         }};
 
         arc = new PowerTurret("arc"){{
             shootType = AmmoTypes.arc;
-            reload = 34f;
+            reload = 60f;
             shootShake = 1f;
+            shootCone = 40f;
+            rotatespeed = 8f;
             powerUsed = 5f;
             powerCapacity = 30f;
-            range = 60f;
+            range = 130f;
             shootEffect = ShootFx.lightningShoot;
             heatColor = Color.RED;
             recoil = 1f;

@@ -1,10 +1,16 @@
 package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.mindustry.content.bullets.TurretBullets;
+import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
@@ -17,17 +23,24 @@ import io.anuke.ucore.entities.trait.PosTrait;
 import io.anuke.ucore.entities.trait.TimeTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Pooling;
-import io.anuke.ucore.util.SeedRandom;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
+import static io.anuke.mindustry.Vars.fontScale;
 
 public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, TimeTrait{
+    public static final float lifetime = 10f;
+
+    private static final SeedRandom random = new SeedRandom();
+    private static final Rectangle rect = new Rectangle();
+    private static final Array<Unit> entities = new Array<>();
+    private static final IntSet hit = new IntSet();
+    private static final int maxChain = 8;
+    private static final float hitRange = 30f;
     private static int lastSeed = 0;
-    private static SeedRandom random = new SeedRandom();
 
     private Array<PosTrait> lines = new Array<>();
     private Color color = Palette.lancerLaser;
@@ -37,25 +50,52 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     }
 
     /**Create a lighting branch at a location. Use Team.none to damage everyone.*/
-    public static void create(Team team, Effect effect, Color color, float damage, float x, float y, float targetAngle, int length){
-        Call.createLighting(lastSeed++, team, effect, color, damage, x, y, targetAngle, length);
+    public static void create(Team team, Color color, float damage, float x, float y, float targetAngle, int length){
+        Call.createLighting(lastSeed++, team, color, damage, x, y, targetAngle, length);
     }
 
     /**Do not invoke!*/
     @Remote(called = Loc.server)
-    public static void createLighting(int seed, Team team, Color color, float damage, float x, float y, int length){
+    public static void createLighting(int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
+
         Lightning l = Pooling.obtain(Lightning.class, Lightning::new);
+        Float dmg = damage;
 
         l.x = x;
         l.y = y;
         l.color = color;
         l.add();
 
-        for (int i = 0; i < length; i++) {
-            Effect
-        }
-
         random.setSeed(seed);
+        hit.clear();
+
+        for (int i = 0; i < length/2; i++) {
+            Bullet.create(TurretBullets.damageLightning, l, team, x, y, 0f, 1f, 1f, dmg);
+            l.lines.add(new Translator(x + Mathf.range(3f), y + Mathf.range(3f)));
+
+            rect.setSize(hitRange).setCenter(x, y);
+            entities.clear();
+            if(hit.size < maxChain){
+                Units.getNearbyEnemies(team, rect, u -> {
+                    if(!hit.contains(u.getID())){
+                        entities.add(u);
+                    }
+                });
+            }
+
+            Unit furthest = Geometry.findFurthest(x, y, entities);
+
+            if(furthest != null){
+                hit.add(furthest.getID());
+                x = furthest.x;
+                y = furthest.y;
+            }else{
+                rotation += random.range(20f);
+                x += Angles.trnsx(rotation, hitRange/2f);
+                y += Angles.trnsy(rotation, hitRange/2f);
+            }
+
+        }
     }
 
     @Override
@@ -71,11 +111,12 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
 
     @Override
     public float lifetime(){
-        return 10;
+        return lifetime;
     }
 
     @Override
     public void reset(){
+        super.reset();
         color = Palette.lancerLaser;
         lines.clear();
     }
@@ -91,20 +132,25 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
         float lx = x, ly = y;
         Draw.color(color, Color.WHITE, fin());
         for(int i = 0; i < lines.size; i++){
-            Vector2 v = lines.get(i);
+            PosTrait v = lines.get(i);
 
-            Lines.stroke(fout() * 3f * (1.5f - (float) i / lines.size));
+            float f = (float) i / lines.size;
+
+            Lines.stroke(fout() * 3f * (1.5f - f));
 
             Lines.stroke(Lines.getStroke() * 4f);
             Draw.alpha(0.3f);
-            Lines.line(lx, ly, v.x, v.y);
+            Lines.line(lx, ly, v.getX(), v.getY());
 
             Lines.stroke(Lines.getStroke()/4f);
             Draw.alpha(1f);
-            Lines.line(lx, ly, v.x, v.y);
+            Lines.line(lx, ly, v.getX(), v.getY());
 
-            lx = v.x;
-            ly = v.y;
+            Lines.stroke(3f * fout() * (1f - f));
+           // Lines.lineAngleCenter(lx, ly, Angles.angle(lx, ly, v.getX(), v.getY()) + 90f, 20f);
+
+            lx = v.getX();
+            ly = v.getY();
         }
         Draw.color();
     }

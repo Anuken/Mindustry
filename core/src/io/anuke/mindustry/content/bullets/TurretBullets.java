@@ -27,10 +27,19 @@ import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
 public class TurretBullets extends BulletList implements ContentList{
-    public static BulletType fireball, basicFlame, lancerLaser, burstLaser, meltdownLaser, fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt, healBullet, arc;
+    public static BulletType fireball, basicFlame, lancerLaser, burstLaser, meltdownLaser,
+        fuseShot, waterShot, cryoShot, lavaShot, oilShot, lightning, driverBolt, healBullet, arc, damageLightning;
 
     @Override
     public void load(){
+
+        damageLightning = new BulletType(0.0001f, 0f){
+            {
+                lifetime = Lightning.lifetime;
+                hiteffect = BulletFx.hitLancer;
+                despawneffect = Fx.none;
+            }
+        };
 
         healBullet = new BulletType(5.2f, 13){
             float healAmount = 21f;
@@ -276,11 +285,12 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        lightning = new BulletType(0.001f, 14){
+        lightning = new BulletType(0.001f, 12f){
             {
-                lifetime = 1;
+                lifetime = 1f;
                 despawneffect = Fx.none;
                 hiteffect = BulletFx.hitLancer;
+                keepVelocity = false;
             }
 
             @Override
@@ -289,11 +299,11 @@ public class TurretBullets extends BulletList implements ContentList{
 
             @Override
             public void init(Bullet b){
-                Lightning.create(b.getTeam(), hiteffect, Palette.lancerLaser, damage, b.x, b.y, b.angle(), 30);
+                Lightning.create(b.getTeam(), Palette.lancerLaser, damage, b.x, b.y, b.angle(), 30);
             }
         };
 
-        arc = new BulletType(0.001f, 7){
+        arc = new BulletType(0.001f, 30){
             {
                 lifetime = 1;
                 despawneffect = Fx.none;
@@ -306,7 +316,7 @@ public class TurretBullets extends BulletList implements ContentList{
 
             @Override
             public void init(Bullet b){
-                Lightning.create(b.getTeam(), hiteffect, Palette.lancerLaser, damage, b.x, b.y, b.angle(), 28);
+                Lightning.create(b.getTeam(), Palette.lancerLaser, damage, b.x, b.y, b.angle(), 34);
             }
         };
 

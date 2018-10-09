@@ -43,7 +43,7 @@ public class FlakBullets extends BulletList implements ContentList{
                 super.despawned(b);
 
                 for (int i = 0; i < 2; i++) {
-                    Lightning.create(b.getTeam(), BulletFx.hitLancer, Palette.surge, damage, b.x, b.y, Mathf.random(360f), 12);
+                    Lightning.create(b.getTeam(), Palette.surge, damage, b.x, b.y, Mathf.random(360f), 12);
                 }
             }
         };

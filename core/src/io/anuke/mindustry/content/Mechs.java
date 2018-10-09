@@ -96,7 +96,7 @@ public class Mechs implements ContentList{
                     Effects.shake(1f, 1f, player);
                     Effects.effect(UnitFx.landShock, player);
                     for(int i = 0; i < 8; i++){
-                        Timers.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), BulletFx.hitLancer, player.getTeam().color, 17f, player.x, player.y, Mathf.random(360f), 14));
+                        Timers.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), player.getTeam().color, 17f, player.x, player.y, Mathf.random(360f), 14));
                     }
                 }
             }
@@ -254,7 +254,7 @@ public class Mechs implements ContentList{
                 float scl = scld(player);
                 if(Mathf.chance(Timers.delta() * (0.15*scl))){
                     Effects.effect(BulletFx.hitLancer, Palette.lancerLaser, player.x, player.y);
-                    Lightning.create(player.getTeam(), BulletFx.hitLancer, Palette.lancerLaser, 10f,
+                    Lightning.create(player.getTeam(), Palette.lancerLaser, 10f,
                     player.x + player.getVelocity().x, player.y + player.getVelocity().y, player.rotation, 14);
                 }
             }
