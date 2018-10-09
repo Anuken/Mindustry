@@ -13,8 +13,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.SectorPresets.SectorPreset;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
-import io.anuke.mindustry.maps.missions.BlockMission;
-import io.anuke.mindustry.maps.missions.Mission;
+import io.anuke.mindustry.maps.missions.*;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
@@ -367,8 +366,8 @@ public class Sectors{
 
         //}
 
-        if(!headless/* && Mathf.randomSeed(sector.getSeed() + 3) < 0.5*/){
-            //build list of locked recipes to add mission for obtaining it
+        //build list of locked recipes to add mission for obtaining it
+        if(!headless && Mathf.randomSeed(sector.getSeed() + 3) < 0.5){
             Array<Recipe> recipes = new Array<>();
             for(Recipe r : content.recipes()){
                 if(!control.unlocks.isUnlocked(r)){
@@ -378,11 +377,27 @@ public class Sectors{
 
             if(recipes.size > 0){
                 Recipe recipe = recipes.random();
-                sector.missions.add(new BlockMission(recipe.result));
+                sector.missions.addAll(Missions.blockRecipe(recipe.result));
             }
         }
 
-        if(Mathf.randomSeed(sector.getSeed() + 4) < 0.5){
+        //add 0-1 expansion mission
+        if(sector.missions.size > 0){
+            int ex = finalWidth >= 3 ? 0 : Mathf.randomSeed(sector.getSeed() + 6, -2, 2);
+            int ey = finalHeight >= 3 ? 0 : Mathf.randomSeed(sector.getSeed() + 7, -2, 2);
+            if(ex != 0 || ey != 0){
+                sector.missions.add(new ExpandMission(ex, ey));
+            }
+        }
+
+        //50% chance to get a wave mission
+        if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5){
+            sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5));
+        }else{
+            sector.missions.add(new BattleMission());
+        }
+
+        if(Mathf.randomSeed(sector.getSeed() + 3) < 0.5){
 
         }
 
