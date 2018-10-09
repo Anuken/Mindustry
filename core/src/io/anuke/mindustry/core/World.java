@@ -77,11 +77,6 @@ public class World extends Module{
         return !wallSolid(x, y - 1) || !wallSolid(x, y + 1) || !wallSolid(x - 1, y) || !wallSolid(x + 1, y);
     }
 
-    public boolean floorBlends(int x, int y, Block block){
-        Tile tile = tile(x, y);
-        return tile == null || tile.floor().id <= block.id;
-    }
-
     public Map getMap(){
         return currentMap;
     }

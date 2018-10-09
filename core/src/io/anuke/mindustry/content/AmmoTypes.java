@@ -14,7 +14,7 @@ public class AmmoTypes implements ContentList{
         bulletDenseBig, bulletPyratiteBig, bulletThoriumBig,
         shock, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite, weaponMissile, weaponMissileSwarm, bulletMech,
         healBlaster, bulletGlaive,
-        flakExplosive, flakPlastic, flakSurge,
+        /*flakCopper, */flakExplosive, flakPlastic, flakSurge,
         missileExplosive, missileIncindiary, missileSurge,
         artilleryDense, artilleryPlastic, artilleryHoming, artilleryIncindiary, artilleryExplosive, unitArtillery,
         basicFlame, lancerLaser, lightning, meltdownLaser, burstLaser,

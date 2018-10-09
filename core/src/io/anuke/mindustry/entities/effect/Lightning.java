@@ -228,8 +228,17 @@ public class Lightning extends SolidEntity implements Poolable, DrawTrait, SyncT
         Draw.color(color, Color.WHITE, fin());
         for(int i = 0; i < lines.size; i++){
             Vector2 v = lines.get(i);
+
             Lines.stroke(fout() * 3f * (1.5f - (float) i / lines.size));
+
+            Lines.stroke(Lines.getStroke() * 4f);
+            Draw.alpha(0.3f);
             Lines.line(lx, ly, v.x, v.y);
+
+            Lines.stroke(Lines.getStroke()/4f);
+            Draw.alpha(1f);
+            Lines.line(lx, ly, v.x, v.y);
+
             lx = v.x;
             ly = v.y;
         }
