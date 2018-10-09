@@ -19,6 +19,7 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
@@ -360,35 +361,11 @@ public class Sectors{
         sector.x = (short)finalX;
         sector.y = (short)finalY;
 
-        //int missions = Math.max((int)(Math.log10(sector.difficulty/3.0) * 5), 1);
+        //recipe mission
+        addRecipeMission(sector, 3);
 
-        //for(int i = 0; i < missions; i++){
-
-        //}
-
-        //build list of locked recipes to add mission for obtaining it
-        if(!headless && Mathf.randomSeed(sector.getSeed() + 3) < 0.5){
-            Array<Recipe> recipes = new Array<>();
-            for(Recipe r : content.recipes()){
-                if(!control.unlocks.isUnlocked(r)){
-                    recipes.add(r);
-                }
-            }
-
-            if(recipes.size > 0){
-                Recipe recipe = recipes.random();
-                sector.missions.addAll(Missions.blockRecipe(recipe.result));
-            }
-        }
-
-        //add 0-1 expansion mission
-        if(sector.missions.size > 0){
-            int ex = finalWidth >= 3 ? 0 : Mathf.randomSeed(sector.getSeed() + 6, -2, 2);
-            int ey = finalHeight >= 3 ? 0 : Mathf.randomSeed(sector.getSeed() + 7, -2, 2);
-            if(ex != 0 || ey != 0){
-                sector.missions.add(new ExpandMission(ex, ey));
-            }
-        }
+        //expand
+        addExpandMission(sector, 16);
 
         //50% chance to get a wave mission
         if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5){
@@ -397,12 +374,42 @@ public class Sectors{
             sector.missions.add(new BattleMission());
         }
 
-        if(Mathf.randomSeed(sector.getSeed() + 3) < 0.5){
+        //possibly add another recipe mission
+        addRecipeMission(sector, 11);
 
+        //possibly another battle mission
+        if(Mathf.randomSeed(sector.getSeed() + 3) < 0.3){
+            addExpandMission(sector, 20);
+            sector.missions.add(new BattleMission());
         }
+    }
 
-        //sector.missions.add(new ExpandMission());
-        //sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5));
+    private void addExpandMission(Sector sector, int offset){
+        //add 0-1 expansion mission
+        if(sector.missions.size > 0){
+            int ex = sector.width >= 3 ? 0 : Mathf.randomSeed(sector.getSeed() + 6 + offset, -2, 2);
+            int ey = sector.height >= 3 ? 0 : Mathf.randomSeed(sector.getSeed() + 7 + offset, -2, 2);
+            if(ex != 0 || ey != 0){
+                sector.missions.add(new ExpandMission(ex, ey));
+            }
+        }
+    }
+
+    private void addRecipeMission(Sector sector, int offset){
+        //build list of locked recipes to add mission for obtaining it
+        if(!headless && Mathf.randomSeed(sector.getSeed() + offset) < 0.5){
+            Array<Recipe> recipes = new Array<>();
+            for(Recipe r : content.recipes()){
+                //..wall missions don't happen
+                if(r.result instanceof Wall || control.unlocks.isUnlocked(r)) continue;
+                recipes.add(r);
+            }
+
+            if(recipes.size > 0){
+                Recipe recipe = recipes.get(Mathf.randomSeed(sector.getSeed() + 10, 0, recipes.size-1));
+                sector.missions.addAll(Missions.blockRecipe(recipe.result));
+            }
+        }
     }
 
     private void createTexture(Sector sector){
