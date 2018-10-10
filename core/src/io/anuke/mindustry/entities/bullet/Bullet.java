@@ -97,6 +97,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         supressOnce = true;
     }
 
+    @Override
     public void absorb(){
         supressCollision = true;
         remove();
