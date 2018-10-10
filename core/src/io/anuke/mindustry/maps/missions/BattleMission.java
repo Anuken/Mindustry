@@ -23,7 +23,7 @@ public class BattleMission extends Mission{
 
     @Override
     public void generate(Generation gen){
-        int enemyX = gen.width-1-coreX, enemyY = gen.height-1-coreX;
+        //int enemyX = gen.width-1-coreX, enemyY = gen.height-1-coreX;
 
         //generateCoreAt(gen, coreX, coreY, Team.blue);
         //generateCoreAt(gen, enemyX, enemyY, Team.red);

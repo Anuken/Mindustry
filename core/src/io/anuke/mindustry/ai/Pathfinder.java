@@ -82,16 +82,12 @@ public class Pathfinder{
         return target;
     }
 
-    public float getDebugValue(int x, int y){
-        return paths[Team.blue.ordinal()].weights[x][y];
-    }
-
     public float getValueforTeam(Team team, int x, int y){
         return paths == null || team.ordinal() >= paths.length ? 0 : paths[team.ordinal()].weights[x][y];
     }
 
     private boolean passable(Tile tile, Team team){
-        return (!tile.solid() && !(tile.floor().isLiquid))
+        return (!tile.solid())
                 || (tile.breakable() && (tile.target().getTeam() != team));
     }
 
@@ -160,10 +156,10 @@ public class Pathfinder{
                     int dx = tile.x + point.x, dy = tile.y + point.y;
                     Tile other = world.tile(dx, dy);
 
-                    if(other != null && (path.weights[dx][dy] > cost + 1 || path.searches[dx][dy] < path.search)
+                    if(other != null && (path.weights[dx][dy] == Float.MAX_VALUE || path.searches[dx][dy] < path.search)
                             && passable(other, team)){
                         path.frontier.addFirst(world.tile(dx, dy));
-                        path.weights[dx][dy] = cost + other.cost / 2f;
+                        path.weights[dx][dy] = cost + other.cost;
                         path.searches[dx][dy] = path.search;
                     }
                 }

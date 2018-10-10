@@ -390,8 +390,13 @@ public class Tile implements PosTrait, TargetTrait{
                 cliffs |= (1 << (i * 2));
             }
         }
+
         if(occluded){
             cost += 1;
+        }
+
+        if(floor.isLiquid){
+            cost += 100f;
         }
     }
 

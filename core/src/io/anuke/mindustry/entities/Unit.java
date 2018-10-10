@@ -122,6 +122,15 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     @Override
+    public void move(float x, float y){
+        if(!isFlying()){
+            super.move(x, y);
+        }else{
+            moveBy(x, y);
+        }
+    }
+
+    @Override
     public void writeSave(DataOutput stream) throws IOException{
         writeSave(stream, false);
     }
