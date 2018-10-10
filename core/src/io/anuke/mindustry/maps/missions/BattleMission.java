@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.generation.FortressGenerator;
 import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.ucore.util.Bundles;
 
@@ -26,10 +25,10 @@ public class BattleMission extends Mission{
     public void generate(Generation gen){
         int enemyX = gen.width-1-coreX, enemyY = gen.height-1-coreX;
 
-        generateCoreAt(gen, coreX, coreY, Team.blue);
-        generateCoreAt(gen, enemyX, enemyY, Team.red);
+        //generateCoreAt(gen, coreX, coreY, Team.blue);
+        //generateCoreAt(gen, enemyX, enemyY, Team.red);
 
-        new FortressGenerator().generate(gen, Team.red, coreX, coreY, enemyX, enemyY);
+        //new FortressGenerator().generate(gen, Team.red, coreX, coreY, enemyX, enemyY);
     }
 
     @Override

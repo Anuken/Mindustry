@@ -22,7 +22,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.BaseEntity;
+import io.anuke.ucore.entities.impl.SolidEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -36,11 +36,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.puddleGroup;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
-public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait, SyncTrait{
+public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrait, SyncTrait{
     private static final IntMap<Puddle> map = new IntMap<>();
     private static final float maxLiquid = 70f;
     private static final int maxGeneration = 2;
@@ -164,6 +162,16 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
 
     public float getFlammability(){
         return liquid.flammability * amount;
+    }
+
+    @Override
+    public void getHitbox(Rectangle rectangle){
+        rectangle.setCenter(x, y).setSize(tilesize);
+    }
+
+    @Override
+    public void getHitboxTile(Rectangle rectangle){
+        rectangle.setCenter(x, y).setSize(0f);
     }
 
     @Override
