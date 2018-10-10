@@ -39,12 +39,12 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     /**Maximum absolute value of a velocity vector component.*/
     public static final float maxAbsVelocity = 127f / velocityPercision;
 
-    public UnitInventory inventory = new UnitInventory(this);
+    public final UnitInventory inventory = new UnitInventory(this);
     public float rotation;
     public float hitTime;
 
-    protected Interpolator interpolator = new Interpolator();
-    protected StatusController status = new StatusController();
+    protected final Interpolator interpolator = new Interpolator();
+    protected final StatusController status = new StatusController();
     protected Team team = Team.blue;
 
     protected CarryTrait carrier;

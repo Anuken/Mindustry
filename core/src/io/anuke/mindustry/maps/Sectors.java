@@ -184,16 +184,6 @@ public class Sectors{
 
         return true;
     }
-    /*
-    private boolean canMerge(Sector s1, Sector s2){
-        int minx = Math.min(s1.x, s2.x);
-        int miny = Math.min(s1.y, s2.y);
-
-        int maxx = Math.max(s1.x + s1.width, s2.x + s2.width);
-        int maxy = Math.max(s1.y + s1.height, s2.y + s2.height);
-
-
-    }*/
 
     /**Returns whether a sector of this size and position can be fit here.*/
     public boolean canFit(int x, int y, int width, int height){

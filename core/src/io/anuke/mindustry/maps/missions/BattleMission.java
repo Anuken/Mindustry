@@ -32,6 +32,11 @@ public class BattleMission extends Mission{
     }
 
     @Override
+    public void onBegin(){
+
+    }
+
+    @Override
     public boolean isComplete(){
         for(Team team : Vars.state.teams.enemiesOf(Vars.defaultTeam)){
             if(Vars.state.teams.isActive(team)){

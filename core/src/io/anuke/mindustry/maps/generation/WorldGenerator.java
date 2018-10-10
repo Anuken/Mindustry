@@ -20,10 +20,10 @@ import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.noise.RidgedPerlin;
 import io.anuke.ucore.noise.Simplex;
-import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.SeedRandom;
+import io.anuke.ucore.util.Structs;
 
 import static io.anuke.mindustry.Vars.sectorSize;
 import static io.anuke.mindustry.Vars.world;
