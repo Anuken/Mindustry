@@ -123,7 +123,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             rotatespeed = 8f;
             powerUsed = 7f;
             powerCapacity = 30f;
-            range = 130f;
+            range = 150f;
             shootEffect = ShootFx.lightningShoot;
             heatColor = Color.RED;
             recoil = 1f;
