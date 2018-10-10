@@ -4,10 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.game.EventType.PlayEvent;
-import io.anuke.mindustry.game.EventType.ResetEvent;
-import io.anuke.mindustry.game.EventType.WaveEvent;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.net.Net;
@@ -112,6 +109,8 @@ public class Logic extends Module{
             if(!headless){
                 ui.missions.show(world.getSector());
             }
+
+            Events.fire(new SectorCompleteEvent());
         }
     }
 

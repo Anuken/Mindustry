@@ -8,6 +8,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
+import io.anuke.mindustry.game.EventType.SectorCompleteEvent;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
@@ -90,6 +91,20 @@ public class ServerControl extends Module{
             err("WARNING: &lyYour server is running a custom build, which means that client checking is disabled.\n" +
             "&lrWARNING: &lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly so that clients know which version you are using.");
         }
+
+        Events.on(SectorCompleteEvent.class, event -> {
+            Log.info("Sector complete.");
+            world.sectors.completeSector(world.getSector().x, world.getSector().y);
+            world.sectors.save();
+            gameOvers = 0;
+            inExtraRound = true;
+            Settings.putInt("sector_x", world.getSector().x + world.getSector().width);
+            Settings.save();
+
+            Call.onInfoMessage("[accent]Sector conquered![]\n" + roundExtraTime + " seconds until deployment in next sector.");
+
+            playSectorMap();
+        });
 
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
@@ -891,28 +906,5 @@ public class ServerControl extends Module{
         if(!inExtraRound && state.mode.isPvp){
             checkPvPGameOver();
         }
-
-        //TODO re implement sector shuffle
-        /*
-        if(state.is(State.playing) && world.getSector() != null && !inExtraRound && netServer.admins.getStrict()){
-            //all assigned missions are complete
-            if(world.getSector().completedMissions >= world.getSector().missions.size){
-                Log.info("Mission complete.");
-                world.sectors.completeSector(world.getSector().x, world.getSector().y);
-                world.sectors.save();
-                gameOvers = 0;
-                inExtraRound = true;
-                Settings.putInt("sector_x", world.getSector().x + world.getSector().size);
-                Settings.save();
-
-                Call.onInfoMessage("[accent]Sector conquered![]\n" + roundExtraTime + " seconds until deployment in next sector.");
-
-                playSectorMap();
-            }else if(world.getSector().currentMission().isComplete()){
-                world.getSector().currentMission().onComplete();
-                //increment completed missions, check next index next frame
-                world.getSector().completedMissions ++;
-            }
-        }*/
     }
 }
