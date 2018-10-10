@@ -132,11 +132,12 @@ public class Recipes implements ContentList{
 
         new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.densealloy, 40), new ItemStack(Items.silicon, 50));
         new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.densealloy, 500), new ItemStack(Items.thorium, 350));
-        new Recipe(distribution, StorageBlocks.core,
+        //core disabled due to being broken
+        /*new Recipe(distribution, StorageBlocks.core,
             new ItemStack(Items.copper, 2000), new ItemStack(Items.densealloy, 1500),
             new ItemStack(Items.silicon, 1500), new ItemStack(Items.thorium, 500),
             new ItemStack(Items.surgealloy, 500), new ItemStack(Items.phasematter, 750)
-        );
+        );*/
 
         //DRILLS, PRODUCERS
         new Recipe(production, ProductionBlocks.mechanicalDrill, new ItemStack(Items.copper, 45)).setAlwaysUnlocked(true);
