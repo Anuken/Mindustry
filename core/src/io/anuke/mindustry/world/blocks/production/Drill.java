@@ -114,7 +114,7 @@ public class Drill extends Block{
 
     @Override
     public TextureRegion[] getIcon(){
-        return new TextureRegion[]{region, rotatorRegion, topRegion};
+        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-rotator"), Draw.region(name + "-top")};
     }
 
     @Override

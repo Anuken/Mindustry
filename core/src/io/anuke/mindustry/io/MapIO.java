@@ -84,6 +84,11 @@ public class MapIO{
                 data.write(x, y, DataPosition.floor, block.floor.id);
                 data.write(x, y, DataPosition.elevation, (byte)block.elevation);
 
+                //place spawn
+                if(color == Color.rgba8888(Color.RED)){
+                    data.write(x, y, DataPosition.wall, Blocks.spawn.id);
+                }
+
                 //place core
                 if(color == Color.rgba8888(Color.GREEN)){
                     for(int dx = 0; dx < 3; dx++){
