@@ -15,7 +15,7 @@ public class Pump extends LiquidBlock{
     protected final Array<Tile> drawTiles = new Array<>();
     protected final Array<Tile> updateTiles = new Array<>();
 
-    protected int timerContentCheck = timers++;
+    protected final int timerContentCheck = timers++;
 
     /**Pump amount per tile this block is on.*/
     protected float pumpAmount = 1f;

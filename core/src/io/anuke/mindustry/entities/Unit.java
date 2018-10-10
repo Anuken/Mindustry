@@ -100,7 +100,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public boolean collides(SolidTrait other){
-        if(isDead()) return true;
+        if(isDead()) return false;
 
         if(other instanceof DamageTrait){
             return other instanceof TeamTrait && state.teams.areEnemies((((TeamTrait) other).getTeam()), team);

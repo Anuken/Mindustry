@@ -51,7 +51,7 @@ public class ServerControl extends Module{
             "shufflemode", "normal",
             "bans", "",
             "admins", "",
-            "sector_x", 0,
+            "sector_x", 2,
             "sector_y", 1,
             "shuffle", true,
             "crashreport", false,
