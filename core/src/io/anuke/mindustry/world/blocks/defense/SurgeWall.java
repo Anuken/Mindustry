@@ -8,8 +8,8 @@ import io.anuke.ucore.util.Mathf;
 
 public class SurgeWall extends Wall{
     protected float lightningChance = 0.05f;
-    protected float lightningDamage = 11f;
-    protected int lightningLength = 20;
+    protected float lightningDamage = 15f;
+    protected int lightningLength = 17;
 
     public SurgeWall(String name){
         super(name);

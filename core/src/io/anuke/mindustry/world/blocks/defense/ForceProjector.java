@@ -117,7 +117,7 @@ public class ForceProjector extends Block {
         if(entity.buildup >= breakage && !entity.broken){
             entity.broken = true;
             entity.buildup = breakage;
-            Effects.effect(BlockFx.shieldBreak, tile.drawy(), tile.drawy(), radius);
+            Effects.effect(BlockFx.shieldBreak, tile.drawx(), tile.drawy(), radius);
         }
 
         if(entity.hit > 0f){
@@ -159,7 +159,7 @@ public class ForceProjector extends Block {
         ForceEntity entity = tile.entity();
 
         if(entity.buildup <= 0f) return;
-        Draw.alpha(entity.buildup / breakage * 0.75f/* * Mathf.absin(Timers.time(), 10f - (entity.buildup/breakage)*6f, 1f)*/);
+        Draw.alpha(entity.buildup / breakage * 0.75f);
 
         Graphics.setAdditiveBlending();
         Draw.rect(topRegion, tile.drawx(), tile.drawy());

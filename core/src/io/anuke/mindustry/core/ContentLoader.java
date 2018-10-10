@@ -23,6 +23,7 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
+import io.anuke.mindustry.world.LegacyColorMapper;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.ThreadArray;
@@ -96,6 +97,7 @@ public class ContentLoader{
 
         //not really a content class, but this makes initialization easier
         new ColorMapper(),
+        new LegacyColorMapper(),
 
         //recipes
         new Recipes(),

@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
@@ -16,11 +17,16 @@ import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
+import io.anuke.mindustry.world.LegacyColorMapper;
+import io.anuke.mindustry.world.LegacyColorMapper.LegacyBlock;
+import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.Structs;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
 import static io.anuke.mindustry.Vars.content;
 
 /**
@@ -66,20 +72,36 @@ public class MapIO{
         return pixmap;
     }
 
-    public static MapTileData readPixmap(Pixmap pixmap){
+    /**Reads a pixmap in the old (3.5) map format.*/
+    public static MapTileData readLegacyPixmap(Pixmap pixmap){
         MapTileData data = new MapTileData(pixmap.getWidth(), pixmap.getHeight());
 
         for(int x = 0; x < data.width(); x++){
             for(int y = 0; y < data.height(); y++){
-                Block block = ColorMapper.getByColor(pixmap.getPixel(y, pixmap.getWidth() - 1 - x));
+                int color = pixmap.getPixel(y, pixmap.getWidth() - 1 - x);
+                LegacyBlock block = LegacyColorMapper.get(color);
 
-                if(block == null){
-                    data.write(x, y, DataPosition.floor, Blocks.stone.id);
-                }else{
-                    data.write(x, y, DataPosition.floor, block.id);
+                data.write(x, y, DataPosition.floor, block.floor.id);
+                data.write(x, y, DataPosition.elevation, (byte)block.elevation);
+
+                //place core
+                if(color == Color.rgba8888(Color.GREEN)){
+                    for(int dx = 0; dx < 3; dx++){
+                        for(int dy = 0; dy < 3; dy++){
+                            int worldx = dx - 1 + x;
+                            int worldy = dy - 1 + y;
+
+                            if(Structs.inBounds(worldx, worldy, pixmap.getWidth(), pixmap.getHeight())){
+                                data.write(worldx, worldy, DataPosition.wall, Blocks.blockpart.id);
+                                data.write(worldx, worldy, DataPosition.rotationTeam, Bits.packByte((byte)0, (byte)Team.blue.ordinal()));
+                                data.write(worldx, worldy, DataPosition.link, Bits.packByte((byte) (dx - 1 + 8), (byte) (dy - 1 + 8)));
+                            }
+                        }
+                    }
+
+                    data.write(x, y, DataPosition.wall, StorageBlocks.core.id);
+                    data.write(x, y, DataPosition.rotationTeam, Bits.packByte((byte)0, (byte)Team.blue.ordinal()));
                 }
-
-                data.write(x, y, DataPosition.wall, Blocks.air.id);
             }
         }
 

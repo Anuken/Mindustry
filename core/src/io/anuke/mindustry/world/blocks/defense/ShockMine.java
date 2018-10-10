@@ -14,7 +14,7 @@ public class ShockMine extends Block{
 
     protected float cooldown = 80f;
     protected float tileDamage = 5f;
-    protected float damage = 10;
+    protected float damage = 13;
     protected int length = 10;
     protected int tendrils = 6;
 

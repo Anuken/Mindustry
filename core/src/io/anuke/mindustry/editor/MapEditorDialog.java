@@ -3,6 +3,7 @@ package io.anuke.mindustry.editor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
@@ -110,15 +111,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                         }
                                     });
                                 }, true, mapExtension);
-                            }/*,
-						"$text.editor.importimage", "$text.editor.importimage.description", "icon-file-image", (Listenable)() -> {
+                            },
+						"$text.editor.importimage", "$text.editor.importimage.description", "icon-file-image", (Runnable)() -> {
 							if(gwt){
 								ui.showError("$text.web.unsupported");
 							}else {
 								Platform.instance.showFileChooser("$text.loadimage", "Image Files", file -> {
 									ui.loadGraphics(() -> {
 										try{
-											MapTileData data = MapIO.readPixmap(new Pixmap(file));
+											MapTileData data = MapIO.readLegacyPixmap(new Pixmap(file));
 
 											editor.beginEdit(data, editor.getTags(), false);
 											view.clearStack();
@@ -129,7 +130,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 									});
 								}, true, "png");
 							}
-						}*/));
+						}));
 
             t.addImageTextButton("$text.editor.export", "icon-save-map", isize, () -> createDialog("$text.editor.export",
                     "$text.editor.exportfile", "$text.editor.exportfile.description", "icon-file", (Runnable) () -> {
