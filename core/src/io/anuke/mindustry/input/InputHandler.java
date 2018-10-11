@@ -331,6 +331,7 @@ public abstract class InputHandler extends InputAdapter{
         for(Tile tile : state.teams.get(player.getTeam()).cores){
             if(tile.distanceTo(x * tilesize, y * tilesize) < coreBuildRange){
                 //TODO terrible hack
+                //this might actually screw things up on the logic thread.
                 try{
                     return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
                     Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;

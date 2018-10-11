@@ -83,7 +83,7 @@ public class WaveSpawner{
         int addGround = groundGroups - groundSpawns.size, addFly = flyGroups - flySpawns.size;
 
         //add extra groups if the total exceeds it
-        if(!dynamicSpawn){
+        if(dynamicSpawn){
             for(int i = 0; i < addGround; i++){
                 GroundSpawn spawn = new GroundSpawn();
                 findLocation(spawn);
