@@ -250,7 +250,11 @@ public class Renderer extends RendererModule{
         EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
         Graphics.endShaders();
 
-        Graphics.flushSurface();
+        if(showFog){
+            Graphics.surface();
+        }else{
+            Graphics.flushSurface();
+        }
 
         batch.end();
 
