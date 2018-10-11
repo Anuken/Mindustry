@@ -166,7 +166,7 @@ public class MassDriver extends Block{
                 entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(waiter), rotateSpeed);
             }else if(tile.entity.items.total() >= minDistribute &&
                     linkValid(tile) && //only fire when at least at half-capacity and power
-                    tile.entity.power.amount >= powerCapacity &&
+                    tile.entity.power.amount >= powerCapacity * 0.8f &&
                     link.block().itemCapacity - link.entity.items.total() >= minDistribute && entity.reload <= 0.0001f){
 
                 MassDriverEntity other = link.entity();
