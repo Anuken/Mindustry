@@ -27,6 +27,7 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Atlas;
+import io.anuke.ucore.util.Timer;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -43,6 +44,7 @@ public class Control extends Module{
     public final Saves saves;
     public final Unlocks unlocks;
 
+    private Timer timerRPC= new Timer(), timerUnlock = new Timer();
     private boolean hiscore = false;
     private boolean wasPaused = false;
     private InputHandler[] inputs = {};
@@ -348,12 +350,12 @@ public class Control extends Module{
             }
 
             //auto-update rpc every 5 seconds
-            if(Timers.get("rpcUpdate", 60 * 5)){
+            if(timerRPC.get(60 * 5)){
                 Platform.instance.updateRPC();
             }
 
             //check unlocks every 2 seconds
-            if(!state.mode.infiniteResources && Timers.get("timerCheckUnlock", 120)){
+            if(!state.mode.infiniteResources && timerUnlock.get(120)){
                 checkUnlockableBlocks();
 
                 //save if the unlocks changed

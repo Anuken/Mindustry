@@ -54,13 +54,16 @@ public class Units{
         return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.getWeapon().getAmmo().getRange());
     }
 
-    /**
-     * Returns whether there are any entities on this tile.
-     */
+    /**Returns whether there are any entities on this tile.*/
     public static boolean anyEntities(Tile tile){
         Block type = tile.block();
         rect.setSize(type.size * tilesize, type.size * tilesize);
         rect.setCenter(tile.drawx(), tile.drawy());
+
+        return anyEntities(rect);
+    }
+
+    public static boolean anyEntities(Rectangle rect){
 
         boolResult = false;
 
@@ -78,9 +81,7 @@ public class Units{
         return boolResult;
     }
 
-    /**
-     * Returns whether there are any entities on this tile, with the hitbox expanded.
-     */
+    /**Returns whether there are any entities on this tile, with the hitbox expanded.*/
     public static boolean anyEntities(Tile tile, float expansion, Predicate<Unit> pred){
         Block type = tile.block();
         rect.setSize(type.size * tilesize + expansion, type.size * tilesize + expansion);

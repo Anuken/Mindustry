@@ -11,7 +11,6 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Events;
-import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.util.Geometry;
 
 import static io.anuke.mindustry.Vars.*;
@@ -113,30 +112,9 @@ public class Build{
             return false;
         }
 
-        rect.setSize(type.size * tilesize, type.size * tilesize);
-        rect.setCenter(type.offset() + x * tilesize, type.offset() + y * tilesize);
-
-        if(type.solid || type.solidifes){
-            synchronized(Entities.entityLock){
-                try{
-
-                    rect.setSize(tilesize * type.size).setCenter(x * tilesize + type.offset(), y * tilesize + type.offset());
-                    boolean[] result = {false};
-
-                    Units.getNearby(rect, e -> {
-                        if(e == null) return; //not sure why this happens?
-                        e.getHitbox(hitrect);
-
-                        if(rect.overlaps(hitrect) && !e.isFlying()){
-                            result[0] = true;
-                        }
-                    });
-
-                    if(result[0]) return false;
-                }catch(Exception e){
-                    return false;
-                }
-            }
+        if((type.solid || type.solidifes) &&
+            Units.anyEntities(rect.setSize(tilesize * type.size).setCenter(x * tilesize + type.offset(), y * tilesize + type.offset()))){
+            return false;
         }
 
         //check for enemy cores

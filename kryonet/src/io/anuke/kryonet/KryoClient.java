@@ -28,7 +28,6 @@ import java.nio.channels.ClosedSelectorException;
 import java.util.List;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.net.Net.packetPoolLock;
 
 public class KryoClient implements ClientProvider{
     Client client;
@@ -146,9 +145,7 @@ public class KryoClient implements ClientProvider{
             client.sendUDP(object);
         }
 
-        synchronized (packetPoolLock) {
-            Pooling.free(object);
-        }
+        Pooling.free(object);
     }
 
     @Override

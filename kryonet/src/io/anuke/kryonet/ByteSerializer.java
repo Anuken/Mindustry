@@ -9,8 +9,6 @@ import io.anuke.ucore.util.Pooling;
 
 import java.nio.ByteBuffer;
 
-import static io.anuke.mindustry.net.Net.packetPoolLock;
-
 @SuppressWarnings("unchecked")
 public class ByteSerializer implements Serialization {
 
@@ -36,11 +34,9 @@ public class ByteSerializer implements Serialization {
         if(id == -2){
            return FrameworkSerializer.read(byteBuffer);
         }else{
-            synchronized (packetPoolLock) {
-                Packet packet = Pooling.obtain((Class<Packet>) Registrator.getByID(id).type, (Supplier<Packet>) Registrator.getByID(id).constructor);
-                packet.read(byteBuffer);
-                return packet;
-            }
+            Packet packet = Pooling.obtain((Class<Packet>) Registrator.getByID(id).type, (Supplier<Packet>) Registrator.getByID(id).constructor);
+            packet.read(byteBuffer);
+            return packet;
         }
     }
 

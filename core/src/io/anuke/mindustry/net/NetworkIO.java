@@ -153,8 +153,6 @@ public class NetworkIO{
 
         Player player = players[0];
 
-        //TODO !! use map name as the network map in Maps, so getMap() isn't null.
-
         try(DataInputStream stream = new DataInputStream(is)){
             float timerTime = stream.readFloat();
             long timestamp = stream.readLong();
