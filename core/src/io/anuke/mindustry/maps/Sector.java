@@ -38,6 +38,8 @@ public class Sector{
     public transient int difficulty;
     /**Items the player starts with on this sector.*/
     public transient Array<ItemStack> startingItems;
+    /**Last expansion parameters.*/
+    public transient int lastExpandX, lastExpandY;
 
     public Mission currentMission(){
         return completedMissions >= missions.size ? victoryMission : missions.get(completedMissions);

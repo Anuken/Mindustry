@@ -260,7 +260,7 @@ public class Tile implements PosTrait, TargetTrait{
     }
 
     public boolean isEnemyCheat(){
-        return getTeam() == waveTeam && state.mode.enemyCheat;
+        return getTeam() == waveTeam && !state.mode.isPvp;
     }
 
     public boolean isLinked(){

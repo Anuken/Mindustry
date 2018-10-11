@@ -71,6 +71,7 @@ public class ForceProjector extends Block {
     @Override
     public void update(Tile tile){
         ForceEntity entity = tile.entity();
+        boolean cheat = tile.isEnemyCheat();
 
         if(entity.shield == null){
             entity.shield = new ShieldEntity(tile);
@@ -89,7 +90,7 @@ public class ForceProjector extends Block {
             Effects.effect(BlockFx.reactorsmoke, tile.drawx() + Mathf.range(tilesize/2f), tile.drawy() + Mathf.range(tilesize/2f));
         }
 
-        if(!entity.cons.valid()){
+        if(!entity.cons.valid() && !cheat){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.1f);
             if(entity.warmup <= 0.09f){
                 entity.broken = true;

@@ -115,6 +115,9 @@ public class Sectors{
             }
         }
 
+        sector.lastExpandX = expandX;
+        sector.lastExpandY = expandY;
+
         //add new sector spaces
         for(int x = sector.x; x < sector.x+sector.width; x++){
             for(int y = sector.y; y < sector.y+sector.height; y++){
@@ -292,7 +295,7 @@ public class Sectors{
     }
 
     private void initSector(Sector sector){
-        sector.difficulty = (int)(Mathf.dst(sector.x, sector.y));
+        sector.difficulty = (int)(Mathf.dst(sector.x, sector.y) / 2);
 
         if(presets.get(sector.x, sector.y) != null){
             SectorPreset p = presets.get(sector.x, sector.y);
@@ -357,8 +360,12 @@ public class Sectors{
         //expand
         addExpandMission(sector, 16);
 
+        if((sector.width + sector.height) <= 3){
+            sector.difficulty = Math.max(sector.difficulty - 3, 0);
+        }
+
         //50% chance to get a wave mission
-        if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5){
+        if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5 || (sector.width + sector.height) <= 3){
             sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5));
         }else{
             sector.missions.add(new BattleMission());
