@@ -244,7 +244,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public String toString(){
-        return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}\n";
+        return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}";
     }
 
     @Override
@@ -570,8 +570,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         movement.y += ya * speed;
         movement.x += xa * speed;
 
-        Vector2 vec = Graphics.world(Vars.control.input(playerIndex).getMouseX(),
-                Vars.control.input(playerIndex).getMouseY());
+        Vector2 vec = Graphics.world(control.input(playerIndex).getMouseX(), control.input(playerIndex).getMouseY());
         pointerX = vec.x;
         pointerY = vec.y;
         updateShooting();
@@ -691,8 +690,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 }
 
             }else if(isShooting()){
-                Vector2 vec = Graphics.world(Vars.control.input(playerIndex).getMouseX(),
-                        Vars.control.input(playerIndex).getMouseY());
+                Vector2 vec = Graphics.world(control.input(playerIndex).getMouseX(),
+                        control.input(playerIndex).getMouseY());
                 pointerX = vec.x;
                 pointerY = vec.y;
 

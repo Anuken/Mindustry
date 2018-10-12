@@ -71,9 +71,6 @@ public class FortressGenerator{
         Array<Block> wallsLarge = find(b -> b instanceof Wall && !(b instanceof Door) && b.size == 2);
 
         Block wall = walls.get((int)(difficultyScl * walls.size));
-        Block wallLarge = wallsLarge.get((int)(difficultyScl * walls.size));
-        Drill drill = (Drill) drills.get((int)(difficultyScl * drills.size));
-        Drill powerDrill = (Drill) powerDrills.get((int)(difficultyScl * powerDrills.size));
 
         Turret powerTurret = (Turret) powerTurrets.get((int)(difficultyScl * powerTurrets.size));
         Turret bigTurret = (Turret) turrets.get(Mathf.clamp((int)((difficultyScl+0.2f+gen.random.range(0.2f)) * turrets.size), 0, turrets.size-1));
