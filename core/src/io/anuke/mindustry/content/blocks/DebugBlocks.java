@@ -129,10 +129,11 @@ public class DebugBlocks extends BlockList implements ContentList{
                 Table cont = new Table();
 
                 for(int i = 0; i < items.size; i++){
+                    if(!control.unlocks.isUnlocked(items.get(i))) continue;
+
                     final int f = i;
-                    ImageButton button = cont.addImageButton("liquid-icon-" + items.get(i).name, "toggle", 24, () -> {
-                        Call.setLiquidSourceLiquid(null, tile, items.get(f));
-                    }).size(38, 42).padBottom(-5.1f).group(group).get();
+                    ImageButton button = cont.addImageButton("liquid-icon-" + items.get(i).name, "toggle", 24,
+                            () -> Call.setLiquidSourceLiquid(null, tile, items.get(f))).size(38, 42).padBottom(-5.1f).group(group).get();
                     button.setChecked(entity.source.id == f);
 
                     if(i % 4 == 3){

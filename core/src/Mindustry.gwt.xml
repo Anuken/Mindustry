@@ -13,6 +13,8 @@
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.effect"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.bullet.Bullet"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.Team"/>
+    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.maps.missions.Mission"/>
+    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.type.Item"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.meta.BlockBar"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.maps.generation.WorldGenerator"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.StatusController"/>

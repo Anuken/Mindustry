@@ -8,8 +8,8 @@ import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.function.IntPositionConsumer;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.ui;
@@ -83,7 +83,7 @@ public enum EditorTool{
         MapTileData data;
 
         public void touched(MapEditor editor, int x, int y){
-            if(!Mathf.inBounds(x, y, editor.getMap().width(), editor.getMap().height())) return;
+            if(!Structs.inBounds(x, y, editor.getMap().width(), editor.getMap().height())) return;
 
             if(editor.getDrawBlock().isMultiblock()){
                 //don't fill multiblocks, thanks
@@ -102,7 +102,7 @@ public enum EditorTool{
             byte brt = Bits.packByte((byte) editor.getDrawRotation(), (byte) editor.getDrawTeam().ordinal());
 
             dest = floor ? bf : bw;
-            byte draw = (byte) editor.getDrawBlock().id;
+            byte draw = editor.getDrawBlock().id;
 
             if(dest == draw){
                 return;

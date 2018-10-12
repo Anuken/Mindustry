@@ -9,7 +9,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.game.ContentList;
 
 public class ArtilleryBullets extends BulletList implements ContentList{
-    public static BulletType dense, plastic, plasticFrag, homing, incindiary, explosive, surge;
+    public static BulletType dense, plastic, plasticFrag, homing, incindiary, explosive, surge, unit;
 
     @Override
     public void load(){
@@ -96,6 +96,21 @@ public class ArtilleryBullets extends BulletList implements ContentList{
                 splashDamage = 50f;
                 backColor = Palette.missileYellowBack;
                 frontColor = Palette.missileYellow;
+            }
+        };
+
+        unit = new ArtilleryBulletType(2f, 0, "shell"){
+            {
+                hiteffect = BulletFx.blastExplosion;
+                knockback = 0.8f;
+                lifetime = 90f;
+                bulletWidth = bulletHeight = 14f;
+                collides = true;
+                collidesTiles = true;
+                splashDamageRadius = 45f;
+                splashDamage = 50f;
+                backColor = Palette.bulletYellowBack;
+                frontColor = Palette.bulletYellow;
             }
         };
 

@@ -47,7 +47,7 @@ public class CommandCenter extends Block{
 
     @Override
     public void playerPlaced(Tile tile){
-        ObjectSet<Tile> set = world.indexer().getAllied(tile.getTeam(), BlockFlag.comandCenter);
+        ObjectSet<Tile> set = world.indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
 
         if(set.size > 0){
             CommandCenterEntity entity = tile.entity();
@@ -92,7 +92,7 @@ public class CommandCenter extends Block{
     public static void onCommandCenterSet(Player player, Tile tile, UnitCommand command){
         Effects.effect(((CommandCenter)tile.block()).effect, tile);
 
-        for(Tile center : world.indexer().getAllied(tile.getTeam(), BlockFlag.comandCenter)){
+        for(Tile center : world.indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter)){
             if(center.block() instanceof CommandCenter){
                 CommandCenterEntity entity = center.entity();
                 entity.command = command;

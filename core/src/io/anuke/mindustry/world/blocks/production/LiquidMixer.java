@@ -9,7 +9,6 @@ import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 
 public class LiquidMixer extends LiquidBlock{

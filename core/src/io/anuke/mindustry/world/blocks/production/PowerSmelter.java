@@ -166,11 +166,8 @@ public class PowerSmelter extends PowerBlock{
             }
         }
 
-        if(useFlux && item.fluxiness >= minFlux){
-            return tile.entity.items.get(item) < itemCapacity;
-        }
+        return useFlux && item.fluxiness >= minFlux && tile.entity.items.get(item) < itemCapacity;
 
-        return false;
     }
 
     @Override

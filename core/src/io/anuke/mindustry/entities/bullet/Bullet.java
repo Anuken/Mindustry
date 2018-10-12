@@ -1,10 +1,10 @@
 package io.anuke.mindustry.entities.bullet;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.traits.AbsorbTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
@@ -69,15 +69,9 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         bullet.type = type;
         bullet.lifeScl = lifetimeScl;
 
-        //translate bullets backwards, purely for visual reasons
-        float backDelta = Timers.delta();
-
-        bullet.lastPosition().set(x - bullet.velocity.x * backDelta, y - bullet.velocity.y * backDelta, bullet.angle());
-        bullet.setLastUpdated(TimeUtils.millis());
-        bullet.setUpdateSpacing((long) ((Timers.delta() / 60f) * 1000));
-        bullet.set(x, y);
-
+        bullet.set(x - bullet.velocity.x * Timers.delta(), y - bullet.velocity.y * Timers.delta());
         bullet.add();
+
         return bullet;
     }
 
@@ -103,6 +97,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         supressOnce = true;
     }
 
+    @Override
     public void absorb(){
         supressCollision = true;
         remove();
@@ -138,6 +133,10 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     public float getDamage(){
         if(owner instanceof Unit){
             return super.getDamage() * ((Unit) owner).getDamageMultipler();
+        }
+
+        if(owner instanceof Lightning && data instanceof Float){
+            return (Float)data;
         }
 
         return super.getDamage();
@@ -179,8 +178,13 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     }
 
     @Override
+    public float getShieldDamage(){
+        return Math.max(getDamage(), type.splashDamage);
+    }
+
+    @Override
     public boolean collides(SolidTrait other){
-        return type.collides && super.collides(other) && !supressCollision;
+        return type.collides && super.collides(other) && !supressCollision && !(other instanceof Unit && ((Unit) other).isFlying() && !type.collidesAir);
     }
 
     @Override

@@ -53,7 +53,7 @@ public class LoadDialog extends FloatingDialog{
 
         Timers.runTask(2f, () -> Core.scene.setScrollFocus(pane));
 
-        Array<SaveSlot> array = control.getSaves().getSaveSlots();
+        Array<SaveSlot> array = control.saves.getSaveSlots();
 
         for(SaveSlot slot : array){
             if(slot.isHidden()) continue;
@@ -142,7 +142,7 @@ public class LoadDialog extends FloatingDialog{
 
     public void addSetup(){
         boolean valids = false;
-        for(SaveSlot slot : control.getSaves().getSaveSlots()) if(!slot.isHidden()) valids = true;
+        for(SaveSlot slot : control.saves.getSaveSlots()) if(!slot.isHidden()) valids = true;
 
         if(!valids){
 
@@ -159,7 +159,7 @@ public class LoadDialog extends FloatingDialog{
             Platform.instance.showFileChooser(Bundles.get("text.save.import"), "Mindustry Save", file -> {
                 if(SaveIO.isSaveValid(file)){
                     try{
-                        control.getSaves().importSave(file);
+                        control.saves.importSave(file);
                         setup();
                     }catch(IOException e){
                         ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));

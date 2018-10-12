@@ -20,9 +20,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.itemSize;
-import static io.anuke.mindustry.Vars.tilesize;
-
 import static io.anuke.mindustry.Vars.*;
 
 public class Conveyor extends Block{

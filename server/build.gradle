@@ -4,7 +4,7 @@ sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 project.ext.mainClassName = "io.anuke.mindustry.server.ServerLauncher"
-project.ext.assetsDir = new File("../core/assets");
+project.ext.assetsDir = new File("../core/assets")
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
@@ -30,7 +30,7 @@ task dist(type: Jar) {
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
     from {configurations.compile.collect {zipTree(it)}}
-    from files(project.assetsDir);
+    from files(project.assetsDir)
 
     writeVersion()
  
@@ -43,8 +43,8 @@ task deploy(type: Copy){
     dependsOn "dist"
     
     from "build/libs/server-release.jar"
-    into "../deploy/";
-    rename ("server-release.jar", appName + "-server-" + getVersionString() + ".jar");
+    into "../deploy/"
+    rename ("server-release.jar", appName + "-server-" + getVersionString() + ".jar")
 }
 
 dist.dependsOn classes

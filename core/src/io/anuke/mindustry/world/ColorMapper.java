@@ -56,6 +56,6 @@ public class ColorMapper implements ContentList{
 
     @Override
     public ContentType type(){
-        return ContentType.mech;
+        return ContentType.block;
     }
 }

@@ -23,6 +23,7 @@ import io.anuke.ucore.noise.Simplex;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.SeedRandom;
+import io.anuke.ucore.util.Structs;
 
 import static io.anuke.mindustry.Vars.sectorSize;
 import static io.anuke.mindustry.Vars.world;
@@ -42,7 +43,7 @@ public class WorldGenerator{
     private ObjectMap<Block, Block> decoration;
 
     public WorldGenerator(){
-        decoration = Mathf.map(
+        decoration = Structs.map(
             Blocks.grass, Blocks.shrub,
             Blocks.stone, Blocks.rock,
             Blocks.ice, Blocks.icerock,
@@ -186,7 +187,7 @@ public class WorldGenerator{
         SeedRandom rnd = new SeedRandom(sector.getSeed());
         Generation gena = new Generation(sector, tiles, tiles.length, tiles[0].length, rnd);
         Array<GridPoint2> spawnpoints = sector.currentMission().getSpawnPoints(gena);
-        Array<Item> ores = world.sectors().getOres(sector.x, sector.y);
+        Array<Item> ores = world.sectors.getOres(sector.x, sector.y);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
@@ -203,7 +204,7 @@ public class WorldGenerator{
                 byte elevation = tile.getElevation();
 
                 for(GridPoint2 point : Geometry.d4){
-                    if(!Mathf.inBounds(x + point.x, y + point.y, width, height)) continue;
+                    if(!Structs.inBounds(x + point.x, y + point.y, width, height)) continue;
                     if(tiles[x + point.x][y + point.y].getElevation() < elevation){
 
                         if(sim2.octaveNoise2D(1, 1, 1.0 / 8, x, y) > 0.8){

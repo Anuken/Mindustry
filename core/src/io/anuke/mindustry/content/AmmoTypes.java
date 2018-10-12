@@ -9,14 +9,16 @@ import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.ContentType;
 
 public class AmmoTypes implements ContentList{
-    public static AmmoType bulletCopper, bulletDense, bulletThorium, bulletSilicon, bulletPyratite,
-    bulletDenseBig, bulletPyratiteBig, bulletThoriumBig,
-    shock, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite, weaponMissile, weaponMissileSwarm, bulletMech,
-            healBlaster, bulletGlaive,
-            flakExplosive, flakPlastic, flakSurge,
-            missileExplosive, missileIncindiary, missileSurge,
-            artilleryDense, artilleryPlastic, artilleryHoming, artilleryIncindiary, artilleryExplosive,
-            basicFlame, lancerLaser, lightning, spectreLaser, meltdownLaser, fuseShotgun, oil, water, lava, cryofluid, arc;
+    public static AmmoType
+        bulletCopper, bulletDense, bulletThorium, bulletSilicon, bulletPyratite,
+        bulletDenseBig, bulletPyratiteBig, bulletThoriumBig,
+        shock, bombExplosive, bombIncendiary, bombOil, shellCarbide, flamerThermite, weaponMissile, weaponMissileSwarm, bulletMech,
+        healBlaster, bulletGlaive,
+        /*flakCopper, */flakExplosive, flakPlastic, flakSurge,
+        missileExplosive, missileIncindiary, missileSurge,
+        artilleryDense, artilleryPlastic, artilleryHoming, artilleryIncindiary, artilleryExplosive, unitArtillery,
+        basicFlame, lancerLaser, lightning, meltdownLaser, burstLaser,
+            fuseShotgun, oil, water, lava, cryofluid, arc;
 
     @Override
     public void load(){
@@ -201,6 +203,13 @@ public class AmmoTypes implements ContentList{
             reloadMultiplier = 1.6f;
         }};
 
+        unitArtillery = new AmmoType(Items.blastCompound, ArtilleryBullets.unit, 1){{
+            shootEffect = ShootFx.shootBig2;
+            smokeEffect = ShootFx.shootBigSmoke2;
+            reloadMultiplier = 1.6f;
+        }};
+
+
         //flame
 
         basicFlame = new AmmoType(Liquids.oil, TurretBullets.basicFlame, 0.3f){{
@@ -211,11 +220,13 @@ public class AmmoTypes implements ContentList{
 
         lancerLaser = new AmmoType(TurretBullets.lancerLaser);
 
+        burstLaser = new AmmoType(TurretBullets.burstLaser){{
+            range = 60f;
+        }};
+
         lightning = new AmmoType(TurretBullets.lightning);
 
         arc = new AmmoType(TurretBullets.arc);
-
-        spectreLaser = new AmmoType(TurretBullets.lancerLaser);
 
         meltdownLaser = new AmmoType(TurretBullets.meltdownLaser);
 

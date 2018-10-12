@@ -99,12 +99,12 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public boolean isCommanded(){
-        return !isWave && world.indexer().getAllied(team, BlockFlag.comandCenter).size != 0;
+        return !isWave && world.indexer.getAllied(team, BlockFlag.comandCenter).size != 0;
     }
 
     public UnitCommand getCommand(){
         if(isCommanded()){
-            return world.indexer().getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
+            return world.indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
         }
         return null;
     }
@@ -141,7 +141,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public boolean targetHasFlag(BlockFlag flag){
         return target instanceof TileEntity && ((TileEntity) target).tile.block().flags != null &&
-                ((TileEntity) target).tile.block().flags.contains(flag);
+            ((TileEntity) target).tile.block().flags.contains(flag);
     }
 
     public void updateRespawning(){
@@ -167,32 +167,30 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
     }
 
-    /**
-     * Only runs when the unit has a target.
-     */
+    /**Only runs when the unit has a target.*/
     public void behavior(){
 
     }
 
     public void updateTargeting(){
         if(target == null || (target instanceof Unit && (target.isDead() || target.getTeam() == team))
-                || (target instanceof TileEntity && ((TileEntity) target).tile.entity == null)){
+        || (target instanceof TileEntity && ((TileEntity) target).tile.entity == null)){
             target = null;
         }
     }
 
     public void targetClosestAllyFlag(BlockFlag flag){
-        Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, flag));
+        Tile target = Geometry.findClosest(x, y, world.indexer.getAllied(team, flag));
         if(target != null) this.target = target.entity;
     }
 
     public void targetClosestEnemyFlag(BlockFlag flag){
-        Tile target = Geometry.findClosest(x, y, world.indexer().getEnemy(team, flag));
+        Tile target = Geometry.findClosest(x, y, world.indexer.getEnemy(team, flag));
         if(target != null) this.target = target.entity;
     }
 
     public void targetClosest(){
-        target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
+        target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange(), u -> type.targetAir || !u.isFlying());
     }
 
     public TileEntity getClosestEnemyCore(){
@@ -221,9 +219,9 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
                 float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 60f);
                 float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 3, 1f) - 1f;
                 Draw.rect(stack.item.region,
-                        x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
-                        y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
-                        itemSize, itemSize, rotation);
+                    x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
+                    y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
+                    itemSize, itemSize, rotation);
             }
         }
     }
@@ -308,7 +306,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
 
         if(!Net.client()){
-            avoidOthers(8f);
 
             if(spawner != -1 && (world.tile(spawner) == null || world.tile(spawner).entity == null)){
                 damage(health);
@@ -322,7 +319,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         updateTargeting();
 
         state.update();
-        updateVelocityStatus(type.drag, type.maxVelocity);
+        updateVelocityStatus();
 
         if(target != null) behavior();
 
@@ -338,13 +335,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public void drawUnder(){
-
-    }
-
-    @Override
-    public void drawOver(){
-
+    public float getMaxVelocity(){
+        return type.maxVelocity;
     }
 
     @Override

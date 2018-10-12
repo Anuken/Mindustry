@@ -133,4 +133,15 @@ public class PowerGraph{
             }
         }
     }
+
+    @Override
+    public String toString(){
+        return "PowerGraph{" +
+        "producers=" + producers +
+        ", consumers=" + consumers +
+        ", all=" + all +
+        ", lastFrameUpdated=" + lastFrameUpdated +
+        ", graphID=" + graphID +
+        '}';
+    }
 }

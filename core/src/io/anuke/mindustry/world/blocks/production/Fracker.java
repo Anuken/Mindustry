@@ -33,11 +33,6 @@ public class Fracker extends SolidPump{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
-    }
-
-    @Override
     public void draw(Tile tile){
         FrackerEntity entity = tile.entity();
 

@@ -83,9 +83,7 @@ public class CoreBlock extends StorageBlock{
     @Override
     public void onProximityUpdate(Tile tile) {
         //add cores
-        if(!state.teams.get(tile.getTeam()).cores.contains(tile, true)){
-            state.teams.get(tile.getTeam()).cores.add(tile);
-        }
+        state.teams.get(tile.getTeam()).cores.add(tile);
     }
 
     @Override
@@ -95,7 +93,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void removed(Tile tile){
-        state.teams.get(tile.getTeam()).cores.removeValue(tile, true);
+        state.teams.get(tile.getTeam()).cores.remove(tile);
     }
 
     @Override
@@ -182,12 +180,6 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public void onDestroyed(Tile tile){
-        super.onDestroyed(tile);
-        //TODO more dramatic effects
-    }
-
-    @Override
     public void handleItem(Item item, Tile tile, Tile source){
         if(Net.server() || !Net.active()) super.handleItem(item, tile, source);
     }
@@ -232,7 +224,7 @@ public class CoreBlock extends StorageBlock{
                     unit.setDead(true);
                     unit.add();
 
-                    useContent(droneType);
+                    useContent(tile, droneType);
 
                     entity.droneID = unit.id;
                 }

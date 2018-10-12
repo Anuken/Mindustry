@@ -13,6 +13,7 @@ public class ArtilleryBulletType extends BasicBulletType{
         super(speed, damage, bulletSprite);
         collidesTiles = false;
         collides = false;
+        collidesAir = false;
         hitShake = 1f;
     }
 

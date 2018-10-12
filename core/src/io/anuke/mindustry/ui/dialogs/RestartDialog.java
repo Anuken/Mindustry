@@ -42,7 +42,7 @@ public class RestartDialog extends FloatingDialog{
 
             buttons().addButton("$text.sector.retry", () -> {
                 Sector sector = world.getSector();
-                ui.loadLogic(() -> world.sectors().playSector(sector));
+                ui.loadLogic(() -> world.sectors.playSector(sector));
                 hide();
             }).size(130f, 60f);
         }

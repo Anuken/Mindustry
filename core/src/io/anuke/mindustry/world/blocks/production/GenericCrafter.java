@@ -97,7 +97,7 @@ public class GenericCrafter extends Block{
 
             if(consumes.has(ConsumeItem.class)) tile.entity.items.remove(consumes.item(), consumes.itemAmount());
 
-            useContent(output);
+            useContent(tile, output);
 
             offloadNear(tile, output);
             Effects.effect(craftEffect, tile.drawx(), tile.drawy());

@@ -10,7 +10,6 @@ import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.*;
 
 public interface SelectionTrait{
@@ -38,7 +37,7 @@ public interface SelectionTrait{
         }
 
         for(Item item : items){
-            if(!control.database().isUnlocked(item)) continue;
+            if(!control.unlocks.isUnlocked(item)) continue;
 
             ImageButton button = cont.addImageButton("white", "toggle", 24, () -> consumer.accept(item))
                     .group(group).get();

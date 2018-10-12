@@ -66,7 +66,7 @@ public class Recipe extends UnlockableContent{
 
         arr.clear();
         for(Recipe r : content.recipes()){
-            if(r.category == category && (control.database().isUnlocked(r)) &&
+            if(r.category == category && (control.unlocks.isUnlocked(r)) &&
             !((r.mode != null && r.mode != state.mode) || (r.desktopOnly && mobile) || (r.isPad && !state.mode.showPads))){
                 arr.add(r);
             }
@@ -168,7 +168,7 @@ public class Recipe extends UnlockableContent{
                     ContentStatValue stat = (ContentStatValue) value;
                     UnlockableContent[] content = stat.getValueContent();
                     for(UnlockableContent c : content){
-                        control.database().unlockContent(c);
+                        control.unlocks.unlockContent(c);
                     }
                 }
             }

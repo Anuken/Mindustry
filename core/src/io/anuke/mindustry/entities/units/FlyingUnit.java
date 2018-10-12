@@ -58,6 +58,12 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             if(target == null){
                 retarget(() -> {
                     targetClosest();
+
+                    if(target == null && isCommanded() && getCommand() == UnitCommand.patrol){
+                        setState(patrol);
+                        return;
+                    }
+
                     if(target == null) targetClosestEnemyFlag(BlockFlag.target);
                     if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
                     if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
@@ -82,9 +88,18 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     },
     patrol = new UnitState(){
         public void update(){
-            target = getClosestCore();
+            retarget(() -> {
+                targetClosest();
+
+                if(target != null){
+                    setState(attack);
+                }
+
+                target = getClosestCore();
+            });
+
             if(target != null){
-                circle(60f + Mathf.absin(Timers.time() + id*23525, 70f, 1200f));
+                circle(60f + Mathf.absin(Timers.time() + id * 23525, 70f, 1200f));
             }
         }
     },
@@ -98,7 +113,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
                 state.set(attack);
             }else if(!targetHasFlag(BlockFlag.repair)){
                 retarget(() -> {
-                    Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair));
+                    Tile target = Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair));
                     if(target != null) FlyingUnit.this.target = target.entity;
                 });
             }else{
@@ -106,11 +121,6 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             }
         }
     };
-
-    //instantiation only
-    public FlyingUnit(){
-
-    }
 
     @Override
     public void onCommand(UnitCommand command){
@@ -167,7 +177,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     @Override
     public void behavior(){
         if(health <= health * type.retreatPercent && !isCommanded() &&
-         Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair)) != null){
+         Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
         }
 

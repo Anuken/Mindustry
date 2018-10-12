@@ -6,14 +6,14 @@ import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
-import static io.anuke.mindustry.Vars.headless;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class Mission{
     private String extraMessage;
@@ -42,6 +42,11 @@ public abstract class Mission{
     public Mission setShowComplete(boolean complete){
         this.showComplete = complete;
         return this;
+    }
+
+    /**Called when a specified piece of content is 'used' by a block.*/
+    public void onContentUsed(UnlockableContent content){
+
     }
 
     /**Draw mission overlay.*/
@@ -90,7 +95,9 @@ public abstract class Mission{
         return Array.with();
     }
 
-    public void generate(Generation gen){}
+    public void generate(Generation gen){
+        generateCoreAt(gen, gen.width/2, gen.height/2, defaultTeam);
+    }
 
     public void generateCoreAt(Generation gen, int coreX, int coreY, Team team){
         gen.tiles[coreX][coreY].setBlock(StorageBlocks.core);

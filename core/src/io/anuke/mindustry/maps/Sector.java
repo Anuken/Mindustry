@@ -11,6 +11,7 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.ucore.util.Bits;
 
 import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.headless;
 
 @Serialize
 public class Sector{
@@ -26,6 +27,7 @@ public class Sector{
     public int width = 1, height = 1;
     /**Num of missions in this sector that have been completed so far.*/
     public int completedMissions;
+
     /**Display texture. Needs to be disposed.*/
     public transient Texture texture;
     /**Missions of this sector-- what needs to be accomplished to unlock it.*/
@@ -36,6 +38,8 @@ public class Sector{
     public transient int difficulty;
     /**Items the player starts with on this sector.*/
     public transient Array<ItemStack> startingItems;
+    /**Last expansion parameters.*/
+    public transient int lastExpandX, lastExpandY;
 
     public Mission currentMission(){
         return completedMissions >= missions.size ? victoryMission : missions.get(completedMissions);
@@ -46,11 +50,11 @@ public class Sector{
     }
 
     public SaveSlot getSave(){
-        return control.getSaves().getByID(saveID);
+        return !hasSave() ? null : control.saves.getByID(saveID);
     }
 
     public boolean hasSave(){
-        return control.getSaves().getByID(saveID) != null;
+        return !headless && control.saves.getByID(saveID) != null;
     }
 
     public int packedPosition(){

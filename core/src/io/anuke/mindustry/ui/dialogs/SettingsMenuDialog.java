@@ -136,6 +136,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.screenshakePref();
         //game.checkPref("smoothcam", true);
         game.checkPref("effects", true);
+        if(mobile){
+            game.checkPref("autotarget", true);
+        }
         //game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
         game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Bundles.format("setting.seconds", i));
         game.pref(new Setting(){
@@ -148,16 +151,16 @@ public class SettingsMenuDialog extends SettingsDialog{
                     dialog.addCloseButton();
                     dialog.content().addButton("$text.settings.clearsectors", "clear", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
-                            Settings.putString("sectors", "{}");
+                            Settings.clearBytes("sectors");
                             Settings.save();
-                            world.sectors().load();
+                            world.sectors.load();
                             dialog.hide();
                         });
                     });
                     dialog.content().row();
                     dialog.content().addButton("$text.settings.clearunlocks", "clear", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
-                            Settings.putString("unlocks", "{}");
+                            Settings.clearBytes("unlocks");
                             Settings.save();
                             dialog.hide();
                         });

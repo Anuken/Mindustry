@@ -39,6 +39,17 @@ public class TurretBlocks extends BlockList implements ContentList{
             shootCone = 10f;
             health = 120;
         }};
+/*
+        scatter = new BurstTurret("scatter"){{
+            ammoTypes = new AmmoType[]{AmmoTypes.flakCopper};
+            reload = 70f;
+            recoil = 2f;
+            shots = 3;
+            range = 220f;
+            inaccuracy = 2f;
+            shootCone = 40f;
+            health = 120;
+        }};*/
 
         scorch = new LiquidTurret("scorch"){
             protected TextureRegion shootRegion;
@@ -101,15 +112,18 @@ public class TurretBlocks extends BlockList implements ContentList{
             heatColor = Color.RED;
             size = 2;
             health = 320;
+            targetAir = false;
         }};
 
         arc = new PowerTurret("arc"){{
             shootType = AmmoTypes.arc;
-            reload = 40f;
+            reload = 55f;
             shootShake = 1f;
-            powerUsed = 5f;
+            shootCone = 40f;
+            rotatespeed = 8f;
+            powerUsed = 7f;
             powerCapacity = 30f;
-            range = 60f;
+            range = 150f;
             shootEffect = ShootFx.lightningShoot;
             heatColor = Color.RED;
             recoil = 1f;
@@ -190,8 +204,8 @@ public class TurretBlocks extends BlockList implements ContentList{
         cyclone = new ItemTurret("cyclone"){{
             ammoTypes = new AmmoType[]{AmmoTypes.flakExplosive, AmmoTypes.flakPlastic, AmmoTypes.flakSurge};
             xRand = 4f;
-            reload = 10f;
-            range = 140f;
+            reload = 8f;
+            range = 145f;
             size = 3;
             recoil = 3f;
             rotatespeed = 10f;

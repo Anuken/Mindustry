@@ -8,6 +8,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
+import io.anuke.mindustry.game.EventType.SectorCompleteEvent;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
@@ -50,7 +51,7 @@ public class ServerControl extends Module{
             "shufflemode", "normal",
             "bans", "",
             "admins", "",
-            "sector_x", 0,
+            "sector_x", 2,
             "sector_y", 1,
             "shuffle", true,
             "crashreport", false,
@@ -91,14 +92,28 @@ public class ServerControl extends Module{
             "&lrWARNING: &lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly so that clients know which version you are using.");
         }
 
+        Events.on(SectorCompleteEvent.class, event -> {
+            Log.info("Sector complete.");
+            world.sectors.completeSector(world.getSector().x, world.getSector().y);
+            world.sectors.save();
+            gameOvers = 0;
+            inExtraRound = true;
+            Settings.putInt("sector_x", world.getSector().x + world.getSector().width);
+            Settings.save();
+
+            Call.onInfoMessage("[accent]Sector conquered![]\n" + roundExtraTime + " seconds until deployment in next sector.");
+
+            playSectorMap();
+        });
+
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
             info("Game over!");
 
             if(Settings.getBool("shuffle")){
                 if(world.getSector() == null){
-                    if(world.maps().all().size > 0){
-                        Array<Map> maps = world.maps().all();
+                    if(world.maps.all().size > 0){
+                        Array<Map> maps = world.maps.all();
 
                         Map previous = world.getMap();
                         Map map = previous;
@@ -179,7 +194,7 @@ public class ServerControl extends Module{
             if(arg.length > 0){
 
                 String search = arg[0];
-                for(Map map : world.maps().all()){
+                for(Map map : world.maps.all()){
                     if(map.name.equalsIgnoreCase(search)) result = map;
                 }
 
@@ -234,7 +249,7 @@ public class ServerControl extends Module{
 
         handler.register("maps", "Display all available maps.", arg -> {
             info("Maps:");
-            for(Map map : world.maps().all()){
+            for(Map map : world.maps.all()){
                 info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
             }
         });
@@ -291,8 +306,7 @@ public class ServerControl extends Module{
 
         handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
             try{
-                Difficulty diff = Difficulty.valueOf(arg[0]);
-                state.difficulty = diff;
+                state.difficulty = Difficulty.valueOf(arg[0]);
                 info("Difficulty set to '{0}'.", arg[0]);
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
@@ -815,13 +829,13 @@ public class ServerControl extends Module{
 
     private void playSectorMap(boolean wait){
         int x = Settings.getInt("sector_x"), y = Settings.getInt("sector_y");
-        if(world.sectors().get(x, y) == null){
-            world.sectors().createSector(x, y);
+        if(world.sectors.get(x, y) == null){
+            world.sectors.createSector(x, y);
         }
 
-        world.sectors().get(x, y).completedMissions = 0;
+        world.sectors.get(x, y).completedMissions = 0;
 
-        play(wait, () -> world.loadSector(world.sectors().get(x, y)));
+        play(wait, () -> world.loadSector(world.sectors.get(x, y)));
     }
 
     private void play(boolean wait, Runnable run){
@@ -892,28 +906,5 @@ public class ServerControl extends Module{
         if(!inExtraRound && state.mode.isPvp){
             checkPvPGameOver();
         }
-
-        //TODO re implement sector shuffle
-        /*
-        if(state.is(State.playing) && world.getSector() != null && !inExtraRound && netServer.admins.getStrict()){
-            //all assigned missions are complete
-            if(world.getSector().completedMissions >= world.getSector().missions.size){
-                Log.info("Mission complete.");
-                world.sectors().completeSector(world.getSector().x, world.getSector().y);
-                world.sectors().save();
-                gameOvers = 0;
-                inExtraRound = true;
-                Settings.putInt("sector_x", world.getSector().x + world.getSector().size);
-                Settings.save();
-
-                Call.onInfoMessage("[accent]Sector conquered![]\n" + roundExtraTime + " seconds until deployment in next sector.");
-
-                playSectorMap();
-            }else if(world.getSector().currentMission().isComplete()){
-                world.getSector().currentMission().onComplete();
-                //increment completed missions, check next index next frame
-                world.getSector().completedMissions ++;
-            }
-        }*/
     }
 }

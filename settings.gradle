@@ -1,6 +1,6 @@
-include 'desktop', 'html', 'core', 'android', 'kryonet', 'server', 'ios', 'annotations', 'packer', 'reporter'
+include 'desktop', 'html', 'core', 'android', 'kryonet', 'server', 'ios', 'annotations', 'tools', 'tests'
 
-if(System.properties["release"] == null || System.properties["release"].equals("false")){
+if(System.properties["release"] == null || System.properties["release"] == "false"){
     if (new File(settingsDir, '../uCore').exists()) {
         include ':uCore'
         project(':uCore').projectDir = new File(settingsDir, '../uCore')

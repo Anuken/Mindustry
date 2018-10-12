@@ -12,30 +12,28 @@ import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.maps.generation.WorldGenerator;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.maps.generation.WorldGenerator;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadArray;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.ucore.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class World extends Module{
+    public final Maps maps = new Maps();
+    public final Sectors sectors = new Sectors();
+    public final WorldGenerator generator = new WorldGenerator();
+    public final BlockIndexer indexer = new BlockIndexer();
+    public final Pathfinder pathfinder = new Pathfinder();
+
     private Map currentMap;
     private Sector currentSector;
     private Tile[][] tiles;
-    private Pathfinder pathfinder = new Pathfinder();
-    private BlockIndexer indexer = new BlockIndexer();
-    private Maps maps = new Maps();
-    private Sectors sectors = new Sectors();
-    private WorldGenerator generator = new WorldGenerator();
 
     private Array<Tile> tempTiles = new ThreadArray<>();
     private boolean generating, invalidMap;
@@ -52,26 +50,6 @@ public class World extends Module{
     @Override
     public void dispose(){
         maps.dispose();
-    }
-
-    public WorldGenerator generator(){
-        return generator;
-    }
-
-    public Sectors sectors(){
-        return sectors;
-    }
-
-    public Maps maps(){
-        return maps;
-    }
-
-    public BlockIndexer indexer(){
-        return indexer;
-    }
-
-    public Pathfinder pathfinder(){
-        return pathfinder;
     }
 
     public boolean isInvalidMap(){
@@ -97,11 +75,6 @@ public class World extends Module{
 
     public boolean isAccessible(int x, int y){
         return !wallSolid(x, y - 1) || !wallSolid(x, y + 1) || !wallSolid(x - 1, y) || !wallSolid(x + 1, y);
-    }
-
-    public boolean floorBlends(int x, int y, Block block){
-        Tile tile = tile(x, y);
-        return tile == null || tile.floor().id <= block.id;
     }
 
     public Map getMap(){
@@ -140,7 +113,7 @@ public class World extends Module{
         if(tiles == null){
             return null;
         }
-        if(!Mathf.inBounds(x, y, tiles)) return null;
+        if(!Structs.inBounds(x, y, tiles)) return null;
         return tiles[x][y];
     }
 
@@ -222,7 +195,7 @@ public class World extends Module{
             }
         }
 
-        EntityPhysics.resizeTree(0, 0, tiles.length * tilesize, tiles[0].length * tilesize);
+        EntityQuery.resizeTree(0, 0, tiles.length * tilesize, tiles[0].length * tilesize);
 
         generating = false;
         Events.fire(new WorldLoadEvent());
@@ -235,7 +208,6 @@ public class World extends Module{
     /**Loads up a sector map. This does not call play(), but calls reset().*/
     public void loadSector(Sector sector){
         currentSector = sector;
-        state.mode = sector.missions.peek().getMode();
         state.difficulty = sectors.getDifficulty(sector);
         Timers.mark();
         Timers.mark();
@@ -251,7 +223,7 @@ public class World extends Module{
         Map map = new Map("Sector " + sector.x + ", " + sector.y, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
         setMap(map);
 
-        EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
+        EntityQuery.resizeTree(0, 0, width * tilesize, height * tilesize);
 
         generator.generateMap(tiles, sector);
 
@@ -267,7 +239,7 @@ public class World extends Module{
 
         createTiles(width, height);
 
-        EntityPhysics.resizeTree(0, 0, width * tilesize, height * tilesize);
+        EntityQuery.resizeTree(0, 0, width * tilesize, height * tilesize);
 
         try{
             generator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), 0);
@@ -337,7 +309,7 @@ public class World extends Module{
     public int transform(int packed, int oldWidth, int oldHeight, int newWidth, int shiftX, int shiftY){
         int x = packed % oldWidth;
         int y = packed / oldWidth;
-        if(!Mathf.inBounds(x, y, oldWidth, oldHeight)) return -1;
+        if(!Structs.inBounds(x, y, oldWidth, oldHeight)) return -1;
         x += shiftX;
         y += shiftY;
         return y*newWidth + x;

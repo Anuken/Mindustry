@@ -77,9 +77,7 @@ public class Conduit extends LiquidBlock{
         Tile other = tile.getNearby(Mathf.mod(tile.getRotation() - direction, 4));
         if(other != null) other = other.target();
 
-        if(other == null || !(other.block().hasLiquids) || !(other.block().outputsLiquid)) return false;
-        return (tile.getNearby(tile.getRotation()) == other)
-                || (!other.block().rotate || other.getNearby(other.getRotation()) == tile);
+        return other != null && other.block().hasLiquids && other.block().outputsLiquid && ((tile.getNearby(tile.getRotation()) == other) || (!other.block().rotate || other.getNearby(other.getRotation()) == tile));
     }
 
     @Override

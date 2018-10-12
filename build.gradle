@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:3.1.3'
+        classpath 'com.android.tools.build:gradle:3.2.0'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
     }
 }
@@ -27,7 +27,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
-        uCoreVersion = '115a42ff7d5bca0a6073b5f1e0b67cc4464c560e'
+        uCoreVersion = '628ced32dbceefe9096c6acc9639cd39b1a867f4'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -47,10 +47,10 @@ allprojects {
             def output = 'en\n'
             def bundles = new File(project(':core').projectDir, 'assets/bundles/')
             bundles.listFiles().each { other ->
-                if(other.name == "bundle.properties") return;
+                if(other.name == "bundle.properties") return
                 output += other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + "\n"
             }
-            new File(project(':core').projectDir, 'assets/locales').text = output;
+            new File(project(':core').projectDir, 'assets/locales').text = output
         }
 
         writeVersion = {
@@ -59,7 +59,7 @@ allprojects {
 
             try{
                 pfile.createNewFile()
-            }catch (Exception e){}
+            }catch (Exception ignored){}
 
             if(pfile.exists()) {
 
@@ -92,7 +92,7 @@ project(":desktop") {
     dependencies {
         compile project(":core")
         compile project(":kryonet")
-        if(new File(projectDir.parent, '../debug').exists()) compile project(":debug")
+        if(new File(projectDir.parent, '../debug').exists() && System.properties["release"] == null) compile project(":debug")
 
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
@@ -104,7 +104,6 @@ project(":desktop") {
 project(":html") {
     apply plugin: "gwt"
     apply plugin: "war"
-
 
     dependencies {
         compile project(":core")
@@ -118,7 +117,6 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion:sources"
     }
-
 }
 
 project(":ios") {
@@ -206,7 +204,24 @@ project(":server") {
     }
 }
 
-project(":packer") {
+project(":tests"){
+    apply plugin: "java"
+
+    dependencies {
+        testImplementation project(":core")
+        testImplementation('org.junit.jupiter:junit-jupiter-api:5.1.0')
+        testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.1.0')
+        testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    }
+
+    test {
+        useJUnitPlatform()
+        workingDir = new File("../core/assets")
+    }
+}
+
+project(":tools") {
     apply plugin: "java"
 
     dependencies {
@@ -231,12 +246,4 @@ project(":kryonet") {
         compile 'com.github.Anuken:kryonet:53b10247b1'
         compile 'com.github.Anuken:WaifUPnP:05eb46bc577fd7674596946ba288c96c0cedd893'
     }
-}
-
-project(":reporter"){
-    apply plugin: "java"
-}
-
-tasks.eclipse.doLast {
-    delete ".project"
 }

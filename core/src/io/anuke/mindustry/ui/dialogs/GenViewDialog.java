@@ -85,7 +85,7 @@ public class GenViewDialog extends FloatingDialog{
                             Pixmap pixmap = new Pixmap(sectorSize, sectorSize, Format.RGBA8888);
                             for(int i = 0; i < sectorSize; i++){
                                 for(int j = 0; j < sectorSize; j++){
-                                    world.generator().generateTile(result, wx, wy, i, j, true, null, ores);
+                                    world.generator.generateTile(result, wx, wy, i, j, true, null, ores);
                                     pixmap.drawPixel(i, sectorSize - 1 - j, ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation, (byte)0));
                                 }
                             }

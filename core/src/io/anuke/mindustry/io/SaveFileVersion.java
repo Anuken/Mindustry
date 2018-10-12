@@ -55,21 +55,19 @@ public abstract class SaveFileVersion{
         Array<Content>[] map = content.getContentMap();
 
         int mappable = 0;
-        for(int i =0; i < map.length; i ++){
-            Array<Content> arr = map[i];
+        for(Array<Content> arr : map){
             if(arr.size > 0 && arr.first() instanceof MappableContent){
-                mappable ++;
+                mappable++;
             }
         }
 
         stream.writeByte(mappable);
-        for(int i =0; i < map.length; i ++){
-            Array<Content> arr = map[i];
+        for(Array<Content> arr : map){
             if(arr.size > 0 && arr.first() instanceof MappableContent){
                 stream.writeByte(arr.first().getContentType().ordinal());
                 stream.writeShort(arr.size);
                 for(Content c : arr){
-                    stream.writeUTF(((MappableContent)c).getContentName());
+                    stream.writeUTF(((MappableContent) c).getContentName());
                 }
             }
         }

@@ -69,7 +69,7 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void drawOutlined(){
-        Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
+        Tile cursor = tileAt(Gdx.input.getX(), Gdx.input.getY());
 
         if(cursor == null) return;
 
@@ -140,7 +140,7 @@ public class DesktopInput extends InputHandler{
             renderer.scaleCamera((int) Inputs.getAxisTapped(section, "zoom"));
         }
 
-        renderer.minimap().zoomBy(-(int) Inputs.getAxisTapped(section, "zoom_minimap"));
+        renderer.minimap.zoomBy(-(int) Inputs.getAxisTapped(section, "zoom_minimap"));
 
         if(player.isDead()) return;
 
@@ -170,7 +170,7 @@ public class DesktopInput extends InputHandler{
 
         rotation = Mathf.mod(rotation + (int) Inputs.getAxisTapped(section, "rotate"), 4);
 
-        Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
+        Tile cursor = tileAt(Gdx.input.getX(), Gdx.input.getY());
 
         if(player.isDead()){
             cursorType = normal;
@@ -200,7 +200,7 @@ public class DesktopInput extends InputHandler{
     }
 
     void pollInput(){
-        Tile cursor = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
+        Tile cursor = tileAt(Gdx.input.getX(), Gdx.input.getY());
         if(cursor == null){
             mode = none;
             return;
@@ -210,32 +210,31 @@ public class DesktopInput extends InputHandler{
             player.setMineTile(null);
         }
 
-        if(!ui.hasMouse()){
-            if(Inputs.keyTap(section, "select")){
-                if(isPlacing()){
-                    selectX = cursor.x;
-                    selectY = cursor.y;
-                    mode = placing;
-                }else{
-                    //only begin shooting if there's no cursor event
-                    if (!tileTapped(cursor) && !tryTapPlayer(Graphics.mouseWorld().x, Graphics.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
-                            !tryBeginMine(cursor) && player.getMineTile() == null) {
-                        player.isShooting = true;
-                    }
-                }
-            }else if(Inputs.keyTap(section, "deselect") && (recipe != null || mode != none || player.isBuilding())){
-                if(recipe == null){
-                    player.clearBuilding();
-                }
-
-                recipe = null;
-                mode = none;
-            }else if(Inputs.keyTap(section, "break")){
+        if(Inputs.keyTap(section, "select") && !ui.hasMouse()){
+            if(isPlacing()){
                 selectX = cursor.x;
                 selectY = cursor.y;
-                mode = breaking;
+                mode = placing;
+            }else{
+                //only begin shooting if there's no cursor event
+                if (!tileTapped(cursor) && !tryTapPlayer(Graphics.mouseWorld().x, Graphics.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
+                        !tryBeginMine(cursor) && player.getMineTile() == null) {
+                    player.isShooting = true;
+                }
             }
+        }else if(Inputs.keyTap(section, "deselect") && (recipe != null || mode != none || player.isBuilding())){
+            if(recipe == null){
+                player.clearBuilding();
+            }
+
+            recipe = null;
+            mode = none;
+        }else if(Inputs.keyTap(section, "break") && !ui.hasMouse()){
+            selectX = cursor.x;
+            selectY = cursor.y;
+            mode = breaking;
         }
+
 
         if(Inputs.keyRelease(section, "break") || Inputs.keyRelease(section, "select")){
 
@@ -271,12 +270,12 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public float getMouseX(){
-        return !controlling ? control.gdxInput().getX() : controlx;
+        return !controlling ? Gdx.input.getX() : controlx;
     }
 
     @Override
     public float getMouseY(){
-        return !controlling ? control.gdxInput().getY() : controly;
+        return !controlling ? Gdx.input.getY() : controly;
     }
 
     @Override
@@ -329,8 +328,8 @@ public class DesktopInput extends InputHandler{
         }
 
         if(!controlling){
-            controlx = control.gdxInput().getX();
-            controly = control.gdxInput().getY();
+            controlx = Gdx.input.getX();
+            controly = Gdx.input.getY();
         }
     }
 

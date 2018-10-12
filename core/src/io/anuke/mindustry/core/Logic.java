@@ -4,10 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.game.EventType.PlayEvent;
-import io.anuke.mindustry.game.EventType.ResetEvent;
-import io.anuke.mindustry.game.EventType.WaveEvent;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.net.Net;
@@ -17,7 +14,7 @@ import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 
 import static io.anuke.mindustry.Vars.*;
@@ -39,8 +36,8 @@ public class Logic extends Module{
 
     @Override
     public void init(){
-        EntityPhysics.initPhysics();
-        EntityPhysics.collisions().setCollider(tilesize, world::solid);
+        EntityQuery.init();
+        EntityQuery.collisions().setCollider(tilesize, world::solid);
     }
 
     public void play(){
@@ -100,18 +97,20 @@ public class Logic extends Module{
 
             state.mode = world.getSector().currentMission().getMode();
             world.getSector().currentMission().onBegin();
-            world.sectors().save();
+            world.sectors.save();
         }
 
         //check if all assigned missions are complete
         if(!world.getSector().complete && world.getSector().completedMissions >= world.getSector().missions.size){
             state.mode = GameMode.victory;
 
-            world.sectors().completeSector(world.getSector().x, world.getSector().y);
-            world.sectors().save();
+            world.sectors.completeSector(world.getSector().x, world.getSector().y);
+            world.sectors.save();
             if(!headless){
                 ui.missions.show(world.getSector());
             }
+
+            Events.fire(new SectorCompleteEvent());
         }
     }
 
@@ -124,8 +123,6 @@ public class Logic extends Module{
         }
 
         if(!state.is(State.menu)){
-
-            if(control != null) control.triggerUpdateInput();
 
             if(!state.is(State.paused) || Net.active()){
                 Timers.update();
@@ -156,9 +153,9 @@ public class Logic extends Module{
                 }
 
                 Entities.update(puddleGroup);
-                Entities.update(tileGroup);
                 Entities.update(shieldGroup);
                 Entities.update(bulletGroup);
+                Entities.update(tileGroup);
                 Entities.update(fireGroup);
                 Entities.update(playerGroup);
 
@@ -168,14 +165,21 @@ public class Logic extends Module{
                 }
 
                 for(EntityGroup group : unitGroups){
-                    if(!group.isEmpty()){
-                        EntityPhysics.collideGroups(bulletGroup, group);
+                    if(group.isEmpty()) continue;
+
+                    EntityQuery.collideGroups(bulletGroup, group);
+                    EntityQuery.collideGroups(group, playerGroup);
+
+                    for(EntityGroup other : unitGroups){
+                        if(other.isEmpty()) continue;
+                        EntityQuery.collideGroups(group, other);
                     }
                 }
 
-                EntityPhysics.collideGroups(bulletGroup, playerGroup);
+                EntityQuery.collideGroups(bulletGroup, playerGroup);
+                EntityQuery.collideGroups(playerGroup, playerGroup);
 
-                world.pathfinder().update();
+                world.pathfinder.update();
             }
         }
 

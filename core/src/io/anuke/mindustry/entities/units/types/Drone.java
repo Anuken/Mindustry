@@ -29,10 +29,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadQueue;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -42,7 +39,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Drone extends FlyingUnit implements BuilderTrait{
     protected static float discoverRange = 120f;
-    protected static boolean initialized;
     protected static int timerRepairEffect = timerIndex++;
 
     protected Item targetItem;
@@ -162,7 +158,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
                     if(targetItem == null) return;
 
-                    target = world.indexer().findClosestOre(x, y, targetItem);
+                    target = world.indexer.findClosestOre(x, y, targetItem);
                 });
 
                 if(target instanceof Tile){
@@ -228,7 +224,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                 state.set(attack);
             }else if(!targetHasFlag(BlockFlag.repair)){
                 if(timer.get(timerTarget, 20)){
-                    Tile target = Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair));
+                    Tile target = Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair));
                     if(target != null) Drone.this.target = target.entity;
                 }
             }else{
@@ -237,17 +233,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         }
     };
 
-    {
-        initEvents();
-    }
-
-    /**
-     * Initialize placement event notifier system.
-     * Static initialization is to be avoided, thus, this is done lazily.
-     */
-    private static void initEvents(){
-        if(initialized) return;
-
+    static{
         Events.on(BlockBuildEvent.class, event -> {
             EntityGroup<BaseUnit> group = unitGroups[event.team.ordinal()];
 
@@ -260,8 +246,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                 }
             }
         });
-
-        initialized = true;
     }
 
     private void notifyPlaced(BuildEntity entity){
@@ -334,7 +318,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     @Override
     public void behavior(){
         if(health <= health * type.retreatPercent &&
-                Geometry.findClosest(x, y, world.indexer().getAllied(team, BlockFlag.repair)) != null){
+                Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
         }
     }
@@ -373,7 +357,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         if(entity == null){
             return;
         }
-        targetItem = Mathf.findMin(type.toMine, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
+        targetItem = Structs.findMin(type.toMine, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
     }
 
     @Override

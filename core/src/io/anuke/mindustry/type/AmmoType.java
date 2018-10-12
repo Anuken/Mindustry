@@ -27,6 +27,8 @@ public class AmmoType extends Content {
     public Effect shootEffect = Fx.none;
     /**Extra smoke effect created when shooting.*/
     public Effect smokeEffect = Fx.none;
+    /**Range. Use a value < 0 to calculate from bullet.*/
+    public float range = -1f;
 
     /**
      * Creates an AmmoType with no liquid or item. Used for power-based ammo.
@@ -63,7 +65,7 @@ public class AmmoType extends Content {
      * Returns maximum distance the bullet this ammo type has can travel.
      */
     public float getRange(){
-        return bullet.speed * bullet.lifetime;
+        return range < 0 ? bullet.speed * bullet.lifetime : range;
     }
 
     @Override

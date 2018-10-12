@@ -11,7 +11,7 @@ public class UnitBlocks extends BlockList implements ContentList{
     public static Block
         spiritFactory, phantomFactory,
         wraithFactory, ghoulFactory, revenantFactory,
-        daggerFactory, titanFactory,
+        daggerFactory, titanFactory, fortressFactory,
         reconstructor, repairPoint, commandCenter;
 
     @Override
@@ -54,7 +54,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 8000;
             size = 4;
             consumes.power(0.3f);
-            shadow = "shadow-round-3";
+            shadow = "shadow-round-4";
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 80), new ItemStack(Items.titanium, 80), new ItemStack(Items.plastanium, 50)});
         }};
 
@@ -73,6 +73,15 @@ public class UnitBlocks extends BlockList implements ContentList{
             consumes.power(0.15f);
             shadow = "shadow-round-3";
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 20), new ItemStack(Items.thorium, 30)});
+        }};
+
+        fortressFactory = new UnitFactory("fortress-factory"){{
+            type = UnitTypes.fortress;
+            produceTime = 5000;
+            size = 3;
+            consumes.power(0.2f);
+            shadow = "shadow-round-3";
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 40), new ItemStack(Items.thorium, 50)});
         }};
 
         repairPoint = new RepairPoint("repair-point"){{

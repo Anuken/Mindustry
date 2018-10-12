@@ -15,6 +15,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 

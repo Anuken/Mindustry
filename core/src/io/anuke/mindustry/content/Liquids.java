@@ -17,6 +17,11 @@ public class Liquids implements ContentList{
                 tier = 0;
                 effect = StatusEffects.wet;
             }
+
+            @Override
+            public boolean alwaysUnlocked() {
+                return true;
+            }
         };
 
         lava = new Liquid("lava", Color.valueOf("e37341")){
@@ -33,6 +38,7 @@ public class Liquids implements ContentList{
                 viscosity = 0.7f;
                 flammability = 0.6f;
                 explosiveness = 0.6f;
+                heatCapacity = 0.7f;
                 tier = 1;
                 effect = StatusEffects.tarred;
             }

@@ -9,7 +9,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
@@ -107,8 +106,7 @@ public class SolidPump extends Pump{
 
     @Override
     protected boolean isValid(Tile tile){
-        if(tile == null) return false;
-        return !tile.floor().isLiquid;
+        return tile != null && !tile.floor().isLiquid;
     }
 
     @Override

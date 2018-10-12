@@ -118,15 +118,15 @@ public class PausedDialog extends FloatingDialog{
     }
 
     public void runExitSave(){
-        if(control.getSaves().getCurrent() == null ||
-                !control.getSaves().getCurrent().isAutosave()){
+        if(control.saves.getCurrent() == null ||
+                !control.saves.getCurrent().isAutosave()){
             state.set(State.menu);
             return;
         }
 
         ui.loadLogic("$text.saveload", () -> {
             try{
-                control.getSaves().getCurrent().save();
+                control.saves.getCurrent().save();
             }catch(Throwable e){
                 e.printStackTrace();
                 threads.runGraphics(() -> ui.showError("[orange]" + Bundles.get("text.savefail")));

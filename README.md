@@ -1,7 +1,8 @@
 ![Imgur](https://i.imgur.com/w4N0yhv.png)
 
-[![Build Status](https://travis-ci.org/Anuken/Mindustry.svg?branch=master)](https://travis-ci.org/Anuken/Mindustry)
-\
+[![Build Status](https://travis-ci.org/Anuken/Mindustry.svg?branch=master)](https://travis-ci.org/Anuken/Mindustry) 
+[![Discord](https://img.shields.io/discord/391020510269669376.svg)](https://discord.gg/mindustry)
+
 A pixelated sandbox tower defense game made using [LibGDX](https://libgdx.badlogicgames.com/). Winner of the [GDL Metal Monstrosity Jam](https://itch.io/jam/gdl---metal-monstrosity-jam).
 
 _[Trello Board](https://trello.com/b/aE2tcUwF/mindustry-40-plans)_  

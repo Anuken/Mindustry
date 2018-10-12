@@ -63,7 +63,6 @@ public class BundleLauncher {
                     result.append("\n");
                 }
                 Files.write(child, result.toString().getBytes());
-                //PropertiesUtils.store(other, Files.newBufferedWriter(output), null);
 
             }catch (IOException e){
                 throw new RuntimeException(e);

@@ -12,5 +12,6 @@ public class BombBulletType extends BasicBulletType{
         lifetime = 30f;
         drag = 0.05f;
         keepVelocity = false;
+        collidesAir = false;
     }
 }

@@ -13,9 +13,9 @@ import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.IndexedRenderer;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -156,7 +156,7 @@ public class MapRenderer implements Disposable{
     private boolean checkElevation(byte elev, int x, int y){
         for(GridPoint2 p : Geometry.d4){
             int wx = x + p.x, wy = y + p.y;
-            if(!Mathf.inBounds(wx, wy, editor.getMap().width(), editor.getMap().height())){
+            if(!Structs.inBounds(wx, wy, editor.getMap().width(), editor.getMap().height())){
                 return true;
             }
             byte value = editor.getMap().read(wx, wy, DataPosition.elevation);

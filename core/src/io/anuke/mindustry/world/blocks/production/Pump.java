@@ -6,6 +6,7 @@ import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
+import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -14,6 +15,8 @@ import io.anuke.ucore.graphics.Draw;
 public class Pump extends LiquidBlock{
     protected final Array<Tile> drawTiles = new Array<>();
     protected final Array<Tile> updateTiles = new Array<>();
+
+    protected final int timerContentCheck = timers++;
 
     /**Pump amount per tile this block is on.*/
     protected float pumpAmount = 1f;
@@ -98,7 +101,16 @@ public class Pump extends LiquidBlock{
             tile.entity.liquids.add(liquidDrop, maxPump);
         }
 
+        if(tile.entity.liquids.currentAmount() > 0f && tile.entity.timer.get(timerContentCheck, 10)){
+            useContent(tile, tile.entity.liquids.current());
+        }
+
         tryDumpLiquid(tile, tile.entity.liquids.current());
+    }
+
+    @Override
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        return consumes.has(ConsumeLiquid.class) && consumes.liquid() == liquid && super.acceptLiquid(tile, source, liquid, amount);
     }
 
     protected boolean isValid(Tile tile){

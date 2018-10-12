@@ -1,10 +1,10 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.ThreadArray;
+import io.anuke.ucore.util.ThreadSet;
 
 /**
  * Class for various team-based utilities.
@@ -54,7 +54,7 @@ public class Teams{
     }
 
     public class TeamData{
-        public final Array<Tile> cores = new ThreadArray<>();
+        public final ObjectSet<Tile> cores = new ThreadSet<>();
         public final EnumSet<Team> enemies;
         public final Team team;
 

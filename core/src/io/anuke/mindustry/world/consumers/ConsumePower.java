@@ -32,8 +32,7 @@ public class ConsumePower extends Consume{
 
     @Override
     public boolean valid(Block block, TileEntity entity){
-        if(entity.power == null) return false;
-        return entity.power.amount >= use(block, entity);
+        return entity.power != null && entity.power.amount >= use(block, entity);
     }
 
     @Override

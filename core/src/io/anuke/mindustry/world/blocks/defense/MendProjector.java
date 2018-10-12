@@ -56,7 +56,7 @@ public class MendProjector extends Block{
     @Override
     public void update(Tile tile){
         MendEntity entity = tile.entity();
-        entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() ? 1f : 0f, 0.08f);
+        entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * entity.delta();
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, (float)entity.items.get(consumes.item()) / itemCapacity, 0.1f);

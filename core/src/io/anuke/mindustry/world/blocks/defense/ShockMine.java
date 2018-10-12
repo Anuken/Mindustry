@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.defense;
 
-import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.graphics.Layer;
@@ -15,7 +14,7 @@ public class ShockMine extends Block{
 
     protected float cooldown = 80f;
     protected float tileDamage = 5f;
-    protected float damage = 10;
+    protected float damage = 13;
     protected int length = 10;
     protected int tendrils = 6;
 
@@ -47,7 +46,7 @@ public class ShockMine extends Block{
     public void unitOn(Tile tile, Unit unit){
         if(unit.getTeam() != tile.getTeam() && tile.entity.timer.get(timerDamage, cooldown)){
             for(int i = 0; i < tendrils; i++){
-                Lightning.create(tile.getTeam(), BulletFx.hitLancer, tile.getTeam().color, damage, tile.drawx(), tile.drawy(), Mathf.random(360f), length);
+                Lightning.create(tile.getTeam(), tile.getTeam().color, damage, tile.drawx(), tile.drawy(), Mathf.random(360f), length);
             }
             tile.entity.damage(tileDamage);
         }

@@ -142,7 +142,7 @@ public class BuildBlock extends Block{
 
         for(TextureRegion region : target.getBlockIcon()){
             Shaders.blockbuild.region = region;
-            Shaders.blockbuild.progress = (float) entity.progress;
+            Shaders.blockbuild.progress = entity.progress;
             Shaders.blockbuild.apply();
 
             Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.getRotation() * 90 : 0);
@@ -163,11 +163,6 @@ public class BuildBlock extends Block{
         }else if(previous != null && !(previous instanceof BuildBlock)){
             previous.drawShadow(tile);
         }
-    }
-
-    @Override
-    public void update(Tile tile){
-
     }
 
     @Override

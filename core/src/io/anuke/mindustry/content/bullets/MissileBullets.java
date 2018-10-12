@@ -67,7 +67,7 @@ public class MissileBullets extends BulletList implements ContentList{
                 super.hit(b);
 
                 for (int i = 0; i < 2; i++) {
-                    Lightning.create(b.getTeam(), BulletFx.hitLancer, Palette.surge, damage, b.x, b.y, Mathf.random(360f), 14);
+                    Lightning.create(b.getTeam(), Palette.surge, damage, b.x, b.y, Mathf.random(360f), 14);
                 }
             }
         };

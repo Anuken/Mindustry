@@ -37,7 +37,7 @@ public class WaveMission extends Mission{
     public void onBegin(){
         super.onBegin();
 
-        world.pathfinder().activateTeamPath(waveTeam);
+        world.pathfinder.activateTeamPath(waveTeam);
     }
 
     @Override

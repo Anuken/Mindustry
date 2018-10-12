@@ -16,7 +16,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.entities.impl.BaseEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.graphics.Draw;
@@ -71,6 +71,7 @@ public class ForceProjector extends Block {
     @Override
     public void update(Tile tile){
         ForceEntity entity = tile.entity();
+        boolean cheat = tile.isEnemyCheat();
 
         if(entity.shield == null){
             entity.shield = new ShieldEntity(tile);
@@ -89,7 +90,7 @@ public class ForceProjector extends Block {
             Effects.effect(BlockFx.reactorsmoke, tile.drawx() + Mathf.range(tilesize/2f), tile.drawy() + Mathf.range(tilesize/2f));
         }
 
-        if(!entity.cons.valid()){
+        if(!entity.cons.valid() && !cheat){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.1f);
             if(entity.warmup <= 0.09f){
                 entity.broken = true;
@@ -117,7 +118,7 @@ public class ForceProjector extends Block {
         if(entity.buildup >= breakage && !entity.broken){
             entity.broken = true;
             entity.buildup = breakage;
-            Effects.effect(BlockFx.shieldBreak, tile.drawy(), tile.drawy(), radius);
+            Effects.effect(BlockFx.shieldBreak, tile.drawx(), tile.drawy(), radius);
         }
 
         if(entity.hit > 0f){
@@ -127,15 +128,15 @@ public class ForceProjector extends Block {
         float realRadius = realRadius(entity);
 
         if(!entity.broken){
-            EntityPhysics.getNearby(bulletGroup, tile.drawx(), tile.drawy(), realRadius*2f, bullet -> {
+            EntityQuery.getNearby(bulletGroup, tile.drawx(), tile.drawy(), realRadius*2f, bullet -> {
                 AbsorbTrait trait = (AbsorbTrait)bullet;
                 if(trait.canBeAbsorbed() && trait.getTeam() != tile.getTeam() && isInsideHexagon(trait.getX(), trait.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
                     trait.absorb();
                     Effects.effect(BulletFx.absorb, trait);
-                    float hit = trait.getDamage()*powerDamage;
+                    float hit = trait.getShieldDamage()*powerDamage;
                     entity.hit = 1f;
                     entity.power.amount -= Math.min(hit, entity.power.amount);
-                    entity.buildup += trait.getDamage() * entity.warmup;
+                    entity.buildup += trait.getShieldDamage() * entity.warmup;
                 }
             });
         }
@@ -159,7 +160,7 @@ public class ForceProjector extends Block {
         ForceEntity entity = tile.entity();
 
         if(entity.buildup <= 0f) return;
-        Draw.alpha(entity.buildup / breakage * 0.75f/* * Mathf.absin(Timers.time(), 10f - (entity.buildup/breakage)*6f, 1f)*/);
+        Draw.alpha(entity.buildup / breakage * 0.75f);
 
         Graphics.setAdditiveBlending();
         Draw.rect(topRegion, tile.drawx(), tile.drawy());

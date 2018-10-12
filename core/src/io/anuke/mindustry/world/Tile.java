@@ -43,7 +43,7 @@ public class Tile implements PosTrait, TargetTrait{
     private byte team;
     /** Tile elevation. -1 means slope.*/
     private byte elevation;
-    /** Visibility status: 3 states, but saved as a single bit. 0 = unexplored, 1 = visited, 2 = currently visible (saved as 1)*/
+    /** Fog visibility status: 3 states, but saved as a single bit. 0 = unexplored, 1 = visited, 2 = currently visible (saved as 1)*/
     private byte visibility;
 
     public Tile(int x, int y){
@@ -260,7 +260,7 @@ public class Tile implements PosTrait, TargetTrait{
     }
 
     public boolean isEnemyCheat(){
-        return getTeam() == waveTeam && state.mode.enemyCheat;
+        return getTeam() == waveTeam && !state.mode.isPvp;
     }
 
     public boolean isLinked(){
@@ -390,8 +390,13 @@ public class Tile implements PosTrait, TargetTrait{
                 cliffs |= (1 << (i * 2));
             }
         }
+
         if(occluded){
             cost += 1;
+        }
+
+        if(floor.isLiquid){
+            cost += 100f;
         }
     }
 

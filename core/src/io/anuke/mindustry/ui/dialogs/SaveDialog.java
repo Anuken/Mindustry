@@ -25,7 +25,7 @@ public class SaveDialog extends LoadDialog{
         slots.addImageTextButton("$text.save.new", "icon-add", "clear", 14 * 3, () ->
                 ui.showTextInput("$text.save", "$text.save.newslot", "", text -> {
                     ui.loadGraphics("$text.saving", () -> {
-                        control.getSaves().addSave(text);
+                        control.saves.addSave(text);
                         threads.runGraphics(() -> threads.run(() -> threads.runGraphics(this::setup)));
                     });
                 })
@@ -52,7 +52,6 @@ public class SaveDialog extends LoadDialog{
                 slot.save();
             }catch(Throwable e){
                 e.printStackTrace();
-                e = (e.getCause() == null ? e : e.getCause());
 
                 ui.showError("[orange]" + Bundles.get("text.savefail"));
             }

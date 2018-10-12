@@ -23,7 +23,6 @@ public class TutorialSector{
     private static int droneIndex;
 
     public static Array<Mission> getMissions(){
-        //int x = sectorSize/2, y = sectorSize/2;
 
         Array<Mission> missions = Array.with(
             new ItemMission(Items.copper, 60).setMessage("$tutorial.begin"),
@@ -50,7 +49,7 @@ public class TutorialSector{
                         for(int x = 0; x < world.width(); x++){
                             for(int y = 0; y < world.height(); y++){
                                 Tile tile = world.tile(x, y);
-                                world.generator().generateTile(res, 0, 0, x, y, true, null, ores);
+                                world.generator.generateTile(res, 0, 0, x, y, true, null, ores);
                                 if(!tile.hasCliffs()){
                                     tile.setFloor((Floor) res.floor);
                                 }
@@ -153,19 +152,11 @@ public class TutorialSector{
     private static void generateBase(){
         int x = sectorSize/2 + sectorSize, y = sectorSize/2;
         world.setBlock(world.tile(x, y), StorageBlocks.core, waveTeam);
-       // world.setBlock(world.tile(x + 1, y + 2), TurretBlocks.duo, waveTeam);
-        //world.setBlock(world.tile(x + 1, y - 2), TurretBlocks.duo, waveTeam);
         world.setBlock(world.tile(x - 1, y + 2), UnitBlocks.daggerFactory, waveTeam);
         world.setBlock(world.tile(x - 1, y - 3), UnitBlocks.daggerFactory, waveTeam);
 
-        //fill turret ammo
-        //world.tile(x + 1, y + 2).block().handleStack(Items.copper, 1, world.tile(x + 1, y + 2), null);
-        //world.tile(x + 1, y - 2).block().handleStack(Items.copper, 1, world.tile(x + 1, y - 2), null);
-
         //since placed() is not called here, add core manually
-        if(!state.teams.get(waveTeam).cores.contains(world.tile(x, y), true)){
-            state.teams.get(waveTeam).cores.add(world.tile(x, y));
-        }
+        state.teams.get(waveTeam).cores.add(world.tile(x, y));
     }
 
     private static class MarkerBlockMission extends BlockLocMission{

@@ -24,6 +24,8 @@ public class UnitTypes implements ContentList{
                 maxVelocity = 1.7f;
                 range = 40f;
                 health = 45;
+                hitsize = 4f;
+                mass = 0.1f;
                 weapon = Weapons.droneBlaster;
                 trailColor = Color.valueOf("ffd37f");
             }
@@ -48,6 +50,8 @@ public class UnitTypes implements ContentList{
             maxVelocity = 1.1f;
             speed = 0.2f;
             drag = 0.4f;
+            hitsize = 8f;
+            mass = 1.75f;
             range = 40f;
             weapon = Weapons.chainBlaster;
             health = 130;
@@ -57,24 +61,33 @@ public class UnitTypes implements ContentList{
             maxVelocity = 0.8f;
             speed = 0.18f;
             drag = 0.4f;
+            mass = 3.5f;
             range = 10f;
+            hitsize = 9f;
+            rotatespeed = 0.1f;
             weapon = Weapons.flamethrower;
             health = 440;
         }};
 
         fortress = new UnitType("fortress", Fortress.class, Fortress::new){{
             maxVelocity = 0.8f;
-            speed = 0.18f;
+            speed = 0.15f;
             drag = 0.4f;
+            mass = 5f;
+            hitsize = 10f;
             range = 10f;
+            rotatespeed = 0.06f;
+            weaponOffsetX = 1;
+            targetAir = false;
             weapon = Weapons.artillery;
-            health = 500;
+            health = 800;
         }};
 
         wraith = new UnitType("wraith", Wraith.class, Wraith::new){{
             speed = 0.3f;
             maxVelocity = 1.9f;
             drag = 0.01f;
+            mass = 1.5f;
             weapon = Weapons.chainBlaster;
             isFlying = true;
             health = 70;
@@ -84,23 +97,28 @@ public class UnitTypes implements ContentList{
             health = 250;
             speed = 0.2f;
             maxVelocity = 1.4f;
+            mass = 3f;
             drag = 0.01f;
             isFlying = true;
+            targetAir = false;
             weapon = Weapons.bomber;
         }};
 
         revenant = new UnitType("revenant", Revenant.class, Revenant::new){{
             health = 250;
-            speed = 0.2f;
-            maxVelocity = 1.4f;
+            mass = 5f;
+            hitsize = 12f;
+            speed = 0.14f;
+            maxVelocity = 1.3f;
             drag = 0.01f;
             isFlying = true;
-            weapon = Weapons.bomber;
+            weapon = Weapons.laserBurster;
         }};
 
         phantom = new UnitType("phantom", Phantom.class, Phantom::new){{
             isFlying = true;
             drag = 0.01f;
+            mass = 2f;
             speed = 0.2f;
             maxVelocity = 0.9f;
             range = 70f;

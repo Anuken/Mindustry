@@ -53,8 +53,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public float pointerX, pointerY;
     public String name = "name";
     public String uuid, usid;
-    public boolean isAdmin, isTransferring, isShooting, isBoosting, isAlt, isMobile;
-    public float boostHeat, altHeat;
+    public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile;
+    public float boostHeat, shootHeat;
     public boolean achievedFlight;
     public Color color = new Color();
     public Mech mech;
@@ -98,12 +98,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void getHitbox(Rectangle rectangle){
-        rectangle.setSize(5).setCenter(x, y);
+        rectangle.setSize(mech.hitsize).setCenter(x, y);
     }
 
     @Override
     public void getHitboxTile(Rectangle rectangle){
-        rectangle.setSize(4).setCenter(x, y);
+        rectangle.setSize(mech.hitsize * 2f / 3f).setCenter(x, y);
     }
 
     @Override
@@ -230,6 +230,21 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void set(float x, float y){
         this.x = x;
         this.y = y;
+    }
+
+    @Override
+    public float getMaxVelocity(){
+        return mech.maxSpeed;
+    }
+
+    @Override
+    public Queue<BuildRequest> getPlaceQueue(){
+        return placeQueue;
+    }
+
+    @Override
+    public String toString(){
+        return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}\n";
     }
 
     @Override
@@ -397,9 +412,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         Draw.tscl(fontScale);
     }
 
-    /**
-     * Draw all current build requests. Does not draw the beam effect, only the positions.
-     */
+    /**Draw all current build requests. Does not draw the beam effect, only the positions.*/
     public void drawBuildRequests(){
         synchronized(getPlaceQueue()){
             for(BuildRequest request : getPlaceQueue()){
@@ -435,17 +448,15 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     //region update methods
 
-    float lastx, lasty;
-
     @Override
     public void update(){
         hitTime -= Timers.delta();
 
         if(Float.isNaN(x) || Float.isNaN(y)){
-            TileEntity core = getClosestCore();
-            if(core != null){
-                set(core.x, core.y);
-            }
+            velocity.set(0f, 0f);
+            x = 0;
+            y = 0;
+            setDead(true);
         }
 
         if(isDead()){
@@ -459,15 +470,15 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         Tile tile = world.tileWorld(x, y);
 
-        altHeat = Mathf.lerpDelta(altHeat, isAlt ? 1f : 0f, mech.altChargeAlpha);
         boostHeat = Mathf.lerpDelta(boostHeat, (tile != null && tile.solid()) || (isBoosting && ((!movement.isZero() && moved) || !isLocal)) ? 1f : 0f, 0.08f);
+        shootHeat = Mathf.lerpDelta(shootHeat, isShooting() ? 1f : 0f, 0.06f);
         mech.updateAlt(this); //updated regardless
 
         if(!isLocal){
             interpolate();
             updateBuilding(this); //building happens even with non-locals
             status.update(this); //status effect updating also happens with non locals for effect purposes
-            updateVelocityStatus(mech.drag, mech.maxSpeed); //velocity too, for visual purposes
+            updateVelocityStatus(); //velocity too, for visual purposes
 
             if(getCarrier() != null){
                 x = getCarrier().getX();
@@ -480,17 +491,13 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             return;
         }else{
             //unlock mech when used
-            control.database().unlockContent(mech);
+            control.unlocks.unlockContent(mech);
         }
 
         if(mobile){
             updateFlying();
         }else{
             updateMech();
-        }
-
-        if(isLocal){
-            avoidOthers(8f);
         }
 
         updateBuilding(this);
@@ -513,11 +520,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 }
                 Effects.effect(UnitFx.unitLand, tile.floor().minimapColor, x, y, tile.floor().isLiquid ? 1f : 0.5f);
             }
+            mech.onLand(this);
             achievedFlight = false;
         }
 
         isBoosting = Inputs.keyDown("dash") && !mech.flying;
-        isAlt = Inputs.keyDown("ability") && !mech.flying && !isBoosting;
 
         //if player is in solid block
         if(tile != null && tile.solid()){
@@ -576,7 +583,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 velocity.add(movement);
             }
             float prex = x, prey = y;
-            updateVelocityStatus(mech.drag, mech.maxSpeed);
+            updateVelocityStatus();
             moved = distanceTo(prex, prey) > 0.01f;
         }else{
             velocity.setZero();
@@ -650,7 +657,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), velocity.len() / 10f);
         }
 
-        updateVelocityStatus(mech.drag, mech.maxSpeed);
+        updateVelocityStatus();
 
         //hovering effect
         x += Mathf.sin(Timers.time() + id * 999, 25f, 0.08f);
@@ -664,7 +671,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
                 if(target == null){
                     isShooting = false;
-                    target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
+                    if(Settings.getBool("autotarget")){
+                        target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
+                    }
                 }else if(target.isValid()){
                     //rotate toward and shoot the target
                     if(mech.turnCursor){
@@ -710,7 +719,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         trail.clear();
         carrier = null;
         health = maxHealth();
-        altHeat = boostHeat = drownTime = hitTime = 0f;
+        boostHeat = drownTime = hitTime = 0f;
         mech = (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
         placeQueue.clear();
 
@@ -736,16 +745,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void beginRespawning(SpawnerTrait spawner){
         this.spawner = spawner.getTile().packedPosition();
         this.dead = true;
-    }
-
-    @Override
-    public Queue<BuildRequest> getPlaceQueue(){
-        return placeQueue;
-    }
-
-    @Override
-    public String toString(){
-        return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}\n";
     }
 
     //endregion
@@ -792,7 +791,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
         buffer.writeUTF(name); //TODO writing strings is very inefficient
-        buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2)| (Bits.toByte(isAlt) << 3));
+        buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? -1 : mining.packedPosition());
@@ -811,7 +810,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         isAdmin = (bools & 1) != 0;
         dead = (bools & 2) != 0;
         boolean boosting = (bools & 4) != 0;
-        boolean alt = (bools & 8) != 0;
         color.set(buffer.readInt());
         mech = content.getByID(ContentType.mech, buffer.readByte());
         int mine = buffer.readInt();
@@ -829,7 +827,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }else{
             mining = world.tile(mine);
             isBoosting = boosting;
-            isAlt = alt;
         }
     }
 

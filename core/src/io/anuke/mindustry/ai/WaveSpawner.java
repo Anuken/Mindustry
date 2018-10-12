@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.Squad;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -9,6 +10,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.GridBits;
 import io.anuke.ucore.util.Mathf;
 
@@ -24,6 +26,7 @@ public class WaveSpawner{
     private GridBits quadrants;
 
     private Array<SpawnGroup> groups;
+    private boolean dynamicSpawn;
 
     private Array<FlyerSpawn> flySpawns = new Array<>();
     private Array<GroundSpawn> groundSpawns = new Array<>();
@@ -80,10 +83,12 @@ public class WaveSpawner{
         int addGround = groundGroups - groundSpawns.size, addFly = flyGroups - flySpawns.size;
 
         //add extra groups if the total exceeds it
-        for(int i = 0; i < addGround; i++){
-            GroundSpawn spawn = new GroundSpawn();
-            findLocation(spawn);
-            groundSpawns.add(spawn);
+        if(dynamicSpawn){
+            for(int i = 0; i < addGround; i++){
+                GroundSpawn spawn = new GroundSpawn();
+                findLocation(spawn);
+                groundSpawns.add(spawn);
+            }
         }
 
         for(int i = 0; i < addFly; i++){
@@ -116,9 +121,12 @@ public class WaveSpawner{
                     flyCount++;
                 }else{
                     GroundSpawn spawn = groundSpawns.get(groundCount);
-                    checkQuadrant(spawn.x, spawn.y);
-                    if(!getQuad(spawn.x, spawn.y)){
-                        findLocation(spawn);
+
+                    if(dynamicSpawn){
+                        checkQuadrant(spawn.x, spawn.y);
+                        if(!getQuad(spawn.x, spawn.y)){
+                            findLocation(spawn);
+                        }
                     }
 
                     spawnX = spawn.x * quadsize * tilesize + quadsize * tilesize / 2f;
@@ -155,7 +163,7 @@ public class WaveSpawner{
             for(int y = quady * quadsize; y < world.height() && y < (quady + 1) * quadsize; y++){
                 Tile tile = world.tile(x, y);
 
-                if(tile == null || tile.solid() || world.pathfinder().getValueforTeam(Team.red, x, y) == Float.MAX_VALUE){
+                if(tile == null || tile.solid() || world.pathfinder.getValueforTeam(Team.red, x, y) == Float.MAX_VALUE){
                     setQuad(quadx, quady, false);
                     break outer;
                 }
@@ -164,6 +172,7 @@ public class WaveSpawner{
     }
 
     private void reset(WorldLoadEvent event){
+        dynamicSpawn = false;
         flySpawns.clear();
         groundSpawns.clear();
         quadrants = new GridBits(quadWidth(), quadHeight());
@@ -172,6 +181,20 @@ public class WaveSpawner{
             groups = Waves.getSpawns();
         }else{
             groups = world.getSector().spawns;
+        }
+
+        dynamicSpawn = true;
+
+        for(int x = 0; x < world.width(); x++){
+            for(int y = 0; y < world.height(); y++){
+                if(world.tile(x, y).block() == Blocks.spawn){
+                    dynamicSpawn = false;
+                    GroundSpawn spawn = new GroundSpawn();
+                    spawn.x = x/quadsize;
+                    spawn.y = y/quadsize;
+                    groundSpawns.add(spawn);
+                }
+            }
         }
     }
 
@@ -184,7 +207,7 @@ public class WaveSpawner{
             quadrants = new GridBits(quadWidth(), quadHeight());
         }
 
-        if(!Mathf.inBounds(quadx, quady, quadWidth(), quadHeight())){
+        if(!Structs.inBounds(quadx, quady, quadWidth(), quadHeight())){
             return;
         }
 

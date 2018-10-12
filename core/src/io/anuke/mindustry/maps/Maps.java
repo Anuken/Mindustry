@@ -32,10 +32,6 @@ public class Maps implements Disposable{
     /**Used for storing a list of custom map names for GWT.*/
     private Array<String> customMapNames;
 
-    public Maps(){
-
-    }
-
     /**Returns a list of all maps, including custom ones.*/
     public Array<Map> all(){
         return allMaps;
@@ -90,7 +86,7 @@ public class Maps implements Disposable{
                 Settings.putString("map-data-" + name, new String(Base64Coder.encode(stream.toByteArray())));
                 if(!customMapNames.contains(name, false)){
                     customMapNames.add(name);
-                    Settings.putBinary("custom-maps", customMapNames);
+                    Settings.putObject("custom-maps", customMapNames);
                 }
                 Settings.save();
             }
@@ -130,7 +126,7 @@ public class Maps implements Disposable{
         } else {
             customMapNames.removeValue(map.name, false);
             Settings.putString("map-data-" + map.name, "");
-            Settings.putBinary("custom-maps", customMapNames);
+            Settings.putObject("custom-maps", customMapNames);
             Settings.save();
         }
     }
@@ -163,7 +159,7 @@ public class Maps implements Disposable{
             }
 
         }else{
-            customMapNames = Settings.getBinary("custom-maps", Array.class, () -> new Array<>());
+            customMapNames = Settings.getObject("custom-maps", Array.class, Array::new);
 
             for(String name : customMapNames){
                 try{

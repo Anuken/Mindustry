@@ -2,13 +2,9 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -19,9 +15,7 @@ import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
-import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
@@ -31,11 +25,9 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.entities.trait.SolidTrait;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
@@ -49,20 +41,15 @@ import static io.anuke.ucore.core.Core.batch;
 import static io.anuke.ucore.core.Core.camera;
 
 public class Renderer extends RendererModule{
-    public Surface effectSurface;
+    public final Surface effectSurface;
+    public final BlockRenderer blocks = new BlockRenderer();
+    public final MinimapRenderer minimap = new MinimapRenderer();
+    public final OverlayRenderer overlays = new OverlayRenderer();
+    public final FogRenderer fog = new FogRenderer();
 
     private int targetscale = baseCameraScale;
-    private Texture background = new Texture("sprites/background.png");
-
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
     private Vector2 avgPosition = new Translator();
-    private Vector2 tmpVector1 = new Translator();
-    private Vector2 tmpVector2 = new Translator();
-
-    private BlockRenderer blocks = new BlockRenderer();
-    private MinimapRenderer minimap = new MinimapRenderer();
-    private OverlayRenderer overlays = new OverlayRenderer();
-    private FogRenderer fog = new FogRenderer();
 
     public Renderer(){
         Core.batch = new SpriteBatch(4096);
@@ -120,18 +107,14 @@ public class Renderer extends RendererModule{
         Cursors.loadCustom("drill");
         Cursors.loadCustom("unload");
 
-        clearColor = Hue.lightness(0f);
-        clearColor.a = 1f;
+        clearColor = new Color(0f, 0f, 0f, 1f);
 
-        background.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+        effectSurface = Graphics.createSurface(Core.cameraScale);
+        pixelSurface = Graphics.createSurface(Core.cameraScale);
     }
 
     @Override
     public void init(){
-        int scale = Core.cameraScale;
-
-        effectSurface = Graphics.createSurface(scale);
-        pixelSurface = Graphics.createSurface(scale);
     }
 
     @Override
@@ -211,8 +194,6 @@ public class Renderer extends RendererModule{
 
         Graphics.clear(clearColor);
 
-        drawPadding();
-
         blocks.drawFloor();
 
         drawAndInterpolate(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
@@ -269,7 +250,11 @@ public class Renderer extends RendererModule{
         EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
         Graphics.endShaders();
 
-        Graphics.flushSurface();
+        if(showFog){
+            Graphics.surface();
+        }else{
+            Graphics.flushSurface();
+        }
 
         batch.end();
 
@@ -340,45 +325,7 @@ public class Renderer extends RendererModule{
     }
 
     public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
-        EntityDraw.drawWith(group, toDraw, t -> {
-            float lastx = t.getX(), lasty = t.getY(), lastrot = 0f;
-
-            if(threads.doInterpolate() && threads.isEnabled() && t instanceof SolidTrait){
-                SolidTrait s = (SolidTrait) t;
-
-                lastrot = s.getRotation();
-
-                if(s.lastUpdated() != 0){
-                    float timeSinceUpdate = TimeUtils.timeSinceMillis(s.lastUpdated());
-                    float alpha = Math.min(timeSinceUpdate / s.updateSpacing(), 1f);
-
-                    tmpVector1.set(s.lastPosition().x, s.lastPosition().y)
-                            .lerp(tmpVector2.set(lastx, lasty), alpha);
-                    s.setRotation(Mathf.slerp(s.lastPosition().z, lastrot, alpha));
-
-                    s.setX(tmpVector1.x);
-                    s.setY(tmpVector1.y);
-                }
-            }
-
-            //TODO extremely hacky
-            if(t instanceof Player && ((Player) t).getCarry() != null && ((Player) t).getCarry() instanceof Player && ((Player) ((Player) t).getCarry()).isLocal){
-                ((Player) t).x = ((Player) t).getCarry().getX();
-                ((Player) t).y = ((Player) t).getCarry().getY();
-            }
-
-            drawer.accept(t);
-
-            t.setX(lastx);
-            t.setY(lasty);
-
-            if(threads.doInterpolate() && threads.isEnabled()){
-
-                if(t instanceof SolidTrait){
-                    ((SolidTrait) t).setRotation(lastrot);
-                }
-            }
-        });
+        EntityDraw.drawWith(group, toDraw, drawer);
     }
 
     @Override
@@ -392,7 +339,6 @@ public class Renderer extends RendererModule{
 
     @Override
     public void dispose(){
-        background.dispose();
         fog.dispose();
     }
 
@@ -403,77 +349,6 @@ public class Renderer extends RendererModule{
 
         avgPosition.scl(1f / players.length);
         return avgPosition;
-    }
-
-    public FogRenderer fog(){
-        return fog;
-    }
-
-    public MinimapRenderer minimap(){
-        return minimap;
-    }
-
-    void drawPadding(){
-        float vw = world.width() * tilesize;
-        float cw = camera.viewportWidth * camera.zoom;
-        float ch = camera.viewportHeight * camera.zoom;
-        if(vw < cw){
-            batch.draw(background,
-                    camera.position.x + vw / 2,
-                    Mathf.round(camera.position.y - ch / 2, tilesize),
-                    (cw - vw) / 2,
-                    ch + tilesize,
-                    0, 0,
-                    ((cw - vw) / 2 / tilesize), -ch / tilesize + 1);
-
-            batch.draw(background,
-                    camera.position.x - vw / 2,
-                    Mathf.round(camera.position.y - ch / 2, tilesize),
-                    -(cw - vw) / 2,
-                    ch + tilesize,
-                    0, 0,
-                    -((cw - vw) / 2 / tilesize), -ch / tilesize + 1);
-        }
-    }
-
-    void drawDebug(){
-        int rangex = (int) (Core.camera.viewportWidth / tilesize / 2), rangey = (int) (Core.camera.viewportHeight / tilesize / 2);
-
-        for(int x = -rangex; x <= rangex; x++){
-            for(int y = -rangey; y <= rangey; y++){
-                int worldx = Mathf.scl(camera.position.x, tilesize) + x;
-                int worldy = Mathf.scl(camera.position.y, tilesize) + y;
-
-                if(world.tile(worldx, worldy) == null) continue;
-
-                float value = world.pathfinder().getDebugValue(worldx, worldy);
-                Draw.color(Color.PURPLE);
-                Draw.alpha((value % 10f) / 10f);
-                Lines.square(worldx * tilesize, worldy * tilesize, 4f);
-            }
-        }
-
-        Draw.color(Color.ORANGE);
-        Draw.tcolor(Color.ORANGE);
-
-        ObjectIntMap<Tile> seen = new ObjectIntMap<>();
-
-        for(BlockFlag flag : BlockFlag.values()){
-            for(Tile tile : world.indexer().getEnemy(Team.blue, flag)){
-                int index = seen.getAndIncrement(tile, 0, 1);
-                Draw.tscl(0.125f);
-                Draw.text(flag.name(), tile.drawx(), tile.drawy() + tile.block().size * tilesize / 2f + 4 + index * 3);
-                Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f);
-            }
-        }
-        Draw.tscl(fontScale);
-        Draw.tcolor();
-
-        Draw.color();
-    }
-
-    public BlockRenderer getBlocks(){
-        return blocks;
     }
 
     public void setCameraScale(int amount){

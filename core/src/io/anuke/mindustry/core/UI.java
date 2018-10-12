@@ -25,9 +25,7 @@ import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
 import io.anuke.ucore.scene.ui.TooltipManager;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Mathf;
-
-import java.util.Locale;
+import io.anuke.ucore.util.Structs;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
@@ -63,13 +61,11 @@ public class UI extends SceneModule{
     public SectorsDialog sectors;
     public MissionDialog missions;
 
-    private Locale lastLocale;
-
     public UI(){
         Dialog.setShowAction(() -> sequence(
             alpha(0f),
             originCenter(),
-            moveToAligned(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, Align.center),
+            moveToAligned(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f, Align.center),
             scaleTo(0.0f, 1f),
             parallel(
                 scaleTo(1f, 1f, 0.1f, Interpolation.fade),
@@ -112,7 +108,7 @@ public class UI extends SceneModule{
     @Override
     protected void loadSkin(){
         skin = new Skin(Gdx.files.internal("ui/uiskin.json"), Core.atlas);
-        Mathf.each(font -> {
+        Structs.each(font -> {
             font.setUseIntegerPositions(false);
             font.getData().setScale(Vars.fontScale);
             font.getData().down += Unit.dp.scl(4f);
@@ -181,33 +177,10 @@ public class UI extends SceneModule{
     }
 
     @Override
-    public boolean hasMouse(){
-        return super.hasMouse();
-    }
-
-    @Override
     public void resize(int width, int height){
         super.resize(width, height);
 
         Events.fire(new ResizeEvent());
-    }
-
-    public Locale getLocale(){
-        String loc = Settings.getString("locale");
-        if(loc.equals("default")){
-            return Locale.getDefault();
-        }else{
-            if(lastLocale == null || !lastLocale.toString().equals(loc)){
-                if(loc.contains("_")){
-                    String[] split = loc.split("_");
-                    lastLocale = new Locale(split[0], split[1]);
-                }else{
-                    lastLocale = new Locale(loc);
-                }
-            }
-
-            return lastLocale;
-        }
     }
 
     public void loadGraphics(Runnable call){
@@ -228,12 +201,11 @@ public class UI extends SceneModule{
 
     public void loadLogic(String text, Runnable call){
         loadfrag.show(text);
-        Timers.runTask(7f, () -> {
+        Timers.runTask(7f, () ->
             threads.run(() -> {
                 call.run();
                 threads.runGraphics(loadfrag::hide);
-            });
-        });
+            }));
     }
 
     public void showTextInput(String title, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){

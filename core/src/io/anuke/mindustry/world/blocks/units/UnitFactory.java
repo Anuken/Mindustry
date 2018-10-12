@@ -35,7 +35,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class UnitFactory extends Block{
-    protected float gracePeriodMultiplier = 23f;
+    protected float gracePeriodMultiplier = 2f;
     protected float speedupTime = 60f * 60f * 20;
     protected float maxSpeedup = 2f;
 
@@ -178,7 +178,7 @@ public class UnitFactory extends Block{
             entity.buildTime = 0f;
 
             Call.onUnitFactorySpawn(tile);
-            useContent(type);
+            useContent(tile, type);
 
             for(ItemStack stack : consumes.items()){
                 entity.items.remove(stack.item, stack.amount);

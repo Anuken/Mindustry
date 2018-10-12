@@ -419,7 +419,7 @@ public class NetClient extends Module{
                 player.pointerX, player.pointerY, player.rotation, player.baseRotation,
                 player.getVelocity().x, player.getVelocity().y,
                 player.getMineTile(),
-                player.isBoosting, player.isShooting, player.isAlt, requests,
+                player.isBoosting, player.isShooting, requests,
                 Core.camera.position.x, Core.camera.position.y,
                 Core.camera.viewportWidth * Core.camera.zoom * viewScale, Core.camera.viewportHeight * Core.camera.zoom * viewScale);
         }

@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
@@ -26,11 +27,12 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.io.ByteBufferOutput;
 import io.anuke.ucore.io.CountableByteArrayOutputStream;
 import io.anuke.ucore.modules.Module;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
@@ -187,7 +189,7 @@ public class NetServer extends Module{
 
             if(state.mode.isPvp){
                 //find team with minimum amount of players and auto-assign player to that.
-                Team min = Mathf.findMin(Team.all, team -> {
+                Team min = Structs.findMin(Team.all, team -> {
                     if(state.teams.isActive(team)){
                         int count = 0;
                         for(Player other : playerGroup.all()){
@@ -295,7 +297,7 @@ public class NetServer extends Module{
         float rotation, float baseRotation,
         float xVelocity, float yVelocity,
         Tile mining,
-        boolean boosting, boolean shooting, boolean alting,
+        boolean boosting, boolean shooting,
         BuildRequest[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
@@ -321,7 +323,6 @@ public class NetServer extends Module{
         player.setMineTile(mining);
         player.isBoosting = boosting;
         player.isShooting = shooting;
-        player.isAlt = alting;
         player.getPlaceQueue().clear();
         for(BuildRequest req : requests){
             //auto-skip done requests
@@ -473,7 +474,7 @@ public class NetServer extends Module{
         dataStream.writeFloat(state.wavetime);
         dataStream.writeInt(state.wave);
 
-        Array<Tile> cores = state.teams.get(player.getTeam()).cores;
+        ObjectSet<Tile> cores = state.teams.get(player.getTeam()).cores;
 
         dataStream.writeByte(cores.size);
 
@@ -508,7 +509,7 @@ public class NetServer extends Module{
 
             returnArray.clear();
             if(represent.isClipped()){
-                EntityPhysics.getNearby(group, viewport, entity -> {
+                EntityQuery.getNearby(group, viewport, entity -> {
                     if(((SyncTrait) entity).isSyncing() && viewport.contains(entity.getX(), entity.getY())){
                         returnArray.add(entity);
                     }
