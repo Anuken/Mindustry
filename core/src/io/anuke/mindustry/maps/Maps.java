@@ -77,6 +77,10 @@ public class Maps implements Disposable{
     /**Save a map. This updates all values and stored data necessary.*/
     public void saveMap(String name, MapTileData data, ObjectMap<String, String> tags){
         try {
+            //create copy of tags to prevent mutation later
+            ObjectMap<String, String> newTags = new ObjectMap<>();
+            newTags.putAll(tags);
+            tags = newTags;
             if (!gwt) {
                 FileHandle file = customMapDirectory.child(name + "." + mapExtension);
                 MapIO.writeMap(file.write(false), tags, data);
