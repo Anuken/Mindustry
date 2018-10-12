@@ -41,7 +41,7 @@ public class TutorialSector{
 
             new WaveMission(2).setMessage("$tutorial.waves"),
 
-            new ActionMission(() -> {
+            new ActionMission(() ->
                 Timers.runTask(30f, () -> {
                     Runnable r = () -> {
                         Array<Item> ores = Array.with(Items.copper, Items.coal, Items.lead);
@@ -63,8 +63,7 @@ public class TutorialSector{
                     }else{
                         threads.run(r);
                     }
-                });
-            }),
+                })),
 
             new ItemMission(Items.lead, 150).setMessage("$tutorial.lead"),
             new ItemMission(Items.copper, 250).setMessage("$tutorial.morecopper"),
@@ -131,6 +130,7 @@ public class TutorialSector{
             },
             new BattleMission(){
                 public void generate(Generation gen){} //no
+                public void onBegin(){} //also no
             }.setMessage("$tutorial.battle")
         );
 

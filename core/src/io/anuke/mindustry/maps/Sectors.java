@@ -102,7 +102,7 @@ public class Sectors{
         if(checkExpansion) {
             for (int x = sector.x; x < sector.x + sector.width; x++) {
                 for (int y = sector.y; y < sector.y + sector.height; y++) {
-                    if (grid.get(x, y) != null && (grid.get(x, y).hasSave() /*|| !canMerge(sector, grid.get(x, y))*/)) {
+                    if (grid.get(x, y) != null && grid.get(x,y) != sector && grid.get(x, y).hasSave() /*|| !canMerge(sector, grid.get(x, y))*/) {
                         //if a completed sector is hit, expansion failed
                         //put back the values of the sector
                         if (expandX < 0) sector.x -= expandX;
