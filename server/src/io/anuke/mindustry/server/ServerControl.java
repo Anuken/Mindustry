@@ -43,7 +43,6 @@ public class ServerControl extends Module{
     private final CommandHandler handler = new CommandHandler("");
     private int gameOvers;
     private boolean inExtraRound;
-    private Team winnerTeam;
     private Task lastTask;
 
     public ServerControl(String[] args){
@@ -121,8 +120,8 @@ public class ServerControl extends Module{
                             while(map == previous) map = maps.random();
                         }
 
-                        Call.onInfoMessage((state.mode.isPvp && winnerTeam != null
-                        ? "[YELLOW]The " + winnerTeam.name() + " team is victorious![]" : "[SCARLET]Game over![]")
+                        Call.onInfoMessage((state.mode.isPvp
+                        ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
                         + "\nNext selected map:[accent] "+map.name+"[]"
                         + (map.meta.author() != null ? " by[accent] " + map.meta.author() + "[]" : "") + "."+
                         "\nNew game begins in " + roundExtraTime + " seconds.");
@@ -650,7 +649,7 @@ public class ServerControl extends Module{
 
             info("&lyCore destroyed.");
             inExtraRound = false;
-            Events.fire(new GameOverEvent());
+            Events.fire(new GameOverEvent(Team.red));
         });
 
         handler.register("traceblock", "<x> <y>", "Prints debug info about a block", arg -> {
@@ -882,29 +881,10 @@ public class ServerControl extends Module{
         }
     }
 
-    private void checkPvPGameOver(){
-        Team alive = null;
-
-        for(Team team : Team.all){
-            if(state.teams.get(team).cores.size > 0){
-                if(alive != null){
-                    return;
-                }
-                alive = team;
-            }
-        }
-
-        if(alive != null && !state.gameOver){
-            state.gameOver = true;
-            winnerTeam = alive;
-            Events.fire(new GameOverEvent());
-        }
-    }
-
     @Override
     public void update(){
         if(!inExtraRound && state.mode.isPvp){
-            checkPvPGameOver();
+        //    checkPvPGameOver();
         }
     }
 }

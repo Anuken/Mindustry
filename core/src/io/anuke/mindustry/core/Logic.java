@@ -6,6 +6,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ItemStack;
@@ -81,7 +82,23 @@ public class Logic extends Module{
     private void checkGameOver(){
         if(!state.mode.isPvp && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
             state.gameOver = true;
-            Events.fire(new GameOverEvent());
+            Events.fire(new GameOverEvent(waveTeam));
+        }else if(state.mode.isPvp){
+            Team alive = null;
+
+            for(Team team : Team.all){
+                if(state.teams.get(team).cores.size > 0){
+                    if(alive != null){
+                        return;
+                    }
+                    alive = team;
+                }
+            }
+
+            if(alive != null && !state.gameOver){
+                state.gameOver = true;
+                Events.fire(new GameOverEvent(alive));
+            }
         }
     }
 

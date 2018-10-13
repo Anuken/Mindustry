@@ -153,8 +153,8 @@ public class Control extends Module{
 
             threads.runGraphics(() -> {
                 Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
-                ui.restart.show();
-                state.set(State.menu);
+                //the restart dialog can show info for any number of scenarios
+                ui.restart.show(event);
             });
         });
 
