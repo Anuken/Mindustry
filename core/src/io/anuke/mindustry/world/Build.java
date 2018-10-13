@@ -215,6 +215,6 @@ public class Build{
         Tile tile = world.tile(x, y);
         if(tile != null) tile = tile.target();
 
-        return tile != null && tile.block().canBreak(tile) && tile.breakable() && (tile.getTeam() == Team.none || tile.getTeam() == team);
+        return tile != null && tile.block().canBreak(tile) && tile.breakable() && (!tile.block().synthetic() || tile.getTeam() == team);
     }
 }
