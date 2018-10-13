@@ -173,7 +173,7 @@ public class BlocksFragment extends Fragment{
 
             //add actual recipes
             for(Recipe r : recipes){
-                if((r.mode != null && r.mode != state.mode) || (r.desktopOnly && mobile) || (r.isPad && !state.mode.showPads)) continue;
+                if((r.mode != null && r.mode != state.mode) || !r.visibility.shown()) continue;
 
                 ImageButton image = new ImageButton(new TextureRegion(), "select");
 

@@ -35,7 +35,7 @@ public class HudFragment extends Fragment{
     public final BlocksFragment blockfrag = new BlocksFragment();
 
     private ImageButton menu, flip;
-    private Table wavetable;
+    private Stack wavetable;
     private Table infolabel;
     private Table lastUnlockTable;
     private Table lastUnlockLayout;
@@ -110,6 +110,8 @@ public class HudFragment extends Fragment{
             stack.add(waves);
             stack.add(btable);
 
+            wavetable = stack;
+
             addWaveTable(waves);
             addPlayButton(btable);
             cont.add(stack).fillX().height(66f);
@@ -127,7 +129,7 @@ public class HudFragment extends Fragment{
                 if(Net.hasClient()){
                     t.label(() -> ping.get(Net.getPing())).visible(() -> Net.client() && !gwt).colspan(2);
                 }
-            }).size(-1).visible(() -> Settings.getBool("fps")).update(t -> t.setTranslation(0, (!waves.isVisible() ? waves.getHeight() : Math.min(waves.getTranslation().y, waves.getHeight())) )).get();
+            }).size(-1).visible(() -> Settings.getBool("fps")).update(t -> t.setTranslation(0, (!waves.isVisible() ? wavetable.getHeight() : Math.min(wavetable.getTranslation().y, wavetable.getHeight())) )).get();
 
             //make wave box appear below rest of menu
             cont.swapActor(wavetable, menu.getParent());
@@ -344,7 +346,6 @@ public class HudFragment extends Fragment{
     }
 
     private void addWaveTable(TextButton table){
-        wavetable = table;
 
         IntFormat wavef = new IntFormat("text.wave");
         IntFormat enemyf = new IntFormat("text.wave.enemy");

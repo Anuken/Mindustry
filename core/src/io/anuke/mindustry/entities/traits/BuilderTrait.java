@@ -247,7 +247,7 @@ public interface BuilderTrait extends Entity{
 
             if(Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
 
-                if(unit.distanceTo(core) < mineTransferRange && core.items.get(item) < core.tile.block().getMaximumAccepted(core.tile, item)){
+                if(unit.distanceTo(core) < mineTransferRange && core.tile.block().acceptStack(item, 1, core.tile, unit) == 1){
                     Call.transferItemTo(item, 1,
                         tile.worldx() + Mathf.range(tilesize / 2f),
                         tile.worldy() + Mathf.range(tilesize / 2f), core.tile);

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
@@ -28,10 +29,9 @@ public class Recipe extends UnlockableContent{
     public final Category category;
     public final float cost;
 
-    public boolean desktopOnly = false;
+    public RecipeVisibility visibility = RecipeVisibility.all;
     //the only gamemode in which the recipe shows up
     public GameMode mode;
-    public boolean isPad;
     public boolean hidden;
     public boolean alwaysUnlocked;
 
@@ -67,7 +67,7 @@ public class Recipe extends UnlockableContent{
         arr.clear();
         for(Recipe r : content.recipes()){
             if(r.category == category && (control.unlocks.isUnlocked(r)) &&
-            !((r.mode != null && r.mode != state.mode) || (r.desktopOnly && mobile) || (r.isPad && !state.mode.showPads))){
+            !((r.mode != null && r.mode != state.mode) || !r.visibility.shown())){
                 arr.add(r);
             }
         }
@@ -89,13 +89,8 @@ public class Recipe extends UnlockableContent{
         return recipeMap.get(block);
     }
 
-    public Recipe setPad(){
-        this.isPad = true;
-        return this;
-    }
-
-    public Recipe setDesktop(){
-        desktopOnly = true;
+    public Recipe setVisible(RecipeVisibility visibility){
+        this.visibility = visibility;
         return this;
     }
 
@@ -122,7 +117,7 @@ public class Recipe extends UnlockableContent{
 
     @Override
     public boolean isHidden(){
-        return (desktopOnly && mobile) || hidden;
+        return !visibility.shown() || hidden;
     }
 
     @Override
@@ -195,5 +190,22 @@ public class Recipe extends UnlockableContent{
     public Recipe setDependencies(Block... dependencies){
         this.blockDependencies = dependencies;
         return this;
+    }
+
+    public enum RecipeVisibility{
+        mobileOnly(true, false),
+        desktopOnly(false, true),
+        all(true, true);
+
+        public final boolean mobile, desktop;
+
+        RecipeVisibility(boolean mobile, boolean desktop){
+            this.mobile = mobile;
+            this.desktop = desktop;
+        }
+
+        public boolean shown(){
+            return (Vars.mobile && mobile) || (!Vars.mobile && desktop);
+        }
     }
 }

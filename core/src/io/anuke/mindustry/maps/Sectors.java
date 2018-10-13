@@ -102,7 +102,7 @@ public class Sectors{
         if(checkExpansion) {
             for (int x = sector.x; x < sector.x + sector.width; x++) {
                 for (int y = sector.y; y < sector.y + sector.height; y++) {
-                    if (grid.get(x, y) != null && (grid.get(x, y).hasSave() /*|| !canMerge(sector, grid.get(x, y))*/)) {
+                    if (grid.get(x, y) != null && grid.get(x,y) != sector && grid.get(x, y).hasSave() /*|| !canMerge(sector, grid.get(x, y))*/) {
                         //if a completed sector is hit, expansion failed
                         //put back the values of the sector
                         if (expandX < 0) sector.x -= expandX;
@@ -269,8 +269,19 @@ public class Sectors{
         Array<Sector> out = Settings.getObject("sectors", Array.class, Array::new);
 
         for(Sector sector : out){
+            short x = sector.x;
+            short y = sector.y;
+            int w = sector.width;
+            int h = sector.height;
+            
             createTexture(sector);
             initSector(sector);
+            
+            sector.x = x;
+            sector.y = y;
+            sector.width = w;
+            sector.height = h;
+            
             for(int cx = 0; cx < sector.width; cx++){
                 for(int cy = 0; cy < sector.height; cy++){
                     grid.put(sector.x + cx, sector.y + cy, sector);

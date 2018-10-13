@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 /** The annotation processor for generating remote method call code. */
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({
-        "io.anuke.annotations.Annotations.Remote",
-        "io.anuke.annotations.Annotations.WriteClass",
-        "io.anuke.annotations.Annotations.ReadClass",
+    "io.anuke.annotations.Annotations.Remote",
+    "io.anuke.annotations.Annotations.WriteClass",
+    "io.anuke.annotations.Annotations.ReadClass",
 })
 public class RemoteMethodAnnotationProcessor extends AbstractProcessor{
     /** Maximum size of each event packet. */
@@ -74,7 +74,6 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor{
             if(round == 1){
                 //get serializers
                 serializers = new IOFinder().findSerializers(roundEnv);
-
                 //last method ID used
                 int lastMethodID = 0;
                 //find all elements with the Remote annotation

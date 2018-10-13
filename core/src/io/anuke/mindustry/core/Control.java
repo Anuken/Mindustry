@@ -160,8 +160,8 @@ public class Control extends Module{
 
         Events.on(WorldLoadEvent.class, event -> threads.runGraphics(() -> Events.fire(new WorldLoadGraphicsEvent())));
 
-        Events.on(BlockBuildEvent.class, event -> {
-            if(event.team == players[0].getTeam() && Recipe.getByResult(event.tile.block()) != null){
+        Events.on(TileChangeEvent.class, event -> {
+            if(event.tile.getTeam() == players[0].getTeam() && Recipe.getByResult(event.tile.block()) != null){
                 unlocks.handleContentUsed(Recipe.getByResult(event.tile.block()));
             }
         });

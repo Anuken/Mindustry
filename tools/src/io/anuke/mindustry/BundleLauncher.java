@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,7 +30,7 @@ public class BundleLauncher {
                 Log.info("Parsing bundle: {0}", child);
 
                 OrderedMap<String, String> other = new OrderedMap<>();
-                PropertiesUtils.load(other, Files.newBufferedReader(child));
+                PropertiesUtils.load(other, Files.newBufferedReader(child, Charset.forName("UTF-8")));
                 removals.clear();
 
                 for(String key : other.orderedKeys()){
@@ -62,7 +63,7 @@ public class BundleLauncher {
                     result.append(e.toString().replace("\\", "\\\\").replace("\n", "\\n"));
                     result.append("\n");
                 }
-                Files.write(child, result.toString().getBytes());
+                Files.write(child, result.toString().getBytes("UTF-8"));
 
             }catch (IOException e){
                 throw new RuntimeException(e);

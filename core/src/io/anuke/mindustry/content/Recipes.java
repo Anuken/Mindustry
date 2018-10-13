@@ -6,6 +6,7 @@ import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.type.Recipe.RecipeVisibility;
 
 import static io.anuke.mindustry.type.Category.*;
 
@@ -152,14 +153,15 @@ public class Recipes implements ContentList{
         //UNITS
 
         //bodies
-        new Recipe(units, UpgradeBlocks.dartPad, new ItemStack(Items.lead, 150), new ItemStack(Items.copper, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240)).setDesktop(); //dart is desktop only, because it's the starter mobile ship
+        new Recipe(units, UpgradeBlocks.dartPad, new ItemStack(Items.lead, 150), new ItemStack(Items.copper, 150), new ItemStack(Items.silicon, 200), new ItemStack(Items.titanium, 240)).setVisible(RecipeVisibility.desktopOnly);
         new Recipe(units, UpgradeBlocks.tridentPad, new ItemStack(Items.lead, 250), new ItemStack(Items.copper, 250), new ItemStack(Items.silicon, 250), new ItemStack(Items.titanium, 300), new ItemStack(Items.plastanium, 200));
         new Recipe(units, UpgradeBlocks.javelinPad, new ItemStack(Items.lead, 350), new ItemStack(Items.silicon, 450), new ItemStack(Items.titanium, 500), new ItemStack(Items.plastanium, 400), new ItemStack(Items.phasematter, 200));
         new Recipe(units, UpgradeBlocks.glaivePad, new ItemStack(Items.lead, 450), new ItemStack(Items.silicon, 650), new ItemStack(Items.titanium, 700), new ItemStack(Items.plastanium, 600), new ItemStack(Items.surgealloy, 200));
 
-        new Recipe(units, UpgradeBlocks.tauPad, new ItemStack(Items.lead, 250), new ItemStack(Items.densealloy, 250), new ItemStack(Items.copper, 250), new ItemStack(Items.silicon, 250)).setDesktop();
-        new Recipe(units, UpgradeBlocks.deltaPad, new ItemStack(Items.lead, 350), new ItemStack(Items.densealloy, 350), new ItemStack(Items.copper, 400), new ItemStack(Items.silicon, 450), new ItemStack(Items.thorium, 300)).setDesktop();
-        new Recipe(units, UpgradeBlocks.omegaPad, new ItemStack(Items.lead, 450), new ItemStack(Items.densealloy, 550), new ItemStack(Items.silicon, 650), new ItemStack(Items.thorium, 600), new ItemStack(Items.surgealloy, 240)).setDesktop();
+        new Recipe(units, UpgradeBlocks.alphaPad, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 100), new ItemStack(Items.copper, 150)).setVisible(RecipeVisibility.mobileOnly);
+        new Recipe(units, UpgradeBlocks.tauPad, new ItemStack(Items.lead, 250), new ItemStack(Items.densealloy, 250), new ItemStack(Items.copper, 250), new ItemStack(Items.silicon, 250));
+        new Recipe(units, UpgradeBlocks.deltaPad, new ItemStack(Items.lead, 350), new ItemStack(Items.densealloy, 350), new ItemStack(Items.copper, 400), new ItemStack(Items.silicon, 450), new ItemStack(Items.thorium, 300));
+        new Recipe(units, UpgradeBlocks.omegaPad, new ItemStack(Items.lead, 450), new ItemStack(Items.densealloy, 550), new ItemStack(Items.silicon, 650), new ItemStack(Items.thorium, 600), new ItemStack(Items.surgealloy, 240));
 
         //actual unit related stuff
         new Recipe(units, UnitBlocks.spiritFactory, new ItemStack(Items.copper, 70), new ItemStack(Items.lead, 110), new ItemStack(Items.silicon, 130));

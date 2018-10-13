@@ -45,7 +45,7 @@ public class SectorPresets{
         //pad mission
         add(new SectorPreset(0, -2,
             Structs.array(
-                Missions.blockRecipe(mobile ? UpgradeBlocks.tridentPad : UpgradeBlocks.deltaPad),
+                Missions.blockRecipe(mobile ? UpgradeBlocks.alphaPad : UpgradeBlocks.dartPad),
                 new MechMission(Mechs.delta),
                 new WaveMission(15)
             ),

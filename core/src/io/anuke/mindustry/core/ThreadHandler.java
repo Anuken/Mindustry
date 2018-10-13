@@ -60,6 +60,9 @@ public class ThreadHandler{
     }
 
     public int getTPS(){
+        if(smoothDelta == 0f){
+            return 60;
+        }
         return (int) (60 / smoothDelta);
     }
 
