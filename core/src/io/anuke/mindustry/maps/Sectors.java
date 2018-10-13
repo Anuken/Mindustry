@@ -269,8 +269,15 @@ public class Sectors{
         Array<Sector> out = Settings.getObject("sectors", Array.class, Array::new);
 
         for(Sector sector : out){
+            int w = sector.width;
+            int h = sector.height;
+            
             createTexture(sector);
             initSector(sector);
+            
+            sector.width = w;
+            sector.height = h;
+            
             for(int cx = 0; cx < sector.width; cx++){
                 for(int cy = 0; cy < sector.height; cy++){
                     grid.put(sector.x + cx, sector.y + cy, sector);
