@@ -123,7 +123,6 @@ public class MechPad extends Block{
 
     @Override
     public void tapped(Tile tile, Player player){
-        if(mobile && !mech.flying) return;
 
         if(checkValidTap(tile, player)){
             Call.onMechFactoryTap(player, tile);
