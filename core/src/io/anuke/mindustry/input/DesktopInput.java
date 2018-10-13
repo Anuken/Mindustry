@@ -146,9 +146,9 @@ public class DesktopInput extends InputHandler{
 
         pollInput();
 
-        if(recipe != null && !Settings.getBool("desktop-place-help", false)){
+        if(recipe != null && !Settings.getBool("desktop-place-help-2", false)){
             ui.showInfo("$text.construction.desktop");
-            Settings.putBool("desktop-place-help", true);
+            Settings.putBool("desktop-place-help-2", true);
             Settings.save();
         }
 
