@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
@@ -143,7 +144,12 @@ public class Renderer extends RendererModule{
             Vector2 position = averagePosition();
 
             if(players[0].isDead()){
-                smoothCamera(position.x + 0.0001f, position.y + 0.0001f, 0.08f);
+                TileEntity core = players[0].getClosestCore();
+                if(core != null){
+                    smoothCamera(core.x, core.y, 0.08f);
+                }else{
+                    smoothCamera(position.x + 0.0001f, position.y + 0.0001f, 0.08f);
+                }
             }else if(!mobile){
                 setCamera(position.x + 0.0001f, position.y + 0.0001f);
             }

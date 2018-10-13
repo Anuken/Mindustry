@@ -137,8 +137,8 @@ public class Net{
      * Starts discovering servers on a different thread. Does not work with GWT.
      * Callback is run on the main libGDX thread.
      */
-    public static void discoverServers(Consumer<Array<Host>> cons){
-        clientProvider.discover(cons);
+    public static void discoverServers(Consumer<Host> cons, Runnable done){
+        clientProvider.discover(cons, done);
     }
 
     /**
@@ -374,8 +374,9 @@ public class Net{
         /**
          * Discover servers. This should run the callback regardless of whether any servers are found. Should not block.
          * Callback should be run on libGDX main thread.
+         * @param done is the callback that should run after discovery.
          */
-        void discover(Consumer<Array<Host>> callback);
+        void discover(Consumer<Host> callback, Runnable done);
 
         /**Ping a host. If an error occured, failed() should be called with the exception.*/
         void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed);

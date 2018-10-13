@@ -377,7 +377,7 @@ public class Sectors{
 
         //50% chance to get a wave mission
         if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5 || (sector.width + sector.height) <= 3){
-            sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5));
+            sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 1, 4)*5));
         }else{
             sector.missions.add(new BattleMission());
         }

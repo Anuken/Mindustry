@@ -209,6 +209,7 @@ public class World extends Module{
     public void loadSector(Sector sector){
         currentSector = sector;
         state.difficulty = sectors.getDifficulty(sector);
+        state.mode = sector.currentMission().getMode();
         Timers.mark();
         Timers.mark();
 
@@ -254,6 +255,8 @@ public class World extends Module{
             return;
         }
 
+        endMapLoad();
+
         if(!headless){
             if(state.teams.get(players[0].getTeam()).cores.size == 0){
                 ui.showError("$text.map.nospawn");
@@ -275,7 +278,6 @@ public class World extends Module{
 
         if(invalidMap) threads.runDelay(() -> state.set(State.menu));
 
-        endMapLoad();
     }
 
     public void notifyChanged(Tile tile){

@@ -5,10 +5,16 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.units.MechPad;
 
 public class UpgradeBlocks extends BlockList{
-    public static Block deltaPad, tauPad, omegaPad, dartPad, javelinPad, tridentPad, glaivePad;
+    public static Block alphaPad, deltaPad, tauPad, omegaPad, dartPad, javelinPad, tridentPad, glaivePad;
 
     @Override
     public void load(){
+        alphaPad = new MechPad("alpha-mech-pad"){{
+            mech = Mechs.alpha;
+            size = 2;
+            powerCapacity = 50f;
+        }};
+
         deltaPad = new MechPad("delta-mech-pad"){{
             mech = Mechs.delta;
             size = 2;
