@@ -269,12 +269,16 @@ public class Sectors{
         Array<Sector> out = Settings.getObject("sectors", Array.class, Array::new);
 
         for(Sector sector : out){
+            short x = sector.x;
+            short y = sector.y;
             int w = sector.width;
             int h = sector.height;
             
             createTexture(sector);
             initSector(sector);
             
+            sector.x = x;
+            sector.y = y;
             sector.width = w;
             sector.height = h;
             
