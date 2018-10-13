@@ -28,7 +28,6 @@ public enum GameMode{
         showPads = true;
         disableWaves = true;
         isPvp = true;
-        hidden = true;
         enemyCoreBuildRadius = 600f;
         respawnTime = 60 * 10;
     }};
