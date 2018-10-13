@@ -15,17 +15,14 @@ public enum GameMode{
         disableWaves = true;
         hidden = true;
         enemyCheat = true;
-        showPads = true;
     }},
     victory{{
         disableWaves = true;
         hidden = true;
         enemyCheat = false;
-        showPads = true;
         showMission = false;
     }},
     pvp{{
-        showPads = true;
         disableWaves = true;
         isPvp = true;
         hidden = true;
@@ -33,7 +30,7 @@ public enum GameMode{
         respawnTime = 60 * 10;
     }};
 
-    public boolean infiniteResources, disableWaveTimer, disableWaves, showMission = true, hidden, enemyCheat, isPvp, showPads;
+    public boolean infiniteResources, disableWaveTimer, disableWaves, showMission = true, hidden, enemyCheat, isPvp;
     public float enemyCoreBuildRadius = 400f;
     public float respawnTime = 60 * 4;
 

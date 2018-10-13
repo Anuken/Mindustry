@@ -32,7 +32,6 @@ public class Recipe extends UnlockableContent{
     public RecipeVisibility visibility = RecipeVisibility.all;
     //the only gamemode in which the recipe shows up
     public GameMode mode;
-    public boolean isPad;
     public boolean hidden;
     public boolean alwaysUnlocked;
 
@@ -68,7 +67,7 @@ public class Recipe extends UnlockableContent{
         arr.clear();
         for(Recipe r : content.recipes()){
             if(r.category == category && (control.unlocks.isUnlocked(r)) &&
-            !((r.mode != null && r.mode != state.mode) || !r.visibility.shown() || (r.isPad && !state.mode.showPads))){
+            !((r.mode != null && r.mode != state.mode) || !r.visibility.shown())){
                 arr.add(r);
             }
         }
@@ -88,11 +87,6 @@ public class Recipe extends UnlockableContent{
 
     public static Recipe getByResult(Block block){
         return recipeMap.get(block);
-    }
-
-    public Recipe setPad(){
-        this.isPad = true;
-        return this;
     }
 
     public Recipe setVisible(RecipeVisibility visibility){
