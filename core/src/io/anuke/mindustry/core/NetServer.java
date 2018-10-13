@@ -414,6 +414,10 @@ public class NetServer extends Module{
         Log.info("&y{0} has connected.", player.name);
     }
 
+    public boolean isWaitingForPlayers(){
+        return state.mode.isPvp && playerGroup.size() < 2;
+    }
+
     public void update(){
         if(threads.isEnabled() && !threads.isOnThread()) return;
 
