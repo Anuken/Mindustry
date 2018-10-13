@@ -8,6 +8,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
+import io.anuke.mindustry.core.World;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
@@ -21,7 +22,10 @@ import io.anuke.mindustry.ui.fragments.OverlayFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
@@ -262,11 +266,23 @@ public abstract class InputHandler extends InputAdapter{
      * Returns the tile at the specified MOUSE coordinates.
      */
     Tile tileAt(float x, float y){
-        Vector2 vec = Graphics.world(x, y);
+        return world.tile(tileX(x), tileY(y));
+    }
+
+    int tileX(float cursorX){
+        Vector2 vec = Graphics.world(cursorX, 0);
         if(isPlacing()){
             vec.sub(recipe.result.offset(), recipe.result.offset());
         }
-        return world.tileWorld(vec.x, vec.y);
+        return world.toTile(vec.x);
+    }
+
+    int tileY(float cursorY){
+        Vector2 vec = Graphics.world(0, cursorY);
+        if(isPlacing()){
+            vec.sub(recipe.result.offset(), recipe.result.offset());
+        }
+        return world.toTile(vec.y);
     }
 
     public boolean isPlacing(){
