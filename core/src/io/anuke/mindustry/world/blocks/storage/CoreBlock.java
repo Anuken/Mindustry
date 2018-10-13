@@ -29,6 +29,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.EnumSet;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInputStream;
@@ -82,7 +83,6 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void onProximityUpdate(Tile tile) {
-        //add cores
         state.teams.get(tile.getTeam()).cores.add(tile);
     }
 
