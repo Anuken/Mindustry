@@ -82,6 +82,16 @@ public class EventType{
         }
     }
 
+    public static class BlockBuildCompletEvent implements Event{
+        public final Tile tile;
+        public final Team team;
+
+        public BlockBuildCompletEvent(Tile tile, Team team){
+            this.tile = tile;
+            this.team = team;
+        }
+    }
+
     public static class ResizeEvent implements Event{
 
     }
