@@ -27,6 +27,7 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Atlas;
+import io.anuke.mindustry.gen.Call;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -154,7 +155,7 @@ public class Control extends Module{
             threads.runGraphics(() -> {
                 Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
                 //the restart dialog can show info for any number of scenarios
-                ui.restart.show(event);
+                Call.onGameOver(event.winner);
             });
         });
 

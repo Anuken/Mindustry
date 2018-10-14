@@ -414,6 +414,12 @@ public class NetServer extends Module{
         Log.info("&y{0} has connected.", player.name);
     }
 
+    @Remote(called = Loc.both)
+    public static void onGameOver(Team winner){
+        threads.runGraphics(() -> ui.restart.show(winner));
+        state.set(State.menu);
+    }
+
     public boolean isWaitingForPlayers(){
         return state.mode.isPvp && playerGroup.size() < 2;
     }

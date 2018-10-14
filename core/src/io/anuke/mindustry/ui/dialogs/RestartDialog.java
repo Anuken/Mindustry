@@ -1,14 +1,14 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.EventType.GameOverEvent;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class RestartDialog extends FloatingDialog{
-    private GameOverEvent event;
+    private Team winner;
 
     public RestartDialog(){
         super("$text.gameover");
@@ -16,8 +16,8 @@ public class RestartDialog extends FloatingDialog{
         shown(this::rebuild);
     }
 
-    public void show(GameOverEvent event){
-        this.event = event;
+    public void show(Team winner){
+        this.winner = winner;
         show();
     }
 
@@ -28,7 +28,7 @@ public class RestartDialog extends FloatingDialog{
         buttons().margin(10);
 
         if(state.mode.isPvp){
-            content().add(Bundles.format("text.gameover.pvp", event.winner.localized())).pad(6);
+            content().add(Bundles.format("text.gameover.pvp",winner.localized())).pad(6);
             buttons().addButton("$text.menu", () -> {
                 hide();
                 state.set(State.menu);
