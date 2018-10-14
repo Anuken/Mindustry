@@ -89,6 +89,7 @@ public class CustomGameDialog extends FloatingDialog{
         float images = 146f;
 
         i = 0;
+        maps.defaults().width(170).fillY().top().pad(4f);
         for(Map map : world.maps.all()){
 
             if(i % maxwidth == 0){
@@ -112,10 +113,17 @@ public class CustomGameDialog extends FloatingDialog{
                 control.playMap(map);
             });
 
-            maps.add(image).width(170).fillY().top().pad(4f);
+            maps.add(image);
 
             i++;
         }
+
+        ImageButton gen = maps.addImageButton("icon-editor", "clear", 16*4, () -> {
+            hide();
+            world.generator.playRandomMap();
+        }).growY().get();
+        gen.row();
+        gen.add("$text.map.random");
 
         if(world.maps.all().size == 0){
             maps.add("$text.maps.none").pad(50);

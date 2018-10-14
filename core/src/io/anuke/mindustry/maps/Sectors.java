@@ -34,7 +34,7 @@ public class Sectors{
 
     private final GridMap<Sector> grid = new GridMap<>();
     private final SectorPresets presets = new SectorPresets();
-    private final Array<Item> allOres = Array.with(Items.copper, Items.lead, Items.coal, Items.titanium, Items.thorium);
+    private final Array<Item> allOres = Item.getAllOres();
 
     public void playSector(Sector sector){
         if(sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){

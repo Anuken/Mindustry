@@ -251,16 +251,11 @@ public class Control extends Module{
     }
 
     public void playMap(Map map){
-        ui.loadfrag.show();
-
-        Timers.run(5f, () ->
-                threads.run(() -> {
-                    logic.reset();
-                    world.loadMap(map);
-                    logic.play();
-
-                    Gdx.app.postRunnable(ui.loadfrag::hide);
-                }));
+        ui.loadLogic(() -> {
+            logic.reset();
+            world.loadMap(map);
+            logic.play();
+        });
     }
 
     public boolean isHighScore(){

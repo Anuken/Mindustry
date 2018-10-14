@@ -8,7 +8,9 @@ import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.OreBlocks;
+import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.maps.Sector;
@@ -25,8 +27,7 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.SeedRandom;
 import io.anuke.ucore.util.Structs;
 
-import static io.anuke.mindustry.Vars.sectorSize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 
 public class WorldGenerator{
@@ -136,6 +137,49 @@ public class WorldGenerator{
                 }
             }
         }
+    }
+
+    public void playRandomMap(){
+        ui.loadLogic(() -> {
+            logic.reset();
+
+            int sx = (short)Mathf.range(Short.MAX_VALUE/2);
+            int sy = (short)Mathf.range(Short.MAX_VALUE/2);
+            int width = 380;
+            int height = 380;
+            Array<GridPoint2> spawns = new Array<>();
+            Array<Item> ores = Item.getAllOres();
+
+            if(state.mode.isPvp){
+                int scaling = 10;
+                spawns.add(new GridPoint2(width/scaling, height/scaling));
+                spawns.add(new GridPoint2(width - 1 - width/scaling, height - 1 - height/scaling));
+            }else{
+                spawns.add(new GridPoint2(width/2, height/2));
+            }
+
+            Tile[][] tiles = world.createTiles(width, height);
+            world.setMap(new Map("Generated Map", width, height));
+            world.beginMapLoad();
+
+            for(int x = 0; x < width; x++){
+                for(int y = 0; y < height; y++){
+                    generateTile(result, sx, sy, x, y, true, spawns, ores);
+                    tiles[x][y] = new Tile(x, y, result.floor.id, result.wall.id, (byte)0, (byte)0, result.elevation);
+                }
+            }
+
+            prepareTiles(tiles);
+
+            world.setBlock(tiles[spawns.get(0).x][spawns.get(0).y], StorageBlocks.core, Team.blue);
+
+            if(state.mode.isPvp){
+                world.setBlock(tiles[spawns.get(1).x][spawns.get(1).y], StorageBlocks.core, Team.red);
+            }
+
+            world.endMapLoad();
+            logic.play();
+        });
     }
 
     public void generateOres(Tile[][] tiles, long seed, boolean genOres, Array<Item> usedOres){

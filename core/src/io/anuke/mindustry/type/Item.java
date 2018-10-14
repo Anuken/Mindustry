@@ -2,6 +2,8 @@ package io.anuke.mindustry.type;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.ContentDisplay;
@@ -94,5 +96,13 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     @Override
     public ContentType getContentType(){
         return ContentType.item;
+    }
+
+    public static Array<Item> getAllOres(){
+        Array<Item> arr = new Array<>();
+        for(Item item : Vars.content.items()){
+            if(item.genOre) arr.add(item);
+        }
+        return arr;
     }
 }
