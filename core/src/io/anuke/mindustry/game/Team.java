@@ -1,6 +1,7 @@
 package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.graphics.Color;
+import io.anuke.ucore.util.Bundles;
 
 public enum Team{
     none(Color.DARK_GRAY),
@@ -17,5 +18,9 @@ public enum Team{
     Team(Color color){
         this.color = color;
         intColor = Color.rgba8888(color);
+    }
+
+    public String localized(){
+        return Bundles.get("team." + name() + ".name");
     }
 }

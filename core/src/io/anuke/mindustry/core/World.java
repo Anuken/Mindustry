@@ -257,13 +257,27 @@ public class World extends Module{
 
         endMapLoad();
 
-        if(!headless && state.teams.get(players[0].getTeam()).cores.size == 0){
-            ui.showError("$text.map.nospawn");
-            threads.runDelay(() -> state.set(State.menu));
-            invalidMap = true;
+        if(!headless){
+            if(state.teams.get(players[0].getTeam()).cores.size == 0){
+                ui.showError("$text.map.nospawn");
+                invalidMap = true;
+            }else if(state.mode.isPvp){
+                invalidMap = true;
+                for(Team team : Team.all){
+                    if(state.teams.get(team).cores.size != 0 && team != players[0].getTeam()){
+                        invalidMap = false;
+                    }
+                }
+                if(invalidMap){
+                    ui.showError("$text.map.nospawn.pvp");
+                }
+            }
         }else{
             invalidMap = false;
         }
+
+        if(invalidMap) threads.runDelay(() -> state.set(State.menu));
+
     }
 
     public void notifyChanged(Tile tile){

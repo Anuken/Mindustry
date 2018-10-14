@@ -27,7 +27,11 @@ public class EventType{
     }
 
     public static class GameOverEvent implements Event{
+        public final Team winner;
 
+        public GameOverEvent(Team winner){
+            this.winner = winner;
+        }
     }
 
     /**

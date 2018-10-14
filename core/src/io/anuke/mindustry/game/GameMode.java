@@ -25,7 +25,6 @@ public enum GameMode{
     pvp{{
         disableWaves = true;
         isPvp = true;
-        hidden = true;
         enemyCoreBuildRadius = 600f;
         respawnTime = 60 * 10;
     }};

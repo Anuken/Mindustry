@@ -336,11 +336,13 @@ public class Renderer extends RendererModule{
 
     @Override
     public void resize(int width, int height){
+        float lastX = camera.position.x, lastY = camera.position.y;
         super.resize(width, height);
         for(Player player : players){
             control.input(player.playerIndex).resetCursor();
         }
-        camera.position.set(players[0].x, players[0].y, 0);
+        camera.update();
+        camera.position.set(lastX, lastY, 0f);
     }
 
     @Override

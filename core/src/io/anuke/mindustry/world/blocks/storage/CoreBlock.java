@@ -36,6 +36,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.netServer;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.unitGroups;
 
@@ -204,7 +205,7 @@ public class CoreBlock extends StorageBlock{
             if(entity.progress >= 1f){
                 Call.onUnitRespawn(tile, entity.currentUnit);
             }
-        }else{
+        }else if(!netServer.isWaitingForPlayers()){
             entity.warmup += Timers.delta();
 
             if(entity.solid && entity.warmup > 60f && unitGroups[tile.getTeamID()].getByID(entity.droneID) == null && !Net.client()){
@@ -241,7 +242,6 @@ public class CoreBlock extends StorageBlock{
 
     public class CoreEntity extends TileEntity implements SpawnerTrait{
         public Unit currentUnit;
-        public float shieldHeat;
         int droneID = -1;
         boolean solid = true;
         float warmup;
@@ -251,7 +251,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void updateSpawning(Unit unit){
-            if(currentUnit == null){
+            if(!netServer.isWaitingForPlayers() && currentUnit == null){
                 currentUnit = unit;
                 progress = 0f;
                 unit.set(tile.drawx(), tile.drawy());
