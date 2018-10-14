@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -13,6 +14,7 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.game.Unlocks;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
@@ -27,7 +29,10 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Atlas;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
+
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -157,6 +162,19 @@ public class Control extends Module{
                 //the restart dialog can show info for any number of scenarios
                 Call.onGameOver(event.winner);
             });
+        });
+
+        //autohost for pvp sectors
+        Events.on(WorldLoadEvent.class, event -> {
+            if(state.mode.isPvp && !Net.active()){
+                try{
+                    Net.host(port);
+                    players[0].isAdmin = true;
+                }catch(IOException e){
+                    ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
+                    state.set(State.menu);
+                }
+            }
         });
 
         Events.on(WorldLoadEvent.class, event -> threads.runGraphics(() -> Events.fire(new WorldLoadGraphicsEvent())));
