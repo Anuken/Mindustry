@@ -5,7 +5,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -172,7 +171,7 @@ public class Control extends Module{
                     players[0].isAdmin = true;
                 }catch(IOException e){
                     ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
-                    state.set(State.menu);
+                    threads.runDelay(() -> state.set(State.menu));
                 }
             }
         });

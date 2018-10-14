@@ -202,6 +202,7 @@ public class NetServer extends Module{
                     return Integer.MAX_VALUE;
                 });
                 player.setTeam(min);
+                Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
             }
 
             connections.put(id, player);

@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
@@ -727,12 +726,14 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     //region utility methods
 
-    public void toggleTeam(){
-        team = (team == Team.blue ? Team.red : Team.blue);
-    }
-
     /** Resets all values of the player.*/
     public void reset(){
+        resetNoAdd();
+
+        add();
+    }
+
+    public void resetNoAdd(){
         status.clear();
         team = Team.blue;
         inventory.clear();
@@ -744,8 +745,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         boostHeat = drownTime = hitTime = 0f;
         mech = (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
         placeQueue.clear();
-
-        add();
     }
 
     public boolean isShooting(){
