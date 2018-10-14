@@ -418,6 +418,7 @@ public class NetServer extends Module{
     @Remote(called = Loc.both)
     public static void onGameOver(Team winner){
         threads.runGraphics(() -> ui.restart.show(winner));
+        netClient.setQuiet();
     }
 
     public boolean isWaitingForPlayers(){

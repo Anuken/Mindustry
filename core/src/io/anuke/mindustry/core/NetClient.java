@@ -398,6 +398,11 @@ public class NetClient extends Module{
         Net.disconnect();
     }
 
+    /**When set, any disconnects will be ignored and no dialogs will be shown.*/
+    public void setQuiet(){
+        quiet = true;
+    }
+
     public synchronized void addRemovedEntity(int id){
         removed.add(id);
     }

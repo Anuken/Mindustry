@@ -51,7 +51,7 @@ public class CustomGameDialog extends FloatingDialog{
             if(mode.hidden) continue;
 
             modes.addButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode)
-                .update(b -> b.setChecked(state.mode == mode)).group(group).size(125f, 54f).padBottom(-5);
+                .update(b -> b.setChecked(state.mode == mode)).group(group).size(140f, 54f).padBottom(-5);
             if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);
@@ -73,9 +73,8 @@ public class CustomGameDialog extends FloatingDialog{
             state.difficulty = (ds[Mathf.mod(state.difficulty.ordinal() - 1, ds.length)]);
         }).width(s);
 
-        sdif.addButton("", () -> {
-
-        }).update(t -> {
+        sdif.addButton("", () -> {})
+        .update(t -> {
             t.setText(state.difficulty.toString());
             t.setTouchable(Touchable.disabled);
         }).width(180f);
