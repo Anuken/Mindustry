@@ -42,14 +42,20 @@ public class CustomGameDialog extends FloatingDialog{
         Table selmode = new Table();
         ButtonGroup<TextButton> group = new ButtonGroup<>();
         selmode.add("$text.level.mode").padRight(15f);
+        int i = 0;
+
+        Table modes = new Table();
+        modes.marginBottom(5);
 
         for(GameMode mode : GameMode.values()){
             if(mode.hidden) continue;
 
-            selmode.addButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode)
-                .update(b -> b.setChecked(state.mode == mode)).group(group).size(130f, 54f);
+            modes.addButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode)
+                .update(b -> b.setChecked(state.mode == mode)).group(group).size(125f, 54f).padBottom(-5);
+            if(i++ % 2 == 1) modes.row();
         }
-        selmode.addButton("?", this::displayGameModeHelp).size(50f, 54f).padLeft(18f);
+        selmode.add(modes);
+        selmode.addButton("?", this::displayGameModeHelp).width(50f).fillY().padLeft(18f);
 
         content().add(selmode);
         content().row();
@@ -83,7 +89,7 @@ public class CustomGameDialog extends FloatingDialog{
 
         float images = 146f;
 
-        int i = 0;
+        i = 0;
         for(Map map : world.maps.all()){
 
             if(i % maxwidth == 0){
