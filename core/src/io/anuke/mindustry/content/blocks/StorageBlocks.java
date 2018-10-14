@@ -7,7 +7,7 @@ import io.anuke.mindustry.world.blocks.storage.SortedUnloader;
 import io.anuke.mindustry.world.blocks.storage.Vault;
 
 public class StorageBlocks extends BlockList implements ContentList{
-    public static Block core, vault, unloader;
+    public static Block core, vault, container, unloader;
 
     @Override
     public void load(){
@@ -19,6 +19,12 @@ public class StorageBlocks extends BlockList implements ContentList{
             size = 3;
             health = 600;
             itemCapacity = 2000;
+        }};
+
+        container = new Vault("container"){{
+            size = 2;
+            health = 600;
+            itemCapacity = 500;
         }};
 
         unloader = new SortedUnloader("unloader"){{
