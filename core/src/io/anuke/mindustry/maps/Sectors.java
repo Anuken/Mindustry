@@ -260,6 +260,25 @@ public class Sectors{
         }
     }
 
+    public void abandonSector(Sector sector){
+        for(int x = sector.x; x < sector.width + sector.x; x++){
+            for(int y = sector.y; y < sector.y + sector.height; y++){
+                grid.put(x, y, null);
+            }
+        }
+        if(sector.hasSave()){
+            sector.getSave().delete();
+        }
+        sector.completedMissions = 0;
+        initSector(sector);
+
+        for(int x = sector.x; x < sector.width + sector.x; x++){
+            for(int y = sector.y; y < sector.y + sector.height; y++){
+                grid.put(x, y, sector);
+            }
+        }
+    }
+
     public void load(){
         for(Sector sector : grid.values()){
             sector.texture.dispose();
@@ -298,7 +317,9 @@ public class Sectors{
         Array<Sector> out = new Array<>();
 
         for(Sector sector : grid.values()){
-            out.add(sector);
+            if(sector != null && !out.contains(sector, true)){
+                out.add(sector);
+            }
         }
 
         Settings.putObject("sectors", out);

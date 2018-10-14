@@ -52,8 +52,12 @@ public class SectorsDialog extends FloatingDialog{
             hide();
 
             ui.loadLogic(() -> world.sectors.playSector(selected));
-        }).size(230f, 64f).disabled(b -> selected == null)
-        .update(t -> t.setText(selected != null && selected.hasSave() ? "$text.sector.resume" : "$text.sector.deploy"));
+        }).size(210f, 64f).disabled(b -> selected == null)
+            .update(t -> t.setText(selected != null && selected.hasSave() ? "$text.sector.resume" : "$text.sector.deploy"));
+
+        buttons().addImageTextButton("$text.sector.abandon", "icon-cancel",  16*2, () ->
+            ui.showConfirm("$text.confirm", "$text.sector.abandon.confirm", () -> world.sectors.abandonSector(selected)))
+            .size(210f, 64f).disabled(b -> selected == null || !selected.hasSave());
     }
 
     void selectSector(Sector sector){
