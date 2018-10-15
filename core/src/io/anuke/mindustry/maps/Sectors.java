@@ -370,7 +370,7 @@ public class Sectors{
         for(int x = 1; x <= width; x++){
             for(int y = 1; y <= height; y++){
                 for(GridPoint2 point : Geometry.d8edge){
-                    int shiftx = (int)(-width/2f + (point.x * (width - 1))/2f), shifty = (int)(-height/2f + (point.y * (height - 1))/2f);
+                    int shiftx = (int)(-x/2f + (point.x * (x - 1))/2f), shifty = (int)(-y/2f + (point.y * (y - 1))/2f);
                     if(canFit(sector.x + shiftx, sector.y + shifty, x, y)){
                         finalWidth = x;
                         finalHeight = y;
