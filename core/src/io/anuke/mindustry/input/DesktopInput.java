@@ -202,9 +202,6 @@ public class DesktopInput extends InputHandler{
         Tile selected = tileAt(Gdx.input.getX(), Gdx.input.getY());
         int cursorX = tileX(Gdx.input.getX());
         int cursorY = tileY(Gdx.input.getY());
-        //if(cursor == null){
-        //    return;
-        //}
 
         if(Inputs.keyTap(section, "deselect")){
             player.setMineTile(null);

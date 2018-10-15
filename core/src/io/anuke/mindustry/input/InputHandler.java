@@ -191,6 +191,10 @@ public abstract class InputHandler extends InputAdapter{
                 consumed = true;
                 frag.config.hideConfig();
             }
+
+            if(frag.config.isShown()){
+                consumed = true;
+            }
         }
 
         //call tapped event
