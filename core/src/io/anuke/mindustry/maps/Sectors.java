@@ -277,6 +277,10 @@ public class Sectors{
                 grid.put(x, y, sector);
             }
         }
+
+        threads.runGraphics(() -> createTexture(sector));
+
+        save();
     }
 
     public void load(){
