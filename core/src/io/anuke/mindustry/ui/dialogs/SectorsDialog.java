@@ -3,6 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.ucore.core.Graphics;
@@ -12,6 +13,7 @@ import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
+import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.scene.utils.ScissorStack;
@@ -56,6 +58,12 @@ public class SectorsDialog extends FloatingDialog{
         buttons().addImageTextButton("$text.sector.abandon", "icon-cancel",  16*2, () ->
             ui.showConfirm("$text.confirm", "$text.sector.abandon.confirm", () -> world.sectors.abandonSector(selected)))
             .size(210f, 64f).disabled(b -> selected == null || !selected.hasSave());
+        
+        Array<Cell> cells = buttons().getCells();
+        float btnWidth = (ui.scene.getWidth() - getMarginRight() - getMarginLeft()) / Unit.dp.scl(cells.size);
+        for (Cell cell : cells) {
+            cell.size(btnWidth, 64f);
+        }
     }
 
     void selectSector(Sector sector){
