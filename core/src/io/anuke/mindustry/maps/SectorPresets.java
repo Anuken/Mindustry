@@ -26,7 +26,7 @@ public class SectorPresets{
         //base tutorial mission
         add(new SectorPreset(0, 0,
             TutorialSector.getMissions(),
-            Array.with(),
+            Array.with(Items.copper, Items.coal, Items.lead),
             1));
 
         //command center mission
@@ -63,10 +63,6 @@ public class SectorPresets{
             ),
             Array.with(Items.copper, Items.lead, Items.coal, Items.titanium),
             2));
-
-        //tutorial ore presets
-        orePresets.put(0, 0, Array.with(Items.copper));
-        orePresets.put(1, 0, Array.with(Items.copper, Items.lead, Items.coal));
     }
 
     public Array<Item> getOres(int x, int y){

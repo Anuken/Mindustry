@@ -84,7 +84,6 @@ public class Mechs implements ContentList{
                 mass = 0.9f;
                 armor = 30f;
                 weaponOffsetX = -1;
-                itemCapacity = 15;
                 weaponOffsetY = -1;
                 weapon = Weapons.shockgun;
                 trailColorTo = Color.valueOf("d3ddff");
