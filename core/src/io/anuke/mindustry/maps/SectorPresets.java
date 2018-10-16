@@ -46,7 +46,7 @@ public class SectorPresets{
         add(new SectorPreset(0, -2,
             Structs.array(
                 Missions.blockRecipe(mobile ? UpgradeBlocks.alphaPad : UpgradeBlocks.dartPad),
-                new MechMission(Mechs.delta),
+                new MechMission(mobile ? Mechs.alpha : Mechs.dart),
                 new WaveMission(15)
             ),
             Array.with(Items.copper, Items.lead, Items.coal, Items.titanium),
