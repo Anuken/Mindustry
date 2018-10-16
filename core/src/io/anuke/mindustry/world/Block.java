@@ -162,7 +162,8 @@ public class Block extends BaseBlock {
     public Array<Tile> getPowerConnections(Tile tile, Array<Tile> out){
         out.clear();
         for(Tile other : tile.entity.proximity()){
-            if(other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)){
+            if(other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
+                    && !tile.entity.power.links.contains(other.packedPosition())){
                 out.add(other);
             }
         }

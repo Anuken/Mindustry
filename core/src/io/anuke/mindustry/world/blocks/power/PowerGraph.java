@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
@@ -11,6 +12,7 @@ public class PowerGraph{
     private final static Queue<Tile> queue = new Queue<>();
     private final static Array<Tile> outArray1 = new Array<>();
     private final static Array<Tile> outArray2 = new Array<>();
+    private final static IntSet closedSet = new IntSet();
 
     private final ObjectSet<Tile> producers = new ObjectSet<>();
     private final ObjectSet<Tile> consumers = new ObjectSet<>();
@@ -101,13 +103,15 @@ public class PowerGraph{
     public synchronized void reflow(Tile tile){
         queue.clear();
         queue.addLast(tile);
+        closedSet.clear();
         while(queue.size > 0){
             Tile child = queue.removeFirst();
             child.entity.power.graph = this;
             add(child);
             for(Tile next : child.block().getPowerConnections(child, outArray2)){
-                if(next.entity.power != null && next.entity.power.graph == null){
+                if(next.entity.power != null && next.entity.power.graph == null && !closedSet.contains(next.packedPosition())){
                     queue.addLast(next);
+                    closedSet.add(next.packedPosition());
                 }
             }
         }
@@ -115,6 +119,7 @@ public class PowerGraph{
 
     public synchronized void remove(Tile tile){
         clear();
+        closedSet.clear();
 
         for(Tile other : tile.block().getPowerConnections(tile, outArray1)){
             if(other.entity.power == null || other.entity.power.graph != null) continue;
@@ -126,8 +131,9 @@ public class PowerGraph{
                 child.entity.power.graph = graph;
                 graph.add(child);
                 for(Tile next : child.block().getPowerConnections(child, outArray2)){
-                    if(next != tile && next.entity.power != null && next.entity.power.graph == null){
+                    if(next != tile && next.entity.power != null && next.entity.power.graph == null && !closedSet.contains(next.packedPosition())){
                         queue.addLast(next);
+                        closedSet.add(next.packedPosition());
                     }
                 }
             }
