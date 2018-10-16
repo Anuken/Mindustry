@@ -58,7 +58,7 @@ public class TutorialSector{
                         Events.fire(new WorldLoadEvent());
                     };
 
-                    if(headless){
+                    if(!headless){
                         ui.loadLogic(r);
                     }else{
                         threads.run(r);
