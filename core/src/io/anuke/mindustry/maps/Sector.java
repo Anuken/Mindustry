@@ -5,8 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.maps.missions.Mission;
-import io.anuke.mindustry.maps.missions.VictoryMission;
+import io.anuke.mindustry.maps.missions.*;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.ucore.util.Bits;
 
@@ -40,6 +39,21 @@ public class Sector{
     public transient Array<ItemStack> startingItems;
     /**Last expansion parameters.*/
     public transient int lastExpandX, lastExpandY;
+
+    public Mission getDominantMission(){
+        for(Mission mission : missions){
+            if(mission instanceof WaveMission || mission instanceof BattleMission){
+                return mission;
+            }
+        }
+
+        for(Mission mission : missions){
+            if(mission instanceof BlockMission){
+                return mission;
+            }
+        }
+        return missions.first();
+    }
 
     public Mission currentMission(){
         return completedMissions >= missions.size ? victoryMission : missions.get(completedMissions);

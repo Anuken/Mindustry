@@ -42,15 +42,13 @@ public class SectorsDialog extends FloatingDialog{
                 + (selected.saveID == -1 ? " " + Bundles.get("text.sector.unexplored") :
                     (selected.hasSave() ? "  [accent]/[white] " + Bundles.format("text.sector.time", selected.getSave().getPlayTime()) : ""))));
         content().row();
-        content().label(() -> Bundles.format("text.missions", selected == null || selected.completedMissions >= selected.missions.size
-        ? Bundles.get("text.none") : selected.missions.size)
-                        + "[WHITE] " /*+ (selected == null ? "" : Bundles.format("text.save.difficulty", "[LIGHT_GRAY]" + selected.getDifficulty().toString()))*/);
+        content().label(() -> Bundles.format("text.mission", selected == null || selected.completedMissions >= selected.missions.size
+        ? Bundles.get("text.none") : selected.getDominantMission().menuDisplayString()));
         content().row();
         content().add(new SectorView()).grow();
         content().row();
         buttons().addImageTextButton("$text.sector.deploy", "icon-play",  10*3, () -> {
             hide();
-
             ui.loadLogic(() -> world.sectors.playSector(selected));
         }).size(210f, 64f).disabled(b -> selected == null)
             .update(t -> t.setText(selected != null && selected.hasSave() ? "$text.sector.resume" : "$text.sector.deploy"));
