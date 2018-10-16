@@ -48,7 +48,7 @@ public class CustomGameDialog extends FloatingDialog{
         modes.marginBottom(5);
 
         for(GameMode mode : GameMode.values()){
-            if(mode.hidden) continue;
+            if(mode.hidden || (mode.isPvp && gwt)) continue;
 
             modes.addButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode)
                 .update(b -> b.setChecked(state.mode == mode)).group(group).size(140f, 54f).padBottom(-5);
