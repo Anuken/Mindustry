@@ -74,15 +74,14 @@ public class PowerBlocks extends BlockList implements ContentList{
 
         powerNode = new PowerNode("power-node"){{
             shadow = "shadow-round-1";
-            powerSpeed = 0.5f;
             maxNodes = 4;
+            laserRange = 6;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{
             size = 2;
-            powerSpeed = 1.5f;
             maxNodes = 6;
-            laserRange = 7.5f;
+            laserRange = 9.5f;
             shadow = "shadow-round-2";
         }};
 

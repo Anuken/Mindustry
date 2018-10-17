@@ -35,7 +35,6 @@ public class PowerNode extends PowerBlock{
     protected Translator t2 = new Translator();
 
     protected float laserRange = 6;
-    protected float powerSpeed = 0.5f;
     protected int maxNodes = 3;
 
     public PowerNode(String name){
@@ -111,7 +110,6 @@ public class PowerNode extends PowerBlock{
         super.setStats();
 
         stats.add(BlockStat.powerRange, laserRange, StatUnit.blocks);
-        stats.add(BlockStat.powerTransferSpeed, powerSpeed * 60 / 2f, StatUnit.powerSecond); //divided by 2 since passback exists
     }
 
     @Override

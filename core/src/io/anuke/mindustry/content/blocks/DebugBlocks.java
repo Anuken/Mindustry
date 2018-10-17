@@ -60,7 +60,6 @@ public class DebugBlocks extends BlockList implements ContentList{
         powerInfinite = new PowerNode("powerinfinite"){
             {
                 powerCapacity = 10000f;
-                powerSpeed = 100f;
                 maxNodes = 100;
                 outputsPower = true;
                 consumesPower = false;
