@@ -85,7 +85,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Check and assign targets for a specific position. */
     void checkTargets(float x, float y){
         synchronized(Entities.entityLock){
-            Unit unit = Units.getClosestEnemy(player.getTeam(), x, y, 20f, u -> true);
+            Unit unit = Units.getClosestEnemy(player.getTeam(), x, y, 20f, u -> !u.isDead() && u.isAdded());
 
             if(unit != null){
                 threads.run(() -> player.target = unit);
