@@ -178,9 +178,11 @@ public class MobileInput extends InputHandler implements GestureListener{
                         request.recipe.result.rotate ? request.rotation * 90 : 0);
             }
         }else{
-            Draw.color(Palette.remove);
             //draw removing request
-            Lines.poly(tile.drawx(), tile.drawy(), 4, tile.block().size * tilesize / 2f * request.scale, 45 + 15);
+            Draw.color(Palette.removeBack);
+            Lines.square(tile.drawx(), tile.drawy()-1, tile.block().size * tilesize / 2f);
+            Draw.color(Palette.remove);
+            Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f);
         }
     }
 
@@ -374,18 +376,16 @@ public class MobileInput extends InputHandler implements GestureListener{
                 NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, lineStartX, lineStartY, tileX, tileY, false, maxLength, 1f);
                 NormalizeResult dresult = PlaceUtils.normalizeArea(lineStartX, lineStartY, tileX, tileY, rotation, false, maxLength);
 
-                Draw.color(Palette.remove);
-
-                Draw.alpha(0.6f);
-                Draw.alpha(1f);
-
                 for(int x = dresult.x; x <= dresult.x2; x++){
                     for(int y = dresult.y; y <= dresult.y2; y++){
                         Tile other = world.tile(x, y);
                         if(other == null || !validBreak(other.x, other.y)) continue;
                         other = other.target();
 
-                        Lines.poly(other.drawx(), other.drawy(), 4, other.block().size * tilesize / 2f, 45 + 15);
+                        Draw.color(Palette.removeBack);
+                        Lines.square(other.drawx(), other.drawy()-1, other.block().size * tilesize / 2f);
+                        Draw.color(Palette.remove);
+                        Lines.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f);
                     }
                 }
 

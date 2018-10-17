@@ -94,15 +94,16 @@ public class DesktopInput extends InputHandler{
             NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, selectX, selectY, cursorX, cursorY, false, maxLength, 1f);
             NormalizeResult dresult = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, false, maxLength);
 
-            Draw.color(Palette.remove);
-
             for(int x = dresult.x; x <= dresult.x2; x++){
                 for(int y = dresult.y; y <= dresult.y2; y++){
                     Tile tile = world.tile(x, y);
                     if(tile == null || !validBreak(tile.x, tile.y)) continue;
                     tile = tile.target();
 
-                    Lines.poly(tile.drawx(), tile.drawy(), 4, tile.block().size * tilesize / 2f, 45 + 15);
+                    Draw.color(Palette.removeBack);
+                    Lines.square(tile.drawx(), tile.drawy()-1, tile.block().size * tilesize / 2f);
+                    Draw.color(Palette.remove);
+                    Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f);
                 }
             }
 

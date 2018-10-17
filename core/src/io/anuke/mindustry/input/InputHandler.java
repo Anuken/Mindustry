@@ -8,7 +8,6 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
-import io.anuke.mindustry.core.World;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
@@ -225,6 +224,12 @@ public abstract class InputHandler extends InputAdapter{
 
         if(!showedConsume){
             frag.consume.hide();
+        }
+
+        if(!consumed && player.isBuilding()){
+            player.clearBuilding();
+            recipe = null;
+            return true;
         }
 
         return consumed;

@@ -418,27 +418,48 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void drawBuildRequests(){
         synchronized(getPlaceQueue()){
             for(BuildRequest request : getPlaceQueue()){
+                if(getCurrentRequest() == request) continue;
 
                 if(request.remove){
                     Block block = world.tile(request.x, request.y).target().block();
 
                     //draw removal request
+                    Lines.stroke(2f);
+
+                    Draw.color(Palette.removeBack);
+
+                    float rad = Mathf.absin(Timers.time(), 7f, 1f) + block.size * tilesize / 2f;
+
+                    Lines.square(
+                        request.x * tilesize + block.offset(),
+                        request.y * tilesize + block.offset() - 1,
+                        rad);
+
                     Draw.color(Palette.remove);
 
-                    Lines.stroke((1f - request.progress));
-
-                    Lines.poly(request.x * tilesize + block.offset(),
-                            request.y * tilesize + block.offset(),
-                            4, block.size * tilesize / 2f, 45 + 15);
+                    Lines.square(
+                        request.x * tilesize + block.offset(),
+                        request.y * tilesize + block.offset(),
+                        rad);
                 }else{
                     //draw place request
+                    Lines.stroke(2f);
+
+                    Draw.color(Palette.accentBack);
+
+                    float rad = Mathf.absin(Timers.time(), 7f, 1f) - 2f + request.recipe.result.size * tilesize / 2f;
+
+                    Lines.square(
+                        request.x * tilesize + request.recipe.result.offset(),
+                        request.y * tilesize + request.recipe.result.offset() - 1,
+                        rad);
+
                     Draw.color(Palette.accent);
 
-                    Lines.stroke((1f - request.progress));
-
-                    Lines.poly(request.x * tilesize + request.recipe.result.offset(),
-                            request.y * tilesize + request.recipe.result.offset(),
-                            4, request.recipe.result.size * tilesize / 2f, 45 + 15);
+                    Lines.square(
+                        request.x * tilesize + request.recipe.result.offset(),
+                        request.y * tilesize + request.recipe.result.offset(),
+                        rad);
                 }
             }
 
