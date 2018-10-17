@@ -428,7 +428,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
                     Draw.color(Palette.removeBack);
 
-                    float rad = Mathf.absin(Timers.time(), 7f, 1f) + block.size * tilesize / 2f;
+                    float rad = Mathf.absin(Timers.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
 
                     Lines.square(
                         request.x * tilesize + block.offset(),

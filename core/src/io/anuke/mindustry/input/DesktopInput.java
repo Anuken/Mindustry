@@ -101,9 +101,9 @@ public class DesktopInput extends InputHandler{
                     tile = tile.target();
 
                     Draw.color(Palette.removeBack);
-                    Lines.square(tile.drawx(), tile.drawy()-1, tile.block().size * tilesize / 2f);
+                    Lines.square(tile.drawx(), tile.drawy()-1, tile.block().size * tilesize / 2f - 1);
                     Draw.color(Palette.remove);
-                    Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f);
+                    Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f - 1);
                 }
             }
 
