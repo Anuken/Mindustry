@@ -62,6 +62,10 @@ public abstract class Mission{
 
     }
 
+    public void onFirstBegin(){
+
+    }
+
     /**Shows the unique sector message.*/
     public void showMessage(){
         if(!headless && extraMessage != null){

@@ -99,7 +99,7 @@ public class TutorialSector{
             },
             new BattleMission(){
                 public void generate(Generation gen){} //no
-                public void onBegin(){} //also no
+                public void onFirstBegin(){} //also no
             }.setMessage("$tutorial.battle")
         );
 
