@@ -107,6 +107,7 @@ public class DesktopInput extends InputHandler{
                 }
             }
 
+            Draw.color(Palette.remove);
             Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
         }else if(isPlacing()){
             if(recipe.result.rotate){

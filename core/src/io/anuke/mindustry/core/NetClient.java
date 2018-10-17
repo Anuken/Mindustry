@@ -12,7 +12,6 @@ import io.anuke.annotations.Annotations.Variant;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
@@ -24,6 +23,7 @@ import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.net.ValidateException;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.modules.InventoryModule;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
@@ -292,9 +292,9 @@ public class NetClient extends Module{
         byte cores = input.readByte();
         for(int i = 0; i < cores; i++){
             int pos = input.readInt();
-            TileEntity entity = world.tile(pos).entity;
-            if(entity != null){
-                entity.items.read(input);
+            Tile tile = world.tile(pos);
+            if(tile != null && tile.entity != null){
+                tile.entity.items.read(input);
             }else{
                 new InventoryModule().read(input);
             }

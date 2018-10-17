@@ -14,7 +14,7 @@ public interface TypeTrait{
      */
     static <T extends TypeTrait> void registerType(Class<T> type, Supplier<T> supplier){
         if(typeToID.get(type, -1) != -1){
-            throw new RuntimeException("Type is already registered: '" + type + "'!");
+            return; //already registered
         }
 
         registeredTypes.add(supplier);

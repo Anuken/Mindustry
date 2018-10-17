@@ -178,11 +178,13 @@ public class MobileInput extends InputHandler implements GestureListener{
                         request.recipe.result.rotate ? request.rotation * 90 : 0);
             }
         }else{
+            float rad = (tile.block().size * tilesize / 2f - 1) * request.scale;
+            Draw.alpha(0f);
             //draw removing request
-            Draw.color(Palette.removeBack);
-            Lines.square(tile.drawx(), tile.drawy()-1, tile.block().size * tilesize / 2f);
-            Draw.color(Palette.remove);
-            Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f);
+            Draw.tint(Palette.removeBack);
+            Lines.square(tile.drawx(), tile.drawy()-1, rad);
+            Draw.tint(Palette.remove);
+            Lines.square(tile.drawx(), tile.drawy(), rad);
         }
     }
 
@@ -242,7 +244,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                         }
                     }
 
-                    //move all current requests to removal array to they fade out
+                    //move all current requests to removal array so they fade out
                     removals.addAll(selection);
                     selection.clear();
                     selecting = false;
@@ -383,12 +385,13 @@ public class MobileInput extends InputHandler implements GestureListener{
                         other = other.target();
 
                         Draw.color(Palette.removeBack);
-                        Lines.square(other.drawx(), other.drawy()-1, other.block().size * tilesize / 2f);
+                        Lines.square(other.drawx(), other.drawy()-1, other.block().size * tilesize / 2f - 1);
                         Draw.color(Palette.remove);
-                        Lines.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f);
+                        Lines.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f - 1);
                     }
                 }
 
+                Draw.color(Palette.remove);
                 Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
 
             }
