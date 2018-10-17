@@ -244,7 +244,7 @@ public class Net{
                 }
             }else if(!((object instanceof Packet) && ((Packet) object).isUnimportant())){
                 packetQueue.add(object);
-                Log.info("Queuing packet {0}.", object);
+                Log.info("Queuing packet {0}", object);
             }else{
                 synchronized(packetPoolLock){
                     Pooling.free(object);

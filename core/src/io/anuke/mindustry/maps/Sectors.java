@@ -53,14 +53,14 @@ public class Sectors{
             }
             world.sectors.save();
             world.setSector(sector);
-            sector.currentMission().onBegin();
+            if(!sector.complete) sector.currentMission().onBegin();
         }else if(SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
             ui.showInfo("$text.save.old");
         }else try{
             sector.getSave().load();
             world.setSector(sector);
             state.set(State.playing);
-            sector.currentMission().onBegin();
+            if(!sector.complete) sector.currentMission().onBegin();
         }catch(Exception e){
             Log.err(e);
             sector.getSave().delete();
@@ -270,6 +270,7 @@ public class Sectors{
             sector.getSave().delete();
         }
         sector.completedMissions = 0;
+        sector.complete = false;
         initSector(sector);
 
         for(int x = sector.x; x < sector.width + sector.x; x++){

@@ -147,11 +147,13 @@ public class DesktopInput extends InputHandler{
 
         pollInput();
 
+        //removed for now, will add back if necessary
+        /*
         if(recipe != null && !Settings.getBool("desktop-place-help-2", false)){
             ui.showInfo("$text.construction.desktop");
             Settings.putBool("desktop-place-help-2", true);
             Settings.save();
-        }
+        }*/
 
         //deselect if not placing
         if(!isPlacing() && mode == placing){

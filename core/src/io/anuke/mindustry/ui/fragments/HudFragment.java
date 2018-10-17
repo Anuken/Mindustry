@@ -380,7 +380,7 @@ public class HudFragment extends Fragment{
         });
 
         table.setDisabled(() -> !(world.getSector() != null && world.getSector().currentMission().hasMessage()));
-        table.visible(() -> !((world.getSector() == null && state.mode.disableWaves) || !state.mode.showMission));
+        table.visible(() -> !((world.getSector() == null && state.mode.disableWaves) || !state.mode.showMission || (world.getSector() != null && world.getSector().complete)));
     }
 
     private void addPlayButton(Table table){
