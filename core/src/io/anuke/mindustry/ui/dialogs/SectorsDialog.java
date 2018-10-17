@@ -9,7 +9,6 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.event.ClickListener;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -18,7 +17,8 @@ import io.anuke.ucore.scene.utils.ScissorStack;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.world;
 
 public class SectorsDialog extends FloatingDialog{
     private Rectangle clip = new Rectangle();
@@ -59,10 +59,6 @@ public class SectorsDialog extends FloatingDialog{
             ui.loadLogic(() -> world.sectors.playSector(selected));
         }).disabled(b -> selected == null)
             .fillX().height(64f).colspan(2).update(t -> t.setText(selected != null && selected.hasSave() ? "$text.sector.resume" : "$text.sector.deploy"));
-
-
-
-
     }
 
     void selectSector(Sector sector){
@@ -108,12 +104,7 @@ public class SectorsDialog extends FloatingDialog{
                 }
             });
 
-            addListener(new ClickListener(){
-                @Override
-                public void clicked(InputEvent event, float x, float y){
-                    clicked = true;
-                }
-            });
+            clicked(() -> clicked = true);
         }
 
         @Override
