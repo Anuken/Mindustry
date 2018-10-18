@@ -16,6 +16,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.blocks.distribution.Sorter;
 import io.anuke.mindustry.world.blocks.power.PowerNode;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
@@ -48,12 +49,17 @@ public class DebugBlocks extends BlockList implements ContentList{
                 super.setBars();
                 bars.remove(BarType.power);
             }
+
+            @Override
+            public void init(){
+                super.init();
+                stats.remove(BlockStat.powerCapacity);
+            }
         };
 
         powerInfinite = new PowerNode("powerinfinite"){
             {
                 powerCapacity = 10000f;
-                powerSpeed = 100f;
                 maxNodes = 100;
                 outputsPower = true;
                 consumesPower = false;

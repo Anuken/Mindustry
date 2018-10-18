@@ -183,6 +183,7 @@ public class NetworkIO{
 
             Entities.clear();
             int id = stream.readInt();
+            player.resetNoAdd();
             player.read(stream, TimeUtils.millis());
             player.resetID(id);
             player.add();
@@ -258,7 +259,6 @@ public class NetworkIO{
                 i += consecutives;
             }
 
-            player.reset();
             state.teams = new Teams();
 
             byte teams = stream.readByte();

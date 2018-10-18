@@ -13,6 +13,7 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.game.Unlocks;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
@@ -27,6 +28,10 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Atlas;
+import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
+
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -153,9 +158,22 @@ public class Control extends Module{
 
             threads.runGraphics(() -> {
                 Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
-                ui.restart.show();
-                state.set(State.menu);
+                //the restart dialog can show info for any number of scenarios
+                Call.onGameOver(event.winner);
             });
+        });
+
+        //autohost for pvp sectors
+        Events.on(WorldLoadEvent.class, event -> {
+            if(state.mode.isPvp && !Net.active()){
+                try{
+                    Net.host(port);
+                    players[0].isAdmin = true;
+                }catch(IOException e){
+                    ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
+                    threads.runDelay(() -> state.set(State.menu));
+                }
+            }
         });
 
         Events.on(WorldLoadEvent.class, event -> threads.runGraphics(() -> Events.fire(new WorldLoadGraphicsEvent())));
@@ -233,16 +251,11 @@ public class Control extends Module{
     }
 
     public void playMap(Map map){
-        ui.loadfrag.show();
-
-        Timers.run(5f, () ->
-                threads.run(() -> {
-                    logic.reset();
-                    world.loadMap(map);
-                    logic.play();
-
-                    Gdx.app.postRunnable(ui.loadfrag::hide);
-                }));
+        ui.loadLogic(() -> {
+            logic.reset();
+            world.loadMap(map);
+            logic.play();
+        });
     }
 
     public boolean isHighScore(){

@@ -4,16 +4,9 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.content.blocks.*;
-import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.maps.generation.Generation;
-import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.maps.missions.*;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
@@ -40,30 +33,6 @@ public class TutorialSector{
             new BlockLocMission(ProductionBlocks.mechanicalDrill, 55, 60).setMessage("$tutorial.drillturret"),
 
             new WaveMission(2).setMessage("$tutorial.waves"),
-
-            new ActionMission(() ->
-                Timers.runTask(30f, () -> {
-                    Runnable r = () -> {
-                        Array<Item> ores = Array.with(Items.copper, Items.coal, Items.lead);
-                        GenResult res = new GenResult();
-                        for(int x = 0; x < world.width(); x++){
-                            for(int y = 0; y < world.height(); y++){
-                                Tile tile = world.tile(x, y);
-                                world.generator.generateTile(res, 0, 0, x, y, true, null, ores);
-                                if(!tile.hasCliffs()){
-                                    tile.setFloor((Floor) res.floor);
-                                }
-                            }
-                        }
-                        Events.fire(new WorldLoadEvent());
-                    };
-
-                    if(headless){
-                        ui.loadLogic(r);
-                    }else{
-                        threads.run(r);
-                    }
-                })),
 
             new ItemMission(Items.lead, 150).setMessage("$tutorial.lead"),
             new ItemMission(Items.copper, 250).setMessage("$tutorial.morecopper"),
@@ -130,7 +99,7 @@ public class TutorialSector{
             },
             new BattleMission(){
                 public void generate(Generation gen){} //no
-                public void onBegin(){} //also no
+                public void onFirstBegin(){} //also no
             }.setMessage("$tutorial.battle")
         );
 

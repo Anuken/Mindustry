@@ -145,6 +145,11 @@ public class HudFragment extends Fragment{
             t.table("clear", top -> top.add("[orange]< " + Bundles.get("text.paused") + " >").pad(6).get().setFontScale(fontScale * 1.5f));
         });
 
+        parent.fill(t -> {
+            t.visible(() -> netServer.isWaitingForPlayers() && !state.is(State.menu));
+            t.table("clear", c -> c.margin(10).add("$text.waiting.players"));
+        });
+
         //'core is under attack' table
         parent.fill(t -> {
             float notifDuration = 240f;
@@ -375,7 +380,7 @@ public class HudFragment extends Fragment{
         });
 
         table.setDisabled(() -> !(world.getSector() != null && world.getSector().currentMission().hasMessage()));
-        table.visible(() -> !((world.getSector() == null && state.mode.disableWaves) || !state.mode.showMission));
+        table.visible(() -> !((world.getSector() == null && state.mode.disableWaves) || !state.mode.showMission || (world.getSector() != null && world.getSector().complete)));
     }
 
     private void addPlayButton(Table table){

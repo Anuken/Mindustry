@@ -29,6 +29,7 @@ public class DistributionBlocks extends BlockList implements ContentList{
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
             range = 4;
             speed = 60f;
+            bufferCapacity = 15;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{

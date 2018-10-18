@@ -21,7 +21,10 @@ import io.anuke.mindustry.ui.fragments.OverlayFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.*;
+import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
@@ -187,6 +190,10 @@ public abstract class InputHandler extends InputAdapter{
                 consumed = true;
                 frag.config.hideConfig();
             }
+
+            if(frag.config.isShown()){
+                consumed = true;
+            }
         }
 
         //call tapped event
@@ -217,6 +224,12 @@ public abstract class InputHandler extends InputAdapter{
 
         if(!showedConsume){
             frag.consume.hide();
+        }
+
+        if(!consumed && player.isBuilding()){
+            player.clearBuilding();
+            recipe = null;
+            return true;
         }
 
         return consumed;
@@ -262,11 +275,23 @@ public abstract class InputHandler extends InputAdapter{
      * Returns the tile at the specified MOUSE coordinates.
      */
     Tile tileAt(float x, float y){
-        Vector2 vec = Graphics.world(x, y);
+        return world.tile(tileX(x), tileY(y));
+    }
+
+    int tileX(float cursorX){
+        Vector2 vec = Graphics.world(cursorX, 0);
         if(isPlacing()){
             vec.sub(recipe.result.offset(), recipe.result.offset());
         }
-        return world.tileWorld(vec.x, vec.y);
+        return world.toTile(vec.x);
+    }
+
+    int tileY(float cursorY){
+        Vector2 vec = Graphics.world(0, cursorY);
+        if(isPlacing()){
+            vec.sub(recipe.result.offset(), recipe.result.offset());
+        }
+        return world.toTile(vec.y);
     }
 
     public boolean isPlacing(){

@@ -56,10 +56,8 @@ public class ChatFragment extends Table{
         setFillParent(true);
         font = Core.skin.getFont("default-font");
 
-        visible(() -> !state.is(State.menu) && Net.active());
-
-        update(() -> {
-            if(!Net.active()){
+        visible(() -> {
+            if(!Net.active() && messages.size > 0){
                 clearMessages();
 
                 if(chatOpen){
@@ -67,6 +65,10 @@ public class ChatFragment extends Table{
                 }
             }
 
+            return !state.is(State.menu) && Net.active();
+        });
+
+        update(() -> {
 
             if(Net.active() && Inputs.keyTap("chat")){
                 toggle();

@@ -35,8 +35,6 @@ public class Blocks extends BlockList implements ContentList{
         blockpart = new BlockPart();
 
         spawn = new Block("spawn"){
-            {
-            }
 
             public void drawShadow(Tile tile){}
 

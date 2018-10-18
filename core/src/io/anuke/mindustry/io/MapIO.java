@@ -78,7 +78,7 @@ public class MapIO{
 
         for(int x = 0; x < data.width(); x++){
             for(int y = 0; y < data.height(); y++){
-                int color = pixmap.getPixel(y, pixmap.getWidth() - 1 - x);
+                int color = pixmap.getPixel(x, pixmap.getHeight() - 1 - y);
                 LegacyBlock block = LegacyColorMapper.get(color);
 
                 data.write(x, y, DataPosition.floor, block.floor.id);

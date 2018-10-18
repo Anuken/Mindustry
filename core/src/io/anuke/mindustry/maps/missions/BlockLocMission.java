@@ -35,7 +35,7 @@ public class BlockLocMission extends Mission{
     public void drawOverlay(){
         Lines.stroke(2f);
 
-        Draw.color(Palette.accent.r * 0.8f,Palette.accent.g * 0.8f,Palette.accent.b * 0.8f);
+        Draw.color(Palette.accentBack);
         Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1f, block.size * tilesize/2f + 1f+ Mathf.absin(Timers.time(), 6f, 2f));
 
         Draw.color(Palette.accent);

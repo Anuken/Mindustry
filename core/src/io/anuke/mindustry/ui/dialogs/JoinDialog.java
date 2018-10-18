@@ -30,6 +30,7 @@ public class JoinDialog extends FloatingDialog{
     Table local = new Table();
     Table remote = new Table();
     Table hosts = new Table();
+    int totalHosts;
 
     public JoinDialog(){
         super("$text.joingame");
@@ -185,15 +186,6 @@ public class JoinDialog extends FloatingDialog{
         });
     }
 
-    void refreshLocal(){
-        if(!Vars.gwt){
-            local.clear();
-            local.background("button");
-            local.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + Strings.animated(4, 10f, ".")).pad(10f);
-            Net.discoverServers(this::addLocalHosts);
-        }
-    }
-
     void setup(){
         float w = targetWidth();
 
@@ -255,30 +247,48 @@ public class JoinDialog extends FloatingDialog{
         });
     }
 
-    void addLocalHosts(Array<Host> array){
-        float w = targetWidth();
+    void refreshLocal(){
+        if(!Vars.gwt){
+            totalHosts = 0;
 
-        local.clear();
+            local.clear();
+            local.background((Drawable)null);
+            local.table("button", t -> {
+                t.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + Strings.animated(4, 10f, ".")).pad(10f);
+            }).growX();
+            Net.discoverServers(this::addLocalHost, this::finishLocalHosts);
+        }
+    }
 
-        if(array.size == 0){
+    void finishLocalHosts(){
+        if(totalHosts == 0){
+            local.clear();
+            local.background("button");
             local.add("$text.hosts.none").pad(10f);
             local.add().growX();
             local.addImageButton("icon-loading", 16 * 2f, this::refreshLocal).pad(-10f).padLeft(0).padTop(-6).size(70f, 74f);
         }else{
-            for(Host a : array){
-                TextButton button = local.addButton("[accent]" + a.name, "clear", () -> connect(a.address, port))
-                    .width(w).height(80f).pad(4f).get();
-                button.left();
-                button.row();
-                button.add("[lightgray]" + (a.players != 1 ? Bundles.format("text.players", a.players) :
-                        Bundles.format("text.players.single", a.players)));
-                button.row();
-                button.add("[lightgray]" + a.address).pad(4).left();
-
-                local.row();
-                local.background((Drawable) null);
-            }
+            local.background((Drawable) null);
         }
+    }
+
+    void addLocalHost(Host host){
+        if(totalHosts == 0){
+            local.clear();
+        }
+        totalHosts ++;
+        float w = targetWidth();
+
+        local.row();
+
+        TextButton button = local.addButton("[accent]" + host.name, "clear", () -> connect(host.address, port))
+        .width(w).height(80f).pad(4f).get();
+        button.left();
+        button.row();
+        button.add("[lightgray]" + (host.players != 1 ? Bundles.format("text.players", host.players) :
+        Bundles.format("text.players.single", host.players)));
+        button.row();
+        button.add("[lightgray]" + host.address).pad(4).left();
     }
 
     void connect(String ip, int port){

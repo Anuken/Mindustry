@@ -209,6 +209,7 @@ public class World extends Module{
     public void loadSector(Sector sector){
         currentSector = sector;
         state.difficulty = sectors.getDifficulty(sector);
+        state.mode = sector.currentMission().getMode();
         Timers.mark();
         Timers.mark();
 
@@ -254,15 +255,29 @@ public class World extends Module{
             return;
         }
 
-        if(!headless && state.teams.get(players[0].getTeam()).cores.size == 0){
-            ui.showError("$text.map.nospawn");
-            threads.runDelay(() -> state.set(State.menu));
-            invalidMap = true;
+        endMapLoad();
+
+        if(!headless){
+            if(state.teams.get(players[0].getTeam()).cores.size == 0){
+                ui.showError("$text.map.nospawn");
+                invalidMap = true;
+            }else if(state.mode.isPvp){
+                invalidMap = true;
+                for(Team team : Team.all){
+                    if(state.teams.get(team).cores.size != 0 && team != players[0].getTeam()){
+                        invalidMap = false;
+                    }
+                }
+                if(invalidMap){
+                    ui.showError("$text.map.nospawn.pvp");
+                }
+            }
         }else{
             invalidMap = false;
         }
 
-        endMapLoad();
+        if(invalidMap) threads.runDelay(() -> state.set(State.menu));
+
     }
 
     public void notifyChanged(Tile tile){

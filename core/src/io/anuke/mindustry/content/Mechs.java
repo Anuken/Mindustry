@@ -84,7 +84,6 @@ public class Mechs implements ContentList{
                 mass = 0.9f;
                 armor = 30f;
                 weaponOffsetX = -1;
-                itemCapacity = 15;
                 weaponOffsetY = -1;
                 weapon = Weapons.shockgun;
                 trailColorTo = Color.valueOf("d3ddff");
@@ -96,7 +95,7 @@ public class Mechs implements ContentList{
                     Effects.shake(1f, 1f, player);
                     Effects.effect(UnitFx.landShock, player);
                     for(int i = 0; i < 8; i++){
-                        Timers.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), player.getTeam().color, 17f, player.x, player.y, Mathf.random(360f), 14));
+                        Timers.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), Palette.lancerLaser, 17f, player.x, player.y, Mathf.random(360f), 14));
                     }
                 }
             }

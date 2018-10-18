@@ -143,7 +143,7 @@ public class Units{
 
     /**Returns the closest target enemy. First, units are checked, then tile entities.*/
     public static TargetTrait getClosestTarget(Team team, float x, float y, float range){
-        return getClosestTarget(team, x, y, range, u -> true);
+        return getClosestTarget(team, x, y, range, u -> !u.isDead() && u.isAdded());
     }
 
     /**Returns the closest target enemy. First, units are checked, then tile entities.*/

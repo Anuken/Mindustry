@@ -25,7 +25,7 @@ public class ExpandMission extends ActionMission{
     }
 
     @Override
-    public void onBegin(){
+    public void onFirstBegin(){
         runner.run();
     }
 

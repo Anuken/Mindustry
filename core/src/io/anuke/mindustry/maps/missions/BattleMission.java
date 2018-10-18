@@ -25,7 +25,7 @@ public class BattleMission extends Mission{
     }
 
     @Override
-    public void onBegin(){
+    public void onFirstBegin(){
         if(state.teams.get(defaultTeam).cores.size == 0){
             return;
         }

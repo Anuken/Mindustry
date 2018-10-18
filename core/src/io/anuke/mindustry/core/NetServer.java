@@ -202,6 +202,7 @@ public class NetServer extends Module{
                     return Integer.MAX_VALUE;
                 });
                 player.setTeam(min);
+                Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
             }
 
             connections.put(id, player);
@@ -412,6 +413,16 @@ public class NetServer extends Module{
         player.con.hasConnected = true;
         Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
         Log.info("&y{0} has connected.", player.name);
+    }
+
+    @Remote(called = Loc.both)
+    public static void onGameOver(Team winner){
+        threads.runGraphics(() -> ui.restart.show(winner));
+        netClient.setQuiet();
+    }
+
+    public boolean isWaitingForPlayers(){
+        return state.mode.isPvp && playerGroup.size() < 2;
     }
 
     public void update(){

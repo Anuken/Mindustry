@@ -27,7 +27,11 @@ public class EventType{
     }
 
     public static class GameOverEvent implements Event{
+        public final Team winner;
 
+        public GameOverEvent(Team winner){
+            this.winner = winner;
+        }
     }
 
     /**
@@ -72,6 +76,7 @@ public class EventType{
         }
     }
 
+    /**Called when block building begins. The tile's block will nearly always be a BuildBlock.*/
     public static class BlockBuildEvent implements Event{
         public final Tile tile;
         public final Team team;

@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
     }
 }
@@ -27,11 +27,11 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
-        uCoreVersion = '628ced32dbceefe9096c6acc9639cd39b1a867f4'
+        uCoreVersion = '53f99fbdc50910a15b4f55e9739385f47cf800cf'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
-            return "$versionNumber-$versionType-$buildVersion"
+            return "$versionNumber-$versionModifier-$buildVersion"
         }
 
         getBuildVersion = {

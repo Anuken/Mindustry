@@ -1,7 +1,6 @@
 package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -31,7 +30,7 @@ public class Pathfinder{
 
             for(Team team : Team.all){
                 TeamData data = state.teams.get(team);
-                if(state.teams.isActive(team) && data.team != event.tile.getTeam() && paths[data.team.ordinal()].weights[event.tile.x][event.tile.y] >= Float.MAX_VALUE){
+                if(state.teams.isActive(team) && data.team != event.tile.getTeam()){
                     update(event.tile, data.team);
                 }
             }
@@ -87,28 +86,28 @@ public class Pathfinder{
     }
 
     private boolean passable(Tile tile, Team team){
-        return (!tile.solid())
-                || (tile.breakable() && (tile.target().getTeam() != team));
+        return (!tile.solid()) || (tile.breakable() && (tile.target().getTeam() != team));
     }
 
+    /**Clears the frontier, increments the search and sets up all flow sources.
+     * This only occurs for active teams.*/
     private void update(Tile tile, Team team){
+        //make sure team exists
         if(paths[team.ordinal()] != null){
             PathData path = paths[team.ordinal()];
 
+            //impassable tiles have a weight of float.max
             if(!passable(tile, team)){
                 path.weights[tile.x][tile.y] = Float.MAX_VALUE;
             }
 
+            //increment search, clear frontier
             path.search++;
-
-            if(path.lastSearchTime + 1000 / 60 * 3 > TimeUtils.millis()){
-                path.frontier.clear();
-            }
-
+            path.frontier.clear();
             path.lastSearchTime = TimeUtils.millis();
 
-            Array<Tile> set = world.indexer.getEnemy(team, BlockFlag.target);
-            for(Tile other : set){
+            //add all targets to the frontier
+            for(Tile other : world.indexer.getEnemy(team, BlockFlag.target)){
                 path.weights[other.x][other.y] = 0;
                 path.searches[other.x][other.y] = path.search;
                 path.frontier.addFirst(other);

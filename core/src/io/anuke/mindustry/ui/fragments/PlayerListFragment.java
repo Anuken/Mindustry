@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -8,6 +9,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.Packets.AdminAction;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
@@ -36,6 +38,10 @@ public class PlayerListFragment extends Fragment{
 
                 if(visible && Timers.get("player-list-rebuild", 20)){
                     rebuild();
+                    content.pack();
+                    content.act(Gdx.graphics.getDeltaTime());
+                    //TODO hack
+                    Core.scene.act(0f);
                 }
             });
 
@@ -104,7 +110,7 @@ public class PlayerListFragment extends Fragment{
 
                     t.addImageButton("icon-ban", 14 * 2,
                         () -> ui.showConfirm("$text.confirm", "$text.confirmban", () -> Call.onAdminRequest(player, AdminAction.ban))).padBottom(-5.1f);
-                    t.addImageButton("icon-cancel", 14 * 2,
+                    t.addImageButton("icon-cancel", 16 * 2,
                         () -> ui.showConfirm("$text.confirm", "$text.confirmkick", () -> Call.onAdminRequest(player, AdminAction.kick))).padBottom(-5.1f);
 
                     t.row();

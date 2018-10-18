@@ -75,7 +75,7 @@ public class WaveSpawner{
             int amount = group.getGroupsSpawned(state.wave);
             if(group.type.isFlying){
                 flyGroups += amount;
-            }else{
+            }else if(dynamicSpawn){
                 groundGroups += amount;
             }
         }
@@ -109,6 +109,8 @@ public class WaveSpawner{
                 float spawnX, spawnY;
                 float spread;
 
+                if(!group.type.isFlying && groundCount >= groundSpawns.size) continue;
+
                 if(group.type.isFlying){
                     FlyerSpawn spawn = flySpawns.get(flyCount);
                     //TODO verify flyer spawn
@@ -119,7 +121,7 @@ public class WaveSpawner{
                     spread = margin / 1.5f;
 
                     flyCount++;
-                }else{
+                }else{ //make sure it works for non-dynamic spawns
                     GroundSpawn spawn = groundSpawns.get(groundCount);
 
                     if(dynamicSpawn){

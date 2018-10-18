@@ -34,7 +34,7 @@ public class Sectors{
 
     private final GridMap<Sector> grid = new GridMap<>();
     private final SectorPresets presets = new SectorPresets();
-    private final Array<Item> allOres = Array.with(Items.copper, Items.lead, Items.coal, Items.titanium, Items.thorium);
+    private final Array<Item> allOres = Item.getAllOres();
 
     public void playSector(Sector sector){
         if(sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
@@ -53,14 +53,14 @@ public class Sectors{
             }
             world.sectors.save();
             world.setSector(sector);
-            sector.currentMission().onBegin();
+            if(!sector.complete) sector.currentMission().onBegin();
         }else if(SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
             ui.showInfo("$text.save.old");
         }else try{
             sector.getSave().load();
             world.setSector(sector);
             state.set(State.playing);
-            sector.currentMission().onBegin();
+            if(!sector.complete) sector.currentMission().onBegin();
         }catch(Exception e){
             Log.err(e);
             sector.getSave().delete();
@@ -260,6 +260,30 @@ public class Sectors{
         }
     }
 
+    public void abandonSector(Sector sector){
+        for(int x = sector.x; x < sector.width + sector.x; x++){
+            for(int y = sector.y; y < sector.y + sector.height; y++){
+                grid.put(x, y, null);
+            }
+        }
+        if(sector.hasSave()){
+            sector.getSave().delete();
+        }
+        sector.completedMissions = 0;
+        sector.complete = false;
+        initSector(sector);
+
+        for(int x = sector.x; x < sector.width + sector.x; x++){
+            for(int y = sector.y; y < sector.y + sector.height; y++){
+                grid.put(x, y, sector);
+            }
+        }
+
+        threads.runGraphics(() -> createTexture(sector));
+
+        save();
+    }
+
     public void load(){
         for(Sector sector : grid.values()){
             sector.texture.dispose();
@@ -298,7 +322,9 @@ public class Sectors{
         Array<Sector> out = new Array<>();
 
         for(Sector sector : grid.values()){
-            out.add(sector);
+            if(sector != null && !out.contains(sector, true)){
+                out.add(sector);
+            }
         }
 
         Settings.putObject("sectors", out);
@@ -349,7 +375,7 @@ public class Sectors{
         for(int x = 1; x <= width; x++){
             for(int y = 1; y <= height; y++){
                 for(GridPoint2 point : Geometry.d8edge){
-                    int shiftx = (int)(-width/2f + (point.x * (width - 1))/2f), shifty = (int)(-height/2f + (point.y * (height - 1))/2f);
+                    int shiftx = (int)(-x/2f + (point.x * (x - 1))/2f), shifty = (int)(-y/2f + (point.y * (y - 1))/2f);
                     if(canFit(sector.x + shiftx, sector.y + shifty, x, y)){
                         finalWidth = x;
                         finalHeight = y;
@@ -377,7 +403,7 @@ public class Sectors{
 
         //50% chance to get a wave mission
         if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5 || (sector.width + sector.height) <= 3){
-            sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 0, 3)*5));
+            sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 1, 4)*5));
         }else{
             sector.missions.add(new BattleMission());
         }

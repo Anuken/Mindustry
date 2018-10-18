@@ -26,11 +26,9 @@ import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
 import io.anuke.mindustry.world.blocks.power.NuclearReactor;
 import io.anuke.mindustry.world.blocks.power.PowerGenerator;
 import io.anuke.mindustry.world.blocks.power.SolarGenerator;
-import io.anuke.mindustry.world.blocks.production.Drill;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.storage.StorageBlock;
 import io.anuke.mindustry.world.blocks.units.UnitFactory;
-import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.ucore.function.BiFunction;
 import io.anuke.ucore.function.IntPositionConsumer;
 import io.anuke.ucore.function.TriFunction;
@@ -60,15 +58,13 @@ public class FortressGenerator{
     void gen(){
         gen.setBlock(enemyX, enemyY, StorageBlocks.core, team);
 
-        float difficultyScl = Mathf.clamp(gen.sector.difficulty / 20f + gen.random.range(1f/2f), 0f, 0.9999f);
+        float difficultyScl = Mathf.clamp(gen.sector.difficulty / 20f + gen.random.range(0.25f), 0f, 0.9999f);
+        float dscl2 = Mathf.clamp(0.5f + gen.sector.difficulty / 20f + gen.random.range(0.1f), 0f, 1.5f);
         int coreDst = FortressGenerator.coreDst*Math.min(gen.sector.width, gen.sector.height);
 
         Array<Block> turrets = find(b -> b instanceof ItemTurret);
         Array<Block> powerTurrets = find(b -> b instanceof PowerTurret);
-        Array<Block> drills = find(b -> b instanceof Drill && !b.consumes.has(ConsumePower.class));
-        Array<Block> powerDrills = find(b -> b instanceof Drill && b.consumes.has(ConsumePower.class));
         Array<Block> walls = find(b -> b instanceof Wall && !(b instanceof Door) && b.size == 1);
-        Array<Block> wallsLarge = find(b -> b instanceof Wall && !(b instanceof Door) && b.size == 2);
 
         Block wall = walls.get((int)(difficultyScl * walls.size));
 
@@ -140,19 +136,19 @@ public class FortressGenerator{
             seeder.get(turret2, tile -> tile.block() instanceof PowerBlock && gen.random.chance(0.12 - turret2.size*0.02)),
 
             //shields
-            seeder.get(DefenseBlocks.forceProjector, tile -> tile.block() instanceof CoreBlock || tile.block() instanceof UnitFactory && gen.random.chance(0.08)),
+            seeder.get(DefenseBlocks.forceProjector, tile -> (tile.block() instanceof CoreBlock || tile.block() instanceof UnitFactory) && gen.random.chance(0.2 * dscl2)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.daggerFactory, tile -> tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector && gen.random.chance(0.3)),
+            seeder.get(UnitBlocks.daggerFactory, tile -> (tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector) && gen.random.chance(0.3 * dscl2)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.wraithFactory, tile -> tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector && gen.random.chance(0.3)),
+            seeder.get(UnitBlocks.wraithFactory, tile -> (tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector) && gen.random.chance(0.3 * dscl2)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.titanFactory, tile -> tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector && gen.random.chance(0.23)),
+            seeder.get(UnitBlocks.titanFactory, tile -> (tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector) && gen.random.chance(0.23 * dscl2)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.ghoulFactory, tile -> tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector && gen.random.chance(0.23)),
+            seeder.get(UnitBlocks.ghoulFactory, tile -> (tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector) && gen.random.chance(0.23 * dscl2)),
 
             //vaults
             seeder.get(StorageBlocks.vault, tile -> (tile.block() instanceof CoreBlock || tile.block() instanceof ForceProjector) && gen.random.chance(0.4)),

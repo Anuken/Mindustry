@@ -42,14 +42,20 @@ public class CustomGameDialog extends FloatingDialog{
         Table selmode = new Table();
         ButtonGroup<TextButton> group = new ButtonGroup<>();
         selmode.add("$text.level.mode").padRight(15f);
+        int i = 0;
+
+        Table modes = new Table();
+        modes.marginBottom(5);
 
         for(GameMode mode : GameMode.values()){
-            if(mode.hidden) continue;
+            if(mode.hidden || (mode.isPvp && gwt)) continue;
 
-            selmode.addButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode)
-                .update(b -> b.setChecked(state.mode == mode)).group(group).size(130f, 54f);
+            modes.addButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode)
+                .update(b -> b.setChecked(state.mode == mode)).group(group).size(140f, 54f).padBottom(-5);
+            if(i++ % 2 == 1) modes.row();
         }
-        selmode.addButton("?", this::displayGameModeHelp).size(50f, 54f).padLeft(18f);
+        selmode.add(modes);
+        selmode.addButton("?", this::displayGameModeHelp).width(50f).fillY().padLeft(18f);
 
         content().add(selmode);
         content().row();
@@ -67,9 +73,8 @@ public class CustomGameDialog extends FloatingDialog{
             state.difficulty = (ds[Mathf.mod(state.difficulty.ordinal() - 1, ds.length)]);
         }).width(s);
 
-        sdif.addButton("", () -> {
-
-        }).update(t -> {
+        sdif.addButton("", () -> {})
+        .update(t -> {
             t.setText(state.difficulty.toString());
             t.setTouchable(Touchable.disabled);
         }).width(180f);
@@ -83,7 +88,8 @@ public class CustomGameDialog extends FloatingDialog{
 
         float images = 146f;
 
-        int i = 0;
+        i = 0;
+        maps.defaults().width(170).fillY().top().pad(4f);
         for(Map map : world.maps.all()){
 
             if(i % maxwidth == 0){
@@ -107,10 +113,17 @@ public class CustomGameDialog extends FloatingDialog{
                 control.playMap(map);
             });
 
-            maps.add(image).width(170).fillY().top().pad(4f);
+            maps.add(image);
 
             i++;
         }
+
+        ImageButton gen = maps.addImageButton("icon-editor", "clear", 16*4, () -> {
+            hide();
+            world.generator.playRandomMap();
+        }).growY().get();
+        gen.row();
+        gen.add("$text.map.random");
 
         if(world.maps.all().size == 0){
             maps.add("$text.maps.none").pad(50);

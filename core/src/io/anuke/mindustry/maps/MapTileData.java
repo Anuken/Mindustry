@@ -1,7 +1,11 @@
 package io.anuke.mindustry.maps;
 
 import com.badlogic.gdx.utils.IntIntMap;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.world.Block;
 import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.Structs;
 
 import java.nio.ByteBuffer;
 
@@ -38,11 +42,43 @@ public class MapTileData{
         this.readOnly = readOnly;
 
         if(mapping != null && !readOnly){
+            buffer.position(0);
+            TileDataMarker marker = new TileDataMarker();
             for(int i = 0; i < width * height; i++){
-                TileDataMarker marker = new TileDataMarker();
                 read(marker);
+
+                //strip blockparts from map data, as they can be invalid
+                if(marker.wall == Blocks.blockpart.id){
+                    marker.wall = Blocks.air.id;
+                }
+
                 buffer.position(i * TILE_SIZE);
+
+                //write mapped marker
                 write(marker);
+            }
+
+            buffer.position(0);
+            for(int x = 0; x < width; x ++){
+                for(int y = 0; y < height; y ++){
+                    //add missing blockparts
+                    Block drawBlock = Vars.content.block(read(x, y, DataPosition.wall));
+                    if(drawBlock.isMultiblock()){
+                        int offsetx = -(drawBlock.size - 1) / 2;
+                        int offsety = -(drawBlock.size - 1) / 2;
+                        for(int dx = 0; dx < drawBlock.size; dx++){
+                            for(int dy = 0; dy < drawBlock.size; dy++){
+                                int worldx = dx + offsetx + x;
+                                int worldy = dy + offsety + y;
+
+                                if(Structs.inBounds(worldx, worldy, width, height) && !(dx + offsetx == 0 && dy + offsety == 0)){
+                                    write(worldx, worldy, DataPosition.wall, Blocks.blockpart.id);
+                                    write(worldx, worldy, DataPosition.link, Bits.packByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8)));
+                                }
+                            }
+                        }
+                    }
+                }
             }
             buffer.position(0);
             this.map = null;
@@ -122,8 +158,8 @@ public class MapTileData{
             team = Bits.getRightByte(rt);
 
             if(map != null){
-                floor = (byte) map.get(floor, floor);
-                wall = (byte) map.get(wall, wall);
+                floor = (byte) map.get(floor, Blocks.stone.id);
+                wall = (byte) map.get(wall, 0);
             }
         }
 

@@ -16,7 +16,7 @@ public class TraceDialog extends FloatingDialog{
     public void show(Player player, TraceInfo info){
         content().clear();
 
-        Table table = new Table("button");
+        Table table = new Table("clear");
         table.margin(14);
         table.defaults().pad(1);
 
@@ -35,6 +35,8 @@ public class TraceDialog extends FloatingDialog{
         table.add().pad(5);
         table.row();
 
+        //disabled until further notice
+/*
         table.add(Bundles.format("text.trace.totalblocksbroken", info.totalBlocksBroken));
         table.row();
         table.add(Bundles.format("text.trace.structureblocksbroken", info.structureBlocksBroken));
@@ -48,7 +50,7 @@ public class TraceDialog extends FloatingDialog{
         table.add(Bundles.format("text.trace.totalblocksplaced", info.totalBlocksPlaced));
         table.row();
         table.add(Bundles.format("text.trace.lastblockplaced", info.lastBlockPlaced.formalName));
-        table.row();
+        table.row();*/
 
         content().add(table);
 
