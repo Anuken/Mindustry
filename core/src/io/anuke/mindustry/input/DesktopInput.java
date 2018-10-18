@@ -57,6 +57,8 @@ public class DesktopInput extends InputHandler{
                         region.getRegionWidth() * selectScale, region.getRegionHeight() * selectScale, block.rotate ? rotation * 90 : 0);
             }
         }else{
+            Draw.color(Palette.removeBack);
+            Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1, block.size * tilesize / 2f);
             Draw.color(Palette.remove);
             Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset(), block.size * tilesize / 2f);
         }
@@ -107,6 +109,8 @@ public class DesktopInput extends InputHandler{
                 }
             }
 
+            Draw.color(Palette.removeBack);
+            Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
             Draw.color(Palette.remove);
             Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
         }else if(isPlacing()){

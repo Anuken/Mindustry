@@ -368,7 +368,9 @@ public class MobileInput extends InputHandler implements GestureListener{
                                     region.getRegionWidth() * lineScale, region.getRegionHeight() * lineScale, recipe.result.rotate ? result.rotation * 90 : 0);
                         }
                     }else{
-                        Draw.color(Palette.breakInvalid);
+                        Draw.color(Palette.removeBack);
+                        Lines.square(x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset() - 1, recipe.result.size * tilesize / 2f);
+                        Draw.color(Palette.remove);
                         Lines.square(x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(), recipe.result.size * tilesize / 2f);
                     }
                 }
@@ -391,6 +393,8 @@ public class MobileInput extends InputHandler implements GestureListener{
                     }
                 }
 
+                Draw.color(Palette.removeBack);
+                Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
                 Draw.color(Palette.remove);
                 Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
 
