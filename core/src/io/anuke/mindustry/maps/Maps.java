@@ -57,7 +57,7 @@ public class Maps implements Disposable{
 
     /**Returns map by internal name.*/
     public Map getByName(String name){
-        return maps.get(name);
+        return maps.get(name.toLowerCase());
     }
 
     /**Load all maps. Should be called at application start.*/
@@ -81,6 +81,7 @@ public class Maps implements Disposable{
             ObjectMap<String, String> newTags = new ObjectMap<>();
             newTags.putAll(tags);
             tags = newTags;
+
             if (!gwt) {
                 FileHandle file = customMapDirectory.child(name + "." + mapExtension);
                 MapIO.writeMap(file.write(false), tags, data);
@@ -144,7 +145,7 @@ public class Maps implements Disposable{
                 map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta, true)));
             }
 
-            maps.put(map.name, map);
+            maps.put(map.name.toLowerCase(), map);
             allMaps.add(map);
         }
     }

@@ -60,7 +60,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public boolean achievedFlight;
     public Color color = new Color();
     public Mech mech;
-    public int spawner;
+    public int spawner = -1;
 
     public NetConnection con;
     public int playerIndex = 0;
@@ -482,6 +482,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             setDead(true);
         }
 
+        if(netServer.isWaitingForPlayers()){
+            setDead(true);
+        }
+
         if(isDead()){
             isBoosting = false;
             boostHeat = 0f;
@@ -778,7 +782,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             ((SpawnerTrait) world.tile(spawner).entity).updateSpawning(this);
         }else{
             CoreEntity entity = (CoreEntity) getClosestCore();
-            if(entity != null){
+            if(entity != null && !netServer.isWaitingForPlayers()){
                 this.spawner = entity.tile.id();
             }
         }
@@ -859,7 +863,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         color.set(buffer.readInt());
         mech = content.getByID(ContentType.mech, buffer.readByte());
         int mine = buffer.readInt();
-        spawner = buffer.readInt();
+        int spawner = buffer.readInt();
         float baseRotation = buffer.readShort() / 2f;
 
         readBuilding(buffer, !isLocal);
@@ -873,6 +877,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }else{
             mining = world.tile(mine);
             isBoosting = boosting;
+            this.spawner = spawner;
         }
     }
 
