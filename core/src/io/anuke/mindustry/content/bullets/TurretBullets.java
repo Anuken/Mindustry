@@ -16,6 +16,7 @@ import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -63,11 +64,11 @@ public class TurretBullets extends BulletList implements ContentList{
             @Override
             public void hitTile(Bullet b, Tile tile){
                 super.hit(b);
+                tile = tile.target();
 
-                if(tile.getTeam() == b.getTeam()){
+                if(tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
                     Effects.effect(BlockFx.healBlock, tile.drawx(), tile.drawy(), tile.block().size);
-                    tile.entity.health += healAmount;
-                    tile.entity.health = Mathf.clamp(tile.entity.health, 0, tile.block().health);
+                    tile.entity.healBy(healAmount);
                 }
             }
         };
