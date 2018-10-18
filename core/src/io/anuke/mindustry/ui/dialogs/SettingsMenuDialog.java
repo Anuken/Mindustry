@@ -160,7 +160,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                     dialog.content().row();
                     dialog.content().addButton("$text.settings.clearunlocks", "clear", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
-                            Settings.clearBytes("unlocks");
+                            control.unlocks.reset();
                             Settings.save();
                             dialog.hide();
                         });
