@@ -155,7 +155,7 @@ public class Pathfinder{
                     int dx = tile.x + point.x, dy = tile.y + point.y;
                     Tile other = world.tile(dx, dy);
 
-                    if(other != null && (path.weights[dx][dy] == Float.MAX_VALUE || path.searches[dx][dy] < path.search)
+                    if(other != null && (path.weights[dx][dy] > cost + other.cost || path.searches[dx][dy] < path.search)
                             && passable(other, team)){
                         path.frontier.addFirst(world.tile(dx, dy));
                         path.weights[dx][dy] = cost + other.cost;

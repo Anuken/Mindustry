@@ -247,14 +247,14 @@ public class Renderer extends RendererModule{
 
         overlays.drawBottom();
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
-        overlays.drawTop();
 
         Shaders.shield.color.set(Palette.accent);
-
         Graphics.beginShaders(Shaders.shield);
         EntityDraw.draw(shieldGroup);
         EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
         Graphics.endShaders();
+
+        overlays.drawTop();
 
         if(showFog){
             Graphics.surface();
