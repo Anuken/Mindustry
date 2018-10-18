@@ -18,6 +18,7 @@ public enum BlockStat{
 
     liquidCapacity(StatCategory.liquids),
     liquidOutput(StatCategory.liquids),
+    liquidOutputSpeed(StatCategory.liquids),
     coolant(StatCategory.liquids),
     coolantUse(StatCategory.liquids),
 
