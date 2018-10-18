@@ -244,6 +244,17 @@ public class UI extends SceneModule{
         }}.show();
     }
 
+    public void showInfo(String info, Runnable clicked){
+        new Dialog("$text.info.title", "dialog"){{
+            getCell(content()).growX();
+            content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons().addButton("$text.ok", () -> {
+                clicked.run();
+                hide();
+            }).size(90, 50).pad(4);
+        }}.show();
+    }
+
     public void showError(String text){
         new Dialog("$text.error.title", "dialog"){{
             content().margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
