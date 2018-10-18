@@ -789,6 +789,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         this.dead = true;
     }
 
+    public void endRespawning(){
+        spawner = -1;
+    }
+
     //endregion
 
     //region read and write methods

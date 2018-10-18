@@ -11,8 +11,6 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
-import static io.anuke.mindustry.Vars.mobile;
-
 //TODO merge unit type with mech
 public class Mech extends UnlockableContent{
     public final String name;
@@ -72,11 +70,6 @@ public class Mech extends UnlockableContent{
     }
 
     public void onLand(Player player){}
-
-    @Override
-    public boolean isHidden() {
-        return !flying && mobile;
-    }
 
     @Override
     public void displayInfo(Table table){

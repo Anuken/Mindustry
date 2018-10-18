@@ -93,6 +93,7 @@ public class MechPad extends Block{
 
         entity.progress = 0;
         entity.player.heal();
+        entity.player.endRespawning();
         entity.open = true;
         entity.player.setDead(false);
         entity.player.inventory.clear();

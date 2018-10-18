@@ -29,16 +29,13 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.netServer;
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.unitGroups;
+import static io.anuke.mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
     protected float droneRespawnDuration = 60 * 6;
@@ -74,6 +71,10 @@ public class CoreBlock extends StorageBlock{
         entity.currentUnit.setNet(tile.drawx(), tile.drawy());
         entity.currentUnit.add();
         entity.currentUnit = null;
+
+        if(player instanceof Player){
+            ((Player) player).endRespawning();
+        }
     }
 
     @Remote(called = Loc.server)
