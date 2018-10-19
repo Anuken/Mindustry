@@ -4,9 +4,7 @@ import io.anuke.ucore.util.Bundles;
 
 import java.util.Locale;
 
-/**
- * Describes one type of stat for a block.
- */
+/**Describes one type of stat for a block.*/
 public enum BlockStat{
     health(StatCategory.general),
     size(StatCategory.general),

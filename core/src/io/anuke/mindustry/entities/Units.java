@@ -37,7 +37,6 @@ public class Units{
      */
     public static boolean invalidateTarget(TargetTrait target, Team team, float x, float y, float range){
         return target == null || (range != Float.MAX_VALUE && target.distanceTo(x, y) > range) || target.getTeam() == team || !target.isValid();
-
     }
 
     /**
