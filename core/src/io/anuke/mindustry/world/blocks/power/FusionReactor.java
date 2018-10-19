@@ -33,7 +33,7 @@ public class FusionReactor extends PowerGenerator{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.maxPowerGeneration, maxPowerProduced * 60f, StatUnit.powerSecond);
+        stats.add(BlockStat.basePowerGeneration, maxPowerProduced * 60f, StatUnit.powerSecond);
     }
 
     @Override

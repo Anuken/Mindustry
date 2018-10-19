@@ -50,7 +50,7 @@ public abstract class ItemGenerator extends PowerGenerator{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.maxPowerGeneration, powerOutput * 60f, StatUnit.powerSecond);
+        stats.add(BlockStat.basePowerGeneration, powerOutput * 60f * 0.5f, StatUnit.powerSecond);
     }
 
     @Override

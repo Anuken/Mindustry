@@ -27,7 +27,7 @@ public enum BlockStat{
     powerDamage(StatCategory.power),
     powerRange(StatCategory.power),
     powerTransferSpeed(StatCategory.power),
-    maxPowerGeneration(StatCategory.power),
+    basePowerGeneration(StatCategory.power),
     inputLiquidFuel(StatCategory.power),
     liquidFuelUse(StatCategory.power),
 
