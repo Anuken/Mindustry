@@ -82,112 +82,6 @@ public class Sectors{
         return grid.get(Bits.getLeftShort(position), Bits.getRightShort(position));
     }
 
-    /**Tries to a sector in a specific direciton, specified by expandX and expandY.
-     * The player *must* currently be playing in this sector.
-     * If a sector is in that direction, this method will return false (failure)
-     * @param sector the sector to expand
-     * @param expandX spaces in X coordinate to expand, can be negative
-     * @param expandY spaces in Y coordinate to expand, can be negative*/
-    public boolean expandSector(Sector sector, int expandX, int expandY){
-        if(world.getSector() != sector){
-            throw new IllegalArgumentException("Sector is not being played in!");
-        }
-
-        if(expandX < 0) sector.x += expandX;
-        if(expandY < 0) sector.y += expandY;
-
-        sector.width += Math.abs(expandX);
-        sector.height += Math.abs(expandY);
-
-        if(checkExpansion) {
-            for (int x = sector.x; x < sector.x + sector.width; x++) {
-                for (int y = sector.y; y < sector.y + sector.height; y++) {
-                    if (grid.get(x, y) != null && grid.get(x,y) != sector && grid.get(x, y).hasSave() /*|| !canMerge(sector, grid.get(x, y))*/) {
-                        //if a completed sector is hit, expansion failed
-                        //put back the values of the sector
-                        if (expandX < 0) sector.x -= expandX;
-                        if (expandY < 0) sector.y -= expandY;
-                        sector.width -= Math.abs(expandX);
-                        sector.height -= Math.abs(expandY);
-                        return false;
-                    }
-                }
-            }
-        }
-
-        sector.lastExpandX = expandX;
-        sector.lastExpandY = expandY;
-
-        //add new sector spaces
-        for(int x = sector.x; x < sector.x+sector.width; x++){
-            for(int y = sector.y; y < sector.y+sector.height; y++){
-                grid.put(x, y, sector);
-            }
-        }
-
-        //sector map data should now be shifted and generated
-        int shiftX = expandX < 0 ? -expandX*sectorSize : 0;
-        int shiftY = expandY < 0 ? -expandY*sectorSize : 0;
-
-        for(EntityGroup<?> group : Entities.getAllGroups()){
-            for(Entity entity : group.all()){
-                entity.set(entity.getX() + shiftX * tilesize, entity.getY() + shiftY * tilesize);
-
-                if(entity instanceof BaseUnit){
-                    Tile spawner = ((BaseUnit) entity).getSpawner();
-                    if(spawner == null) continue;
-                    int i = spawner.packedPosition();
-                    ((BaseUnit) entity).setIntSpawner(world.transform(i, world.width(), world.height(), sector.width*sectorSize, shiftX, shiftY));
-                }
-            }
-        }
-
-        if(!headless){
-            renderer.fog.setLoadingOffset(shiftX, shiftY);
-        }
-
-        //create *new* tile array
-        Tile[][] newTiles = new Tile[sector.width * sectorSize][sector.height * sectorSize];
-
-        //shift existing tiles to new array
-        for (int x = 0; x < (sector.width - Math.abs(expandX))*sectorSize; x++) {
-            for (int y = 0; y < (sector.height - Math.abs(expandY))*sectorSize; y++) {
-                Tile tile = world.rawTile(x, y);
-                tile.x = (short)(x + shiftX);
-                tile.y = (short)(y + shiftY);
-                newTiles[x + shiftX][y + shiftY] = tile;
-                tile.block().transformLinks(tile, world.width(), world.height(), sector.width*sectorSize, sector.height*sectorSize, shiftX, shiftY);
-            }
-        }
-
-        world.beginMapLoad(newTiles);
-
-        //create new tiles
-        for (int sx = 0; sx < sector.width; sx++) {
-            for (int sy = 0; sy < sector.height; sy++) {
-                //if this sector is a 'new sector (not part of the current save data...)
-                if(sx < -expandX || sy < -expandY || sx >= sector.width - expandX || sy >= sector.height - expandY){
-                    GenResult result = new GenResult();
-                    Array<Item> ores = getOres(sx + sector.x, sy + sector.y);
-                    //gen tiles in sector
-                    for (int x = 0; x < sectorSize; x++) {
-                        for (int y = 0; y < sectorSize; y++) {
-                            world.generator.generateTile(result, sx + sector.x, sy + sector.y, x, y, true, null, ores);
-                            newTiles[sx * sectorSize + x][sy * sectorSize + y] = new Tile(x + sx * sectorSize, y + sy*sectorSize, result.floor.id, result.wall.id, (byte)0, (byte)0, result.elevation);
-                        }
-                    }
-                }
-            }
-        }
-
-        //end loading of map
-        world.endMapLoad();
-
-        threads.runGraphics(() -> createTexture(sector));
-
-        return true;
-    }
-
     /**Returns whether a sector of this size and position can be fit here.*/
     public boolean canFit(int x, int y, int width, int height){
         for(int cx = x; cx < x + width; cx++){
@@ -224,17 +118,7 @@ public class Sectors{
         Sector sector = get(x, y);
         sector.complete = true;
 
-        for(int sx = 0; sx < sector.width + 2; sx++){
-            for(int sy = 0; sy < sector.height + 2; sy++){
-                if((sx == 0 || sy == 0 || sx == sector.width + 1 || sy == sector.height + 1) &&
-                     !((sx == 0 && sy == 0)
-                    || (sx == 0 && sy == sector.height+1)
-                    || (sx == sector.width+1 && sy == 0)
-                    || (sx == sector.width+1 && sy == sector.height+1))){
-                    createSector(sector.x + sx - 1, sector.y + sy - 1);
-                }
-            }
-        }
+        //todo use geometry.d4 to unlock
     }
 
     /**Creates a sector at a location if it is not present, but does not unlock it.*/
@@ -246,14 +130,9 @@ public class Sectors{
         sector.x = (short)x;
         sector.y = (short)y;
         sector.complete = false;
-        sector.width = sector.height = 1;
         initSector(sector);
 
-        for(int cx = 0; cx < sector.width; cx++){
-            for(int cy = 0; cy < sector.height; cy++){
-                grid.put(sector.x + cx, sector.y + cy, sector);
-            }
-        }
+        grid.put(sector.x, sector.y, sector);
 
         if(sector.texture == null){
             threads.runGraphics(() -> createTexture(sector));
@@ -261,11 +140,6 @@ public class Sectors{
     }
 
     public void abandonSector(Sector sector){
-        for(int x = sector.x; x < sector.width + sector.x; x++){
-            for(int y = sector.y; y < sector.y + sector.height; y++){
-                grid.put(x, y, null);
-            }
-        }
         if(sector.hasSave()){
             sector.getSave().delete();
         }
@@ -273,11 +147,7 @@ public class Sectors{
         sector.complete = false;
         initSector(sector);
 
-        for(int x = sector.x; x < sector.width + sector.x; x++){
-            for(int y = sector.y; y < sector.y + sector.height; y++){
-                grid.put(x, y, sector);
-            }
-        }
+        grid.put(sector.x, sector.y, sector);
 
         threads.runGraphics(() -> createTexture(sector));
 
@@ -290,7 +160,7 @@ public class Sectors{
         }
         grid.clear();
 
-        Array<Sector> out = Settings.getObject("sectors", Array.class, Array::new);
+        Array<Sector> out = Settings.getObject("sector-data", Array.class, Array::new);
 
         for(Sector sector : out){
             short x = sector.x;
@@ -327,7 +197,7 @@ public class Sectors{
             }
         }
 
-        Settings.putObject("sectors", out);
+        Settings.putObject("sector-data", out);
         Settings.save();
     }
 

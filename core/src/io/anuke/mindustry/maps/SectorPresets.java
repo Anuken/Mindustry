@@ -85,7 +85,7 @@ public class SectorPresets{
     public static class SectorPreset{
         public final Array<Mission> missions;
         public final Array<Item> ores;
-        public final int size, x, y;
+        public final int x, y;
 
         public SectorPreset(int x, int y, Array<Mission> missions, Array<Item> ores, int size){
             this.missions = missions;
