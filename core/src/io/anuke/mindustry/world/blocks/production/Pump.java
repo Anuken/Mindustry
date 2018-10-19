@@ -41,7 +41,7 @@ public class Pump extends LiquidBlock{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.liquidOutput, 60f * pumpAmount, StatUnit.liquidSecond);
+        stats.add(BlockStat.liquidOutputSpeed, 60f * pumpAmount, StatUnit.liquidSecond);
     }
 
     @Override

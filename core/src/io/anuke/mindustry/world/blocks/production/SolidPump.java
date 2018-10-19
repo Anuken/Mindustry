@@ -37,7 +37,7 @@ public class SolidPump extends Pump{
     public void setStats(){
         super.setStats();
 
-        stats.remove(BlockStat.liquidOutput);
+        // stats.remove(BlockStat.liquidOutput);
         stats.add(BlockStat.liquidOutput, result);
     }
 
