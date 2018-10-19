@@ -53,7 +53,11 @@ public class Sectors{
             }
             world.sectors.save();
             world.setSector(sector);
-            if(!sector.complete) sector.currentMission().onBegin();
+
+            if(!sector.complete) {
+                world.getSector().currentMission().onFirstBegin();
+                sector.currentMission().onBegin();
+            }
         }else if(SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
             ui.showInfo("$text.save.old");
         }else try{
