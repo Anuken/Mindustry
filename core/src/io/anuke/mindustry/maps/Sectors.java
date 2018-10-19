@@ -3,34 +3,33 @@ package io.anuke.mindustry.maps;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.SectorPresets.SectorPreset;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
-import io.anuke.mindustry.maps.missions.*;
+import io.anuke.mindustry.maps.missions.BattleMission;
+import io.anuke.mindustry.maps.missions.Mission;
+import io.anuke.mindustry.maps.missions.Missions;
+import io.anuke.mindustry.maps.missions.WaveMission;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.ColorMapper;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.GridMap;
+import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class Sectors{
     private static final int sectorImageSize = 32;
-    private static final boolean checkExpansion = true;
 
     private final GridMap<Sector> grid = new GridMap<>();
     private final SectorPresets presets = new SectorPresets();
@@ -80,18 +79,6 @@ public class Sectors{
 
     public Sector get(int position){
         return grid.get(Bits.getLeftShort(position), Bits.getRightShort(position));
-    }
-
-    /**Returns whether a sector of this size and position can be fit here.*/
-    public boolean canFit(int x, int y, int width, int height){
-        for(int cx = x; cx < x + width; cx++){
-            for(int cy = y; cy < y + height; cy++){
-                if(grid.get(cx, cy) != null){
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     public Difficulty getDifficulty(Sector sector){
@@ -163,29 +150,20 @@ public class Sectors{
         Array<Sector> out = Settings.getObject("sector-data", Array.class, Array::new);
 
         for(Sector sector : out){
-            short x = sector.x;
-            short y = sector.y;
-            int w = sector.width;
-            int h = sector.height;
             
             createTexture(sector);
             initSector(sector);
-            
-            sector.x = x;
-            sector.y = y;
-            sector.width = w;
-            sector.height = h;
-            
-            for(int cx = 0; cx < sector.width; cx++){
-                for(int cy = 0; cy < sector.height; cy++){
-                    grid.put(sector.x + cx, sector.y + cy, sector);
-                }
-            }
+            grid.put(sector.x, sector.y, sector);
         }
 
         if(out.size == 0){
             createSector(0, 0);
         }
+    }
+
+    public void clear(){
+        grid.clear();
+        save();
     }
 
     public void save(){
@@ -207,7 +185,6 @@ public class Sectors{
         if(presets.get(sector.x, sector.y) != null){
             SectorPreset p = presets.get(sector.x, sector.y);
             sector.missions.addAll(p.missions);
-            sector.width = sector.height = p.size;
             sector.x = (short)p.x;
             sector.y = (short)p.y;
         }else{
@@ -237,42 +214,12 @@ public class Sectors{
     }
 
     private void generate(Sector sector){
-        int width = Mathf.randomSeed(sector.getSeed()+1, 1, 3);
-        int height = Mathf.randomSeed(sector.getSeed()+2, 1, 3);
-        int finalWidth = 1, finalHeight = 1;
-        int finalX = sector.x, finalY = sector.y;
-
-        for(int x = 1; x <= width; x++){
-            for(int y = 1; y <= height; y++){
-                for(GridPoint2 point : Geometry.d8edge){
-                    int shiftx = (int)(-x/2f + (point.x * (x - 1))/2f), shifty = (int)(-y/2f + (point.y * (y - 1))/2f);
-                    if(canFit(sector.x + shiftx, sector.y + shifty, x, y)){
-                        finalWidth = x;
-                        finalHeight = y;
-                        finalX = sector.x + shiftx;
-                        finalY = sector.y + shifty;
-                    }
-                }
-            }
-        }
-
-        sector.width = finalWidth;
-        sector.height = finalHeight;
-        sector.x = (short)finalX;
-        sector.y = (short)finalY;
 
         //recipe mission
         addRecipeMission(sector, 3);
 
-        //expand
-        addExpandMission(sector, 16);
-
-        if((sector.width + sector.height) <= 3){
-            sector.difficulty = Math.max(sector.difficulty - 3, 0);
-        }
-
         //50% chance to get a wave mission
-        if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5 || (sector.width + sector.height) <= 3){
+        if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5){
             sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 1, 4)*5));
         }else{
             sector.missions.add(new BattleMission());
@@ -283,19 +230,7 @@ public class Sectors{
 
         //possibly another battle mission
         if(Mathf.randomSeed(sector.getSeed() + 3) < 0.3){
-            addExpandMission(sector, 20);
             sector.missions.add(new BattleMission());
-        }
-    }
-
-    private void addExpandMission(Sector sector, int offset){
-        //add 0-1 expansion mission
-        if(sector.missions.size > 0){
-            int ex = sector.width >= 3 ? 0 : Mathf.randomSeed(sector.getSeed() + 6 + offset, -2, 2);
-            int ey = sector.height >= 3 ? 0 : Mathf.randomSeed(sector.getSeed() + 7 + offset, -2, 2);
-            if(ex != 0 || ey != 0){
-                sector.missions.add(new ExpandMission(ex, ey));
-            }
         }
     }
 
@@ -323,7 +258,7 @@ public class Sectors{
             sector.texture.dispose();
         }
 
-        Pixmap pixmap = new Pixmap(sectorImageSize * sector.width, sectorImageSize * sector.height, Format.RGBA8888);
+        Pixmap pixmap = new Pixmap(sectorImageSize, sectorImageSize, Format.RGBA8888);
         GenResult secResult = new GenResult();
 
         for(int x = 0; x < pixmap.getWidth(); x++){

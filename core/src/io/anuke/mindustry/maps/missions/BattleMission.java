@@ -31,14 +31,8 @@ public class BattleMission extends Mission{
         }
         Tile core = state.teams.get(defaultTeam).cores.first();
         Generation gen = new Generation(world.getSector(), world.getTiles(), world.width(), world.height(), new SeedRandom(world.getSector().getSeed()-1));
-        int ex = world.getSector().lastExpandX;
-        int ey = world.getSector().lastExpandY;
         int enx = world.width() - 1 - spacing;
         int eny = world.height() - 1 - spacing;
-        if(ex < 0) enx = spacing*gen.sector.width;
-        if(ex > 0) enx = world.width() - 1 - spacing*gen.sector.width;
-        if(ey < 0) eny = spacing*gen.sector.height;
-        if(ey > 0) eny = world.height() - 1 - spacing*gen.sector.height;
         new FortressGenerator().generate(gen, Team.red, core.x, core.y, enx, eny);
     }
 

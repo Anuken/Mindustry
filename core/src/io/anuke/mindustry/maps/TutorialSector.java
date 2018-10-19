@@ -90,13 +90,7 @@ public class TutorialSector{
             new BlockLocMission(PowerBlocks.powerNode, 62, 54),
 
             new UnitMission(UnitTypes.dagger).setMessage("$tutorial.dagger"),
-            new ExpandMission(1, 0){
-                @Override
-                public void onComplete(){
-                    super.onComplete();
-                    generateBase();
-                }
-            },
+            new ActionMission(TutorialSector::generateBase),
             new BattleMission(){
                 public void generate(Generation gen){} //no
                 public void onFirstBegin(){} //also no
