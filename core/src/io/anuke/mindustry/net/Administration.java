@@ -8,8 +8,6 @@ import io.anuke.ucore.core.Settings;
 import static io.anuke.mindustry.Vars.headless;
 
 public class Administration{
-    public static final int defaultMaxBrokenBlocks = 15;
-    public static final int defaultBreakCooldown = 1000 * 15;
 
     /**All player info. Maps UUIDs to info. This persists throughout restarts.*/
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();

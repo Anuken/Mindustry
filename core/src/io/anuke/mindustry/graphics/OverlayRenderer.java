@@ -46,7 +46,7 @@ public class OverlayRenderer{
     public void drawTop(){
 
         for(Player player : players){
-            if(player.isDead()) continue; //dead player don't draw
+            if(player.isDead()) continue; //dead players don't draw
 
             InputHandler input = control.input(player.playerIndex);
 
@@ -83,7 +83,7 @@ public class OverlayRenderer{
             Draw.reset();
 
             //draw selected block bars and info
-            if(input.recipe == null && !ui.hasMouse() && !input.frag.config.isShown()){
+            if(input.recipe == null && !ui.hasMouse()){
                 Vector2 vec = Graphics.world(input.getMouseX(), input.getMouseY());
                 Tile tile = world.tileWorld(vec.x, vec.y);
 

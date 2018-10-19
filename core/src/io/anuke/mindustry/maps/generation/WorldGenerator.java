@@ -141,6 +141,7 @@ public class WorldGenerator{
 
     public void playRandomMap(){
         ui.loadLogic(() -> {
+            world.setSector(null);
             logic.reset();
 
             int sx = (short)Mathf.range(Short.MAX_VALUE/2);

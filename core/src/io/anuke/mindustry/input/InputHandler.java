@@ -271,9 +271,7 @@ public abstract class InputHandler extends InputAdapter{
                 && tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance;
     }
 
-    /**
-     * Returns the tile at the specified MOUSE coordinates.
-     */
+    /**Returns the tile at the specified MOUSE coordinates.*/
     Tile tileAt(float x, float y){
         return world.tile(tileX(x), tileY(y));
     }

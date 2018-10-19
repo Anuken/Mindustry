@@ -229,7 +229,8 @@ public class DesktopInput extends InputHandler{
             }else{ //if it's out of bounds, shooting is just fine
                 player.isShooting = true;
             }
-        }else if(Inputs.keyTap(section, "deselect") && (recipe != null || mode != none || player.isBuilding())){
+        }else if(Inputs.keyTap(section, "deselect") && (recipe != null || mode != none || player.isBuilding()) &&
+        !(player.getCurrentRequest() != null && player.getCurrentRequest().remove && KeyBinds.get(section, "deselect") == KeyBinds.get(section, "break"))){
             if(recipe == null){
                 player.clearBuilding();
             }

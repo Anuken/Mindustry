@@ -112,7 +112,7 @@ public class UI extends SceneModule{
             font.setUseIntegerPositions(false);
             font.getData().setScale(Vars.fontScale);
             font.getData().down += Unit.dp.scl(4f);
-            font.getData().lineHeight -= Unit.dp.scl(4.3f);
+            font.getData().lineHeight -= Unit.dp.scl(4f);
         }, skin.font(), skin.getFont("default-font-chat"), skin.getFont("trad-chinese"), skin.getFont("simp-chinese"));
     }
 
@@ -241,6 +241,17 @@ public class UI extends SceneModule{
             getCell(content()).growX();
             content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
             buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
+        }}.show();
+    }
+
+    public void showInfo(String info, Runnable clicked){
+        new Dialog("$text.info.title", "dialog"){{
+            getCell(content()).growX();
+            content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons().addButton("$text.ok", () -> {
+                clicked.run();
+                hide();
+            }).size(90, 50).pad(4);
         }}.show();
     }
 

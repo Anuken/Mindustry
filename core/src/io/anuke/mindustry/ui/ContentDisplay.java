@@ -88,13 +88,13 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        table.add(Bundles.format("text.item.explosiveness", (int) (item.explosiveness * 100)));
+        table.add(Bundles.format("text.item.explosiveness", (int) (item.explosiveness * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.item.flammability", (int) (item.flammability * 100)));
+        table.add(Bundles.format("text.item.flammability", (int) (item.flammability * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.item.radioactivity", (int) (item.radioactivity * 100)));
+        table.add(Bundles.format("text.item.radioactivity", (int) (item.radioactivity * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.item.fluxiness", (int) (item.fluxiness * 100)));
+        table.add(Bundles.format("text.item.fluxiness", (int) (item.fluxiness * 100 * 2f)));
         table.row();
     }
 
@@ -121,9 +121,9 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        table.add(Bundles.format("text.item.explosiveness", (int) (liquid.explosiveness * 100)));
+        table.add(Bundles.format("text.item.explosiveness", (int) (liquid.explosiveness * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.item.flammability", (int) (liquid.flammability * 100)));
+        table.add(Bundles.format("text.item.flammability", (int) (liquid.flammability * 100 * 2f)));
         table.row();
         table.add(Bundles.format("text.liquid.heatcapacity", (int) (liquid.heatCapacity * 100)));
         table.row();

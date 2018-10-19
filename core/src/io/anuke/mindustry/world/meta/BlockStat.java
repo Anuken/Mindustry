@@ -4,9 +4,7 @@ import io.anuke.ucore.util.Bundles;
 
 import java.util.Locale;
 
-/**
- * Describes one type of stat for a block.
- */
+/**Describes one type of stat for a block.*/
 public enum BlockStat{
     health(StatCategory.general),
     size(StatCategory.general),
@@ -18,6 +16,7 @@ public enum BlockStat{
 
     liquidCapacity(StatCategory.liquids),
     liquidOutput(StatCategory.liquids),
+    liquidOutputSpeed(StatCategory.liquids),
     coolant(StatCategory.liquids),
     coolantUse(StatCategory.liquids),
 
@@ -26,7 +25,7 @@ public enum BlockStat{
     powerDamage(StatCategory.power),
     powerRange(StatCategory.power),
     powerTransferSpeed(StatCategory.power),
-    maxPowerGeneration(StatCategory.power),
+    basePowerGeneration(StatCategory.power),
     inputLiquidFuel(StatCategory.power),
     liquidFuelUse(StatCategory.power),
 

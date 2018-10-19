@@ -570,16 +570,18 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(!canTapPlayer(worldx, worldy)){
             boolean consumed = false;
             //else, try and carry units
-            if(player.getCarry() != null){
-                consumed = true;
-                player.dropCarry(); //drop off unit
-            }else{
-                Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
-
-                if(unit != null){
-                    player.moveTarget = unit;
+            if(player.mech.flying){
+                if(player.getCarry() != null){
                     consumed = true;
-                    Effects.effect(Fx.select, unit.getX(), unit.getY());
+                    player.dropCarry(); //drop off unit
+                }else{
+                    Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
+
+                    if(unit != null){
+                        player.moveTarget = unit;
+                        consumed = true;
+                        Effects.effect(Fx.select, unit.getX(), unit.getY());
+                    }
                 }
             }
 

@@ -222,7 +222,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         clearChildren();
         margin(0);
-        build();
+        shown(this::build);
 
         update(() -> {
             if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
@@ -382,6 +382,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         float size = mobile ? (int) (Math.min(Gdx.graphics.getHeight(), Gdx.graphics.getWidth()) / amount / Unit.dp.scl(1f)) :
                 Math.min(Gdx.graphics.getDisplayMode().height / amount, baseSize);
 
+        clearChildren();
         table(cont -> {
             cont.left();
 

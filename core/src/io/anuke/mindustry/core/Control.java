@@ -114,10 +114,13 @@ public class Control extends Module{
 
             state.set(State.playing);
 
-            if(world.getSector() == null && !Settings.getBool("custom-warning", false)){
-                threads.runGraphics(() -> ui.showInfo("$mode.custom.warning"));
-                Settings.putBool("custom-warning", true);
-                Settings.save();
+            if(world.getSector() == null && !Settings.getBool("custom-warning-for-real-1", false)){
+                threads.runGraphics(() -> ui.showInfo("$mode.custom.warning", () ->
+                    ui.showInfo("$mode.custom.warning.read", () -> {
+                        Settings.putBool("custom-warning-for-real-1", true);
+                        Settings.save();
+                    })));
+
             }
         });
 

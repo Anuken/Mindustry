@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.ucore.core.Settings;
@@ -46,7 +47,7 @@ public class Unlocks{
         //client connected to server: always return the IP-specific set
         if(Net.client()){
             return getSet(Net.getLastIP());
-        }else if(world.getSector() != null || state.mode.infiniteResources){ //sector-sandbox have shared set
+        }else if((world.getSector() != null || state.mode.infiniteResources) || state.is(State.menu)){ //sector-sandbox have shared set
             return rootSet();
         }else{ //per-mode set
             return getSet(state.mode.name());

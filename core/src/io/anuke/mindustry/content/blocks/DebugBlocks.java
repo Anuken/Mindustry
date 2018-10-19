@@ -84,6 +84,12 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
+            public void setBars(){
+                super.setBars();
+                bars.remove(BarType.inventory);
+            }
+
+            @Override
             public void update(Tile tile){
                 SorterEntity entity = tile.entity();
                 entity.items.set(entity.sortItem, 1);

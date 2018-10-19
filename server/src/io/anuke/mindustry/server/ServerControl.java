@@ -112,7 +112,7 @@ public class ServerControl extends Module{
             if(Settings.getBool("shuffle")){
                 if(world.getSector() == null){
                     if(world.maps.all().size > 0){
-                        Array<Map> maps = world.maps.all();
+                        Array<Map> maps = world.maps.customMaps().size == 0 ? world.maps.defaultMaps() : world.maps.customMaps();
 
                         Map previous = world.getMap();
                         Map map = previous;
