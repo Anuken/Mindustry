@@ -25,7 +25,7 @@ public class BlockRenderer{
 
     private FloorRenderer floorRenderer;
 
-    private Array<BlockRequest> requests = new Array<>(initialRequests);
+    private Array<BlockRequest> requests = new Array<>(true, initialRequests, BlockRequest.class);
     private IntSet teamChecks = new IntSet();
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private Layer lastLayer;
