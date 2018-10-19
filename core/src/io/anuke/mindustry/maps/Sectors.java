@@ -3,6 +3,7 @@ package io.anuke.mindustry.maps;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
@@ -21,10 +22,7 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.GridMap;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -105,10 +103,12 @@ public class Sectors{
         Sector sector = get(x, y);
         sector.complete = true;
 
-        //todo use geometry.d4 to unlock
+        for(GridPoint2 g : Geometry.d4){
+            createSector(x + g.x, y + g.y);
+        }
     }
 
-    /**Creates a sector at a location if it is not present, but does not unlock it.*/
+    /**Creates a sector at a location if it is not present, but does not complete it.*/
     public void createSector(int x, int y){
 
         if(grid.containsKey(x, y)) return;
