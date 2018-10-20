@@ -11,7 +11,7 @@ import io.anuke.ucore.util.Bundles;
 import static io.anuke.mindustry.Vars.*;
 
 public class BattleMission extends Mission{
-    final int spacing = 20;
+    final int spacing = 30;
 
     @Override
     public GameMode getMode(){
@@ -25,9 +25,12 @@ public class BattleMission extends Mission{
 
     @Override
     public void generate(Generation gen){
+        super.generate(gen);
+
         if(state.teams.get(defaultTeam).cores.size == 0){
             return;
         }
+
         Tile core = state.teams.get(defaultTeam).cores.first();
         int enx = world.width() - 1 - spacing;
         int eny = world.height() - 1 - spacing;
