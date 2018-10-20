@@ -19,6 +19,7 @@ import io.anuke.mindustry.maps.missions.WaveMission;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.type.Recipe.RecipeVisibility;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.ucore.core.Settings;
@@ -180,7 +181,7 @@ public class Sectors{
     }
 
     private void initSector(Sector sector){
-        sector.difficulty = (int)(Mathf.dst(sector.x, sector.y) / 2);
+        sector.difficulty = (int)(Mathf.dst(sector.x, sector.y));
 
         if(presets.get(sector.x, sector.y) != null){
             SectorPreset p = presets.get(sector.x, sector.y);
@@ -213,39 +214,43 @@ public class Sectors{
         }
     }
 
+    /**Generates a mission for a sector. This is deterministic and the same for each client.*/
     private void generate(Sector sector){
-
-        //recipe mission
-        addRecipeMission(sector, 3);
 
         //50% chance to get a wave mission
         if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5){
+            //recipe mission (maybe)
+            addRecipeMission(sector, 3);
             sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 1, 4)*5));
         }else{
+            //battle missions don't get recipes
             sector.missions.add(new BattleMission());
         }
-
-        //possibly add another recipe mission
-        addRecipeMission(sector, 11);
 
         //possibly another battle mission
         if(Mathf.randomSeed(sector.getSeed() + 3) < 0.3){
             sector.missions.add(new BattleMission());
         }
+
+        //possibly add another recipe mission
+        addRecipeMission(sector, 11);
     }
 
     private void addRecipeMission(Sector sector, int offset){
         //build list of locked recipes to add mission for obtaining it
-        if(!headless && Mathf.randomSeed(sector.getSeed() + offset) < 0.5){
+        if(Mathf.randomSeed(sector.getSeed() + offset) < 0.5){
             Array<Recipe> recipes = new Array<>();
             for(Recipe r : content.recipes()){
-                //..wall missions don't happen
-                if(r.result instanceof Wall || control.unlocks.isUnlocked(r)) continue;
+                if(r.result instanceof Wall || (r.visibility != RecipeVisibility.all) || r.cost < 10f) continue;
                 recipes.add(r);
             }
+            float maxdiff = 8f;
+            recipes.sort((r1, r2) -> Float.compare(r1.cost, r2.cost));
+            int end = (int)(Mathf.clamp(sector.difficulty / maxdiff + 0.25f) * (recipes.size - 1));
+            int start = (int)(Mathf.clamp(sector.difficulty / maxdiff) * (recipes.size / 2f));
 
-            if(recipes.size > 0){
-                Recipe recipe = recipes.get(Mathf.randomSeed(sector.getSeed() + 10, 0, recipes.size-1));
+            if(recipes.size > 0 && end > start){
+                Recipe recipe = recipes.get(Mathf.randomSeed(sector.getSeed() + 10, start, end));
                 sector.missions.addAll(Missions.blockRecipe(recipe.result));
             }
         }
