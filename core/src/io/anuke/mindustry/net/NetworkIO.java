@@ -36,6 +36,8 @@ public class NetworkIO{
             //--GENERAL STATE--
             stream.writeByte(state.mode.ordinal()); //gamemode
             stream.writeUTF(world.getMap().name); //map name
+            stream.writeInt(world.getSector() == null ? invalidSector : world.getSector().packedPosition()); //sector ID
+            stream.writeInt(world.getSector() == null ? 0 : world.getSector().completedMissions);
 
             //write tags
             ObjectMap<String, String> tags = world.getMap().meta.tags;
@@ -163,6 +165,15 @@ public class NetworkIO{
             //general state
             byte mode = stream.readByte();
             String map = stream.readUTF();
+            int sector = stream.readInt();
+            int missions = stream.readInt();
+
+            if(sector != invalidSector){
+                world.sectors.createSector(Bits.getLeftShort(sector), Bits.getRightShort(sector));
+                world.setSector(world.sectors.get(sector));
+                world.getSector().completedMissions = missions;
+            }
+
             ObjectMap<String, String> tags = new ObjectMap<>();
 
             byte tagSize = stream.readByte();
@@ -195,7 +206,6 @@ public class NetworkIO{
             Map currentMap = new Map(map, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
             currentMap.meta.tags.clear();
             currentMap.meta.tags.putAll(tags);
-            world.setSector(null);
             world.setMap(currentMap);
 
             Tile[][] tiles = world.createTiles(width, height);

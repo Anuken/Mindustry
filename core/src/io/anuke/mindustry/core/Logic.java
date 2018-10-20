@@ -1,6 +1,8 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
@@ -19,6 +21,7 @@ import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 
 import static io.anuke.mindustry.Vars.*;
+import io.anuke.mindustry.gen.Call;
 
 /**
  * Logic module.
@@ -108,26 +111,42 @@ public class Logic extends Module{
 
         //check unlocked sectors
         while(!world.getSector().complete && world.getSector().currentMission().isComplete()){
-            world.getSector().currentMission().onComplete();
-            world.getSector().completedMissions ++;
-
-            state.mode = world.getSector().currentMission().getMode();
-            world.getSector().currentMission().onBegin();
-            world.sectors.save();
+            Call.onMissionFinish(world.getSector().completedMissions);
         }
 
         //check if all assigned missions are complete
         if(!world.getSector().complete && world.getSector().completedMissions >= world.getSector().missions.size){
-            state.mode = GameMode.victory;
-
-            world.sectors.completeSector(world.getSector().x, world.getSector().y);
-            world.sectors.save();
-            if(!headless){
-                ui.missions.show(world.getSector());
-            }
-
-            Events.fire(new SectorCompleteEvent());
+            Call.onSectorComplete();
         }
+    }
+
+    @Remote(called = Loc.both)
+    public static void onGameOver(Team winner){
+        threads.runGraphics(() -> ui.restart.show(winner));
+        netClient.setQuiet();
+    }
+
+    @Remote(called = Loc.server)
+    public static void onMissionFinish(int index){
+        world.getSector().missions.get(index).onComplete();
+        world.getSector().completedMissions = index + 1;
+
+        state.mode = world.getSector().currentMission().getMode();
+        world.getSector().currentMission().onBegin();
+        world.sectors.save();
+    }
+
+    @Remote(called = Loc.server)
+    public static void onSectorComplete(){
+        state.mode = GameMode.victory;
+
+        world.sectors.completeSector(world.getSector().x, world.getSector().y);
+        world.sectors.save();
+        if(!headless){
+            ui.missions.show(world.getSector());
+        }
+
+        Events.fire(new SectorCompleteEvent());
     }
 
     @Override
@@ -144,9 +163,8 @@ public class Logic extends Module{
                 Timers.update();
             }
 
-            updateSectors();
-
             if(!Net.client() && !world.isInvalidMap()){
+                updateSectors();
                 checkGameOver();
             }
 
