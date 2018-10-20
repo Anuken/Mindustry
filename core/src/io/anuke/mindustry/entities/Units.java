@@ -83,6 +83,8 @@ public class Units{
 
             return boolResult;
         }else{
+            boolResultGraphics = false;
+
             for(EntityGroup<? extends BaseUnit> g : unitGroups){
                 g.forEach(u -> {
                     u.getHitbox(rectGraphics);
