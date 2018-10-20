@@ -66,10 +66,10 @@ public class PlayerListFragment extends Fragment{
 
         float h = 74f;
 
-        for(Player player : playerGroup.all()){
+        playerGroup.forEach(player -> {
             NetConnection connection = gwt ? null : player.con;
 
-            if(connection == null && Net.server() && !player.isLocal) continue;
+            if(connection == null && Net.server() && !player.isLocal) return;
 
             Table button = new Table("button");
             button.left();
@@ -134,7 +134,7 @@ public class PlayerListFragment extends Fragment{
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
             content.row();
-        }
+        });
 
         content.marginBottom(5);
     }

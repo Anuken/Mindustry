@@ -23,7 +23,6 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Atlas;
@@ -382,10 +381,6 @@ public class Control extends Module{
                 }
             }
 
-            if(!state.is(State.paused) || Net.active()){
-                Entities.update(effectGroup);
-                Entities.update(groundEffectGroup);
-            }
         }else{
             if(!state.is(State.paused) || Net.active()){
                 Timers.update();

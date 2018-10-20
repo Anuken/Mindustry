@@ -1,6 +1,5 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.ucore.scene.ui.ScrollPane;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -43,12 +42,18 @@ public class AdminsDialog extends FloatingDialog{
             res.addImageButton("icon-cancel", 14 * 3, () -> {
                 ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
                     netServer.admins.unAdminPlayer(info.id);
+                    playerGroup.forEach(player -> {
+                        if(player.uuid.equals(info.id)){
+                            player.isAdmin = false;
+                        }
+                    });
+                    /*
                     for(Player player : playerGroup.all()){
                         if(player.con != null){
                             player.isAdmin = false;
                             break;
                         }
-                    }
+                    }*/
                     setup();
                 });
             }).size(h).pad(-14f);

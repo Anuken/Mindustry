@@ -254,7 +254,6 @@ public abstract class InputHandler extends InputAdapter{
                 && tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
                 && !tile.floor().playerUnmineable
                 && player.inventory.canAcceptItem(tile.floor().drops.item)
-                && Units.getClosestEnemy(player.getTeam(), tile.worldx(), tile.worldy(), 40f, e -> true) == null //don't being mining when an enemy is near
                 && tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance;
     }
 
@@ -330,12 +329,8 @@ public abstract class InputHandler extends InputAdapter{
     public boolean validPlace(int x, int y, Block type, int rotation){
         for(Tile tile : state.teams.get(player.getTeam()).cores){
             if(tile.distanceTo(x * tilesize, y * tilesize) < coreBuildRange){
-                //TODO terrible hack
-                //this might actually screw things up on the logic thread.
-                try{
-                    return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
-                    Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
-                }catch(Exception e){return false;}
+                return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
+                Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
             }
         }
 
