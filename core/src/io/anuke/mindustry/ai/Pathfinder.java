@@ -14,6 +14,7 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Structs;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
@@ -82,7 +83,7 @@ public class Pathfinder{
     }
 
     public float getValueforTeam(Team team, int x, int y){
-        return paths == null || team.ordinal() >= paths.length ? 0 : paths[team.ordinal()].weights[x][y];
+        return paths == null || team.ordinal() >= paths.length ? 0 : Structs.inBounds(x, y, paths[team.ordinal()].weights) ? paths[team.ordinal()].weights[x][y] : 0;
     }
 
     private boolean passable(Tile tile, Team team){

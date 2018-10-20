@@ -28,7 +28,6 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Group;
@@ -84,19 +83,17 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     /** Check and assign targets for a specific position. */
     void checkTargets(float x, float y){
-        synchronized(Entities.entityLock){
-            Unit unit = Units.getClosestEnemy(player.getTeam(), x, y, 20f, u -> !u.isDead() && u.isAdded());
+        Unit unit = Units.getClosestEnemy(player.getTeam(), x, y, 20f, u -> !u.isDead());
 
-            if(unit != null){
-                threads.run(() -> player.target = unit);
-            }else{
-                Tile tile = world.tileWorld(x, y);
-                if(tile != null) tile = tile.target();
+        if(unit != null){
+            threads.run(() -> player.target = unit);
+        }else{
+            Tile tile = world.tileWorld(x, y);
+            if(tile != null) tile = tile.target();
 
-                if(tile != null && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
-                    TileEntity entity = tile.entity;
-                    threads.run(() -> player.target = entity);
-                }
+            if(tile != null && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
+                TileEntity entity = tile.entity;
+                threads.run(() -> player.target = entity);
             }
         }
     }
@@ -344,7 +341,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(lineMode){
             int tileX = tileX(Gdx.input.getX());
             int tileY = tileY(Gdx.input.getY());
-            
+
             //draw placing
             if(mode == placing && recipe != null){
                 NormalizeDrawResult dresult = PlaceUtils.normalizeDrawArea(recipe.result, lineStartX, lineStartY, tileX, tileY, true, maxLength, lineScale);
@@ -399,7 +396,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
 
             }
-            
+
         }
 
         TargetTrait target = player.target;
@@ -555,7 +552,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         //ignore off-screen taps
         if(cursor == null || ui.hasMouse(x, y)) return false;
 
-        checkTargets(worldx, worldy);
+        threads.run(() -> checkTargets(worldx, worldy));
 
         //remove if request present
         if(hasRequest(cursor)){

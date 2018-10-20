@@ -113,7 +113,6 @@ public class WaveSpawner{
 
                 if(group.type.isFlying){
                     FlyerSpawn spawn = flySpawns.get(flyCount);
-                    //TODO verify flyer spawn
 
                     float margin = 40f; //how far away from the edge flying units spawn
                     spawnX = world.width() * tilesize / 2f + Mathf.sqrwavex(spawn.angle) * (world.width() / 2f * tilesize + margin);

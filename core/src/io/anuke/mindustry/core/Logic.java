@@ -163,6 +163,10 @@ public class Logic extends Module{
                 if(!Entities.defaultGroup().isEmpty())
                     throw new RuntimeException("Do not add anything to the default group!");
 
+                if(!headless){
+                    Entities.update(effectGroup);
+                    Entities.update(groundEffectGroup);
+                }
 
                 for(EntityGroup group : unitGroups){
                     Entities.update(group);

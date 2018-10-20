@@ -10,7 +10,7 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
 /**
- * Class that renders a trail.
+ * Class that renders a colored trail.
  */
 public class Trail{
     private final static float maxJump = 15f;
