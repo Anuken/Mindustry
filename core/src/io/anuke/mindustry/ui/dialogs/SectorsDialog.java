@@ -71,7 +71,7 @@ public class SectorsDialog extends FloatingDialog{
 
     class SectorView extends Element{
         float lastX, lastY;
-        float sectorSize = Unit.dp.scl(32*4);
+        float sectorSize = Unit.dp.scl(32*5);
         float sectorPadding = Unit.dp.scl(14f);
         boolean clicked = false;
         float panX = -sectorPadding/2f, panY = -sectorSize/2f;

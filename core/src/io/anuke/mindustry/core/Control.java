@@ -347,7 +347,6 @@ public class Control extends Module{
 
     @Override
     public void update(){
-
         if(error != null){
             throw new RuntimeException(error);
         }

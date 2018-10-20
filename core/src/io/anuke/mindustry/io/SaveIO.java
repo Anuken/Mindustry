@@ -28,6 +28,10 @@ public class SaveIO{
         }
     }
 
+    public static SaveFileVersion getSaveWriter(){
+        return versionArray.peek();
+    }
+
     public static void saveToSlot(int slot){
         if(gwt){
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
