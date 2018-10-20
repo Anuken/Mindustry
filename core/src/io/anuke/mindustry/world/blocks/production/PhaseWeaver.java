@@ -46,6 +46,7 @@ public class PhaseWeaver extends PowerSmelter{
             Shaders.build.region = weaveRegion;
             Shaders.build.progress = progress;
             Shaders.build.color.set(Palette.accent);
+            Shaders.build.color.a = entity.heat;
             Shaders.build.time = -entity.time / 10f;
 
             Graphics.shader(Shaders.build, false);
