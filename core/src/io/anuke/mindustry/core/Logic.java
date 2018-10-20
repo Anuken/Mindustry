@@ -112,7 +112,6 @@ public class Logic extends Module{
             world.getSector().completedMissions ++;
 
             state.mode = world.getSector().currentMission().getMode();
-            world.getSector().currentMission().onFirstBegin();
             world.getSector().currentMission().onBegin();
             world.sectors.save();
         }
