@@ -47,7 +47,7 @@ public class Damage{
         for(int i = 0; i < waves; i++){
             int f = i;
             Timers.run(i * 2f, () -> {
-                Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
+                threads.run(() -> Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f));
                 Effects.effect(ExplosionFx.blockExplosionSmoke, x + Mathf.range(radius), y + Mathf.range(radius));
             });
         }

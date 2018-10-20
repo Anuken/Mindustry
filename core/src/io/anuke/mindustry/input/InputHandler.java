@@ -267,7 +267,6 @@ public abstract class InputHandler extends InputAdapter{
                 && tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
                 && !tile.floor().playerUnmineable
                 && player.inventory.canAcceptItem(tile.floor().drops.item)
-                && Units.getClosestEnemy(player.getTeam(), tile.worldx(), tile.worldy(), 40f, e -> true) == null //don't being mining when an enemy is near
                 && tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance;
     }
 
@@ -354,7 +353,7 @@ public abstract class InputHandler extends InputAdapter{
         for(Tile tile : state.teams.get(player.getTeam()).cores){
             if(tile.distanceTo(x * tilesize, y * tilesize) < coreBuildRange){
                 return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
-                        Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
+                Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
             }
         }
 
@@ -366,12 +365,10 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     public void placeBlock(int x, int y, Recipe recipe, int rotation){
-        //todo multiplayer support
         player.addBuildRequest(new BuildRequest(x, y, rotation, recipe));
     }
 
     public void breakBlock(int x, int y){
-        //todo multiplayer support
         Tile tile = world.tile(x, y).target();
         player.addBuildRequest(new BuildRequest(tile.x, tile.y));
     }

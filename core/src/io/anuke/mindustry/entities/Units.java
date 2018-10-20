@@ -11,6 +11,7 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
+import io.anuke.ucore.util.Threads;
 import io.anuke.ucore.util.EnumSet;
 
 import static io.anuke.mindustry.Vars.*;
@@ -20,10 +21,11 @@ import static io.anuke.mindustry.Vars.*;
  */
 public class Units{
     private static Rectangle rect = new Rectangle();
+    private static Rectangle rectGraphics = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
     private static Unit result;
     private static float cdist;
-    private static boolean boolResult;
+    private static boolean boolResult, boolResultGraphics;
 
     /**
      * Validates a target.
@@ -53,33 +55,57 @@ public class Units{
         return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.getWeapon().getAmmo().getRange());
     }
 
-    /**
-     * Returns whether there are any entities on this tile.
-     */
+    /**Returns whether there are any entities on this tile.*/
     public static boolean anyEntities(Tile tile){
         Block type = tile.block();
         rect.setSize(type.size * tilesize, type.size * tilesize);
         rect.setCenter(tile.drawx(), tile.drawy());
 
-        boolResult = false;
-
-        Units.getNearby(rect, unit -> {
-            if(boolResult) return;
-            if(!unit.isFlying()){
-                unit.getHitbox(hitrect);
-
-                if(hitrect.overlaps(rect)){
-                    boolResult = true;
-                }
-            }
-        });
-
-        return boolResult;
+        return anyEntities(rect);
     }
 
-    /**
-     * Returns whether there are any entities on this tile, with the hitbox expanded.
-     */
+    /**Can be called from any thread.*/
+    public static boolean anyEntities(Rectangle rect){
+        if(Threads.isLogic()){
+            boolResult = false;
+
+            Units.getNearby(rect, unit -> {
+                if(boolResult) return;
+                if(!unit.isFlying()){
+                    unit.getHitbox(hitrect);
+
+                    if(hitrect.overlaps(rect)){
+                        boolResult = true;
+                    }
+                }
+            });
+
+            return boolResult;
+        }else{
+            boolResultGraphics = false;
+
+            for(EntityGroup<? extends BaseUnit> g : unitGroups){
+                g.forEach(u -> {
+                    u.getHitbox(rectGraphics);
+                    if(rectGraphics.overlaps(rect)){
+                        boolResultGraphics = true;
+                    }
+                });
+                if(boolResultGraphics) return true;
+            }
+
+            playerGroup.forEach(u -> {
+                u.getHitbox(rectGraphics);
+                if(rectGraphics.overlaps(rect)){
+                    boolResultGraphics = true;
+                }
+            });
+
+            return boolResultGraphics;
+        }
+    }
+
+    /**Returns whether there are any entities on this tile, with the hitbox expanded.*/
     public static boolean anyEntities(Tile tile, float expansion, Predicate<Unit> pred){
         Block type = tile.block();
         rect.setSize(type.size * tilesize + expansion, type.size * tilesize + expansion);

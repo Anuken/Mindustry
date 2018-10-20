@@ -176,7 +176,7 @@ public class ContentLoader{
     }
 
     public void dispose(){
-        //TODO clear all content.
+        //clear all content, currently not needed
     }
 
     public void handleContent(Content content){

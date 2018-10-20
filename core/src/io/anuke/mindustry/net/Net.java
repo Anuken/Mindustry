@@ -26,8 +26,6 @@ import static io.anuke.mindustry.Vars.headless;
 import static io.anuke.mindustry.Vars.ui;
 
 public class Net{
-    public static final Object packetPoolLock = new Object();
-
     private static boolean server;
     private static boolean active;
     private static boolean clientLoaded;
@@ -239,16 +237,12 @@ public class Net{
             if(clientLoaded || ((object instanceof Packet) && ((Packet) object).isImportant())){
                 if(clientListeners.get(object.getClass()) != null)
                     clientListeners.get(object.getClass()).accept(object);
-                synchronized(packetPoolLock){
-                    Pooling.free(object);
-                }
+                Pooling.free(object);
             }else if(!((object instanceof Packet) && ((Packet) object).isUnimportant())){
                 packetQueue.add(object);
                 Log.info("Queuing packet {0}", object);
             }else{
-                synchronized(packetPoolLock){
-                    Pooling.free(object);
-                }
+                Pooling.free(object);
             }
         }else{
             Log.err("Unhandled packet type: '{0}'!", object);
@@ -263,9 +257,7 @@ public class Net{
         if(serverListeners.get(object.getClass()) != null){
             if(serverListeners.get(object.getClass()) != null)
                 serverListeners.get(object.getClass()).accept(connection, object);
-            synchronized(packetPoolLock){
-                Pooling.free(object);
-            }
+            Pooling.free(object);
         }else{
             Log.err("Unhandled packet type: '{0}'!", object.getClass());
         }

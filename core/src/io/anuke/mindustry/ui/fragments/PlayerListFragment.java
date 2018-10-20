@@ -19,12 +19,14 @@ import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Timer;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class PlayerListFragment extends Fragment{
     private boolean visible = false;
     private Table content = new Table().marginRight(13f).marginLeft(13f);
+    private Timer timer = new Timer();
 
     @Override
     public void build(Group parent){
@@ -36,7 +38,7 @@ public class PlayerListFragment extends Fragment{
                     return;
                 }
 
-                if(visible && Timers.get("player-list-rebuild", 20)){
+                if(visible && timer.get(20)){
                     rebuild();
                     content.pack();
                     content.act(Gdx.graphics.getDeltaTime());
@@ -48,8 +50,7 @@ public class PlayerListFragment extends Fragment{
             cont.table("pane", pane -> {
                 pane.label(() -> Bundles.format(playerGroup.size() == 1 ? "text.players.single" : "text.players", playerGroup.size()));
                 pane.row();
-                pane.pane("clear", content)
-                    .grow().get().setScrollingDisabled(true, false);
+                pane.pane("clear", content).grow().get().setScrollingDisabled(true, false);
                 pane.row();
 
                 pane.table("pane", menu -> {
@@ -71,10 +72,10 @@ public class PlayerListFragment extends Fragment{
 
         float h = 74f;
 
-        for(Player player : playerGroup.all()){
+        playerGroup.forEach(player -> {
             NetConnection connection = gwt ? null : player.con;
 
-            if(connection == null && Net.server() && !player.isLocal) continue;
+            if(connection == null && Net.server() && !player.isLocal) return;
 
             Table button = new Table("button");
             button.left();
@@ -139,7 +140,7 @@ public class PlayerListFragment extends Fragment{
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
             content.row();
-        }
+        });
 
         content.marginBottom(5);
     }

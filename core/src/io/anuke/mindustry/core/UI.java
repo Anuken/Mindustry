@@ -117,7 +117,7 @@ public class UI extends SceneModule{
     }
 
     @Override
-    public synchronized void update(){
+    public void update(){
         if(Graphics.drawing()) Graphics.end();
 
         act();
