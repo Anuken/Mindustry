@@ -90,16 +90,9 @@ public class TutorialSector{
             new BlockLocMission(PowerBlocks.powerNode, 62, 54),
 
             new UnitMission(UnitTypes.dagger).setMessage("$tutorial.dagger"),
-            new ExpandMission(1, 0){
-                @Override
-                public void onComplete(){
-                    super.onComplete();
-                    generateBase();
-                }
-            },
+            new ActionMission(TutorialSector::generateBase),
             new BattleMission(){
                 public void generate(Generation gen){} //no
-                public void onFirstBegin(){} //also no
             }.setMessage("$tutorial.battle")
         );
 
@@ -119,7 +112,7 @@ public class TutorialSector{
     }
 
     private static void generateBase(){
-        int x = sectorSize/2 + sectorSize, y = sectorSize/2;
+        int x = sectorSize - 50, y = sectorSize - 50;
         world.setBlock(world.tile(x, y), StorageBlocks.core, waveTeam);
         world.setBlock(world.tile(x - 1, y + 2), UnitBlocks.daggerFactory, waveTeam);
         world.setBlock(world.tile(x - 1, y - 3), UnitBlocks.daggerFactory, waveTeam);

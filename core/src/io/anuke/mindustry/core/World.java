@@ -217,7 +217,7 @@ public class World extends Module{
 
         beginMapLoad();
 
-        int width = sectorSize * sector.width, height = sectorSize * sector.height;
+        int width = sectorSize, height = sectorSize;
 
         Tile[][] tiles = createTiles(width, height);
 

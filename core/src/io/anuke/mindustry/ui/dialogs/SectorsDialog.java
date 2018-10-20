@@ -71,7 +71,7 @@ public class SectorsDialog extends FloatingDialog{
 
     class SectorView extends Element{
         float lastX, lastY;
-        float sectorSize = Unit.dp.scl(32*4);
+        float sectorSize = Unit.dp.scl(32*5);
         float sectorPadding = Unit.dp.scl(14f);
         boolean clicked = false;
         float panX = -sectorPadding/2f, panY = -sectorSize/2f;
@@ -133,8 +133,8 @@ public class SectorsDialog extends FloatingDialog{
                     float drawY = y + height/2f + sectorY * padSectorSize - offsetY * padSectorSize - panY % padSectorSize;
 
                     Sector sector = world.sectors.get(sectorX, sectorY);
-                    int width = (sector == null ? 1 : sector.width);
-                    int height = (sector == null ? 1 : sector.height);
+                    int width = 1;
+                    int height = 1;
                     float paddingx = (width-1) * sectorPadding;
                     float paddingy = (height-1) * sectorPadding;
 
