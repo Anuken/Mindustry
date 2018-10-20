@@ -86,6 +86,7 @@ public class Units{
 
             for(EntityGroup<? extends BaseUnit> g : unitGroups){
                 g.forEach(u -> {
+                    if(u.isFlying()) return;
                     u.getHitbox(rectGraphics);
                     if(rectGraphics.overlaps(rect)){
                         boolResultGraphics = true;
@@ -95,6 +96,7 @@ public class Units{
             }
 
             playerGroup.forEach(u -> {
+                if(u.isFlying()) return;
                 u.getHitbox(rectGraphics);
                 if(rectGraphics.overlaps(rect)){
                     boolResultGraphics = true;
