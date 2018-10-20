@@ -32,6 +32,12 @@ public class Router extends Block{
     @Override
     public void update(Tile tile){
         SplitterEntity entity = tile.entity();
+
+        if(entity.lastItem == null && entity.items.total() > 0){
+            entity.lastItem = entity.items.take();
+            entity.items.add(entity.lastItem, 1);
+        }
+
         if(entity.lastItem != null){
             entity.time += 1f/speed * Timers.delta();
             Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);

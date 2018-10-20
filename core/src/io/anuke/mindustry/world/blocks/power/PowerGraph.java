@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Timers;
 
 import static io.anuke.mindustry.Vars.threads;
 
@@ -55,7 +56,7 @@ public class PowerGraph{
                 outputs += Math.min(tile.block().powerCapacity - tile.entity.power.amount, toEach) / toEach;
             }
 
-            float finalEach = toEach / outputs;
+            float finalEach = toEach / outputs * Timers.delta();
             float buffer = 0f;
 
             if(Float.isNaN(finalEach) || Float.isInfinite(finalEach)){
