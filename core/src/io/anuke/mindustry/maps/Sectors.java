@@ -165,6 +165,7 @@ public class Sectors{
     public void clear(){
         grid.clear();
         save();
+        createSector(0, 0);
     }
 
     public void save(){
