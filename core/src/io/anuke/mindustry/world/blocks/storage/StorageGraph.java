@@ -26,15 +26,13 @@ public class StorageGraph{
             other.<StorageEntity>entity().graph = null;
         }
 
-        if(tiles.remove(tile) && tile.block() instanceof CoreBlock){
-            cores --;
-        }
-
         cores = 0;
 
         for(Tile other : tile.entity.proximity()){
-            if(other.block() instanceof StorageBlock){
-                reflow(tile, other);
+            if(other.block() instanceof StorageBlock && other.<StorageEntity>entity().graph == null){
+                StorageGraph graph = new StorageGraph();
+                other.<StorageEntity>entity().graph = graph;
+                graph.reflow(tile, other);
             }
         }
     }
@@ -58,7 +56,7 @@ public class StorageGraph{
     }
 
     public void merge(StorageGraph other){
-        if(this == other) return;
+        if(this == other || other == null) return;
 
         for(Tile tile : other.tiles){
             StorageEntity e = tile.entity();

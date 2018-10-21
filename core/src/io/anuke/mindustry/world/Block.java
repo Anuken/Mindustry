@@ -139,7 +139,17 @@ public class Block extends BaseBlock {
         return drops != null && drops.item == item;
     }
 
-    public void updatePowerGraph(Tile tile){
+    public void onProximityRemoved(Tile tile){
+        if(tile.entity.power != null){
+            tile.block().powerGraphRemoved(tile);
+        }
+    }
+
+    public void onProximityAdded(Tile tile){
+        if(tile.block().hasPower) tile.block().updatePowerGraph(tile);
+    }
+
+    protected void updatePowerGraph(Tile tile){
         TileEntity entity = tile.entity();
 
         for(Tile other : getPowerConnections(tile, tempTiles)){
@@ -149,7 +159,7 @@ public class Block extends BaseBlock {
         }
     }
 
-    public void powerGraphRemoved(Tile tile){
+    protected void powerGraphRemoved(Tile tile){
         tile.entity.power.graph.remove(tile);
         for(int i = 0; i < tile.entity.power.links.size; i++){
             Tile other = world.tile(tile.entity.power.links.get(i));

@@ -19,8 +19,7 @@ public abstract class StorageBlock extends Block{
     }
 
     @Override
-    public void onProximityUpdate(Tile tile){
-        super.onProximityUpdate(tile);
+    public void onProximityAdded(Tile tile){
         StorageEntity entity = tile.entity();
         entity.graph.add(tile);
 
@@ -33,8 +32,7 @@ public abstract class StorageBlock extends Block{
     }
 
     @Override
-    public void removed(Tile tile){
-        super.removed(tile);
+    public void onProximityRemoved(Tile tile){
         StorageEntity entity = tile.entity();
         entity.graph.remove(tile);
     }

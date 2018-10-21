@@ -157,9 +157,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     }
 
     public void removeFromProximity(){
-        if(power != null){
-            tile.block().powerGraphRemoved(tile);
-        }
+        tile.block().onProximityRemoved(tile);
 
         GridPoint2[] nearby = Edges.getEdges(tile.block().size);
         for(GridPoint2 point : nearby){
@@ -202,7 +200,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             proximity.add(tile);
         }
 
-        if(tile.block().hasPower) tile.block().updatePowerGraph(tile);
+        tile.block().onProximityAdded(tile);
         tile.block().onProximityUpdate(tile);
     }
 
