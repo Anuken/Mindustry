@@ -415,9 +415,14 @@ public class NetClient extends Module{
 
         if(timer.get(0, playerSyncTime)){
             Player player = players[0];
-            BuildRequest[] requests = new BuildRequest[player.getPlaceQueue().size];
-            for(int i = 0; i < requests.length; i++){
-                requests[i] = player.getPlaceQueue().get(i);
+
+            BuildRequest[] requests;
+
+            synchronized(player.getPlaceQueue()){
+                requests = new BuildRequest[player.getPlaceQueue().size];
+                for(int i = 0; i < requests.length; i++){
+                    requests[i] = player.getPlaceQueue().get(i);
+                }
             }
 
             Call.onClientShapshot(lastSent++, TimeUtils.millis(), player.x, player.y,
