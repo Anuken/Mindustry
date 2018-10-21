@@ -3,21 +3,32 @@ package io.anuke.mindustry.world.blocks.storage;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.storage.StorageBlock.StorageEntity;
+import io.anuke.mindustry.world.modules.ItemModule;
 
 public class StorageGraph{
     private static IntSet closedSet = new IntSet();
     private static Queue<Tile> queue = new Queue<>();
     private static int lastID;
 
+    private final int id = lastID++;
     private ObjectSet<Tile> tiles = new ObjectSet<>();
+    private ItemModule items = new ItemModule();
+    private int capacity;
     private int cores;
-    private int id = lastID++;
 
     public void add(Tile tile){
-        if(tiles.add(tile) && tile.block() instanceof CoreBlock){
-            cores ++;
+        if(tiles.add(tile)){
+            if(tile.block() instanceof CoreBlock) cores ++;
+            capacity += tile.block().itemCapacity;
+
+            if(tile.entity.items != items){
+                items.addAll(tile.entity.items);
+            }
+
+            tile.entity.items = items;
         }
     }
 
@@ -27,6 +38,7 @@ public class StorageGraph{
         }
 
         cores = 0;
+        capacity = 0;
 
         for(Tile other : tile.entity.proximity()){
             if(other.block() instanceof StorageBlock && other.<StorageEntity>entity().graph == null){
@@ -61,10 +73,24 @@ public class StorageGraph{
         for(Tile tile : other.tiles){
             StorageEntity e = tile.entity();
             e.graph = this;
+            add(tile);
         }
+    }
 
-        tiles.addAll(other.tiles);
-        cores += other.cores;
+    public boolean accept(Item item){
+        return accept(item, 1) == 1;
+    }
+
+    public int accept(Item item, int amount){
+        if(hasCores()){
+            return Math.min(capacity - items.get(item), amount);
+        }else{
+            return Math.min(capacity - items.total(), amount);
+        }
+    }
+
+    public ObjectSet<Tile> getTiles(){
+        return tiles;
     }
 
     public boolean hasCores(){
@@ -73,5 +99,13 @@ public class StorageGraph{
 
     public int getID(){
         return id;
+    }
+
+    public int getCapacity(){
+        return capacity;
+    }
+
+    public ItemModule items(){
+        return items;
     }
 }

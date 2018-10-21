@@ -17,7 +17,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.modules.ConsumeModule;
-import io.anuke.mindustry.world.modules.InventoryModule;
+import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.mindustry.world.modules.PowerModule;
 import io.anuke.ucore.core.Effects;
@@ -47,7 +47,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public float timeScale = 1f, timeScaleDuration;
 
     public PowerModule power;
-    public InventoryModule items;
+    public ItemModule items;
     public LiquidModule liquids;
     public ConsumeModule cons;
 

@@ -22,7 +22,7 @@ import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
-import io.anuke.mindustry.world.modules.InventoryModule;
+import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
@@ -246,7 +246,7 @@ public class BuildBlock extends Block{
             }
         }
 
-        private float checkRequired(InventoryModule inventory, float amount, boolean remove){
+        private float checkRequired(ItemModule inventory, float amount, boolean remove){
             float maxProgress = amount;
 
             for(int i = 0; i < recipe.requirements.length; i++){

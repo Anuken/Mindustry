@@ -22,7 +22,7 @@ import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.mindustry.world.modules.InventoryModule;
+import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
@@ -211,7 +211,7 @@ public class UnitFactory extends Block{
         return new UnitFactoryEntity();
     }
 
-    protected boolean hasRequirements(InventoryModule inv, float fraction){
+    protected boolean hasRequirements(ItemModule inv, float fraction){
         for(ItemStack stack : consumes.items()){
             if(!inv.has(stack.item, (int) (fraction * stack.amount))){
                 return false;

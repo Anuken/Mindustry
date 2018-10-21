@@ -24,7 +24,7 @@ import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.modules.InventoryModule;
+import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
@@ -296,7 +296,7 @@ public class NetClient extends Module{
             if(tile != null && tile.entity != null){
                 tile.entity.items.read(input);
             }else{
-                new InventoryModule().read(input);
+                new ItemModule().read(input);
             }
         }
 

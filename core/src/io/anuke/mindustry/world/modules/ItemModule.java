@@ -7,9 +7,10 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
+
 import static io.anuke.mindustry.Vars.content;
 
-public class InventoryModule extends BlockModule{
+public class ItemModule extends BlockModule{
     private int[] items = new int[content.items().size];
     private int total;
 
@@ -83,6 +84,13 @@ public class InventoryModule extends BlockModule{
     public void add(Item item, int amount){
         items[item.id] += amount;
         total += amount;
+    }
+
+    public void addAll(ItemModule items){
+        for(int i = 0; i < items.items.length; i++){
+           this.items[i] += items.items[i];
+           total += items.items[i];
+        }
     }
 
     public void remove(Item item, int amount){

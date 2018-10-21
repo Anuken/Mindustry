@@ -1,10 +1,19 @@
 package io.anuke.mindustry.world.blocks.storage;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
+
+import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class StorageBlock extends Block{
 
@@ -38,6 +47,42 @@ public abstract class StorageBlock extends Block{
     }
 
     @Override
+    public void drawSelect(Tile tile){
+
+        StorageEntity entity = tile.entity();
+
+        if(entity.graph.getTiles().size > 1){
+
+            Shaders.outline.color.set(Palette.accent);
+            Graphics.beginShaders(Shaders.outline);
+
+            for(Tile other : entity.graph.getTiles()){
+                Fill.square(other.drawx(), other.drawy(), other.block().size * tilesize);
+            }
+
+            Draw.color(Color.CLEAR);
+            Graphics.endShaders();
+            Draw.color();
+        }
+    }
+
+    @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        StorageEntity entity = tile.entity();
+        return entity.graph.accept(item);
+    }
+
+    @Override
+    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+        StorageEntity entity = tile.entity();
+        if(acceptItem(item, tile, tile) && hasItems && (source == null || source.getTeam() == tile.getTeam())){
+            return Math.min(entity.graph.accept(item, amount), amount);
+        }else{
+            return 0;
+        }
+    }
+
+    @Override
     public TileEntity newEntity(){
         return new StorageEntity();
     }
@@ -47,7 +92,7 @@ public abstract class StorageBlock extends Block{
         Array<Object> arr = super.getDebugInfo(tile);
 
         StorageEntity entity = tile.entity();
-        arr.addAll("storage graph", entity.graph.getID());
+        arr.addAll("storage graph", entity.graph.getID(), "graph capacity", entity.graph.getCapacity(), "graph tiles", entity.graph.getTiles().size);
 
         return arr;
     }

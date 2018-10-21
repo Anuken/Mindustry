@@ -19,7 +19,6 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.maps.TutorialSector;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -161,25 +160,6 @@ public class CoreBlock extends StorageBlock{
         CoreEntity entity = tile.entity();
 
         return entity.solid;
-    }
-
-    @Override
-    public int acceptStack(Item item, int amount, Tile tile, Unit source){
-        if(acceptItem(item, tile, tile) && hasItems && (source == null || source.getTeam() == tile.getTeam())){
-            return Math.min(itemCapacity - tile.entity.items.get(item), amount);
-        }else{
-            return 0;
-        }
-    }
-
-    @Override
-    public int getMaximumAccepted(Tile tile, Item item){
-        return itemCapacity;
-    }
-
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        return tile.entity.items.get(item) < itemCapacity && item.type == ItemType.material;
     }
 
     @Override
