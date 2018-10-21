@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.storage;
 
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
@@ -15,6 +16,42 @@ public abstract class StorageBlock extends Block{
     @Override
     public boolean outputsItems(){
         return false;
+    }
+
+    @Override
+    public void onProximityUpdate(Tile tile){
+        super.onProximityUpdate(tile);
+        StorageEntity entity = tile.entity();
+        entity.graph.add(tile);
+
+        for(Tile prox : tile.entity.proximity()){
+            if(prox.block() instanceof StorageBlock){
+                StorageEntity other = prox.entity();
+                entity.graph.merge(other.graph);
+            }
+        }
+    }
+
+    @Override
+    public void removed(Tile tile){
+        super.removed(tile);
+        StorageEntity entity = tile.entity();
+        entity.graph.remove(tile);
+    }
+
+    @Override
+    public TileEntity newEntity(){
+        return new StorageEntity();
+    }
+
+    @Override
+    public Array<Object> getDebugInfo(Tile tile){
+        Array<Object> arr = super.getDebugInfo(tile);
+
+        StorageEntity entity = tile.entity();
+        arr.addAll("storage graph", entity.graph.getID());
+
+        return arr;
     }
 
     /**
@@ -47,5 +84,9 @@ public abstract class StorageBlock extends Block{
         }else{
             return entity.items.has(item);
         }
+    }
+
+    public class StorageEntity extends TileEntity{
+        public StorageGraph graph = new StorageGraph();
     }
 }

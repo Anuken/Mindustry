@@ -242,7 +242,7 @@ public class CoreBlock extends StorageBlock{
         return new CoreEntity();
     }
 
-    public class CoreEntity extends TileEntity implements SpawnerTrait{
+    public class CoreEntity extends StorageEntity implements SpawnerTrait{
         public Unit currentUnit;
         int droneID = -1;
         boolean solid = true;

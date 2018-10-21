@@ -322,9 +322,9 @@ public class BlockFx extends FxList implements ContentList{
         });
 
         shieldBreak = new Effect(40, e -> {
-            Draw.color(Color.WHITE);
+            Draw.color(Palette.accent);
             Lines.stroke(3f * e.fout());
-            Lines.poly(e.x, e.y, 6, e.rotation, 90);
+            Lines.poly(e.x, e.y, 6, e.rotation + e.fin(), 90);
             Draw.reset();
         });
     }

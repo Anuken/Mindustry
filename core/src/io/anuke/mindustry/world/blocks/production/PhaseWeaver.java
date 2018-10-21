@@ -45,6 +45,7 @@ public class PhaseWeaver extends PowerSmelter{
         Shaders.build.region = weaveRegion;
         Shaders.build.progress = progress;
         Shaders.build.color.set(Palette.accent);
+        Shaders.build.color.a = entity.heat;
         Shaders.build.time = -entity.time / 10f;
 
         Graphics.shader(Shaders.build, false);
@@ -53,6 +54,7 @@ public class PhaseWeaver extends PowerSmelter{
         Graphics.shader();
 
         Draw.color(Palette.accent);
+        Draw.alpha(entity.heat);
 
         Lines.lineAngleCenter(
                 tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
