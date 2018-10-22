@@ -11,33 +11,70 @@ import io.anuke.mindustry.world.modules.ItemModule;
 public class StorageGraph{
     private static IntSet closedSet = new IntSet();
     private static Queue<Tile> queue = new Queue<>();
+    private static ObjectSet<ItemModule> itemSet = new ObjectSet<>();
     private static int lastID;
 
     private final int id = lastID++;
     private ObjectSet<Tile> tiles = new ObjectSet<>();
     private ItemModule items = new ItemModule();
     private int capacity;
-    private int cores;
+
+    public void set(Tile tile){
+        items.addAll(tile.entity.items);
+        items.setID(tile.entity.items.getID());
+
+        add(tile);
+    }
 
     public void add(Tile tile){
-        if(tiles.add(tile)){
-            if(tile.block() instanceof CoreBlock) cores ++;
-            capacity += tile.block().itemCapacity;
 
-            if(tile.entity.items != items){
-                items.addAll(tile.entity.items);
-            }
+        if(!tiles.add(tile)) return;
 
-            tile.entity.items = items;
+        StorageEntity e = tile.entity();
+        e.graph = this;
+
+        capacity += tile.block().itemCapacity;
+
+        if(tile.entity.items != null && tile.entity.items.getID() != items.getID()){
+            items.addAll(tile.entity.items);
         }
+
+        tile.entity.items = items;
     }
 
     public void remove(Tile tile){
+        if(!tiles.contains(tile)) return;
+
         for(Tile other : tiles){
-            other.<StorageEntity>entity().graph = null;
+            if(other == tile) continue;
+
+            StorageEntity entity = other.entity();
+            entity.graph = null;
+            entity.items = new ItemModule();
+
+            float fraction = (float)other.block().itemCapacity / capacity;
+            items.forEach((item, amount) -> {
+                int added = (int)(fraction * amount);
+                entity.items.add(item, added);
+                items.remove(item, added);
+            });
         }
 
-        cores = 0;
+        //handle remaining items that didn't get added
+        Item taken;
+        while((taken = items.take()) != null){
+            for(Tile other : tiles){
+                if(other == tile) continue;
+
+                //insert item into first found block
+                if(other.entity.items.get(taken) < other.block().itemCapacity){
+                    other.entity.items.add(taken, 1);
+                    break;
+                }
+            }
+        }
+
+        items.clear();
         capacity = 0;
 
         for(Tile other : tile.entity.proximity()){
@@ -53,11 +90,16 @@ public class StorageGraph{
         queue.clear();
         queue.addLast(tile);
         closedSet.clear();
+        itemSet.clear();
+
         while(queue.size > 0){
             Tile child = queue.removeFirst();
             StorageEntity entity = child.entity();
             entity.graph = this;
+
+            if(!itemSet.add(child.entity.items)) child.entity.items = null;
             add(child);
+
             for(Tile next : child.entity.proximity()){
                 if(next != base && next.block() instanceof StorageBlock && next.<StorageEntity>entity().graph == null && !closedSet.contains(next.packedPosition())){
                     queue.addLast(next);
@@ -70,9 +112,14 @@ public class StorageGraph{
     public void merge(StorageGraph other){
         if(this == other || other == null) return;
 
+        itemSet.clear();
         for(Tile tile : other.tiles){
-            StorageEntity e = tile.entity();
-            e.graph = this;
+            if(!itemSet.add(tile.entity.items)){
+                tile.entity.items = null;
+            }
+        }
+
+        for(Tile tile : other.tiles){
             add(tile);
         }
     }
@@ -82,19 +129,11 @@ public class StorageGraph{
     }
 
     public int accept(Item item, int amount){
-        if(hasCores()){
-            return Math.min(capacity - items.get(item), amount);
-        }else{
-            return Math.min(capacity - items.total(), amount);
-        }
+        return Math.min(capacity - items.get(item), amount);
     }
 
     public ObjectSet<Tile> getTiles(){
         return tiles;
-    }
-
-    public boolean hasCores(){
-        return cores > 0;
     }
 
     public int getID(){
@@ -108,4 +147,5 @@ public class StorageGraph{
     public ItemModule items(){
         return items;
     }
+
 }

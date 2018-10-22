@@ -7,6 +7,7 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Graphics;
@@ -23,6 +24,12 @@ public abstract class StorageBlock extends Block{
     }
 
     @Override
+    public void setBars(){
+        super.setBars();
+        bars.remove(BarType.inventory);
+    }
+
+    @Override
     public boolean outputsItems(){
         return false;
     }
@@ -30,7 +37,7 @@ public abstract class StorageBlock extends Block{
     @Override
     public void onProximityAdded(Tile tile){
         StorageEntity entity = tile.entity();
-        entity.graph.add(tile);
+        entity.graph.set(tile);
 
         for(Tile prox : tile.entity.proximity()){
             if(prox.block() instanceof StorageBlock){
@@ -92,7 +99,10 @@ public abstract class StorageBlock extends Block{
         Array<Object> arr = super.getDebugInfo(tile);
 
         StorageEntity entity = tile.entity();
-        arr.addAll("storage graph", entity.graph.getID(), "graph capacity", entity.graph.getCapacity(), "graph tiles", entity.graph.getTiles().size);
+        arr.addAll("storage graph", entity.graph.getID(),
+            "graph capacity", entity.graph.getCapacity(),
+            "graph tiles", entity.graph.getTiles().size,
+            "graph item ID", entity.graph.items().getID());
 
         return arr;
     }

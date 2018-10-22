@@ -11,8 +11,11 @@ import java.util.Arrays;
 import static io.anuke.mindustry.Vars.content;
 
 public class ItemModule extends BlockModule{
+    private static int lastID;
+
     private int[] items = new int[content.items().size];
     private int total;
+    private int id = lastID ++;
 
     public void forEach(ItemConsumer cons){
         for(int i = 0; i < items.length; i++){
@@ -111,6 +114,8 @@ public class ItemModule extends BlockModule{
 
     @Override
     public void write(DataOutput stream) throws IOException{
+        stream.writeInt(id); //unique ID
+
         byte amount = 0;
         for(int item : items){
             if(item > 0) amount++;
@@ -128,6 +133,7 @@ public class ItemModule extends BlockModule{
 
     @Override
     public void read(DataInput stream) throws IOException{
+        id = stream.readInt();
         byte count = stream.readByte();
         total = 0;
 
@@ -137,6 +143,14 @@ public class ItemModule extends BlockModule{
             items[content.item(itemid).id] = itemamount;
             total += itemamount;
         }
+    }
+
+    public int getID(){
+        return id;
+    }
+
+    public void setID(int id){
+        this.id = id;
     }
 
     public interface ItemConsumer{
