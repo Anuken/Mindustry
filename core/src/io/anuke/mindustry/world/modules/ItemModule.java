@@ -7,11 +7,15 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
+
 import static io.anuke.mindustry.Vars.content;
 
-public class InventoryModule extends BlockModule{
+public class ItemModule extends BlockModule{
+    private static int lastID;
+
     private int[] items = new int[content.items().size];
     private int total;
+    private int id = lastID ++;
 
     public void forEach(ItemConsumer cons){
         for(int i = 0; i < items.length; i++){
@@ -85,6 +89,13 @@ public class InventoryModule extends BlockModule{
         total += amount;
     }
 
+    public void addAll(ItemModule items){
+        for(int i = 0; i < items.items.length; i++){
+           this.items[i] += items.items[i];
+           total += items.items[i];
+        }
+    }
+
     public void remove(Item item, int amount){
         amount = Math.min(amount, items[item.id]);
 
@@ -103,6 +114,8 @@ public class InventoryModule extends BlockModule{
 
     @Override
     public void write(DataOutput stream) throws IOException{
+        stream.writeInt(id); //unique ID
+
         byte amount = 0;
         for(int item : items){
             if(item > 0) amount++;
@@ -120,6 +133,7 @@ public class InventoryModule extends BlockModule{
 
     @Override
     public void read(DataInput stream) throws IOException{
+        id = stream.readInt();
         byte count = stream.readByte();
         total = 0;
 
@@ -129,6 +143,14 @@ public class InventoryModule extends BlockModule{
             items[content.item(itemid).id] = itemamount;
             total += itemamount;
         }
+    }
+
+    public int getID(){
+        return id;
+    }
+
+    public void setID(int id){
+        this.id = id;
     }
 
     public interface ItemConsumer{

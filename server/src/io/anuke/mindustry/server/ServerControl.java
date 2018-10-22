@@ -97,7 +97,7 @@ public class ServerControl extends Module{
             world.sectors.save();
             gameOvers = 0;
             inExtraRound = true;
-            Settings.putInt("sector_x", world.getSector().x + world.getSector().width);
+            Settings.putInt("sector_x", world.getSector().x + 1);
             Settings.save();
 
             Call.onInfoMessage("[accent]Sector conquered![]\n" + roundExtraTime + " seconds until deployment in next sector.");

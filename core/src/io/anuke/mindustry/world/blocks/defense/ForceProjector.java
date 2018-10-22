@@ -7,9 +7,11 @@ import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.AbsorbTrait;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
+import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Effects;
@@ -69,6 +71,13 @@ public class ForceProjector extends Block {
     }
 
     @Override
+    public void setBars(){
+        super.setBars();
+
+        bars.add(new BlockBar(BarType.heat, true, tile -> tile.<ForceEntity>entity().buildup / breakage));
+    }
+
+    @Override
     public void update(Tile tile){
         ForceEntity entity = tile.entity();
         boolean cheat = tile.isEnemyCheat();
@@ -91,7 +100,7 @@ public class ForceProjector extends Block {
         }
 
         if(!entity.cons.valid() && !cheat){
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.1f);
+            entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.15f);
             if(entity.warmup <= 0.09f){
                 entity.broken = true;
             }
@@ -136,6 +145,10 @@ public class ForceProjector extends Block {
                     float hit = trait.getShieldDamage()*powerDamage;
                     entity.hit = 1f;
                     entity.power.amount -= Math.min(hit, entity.power.amount);
+
+                    if(entity.power.amount <= 0.0001f){
+                        entity.buildup += trait.getShieldDamage() * entity.warmup*2f;
+                    }
                     entity.buildup += trait.getShieldDamage() * entity.warmup;
                 }
             });

@@ -96,12 +96,6 @@ public class FogRenderer implements Disposable{
         }));
     }
 
-    public void setLoadingOffset(int x, int y){
-        isOffseted = true;
-        offsettedX = x;
-        offsettedY = y;
-    }
-
     public void writeFog(){
         if(buffer == null) return;
 
