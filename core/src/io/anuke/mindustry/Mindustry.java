@@ -10,16 +10,16 @@ import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Mindustry extends ModuleCore{
+public class Mindustry extends ModuleCore {
 
     @Override
-    public void init(){
+    public void init() {
         Timers.mark();
 
+        BundleLoader.load();
         Vars.init();
 
         Log.setUseColors(false);
-        BundleLoader.load();
         content.load();
 
         module(logic = new Logic());
@@ -32,13 +32,13 @@ public class Mindustry extends ModuleCore{
     }
 
     @Override
-    public void postInit(){
+    public void postInit() {
         Log.info("Time to load [total]: {0}", Timers.elapsed());
         Events.fire(new GameLoadEvent());
     }
 
     @Override
-    public void render(){
+    public void render() {
         threads.handleBeginRender();
         super.render();
         threads.handleEndRender();

@@ -28,7 +28,7 @@ import java.util.Map;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class SettingsMenuDialog extends SettingsDialog{
+public class SettingsMenuDialog extends SettingsDialog {
     public SettingsTable graphics;
     public SettingsTable game;
     public SettingsTable sound;
@@ -36,24 +36,26 @@ public class SettingsMenuDialog extends SettingsDialog{
     private Table prefs;
     private Table menu;
     private boolean wasPaused;
+    private static boolean scaleChanged = false;
+    private static int[] scaleValues = new int[]{-1, -1, -1};
 
-    public SettingsMenuDialog(){
+    public SettingsMenuDialog() {
         setStyle(Core.skin.get("dialog", WindowStyle.class));
 
         hidden(() -> {
-            if(!state.is(State.menu)){
-                if(!wasPaused || Net.active())
+            if (!state.is(State.menu)) {
+                if (!wasPaused || Net.active())
                     state.set(State.playing);
             }
         });
 
         shown(() -> {
-            if(!state.is(State.menu)){
+            if (!state.is(State.menu)) {
                 wasPaused = state.is(State.paused);
-                if(ui.paused.getScene() != null){
+                if (ui.paused.getScene() != null) {
                     wasPaused = ui.paused.wasPaused;
                 }
-                if(!Net.active()) state.set(State.paused);
+                if (!Net.active()) state.set(State.paused);
                 ui.paused.hide();
             }
         });
@@ -89,7 +91,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         menu.addButton("$text.settings.graphics", () -> visible(1));
         menu.row();
         menu.addButton("$text.settings.sound", () -> visible(2));
-        if(!Vars.mobile){
+        if (!Vars.mobile) {
             menu.row();
             menu.addButton("$text.settings.controls", ui.controls::show);
         }
@@ -100,11 +102,11 @@ public class SettingsMenuDialog extends SettingsDialog{
         prefs.add(menu);
 
         ScrollPane pane = new ScrollPane(prefs, "clear");
-        pane.addCaptureListener(new InputListener(){
+        pane.addCaptureListener(new InputListener() {
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 Element actor = pane.hit(x, y, true);
-                if(actor instanceof Slider){
+                if (actor instanceof Slider) {
                     pane.setFlickScroll(false);
                     return true;
                 }
@@ -113,7 +115,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
 
             @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button){
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 pane.setFlickScroll(true);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -130,20 +132,20 @@ public class SettingsMenuDialog extends SettingsDialog{
         addSettings();
     }
 
-    void addSettings(){
+    void addSettings() {
         sound.volumePrefs();
 
         game.screenshakePref();
         //game.checkPref("smoothcam", true);
         game.checkPref("effects", true);
-        if(mobile){
+        if (mobile) {
             game.checkPref("autotarget", true);
         }
         //game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
         game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Bundles.format("setting.seconds", i));
-        game.pref(new Setting(){
+        game.pref(new Setting() {
             @Override
-            public void add(SettingsTable table){
+            public void add(SettingsTable table) {
                 table.addButton("$text.settings.cleardata", () -> {
                     FloatingDialog dialog = new FloatingDialog("$text.settings.cleardata");
                     dialog.setFillParent(false);
@@ -166,8 +168,8 @@ public class SettingsMenuDialog extends SettingsDialog{
                     dialog.content().addButton("$text.settings.clearall", "clear", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clearall.confirm", () -> {
                             Map<String, Object> map = new HashMap<>();
-                            for(String value : Settings.prefs().get().keySet()){
-                                if(value.contains("usid") || value.contains("uuid")){
+                            for (String value : Settings.prefs().get().keySet()) {
+                                if (value.contains("usid") || value.contains("uuid")) {
                                     map.put(value, Settings.prefs().getString(value));
                                 }
                             }
@@ -175,9 +177,9 @@ public class SettingsMenuDialog extends SettingsDialog{
                             Settings.prefs().put(map);
                             Settings.save();
 
-                            if(!gwt){
+                            if (!gwt) {
                                 Settings.prefs().clear();
-                                for(FileHandle file : dataDirectory.list()){
+                                for (FileHandle file : dataDirectory.list()) {
                                     file.deleteDirectory();
                                 }
                             }
@@ -193,30 +195,30 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        if(!gwt){
+        if (!gwt) {
             graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Bundles.get("setting.fpscap.none") : Bundles.format("setting.fpscap.text", s)));
         }
 
-        if(!gwt){
+        if (!gwt) {
             graphics.checkPref("multithread", mobile, threads::setEnabled);
 
-            if(Settings.getBool("multithread")){
+            if (Settings.getBool("multithread")) {
                 threads.setEnabled(true);
             }
         }
 
-        if(!mobile && !gwt){
+        if (!mobile && !gwt) {
             graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
-                if(b){
+                if (b) {
                     Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-                }else{
+                } else {
                     Gdx.graphics.setWindowedMode(600, 480);
                 }
             });
 
             Gdx.graphics.setVSync(Settings.getBool("vsync"));
-            if(Settings.getBool("fullscreen")){
+            if (Settings.getBool("fullscreen")) {
                 Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
             }
         }
@@ -224,25 +226,46 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("fps", false);
         graphics.checkPref("lasers", true);
         graphics.checkPref("minimap", !mobile); //minimap is disabled by default on mobile devices
+        if (!gwt) {
+            //int[] currentScales = {Settings.getInt("fontScale"), Settings.getInt("baseCameraScale"), Settings.getInt("UIScale")};
+            graphics.sliderPref("fontScale", 10, 4, 22, 2, s -> {
+                if (scaleValues[0] == -1) scaleValues[0] = s;
+                else if (scaleValues[0] != s) scaleChanged = true;
+                return String.valueOf(s / 10.0f);
+            });
+            graphics.sliderPref("baseCameraScale", 4, 1, 6, 1, s -> {
+                if (scaleValues[1] == -1) scaleValues[1] = s;
+                else if (scaleValues[1] != s) scaleChanged = true;
+                return String.valueOf(s);
+            });
+            graphics.sliderPref("UIScale", 10, 4, 22, 2, s -> {
+                if (scaleValues[2] == -1) scaleValues[2] = s;
+                else if (scaleValues[2] != s) scaleChanged = true;
+                return String.valueOf(s / 10.0f);
+            });
+        }
     }
 
-    private void back(){
+    private void back() {
         prefs.clearChildren();
         prefs.add(menu);
     }
 
-    private void visible(int index){
+    private void visible(int index) {
         prefs.clearChildren();
         Table table = Mathf.select(index, game, graphics, sound);
         prefs.add(table);
     }
 
     @Override
-    public void addCloseButton(){
-        buttons().addImageTextButton("$text.menu", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+    public void addCloseButton() {
+        buttons().addImageTextButton("$text.menu", "icon-arrow-left", 30f, () -> {
+            hide();
+            if (scaleChanged) ui.showInfo("$text.graphics.restart");
+        }).size(230f, 64f);
 
         keyDown(key -> {
-            if(key == Keys.ESCAPE || key == Keys.BACK)
+            if (key == Keys.ESCAPE || key == Keys.BACK)
                 hide();
         });
     }

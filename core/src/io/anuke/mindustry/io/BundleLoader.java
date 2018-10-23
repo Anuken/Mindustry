@@ -7,30 +7,38 @@ import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Log;
 
 import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.headless;
 
-public class BundleLoader{
+public class BundleLoader {
 
-    public static void load(){
+    public static void load() {
         Settings.defaults("locale", "default");
         Settings.load(Vars.appName, headless ? "io.anuke.mindustry.server" : "io.anuke.mindustry");
+        loadGraphicSetting();
         loadBundle();
     }
 
-    private static Locale getLocale(){
+    private static void loadGraphicSetting() {
+        Unit.dp.product = Settings.prefs().getInteger("UIScale") / 10.0f;
+        Vars.fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f) * Settings.prefs().getInteger("fontScale") / 10.0f;
+        Vars.baseCameraScale = Math.round(Unit.dp.scl(Settings.prefs().getInteger("baseCameraScale")));
+    }
+
+    private static Locale getLocale() {
         String loc = Settings.getString("locale");
-        if(loc.equals("default")){
+        if (loc.equals("default")) {
             return Locale.getDefault();
-        }else{
+        } else {
             Locale lastLocale;
-            if(loc.contains("_")){
+            if (loc.contains("_")) {
                 String[] split = loc.split("_");
                 lastLocale = new Locale(split[0], split[1]);
-            }else{
+            } else {
                 lastLocale = new Locale(loc);
             }
 
@@ -38,9 +46,9 @@ public class BundleLoader{
         }
     }
 
-    private static void loadBundle(){
+    private static void loadBundle() {
         I18NBundle.setExceptionOnMissingKey(false);
-        try{
+        try {
             //try loading external bundle
             FileHandle handle = Gdx.files.local("bundle");
 
@@ -48,17 +56,17 @@ public class BundleLoader{
             Core.bundle = I18NBundle.createBundle(handle, locale);
 
             Log.info("NOTE: external translation bundle has been loaded.");
-            if(!headless){
+            if (!headless) {
                 Timers.run(10f, () -> Vars.ui.showInfo("Note: You have successfully loaded an external translation bundle."));
             }
-        }catch(Throwable e){
+        } catch (Throwable e) {
             //no external bundle found
 
             FileHandle handle = Gdx.files.internal("bundles/bundle");
 
             Locale locale = getLocale();
             Locale.setDefault(locale);
-            if(!headless) Log.info("Got locale: {0}", locale);
+            if (!headless) Log.info("Got locale: {0}", locale);
             Core.bundle = I18NBundle.createBundle(handle, locale);
         }
 

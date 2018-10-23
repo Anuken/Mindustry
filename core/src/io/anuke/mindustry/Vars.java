@@ -21,7 +21,6 @@ import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Translator;
 
@@ -179,7 +178,7 @@ public class Vars{
             saveDirectory = dataDirectory.child("saves/");
         }
 
-        fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f);
-        baseCameraScale = Math.round(Unit.dp.scl(4));
+        //fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f);
+        //baseCameraScale = Math.round(Unit.dp.scl(2));
     }
 }
