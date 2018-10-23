@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
 
 import static io.anuke.mindustry.Vars.threads;
 
@@ -39,37 +38,41 @@ public class PowerGraph{
         lastFrameUpdated = threads.getFrameID();
 
         float totalInput = 0f;
-
         for(Tile producer : producers){
-            totalInput += producer.entity.power.amount;
+            float accumulator = producer.entity.power.amount;
+            if (accumulator > 0.0001f) {
+                totalInput += producer.entity.power.amount;
+            }
         }
 
+        float maxOutput = 0f;
+        for(Tile consumer : consumers){
+            float canHold = consumer.block().powerCapacity - consumer.entity.power.amount;
+            if (canHold > 0.0001f) {
+                maxOutput += canHold;
+            }
+        }
+
+        if (totalInput == 0 || maxOutput == 0) {
+            return;
+        }
+
+        float inputUsed = Math.min(maxOutput / totalInput, 1f);
         for(Tile producer : producers){
             float accumulator = producer.entity.power.amount;
 
-            if(accumulator <= 0.0001f) continue;
-
-            float toEach = accumulator / consumers.size;
-            float outputs = 0f;
-
-            for(Tile tile : consumers){
-                outputs += Math.min(tile.block().powerCapacity - tile.entity.power.amount, toEach) / toEach;
+            if (accumulator > 0.0001f) {
+                producer.entity.power.amount -= accumulator * inputUsed;
             }
+        }
 
-            float finalEach = toEach / outputs * Timers.delta();
-            float buffer = 0f;
+        float outputSatisfied = Math.min(totalInput / maxOutput, 1f);
+        for(Tile consumer : consumers){
+            float canHold = consumer.block().powerCapacity - consumer.entity.power.amount;
 
-            if(Float.isNaN(finalEach) || Float.isInfinite(finalEach)){
-                continue;
+            if (canHold > 0.0001f) {
+                consumer.entity.power.amount += canHold * outputSatisfied;
             }
-
-            for(Tile tile : consumers){
-                float used = Math.min(tile.block().powerCapacity - tile.entity.power.amount, finalEach) * accumulator / totalInput;
-                buffer += used;
-                tile.entity.power.amount += used;
-            }
-
-            producer.entity.power.amount -= buffer;
         }
     }
 
