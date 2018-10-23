@@ -39,40 +39,26 @@ public class PowerGraph{
 
         float totalInput = 0f;
         for(Tile producer : producers){
-            float accumulator = producer.entity.power.amount;
-            if (accumulator > 0.0001f) {
-                totalInput += producer.entity.power.amount;
-            }
+            totalInput += producer.entity.power.amount;
         }
 
         float maxOutput = 0f;
         for(Tile consumer : consumers){
-            float canHold = consumer.block().powerCapacity - consumer.entity.power.amount;
-            if (canHold > 0.0001f) {
-                maxOutput += canHold;
-            }
+            maxOutput += consumer.block().powerCapacity - consumer.entity.power.amount;
         }
 
-        if (totalInput == 0 || maxOutput == 0) {
+        if (totalInput <= 0.0001f || maxOutput <= 0.0001f) {
             return;
         }
 
         float inputUsed = Math.min(maxOutput / totalInput, 1f);
         for(Tile producer : producers){
-            float accumulator = producer.entity.power.amount;
-
-            if (accumulator > 0.0001f) {
-                producer.entity.power.amount -= accumulator * inputUsed;
-            }
+            producer.entity.power.amount -= producer.entity.power.amount * inputUsed;
         }
 
         float outputSatisfied = Math.min(totalInput / maxOutput, 1f);
         for(Tile consumer : consumers){
-            float canHold = consumer.block().powerCapacity - consumer.entity.power.amount;
-
-            if (canHold > 0.0001f) {
-                consumer.entity.power.amount += canHold * outputSatisfied;
-            }
+            consumer.entity.power.amount += (consumer.block().powerCapacity - consumer.entity.power.amount) * outputSatisfied;
         }
     }
 
