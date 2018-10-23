@@ -58,7 +58,7 @@ public class NetServer extends Module{
     private final static Vector2 vector = new Vector2();
     private final static Rectangle viewport = new Rectangle();
     private final static Array<Entity> returnArray = new Array<>();
-    /**If a play goes away of their server-side coordinates by this distance, they get teleported back.*/
+    /**If a player goes away of their server-side coordinates by this distance, they get teleported back.*/
     private final static float correctDist = 16f;
 
     public final Administration admins = new Administration();
