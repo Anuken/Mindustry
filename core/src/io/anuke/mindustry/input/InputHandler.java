@@ -9,7 +9,6 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.gen.Call;
@@ -277,7 +276,7 @@ public abstract class InputHandler extends InputAdapter{
 
     int tileX(float cursorX){
         Vector2 vec = Graphics.world(cursorX, 0);
-        if(isPlacing()){
+        if(selectedBlock()){
             vec.sub(recipe.result.offset(), recipe.result.offset());
         }
         return world.toTile(vec.x);
@@ -285,10 +284,14 @@ public abstract class InputHandler extends InputAdapter{
 
     int tileY(float cursorY){
         Vector2 vec = Graphics.world(0, cursorY);
-        if(isPlacing()){
+        if(selectedBlock()){
             vec.sub(recipe.result.offset(), recipe.result.offset());
         }
         return world.toTile(vec.y);
+    }
+
+    public boolean selectedBlock(){
+        return isPlacing();
     }
 
     public boolean isPlacing(){
