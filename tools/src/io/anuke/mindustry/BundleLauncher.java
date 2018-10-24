@@ -60,7 +60,7 @@ public class BundleLauncher {
                 Log.info("Writing bundle to {0}", output);
                 StringBuilder result = new StringBuilder();
                 for(ObjectMap.Entry<String, String> e : other.entries()){
-                    result.append(e.toString().replace("\\", "\\\\").replace("\n", "\\n"));
+                    result.append((e.key + " = " + e.value).replace("\\", "\\\\").replace("\n", "\\n"));
                     result.append("\n");
                 }
                 Files.write(child, result.toString().getBytes("UTF-8"));
