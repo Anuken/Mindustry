@@ -179,7 +179,7 @@ public class Vars{
             saveDirectory = dataDirectory.child("saves/");
         }
 
-        fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f);
-        baseCameraScale = Math.round(Unit.dp.scl(4));
+        //fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f);
+        //baseCameraScale = Math.round(Unit.dp.scl(4));
     }
 }

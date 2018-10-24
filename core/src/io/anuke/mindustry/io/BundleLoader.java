@@ -7,6 +7,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Log;
 
 import java.util.Locale;
@@ -18,7 +19,14 @@ public class BundleLoader{
     public static void load(){
         Settings.defaults("locale", "default");
         Settings.load(Vars.appName, headless ? "io.anuke.mindustry.server" : "io.anuke.mindustry");
+        loadGraphicSetting();
         loadBundle();
+    }
+
+    private static void loadGraphicSetting(){
+        Unit.dp.product = Settings.prefs().getInteger("UIScale") / 10.0f;
+        Vars.fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f) * Settings.prefs().getInteger("fontScale") / 10.0f;
+        Vars.baseCameraScale = Math.round(Unit.dp.scl(Settings.prefs().getInteger("baseCameraScale")));
     }
 
     private static Locale getLocale(){

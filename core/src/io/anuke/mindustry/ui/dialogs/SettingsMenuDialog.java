@@ -36,6 +36,8 @@ public class SettingsMenuDialog extends SettingsDialog{
     private Table prefs;
     private Table menu;
     private boolean wasPaused;
+    private static boolean scaleChanged = false;
+    private static int[] scaleValues = new int[]{-1, -1, -1};
 
     public SettingsMenuDialog(){
         setStyle(Core.skin.get("dialog", WindowStyle.class));
@@ -224,6 +226,24 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("fps", false);
         graphics.checkPref("lasers", true);
         graphics.checkPref("minimap", !mobile); //minimap is disabled by default on mobile devices
+        if(!gwt){
+            //int[] currentScales = {Settings.getInt("fontScale"), Settings.getInt("baseCameraScale"), Settings.getInt("UIScale")};
+            graphics.sliderPref("fontScale", 10, 4, 22, 2, s -> {
+                if(scaleValues[0] == -1) scaleValues[0] = s;
+                else if(scaleValues[0] != s) scaleChanged = true;
+                return String.valueOf(s / 10.0f);
+            });
+            graphics.sliderPref("baseCameraScale", 4, 1, 6, 1, s -> {
+                if(scaleValues[1] == -1) scaleValues[1] = s;
+                else if(scaleValues[1] != s) scaleChanged = true;
+                return String.valueOf(s);
+            });
+            graphics.sliderPref("UIScale", 10, 4, 22, 2, s -> {
+                if(scaleValues[2] == -1) scaleValues[2] = s;
+                else if(scaleValues[2] != s) scaleChanged = true;
+                return String.valueOf(s / 10.0f);
+            });
+        }
     }
 
     private void back(){
@@ -239,7 +259,11 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     @Override
     public void addCloseButton(){
-        buttons().addImageTextButton("$text.menu", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+        buttons().addImageTextButton("$text.menu", "icon-arrow-left", 30f, () -> {
+            hide();
+            if(scaleChanged)
+                ui.showInfo("$text.graphics.restart");
+        }).size(230f, 64f);
 
         keyDown(key -> {
             if(key == Keys.ESCAPE || key == Keys.BACK)
