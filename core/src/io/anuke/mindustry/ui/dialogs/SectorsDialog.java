@@ -14,10 +14,8 @@ import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.scene.utils.ScissorStack;
-import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.ui;
 import static io.anuke.mindustry.Vars.world;
 
 public class SectorsDialog extends FloatingDialog{
@@ -25,7 +23,12 @@ public class SectorsDialog extends FloatingDialog{
     private Sector selected;
 
     public SectorsDialog(){
-        super("$text.sectors");
+        super("");
+
+        margin(0);
+        getTitleTable().clear();
+        clear();
+        add(content()).grow();
 
         shown(this::setup);
     }
@@ -35,8 +38,9 @@ public class SectorsDialog extends FloatingDialog{
         content().clear();
         buttons().clear();
 
-        addCloseButton();
+       // addCloseButton();
 
+        /*
         content().label(() -> Bundles.format("text.sector", selected == null ? Bundles.get("text.none") :
         (selected.x + ", " + selected.y + (!selected.complete && selected.saveID != -1 ? " " + Bundles.get("text.sector.locked") : ""))
                 + (selected.saveID == -1 ? " " + Bundles.get("text.sector.unexplored") :
@@ -44,9 +48,10 @@ public class SectorsDialog extends FloatingDialog{
         content().row();
         content().label(() -> Bundles.format("text.mission.main", selected == null || selected.completedMissions >= selected.missions.size
         ? Bundles.get("text.none") : selected.getDominantMission().menuDisplayString()));
-        content().row();
+        content().row();*/
         content().add(new SectorView()).grow();
-        content().row();
+        //content().row();
+        /*
 
         buttons().addImageTextButton("$text.sector.abandon", "icon-cancel",  16*2, () ->
                 ui.showConfirm("$text.confirm", "$text.sector.abandon.confirm", () -> world.sectors.abandonSector(selected)))
@@ -58,7 +63,7 @@ public class SectorsDialog extends FloatingDialog{
             hide();
             ui.loadLogic(() -> world.sectors.playSector(selected));
         }).disabled(b -> selected == null)
-            .fillX().height(64f).colspan(2).update(t -> t.setText(selected != null && selected.hasSave() ? "$text.sector.resume" : "$text.sector.deploy"));
+            .fillX().height(64f).colspan(2).update(t -> t.setText(selected != null && selected.hasSave() ? "$text.sector.resume" : "$text.sector.deploy"));*/
     }
 
     void selectSector(Sector sector){
