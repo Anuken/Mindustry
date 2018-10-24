@@ -1,4 +1,18 @@
-include 'desktop', 'html', 'core', 'android', 'kryonet', 'server', 'ios', 'annotations', 'tools', 'tests'
+include 'desktop', 'html', 'core', 'kryonet', 'server', 'ios', 'annotations', 'tools', 'tests'
+
+Properties properties = new Properties()
+
+if(new File(settingsDir, 'local.properties').exists()){
+    properties.load(new File(settingsDir, 'local.properties').newDataInputStream())
+
+    if(properties.containsKey("sdk.dir")){
+        include 'android'
+    }else{
+        println("No android SDK dir found Not loading Android module.")
+    }
+}else{
+    println("No local.properties found. Not loading Android module.")
+}
 
 if(System.properties["release"] == null || System.properties["release"] == "false"){
     if (new File(settingsDir, '../uCore').exists()) {
