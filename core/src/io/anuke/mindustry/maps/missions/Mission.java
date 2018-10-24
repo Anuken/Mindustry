@@ -79,7 +79,7 @@ public abstract class Mission{
 
     public void onComplete(){
         if(showComplete && !headless){
-            ui.hudfrag.showText("[LIGHT_GRAY]"+menuDisplayString() + ":\n" + Bundles.get("text.mission.complete"));
+            threads.runGraphics(() -> ui.hudfrag.showText("[LIGHT_GRAY]"+menuDisplayString() + ":\n" + Bundles.get("text.mission.complete")));
         }
     }
 

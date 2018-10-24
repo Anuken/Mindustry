@@ -29,10 +29,6 @@ public class NetworkIO{
     public static void writeWorld(Player player, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
-
-            stream.writeFloat(Timers.time()); //timer time
-            stream.writeLong(TimeUtils.millis()); //timestamp
-
             //--GENERAL STATE--
             stream.writeByte(state.mode.ordinal()); //gamemode
             stream.writeUTF(world.getMap().name); //map name
@@ -156,11 +152,7 @@ public class NetworkIO{
         Player player = players[0];
 
         try(DataInputStream stream = new DataInputStream(is)){
-            float timerTime = stream.readFloat();
-            long timestamp = stream.readLong();
-
             Timers.clear();
-            Timers.resetTime(timerTime + (TimeUtils.timeSinceMillis(timestamp) / 1000f) * 60f);
 
             //general state
             byte mode = stream.readByte();
