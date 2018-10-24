@@ -21,6 +21,7 @@ public enum StatUnit{
     items;
 
     public String localized(){
+        if(this == none) return "";
         return Bundles.get("text.unit." + name().toLowerCase(Locale.ROOT));
     }
 }
