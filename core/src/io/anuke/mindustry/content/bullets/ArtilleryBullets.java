@@ -1,19 +1,20 @@
 package io.anuke.mindustry.content.bullets;
 
 import io.anuke.mindustry.content.fx.BulletFx;
+import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.ArtilleryBulletType;
 import io.anuke.mindustry.entities.bullet.BasicBulletType;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 
 public class ArtilleryBullets extends BulletList implements ContentList{
-    public static BulletType carbide, plastic, plasticFrag, homing, incindiary, explosive, surge;
+    public static BulletType dense, plastic, plasticFrag, homing, incindiary, explosive, surge, unit;
 
     @Override
     public void load(){
 
-        carbide = new ArtilleryBulletType(3f, 0, "shell"){
+        dense = new ArtilleryBulletType(3f, 0, "shell"){
             {
                 hiteffect = BulletFx.flakExplosion;
                 knockback = 0.8f;
@@ -33,6 +34,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
                 lifetime = 15f;
                 backColor = Palette.plastaniumBack;
                 frontColor = Palette.plastaniumFront;
+                despawneffect = Fx.none;
             }
         };
 
@@ -94,6 +96,21 @@ public class ArtilleryBullets extends BulletList implements ContentList{
                 splashDamage = 50f;
                 backColor = Palette.missileYellowBack;
                 frontColor = Palette.missileYellow;
+            }
+        };
+
+        unit = new ArtilleryBulletType(2f, 0, "shell"){
+            {
+                hiteffect = BulletFx.blastExplosion;
+                knockback = 0.8f;
+                lifetime = 90f;
+                bulletWidth = bulletHeight = 14f;
+                collides = true;
+                collidesTiles = true;
+                splashDamageRadius = 45f;
+                splashDamage = 50f;
+                backColor = Palette.bulletYellowBack;
+                frontColor = Palette.bulletYellow;
             }
         };
 

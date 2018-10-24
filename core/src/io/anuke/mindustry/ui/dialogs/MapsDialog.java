@@ -40,15 +40,15 @@ public class MapsDialog extends FloatingDialog{
 
                     String name = meta.tags.get("name", file.nameWithoutExtension());
 
-                    if(world.maps().getByName(name) != null && !world.maps().getByName(name).custom){
+                    if(world.maps.getByName(name) != null && !world.maps.getByName(name).custom){
                         ui.showError(Bundles.format("text.editor.import.exists", name));
-                    }else if(world.maps().getByName(name) != null){
+                    }else if(world.maps.getByName(name) != null){
                         ui.showConfirm("$text.confirm", "$text.editor.overwrite.confirm", () -> {
-                            world.maps().saveMap(name, data, meta.tags);
+                            world.maps.saveMap(name, data, meta.tags);
                             setup();
                         });
                     }else{
-                        world.maps().saveMap(name, data, meta.tags);
+                        world.maps.saveMap(name, data, meta.tags);
                         setup();
                     }
 
@@ -80,7 +80,7 @@ public class MapsDialog extends FloatingDialog{
         float mapsize = 200f;
 
         int i = 0;
-        for(Map map : world.maps().all()){
+        for(Map map : world.maps.all()){
 
             if(i % maxwidth == 0){
                 maps.row();
@@ -100,7 +100,7 @@ public class MapsDialog extends FloatingDialog{
             i++;
         }
 
-        if(world.maps().all().size == 0){
+        if(world.maps.all().size == 0){
             maps.add("$text.maps.none");
         }
 
@@ -154,7 +154,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.addImageTextButton("$text.delete", "icon-trash-16", "clear", 16 * 2, () -> {
             ui.showConfirm("$text.confirm", Bundles.format("text.map.delete", map.name), () -> {
-                world.maps().removeMap(map);
+                world.maps.removeMap(map);
                 dialog.hide();
                 setup();
             });

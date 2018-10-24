@@ -5,11 +5,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Goal: To create a system to send events to the server from the client and vice versa, without creating a new packet type each time.<br>
- * These events may optionally also trigger on the caller client/server as well.<br>
- */
 public class Annotations{
+
+    /** Marks a class as serializable.*/
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Serialize{
+
+    }
 
     public enum PacketPriority{
         /** Gets put in a queue and processed if not connected. */
@@ -60,7 +63,7 @@ public class Annotations{
 
     /** Marks a method as invokable remotely across a server/client connection. */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.SOURCE)
     public @interface Remote{
         /** Specifies the locations from which this method can be invoked. */
         Loc targets() default Loc.server;
@@ -90,7 +93,7 @@ public class Annotations{
      * being the type returned by {@link #value()}.
      */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.SOURCE)
     public @interface WriteClass{
         Class<?> value();
     }
@@ -101,7 +104,7 @@ public class Annotations{
      * and have one parameter, being of type {@link java.nio.ByteBuffer}.
      */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.SOURCE)
     public @interface ReadClass{
         Class<?> value();
     }

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.server;
 
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.ContentLoader;
 import io.anuke.mindustry.core.Logic;
 import io.anuke.mindustry.core.NetServer;
 import io.anuke.mindustry.core.World;
@@ -25,8 +24,8 @@ public class MindustryServer extends ModuleCore{
         headless = true;
 
         BundleLoader.load();
-        ContentLoader.load();
-        ContentLoader.initialize(Content::init);
+        content.load();
+        content.initialize(Content::init);
 
         module(logic = new Logic());
         module(world = new World());

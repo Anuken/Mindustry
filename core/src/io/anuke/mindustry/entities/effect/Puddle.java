@@ -22,7 +22,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.BaseEntity;
+import io.anuke.ucore.entities.impl.SolidEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -36,10 +36,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.puddleGroup;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
-public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait, SyncTrait{
+public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrait, SyncTrait{
     private static final IntMap<Puddle> map = new IntMap<>();
     private static final float maxLiquid = 70f;
     private static final int maxGeneration = 2;
@@ -51,6 +50,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     private int loadedPosition = -1;
 
     private float updateTime;
+    private float lastRipple;
     private Tile tile;
     private Liquid liquid;
     private float amount, targetAmount;
@@ -89,9 +89,12 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
             reactPuddle(tile.floor().liquidDrop, liquid, amount, tile,
                     (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
 
-            if(generation == 0 && Timers.get(tile, "ripple", 50)){
+            Puddle p = map.get(tile.packedPosition());
+
+            if(generation == 0 && p != null && p.lastRipple <= Timers.time() - 40f){
                 Effects.effect(BlockFx.ripple, tile.floor().liquidDrop.color,
                         (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
+                p.lastRipple = Timers.time();
             }
             return;
         }
@@ -100,7 +103,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         if(p == null){
             if(Net.client()) return; //not clientside.
 
-            Puddle puddle = Pooling.obtain(Puddle.class);
+            Puddle puddle = Pooling.obtain(Puddle.class, Puddle::new);
             puddle.tile = tile;
             puddle.liquid = liquid;
             puddle.amount = amount;
@@ -111,8 +114,9 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
 
-            if(generation == 0 && Timers.get(p, "ripple2", 50) && p.amount >= maxLiquid / 2f){
+            if(generation == 0  && p.lastRipple <= Timers.time() - 40f && p.amount >= maxLiquid / 2f){
                 Effects.effect(BlockFx.ripple, p.liquid.color, (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
+                p.lastRipple = Timers.time();
             }
         }else{
             p.amount -= reactPuddle(p.liquid, liquid, amount, p.tile, p.x, p.y);
@@ -161,6 +165,16 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     }
 
     @Override
+    public void getHitbox(Rectangle rectangle){
+        rectangle.setCenter(x, y).setSize(tilesize);
+    }
+
+    @Override
+    public void getHitboxTile(Rectangle rectangle){
+        rectangle.setCenter(x, y).setSize(0f);
+    }
+
+    @Override
     public void update(){
 
         //no updating happens clientside
@@ -179,7 +193,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
                 float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Timers.delta();
                 for(GridPoint2 point : Geometry.d4){
                     Tile other = world.tile(tile.x + point.x, tile.y + point.y);
-                    if(other.block() == Blocks.air && !other.hasCliffs()){
+                    if(other != null && other.block() == Blocks.air && !other.hasCliffs()){
                         deposit(other, tile, liquid, deposited, generation + 1);
                         amount -= deposited / 2f; //tweak to speed up/slow down puddle propagation
                     }
@@ -256,7 +270,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
         this.loadedPosition = stream.readInt();
         this.x = stream.readFloat();
         this.y = stream.readFloat();
-        this.liquid = Liquid.getByID(stream.readByte());
+        this.liquid = content.liquid(stream.readByte());
         this.amount = stream.readFloat();
         this.generation = stream.readByte();
         add();
@@ -299,7 +313,7 @@ public class Puddle extends BaseEntity implements SaveTrait, Poolable, DrawTrait
     public void read(DataInput data, long time) throws IOException{
         x = data.readFloat();
         y = data.readFloat();
-        liquid = Liquid.getByID(data.readByte());
+        liquid = content.liquid(data.readByte());
         targetAmount = data.readShort() / 4f;
         tile = world.tile(data.readInt());
 

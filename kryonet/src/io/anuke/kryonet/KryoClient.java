@@ -2,11 +2,8 @@ package io.anuke.kryonet;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.*;
 import com.esotericsoftware.minlog.Log;
-import io.anuke.kryonet.CustomListeners.UnreliableListener;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
@@ -17,22 +14,22 @@ import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.Strings;
+import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.lz4.LZ4FastDecompressor;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedSelectorException;
-import java.util.List;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.net.Net.packetPoolLock;
 
 public class KryoClient implements ClientProvider{
     Client client;
-    ObjectMap<InetAddress, Host> addresses = new ObjectMap<>();
+    Consumer<Host> lastCallback;
+    Array<InetAddress> foundAddresses = new Array<>();
     ClientDiscoveryHandler handler;
+    LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
 
     public KryoClient(){
         KryoCore.init();
@@ -46,8 +43,14 @@ public class KryoClient implements ClientProvider{
             @Override
             public void onDiscoveredHost(DatagramPacket datagramPacket) {
                 ByteBuffer buffer = ByteBuffer.wrap(datagramPacket.getData());
-                Host address = NetworkIO.readServerData(datagramPacket.getAddress().getHostAddress(), buffer);
-                addresses.put(datagramPacket.getAddress(), address);
+                Host host = NetworkIO.readServerData(datagramPacket.getAddress().getHostAddress(), buffer);
+                for(InetAddress address : foundAddresses){
+                    if(address.equals(datagramPacket.getAddress()) || (isLocal(address) && isLocal(datagramPacket.getAddress()))){
+                        return;
+                    }
+                }
+                Gdx.app.postRunnable(() -> lastCallback.accept(host));
+                foundAddresses.add(datagramPacket.getAddress());
             }
 
             @Override
@@ -100,10 +103,28 @@ public class KryoClient implements ClientProvider{
         };
 
         if(KryoCore.fakeLag){
-            client.addListener(new UnreliableListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, KryoCore.fakeLagDrop, KryoCore.fakeLagDuplicate, listener));
+            client.addListener(new Listener.LagListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, listener));
         }else{
             client.addListener(listener);
         }
+    }
+
+    private static boolean isLocal(InetAddress addr) {
+        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) return true;
+
+        try {
+            return NetworkInterface.getByInetAddress(addr) != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    @Override
+    public byte[] decompressSnapshot(byte[] input, int size){
+        byte[] result = new byte[size];
+        decompressor.decompress(input, result);
+        return result;
     }
 
     @Override
@@ -137,9 +158,7 @@ public class KryoClient implements ClientProvider{
             client.sendUDP(object);
         }
 
-        synchronized (packetPoolLock) {
-            Pooling.free(object);
-        }
+        Pooling.free(object);
     }
 
     @Override
@@ -161,7 +180,7 @@ public class KryoClient implements ClientProvider{
 
                 socket.setSoTimeout(2000);
 
-                addresses.clear();
+                lastCallback = valid;
 
                 DatagramPacket packet = handler.onRequestNewDatagramPacket();
 
@@ -178,23 +197,12 @@ public class KryoClient implements ClientProvider{
     }
 
     @Override
-    public void discover(Consumer<Array<Host>> callback){
+    public void discover(Consumer<Host> callback, Runnable done){
         runAsync(() -> {
-            addresses.clear();
-            List<InetAddress> list = client.discoverHosts(port, 3000);
-            ObjectSet<String> hostnames = new ObjectSet<>();
-            Array<Host> result = new Array<>();
-
-            for(InetAddress a : list){
-                if(!hostnames.contains(a.getHostName())) {
-                    Host address = addresses.get(a);
-                    if(address != null) result.add(address);
-
-                }
-                hostnames.add(a.getHostName());
-            }
-
-            Gdx.app.postRunnable(() -> callback.accept(result));
+            foundAddresses.clear();
+            lastCallback = callback;
+            client.discoverHosts(port, 3000);
+            Gdx.app.postRunnable(done);
         });
     }
 

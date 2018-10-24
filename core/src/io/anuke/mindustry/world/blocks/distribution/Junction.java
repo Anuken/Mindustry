@@ -11,6 +11,8 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
 
+import static io.anuke.mindustry.Vars.*;
+
 public class Junction extends Block{
     protected float speed = 26; //frames taken to go through this junction
     protected int capacity = 32;
@@ -20,8 +22,12 @@ public class Junction extends Block{
         update = true;
         solid = true;
         instantTransfer = true;
-        outputsItems = true;
         group = BlockGroup.transportation;
+    }
+
+    @Override
+    public boolean outputsItems(){
+        return true;
     }
 
     @Override
@@ -40,7 +46,7 @@ public class Junction extends Block{
 
                     int val = Bits.getRightInt(l);
 
-                    Item item = Item.getByID(Bits.getLeftShort(val));
+                    Item item = content.item(Bits.getLeftShort(val));
                     int direction = Bits.getRightShort(val);
                     Tile dest = tile.getNearby(direction);
 
@@ -86,7 +92,7 @@ public class Junction extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new JunctionEntity();
     }
 
@@ -104,7 +110,7 @@ public class Junction extends Block{
                 long l = b.items[i];
                 float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
                 int val = Bits.getRightInt(l);
-                Item item = Item.getByID(Bits.getLeftShort(val));
+                Item item = content.item(Bits.getLeftShort(val));
                 int direction = Bits.getRightShort(val);
                 Tile dest = tile.getNearby(direction);
                 arr.add("  bufferx.item");

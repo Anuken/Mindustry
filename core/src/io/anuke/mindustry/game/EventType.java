@@ -6,64 +6,89 @@ import io.anuke.ucore.function.Event;
 
 public class EventType{
 
-    public interface PlayEvent extends Event{
-        void handle();
+    public static class SectorCompleteEvent implements Event{
+
     }
 
-    public interface ResetEvent extends Event{
-        void handle();
+    public static class GameLoadEvent implements Event{
+
     }
 
-    public interface WaveEvent extends Event{
-        void handle();
+    public static class PlayEvent implements Event{
+
     }
 
-    public interface GameOverEvent extends Event{
-        void handle();
+    public static class ResetEvent implements Event{
+
+    }
+
+    public static class WaveEvent implements Event{
+
+    }
+
+    public static class GameOverEvent implements Event{
+        public final Team winner;
+
+        public GameOverEvent(Team winner){
+            this.winner = winner;
+        }
     }
 
     /**
      * This event is called from the logic thread.
      * DO NOT INITIALIZE GRAPHICS HERE.
      */
-    public interface WorldLoadEvent extends Event{
-        void handle();
+    public static class WorldLoadEvent implements Event{
+
     }
 
     /**
      * Called after the WorldLoadEvent is, and all logic has been loaded.
      * It is safe to intialize graphics here.
      */
-    public interface WorldLoadGraphicsEvent extends Event{
-        void handle();
+    public static class WorldLoadGraphicsEvent implements Event{
+
     }
 
-    /**
-     * Called from the logic thread. Do not access graphics here!
-     */
-    public interface TileChangeEvent extends Event{
-        void handle(Tile tile);
+    /**Called from the logic thread. Do not access graphics here!*/
+    public static class TileChangeEvent implements Event{
+        public final Tile tile;
+
+        public TileChangeEvent(Tile tile){
+            this.tile = tile;
+        }
     }
 
-    //TODO unimplemented; remove?
-    public interface TileRemoveEvent extends Event{
-        void handle(Tile tile, Team oldTeam);
+    public static class StateChangeEvent implements Event{
+        public final State from, to;
+
+        public StateChangeEvent(State from, State to){
+            this.from = from;
+            this.to = to;
+        }
     }
 
-    public interface StateChangeEvent extends Event{
-        void handle(State from, State to);
+    public static class UnlockEvent implements Event{
+        public final Content content;
+
+        public UnlockEvent(Content content){
+            this.content = content;
+        }
     }
 
-    public interface UnlockEvent extends Event{
-        void handle(Content content);
+    /**Called when block building begins. The tile's block will nearly always be a BuildBlock.*/
+    public static class BlockBuildEvent implements Event{
+        public final Tile tile;
+        public final Team team;
+
+        public BlockBuildEvent(Tile tile, Team team){
+            this.tile = tile;
+            this.team = team;
+        }
     }
 
-    public interface BlockBuildEvent extends Event{
-        void handle(Team team, Tile tile);
-    }
+    public static class ResizeEvent implements Event{
 
-    public interface ResizeEvent extends Event{
-        void handle();
     }
 }
 

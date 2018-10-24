@@ -11,13 +11,13 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Strings;
 
-import java.io.File;
 import java.net.NetworkInterface;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -37,7 +37,7 @@ public class DesktopPlatform extends Platform{
     public DesktopPlatform(String[] args){
         this.args = args;
 
-        Vars.testMobile = isDebug() && Array.with(args).contains("-testMobile", false);
+        Vars.testMobile = Array.with(args).contains("-testMobile", false);
 
         if(useDiscord){
             DiscordEventHandlers handlers = new DiscordEventHandlers();
@@ -61,11 +61,6 @@ public class DesktopPlatform extends Platform{
     }
 
     @Override
-    public void showError(String text){
-
-    }
-
-    @Override
     public String getLocaleName(Locale locale){
         return locale.getDisplayName(locale);
     }
@@ -78,14 +73,24 @@ public class DesktopPlatform extends Platform{
         DiscordRichPresence presence = new DiscordRichPresence();
 
         if(!state.is(State.menu)){
-            presence.state = Strings.capitalize(state.mode.name()) + ", Solo";
-            presence.details = Strings.capitalize(world.getMap().name) + " | Wave " + state.wave;
-            presence.largeImageText = "Wave " + state.wave;
+            presence.state = Strings.capitalize(state.mode.name());
+            if(state.mode == GameMode.noWaves){
+                presence.details = Strings.capitalize(world.getMap().name);
+            }else{
+                presence.details = Strings.capitalize(world.getMap().name) + " | Wave " + state.wave;
+                presence.largeImageText = "Wave " + state.wave;
+            }
+
+            if(state.mode != GameMode.noWaves){
+                presence.state = Strings.capitalize(state.mode.name());
+            }else{
+                presence.state = unitGroups[players[0].getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
+                (unitGroups[players[0].getTeam().ordinal()].size() + " Units Active");
+            }
 
             if(Net.active()){
                 presence.partyMax = 16;
                 presence.partySize = playerGroup.size();
-                presence.state = Strings.capitalize(state.mode.name());
             }
         }else{
             if(ui.editor != null && ui.editor.isShown()){
@@ -106,13 +111,6 @@ public class DesktopPlatform extends Platform{
     }
 
     @Override
-    public boolean isDebug(){
-        //honestly I'm just putting this ridiculous """anti-debug""" mess here to see if anyone bothers solving it without editing source
-        return args.length > 0 && args[0].equals(("-debug_" + getUUID().hashCode() + "_"
-                + " " + System.getProperty("os.arch") + "nice" + (int)(Math.sin(System.getProperty("user.dir").hashCode()) * 100) + Thread.currentThread().getStackTrace()[1].toString()).hashCode() + "") && new File("../../desktop/build/").exists();
-    }
-
-    @Override
     public ThreadProvider getThreadProvider(){
         return new DefaultThreadImpl();
     }
@@ -122,8 +120,7 @@ public class DesktopPlatform extends Platform{
         try{
             Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
             NetworkInterface out;
-            for(out = e.nextElement(); out.getHardwareAddress() == null && e.hasMoreElements() && validAddress(out.getHardwareAddress()); out = e.nextElement())
-                ;
+            for(out = e.nextElement(); (out.getHardwareAddress() == null || !validAddress(out.getHardwareAddress())) && e.hasMoreElements(); out = e.nextElement()) ;
 
             byte[] bytes = out.getHardwareAddress();
             byte[] result = new byte[8];
@@ -140,6 +137,7 @@ public class DesktopPlatform extends Platform{
     }
 
     private boolean validAddress(byte[] bytes){
+        if(bytes == null) return false;
         byte[] result = new byte[8];
         System.arraycopy(bytes, 0, result, 0, bytes.length);
         return !new String(Base64Coder.encode(result)).equals("AAAAAAAAAOA=");

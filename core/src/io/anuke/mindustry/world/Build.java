@@ -1,14 +1,17 @@
 package io.anuke.mindustry.world;
 
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.BlockBuildEvent;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Events;
-import io.anuke.ucore.entities.Entities;
+import io.anuke.ucore.util.Geometry;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -31,7 +34,7 @@ public class Build{
 
         Block previous = tile.block();
 
-        Block sub = Block.getByName("build" + previous.size);
+        Block sub = content.getByName(ContentType.block, "build" + previous.size);
 
         tile.setBlock(sub);
         tile.<BuildEntity>entity().setDeconstruct(previous);
@@ -72,7 +75,7 @@ public class Build{
         Block result = recipe.result;
         Block previous = tile.block();
 
-        Block sub = Block.getByName("build" + result.size);
+        Block sub = content.getByName(ContentType.block, "build" + result.size);
 
         tile.setBlock(sub, rotation);
         tile.<BuildEntity>entity().setConstruct(previous, recipe);
@@ -98,38 +101,26 @@ public class Build{
         }
 
 
-        threads.runDelay(() -> Events.fire(BlockBuildEvent.class, team, tile));
+        threads.runDelay(() -> Events.fire(new BlockBuildEvent(tile, team)));
     }
 
     /**Returns whether a tile can be placed at this location by this team.*/
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
         Recipe recipe = Recipe.getByResult(type);
 
-        if(recipe == null || (recipe.debugOnly && !debug)){
+        if(recipe == null || (recipe.mode != null && recipe.mode != state.mode)){
             return false;
         }
 
-        rect.setSize(type.size * tilesize, type.size * tilesize);
-        rect.setCenter(type.offset() + x * tilesize, type.offset() + y * tilesize);
+        if((type.solid || type.solidifes) &&
+            Units.anyEntities(rect.setSize(tilesize * type.size).setCenter(x * tilesize + type.offset(), y * tilesize + type.offset()))){
+            return false;
+        }
 
-        if(type.solid || type.solidifes){
-            synchronized(Entities.entityLock){
-                try{
-
-                    rect.setSize(tilesize * type.size).setCenter(x * tilesize + type.offset(), y * tilesize + type.offset());
-                    boolean[] result = {false};
-
-                    Units.getNearby(rect, e -> {
-                        if(e == null) return; //not sure why this happens?
-                        e.getHitbox(hitrect);
-
-                        if(rect.overlaps(hitrect) && !e.isFlying()){
-                            result[0] = true;
-                        }
-                    });
-
-                    if(result[0]) return false;
-                }catch(Exception e){
+        //check for enemy cores
+        for(Team enemy : state.teams.enemiesOf(team)){
+            for(Tile core : state.teams.get(enemy).cores){
+                if(Vector2.dst(x*tilesize + type.offset(), y*tilesize + type.offset(), core.drawx(), core.drawy()) < state.mode.enemyCoreBuildRadius + type.size*tilesize/2f){
                     return false;
                 }
             }
@@ -144,6 +135,10 @@ public class Build{
                 return true;
             }
 
+            if(!contactsGround(tile.x, tile.y, type)){
+                return false;
+            }
+
             if(!type.canPlaceOn(tile)){
                 return false;
             }
@@ -155,7 +150,7 @@ public class Build{
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
                     if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace)
                             || other.hasCliffs() || !other.floor().placeableOn ||
-                            (tile.floor().liquidDrop != null && !type.floating)){
+                            (other.floor().isLiquid && !type.floating)){
                         return false;
                     }
                 }
@@ -163,7 +158,8 @@ public class Build{
             return true;
         }else{
             return (tile.getTeam() == Team.none || tile.getTeam() == team)
-                    && (tile.floor().liquidDrop == null || type.floating)
+                    && contactsGround(tile.x, tile.y, type)
+                    && (!tile.floor().isLiquid || type.floating)
                     && tile.floor().placeableOn && !tile.hasCliffs()
                     && ((type.canReplace(tile.block())
                     && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
@@ -171,11 +167,32 @@ public class Build{
         }
     }
 
+    private static boolean contactsGround(int x, int y, Block block){
+        if(block.isMultiblock()){
+            for(GridPoint2 point : Edges.getInsideEdges(block.size)){
+                Tile tile = world.tile(x + point.x, y + point.y);
+                if(tile != null && !tile.floor().isLiquid) return true;
+            }
+
+            for(GridPoint2 point : Edges.getEdges(block.size)){
+                Tile tile = world.tile(x + point.x, y + point.y);
+                if(tile != null && !tile.floor().isLiquid) return true;
+            }
+        }else{
+            for(GridPoint2 point : Geometry.d4){
+                Tile tile = world.tile(x + point.x, y + point.y);
+                if(tile != null && !tile.floor().isLiquid) return true;
+            }
+            return world.tile(x, y) != null && !world.tile(x, y).floor().isLiquid;
+        }
+        return false;
+    }
+
     /**Returns whether the tile at this position is breakable by this team*/
     public static boolean validBreak(Team team, int x, int y){
         Tile tile = world.tile(x, y);
+        if(tile != null) tile = tile.target();
 
-        return tile != null && !tile.block().unbreakable
-                && (!tile.isLinked() || !tile.getLinked().block().unbreakable) && tile.breakable() && (tile.getTeam() == Team.none || tile.getTeam() == team);
+        return tile != null && tile.block().canBreak(tile) && tile.breakable() && (!tile.block().synthetic() || tile.getTeam() == team);
     }
 }

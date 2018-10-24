@@ -14,6 +14,7 @@ import static io.anuke.mindustry.Vars.locales;
 import static io.anuke.mindustry.Vars.ui;
 
 public class LanguageDialog extends FloatingDialog{
+    private Locale lastLocale;
 
     public LanguageDialog(){
         super("$text.settings.language");
@@ -31,19 +32,55 @@ public class LanguageDialog extends FloatingDialog{
 
         for(Locale loc : locales){
             TextButton button = new TextButton(Platform.instance.getLocaleName(loc), "toggle");
-            button.setChecked(ui.getLocale().equals(loc));
             button.clicked(() -> {
-                if(ui.getLocale().equals(loc)) return;
+                if(getLocale().equals(loc)) return;
                 Settings.putString("locale", loc.toString());
                 Settings.save();
                 Log.info("Setting locale: {0}", loc.toString());
                 ui.showInfo("$text.language.restart");
             });
-            langs.add(button).group(group).update(t -> {
-                t.setChecked(loc.equals(ui.getLocale()));
-            }).size(400f, 60f).row();
+            langs.add(button).group(group).update(t -> t.setChecked(loc.equals(getLocale()))).size(400f, 60f).row();
         }
 
         content().add(pane);
+    }
+
+    public Locale getLocale(){
+        String loc = Settings.getString("locale");
+
+        if(loc.equals("default")){
+            findClosestLocale();
+        }
+
+        if(lastLocale == null || !lastLocale.toString().equals(loc)){
+            if(loc.contains("_")){
+                String[] split = loc.split("_");
+                lastLocale = new Locale(split[0], split[1]);
+            }else{
+                lastLocale = new Locale(loc);
+            }
+        }
+
+        return lastLocale;
+    }
+
+    void findClosestLocale(){
+        //check exact locale
+        for(Locale l : locales){
+            if(l.equals(Locale.getDefault())){
+                Settings.putString("locale", l.toString());
+                return;
+            }
+        }
+
+        //find by language
+        for(Locale l : locales){
+            if(l.getLanguage().equals(Locale.getDefault().getLanguage())){
+                Settings.putString("locale", l.toString());
+                return;
+            }
+        }
+
+        Settings.putString("locale", new Locale("en").toString());
     }
 }

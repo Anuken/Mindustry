@@ -2,25 +2,25 @@ package io.anuke.kryonet;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import com.dosse.upnp.UPnP;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
-import io.anuke.kryonet.CustomListeners.UnreliableListener;
-import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Net.ServerProvider;
-import io.anuke.mindustry.net.NetConnection;
-import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.mindustry.net.Packets.StreamBegin;
 import io.anuke.mindustry.net.Packets.StreamChunk;
-import io.anuke.mindustry.net.Streamable;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
+import net.jpountz.lz4.LZ4Compressor;
+import net.jpountz.lz4.LZ4Factory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -34,6 +34,7 @@ public class KryoServer implements ServerProvider {
     final CopyOnWriteArrayList<KryoConnection> connections = new CopyOnWriteArrayList<>();
     final CopyOnWriteArraySet<Integer> missing = new CopyOnWriteArraySet<>();
     final Array<KryoConnection> array = new Array<>();
+    final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
     Thread serverThread;
 
     int lastconnection = 0;
@@ -100,10 +101,15 @@ public class KryoServer implements ServerProvider {
         };
 
         if(KryoCore.fakeLag){
-            server.addListener(new UnreliableListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, KryoCore.fakeLagDrop, KryoCore.fakeLagDuplicate, listener));
+            server.addListener(new LagListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, listener));
         }else{
             server.addListener(listener);
         }
+    }
+
+    @Override
+    public byte[] compressSnapshot(byte[] input){
+        return compressor.compress(input);
     }
 
     @Override
@@ -129,6 +135,17 @@ public class KryoServer implements ServerProvider {
 
     @Override
     public void host(int port) throws IOException {
+        //attempt to open default ports if they're not already open
+        //this only opens the default port due to security concerns (?)
+        if(port == Vars.port){
+            async(() -> {
+                try{
+                    if(!UPnP.isMappedTCP(port)) UPnP.openPortTCP(port);
+                    if(!UPnP.isMappedUDP(port)) UPnP.openPortUDP(port);
+                }catch(Throwable ignored){}
+            });
+        }
+
         lastconnection = 0;
         connections.clear();
         missing.clear();
@@ -151,7 +168,6 @@ public class KryoServer implements ServerProvider {
 
     @Override
     public void close() {
-        UCore.setPrivate(server, "shutdown", true);
         connections.clear();
         lastconnection = 0;
 
@@ -173,7 +189,7 @@ public class KryoServer implements ServerProvider {
                         //send an object so the receiving side knows how to handle the following chunks
                         StreamBegin begin = new StreamBegin();
                         begin.total = stream.stream.available();
-                        begin.type = stream.getClass();
+                        begin.type = Registrator.getID(stream.getClass());
                         connection.connection.sendTCP(begin);
                         id = begin.id;
                     }
@@ -189,7 +205,7 @@ public class KryoServer implements ServerProvider {
                 int cid;
                 StreamBegin begin = new StreamBegin();
                 begin.total = stream.stream.available();
-                begin.type = stream.getClass();
+                begin.type = Registrator.getID(stream.getClass());
                 connection.send(begin, SendMode.tcp);
                 cid = begin.id;
 

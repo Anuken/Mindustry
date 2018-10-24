@@ -6,10 +6,6 @@ import io.anuke.mindustry.world.ItemBuffer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class BufferedItemBridge extends ExtendingItemBridge{
     protected int timerAccept = timers++;
 
@@ -41,21 +37,11 @@ public class BufferedItemBridge extends ExtendingItemBridge{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new BufferedItemBridgeEntity();
     }
 
     class BufferedItemBridgeEntity extends ItemBridgeEntity{
         ItemBuffer buffer = new ItemBuffer(bufferCapacity, speed);
-
-        @Override
-        public void write(DataOutputStream stream) throws IOException{
-            super.write(stream);
-        }
-
-        @Override
-        public void read(DataInputStream stream) throws IOException{
-            super.read(stream);
-        }
     }
 }

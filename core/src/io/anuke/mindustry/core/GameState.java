@@ -4,7 +4,7 @@ import io.anuke.mindustry.ai.WaveSpawner;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.GameMode;
-import io.anuke.mindustry.game.TeamInfo;
+import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Events;
 
@@ -14,13 +14,12 @@ public class GameState{
     public boolean gameOver = false;
     public GameMode mode = GameMode.waves;
     public Difficulty difficulty = Difficulty.normal;
-    public boolean friendlyFire;
     public WaveSpawner spawner = new WaveSpawner();
-    public TeamInfo teams = new TeamInfo();
+    public Teams teams = new Teams();
     private State state = State.menu;
 
     public void set(State astate){
-        Events.fire(StateChangeEvent.class, state, astate);
+        Events.fire(new StateChangeEvent(state, astate));
         state = astate;
     }
 

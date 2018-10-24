@@ -48,7 +48,7 @@ public class ConsumeItem extends Consume{
 
     @Override
     public boolean valid(Block block, TileEntity entity){
-        return entity.items.has(item, amount);
+        return entity != null && entity.items != null && entity.items.has(item, amount);
     }
 
     @Override

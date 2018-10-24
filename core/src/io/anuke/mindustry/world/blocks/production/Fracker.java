@@ -5,11 +5,10 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeItem;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 
 public class Fracker extends SolidPump{
-    protected float itemUseTime = 100f;
+    protected final float itemUseTime = 100f;
 
     protected TextureRegion liquidRegion;
     protected TextureRegion rotatorRegion;
@@ -31,11 +30,6 @@ public class Fracker extends SolidPump{
         liquidRegion = Draw.region(name + "-liquid");
         rotatorRegion = Draw.region(name + "-rotator");
         topRegion = Draw.region(name + "-top");
-    }
-
-    @Override
-    public void setStats(){
-        super.setStats();
     }
 
     @Override
@@ -63,21 +57,21 @@ public class Fracker extends SolidPump{
         FrackerEntity entity = tile.entity();
         Item item = consumes.item();
 
-        while(entity.accumulator > itemUseTime && entity.items.has(item, 1)){
+        while(entity.accumulator >= itemUseTime && entity.items.has(item, 1)){
             entity.items.remove(item, 1);
             entity.accumulator -= itemUseTime;
         }
 
         if(entity.cons.valid() && entity.accumulator < itemUseTime){
             super.update(tile);
-            entity.accumulator += Timers.delta();
+            entity.accumulator += entity.delta();
         }else{
             tryDumpLiquid(tile, result);
         }
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new FrackerEntity();
     }
 

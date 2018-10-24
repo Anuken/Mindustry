@@ -9,7 +9,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
@@ -38,7 +37,7 @@ public class SolidPump extends Pump{
     public void setStats(){
         super.setStats();
 
-        stats.remove(BlockStat.liquidOutput);
+        // stats.remove(BlockStat.liquidOutput);
         stats.add(BlockStat.liquidOutput, result);
     }
 
@@ -77,16 +76,16 @@ public class SolidPump extends Pump{
         }
 
         if(tile.entity.cons.valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
-            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * Timers.delta() * fraction);
+            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction);
             tile.entity.liquids.add(result, maxPump);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
-            if(Mathf.chance(Timers.delta() * updateEffectChance))
+            if(Mathf.chance(entity.delta() * updateEffectChance))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
         }
 
-        entity.pumpTime += entity.warmup * Timers.delta();
+        entity.pumpTime += entity.warmup * entity.delta();
 
         tryDumpLiquid(tile, result);
     }
@@ -107,11 +106,11 @@ public class SolidPump extends Pump{
 
     @Override
     protected boolean isValid(Tile tile){
-        return !tile.floor().isLiquid;
+        return tile != null && !tile.floor().isLiquid;
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new SolidPumpEntity();
     }
 

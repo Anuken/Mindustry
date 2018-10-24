@@ -14,11 +14,12 @@ public class OreBlock extends Floor{
 
     public OreBlock(Item ore, Floor base){
         super("ore-" + ore.name + "-" + base.name);
+        this.formalName = ore.localizedName() + " " + base.formalName;
         this.drops = new ItemStack(ore, 1);
         this.base = base;
         this.variants = 3;
         this.minimapColor = ore.color;
-        this.blends = block -> block instanceof OreBlock && ((OreBlock) block).base != base;
+        this.blends = block -> (block instanceof OreBlock && ((OreBlock) block).base != base) || (!(block instanceof OreBlock) && block != base);
         this.tileBlends = (tile, other) -> tile.getElevation() < other.getElevation();
         this.edge = base.name;
     }

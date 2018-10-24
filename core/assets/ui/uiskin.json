@@ -2,27 +2,27 @@
 Font: {
 	default-font: {
 		file: square.fnt,
-		markupEnabled: true,
+		markup: true,
 		scale: 0.5
 	},
 	default-font-chat: {
 		file: square.fnt,
-		markupEnabled: false,
-		scale: 0.5
-	},
-	korean: {
-		file: korean.fnt,
-		markupEnabled: true,
+		markup: false,
 		scale: 0.5
 	},
 	trad-chinese: {
 		file: trad_chinese.fnt,
-		markupEnabled: true,
+		markup: true,
+		scale: 0.5
+	},
+	simp-chinese: {
+		file: simp_chinese.fnt,
+		markup: true,
 		scale: 0.5
 	},
 	title: {
 		file: title.fnt,
-		markupEnabled: true,
+		markup: true,
 		scale: 2
 	}
 },
@@ -41,6 +41,7 @@ TintedDrawable: {
 	loadDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.8} },
 	chatfield: {name: white, color: {r: 0, g: 0, b: 0, a: 0.2}},
 	clear: {name: white, color: {r: 0.1, g: 0.1, b: 0.1, a: 0.75}},
+	none: {name: white, color: {r: 0, g: 0, b: 0, a: 0}},
 	clear-over: {name: white, color: {r: 1, g: 1, b: 1, a: 0.2} },
 	clear-down: {name: white, color: {r: 1, g: 1, b: 1, a: 0.4} }
 },
@@ -64,7 +65,7 @@ ImageButtonStyle: {
 	static: {up: button },
 	static-down: {up: button-down },
 	toggle: {checked: button-down, down: button-down, up: button, imageDisabledColor: gray, imageUpColor: white  },
-	select: {checked: button-select, up: clear },
+	select: {checked: button-select, up: none },
 	clear: {down: clear-down, up: clear, over: clear-over},
 },
 ScrollPaneStyle: {
@@ -93,8 +94,7 @@ LabelStyle: {
 TextFieldStyle: {
 	default: {font: default-font-chat, fontColor: white, disabledFontColor: gray, selection: selection, background: button, cursor: cursor, messageFont: default-font, messageFontColor: gray }
 	textarea: {font: default-font-chat, fontColor: white, disabledFontColor: gray, selection: selection, background: textarea, cursor: cursor, messageFont: default-font, messageFontColor: gray }
-}
-
+},
 CheckBoxStyle: {
 	default: {checkboxOn: check-on, checkboxOff: check-off, checkboxOnOver: check-on-over, checkboxOver: check-over, font: default-font, fontColor: white, disabledFontColor: gray }
 }

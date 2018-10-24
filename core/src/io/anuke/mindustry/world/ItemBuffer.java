@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.NumberUtils;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Bits;
+import static io.anuke.mindustry.Vars.*;
 
 public class ItemBuffer{
     private final float speed;
@@ -35,7 +36,7 @@ public class ItemBuffer{
             float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
 
             if(Timers.time() >= time + speed || Timers.time() < time){
-                return Item.getByID(Bits.getLeftShort(Bits.getRightInt(l)));
+                return content.item(Bits.getLeftShort(Bits.getRightInt(l)));
             }
         }
         return null;

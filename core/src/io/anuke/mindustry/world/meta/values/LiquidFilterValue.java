@@ -5,6 +5,7 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.scene.ui.layout.Table;
+import static io.anuke.mindustry.Vars.*;
 
 public class LiquidFilterValue implements StatValue{
     private final Predicate<Liquid> filter;
@@ -17,7 +18,7 @@ public class LiquidFilterValue implements StatValue{
     public void display(Table table){
         Array<Liquid> list = new Array<>();
 
-        for(Liquid item : Liquid.all()){
+        for(Liquid item : content.liquids()){
             if(!item.isHidden() && filter.test(item)) list.add(item);
         }
 

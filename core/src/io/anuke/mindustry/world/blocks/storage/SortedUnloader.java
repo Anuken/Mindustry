@@ -15,6 +15,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import static io.anuke.mindustry.Vars.*;
 
 public class SortedUnloader extends Unloader implements SelectionTrait{
 
@@ -26,6 +27,7 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSortedUnloaderItem(Player player, Tile tile, Item item){
         SortedUnloaderEntity entity = tile.entity();
+        entity.items.clear();
         entity.sortItem = item;
     }
 
@@ -35,7 +37,7 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
 
         if(entity.items.total() == 0 && entity.timer.get(timerUnload, speed)){
             tile.allNearby(other -> {
-                if(other.block() instanceof StorageBlock && entity.items.total() == 0 &&
+                if(other.getTeam() == tile.getTeam() && other.block() instanceof StorageBlock && entity.items.total() == 0 &&
                 ((entity.sortItem == null && other.entity.items.total() > 0) || ((StorageBlock) other.block()).hasItem(other, entity.sortItem))){
                     offloadNear(tile, ((StorageBlock) other.block()).removeItem(other, entity.sortItem));
                 }
@@ -65,7 +67,7 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new SortedUnloaderEntity();
     }
 
@@ -80,7 +82,7 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
         @Override
         public void read(DataInputStream stream) throws IOException{
             byte id = stream.readByte();
-            sortItem = id == -1 ? null : Item.all().get(id);
+            sortItem = id == -1 ? null : content.items().get(id);
         }
     }
 }

@@ -19,8 +19,7 @@ public abstract class Platform {
     public String format(Date date){return "invalid";}
     /**Format a number by adding in commas or periods where needed.*/
     public String format(int number){return "invalid";}
-    /**Show a native error dialog.*/
-    public void showError(String text){}
+
     /**Add a text input dialog that should show up after the field is tapped.*/
     public void addDialog(TextField field){
         addDialog(field, 16);
@@ -37,14 +36,10 @@ public abstract class Platform {
     public boolean canDonate(){
         return false;
     }
-    /**Whether the user has Discord installed. Defaults to true if unknown.*/
-    public boolean hasDiscord(){return true;}
     /**Return the localized name for the locale. This is basically a workaround for GWT not supporting getName().*/
     public String getLocaleName(Locale locale){
         return locale.toString();
     }
-    /**Whether debug mode is enabled.*/
-    public boolean isDebug(){return false;}
     /**Must be a base64 string 8 bytes in length.*/
     public String getUUID(){
         String uuid = Settings.getString("uuid", "");
@@ -84,11 +79,9 @@ public abstract class Platform {
         };
     }
 
-    //TODO iOS implementation
     /**Forces the app into landscape mode. Currently Android only.*/
     public void beginForceLandscape(){}
 
-    //TODO iOS implementation
     /**Stops forcing the app into landscape orientation. Currently Android only.*/
     public void endForceLandscape(){}
 }

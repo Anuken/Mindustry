@@ -13,12 +13,16 @@ public class PowerGenerator extends PowerDistributor{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public boolean outputsItems(){
+        return false;
+    }
+
+    @Override
+    public TileEntity newEntity(){
         return new GeneratorEntity();
     }
 
     public static class GeneratorEntity extends TileEntity{
         public float generateTime;
-        public float uptime;
     }
 }

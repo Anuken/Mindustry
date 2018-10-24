@@ -45,13 +45,11 @@ public class FrameworkSerializer {
 
             return p;
         }else if(id == 1){
-            DiscoverHost p = new DiscoverHost();
 
-            return p;
+            return new DiscoverHost();
         }else if(id == 2){
-            KeepAlive p = new KeepAlive();
 
-            return p;
+            return new KeepAlive();
         }else if(id == 3){
             RegisterUDP p = new RegisterUDP();
             p.connectionID = buffer.getInt();

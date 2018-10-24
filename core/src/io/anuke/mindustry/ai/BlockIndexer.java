@@ -1,95 +1,73 @@
 package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Bits;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.*;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
+import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Events;
-import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.ThreadArray;
 
 import static io.anuke.mindustry.Vars.*;
 
 //TODO consider using quadtrees for finding specific types of blocks within an area
 //TODO maybe use Arrays instead of ObjectSets?
 
-/**
- * Class used for indexing special target blocks for AI.
- */
+/**Class used for indexing special target blocks for AI.*/
+@SuppressWarnings("unchecked")
 public class BlockIndexer{
-    /**
-     * Size of one ore quadrant.
-     */
+    /**Size of one ore quadrant.*/
     private final static int oreQuadrantSize = 20;
-    /**
-     * Size of one structure quadrant.
-     */
+    /**Size of one structure quadrant.*/
     private final static int structQuadrantSize = 12;
 
-    /**
-     * Set of all ores that are being scanned.
-     */
-    private final ObjectSet<Item> scanOres = ObjectSet.with(Items.tungsten, Items.coal, Items.lead, Items.thorium, Items.titanium);
+    /**Set of all ores that are being scanned.*/
+    private final ObjectSet<Item> scanOres = ObjectSet.with(Items.copper, Items.coal, Items.lead, Items.thorium, Items.titanium);
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
-    /**
-     * Stores all ore quadtrants on the map.
-     */
+    /**Stores all ore quadtrants on the map.*/
     private ObjectMap<Item, ObjectSet<Tile>> ores;
-    /**
-     * Tags all quadrants.
-     */
+    /**Tags all quadrants.*/
     private Bits[] structQuadrants;
 
-    /**
-     * Maps teams to a map of flagged tiles by type.
-     */
-    private ObjectMap<BlockFlag, ObjectSet<Tile>> enemyMap = new ObjectMap<>();
-    /**
-     * Maps teams to a map of flagged tiles by type.
-     */
-    private ObjectMap<BlockFlag, ObjectSet<Tile>> allyMap = new ObjectMap<>();
-    /**
-     * Empty map for invalid teams.
-     */
-    private ObjectMap<BlockFlag, ObjectSet<Tile>> emptyMap = new ObjectMap<>();
-    /**
-     * Maps tile positions to their last known tile index data.
-     */
+    /**Maps teams to a map of flagged tiles by type.*/
+    private ObjectSet<Tile>[][] flagMap = new ObjectSet[Team.all.length][BlockFlag.all.length];
+    /**Maps tile positions to their last known tile index data.*/
     private IntMap<TileIndex> typeMap = new IntMap<>();
-    /**
-     * Empty array used for returning.
-     */
-    private ObjectSet<Tile> emptyArray = new ObjectSet<>();
+    /**Empty set used for returning.*/
+    private ObjectSet<Tile> emptySet = new ObjectSet<>();
+    /**Array used for returning and reusing.*/
+    private Array<Tile> returnArray = new ThreadArray<>();
 
     public BlockIndexer(){
-        Events.on(TileChangeEvent.class, tile -> {
-            if(typeMap.get(tile.packedPosition()) != null){
-                TileIndex index = typeMap.get(tile.packedPosition());
+        Events.on(TileChangeEvent.class, event -> {
+            if(typeMap.get(event.tile.packedPosition()) != null){
+                TileIndex index = typeMap.get(event.tile.packedPosition());
                 for(BlockFlag flag : index.flags){
-                    getMap(index.team).get(flag).remove(tile);
+                    getFlagged(index.team)[flag.ordinal()].remove(event.tile);
                 }
             }
-            process(tile);
-            updateQuadrant(tile);
+            process(event.tile);
+            updateQuadrant(event.tile);
         });
 
-        Events.on(WorldLoadEvent.class, () -> {
-            enemyMap.clear();
-            allyMap.clear();
+        Events.on(WorldLoadEvent.class, event -> {
+            flagMap = new ObjectSet[Team.all.length][BlockFlag.all.length];
+            for(int i = 0; i < flagMap.length; i++){
+                for(int j = 0; j < BlockFlag.all.length; j++){
+                    flagMap[i][j] = new ObjectSet<>();
+                }
+            }
             typeMap.clear();
             ores = null;
 
@@ -115,22 +93,30 @@ public class BlockIndexer{
         });
     }
 
-    /**
-     * Get all allied blocks with a flag.
-     */
-    public ObjectSet<Tile> getAllied(Team team, BlockFlag type){
-        return (state.teams.get(team).ally ? allyMap : enemyMap).get(type, emptyArray);
+    private ObjectSet<Tile>[] getFlagged(Team team){
+        return flagMap[team.ordinal()];
     }
 
-    /**
-     * Get all enemy blocks with a flag.
-     */
-    public ObjectSet<Tile> getEnemy(Team team, BlockFlag type){
-        return (!state.teams.get(team).ally ? allyMap : enemyMap).get(type, emptyArray);
+    /**Get all allied blocks with a flag.*/
+    public ObjectSet<Tile> getAllied(Team team, BlockFlag type){
+        return flagMap[team.ordinal()][type.ordinal()];
+    }
+
+    /**Get all enemy blocks with a flag.*/
+    public Array<Tile> getEnemy(Team team, BlockFlag type){
+        returnArray.clear();
+        for(Team enemy : state.teams.enemiesOf(team)){
+            if(state.teams.isActive(enemy)){
+                for(Tile tile : getFlagged(enemy)[type.ordinal()]){
+                    returnArray.add(tile);
+                }
+            }
+        }
+        return returnArray;
     }
 
     public TileEntity findTile(Team team, float x, float y, float range, Predicate<Tile> pred){
-        Entity closest = null;
+        TileEntity closest = null;
         float dst = 0;
 
         for(int rx = Math.max((int) ((x - range) / tilesize / structQuadrantSize), 0); rx <= (int) ((x + range) / tilesize / structQuadrantSize) && rx < quadWidth(); rx++){
@@ -142,7 +128,7 @@ public class BlockIndexer{
                     for(int ty = ry * structQuadrantSize; ty < (ry + 1) * structQuadrantSize && ty < world.height(); ty++){
                         Tile other = world.tile(tx, ty);
 
-                        if(other == null || other.entity == null || !pred.test(other)) continue;
+                        if(other == null || other.entity == null || other.getTeam() != team || !pred.test(other) || !other.block().targetable) continue;
 
                         TileEntity e = other.entity;
 
@@ -156,7 +142,7 @@ public class BlockIndexer{
             }
         }
 
-        return (TileEntity) closest;
+        return closest;
     }
 
     /**
@@ -166,14 +152,12 @@ public class BlockIndexer{
      * Only specific ore types are scanned. See {@link #scanOres}.
      */
     public ObjectSet<Tile> getOrePositions(Item item){
-        return ores.get(item, emptyArray);
+        return ores.get(item, emptySet);
     }
 
-    /**
-     * Find the closest ore block relative to a position.
-     */
+    /**Find the closest ore block relative to a position.*/
     public Tile findClosestOre(float xp, float yp, Item item){
-        Tile tile = Geometry.findClosest(xp, yp, world.indexer().getOrePositions(item));
+        Tile tile = Geometry.findClosest(xp, yp, world.indexer.getOrePositions(item));
 
         if(tile == null) return null;
 
@@ -192,19 +176,15 @@ public class BlockIndexer{
     private void process(Tile tile){
         if(tile.block().flags != null &&
                 tile.getTeam() != Team.none){
-            ObjectMap<BlockFlag, ObjectSet<Tile>> map = getMap(tile.getTeam());
+            ObjectSet<Tile>[] map = getFlagged(tile.getTeam());
 
             for(BlockFlag flag : tile.block().flags){
 
-                ObjectSet<Tile> arr = map.get(flag);
-                if(arr == null){
-                    arr = new ObjectSet<>();
-                    map.put(flag, arr);
-                }
+                ObjectSet<Tile> arr = map[flag.ordinal()];
 
                 arr.add(tile);
 
-                map.put(flag, arr);
+                map[flag.ordinal()] = arr;
             }
             typeMap.put(tile.packedPosition(), new TileIndex(tile.block().flags, tile.getTeam()));
         }
@@ -246,12 +226,12 @@ public class BlockIndexer{
         int quadrantX = tile.x / structQuadrantSize;
         int quadrantY = tile.y / structQuadrantSize;
         int index = quadrantX + quadrantY * quadWidth();
-        //Log.info("Updating quadrant: {0} {1}", quadrantX, quadrantY);
 
-        for(TeamData data : state.teams.getTeams()){
+        for(Team team : Team.all){
+            TeamData data = state.teams.get(team);
 
             //fast-set this quadrant to 'occupied' if the tile just placed is already of this team
-            if(tile.getTeam() == data.team && tile.entity != null){
+            if(tile.getTeam() == data.team && tile.entity != null && tile.block().targetable){
                 structQuadrants[data.team.ordinal()].set(index);
                 continue; //no need to process futher
             }
@@ -283,11 +263,6 @@ public class BlockIndexer{
 
     private int quadHeight(){
         return Mathf.ceil(world.height() / (float) structQuadrantSize);
-    }
-
-    private ObjectMap<BlockFlag, ObjectSet<Tile>> getMap(Team team){
-        if(!state.teams.has(team)) return emptyMap;
-        return state.teams.get(team).ally ? allyMap : enemyMap;
     }
 
     private void scanOres(){

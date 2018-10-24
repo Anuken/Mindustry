@@ -7,6 +7,7 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
@@ -28,6 +29,20 @@ public class LiquidBulletType extends BulletType{
         hiteffect = BulletFx.hitLiquid;
         drag = 0.01f;
         knockback = 0.5f;
+    }
+
+    @Override
+    public void update(Bullet b) {
+        super.update(b);
+
+        if(liquid.canExtinguish()){
+            Tile tile = world.tileWorld(b.x, b.y);
+            if(tile != null && Fire.has(tile.x, tile.y)){
+                Fire.extinguish(tile, 100f);
+                b.remove();
+                hit(b);
+            }
+        }
     }
 
     @Override

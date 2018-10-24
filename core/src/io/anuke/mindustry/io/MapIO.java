@@ -7,19 +7,27 @@ import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
+import io.anuke.mindustry.world.LegacyColorMapper;
+import io.anuke.mindustry.world.LegacyColorMapper.LegacyBlock;
+import io.anuke.ucore.util.Bits;
+import io.anuke.ucore.util.Structs;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import static io.anuke.mindustry.Vars.content;
 
 /**
  * Reads and writes map files.
@@ -29,7 +37,7 @@ public class MapIO{
     private static IntIntMap defaultBlockMap = new IntIntMap();
 
     private static void loadDefaultBlocks(){
-        for(Block block : Block.all()){
+        for(Block block : content.blocks()){
             defaultBlockMap.put(block.id, block.id);
         }
     }
@@ -44,8 +52,8 @@ public class MapIO{
         for(int y = 0; y < data.height(); y++){
             for(int x = 0; x < data.width(); x++){
                 data.read(marker);
-                Block floor = Block.getByID(marker.floor);
-                Block wall = Block.getByID(marker.wall);
+                Block floor = content.block(marker.floor);
+                Block wall = content.block(marker.wall);
                 int wallc = ColorMapper.getBlockColor(wall);
                 if(wallc == 0 && (wall.update || wall.solid || wall.breakable)) wallc = Team.all[marker.team].intColor;
                 wallc = wallc == 0 ? ColorMapper.getBlockColor(floor) : wallc;
@@ -64,20 +72,41 @@ public class MapIO{
         return pixmap;
     }
 
-    public static MapTileData readPixmap(Pixmap pixmap){
+    /**Reads a pixmap in the old (3.5) map format.*/
+    public static MapTileData readLegacyPixmap(Pixmap pixmap){
         MapTileData data = new MapTileData(pixmap.getWidth(), pixmap.getHeight());
 
         for(int x = 0; x < data.width(); x++){
             for(int y = 0; y < data.height(); y++){
-                Block block = ColorMapper.getByColor(pixmap.getPixel(y, pixmap.getWidth() - 1 - x));
+                int color = pixmap.getPixel(x, pixmap.getHeight() - 1 - y);
+                LegacyBlock block = LegacyColorMapper.get(color);
 
-                if(block == null){
-                    data.write(x, y, DataPosition.floor, (byte) Blocks.stone.id);
-                }else{
-                    data.write(x, y, DataPosition.floor, (byte) block.id);
+                data.write(x, y, DataPosition.floor, block.floor.id);
+                data.write(x, y, DataPosition.elevation, (byte)block.elevation);
+
+                //place spawn
+                if(color == Color.rgba8888(Color.RED)){
+                    data.write(x, y, DataPosition.wall, Blocks.spawn.id);
                 }
 
-                data.write(x, y, DataPosition.wall, (byte) Blocks.air.id);
+                //place core
+                if(color == Color.rgba8888(Color.GREEN)){
+                    for(int dx = 0; dx < 3; dx++){
+                        for(int dy = 0; dy < 3; dy++){
+                            int worldx = dx - 1 + x;
+                            int worldy = dy - 1 + y;
+
+                            if(Structs.inBounds(worldx, worldy, pixmap.getWidth(), pixmap.getHeight())){
+                                data.write(worldx, worldy, DataPosition.wall, Blocks.blockpart.id);
+                                data.write(worldx, worldy, DataPosition.rotationTeam, Bits.packByte((byte)0, (byte)Team.blue.ordinal()));
+                                data.write(worldx, worldy, DataPosition.link, Bits.packByte((byte) (dx - 1 + 8), (byte) (dy - 1 + 8)));
+                            }
+                        }
+                    }
+
+                    data.write(x, y, DataPosition.wall, StorageBlocks.core.id);
+                    data.write(x, y, DataPosition.rotationTeam, Bits.packByte((byte)0, (byte)Team.blue.ordinal()));
+                }
             }
         }
 
@@ -146,7 +175,7 @@ public class MapIO{
         for(int i = 0; i < blocks; i++){
             short id = stream.readShort();
             String name = stream.readUTF();
-            Block block = Block.getByName(name);
+            Block block = content.getByName(ContentType.block, name);
             if(block == null){
                 //Log.info("Map load info: No block with name {0} found.", name);
                 block = Blocks.air;
@@ -169,8 +198,8 @@ public class MapIO{
             stream.writeUTF(entry.value);
         }
 
-        stream.writeShort(Block.all().size);
-        for(Block block : Block.all()){
+        stream.writeShort(content.blocks().size);
+        for(Block block : content.blocks()){
             stream.writeShort(block.id);
             stream.writeUTF(block.name);
         }

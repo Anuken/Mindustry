@@ -1,7 +1,6 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -11,23 +10,28 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.ContentDatabase;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Saves;
+import io.anuke.mindustry.game.Unlocks;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.MobileInput;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.Atlas;
+import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
+import io.anuke.ucore.util.Timer;
+
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -41,19 +45,20 @@ public class Control extends Module{
     /** Minimum period of time between the same sound being played.*/
     private static final long minSoundPeriod = 100;
 
+    public final Saves saves;
+    public final Unlocks unlocks;
+
+    private Timer timerRPC= new Timer(), timerUnlock = new Timer();
     private boolean hiscore = false;
     private boolean wasPaused = false;
-    private Saves saves;
-    private ContentDatabase db;
     private InputHandler[] inputs = {};
     private ObjectMap<Sound, Long> soundMap = new ObjectMap<>();
-
     private Throwable error;
 
     public Control(){
 
         saves = new Saves();
-        db = new ContentDatabase();
+        unlocks = new Unlocks();
 
         Inputs.useControllers(!gwt);
 
@@ -61,12 +66,12 @@ public class Control extends Module{
 
         Effects.setShakeFalloff(10000f);
 
-        ContentLoader.initialize(Content::init);
+        content.initialize(Content::init);
         Core.atlas = new Atlas("sprites.atlas");
         Core.atlas.setErrorRegion("error");
-        ContentLoader.initialize(Content::load);
+        content.initialize(Content::load);
 
-        db.load();
+        unlocks.load();
 
         Sounds.setFalloff(9000f);
         Sounds.setPlayer((sound, volume) -> {
@@ -74,7 +79,7 @@ public class Control extends Module{
             long value = soundMap.get(sound, 0L);
 
             if(TimeUtils.timeSinceMillis(value) >= minSoundPeriod){
-                threads.run(() -> sound.play(volume));
+                threads.runGraphics(() -> sound.play(volume));
                 soundMap.put(sound, time);
             }
         });
@@ -83,7 +88,6 @@ public class Control extends Module{
 
         Settings.defaultList(
             "ip", "localhost",
-            "port", port + "",
             "color-0", Color.rgba8888(playerColors[8]),
             "color-1", Color.rgba8888(playerColors[11]),
             "color-2", Color.rgba8888(playerColors[13]),
@@ -98,33 +102,36 @@ public class Control extends Module{
 
         saves.load();
 
-        Events.on(StateChangeEvent.class, (from, to) -> {
-            if((from == State.playing && to == State.menu) || (from == State.menu && to != State.menu)){
+        Events.on(StateChangeEvent.class, event -> {
+            if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
                 Timers.runTask(5f, Platform.instance::updateRPC);
             }
         });
 
-        Events.on(PlayEvent.class, () -> {
+        Events.on(PlayEvent.class, event -> {
             for(Player player : players){
                 player.add();
             }
 
             state.set(State.playing);
 
-            if(state.mode == GameMode.sandbox && !Settings.getBool("sandbox-warning", false)){
-                threads.runGraphics(() -> ui.showInfo("$mode.sandbox.warning"));
-                Settings.putBool("sandbox-warning", true);
-                Settings.save();
+            if(world.getSector() == null && !Settings.getBool("custom-warning-for-real-1", false)){
+                threads.runGraphics(() -> ui.showInfo("$mode.custom.warning", () ->
+                    ui.showInfo("$mode.custom.warning.read", () -> {
+                        Settings.putBool("custom-warning-for-real-1", true);
+                        Settings.save();
+                    })));
+
             }
         });
 
-        Events.on(WorldLoadGraphicsEvent.class, () -> {
+        Events.on(WorldLoadGraphicsEvent.class, event -> {
             if(mobile){
                 Core.camera.position.set(players[0].x, players[0].y, 0);
             }
         });
 
-        Events.on(ResetEvent.class, () -> {
+        Events.on(ResetEvent.class, event -> {
             for(Player player : players){
                 player.reset();
             }
@@ -134,11 +141,11 @@ public class Control extends Module{
             saves.resetSave();
         });
 
-        Events.on(WaveEvent.class, () -> {
+        Events.on(WaveEvent.class, event -> {
 
             int last = Settings.getInt("hiscore" + world.getMap().name, 0);
 
-            if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer){
+            if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer && world.getSector() == null){
                 Settings.putInt("hiscore" + world.getMap().name, state.wave);
                 Settings.save();
                 hiscore = true;
@@ -147,7 +154,7 @@ public class Control extends Module{
             Platform.instance.updateRPC();
         });
 
-        Events.on(GameOverEvent.class, () -> {
+        Events.on(GameOverEvent.class, event -> {
             //delete saves for game-over sectors
             if(world.getSector() != null && world.getSector().hasSave()){
                 world.getSector().getSave().delete();
@@ -155,12 +162,31 @@ public class Control extends Module{
 
             threads.runGraphics(() -> {
                 Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
-                ui.restart.show();
-                state.set(State.menu);
+                //the restart dialog can show info for any number of scenarios
+                Call.onGameOver(event.winner);
             });
         });
 
-        Events.on(WorldLoadEvent.class, () -> threads.runGraphics(() -> Events.fire(WorldLoadGraphicsEvent.class)));
+        //autohost for pvp sectors
+        Events.on(WorldLoadEvent.class, event -> {
+            if(state.mode.isPvp && !Net.active()){
+                try{
+                    Net.host(port);
+                    players[0].isAdmin = true;
+                }catch(IOException e){
+                    ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
+                    threads.runDelay(() -> state.set(State.menu));
+                }
+            }
+        });
+
+        Events.on(WorldLoadEvent.class, event -> threads.runGraphics(() -> Events.fire(new WorldLoadGraphicsEvent())));
+
+        Events.on(TileChangeEvent.class, event -> {
+            if(event.tile.getTeam() == players[0].getTeam() && Recipe.getByResult(event.tile.block()) != null){
+                unlocks.handleContentUsed(Recipe.getByResult(event.tile.block()));
+            }
+        });
     }
 
     public void addPlayer(int index){
@@ -220,41 +246,20 @@ public class Control extends Module{
         System.arraycopy(oldi, 0, inputs, 0, inputs.length);
     }
 
-    public ContentDatabase database(){
-        return db;
-    }
-
-    public Input gdxInput(){
-        return Gdx.input;
-    }
-
     public void setError(Throwable error){
         this.error = error;
-    }
-
-    public Saves getSaves(){
-        return saves;
     }
 
     public InputHandler input(int index){
         return inputs[index];
     }
 
-    public void triggerUpdateInput(){
-        //Gdx.input = proxy;
-    }
-
     public void playMap(Map map){
-        ui.loadfrag.show();
-
-        Timers.run(5f, () ->
-                threads.run(() -> {
-                    logic.reset();
-                    world.loadMap(map);
-                    logic.play();
-
-                    Gdx.app.postRunnable(ui.loadfrag::hide);
-                }));
+        ui.loadLogic(() -> {
+            logic.reset();
+            world.loadMap(map);
+            logic.play();
+        });
     }
 
     public boolean isHighScore(){
@@ -266,16 +271,21 @@ public class Control extends Module{
 
         if(entity == null) return;
 
-        entity.items.forEach((item, amount) -> control.database().unlockContent(item));
+        entity.items.forEach((item, amount) -> unlocks.unlockContent(item));
 
         if(players[0].inventory.hasItem()){
-            control.database().unlockContent(players[0].inventory.getItem().item);
+            unlocks.unlockContent(players[0].inventory.getItem().item);
         }
 
-        for(int i = 0; i < Recipe.all().size; i++){
-            Recipe recipe = Recipe.all().get(i);
-            if(!recipe.debugOnly && entity.items.has(recipe.requirements, 1.4f)){
-                if(control.database().unlockContent(recipe)){
+        outer:
+        for(int i = 0; i < content.recipes().size; i ++){
+            Recipe recipe = content.recipes().get(i);
+            if(!recipe.hidden && recipe.requirements != null){
+                for(ItemStack stack : recipe.requirements){
+                    if(!entity.items.has(stack.item, Math.min((int) (stack.amount * unlockResourceScaling), 2000))) continue outer;
+                }
+
+                if(unlocks.unlockContent(recipe)){
                     ui.hudfrag.showUnlock(recipe);
                 }
             }
@@ -285,7 +295,7 @@ public class Control extends Module{
     @Override
     public void dispose(){
         Platform.instance.onGameExit();
-        ContentLoader.dispose();
+        content.dispose();
         Net.dispose();
         ui.editor.dispose();
         inputs = new InputHandler[]{};
@@ -307,33 +317,24 @@ public class Control extends Module{
 
     @Override
     public void init(){
-        EntityPhysics.initPhysics();
+        EntityQuery.init();
 
         Platform.instance.updateRPC();
 
-        if(!Settings.has("4.0-warning")){
-            Settings.putBool("4.0-warning", true);
+        if(!Settings.getBool("4.0-warning-2", false)){
 
             Timers.run(5f, () -> {
                 FloatingDialog dialog = new FloatingDialog("[orange]WARNING![]");
-                dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
-                dialog.content().add("The beta version you are about to play should be considered very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
-                        "A large portion of content is still unimplemented. \nAll current art and UI is temporary, and will be re-drawn before release. " +
-                        "\n\n[accent]Saves and maps may be corrupted without warning between updates.[] You have been warned!").wrap().width(400f);
+                dialog.buttons().addButton("$text.ok", () -> {
+                    dialog.hide();
+                    Settings.putBool("4.0-warning-2", true);
+                    Settings.save();
+                }).size(100f, 60f);
+                dialog.content().add("Reminder: The beta version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
+                        "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
+                        "All current art and UI is temporary, and will be re-drawn before release. " +
+                        "\n\n[accent]Saves and maps may be corrupted without warning between updates.").wrap().width(400f);
                 dialog.show();
-
-            });
-        }
-
-        if(!Settings.has("4.0-no-sound")){
-            Settings.putBool("4.0-no-sound", true);
-
-            Timers.run(4f, () -> {
-                FloatingDialog dialog = new FloatingDialog("[orange]Attention![]");
-                dialog.buttons().addButton("$text.ok", dialog::hide).size(100f, 60f);
-                dialog.content().add("You might have noticed that 4.0 does not have any sound.\nThis is [orange]intentional![] Sound will be added in a later update.\n\n[LIGHT_GRAY](now stop reporting this as a bug)").wrap().width(400f);
-                dialog.show();
-
             });
         }
     }
@@ -341,24 +342,17 @@ public class Control extends Module{
     /** Called from main logic thread.*/
     public void runUpdateLogic(){
         if(!state.is(State.menu)){
-            renderer.minimap().updateUnitArray();
+            renderer.minimap.updateUnitArray();
         }
     }
 
     @Override
     public void update(){
-
         if(error != null){
             throw new RuntimeException(error);
         }
 
-        if(Inputs.keyTap("console")){
-            console = !console;
-        }
-
         saves.update();
-
-        triggerUpdateInput();
 
         for(InputHandler inputHandler : inputs){
             inputHandler.updateController();
@@ -369,27 +363,18 @@ public class Control extends Module{
                 input.update();
             }
 
-            //check unlocked sectors
-            if(world.getSector() != null && !world.getSector().complete){
-                //all assigned missions are complete
-                if(world.getSector().completedMissions >= world.getSector().missions.size){
-
-                    world.sectors().completeSector(world.getSector().x, world.getSector().y);
-                    world.sectors().save();
-                    ui.missions.show(world.getSector());
-                }else if(world.getSector().currentMission().isComplete()){
-                    //increment completed missions, check next index next frame
-                    world.getSector().completedMissions ++;
-                }
+            //auto-update rpc every 5 seconds
+            if(timerRPC.get(60 * 5)){
+                Platform.instance.updateRPC();
             }
 
             //check unlocks every 2 seconds
-            if(!state.mode.infiniteResources && Timers.get("timerCheckUnlock", 120)){
+            if(!state.mode.infiniteResources && timerUnlock.get(120)){
                 checkUnlockableBlocks();
 
-                //save if the db changed, but don't save in debug
-                if(db.isDirty() && !debug){
-                    db.save();
+                //save if the unlocks changed
+                if(unlocks.isDirty()){
+                    unlocks.save();
                 }
             }
 
@@ -411,10 +396,6 @@ public class Control extends Module{
                 }
             }
 
-            if(!state.is(State.paused) || Net.active()){
-                Entities.update(effectGroup);
-                Entities.update(groundEffectGroup);
-            }
         }else{
             if(!state.is(State.paused) || Net.active()){
                 Timers.update();

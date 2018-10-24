@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -18,6 +17,7 @@ import io.anuke.ucore.util.Mathf;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import static io.anuke.mindustry.Vars.*;
 
 public class Sorter extends Block implements SelectionTrait{
 
@@ -26,15 +26,19 @@ public class Sorter extends Block implements SelectionTrait{
         update = true;
         solid = true;
         instantTransfer = true;
-        outputsItems = true;
         group = BlockGroup.transportation;
         configurable = true;
+    }
+
+    @Override
+    public boolean outputsItems(){
+        return true;
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSorterItem(Player player, Tile tile, Item item){
         SorterEntity entity = tile.entity();
-        entity.sortItem = item;
+        if(entity != null) entity.sortItem = item;
     }
 
     @Override
@@ -110,12 +114,12 @@ public class Sorter extends Block implements SelectionTrait{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new SorterEntity();
     }
 
     public static class SorterEntity extends TileEntity{
-        public Item sortItem = Items.tungsten;
+        public Item sortItem = content.item(0);
 
         @Override
         public void write(DataOutputStream stream) throws IOException{
@@ -124,7 +128,7 @@ public class Sorter extends Block implements SelectionTrait{
 
         @Override
         public void read(DataInputStream stream) throws IOException{
-            sortItem = Item.all().get(stream.readByte());
+            sortItem = content.items().get(stream.readByte());
         }
     }
 }

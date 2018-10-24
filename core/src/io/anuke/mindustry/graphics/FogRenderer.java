@@ -29,21 +29,30 @@ import static io.anuke.mindustry.Vars.*;
 /**Used for rendering fog of war. A framebuffer is used for this.*/
 public class FogRenderer implements Disposable{
     private static final int extraPadding = 3;
-    private static final int shadowPadding = 1;
+    private static final int fshadowPadding = 1;
 
     private TextureRegion region = new TextureRegion();
     private FrameBuffer buffer;
     private ByteBuffer pixelBuffer;
     private Array<Tile> changeQueue = new Array<>();
     private int padding;
+    private int shadowPadding;
     private Rectangle rect = new Rectangle();
     private boolean dirty;
 
+    private boolean isOffseted;
+    private int offsettedX, offsettedY;
+
     public FogRenderer(){
-        Events.on(WorldLoadGraphicsEvent.class, () -> {
-            dispose();
+        Events.on(WorldLoadGraphicsEvent.class, event -> {
+            if(!isOffseted){
+                dispose();
+            }
 
             padding = world.getSector() != null ? mapPadding + extraPadding : 0;
+            shadowPadding = world.getSector() != null ? fshadowPadding : -1;
+
+            FrameBuffer lastBuffer = buffer;
 
             buffer = new FrameBuffer(Format.RGBA8888, world.width() + padding*2, world.height() + padding*2, false);
             changeQueue.clear();
@@ -51,7 +60,19 @@ public class FogRenderer implements Disposable{
             //clear buffer to black
             buffer.begin();
             Graphics.clear(0, 0, 0, 1f);
+
+            if(isOffseted){
+                Core.batch.getProjectionMatrix().setToOrtho2D(-padding, -padding, buffer.getWidth(), buffer.getHeight());
+                Core.batch.begin();
+                Core.batch.draw(lastBuffer.getColorBufferTexture(), offsettedX, offsettedY + lastBuffer.getColorBufferTexture().getHeight(),
+                            lastBuffer.getColorBufferTexture().getWidth(), -lastBuffer.getColorBufferTexture().getHeight());
+                Core.batch.end();
+            }
             buffer.end();
+
+            if(isOffseted){
+                lastBuffer.dispose();
+            }
 
             for(int x = 0; x < world.width(); x++){
                 for(int y = 0; y < world.height(); y++){
@@ -64,11 +85,13 @@ public class FogRenderer implements Disposable{
 
             pixelBuffer = ByteBuffer.allocateDirect(world.width() * world.height() * 4);
             dirty = true;
+
+            isOffseted = false;
         });
 
-        Events.on(TileChangeEvent.class, tile -> threads.runGraphics(() -> {
-            if(tile.getTeam() == players[0].getTeam() && tile.block().synthetic() && tile.block().viewRange > 0){
-                changeQueue.add(tile);
+        Events.on(TileChangeEvent.class, event -> threads.runGraphics(() -> {
+            if(event.tile.getTeam() == players[0].getTeam() && event.tile.block().synthetic() && event.tile.block().viewRange > 0){
+                changeQueue.add(event.tile);
             }
         }));
     }

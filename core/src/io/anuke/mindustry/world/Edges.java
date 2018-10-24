@@ -64,19 +64,15 @@ public class Edges{
         return polygons[(int) (radius * 2) - 1];
     }
 
-    public static synchronized GridPoint2[] getEdges(int size){
+    public static GridPoint2[] getEdges(int size){
         if(size < 0 || size > maxSize) throw new RuntimeException("Block size must be between 0 and " + maxSize);
 
         return edges[size - 1];
     }
 
-    public static synchronized GridPoint2[] getInsideEdges(int size){
+    public static GridPoint2[] getInsideEdges(int size){
         if(size < 0 || size > maxSize) throw new RuntimeException("Block size must be between 0 and " + maxSize);
 
         return edgeInside[size - 1];
-    }
-
-    public static synchronized int getEdgeAmount(int size){
-        return getEdges(size).length;
     }
 }

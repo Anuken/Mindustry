@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.Block;
@@ -21,24 +21,24 @@ import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Recipe implements UnlockableContent{
-    private static int lastid;
-    private static Array<Recipe> allRecipes = new Array<>();
+public class Recipe extends UnlockableContent{
     private static ObjectMap<Block, Recipe> recipeMap = new ObjectMap<>();
 
-    public final int id;
     public final Block result;
     public final ItemStack[] requirements;
     public final Category category;
     public final float cost;
 
-    public boolean desktopOnly = false, debugOnly = false;
+    public RecipeVisibility visibility = RecipeVisibility.all;
+    //the only gamemode in which the recipe shows up
+    public GameMode mode;
+    public boolean hidden;
+    public boolean alwaysUnlocked;
 
-    private Block[] dependencies;
-    private Recipe[] recipeDependencies;
+    private UnlockableContent[] dependencies;
+    private Block[] blockDependencies;
 
     public Recipe(Category category, Block result, ItemStack... requirements){
-        this.id = lastid++;
         this.result = result;
         this.requirements = requirements;
         this.category = category;
@@ -52,7 +52,6 @@ public class Recipe implements UnlockableContent{
 
         this.cost = timeToPlace;
 
-        allRecipes.add(this);
         recipeMap.put(result, this);
     }
 
@@ -60,15 +59,16 @@ public class Recipe implements UnlockableContent{
      * Returns unlocked recipes in a category.
      * Do not call on the server backend, as unlocking does not exist!
      */
-    public static void getUnlockedByCategory(Category category, Array<Recipe> r){
+    public static void getUnlockedByCategory(Category category, Array<Recipe> arr){
         if(headless){
-            throw new RuntimeException("Not enabled on the headless backend!");
+            throw new RuntimeException("Not implemented on the headless backend!");
         }
 
-        r.clear();
-        for(Recipe recipe : allRecipes){
-            if(recipe.category == category && (Vars.control.database().isUnlocked(recipe) || (debug && recipe.debugOnly))){
-                r.add(recipe);
+        arr.clear();
+        for(Recipe r : content.recipes()){
+            if(r.category == category && (control.unlocks.isUnlocked(r)) &&
+            !((r.mode != null && r.mode != state.mode) || !r.visibility.shown())){
+                arr.add(r);
             }
         }
     }
@@ -78,42 +78,46 @@ public class Recipe implements UnlockableContent{
      */
     public static void getByCategory(Category category, Array<Recipe> r){
         r.clear();
-        for(Recipe recipe : allRecipes){
+        for(Recipe recipe : content.recipes()){
             if(recipe.category == category){
                 r.add(recipe);
             }
         }
     }
 
-    public static Array<Recipe> all(){
-        return allRecipes;
-    }
-
     public static Recipe getByResult(Block block){
         return recipeMap.get(block);
     }
 
-    public static Recipe getByID(int id){
-        if(id < 0 || id >= allRecipes.size){
-            return null;
-        }else{
-            return allRecipes.get(id);
-        }
-    }
-
-    public Recipe setDesktop(){
-        desktopOnly = true;
+    public Recipe setVisible(RecipeVisibility visibility){
+        this.visibility = visibility;
         return this;
     }
 
-    public Recipe setDebug(){
-        debugOnly = true;
+    public Recipe setMode(GameMode mode){
+        this.mode = mode;
         return this;
+    }
+
+    public Recipe setHidden(boolean hidden){
+        this.hidden = hidden;
+        return this;
+    }
+
+    public Recipe setAlwaysUnlocked(boolean unlocked){
+        this.alwaysUnlocked = unlocked;
+        return this;
+    }
+
+
+    @Override
+    public boolean alwaysUnlocked(){
+        return alwaysUnlocked;
     }
 
     @Override
     public boolean isHidden(){
-        return debugOnly || (desktopOnly && mobile);
+        return !visibility.shown() || hidden;
     }
 
     @Override
@@ -147,8 +151,8 @@ public class Recipe implements UnlockableContent{
     }
 
     @Override
-    public String getContentTypeName(){
-        return "recipe";
+    public ContentType getContentType(){
+        return ContentType.recipe;
     }
 
     @Override
@@ -159,7 +163,7 @@ public class Recipe implements UnlockableContent{
                     ContentStatValue stat = (ContentStatValue) value;
                     UnlockableContent[] content = stat.getValueContent();
                     for(UnlockableContent c : content){
-                        control.database().unlockContent(c);
+                        control.unlocks.unlockContent(c);
                     }
                 }
             }
@@ -168,24 +172,40 @@ public class Recipe implements UnlockableContent{
 
     @Override
     public UnlockableContent[] getDependencies(){
-        if(dependencies == null){
-            return null;
-        }else if(recipeDependencies == null){
-            recipeDependencies = new Recipe[dependencies.length];
-            for(int i = 0; i < recipeDependencies.length; i++){
-                recipeDependencies[i] = Recipe.getByResult(dependencies[i]);
+        if(blockDependencies != null && dependencies == null){
+            dependencies = new UnlockableContent[blockDependencies.length];
+            for(int i = 0; i < dependencies.length; i++){
+                dependencies[i] = Recipe.getByResult(blockDependencies[i]);
             }
+            return dependencies;
         }
-        return recipeDependencies;
+        return dependencies;
     }
 
-    public Recipe setDependencies(Block... blocks){
-        this.dependencies = blocks;
+    public Recipe setDependencies(UnlockableContent... dependencies){
+        this.dependencies = dependencies;
         return this;
     }
 
-    @Override
-    public Array<? extends Content> getAll(){
-        return allRecipes;
+    public Recipe setDependencies(Block... dependencies){
+        this.blockDependencies = dependencies;
+        return this;
+    }
+
+    public enum RecipeVisibility{
+        mobileOnly(true, false),
+        desktopOnly(false, true),
+        all(true, true);
+
+        public final boolean mobile, desktop;
+
+        RecipeVisibility(boolean mobile, boolean desktop){
+            this.mobile = mobile;
+            this.desktop = desktop;
+        }
+
+        public boolean shown(){
+            return (Vars.mobile && mobile) || (!Vars.mobile && desktop);
+        }
     }
 }

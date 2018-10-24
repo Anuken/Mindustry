@@ -81,12 +81,7 @@ public class WarpGate extends PowerBlock{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
-    }
-
-    @Override
-    public void placed(Tile tile){
+    public void playerPlaced(Tile tile){
         Call.setTeleporterColor(null, tile, lastColor);
     }
 
@@ -273,7 +268,7 @@ public class WarpGate extends PowerBlock{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new TeleporterEntity();
     }
 

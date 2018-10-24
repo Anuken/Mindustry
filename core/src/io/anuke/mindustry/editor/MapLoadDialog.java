@@ -38,8 +38,8 @@ public class MapLoadDialog extends FloatingDialog{
 
     public void rebuild(){
         content().clear();
-        if(world.maps().all().size > 0){
-            selected = world.maps().all().first();
+        if(world.maps.all().size > 0){
+            selected = world.maps.all().first();
         }
 
         ButtonGroup<TextButton> group = new ButtonGroup<>();
@@ -55,7 +55,7 @@ public class MapLoadDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(table, "horizontal");
         pane.setFadeScrollBars(false);
 
-        for(Map map : world.maps().all()){
+        for(Map map : world.maps.all()){
 
             TextButton button = new TextButton(map.getDisplayName(), "toggle");
             button.add(new BorderImage(map.texture, 2f)).size(16 * 4f);
@@ -67,7 +67,7 @@ public class MapLoadDialog extends FloatingDialog{
             if(++i % maxcol == 0) table.row();
         }
 
-        if(world.maps().all().size == 0){
+        if(world.maps.all().size == 0){
             pane.setStyle(Core.skin.get("clear", ScrollPaneStyle.class));
             table.add("$text.maps.none").center();
         }else{

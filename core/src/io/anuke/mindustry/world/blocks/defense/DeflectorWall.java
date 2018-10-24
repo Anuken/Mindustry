@@ -7,7 +7,6 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Wall;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -17,10 +16,11 @@ import io.anuke.ucore.util.Physics;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class DeflectorWall extends Wall{
-    static final float hitTime = 10f;
+    public static final float hitTime = 10f;
 
-    protected float maxDamageDeflect = 5f;
+    protected float maxDamageDeflect = 10f;
     protected Rectangle rect = new Rectangle();
+    protected Rectangle rect2 = new Rectangle();
 
     public DeflectorWall(String name){
         super(name);
@@ -55,8 +55,10 @@ public class DeflectorWall extends Wall{
 
         float penX = Math.abs(entity.x - bullet.x), penY = Math.abs(entity.y - bullet.y);
 
-        Vector2 position = Physics.raycastRect(bullet.lastPosition().x, bullet.lastPosition().y, bullet.x, bullet.y,
-                rect.setCenter(entity.x, entity.y).setSize(size * tilesize + bullet.hitbox.width + bullet.hitbox.height));
+        bullet.getHitbox(rect2);
+
+        Vector2 position = Physics.raycastRect(bullet.x, bullet.y, bullet.x + bullet.getVelocity().x, bullet.y + bullet.getVelocity().y,
+                rect.setCenter(entity.x, entity.y).setSize(size * tilesize + rect2.width + rect2.height));
 
         if(position != null){
             bullet.set(position.x, position.y);
@@ -68,20 +70,20 @@ public class DeflectorWall extends Wall{
             bullet.getVelocity().y *= -1;
         }
 
-        bullet.updateVelocity(0f);
+        bullet.updateVelocity();
         bullet.resetOwner(entity, Team.none);
         bullet.scaleTime(1f);
-        bullet.supressCollision();
+        bullet.supress();
 
         ((DeflectorEntity) entity).hit = 1f;
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new DeflectorEntity();
     }
 
-    static class DeflectorEntity extends TileEntity{
+    public static class DeflectorEntity extends TileEntity{
         public float hit;
     }
 }

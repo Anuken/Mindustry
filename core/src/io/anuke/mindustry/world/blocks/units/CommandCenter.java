@@ -10,6 +10,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitCommand;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
@@ -22,6 +23,10 @@ import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.EnumSet;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -41,8 +46,8 @@ public class CommandCenter extends Block{
     }
 
     @Override
-    public void placed(Tile tile){
-        ObjectSet<Tile> set = world.indexer().getAllied(tile.getTeam(), BlockFlag.comandCenter);
+    public void playerPlaced(Tile tile){
+        ObjectSet<Tile> set = world.indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
 
         if(set.size > 0){
             CommandCenterEntity entity = tile.entity();
@@ -87,24 +92,36 @@ public class CommandCenter extends Block{
     public static void onCommandCenterSet(Player player, Tile tile, UnitCommand command){
         Effects.effect(((CommandCenter)tile.block()).effect, tile);
 
-        for(Tile center : world.indexer().getAllied(tile.getTeam(), BlockFlag.comandCenter)){
+        for(Tile center : world.indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter)){
             if(center.block() instanceof CommandCenter){
                 CommandCenterEntity entity = center.entity();
                 entity.command = command;
             }
         }
 
-        for(BaseUnit unit : unitGroups[player.getTeam().ordinal()].all()){
+        Team team = (player == null ? tile.getTeam() : player.getTeam());
+
+        for(BaseUnit unit : unitGroups[team.ordinal()].all()){
             unit.onCommand(command);
         }
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new CommandCenterEntity();
     }
 
     public class CommandCenterEntity extends TileEntity{
-        public UnitCommand command = UnitCommand.idle;
+        public UnitCommand command = UnitCommand.attack;
+
+        @Override
+        public void write(DataOutputStream stream) throws IOException{
+            stream.writeByte(command.ordinal());
+        }
+
+        @Override
+        public void read(DataInputStream stream) throws IOException{
+            command = UnitCommand.values()[stream.readByte()];
+        }
     }
 }

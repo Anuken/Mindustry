@@ -15,6 +15,7 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.TargetTrait;
@@ -27,7 +28,6 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
-import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Group;
@@ -45,9 +45,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private final float edgePan = io.anuke.ucore.scene.ui.layout.Unit.dp.scl(60f);
 
     //gesture data
-    private Vector2 pinch1 = new Vector2(-1, -1), pinch2 = pinch1.cpy();
     private Vector2 vector = new Vector2();
-    private float initzoom = -1;
     private boolean zoomed = false;
     /** Set of completed guides. */
     private ObjectSet<String> guides = new ObjectSet<>();
@@ -85,18 +83,17 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     /** Check and assign targets for a specific position. */
     void checkTargets(float x, float y){
-        synchronized(Entities.entityLock){
-            Unit unit = Units.getClosestEnemy(player.getTeam(), x, y, 20f, u -> true);
+        Unit unit = Units.getClosestEnemy(player.getTeam(), x, y, 20f, u -> !u.isDead());
 
-            if(unit != null){
-                player.target = unit;
-            }else{
-                Tile tile = world.tileWorld(x, y);
-                if(tile != null) tile = tile.target();
+        if(unit != null){
+            threads.run(() -> player.target = unit);
+        }else{
+            Tile tile = world.tileWorld(x, y);
+            if(tile != null) tile = tile.target();
 
-                if(tile != null && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
-                    player.target = tile.entity;
-                }
+            if(tile != null && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
+                TileEntity entity = tile.entity;
+                threads.run(() -> player.target = entity);
             }
         }
     }
@@ -178,9 +175,13 @@ public class MobileInput extends InputHandler implements GestureListener{
                         request.recipe.result.rotate ? request.rotation * 90 : 0);
             }
         }else{
-            Draw.color(Palette.remove);
+            float rad = (tile.block().size * tilesize / 2f - 1) * request.scale;
+            Draw.alpha(0f);
             //draw removing request
-            Lines.poly(tile.drawx(), tile.drawy(), 4, tile.block().size * tilesize / 2f * request.scale, 45 + 15);
+            Draw.tint(Palette.removeBack);
+            Lines.square(tile.drawx(), tile.drawy()-1, rad);
+            Draw.tint(Palette.remove);
+            Lines.square(tile.drawx(), tile.drawy(), rad);
         }
     }
 
@@ -240,7 +241,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                         }
                     }
 
-                    //move all current requests to removal array to they fade out
+                    //move all current requests to removal array so they fade out
                     removals.addAll(selection);
                     selection.clear();
                     selecting = false;
@@ -252,7 +253,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 act.addImageButton("icon-arrow", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
                         .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center))
                         .disabled(i -> recipe == null || !recipe.result.rotate);
-            }).visible(() -> mode != none).touchable(Touchable.enabled);;
+            }).visible(() -> mode != none).touchable(Touchable.enabled);
 
             c.row();
 
@@ -267,7 +268,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                         showGuide("deconstruction");
                     }
                 }).update(l -> l.setChecked(mode == breaking));
-            }).margin(5).touchable(Touchable.enabled);;
+            }).margin(5).touchable(Touchable.enabled);
 
             c.table("pane", cancel -> {
                 cancel.defaults().size(60f);
@@ -291,10 +292,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void drawOutlined(){
-
-        //Draw.color(Palette.placing);
-        //Lines.poly(player.x, player.y, 100, Player.placeDistance);
-        //Draw.color();
+        Lines.stroke(1f);
 
         Shaders.mix.color.set(Palette.accent);
         Graphics.shader(Shaders.mix);
@@ -341,62 +339,64 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //Draw lines
         if(lineMode){
-            Tile tile = tileAt(control.gdxInput().getX(), control.gdxInput().getY());
+            int tileX = tileX(Gdx.input.getX());
+            int tileY = tileY(Gdx.input.getY());
 
-            if(tile != null){
+            //draw placing
+            if(mode == placing && recipe != null){
+                NormalizeDrawResult dresult = PlaceUtils.normalizeDrawArea(recipe.result, lineStartX, lineStartY, tileX, tileY, true, maxLength, lineScale);
 
-                //draw placing
-                if(mode == placing && recipe != null){
-                    NormalizeDrawResult dresult = PlaceUtils.normalizeDrawArea(recipe.result, lineStartX, lineStartY, tile.x, tile.y, true, maxLength, lineScale);
+                Lines.rect(dresult.x, dresult.y, dresult.x2 - dresult.x, dresult.y2 - dresult.y);
 
-                    Lines.rect(dresult.x, dresult.y, dresult.x2 - dresult.x, dresult.y2 - dresult.y);
+                NormalizeResult result = PlaceUtils.normalizeArea(lineStartX, lineStartY, tileX, tileY, rotation, true, maxLength);
 
-                    NormalizeResult result = PlaceUtils.normalizeArea(lineStartX, lineStartY, tile.x, tile.y, rotation, true, maxLength);
+                //go through each cell and draw the block to place if valid
+                for(int i = 0; i <= result.getLength(); i += recipe.result.size){
+                    int x = lineStartX + i * Mathf.sign(tileX - lineStartX) * Mathf.bool(result.isX());
+                    int y = lineStartY + i * Mathf.sign(tileY - lineStartY) * Mathf.bool(!result.isX());
 
-                    //go through each cell and draw the block to place if valid
-                    for(int i = 0; i <= result.getLength(); i += recipe.result.size){
-                        int x = lineStartX + i * Mathf.sign(tile.x - lineStartX) * Mathf.bool(result.isX());
-                        int y = lineStartY + i * Mathf.sign(tile.y - lineStartY) * Mathf.bool(!result.isX());
+                    if(!checkOverlapPlacement(x, y, recipe.result) && validPlace(x, y, recipe.result, result.rotation)){
+                        Draw.color();
 
-                        if(!checkOverlapPlacement(x, y, recipe.result) && validPlace(x, y, recipe.result, result.rotation)){
-                            Draw.color();
+                        TextureRegion[] regions = recipe.result.getBlockIcon();
 
-                            TextureRegion[] regions = recipe.result.getBlockIcon();
-
-                            for(TextureRegion region : regions){
-                                Draw.rect(region, x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(),
-                                        region.getRegionWidth() * lineScale, region.getRegionHeight() * lineScale, recipe.result.rotate ? result.rotation * 90 : 0);
-                            }
-                        }else{
-                            Draw.color(Palette.breakInvalid);
-                            Lines.square(x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(), recipe.result.size * tilesize / 2f);
+                        for(TextureRegion region : regions){
+                            Draw.rect(region, x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(),
+                                    region.getRegionWidth() * lineScale, region.getRegionHeight() * lineScale, recipe.result.rotate ? result.rotation * 90 : 0);
                         }
+                    }else{
+                        Draw.color(Palette.removeBack);
+                        Lines.square(x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset() - 1, recipe.result.size * tilesize / 2f);
+                        Draw.color(Palette.remove);
+                        Lines.square(x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(), recipe.result.size * tilesize / 2f);
                     }
-
-                }else if(mode == breaking){
-                    //draw breaking
-                    NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, lineStartX, lineStartY, tile.x, tile.y, false, maxLength, 1f);
-                    NormalizeResult dresult = PlaceUtils.normalizeArea(lineStartX, lineStartY, tile.x, tile.y, rotation, false, maxLength);
-
-                    Draw.color(Palette.remove);
-
-                    Draw.alpha(0.6f);
-                    Draw.alpha(1f);
-
-                    for(int x = dresult.x; x <= dresult.x2; x++){
-                        for(int y = dresult.y; y <= dresult.y2; y++){
-                            Tile other = world.tile(x, y);
-                            if(other == null || !validBreak(other.x, other.y)) continue;
-                            other = other.target();
-
-                            Lines.poly(other.drawx(), other.drawy(), 4, other.block().size * tilesize / 2f, 45 + 15);
-                        }
-                    }
-
-                    Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
-
                 }
+
+            }else if(mode == breaking){
+                //draw breaking
+                NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, lineStartX, lineStartY, tileX, tileY, false, maxLength, 1f);
+                NormalizeResult dresult = PlaceUtils.normalizeArea(lineStartX, lineStartY, tileX, tileY, rotation, false, maxLength);
+
+                for(int x = dresult.x; x <= dresult.x2; x++){
+                    for(int y = dresult.y; y <= dresult.y2; y++){
+                        Tile other = world.tile(x, y);
+                        if(other == null || !validBreak(other.x, other.y)) continue;
+                        other = other.target();
+
+                        Draw.color(Palette.removeBack);
+                        Lines.square(other.drawx(), other.drawy()-1, other.block().size * tilesize / 2f - 1);
+                        Draw.color(Palette.remove);
+                        Lines.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f - 1);
+                    }
+                }
+
+                Draw.color(Palette.removeBack);
+                Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
+                Draw.color(Palette.remove);
+                Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+
             }
+
         }
 
         TargetTrait target = player.target;
@@ -454,24 +454,23 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //place down a line if in line mode
         if(lineMode){
-            Tile tile = tileAt(screenX, screenY);
-
-            if(tile == null) return false;
+            int tileX = tileX(screenX);
+            int tileY = tileY(screenY);
 
             if(mode == placing && recipe != null){
 
                 //normalize area
-                NormalizeResult result = PlaceUtils.normalizeArea(lineStartX, lineStartY, tile.x, tile.y, rotation, true, 100);
+                NormalizeResult result = PlaceUtils.normalizeArea(lineStartX, lineStartY, tileX, tileY, rotation, true, 100);
 
                 rotation = result.rotation;
 
                 //place blocks on line
                 for(int i = 0; i <= result.getLength(); i += recipe.result.size){
-                    int x = lineStartX + i * Mathf.sign(tile.x - lineStartX) * Mathf.bool(result.isX());
-                    int y = lineStartY + i * Mathf.sign(tile.y - lineStartY) * Mathf.bool(!result.isX());
+                    int x = lineStartX + i * Mathf.sign(tileX - lineStartX) * Mathf.bool(result.isX());
+                    int y = lineStartY + i * Mathf.sign(tileY - lineStartY) * Mathf.bool(!result.isX());
 
                     if(!checkOverlapPlacement(x, y, recipe.result) && validPlace(x, y, recipe.result, result.rotation)){
-                        PlaceRequest request = new PlaceRequest(x * tilesize, y * tilesize, recipe, result.rotation);
+                        PlaceRequest request = new PlaceRequest(x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(), recipe, result.rotation);
                         request.scale = 1f;
                         selection.add(request);
                     }
@@ -482,13 +481,13 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             }else if(mode == breaking){
                 //normalize area
-                NormalizeResult result = PlaceUtils.normalizeArea(lineStartX, lineStartY, tile.x, tile.y, rotation, false, maxLength);
+                NormalizeResult result = PlaceUtils.normalizeArea(lineStartX, lineStartY, tileX, tileY, rotation, false, maxLength);
 
                 //break everything in area
                 for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
                     for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
-                        int wx = lineStartX + x * Mathf.sign(tile.x - lineStartX);
-                        int wy = lineStartY + y * Mathf.sign(tile.y - lineStartY);
+                        int wx = lineStartX + x * Mathf.sign(tileX - lineStartX);
+                        int wy = lineStartY + y * Mathf.sign(tileY - lineStartY);
 
                         Tile tar = world.tile(wx, wy);
 
@@ -547,36 +546,44 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         float worldx = Graphics.world(x, y).x, worldy = Graphics.world(x, y).y;
 
-        checkTargets(worldx, worldy);
-
         //get tile on cursor
         Tile cursor = tileAt(x, y);
 
         //ignore off-screen taps
         if(cursor == null || ui.hasMouse(x, y)) return false;
 
+        threads.run(() -> checkTargets(worldx, worldy));
+
         //remove if request present
         if(hasRequest(cursor)){
             removeRequest(getRequest(cursor));
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, recipe.result, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, recipe.result)){
             //add to selection queue if it's a valid place position
-            selection.add(lastPlaced = new PlaceRequest(cursor.worldx(), cursor.worldy(), recipe, rotation));
+            selection.add(lastPlaced = new PlaceRequest(cursor.worldx() + recipe.result.offset(), cursor.worldy() + recipe.result.offset(), recipe, rotation));
         }else if(mode == breaking && validBreak(cursor.target().x, cursor.target().y) && !hasRequest(cursor.target())){
             //add to selection queue if it's a valid BREAK position
             cursor = cursor.target();
             selection.add(new PlaceRequest(cursor.worldx(), cursor.worldy()));
-        }else if(!tileTapped(cursor.target()) && !canTapPlayer(worldx, worldy)){
-            tryBeginMine(cursor);
-        }else{ //else, try and carry units
-            if(player.getCarry() != null){
-                player.dropCarry(); //drop off unit
-            }else{
-                Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
+        }else if(!canTapPlayer(worldx, worldy)){
+            boolean consumed = false;
+            //else, try and carry units
+            if(player.mech.flying){
+                if(player.getCarry() != null){
+                    consumed = true;
+                    player.dropCarry(); //drop off unit
+                }else{
+                    Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
 
-                if(unit != null){
-                    player.moveTarget = unit;
-                    Effects.effect(Fx.select, unit.getX(), unit.getY());
+                    if(unit != null){
+                        player.moveTarget = unit;
+                        consumed = true;
+                        Effects.effect(Fx.select, unit.getX(), unit.getY());
+                    }
                 }
+            }
+
+            if(!consumed && !tileTapped(cursor.target())){
+                tryBeginMine(cursor);
             }
         }
 
@@ -585,6 +592,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void update(){
+        if(state.is(State.menu)){
+            selection.clear();
+            removals.clear();
+            mode = none;
+        }
 
         //reset state when not placing
         if(mode == none){
@@ -693,27 +705,15 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2){
-        if(pinch1.x < 0){
-            pinch1.set(initialPointer1);
-            pinch2.set(initialPointer2);
-        }
-
-        pinch1.set(pointer1);
-        pinch2.set(pointer2);
-
         return false;
     }
 
     @Override
     public boolean zoom(float initialDistance, float distance){
-        if(initzoom < 0){
-            initzoom = initialDistance;
-        }
 
-        if(Math.abs(distance - initzoom) > io.anuke.ucore.scene.ui.layout.Unit.dp.scl(100f) && !zoomed){
-            int amount = (distance > initzoom ? 1 : -1);
+        if(Math.abs(distance - initialDistance) > io.anuke.ucore.scene.ui.layout.Unit.dp.scl(100f) && !zoomed){
+            int amount = (distance > initialDistance ? 1 : -1);
             renderer.scaleCamera(Math.round(io.anuke.ucore.scene.ui.layout.Unit.dp.scl(amount)));
-            initzoom = distance;
             zoomed = true;
             return true;
         }
@@ -723,8 +723,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void pinchStop(){
-        initzoom = -1;
-        pinch2.set(pinch1.set(-1, -1));
         zoomed = false;
     }
 

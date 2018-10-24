@@ -1,12 +1,13 @@
 package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
-import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.type.ContentType;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class ColorMapper implements ContentList{
     private static IntMap<Block> blockMap = new IntMap<>();
@@ -21,7 +22,7 @@ public class ColorMapper implements ContentList{
         return colorMap.get(block, 0);
     }
 
-    public static int colorFor(Block floor, Block wall, Team team, int elevation){
+    public static int colorFor(Block floor, Block wall, Team team, int elevation, byte cliffs){
         if(wall.synthetic()){
             return team.intColor;
         }
@@ -32,7 +33,10 @@ public class ColorMapper implements ContentList{
             Color tmpColor = tmpColors.get();
             tmpColor.set(color);
             float maxMult = 1f/Math.max(Math.max(tmpColor.r, tmpColor.g), tmpColor.b) ;
-            float mul = Math.min(1.1f + elevation / 4f, maxMult);
+            float mul = Math.min(0.7f + elevation / 5f, maxMult);
+            if((cliffs & ((1 << 6))) != 0){
+                mul -= 0.35f;
+            }
             tmpColor.mul(mul, mul, mul, 1f);
             color = Color.rgba8888(tmpColor);
         }
@@ -41,7 +45,7 @@ public class ColorMapper implements ContentList{
 
     @Override
     public void load(){
-        for(Block block : Block.all()){
+        for(Block block : content.blocks()){
             int color = Color.rgba8888(block.minimapColor);
             if(color == 0) continue; //skip blocks that are not mapped
 
@@ -51,7 +55,7 @@ public class ColorMapper implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll(){
-        return new Array<>();
+    public ContentType type(){
+        return ContentType.block;
     }
 }

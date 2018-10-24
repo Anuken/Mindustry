@@ -1,10 +1,26 @@
 package io.anuke.kryonet;
 
 import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
+import io.anuke.ucore.util.Threads;
+import io.anuke.ucore.util.Threads.ThreadInfoProvider;
 import io.anuke.ucore.util.Log;
 
-public class DefaultThreadImpl implements ThreadProvider {
+public class DefaultThreadImpl implements ThreadProvider, ThreadInfoProvider{
     private Thread thread;
+
+    public DefaultThreadImpl(){
+        Threads.setThreadInfoProvider(this);
+    }
+
+    @Override
+    public boolean isOnLogicThread(){
+        return thread == null || isOnThread();
+    }
+
+    @Override
+    public boolean isOnGraphicsThread(){
+        return thread == null || !isOnThread();
+    }
 
     @Override
     public boolean isOnThread() {

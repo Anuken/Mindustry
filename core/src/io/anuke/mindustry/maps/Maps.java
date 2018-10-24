@@ -32,10 +32,6 @@ public class Maps implements Disposable{
     /**Used for storing a list of custom map names for GWT.*/
     private Array<String> customMapNames;
 
-    public Maps(){
-
-    }
-
     /**Returns a list of all maps, including custom ones.*/
     public Array<Map> all(){
         return allMaps;
@@ -61,7 +57,7 @@ public class Maps implements Disposable{
 
     /**Returns map by internal name.*/
     public Map getByName(String name){
-        return maps.get(name);
+        return maps.get(name.toLowerCase());
     }
 
     /**Load all maps. Should be called at application start.*/
@@ -81,6 +77,11 @@ public class Maps implements Disposable{
     /**Save a map. This updates all values and stored data necessary.*/
     public void saveMap(String name, MapTileData data, ObjectMap<String, String> tags){
         try {
+            //create copy of tags to prevent mutation later
+            ObjectMap<String, String> newTags = new ObjectMap<>();
+            newTags.putAll(tags);
+            tags = newTags;
+
             if (!gwt) {
                 FileHandle file = customMapDirectory.child(name + "." + mapExtension);
                 MapIO.writeMap(file.write(false), tags, data);
@@ -90,7 +91,7 @@ public class Maps implements Disposable{
                 Settings.putString("map-data-" + name, new String(Base64Coder.encode(stream.toByteArray())));
                 if(!customMapNames.contains(name, false)){
                     customMapNames.add(name);
-                    Settings.putJson("custom-maps", customMapNames);
+                    Settings.putObject("custom-maps", customMapNames);
                 }
                 Settings.save();
             }
@@ -130,7 +131,7 @@ public class Maps implements Disposable{
         } else {
             customMapNames.removeValue(map.name, false);
             Settings.putString("map-data-" + map.name, "");
-            Settings.putJson("custom-maps", customMapNames);
+            Settings.putObject("custom-maps", customMapNames);
             Settings.save();
         }
     }
@@ -144,7 +145,7 @@ public class Maps implements Disposable{
                 map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta, true)));
             }
 
-            maps.put(map.name, map);
+            maps.put(map.name.toLowerCase(), map);
             allMaps.add(map);
         }
     }
@@ -163,7 +164,7 @@ public class Maps implements Disposable{
             }
 
         }else{
-            customMapNames = Settings.getJson("custom-maps", Array.class);
+            customMapNames = Settings.getObject("custom-maps", Array.class, Array::new);
 
             for(String name : customMapNames){
                 try{

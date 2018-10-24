@@ -2,14 +2,14 @@ package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.distribution.WarpGate;
 import io.anuke.mindustry.world.blocks.power.*;
 
 public class PowerBlocks extends BlockList implements ContentList{
     public static Block combustionGenerator, thermalGenerator, turbineGenerator, rtgGenerator, solarPanel, largeSolarPanel,
-            nuclearReactor, fusionReactor, battery, batteryLarge, powerNode, powerNodeLarge, warpGate;
+            thoriumReactor, fusionReactor, battery, batteryLarge, powerNode, powerNodeLarge, warpGate;
 
     @Override
     public void load(){
@@ -21,9 +21,8 @@ public class PowerBlocks extends BlockList implements ContentList{
 
         thermalGenerator = new LiquidHeatGenerator("thermal-generator"){{
             maxLiquidGenerate = 0.5f;
-            powerPerLiquid = 0.08f;
             powerCapacity = 40f;
-            powerPerLiquid = 0.25f;
+            powerPerLiquid = 1f;
             generateEffect = BlockFx.redgeneratespark;
             size = 2;
         }};
@@ -39,8 +38,9 @@ public class PowerBlocks extends BlockList implements ContentList{
 
         rtgGenerator = new DecayGenerator("rtg-generator"){{
             powerCapacity = 40f;
-            powerOutput = 0.02f;
-            itemDuration = 500f;
+            size = 2;
+            powerOutput = 0.3f;
+            itemDuration = 220f;
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
@@ -52,10 +52,10 @@ public class PowerBlocks extends BlockList implements ContentList{
             generation = 0.055f;
         }};
 
-        nuclearReactor = new NuclearReactor("nuclear-reactor"){{
+        thoriumReactor = new NuclearReactor("thorium-reactor"){{
             size = 3;
             health = 700;
-            powerMultiplier = 0.8f;
+            powerMultiplier = 1.1f;
         }};
 
         fusionReactor = new FusionReactor("fusion-reactor"){{
@@ -63,11 +63,11 @@ public class PowerBlocks extends BlockList implements ContentList{
             health = 600;
         }};
 
-        battery = new PowerDistributor("battery"){{
+        battery = new Battery("battery"){{
             powerCapacity = 320f;
         }};
 
-        batteryLarge = new PowerDistributor("battery-large"){{
+        batteryLarge = new Battery("battery-large"){{
             size = 3;
             powerCapacity = 2000f;
         }};
@@ -75,13 +75,13 @@ public class PowerBlocks extends BlockList implements ContentList{
         powerNode = new PowerNode("power-node"){{
             shadow = "shadow-round-1";
             maxNodes = 4;
+            laserRange = 6;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{
             size = 2;
-            powerSpeed = 1f;
             maxNodes = 6;
-            laserRange = 7.5f;
+            laserRange = 9.5f;
             shadow = "shadow-round-2";
         }};
 

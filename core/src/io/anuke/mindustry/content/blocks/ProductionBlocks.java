@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.production.Cultivator;
 import io.anuke.mindustry.world.blocks.production.Drill;
@@ -12,33 +12,37 @@ import io.anuke.mindustry.world.blocks.production.Fracker;
 import io.anuke.mindustry.world.blocks.production.SolidPump;
 
 public class ProductionBlocks extends BlockList implements ContentList{
-    public static Block tungstenDrill, carbideDrill, laserdrill, blastdrill, plasmadrill, waterextractor, oilextractor, cultivator;
+    public static Block mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, plasmaDrill, waterExtractor, oilExtractor, cultivator;
 
     @Override
     public void load(){
-        tungstenDrill = new Drill("tungsten-drill"){{
+        mechanicalDrill = new Drill("mechanical-drill"){{
             tier = 2;
-            drillTime = 340;
+            drillTime = 300;
+            size = 2;
+            drawMineItem = true;
         }};
 
-        carbideDrill = new Drill("carbide-drill"){{
+        pneumaticDrill = new Drill("pneumatic-drill"){{
             tier = 3;
-            drillTime = 280;
+            drillTime = 240;
+            size = 2;
+            drawMineItem = true;
         }};
 
-        laserdrill = new Drill("laser-drill"){{
-            drillTime = 180;
+        laserDrill = new Drill("laser-drill"){{
+            drillTime = 140;
             size = 2;
             hasPower = true;
             tier = 4;
             updateEffect = BlockFx.pulverizeMedium;
             drillEffect = BlockFx.mineBig;
 
-            consumes.power(0.2f);
+            consumes.power(0.16f);
         }};
 
-        blastdrill = new Drill("blast-drill"){{
-            drillTime = 120;
+        blastDrill = new Drill("blast-drill"){{
+            drillTime = 60;
             size = 3;
             drawRim = true;
             hasPower = true;
@@ -49,12 +53,12 @@ public class ProductionBlocks extends BlockList implements ContentList{
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
 
-            consumes.power(0.5f);
+            consumes.power(0.3f);
         }};
 
-        plasmadrill = new Drill("plasma-drill"){{
+        plasmaDrill = new Drill("plasma-drill"){{
             heatColor = Color.valueOf("ff461b");
-            drillTime = 90;
+            drillTime = 50;
             size = 4;
             hasLiquids = true;
             hasPower = true;
@@ -69,28 +73,28 @@ public class ProductionBlocks extends BlockList implements ContentList{
             consumes.power(0.7f);
         }};
 
-        waterextractor = new SolidPump("water-extractor"){{
+        waterExtractor = new SolidPump("water-extractor"){{
             result = Liquids.water;
-            pumpAmount = 0.1f;
+            pumpAmount = 0.065f;
             size = 2;
             liquidCapacity = 30f;
             rotateSpeed = 1.4f;
 
-            consumes.power(0.2f);
+            consumes.power(0.1f);
         }};
 
-        oilextractor = new Fracker("oil-extractor"){{
+        oilExtractor = new Fracker("oil-extractor"){{
             result = Liquids.oil;
             updateEffect = BlockFx.pulverize;
             liquidCapacity = 50f;
             updateEffectChance = 0.05f;
-            pumpAmount = 0.08f;
+            pumpAmount = 0.09f;
             size = 3;
             liquidCapacity = 30f;
 
             consumes.item(Items.sand);
-            consumes.power(0.5f);
-            consumes.liquid(Liquids.water, 0.3f);
+            consumes.power(0.3f);
+            consumes.liquid(Liquids.water, 0.15f);
         }};
 
         cultivator = new Cultivator("cultivator"){{

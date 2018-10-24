@@ -8,7 +8,6 @@ import io.anuke.mindustry.world.blocks.power.ItemGenerator.ItemGeneratorEntity;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
@@ -51,18 +50,18 @@ public abstract class LiquidGenerator extends PowerGenerator{
 
         if(entity.liquids.get(entity.liquids.current()) >= 0.001f){
             float powerPerLiquid = getEfficiency(entity.liquids.current()) * this.powerPerLiquid;
-            float used = Math.min(entity.liquids.currentAmount(), maxLiquidGenerate * Timers.delta());
+            float used = Math.min(entity.liquids.currentAmount(), maxLiquidGenerate * entity.delta());
             used = Math.min(used, (powerCapacity - entity.power.amount) / powerPerLiquid);
 
             entity.liquids.remove(entity.liquids.current(), used);
             entity.power.amount += used * powerPerLiquid;
 
-            if(used > 0.001f && Mathf.chance(0.05 * Timers.delta())){
+            if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
             }
         }
 
-        distributePower(tile);
+        tile.entity.power.graph.update();
     }
 
     @Override
@@ -71,7 +70,7 @@ public abstract class LiquidGenerator extends PowerGenerator{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new ItemGeneratorEntity();
     }
 

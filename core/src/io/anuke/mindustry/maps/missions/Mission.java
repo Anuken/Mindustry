@@ -1,51 +1,107 @@
 package io.anuke.mindustry.maps.missions;
 
-import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.content.blocks.Blocks;
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.ucore.noise.Noise;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Bundles;
 
-public interface Mission{
-    boolean isComplete();
-    String displayString();
-    GameMode getMode();
-    void display(Table table);
+import static io.anuke.mindustry.Vars.*;
 
-    default void generate(Generation gen){}
+public abstract class Mission{
+    private String extraMessage;
+    private boolean showComplete =true;
 
-    default void generateCoreAt(Generation gen, int coreX, int coreY, Team team){
-        Noise.setSeed(0);
-        float targetElevation = Math.max(gen.tiles[coreX][coreY].getElevation(), 1);
+    public abstract boolean isComplete();
 
-        int lerpDst = 20;
-        for(int x = -lerpDst; x <= lerpDst; x++){
-            for(int y = -lerpDst; y <= lerpDst; y++){
-                int wx = gen.width / 2 + x, wy = gen.height / 2 + y;
+    /**Returns the string that is displayed in-game near the menu.*/
+    public abstract String displayString();
 
-                float dst = Vector2.dst(wx, wy, coreX, coreY);
-                float elevation = gen.tiles[wx][wy].getElevation();
+    /**Returns the info string displayed in the sector dialog (menu)*/
+    public String menuDisplayString(){
+        return displayString();
+    }
 
-                if(dst < 4){
-                    elevation = targetElevation;
-                }else if(dst < lerpDst){
-                    elevation = Mathf.lerp(elevation, targetElevation, Mathf.clamp(2*(1f-(dst / lerpDst))) + Noise.nnoise(wx, wy, 8f, 1f));
-                }
+    public GameMode getMode(){
+        return GameMode.noWaves;
+    }
 
-                if(gen.tiles[wx][wy].floor().liquidDrop == null){
-                    gen.tiles[wx][wy].setElevation((int) elevation);
-                }else{
-                    gen.tiles[wx][wy].setFloor((Floor) Blocks.sand);
-                }
-            }
+    /**Sets the message displayed on mission begin. Returns this mission for chaining.*/
+    public Mission setMessage(String message){
+        this.extraMessage = message;
+        return this;
+    }
+
+    public Mission setShowComplete(boolean complete){
+        this.showComplete = complete;
+        return this;
+    }
+
+    /**Called when a specified piece of content is 'used' by a block.*/
+    public void onContentUsed(UnlockableContent content){
+
+    }
+
+    /**Draw mission overlay.*/
+    public void drawOverlay(){
+
+    }
+
+    public void update(){
+
+    }
+
+    public void reset(){
+
+    }
+
+    /**Shows the unique sector message.*/
+    public void showMessage(){
+        if(!headless && extraMessage != null){
+            ui.hudfrag.showTextDialog(extraMessage);
         }
+    }
 
+    public boolean hasMessage(){
+        return extraMessage != null;
+    }
+
+    public void onBegin(){
+        Timers.runTask(60f, this::showMessage);
+    }
+
+    public void onComplete(){
+        if(showComplete && !headless){
+            ui.hudfrag.showText("[LIGHT_GRAY]"+menuDisplayString() + ":\n" + Bundles.get("text.mission.complete"));
+        }
+    }
+
+    public void display(Table table){
+        table.add(displayString());
+    }
+
+    public Array<SpawnGroup> getWaves(Sector sector){
+        return new Array<>();
+    }
+
+    public Array<GridPoint2> getSpawnPoints(Generation gen){
+        return Array.with();
+    }
+
+    public void generate(Generation gen){
+        generateCoreAt(gen, 50, 50, defaultTeam);
+    }
+
+    public void generateCoreAt(Generation gen, int coreX, int coreY, Team team){
         gen.tiles[coreX][coreY].setBlock(StorageBlocks.core);
         gen.tiles[coreX][coreY].setTeam(team);
+        state.teams.get(team).cores.add(gen.tiles[coreX][coreY]);
     }
 }

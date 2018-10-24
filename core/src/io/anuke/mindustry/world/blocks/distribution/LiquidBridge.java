@@ -1,7 +1,9 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
@@ -14,6 +16,7 @@ public class LiquidBridge extends ItemBridge{
         hasItems = false;
         hasLiquids = true;
         outputsLiquid = true;
+        group = BlockGroup.liquids;
     }
 
     @Override
@@ -47,5 +50,20 @@ public class LiquidBridge extends ItemBridge{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         return false;
+    }
+
+    @Override
+    public boolean canDumpLiquid(Tile tile, Tile to, Liquid liquid){
+        ItemBridgeEntity entity = tile.entity();
+
+        Tile other = world.tile(entity.link);
+        if(!linkValid(tile, other)){
+            return !(to.block() instanceof LiquidBridge);
+        }
+
+        int rel = tile.absoluteRelativeTo(other.x, other.y);
+        int rel2 = tile.relativeTo(to.x, to.y);
+
+        return rel != rel2;
     }
 }

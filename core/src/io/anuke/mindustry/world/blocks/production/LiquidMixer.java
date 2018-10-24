@@ -8,8 +8,8 @@ import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 
 public class LiquidMixer extends LiquidBlock{
@@ -36,6 +36,7 @@ public class LiquidMixer extends LiquidBlock{
         super.setStats();
 
         stats.add(BlockStat.liquidOutput, outputLiquid);
+        stats.add(BlockStat.liquidOutputSpeed, 60f * consumes.get(ConsumeLiquid.class).used(), StatUnit.liquidSecond);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class LiquidMixer extends LiquidBlock{
         LiquidMixerEntity entity = tile.entity();
 
         if(tile.entity.cons.valid()){
-            float use = Math.min(consumes.get(ConsumeLiquid.class).used() * Timers.delta(), liquidCapacity - entity.liquids.get(outputLiquid));
+            float use = Math.min(consumes.get(ConsumeLiquid.class).used() * entity.delta(), liquidCapacity - entity.liquids.get(outputLiquid));
             entity.accumulator += use;
             entity.liquids.add(outputLiquid, use);
             for(int i = 0; i < (int) (entity.accumulator / liquidPerItem); i++){
@@ -89,7 +90,7 @@ public class LiquidMixer extends LiquidBlock{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new LiquidMixerEntity();
     }
 

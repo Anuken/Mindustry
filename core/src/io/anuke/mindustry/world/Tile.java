@@ -3,14 +3,14 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.modules.ConsumeModule;
-import io.anuke.mindustry.world.modules.InventoryModule;
+import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.mindustry.world.modules.PowerModule;
 import io.anuke.ucore.entities.trait.PosTrait;
@@ -18,8 +18,7 @@ import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Geometry;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 
 public class Tile implements PosTrait, TargetTrait{
@@ -44,7 +43,7 @@ public class Tile implements PosTrait, TargetTrait{
     private byte team;
     /** Tile elevation. -1 means slope.*/
     private byte elevation;
-    /** Visibility status: 3 states, but saved as a single bit. 0 = unexplored, 1 = visited, 2 = currently visible (saved as 1)*/
+    /** Fog visibility status: 3 states, but saved as a single bit. 0 = unexplored, 1 = visited, 2 = currently visible (saved as 1)*/
     private byte visibility;
 
     public Tile(int x, int y){
@@ -54,15 +53,15 @@ public class Tile implements PosTrait, TargetTrait{
 
     public Tile(int x, int y, byte floor, byte wall){
         this(x, y);
-        this.floor = (Floor) Block.getByID(floor);
-        this.wall = Block.getByID(wall);
+        this.floor = (Floor) content.block(floor);
+        this.wall = content.block(wall);
         changed();
     }
 
     public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team, byte elevation){
         this(x, y);
-        this.floor = (Floor) Block.getByID(floor);
-        this.wall = Block.getByID(wall);
+        this.floor = (Floor) content.block(floor);
+        this.wall = content.block(wall);
         this.rotation = rotation;
         this.setElevation(elevation);
         changed();
@@ -78,11 +77,11 @@ public class Tile implements PosTrait, TargetTrait{
     }
 
     public byte getBlockID(){
-        return (byte) wall.id;
+        return wall.id;
     }
 
     public byte getFloorID(){
-        return (byte) floor.id;
+        return floor.id;
     }
 
     /** Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile. */
@@ -166,8 +165,13 @@ public class Tile implements PosTrait, TargetTrait{
     }
 
     public void setBlock(Block type, Team team){
-        setBlock(type);
-        setTeam(team);
+        synchronized(tileSetLock){
+            preChanged();
+            this.wall = type;
+            this.team = (byte)team.ordinal();
+            this.link = 0;
+            changed();
+        }
     }
 
     public void setBlock(Block type){
@@ -251,8 +255,12 @@ public class Tile implements PosTrait, TargetTrait{
         if(link == 0){
             return (block.destructible || block.breakable || block.update);
         }else{
-            return getLinked().breakable();
+            return getLinked() != this && getLinked().breakable();
         }
+    }
+
+    public boolean isEnemyCheat(){
+        return getTeam() == waveTeam && !state.mode.isPvp;
     }
 
     public boolean isLinked(){
@@ -382,16 +390,23 @@ public class Tile implements PosTrait, TargetTrait{
                 cliffs |= (1 << (i * 2));
             }
         }
+
         if(occluded){
             cost += 1;
+        }
+
+        if(floor.isLiquid){
+            cost += 100f;
         }
     }
 
     private void preChanged(){
         synchronized(tileSetLock){
+            block().removed(this);
             if(entity != null){
                 entity.removeFromProximity();
             }
+            team = 0;
         }
     }
 
@@ -403,18 +418,22 @@ public class Tile implements PosTrait, TargetTrait{
                 entity = null;
             }
 
-            team = 0;
-
             Block block = block();
 
             if(block.hasEntity()){
-                entity = block.getEntity().init(this, block.update);
+                entity = block.newEntity().init(this, block.update);
                 entity.cons = new ConsumeModule();
-                if(block.hasItems) entity.items = new InventoryModule();
+                if(block.hasItems) entity.items = new ItemModule();
                 if(block.hasLiquids) entity.liquids = new LiquidModule();
-                if(block.hasPower) entity.power = new PowerModule();
-                entity.updateProximity();
-            }else{
+                if(block.hasPower){
+                    entity.power = new PowerModule();
+                    entity.power.graph.add(this);
+                }
+
+                if(!world.isGenerating()){
+                    entity.updateProximity();
+                }
+            }else if(!(block instanceof BlockPart) && !world.isGenerating()){
                 //since the entity won't update proximity for us, update proximity for all nearby tiles manually
                 for(GridPoint2 p : Geometry.d4){
                     Tile tile = world.tile(x + p.x, y + p.y);
@@ -464,7 +483,7 @@ public class Tile implements PosTrait, TargetTrait{
         Block block = block();
         Block floor = floor();
 
-        return floor.name() + ":" + block.name() + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : ClassReflection.getSimpleName(entity.getClass())) +
+        return floor.name() + ":" + block.name() + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
         (link != 0 ? " link=[" + (Bits.getLeftByte(link) - 8) + ", " + (Bits.getRightByte(link) - 8) + "]" : "");
     }
 }

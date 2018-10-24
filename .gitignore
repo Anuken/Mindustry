@@ -3,6 +3,7 @@
 /core/assets/mindustry-saves/
 /core/assets/mindustry-maps/
 /core/assets/bundles/output/
+/core/assets/.gifimages/
 /deploy/
 /desktop/packr-out/
 /desktop/packr-export/
@@ -13,14 +14,17 @@
 /core/assets-raw/sprites/generated/
 /annotations/build/
 /kryonet/build/
-/packer/build/
+/tools/build/
+/tests/build/
 /server/build/
+/test_files/
 /annotations/build/
 /android/assets/mindustry-maps/
 /android/assets/mindustry-saves/
 /core/assets/gifexport/
 /core/assets/version.properties
-/core/assets/locales.json
+/core/assets/locales
+/ios/src/io/anuke/mindustry/gen/
 *.gif
 
 version.properties

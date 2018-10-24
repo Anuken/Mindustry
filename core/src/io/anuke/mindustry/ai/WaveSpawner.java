@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Bits;
+import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.Squad;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -10,6 +10,8 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
+import io.anuke.ucore.util.Structs;
+import io.anuke.ucore.util.GridBits;
 import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
@@ -21,9 +23,10 @@ import static io.anuke.mindustry.Vars.*;
 public class WaveSpawner{
     private static final int quadsize = 4;
 
-    private Bits quadrants;
+    private GridBits quadrants;
 
     private Array<SpawnGroup> groups;
+    private boolean dynamicSpawn;
 
     private Array<FlyerSpawn> flySpawns = new Array<>();
     private Array<GroundSpawn> groundSpawns = new Array<>();
@@ -72,7 +75,7 @@ public class WaveSpawner{
             int amount = group.getGroupsSpawned(state.wave);
             if(group.type.isFlying){
                 flyGroups += amount;
-            }else{
+            }else if(dynamicSpawn){
                 groundGroups += amount;
             }
         }
@@ -80,10 +83,12 @@ public class WaveSpawner{
         int addGround = groundGroups - groundSpawns.size, addFly = flyGroups - flySpawns.size;
 
         //add extra groups if the total exceeds it
-        for(int i = 0; i < addGround; i++){
-            GroundSpawn spawn = new GroundSpawn();
-            findLocation(spawn);
-            groundSpawns.add(spawn);
+        if(dynamicSpawn){
+            for(int i = 0; i < addGround; i++){
+                GroundSpawn spawn = new GroundSpawn();
+                findLocation(spawn);
+                groundSpawns.add(spawn);
+            }
         }
 
         for(int i = 0; i < addFly; i++){
@@ -104,9 +109,10 @@ public class WaveSpawner{
                 float spawnX, spawnY;
                 float spread;
 
+                if(!group.type.isFlying && groundCount >= groundSpawns.size) continue;
+
                 if(group.type.isFlying){
                     FlyerSpawn spawn = flySpawns.get(flyCount);
-                    //TODO verify flyer spawn
 
                     float margin = 40f; //how far away from the edge flying units spawn
                     spawnX = world.width() * tilesize / 2f + Mathf.sqrwavex(spawn.angle) * (world.width() / 2f * tilesize + margin);
@@ -114,11 +120,14 @@ public class WaveSpawner{
                     spread = margin / 1.5f;
 
                     flyCount++;
-                }else{
+                }else{ //make sure it works for non-dynamic spawns
                     GroundSpawn spawn = groundSpawns.get(groundCount);
-                    checkQuadrant(spawn.x, spawn.y);
-                    if(!getQuad(spawn.x, spawn.y)){
-                        findLocation(spawn);
+
+                    if(dynamicSpawn){
+                        checkQuadrant(spawn.x, spawn.y);
+                        if(!getQuad(spawn.x, spawn.y)){
+                            findLocation(spawn);
+                        }
                     }
 
                     spawnX = spawn.x * quadsize * tilesize + quadsize * tilesize / 2f;
@@ -155,7 +164,7 @@ public class WaveSpawner{
             for(int y = quady * quadsize; y < world.height() && y < (quady + 1) * quadsize; y++){
                 Tile tile = world.tile(x, y);
 
-                if(tile == null || tile.solid() || world.pathfinder().getValueforTeam(Team.red, x, y) == Float.MAX_VALUE){
+                if(tile == null || tile.solid() || world.pathfinder.getValueforTeam(Team.red, x, y) == Float.MAX_VALUE){
                     setQuad(quadx, quady, false);
                     break outer;
                 }
@@ -163,28 +172,47 @@ public class WaveSpawner{
         }
     }
 
-    private void reset(){
+    private void reset(WorldLoadEvent event){
+        dynamicSpawn = false;
         flySpawns.clear();
         groundSpawns.clear();
-        quadrants = new Bits(quadWidth() * quadHeight());
+        quadrants = new GridBits(quadWidth(), quadHeight());
 
         if(world.getSector() == null){
             groups = Waves.getSpawns();
         }else{
             groups = world.getSector().spawns;
         }
+
+        dynamicSpawn = true;
+
+        for(int x = 0; x < world.width(); x++){
+            for(int y = 0; y < world.height(); y++){
+                if(world.tile(x, y).block() == Blocks.spawn){
+                    dynamicSpawn = false;
+                    GroundSpawn spawn = new GroundSpawn();
+                    spawn.x = x/quadsize;
+                    spawn.y = y/quadsize;
+                    groundSpawns.add(spawn);
+                }
+            }
+        }
     }
 
     private boolean getQuad(int quadx, int quady){
-        return quadrants.get(quadx + quady * quadWidth());
+        return quadrants.get(quadx, quady);
     }
 
     private void setQuad(int quadx, int quady, boolean valid){
-        if(valid){
-            quadrants.set(quadx + quady * quadWidth());
-        }else{
-            quadrants.clear(quadx + quady * quadWidth());
+        if(quadrants == null){
+            quadrants = new GridBits(quadWidth(), quadHeight());
         }
+
+        if(!Structs.inBounds(quadx, quady, quadWidth(), quadHeight())){
+            return;
+        }
+
+        quadrants.set(quadx, quady, valid);
     }
 
     //TODO instead of randomly scattering locations around the map, find spawns close to each other

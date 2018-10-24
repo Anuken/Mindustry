@@ -1,43 +1,35 @@
 package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.ucore.core.Settings;
 
 import static io.anuke.mindustry.Vars.headless;
 
 public class Administration{
-    public static final int defaultMaxBrokenBlocks = 15;
-    public static final int defaultBreakCooldown = 1000 * 15;
 
     /**All player info. Maps UUIDs to info. This persists throughout restarts.*/
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     /**Maps UUIDs to trace infos. This is wiped when a player logs off.*/
     private ObjectMap<String, TraceInfo> traceInfo = new ObjectMap<>();
-    /** Maps packed coordinates to logs for that coordinate*/
-    private IntMap<Array<EditLog>> editLogs = new IntMap<>();
-
     private Array<String> bannedIPs = new Array<>();
 
     public Administration(){
         Settings.defaultList(
-            "antigrief", false,
-            "antigrief-max", defaultMaxBrokenBlocks,
-            "antigrief-cooldown", defaultBreakCooldown
+            "strict", true
         );
 
         load();
     }
 
-    public boolean isAntiGrief(){
-        return Settings.getBool("antigrief");
+    public void setStrict(boolean on){
+        Settings.putBool("strict", on);
+        Settings.save();
     }
 
-    public void setAntiGrief(boolean antiGrief){
-        Settings.putBool("antigrief", antiGrief);
-        Settings.save();
+    public boolean getStrict(){
+        return Settings.getBool("strict");
     }
 
     public boolean allowsCustomClients(){
@@ -47,105 +39,6 @@ public class Administration{
     public void setCustomClients(boolean allowed){
         Settings.putBool("allow-custom", allowed);
         Settings.save();
-    }
-
-    public boolean isValidateReplace(){
-        return false;
-    }
-
-    public void setAntiGriefParams(int maxBreak, int cooldown){
-        Settings.putInt("antigrief-max", maxBreak);
-        Settings.putInt("antigrief-cooldown", cooldown);
-        Settings.save();
-    }
-
-    public IntMap<Array<EditLog>> getEditLogs(){
-        return editLogs;
-    }
-
-    /*
-    public void rollbackWorld(int rollbackTimes) {
-        for(IntMap.Entry<Array<EditLog>> editLog : editLogs.entries()) {
-            int coords = editLog.key;
-            Array<EditLog> logs = editLog.value;
-
-            for(int i = 0; i < rollbackTimes; i++) {
-
-                EditLog log = logs.get(logs.size - 1);
-
-                int x = coords % world.width();
-                int y = coords / world.width();
-                Block result = log.block;
-                int rotation = log.rotation;
-
-                //TODO fix this mess, broken with 4.0
-
-                if(log.action == EditLog.EditAction.PLACE) {
-                   // Build.breakBlock(x, y, false, false);
-
-                    Packets.BreakPacket packet = new Packets.BreakPacket();
-                    packet.x = (short) x;
-                    packet.y = (short) y;
-                    packet.playerid = 0;
-
-                    Net.send(packet, Net.SendMode.tcp);
-                }
-                else if(log.action == EditLog.EditAction.BREAK) {
-                    //Build.placeBlock(x, y, result, rotation, false, false);
-
-                    Packets.PlacePacket packet = new Packets.PlacePacket();
-                    packet.x = (short) x;
-                    packet.y = (short) y;
-                    packet.rotation = (byte) rotation;
-                    packet.playerid = 0;
-                    //packet.block = result.id;
-
-                    Net.send(packet, Net.SendMode.tcp);
-                }
-
-                logs.removeIndex(logs.size - 1);
-                if(logs.size == 0) {
-                    editLogs.remove(coords);
-                    break;
-                }
-            }
-        }
-    }*/
-
-    public boolean validateBreak(String id, String ip){
-        if(!isAntiGrief() || isAdmin(id, ip)) return true;
-
-        PlayerInfo info = getCreateInfo(id);
-
-        if(info.lastBroken == null || info.lastBroken.length != Settings.getInt("antigrief-max")){
-            info.lastBroken = new long[Settings.getInt("antigrief-max")];
-        }
-
-        long[] breaks = info.lastBroken;
-
-        int shiftBy = 0;
-        for(int i = 0; i < breaks.length && breaks[i] != 0; i++){
-            if(TimeUtils.timeSinceMillis(breaks[i]) >= Settings.getInt("antigrief-cooldown")){
-                shiftBy = i;
-            }
-        }
-
-        for(int i = 0; i < breaks.length; i++){
-            breaks[i] = (i + shiftBy >= breaks.length) ? 0 : breaks[i + shiftBy];
-        }
-
-        int remaining = 0;
-        for(int i = 0; i < breaks.length; i++){
-            if(breaks[i] == 0){
-                remaining = breaks.length - i;
-                break;
-            }
-        }
-
-        if(remaining == 0) return false;
-
-        breaks[breaks.length - remaining] = TimeUtils.millis();
-        return true;
     }
 
     /**
@@ -375,16 +268,17 @@ public class Administration{
     }
 
     public void save(){
-        Settings.putJson("player-info", playerInfo);
-        Settings.putJson("banned-ips", bannedIPs);
+        Settings.putObject("player-info", playerInfo);
+        Settings.putObject("banned-ips", bannedIPs);
         Settings.save();
     }
 
     private void load(){
-        playerInfo = Settings.getJson("player-info", ObjectMap.class);
-        bannedIPs = Settings.getJson("banned-ips", Array.class);
+        playerInfo = Settings.getObject("player-info", ObjectMap.class, ObjectMap::new);
+        bannedIPs = Settings.getObject("banned-ips", Array.class, Array::new);
     }
 
+    @Serialize
     public static class PlayerInfo{
         public String id;
         public String lastName = "<unknown>", lastIP = "<unknown>";
@@ -398,13 +292,11 @@ public class Administration{
         public boolean banned, admin;
         public long lastKicked; //last kicked timestamp
 
-        public long[] lastBroken;
-
         PlayerInfo(String id){
             this.id = id;
         }
 
-        private PlayerInfo(){
+        public PlayerInfo(){
         }
     }
 

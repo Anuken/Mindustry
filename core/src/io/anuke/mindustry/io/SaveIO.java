@@ -16,7 +16,7 @@ import java.util.zip.InflaterInputStream;
 import static io.anuke.mindustry.Vars.*;
 
 public class SaveIO{
-    public static final IntArray breakingVersions = IntArray.with(47);
+    public static final IntArray breakingVersions = IntArray.with(47, 48, 49, 50, 51, 52, 53, 54, 55, 56);
     public static final IntMap<SaveFileVersion> versions = new IntMap<>();
     public static final Array<SaveFileVersion> versionArray = Array.with(
         new Save16()
@@ -26,6 +26,10 @@ public class SaveIO{
         for(SaveFileVersion version : versionArray){
             versions.put(version.version, version);
         }
+    }
+
+    public static SaveFileVersion getSaveWriter(){
+        return versionArray.peek();
     }
 
     public static void saveToSlot(int slot){
@@ -111,7 +115,14 @@ public class SaveIO{
     }
 
     public static void write(FileHandle file){
-        write(new DeflaterOutputStream(file.write(false)));
+        write(new DeflaterOutputStream(file.write(false)){
+            byte[] tmp = {0};
+
+            public void write(int var1) throws IOException {
+                tmp[0] = (byte)(var1 & 255);
+                this.write(tmp, 0, 1);
+            }
+        });
     }
 
     public static void write(OutputStream os){

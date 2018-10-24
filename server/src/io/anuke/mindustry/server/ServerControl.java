@@ -2,21 +2,25 @@ package io.anuke.mindustry.server;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
+import io.anuke.mindustry.game.EventType.SectorCompleteEvent;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.KickReason;
-import io.anuke.mindustry.ui.fragments.DebugFragment;
+import io.anuke.mindustry.net.TraceInfo;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.modules.Module;
@@ -34,41 +38,49 @@ import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.util.Log.*;
 
 public class ServerControl extends Module{
+    private static final int roundExtraTime = 12;
+
     private final CommandHandler handler = new CommandHandler("");
-    private ShuffleMode mode;
+    private int gameOvers;
+    private boolean inExtraRound;
+    private Task lastTask;
 
     public ServerControl(String[] args){
         Settings.defaultList(
             "shufflemode", "normal",
             "bans", "",
-            "admins", ""
+            "admins", "",
+            "sector_x", 2,
+            "sector_y", 1,
+            "shuffle", true,
+            "crashreport", false,
+            "port", port
         );
 
-        mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
-
-        Effects.setScreenShakeProvider((a, b) -> {
-        });
-        Effects.setEffectProvider((a, b, c, d, e, f) -> {
-        });
+        Timers.setDeltaProvider(() -> Gdx.graphics.getDeltaTime() * 60f);
+        Effects.setScreenShakeProvider((a, b) -> {});
+        Effects.setEffectProvider((a, b, c, d, e, f) -> {});
         Sounds.setHeadless(true);
-
-        String[] commands = {};
-
-        if(args.length > 0){
-            commands = String.join(" ", args).split(",");
-            Log.info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
-        }
 
         registerCommands();
 
-        for(String s : commands){
-            Response response = handler.handleMessage(s);
-            if(response.type != ResponseType.valid){
-                Log.err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
-                Log.err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
-                System.exit(1);
+        Gdx.app.postRunnable(() -> {
+            String[] commands = {};
+
+            if(args.length > 0){
+                commands = String.join(" ", args).split(",");
+                Log.info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
             }
-        }
+
+            for(String s : commands){
+                Response response = handler.handleMessage(s);
+                if(response.type != ResponseType.valid){
+                    Log.err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
+                    Log.err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
+                    System.exit(1);
+                }
+            }
+        });
 
         Thread thread = new Thread(this::readCommands, "Server Controls");
         thread.setDaemon(true);
@@ -79,38 +91,60 @@ public class ServerControl extends Module{
             "&lrWARNING: &lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly so that clients know which version you are using.");
         }
 
-        Events.on(GameOverEvent.class, () -> {
+        Events.on(SectorCompleteEvent.class, event -> {
+            Log.info("Sector complete.");
+            world.sectors.completeSector(world.getSector().x, world.getSector().y);
+            world.sectors.save();
+            gameOvers = 0;
+            inExtraRound = true;
+            Settings.putInt("sector_x", world.getSector().x + 1);
+            Settings.save();
+
+            Call.onInfoMessage("[accent]Sector conquered![]\n" + roundExtraTime + " seconds until deployment in next sector.");
+
+            playSectorMap();
+        });
+
+        Events.on(GameOverEvent.class, event -> {
+            if(inExtraRound) return;
             info("Game over!");
 
-            for(NetConnection connection : Net.getConnections()){
-                netServer.kick(connection.id, KickReason.gameover);
-            }
+            if(Settings.getBool("shuffle")){
+                if(world.getSector() == null){
+                    if(world.maps.all().size > 0){
+                        Array<Map> maps = world.maps.customMaps().size == 0 ? world.maps.defaultMaps() : world.maps.customMaps();
 
-            if(mode != ShuffleMode.off){
-                if(world.maps().all().size > 0){
-                    Array<Map> maps = mode == ShuffleMode.both ? world.maps().all() :
-                            mode == ShuffleMode.normal ? world.maps().defaultMaps() : world.maps().customMaps();
+                        Map previous = world.getMap();
+                        Map map = previous;
+                        if(maps.size > 1){
+                            while(map == previous) map = maps.random();
+                        }
 
-                    Map previous = world.getMap();
-                    Map map = previous;
-                    while(map == previous) map = maps.random();
-
-                    if(map != null){
+                        Call.onInfoMessage((state.mode.isPvp
+                        ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
+                        + "\nNext selected map:[accent] "+map.name+"[]"
+                        + (map.meta.author() != null ? " by[accent] " + map.meta.author() + "[]" : "") + "."+
+                        "\nNew game begins in " + roundExtraTime + " seconds.");
 
                         info("Selected next map to be {0}.", map.name);
-                        state.set(State.playing);
 
-                        logic.reset();
-                        world.loadMap(map);
-                    }else{
-                        info("Selected a procedural map.");
-                        playSectorMap();
+                        Map fmap = map;
+
+                        play(true, () -> world.loadMap(fmap));
                     }
                 }else{
-                    info("Selected a procedural map.");
+                    Call.onInfoMessage("[SCARLET]Sector has been lost.[]\nRe-deploying in " + roundExtraTime + " seconds.");
+                    if(gameOvers >= 2){
+                        Settings.putInt("sector_y", Settings.getInt("sector_y") < 0 ? Settings.getInt("sector_y") + 1 : Settings.getInt("sector_y") - 1);
+                        Settings.save();
+                        gameOvers = 0;
+                    }
+                    gameOvers ++;
                     playSectorMap();
+                    info("Re-trying sector map: {0} {1}",  Settings.getInt("sector_x"), Settings.getInt("sector_y"));
                 }
             }else{
+                netServer.kickAll(KickReason.gameover);
                 state.set(State.menu);
                 Net.closeServer();
             }
@@ -128,7 +162,7 @@ public class ServerControl extends Module{
         });
 
         handler.register("version", "Displays server version info.", arg -> {
-            info("&lmVersion: &lyMindustry {0} {1} / {2}", Version.code, Version.type, Version.buildName);
+            info("&lmVersion: &lyMindustry {0}-{1} {2} / build {3}", Version.number, Version.modifier, Version.type, Version.build);
             info("&lmJava Version: &ly{0}", System.getProperty("java.version"));
         });
 
@@ -140,54 +174,56 @@ public class ServerControl extends Module{
 
         handler.register("stop", "Stop hosting the server.", arg -> {
             Net.closeServer();
+            if(lastTask != null) lastTask.cancel();
             state.set(State.menu);
             netServer.reset();
             Log.info("Stopped server.");
         });
 
-        handler.register("host", "[mode] [mapname]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "[mapname] [mode]", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
             }
 
+            if(lastTask != null) lastTask.cancel();
+
             Map result = null;
 
             if(arg.length > 0){
-                GameMode mode;
-                try{
-                    mode = GameMode.valueOf(arg[0]);
-                }catch(IllegalArgumentException e){
-                    err("No gamemode '{0}' found.", arg[0]);
+
+                String search = arg[0];
+                for(Map map : world.maps.all()){
+                    if(map.name.equalsIgnoreCase(search)) result = map;
+                }
+
+                if(result == null){
+                    err("No map with name &y'{0}'&lr found.", search);
                     return;
                 }
 
+
                 info("Loading map...");
-                state.mode = mode;
 
                 if(arg.length > 1){
-                    String search = arg[1];
-                    for(Map map : world.maps().all()){
-                        if(map.name.equalsIgnoreCase(search))
-                            result = map;
-                    }
-
-                    if(result == null){
-                        err("No map with name &y'{0}'&lr found.", search);
+                    GameMode mode;
+                    try{
+                        mode = GameMode.valueOf(arg[1]);
+                    }catch(IllegalArgumentException e){
+                        err("No gamemode '{0}' found.", arg[1]);
                         return;
                     }
 
-                    logic.reset();
-                    world.loadMap(result);
-                    logic.play();
-                }else{
-                    Log.info("&ly&fiNo map specified, so a procedural one was generated.");
-                    playSectorMap();
+                    state.mode = mode;
                 }
 
+                logic.reset();
+                world.loadMap(result);
+                logic.play();
+
             }else{
-                Log.info("&ly&fiNo map specified, so a procedural one was generated.");
-                playSectorMap();
+                info("&ly&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sector_x"), Settings.getInt("sector_y"));
+                playSectorMap(false);
             }
 
             info("Map loaded.");
@@ -195,10 +231,25 @@ public class ServerControl extends Module{
             host();
         });
 
+        handler.register("port", "[port]", "Sets or displays the port for hosting the server.", arg -> {
+            if(arg.length == 0){
+                info("&lyPort: &lc{0}", Settings.getInt("port"));
+            }else{
+                int port = Strings.parseInt(arg[0]);
+                if(port < 0 || port > 65535){
+                    err("Port must be a number between 0 and 65535.");
+                    return;
+                }
+                info("&lyPort set to {0}.", port);
+                Settings.putInt("port", port);
+                Settings.save();
+            }
+        });
+
         handler.register("maps", "Display all available maps.", arg -> {
-            Log.info("Maps:");
-            for(Map map : world.maps().all()){
-                Log.info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
+            info("Maps:");
+            for(Map map : world.maps.all()){
+                info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
             }
         });
 
@@ -254,54 +305,49 @@ public class ServerControl extends Module{
 
         handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
             try{
-                Difficulty diff = Difficulty.valueOf(arg[0]);
-                state.difficulty = diff;
+                state.difficulty = Difficulty.valueOf(arg[0]);
                 info("Difficulty set to '{0}'.", arg[0]);
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
             }
         });
 
-        handler.register("friendlyfire", "<on/off>", "Enable or disable friendly fire.", arg -> {
-            String s = arg[0];
-            if(s.equalsIgnoreCase("on")){
-                state.friendlyFire = true;
-                info("Friendly fire enabled.");
-            }else if(s.equalsIgnoreCase("off")){
-                state.friendlyFire = false;
-                info("Friendly fire disabled.");
-            }else{
-                err("Incorrect command usage.");
+        handler.register("setsector", "<x> <y>", "Sets the next sector to be played. Does not affect current game.", arg -> {
+            try{
+                Settings.putInt("sector_x", Integer.parseInt(arg[0]));
+                Settings.putInt("sector_y", Integer.parseInt(arg[1]));
+                Settings.save();
+                info("Sector position set.");
+            }catch(NumberFormatException e){
+                err("Invalid coordinates.");
             }
         });
 
-        handler.register("antigrief", "[on/off] [max-break] [cooldown-in-ms]", "Enable or disable anti-grief.", arg -> {
-            if(arg.length == 0){
-                info("Anti-grief is currently &lc{0}.", netServer.admins.isAntiGrief() ? "on" : "off");
+        handler.register("fillitems", "Fill the core with 2000 items.", arg -> {
+            if(!state.is(State.playing)){
+                err("Not playing. Host first.");
                 return;
             }
 
-            String s = arg[0];
-            if(s.equalsIgnoreCase("on")){
-                netServer.admins.setAntiGrief(true);
-                info("Anti-grief enabled.");
-            }else if(s.equalsIgnoreCase("off")){
-                netServer.admins.setAntiGrief(false);
-                info("Anti-grief disabled.");
-            }else{
-                err("Incorrect command usage.");
-            }
-
-            if(arg.length >= 2){
-                try{
-                    int maxbreak = Integer.parseInt(arg[1]);
-                    int cooldown = (arg.length >= 3 ? Integer.parseInt(arg[2]) : Administration.defaultBreakCooldown);
-                    netServer.admins.setAntiGriefParams(maxbreak, cooldown);
-                    info("Anti-grief parameters set.");
-                }catch(NumberFormatException e){
-                    err("Invalid number format.");
+            for(Item item : content.items()){
+                if(item.type == ItemType.material){
+                    state.teams.get(Team.blue).cores.first().entity.items.add(item, 2000);
                 }
             }
+            info("Core filled.");
+        });
+
+        handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
+            boolean value = arg[0].equalsIgnoreCase("on");
+            Settings.putBool("crashreport", value);
+            Settings.save();
+            info("Crash reporting is now {0}.", value ? "on" : "off");
+        });
+
+        handler.register("strict", "<on/off>", "Disables or enables strict mode", arg -> {
+           boolean value = arg[0].equalsIgnoreCase("on");
+           netServer.admins.setStrict(value);
+           info("Strict mode is now {0}.", netServer.admins.getStrict() ? "on" : "off");
         });
 
         handler.register("allow-custom-clients", "[on/off]", "Allow or disallow custom clients.", arg -> {
@@ -322,16 +368,14 @@ public class ServerControl extends Module{
             }
         });
 
-        handler.register("shuffle", "<normal/custom/both/off>", "Set map shuffling.", arg -> {
-
-            try{
-                mode = ShuffleMode.valueOf(arg[0]);
-                Settings.putString("shufflemode", arg[0]);
-                Settings.save();
-                info("Shuffle mode set to '{0}'.", arg[0]);
-            }catch(Exception e){
-                err("Unknown shuffle mode '{0}'.", arg[0]);
+        handler.register("shuffle", "<on/off>", "Set map shuffling.", arg -> {
+            if(!arg[0].equals("on") && !arg[0].equals("off")){
+                err("Invalid shuffle mode.");
+                return;
             }
+            Settings.putBool("shuffle", arg[0].equals("on"));
+            Settings.save();
+            info("Shuffle mode set to '{0}'.", arg[0]);
         });
 
         handler.register("kick", "<username...>", "Kick a person by name.", arg -> {
@@ -368,7 +412,6 @@ public class ServerControl extends Module{
             for(Player player : playerGroup.all()){
                 if(player.name.equalsIgnoreCase(arg[0])){
                     target = player;
-                    break;
                 }
             }
 
@@ -420,7 +463,6 @@ public class ServerControl extends Module{
                     if(player.con.address != null &&
                             player.con.address.equals(arg[0])){
                         netServer.kick(player.con.id, KickReason.banned);
-                        break;
                     }
                 }
             }else{
@@ -435,7 +477,6 @@ public class ServerControl extends Module{
                 for(Player player : playerGroup.all()){
                     if(player.uuid.equals(arg[0])){
                         netServer.kick(player.con.id, KickReason.banned);
-                        break;
                     }
                 }
             }else{
@@ -545,10 +586,12 @@ public class ServerControl extends Module{
                 return;
             }
 
-            SaveIO.loadFromSlot(slot);
-            info("Save loaded.");
-            host();
-            state.set(State.playing);
+            threads.run(() -> {
+                SaveIO.loadFromSlot(slot);
+                info("Save loaded.");
+                host();
+                state.set(State.playing);
+            });
         });
 
         handler.register("save", "<slot>", "Save game state to a slot.", arg -> {
@@ -560,11 +603,11 @@ public class ServerControl extends Module{
                 return;
             }
 
-            int slot = Strings.parseInt(arg[0]);
-
-            SaveIO.saveToSlot(slot);
-
-            info("Saved to slot {0}.", slot);
+            threads.run(() -> {
+                int slot = Strings.parseInt(arg[0]);
+                SaveIO.saveToSlot(slot);
+                info("Saved to slot {0}.", slot);
+            });
         });
 
         handler.register("griefers", "[min-break:place-ratio] [min-breakage]", "Find possible griefers currently online.", arg -> {
@@ -604,13 +647,9 @@ public class ServerControl extends Module{
                 return;
             }
 
-            Events.fire(GameOverEvent.class);
-
-            info("Core destroyed.");
-        });
-
-        handler.register("debug", "Print debug info", arg -> {
-            info(DebugFragment.debugInfo());
+            info("&lyCore destroyed.");
+            inExtraRound = false;
+            Events.fire(new GameOverEvent(Team.red));
         });
 
         handler.register("traceblock", "<x> <y>", "Prints debug info about a block", arg -> {
@@ -746,28 +785,6 @@ public class ServerControl extends Module{
                 info("Nobody with that name could be found.");
             }
         });
-
-        handler.register("rollback", "<amount>", "Rollback the block edits in the world", arg -> {
-            if(!state.is(State.playing)){
-                err("Open the server first.");
-                return;
-            }
-
-            if(!Strings.canParsePostiveInt(arg[0])){
-                err("Please input a valid, positive, number of times to rollback");
-                return;
-            }
-
-            int rollbackTimes = Integer.valueOf(arg[0]);
-            IntMap<Array<EditLog>> editLogs = netServer.admins.getEditLogs();
-            if(editLogs.size == 0){
-                err("Nothing to rollback!");
-                return;
-            }
-
-            //netServer.admins.rollbackWorld(rollbackTimes);
-            info("Rollback done!");
-        });
     }
 
     private void readCommands(){
@@ -806,20 +823,68 @@ public class ServerControl extends Module{
     }
 
     private void playSectorMap(){
-        world.loadSector(world.sectors().get(0, 0));
-        logic.play();
+        playSectorMap(true);
+    }
+
+    private void playSectorMap(boolean wait){
+        int x = Settings.getInt("sector_x"), y = Settings.getInt("sector_y");
+        if(world.sectors.get(x, y) == null){
+            world.sectors.createSector(x, y);
+        }
+
+        world.sectors.get(x, y).completedMissions = 0;
+
+        play(wait, () -> world.loadSector(world.sectors.get(x, y)));
+    }
+
+    private void play(boolean wait, Runnable run){
+        inExtraRound = true;
+        Runnable r = () -> {
+
+            Array<Player> players = new Array<>();
+            for(Player p : playerGroup.all()){
+                players.add(p);
+                p.setDead(true);
+            }
+            logic.reset();
+            Call.onWorldDataBegin();
+            run.run();
+            logic.play();
+            for(Player p : players){
+                p.reset();
+                netServer.sendWorldData(p, p.con.id);
+            }
+            inExtraRound = false;
+        };
+
+        if(wait){
+            lastTask = new Task(){
+                @Override
+                public void run(){
+                    r.run();
+                }
+            };
+
+            Timer.schedule(lastTask, roundExtraTime);
+        }else{
+            r.run();
+        }
     }
 
     private void host(){
         try{
-            Net.host(port);
+            Net.host(Settings.getInt("port"));
+            info("&lcOpened a server on port {0}.", Settings.getInt("port"));
         }catch(IOException e){
             Log.err(e);
             state.set(State.menu);
         }
     }
 
-    enum ShuffleMode{
-        normal, custom, both, off
+    @Override
+    public void update(){
+        if(!inExtraRound && state.mode.isPvp){
+        //    checkPvPGameOver();
+        }
     }
 }

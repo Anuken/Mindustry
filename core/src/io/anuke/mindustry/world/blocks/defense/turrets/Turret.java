@@ -7,16 +7,18 @@ import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.AmmoEntry;
 import io.anuke.mindustry.type.AmmoType;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -27,19 +29,17 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadArray;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class Turret extends Block{
-    protected static final int targetInterval = 15;
+    protected static final int targetInterval = 20;
 
     protected final int timerTarget = timers++;
 
@@ -54,12 +54,14 @@ public abstract class Turret extends Block{
     protected float reload = 10f;
     protected float inaccuracy = 0f;
     protected int shots = 1;
+    protected float spread = 4f;
     protected float recoil = 1f;
     protected float restitution = 0.02f;
     protected float cooldown = 0.02f;
     protected float rotatespeed = 5f; //in degrees per tick
     protected float shootCone = 8f;
     protected float shootShake = 0f;
+    protected float xRand = 0f;
     protected boolean targetAir = true;
 
     protected Translator tr = new Translator();
@@ -86,6 +88,12 @@ public abstract class Turret extends Block{
         layer = Layer.turret;
         group = BlockGroup.turrets;
         turretIcon = true;
+        flags = EnumSet.of(BlockFlag.turret);
+    }
+
+    @Override
+    public boolean outputsItems(){
+        return false;
     }
 
     @Override
@@ -184,11 +192,11 @@ public abstract class Turret extends Block{
         if(hasAmmo(tile)){
 
             if(entity.timer.get(timerTarget, targetInterval)){
-                entity.target = Units.getClosestEnemy(tile.getTeam(),
-                        tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir));
+                findTarget(tile);
             }
 
-            if(entity.target != null){
+            if(validateTarget(tile)){
+
                 AmmoType type = peekAmmo(tile);
                 float speed = type.bullet.speed;
                 if(speed < 0.1f) speed = 9999999f;
@@ -204,7 +212,9 @@ public abstract class Turret extends Block{
                     entity.rotation = 0;
                 }
 
-                entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * Timers.delta());
+                if(shouldTurn(tile)){
+                    turnToTarget(tile, targetRot);
+                }
 
                 if(Angles.angleDist(entity.rotation, targetRot) < shootCone){
                     updateShooting(tile);
@@ -213,10 +223,32 @@ public abstract class Turret extends Block{
         }
     }
 
-    /**
-     * Consume ammo and return a type.
-     */
+    protected boolean validateTarget(Tile tile){
+        TurretEntity entity = tile.entity();
+        return !Units.invalidateTarget(entity.target, tile.getTeam(), tile.drawx(), tile.drawy());
+    }
+
+    protected void findTarget(Tile tile){
+        TurretEntity entity = tile.entity();
+
+        entity.target = Units.getClosestTarget(tile.getTeam(),
+                tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir));
+    }
+
+    protected void turnToTarget(Tile tile, float targetRot){
+        TurretEntity entity = tile.entity();
+
+        entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * entity.delta());
+    }
+
+    public boolean shouldTurn(Tile tile){
+        return true;
+    }
+
+    /**Consume ammo and return a type.*/
     public AmmoType useAmmo(Tile tile){
+        if(tile.isEnemyCheat()) return peekAmmo(tile);
+
         TurretEntity entity = tile.entity();
         AmmoEntry entry = entity.ammo.peek();
         entry.amount -= ammoPerShot;
@@ -252,7 +284,7 @@ public abstract class Turret extends Block{
 
             entity.reload = 0f;
         }else{
-            entity.reload += Timers.delta() * peekAmmo(tile).reloadMultiplier;
+            entity.reload += tile.entity.delta() * peekAmmo(tile).reloadMultiplier;
         }
     }
 
@@ -263,13 +295,15 @@ public abstract class Turret extends Block{
         entity.heat = 1f;
 
         AmmoType type = peekAmmo(tile);
-        useAmmo(tile);
 
-        tr.trns(entity.rotation, size * tilesize / 2);
+        tr.trns(entity.rotation, size * tilesize / 2, Mathf.range(xRand));
 
-        bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy));
+        for(int i = 0; i < shots; i++){
+            bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i-shots/2) * spread);
+        }
 
         effects(tile);
+        useAmmo(tile);
     }
 
     protected void bullet(Tile tile, BulletType type, float angle){
@@ -305,12 +339,11 @@ public abstract class Turret extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new TurretEntity();
     }
 
     public static class TurretEntity extends TileEntity{
-        public TileEntity blockTarget;
         public Array<AmmoEntry> ammo = new ThreadArray<>();
         public int totalAmmo;
         public float reload;
@@ -318,7 +351,7 @@ public abstract class Turret extends Block{
         public float recoil = 0f;
         public float heat;
         public int shots;
-        public Unit target;
+        public TargetTrait target;
 
         @Override
         public void write(DataOutputStream stream) throws IOException{
@@ -333,7 +366,7 @@ public abstract class Turret extends Block{
         public void read(DataInputStream stream) throws IOException{
             byte amount = stream.readByte();
             for(int i = 0; i < amount; i++){
-                AmmoType type = AmmoType.getByID(stream.readByte());
+                AmmoType type = content.getByID(ContentType.ammo, stream.readByte());
                 short ta = stream.readShort();
                 ammo.add(new AmmoEntry(type, ta));
                 totalAmmo += ta;

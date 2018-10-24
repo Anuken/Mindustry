@@ -1,9 +1,8 @@
 package io.anuke.mindustry.content;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Liquid;
 
 public class Liquids implements ContentList{
@@ -17,6 +16,11 @@ public class Liquids implements ContentList{
                 heatCapacity = 0.4f;
                 tier = 0;
                 effect = StatusEffects.wet;
+            }
+
+            @Override
+            public boolean alwaysUnlocked() {
+                return true;
             }
         };
 
@@ -34,6 +38,7 @@ public class Liquids implements ContentList{
                 viscosity = 0.7f;
                 flammability = 0.6f;
                 explosiveness = 0.6f;
+                heatCapacity = 0.7f;
                 tier = 1;
                 effect = StatusEffects.tarred;
             }
@@ -50,7 +55,7 @@ public class Liquids implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll(){
-        return Liquid.all();
+    public ContentType type(){
+        return ContentType.liquid;
     }
 }

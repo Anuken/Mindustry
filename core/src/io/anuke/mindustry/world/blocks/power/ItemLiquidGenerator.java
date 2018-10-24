@@ -6,10 +6,10 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
+import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class ItemLiquidGenerator extends ItemGenerator{
@@ -32,8 +32,10 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
     public void update(Tile tile){
         ItemGeneratorEntity entity = tile.entity();
 
+        entity.power.graph.update();
+
         Liquid liquid = null;
-        for(Liquid other : Liquid.all()){
+        for(Liquid other : content.liquids()){
             if(entity.liquids.get(other) >= 0.001f && getLiquidEfficiency(other) >= minLiquidEfficiency){
                 liquid = other;
                 break;
@@ -43,30 +45,18 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
         //liquid takes priority over solids
         if(liquid != null && entity.liquids.get(liquid) >= 0.001f && entity.cons.valid()){
             float powerPerLiquid = getLiquidEfficiency(liquid) * this.powerPerLiquid;
-            float used = Math.min(entity.liquids.get(liquid), maxLiquidGenerate * Timers.delta());
+            float used = Math.min(entity.liquids.get(liquid), maxLiquidGenerate * entity.delta());
             used = Math.min(used, (powerCapacity - entity.power.amount) / powerPerLiquid);
 
             entity.liquids.remove(liquid, used);
             entity.power.amount += used * powerPerLiquid;
 
-            if(used > 0.001f && Mathf.chance(0.05 * Timers.delta())){
+            if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
             }
         }else if(entity.cons.valid()){
 
-            float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * Timers.delta()) * entity.efficiency;
-            float mfract = maxPower / (powerOutput);
-
-            if(entity.generateTime > 0f){
-                entity.generateTime -= 1f / itemDuration * mfract;
-                entity.power.amount += maxPower;
-                entity.generateTime = Mathf.clamp(entity.generateTime);
-
-                if(Mathf.chance(Timers.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
-                    entity.damage(Mathf.random(8f));
-                    Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
-                }
-            }
+            float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * entity.delta()) * entity.efficiency;
 
             if(entity.generateTime <= 0f && entity.items.total() > 0){
                 Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
@@ -75,9 +65,18 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
                 entity.explosiveness = item.explosiveness;
                 entity.generateTime = 1f;
             }
-        }
 
-        distributePower(tile);
+            if(entity.generateTime > 0f){
+                entity.generateTime -= 1f / itemDuration * entity.delta();
+                entity.power.amount += maxPower;
+                entity.generateTime = Mathf.clamp(entity.generateTime);
+
+                if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
+                    entity.damage(Mathf.random(8f));
+                    Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
+                }
+            }
+        }
     }
 
     @Override

@@ -3,8 +3,12 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.ui.layout.Unit;
 
@@ -16,14 +20,13 @@ public class BackgroundFragment extends Fragment{
     public void build(Group parent){
 
         Core.scene.table().addRect((a, b, w, h) -> {
+            Draw.colorl(0.1f);
+            Fill.crect(0, 0, w, h);
+            Draw.color(Palette.accent);
+            Graphics.shader(Shaders.menu);
+            Fill.crect(0, 0, w, h);
+            Graphics.shader();
             Draw.color();
-
-            TextureRegion back = Draw.region("background");
-            float backscl = (int) Math.max(Gdx.graphics.getWidth() / (float) back.getRegionWidth() * 1.5f, Unit.dp.scl(5f));
-
-            Draw.alpha(0.5f);
-            Core.batch.draw(back, w / 2 - back.getRegionWidth() * backscl / 2, h / 2 - back.getRegionHeight() * backscl / 2,
-                    back.getRegionWidth() * backscl, back.getRegionHeight() * backscl);
 
             boolean portrait = Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
             float logoscl = (int) Unit.dp.scl(7) * (portrait ? 5f / 7f : 1f);

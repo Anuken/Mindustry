@@ -3,8 +3,7 @@ package io.anuke.mindustry.world;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.IntArray;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -18,6 +17,7 @@ import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.CursorType;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.meta.*;
@@ -32,25 +32,17 @@ import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Block extends BaseBlock implements Content{
-    private static int lastid;
-    private static Array<Block> blocks = new Array<>(140);
-    private static ObjectMap<String, Block> map = new ObjectMap<>();
-
+public class Block extends BaseBlock {
     /** internal name */
     public final String name;
-    /** internal ID */
-    public final int id;
     /** display name */
-    public final String formalName;
+    public String formalName;
     /** Detailed description of the block. Can be as long as necesary. */
     public final String fullDescription;
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */
     public boolean destructible;
-    /** if true, this block cannot be broken by normal means. */
-    public boolean unbreakable;
     /** whether this is solid */
     public boolean solid;
     /** whether this block CAN be solid. */
@@ -66,7 +58,7 @@ public class Block extends BaseBlock implements Content{
     /** base block explosiveness */
     public float baseExplosiveness = 0f;
     /** whether this block can be placed on liquids. */
-    public boolean floating = true;
+    public boolean floating = false;
     /** stuff that drops when broken */
     public ItemStack drops = null;
     /** multiblock size */
@@ -107,6 +99,10 @@ public class Block extends BaseBlock implements Content{
     public float viewRange = 10;
     /**Whether the top icon is outlined, like a turret.*/
     public boolean turretIcon = false;
+    /**Whether units target this block.*/
+    public boolean targetable = true;
+    /**Whether the overdrive core has any effect on this block.*/
+    public boolean canOverdrive = true;
 
     protected Array<Tile> tempTiles = new Array<>();
     protected Color tempColor = new Color();
@@ -123,46 +119,70 @@ public class Block extends BaseBlock implements Content{
         this.formalName = Bundles.get("block." + name + ".name", name);
         this.fullDescription = Bundles.getOrNull("block." + name + ".description");
         this.solid = false;
-        this.id = lastid++;
-
-        if(map.containsKey(name)){
-            throw new RuntimeException("Two blocks cannot have the same names! Problematic block: " + name);
-        }
-
-        map.put(name, this);
-        blocks.add(this);
-    }
-
-    public static Array<Block> all(){
-        return blocks;
-    }
-
-    public static Block getByName(String name){
-        return map.get(name);
-    }
-
-    public static Block getByID(int id){
-        if(id < 0){ //offset negative values by 256, as they are a product of byte overflow
-            id += 256;
-        }
-        if(id >= blocks.size || id < 0){
-            throw new RuntimeException("No block with ID '" + id + "' found!");
-        }
-        return blocks.get(id);
     }
 
     /**Populates the array with all blocks that produce this content.*/
-    public static void getByProduction(Array<Block> arr, Content content){
+    public static void getByProduction(Array<Block> arr, Content result){
         arr.clear();
-        for(Block block : Block.all()){
-            if(block.produces.get() == content){
+        for(Block block : content.blocks()){
+            if(block.produces.get() == result){
                 arr.add(block);
             }
         }
     }
 
+    public boolean canBreak(Tile tile){
+        return true;
+    }
+
     public boolean dropsItem(Item item){
         return drops != null && drops.item == item;
+    }
+
+    public void onProximityRemoved(Tile tile){
+        if(tile.entity.power != null){
+            tile.block().powerGraphRemoved(tile);
+        }
+    }
+
+    public void onProximityAdded(Tile tile){
+        if(tile.block().hasPower) tile.block().updatePowerGraph(tile);
+    }
+
+    protected void updatePowerGraph(Tile tile){
+        TileEntity entity = tile.entity();
+
+        for(Tile other : getPowerConnections(tile, tempTiles)){
+            if(other.entity.power != null){
+                other.entity.power.graph.add(entity.power.graph);
+            }
+        }
+    }
+
+    protected void powerGraphRemoved(Tile tile){
+        tile.entity.power.graph.remove(tile);
+        for(int i = 0; i < tile.entity.power.links.size; i++){
+            Tile other = world.tile(tile.entity.power.links.get(i));
+            if(other != null && other.entity != null && other.entity.power != null){
+                other.entity.power.links.removeValue(tile.packedPosition());
+            }
+        }
+    }
+
+    public Array<Tile> getPowerConnections(Tile tile, Array<Tile> out){
+        out.clear();
+        for(Tile other : tile.entity.proximity()){
+            if(other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
+                    && !tile.entity.power.links.contains(other.packedPosition())){
+                out.add(other);
+            }
+        }
+
+        for(int i = 0; i < tile.entity.power.links.size; i++){
+            Tile link = world.tile(tile.entity.power.links.get(i));
+            if(link != null && link.entity != null && link.entity.power != null) out.add(link);
+        }
+        return out;
     }
 
     public boolean isLayer(Tile tile){
@@ -187,7 +207,14 @@ public class Block extends BaseBlock implements Content{
     public void drawPlace(int x, int y, int rotation, boolean valid){
     }
 
-    /** Called after the block is placed. */
+    /** Called after the block is placed by this client. */
+    public void playerPlaced(Tile tile){
+    }
+
+    public void removed(Tile tile){
+    }
+
+    /** Called after the block is placed by anyone. */
     public void placed(Tile tile){
     }
 
@@ -201,10 +228,20 @@ public class Block extends BaseBlock implements Content{
     }
 
     /**Call when some content is produced. This unlocks the content if it is applicable.*/
-    public void useContent(UnlockableContent content){
-        if(!headless){
-            control.database().unlockContent(content);
+    public void useContent(Tile tile, UnlockableContent content){
+        if(!headless && tile.getTeam() == players[0].getTeam()){
+            control.unlocks.handleContentUsed(content);
         }
+    }
+
+    @Override
+    public ContentType getContentType(){
+        return ContentType.block;
+    }
+
+    @Override
+    public String getContentName() {
+        return name;
     }
 
     /** Called after all blocks are created. */
@@ -225,6 +262,19 @@ public class Block extends BaseBlock implements Content{
     public void load(){
         shadowRegion = Draw.region(shadow == null ? "shadow-" + size : shadow);
         region = Draw.region(name);
+    }
+
+    /**Called when the world is resized.
+     * Call super!*/
+    public void transformLinks(Tile tile, int oldWidth, int oldHeight, int newWidth, int newHeight, int shiftX, int shiftY){
+        if(tile.entity != null && tile.entity.power != null){
+            IntArray links = tile.entity.power.links;
+            IntArray out = new IntArray();
+            for(int i = 0; i < links.size; i++){
+                out.add(world.transform(links.get(i), oldWidth, oldHeight, newWidth, shiftX, shiftY));
+            }
+            tile.entity.power.links = out;
+        }
     }
 
     /** Called when the block is tapped. */
@@ -336,7 +386,7 @@ public class Block extends BaseBlock implements Content{
         tempColor.set(Palette.darkFlame);
 
         if(hasItems){
-            for(Item item : Item.all()){
+            for(Item item : content.items()){
                 int amount = tile.entity.items.get(item);
                 explosiveness += item.explosiveness * amount;
                 flammability += item.flammability * amount;
@@ -454,7 +504,7 @@ public class Block extends BaseBlock implements Content{
         return destructible || update;
     }
 
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new TileEntity();
     }
 
@@ -484,26 +534,12 @@ public class Block extends BaseBlock implements Content{
                 "floor", tile.floor().name,
                 "x", tile.x,
                 "y", tile.y,
-                "entity.name", ClassReflection.getSimpleName(tile.entity.getClass()),
+                "entity.name", tile.entity.getClass(),
                 "entity.x", tile.entity.x,
                 "entity.y", tile.entity.y,
                 "entity.id", tile.entity.id,
-                "entity.items.total", hasItems ? tile.entity.items.total() : null
+                "entity.items.total", hasItems ? tile.entity.items.total() : null,
+                "entity.graph", tile.entity.power != null && tile.entity.power.graph != null ? tile.entity.power.graph.getID() : null
         );
-    }
-
-    @Override
-    public String getContentTypeName(){
-        return "block";
-    }
-
-    @Override
-    public Array<? extends Content> getAll(){
-        return all();
-    }
-
-    @Override
-    public String toString(){
-        return name;
     }
 }

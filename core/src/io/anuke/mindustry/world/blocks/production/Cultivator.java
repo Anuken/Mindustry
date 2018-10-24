@@ -95,13 +95,13 @@ public class Cultivator extends Drill{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new CultivatorEntity();
     }
 
     @Override
     public boolean isValid(Tile tile){
-        return tile.floor() == Blocks.grass;
+        return tile != null && tile.floor() == Blocks.grass;
     }
 
     @Override

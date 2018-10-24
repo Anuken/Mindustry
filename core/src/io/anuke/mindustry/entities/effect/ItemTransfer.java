@@ -35,14 +35,6 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void transferAmmo(Item item, float x, float y, Unit to){
-        if(to == null) return;
-        to.addAmmo(item);
-        create(item, x, y, to, () -> {
-        });
-    }
-
-    @Remote(called = Loc.server, unreliable = true)
     public static void transferItemEffect(Item item, float x, float y, Unit to){
         if(to == null) return;
         create(item, x, y, to, () -> {
@@ -57,7 +49,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
 
     @Remote(called = Loc.server)
     public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
-        if(tile == null) return;
+        if(tile == null || tile.entity == null || tile.entity.items == null) return;
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
             Timers.run(i * 3, () -> create(item, x, y, tile, () -> {
             }));
@@ -66,7 +58,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     }
 
     public static void create(Item item, float fromx, float fromy, PosTrait to, Runnable done){
-        ItemTransfer tr = Pooling.obtain(ItemTransfer.class);
+        ItemTransfer tr = Pooling.obtain(ItemTransfer.class, ItemTransfer::new);
         tr.item = item;
         tr.from.set(fromx, fromy);
         tr.to = to;

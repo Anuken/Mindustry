@@ -28,6 +28,8 @@ public class PausedDialog extends FloatingDialog{
             missionTable.table(t -> {
                 world.getSector().currentMission().display(t);
             });
+            missionTable.row();
+            missionTable.add(Bundles.format("text.sector", world.getSector().x + ", " + world.getSector().y));
         }
     }
 
@@ -43,7 +45,7 @@ public class PausedDialog extends FloatingDialog{
             if(!Net.active()) state.set(State.paused);
         });
 
-        content().table(t -> missionTable = t);
+        content().table(t -> missionTable = t).colspan(mobile ? 3 : 1);
         content().row();
 
         if(!mobile){
@@ -104,7 +106,7 @@ public class PausedDialog extends FloatingDialog{
             content().row();
 
             content().addRowImageTextButton("$text.load", "icon-load", isize, load::show).disabled(b -> Net.active());
-            content().addRowImageTextButton("$text.host", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
+            content().addRowImageTextButton("$text.hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
             content().addRowImageTextButton("$text.quit", "icon-quit", isize, () -> {
                 ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
                     if(Net.client()) netClient.disconnectQuietly();
@@ -116,15 +118,15 @@ public class PausedDialog extends FloatingDialog{
     }
 
     public void runExitSave(){
-        if(control.getSaves().getCurrent() == null ||
-                !control.getSaves().getCurrent().isAutosave()){
+        if(control.saves.getCurrent() == null ||
+                !control.saves.getCurrent().isAutosave()){
             state.set(State.menu);
             return;
         }
 
         ui.loadLogic("$text.saveload", () -> {
             try{
-                control.getSaves().getCurrent().save();
+                control.saves.getCurrent().save();
             }catch(Throwable e){
                 e.printStackTrace();
                 threads.runGraphics(() -> ui.showError("[orange]" + Bundles.get("text.savefail")));

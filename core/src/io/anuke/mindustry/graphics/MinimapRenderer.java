@@ -39,13 +39,13 @@ public class MinimapRenderer implements Disposable{
     private int zoom = 4;
 
     public MinimapRenderer(){
-        Events.on(WorldLoadGraphicsEvent.class, () -> {
+        Events.on(WorldLoadGraphicsEvent.class, event -> {
             reset();
             updateAll();
         });
 
         //make sure to call on the graphics thread
-        Events.on(TileChangeEvent.class, tile -> Gdx.app.postRunnable(() -> update(tile)));
+        Events.on(TileChangeEvent.class, event -> Gdx.app.postRunnable(() -> update(event.tile)));
     }
 
     public Texture getTexture(){
@@ -144,7 +144,7 @@ public class MinimapRenderer implements Disposable{
 
     private int colorFor(Tile tile){
         tile = tile.target();
-        return ColorMapper.colorFor(tile.floor(), tile.block(), tile.getTeam(), tile.getElevation());
+        return ColorMapper.colorFor(tile.floor(), tile.block(), tile.getTeam(), tile.getElevation(), tile.getCliffs());
     }
 
     @Override

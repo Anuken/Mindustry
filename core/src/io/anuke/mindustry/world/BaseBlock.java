@@ -1,10 +1,12 @@
 package io.anuke.mindustry.world;
 
 import com.badlogic.gdx.utils.Array;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.Puddle;
+import io.anuke.mindustry.game.MappableContent;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.consumers.ConsumeItem;
@@ -16,15 +18,15 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
-public abstract class BaseBlock{
+public abstract class BaseBlock extends MappableContent{
     public boolean hasItems;
     public boolean hasLiquids;
     public boolean hasPower;
 
     public boolean outputsLiquid = false;
     public boolean singleLiquid = true;
-
-    public boolean outputsItems = false;
+    public boolean consumesPower = true;
+    public boolean outputsPower;
 
     public int itemCapacity;
     public float liquidCapacity = 10f;
@@ -42,7 +44,7 @@ public abstract class BaseBlock{
      * Returns the amount of items this block can accept.
      */
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
-        if(acceptItem(item, tile, tile) && hasItems && source.getTeam() == tile.getTeam()){
+        if(acceptItem(item, tile, tile) && hasItems && (source == null || source.getTeam() == tile.getTeam())){
             return Math.min(getMaximumAccepted(tile, item), amount);
         }else{
             return 0;
@@ -50,7 +52,7 @@ public abstract class BaseBlock{
     }
 
     public int getMaximumAccepted(Tile tile, Item item){
-        return itemCapacity - tile.entity.items.total();
+        return itemCapacity - (tile.entity.items.total() - tile.entity.items.get(item));
     }
 
     /**
@@ -68,6 +70,10 @@ public abstract class BaseBlock{
         tile.entity.items.add(item, amount);
     }
 
+    public boolean outputsItems(){
+        return hasItems;
+    }
+
     /**Returns offset for stack placement.*/
     public void getStackOffset(Item item, Tile tile, Translator trns){
 
@@ -82,7 +88,7 @@ public abstract class BaseBlock{
     }
 
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return tile.entity != null && consumes.has(ConsumeItem.class) && consumes.item() == item && tile.entity.items.total() < itemCapacity;
+        return tile.entity != null && consumes.has(ConsumeItem.class) && consumes.item() == item && tile.entity.items.get(item) < getMaximumAccepted(tile, item);
     }
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
@@ -99,9 +105,7 @@ public abstract class BaseBlock{
         return true;
     }
 
-    /**
-     * Returns how much power is accepted.
-     */
+    /**Returns how much power is accepted.*/
     public float addPower(Tile tile, float amount){
         float canAccept = Math.min(powerCapacity - tile.entity.power.amount, amount);
 
@@ -119,7 +123,7 @@ public abstract class BaseBlock{
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
 
-            if(other.block().hasLiquids){
+            if(other.getTeamID() == tile.getTeamID() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid)){
                 float ofract = other.entity.liquids.get(liquid) / other.block().liquidCapacity;
                 float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
 
@@ -127,6 +131,10 @@ public abstract class BaseBlock{
             }
         }
 
+    }
+
+    public boolean canDumpLiquid(Tile tile, Tile to, Liquid liquid){
+        return true;
     }
 
     public void tryMoveLiquid(Tile tile, Tile tileSource, Tile next, float amount, Liquid liquid){
@@ -143,7 +151,7 @@ public abstract class BaseBlock{
 
         next = next.target();
 
-        if(next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
+        if(next.getTeamID() == tile.getTeamID() && next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
 
             if(next.block().acceptLiquid(next, tile, liquid, 0f)){
                 float ofract = next.entity.liquids.get(liquid) / next.block().liquidCapacity;
@@ -193,7 +201,7 @@ public abstract class BaseBlock{
             incrementDump(tile, proximity.size);
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
-            if(other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+            if(other.getTeamID() == tile.getTeamID() && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                 other.block().handleItem(item, other, in);
                 return;
             }
@@ -230,10 +238,10 @@ public abstract class BaseBlock{
 
             if(todump == null){
 
-                for(int ii = 0; ii < Item.all().size; ii++){
-                    Item item = Item.getByID(ii);
+                for(int ii = 0; ii < Vars.content.items().size; ii++){
+                    Item item = Vars.content.item(ii);
 
-                    if(entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+                    if(other.getTeamID() == tile.getTeamID() && entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                         other.block().handleItem(item, other, in);
                         tile.entity.items.remove(item, 1);
                         incrementDump(tile, proximity.size);
@@ -242,7 +250,7 @@ public abstract class BaseBlock{
                 }
             }else{
 
-                if(other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
+                if(other.getTeamID() == tile.getTeamID() && other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
                     other.block().handleItem(todump, other, in);
                     tile.entity.items.remove(todump, 1);
                     incrementDump(tile, proximity.size);
@@ -268,7 +276,7 @@ public abstract class BaseBlock{
     /** Try offloading an item to a nearby container in its facing direction. Returns true if success.*/
     public boolean offloadDir(Tile tile, Item item){
         Tile other = tile.getNearby(tile.getRotation());
-        if(other != null && other.block().acceptItem(item, other, tile)){
+        if(other != null && other.target().getTeamID() == tile.getTeamID() && other.block().acceptItem(item, other, tile)){
             other.block().handleItem(item, other, tile);
             return true;
         }

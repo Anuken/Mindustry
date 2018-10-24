@@ -10,6 +10,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Build;
@@ -23,19 +24,14 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.tmptr;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 /**
  * Interface for units that build, break or mine things.
@@ -71,6 +67,7 @@ public interface BuilderTrait extends Entity{
         if(request != null){
             output.writeByte(request.remove ? 1 : 0);
             output.writeInt(world.toPacked(request.x, request.y));
+            output.writeFloat(request.progress);
             if(!request.remove){
                 output.writeByte(request.recipe.id);
                 output.writeByte(request.rotation);
@@ -91,6 +88,7 @@ public interface BuilderTrait extends Entity{
             byte type = input.readByte();
             if(type != -1){
                 int position = input.readInt();
+                float progress = input.readFloat();
                 BuildRequest request;
 
                 if(type == 1){ //remove
@@ -98,11 +96,15 @@ public interface BuilderTrait extends Entity{
                 }else{ //place
                     byte recipe = input.readByte();
                     byte rotation = input.readByte();
-                    request = new BuildRequest(position % world.width(), position / world.width(), rotation, Recipe.getByID(recipe));
+                    request = new BuildRequest(position % world.width(), position / world.width(), rotation, content.recipe(recipe));
                 }
+
+                request.progress = progress;
 
                 if(applyChanges){
                     getPlaceQueue().addLast(request);
+                }else if(isBuilding()){
+                    getCurrentRequest().progress = progress;
                 }
             }
         }
@@ -144,6 +146,10 @@ public interface BuilderTrait extends Entity{
                     return;
                 }
             }
+            Tile tile = world.tile(place.x, place.y);
+            if(tile != null && tile.entity instanceof BuildEntity){
+                place.progress = tile.<BuildEntity>entity().progress;
+            }
             getPlaceQueue().addLast(place);
         }
     }
@@ -175,12 +181,7 @@ public interface BuilderTrait extends Entity{
             setMineTile(null);
         }
 
-        TileEntity core = unit.getClosestCore();
 
-        //if there is no core to build with, stop building!
-        if(core == null){
-            return;
-        }
 
         Tile tile = world.tile(current.x, current.y);
 
@@ -199,38 +200,63 @@ public interface BuilderTrait extends Entity{
             }
         }
 
+        TileEntity core = unit.getClosestCore();
+
+        //if there is no core to build with, stop building!
+        if(core == null){
+            return;
+        }
+
         //otherwise, update it.
         BuildEntity entity = tile.entity();
 
-        //deconstructing is 2x as fast
-        if(current.remove){
-            entity.deconstruct(unit, core, 2f / entity.buildCost * Timers.delta() * getBuildPower(tile));
-        }else{
-            entity.construct(unit, core, 1f / entity.buildCost * Timers.delta() * getBuildPower(tile));
+        if(entity == null){
+            getPlaceQueue().removeFirst();
+            return;
         }
 
         if(unit.distanceTo(tile) <= placeDistance){
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
         }
-        current.progress = entity.progress();
+
+        //progress is synced, thus not updated clientside
+        if(!Net.client()){
+            //deconstructing is 2x as fast
+            if(current.remove){
+                entity.deconstruct(unit, core, 2f / entity.buildCost * Timers.delta() * getBuildPower(tile));
+            }else{
+                entity.construct(unit, core, 1f / entity.buildCost * Timers.delta() * getBuildPower(tile));
+            }
+
+            current.progress = entity.progress();
+        }else{
+            entity.progress = current.progress;
+        }
     }
 
     /**Do not call directly.*/
     default void updateMining(Unit unit){
         Tile tile = getMineTile();
+        TileEntity core = unit.getClosestCore();
 
-        if(tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance || !unit.inventory.canAcceptItem(tile.floor().drops.item)){
+        if(core == null || tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance || !unit.inventory.canAcceptItem(tile.floor().drops.item)){
             setMineTile(null);
         }else{
             Item item = tile.floor().drops.item;
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.worldx(), tile.worldy()), 0.4f);
 
-            if(unit.inventory.canAcceptItem(item) &&
-                    Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
-                Call.transferItemToUnit(item,
+            if(Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
+
+                if(unit.distanceTo(core) < mineTransferRange && core.tile.block().acceptStack(item, 1, core.tile, unit) == 1){
+                    Call.transferItemTo(item, 1,
+                        tile.worldx() + Mathf.range(tilesize / 2f),
+                        tile.worldy() + Mathf.range(tilesize / 2f), core.tile);
+                }else if(unit.inventory.canAcceptItem(item)){
+                    Call.transferItemToUnit(item,
                         tile.worldx() + Mathf.range(tilesize / 2f),
                         tile.worldy() + Mathf.range(tilesize / 2f),
                         unit);
+                }
             }
 
             if(Mathf.chance(0.06 * Timers.delta())){
@@ -284,9 +310,6 @@ public interface BuilderTrait extends Entity{
         float x2 = close.x, y2 = close.y;
 
         Draw.alpha(0.3f + Mathf.absin(Timers.time(), 0.9f, 0.2f));
-
-        Fill.tri(px, py, x2, y2, x1, y1);
-        Fill.tri(px, py, x2, y2, x3, y3);
 
         Draw.alpha(1f);
 

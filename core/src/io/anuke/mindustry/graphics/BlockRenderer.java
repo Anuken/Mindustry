@@ -25,7 +25,7 @@ public class BlockRenderer{
 
     private FloorRenderer floorRenderer;
 
-    private Array<BlockRequest> requests = new Array<>(initialRequests);
+    private Array<BlockRequest> requests = new Array<>(true, initialRequests, BlockRequest.class);
     private IntSet teamChecks = new IntSet();
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private Layer lastLayer;
@@ -40,18 +40,18 @@ public class BlockRenderer{
             requests.set(i, new BlockRequest());
         }
 
-        Events.on(WorldLoadGraphicsEvent.class, () -> {
+        Events.on(WorldLoadGraphicsEvent.class, event -> {
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
         });
 
-        Events.on(TileChangeEvent.class, tile -> {
+        Events.on(TileChangeEvent.class, event -> {
             threads.runGraphics(() -> {
                 int avgx = Mathf.scl(camera.position.x, tilesize);
                 int avgy = Mathf.scl(camera.position.y, tilesize);
                 int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
                 int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
 
-                if(Math.abs(avgx - tile.x) <= rangex && Math.abs(avgy - tile.y) <= rangey){
+                if(Math.abs(avgx - event.tile.x) <= rangex && Math.abs(avgy - event.tile.y) <= rangey){
                     lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
                 }
             });
@@ -88,14 +88,13 @@ public class BlockRenderer{
 
         int shadowW = rangex * tilesize*2, shadowH = rangey * tilesize*2;
 
-        if(shadows.width() != shadowW || shadows.height() != shadowH){
-            shadows.setSize(shadowW, shadowH);
-        }
-
         teamChecks.clear();
         requestidx = 0;
 
         Graphics.end();
+        if(shadows.width() != shadowW || shadows.height() != shadowH){
+            shadows.setSize(shadowW, shadowH);
+        }
         Core.batch.getProjectionMatrix().setToOrtho2D(Mathf.round(Core.camera.position.x, tilesize)-shadowW/2f, Mathf.round(Core.camera.position.y, tilesize)-shadowH/2f, shadowW, shadowH);
         Graphics.surface(shadows);
 

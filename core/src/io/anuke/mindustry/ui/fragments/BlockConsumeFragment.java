@@ -34,17 +34,15 @@ public class BlockConsumeFragment extends Fragment{
         ObjectSet<Consume> consumers = new ObjectSet<>();
         TileEntity entity = tile.entity;
         Block block = tile.block();
-        Consume[] lastCurrent = {null};
 
         table.clearChildren();
 
-        //table.background("clear");
         rebuild(block, entity);
         visible = true;
 
         table.update(() -> {
 
-            if(tile.entity == null){
+            if(tile.entity == null || state.is(State.menu)){
                 hide();
                 return;
             }

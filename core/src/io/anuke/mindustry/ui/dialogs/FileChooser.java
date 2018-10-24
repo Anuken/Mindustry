@@ -5,7 +5,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pools;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.ucore.core.Core;
@@ -18,6 +17,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.OS;
+import io.anuke.ucore.util.Pooling;
 
 import java.util.Arrays;
 
@@ -52,7 +52,6 @@ public class FileChooser extends FloatingDialog{
     }
 
     private void setupWidgets(){
-        //getCell(content()).maxWidth(UIUtils.portrait() ? Gdx.graphics.getWidth() : Gdx.graphics.getWidth()/Unit.dp.scl(2f));
         content().margin(-10);
 
         Table content = new Table();
@@ -137,7 +136,7 @@ public class FileChooser extends FloatingDialog{
         icontable.add(up);
 
         Table fieldcontent = new Table();
-        fieldcontent.bottom().left().add(new Label("File Name:"));
+        fieldcontent.bottom().left().add(new Label("$text.filename"));
         fieldcontent.add(filefield).height(40f).fillX().expandX().padLeft(10f);
 
         Table buttons = new Table();
@@ -186,7 +185,7 @@ public class FileChooser extends FloatingDialog{
         //if is mac, don't display extra info since you can only ever go to downloads
         navigation.setText(OS.isMac ? directory.name() : directory.toString());
 
-        GlyphLayout layout = Pools.obtain(GlyphLayout.class);
+        GlyphLayout layout = Pooling.obtain(GlyphLayout.class, GlyphLayout::new);
 
         layout.setText(Core.font, navigation.getText());
 
@@ -196,7 +195,7 @@ public class FileChooser extends FloatingDialog{
             navigation.setCursorPosition(navigation.getText().length());
         }
 
-        Pools.free(layout);
+        Pooling.free(layout);
 
         files.clearChildren();
         files.top().left();

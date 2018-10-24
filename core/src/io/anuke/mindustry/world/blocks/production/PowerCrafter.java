@@ -7,10 +7,10 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.ucore.core.Timers;
 
 public class PowerCrafter extends Block{
     protected final int timerDump = timers++;
+    protected final int timerContentCheck = timers++;
 
     /**Optional.*/
     protected Item outputItem;
@@ -65,14 +65,23 @@ public class PowerCrafter extends Block{
         GenericCrafterEntity entity = tile.entity();
 
         if(entity.cons.valid()){
-            entity.progress += 1f / craftTime;
-            entity.totalProgress += Timers.delta();
+            entity.progress += 1f / craftTime * entity.delta();
+            entity.totalProgress += entity.delta();
         }
 
         if(entity.progress >= 1f){
             entity.items.remove(consumes.item(), consumes.itemAmount());
-            if(outputItem != null) offloadNear(tile, outputItem);
-            if(outputLiquid != null) handleLiquid(tile, tile, outputLiquid, outputLiquidAmount);
+            if(outputItem != null){
+                offloadNear(tile, outputItem);
+                useContent(tile, outputItem);
+            }
+
+            if(outputLiquid != null){
+                handleLiquid(tile, tile, outputLiquid, outputLiquidAmount);
+                if(tile.entity.liquids.currentAmount() > 0f && tile.entity.timer.get(timerContentCheck, 10)){
+                    useContent(tile, outputLiquid);
+                }
+            }
             entity.progress = 0f;
         }
 
@@ -86,7 +95,7 @@ public class PowerCrafter extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new GenericCrafterEntity();
     }
 }

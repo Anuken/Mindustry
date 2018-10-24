@@ -3,7 +3,6 @@ package io.anuke.mindustry.game;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.GroundUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.Weapon;
@@ -62,10 +61,6 @@ public class SpawnGroup{
      * Items this unit spawns with. Null to disable.
      */
     protected ItemStack items;
-    /**
-     * Ammo type this unit spawns with. Null to use the first available ammo.
-     */
-    protected Item ammoItem;
 
     public SpawnGroup(UnitType type){
         this.type = type;
@@ -90,7 +85,6 @@ public class SpawnGroup{
         if(wave < begin || wave > end || (wave - begin) % spacing != 0){
             return 0;
         }
-        float scaling = this.groupScaling;
 
         return Math.min(groupAmount - 1 + Math.max((int) ((wave / spacing) / groupScaling), 1), max);
     }
@@ -112,12 +106,6 @@ public class SpawnGroup{
 
         if(items != null){
             unit.inventory.addItem(items.item, items.amount);
-        }
-
-        if(ammoItem != null){
-            unit.inventory.addAmmo(unit.getWeapon().getAmmoType(ammoItem));
-        }else{
-            unit.inventory.addAmmo(unit.getWeapon().getAmmoType(unit.getWeapon().getAcceptedItems().iterator().next()));
         }
 
         return unit;

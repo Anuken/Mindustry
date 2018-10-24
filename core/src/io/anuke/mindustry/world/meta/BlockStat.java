@@ -2,9 +2,9 @@ package io.anuke.mindustry.world.meta;
 
 import io.anuke.ucore.util.Bundles;
 
-/**
- * Describes one type of stat for a block.
- */
+import java.util.Locale;
+
+/**Describes one type of stat for a block.*/
 public enum BlockStat{
     health(StatCategory.general),
     size(StatCategory.general),
@@ -16,14 +16,16 @@ public enum BlockStat{
 
     liquidCapacity(StatCategory.liquids),
     liquidOutput(StatCategory.liquids),
+    liquidOutputSpeed(StatCategory.liquids),
     coolant(StatCategory.liquids),
     coolantUse(StatCategory.liquids),
 
     powerCapacity(StatCategory.power),
     powerUse(StatCategory.power),
+    powerDamage(StatCategory.power),
     powerRange(StatCategory.power),
     powerTransferSpeed(StatCategory.power),
-    maxPowerGeneration(StatCategory.power),
+    basePowerGeneration(StatCategory.power),
     inputLiquidFuel(StatCategory.power),
     liquidFuelUse(StatCategory.power),
 
@@ -53,6 +55,6 @@ public enum BlockStat{
     }
 
     public String localized(){
-        return Bundles.get("text.blocks." + name().toLowerCase());
+        return Bundles.get("text.blocks." + name().toLowerCase(Locale.ROOT));
     }
 }

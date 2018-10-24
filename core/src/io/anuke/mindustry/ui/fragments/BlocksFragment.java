@@ -7,11 +7,13 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.ucore.core.Core;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
@@ -63,36 +65,42 @@ public class BlocksFragment extends Fragment{
 
                 //add top description table
                 descTable = new Table("button");
-                descTable.visible(() -> hoverRecipe != null || input.recipe != null); //make sure it's visible when necessary
+                descTable.visible(() -> (hoverRecipe != null || input.recipe != null) && shown); //make sure it's visible when necessary
                 descTable.update(() -> {
+                    if(state.is(State.menu)){
+                        descTable.clear();
+                        control.input(0).recipe = null;
+                    }
                     // note: This is required because there is no direct connection between input.recipe and the description ui.
                     // If input.recipe gets set to null, a proper cleanup of the ui elements is required.
                     boolean anyRecipeShown = input.recipe != null || hoverRecipe != null;
                     boolean descriptionTableClean = descTable.getChildren().size == 0;
-                    boolean cleanupRequired = !anyRecipeShown && !descriptionTableClean;
+                    boolean cleanupRequired = (!anyRecipeShown && !descriptionTableClean);
                     if(cleanupRequired){
                         descTable.clear();
                     }
                 });
 
-                container.add(descTable).fillX().uniformX();
+                float w = 246f;
 
-                container.row();
+                main.add(descTable).width(w);
+
+                main.row();
 
                 //now add the block selection menu
                 selectTable = main.table("pane", select -> {})
                 .margin(10f).marginLeft(0f).marginRight(0f).marginTop(-5)
-                .touchable(Touchable.enabled).right().bottom().get();
+                .touchable(Touchable.enabled).right().bottom().width(w).get();
 
             }).bottom().right().get();
         });
 
+        Events.on(WorldLoadEvent.class, event -> rebuild());
+
         rebuild();
     }
 
-    /**
-     * Rebuilds the whole placement menu, attempting to preserve previous state.
-     */
+    /**Rebuilds the whole placement menu, attempting to preserve previous state.*/
     void rebuild(){
         selectTable.clear();
 
@@ -165,7 +173,7 @@ public class BlocksFragment extends Fragment{
 
             //add actual recipes
             for(Recipe r : recipes){
-                if((r.debugOnly && !debug) || (r.desktopOnly && mobile)) continue;
+                if((r.mode != null && r.mode != state.mode) || !r.visibility.shown()) continue;
 
                 ImageButton image = new ImageButton(new TextureRegion(), "select");
 
@@ -254,7 +262,7 @@ public class BlocksFragment extends Fragment{
         }
 
         selectTable.row();
-        selectTable.add(stack).growX().left().top().colspan(Category.values().length).padBottom(-5).height((size + 12) * rowsUsed);
+        selectTable.add(stack).growX().left().top().colspan(Category.values().length).padBottom(-5).height((size + 12) * Math.min(rowsUsed, 3));
     }
 
     void toggle(float t, Interpolation ip){
@@ -305,8 +313,8 @@ public class BlocksFragment extends Fragment{
 
         descTable.row();
 
-        descTable.add(requirements);
         descTable.left();
+        descTable.add(requirements);
 
         for(ItemStack stack : recipe.requirements){
             requirements.addImage(stack.item.region).size(8 * 3);

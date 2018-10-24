@@ -14,16 +14,17 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Wall;
+import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.modules.ConsumeModule;
-import io.anuke.mindustry.world.modules.InventoryModule;
+import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.mindustry.world.modules.PowerModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.BaseEntity;
+import io.anuke.ucore.entities.trait.HealthTrait;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
@@ -34,17 +35,19 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.tileGroup;
 import static io.anuke.mindustry.Vars.world;
 
-public class TileEntity extends BaseEntity implements TargetTrait{
+public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public static final float timeToSleep = 60f * 4; //4 seconds to fall asleep
     private static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
     /**This value is only used for debugging.*/
     public static int sleepingEntities = 0;
+
     public Tile tile;
     public Timer timer;
     public float health;
+    public float timeScale = 1f, timeScaleDuration;
 
     public PowerModule power;
-    public InventoryModule items;
+    public ItemModule items;
     public LiquidModule liquids;
     public ConsumeModule cons;
 
@@ -84,6 +87,11 @@ public class TileEntity extends BaseEntity implements TargetTrait{
         return this;
     }
 
+    /**Scaled delta.*/
+    public float delta(){
+        return Timers.delta() * timeScale;
+    }
+
     /**Call when nothing is happening to the entity. This increments the internal sleep timer.*/
     public void sleep(){
         sleepTime += Timers.delta();
@@ -109,7 +117,7 @@ public class TileEntity extends BaseEntity implements TargetTrait{
     }
 
     public boolean isDead(){
-        return dead;
+        return dead || tile.entity != this;
     }
 
     public void write(DataOutputStream stream) throws IOException{
@@ -118,24 +126,16 @@ public class TileEntity extends BaseEntity implements TargetTrait{
     public void read(DataInputStream stream) throws IOException{
     }
 
-    private void onDeath(){
-        if(!dead){
-            dead = true;
-            Block block = tile.block();
-
-            block.onDestroyed(tile);
-            world.removeBlock(tile);
-            block.afterDestroyed(tile, this);
-            remove();
-        }
-    }
-
     public boolean collide(Bullet other){
         return true;
     }
 
     public void collision(Bullet other){
         tile.block().handleBulletHit(this, other);
+    }
+
+    public void kill(){
+        Call.onTileDestroyed(tile);
     }
 
     public void damage(float damage){
@@ -157,6 +157,8 @@ public class TileEntity extends BaseEntity implements TargetTrait{
     }
 
     public void removeFromProximity(){
+        tile.block().onProximityRemoved(tile);
+
         GridPoint2[] nearby = Edges.getEdges(tile.block().size);
         for(GridPoint2 point : nearby){
             Tile other = world.tile(tile.x + point.x, tile.y + point.y);
@@ -179,18 +181,17 @@ public class TileEntity extends BaseEntity implements TargetTrait{
         for(GridPoint2 point : nearby){
             Tile other = world.tile(tile.x + point.x, tile.y + point.y);
 
-            if(other != null){
-                other.block().onProximityUpdate(other);
-                other = other.target();
-            }
+            if(other == null) continue;
+            other = other.target();
+            if(other.entity == null || other.getTeamID() != tile.getTeamID()) continue;
 
-            if(other != null && other.entity != null){
-                tmpTiles.add(other);
+            other.block().onProximityUpdate(other);
 
-                //add this tile to proximity of nearby tiles
-                if(!other.entity.proximity.contains(tile, true)){
-                    other.entity.proximity.add(tile);
-                }
+            tmpTiles.add(other);
+
+            //add this tile to proximity of nearby tiles
+            if(!other.entity.proximity.contains(tile, true)){
+                other.entity.proximity.add(tile);
             }
         }
 
@@ -199,11 +200,45 @@ public class TileEntity extends BaseEntity implements TargetTrait{
             proximity.add(tile);
         }
 
+        tile.block().onProximityAdded(tile);
         tile.block().onProximityUpdate(tile);
     }
 
     public Array<Tile> proximity(){
         return proximity;
+    }
+
+    @Override
+    public void health(float health){
+        this.health = health;
+    }
+
+    @Override
+    public float health(){
+        return health;
+    }
+
+    @Override
+    public float maxHealth(){
+        return tile.block().health;
+    }
+
+    @Override
+    public void setDead(boolean dead){
+        this.dead = dead;
+    }
+
+    @Override
+    public void onDeath(){
+        if(!dead){
+            dead = true;
+            Block block = tile.block();
+
+            block.onDestroyed(tile);
+            world.removeBlock(tile);
+            block.afterDestroyed(tile, this);
+            remove();
+        }
     }
 
     @Override
@@ -226,12 +261,17 @@ public class TileEntity extends BaseEntity implements TargetTrait{
                 Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
             }
 
+            timeScaleDuration -= Timers.delta();
+            if(timeScaleDuration <= 0f || !tile.block().canOverdrive){
+                timeScale = 1f;
+            }
+
             if(health <= 0){
                 onDeath();
             }
-
+            Block previous = tile.block();
             tile.block().update(tile);
-            if(cons != null){
+            if(tile.block() == previous && cons != null){
                 cons.update(this);
             }
         }

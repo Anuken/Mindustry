@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.game.Team;
@@ -15,7 +16,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.impl.SolidEntity;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.Mathf;
@@ -24,26 +24,22 @@ import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 
-/**
- * Utility class for damaging in an area.
- */
+/**Utility class for damaging in an area.*/
 public class Damage{
     private static Rectangle rect = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
     private static Translator tr = new Translator();
 
-    /**
-     * Creates a dynamic explosion based on specified parameters.
-     */
+    /**Creates a dynamic explosion based on specified parameters.*/
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
         for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
             int branches = 5 + Mathf.clamp((int) (power / 30), 1, 20);
-            Timers.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.none, Fx.none, Palette.power, 3,
+            Timers.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.none, Palette.power, 3,
                     x, y, Mathf.random(360f), branches + Mathf.range(2)));
         }
 
         for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
-            Timers.run(i / 2, () -> Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f)));
+            Timers.run(i / 2f, () -> Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f)));
         }
 
         int waves = Mathf.clamp((int) (explosiveness / 4), 0, 30);
@@ -51,7 +47,7 @@ public class Damage{
         for(int i = 0; i < waves; i++){
             int f = i;
             Timers.run(i * 2f, () -> {
-                Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
+                threads.run(() -> Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f));
                 Effects.effect(ExplosionFx.blockExplosionSmoke, x + Mathf.range(radius), y + Mathf.range(radius));
             });
         }
@@ -84,8 +80,17 @@ public class Damage{
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(SolidEntity hitter, Team team, Effect effect, float x, float y, float angle, float length){
+    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
         tr.trns(angle, length);
+        world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
+            Tile tile = world.tile(cx, cy);
+            if(tile != null && tile.entity != null && tile.target().getTeamID() != team.ordinal() && tile.entity.collide(hitter)){
+                tile.entity.collision(hitter);
+                hitter.getBulletType().hit(hitter, tile.worldx(), tile.worldy());
+            }
+            return false;
+        });
+
         rect.setPosition(x, y).setSize(tr.x, tr.y);
         float x2 = tr.x + x, y2 = tr.y + y;
 
@@ -126,9 +131,7 @@ public class Damage{
         Units.getNearbyEnemies(team, rect, cons);
     }
 
-    /**
-     * Damages all entities and blocks in a radius that are enemies of the team.
-     */
+    /**Damages all entities and blocks in a radius that are enemies of the team.*/
     public static void damageUnits(Team team, float x, float y, float size, float damage, Predicate<Unit> predicate, Consumer<Unit> acceptor){
         Consumer<Unit> cons = entity -> {
             if(!predicate.test(entity)) return;
@@ -149,16 +152,12 @@ public class Damage{
         }
     }
 
-    /**
-     * Damages everything in a radius.
-     */
+    /**Damages everything in a radius.*/
     public static void damage(float x, float y, float radius, float damage){
         damage(null, x, y, radius, damage);
     }
 
-    /**
-     * Damages all entities and blocks in a radius that are enemies of the team.
-     */
+    /**Damages all entities and blocks in a radius that are enemies of the team.*/
     public static void damage(Team team, float x, float y, float radius, float damage){
         Consumer<Unit> cons = entity -> {
             if(entity.team == team || entity.distanceTo(x, y) > radius){

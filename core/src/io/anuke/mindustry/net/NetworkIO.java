@@ -7,11 +7,11 @@ import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TeamInfo;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
+import io.anuke.mindustry.game.Teams;
+import io.anuke.mindustry.game.Teams.TeamData;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
-import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.ucore.core.Core;
@@ -36,6 +36,8 @@ public class NetworkIO{
             //--GENERAL STATE--
             stream.writeByte(state.mode.ordinal()); //gamemode
             stream.writeUTF(world.getMap().name); //map name
+            stream.writeInt(world.getSector() == null ? invalidSector : world.getSector().packedPosition()); //sector ID
+            stream.writeInt(world.getSector() == null ? 0 : world.getSector().completedMissions);
 
             //write tags
             ObjectMap<String, String> tags = world.getMap().meta.tags;
@@ -47,8 +49,6 @@ public class NetworkIO{
 
             stream.writeInt(state.wave); //wave
             stream.writeFloat(state.wavetime); //wave countdown
-
-            stream.writeBoolean(state.friendlyFire); //friendly fire state
 
             stream.writeInt(player.id);
             player.write(stream);
@@ -118,16 +118,30 @@ public class NetworkIO{
                 i += consecutives;
             }
 
+            stream.write(Team.all.length);
+
             //write team data
-            stream.writeByte(state.teams.getTeams().size);
-            for(TeamData data : state.teams.getTeams()){
-                stream.writeByte(data.team.ordinal());
-                stream.writeBoolean(data.ally);
-                stream.writeShort(data.cores.size);
+            for(Team team : Team.all){
+                TeamData data = state.teams.get(team);
+                stream.writeByte(team.ordinal());
+
+                stream.writeByte(data.enemies.size());
+                for(Team enemy : data.enemies){
+                    stream.writeByte(enemy.ordinal());
+                }
+
+                stream.writeByte(data.cores.size);
                 for(Tile tile : data.cores){
                     stream.writeInt(tile.packedPosition());
                 }
             }
+
+            //now write a snapshot.
+            player.con.viewX = world.width() * tilesize/2f;
+            player.con.viewY = world.height() * tilesize/2f;
+            player.con.viewWidth = world.width() * tilesize;
+            player.con.viewHeight = world.height() * tilesize;
+            netServer.writeSnapshot(player, stream);
 
         }catch(IOException e){
             throw new RuntimeException(e);
@@ -141,8 +155,6 @@ public class NetworkIO{
 
         Player player = players[0];
 
-        //TODO !! use map name as the network map in Maps, so getMap() isn't null.
-
         try(DataInputStream stream = new DataInputStream(is)){
             float timerTime = stream.readFloat();
             long timestamp = stream.readLong();
@@ -153,6 +165,15 @@ public class NetworkIO{
             //general state
             byte mode = stream.readByte();
             String map = stream.readUTF();
+            int sector = stream.readInt();
+            int missions = stream.readInt();
+
+            if(sector != invalidSector){
+                world.sectors.createSector(Bits.getLeftShort(sector), Bits.getRightShort(sector));
+                world.setSector(world.sectors.get(sector));
+                world.getSector().completedMissions = missions;
+            }
+
             ObjectMap<String, String> tags = new ObjectMap<>();
 
             byte tagSize = stream.readByte();
@@ -165,15 +186,13 @@ public class NetworkIO{
             int wave = stream.readInt();
             float wavetime = stream.readFloat();
 
-            boolean friendlyfire = stream.readBoolean();
-
             state.wave = wave;
             state.wavetime = wavetime;
             state.mode = GameMode.values()[mode];
-            state.friendlyFire = friendlyfire;
 
             Entities.clear();
             int id = stream.readInt();
+            player.resetNoAdd();
             player.read(stream, TimeUtils.millis());
             player.resetID(id);
             player.add();
@@ -184,8 +203,6 @@ public class NetworkIO{
             int width = stream.readShort();
             int height = stream.readShort();
 
-            //TODO send advanced map meta such as author, etc
-            //TODO scan for cores
             Map currentMap = new Map(map, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
             currentMap.meta.tags.clear();
             currentMap.meta.tags.putAll(tags);
@@ -249,15 +266,21 @@ public class NetworkIO{
                 i += consecutives;
             }
 
-            player.reset();
-            state.teams = new TeamInfo();
+            state.teams = new Teams();
 
             byte teams = stream.readByte();
             for(int i = 0; i < teams; i++){
                 Team team = Team.all[stream.readByte()];
-                boolean ally = stream.readBoolean();
-                short cores = stream.readShort();
-                state.teams.add(team, ally);
+
+                byte enemies = stream.readByte();
+                Team[] enemyArr = new Team[enemies];
+                for(int j = 0; j < enemies; j++){
+                    enemyArr[j] = Team.all[stream.readByte()];
+                }
+
+                state.teams.add(team, enemyArr);
+
+                byte cores = stream.readByte();
 
                 for(int j = 0; j < cores; j++){
                     state.teams.get(team).cores.add(world.tile(stream.readInt()));
@@ -269,6 +292,9 @@ public class NetworkIO{
             }
 
             world.endMapLoad();
+
+            //read raw snapshot
+            netClient.readSnapshot(stream);
 
         }catch(IOException e){
             throw new RuntimeException(e);
@@ -295,6 +321,8 @@ public class NetworkIO{
         buffer.putInt(playerGroup.size());
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
+        buffer.put((byte)Version.type.getBytes().length);
+        buffer.put(Version.type.getBytes());
         return buffer;
     }
 
@@ -313,7 +341,11 @@ public class NetworkIO{
         int players = buffer.getInt();
         int wave = buffer.getInt();
         int version = buffer.getInt();
+        byte tlength = buffer.get();
+        byte[] tb = new byte[tlength];
+        buffer.get(tb);
+        String vertype = new String(tb);
 
-        return new Host(host, hostAddress, map, wave, players, version);
+        return new Host(host, hostAddress, map, wave, players, version, vertype);
     }
 }

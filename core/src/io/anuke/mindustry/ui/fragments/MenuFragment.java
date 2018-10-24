@@ -27,7 +27,7 @@ public class MenuFragment extends Fragment{
                 buildDesktop();
             }else{
                 buildMobile();
-                Events.on(ResizeEvent.class, this::buildMobile);
+                Events.on(ResizeEvent.class, event -> buildMobile());
             }
         });
 
@@ -42,7 +42,7 @@ public class MenuFragment extends Fragment{
         }
 
         //version info
-        parent.fill(c -> c.bottom().left().add("Mindustry " + Version.code + " " + Version.type + " / " + Version.buildName)
+        parent.fill(c -> c.bottom().left().add("Mindustry " + Version.number + "-" + Version.modifier + " " + Version.type + " / " + (Version.build == -1 ? "custom build" : "build " + Version.build))
                 .visible(() -> state.is(State.menu)));
     }
 
@@ -59,7 +59,7 @@ public class MenuFragment extends Fragment{
                 maps = new MobileButton("icon-map", isize, "$text.maps", ui.maps::show),
                 load = new MobileButton("icon-load", isize, "$text.load", ui.load::show),
                 join = new MobileButton("icon-add", isize, "$text.joingame", ui.join::show),
-                editor = new MobileButton("icon-editor", isize, "$text.editor", () -> ui.loadAnd(ui.editor::show)),
+                editor = new MobileButton("icon-editor", isize, "$text.editor", () -> ui.loadGraphics(ui.editor::show)),
                 tools = new MobileButton("icon-tools", isize, "$text.settings", ui.settings::show),
                 unlocks = new MobileButton("icon-unlocks", isize, "$text.unlocks", ui.unlocks::show),
                 donate = new MobileButton("icon-donate", isize, "$text.donate", Platform.instance::openDonations);
@@ -114,7 +114,7 @@ public class MenuFragment extends Fragment{
 
             out.row();
 
-            out.add(new MenuButton("icon-editor", "$text.editor", () -> ui.loadAnd(ui.editor::show)));
+            out.add(new MenuButton("icon-editor", "$text.editor", () -> ui.loadGraphics(ui.editor::show)));
 
             out.add(new MenuButton("icon-map", "$text.maps", ui.maps::show));
 
@@ -146,7 +146,7 @@ public class MenuFragment extends Fragment{
         dialog.addCloseButton();
         dialog.content().defaults().height(66f).width(w).padRight(5f);
 
-        dialog.content().add(new MenuButton("icon-play-2", "$text.campaign", () -> {
+        dialog.content().add(new MenuButton("icon-play-2", "$text.sectors", () -> {
             dialog.hide();
             ui.sectors.show();
         })).width(bw).colspan(2);

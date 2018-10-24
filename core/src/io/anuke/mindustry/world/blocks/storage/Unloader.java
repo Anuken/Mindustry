@@ -22,7 +22,7 @@ public class Unloader extends Block{
     public void update(Tile tile){
         if(tile.entity.items.total() == 0 && tile.entity.timer.get(timerUnload, speed)){
             tile.allNearby(other -> {
-                if(other.block() instanceof StorageBlock && tile.entity.items.total() == 0 &&
+                if(other.getTeam() == tile.getTeam() && other.block() instanceof StorageBlock && tile.entity.items.total() == 0 &&
                         ((StorageBlock) other.block()).hasItem(other, null)){
                     offloadNear(tile, ((StorageBlock) other.block()).removeItem(other, null));
                 }

@@ -7,14 +7,16 @@ import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.blocks.distribution.Sorter;
 import io.anuke.mindustry.world.blocks.power.PowerNode;
+import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
@@ -23,6 +25,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import static io.anuke.mindustry.Vars.*;
 
 public class DebugBlocks extends BlockList implements ContentList{
     public static Block powerVoid, powerInfinite, itemSource, liquidSource, itemVoid;
@@ -38,13 +41,29 @@ public class DebugBlocks extends BlockList implements ContentList{
         powerVoid = new PowerBlock("powervoid"){
             {
                 powerCapacity = Float.MAX_VALUE;
+                shadow = "shadow-round-1";
+            }
+
+            @Override
+            public void setBars(){
+                super.setBars();
+                bars.remove(BarType.power);
+            }
+
+            @Override
+            public void init(){
+                super.init();
+                stats.remove(BlockStat.powerCapacity);
             }
         };
 
         powerInfinite = new PowerNode("powerinfinite"){
             {
                 powerCapacity = 10000f;
-                powerSpeed = 100f;
+                maxNodes = 100;
+                outputsPower = true;
+                consumesPower = false;
+                shadow = "shadow-round-1";
             }
 
             @Override
@@ -57,6 +76,17 @@ public class DebugBlocks extends BlockList implements ContentList{
         itemSource = new Sorter("itemsource"){
             {
                 hasItems = true;
+            }
+
+            @Override
+            public boolean outputsItems(){
+                return true;
+            }
+
+            @Override
+            public void setBars(){
+                super.setBars();
+                bars.remove(BarType.inventory);
             }
 
             @Override
@@ -79,6 +109,7 @@ public class DebugBlocks extends BlockList implements ContentList{
                 hasLiquids = true;
                 liquidCapacity = 100f;
                 configurable = true;
+                outputsLiquid = true;
             }
 
             @Override
@@ -104,18 +135,17 @@ public class DebugBlocks extends BlockList implements ContentList{
             public void buildTable(Tile tile, Table table){
                 LiquidSourceEntity entity = tile.entity();
 
-                Array<Liquid> items = Liquid.all();
+                Array<Liquid> items = content.liquids();
 
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
                 Table cont = new Table();
 
                 for(int i = 0; i < items.size; i++){
-                    if(i == 0) continue;
+                    if(!control.unlocks.isUnlocked(items.get(i))) continue;
+
                     final int f = i;
-                    ImageButton button = cont.addImageButton("white", "toggle", 24, () -> {
-                        Call.setLiquidSourceLiquid(null, tile, items.get(f));
-                    }).size(38, 42).padBottom(-5.1f).group(group).get();
-                    button.getStyle().imageUpColor = items.get(i).color;
+                    ImageButton button = cont.addImageButton("liquid-icon-" + items.get(i).name, "toggle", 24,
+                            () -> Call.setLiquidSourceLiquid(null, tile, items.get(f))).size(38, 42).padBottom(-5.1f).group(group).get();
                     button.setChecked(entity.source.id == f);
 
                     if(i % 4 == 3){
@@ -127,7 +157,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public TileEntity getEntity(){
+            public TileEntity newEntity(){
                 return new LiquidSourceEntity();
             }
         };
@@ -158,7 +188,7 @@ public class DebugBlocks extends BlockList implements ContentList{
 
         @Override
         public void read(DataInputStream stream) throws IOException{
-            source = Liquid.getByID(stream.readByte());
+            source = content.liquid(stream.readByte());
         }
     }
 }

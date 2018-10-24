@@ -81,11 +81,11 @@ public class GenericCrafter extends Block{
     public void update(Tile tile){
         GenericCrafterEntity entity = tile.entity();
 
-        if(entity.cons.valid()){
+        if(entity.cons.valid() && tile.entity.items.get(output) < itemCapacity){
 
-            entity.progress += 1f / craftTime * Timers.delta();
-            entity.totalProgress += Timers.delta();
-            entity.warmup = Mathf.lerp(entity.warmup, 1f, 0.02f);
+            entity.progress += 1f / craftTime * entity.delta();
+            entity.totalProgress += entity.delta();
+            entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
 
             if(Mathf.chance(Timers.delta() * updateEffectChance))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 4f), entity.y + Mathf.range(size * 4));
@@ -97,7 +97,7 @@ public class GenericCrafter extends Block{
 
             if(consumes.has(ConsumeItem.class)) tile.entity.items.remove(consumes.item(), consumes.itemAmount());
 
-            useContent(output);
+            useContent(tile, output);
 
             offloadNear(tile, output);
             Effects.effect(craftEffect, tile.drawx(), tile.drawy());
@@ -110,8 +110,13 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new GenericCrafterEntity();
+    }
+
+    @Override
+    public int getMaximumAccepted(Tile tile, Item item){
+        return itemCapacity;
     }
 
     public static class GenericCrafterEntity extends TileEntity{

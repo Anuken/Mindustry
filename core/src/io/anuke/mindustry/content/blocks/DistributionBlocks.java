@@ -1,12 +1,12 @@
 package io.anuke.mindustry.content.blocks;
 
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.distribution.*;
 
 public class DistributionBlocks extends BlockList implements ContentList{
     public static Block conveyor, titaniumconveyor, distributor, junction,
-            bridgeConveyor, phaseConveyor, sorter, splitter, overflowGate, massDriver;
+    itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver;
 
     @Override
     public void load(){
@@ -26,9 +26,10 @@ public class DistributionBlocks extends BlockList implements ContentList{
             capacity = 32;
         }};
 
-        bridgeConveyor = new BufferedItemBridge("bridge-conveyor"){{
+        itemBridge = new BufferedItemBridge("bridge-conveyor"){{
             range = 4;
             speed = 60f;
+            bufferCapacity = 15;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
@@ -39,9 +40,9 @@ public class DistributionBlocks extends BlockList implements ContentList{
 
         sorter = new Sorter("sorter");
 
-        splitter = new Splitter("splitter");
+        router = new Router("router");
 
-        distributor = new Splitter("distributor"){{
+        distributor = new Router("distributor"){{
             size = 2;
         }};
 

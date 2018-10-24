@@ -2,6 +2,7 @@ package io.anuke.mindustry.game;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
@@ -31,18 +32,23 @@ public class Saves{
     private long lastTimestamp;
 
     public Saves(){
-        Events.on(StateChangeEvent.class, (prev, state) -> {
-            if(state == State.menu){
-                threads.run(() -> current = null);
+        Events.on(StateChangeEvent.class, event -> {
+            if(event.to == State.menu){
+                threads.run(() -> {
+                    totalPlaytime = 0;
+                    lastTimestamp = 0;
+                    current = null;
+                });
             }
         });
     }
 
     public void load(){
         saves.clear();
-        int[] slots = Settings.getJson("save-slots", int[].class);
+        IntArray slots = Settings.getObject("save-slots", IntArray.class, IntArray::new);
 
-        for(int index : slots){
+        for(int i = 0; i < slots.size; i ++){
+            int index = slots.get(i);
             if(SaveIO.isSaveValid(index)){
                 SaveSlot slot = new SaveSlot(index);
                 saves.add(slot);
@@ -73,7 +79,7 @@ public class Saves{
             if(time > Settings.getInt("saveinterval") * 60){
                 saving = true;
 
-                Timers.run(2f, () -> {
+                Timers.runTask(2f, () -> {
                     try{
                         current.save();
                     }catch(Exception e){
@@ -134,11 +140,10 @@ public class Saves{
     }
 
     private void saveSlots(){
-        int[] result = new int[saves.size];
-        for(int i = 0; i < result.length; i++){
-            result[i] = saves.get(i).index;
-        }
-        Settings.putJson("save-slots", result);
+        IntArray result = new IntArray(saves.size);
+        for(int i = 0; i < saves.size; i++) result.add(saves.get(i).index);
+
+        Settings.putObject("save-slots", result);
         Settings.save();
     }
 
@@ -158,16 +163,25 @@ public class Saves{
         }
 
         public void save(){
+            long time = totalPlaytime;
+
             threads.runGraphics(() -> {
                 //Renderer fog needs to be written on graphics thread, but save() can run on logic thread
                 //thus, runGraphics is required here
-                renderer.fog().writeFog();
+                renderer.fog.writeFog();
 
                 //save on the logic thread
                 threads.run(() -> {
+                    long prev = totalPlaytime;
+                    totalPlaytime = time;
+
                     SaveIO.saveToSlot(index);
                     meta = SaveIO.getData(index);
-                    current = this;
+                    if(!state.is(State.menu)){
+                        current = this;
+                    }
+
+                    totalPlaytime = prev;
                 });
             });
         }

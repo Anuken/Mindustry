@@ -8,7 +8,6 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Wall;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
@@ -82,7 +81,7 @@ public class Door extends Wall{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new DoorEntity();
     }
 

@@ -1,28 +1,27 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.utils.Array;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.game.EventType.PlayEvent;
-import io.anuke.mindustry.game.EventType.ResetEvent;
-import io.anuke.mindustry.game.EventType.WaveEvent;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TeamInfo;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
+import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemType;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityPhysics;
+import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 
 import static io.anuke.mindustry.Vars.*;
+import io.anuke.mindustry.gen.Call;
 
 /**
  * Logic module.
@@ -41,48 +40,37 @@ public class Logic extends Module{
 
     @Override
     public void init(){
-        EntityPhysics.initPhysics();
-        EntityPhysics.collisions().setCollider(tilesize, world::solid);
+        EntityQuery.init();
+        EntityQuery.collisions().setCollider(tilesize, world::solid);
     }
 
     public void play(){
         state.set(State.playing);
         state.wavetime = wavespace * state.difficulty.timeScaling * 2;
 
-        //fill inventory with items for debugging
-
-        for(TeamData team : state.teams.getTeams()){
-            for(Tile tile : team.cores){
-                if(debug){
-                    for(Item item : Item.all()){
-                        if(item.type == ItemType.material){
-                            tile.entity.items.set(item, 1000);
-                        }
-                    }
-                }else if(!state.mode.infiniteResources){
-                    tile.entity.items.add(Items.tungsten, 50);
-                    tile.entity.items.add(Items.lead, 20);
+        for(Tile tile : state.teams.get(defaultTeam).cores){
+            if(world.getSector() != null){
+                Array<ItemStack> items = world.getSector().startingItems;
+                for(ItemStack stack : items){
+                    tile.entity.items.add(stack.item, stack.amount);
                 }
             }
         }
 
-
-        Events.fire(PlayEvent.class);
+        Events.fire(new PlayEvent());
     }
 
     public void reset(){
         state.wave = 1;
         state.wavetime = wavespace * state.difficulty.timeScaling;
         state.gameOver = false;
-        state.teams = new TeamInfo();
-        state.teams.add(Team.blue, true);
-        state.teams.add(Team.red, false);
+        state.teams = new Teams();
 
         Timers.clear();
         Entities.clear();
         TileEntity.sleepingEntities = 0;
 
-        Events.fire(ResetEvent.class);
+        Events.fire(new ResetEvent());
     }
 
     public void runWave(){
@@ -90,23 +78,75 @@ public class Logic extends Module{
         state.wave++;
         state.wavetime = wavespace * state.difficulty.timeScaling;
 
-        Events.fire(WaveEvent.class);
+        Events.fire(new WaveEvent());
     }
 
     private void checkGameOver(){
-        boolean gameOver = true;
+        if(!state.mode.isPvp && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
+            state.gameOver = true;
+            Events.fire(new GameOverEvent(waveTeam));
+        }else if(state.mode.isPvp){
+            Team alive = null;
 
-        for(TeamData data : state.teams.getTeams(true)){
-            if(data.cores.size > 0){
-                gameOver = false;
-                break;
+            for(Team team : Team.all){
+                if(state.teams.get(team).cores.size > 0){
+                    if(alive != null){
+                        return;
+                    }
+                    alive = team;
+                }
+            }
+
+            if(alive != null && !state.gameOver){
+                state.gameOver = true;
+                Events.fire(new GameOverEvent(alive));
             }
         }
+    }
 
-        if(gameOver && !state.gameOver){
-            state.gameOver = true;
-            Events.fire(GameOverEvent.class);
+    private void updateSectors(){
+        if(world.getSector() == null) return;
+
+        world.getSector().currentMission().update();
+
+        //check unlocked sectors
+        while(!world.getSector().complete && world.getSector().currentMission().isComplete()){
+            Call.onMissionFinish(world.getSector().completedMissions);
         }
+
+        //check if all assigned missions are complete
+        if(!world.getSector().complete && world.getSector().completedMissions >= world.getSector().missions.size){
+            Call.onSectorComplete();
+        }
+    }
+
+    @Remote(called = Loc.both)
+    public static void onGameOver(Team winner){
+        threads.runGraphics(() -> ui.restart.show(winner));
+        netClient.setQuiet();
+    }
+
+    @Remote(called = Loc.server)
+    public static void onMissionFinish(int index){
+        world.getSector().missions.get(index).onComplete();
+        world.getSector().completedMissions = index + 1;
+
+        state.mode = world.getSector().currentMission().getMode();
+        world.getSector().currentMission().onBegin();
+        world.sectors.save();
+    }
+
+    @Remote(called = Loc.server)
+    public static void onSectorComplete(){
+        state.mode = GameMode.victory;
+
+        world.sectors.completeSector(world.getSector().x, world.getSector().y);
+        world.sectors.save();
+        if(!headless){
+            ui.missions.show(world.getSector());
+        }
+
+        Events.fire(new SectorCompleteEvent());
     }
 
     @Override
@@ -119,13 +159,12 @@ public class Logic extends Module{
 
         if(!state.is(State.menu)){
 
-            if(control != null) control.triggerUpdateInput();
-
             if(!state.is(State.paused) || Net.active()){
                 Timers.update();
             }
 
-            if(!world.isInvalidMap()){
+            if(!Net.client() && !world.isInvalidMap()){
+                updateSectors();
                 checkGameOver();
             }
 
@@ -142,32 +181,48 @@ public class Logic extends Module{
                 if(!Entities.defaultGroup().isEmpty())
                     throw new RuntimeException("Do not add anything to the default group!");
 
-                Entities.update(bulletGroup);
+                if(!headless){
+                    Entities.update(effectGroup);
+                    Entities.update(groundEffectGroup);
+                }
+
                 for(EntityGroup group : unitGroups){
                     Entities.update(group);
                 }
+
                 Entities.update(puddleGroup);
+                Entities.update(shieldGroup);
+                Entities.update(bulletGroup);
                 Entities.update(tileGroup);
                 Entities.update(fireGroup);
                 Entities.update(playerGroup);
-                Entities.update(itemGroup);
 
-                //effect group only contains item drops in the headless version, update it!
+                //effect group only contains item transfers in the headless version, update it!
                 if(headless){
                     Entities.update(effectGroup);
                 }
 
                 for(EntityGroup group : unitGroups){
-                    if(!group.isEmpty()){
-                        EntityPhysics.collideGroups(bulletGroup, group);
+                    if(group.isEmpty()) continue;
+
+                    EntityQuery.collideGroups(bulletGroup, group);
+                    EntityQuery.collideGroups(group, playerGroup);
+
+                    for(EntityGroup other : unitGroups){
+                        if(other.isEmpty()) continue;
+                        EntityQuery.collideGroups(group, other);
                     }
                 }
 
-                EntityPhysics.collideGroups(bulletGroup, playerGroup);
-                EntityPhysics.collideGroups(itemGroup, playerGroup);
+                EntityQuery.collideGroups(bulletGroup, playerGroup);
+                EntityQuery.collideGroups(playerGroup, playerGroup);
 
-                world.pathfinder().update();
+                world.pathfinder.update();
             }
+        }
+
+        if(threads.isEnabled()){
+            netServer.update();
         }
     }
 }

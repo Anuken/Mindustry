@@ -1,7 +1,5 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import io.anuke.mindustry.net.Packets.StreamBegin;
 
 import java.io.ByteArrayInputStream;
@@ -18,7 +16,7 @@ public class Streamable implements Packet{
 
     public static class StreamBuilder{
         public final int id;
-        public final Class<? extends Streamable> type;
+        public final byte type;
         public final int total;
         public final ByteArrayOutputStream stream;
 
@@ -38,13 +36,9 @@ public class Streamable implements Packet{
         }
 
         public Streamable build(){
-            try{
-                Streamable s = ClassReflection.newInstance(type);
-                s.stream = new ByteArrayInputStream(stream.toByteArray());
-                return s;
-            }catch(ReflectionException e){
-                throw new RuntimeException(e);
-            }
+            Streamable s = (Streamable) Registrator.getByID(type).constructor.get();
+            s.stream = new ByteArrayInputStream(stream.toByteArray());
+            return s;
         }
 
         public boolean isDone(){

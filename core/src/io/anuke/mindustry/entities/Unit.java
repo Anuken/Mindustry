@@ -1,20 +1,20 @@
 package io.anuke.mindustry.entities;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TeamInfo.TeamData;
+import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.StatusEffect;
+import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityPhysics;
 import io.anuke.ucore.entities.impl.DestructibleEntity;
 import io.anuke.ucore.entities.trait.DamageTrait;
 import io.anuke.ucore.entities.trait.DrawTrait;
@@ -23,7 +23,6 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -33,46 +32,32 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait, CarriableTrait, InventoryTrait{
-    /**
-     * total duration of hit flash effect
-     */
+    /**Total duration of hit flash effect*/
     public static final float hitDuration = 9f;
-    /**
-     * Percision divisor of velocity, used when writing. For example a value of '2' would mean the percision is 1/2 = 0.5-size chunks.
-     */
+    /**Percision divisor of velocity, used when writing. For example a value of '2' would mean the percision is 1/2 = 0.5-size chunks.*/
     public static final float velocityPercision = 8f;
-    /**
-     * Maximum absolute value of a velocity vector component.
-     */
+    /**Maximum absolute value of a velocity vector component.*/
     public static final float maxAbsVelocity = 127f / velocityPercision;
 
-    private static final Vector2 moveVector = new Vector2();
-
-    public UnitInventory inventory = new UnitInventory(this);
+    public final UnitInventory inventory = new UnitInventory(this);
     public float rotation;
+    public float hitTime;
 
-    protected Interpolator interpolator = new Interpolator();
-    protected StatusController status = new StatusController();
+    protected final Interpolator interpolator = new Interpolator();
+    protected final StatusController status = new StatusController();
     protected Team team = Team.blue;
 
     protected CarryTrait carrier;
-    protected Vector2 velocity = new Translator(0f, 0.0001f);
-    protected float hitTime;
     protected float drownTime;
+
+    @Override
+    public boolean movable(){
+        return !isDead();
+    }
 
     @Override
     public UnitInventory getInventory(){
         return inventory;
-    }
-
-    @Override
-    public float getRotation(){
-        return rotation;
-    }
-
-    @Override
-    public void setRotation(float rotation){
-        this.rotation = rotation;
     }
 
     @Override
@@ -115,8 +100,13 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public boolean collides(SolidTrait other){
-        return other instanceof DamageTrait && other
-                instanceof TeamTrait && state.teams.areEnemies((((TeamTrait) other).getTeam()), team) && !isDead();
+        if(isDead()) return false;
+
+        if(other instanceof DamageTrait){
+            return other instanceof TeamTrait && state.teams.areEnemies((((TeamTrait) other).getTeam()), team);
+        }else{
+            return other instanceof Unit && ((Unit) other).isFlying() == isFlying();
+        }
     }
 
     @Override
@@ -129,6 +119,15 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     @Override
     public Vector2 getVelocity(){
         return velocity;
+    }
+
+    @Override
+    public void move(float x, float y){
+        if(!isFlying()){
+            super.move(x, y);
+        }else{
+            moveBy(x, y);
+        }
     }
 
     @Override
@@ -184,17 +183,13 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public TileEntity getClosestCore(){
-        if(state.teams.has(team)){
-            TeamData data = state.teams.get(team);
+        TeamData data = state.teams.get(team);
 
-            Tile tile = Geometry.findClosest(x, y, data.cores);
-            if(tile == null){
-                return null;
-            }else{
-                return tile.entity;
-            }
-        }else{
+        Tile tile = Geometry.findClosest(x, y, data.cores);
+        if(tile == null){
             return null;
+        }else{
+            return tile.entity;
         }
     }
 
@@ -203,35 +198,30 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return tile == null ? (Floor) Blocks.air : tile.floor();
     }
 
-    public void avoidOthers(float avoidRange){
-
-        EntityPhysics.getNearby(getGroup(), x, y, avoidRange * 2f, t -> {
-            if(t == this || (t instanceof Unit && (((Unit) t).isDead() || (((Unit) t).isFlying() != isFlying()) || ((Unit) t).getCarrier() == this) || getCarrier() == t))
-                return;
-            float dst = distanceTo(t);
-            if(dst > avoidRange) return;
-            velocity.add(moveVector.set(x, y).sub(t.getX(), t.getY()).setLength(1f * (1f - (dst / avoidRange))));
-        });
+    @Override
+    public boolean isValid(){
+        return !isDead() && isAdded();
     }
 
     /**Updates velocity and status effects.*/
-    public void updateVelocityStatus(float drag, float maxVelocity){
+    public void updateVelocityStatus(){
+        Floor floor = getFloorOn();
+
         if(isCarried()){ //carried units do not take into account velocity normally
             set(carrier.getX(), carrier.getY());
             velocity.set(carrier.getVelocity());
             return;
         }
 
-        Floor floor = getFloorOn();
         Tile tile = world.tileWorld(x, y);
 
         status.update(this);
 
-        velocity.limit(maxVelocity).scl(status.getSpeedMultiplier());
+        velocity.limit(getMaxVelocity()).scl(status.getSpeedMultiplier());
 
         if(isFlying()){
-            x += velocity.x / getMass() * Timers.delta();
-            y += velocity.y / getMass() * Timers.delta();
+            x += velocity.x * Timers.delta();
+            y += velocity.y * Timers.delta();
         }else{
             boolean onLiquid = floor.isLiquid;
 
@@ -247,19 +237,21 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 }
             }
 
-            if(onLiquid && velocity.len() > 0.4f && Timers.get(this, "flooreffect", 14 - (velocity.len() * floor.speedMultiplier) * 2f)){
+            if(onLiquid && velocity.len() > 0.4f && Mathf.chance((velocity.len() * floor.speedMultiplier) * 0.06f * Timers.delta())){
                 Effects.effect(floor.walkEffect, floor.liquidColor, x, y);
             }
 
-            status.handleApply(this, floor.status, floor.statusIntensity);
+            if(onLiquid){
+                status.handleApply(this, floor.status, floor.statusIntensity);
 
-            if(floor.damageTaken > 0f){
-                damagePeriodic(floor.damageTaken);
+                if(floor.damageTaken > 0f){
+                    damagePeriodic(floor.damageTaken);
+                }
             }
 
             if(onLiquid && floor.drownTime > 0){
                 drownTime += Timers.delta() * 1f / floor.drownTime;
-                if(Timers.get(this, "drowneffect", 15)){
+                if(Mathf.chance(Timers.delta() * 0.05f)){
                     Effects.effect(floor.drownUpdateEffect, floor.liquidColor, x, y);
                 }
             }else{
@@ -268,17 +260,17 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
             drownTime = Mathf.clamp(drownTime);
 
-            if(drownTime >= 1f){
+            if(drownTime >= 0.999f){
                 damage(health + 1);
             }
 
             float px = x, py = y;
-            move(velocity.x / getMass() * floor.speedMultiplier * Timers.delta(), velocity.y / getMass() * floor.speedMultiplier * Timers.delta());
+            move(velocity.x * floor.speedMultiplier * Timers.delta(), velocity.y * floor.speedMultiplier * Timers.delta());
             if(Math.abs(px - x) <= 0.0001f) velocity.x = 0f;
             if(Math.abs(py - y) <= 0.0001f) velocity.y = 0f;
         }
 
-        velocity.scl(Mathf.clamp(1f - drag * (isFlying() ? 1f : floor.dragMultiplier) * Timers.delta()));
+        velocity.scl(Mathf.clamp(1f - getDrag() * (isFlying() ? 1f : floor.dragMultiplier) * Timers.delta()));
     }
 
     public void applyEffect(StatusEffect effect, float intensity){
@@ -287,7 +279,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void damagePeriodic(float amount){
-        damage(amount * Timers.delta(), Timers.get(this, "damageeffect", 20));
+        damage(amount * Timers.delta(), hitTime <= -20 + hitDuration);
     }
 
     public void damage(float amount, boolean withEffect){
@@ -300,26 +292,36 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
     }
 
-    public float getAmmoFraction(){
-        return inventory.totalAmmo() / (float) inventory.ammoCapacity();
-    }
-
     public void drawUnder(){
     }
 
     public void drawOver(){
     }
 
-    public void drawShadow(){
-        Draw.rect(getIconRegion(), x , y, rotation - 90);
+    public void drawStats(){
+        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Timers.time(), healthf()*5f, 1f - healthf()));
+        Draw.alpha(hitTime);
+        Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
+        Draw.color();
+    }
+
+    public TextureRegion getPowerCellRegion(){
+        return Draw.region("power-cell");
+    }
+
+    public void drawAll(){
+        if(!isDead()){
+            draw();
+            drawStats();
+        }
+    }
+
+    public void drawShadow(float offsetX, float offsetY){
+        Draw.rect(getIconRegion(), x + offsetX, y + offsetY, rotation - 90);
     }
 
     public void drawView(){
         Fill.circle(x, y, getViewDistance());
-    }
-
-    public boolean isInfiniteAmmo(){
-        return false;
     }
 
     public float getViewDistance(){
@@ -328,15 +330,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public abstract TextureRegion getIconRegion();
 
+    public abstract Weapon getWeapon();
+
     public abstract int getItemCapacity();
 
-    public abstract int getAmmoCapacity();
-
     public abstract float getArmor();
-
-    public abstract boolean acceptsAmmo(Item item);
-
-    public abstract void addAmmo(Item item);
 
     public abstract float getMass();
 

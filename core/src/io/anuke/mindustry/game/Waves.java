@@ -11,17 +11,17 @@ public class Waves{
 
     public static Array<SpawnGroup> getSpawns(){
         return Array.with(
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 end = 8;
-                unitScaling = 2;
+                unitScaling = 3;
             }},
 
-            new SpawnGroup(UnitTypes.interceptor){{
+            new SpawnGroup(UnitTypes.wraith){{
                 begin = 12;
                 end = 14;
             }},
 
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 begin = 11;
                 unitScaling = 2;
                 spacing = 2;
@@ -36,12 +36,11 @@ public class Waves{
                 end = 30;
             }},
 
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 begin = 10;
                 unitScaling = 2;
                 unitAmount = 1;
                 spacing = 2;
-                ammoItem = Items.tungsten;
                 end = 30;
             }},
 
@@ -70,7 +69,7 @@ public class Waves{
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(UnitTypes.interceptor){{
+            new SpawnGroup(UnitTypes.wraith){{
                 begin = 16;
                 unitScaling = 2;
                 spacing = 2;
@@ -79,27 +78,25 @@ public class Waves{
                 max = 7;
             }},
 
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 begin = 82;
                 spacing = 3;
                 unitAmount = 4;
                 groupAmount = 2;
                 unitScaling = 3;
                 effect = StatusEffects.overdrive;
-                ammoItem = Items.silicon;
             }},
 
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 begin = 41;
                 spacing = 5;
                 unitAmount = 1;
                 unitScaling = 3;
                 effect = StatusEffects.shielded;
-                ammoItem = Items.thorium;
                 max = 10;
             }},
 
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 begin = 35;
                 spacing = 3;
                 unitAmount = 4;
@@ -109,7 +106,7 @@ public class Waves{
                 end = 60;
             }},
 
-            new SpawnGroup(UnitTypes.scout){{
+            new SpawnGroup(UnitTypes.dagger){{
                 begin = 42;
                 spacing = 3;
                 unitAmount = 4;
@@ -119,16 +116,15 @@ public class Waves{
                 end = 130;
             }},
 
-            new SpawnGroup(UnitTypes.monsoon){{
+            new SpawnGroup(UnitTypes.ghoul){{
                 begin = 40;
-                ammoItem = Items.blastCompound;
                 unitAmount = 2;
                 spacing = 2;
                 unitScaling = 3;
                 max = 8;
             }},
 
-            new SpawnGroup(UnitTypes.interceptor){{
+            new SpawnGroup(UnitTypes.wraith){{
                 begin = 50;
                 unitAmount = 4;
                 unitScaling = 3;
@@ -138,9 +134,8 @@ public class Waves{
                 max = 8;
             }},
 
-            new SpawnGroup(UnitTypes.monsoon){{
+            new SpawnGroup(UnitTypes.ghoul){{
                 begin = 53;
-                ammoItem = Items.pyratite;
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 4;
@@ -148,9 +143,8 @@ public class Waves{
                 end = 74;
             }},
 
-            new SpawnGroup(UnitTypes.monsoon){{
+            new SpawnGroup(UnitTypes.ghoul){{
                 begin = 53;
-                ammoItem = Items.coal;
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 4;
@@ -174,10 +168,6 @@ public class Waves{
 
                     if(spawn.weapon != null){
                         System.out.print(":" + spawn.weapon.name);
-                    }
-
-                    if(spawn.ammoItem != null){
-                        System.out.print(":" + spawn.ammoItem.name);
                     }
 
                     System.out.print(" ");

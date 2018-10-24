@@ -10,11 +10,11 @@ import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Mathf;
-
+import static io.anuke.mindustry.Vars.content;
 public class MapEditor{
-    public static final int minMapSize = 128, maxMapSize = 512;
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15};
 
     private MapTileData map;
@@ -26,10 +26,6 @@ public class MapEditor{
     private int rotation;
     private Block drawBlock = Blocks.stone;
     private Team drawTeam = Team.blue;
-
-    public MapEditor(){
-
-    }
 
     public MapTileData getMap(){
         return map;
@@ -47,7 +43,7 @@ public class MapEditor{
         if(clear){
             for(int x = 0; x < map.width(); x++){
                 for(int y = 0; y < map.height(); y++){
-                    map.write(x, y, DataPosition.floor, (byte) Blocks.stone.id);
+                    map.write(x, y, DataPosition.floor, Blocks.stone.id);
                 }
             }
         }
@@ -105,8 +101,8 @@ public class MapEditor{
             return;
         }
 
-        byte writeID = (byte) drawBlock.id;
-        byte partID = (byte) Blocks.blockpart.id;
+        byte writeID = drawBlock.id;
+        byte partID = Blocks.blockpart.id;
         byte rotationTeam = Bits.packByte(drawBlock.rotate ? (byte) rotation : 0, drawBlock.synthetic() ? (byte) drawTeam.ordinal() : 0);
 
         boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
@@ -124,7 +120,7 @@ public class MapEditor{
                         int worldx = dx + offsetx + x;
                         int worldy = dy + offsety + y;
 
-                        if(Mathf.inBounds(worldx, worldy, map.width(), map.height())){
+                        if(Structs.inBounds(worldx, worldy, map.width(), map.height())){
                             TileDataMarker prev = getPrev(worldx, worldy, false);
 
                             if(i == 1){
@@ -137,7 +133,7 @@ public class MapEditor{
 
                                 if(link != 0){
                                     removeLinked(worldx - (Bits.getLeftByte(link) - 8), worldy - (Bits.getRightByte(link) - 8));
-                                }else if(Block.getByID(block).isMultiblock()){
+                                }else if(content.block(block).isMultiblock()){
                                     removeLinked(worldx, worldy);
                                 }
                             }
@@ -171,7 +167,9 @@ public class MapEditor{
                         if(!isfloor){
                             byte link = map.read(wx, wy, DataPosition.link);
 
-                            if(link != 0){
+                            if(content.block(map.read(wx, wy, DataPosition.wall)).isMultiblock()){
+                                removeLinked(wx, wy);
+                            }else if(link != 0){
                                 removeLinked(wx - (Bits.getLeftByte(link) - 8), wy - (Bits.getRightByte(link) - 8));
                             }
                         }
@@ -217,14 +215,14 @@ public class MapEditor{
     }
 
     private void removeLinked(int x, int y){
-        Block block = Block.getByID(map.read(x, y, DataPosition.wall));
+        Block block = content.block(map.read(x, y, DataPosition.wall));
 
         int offsetx = -(block.size - 1) / 2;
         int offsety = -(block.size - 1) / 2;
         for(int dx = 0; dx < block.size; dx++){
             for(int dy = 0; dy < block.size; dy++){
                 int worldx = x + dx + offsetx, worldy = y + dy + offsety;
-                if(Mathf.inBounds(worldx, worldy, map.width(), map.height())){
+                if(Structs.inBounds(worldx, worldy, map.width(), map.height())){
                     TileDataMarker prev = getPrev(worldx, worldy, false);
 
                     map.write(worldx, worldy, DataPosition.link, (byte) 0);
@@ -274,7 +272,7 @@ public class MapEditor{
         map = new MapTileData(width, height);
         for(int x = 0; x < map.width(); x++){
             for(int y = 0; y < map.height(); y++){
-                map.write(x, y, DataPosition.floor, (byte) Blocks.stone.id);
+                map.write(x, y, DataPosition.floor, Blocks.stone.id);
             }
         }
         renderer.resize(width, height);

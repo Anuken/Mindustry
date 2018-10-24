@@ -8,13 +8,17 @@ public enum BlockFlag{
     /**Point to drop off resources.*/
     dropPoint(Float.MAX_VALUE),
     /**Producer of important goods.*/
-    producer(20),
+    producer(Float.MAX_VALUE),
+    /**Just a turret.*/
+    turret(Float.MAX_VALUE),
     /**Producer or storage unit of volatile materials.*/
-    explosive(10),
+    explosive(Float.MAX_VALUE),
     /**Repair point.*/
     repair(Float.MAX_VALUE),
     /**Special flag for command center blocks.*/
-    comandCenter(30);
+    comandCenter(Float.MAX_VALUE);
+
+    public final static BlockFlag[] all = values();
 
     public final float cost;
 

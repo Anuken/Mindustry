@@ -10,11 +10,13 @@ import io.anuke.mindustry.world.meta.values.*;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 
+import java.util.Locale;
+
 /**
  * Hold and organizes a list of block stats.
  */
 public class BlockStats{
-    private static final boolean errorWhenMissing = true;
+    private static final boolean errorWhenMissing = false;
 
     private final OrderedMap<StatCategory, OrderedMap<BlockStat, StatValue>> map = new OrderedMap<>();
     private final Block block;
@@ -71,7 +73,7 @@ public class BlockStats{
      * Adds a stat value.
      */
     public void add(BlockStat stat, StatValue value){
-        if(!Bundles.has("text.blocks." + stat.name().toLowerCase())){
+        if(!Bundles.has("text.blocks." + stat.name().toLowerCase(Locale.ROOT))){
             if(!errorWhenMissing){
                 Log.err("Warning: No bundle entry for stat type \"" + stat + "\"!");
             }else{
@@ -79,9 +81,9 @@ public class BlockStats{
             }
         }
 
-        if(!Bundles.has("text.category." + stat.category.name().toLowerCase())){
+        if(!Bundles.has("text.category." + stat.category.name().toLowerCase(Locale.ROOT))){
             if(!errorWhenMissing){
-                Log.err("Warning: No bundle entry for stat cateogry \"" + stat.category + "\"!");
+                Log.err("Warning: No bundle entry for stat category \"" + stat.category + "\"!");
             }else{
                 throw new RuntimeException("No bundle entry for stat category \"" + stat.category + "\"!");
             }

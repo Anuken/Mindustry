@@ -28,6 +28,7 @@ public abstract class PowerTurret extends CooledTurret{
 
     @Override
     public AmmoType useAmmo(Tile tile){
+        if(tile.isEnemyCheat()) return shootType;
         tile.entity.power.amount -= powerUsed;
         return shootType;
     }

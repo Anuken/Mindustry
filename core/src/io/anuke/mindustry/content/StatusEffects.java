@@ -1,11 +1,10 @@
 package io.anuke.mindustry.content;
 
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.StatusController.StatusEntry;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
@@ -122,10 +121,10 @@ public class StatusEffects implements ContentList{
             }
         };
 
-        overdrive = new StatusEffect(6f){
+        overdrive = new StatusEffect(60f*15){
             {
                 armorMultiplier = 0.95f;
-                speedMultiplier = 1.05f;
+                speedMultiplier = 1.15f;
                 damageMultiplier = 1.4f;
             }
 
@@ -133,6 +132,10 @@ public class StatusEffects implements ContentList{
             public void update(Unit unit, float time){
                 //idle regen boosted
                 unit.health += 0.01f * Timers.delta();
+
+                if(Mathf.chance(Timers.delta() * 0.25f)){
+                    Effects.effect(EnvironmentFx.overdriven, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f), 0f, unit);
+                }
             }
         };
 
@@ -149,7 +152,7 @@ public class StatusEffects implements ContentList{
     }
 
     @Override
-    public Array<? extends Content> getAll(){
-        return StatusEffect.all();
+    public ContentType type(){
+        return ContentType.status;
     }
 }

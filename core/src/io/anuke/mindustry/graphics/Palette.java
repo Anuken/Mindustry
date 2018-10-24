@@ -3,70 +3,83 @@ package io.anuke.mindustry.graphics;
 import com.badlogic.gdx.graphics.Color;
 
 public class Palette{
-    public static final Color command = Color.valueOf("eab678");
+    public static final Color
 
-    public static final Color bulletYellow = Color.valueOf("ffeec9");
-    public static final Color bulletYellowBack = Color.valueOf("f9c87a");
+    command = Color.valueOf("eab678"),
 
-    public static final Color missileYellow = Color.valueOf("ffd2ae");
-    public static final Color missileYellowBack = Color.valueOf("e58956");
+    bulletYellow = Color.valueOf("ffeec9"),
+    bulletYellowBack = Color.valueOf("f9c87a"),
 
-    public static final Color plastaniumBack = Color.valueOf("d8d97f");
-    public static final Color plastaniumFront = Color.valueOf("fffac6");
+    missileYellow = Color.valueOf("ffd2ae"),
+    missileYellowBack = Color.valueOf("e58956"),
 
-    public static final Color lightFlame = Color.valueOf("ffdd55");
-    public static final Color darkFlame = Color.valueOf("db401c");
+    meltdownHit = Color.valueOf("ffb98b"),
 
-    public static final Color turretHeat = Color.valueOf("ab3400");
+    plastaniumBack = Color.valueOf("d8d97f"),
+    plastaniumFront = Color.valueOf("fffac6"),
 
-    public static final Color lightOrange = Color.valueOf("f68021");
-    public static final Color lightishOrange = Color.valueOf("f8ad42");
-    public static final Color lighterOrange = Color.valueOf("f6e096");
+    lightFlame = Color.valueOf("ffdd55"),
+    darkFlame = Color.valueOf("db401c"),
 
-    public static final Color lightishGray = Color.valueOf("a2a2a2");
-    public static final Color darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f);
+    turretHeat = Color.valueOf("ab3400"),
 
-    public static final Color lancerLaser = Color.valueOf("a9d8ff");
+    lightOrange = Color.valueOf("f68021"),
+    lightishOrange = Color.valueOf("f8ad42"),
+    lighterOrange = Color.valueOf("f6e096"),
 
-    public static final Color stoneGray = Color.valueOf("8f8f8f");
+    lightishGray = Color.valueOf("a2a2a2"),
+    darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f),
 
-    public static final Color portalLight = Color.valueOf("9054ea");
-    public static final Color portal = Color.valueOf("6344d7");
-    public static final Color portalDark = Color.valueOf("3f3dac");
+    boostTo = Color.valueOf("ffad4d"),
+    boostFrom = Color.valueOf("ff7f57"),
 
-    public static final Color powerLaserFrom = Color.valueOf("e3e3e3");
-    public static final Color powerLaserTo = Color.valueOf("ffe7a8");
+    lancerLaser = Color.valueOf("a9d8ff"),
 
-    public static final Color description = Color.WHITE;
-    public static final Color turretinfo = Color.ORANGE;
-    public static final Color iteminfo = Color.LIGHT_GRAY;
-    public static final Color powerinfo = Color.YELLOW;
-    public static final Color liquidinfo = Color.ROYAL;
-    public static final Color craftinfo = Color.LIGHT_GRAY;
+    stoneGray = Color.valueOf("8f8f8f"),
 
-    public static final Color missingitems = Color.SCARLET;
-    public static final Color health = Color.YELLOW;
-    public static final Color ammo = Color.valueOf("32cf6d");
-    public static final Color healthstats = Color.SCARLET;
-    public static final Color bar = Color.SLATE;
-    public static final Color interact = Color.ORANGE;
-    public static final Color accent = Color.valueOf("f4ba6e");
-    public static final Color place = Color.valueOf("6335f8");
-    public static final Color remove = Color.valueOf("e55454");
-    public static final Color placeRotate = accent;
-    public static final Color breakInvalid = Color.valueOf("d44b3d");
-    public static final Color range = Color.valueOf("f4ba6e");
-    public static final Color power = Color.valueOf("fbd367");
-    public static final Color placing = Color.valueOf("616161");
+    portalLight = Color.valueOf("9054ea"),
+    portal = Color.valueOf("6344d7"),
+    portalDark = Color.valueOf("3f3dac"),
 
-    public static final Color lightTrail = Color.valueOf("ffe2a9");
+    powerLaserFrom = Color.valueOf("e3e3e3"),
+    powerLaserTo = Color.valueOf("ffe7a8"),
 
-    public static final Color redSpark = Color.valueOf("fbb97f");
-    public static final Color orangeSpark = Color.valueOf("d2b29c");
+    heal = Color.valueOf("98ffa9"),
 
-    public static final Color redDust = Color.valueOf("ffa480");
-    public static final Color redderDust = Color.valueOf("ff7b69");
+    description = Color.WHITE,
+    turretinfo = Color.ORANGE,
+    iteminfo = Color.LIGHT_GRAY,
+    powerinfo = Color.YELLOW,
+    liquidinfo = Color.ROYAL,
+    craftinfo = Color.LIGHT_GRAY,
 
-    public static final Color plasticSmoke = Color.valueOf("f1e479");
-    public static final Color plasticBurn = Color.valueOf("e9ead3");
+    missingitems = Color.SCARLET,
+    health = Color.YELLOW,
+    ammo = Color.valueOf("32cf6d"),
+    healthstats = Color.SCARLET,
+    bar = Color.SLATE,
+    interact = Color.ORANGE,
+    accent = Color.valueOf("f4ba6e"),
+    accentBack = new Color(accent.r * 0.8f, accent.g * 0.8f, accent.b * 0.8f, 1f),
+    place = Color.valueOf("6335f8"),
+    remove = Color.valueOf("e55454"),
+    removeBack = Color.valueOf("a73e3e"),
+    placeRotate = accent,
+    breakInvalid = Color.valueOf("d44b3d"),
+    range = Color.valueOf("f4ba6e"),
+    power = Color.valueOf("fbd367"),
+    placing = Color.valueOf("616161"),
+
+    lightTrail = Color.valueOf("ffe2a9"),
+
+    surge = Color.valueOf("f3e979"),
+
+    redSpark = Color.valueOf("fbb97f"),
+    orangeSpark = Color.valueOf("d2b29c"),
+
+    redDust = Color.valueOf("ffa480"),
+    redderDust = Color.valueOf("ff7b69"),
+
+    plasticSmoke = Color.valueOf("f1e479"),
+    plasticBurn = Color.valueOf("e9ead3");
 }

@@ -3,19 +3,18 @@
     <source path="io/anuke/mindustry"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Tile"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.Content"/>
+    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.type.ItemStack"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.maps.Maps"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.Map"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.SpawnGroup"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.core.GameState"/>
-    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.EventType"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.io.SaveFileVersion"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.ucore.entities.impl.EffectEntity"/>
-    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Packets"/>
-    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Packet"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.effect"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.bullet.Bullet"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.game.Team"/>
-    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.net.Streamable"/>
+    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.maps.missions.Mission"/>
+    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.type.Item"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.world.meta.BlockBar"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.maps.generation.WorldGenerator"/>
     <extend-configuration-property name="gdx.reflect.include" value="io.anuke.mindustry.entities.StatusController"/>

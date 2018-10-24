@@ -1,7 +1,9 @@
 package io.anuke.mindustry;
 
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.game.EventType.GameLoadEvent;
 import io.anuke.mindustry.io.BundleLoader;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.modules.ModuleCore;
 import io.anuke.ucore.util.Log;
@@ -16,11 +18,9 @@ public class Mindustry extends ModuleCore{
 
         Vars.init();
 
-        debug = Platform.instance.isDebug();
-
         Log.setUseColors(false);
         BundleLoader.load();
-        ContentLoader.load();
+        content.load();
 
         module(logic = new Logic());
         module(world = new World());
@@ -34,6 +34,7 @@ public class Mindustry extends ModuleCore{
     @Override
     public void postInit(){
         Log.info("Time to load [total]: {0}", Timers.elapsed());
+        Events.fire(new GameLoadEvent());
     }
 
     @Override

@@ -9,7 +9,6 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatCategory;
@@ -26,10 +25,6 @@ public class ContentDisplay{
 
         table.table(title -> {
             int size = 8 * 6;
-
-            if(block instanceof Turret){
-                size = (8 * block.size + 2) * (7 - block.size * 2);
-            }
 
             title.addImage(Draw.region("block-icon-" + block.name)).size(size);
             title.add("[accent]" + block.formalName).padLeft(5);
@@ -93,15 +88,13 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        table.add(Bundles.format("text.item.explosiveness", (int) (item.explosiveness * 100)));
+        table.add(Bundles.format("text.item.explosiveness", (int) (item.explosiveness * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.item.flammability", (int) (item.flammability * 100)));
+        table.add(Bundles.format("text.item.flammability", (int) (item.flammability * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.item.radioactivity", (int) (item.radioactivity * 100)));
+        table.add(Bundles.format("text.item.radioactivity", (int) (item.radioactivity * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.item.fluxiness", (int) (item.fluxiness * 100)));
-        table.row();
-        table.add(Bundles.format("text.item.hardness", item.hardness));
+        table.add(Bundles.format("text.item.fluxiness", (int) (item.fluxiness * 100 * 2f)));
         table.row();
     }
 
@@ -128,9 +121,9 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        table.add(Bundles.format("text.item.explosiveness", (int) (liquid.explosiveness * 100)));
+        table.add(Bundles.format("text.item.explosiveness", (int) (liquid.explosiveness * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.item.flammability", (int) (liquid.flammability * 100)));
+        table.add(Bundles.format("text.item.flammability", (int) (liquid.flammability * 100 * 2f)));
         table.row();
         table.add(Bundles.format("text.liquid.heatcapacity", (int) (liquid.heatCapacity * 100)));
         table.row();
@@ -141,7 +134,46 @@ public class ContentDisplay{
     }
 
     public static void displayMech(Table table, Mech mech){
+        table.table(title -> {
+            title.addImage(mech.getContentIcon()).size(8 * 6);
+            title.add("[accent]" + mech.localizedName()).padLeft(5);
+        });
 
+        table.row();
+
+        table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+
+        table.row();
+
+        if(mech.description != null){
+            table.add(mech.description).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.row();
+
+            table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+            table.row();
+        }
+
+        table.left().defaults().fillX();
+
+        if(Bundles.has("mech." + mech.name + ".weapon")){
+            table.add(Bundles.format("text.mech.weapon", Bundles.get("mech." + mech.name + ".weapon")));
+            table.row();
+        }
+        if(Bundles.has("mech." + mech.name + ".ability")){
+            table.add(Bundles.format("text.mech.ability", Bundles.get("mech." + mech.name + ".ability")));
+            table.row();
+        }
+        table.add(Bundles.format("text.mech.armor", mech.armor));
+        table.row();
+        table.add(Bundles.format("text.mech.itemcapacity", mech.itemCapacity));
+        table.row();
+
+        if(mech.drillPower > 0){
+            table.add(Bundles.format("text.mech.minespeed", (int) (mech.mineSpeed * 10)));
+            table.row();
+            table.add(Bundles.format("text.mech.minepower", mech.drillPower));
+            table.row();
+        }
     }
 
     public static void displayUnit(Table table, UnitType unit){

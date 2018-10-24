@@ -2,6 +2,8 @@ package io.anuke.mindustry.world.meta;
 
 import io.anuke.ucore.util.Bundles;
 
+import java.util.Locale;
+
 /**
  * Defines a unit of measurement for block stats.
  */
@@ -19,6 +21,7 @@ public enum StatUnit{
     items;
 
     public String localized(){
-        return Bundles.get("text.unit." + name().toLowerCase());
+        if(this == none) return "";
+        return Bundles.get("text.unit." + name().toLowerCase(Locale.ROOT));
     }
 }

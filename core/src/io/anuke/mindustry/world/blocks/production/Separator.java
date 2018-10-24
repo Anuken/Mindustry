@@ -6,12 +6,12 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
@@ -22,7 +22,7 @@ import io.anuke.ucore.util.Mathf;
 public class Separator extends Block{
     protected final int timerDump = timers++;
 
-    protected Item[] results;
+    protected ItemStack[] results;
     protected float filterTime;
     protected float spinnerRadius = 2.5f;
     protected float spinnerLength = 1f;
@@ -57,8 +57,8 @@ public class Separator extends Block{
         super.setStats();
 
         stats.add(BlockStat.outputItem, new ItemFilterValue(item -> {
-            for(Item i : results){
-                if(item == i) return true;
+            for(ItemStack i : results){
+                if(item == i.item) return true;
             }
             return false;
         }));
@@ -84,10 +84,10 @@ public class Separator extends Block{
     public void update(Tile tile){
         GenericCrafterEntity entity = tile.entity();
 
-        entity.totalProgress += entity.warmup * Timers.delta();
+        entity.totalProgress += entity.warmup * entity.delta();
 
         if(entity.cons.valid()){
-            entity.progress += 1f / filterTime;
+            entity.progress += 1f / filterTime*entity.delta();
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
@@ -95,7 +95,22 @@ public class Separator extends Block{
 
         if(entity.progress >= 1f){
             entity.progress = 0f;
-            Item item = Mathf.select(results);
+            int sum = 0;
+            for(ItemStack stack : results) sum += stack.amount;
+
+            int i = Mathf.random(sum);
+            int count = 0;
+            Item item = null;
+
+            //TODO possible desync since items are random
+            for(ItemStack stack : results){
+                if(i >= count && i < count + stack.amount){
+                    item = stack.item;
+                    break;
+                }
+                count += stack.amount;
+            }
+
             entity.items.remove(consumes.item(), consumes.itemAmount());
             if(item != null){
                 offloading = true;
@@ -115,7 +130,7 @@ public class Separator extends Block{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new GenericCrafterEntity();
     }
 }

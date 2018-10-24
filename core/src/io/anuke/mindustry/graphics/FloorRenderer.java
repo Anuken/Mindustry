@@ -20,6 +20,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
+import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
@@ -42,13 +43,13 @@ public class FloorRenderer{
     private IntArray drawnLayers = new IntArray();
 
     public FloorRenderer(){
-        Events.on(WorldLoadGraphicsEvent.class, this::clearTiles);
+        Events.on(WorldLoadGraphicsEvent.class, event -> clearTiles());
 
         gutterTile = new Tile(0, 0){
             @Override
             public Tile getNearby(int dx, int dy){
                 Sector sec = world.getSector();
-                GenResult result = world.generator().generateTile(sec.x, sec.y, x + dx, y + dy);
+                GenResult result = world.generator.generateTile(sec.x, sec.y, x + dx, y + dy);
                 gutterNearTile.x = (short)(x + dx);
                 gutterNearTile.y = (short)(y + dy);
                 gutterNearTile.setElevation(result.elevation);
@@ -89,7 +90,7 @@ public class FloorRenderer{
                 int worldx = camx + x;
                 int worldy = camy + y;
 
-                if(!Mathf.inBounds(worldx, worldy, cache))
+                if(!Structs.inBounds(worldx, worldy, cache))
                     continue;
 
                 Chunk chunk = cache[worldx][worldy];
@@ -159,7 +160,7 @@ public class FloorRenderer{
                 int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
                 int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
 
-                if(!Mathf.inBounds(worldx, worldy, cache)){
+                if(!Structs.inBounds(worldx, worldy, cache)){
                     continue;
                 }
 
@@ -191,7 +192,7 @@ public class FloorRenderer{
                 Floor floor = null;
 
                 if(tile == null && sector != null && tilex < world.width() + gutter*2 && tiley < world.height() + gutter*2){
-                    GenResult result = world.generator().generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
+                    GenResult result = world.generator.generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
                     floor = (Floor) result.floor;
                 }else if(tile != null){
                     floor = tile.floor();
@@ -222,7 +223,7 @@ public class FloorRenderer{
 
                 if(tile == null){
                     if(sector != null && tilex < world.width() + gutter*2 && tiley < world.height() + gutter*2){
-                        GenResult result = world.generator().generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
+                        GenResult result = world.generator.generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
                         floor = (Floor)result.floor;
                         gutterTile.setFloor(floor);
                         gutterTile.x = (short)(tilex - gutter);
@@ -253,8 +254,6 @@ public class FloorRenderer{
     public void clearTiles(){
         if(cbatch != null) cbatch.dispose();
 
-        Timers.mark();
-
         if(world.getSector() != null){
             gutter = mapPadding;
         }else{
@@ -265,8 +264,6 @@ public class FloorRenderer{
             chunksy = Mathf.ceil((float) (world.height() + gutter) / chunksize) ;
         cache = new Chunk[chunksx][chunksy];
         cbatch = new CacheBatch(world.width() * world.height() * 4 * 4);
-
-        Log.info("Time to create: {0}", Timers.elapsed());
 
         Timers.mark();
 

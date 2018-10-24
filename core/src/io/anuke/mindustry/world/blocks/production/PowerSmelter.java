@@ -23,6 +23,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.*;
+
 public class PowerSmelter extends PowerBlock{
     protected final int timerDump = timers++;
     protected final int timerCraft = timers++;
@@ -31,6 +33,7 @@ public class PowerSmelter extends PowerBlock{
 
     protected float minFlux = 0.2f;
     protected int fluxNeeded = 1;
+    protected float fluxSpeedMult = 0.75f;
     protected float baseFluxChance = 0.25f;
     protected boolean useFlux = false;
 
@@ -97,31 +100,43 @@ public class PowerSmelter extends PowerBlock{
 
         //heat it up if there's enough power
         if(entity.cons.valid()){
-            entity.heat += 1f / heatUpTime * Timers.delta();
-            if(Mathf.chance(Timers.delta() * burnEffectChance))
+            entity.heat += 1f / heatUpTime * entity.delta();
+            if(Mathf.chance(entity.delta() * burnEffectChance))
                 Effects.effect(burnEffect, entity.x + Mathf.range(size * 4f), entity.y + Mathf.range(size * 4));
         }else{
             entity.heat -= 1f / heatUpTime * Timers.delta();
         }
 
         entity.heat = Mathf.clamp(entity.heat);
-        entity.time += entity.heat * Timers.delta();
+        entity.time += entity.heat * entity.delta();
 
         if(!entity.cons.valid()){
             return;
         }
 
+        float baseSmeltSpeed = 1f;
+        for(Item item : content.items()){
+            if(item.fluxiness >= minFlux && tile.entity.items.get(item) > 0){
+                baseSmeltSpeed = fluxSpeedMult;
+                break;
+            }
+        }
+
+        entity.craftTime += entity.delta();
+
         if(entity.items.get(result) >= itemCapacity //output full
                 || entity.heat <= minHeat //not burning
-                || !entity.timer.get(timerCraft, craftTime)){ //not yet time
+                || entity.craftTime < craftTime*baseSmeltSpeed){ //not yet time
             return;
         }
+
+        entity.craftTime = 0f;
 
         boolean consumeInputs = true;
 
         if(useFlux){
             //remove flux materials if present
-            for(Item item : Item.all()){
+            for(Item item : content.items()){
                 if(item.fluxiness >= minFlux && tile.entity.items.get(item) >= fluxNeeded){
                     tile.entity.items.remove(item, fluxNeeded);
 
@@ -151,11 +166,8 @@ public class PowerSmelter extends PowerBlock{
             }
         }
 
-        if(useFlux && item.fluxiness >= minFlux){
-            return tile.entity.items.get(item) < itemCapacity;
-        }
+        return useFlux && item.fluxiness >= minFlux && tile.entity.items.get(item) < itemCapacity;
 
-        return false;
     }
 
     @Override
@@ -188,13 +200,14 @@ public class PowerSmelter extends PowerBlock{
     }
 
     @Override
-    public TileEntity getEntity(){
+    public TileEntity newEntity(){
         return new PowerSmelterEntity();
     }
 
     class PowerSmelterEntity extends TileEntity{
         public float heat;
         public float time;
+        public float craftTime;
 
         @Override
         public void write(DataOutputStream stream) throws IOException{

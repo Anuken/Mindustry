@@ -8,9 +8,10 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.scene.ui.layout.Table;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class ConsumeLiquidFilter extends Consume{
     private final Predicate<Liquid> filter;
@@ -31,7 +32,7 @@ public class ConsumeLiquidFilter extends Consume{
     public void buildTooltip(Table table){
         Array<Liquid> list = new Array<>();
 
-        for(Liquid item : Liquid.all()){
+        for(Liquid item : content.liquids()){
             if(!item.isHidden() && filter.test(item)) list.add(item);
         }
 
@@ -51,12 +52,12 @@ public class ConsumeLiquidFilter extends Consume{
 
     @Override
     public void update(Block block, TileEntity entity){
-        entity.liquids.remove(entity.liquids.current(), use(block));
+        entity.liquids.remove(entity.liquids.current(), use(block, entity));
     }
 
     @Override
     public boolean valid(Block block, TileEntity entity){
-        return filter.test(entity.liquids.current()) && entity.liquids.currentAmount() >= use(block);
+        return entity.liquids != null && filter.test(entity.liquids.current()) && entity.liquids.currentAmount() >= use(block, entity);
     }
 
     @Override
@@ -70,7 +71,7 @@ public class ConsumeLiquidFilter extends Consume{
         }
     }
 
-    float use(Block block){
-        return Math.min(use * Timers.delta(), block.liquidCapacity);
+    float use(Block block, TileEntity entity){
+        return Math.min(use * entity.delta(), block.liquidCapacity);
     }
 }

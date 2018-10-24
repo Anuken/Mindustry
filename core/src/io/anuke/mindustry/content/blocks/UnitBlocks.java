@@ -2,59 +2,86 @@ package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.type.ContentList;
+import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.units.*;
 
 public class UnitBlocks extends BlockList implements ContentList{
-    public static Block resupplyPoint, repairPoint, dronePad,
-    fabricatorPad, interceptorPad, monsoonPad, scoutPad, titanPad,
-    dropPoint, reconstructor, overdriveProjector, shieldProjector, commandCenter;
+    public static Block
+        spiritFactory, phantomFactory,
+        wraithFactory, ghoulFactory, revenantFactory,
+        daggerFactory, titanFactory, fortressFactory,
+        reconstructor, repairPoint, commandCenter;
 
     @Override
     public void load(){
-        dronePad = new UnitPad("drone-pad"){{
-            type = UnitTypes.drone;
-            produceTime = 800;
+        spiritFactory = new UnitFactory("spirit-factory"){{
+            type = UnitTypes.spirit;
+            produceTime = 5700;
             size = 2;
             consumes.power(0.08f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30)});
         }};
 
-        fabricatorPad = new UnitPad("fabricator-pad"){{
-            type = UnitTypes.fabricator;
-            produceTime = 1600;
+        phantomFactory = new UnitFactory("phantom-factory"){{
+            type = UnitTypes.phantom;
+            produceTime = 7300;
             size = 2;
             consumes.power(0.2f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80)});
         }};
 
-        interceptorPad = new UnitPad("interceptor-pad"){{
-            type = UnitTypes.interceptor;
-            produceTime = 1300;
+        wraithFactory = new UnitFactory("wraith-factory"){{
+            type = UnitTypes.wraith;
+            produceTime = 1800;
             size = 2;
             consumes.power(0.1f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 40)});
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.titanium, 10)});
         }};
 
-        monsoonPad = new UnitPad("monsoon-pad"){{
-            type = UnitTypes.monsoon;
-            produceTime = 1400;
+        ghoulFactory = new UnitFactory("ghoul-factory"){{
+            type = UnitTypes.ghoul;
+            produceTime = 3600;
             size = 3;
-            consumes.power(0.14f);
+            consumes.power(0.2f);
             shadow = "shadow-round-3";
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 50), new ItemStack(Items.plastanium, 50)});
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 30), new ItemStack(Items.plastanium, 20)});
         }};
 
-        resupplyPoint = new ResupplyPoint("resupply-point"){{
-            shadow = "shadow-round-1";
-            itemCapacity = 30;
+        revenantFactory = new UnitFactory("revenant-factory"){{
+            type = UnitTypes.revenant;
+            produceTime = 8000;
+            size = 4;
+            consumes.power(0.3f);
+            shadow = "shadow-round-4";
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 80), new ItemStack(Items.titanium, 80), new ItemStack(Items.plastanium, 50)});
         }};
 
-        dropPoint = new DropPoint("drop-point"){{
-            shadow = "shadow-round-1";
-            itemCapacity = 40;
+        daggerFactory = new UnitFactory("dagger-factory"){{
+            type = UnitTypes.dagger;
+            produceTime = 1700;
+            size = 2;
+            consumes.power(0.05f);
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10)});
+        }};
+
+        titanFactory = new UnitFactory("titan-factory"){{
+            type = UnitTypes.titan;
+            produceTime = 3400;
+            size = 3;
+            consumes.power(0.15f);
+            shadow = "shadow-round-3";
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 20), new ItemStack(Items.thorium, 30)});
+        }};
+
+        fortressFactory = new UnitFactory("fortress-factory"){{
+            type = UnitTypes.fortress;
+            produceTime = 5000;
+            size = 3;
+            consumes.power(0.2f);
+            shadow = "shadow-round-3";
+            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 40), new ItemStack(Items.thorium, 50)});
         }};
 
         repairPoint = new RepairPoint("repair-point"){{
@@ -63,14 +90,6 @@ public class UnitBlocks extends BlockList implements ContentList{
         }};
 
         reconstructor = new Reconstructor("reconstructor"){{
-            size = 2;
-        }};
-
-        overdriveProjector = new OverdriveProjector("overdrive-projector"){{
-            size = 2;
-        }};
-
-        shieldProjector = new ShieldProjector("shield-projector"){{
             size = 2;
         }};
 
