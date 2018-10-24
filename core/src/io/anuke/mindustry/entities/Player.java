@@ -316,7 +316,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 Draw.rect(mech.legRegion,
                         x + Angles.trnsx(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
                         y + Angles.trnsy(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
-                mech.legRegion.getRegionWidth() * i, mech.legRegion.getRegionHeight() - Mathf.clamp(ft * i, 0, 2), baseRotation - 90 + boostAng * i);
+                        mech.legRegion.getRegionWidth() * i, mech.legRegion.getRegionHeight() - Mathf.clamp(ft * i, 0, 2), baseRotation - 90 + boostAng * i);
             }
 
             Draw.rect(mech.baseRegion, x, y, baseRotation - 90);
@@ -431,16 +431,16 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                     float rad = Mathf.absin(Timers.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
 
                     Lines.square(
-                        request.x * tilesize + block.offset(),
-                        request.y * tilesize + block.offset() - 1,
-                        rad);
+                            request.x * tilesize + block.offset(),
+                            request.y * tilesize + block.offset() - 1,
+                            rad);
 
                     Draw.color(Palette.remove);
 
                     Lines.square(
-                        request.x * tilesize + block.offset(),
-                        request.y * tilesize + block.offset(),
-                        rad);
+                            request.x * tilesize + block.offset(),
+                            request.y * tilesize + block.offset(),
+                            rad);
                 }else{
                     //draw place request
                     Lines.stroke(2f);
@@ -450,16 +450,16 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                     float rad = Mathf.absin(Timers.time(), 7f, 1f) - 2f + request.recipe.result.size * tilesize / 2f;
 
                     Lines.square(
-                        request.x * tilesize + request.recipe.result.offset(),
-                        request.y * tilesize + request.recipe.result.offset() - 1,
-                        rad);
+                            request.x * tilesize + request.recipe.result.offset(),
+                            request.y * tilesize + request.recipe.result.offset() - 1,
+                            rad);
 
                     Draw.color(Palette.accent);
 
                     Lines.square(
-                        request.x * tilesize + request.recipe.result.offset(),
-                        request.y * tilesize + request.recipe.result.offset(),
-                        rad);
+                            request.x * tilesize + request.recipe.result.offset(),
+                            request.y * tilesize + request.recipe.result.offset(),
+                            rad);
                 }
             }
 
@@ -714,11 +714,13 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
             //autofire: mobile only!
             if(mobile){
-
                 if(target == null){
                     isShooting = false;
                     if(Settings.getBool("autotarget")){
                         target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
+                        if(target != null){
+                            setMineTile(null);
+                        }
                     }
                 }else if(target.isValid()){
                     //rotate toward and shoot the target
