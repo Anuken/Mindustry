@@ -61,7 +61,7 @@ public class MendProjector extends Block{
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, (float)entity.items.get(consumes.item()) / itemCapacity, 0.1f);
 
-        if(entity.timer.get(timerUse, useTime) && entity.items.total() > 0){
+        if(entity.cons.valid() && entity.timer.get(timerUse, useTime) && entity.items.total() > 0){
             entity.items.remove(consumes.item(), 1);
         }
 

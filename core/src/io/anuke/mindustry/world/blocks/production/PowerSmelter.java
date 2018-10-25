@@ -172,7 +172,7 @@ public class PowerSmelter extends PowerBlock{
 
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
-        return itemCapacity - tile.entity.items.get(item);
+        return itemCapacity;
     }
 
     @Override
