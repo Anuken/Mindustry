@@ -77,9 +77,8 @@ public class SectorsDialog extends FloatingDialog{
     class SectorView extends Element{
         float lastX, lastY;
         float sectorSize = Unit.dp.scl(32*5);
-        float sectorPadding = Unit.dp.scl(14f);
         boolean clicked = false;
-        float panX = -sectorPadding/2f, panY = -sectorSize/2f;
+        float panX = 0, panY = -sectorSize/2f;
 
         SectorView(){
             addListener(new InputListener(){
@@ -116,7 +115,7 @@ public class SectorsDialog extends FloatingDialog{
         public void draw(){
             Draw.alpha(alpha);
 
-            float padSectorSize = sectorSize + sectorPadding;
+            float padSectorSize = sectorSize;
 
             int shownSectorsX = (int)(width/padSectorSize);
             int shownSectorsY = (int)(height/padSectorSize);
@@ -140,26 +139,22 @@ public class SectorsDialog extends FloatingDialog{
                     Sector sector = world.sectors.get(sectorX, sectorY);
                     int width = 1;
                     int height = 1;
-                    float paddingx = (width-1) * sectorPadding;
-                    float paddingy = (height-1) * sectorPadding;
+                    float paddingx = (width-1);
+                    float paddingy = (height-1);
 
-                    if(sector != null && (sector.x != sectorX || sector.y != sectorY)){
+                    if(sector == null || sector.texture == null){
                         continue;
                     }
 
                     drawX += (width-1)/2f*padSectorSize;
                     drawY += (height-1)/2f*padSectorSize;
 
-                    if(sector != null && sector.texture != null){
-                        Draw.colorl(!sector.complete ? 0.3f : 1f);
-                        Draw.rect(sector.texture, drawX, drawY, sectorSize * width + paddingx, sectorSize * height + paddingy);
-                    }
+                    Draw.colorl(!sector.complete ? 0.3f : 1f);
+                    Draw.rect(sector.texture, drawX, drawY, sectorSize * width + paddingx, sectorSize * height + paddingy);
 
                     float stroke = 4f;
 
-                    if(sector == null){
-                        Draw.color(Color.DARK_GRAY);
-                    }else if(sector == selected){
+                    if(sector == selected){
                         Draw.color(Palette.place);
                         stroke = 6f;
                     }else if(Mathf.inRect(mouse.x, mouse.y, drawX - padSectorSize/2f * width, drawY - padSectorSize/2f * height,
@@ -175,13 +170,13 @@ public class SectorsDialog extends FloatingDialog{
                     }
 
                     Lines.stroke(Unit.dp.scl(stroke));
-                    Lines.crect(drawX, drawY, sectorSize * width + paddingx, sectorSize * height + paddingy, (int)stroke);
+                    Lines.crect(drawX, drawY, sectorSize * width + paddingx, sectorSize * height + paddingy, 0);
                 }
             }
 
             Draw.color(Palette.accent);
             Lines.stroke(Unit.dp.scl(4f));
-            Lines.crect(x + width/2f, y + height/2f, width, height);
+            //Lines.crect(x + width/2f, y + height/2f, width, height);
 
             Draw.reset();
             Graphics.flush();
