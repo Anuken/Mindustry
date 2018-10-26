@@ -16,7 +16,7 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
 public class Blocks extends BlockList implements ContentList{
-    public static Block air, blockpart, spawn, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, dirt, sand, ice, snow, grass, shrub, rock, icerock, blackrock;
+    public static Block air, blockpart, spawn, space, metalfloor, deepwater, water, lava, tar, stone, blackstone, dirt, sand, ice, snow, grass, shrub, rock, icerock, blackrock;
 
 
     @Override
@@ -100,11 +100,11 @@ public class Blocks extends BlockList implements ContentList{
             minimapColor = Color.valueOf("ed5334");
         }};
 
-        oil = new Floor("oil"){{
+        tar = new Floor("tar"){{
             liquidColor = Color.valueOf("292929");
             status = StatusEffects.tarred;
             statusIntensity = 1f;
-            speedMultiplier = 0.2f;
+            speedMultiplier = 0.19f;
             variants = 0;
             liquidDrop = Liquids.oil;
             isLiquid = true;

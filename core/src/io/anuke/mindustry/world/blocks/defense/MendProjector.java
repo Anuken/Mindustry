@@ -35,8 +35,8 @@ public class MendProjector extends Block{
     protected float range = 50f;
     protected float healPercent = 6f;
     protected float phaseBoost = 12f;
-    protected float phaseRangeBoost = 40f;
-    protected float useTime = 300f;
+    protected float phaseRangeBoost = 50f;
+    protected float useTime = 400f;
 
     public MendProjector(String name){
         super(name);
