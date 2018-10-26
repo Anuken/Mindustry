@@ -10,6 +10,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Tile;
@@ -21,7 +22,6 @@ import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
 
 import static io.anuke.mindustry.Vars.*;
-import io.anuke.mindustry.gen.Call;
 
 /**
  * Logic module.
@@ -159,16 +159,13 @@ public class Logic extends Module{
 
         if(!state.is(State.menu)){
 
-            if(!state.is(State.paused) || Net.active()){
-                Timers.update();
-            }
-
             if(!Net.client() && !world.isInvalidMap()){
                 updateSectors();
                 checkGameOver();
             }
 
-            if(!state.is(State.paused) || Net.active()){
+            if(!state.isPaused()){
+                Timers.update();
 
                 if(!state.mode.disableWaveTimer && !state.mode.disableWaves){
                     state.wavetime -= Timers.delta();

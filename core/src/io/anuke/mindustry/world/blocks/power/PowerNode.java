@@ -99,6 +99,12 @@ public class PowerNode extends PowerBlock{
     public void playerPlaced(Tile tile){
         Tile before = world.tile(lastPlaced);
         if(linkValid(tile, before) && before.block() instanceof PowerNode){
+            for(Tile near : before.entity.proximity()){
+                if(near.target() == tile){
+                    lastPlaced = tile.packedPosition();
+                    return;
+                }
+            }
             Call.linkPowerNodes(null, tile, before);
         }
 

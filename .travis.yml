@@ -1,14 +1,6 @@
-language: android
+
 jdk:
 - openjdk8
-android:
-  components:
-  - android-28
-  - extra-google-google_play_services
-  - extra-google-m2repository
-  - extra-android-m2repository
-  - addon-google_apis-google-28
-  - build-tools-28.0.3
 script:
 - "./gradlew test"
 - "./gradlew desktop:dist"
