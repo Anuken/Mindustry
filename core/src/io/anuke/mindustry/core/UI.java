@@ -111,8 +111,6 @@ public class UI extends SceneModule{
         Structs.each(font -> {
             font.setUseIntegerPositions(false);
             font.getData().setScale(Vars.fontScale);
-            font.getData().down += Unit.dp.scl(3f);
-            font.getData().lineHeight -= Unit.dp.scl(3f);
         }, skin.font(), skin.getFont("default-font-chat"), skin.getFont("trad-chinese"), skin.getFont("simp-chinese"));
     }
 
