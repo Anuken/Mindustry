@@ -75,7 +75,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
 
         phaseWeaver = new PhaseWeaver("phase-weaver"){{
             craftEffect = BlockFx.smeltsmoke;
-            result = Items.phasematter;
+            result = Items.phasefabric;
             craftTime = 120f;
             powerCapacity = 50f;
             size = 2;

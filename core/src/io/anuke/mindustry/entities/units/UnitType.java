@@ -29,7 +29,7 @@ public class UnitType extends UnlockableContent{
     public float hitsize = 7f;
     public float hitsizeTile = 4f;
     public float speed = 0.4f;
-    public float range = 160;
+    public float range = 0;
     public float rotatespeed = 0.2f;
     public float baseRotateSpeed = 0.1f;
     public float mass = 1f;

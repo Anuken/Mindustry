@@ -89,7 +89,7 @@ public class ForceProjector extends Block {
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, (float)entity.items.get(consumes.item()) / itemCapacity, 0.1f);
 
-        if(!entity.broken && entity.timer.get(timerUse, phaseUseTime) && entity.items.total() > 0){
+        if(entity.cons.valid() && !entity.broken && entity.timer.get(timerUse, phaseUseTime) && entity.items.total() > 0){
             entity.items.remove(consumes.item(), 1);
         }
 

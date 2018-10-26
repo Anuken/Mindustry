@@ -154,7 +154,7 @@ public class Smelter extends Block{
 
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
-        return itemCapacity - tile.entity.items.get(item);
+        return itemCapacity;
     }
 
     @Override
