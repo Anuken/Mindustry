@@ -3,6 +3,7 @@ package io.anuke.mindustry.core;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Colors;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
@@ -25,7 +26,6 @@ import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
 import io.anuke.ucore.scene.ui.TooltipManager;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Structs;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
@@ -108,10 +108,11 @@ public class UI extends SceneModule{
     @Override
     protected void loadSkin(){
         skin = new Skin(Gdx.files.internal("ui/uiskin.json"), Core.atlas);
-        Structs.each(font -> {
+
+        for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
             font.setUseIntegerPositions(false);
             font.getData().setScale(Vars.fontScale);
-        }, skin.font(), skin.getFont("default-font-chat"), skin.getFont("trad-chinese"), skin.getFont("simp-chinese"));
+        }
     }
 
     @Override
