@@ -76,7 +76,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
                 attack(150f);
 
                 if((Mathf.angNear(angleTo(target), rotation, 15f) || !getWeapon().getAmmo().bullet.keepVelocity) //bombers don't care about rotation
-                && distanceTo(target) < getWeapon().getAmmo().getRange()){
+                && distanceTo(target) < Math.max(getWeapon().getAmmo().getRange(), type.range)){
                     AmmoType ammo = getWeapon().getAmmo();
 
                     Vector2 to = Predict.intercept(FlyingUnit.this, target, ammo.bullet.speed);
