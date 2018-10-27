@@ -34,8 +34,8 @@ public class OverdriveProjector extends Block{
     protected float reload = 260f;
     protected float range = 80f;
     protected float speedBoost = 1.5f;
-    protected float speedBoostPhase = 0.5f;
-    protected float useTime = 300f;
+    protected float speedBoostPhase = 0.75f;
+    protected float useTime = 400f;
 
     public OverdriveProjector(String name){
         super(name);

@@ -33,9 +33,9 @@ import static io.anuke.mindustry.Vars.*;
 
 public class ForceProjector extends Block {
     protected int timerUse = timers ++;
-    protected float phaseUseTime = 250f;
+    protected float phaseUseTime = 350f;
 
-    protected float phaseRadiusBoost = 60f;
+    protected float phaseRadiusBoost = 80f;
     protected float radius = 100f;
     protected float breakage = 550f;
     protected float cooldownNormal = 1.75f;
