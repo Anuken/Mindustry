@@ -26,13 +26,14 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entities;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
 import static io.anuke.mindustry.Vars.*;
 
 /** Class for specifying read/write methods for code generation.*/
 @SuppressWarnings("unused")
 public class TypeIO{
+    private static final Charset charset = Charset.forName("UTF-8");
 
     @WriteClass(Player.class)
     public static void writePlayer(ByteBuffer buffer, Player player){
@@ -330,7 +331,7 @@ public class TypeIO{
     @WriteClass(String.class)
     public static void writeString(ByteBuffer buffer, String string){
         if(string != null){
-            byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+            byte[] bytes = string.getBytes(charset);
             buffer.putShort((short) bytes.length);
             buffer.put(bytes);
         }else{
@@ -344,7 +345,7 @@ public class TypeIO{
         if(length != -1){
             byte[] bytes = new byte[length];
             buffer.get(bytes);
-            return new String(bytes, StandardCharsets.UTF_8);
+            return new String(bytes, charset);
         }else{
             return null;
         }
