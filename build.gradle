@@ -160,7 +160,6 @@ project(":core") {
     }
 
     dependencies {
-        compileOnly project(":annotations")
         build.finalizedBy(finish)
 
         def comp = System.properties["release"] == null || System.properties["release"] == "false"
@@ -179,13 +178,9 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
 
+        compileOnly project(":annotations")
         annotationProcessor project(":annotations")
     }
-
-    /*
-    compileJava.options.compilerArgs = [
-        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor,io.anuke.annotations.SerializeAnnotationProcessor"
-    ]*/
 }
 
 project(":server") {
@@ -198,7 +193,6 @@ project(":server") {
     }
     
     dependencies {
-        compileOnly project(":annotations")
 
         compile project(":core")
         compile project(":kryonet")
