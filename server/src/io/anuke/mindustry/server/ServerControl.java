@@ -109,8 +109,8 @@ public class ServerControl extends Module{
         thread.start();
 
         if(Version.build == -1){
-            err("WARNING: &lyYour server is running a custom build, which means that client checking is disabled.\n" +
-            "&lrWARNING: &lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly so that clients know which version you are using.");
+            warn("&lyYour server is running a custom build, which means that client checking is disabled.");
+            warn("&lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly.");
         }
 
         Events.on(SectorCompleteEvent.class, event -> {
