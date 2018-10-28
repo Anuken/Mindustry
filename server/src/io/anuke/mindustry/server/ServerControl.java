@@ -28,7 +28,6 @@ import io.anuke.ucore.util.CommandHandler;
 import io.anuke.ucore.util.CommandHandler.Command;
 import io.anuke.ucore.util.CommandHandler.Response;
 import io.anuke.ucore.util.CommandHandler.ResponseType;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
@@ -378,7 +377,7 @@ public class ServerControl extends Module{
             }
         });
 
-        handler.register("ban", "<type (id/name/ip)> <username/IP/ID...>", "Ban a person.", arg -> {
+        handler.register("ban", "<type-id/name/ip> <username/IP/ID...>", "Ban a person.", arg -> {
             if(arg[0].equals("id")){
                 netServer.admins.banPlayerID(arg[1]);
                 info("Banned.");
@@ -602,6 +601,7 @@ public class ServerControl extends Module{
     private void readCommands(){
         Scanner scan = new Scanner(System.in);
         while(scan.hasNext()){
+            System.out.print("> ");
             String line = scan.nextLine();
 
             Gdx.app.postRunnable(() -> {
