@@ -40,9 +40,7 @@ public class Administration{
         Settings.save();
     }
 
-    /**
-     * Call when a player joins to update their information here.
-     */
+    /**Call when a player joins to update their information here.*/
     public void updatePlayerJoined(String id, String ip, String name){
         PlayerInfo info = getCreateInfo(id);
         info.lastName = name;
