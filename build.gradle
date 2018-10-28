@@ -178,11 +178,14 @@ project(":core") {
 
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+
+        annotationProcessor project(":annotations")
     }
 
+    /*
     compileJava.options.compilerArgs = [
         "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor,io.anuke.annotations.SerializeAnnotationProcessor"
-    ]
+    ]*/
 }
 
 project(":server") {

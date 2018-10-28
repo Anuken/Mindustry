@@ -2,6 +2,8 @@ package io.anuke.annotations;
 
 import com.squareup.javapoet.*;
 import io.anuke.annotations.IOFinder.ClassSerializer;
+import io.anuke.annotations.MethodEntry;
+import io.anuke.annotations.Utils;
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;

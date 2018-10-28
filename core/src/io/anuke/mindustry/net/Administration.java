@@ -2,6 +2,7 @@ package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.ucore.core.Settings;
 
@@ -11,8 +12,6 @@ public class Administration{
 
     /**All player info. Maps UUIDs to info. This persists throughout restarts.*/
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
-    /**Maps UUIDs to trace infos. This is wiped when a player logs off.*/
-    private ObjectMap<String, TraceInfo> traceInfo = new ObjectMap<>();
     private Array<String> bannedIPs = new Array<>();
 
     public Administration(){
@@ -53,17 +52,20 @@ public class Administration{
         if(!info.ips.contains(ip, false)) info.ips.add(ip);
     }
 
-    /**
-     * Returns trace info by UUID.
-     */
-    public TraceInfo getTraceByID(String uuid){
-        if(!traceInfo.containsKey(uuid)) traceInfo.put(uuid, new TraceInfo(uuid));
+    public boolean banPlayer(String uuid){
+        if(bannedIPs.contains(ip, false))
+            return false;
 
-        return traceInfo.get(uuid);
-    }
+        for(PlayerInfo info : playerInfo.values()){
+            if(info.ips.contains(ip, false)){
+                info.banned = true;
+            }
+        }
 
-    public void clearTraces(){
-        traceInfo.clear();
+        bannedIPs.add(ip);
+        save();
+
+        return true;
     }
 
     /**
@@ -86,9 +88,7 @@ public class Administration{
         return true;
     }
 
-    /**
-     * Bans a player by UUID; returns whether this player was already banned.
-     */
+    /**Bans a player by UUID; returns whether this player was already banned.*/
     public boolean banPlayerID(String id){
         if(playerInfo.containsKey(id) && playerInfo.get(id).banned)
             return false;
@@ -215,11 +215,13 @@ public class Administration{
         return info.admin && usip.equals(info.adminUsid);
     }
 
-    public Array<PlayerInfo> findByName(String name, boolean last){
-        Array<PlayerInfo> result = new Array<>();
+    /**Finds player info by IP, UUID and name.*/
+    public ObjectSet<PlayerInfo> findByName(String name){
+        ObjectSet<PlayerInfo> result = new ObjectSet<>();
 
         for(PlayerInfo info : playerInfo.values()){
-            if(info.lastName.toLowerCase().equals(name.toLowerCase()) || (last && info.names.contains(name, false))){
+            if(info.lastName.toLowerCase().equals(name.toLowerCase()) || (info.names.contains(name, false))
+                || info.ips.contains(name, false) || info.id.equals(name)){
                 result.add(info);
             }
         }
@@ -287,8 +289,6 @@ public class Administration{
         public String adminUsid;
         public int timesKicked;
         public int timesJoined;
-        public int totalBlockPlaced;
-        public int totalBlocksBroken;
         public boolean banned, admin;
         public long lastKicked; //last kicked timestamp
 
