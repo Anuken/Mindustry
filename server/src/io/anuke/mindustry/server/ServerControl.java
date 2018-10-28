@@ -281,25 +281,27 @@ public class ServerControl extends Module{
 
         handler.register("status", "Display server status.", arg -> {
             if(state.is(State.menu)){
-                info("&lyStatus: &rserver closed");
+                info("Status: &rserver closed");
             }else{
-                info("&lyStatus: &lcPlaying on map &fi{0}&fb &lb/&lc Wave {1} &lb/&lc {2} &lb/&lc {3}",
-                        Strings.capitalize(world.getMap().name), state.wave, Strings.capitalize(state.difficulty.name()), Strings.capitalize(state.mode.name()));
+                info("Status:");
+                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1} &lb/&ly {2} &lb/&ly {3}", Strings.capitalize(world.getMap().name), state.wave, Strings.capitalize(state.difficulty.name()), Strings.capitalize(state.mode.name()));
+
                 if(state.mode.disableWaveTimer){
-                    info("&ly{0} enemies.", unitGroups[Team.red.ordinal()].size());
+                    info("&ly  {0} enemies.", unitGroups[Team.red.ordinal()].size());
                 }else{
-                    info("&ly{0} seconds until next wave.", (int) (state.wavetime / 60));
+                    info("&ly  {0} seconds until next wave.", (int) (state.wavetime / 60));
                 }
 
+                info("  &ly{0} FPS.", (int) (60f / Timers.delta()));
+
                 if(playerGroup.size() > 0){
-                    info("&lyPlayers: {0}", playerGroup.size());
+                    info("  &lyPlayers: {0}", playerGroup.size());
                     for(Player p : playerGroup.all()){
-                        info("   &y{0} / {1}", p.name, p.uuid);
+                        info("    &y{0} / {1}", p.name, p.uuid);
                     }
                 }else{
-                    info("&lyNo players connected.");
+                    info("  &lyNo players connected.");
                 }
-                info("&lbFPS: {0}", (int) (60f / Timers.delta()));
             }
         });
 
