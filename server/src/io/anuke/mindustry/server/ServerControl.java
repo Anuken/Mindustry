@@ -31,6 +31,8 @@ import io.anuke.ucore.util.CommandHandler.ResponseType;
 import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;  
+import java.time.LocalDateTime; 
 import java.util.Scanner;
 
 import static io.anuke.mindustry.Vars.*;
@@ -55,6 +57,26 @@ public class ServerControl extends Module{
             "crashreport", false,
             "port", port
         );
+
+        Log.setLogger(new LogHandler(){
+            DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");  
+
+            public void info(String text, Object... args){
+                print("&lg&fb" + "[ INFO ] " + format(text, args));
+            }
+    
+            public void err(String text, Object... args){
+                print("&lr&fb" + "[ ERR! ] " + format(text, args));
+            }
+
+            public void warn(String text, Object... args){
+                print("&ly&fb" + "[ WARN ] " + format(text, args));
+            }
+
+            public void print(String text, Object... args){
+                System.out.println("[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", args));
+            }
+        });
 
         Timers.setDeltaProvider(() -> Gdx.graphics.getDeltaTime() * 60f);
         Effects.setScreenShakeProvider((a, b) -> {});
@@ -86,8 +108,8 @@ public class ServerControl extends Module{
         thread.start();
 
         if(Version.build == -1){
-            err("WARNING: &lyYour server is running a custom build, which means that client checking is disabled.\n" +
-            "&lrWARNING: &lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly so that clients know which version you are using.");
+            warn("&lyYour server is running a custom build, which means that client checking is disabled.");
+            warn("&lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly.");
         }
 
         Events.on(SectorCompleteEvent.class, event -> {
