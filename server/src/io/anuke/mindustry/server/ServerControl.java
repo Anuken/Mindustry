@@ -32,6 +32,8 @@ import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;  
+import java.time.LocalDateTime; 
 import java.util.Scanner;
 
 import static io.anuke.mindustry.Vars.*;
@@ -56,6 +58,26 @@ public class ServerControl extends Module{
             "crashreport", false,
             "port", port
         );
+
+        Log.setLogger(new LogHandler(){
+            DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");  
+
+            public void info(String text, Object... args){
+                print("&lg&fb" + "[ INFO ] " + format(text, args));
+            }
+    
+            public void err(String text, Object... args){
+                print("&lr&fb" + "[ ERR! ] " + format(text, args));
+            }
+
+            public void warn(String text, Object... args){
+                print("&ly&fb" + "[ WARN ] " + format(text, args));
+            }
+
+            public void print(String text, Object... args){
+                System.out.println("[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", args));
+            }
+        });
 
         Timers.setDeltaProvider(() -> Gdx.graphics.getDeltaTime() * 60f);
         Effects.setScreenShakeProvider((a, b) -> {});
