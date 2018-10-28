@@ -28,11 +28,12 @@ import io.anuke.ucore.util.CommandHandler;
 import io.anuke.ucore.util.CommandHandler.Command;
 import io.anuke.ucore.util.CommandHandler.Response;
 import io.anuke.ucore.util.CommandHandler.ResponseType;
+import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;  
-import java.time.LocalDateTime; 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 import static io.anuke.mindustry.Vars.*;
@@ -61,18 +62,22 @@ public class ServerControl extends Module{
         Log.setLogger(new LogHandler(){
             DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");  
 
+            @Override
             public void info(String text, Object... args){
-                print("&lg&fb" + "[ INFO ] " + format(text, args));
+                print("&lg&fb" + "[INFO] " + format(text, args));
             }
-    
+
+            @Override
             public void err(String text, Object... args){
-                print("&lr&fb" + "[ ERR! ] " + format(text, args));
+                print("&lr&fb" + "[ERR!] " + format(text, args));
             }
 
+            @Override
             public void warn(String text, Object... args){
-                print("&ly&fb" + "[ WARN ] " + format(text, args));
+                print("&ly&fb" + "[WARN] " + format(text, args));
             }
 
+            @Override
             public void print(String text, Object... args){
                 System.out.println("[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", args));
             }
@@ -172,6 +177,7 @@ public class ServerControl extends Module{
         });
 
         info("&lcServer loaded. Type &ly'help'&lc for help.");
+        System.out.print("> ");
     }
 
     private void registerCommands(){
@@ -242,7 +248,7 @@ public class ServerControl extends Module{
                 logic.play();
 
             }else{
-                info("&ly&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sector_x"), Settings.getInt("sector_y"));
+                info("&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sector_x"), Settings.getInt("sector_y"));
                 playSectorMap(false);
             }
 
@@ -621,9 +627,9 @@ public class ServerControl extends Module{
     }
 
     private void readCommands(){
+
         Scanner scan = new Scanner(System.in);
         while(scan.hasNext()){
-            System.out.print("> ");
             String line = scan.nextLine();
 
             Gdx.app.postRunnable(() -> {
@@ -652,6 +658,8 @@ public class ServerControl extends Module{
                 }else if(response.type == ResponseType.manyArguments){
                     err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
                 }
+
+                System.out.print("> ");
             });
         }
     }
