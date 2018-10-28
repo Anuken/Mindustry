@@ -74,7 +74,9 @@ public class DesktopPlatform extends Platform{
 
         if(!state.is(State.menu)){
             presence.state = Strings.capitalize(state.mode.name());
-            if(state.mode == GameMode.noWaves){
+            if(world.getMap() == null){
+                presence.details = "Unknown Map";
+            }else if(state.mode.disableWaves){
                 presence.details = Strings.capitalize(world.getMap().name);
             }else{
                 presence.details = Strings.capitalize(world.getMap().name) + " | Wave " + state.wave;

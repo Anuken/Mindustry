@@ -165,9 +165,9 @@ public class TypeIO{
     public static void writeRequests(ByteBuffer buffer, BuildRequest[] requests){
         buffer.putShort((short)requests.length);
         for(BuildRequest request : requests){
-            buffer.put(request.remove ? (byte) 1 : 0);
+            buffer.put(request.breaking ? (byte) 1 : 0);
             buffer.putInt(world.toPacked(request.x, request.y));
-            if(!request.remove){
+            if(!request.breaking){
                 buffer.put(request.recipe.id);
                 buffer.put((byte) request.rotation);
             }

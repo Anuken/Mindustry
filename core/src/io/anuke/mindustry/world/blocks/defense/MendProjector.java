@@ -71,27 +71,25 @@ public class MendProjector extends Block{
             Effects.effect(BlockFx.healWaveMend, Hue.mix(color, phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
             entity.charge = 0f;
 
-            Timers.run(10f, () -> {
-                int tileRange = (int)(realRange / tilesize);
-                healed.clear();
+            int tileRange = (int)(realRange / tilesize);
+            healed.clear();
 
-                for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
-                    for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                        if(Vector2.dst(x, y, tile.x, tile.y) > realRange) continue;
+            for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
+                for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
+                    if(Vector2.dst(x, y, tile.x, tile.y) > realRange) continue;
 
-                        Tile other = world.tile(x, y);
+                    Tile other = world.tile(x, y);
 
-                        if(other == null) continue;
-                        other = other.target();
+                    if(other == null) continue;
+                    other = other.target();
 
-                        if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.packedPosition()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
-                            other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat*phaseBoost)/100f);
-                            Effects.effect(BlockFx.healBlockFull, Hue.mix(color, phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
-                            healed.add(other.packedPosition());
-                        }
+                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.packedPosition()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
+                        other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat*phaseBoost)/100f);
+                        Effects.effect(BlockFx.healBlockFull, Hue.mix(color, phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
+                        healed.add(other.packedPosition());
                     }
                 }
-            });
+            }
         }
     }
 

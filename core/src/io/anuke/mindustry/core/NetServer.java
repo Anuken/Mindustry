@@ -327,9 +327,9 @@ public class NetServer extends Module{
         player.getPlaceQueue().clear();
         for(BuildRequest req : requests){
             //auto-skip done requests
-            if(req.remove && world.tile(req.x, req.y).block() == Blocks.air){
+            if(req.breaking && world.tile(req.x, req.y).block() == Blocks.air){
                 continue;
-            }else if(!req.remove && world.tile(req.x, req.y).block() == req.recipe.result && (!req.recipe.result.rotate || world.tile(req.x, req.y).getRotation() == req.rotation)){
+            }else if(!req.breaking && world.tile(req.x, req.y).block() == req.recipe.result && (!req.recipe.result.rotate || world.tile(req.x, req.y).getRotation() == req.rotation)){
                 continue;
             }
             player.getPlaceQueue().addLast(req);
