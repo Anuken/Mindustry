@@ -53,19 +53,7 @@ public class Administration{
     }
 
     public boolean banPlayer(String uuid){
-        if(bannedIPs.contains(ip, false))
-            return false;
-
-        for(PlayerInfo info : playerInfo.values()){
-            if(info.ips.contains(ip, false)){
-                info.banned = true;
-            }
-        }
-
-        bannedIPs.add(ip);
-        save();
-
-        return true;
+        return banPlayerID(uuid) || banPlayerIP(getInfo(uuid).lastIP);
     }
 
     /**

@@ -69,14 +69,14 @@ public class ServerControl extends Module{
 
             if(args.length > 0){
                 commands = String.join(" ", args).split(",");
-                Log.info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
+                info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
             }
 
             for(String s : commands){
                 Response response = handler.handleMessage(s);
                 if(response.type != ResponseType.valid){
-                    Log.err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
-                    Log.err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
+                    err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
+                    err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
                     System.exit(1);
                 }
             }
@@ -92,7 +92,7 @@ public class ServerControl extends Module{
         }
 
         Events.on(SectorCompleteEvent.class, event -> {
-            Log.info("Sector complete.");
+            info("Sector complete.");
             world.sectors.completeSector(world.getSector().x, world.getSector().y);
             world.sectors.save();
             gameOvers = 0;
@@ -176,7 +176,7 @@ public class ServerControl extends Module{
             Net.closeServer();
             if(lastTask != null) lastTask.cancel();
             state.set(State.menu);
-            Log.info("Stopped server.");
+            info("Stopped server.");
         });
 
         handler.register("host", "[mapname] [mode]", "Open the server with a specific map.", arg -> {
@@ -380,36 +380,21 @@ public class ServerControl extends Module{
 
         handler.register("ban", "<type (id/name/ip)> <username/IP/ID...>", "Ban a person.", arg -> {
             if(arg[0].equals("id")){
-                netServer.admins.banPlayerID(arg[0]);
+                netServer.admins.banPlayerID(arg[1]);
+                info("Banned.");
             }else if(arg[0].equals("name")){
-                Player target = playerGroup.find(p -> p.name.equalsIgnoreCase(arg[0]));
+                Player target = playerGroup.find(p -> p.name.equalsIgnoreCase(arg[1]));
                 if(target != null){
                     netServer.admins.banPlayer(target.uuid);
+                    info("Banned.");
                 }else{
                     err("No matches found.");
                 }
             }else if(arg[0].equals("ip")){
-                netServer.admins.banPlayerIP(arg[0]);
+                netServer.admins.banPlayerIP(arg[1]);
+                info("Banned.");
             }else{
                 err("Invalid type.");
-            }
-
-            if(state.is(State.playing)){
-                for(Player player : playerGroup.all()){
-                    if(player.name.equalsIgnoreCase(arg[0])){
-                        targets.add(netServer.admins.getInfo(player.uuid));
-                    }
-                }
-            }
-
-            if(target != null){
-                String ip = target.con.address;
-                netServer.admins.banPlayerIP(ip);
-                netServer.admins.banPlayerID(target.uuid);
-                netServer.kick(target.con.id, KickReason.banned);
-                info("Banned player by IP and ID: {0} / {1}", ip, target.uuid);
-            }else{
-                info("No matches were found.");
             }
         });
 
@@ -417,44 +402,44 @@ public class ServerControl extends Module{
             Array<PlayerInfo> bans = netServer.admins.getBanned();
 
             if(bans.size == 0){
-                Log.info("No ID-banned players have been found.");
+                info("No ID-banned players have been found.");
             }else{
-                Log.info("&lyBanned players [ID]:");
+                info("&lyBanned players [ID]:");
                 for(PlayerInfo info : bans){
-                    Log.info(" &ly {0} / Last known name: '{1}'", info.id, info.lastName);
+                    info(" &ly {0} / Last known name: '{1}'", info.id, info.lastName);
                 }
             }
 
             Array<String> ipbans = netServer.admins.getBannedIPs();
 
             if(ipbans.size == 0){
-                Log.info("No IP-banned players have been found.");
+                info("No IP-banned players have been found.");
             }else{
-                Log.info("&lmBanned players [IP]:");
+                info("&lmBanned players [IP]:");
                 for(String string : ipbans){
                     PlayerInfo info = netServer.admins.findByIP(string);
                     if(info != null){
-                        Log.info(" &lm '{0}' / Last known name: '{1}' / ID: '{2}'", string, info.lastName, info.id);
+                        info(" &lm '{0}' / Last known name: '{1}' / ID: '{2}'", string, info.lastName, info.id);
                     }else{
-                        Log.info(" &lm '{0}' (No known name or info)", string);
+                        info(" &lm '{0}' (No known name or info)", string);
                     }
                 }
             }
         });
 
-        handler.register("unbanip", "<ip>", "Completely unban a person by IP.", arg -> {
-            if(netServer.admins.unbanPlayerIP(arg[0])){
-                info("Unbanned player by IP: {0}.", arg[0]);
+        handler.register("unban", "<ip/ID>", "Completely unban a person by IP or ID.", arg -> {
+            if(arg[0].contains(".")){
+                if(netServer.admins.unbanPlayerIP(arg[0])){
+                    info("Unbanned player by IP: {0}.", arg[0]);
+                }else{
+                    err("That IP is not banned!");
+                }
             }else{
-                err("That IP is not banned!");
-            }
-        });
-
-        handler.register("unbanid", "<id>", "Completely unban a person by ID.", arg -> {
-            if(netServer.admins.unbanPlayerID(arg[0])){
-                info("&lmUnbanned player by ID: {0}.", arg[0]);
-            }else{
-                err("That IP is not banned!");
+                if(netServer.admins.unbanPlayerID(arg[0])){
+                    info("Unbanned player by ID: {0}.", arg[0]);
+                }else{
+                    err("That ID is not banned!");
+                }
             }
         });
 
@@ -496,11 +481,11 @@ public class ServerControl extends Module{
             Array<PlayerInfo> admins = netServer.admins.getAdmins();
 
             if(admins.size == 0){
-                Log.info("No admins have been found.");
+                info("No admins have been found.");
             }else{
-                Log.info("&lyAdmins:");
+                info("&lyAdmins:");
                 for(PlayerInfo info : admins){
-                    Log.info(" &lm {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
+                    info(" &lm {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
                 }
             }
         });
@@ -580,15 +565,15 @@ public class ServerControl extends Module{
                             result.append(arr.get(i * 2 + 1));
                             result.append("\n");
                         }
-                        Log.info("&ly{0}", result);
+                        info("&ly{0}", result);
                     }else{
-                        Log.info("No tile entity for that block.");
+                        info("No tile entity for that block.");
                     }
                 }else{
-                    Log.info("No tile at that location.");
+                    info("No tile at that location.");
                 }
             }catch(NumberFormatException e){
-                Log.err("Invalid coordinates passed.");
+                err("Invalid coordinates passed.");
             }
         });
 
@@ -597,16 +582,16 @@ public class ServerControl extends Module{
             ObjectSet<PlayerInfo> infos = netServer.admins.findByName(arg[0]);
 
             if(infos.size > 0){
-                Log.info("&lgPlayers found: {0}", infos.size);
+                info("&lgPlayers found: {0}", infos.size);
 
                 int i = 0;
                 for(PlayerInfo info : infos){
-                    Log.info("&lc[{0}] Trace info for player '{1}' / UUID {2}", i ++, info.lastName, info.id);
-                    Log.info("  &lyall names used: {0}", info.names);
-                    Log.info("  &lyIP: {0}", info.lastIP);
-                    Log.info("  &lyall IPs used: {0}", info.ips);
-                    Log.info("  &lytimes joined: {0}", info.timesJoined);
-                    Log.info("  &lytimes kicked: {0}", info.timesKicked);
+                    info("&lc[{0}] Trace info for player '{1}' / UUID {2}", i ++, info.lastName, info.id);
+                    info("  &lyall names used: {0}", info.names);
+                    info("  &lyIP: {0}", info.lastIP);
+                    info("  &lyall IPs used: {0}", info.ips);
+                    info("  &lytimes joined: {0}", info.timesJoined);
+                    info("  &lytimes kicked: {0}", info.timesKicked);
                 }
             }else{
                 info("Nobody with that name could be found.");
@@ -703,7 +688,7 @@ public class ServerControl extends Module{
             Net.host(Settings.getInt("port"));
             info("&lcOpened a server on port {0}.", Settings.getInt("port"));
         }catch(IOException e){
-            Log.err(e);
+            err(e);
             state.set(State.menu);
         }
     }
