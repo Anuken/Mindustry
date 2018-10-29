@@ -3,7 +3,6 @@ package io.anuke.kryonet;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.kryonet.*;
-import com.esotericsoftware.minlog.Log;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
@@ -13,12 +12,14 @@ import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Pooling;
-import io.anuke.ucore.util.Strings;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedSelectorException;
 
@@ -75,10 +76,12 @@ public class KryoClient implements ClientProvider{
 
             @Override
             public void disconnected (Connection connection) {
-                Disconnect c = new Disconnect();
+                if(connection.getLastProtocolError() != null){
+                    netClient.setQuiet();
+                }
 
+                Disconnect c = new Disconnect();
                 threads.runDelay(() -> Net.handleClientReceived(c));
-                if(connection.getLastProtocolError() != null) Log.error("\n\n\n\nProtocol error: " + connection.getLastProtocolError() + "\n\n\n\n");
             }
 
             @Override
@@ -89,13 +92,7 @@ public class KryoClient implements ClientProvider{
                     try{
                         Net.handleClientReceived(object);
                     }catch (Exception e){
-                        e.printStackTrace();
-                        if(e instanceof KryoNetException && e.getMessage() != null && e.getMessage().toLowerCase().contains("incorrect")) {
-                            Net.showError("$text.server.mismatch");
-                            netClient.disconnectQuietly();
-                        }else{
-                            throw new RuntimeException(e);
-                        }
+                        handleException(e);
                     }
                 });
 
@@ -128,21 +125,28 @@ public class KryoClient implements ClientProvider{
     }
 
     @Override
-    public void connect(String ip, int port) throws IOException {
-        //just in case
-        client.stop();
-
-        Thread updateThread = new Thread(() -> {
+    public void connect(String ip, int port, Runnable success){
+        runAsync(() -> {
             try{
-                client.run();
-            }catch (Exception e){
-                if(!(e instanceof ClosedSelectorException)) handleException(e);
-            }
-        }, "Kryonet Client");
-        updateThread.setDaemon(true);
-        updateThread.start();
+                //just in case
+                client.stop();
 
-        client.connect(5000, ip, port, port);
+                Thread updateThread = new Thread(() -> {
+                    try{
+                        client.run();
+                    }catch(Exception e){
+                        if(!(e instanceof ClosedSelectorException)) handleException(e);
+                    }
+                }, "Kryonet Client");
+                updateThread.setDaemon(true);
+                updateThread.start();
+
+                client.connect(5000, ip, port, port);
+                success.run();
+            }catch(Exception e){
+                handleException(e);
+            }
+        });
     }
 
     @Override
@@ -222,12 +226,10 @@ public class KryoClient implements ClientProvider{
     }
 
     private void handleException(Exception e){
-        e.printStackTrace();
         if(e instanceof KryoNetException){
-            Gdx.app.postRunnable(() -> Net.showError("$text.server.mismatch"));
+            Gdx.app.postRunnable(() -> Net.showError(new IOException("mismatch")));
         }else{
-            Net.showError(Strings.parseException(e, true));
-            disconnect();
+            Gdx.app.postRunnable(() -> Net.showError(e));
         }
     }
 

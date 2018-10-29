@@ -269,10 +269,9 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     }
 
     private void notifyPlaced(BuildEntity entity, boolean isBreaking){
-        float timeToBuild = entity.buildCost;
         float dist = Math.min(entity.distanceTo(x, y) - placeDistance, 0);
 
-        if(!state.is(build) && dist / type.maxVelocity < timeToBuild * 0.9f){
+        if(!state.is(build) && dist / type.maxVelocity < entity.buildCost * 0.9f){
             target = entity;
             this.isBreaking = isBreaking;
             setState(build);
