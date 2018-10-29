@@ -69,6 +69,8 @@ public class Net{
                 error = Bundles.get("text.error.unreachable");
             }else if(type.contains("timeout")){
                 error = Bundles.get("text.error.timeout");
+            }else if(error.equals("alreadyconnected")){
+                error = Bundles.get("text.error.alreadyconnected");
             }else if(!error.isEmpty()){
                 error = Bundles.get("text.error.any");
             }
@@ -112,7 +114,7 @@ public class Net{
                 active = true;
                 server = false;
             }else{
-                throw new IOException("Already connected!");
+                throw new IOException("alreadyconnected");
             }
         }catch(IOException e){
             showError(e);
