@@ -475,6 +475,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 mid.table("button", t -> {
                     Slider slider = new Slider(0, MapEditor.brushSizes.length - 1, 1, false);
                     slider.moved(f -> editor.setBrushSize(MapEditor.brushSizes[(int) (float) f]));
+                    slider.update(() -> {
+                        for(int j = 0; j < MapEditor.brushSizes.length; j++){
+                            if(editor.getBrushSize() == j){
+                                slider.setValue(j);
+                                return;
+                            }
+                        }
+                    });
 
                     t.top();
                     t.add("$text.editor.brush");

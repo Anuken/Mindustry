@@ -295,7 +295,7 @@ public class MapView extends Element implements GestureListener{
         }
 
         //todo is it really math.max?
-        float scaling = zoom * Math.min(width, height) / Math.max(editor.getMap().width(), editor.getMap().height());
+        float scaling = zoom * Math.min(width, height) / editor.getMap().width();
 
         Draw.color(Palette.accent);
         Lines.stroke(Unit.dp.scl(1f * zoom));

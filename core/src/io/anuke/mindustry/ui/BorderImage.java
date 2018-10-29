@@ -13,6 +13,7 @@ public class BorderImage extends Image{
     private float thickness = 3f;
 
     public BorderImage(){
+
     }
 
     public BorderImage(Texture texture){

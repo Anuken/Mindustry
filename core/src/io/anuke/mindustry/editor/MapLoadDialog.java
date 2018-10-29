@@ -1,5 +1,6 @@
 package io.anuke.mindustry.editor;
 
+import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
@@ -58,7 +59,7 @@ public class MapLoadDialog extends FloatingDialog{
         for(Map map : world.maps.all()){
 
             TextButton button = new TextButton(map.getDisplayName(), "toggle");
-            button.add(new BorderImage(map.texture, 2f)).size(16 * 4f);
+            button.add(new BorderImage(map.texture, 2f).setScaling(Scaling.fit)).size(16 * 4f);
             button.getCells().reverse();
             button.clicked(() -> selected = map);
             button.getLabelCell().grow().left().padLeft(5f);
