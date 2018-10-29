@@ -1,3 +1,16 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        jcenter()
+    }
+    
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.2.1'
+    }
+}
 
 apply plugin: "com.android.application"
 
