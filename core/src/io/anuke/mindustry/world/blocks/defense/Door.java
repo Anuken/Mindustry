@@ -12,8 +12,8 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.threads;
@@ -89,14 +89,12 @@ public class Door extends Wall{
         public boolean open = false;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
-            super.write(stream);
+        public void write(DataOutput stream) throws IOException{
             stream.writeBoolean(open);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream) throws IOException{
             open = stream.readBoolean();
         }
     }

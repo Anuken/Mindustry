@@ -28,8 +28,8 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
@@ -302,7 +302,7 @@ public class BuildBlock extends Block{
         }
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeFloat(progress);
             stream.writeShort(previous == null ? -1 : previous.id);
             stream.writeShort(recipe == null ? -1 : recipe.result.id);
@@ -319,7 +319,7 @@ public class BuildBlock extends Block{
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             progress = stream.readFloat();
             short pid = stream.readShort();
             short rid = stream.readShort();

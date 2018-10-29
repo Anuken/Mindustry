@@ -23,8 +23,8 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -325,7 +325,7 @@ public class ItemBridge extends Block{
         public float cycleSpeed = 1f;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeInt(link);
             stream.writeFloat(uptime);
             stream.writeByte(incoming.size);
@@ -338,7 +338,7 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             link = stream.readInt();
             uptime = stream.readFloat();
             byte links = stream.readByte();

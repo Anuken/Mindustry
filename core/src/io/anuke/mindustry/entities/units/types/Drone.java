@@ -13,7 +13,6 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnit;
 import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.entities.units.UnitState;
-import io.anuke.mindustry.game.EventType.BlockBuildBeginEvent;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
@@ -270,7 +269,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     }
 
     private void notifyPlaced(BuildEntity entity, boolean isBreaking){
-        float timeToBuild = entity.recipe.cost;
+        float timeToBuild = entity.buildCost;
         float dist = Math.min(entity.distanceTo(x, y) - placeDistance, 0);
 
         if(!state.is(build) && dist / type.maxVelocity < timeToBuild * 0.9f){

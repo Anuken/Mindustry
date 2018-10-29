@@ -25,8 +25,8 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
@@ -197,7 +197,7 @@ public class ForceProjector extends Block {
         float phaseHeat;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeBoolean(broken);
             stream.writeFloat(buildup);
             stream.writeFloat(radscl);
@@ -206,7 +206,7 @@ public class ForceProjector extends Block {
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             broken = stream.readBoolean();
             buildup = stream.readFloat();
             radscl = stream.readFloat();

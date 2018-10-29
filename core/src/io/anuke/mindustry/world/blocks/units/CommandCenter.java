@@ -24,8 +24,8 @@ import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.EnumSet;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
@@ -115,12 +115,12 @@ public class CommandCenter extends Block{
         public UnitCommand command = UnitCommand.attack;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void writeConfig(DataOutput stream) throws IOException{
             stream.writeByte(command.ordinal());
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void readConfig(DataInput stream) throws IOException{
             command = UnitCommand.values()[stream.readByte()];
         }
     }
