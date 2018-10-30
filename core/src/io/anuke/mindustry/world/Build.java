@@ -132,7 +132,9 @@ public class Build{
         if(tile == null) return false;
 
         if(type.isMultiblock()){
-            if(type.canReplace(tile.block()) && tile.block().size == type.size){
+            // If a block shall replace another block we need to make sure the drills have the same size and the
+            // resources on the given tiles allow for the new type.
+            if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile)){
                 return true;
             }
 
