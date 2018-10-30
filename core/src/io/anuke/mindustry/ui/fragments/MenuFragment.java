@@ -32,7 +32,7 @@ public class MenuFragment implements Fragment{
 
 					add(new MenuButton("icon-editor", "$text.editor", () -> {
 						if(gwt){
-							ui.showInfo("$text.editor.web");
+							ui.showInfo("$text.classic.unsupported");
 						}else{
 							ui.editor.show();
 						}
@@ -121,11 +121,11 @@ public class MenuFragment implements Fragment{
 		dialog.content().row();
 
 		dialog.content().add(new MenuButton("icon-add", "$text.joingame", () -> {
-			if(Platform.instance.canJoinGame()){
+			if(!gwt){
 				ui.join.show();
 				dialog.hide();
 			}else{
-				ui.showInfo("$text.multiplayer.web");
+				ui.showInfo("$text.classic.unsupported");
 			}
 		}));
 		dialog.content().add(new MenuButton("icon-tutorial", "$text.tutorial", ()-> {
