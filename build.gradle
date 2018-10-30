@@ -143,32 +143,12 @@ project(":ios") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
     }
 
-    robovm {
-
-    }
 }
 
 project(":core") {
     apply plugin: "java"
 
     dependencies {
-        boolean comp = false//System.properties["release"] == null || System.properties["release"] == "false"
-
-        if(!comp){
-            println("NOTICE: Compiling release build.")
-        }else{
-            println("Compiling DEBUG build.")
-        }
-
-        if(new File('../uCore').exists() && comp){
-            compile project(":uCore")
-        }else{
-            compile "com.github.anuken:ucore:$uCoreVersion"
-        }
-
-        if(new File('../GDXGifRecorder').exists() && comp) {
-            compile project(":GDXGifRecorder")
-        }
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
