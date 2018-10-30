@@ -165,6 +165,7 @@ public class SaveIO{
 
             stream.close();
         }catch(Exception e){
+            content.setTemporaryMapper(null);
             throw new RuntimeException(e);
         }
     }

@@ -210,7 +210,7 @@ public class ContentLoader{
         if(id < 0) id += 256;
 
         if(temporaryMapper != null && temporaryMapper[type.ordinal()] != null && temporaryMapper[type.ordinal()].length != 0){
-            if(temporaryMapper[type.ordinal()][id] == null){
+            if(temporaryMapper[type.ordinal()].length <= id || temporaryMapper[type.ordinal()][id] == null){
                 return getByID(type, 0); //default value is always ID 0
             }
             return (T)temporaryMapper[type.ordinal()][id];

@@ -6,11 +6,9 @@ import club.minnced.discord.rpc.DiscordRichPresence;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
-import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
@@ -110,11 +108,6 @@ public class DesktopPlatform extends Platform{
     @Override
     public void onGameExit(){
         if(useDiscord) DiscordRPC.INSTANCE.Discord_Shutdown();
-    }
-
-    @Override
-    public ThreadProvider getThreadProvider(){
-        return new DefaultThreadImpl();
     }
 
     @Override

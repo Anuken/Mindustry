@@ -23,7 +23,6 @@ import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
@@ -83,11 +82,6 @@ public class AndroidLauncher extends PatchedAndroidApplication{
             @Override
             public void openDonations(){
                 showDonations();
-            }
-
-            @Override
-            public ThreadProvider getThreadProvider(){
-                return new DefaultThreadImpl();
             }
 
             @Override

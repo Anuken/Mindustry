@@ -4,13 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
-import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.core.ThreadHandler;
-import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.game.Saves.SaveSlot;
+import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
@@ -71,11 +69,6 @@ public class IOSLauncher extends IOSApplication.Delegate {
             @Override
             public String getLocaleName(Locale locale) {
                 return locale.getDisplayName(locale);
-            }
-
-            @Override
-            public ThreadHandler.ThreadProvider getThreadProvider() {
-                return new DefaultThreadImpl();
             }
 
             @Override

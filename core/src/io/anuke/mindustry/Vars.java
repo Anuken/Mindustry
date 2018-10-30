@@ -166,7 +166,7 @@ public class Vars{
             });
         }
 
-        threads = new ThreadHandler(Platform.instance.getThreadProvider());
+        threads = new ThreadHandler();
 
         mobile = Gdx.app.getType() == ApplicationType.Android || Gdx.app.getType() == ApplicationType.iOS || testMobile;
         ios = Gdx.app.getType() == ApplicationType.iOS;
