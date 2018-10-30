@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
     }
 }
@@ -21,13 +21,12 @@ allprojects {
     version = 'release'
 
     ext {
-        versionNumber = '3.5'
+        versionNumber = 'classic'
         versionType = 'release'
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
         aiVersion = '1.8.1'
-        uCoreVersion = '55f0d90'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -49,7 +48,7 @@ allprojects {
 
             try{
                 pfile.createNewFile()
-            }catch (Exception e){}
+            }catch (Exception ignored){}
 
             if(pfile.exists()) {
 
@@ -85,7 +84,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
-        compile 'com.github.MinnDevelopment:java-discord-rpc:v1.3.2'
+        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
     }
 }
 
@@ -174,8 +173,4 @@ project(":kryonet") {
         compile 'com.github.crykn:kryonet:2.22.1'
         compile "org.java-websocket:Java-WebSocket:1.3.7"
     }
-}
-
-tasks.eclipse.doLast {
-    delete ".project"
 }

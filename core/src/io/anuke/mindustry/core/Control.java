@@ -250,23 +250,6 @@ public class Control extends Module{
 		return tutorial;
 	}
 
-	private void checkOldUser(){
-		boolean hasPlayed = false;
-
-		for(Map map : world.maps().getAllMaps()){
-			if(Settings.getInt("hiscore" + map.name) != 0){
-				hasPlayed = true;
-				break;
-			}
-		}
-
-		if(hasPlayed && Settings.getString("lastVersion").equals("3.2")){
-			Timers.runTask(1f, () -> ui.showInfo("$text.changes"));
-			Settings.putString("lastVersion", "3.3");
-			Settings.save();
-		}
-	}
-
 	@Override
 	public void dispose(){
 		Platform.instance.onGameExit();
@@ -294,8 +277,6 @@ public class Control extends Module{
 		Entities.collisions().setCollider(tilesize, world::solid);
 
 		Platform.instance.updateRPC();
-
-		checkOldUser();
 	}
 
 	@Override
