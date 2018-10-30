@@ -33,7 +33,7 @@ public class HandCursorListener extends ClickListener{
 	public void exit (InputEvent event, float x, float y, int pointer, Element toActor) {
 		super.exit(event, x, y, pointer, toActor);
 
-		if(!enabled.get() || set) return;
+		if(!enabled.get() || !set) return;
 
 		if (pointer == -1) {
 			Cursors.restoreCursor();
