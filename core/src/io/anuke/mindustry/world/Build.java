@@ -133,7 +133,7 @@ public class Build{
 
         if(type.isMultiblock()){
             // If a block shall replace another block we need to make sure the blocks have the same size and the
-            // resources on the given tiles allow for the new type.
+            // requirements for building the new block are fulfilled by the given tiles.
             if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile)){
                 return true;
             }
