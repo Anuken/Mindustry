@@ -159,7 +159,7 @@ public class Conveyor extends Block{
                 if(pos.item == null) continue;
 
                 tr1.trns(rotation * 90, tilesize, 0);
-                tr2.trns(rotation * 90, -tilesize / 2, pos.x * tilesize / 2);
+                tr2.trns(rotation * 90, -tilesize / 2f, pos.x * tilesize / 2f);
 
                 Draw.rect(pos.item.region,
                         (int) (tile.x * tilesize + tr1.x * pos.y + tr2.x),

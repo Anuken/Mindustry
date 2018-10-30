@@ -14,6 +14,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.ValidateException;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.fragments.OverlayFragment;
@@ -76,10 +77,11 @@ public abstract class InputHandler extends InputAdapter{
 
             player.isTransferring = true;
 
-            ItemStack stack = player.inventory.getItem();
-            int accepted = tile.block().acceptStack(stack.item, stack.amount, tile, player);
+            Item item = player.inventory.getItem().item;
+            int amount = player.inventory.getItem().amount;
+            int accepted = tile.block().acceptStack(item, amount, tile, player);
+            player.inventory.getItem().amount -= accepted;
 
-            boolean clear = stack.amount == accepted;
             int sent = Mathf.clamp(accepted / 4, 1, 8);
             int removed = accepted / sent;
             int[] remaining = {accepted, accepted};
@@ -88,29 +90,24 @@ public abstract class InputHandler extends InputAdapter{
             for(int i = 0; i < sent; i++){
                 boolean end = i == sent - 1;
                 Timers.run(i * 3, () -> {
-                    tile.block().getStackOffset(stack.item, tile, stackTrns);
+                    tile.block().getStackOffset(item, tile, stackTrns);
 
-                    ItemTransfer.create(stack.item,
+                    ItemTransfer.create(item,
                             player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
                             new Translator(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
                                 if(tile.block() != block || tile.entity == null) return;
 
-                                tile.block().handleStack(stack.item, removed, tile, player);
+                                tile.block().handleStack(item, removed, tile, player);
                                 remaining[1] -= removed;
 
                                 if(end && remaining[1] > 0){
-                                    tile.block().handleStack(stack.item, remaining[1], tile, player);
+                                    tile.block().handleStack(item, remaining[1], tile, player);
                                 }
                             });
 
-                    stack.amount -= removed;
                     remaining[0] -= removed;
 
                     if(end){
-                        stack.amount -= remaining[0];
-                        if(clear){
-                            player.inventory.clearItem();
-                        }
                         player.isTransferring = false;
                     }
                 });
