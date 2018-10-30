@@ -247,16 +247,14 @@ public class JoinDialog extends FloatingDialog{
     }
 
     void refreshLocal(){
-        if(!Vars.gwt){
-            totalHosts = 0;
+        totalHosts = 0;
 
-            local.clear();
-            local.background((Drawable)null);
-            local.table("button", t -> {
-                t.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + Strings.animated(4, 10f, ".")).pad(10f);
-            }).growX();
-            Net.discoverServers(this::addLocalHost, this::finishLocalHosts);
-        }
+        local.clear();
+        local.background((Drawable)null);
+        local.table("button", t -> {
+            t.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + Strings.animated(4, 10f, ".")).pad(10f);
+        }).growX();
+        Net.discoverServers(this::addLocalHost, this::finishLocalHosts);
     }
 
     void finishLocalHosts(){

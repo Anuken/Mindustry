@@ -78,8 +78,6 @@ public class Vars{
     public static boolean mobile;
     public static boolean ios;
     public static boolean android;
-    //shorthand for whether or not this is running on GWT
-    public static boolean gwt;
     //main data directory
     public static FileHandle dataDirectory;
     //directory for user-created map data
@@ -139,7 +137,7 @@ public class Vars{
             }
         }
 
-        Arrays.sort(locales, (l1, l2) -> Platform.instance.getLocaleName(l1).compareTo(Platform.instance.getLocaleName(l2)));
+        Arrays.sort(locales, (l1, l2) -> l1.getDisplayName(l1).compareTo(l2.getDisplayName(l2)));
         Version.init();
 
         content = new ContentLoader();
@@ -171,13 +169,10 @@ public class Vars{
         mobile = Gdx.app.getType() == ApplicationType.Android || Gdx.app.getType() == ApplicationType.iOS || testMobile;
         ios = Gdx.app.getType() == ApplicationType.iOS;
         android = Gdx.app.getType() == ApplicationType.Android;
-        gwt = Gdx.app.getType() == ApplicationType.WebGL;
 
-        if(!gwt){
-            dataDirectory = OS.getAppDataDirectory(appName);
-            customMapDirectory = dataDirectory.child("maps/");
-            saveDirectory = dataDirectory.child("saves/");
-        }
+        dataDirectory = OS.getAppDataDirectory(appName);
+        customMapDirectory = dataDirectory.child("maps/");
+        saveDirectory = dataDirectory.child("saves/");
 
         fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f);
         baseCameraScale = Math.round(Unit.dp.scl(4));
