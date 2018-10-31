@@ -135,28 +135,29 @@ public class SectorsDialog extends FloatingDialog{
                     int sectorX = offsetX + x;
                     int sectorY = offsetY + y;
 
-                    float drawX = x + width/2f+ sectorX * padSectorSize - offsetX * padSectorSize - panX % padSectorSize;
-                    float drawY = y + height/2f + sectorY * padSectorSize - offsetY * padSectorSize - panY % padSectorSize;
+                    float drawX = x + width/2f+ sectorX * padSectorSize - offsetX * padSectorSize - panX % padSectorSize + padSectorSize/2f;
+                    float drawY = y + height/2f + sectorY * padSectorSize - offsetY * padSectorSize - panY % padSectorSize + padSectorSize/2f;
 
                     Sector sector = world.sectors.get(sectorX, sectorY);
                     int width = 1;
                     int height = 1;
 
                     if(sector == null || sector.texture == null){
+                        Draw.color(Color.DARK_GRAY);
+                        Draw.rect(Draw.getBlankRegion(), drawX, drawY, sectorSize * width + 1f, sectorSize * height + 1f);
                         continue;
                     }
-
-                    drawX += (width)/2f*padSectorSize;
-                    drawY += (height)/2f*padSectorSize;
 
                     Draw.colorl(!sector.complete ? 0.3f : 1f);
                     Draw.rect(sector.texture, drawX, drawY, sectorSize * width + 1f, sectorSize * height + 1f);
 
-                    float stroke = 4f;
+                    if(sector.missions.size == 0) continue;
+
+                    Draw.color(Color.DARK_GRAY);
+                    Fill.square(drawX, drawY - 5f, Unit.dp.scl(10f), 45f);
 
                     if(sector == selected){
                         Draw.color(Palette.place);
-                        stroke = 6f;
                     }else if(Mathf.inRect(mouse.x, mouse.y, drawX - padSectorSize/2f * width, drawY - padSectorSize/2f * height,
                                                             drawX + padSectorSize/2f * width, drawY + padSectorSize/2f * height)){
                         if(clicked){
@@ -169,13 +170,12 @@ public class SectorsDialog extends FloatingDialog{
                         Draw.color(Color.LIGHT_GRAY);
                     }
 
-                    Lines.stroke(Unit.dp.scl(stroke));
                     Fill.square(drawX, drawY, Unit.dp.scl(10f), 45f);
                     //Lines.crect(drawX, drawY, sectorSize * width + paddingx, sectorSize * height + paddingy, 0);
                 }
             }
 
-            Draw.color(Palette.accent);
+            Draw.color(Color.GRAY);
             Lines.stroke(Unit.dp.scl(4f));
             //Lines.crect(x + width/2f, y + height/2f, width, height);
 
