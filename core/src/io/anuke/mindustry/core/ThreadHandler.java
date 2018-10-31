@@ -102,7 +102,7 @@ public class ThreadHandler implements ThreadInfoProvider{
 
         synchronized(updateLock){
             rendered = true;
-            Threads.notify(updateLock);
+            updateLock.notify();
         }
     }
 
@@ -188,7 +188,7 @@ public class ThreadHandler implements ThreadInfoProvider{
 
                 synchronized(updateLock){
                     while(!rendered){
-                        Threads.wait(updateLock);
+                        updateLock.wait();
                     }
                     rendered = false;
                 }
