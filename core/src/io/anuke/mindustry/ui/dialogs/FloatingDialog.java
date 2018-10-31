@@ -13,7 +13,6 @@ import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.ScrollPane;
 
 import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.ui;
 
 public class FloatingDialog extends Dialog{
     private boolean wasPaused;
@@ -29,19 +28,16 @@ public class FloatingDialog extends Dialog{
 
         hidden(() -> {
             if(shouldPause && !state.is(State.menu)){
-                if(!wasPaused || Net.active())
+                if(!wasPaused || Net.active()){
                     state.set(State.playing);
+                }
             }
         });
 
         shown(() -> {
             if(shouldPause && !state.is(State.menu)){
                 wasPaused = state.is(State.paused);
-                if(ui.paused.getScene() != null){
-                    wasPaused = ui.paused.wasPaused;
-                }
-                if(!Net.active()) state.set(State.paused);
-                ui.paused.hide();
+                state.set(State.paused);
             }
         });
 
@@ -71,8 +67,9 @@ public class FloatingDialog extends Dialog{
         buttons().addImageTextButton("$text.back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 
         keyDown(key -> {
-            if(key == Keys.ESCAPE || key == Keys.BACK)
-                hide();
+            if(key == Keys.ESCAPE || key == Keys.BACK) {
+                Gdx.app.postRunnable(this::hide);
+            }
         });
     }
 }

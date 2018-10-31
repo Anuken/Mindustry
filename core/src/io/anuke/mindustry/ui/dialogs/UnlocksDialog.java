@@ -21,8 +21,8 @@ public class UnlocksDialog extends FloatingDialog{
     public UnlocksDialog(){
         super("$text.unlocks");
 
-        addCloseButton();
         shouldPause = true;
+        addCloseButton();
         shown(this::rebuild);
         onResize(this::rebuild);
     }
@@ -36,7 +36,7 @@ public class UnlocksDialog extends FloatingDialog{
 
         Array<Content>[] allContent = content.getContentMap();
 
-        for(int j =0; j< allContent.length; j ++){
+        for(int j = 0; j < allContent.length; j ++){
             ContentType type = ContentType.values()[j];
 
             Array<Content> array = allContent[j];
