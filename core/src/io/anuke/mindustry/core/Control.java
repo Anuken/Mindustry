@@ -26,10 +26,7 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Atlas;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.*;
 
 import java.io.IOException;
 
@@ -60,7 +57,7 @@ public class Control extends Module{
         saves = new Saves();
         unlocks = new Unlocks();
 
-        Inputs.useControllers(!gwt);
+        Inputs.useControllers(true);
 
         Gdx.input.setCatchBackKey(true);
 
@@ -397,7 +394,7 @@ public class Control extends Module{
             }
 
         }else{
-            if(!state.is(State.paused) || Net.active()){
+            if(!state.isPaused()){
                 Timers.update();
             }
         }

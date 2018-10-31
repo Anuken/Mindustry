@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
@@ -12,7 +13,7 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnit;
 import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.entities.units.UnitState;
-import io.anuke.mindustry.game.EventType.BlockBuildEvent;
+import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
@@ -35,7 +36,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.unitGroups;
+import static io.anuke.mindustry.Vars.world;
 
 public class Drone extends FlyingUnit implements BuilderTrait{
     protected static float discoverRange = 120f;
@@ -44,6 +46,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     protected Item targetItem;
     protected Tile mineTile;
     protected Queue<BuildRequest> placeQueue = new ThreadQueue<>();
+    protected boolean isBreaking;
 
     public final UnitState
 
@@ -66,9 +69,13 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
             if(core == null) return;
 
-            if(entity.progress() < 1f && entity.tile.block() instanceof BuildBlock){ //building is valid
+            if((entity.progress() < 1f || entity.progress() > 0f) && entity.tile.block() instanceof BuildBlock){ //building is valid
                 if(!isBuilding() && distanceTo(target) < placeDistance * 0.9f){ //within distance, begin placing
-                    getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.getRotation(), entity.recipe));
+                    if(isBreaking){
+                        getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y));
+                    }else{
+                        getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.getRotation(), entity.recipe));
+                    }
                 }
 
                 //if it's missing requirements, try and mine them
@@ -234,27 +241,39 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     };
 
     static{
-        Events.on(BlockBuildEvent.class, event -> {
+
+        Events.on(BuildSelectEvent.class, event -> {
             EntityGroup<BaseUnit> group = unitGroups[event.team.ordinal()];
 
-            if(!(event.tile.entity instanceof BuildEntity)) return;
+            if(!(event.builder instanceof Player) || !(event.tile.entity instanceof BuildEntity)) return;
             BuildEntity entity = event.tile.entity();
 
             for(BaseUnit unit : group.all()){
                 if(unit instanceof Drone){
-                    ((Drone) unit).notifyPlaced(entity);
+                    Drone drone = (Drone)unit;
+                    synchronized(drone.getPlaceQueue()){
+                        if(drone.isBuilding()){
+                            //stop building if opposite building begins.
+                            BuildRequest req = drone.getCurrentRequest();
+                            if(req.breaking != event.breaking && req.x == event.tile.x && req.y == event.tile.y){
+                                drone.clearBuilding();
+                                drone.setState(drone.repair);
+                            }
+                        }
+                    }
+
+                    drone.notifyPlaced(entity, event.breaking);
                 }
             }
         });
     }
 
-    private void notifyPlaced(BuildEntity entity){
-        float timeToBuild = entity.recipe.cost;
+    private void notifyPlaced(BuildEntity entity, boolean isBreaking){
         float dist = Math.min(entity.distanceTo(x, y) - placeDistance, 0);
 
-        if(dist / type.maxVelocity < timeToBuild * 0.9f){
-            //Call.onDroneBeginBuild(this, entity.tile, entity.recipe);
+        if(!state.is(build) && dist / type.maxVelocity < entity.buildCost * 0.9f){
             target = entity;
+            this.isBreaking = isBreaking;
             setState(build);
         }
     }

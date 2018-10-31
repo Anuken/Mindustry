@@ -222,7 +222,7 @@ public class DesktopInput extends InputHandler{
                 player.isShooting = true;
             }
         }else if(Inputs.keyTap(section, "deselect") && (recipe != null || mode != none || player.isBuilding()) &&
-        !(player.getCurrentRequest() != null && player.getCurrentRequest().remove && KeyBinds.get(section, "deselect") == KeyBinds.get(section, "break"))){
+        !(player.getCurrentRequest() != null && player.getCurrentRequest().breaking && KeyBinds.get(section, "deselect") == KeyBinds.get(section, "break"))){
             if(recipe == null){
                 player.clearBuilding();
             }

@@ -30,8 +30,8 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
@@ -246,13 +246,13 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeBoolean(solid);
             stream.writeInt(droneID);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             solid = stream.readBoolean();
             droneID = stream.readInt();
         }

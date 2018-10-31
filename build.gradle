@@ -8,8 +8,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
-        classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
     }
 }
@@ -27,7 +25,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
-        uCoreVersion = '6080b6fb8c81f9c8e8dcb5809c2399061e15a63f'
+        uCoreVersion = 'dec41336067c013f04f0e17db3b06e24d3c11f6a'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -101,24 +99,6 @@ project(":desktop") {
     }
 }
 
-project(":html") {
-    apply plugin: "gwt"
-    apply plugin: "war"
-
-    dependencies {
-        compile project(":core")
-        compileOnly project(":annotations")
-
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-
-        compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion:sources"
-    }
-}
-
 project(":ios") {
     apply plugin: "java"
     apply plugin: "robovm"
@@ -160,7 +140,6 @@ project(":core") {
     }
 
     dependencies {
-        compileOnly project(":annotations")
         build.finalizedBy(finish)
 
         def comp = System.properties["release"] == null || System.properties["release"] == "false"
@@ -178,11 +157,10 @@ project(":core") {
 
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
-    }
 
-    compileJava.options.compilerArgs = [
-        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor,io.anuke.annotations.SerializeAnnotationProcessor"
-    ]
+        compileOnly project(":annotations")
+        annotationProcessor project(":annotations")
+    }
 }
 
 project(":server") {
@@ -195,7 +173,6 @@ project(":server") {
     }
     
     dependencies {
-        compileOnly project(":annotations")
 
         compile project(":core")
         compile project(":kryonet")

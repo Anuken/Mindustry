@@ -19,8 +19,8 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
@@ -172,7 +172,7 @@ public class PowerSmelter extends PowerBlock{
 
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
-        return itemCapacity - tile.entity.items.get(item);
+        return itemCapacity;
     }
 
     @Override
@@ -210,12 +210,12 @@ public class PowerSmelter extends PowerBlock{
         public float craftTime;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeFloat(heat);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             heat = stream.readFloat();
         }
     }

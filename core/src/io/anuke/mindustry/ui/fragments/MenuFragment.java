@@ -132,9 +132,7 @@ public class MenuFragment extends Fragment{
 
             out.row();
 
-            if(!gwt){
-                out.add(new MenuButton("icon-exit", "$text.quit", Gdx.app::exit)).width(bw).colspan(2);
-            }
+            out.add(new MenuButton("icon-exit", "$text.quit", Gdx.app::exit)).width(bw).colspan(2);
         });
     }
 
@@ -153,12 +151,8 @@ public class MenuFragment extends Fragment{
         dialog.content().row();
 
         dialog.content().add(new MenuButton("icon-add", "$text.joingame", () -> {
-            if(!gwt){
-                ui.join.show();
-                dialog.hide();
-            }else{
-                ui.showInfo("$text.web.unsupported");
-            }
+            ui.join.show();
+            dialog.hide();
         }));
 
         dialog.content().add(new MenuButton("icon-editor", "$text.customgame", () -> {

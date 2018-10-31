@@ -1,3 +1,16 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        jcenter()
+    }
+    
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.2.1'
+    }
+}
 
 apply plugin: "com.android.application"
 
@@ -14,9 +27,9 @@ repositories {
 dependencies {
     implementation project(":core")
     implementation project(":kryonet")
-    implementation 'com.android.support:support-v4:25.3.1'
+    implementation 'com.android.support:support-v4:28.0.0'
     implementation 'org.sufficientlysecure:donations:2.5'
-    implementation 'com.google.android.gms:play-services-auth:11.8.0'
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
 
     implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"

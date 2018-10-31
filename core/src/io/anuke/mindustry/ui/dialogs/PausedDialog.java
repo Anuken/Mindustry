@@ -61,25 +61,14 @@ public class PausedDialog extends FloatingDialog{
             content().addButton("$text.settings", ui.settings::show);
 
             content().row();
-            content().addButton("$text.savegame", () -> {
-                save.show();
-            }).disabled(s -> world.getSector() != null);
+            content().addButton("$text.savegame", save::show).disabled(s -> world.getSector() != null);
 
             content().row();
-            content().addButton("$text.loadgame", () -> {
-                load.show();
-            }).disabled(b -> Net.active());
+            content().addButton("$text.loadgame", load::show).disabled(b -> Net.active());
 
             content().row();
 
-            content().addButton("$text.hostserver", () -> {
-                if(!gwt){
-                    ui.host.show();
-                }else{
-                    ui.showInfo("$text.web.unsupported");
-                }
-            }).disabled(b -> Net.active());
-
+            content().addButton("$text.hostserver", ui.host::show).disabled(b -> Net.active());
 
             content().row();
 

@@ -175,11 +175,8 @@ public class SettingsMenuDialog extends SettingsDialog{
                             Settings.prefs().put(map);
                             Settings.save();
 
-                            if(!gwt){
-                                Settings.prefs().clear();
-                                for(FileHandle file : dataDirectory.list()){
-                                    file.deleteDirectory();
-                                }
+                            for(FileHandle file : dataDirectory.list()){
+                                file.deleteDirectory();
                             }
 
                             Gdx.app.exit();
@@ -193,19 +190,15 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        if(!gwt){
-            graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Bundles.get("setting.fpscap.none") : Bundles.format("setting.fpscap.text", s)));
+        graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Bundles.get("setting.fpscap.none") : Bundles.format("setting.fpscap.text", s)));
+        graphics.checkPref("multithread", mobile, threads::setEnabled);
+
+        if(Settings.getBool("multithread")){
+            threads.setEnabled(true);
         }
 
-        if(!gwt){
-            graphics.checkPref("multithread", mobile, threads::setEnabled);
 
-            if(Settings.getBool("multithread")){
-                threads.setEnabled(true);
-            }
-        }
-
-        if(!mobile && !gwt){
+        if(!mobile){
             graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
                 if(b){

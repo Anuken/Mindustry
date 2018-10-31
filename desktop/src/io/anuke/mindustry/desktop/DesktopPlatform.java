@@ -6,11 +6,9 @@ import club.minnced.discord.rpc.DiscordRichPresence;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
-import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
@@ -24,7 +22,6 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -61,11 +58,6 @@ public class DesktopPlatform extends Platform{
     }
 
     @Override
-    public String getLocaleName(Locale locale){
-        return locale.getDisplayName(locale);
-    }
-
-    @Override
     public void updateRPC(){
 
         if(!useDiscord) return;
@@ -74,7 +66,9 @@ public class DesktopPlatform extends Platform{
 
         if(!state.is(State.menu)){
             presence.state = Strings.capitalize(state.mode.name());
-            if(state.mode == GameMode.noWaves){
+            if(world.getMap() == null){
+                presence.details = "Unknown Map";
+            }else if(state.mode.disableWaves){
                 presence.details = Strings.capitalize(world.getMap().name);
             }else{
                 presence.details = Strings.capitalize(world.getMap().name) + " | Wave " + state.wave;
@@ -108,11 +102,6 @@ public class DesktopPlatform extends Platform{
     @Override
     public void onGameExit(){
         if(useDiscord) DiscordRPC.INSTANCE.Discord_Shutdown();
-    }
-
-    @Override
-    public ThreadProvider getThreadProvider(){
-        return new DefaultThreadImpl();
     }
 
     @Override

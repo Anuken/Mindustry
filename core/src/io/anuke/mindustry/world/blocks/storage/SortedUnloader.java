@@ -12,8 +12,8 @@ import io.anuke.mindustry.world.blocks.SelectionTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
@@ -75,12 +75,12 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
         public Item sortItem = null;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void writeConfig(DataOutput stream) throws IOException{
             stream.writeByte(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void readConfig(DataInput stream) throws IOException{
             byte id = stream.readByte();
             sortItem = id == -1 ? null : content.items().get(id);
         }

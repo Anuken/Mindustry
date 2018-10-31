@@ -2,13 +2,11 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Base64Coder;
-import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.TextField;
 
 import java.util.Date;
-import java.util.Locale;
 import java.util.Random;
 
 public abstract class Platform {
@@ -36,10 +34,6 @@ public abstract class Platform {
     public boolean canDonate(){
         return false;
     }
-    /**Return the localized name for the locale. This is basically a workaround for GWT not supporting getName().*/
-    public String getLocaleName(Locale locale){
-        return locale.toString();
-    }
     /**Must be a base64 string 8 bytes in length.*/
     public String getUUID(){
         String uuid = Settings.getString("uuid", "");
@@ -55,8 +49,6 @@ public abstract class Platform {
     }
     /**Only used for iOS or android: open the share menu for a map or save.*/
     public void shareFile(FileHandle file){}
-    /**Download a file. Only used on GWT backend.*/
-    public void downloadFile(String name, byte[] bytes){}
 
     /**Show a file chooser. Desktop only.
      *
@@ -67,17 +59,6 @@ public abstract class Platform {
      * @param filetype File extension to filter
      */
     public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype){}
-    /**Use the default thread provider from the kryonet module for this.*/
-    public ThreadProvider getThreadProvider(){
-        return new ThreadProvider() {
-            @Override public boolean isOnThread() {return true;}
-            @Override public void sleep(long ms) {}
-            @Override public void start(Runnable run) {}
-            @Override public void stop() {}
-            @Override public void notify(Object object) {}
-            @Override public void wait(Object object) {}
-        };
-    }
 
     /**Forces the app into landscape mode. Currently Android only.*/
     public void beginForceLandscape(){}

@@ -19,11 +19,9 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
-import io.anuke.kryonet.DefaultThreadImpl;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
@@ -43,7 +41,6 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -76,25 +73,14 @@ public class AndroidLauncher extends PatchedAndroidApplication{
             }
 
             @Override
-            public String getLocaleName(Locale locale){
-                return locale.getDisplayName(locale);
-            }
-
-            @Override
             public void openDonations(){
                 showDonations();
             }
 
             @Override
-            public ThreadProvider getThreadProvider(){
-                return new DefaultThreadImpl();
-            }
-
-            @Override
             public String getUUID(){
                 try{
-                    String s = Secure.getString(getContext().getContentResolver(),
-                    Secure.ANDROID_ID);
+                    String s = Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
                     int len = s.length();
                     byte[] data = new byte[len / 2];
                     for(int i = 0; i < len; i += 2){

@@ -1,10 +1,5 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.net.TraceInfo;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-
 public class TraceDialog extends FloatingDialog{
 
     public TraceDialog(){
@@ -12,14 +7,15 @@ public class TraceDialog extends FloatingDialog{
 
         addCloseButton();
     }
-
-    public void show(Player player, TraceInfo info){
+/*
+    public void show(Player player, SessionInfo info){
         content().clear();
 
         Table table = new Table("clear");
         table.margin(14);
         table.defaults().pad(1);
 
+        /*
         table.defaults().left();
         table.add(Bundles.format("text.trace.playername", player.name));
         table.row();
@@ -50,10 +46,10 @@ public class TraceDialog extends FloatingDialog{
         table.add(Bundles.format("text.trace.totalblocksplaced", info.totalBlocksPlaced));
         table.row();
         table.add(Bundles.format("text.trace.lastblockplaced", info.lastBlockPlaced.formalName));
-        table.row();*/
+        table.row();
 
         content().add(table);
 
         show();
-    }
+    }*/
 }

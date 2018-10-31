@@ -8,7 +8,6 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.meta.BlockStat;
@@ -17,7 +16,6 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
@@ -99,6 +97,12 @@ public class PowerNode extends PowerBlock{
     public void playerPlaced(Tile tile){
         Tile before = world.tile(lastPlaced);
         if(linkValid(tile, before) && before.block() instanceof PowerNode){
+            for(Tile near : before.entity.proximity()){
+                if(near.target() == tile){
+                    lastPlaced = tile.packedPosition();
+                    return;
+                }
+            }
             Call.linkPowerNodes(null, tile, before);
         }
 
@@ -139,11 +143,10 @@ public class PowerNode extends PowerBlock{
     public void drawSelect(Tile tile){
         super.drawSelect(tile);
 
-        Draw.color(Palette.power);
         Lines.stroke(1f);
 
-        Lines.poly(Edges.getPixelPolygon(laserRange), tile.worldx() - tilesize / 2, tile.worldy() - tilesize / 2, tilesize);
-
+        Draw.color(Palette.accent);
+        Lines.poly(tile.drawx(), tile.drawy(), 50, laserRange*tilesize);
         Draw.reset();
     }
 
@@ -154,14 +157,10 @@ public class PowerNode extends PowerBlock{
         Draw.color(Palette.accent);
 
         Lines.stroke(1f);
-        Lines.square(tile.drawx(), tile.drawy(),
+        Lines.circle(tile.drawx(), tile.drawy(),
                 tile.block().size * tilesize / 2f + 1f + Mathf.absin(Timers.time(), 4f, 1f));
 
-        Lines.stroke(1f);
-
-        Lines.poly(Edges.getPixelPolygon(laserRange), tile.worldx() - tilesize / 2, tile.worldy() - tilesize / 2, tilesize);
-
-        Draw.color(Palette.power);
+        Lines.poly(tile.drawx(), tile.drawy(), 50, laserRange*tilesize);
 
         for(int x = (int) (tile.x - laserRange); x <= tile.x + laserRange; x++){
             for(int y = (int) (tile.y - laserRange); y <= tile.y + laserRange; y++){
@@ -172,7 +171,7 @@ public class PowerNode extends PowerBlock{
                     boolean linked = linked(tile, link);
                     Draw.color(linked ? Palette.place : Palette.breakInvalid);
 
-                    Lines.square(link.drawx(), link.drawy(),
+                    Lines.circle(link.drawx(), link.drawy(),
                             link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Timers.time(), 4f, 1f)));
 
                     if((entity.power.links.size >= maxNodes || (link.block() instanceof PowerNode && link.entity.power.links.size >= ((PowerNode) link.block()).maxNodes)) && !linked){
@@ -188,11 +187,9 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Draw.color(Palette.placing);
         Lines.stroke(1f);
-
-        Lines.poly(Edges.getPixelPolygon(laserRange), x * tilesize - tilesize / 2, y * tilesize - tilesize / 2, tilesize);
-
+        Draw.color(Palette.placing);
+        Lines.poly(x * tilesize + offset(), y * tilesize + offset(), 50, laserRange*tilesize);
         Draw.reset();
     }
 
@@ -202,14 +199,15 @@ public class PowerNode extends PowerBlock{
 
         TileEntity entity = tile.entity();
 
-        Draw.color(Palette.powerLaserFrom, Palette.powerLaserTo, 0f * (1f - flashScl) + Mathf.sin(Timers.time(), 1.7f, flashScl));
-
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));
-            if(linkValid(tile, link)) drawLaser(tile, link);
+            if(linkValid(tile, link) && (!(link.block() instanceof PowerNode)
+                || ((tile.block().size > link.block().size) || (tile.block().size == link.block().size && tile.id() < link.id())))){
+                drawLaser(tile, link);
+            }
         }
 
-        Draw.color();
+        Draw.reset();
     }
 
     protected boolean linked(Tile tile, Tile other){
@@ -227,12 +225,12 @@ public class PowerNode extends PowerBlock{
             TileEntity oe = link.entity();
 
             return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
-                    ((PowerNode) link.block()).laserRange * tilesize) - tilesize / 2f
+                    ((PowerNode) link.block()).laserRange * tilesize)
                     + (link.block().size - 1) * tilesize / 2f + (tile.block().size - 1) * tilesize / 2f &&
                     (!checkMaxNodes || (oe.power.links.size < ((PowerNode) link.block()).maxNodes || oe.power.links.contains(tile.packedPosition())));
         }else{
             return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
-                    <= laserRange * tilesize - tilesize / 2f + (link.block().size - 1) * tilesize;
+                    <= laserRange * tilesize + (link.block().size - 1) * tilesize;
         }
     }
 
@@ -243,11 +241,31 @@ public class PowerNode extends PowerBlock{
         float angle1 = Angles.angle(x1, y1, x2, y2);
         float angle2 = angle1 + 180f;
 
-        t1.trns(angle1, tile.block().size * tilesize / 2f + 1f);
-        t2.trns(angle2, target.block().size * tilesize / 2f + 1f);
+        t1.trns(angle1, tile.block().size * tilesize / 2f - 1f);
+        t2.trns(angle2, target.block().size * tilesize / 2f - 1f);
 
-        Shapes.laser("laser", "laser-end", x1 + t1.x, y1 + t1.y,
-                x2 + t2.x, y2 + t2.y, thicknessScl);
+        x1 += t1.x;
+        y1 += t1.y;
+        x2 += t2.x;
+        y2 += t2.y;
+
+        float space = Vector2.dst(x1, y1, x2, y2);
+        float scl = 4f, mag = 2f, tscl = 4f, segscl = 3f;
+
+        int segments = Mathf.ceil(space / segscl);
+
+        Draw.color(Palette.power, Palette.powerLight, Mathf.absin(Timers.time(), 5f, 1f));
+        Lines.stroke(1f);
+
+        for(int i = 0; i < segments; i++){
+            float f1 = (float)i / segments;
+            float f2 = (float)(i+1) / segments;
+            t1.trns(angle1 + 90f, Mathf.lerp(Mathf.sin(tile.entity.id * 124f + Timers.time()/tscl + f1 * space, scl, mag), 0f, Math.abs(f1 - 0.5f)*2f));
+            t2.trns(angle1 + 90f, Mathf.lerp(Mathf.sin(tile.entity.id * 124f + Timers.time()/tscl + f2 * space, scl, mag), 0f, Math.abs(f2 - 0.5f)*2f));
+
+            Lines.line(x1 + (x2 - x1) * f1 + t1.x, y1 + (y2 - y1) * f1 + t1.y,
+                        x1 + (x2 - x1) * f2 + t2.x, y1 + (y2 - y1) * f2 + t2.y);
+        }
     }
 
 }

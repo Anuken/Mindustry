@@ -35,6 +35,7 @@ import io.anuke.ucore.util.ThreadArray;
 @SuppressWarnings("unchecked")
 public class ContentLoader{
     private boolean loaded = false;
+    private boolean verbose = true;
 
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
     private Array<Content>[] contentMap = new Array[ContentType.values().length];
@@ -152,12 +153,14 @@ public class ContentLoader{
             throw new ImpendingDoomException("THE TIME HAS COME. More than 256 blocks have been created.");
         }
 
-        Log.info("--- CONTENT INFO ---");
-        for(int k = 0; k < contentMap.length; k ++){
-            Log.info("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);
+        if(verbose){
+            Log.info("--- CONTENT INFO ---");
+            for(int k = 0; k < contentMap.length; k++){
+                Log.info("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);
+            }
+            Log.info("Total content loaded: {0}", total);
+            Log.info("-------------------");
         }
-        Log.info("Total content loaded: {0}", total);
-        Log.info("-------------------");
 
         loaded = true;
     }
@@ -173,6 +176,10 @@ public class ContentLoader{
         }
 
         initialization.add(callable);
+    }
+
+    public void verbose(boolean verbose){
+        this.verbose = verbose;
     }
 
     public void dispose(){
@@ -203,7 +210,7 @@ public class ContentLoader{
         if(id < 0) id += 256;
 
         if(temporaryMapper != null && temporaryMapper[type.ordinal()] != null && temporaryMapper[type.ordinal()].length != 0){
-            if(temporaryMapper[type.ordinal()][id] == null){
+            if(temporaryMapper[type.ordinal()].length <= id || temporaryMapper[type.ordinal()][id] == null){
                 return getByID(type, 0); //default value is always ID 0
             }
             return (T)temporaryMapper[type.ordinal()][id];

@@ -73,6 +73,7 @@ public class NetworkIO{
                     if(tile.entity.liquids != null) tile.entity.liquids.write(stream);
                     if(tile.entity.cons != null) tile.entity.cons.write(stream);
 
+                    tile.entity.writeConfig(stream);
                     tile.entity.write(stream);
                 }else if(tile.block() == Blocks.air){
                     int consecutives = 0;
@@ -229,6 +230,7 @@ public class NetworkIO{
                     if(tile.entity.liquids != null) tile.entity.liquids.read(stream);
                     if(tile.entity.cons != null) tile.entity.cons.read(stream);
 
+                    tile.entity.readConfig(stream);
                     tile.entity.read(stream);
                 }else if(wallid == 0){
                     int consecutives = stream.readUnsignedByte();

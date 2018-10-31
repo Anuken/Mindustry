@@ -52,7 +52,7 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
 
                 TypeSpec.Builder serializer = TypeSpec.anonymousClassBuilder("")
                 .addSuperinterface(ParameterizedTypeName.get(
-                ClassName.get(Class.forName("io.anuke.ucore.io.TypeSerializer")), type));
+                ClassName.bestGuess("io.anuke.ucore.io.TypeSerializer"), type));
 
                 MethodSpec.Builder writeMethod = MethodSpec.methodBuilder("write")
                 .returns(void.class)

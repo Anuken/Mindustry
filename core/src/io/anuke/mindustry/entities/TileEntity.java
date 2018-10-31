@@ -28,8 +28,8 @@ import io.anuke.ucore.entities.trait.HealthTrait;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Timer;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.tileGroup;
@@ -120,11 +120,13 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return dead || tile.entity != this;
     }
 
-    public void write(DataOutputStream stream) throws IOException{
-    }
+    public void write(DataOutput stream) throws IOException{}
 
-    public void read(DataInputStream stream) throws IOException{
-    }
+    public void writeConfig(DataOutput stream) throws IOException{}
+
+    public void read(DataInput stream) throws IOException{}
+
+    public void readConfig(DataInput stream) throws IOException{}
 
     public boolean collide(Bullet other){
         return true;

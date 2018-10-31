@@ -164,7 +164,7 @@ public class ApplicationTests{
         tile.entity.items.add(Items.coal, 5);
         tile.entity.items.add(Items.titanium, 50);
         assertEquals(tile.entity.items.total(), 55);
-        tile.entity.items.remove(Items.phasematter, 10);
+        tile.entity.items.remove(Items.phasefabric, 10);
         tile.entity.items.remove(Items.titanium, 10);
         assertEquals(tile.entity.items.total(), 45);
     }

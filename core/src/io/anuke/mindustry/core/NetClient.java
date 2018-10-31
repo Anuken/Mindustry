@@ -21,7 +21,6 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.modules.ItemModule;
@@ -205,12 +204,6 @@ public class NetClient extends Module{
     public static void onPositionSet(float x, float y){
         players[0].x = x;
         players[0].y = y;
-    }
-
-    @Remote(variants = Variant.one)
-    public static void onTraceInfo(TraceInfo info){
-        Player player = playerGroup.getByID(info.playerid);
-        ui.traces.show(player, info);
     }
 
     @Remote
