@@ -36,11 +36,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -55,17 +51,6 @@ public class AndroidLauncher extends PatchedAndroidApplication{
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.useImmersiveMode = true;
         Platform.instance = new Platform(){
-            DateFormat format = SimpleDateFormat.getDateTimeInstance();
-
-            @Override
-            public String format(Date date){
-                return format.format(date);
-            }
-
-            @Override
-            public String format(int number){
-                return NumberFormat.getIntegerInstance().format(number);
-            }
 
             @Override
             public void addDialog(TextField field, int length){
@@ -133,6 +118,7 @@ public class AndroidLauncher extends PatchedAndroidApplication{
                 return true;
             }
         };
+
         try{
             ProviderInstaller.installIfNeeded(this);
         }catch(GooglePlayServicesRepairableException e){

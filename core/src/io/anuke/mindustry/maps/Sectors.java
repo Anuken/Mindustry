@@ -228,11 +228,6 @@ public class Sectors{
             sector.missions.add(new BattleMission());
         }
 
-        //possibly another battle mission
-        if(Mathf.randomSeed(sector.getSeed() + 3) < 0.3){
-            sector.missions.add(new BattleMission());
-        }
-
         //possibly add another recipe mission
         addRecipeMission(sector, 11);
     }

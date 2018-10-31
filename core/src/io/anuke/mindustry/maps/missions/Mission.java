@@ -95,9 +95,7 @@ public abstract class Mission{
         return Array.with();
     }
 
-    public void generate(Generation gen){
-        generateCoreAt(gen, 50, 50, defaultTeam);
-    }
+    public void generate(Generation gen){}
 
     public void generateCoreAt(Generation gen, int coreX, int coreY, Team team){
         gen.tiles[coreX][coreY].setBlock(StorageBlocks.core);

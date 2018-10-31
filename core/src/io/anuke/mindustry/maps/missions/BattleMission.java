@@ -25,7 +25,7 @@ public class BattleMission extends Mission{
 
     @Override
     public void generate(Generation gen){
-        super.generate(gen);
+        generateCoreAt(gen, 50, 50, defaultTeam);
 
         if(state.teams.get(defaultTeam).cores.size == 0){
             return;

@@ -18,9 +18,7 @@ import io.anuke.ucore.util.Strings;
 
 import java.net.NetworkInterface;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Enumeration;
 
 import static io.anuke.mindustry.Vars.*;
@@ -45,16 +43,6 @@ public class DesktopPlatform extends Platform{
     @Override
     public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filter){
         new FileChooser(text, file -> file.extension().equalsIgnoreCase(filter), open, cons).show();
-    }
-
-    @Override
-    public String format(Date date){
-        return format.format(date);
-    }
-
-    @Override
-    public String format(int number){
-        return NumberFormat.getIntegerInstance().format(number);
     }
 
     @Override

@@ -7,6 +7,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.event.InputEvent;
@@ -28,7 +29,7 @@ public class SectorsDialog extends FloatingDialog{
         margin(0);
         getTitleTable().clear();
         clear();
-        add(content()).grow();
+        stack(content(), buttons()).grow();
 
         shown(this::setup);
     }
@@ -37,8 +38,9 @@ public class SectorsDialog extends FloatingDialog{
         selected = null;
         content().clear();
         buttons().clear();
+        buttons().bottom().margin(15);
 
-       // addCloseButton();
+        addCloseButton();
 
         /*
         content().label(() -> Bundles.format("text.sector", selected == null ? Bundles.get("text.none") :
@@ -139,18 +141,16 @@ public class SectorsDialog extends FloatingDialog{
                     Sector sector = world.sectors.get(sectorX, sectorY);
                     int width = 1;
                     int height = 1;
-                    float paddingx = (width-1);
-                    float paddingy = (height-1);
 
                     if(sector == null || sector.texture == null){
                         continue;
                     }
 
-                    drawX += (width-1)/2f*padSectorSize;
-                    drawY += (height-1)/2f*padSectorSize;
+                    drawX += (width)/2f*padSectorSize;
+                    drawY += (height)/2f*padSectorSize;
 
                     Draw.colorl(!sector.complete ? 0.3f : 1f);
-                    Draw.rect(sector.texture, drawX, drawY, sectorSize * width + paddingx, sectorSize * height + paddingy);
+                    Draw.rect(sector.texture, drawX, drawY, sectorSize * width + 1f, sectorSize * height + 1f);
 
                     float stroke = 4f;
 
@@ -170,7 +170,8 @@ public class SectorsDialog extends FloatingDialog{
                     }
 
                     Lines.stroke(Unit.dp.scl(stroke));
-                    Lines.crect(drawX, drawY, sectorSize * width + paddingx, sectorSize * height + paddingy, 0);
+                    Fill.square(drawX, drawY, Unit.dp.scl(10f), 45f);
+                    //Lines.crect(drawX, drawY, sectorSize * width + paddingx, sectorSize * height + paddingy, 0);
                 }
             }
 
