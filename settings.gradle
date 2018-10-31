@@ -1,4 +1,4 @@
-include 'desktop', 'html', 'core', 'kryonet', 'server', 'ios', 'annotations', 'tools', 'tests'
+include 'desktop', 'core', 'kryonet', 'server', 'ios', 'annotations', 'tools', 'tests'
 
 Properties properties = new Properties()
 

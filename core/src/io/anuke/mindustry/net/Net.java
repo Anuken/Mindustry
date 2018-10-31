@@ -165,7 +165,7 @@ public class Net{
     }
 
     /**
-     * Starts discovering servers on a different thread. Does not work with GWT.
+     * Starts discovering servers on a different thread.
      * Callback is run on the main libGDX thread.
      */
     public static void discoverServers(Consumer<Host> cons, Runnable done){

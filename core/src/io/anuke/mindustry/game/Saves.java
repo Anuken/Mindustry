@@ -256,9 +256,7 @@ public class Saves{
         }
 
         public void delete(){
-            if(!gwt){ //can't delete files
-                SaveIO.fileFor(index).delete();
-            }
+            SaveIO.fileFor(index).delete();
             saves.removeValue(this, true);
             saveMap.remove(index);
             if(this == current){

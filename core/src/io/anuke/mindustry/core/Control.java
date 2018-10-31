@@ -57,7 +57,7 @@ public class Control extends Module{
         saves = new Saves();
         unlocks = new Unlocks();
 
-        Inputs.useControllers(!gwt);
+        Inputs.useControllers(true);
 
         Gdx.input.setCatchBackKey(true);
 

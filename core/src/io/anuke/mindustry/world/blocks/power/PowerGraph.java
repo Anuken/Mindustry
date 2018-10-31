@@ -37,27 +37,62 @@ public class PowerGraph{
 
         lastFrameUpdated = threads.getFrameID();
 
+        boolean charge = false;
+        
         float totalInput = 0f;
+        float bufferInput = 0f;
         for(Tile producer : producers){
-            totalInput += producer.entity.power.amount;
+            if (producer.block().consumesPower) {
+                bufferInput += producer.entity.power.amount;
+            } else {
+                totalInput += producer.entity.power.amount;
+            }
         }
 
         float maxOutput = 0f;
+        float bufferOutput = 0f;
         for(Tile consumer : consumers){
-            maxOutput += consumer.block().powerCapacity - consumer.entity.power.amount;
+            if (consumer.block().outputsPower) {
+                bufferOutput += consumer.block().powerCapacity - consumer.entity.power.amount;
+            } else {
+                maxOutput += consumer.block().powerCapacity - consumer.entity.power.amount;
+            }
         }
 
-        if (totalInput <= 0.0001f || maxOutput <= 0.0001f) {
+        if (maxOutput < totalInput) {
+            charge = true;
+        }
+
+        if (totalInput + bufferInput <= 0.0001f || maxOutput + bufferOutput <= 0.0001f) {
             return;
         }
 
-        float inputUsed = Math.min(maxOutput / totalInput, 1f);
+        float bufferUsed = 0;
+        if (charge) {
+            bufferUsed = Math.min((totalInput - maxOutput) / bufferOutput, 1f);
+        } else {
+            bufferUsed = Math.min((maxOutput - totalInput) / bufferInput, 1f);
+        }
+
+        float inputUsed = charge ? Math.min((maxOutput + bufferOutput) / totalInput, 1f) : 1f;
         for(Tile producer : producers){
+            if (producer.block().consumesPower) {
+                if (!charge) {
+                    producer.entity.power.amount -= producer.entity.power.amount * bufferUsed;
+                }
+                continue;
+            }
             producer.entity.power.amount -= producer.entity.power.amount * inputUsed;
         }
 
-        float outputSatisfied = Math.min(totalInput / maxOutput, 1f);
+        float outputSatisfied = charge ? 1f : Math.min((totalInput + bufferInput) / maxOutput, 1f);
         for(Tile consumer : consumers){
+            if (consumer.block().outputsPower) {
+                if (charge) {
+                    consumer.entity.power.amount +=  (consumer.block().powerCapacity - consumer.entity.power.amount) * bufferUsed;
+                }
+                continue;
+            }
             consumer.entity.power.amount += (consumer.block().powerCapacity - consumer.entity.power.amount) * outputSatisfied;
         }
     }

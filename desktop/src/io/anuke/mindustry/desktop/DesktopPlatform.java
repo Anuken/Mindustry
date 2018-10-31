@@ -22,7 +22,6 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -56,11 +55,6 @@ public class DesktopPlatform extends Platform{
     @Override
     public String format(int number){
         return NumberFormat.getIntegerInstance().format(number);
-    }
-
-    @Override
-    public String getLocaleName(Locale locale){
-        return locale.getDisplayName(locale);
     }
 
     @Override

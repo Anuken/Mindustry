@@ -86,28 +86,27 @@ public class LoadDialog extends FloatingDialog{
                     });
                 }).size(14 * 3).right();
 
-                if(!gwt){
-                    t.addImageButton("icon-save", "empty", 14 * 3, () -> {
-                        if(!ios){
-                            Platform.instance.showFileChooser(Bundles.get("text.save.export"), "Mindustry Save", file -> {
-                                try{
-                                    slot.exportFile(file);
-                                    setup();
-                                }catch(IOException e){
-                                    ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
-                                }
-                            }, false, saveExtension);
-                        }else{
+                t.addImageButton("icon-save", "empty", 14 * 3, () -> {
+                    if(!ios){
+                        Platform.instance.showFileChooser(Bundles.get("text.save.export"), "Mindustry Save", file -> {
                             try{
-                                FileHandle file = Gdx.files.local("save-" + slot.getName() + "." + Vars.saveExtension);
                                 slot.exportFile(file);
-                                Platform.instance.shareFile(file);
-                            }catch(Exception e){
+                                setup();
+                            }catch(IOException e){
                                 ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
                             }
+                        }, false, saveExtension);
+                    }else{
+                        try{
+                            FileHandle file = Gdx.files.local("save-" + slot.getName() + "." + Vars.saveExtension);
+                            slot.exportFile(file);
+                            Platform.instance.shareFile(file);
+                        }catch(Exception e){
+                            ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
                         }
-                    }).size(14 * 3).right();
-                }
+                    }
+                }).size(14 * 3).right();
+
 
             }).padRight(-10).growX();
 
@@ -153,7 +152,7 @@ public class LoadDialog extends FloatingDialog{
 
         slots.row();
 
-        if(gwt || ios) return;
+        if(ios) return;
 
         slots.addImageTextButton("$text.save.import", "icon-add", "clear", 14 * 3, () -> {
             Platform.instance.showFileChooser(Bundles.get("text.save.import"), "Mindustry Save", file -> {
