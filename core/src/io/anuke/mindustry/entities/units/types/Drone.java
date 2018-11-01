@@ -113,6 +113,8 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                 }
             });
 
+            if(target == null) return;
+
             if(target.distanceTo(Drone.this) > type.range){
                 circle(type.range*0.9f);
             }else{
