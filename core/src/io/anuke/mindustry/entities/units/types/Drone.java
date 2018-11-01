@@ -79,12 +79,14 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                 }
 
                 //if it's missing requirements, try and mine them
-                for(ItemStack stack : entity.recipe.requirements){
-                    if(!core.items.has(stack.item, stack.amount) && type.toMine.contains(stack.item)){
-                        targetItem = stack.item;
-                        getPlaceQueue().clear();
-                        setState(mine);
-                        return;
+                if(entity.recipe != null){
+                    for(ItemStack stack : entity.recipe.requirements){
+                        if(!core.items.has(stack.item, stack.amount) && type.toMine.contains(stack.item)){
+                            targetItem = stack.item;
+                            getPlaceQueue().clear();
+                            setState(mine);
+                            return;
+                        }
                     }
                 }
 
