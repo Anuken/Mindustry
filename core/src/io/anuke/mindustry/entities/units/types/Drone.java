@@ -104,22 +104,17 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         }
 
         public void update(){
-            if(target != null && (((TileEntity) target).health >= ((TileEntity) target).tile.block().health
-                    || target.distanceTo(Drone.this) > discoverRange)){
-                target = null;
-            }
 
-            if(target == null){
-                retarget(() -> {
-                    target = Units.findAllyTile(team, x, y, discoverRange,
-                            tile -> tile.entity != null && tile.entity.health + 0.0001f < tile.block().health);
+            retarget(() -> {
+                target = Units.findDamagedTile(team, x, y);
 
-                    if(target == null){
-                        setState(mine);
-                    }
-                });
-            }else if(target.distanceTo(Drone.this) > type.range){
-                circle(type.range);
+                if(target == null){
+                    setState(mine);
+                }
+            });
+
+            if(target.distanceTo(Drone.this) > type.range){
+                circle(type.range*0.9f);
             }else{
                 TileEntity entity = (TileEntity) target;
                 entity.healBy(type.healSpeed * entity.tile.block().health / 100f * Timers.delta());
@@ -318,7 +313,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             target = null;
         }
 
-        if(Net.client() && state.is(repair) && target instanceof TileEntity){
+        if(Net.client() && state.is(repair) && target instanceof TileEntity && target.distanceTo(this) < type.range){
             TileEntity entity = (TileEntity) target;
             entity.health += type.healSpeed * Timers.delta();
             entity.health = Mathf.clamp(entity.health, 0, entity.tile.block().health);
@@ -329,7 +324,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
     @Override
     protected void updateRotation(){
-        if(target != null && (state.is(repair) || state.is(mine))){
+        if(target != null && ((state.is(repair) && target.distanceTo(this) < type.range) || state.is(mine))){
             rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.3f);
         }else{
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), 0.3f);
@@ -355,7 +350,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
         TargetTrait entity = target;
 
-        if(entity instanceof TileEntity && state.is(repair)){
+        if(entity instanceof TileEntity && state.is(repair) && target.distanceTo(this) < type.range){
             float len = 5f;
             Draw.color(Color.BLACK, Color.WHITE, 0.95f + Mathf.absin(Timers.time(), 0.8f, 0.05f));
             Shapes.laser("beam", "beam-end",
