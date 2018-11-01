@@ -139,41 +139,36 @@ public class SectorsDialog extends FloatingDialog{
                     float drawY = y + height/2f + sectorY * padSectorSize - offsetY * padSectorSize - panY % padSectorSize + padSectorSize/2f;
 
                     Sector sector = world.sectors.get(sectorX, sectorY);
-                    int width = 1;
-                    int height = 1;
 
                     if(sector == null || sector.texture == null){
                         Draw.color(Color.DARK_GRAY);
-                        Draw.rect(Draw.getBlankRegion(), drawX, drawY, sectorSize * width + 1f, sectorSize * height + 1f);
+                        Draw.rect(Draw.getBlankRegion(), drawX, drawY, sectorSize + 1f, sectorSize + 1f);
                         continue;
                     }
 
                     Draw.colorl(!sector.complete ? 0.3f : 1f);
-                    Draw.rect(sector.texture, drawX, drawY, sectorSize * width + 1f, sectorSize * height + 1f);
+                    Draw.rect(sector.texture, drawX, drawY, sectorSize + 1f, sectorSize + 1f);
 
-                    if(sector.missions.size == 0) continue;
-
-                    Draw.color(Color.DARK_GRAY);
-                    Fill.square(drawX, drawY - 5f, Unit.dp.scl(10f), 45f);
+                    Draw.color(Palette.place);
 
                     if(sector == selected){
                         Draw.color(Palette.place);
-                    }else if(Mathf.inRect(mouse.x, mouse.y, drawX - padSectorSize/2f * width, drawY - padSectorSize/2f * height,
-                                                            drawX + padSectorSize/2f * width, drawY + padSectorSize/2f * height)){
+                    }else if(Mathf.inRect(mouse.x, mouse.y, drawX - padSectorSize / 2f, drawY - padSectorSize / 2f,
+                    drawX + padSectorSize / 2f, drawY + padSectorSize / 2f)){
                         if(clicked){
                             selectSector(sector);
                         }
                         Draw.color(Palette.remove);
-                    }else if (sector.complete){
+                    }else if(sector.complete){
                         Draw.color(Palette.accent);
                     }else{
                         Draw.color(Color.LIGHT_GRAY);
                     }
 
                     Fill.square(drawX, drawY, Unit.dp.scl(10f), 45f);
-                    //Lines.crect(drawX, drawY, sectorSize * width + paddingx, sectorSize * height + paddingy, 0);
                 }
             }
+
 
             Draw.color(Color.GRAY);
             Lines.stroke(Unit.dp.scl(4f));

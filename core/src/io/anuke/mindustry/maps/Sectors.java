@@ -35,7 +35,7 @@ public class Sectors{
     private final GridMap<Sector> grid = new GridMap<>();
     private final SectorPresets presets = new SectorPresets();
     private final Array<Item> allOres = Item.getAllOres();
-    private AsyncExecutor executor = new AsyncExecutor(6);
+    private final AsyncExecutor executor = new AsyncExecutor(6);
 
     public void playSector(Sector sector){
         if(sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
@@ -109,6 +109,7 @@ public class Sectors{
 
         for(GridPoint2 g : Geometry.d4){
             createSector(x + g.x, y + g.y);
+            Sector other = grid.get(x + g.x, y + g.y);
         }
     }
 

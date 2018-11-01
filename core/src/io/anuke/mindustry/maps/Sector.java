@@ -2,7 +2,6 @@ package io.anuke.mindustry.maps;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
@@ -25,8 +24,6 @@ public class Sector{
     public int saveID = -1;
     /**Num of missions in this sector that have been completed so far.*/
     public int completedMissions;
-    /**List of links to other sector coords.*/
-    public IntArray links = new IntArray();
 
     /**Display texture. Needs to be disposed.*/
     public transient Texture texture;
