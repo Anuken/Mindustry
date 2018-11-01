@@ -24,7 +24,6 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.*;
 import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
@@ -64,11 +63,6 @@ public class IOSLauncher extends IOSApplication.Delegate {
             @Override
             public void addDialog(TextField field, int maxLength) {
                 TextFieldDialogListener.add(field, maxLength);
-            }
-
-            @Override
-            public String getLocaleName(Locale locale) {
-                return locale.getDisplayName(locale);
             }
 
             @Override

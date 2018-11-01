@@ -206,20 +206,10 @@ public abstract class InputHandler extends InputAdapter{
                 consumed = true;
                 showedInventory = true;
             }
-
-            if(tile.block().consumes.hasAny()){
-                frag.consume.show(tile);
-                consumed = true;
-                showedConsume = true;
-            }
         }
 
         if(!showedInventory){
             frag.inv.hide();
-        }
-
-        if(!showedConsume){
-            frag.consume.hide();
         }
 
         if(!consumed && player.isBuilding()){
