@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.mapeditor.MapEditorDialog;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
@@ -175,6 +174,21 @@ public class UI extends SceneModule{
 		loadfrag.build();
 
 		build.end();
+
+		if(Settings.getBool("showClassicDialog", true)){
+			FloatingDialog dialog = new FloatingDialog("unimportant information");
+			dialog.setFillParent(false);
+			dialog.content().add("Welcome to [accent]Mindustry Classic![]\n\nThis is an ancient version of mindustry, intended to be played as a [accent]demo[]. For the real game, download Mindustry on PC or mobile.")
+			.width(400f).wrap();
+			dialog.content().row();
+			dialog.content().addCheck("Show at startup", true, val -> {
+				Settings.putBool("showClassicDialog", val);
+				Settings.save();
+			}).pad(10).growX().get().left();
+			dialog.buttons().addButton("I didn't read any of that but ok", dialog::hide).margin(20).growX();
+
+			dialog.show();
+		}
 	}
 
 	@Override

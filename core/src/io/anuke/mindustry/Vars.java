@@ -10,7 +10,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.effect.Shield;
 import io.anuke.mindustry.entities.enemies.Enemy;
-import io.anuke.mindustry.io.Platform;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.ClientDebug;
 import io.anuke.mindustry.net.ServerDebug;
 import io.anuke.ucore.UCore;
@@ -95,7 +95,7 @@ public class Vars{
 	
 	public static final int tilesize = 8;
 
-	public static final Locale[] locales = {new Locale("en"), new Locale("fr"), new Locale("ru"), new Locale("uk", "UA"), new Locale("pl", "PL"),
+	public static final Locale[] locales = {new Locale("en"), new Locale("fr"), new Locale("ru"), new Locale("uk", "UA"), new Locale("pl"),
 			new Locale("de"), new Locale("pt", "BR"), new Locale("ko"), new Locale("in", "ID"), new Locale("ita"), new Locale("es")};
 
 	public static final Color[] playerColors = {

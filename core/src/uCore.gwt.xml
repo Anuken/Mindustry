@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "https://raw.githubusercontent.com/gwtproject/gwt/master/distro-source/core/src/gwt-module.dtd">
+<module>
+	<source path="io/anuke/ucore" />
+    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.ucore.function.DelayRun" />
+
+    <extend-configuration-property name="gdx.reflect.include" value="io.anuke.ucore.scene" />
+
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.actions.Actions" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.builders.build" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.builders.builder" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.builders.button" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.builders.checkbox" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.builders.dialog" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.builders.field" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.builders.imagebutton" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.builders.label" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.builders.table" />
+
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.utils.ArraySelection" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.utils.Cullable" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.utils.Cursors" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.utils.Disableable" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.utils.DragAndDrop" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.utils.Elements" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.utils.Layout" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.utils.Selection" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.utils.ScissorStack" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.utils.UIUtils" />
+
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.event.HandCursorListener" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.event.IbeamCursorListener" />
+
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.ui.layout.Table" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.ui.layout.Container" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.ui.layout.HorizontalGroup" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.ui.layout.VerticalGroup" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.ui.layout.WidgetGroup" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.ui.layout.Value" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.ui.layout.Unit" />
+    <extend-configuration-property name="gdx.reflect.exclude" value="io.anuke.ucore.scene.ui.layout.Stack" />
+</module>

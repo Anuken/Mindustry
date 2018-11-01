@@ -13,7 +13,6 @@ import io.anuke.mindustry.input.AndroidInput;
 import io.anuke.mindustry.input.DefaultKeybinds;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.io.Platform;
 import io.anuke.mindustry.io.Saves;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.resource.Item;
@@ -25,7 +24,9 @@ import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Atlas;
+import io.anuke.ucore.util.InputProxy;
+import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -102,7 +103,7 @@ public class Control extends Module{
 
 		Sounds.setFalloff(9000f);
 
-		Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3");
+        Musics.load("1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3");
 
         DefaultKeybinds.load();
 
@@ -251,23 +252,6 @@ public class Control extends Module{
 		return tutorial;
 	}
 
-	private void checkOldUser(){
-		boolean hasPlayed = false;
-
-		for(Map map : world.maps().getAllMaps()){
-			if(Settings.getInt("hiscore" + map.name) != 0){
-				hasPlayed = true;
-				break;
-			}
-		}
-
-		if(hasPlayed && Settings.getString("lastVersion").equals("3.2")){
-			Timers.runTask(1f, () -> ui.showInfo("$text.changes"));
-			Settings.putString("lastVersion", "3.3");
-			Settings.save();
-		}
-	}
-
 	@Override
 	public void dispose(){
 		Platform.instance.onGameExit();
@@ -295,8 +279,6 @@ public class Control extends Module{
 		Entities.collisions().setCollider(tilesize, world::solid);
 
 		Platform.instance.updateRPC();
-
-		checkOldUser();
 	}
 
 	@Override

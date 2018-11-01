@@ -46,9 +46,9 @@ public class GestureHandler extends GestureAdapter{
 	public boolean pan(float x, float y, float deltaX, float deltaY){
 		if(control.showCursor() && !Inputs.keyDown("select")) return false;
 
-		if(!control.showCursor() && !(control.input().recipe != null
+		if((!control.showCursor() && !(control.input().recipe != null
 				&& control.input().placeMode.lockCamera && state.inventory.hasItems(control.input().recipe.requirements)) &&
-				!(control.input().recipe == null && control.input().breakMode.lockCamera)){
+				!(control.input().recipe == null && control.input().breakMode.lockCamera)) && !ui.hasMouse(x, y)){
 			float dx = deltaX*Core.camera.zoom/Core.cameraScale, dy = deltaY*Core.camera.zoom/Core.cameraScale;
 			player.x -= dx;
 			player.y += dy;

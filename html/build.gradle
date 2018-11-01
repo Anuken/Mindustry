@@ -41,13 +41,6 @@ task distZip(type: Zip, dependsOn: dist){
     destinationDir(file("build/dist-zipped"))
 }
 
-
-eclipseWtpFacet.doLast{
-	delete{
-		delete '.settings/org.eclipse.wst.common.project.facet.core.xml'
-	}
-}
-
 draftWar {
    from "war"
 }
@@ -55,8 +48,6 @@ draftWar {
 task addSource{
 	doLast{
 		sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
-        //this WILL fail if uCore is not a module
-        sourceSets.main.compileClasspath += files(project(':uCore').sourceSets.main.allJava.srcDirs)
 	}
 }
 
@@ -65,8 +56,3 @@ tasks.draftCompileGwt.dependsOn(addSource)
 
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
-
-
-eclipse.project {
-    name = appName + "-html"
-}

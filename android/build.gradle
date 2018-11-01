@@ -8,9 +8,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.android.support:support-v4:22.1.1'
+    implementation 'com.android.support:support-v4:28.0.0'
     implementation 'org.sufficientlysecure:donations:2.5'
-    implementation 'com.google.android.gms:play-services-auth:11.8.0'
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
 }
 
 task deploy(type: Copy){
@@ -22,8 +22,8 @@ task deploy(type: Copy){
 }
 
 android {
-    buildToolsVersion '26.0.2'
-    compileSdkVersion 26
+    buildToolsVersion '28.0.3'
+    compileSdkVersion 28
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -34,8 +34,6 @@ android {
             assets.srcDirs = ['assets', 'src/main/assets', '../core/assets/']
             jniLibs.srcDirs = ['libs']
         }
-
-        instrumentTest.setRoot('tests')
     }
     packagingOptions {
         exclude 'META-INF/robovm/ios/robovm.xml'
@@ -60,7 +58,7 @@ android {
 
         applicationId "io.anuke.mindustry"
         minSdkVersion 14
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode code
         versionName versionNameResult
     }
@@ -144,36 +142,7 @@ task run(type: Exec) {
     def adb = path + "/platform-tools/adb"
     commandLine "$adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/io.anuke.mindustry.AndroidLauncher'
 }
-// sets up the Android Eclipse project, using the old Ant based build.
-eclipse {
-    // need to specify Java source sets explicitly, SpringSource Gradle Eclipse plugin
-    // ignores any nodes added in classpath.file.withXml
-    sourceSets {
-        main {
-            java.srcDirs "src", 'gen'
-        }
-    }
 
-    jdt {
-        sourceCompatibility = 1.7
-        targetCompatibility = 1.7
-    }
-
-    classpath {
-        plusConfigurations += [project.configurations.compile]
-        containers 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK', 'com.android.ide.eclipse.adt.LIBRARIES'
-    }
-
-    project {
-        name = appName + "-android"
-        natures 'com.android.ide.eclipse.adt.AndroidNature'
-        buildCommands.clear();
-        buildCommand "com.android.ide.eclipse.adt.ResourceManagerBuilder"
-        buildCommand "com.android.ide.eclipse.adt.PreCompilerBuilder"
-        buildCommand "org.eclipse.jdt.core.javabuilder"
-        buildCommand "com.android.ide.eclipse.adt.ApkBuilder"
-    }
-}
 // sets up the Android Idea project, using the old Ant based build.
 idea {
     module {

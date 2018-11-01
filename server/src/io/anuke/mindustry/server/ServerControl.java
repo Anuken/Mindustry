@@ -559,6 +559,10 @@ public class ServerControl extends Module {
                 boolean found = false;
 
                 for (Player player : playerGroup.all()) {
+                    if(Net.getConnection(player.clientid) == null){
+                        err("Player \"{0}\" does not have an associated connection!");
+                        continue;
+                    }
                     TraceInfo info = netServer.admins.getTrace(Net.getConnection(player.clientid).address);
                     if(info.totalBlocksBroken >= minbreak && info.totalBlocksBroken / Math.max(info.totalBlocksPlaced, 1f) >= ratio){
                         info("&ly - Player '{0}' / UUID &lm{1}&ly found: &lc{2}&ly broken and &lc{3}&ly placed.",
