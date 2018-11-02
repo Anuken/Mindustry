@@ -124,7 +124,7 @@ public class Control extends Module{
 
         Events.on(WorldLoadGraphicsEvent.class, event -> {
             if(mobile){
-                Core.camera.position.set(players[0].x, players[0].y, 0);
+                Gdx.app.postRunnable(() -> Core.camera.position.set(players[0].x, players[0].y, 0));
             }
         });
 
