@@ -14,6 +14,7 @@ import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Timers;
@@ -265,7 +266,8 @@ public class ItemBridge extends Block{
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
-            int i = tile.absoluteRelativeTo(to.x, to.y);
+            Tile edge = Edges.getFacingEdge(to, tile);
+            int i = tile.absoluteRelativeTo(edge.x, edge.y);
 
             IntSetIterator it = entity.incoming.iterator();
 

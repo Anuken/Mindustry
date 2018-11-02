@@ -5,6 +5,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.meta.ContentStatValue;
+import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 public class ItemValue implements ContentStatValue{
@@ -22,6 +23,8 @@ public class ItemValue implements ContentStatValue{
     @Override
     public void display(Table table){
         //TODO better implementation, quantity support
-        table.add(new ItemImage(item)).size(8 * 3);
+        ItemImage image = new ItemImage(item);
+        table.add(image).size(8 * 3);
+        StatValue.addToolTip(image, item.item);
     }
 }

@@ -206,20 +206,10 @@ public abstract class InputHandler extends InputAdapter{
                 consumed = true;
                 showedInventory = true;
             }
-
-            if(tile.block().consumes.hasAny()){
-                frag.consume.show(tile);
-                consumed = true;
-                showedConsume = true;
-            }
         }
 
         if(!showedInventory){
             frag.inv.hide();
-        }
-
-        if(!showedConsume){
-            frag.consume.hide();
         }
 
         if(!consumed && player.isBuilding()){
@@ -231,9 +221,7 @@ public abstract class InputHandler extends InputAdapter{
         return consumed;
     }
 
-    /**
-     * Tries to select the player to drop off items, returns true if successful.
-     */
+    /**Tries to select the player to drop off items, returns true if successful.*/
     boolean tryTapPlayer(float x, float y){
         if(canTapPlayer(x, y)){
             droppingItem = true;
@@ -246,9 +234,7 @@ public abstract class InputHandler extends InputAdapter{
         return Vector2.dst(x, y, player.x, player.y) <= playerSelectRange && player.inventory.hasItem();
     }
 
-    /**
-     * Tries to begin mining a tile, returns true if successful.
-     */
+    /**Tries to begin mining a tile, returns true if successful.*/
     boolean tryBeginMine(Tile tile){
         if(canMine(tile)){
             //if a block is clicked twice, reset it

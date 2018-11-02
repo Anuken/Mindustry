@@ -11,8 +11,9 @@ import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.util.Threads;
 import io.anuke.ucore.util.EnumSet;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Threads;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -123,6 +124,12 @@ public class Units{
         });
 
         return value[0];
+    }
+
+    /**Returns the neareset damaged tile.*/
+    public static TileEntity findDamagedTile(Team team, float x, float y){
+        Tile tile = Geometry.findClosest(x, y, world.indexer.getDamaged(team));
+        return tile == null ? null : tile.entity;
     }
 
     /**Returns the neareset ally tile in a range.*/

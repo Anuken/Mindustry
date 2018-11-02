@@ -1,6 +1,7 @@
 package io.anuke.mindustry.server;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Timer;
@@ -41,11 +42,17 @@ import static io.anuke.ucore.util.Log.*;
 
 public class ServerControl extends Module{
     private static final int roundExtraTime = 12;
+    //in bytes: 512 kb is max
+    private static final int maxLogLength = 1024 * 512;
 
     private final CommandHandler handler = new CommandHandler("");
+    private final FileHandle logFolder = Gdx.files.local("logs/");
+
+    private FileHandle currentLogFile;
     private int gameOvers;
     private boolean inExtraRound;
     private Task lastTask;
+
 
     public ServerControl(String[] args){
         Settings.defaultList(
@@ -56,7 +63,8 @@ public class ServerControl extends Module{
             "sector_y", 1,
             "shuffle", true,
             "crashreport", false,
-            "port", port
+            "port", port,
+            "logging", true
         );
 
         Log.setLogger(new LogHandler(){
@@ -64,22 +72,27 @@ public class ServerControl extends Module{
 
             @Override
             public void info(String text, Object... args){
-                print("&lg&fb" + "[INFO] " + format(text, args));
+                print("&lg&fb" + "[INFO] " + text, args);
             }
 
             @Override
             public void err(String text, Object... args){
-                print("&lr&fb" + "[ERR!] " + format(text, args));
+                print("&lr&fb" + "[ERR!] " + text, args);
             }
 
             @Override
             public void warn(String text, Object... args){
-                print("&ly&fb" + "[WARN] " + format(text, args));
+                print("&ly&fb" + "[WARN] " + text, args);
             }
 
             @Override
             public void print(String text, Object... args){
-                System.out.println("[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", args));
+                String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", args);
+                System.out.println(result);
+
+                if(Settings.getBool("logging")){
+                    logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", false, args));
+                }
             }
         });
 
@@ -311,7 +324,7 @@ public class ServerControl extends Module{
                 return;
             }
 
-            Call.sendMessage("[GRAY][[Server]:[] " + arg[0]);
+            Call.sendMessage("[scarlet][[Server]:[] " + arg[0]);
 
             info("&lyServer: &lb{0}", arg[0]);
         });
@@ -357,6 +370,13 @@ public class ServerControl extends Module{
             info("Crash reporting is now {0}.", value ? "on" : "off");
         });
 
+        handler.register("logging", "<on/off>", "Disables or enables server logs", arg -> {
+            boolean value = arg[0].equalsIgnoreCase("on");
+            Settings.putBool("logging", value);
+            Settings.save();
+            info("Logging is now {0}.", value ? "on" : "off");
+        });
+
         handler.register("strict", "<on/off>", "Disables or enables strict mode", arg -> {
            boolean value = arg[0].equalsIgnoreCase("on");
            netServer.admins.setStrict(value);
@@ -400,6 +420,7 @@ public class ServerControl extends Module{
             Player target = playerGroup.find(p -> p.name.equals(arg[0]));
 
             if(target != null){
+                Call.sendMessage("[scarlet] " + target.name + " has been kicked by the server.");
                 netServer.kick(target.con.id, KickReason.kick);
                 info("It is done.");
             }else{
@@ -424,6 +445,13 @@ public class ServerControl extends Module{
                 info("Banned.");
             }else{
                 err("Invalid type.");
+            }
+
+            for(Player player : playerGroup.all()){
+                if(netServer.admins.isIDBanned(player.uuid)){
+                    Call.sendMessage("[scarlet] " + player.name + " has been banned.");
+                    netServer.kick(player.con.id, KickReason.banned);
+                }
             }
         });
 
@@ -723,5 +751,24 @@ public class ServerControl extends Module{
             err(e);
             state.set(State.menu);
         }
+    }
+
+    private void logToFile(String text){
+        if(currentLogFile != null && currentLogFile.length() > maxLogLength){
+            String date = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss").format(LocalDateTime.now());
+            currentLogFile.writeString("[End of log file. Date: "+ date + "]\n", true);
+            currentLogFile = null;
+        }
+
+        if(currentLogFile == null){
+            int i = 0;
+            while(logFolder.child("log-" + i + ".txt").length() >= maxLogLength){
+                i ++;
+            }
+
+            currentLogFile = logFolder.child("log-" + i + ".txt");
+        }
+
+        currentLogFile.writeString(text + "\n", true);
     }
 }
