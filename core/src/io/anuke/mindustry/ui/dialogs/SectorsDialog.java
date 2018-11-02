@@ -3,10 +3,10 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
@@ -142,23 +142,30 @@ public class SectorsDialog extends FloatingDialog{
                     Draw.colorl(!sector.complete ? 0.3f : 1f);
                     Draw.rect(sector.texture, drawX, drawY, sectorSize + 1f, sectorSize + 1f);
 
-                    Draw.color(Palette.place);
+                    String region = "icon-mission-defense";
 
                     if(sector == selected){
-                        Draw.color(Palette.place);
+                        Draw.color(Color.WHITE);
                     }else if(Mathf.inRect(mouse.x, mouse.y, drawX - padSectorSize / 2f, drawY - padSectorSize / 2f,
-                    drawX + padSectorSize / 2f, drawY + padSectorSize / 2f)){
+                        drawX + padSectorSize / 2f, drawY + padSectorSize / 2f)){
                         if(clicked){
                             selectSector(sector);
                         }
                         Draw.color(Palette.remove);
                     }else if(sector.complete){
+                        region = "icon-mission-done";
                         Draw.color(Palette.accent);
                     }else{
                         Draw.color(Color.LIGHT_GRAY);
                     }
 
-                    Fill.square(drawX, drawY, Unit.dp.scl(10f), 45f);
+                    float size = Unit.dp.scl(1f) * 10f * 5f;
+
+                    Shaders.outline.color = Color.BLACK;
+                    Shaders.outline.region = Draw.region(region);
+                    Graphics.shader(Shaders.outline);
+                    Draw.rect(region, drawX, drawY, size, size);
+                    Graphics.shader();
                 }
             }
 
