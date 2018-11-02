@@ -89,10 +89,7 @@ public class CommandCenter extends Block{
         }
         table.add(buttons);
         table.row();
-        Table lab = new Table("pane");
-        lab.label(() -> entity.command.localized()).center().width(group.getButtons().size * 40 - 20);
-        table.add(lab);
-
+        table.table("button", t -> t.label(() -> entity.command.localized()).center().growX()).growX().padTop(-5);
     }
 
     @Remote(called = Loc.server, forward = true, targets = Loc.both)
