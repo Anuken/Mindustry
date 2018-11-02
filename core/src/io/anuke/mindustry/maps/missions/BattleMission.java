@@ -14,6 +14,11 @@ public class BattleMission extends Mission{
     final int spacing = 30;
 
     @Override
+    public String getIcon(){
+        return "icon-mission-battle";
+    }
+
+    @Override
     public GameMode getMode(){
         return GameMode.noWaves;
     }

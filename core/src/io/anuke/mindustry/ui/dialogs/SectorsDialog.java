@@ -134,15 +134,25 @@ public class SectorsDialog extends FloatingDialog{
                     Sector sector = world.sectors.get(sectorX, sectorY);
 
                     if(sector == null || sector.texture == null){
-                        Draw.color(Color.DARK_GRAY);
-                        Draw.rect(Draw.getBlankRegion(), drawX, drawY, sectorSize + 1f, sectorSize + 1f);
+                        Draw.reset();
+                        Draw.rect("empty-sector", drawX, drawY, sectorSize + 1f, sectorSize + 1f);
                         continue;
                     }
 
                     Draw.colorl(!sector.complete ? 0.3f : 1f);
                     Draw.rect(sector.texture, drawX, drawY, sectorSize + 1f, sectorSize + 1f);
 
-                    String region = "icon-mission-defense";
+                    if(sector.missions.size == 0) continue;
+
+                    Draw.color(Color.BLACK);
+                    Draw.alpha(0.75f);
+                    Draw.rect("icon-mission-background", drawX, drawY, Unit.dp.scl(18f * 5), Unit.dp.scl(18f * 5));
+
+                    String region = sector.getDominantMission().getIcon();
+
+                    if(sector.complete){
+                        region = "icon-mission-done";
+                    }
 
                     if(sector == selected){
                         Draw.color(Color.WHITE);
@@ -153,13 +163,12 @@ public class SectorsDialog extends FloatingDialog{
                         }
                         Draw.color(Palette.remove);
                     }else if(sector.complete){
-                        region = "icon-mission-done";
                         Draw.color(Palette.accent);
                     }else{
                         Draw.color(Color.LIGHT_GRAY);
                     }
 
-                    float size = Unit.dp.scl(1f) * 10f * 5f;
+                    float size = Unit.dp.scl(10f * 5);
 
                     Shaders.outline.color = Color.BLACK;
                     Shaders.outline.region = Draw.region(region);

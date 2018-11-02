@@ -33,8 +33,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     private static final IntMap<Fire> map = new IntMap<>();
-    private static final float baseLifetime = 1000f;
-    private static final float spreadChance = 0.05f, fireballChance = 0.07f;
+    private static final float baseLifetime = 1000f, spreadChance = 0.05f, fireballChance = 0.07f;
 
     private int loadedPosition = -1;
     private Tile tile;
@@ -42,15 +41,10 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     private float baseFlammability = -1, puddleFlammability;
     private float lifetime;
 
-    /**
-     * Deserialization use only!
-     */
-    public Fire(){
-    }
+    /**Deserialization use only!*/
+    public Fire(){}
 
-    /**
-     * Start a fire on the tile. If there already is a file there, refreshes its lifetime.
-     */
+    /**Start a fire on the tile. If there already is a file there, refreshes its lifetime.*/
     public static void create(Tile tile){
         if(Net.client() || tile == null) return; //not clientside.
 
@@ -70,7 +64,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     }
 
     public static boolean has(int x, int y){
-        return Structs.inBounds(x, y, world.width(), world.height()) && map.containsKey(x + y * world.width());
+        if(!Structs.inBounds(x, y, world.width(), world.height()) || !map.containsKey(x + y * world.width())){
+            return false;
+        }
+        Fire fire = map.get(x + y * world.width());
+        return fire.isAdded() && fire.fin() < 1f && fire.tile != null && fire.tile.x == x && fire.tile.y == y;
     }
 
     /**

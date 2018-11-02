@@ -225,8 +225,8 @@ public class Sectors{
 
     /**Generates a mission for a sector. This is deterministic and the same for each client.*/
     private void generate(Sector sector){
-        //25% chance for no missions, empty sector
-        if(Mathf.randomSeed(sector.getSeed() + 213) < 0.4){
+        //empty sector
+        if(Mathf.randomSeed(sector.getSeed() + 213) < 0.2){
             return;
         }
 

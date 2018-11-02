@@ -17,7 +17,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public abstract class Mission{
     private String extraMessage;
-    private boolean showComplete =true;
+    private boolean showComplete = true;
 
     public abstract boolean isComplete();
 
@@ -27,6 +27,10 @@ public abstract class Mission{
     /**Returns the info string displayed in the sector dialog (menu)*/
     public String menuDisplayString(){
         return displayString();
+    }
+
+    public String getIcon(){
+        return "icon-mission-defense";
     }
 
     public GameMode getMode(){
