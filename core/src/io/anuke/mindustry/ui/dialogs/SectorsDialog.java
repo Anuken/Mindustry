@@ -1,26 +1,22 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.scene.utils.ScissorStack;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
 public class SectorsDialog extends FloatingDialog{
-    private Rectangle clip = new Rectangle();
     private Sector selected;
 
     public SectorsDialog(){
@@ -121,9 +117,6 @@ public class SectorsDialog extends FloatingDialog{
 
             int shownSectorsX = (int)(width/padSectorSize);
             int shownSectorsY = (int)(height/padSectorSize);
-            clip.setSize(width, height).setCenter(x + width/2f, y + height/2f);
-            Graphics.flush();
-            boolean clipped = ScissorStack.pushScissors(clip);
 
             int offsetX = (int)(panX / padSectorSize);
             int offsetY = (int)(panY / padSectorSize);
@@ -169,14 +162,7 @@ public class SectorsDialog extends FloatingDialog{
                 }
             }
 
-
-            Draw.color(Color.GRAY);
-            Lines.stroke(Unit.dp.scl(4f));
-            //Lines.crect(x + width/2f, y + height/2f, width, height);
-
             Draw.reset();
-            Graphics.flush();
-            if(clipped) ScissorStack.popScissors();
 
             clicked = false;
         }
