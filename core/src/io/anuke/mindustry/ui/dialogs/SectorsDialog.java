@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
@@ -12,6 +13,7 @@ import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
+import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
@@ -37,31 +39,7 @@ public class SectorsDialog extends FloatingDialog{
         buttons().bottom().margin(15);
 
         addCloseButton();
-
-        /*
-        content().label(() -> Bundles.format("text.sector", selected == null ? Bundles.get("text.none") :
-        (selected.x + ", " + selected.y + (!selected.complete && selected.saveID != -1 ? " " + Bundles.get("text.sector.locked") : ""))
-                + (selected.saveID == -1 ? " " + Bundles.get("text.sector.unexplored") :
-                    (selected.hasSave() ? "  [accent]/[white] " + Bundles.format("text.sector.time", selected.getSave().getPlayTime()) : ""))));
-        content().row();
-        content().label(() -> Bundles.format("text.mission.main", selected == null || selected.completedMissions >= selected.missions.size
-        ? Bundles.get("text.none") : selected.getDominantMission().menuDisplayString()));
-        content().row();*/
         content().add(new SectorView()).grow();
-        //content().row();
-        /*
-
-        buttons().addImageTextButton("$text.sector.abandon", "icon-cancel",  16*2, () ->
-                ui.showConfirm("$text.confirm", "$text.sector.abandon.confirm", () -> world.sectors.abandonSector(selected)))
-        .size(200f, 64f).disabled(b -> selected == null || !selected.hasSave());
-
-        buttons().row();
-
-        buttons().addImageTextButton("$text.sector.deploy", "icon-play",  10*3, () -> {
-            hide();
-            ui.loadLogic(() -> world.sectors.playSector(selected));
-        }).disabled(b -> selected == null)
-            .fillX().height(64f).colspan(2).update(t -> t.setText(selected != null && selected.hasSave() ? "$text.sector.resume" : "$text.sector.deploy"));*/
     }
 
     void selectSector(Sector sector){
@@ -128,25 +106,31 @@ public class SectorsDialog extends FloatingDialog{
                     int sectorX = offsetX + x;
                     int sectorY = offsetY + y;
 
-                    float drawX = x + width/2f+ sectorX * padSectorSize - offsetX * padSectorSize - panX % padSectorSize + padSectorSize/2f;
-                    float drawY = y + height/2f + sectorY * padSectorSize - offsetY * padSectorSize - panY % padSectorSize + padSectorSize/2f;
+                    float drawX = x + width/2f+ sectorX * (padSectorSize-2) - offsetX * padSectorSize - panX % padSectorSize + padSectorSize/2f;
+                    float drawY = y + height/2f + sectorY * (padSectorSize-2) - offsetY * padSectorSize - panY % padSectorSize + padSectorSize/2f;
 
                     Sector sector = world.sectors.get(sectorX, sectorY);
 
                     if(sector == null || sector.texture == null){
+
                         Draw.reset();
-                        Draw.rect("empty-sector", drawX, drawY, sectorSize + 1f, sectorSize + 1f);
+
+                        int i = 0;
+                        for(GridPoint2 point : Geometry.d4){
+                            Sector other = world.sectors.get(sectorX + point.x, sectorY + point.y);
+                            if(other != null){
+                                Draw.rect("sector-edge", drawX, drawY, padSectorSize, padSectorSize, i*90);
+                            }
+
+                            i ++;
+                        }
                         continue;
                     }
 
                     Draw.colorl(!sector.complete ? 0.3f : 1f);
-                    Draw.rect(sector.texture, drawX, drawY, sectorSize + 1f, sectorSize + 1f);
+                    Draw.rect(sector.texture, drawX, drawY, sectorSize, sectorSize);
 
                     if(sector.missions.size == 0) continue;
-
-                    Draw.color(Color.BLACK);
-                    Draw.alpha(0.75f);
-                    Draw.rect("icon-mission-background", drawX, drawY, Unit.dp.scl(18f * 5), Unit.dp.scl(18f * 5));
 
                     String region = sector.getDominantMission().getIcon();
 
@@ -154,27 +138,35 @@ public class SectorsDialog extends FloatingDialog{
                         region = "icon-mission-done";
                     }
 
+                    Color iconColor;
+                    Color missionColor = Color.BLACK;
+
                     if(sector == selected){
-                        Draw.color(Color.WHITE);
+                        iconColor = Palette.accent;
                     }else if(Mathf.inRect(mouse.x, mouse.y, drawX - padSectorSize / 2f, drawY - padSectorSize / 2f,
                         drawX + padSectorSize / 2f, drawY + padSectorSize / 2f)){
                         if(clicked){
                             selectSector(sector);
                         }
-                        Draw.color(Palette.remove);
+                        iconColor = Color.WHITE;
                     }else if(sector.complete){
-                        Draw.color(Palette.accent);
+                        iconColor = missionColor = Color.CLEAR;
                     }else{
-                        Draw.color(Color.LIGHT_GRAY);
+                        iconColor = Color.GRAY;
                     }
+
+                    Draw.color(missionColor);
+                    Draw.alpha(0.75f * missionColor.a);
+                    Draw.rect("icon-mission-background", drawX, drawY, Unit.dp.scl(18f * 5), Unit.dp.scl(18f * 5));
 
                     float size = Unit.dp.scl(10f * 5);
 
+                    Draw.color(iconColor);
                     Shaders.outline.color = Color.BLACK;
                     Shaders.outline.region = Draw.region(region);
-                    Graphics.shader(Shaders.outline);
+                    //Graphics.shader(Shaders.outline);
                     Draw.rect(region, drawX, drawY, size, size);
-                    Graphics.shader();
+                    //Graphics.shader();
                 }
             }
 

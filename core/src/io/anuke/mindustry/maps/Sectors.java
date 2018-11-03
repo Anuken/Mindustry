@@ -30,7 +30,7 @@ import io.anuke.ucore.util.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class Sectors{
-    private static final int sectorImageSize = 32;
+    public static final int sectorImageSize = 32;
 
     private final GridMap<Sector> grid = new GridMap<>();
     private final SectorPresets presets = new SectorPresets();
