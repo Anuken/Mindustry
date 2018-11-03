@@ -18,7 +18,6 @@ import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
@@ -252,10 +251,7 @@ public class JoinDialog extends FloatingDialog{
 
         local.clear();
         local.background((Drawable)null);
-        local.table("button", t -> {
-            t.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + Strings.animated(4, 10f, ".")).pad(10f);
-        }).growX();
-        Log.info("begin of discover");
+        local.table("button", t -> t.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + Strings.animated(4, 10f, ".")).pad(10f)).growX();
         Net.discoverServers(this::addLocalHost, this::finishLocalHosts);
     }
 

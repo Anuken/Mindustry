@@ -1,6 +1,5 @@
 package io.anuke.kryonet;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.dosse.upnp.UPnP;
 import com.esotericsoftware.kryonet.Connection;
@@ -27,6 +26,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedSelectorException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+
+import static io.anuke.mindustry.Vars.threads;
 
 public class KryoServer implements ServerProvider {
     final boolean tcpOnly = System.getProperty("java.version") == null;
@@ -65,7 +66,7 @@ public class KryoServer implements ServerProvider {
                 Log.info("&bRecieved connection: {0} / {1}. Kryonet ID: {2}", c.id, c.addressTCP, connection.getID());
 
                 connections.add(kn);
-                Gdx.app.postRunnable(() -> Net.handleServerReceived(kn.id, c));
+                threads.runDelay(() -> Net.handleServerReceived(kn.id, c));
             }
 
             @Override
@@ -79,7 +80,7 @@ public class KryoServer implements ServerProvider {
 
                 Log.info("&bLost connection: {0}", k.id);
 
-                Gdx.app.postRunnable(() -> {
+                threads.runDelay(() -> {
                     Net.handleServerReceived(k.id, c);
                     connections.remove(k);
                 });
@@ -90,7 +91,7 @@ public class KryoServer implements ServerProvider {
                 KryoConnection k = getByKryoID(connection.getID());
                 if(object instanceof FrameworkMessage || k == null) return;
 
-                Gdx.app.postRunnable(() -> {
+                threads.runDelay(() -> {
                     try{
                         Net.handleServerReceived(k.id, object);
                     }catch (Exception e){
