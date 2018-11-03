@@ -26,11 +26,11 @@ import java.nio.channels.ClosedSelectorException;
 import static io.anuke.mindustry.Vars.*;
 
 public class KryoClient implements ClientProvider{
-    Client client;
+    final Client client;
+    final Array<InetAddress> foundAddresses = new Array<>();
+    final ClientDiscoveryHandler handler;
+    final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
     Consumer<Host> lastCallback;
-    Array<InetAddress> foundAddresses = new Array<>();
-    ClientDiscoveryHandler handler;
-    LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
 
     public KryoClient(){
         KryoCore.init();
@@ -178,24 +178,26 @@ public class KryoClient implements ClientProvider{
     @Override
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> invalid){
         runAsync(() -> {
-            try {
-                DatagramSocket socket = new DatagramSocket();
-                socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
+            synchronized(handler){
+                try{
+                    DatagramSocket socket = new DatagramSocket();
+                    socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
 
-                socket.setSoTimeout(2000);
+                    socket.setSoTimeout(2000);
 
-                lastCallback = valid;
+                    lastCallback = valid;
 
-                DatagramPacket packet = handler.onRequestNewDatagramPacket();
+                    DatagramPacket packet = handler.onRequestNewDatagramPacket();
 
-                socket.receive(packet);
+                    socket.receive(packet);
 
-                ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-                Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
+                    ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
+                    Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
 
-                Gdx.app.postRunnable(() -> valid.accept(host));
-            } catch (Exception e) {
-                Gdx.app.postRunnable(() -> invalid.accept(e));
+                    Gdx.app.postRunnable(() -> valid.accept(host));
+                }catch(Exception e){
+                    Gdx.app.postRunnable(() -> invalid.accept(e));
+                }
             }
         });
     }
@@ -203,16 +205,18 @@ public class KryoClient implements ClientProvider{
     @Override
     public void discover(Consumer<Host> callback, Runnable done){
         runAsync(() -> {
-            foundAddresses.clear();
-            lastCallback = callback;
-            client.discoverHosts(port, 3000);
-            Gdx.app.postRunnable(done);
+            synchronized(handler){
+                foundAddresses.clear();
+                lastCallback = callback;
+                client.discoverHosts(port, 3000);
+                Gdx.app.postRunnable(done);
+            }
         });
     }
 
     @Override
     public void dispose(){
-        try {
+        try{
             client.dispose();
         }catch (IOException e){
             throw new RuntimeException(e);
