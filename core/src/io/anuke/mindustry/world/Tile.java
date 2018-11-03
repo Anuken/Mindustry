@@ -278,7 +278,7 @@ public class Tile implements PosTrait, TargetTrait{
             for(int dx = 0; dx < block.size; dx++){
                 for(int dy = 0; dy < block.size; dy++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    tmpArray.add(other);
+                    if(other != null) tmpArray.add(other);
                 }
             }
         }else{
@@ -299,7 +299,7 @@ public class Tile implements PosTrait, TargetTrait{
             for(int dx = 0; dx < block.size; dx++){
                 for(int dy = 0; dy < block.size; dy++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    tmpArray.add(other);
+                    if(other != null) tmpArray.add(other);
                 }
             }
         }else{
