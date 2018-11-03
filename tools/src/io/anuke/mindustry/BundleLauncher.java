@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.badlogic.gdx.utils.PropertiesUtils;
+import io.anuke.ucore.function.BiFunction;
 import io.anuke.ucore.util.Log;
 
 import java.io.File;
@@ -54,15 +55,26 @@ public class BundleLauncher {
                     }
                 }
 
+                BiFunction<String, String, String> processor = (key, value) -> (key + " = " + value).replace("\\", "\\\\").replace("\n", "\\n") + "\n";
+
                 Path output = child.resolveSibling("output/" + child.getFileName());
 
                 Log.info("&lc{0} keys added.", added);
                 Log.info("Writing bundle to {0}", output);
                 StringBuilder result = new StringBuilder();
-                for(ObjectMap.Entry<String, String> e : other.entries()){
-                    result.append((e.key + " = " + e.value).replace("\\", "\\\\").replace("\n", "\\n"));
-                    result.append("\n");
+
+                //add everything ordered
+                for(String key : base.orderedKeys()){
+                    result.append(processor.get(key, other.get(key)));
+                    other.remove(key);
                 }
+
+                result.append("\n#Additional Entries\n\n");
+
+                for(ObjectMap.Entry<String, String> e : other.entries()){
+                    result.append(processor.get(e.key, e.value));
+                }
+
                 Files.write(child, result.toString().getBytes(StandardCharsets.UTF_8));
 
             }catch (IOException e){
