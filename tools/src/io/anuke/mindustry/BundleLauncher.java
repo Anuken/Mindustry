@@ -1,7 +1,6 @@
 package io.anuke.mindustry;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.badlogic.gdx.utils.PropertiesUtils;
 import io.anuke.ucore.function.BiFunction;
@@ -35,7 +34,7 @@ public class BundleLauncher {
                 removals.clear();
 
                 for(String key : other.orderedKeys()){
-                    if(!base.containsKey(key) && !key.contains(".description")){
+                    if(!base.containsKey(key)){
                         removals.add(key);
                         Log.info("&lr- Removing unused key '{0}'...", key);
                     }
@@ -67,12 +66,6 @@ public class BundleLauncher {
                 for(String key : base.orderedKeys()){
                     result.append(processor.get(key, other.get(key)));
                     other.remove(key);
-                }
-
-                result.append("\n#Additional Entries\n\n");
-
-                for(ObjectMap.Entry<String, String> e : other.entries()){
-                    result.append(processor.get(e.key, e.value));
                 }
 
                 Files.write(child, result.toString().getBytes(StandardCharsets.UTF_8));
