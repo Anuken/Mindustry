@@ -147,9 +147,14 @@ public class MapsDialog extends FloatingDialog{
         table.row();
 
         table.addImageTextButton("$text.editor.openin", "icon-load-map", "clear", 16 * 2, () -> {
-            Vars.ui.editor.beginEditMap(map.stream.get());
-            dialog.hide();
-            hide();
+            try{
+                Vars.ui.editor.beginEditMap(map.stream.get());
+                dialog.hide();
+                hide();
+            }catch(Exception e){
+                e.printStackTrace();
+                ui.showError("$text.error.mapnotfound");
+            }
         }).fillX().height(50f).marginLeft(6);
 
         table.addImageTextButton("$text.delete", "icon-trash-16", "clear", 16 * 2, () -> {
