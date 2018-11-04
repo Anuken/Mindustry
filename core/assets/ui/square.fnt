@@ -5,7 +5,7 @@ page id=1 file="square2.png"
 page id=2 file="square3.png"
 chars count=11450
 char id=10      x=0    y=0    width=0    height=0    xoffset=-1   yoffset=0    xadvance=0    page=0    chnl=0 
-char id=32      x=0    y=0    width=0    height=0    xoffset=-1   yoffset=0    xadvance=16   page=0    chnl=0 
+char id=32      x=0    y=0    width=0    height=0    xoffset=-1   yoffset=0    xadvance=10   page=0    chnl=0
 char id=33      x=2039 y=147  width=7    height=23   xoffset=-1   yoffset=4    xadvance=8    page=0    chnl=0 
 char id=34      x=147  y=2032 width=15   height=11   xoffset=-1   yoffset=4    xadvance=16   page=0    chnl=0 
 char id=36      x=7    y=0    width=23   height=31   xoffset=-1   yoffset=0    xadvance=24   page=0    chnl=0 
