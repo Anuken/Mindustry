@@ -8,9 +8,15 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.OS;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class CrashHandler{
 
@@ -48,6 +54,18 @@ public class CrashHandler{
         ex(() -> value.addChild("players", new JsonValue(Vars.playerGroup.size())));
         ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name"))));
         ex(() -> value.addChild("trace", new JsonValue(parseException(e))));
+
+        try{
+            Path path = Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes",
+                "crash-report-" + DateTimeFormatter.ofPattern("MM-dd-yyyy-HH:mm:ss").format(LocalDateTime.now()) + ".txt");
+            Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
+            Files.write(path, parseException(e).getBytes());
+
+            Log.info("Saved crash report at {0}", path.toAbsolutePath().toString());
+        }catch(Throwable t){
+            Log.err("Failure saving crash report: ");
+            t.printStackTrace();
+        }
 
         Log.info("&lcSending crash report.");
         //post to crash report URL
