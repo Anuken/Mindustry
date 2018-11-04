@@ -495,6 +495,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             spawner = -1;
         }
 
+        avoidOthers(1f);
+
         Tile tile = world.tileWorld(x, y);
 
         boostHeat = Mathf.lerpDelta(boostHeat, (tile != null && tile.solid()) || (isBoosting && ((!movement.isZero() && moved) || !isLocal)) ? 1f : 0f, 0.08f);

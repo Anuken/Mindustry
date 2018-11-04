@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.traits.*;
@@ -38,6 +39,9 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public static final float velocityPercision = 8f;
     /**Maximum absolute value of a velocity vector component.*/
     public static final float maxAbsVelocity = 127f / velocityPercision;
+
+    private static final Rectangle queryRect = new Rectangle();
+    private static final Vector2 moveVector = new Vector2();
 
     public final UnitInventory inventory = new UnitInventory(this);
     public float rotation;
@@ -180,6 +184,18 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public boolean hasEffect(StatusEffect effect){
         return status.hasEffect(effect);
+    }
+
+    public void avoidOthers(float scaling){
+        getHitbox(queryRect);
+        queryRect.setSize(queryRect.getWidth() * scaling);
+
+        Units.getNearby(queryRect, t -> {
+            if(t == this || t.getCarrier() == this || getCarrier() == t || t.isFlying() != isFlying()) return;
+            float dst = distanceTo(t);
+            moveVector.set(x, y).sub(t.getX(), t.getY()).setLength(1f * (1f - (dst / queryRect.getWidth())));
+            applyImpulse(moveVector.x, moveVector.y);
+        });
     }
 
     public TileEntity getClosestCore(){
