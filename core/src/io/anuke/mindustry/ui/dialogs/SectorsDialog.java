@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
@@ -21,7 +20,6 @@ import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
@@ -79,7 +77,6 @@ public class SectorsDialog extends FloatingDialog{
     }
 
     void selectSector(Sector sector){
-        Log.info((int)' ');
         selected = sector;
 
         table.clear();
@@ -217,6 +214,8 @@ public class SectorsDialog extends FloatingDialog{
                             selectSector(sector);
                         }
                         selectColor = Color.WHITE;
+                    }else if(sector.hasSave()){
+                        iconColor = Palette.command;
                     }else{
                         iconColor = Color.GRAY;
                     }
@@ -235,11 +234,7 @@ public class SectorsDialog extends FloatingDialog{
                     float size = Unit.dp.scl(10f * 5);
 
                     Draw.color(iconColor);
-                    Shaders.outline.color = Color.BLACK;
-                    Shaders.outline.region = Draw.region(region);
-                    //Graphics.shader(Shaders.outline);
                     Draw.rect(region, drawX, drawY, size, size);
-                    //Graphics.shader();
                 }
             }
 
