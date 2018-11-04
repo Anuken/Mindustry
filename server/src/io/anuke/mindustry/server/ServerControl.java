@@ -306,6 +306,7 @@ public class ServerControl extends Module{
                 }
 
                 info("  &ly{0} FPS.", (int) (60f / Timers.delta()));
+                info("  &ly{0} MB used.", Gdx.app.getJavaHeap() / 1024 / 1024);
 
                 if(playerGroup.size() > 0){
                     info("  &lyPlayers: {0}", playerGroup.size());

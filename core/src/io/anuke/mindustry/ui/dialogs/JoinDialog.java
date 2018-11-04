@@ -177,8 +177,6 @@ public class JoinDialog extends FloatingDialog{
                 t.add("[lightgray]" + Bundles.format("text.save.map", host.mapname) + " / " + Bundles.format("text.save.wave", host.wave)).left();
             }).expand().left().bottom().padLeft(12f).padBottom(8);
 
-            //server.content.add(versionString).top().expandY().top().expandX();
-
         }, e -> {
             server.content.clear();
             server.content.add("$text.host.invalid");
@@ -321,7 +319,6 @@ public class JoinDialog extends FloatingDialog{
         public String ip;
         public int port;
 
-        transient Host host;
         transient Table content;
 
         void setIP(String ip){

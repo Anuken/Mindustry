@@ -17,7 +17,7 @@ public class NumberValue implements StatValue{
         this.unit = unit;
         this.value = value;
 
-        if(unit.localized().contains("???")){
+        if(unit != StatUnit.none && unit.localized().contains("???")){
             throw new RuntimeException("No bundle definition found for unit: '" + unit + "'");
         }
     }

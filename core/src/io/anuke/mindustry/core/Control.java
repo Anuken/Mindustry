@@ -379,17 +379,12 @@ public class Control extends Module{
                 state.set(state.is(State.playing) ? State.paused : State.playing);
             }
 
-            if(Inputs.keyTap("menu")){
-                if(state.is(State.paused)){
-                    ui.paused.hide();
-                    state.set(State.playing);
-                }else if(!ui.restart.isShown()){
-                    if(ui.chatfrag.chatOpen()){
-                        ui.chatfrag.hide();
-                    }else{
-                        ui.paused.show();
-                        state.set(State.paused);
-                    }
+            if(Inputs.keyTap("menu") && !ui.restart.isShown()){
+                if(ui.chatfrag.chatOpen()){
+                    ui.chatfrag.hide();
+                }else if(!ui.paused.isShown() && !ui.hasDialog()){
+                    ui.paused.show();
+                    state.set(State.paused);
                 }
             }
 

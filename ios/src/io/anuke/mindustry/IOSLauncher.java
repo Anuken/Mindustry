@@ -19,11 +19,7 @@ import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.uikit.*;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Date;
 
 import static io.anuke.mindustry.Vars.*;
 import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
@@ -43,17 +39,6 @@ public class IOSLauncher extends IOSApplication.Delegate {
         }
 
         Platform.instance = new Platform() {
-            DateFormat format = SimpleDateFormat.getDateTimeInstance();
-
-            @Override
-            public String format(Date date) {
-                return format.format(date);
-            }
-
-            @Override
-            public String format(int number) {
-                return NumberFormat.getIntegerInstance().format(number);
-            }
 
             @Override
             public void addDialog(TextField field) {

@@ -20,7 +20,6 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.entities.EntityDraw;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.scene.utils.ScissorStack;
 
 import java.nio.ByteBuffer;
 
@@ -140,9 +139,7 @@ public class FogRenderer implements Disposable{
 
         buffer.begin();
 
-        boolean pop = ScissorStack.pushScissors(rect.set((padding-shadowPadding), (padding-shadowPadding),
-                    (world.width() + shadowPadding*2) ,
-                    (world.height() + shadowPadding*2)));
+        Graphics.beginClip((padding-shadowPadding), (padding-shadowPadding), (world.width() + shadowPadding*2), (world.height() + shadowPadding*2));
 
         Graphics.begin();
         EntityDraw.setClip(false);
@@ -172,7 +169,7 @@ public class FogRenderer implements Disposable{
         Graphics.end();
         buffer.end();
 
-        if(pop) ScissorStack.popScissors();
+        Graphics.endClip();
 
         region.setTexture(buffer.getColorBufferTexture());
         region.setRegion(u, v2, u2, v);

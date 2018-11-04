@@ -6,17 +6,11 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.TextField;
 
-import java.util.Date;
 import java.util.Random;
 
 public abstract class Platform {
     /**Each separate game platform should set this instance to their own implementation.*/
     public static Platform instance = new Platform() {};
-
-    /**Format the date using the default date formatter.*/
-    public String format(Date date){return "invalid";}
-    /**Format a number by adding in commas or periods where needed.*/
-    public String format(int number){return "invalid";}
 
     /**Add a text input dialog that should show up after the field is tapped.*/
     public void addDialog(TextField field){

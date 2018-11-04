@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import com.badlogic.gdx.Input.Keys;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.scene.ui.layout.Table;
@@ -8,16 +9,22 @@ import io.anuke.ucore.util.Bundles;
 import static io.anuke.mindustry.Vars.*;
 
 public class PausedDialog extends FloatingDialog{
-    public boolean wasPaused = false;
     private SaveDialog save = new SaveDialog();
     private LoadDialog load = new LoadDialog();
     private Table missionTable;
 
     public PausedDialog(){
         super("$text.menu");
+        shouldPause = true;
         setup();
 
         shown(this::rebuild);
+
+        keyDown(key -> {
+            if(key == Keys.ESCAPE || key == Keys.BACK) {
+                hide();
+            }
+        });
     }
 
     void rebuild(){
@@ -40,11 +47,6 @@ public class PausedDialog extends FloatingDialog{
             }
         });
 
-        shown(() -> {
-            wasPaused = state.is(State.paused);
-            if(!Net.active()) state.set(State.paused);
-        });
-
         content().table(t -> missionTable = t).colspan(mobile ? 3 : 1);
         content().row();
 
@@ -53,8 +55,6 @@ public class PausedDialog extends FloatingDialog{
 
             content().addButton("$text.back", () -> {
                 hide();
-                if((!wasPaused || Net.active()) && !state.is(State.menu))
-                    state.set(State.playing);
             });
 
             content().row();
@@ -86,8 +86,6 @@ public class PausedDialog extends FloatingDialog{
 
             content().addRowImageTextButton("$text.back", "icon-play-2", isize, () -> {
                 hide();
-                if(!wasPaused && !state.is(State.menu))
-                    state.set(State.playing);
             });
             content().addRowImageTextButton("$text.settings", "icon-tools", isize, ui.settings::show);
             content().addRowImageTextButton("$text.save", "icon-save", isize, save::show).disabled(b -> world.getSector() != null);

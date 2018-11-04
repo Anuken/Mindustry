@@ -41,24 +41,8 @@ public class Palette{
     portal = Color.valueOf("6344d7"),
     portalDark = Color.valueOf("3f3dac"),
 
-    powerLaserFrom = Color.valueOf("e3e3e3"),
-    powerLaserTo = Color.valueOf("ffe7a8"),
-
     heal = Color.valueOf("98ffa9"),
-
-    description = Color.WHITE,
-    turretinfo = Color.ORANGE,
-    iteminfo = Color.LIGHT_GRAY,
-    powerinfo = Color.YELLOW,
-    liquidinfo = Color.ROYAL,
-    craftinfo = Color.LIGHT_GRAY,
-
-    missingitems = Color.SCARLET,
-    health = Color.YELLOW,
-    ammo = Color.valueOf("32cf6d"),
-    healthstats = Color.SCARLET,
     bar = Color.SLATE,
-    interact = Color.ORANGE,
     accent = Color.valueOf("f4ba6e"),
     accentBack = Color.valueOf("d58c4b"),
     place = Color.valueOf("6335f8"),
@@ -81,6 +65,5 @@ public class Palette{
     redDust = Color.valueOf("ffa480"),
     redderDust = Color.valueOf("ff7b69"),
 
-    plasticSmoke = Color.valueOf("f1e479"),
-    plasticBurn = Color.valueOf("e9ead3");
+    plasticSmoke = Color.valueOf("f1e479");
 }

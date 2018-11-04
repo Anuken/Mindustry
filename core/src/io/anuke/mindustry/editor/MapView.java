@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Bresenham2;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.graphics.Palette;
@@ -270,8 +269,7 @@ public class MapView extends Element implements GestureListener{
 
         image.setImageSize(editor.getMap().width(), editor.getMap().height());
 
-        batch.flush();
-        boolean pop = ScissorStack.pushScissors(rect.set(x, y, width, height));
+        Graphics.beginClip(x, y, width, height);
 
         Draw.color(Color.LIGHT_GRAY);
         Lines.stroke(-2f);
@@ -327,9 +325,7 @@ public class MapView extends Element implements GestureListener{
             }
         }
 
-        batch.flush();
-
-        if(pop) ScissorStack.popScissors();
+        Graphics.endClip();
 
         Draw.color(Palette.accent);
         Lines.stroke(Unit.dp.scl(3f));

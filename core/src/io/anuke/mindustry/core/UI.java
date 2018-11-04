@@ -87,22 +87,7 @@ public class UI extends SceneModule{
         Dialog.closePadR = -1;
         Dialog.closePadT = 5;
 
-        Colors.put("description", Palette.description);
-        Colors.put("turretinfo", Palette.turretinfo);
-        Colors.put("iteminfo", Palette.iteminfo);
-        Colors.put("powerinfo", Palette.powerinfo);
-        Colors.put("liquidinfo", Palette.liquidinfo);
-        Colors.put("craftinfo", Palette.craftinfo);
-        Colors.put("missingitems", Palette.missingitems);
-        Colors.put("health", Palette.health);
-        Colors.put("healthstats", Palette.healthstats);
-        Colors.put("interact", Palette.interact);
         Colors.put("accent", Palette.accent);
-        Colors.put("place", Palette.place);
-        Colors.put("remove", Palette.remove);
-        Colors.put("placeRotate", Palette.placeRotate);
-        Colors.put("range", Palette.range);
-        Colors.put("power", Palette.power);
     }
 
     @Override
