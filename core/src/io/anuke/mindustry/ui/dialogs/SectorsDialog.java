@@ -104,7 +104,11 @@ public class SectorsDialog extends FloatingDialog{
 
             if(selected.hasSave()){
                 t.addImageTextButton("$text.sector.abandon", "icon-cancel", 16 * 2, () ->
-                    Vars.ui.showConfirm("$text.confirm", "$text.sector.abandon.confirm", () -> world.sectors.abandonSector(selected))
+                    Vars.ui.showConfirm("$text.confirm", "$text.sector.abandon.confirm", () -> {
+                        world.sectors.abandonSector(selected);
+                        // Simulate a sector selection so the buttons get updated.
+                        selectSector(selected);
+                        })
                 ).width(sectorSize).height(60f);
             }
         }).pad(-5).growX().padTop(0);
