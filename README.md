@@ -1,8 +1,9 @@
 BIL 481 Project Members
 
-Yasar Can Kakdas - ykakdas@etu.edu.tr
-Huseyin Batuhan Ulucay - hulucay@etu.edu.tr
-Onur Demirezen - odemirezen@etu.edu.tr
+Yasar Can Kakdas - ykakdas@etu.edu.tr  
+Huseyin Batuhan Ulucay - hulucay@etu.edu.tr  
+Onur Demirezen - odemirezen@etu.edu.tr  
+Mehmet Arif Sahin - mehmetarifsahin@etu.edu.tr
 
 
 ![Imgur](https://i.imgur.com/w4N0yhv.png)
