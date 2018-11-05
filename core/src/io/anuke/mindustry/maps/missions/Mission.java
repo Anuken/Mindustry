@@ -100,10 +100,4 @@ public abstract class Mission{
     }
 
     public void generate(Generation gen){}
-
-    public void generateCoreAt(Generation gen, int coreX, int coreY, Team team){
-        gen.tiles[coreX][coreY].setBlock(StorageBlocks.core);
-        gen.tiles[coreX][coreY].setTeam(team);
-        state.teams.get(team).cores.add(gen.tiles[coreX][coreY]);
-    }
 }
