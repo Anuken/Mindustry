@@ -18,13 +18,23 @@ import static io.anuke.mindustry.Vars.world;
 public class WaveMission extends MissionWithStartingCore{
     private final int target;
 
+    /**
+     * Creates a wave survival mission with the player core being in the center of the map.
+     * @param target The number of waves to be survived.
+     */
     public WaveMission(int target){
         super();
         this.target = target;
     }
 
-    public WaveMission(int target, StartingCorePositionRetriever startingCorePositionRetriever){
-        super(startingCorePositionRetriever);
+    /**
+     * Creates a wave survival with the player core being at a custom location.
+     * @param target The number of waves to be survived.
+     * @param xCorePos The X coordinate of the custom core position.
+     * @param yCorePos The Y coordinate of the custom core position.
+     */
+    public WaveMission(int target, int xCorePos, int yCorePos){
+        super(xCorePos, yCorePos);
         this.target = target;
     }
 

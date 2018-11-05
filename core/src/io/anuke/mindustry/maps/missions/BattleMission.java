@@ -13,8 +13,20 @@ import static io.anuke.mindustry.Vars.*;
 public class BattleMission extends MissionWithStartingCore{
     final int spacing = 30;
 
+    /**
+     * Creates a battle mission with the player core being in the center of the map.
+     */
     public BattleMission(){
-        super((gen, team) -> gen.tiles[50][50]);
+        super();
+    }
+
+    /**
+     * Creates a wave survival with the player core being at a custom location.
+     * @param xCorePos The X coordinate of the custom core position.
+     * @param yCorePos The Y coordinate of the custom core position.
+     */
+    public BattleMission(int xCorePos, int yCorePos){
+        super(xCorePos, yCorePos);
     }
 
     @Override

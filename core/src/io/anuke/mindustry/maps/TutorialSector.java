@@ -31,7 +31,7 @@ public class TutorialSector{
             //new BlockMission(ProductionBlocks.mechanicalDrill).setMessage("$tutorial.drillturret"),
 
             // Create a wave mission which spawns the core at 60, 60 rather than in the center of the map
-            new WaveMission(2, (gen, team) -> gen.tiles[60][60]).setMessage("$tutorial.waves"),
+            new WaveMission(2, 60, 60).setMessage("$tutorial.waves"),
 
             new ItemMission(Items.lead, 150).setMessage("$tutorial.lead"),
             new ItemMission(Items.copper, 250).setMessage("$tutorial.morecopper"),

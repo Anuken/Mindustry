@@ -1,5 +1,6 @@
 package io.anuke.mindustry.maps.missions;
 
+import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.Generation;
@@ -9,32 +10,26 @@ import static io.anuke.mindustry.Vars.state;
 
 public abstract class MissionWithStartingCore extends Mission{
 
-    /**
-     * Retrieves a tile for the starting core based on the generation parameters.
-     */
-    @FunctionalInterface
-    public interface StartingCorePositionRetriever{
-        Tile getCoreTile(Generation gen, Team team);
-    }
 
     /**
-     * Stores a function which calculates the position of the starting core.
+     * Stores a custom starting location for the core, or null if the default calculation (map center) shall be used
      */
-    private final StartingCorePositionRetriever startingCorePositionRetriever;
+    private final GridPoint2 customStartingPoint;
 
     /**
      * Default constructor. Missions created this way will have a player starting core in the center of the map.
      */
     MissionWithStartingCore(){
-        this((gen, team) -> gen.tiles[gen.width/2][gen.height/2]);
+        this.customStartingPoint = null;
     }
 
     /**
      * Creates a mission with a core on a non-default location.
-     * @param startingCorePositionRetriever
+     * @param xCorePos The x coordinate of the custom core position.
+     * @param yCorePos The y coordinate of the custom core position.
      */
-    MissionWithStartingCore(StartingCorePositionRetriever startingCorePositionRetriever){
-        this.startingCorePositionRetriever = startingCorePositionRetriever;
+    MissionWithStartingCore(int xCorePos, int yCorePos){
+        this.customStartingPoint = new GridPoint2(xCorePos, yCorePos);
     }
 
     /**
@@ -43,7 +38,17 @@ public abstract class MissionWithStartingCore extends Mission{
      * @param team The team to generate the core for.
      */
     public void generateCore(Generation gen, Team team){
-        Tile startingCoreTile = startingCorePositionRetriever.getCoreTile(gen, team);
+        int xPos, yPos;
+
+        if(this.customStartingPoint == null){
+            xPos = gen.width/2;
+            yPos = gen.height/2;
+        }else{
+            xPos = this.customStartingPoint.x;
+            yPos = this.customStartingPoint.y;
+        }
+
+        Tile startingCoreTile = gen.tiles[xPos][yPos];
         startingCoreTile.setBlock(StorageBlocks.core);
         startingCoreTile.setTeam(team);
         state.teams.get(team).cores.add(startingCoreTile);
