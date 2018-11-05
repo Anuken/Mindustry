@@ -15,12 +15,19 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.waveTeam;
 import static io.anuke.mindustry.Vars.world;
 
-public class WaveMission extends Mission{
+public class WaveMission extends MissionWithStartingCore{
     private final int target;
 
     public WaveMission(int target){
+        super();
         this.target = target;
     }
+
+    public WaveMission(int target, StartingCorePositionRetriever startingCorePositionRetriever){
+        super(startingCorePositionRetriever);
+        this.target = target;
+    }
+
 
     @Override
     public Array<SpawnGroup> getWaves(Sector sector){
@@ -29,8 +36,7 @@ public class WaveMission extends Mission{
 
     @Override
     public void generate(Generation gen){
-        int coreX = gen.width/2, coreY = gen.height/2;
-        generateCoreAt(gen, coreX, coreY, Team.blue);
+        generateCore(gen, Team.blue);
     }
 
     @Override
