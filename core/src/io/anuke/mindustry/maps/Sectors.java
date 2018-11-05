@@ -230,6 +230,8 @@ public class Sectors{
             return;
         }
 
+        //TODO check for core on impassable block.
+
         //50% chance to get a wave mission
         if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5){
             //recipe mission (maybe)

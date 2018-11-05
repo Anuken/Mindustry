@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.maps.Sector;
-import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.core.Core;
@@ -20,23 +19,18 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.util.Structs;
-import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Structs;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.mapPadding;
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 public class FloorRenderer{
     private final static int chunksize = 64;
 
-    private int gutter;
-    private Tile gutterTile;
-    private Tile gutterNearTile = new Tile(0, 0);
     private Chunk[][] cache;
     private CacheBatch cbatch;
     private IntSet drawnLayerSet = new IntSet();
@@ -44,26 +38,6 @@ public class FloorRenderer{
 
     public FloorRenderer(){
         Events.on(WorldLoadGraphicsEvent.class, event -> clearTiles());
-
-        gutterTile = new Tile(0, 0){
-            @Override
-            public Tile getNearby(int dx, int dy){
-                Sector sec = world.getSector();
-                GenResult result = world.generator.generateTile(sec.x, sec.y, x + dx, y + dy);
-                gutterNearTile.x = (short)(x + dx);
-                gutterNearTile.y = (short)(y + dy);
-                gutterNearTile.setElevation(result.elevation);
-                gutterNearTile.setFloor((Floor)result.floor);
-                return gutterNearTile;
-            }
-
-            @Override
-            public Tile getNearby(int rotation){
-                int dx = Geometry.d4[rotation].x;
-                int dy = Geometry.d4[rotation].y;
-                return getNearby(dx, dy);
-            }
-        };
     }
 
     public void drawFloor(){
@@ -188,18 +162,10 @@ public class FloorRenderer{
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
-                Tile tile = world.tile(tilex - gutter, tiley - gutter);
-                Floor floor = null;
+                Tile tile = world.tile(tilex, tiley);
 
-                if(tile == null && sector != null && tilex < world.width() + gutter*2 && tiley < world.height() + gutter*2){
-                    GenResult result = world.generator.generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
-                    floor = (Floor) result.floor;
-                }else if(tile != null){
-                    floor = tile.floor();
-                }
-
-                if(floor != null){
-                    used.add(floor.cacheLayer);
+                if(tile != null){
+                    used.add(tile.floor().cacheLayer);
                 }
             }
         }
@@ -218,22 +184,11 @@ public class FloorRenderer{
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
-                Tile tile = world.tile(tilex - gutter, tiley - gutter);
+                Tile tile = world.tile(tilex , tiley);
                 Floor floor;
 
                 if(tile == null){
-                    if(sector != null && tilex < world.width() + gutter*2 && tiley < world.height() + gutter*2){
-                        GenResult result = world.generator.generateTile(sector.x, sector.y, tilex - gutter, tiley - gutter);
-                        floor = (Floor)result.floor;
-                        gutterTile.setFloor(floor);
-                        gutterTile.x = (short)(tilex - gutter);
-                        gutterTile.y = (short)(tiley - gutter);
-                        gutterTile.setElevation(result.elevation);
-                        gutterTile.updateOcclusion();
-                        tile = gutterTile;
-                    }else{
-                        continue;
-                    }
+                    continue;
                 }else{
                     floor = tile.floor();
                 }
@@ -254,14 +209,8 @@ public class FloorRenderer{
     public void clearTiles(){
         if(cbatch != null) cbatch.dispose();
 
-        if(world.getSector() != null){
-            gutter = mapPadding;
-        }else{
-            gutter = 0;
-        }
-
-        int chunksx = Mathf.ceil((float) (world.width() + gutter) / chunksize),
-            chunksy = Mathf.ceil((float) (world.height() + gutter) / chunksize) ;
+        int chunksx = Mathf.ceil((float) (world.width()) / chunksize),
+            chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
         cache = new Chunk[chunksx][chunksy];
         cbatch = new CacheBatch(world.width() * world.height() * 4 * 4);
 
