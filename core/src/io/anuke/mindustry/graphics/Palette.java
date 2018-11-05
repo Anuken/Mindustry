@@ -43,8 +43,8 @@ public class Palette{
 
     heal = Color.valueOf("98ffa9"),
     bar = Color.SLATE,
-    accent = Color.valueOf("f4ba6e"),
-    accentBack = Color.valueOf("d58c4b"),
+    accent = Color.valueOf("ffd37f"),
+    accentBack = Color.valueOf("d4816b"),
     place = Color.valueOf("6335f8"),
     remove = Color.valueOf("e55454"),
     removeBack = Color.valueOf("a73e3e"),

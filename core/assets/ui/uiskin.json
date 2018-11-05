@@ -71,12 +71,12 @@ ImageButtonStyle: {
 ScrollPaneStyle: {
 	default: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
 	horizontal: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal},
-	volume: {background: button-map, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
+	volume: {background: button, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
 	clear: {vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
 	clear-black: {vScroll: scroll, vScrollKnob: scroll-knob-vertical-black}
 },
 WindowStyle: {
-	default: {titleFont: default-font, background: window, titleFontColor: accent },
+	default: {titleFont: default-font, titleFontColor: accent },
 	dialog: {stageBackground: dialogDim, titleFont: default-font, background: window-empty, titleFontColor: accent }
 },
 KeybindDialogStyle: {
