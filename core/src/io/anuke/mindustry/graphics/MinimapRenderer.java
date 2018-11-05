@@ -1,7 +1,6 @@
 package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -20,7 +19,6 @@ import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Pixmaps;
-import io.anuke.ucore.scene.utils.ScissorStack;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.ThreadArray;
 
@@ -34,8 +32,6 @@ public class MinimapRenderer implements Disposable{
     private Texture texture;
     private TextureRegion region;
     private Rectangle rect = new Rectangle();
-    private Rectangle clipRect = new Rectangle();
-    private Color tmpColor = new Color();
     private int zoom = 4;
 
     public MinimapRenderer(){
@@ -80,9 +76,7 @@ public class MinimapRenderer implements Disposable{
 
         synchronized(units){
             rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
-            Graphics.flush();
-
-            boolean clip = ScissorStack.pushScissors(clipRect.set(x, y, w, h));
+            Graphics.beginClip(x, y, w, h);
 
             for(Unit unit : units){
                 float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
@@ -92,8 +86,7 @@ public class MinimapRenderer implements Disposable{
 
             Draw.color();
 
-            Graphics.flush();
-            if(clip) ScissorStack.popScissors();
+            Graphics.endClip();
         }
     }
 

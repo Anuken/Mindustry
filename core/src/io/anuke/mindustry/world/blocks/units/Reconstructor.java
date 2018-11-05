@@ -23,8 +23,8 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
@@ -329,12 +329,12 @@ public class Reconstructor extends Block{
         }
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeInt(link);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             link = stream.readInt();
         }
     }

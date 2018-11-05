@@ -4,16 +4,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.io.MapIO;
-import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.function.Supplier;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.ThreadArray;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -29,8 +29,6 @@ public class Maps implements Disposable{
     private Array<Map> allMaps = new ThreadArray<>();
     /**Temporary array used for returning things.*/
     private Array<Map> returnArray = new ThreadArray<>();
-    /**Used for storing a list of custom map names for GWT.*/
-    private Array<String> customMapNames;
 
     /**Returns a list of all maps, including custom ones.*/
     public Array<Map> all(){
@@ -76,25 +74,14 @@ public class Maps implements Disposable{
 
     /**Save a map. This updates all values and stored data necessary.*/
     public void saveMap(String name, MapTileData data, ObjectMap<String, String> tags){
-        try {
+        try{
             //create copy of tags to prevent mutation later
             ObjectMap<String, String> newTags = new ObjectMap<>();
             newTags.putAll(tags);
             tags = newTags;
 
-            if (!gwt) {
-                FileHandle file = customMapDirectory.child(name + "." + mapExtension);
-                MapIO.writeMap(file.write(false), tags, data);
-            } else {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                MapIO.writeMap(stream, tags, data);
-                Settings.putString("map-data-" + name, new String(Base64Coder.encode(stream.toByteArray())));
-                if(!customMapNames.contains(name, false)){
-                    customMapNames.add(name);
-                    Settings.putObject("custom-maps", customMapNames);
-                }
-                Settings.save();
-            }
+            FileHandle file = customMapDirectory.child(name + "." + mapExtension);
+            MapIO.writeMap(file.write(false), tags, data);
 
             if(maps.containsKey(name)){
                 if(maps.get(name).texture != null) {
@@ -105,7 +92,7 @@ public class Maps implements Disposable{
             }
 
             Map map = new Map(name, new MapMeta(version, tags, data.width(), data.height(), null), true, getStreamFor(name));
-            if (!headless){
+            if(!headless){
                 map.texture = new Texture(MapIO.generatePixmap(data));
             }
             allMaps.add(map);
@@ -126,14 +113,7 @@ public class Maps implements Disposable{
         maps.remove(map.name);
         allMaps.removeValue(map, true);
 
-        if (!gwt) {
-            customMapDirectory.child(map.name + "." + mapExtension).delete();
-        } else {
-            customMapNames.removeValue(map.name, false);
-            Settings.putString("map-data-" + map.name, "");
-            Settings.putObject("custom-maps", customMapNames);
-            Settings.save();
-        }
+        customMapDirectory.child(map.name + "." + mapExtension).delete();
     }
 
     private void loadMap(String name, Supplier<InputStream> supplier, boolean custom) throws IOException{
@@ -151,43 +131,21 @@ public class Maps implements Disposable{
     }
 
     private void loadCustomMaps(){
-        if(!gwt){
-            for(FileHandle file : customMapDirectory.list()){
-                try{
-                    if(file.extension().equalsIgnoreCase(mapExtension)){
-                        loadMap(file.nameWithoutExtension(), file::read, true);
-                    }
-                }catch (Exception e){
-                    Log.err("Failed to load custom map file '{0}'!", file);
-                    Log.err(e);
+        for(FileHandle file : customMapDirectory.list()){
+            try{
+                if(file.extension().equalsIgnoreCase(mapExtension)){
+                    loadMap(file.nameWithoutExtension(), file::read, true);
                 }
-            }
-
-        }else{
-            customMapNames = Settings.getObject("custom-maps", Array.class, Array::new);
-
-            for(String name : customMapNames){
-                try{
-                    String data = Settings.getString("map-data-" + name, "");
-                    byte[] bytes = Base64Coder.decode(data);
-                    loadMap(name, () -> new ByteArrayInputStream(bytes), true);
-                }catch (Exception e){
-                    Log.err("Failed to load custom map '{0}'!", name);
-                    Log.err(e);
-                }
+            }catch (Exception e){
+                Log.err("Failed to load custom map file '{0}'!", file);
+                Log.err(e);
             }
         }
     }
 
     /**Returns an input stream supplier for a given map name.*/
     private Supplier<InputStream> getStreamFor(String name){
-        if(!gwt){
-            return customMapDirectory.child(name + "." + mapExtension)::read;
-        }else{
-            String data = Settings.getString("map-data-" + name, "");
-            byte[] bytes = Base64Coder.decode(data);
-            return () -> new ByteArrayInputStream(bytes);
-        }
+        return customMapDirectory.child(name + "." + mapExtension)::read;
     }
 
     @Override

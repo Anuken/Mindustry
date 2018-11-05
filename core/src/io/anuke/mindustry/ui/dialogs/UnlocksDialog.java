@@ -6,10 +6,10 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.scene.event.HandCursorListener;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.Tooltip;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.UIUtils;
 
@@ -21,8 +21,8 @@ public class UnlocksDialog extends FloatingDialog{
     public UnlocksDialog(){
         super("$text.unlocks");
 
-        addCloseButton();
         shouldPause = true;
+        addCloseButton();
         shown(this::rebuild);
         onResize(this::rebuild);
     }
@@ -36,7 +36,7 @@ public class UnlocksDialog extends FloatingDialog{
 
         Array<Content>[] allContent = content.getContentMap();
 
-        for(int j =0; j< allContent.length; j ++){
+        for(int j = 0; j < allContent.length; j ++){
             ContentType type = ContentType.values()[j];
 
             Array<Content> array = allContent[j];
@@ -65,10 +65,7 @@ public class UnlocksDialog extends FloatingDialog{
 
                     if(control.unlocks.isUnlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));
-                        image.addListener(new Tooltip<>(new Table("clear"){{
-                            add(unlock.localizedName());
-                            margin(4);
-                        }}));
+                        StatValue.addToolTip(image, unlock);
                     }
 
                     if((++count) % maxWidth == 0){

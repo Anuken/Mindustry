@@ -5,6 +5,9 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.meta.ContentStatValue;
+import io.anuke.mindustry.world.meta.StatValue;
+import io.anuke.ucore.scene.ui.Image;
+import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 public class ItemListValue implements ContentStatValue{
@@ -38,11 +41,17 @@ public class ItemListValue implements ContentStatValue{
     public void display(Table table){
         if(items != null){
             for(Item item : items){
-                table.addImage(item.region).size(8 * 3).padRight(5);
+                Cell<Image> imageCell = table.addImage(item.region);
+                imageCell.size(8 * 3).padRight(5);
+
+                StatValue.addToolTip(imageCell.getElement(), item);
             }
         }else{
             for(ItemStack stack : stacks){
-                table.add(new ItemImage(stack)).size(8 * 3).padRight(5);
+                ItemImage image = new ItemImage(stack);
+                table.add(image).size(8 * 3).padRight(5);
+
+                StatValue.addToolTip(image, stack.item);
             }
         }
     }

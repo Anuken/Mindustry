@@ -27,8 +27,8 @@ import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -342,7 +342,7 @@ public class WarpGate extends PowerBlock{
         public float time;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeByte(color);
             stream.writeBoolean(active);
             stream.writeFloat(activeScl);
@@ -351,7 +351,7 @@ public class WarpGate extends PowerBlock{
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             color = stream.readByte();
             active = stream.readBoolean();
             activeScl = stream.readFloat();

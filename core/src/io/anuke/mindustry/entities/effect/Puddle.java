@@ -57,29 +57,21 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
     private float accepting;
     private byte generation;
 
-    /**
-     * Deserialization use only!
-     */
+    /**Deserialization use only!*/
     public Puddle(){
     }
 
-    /**
-     * Deposists a puddle between tile and source.
-     */
+    /**Deposists a puddle between tile and source.*/
     public static void deposit(Tile tile, Tile source, Liquid liquid, float amount){
         deposit(tile, source, liquid, amount, 0);
     }
 
-    /**
-     * Deposists a puddle at a tile.
-     */
+    /**Deposists a puddle at a tile.*/
     public static void deposit(Tile tile, Liquid liquid, float amount){
         deposit(tile, tile, liquid, amount, 0);
     }
 
-    /**
-     * Returns the puddle on the specified tile. May return null.
-     */
+    /**Returns the puddle on the specified tile. May return null.*/
     public static Puddle getPuddle(Tile tile){
         return map.get(tile.packedPosition());
     }
@@ -119,7 +111,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
                 p.lastRipple = Timers.time();
             }
         }else{
-            p.amount -= reactPuddle(p.liquid, liquid, amount, p.tile, p.x, p.y);
+            p.amount += reactPuddle(p.liquid, liquid, amount, p.tile, p.x, p.y);
         }
     }
 
@@ -131,9 +123,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
         return liquid == Liquids.oil && other == Liquids.water;
     }
 
-    /**
-     * Reacts two liquids together at a location.
-     */
+    /**Reacts two liquids together at a location.*/
     private static float reactPuddle(Liquid dest, Liquid liquid, float amount, Tile tile, float x, float y){
         if((dest.flammability > 0.3f && liquid.temperature > 0.7f) ||
                 (liquid.flammability > 0.3f && dest.temperature > 0.7f)){ //flammable liquid + hot liquid

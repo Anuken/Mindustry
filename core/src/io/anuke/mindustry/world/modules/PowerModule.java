@@ -9,25 +9,8 @@ import java.io.IOException;
 
 public class PowerModule extends BlockModule{
     public float amount;
-    public float capacity = 10f;
-    public float voltage = 0.0001f;
     public PowerGraph graph = new PowerGraph();
     public IntArray links = new IntArray();
-
-    public boolean acceptsPower(){
-        return amount + 0.001f <= capacity;
-    }
-
-    public float addPower(float add){
-        if(add < voltage){
-            return add;
-        }
-
-        float canAccept = Math.min(capacity - amount, add);
-        amount += canAccept;
-
-        return canAccept;
-    }
 
     @Override
     public void write(DataOutput stream) throws IOException{

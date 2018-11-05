@@ -1,6 +1,5 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.mindustry.core.Platform;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ScrollPane;
@@ -31,7 +30,7 @@ public class LanguageDialog extends FloatingDialog{
         ButtonGroup<TextButton> group = new ButtonGroup<>();
 
         for(Locale loc : locales){
-            TextButton button = new TextButton(Platform.instance.getLocaleName(loc), "toggle");
+            TextButton button = new TextButton(loc.getDisplayName(loc), "toggle");
             button.clicked(() -> {
                 if(getLocale().equals(loc)) return;
                 Settings.putString("locale", loc.toString());

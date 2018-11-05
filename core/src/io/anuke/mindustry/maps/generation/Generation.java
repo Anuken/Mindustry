@@ -72,14 +72,14 @@ public class Generation{
                 for(int dy = 0; dy < block.size; dy++){
                     int worldx = dx + offsetx + x;
                     int worldy = dy + offsety + y;
-                    if(!Structs.inBounds(worldx, worldy, tiles) || !tiles[worldx][worldy].block().alwaysReplace){
+                    if(!Structs.inBounds(worldx, worldy, tiles) || !tiles[worldx][worldy].block().alwaysReplace || tiles[worldx][worldy].floor().isLiquid){
                         return false;
                     }
                 }
             }
             return true;
         }else{
-            return tiles[x][y].block().alwaysReplace;
+            return tiles[x][y].block().alwaysReplace && !tiles[x][y].floor().isLiquid;
         }
     }
 

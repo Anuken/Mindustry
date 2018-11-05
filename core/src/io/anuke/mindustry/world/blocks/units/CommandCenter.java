@@ -24,8 +24,8 @@ import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.EnumSet;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
@@ -81,11 +81,15 @@ public class CommandCenter extends Block{
     public void buildTable(Tile tile, Table table){
         CommandCenterEntity entity = tile.entity();
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
+        Table buttons = new Table();
 
         for(UnitCommand cmd : UnitCommand.values()){
-            table.addImageButton("command-" + cmd.name(), "toggle", 8*3, () -> threads.run(() -> Call.onCommandCenterSet(players[0], tile, cmd))).size(40f, 44f)
+            buttons.addImageButton("command-" + cmd.name(), "toggle", 8*3, () -> threads.run(() -> Call.onCommandCenterSet(players[0], tile, cmd))).size(40f, 44f)
                 .checked(entity.command == cmd).group(group);
         }
+        table.add(buttons);
+        table.row();
+        table.table("button", t -> t.label(() -> entity.command.localized()).center().growX()).growX().padTop(-5);
     }
 
     @Remote(called = Loc.server, forward = true, targets = Loc.both)
@@ -115,12 +119,12 @@ public class CommandCenter extends Block{
         public UnitCommand command = UnitCommand.attack;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void writeConfig(DataOutput stream) throws IOException{
             stream.writeByte(command.ordinal());
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void readConfig(DataInput stream) throws IOException{
             command = UnitCommand.values()[stream.readByte()];
         }
     }

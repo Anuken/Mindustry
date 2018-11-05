@@ -52,7 +52,7 @@ public class BlockLocMission extends Mission{
         float rot = players[0].angleTo(x * tilesize + block.offset(), y * tilesize + block.offset());
         float len = 12f;
 
-        Draw.color(Palette.accent.r * 0.8f,Palette.accent.g * 0.8f,Palette.accent.b * 0.8f);
+        Draw.color(Palette.accentBack);
         Draw.rect("icon-arrow", players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len), rot);
         Draw.color(Palette.accent);
         Draw.rect("icon-arrow", players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len) + 1f, rot);

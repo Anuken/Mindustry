@@ -3,14 +3,12 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Group;
@@ -73,7 +71,7 @@ public class PlayerListFragment extends Fragment{
         float h = 74f;
 
         playerGroup.forEach(player -> {
-            NetConnection connection = gwt ? null : player.con;
+            NetConnection connection = player.con;
 
             if(connection == null && Net.server() && !player.isLocal) return;
 
@@ -119,7 +117,7 @@ public class PlayerListFragment extends Fragment{
                     t.addImageButton("icon-admin", "toggle", 14 * 2, () -> {
                         if(Net.client()) return;
 
-                        String id = netServer.admins.getTraceByID(player.uuid).uuid;
+                        String id = player.uuid;
 
                         if(netServer.admins.isAdmin(id, connection.address)){
                             ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> netServer.admins.unAdminPlayer(id));

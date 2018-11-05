@@ -106,11 +106,9 @@ public class NetServer extends Module{
 
             connection.hasBegunConnecting = true;
 
-            TraceInfo trace = admins.getTraceByID(uuid);
             PlayerInfo info = admins.getInfo(uuid);
-            trace.uuid = uuid;
-            trace.ip = connection.address;
-            trace.android = packet.mobile;
+
+            connection.mobile = packet.mobile;
 
             if(admins.isIDBanned(uuid)){
                 kick(id, KickReason.banned);
@@ -150,7 +148,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            Log.info("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, trace.ip);
+            Log.info("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, connection.address);
 
             String ip = Net.getConnection(id).address;
 
@@ -162,7 +160,7 @@ public class NetServer extends Module{
             }
 
             if(packet.version == -1){
-                trace.modclient = true;
+                connection.modclient = true;
             }
 
             Player player = new Player();
@@ -206,8 +204,6 @@ public class NetServer extends Module{
             }
 
             connections.put(id, player);
-
-            trace.playerid = player.id;
 
             sendWorldData(player, id);
 
@@ -327,9 +323,9 @@ public class NetServer extends Module{
         player.getPlaceQueue().clear();
         for(BuildRequest req : requests){
             //auto-skip done requests
-            if(req.remove && world.tile(req.x, req.y).block() == Blocks.air){
+            if(req.breaking && world.tile(req.x, req.y).block() == Blocks.air){
                 continue;
-            }else if(!req.remove && world.tile(req.x, req.y).block() == req.recipe.result && (!req.recipe.result.rotate || world.tile(req.x, req.y).getRotation() == req.rotation)){
+            }else if(!req.breaking && world.tile(req.x, req.y).block() == req.recipe.result && (!req.recipe.result.rotate || world.tile(req.x, req.y).getRotation() == req.rotation)){
                 continue;
             }
             player.getPlaceQueue().addLast(req);
@@ -395,11 +391,11 @@ public class NetServer extends Module{
             netServer.kick(other.con.id, KickReason.kick);
             Log.info("&lc{0} has kicked {1}.", player.name, other.name);
         }else if(action == AdminAction.trace){
-            //TODO
+            //TODO implement
             if(player.con != null){
-                Call.onTraceInfo(player.con.id, netServer.admins.getTraceByID(other.uuid));
+                //Call.onTraceInfo(player.con.id, other.con.trace);
             }else{
-                NetClient.onTraceInfo(netServer.admins.getTraceByID(other.uuid));
+                //NetClient.onTraceInfo(other.con.trace);
             }
             Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
         }
@@ -424,7 +420,6 @@ public class NetServer extends Module{
 
         if(!headless && !closing && Net.server() && state.is(State.menu)){
             closing = true;
-            reset();
             threads.runGraphics(() -> ui.loadfrag.show("$text.server.closing"));
             Timers.runTask(5f, () -> {
                 Net.closeServer();
@@ -436,10 +431,6 @@ public class NetServer extends Module{
         if(!state.is(State.menu) && Net.server()){
             sync();
         }
-    }
-
-    public void reset(){
-        admins.clearTraces();
     }
 
     public void kickAll(KickReason reason){

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.annotations.Annotations.ReadClass;
 import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.mindustry.entities.Player;
@@ -17,7 +16,6 @@ import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.net.Packets.KickReason;
-import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -26,13 +24,14 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entities;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
 import static io.anuke.mindustry.Vars.*;
 
 /** Class for specifying read/write methods for code generation.*/
 @SuppressWarnings("unused")
 public class TypeIO{
+    private static final Charset charset = Charset.forName("UTF-8");
 
     @WriteClass(Player.class)
     public static void writePlayer(ByteBuffer buffer, Player player){
@@ -164,9 +163,9 @@ public class TypeIO{
     public static void writeRequests(ByteBuffer buffer, BuildRequest[] requests){
         buffer.putShort((short)requests.length);
         for(BuildRequest request : requests){
-            buffer.put(request.remove ? (byte) 1 : 0);
+            buffer.put(request.breaking ? (byte) 1 : 0);
             buffer.putInt(world.toPacked(request.x, request.y));
-            if(!request.remove){
+            if(!request.breaking){
                 buffer.put(request.recipe.id);
                 buffer.put((byte) request.rotation);
             }
@@ -330,7 +329,7 @@ public class TypeIO{
     @WriteClass(String.class)
     public static void writeString(ByteBuffer buffer, String string){
         if(string != null){
-            byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+            byte[] bytes = string.getBytes(charset);
             buffer.putShort((short) bytes.length);
             buffer.put(bytes);
         }else{
@@ -344,7 +343,7 @@ public class TypeIO{
         if(length != -1){
             byte[] bytes = new byte[length];
             buffer.get(bytes);
-            return new String(bytes, StandardCharsets.UTF_8);
+            return new String(bytes, charset);
         }else{
             return null;
         }
@@ -362,46 +361,5 @@ public class TypeIO{
         byte[] bytes = new byte[length];
         buffer.get(bytes);
         return bytes;
-    }
-
-    @WriteClass(TraceInfo.class)
-    public static void writeTrace(ByteBuffer buffer, TraceInfo info){
-        buffer.putInt(info.playerid);
-        buffer.putShort((short) info.ip.getBytes().length);
-        buffer.put(info.ip.getBytes());
-        buffer.put(info.modclient ? (byte) 1 : 0);
-        buffer.put(info.android ? (byte) 1 : 0);
-
-        buffer.putInt(info.totalBlocksBroken);
-        buffer.putInt(info.structureBlocksBroken);
-        buffer.putInt(info.lastBlockBroken.id);
-
-        buffer.putInt(info.totalBlocksPlaced);
-        buffer.putInt(info.lastBlockPlaced.id);
-        buffer.put(Base64Coder.decode(info.uuid));
-    }
-
-    @ReadClass(TraceInfo.class)
-    public static TraceInfo readTrace(ByteBuffer buffer){
-        int id = buffer.getInt();
-        short iplen = buffer.getShort();
-        byte[] ipb = new byte[iplen];
-        buffer.get(ipb);
-
-        TraceInfo info = new TraceInfo(new String(ipb));
-
-        info.playerid = id;
-        info.modclient = buffer.get() == 1;
-        info.android = buffer.get() == 1;
-        info.totalBlocksBroken = buffer.getInt();
-        info.structureBlocksBroken = buffer.getInt();
-        info.lastBlockBroken = content.block(buffer.getInt());
-        info.totalBlocksPlaced = buffer.getInt();
-        info.lastBlockPlaced = content.block(buffer.getInt());
-        byte[] uuid = new byte[8];
-        buffer.get(uuid);
-
-        info.uuid = new String(Base64Coder.encode(uuid));
-        return info;
     }
 }

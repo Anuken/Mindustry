@@ -41,6 +41,7 @@ import static io.anuke.mindustry.Vars.*;
 
 /**Base class for AI units.*/
 public abstract class BaseUnit extends Unit implements ShooterTrait{
+
     protected static int timerIndex = 0;
 
     protected static final int timerTarget = timerIndex++;
@@ -305,11 +306,10 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
             return;
         }
 
-        if(!Net.client()){
+        avoidOthers(1.25f);
 
-            if(spawner != -1 && (world.tile(spawner) == null || world.tile(spawner).entity == null)){
-                damage(health);
-            }
+        if(spawner != -1 && (world.tile(spawner) == null || world.tile(spawner).entity == null)){
+            damage(health);
         }
 
         if(squad != null){

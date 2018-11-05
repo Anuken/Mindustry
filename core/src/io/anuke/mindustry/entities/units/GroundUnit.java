@@ -121,10 +121,6 @@ public abstract class GroundUnit extends BaseUnit{
 
         stuckTime = !vec.set(x, y).sub(lastPosition()).isZero(0.0001f) ? 0f : stuckTime + Timers.delta();
 
-        if(!velocity.isZero(0.0001f) && (Units.invalidateTarget(target, this) || (distanceTo(target) > getWeapon().getAmmo().getRange()))){
-            rotation = Mathf.slerpDelta(rotation, velocity.angle(), type.rotatespeed);
-        }
-
         if(!velocity.isZero()){
             baseRotation = Mathf.slerpDelta(baseRotation, velocity.angle(), 0.05f);
         }
@@ -249,6 +245,8 @@ public abstract class GroundUnit extends BaseUnit{
         if((tile == null || tile.solid() || tile.floor().drownTime > 0) || stuckTime > 10f){
             baseRotation += Mathf.sign(id % 2 - 0.5f) * Timers.delta() * 3f;
         }
+
+        rotation = Mathf.slerpDelta(rotation, velocity.angle(), type.rotatespeed);
     }
 
     protected void circle(float circleLength){
@@ -272,7 +270,10 @@ public abstract class GroundUnit extends BaseUnit{
 
         if(tile == targetTile) return;
 
+        float angle = angleTo(targetTile);
+
         velocity.add(vec.trns(angleTo(targetTile), type.speed));
+        rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
     }
 
     protected void moveAwayFromCore(){
@@ -293,6 +294,9 @@ public abstract class GroundUnit extends BaseUnit{
 
         if(tile == targetTile || core == null || distanceTo(core) < 90f) return;
 
+        float angle = angleTo(targetTile);
+
         velocity.add(vec.trns(angleTo(targetTile), type.speed));
+        rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
     }
 }

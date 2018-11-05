@@ -8,6 +8,7 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
@@ -18,6 +19,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.ucore.core.Effects;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.trait.Entity;
 import io.anuke.ucore.graphics.Draw;
@@ -65,10 +67,10 @@ public interface BuilderTrait extends Entity{
         BuildRequest request = getCurrentRequest();
 
         if(request != null){
-            output.writeByte(request.remove ? 1 : 0);
+            output.writeByte(request.breaking ? 1 : 0);
             output.writeInt(world.toPacked(request.x, request.y));
             output.writeFloat(request.progress);
-            if(!request.remove){
+            if(!request.breaking){
                 output.writeByte(request.recipe.id);
                 output.writeByte(request.rotation);
             }
@@ -181,18 +183,16 @@ public interface BuilderTrait extends Entity{
             setMineTile(null);
         }
 
-
-
         Tile tile = world.tile(current.x, current.y);
 
         if(unit.distanceTo(tile) > placeDistance){
             return;
         }
 
-        if(!(tile.block() instanceof BuildBlock) ){
-            if(canCreateBlocks() && !current.remove && Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)){
+        if(!(tile.block() instanceof BuildBlock)){
+            if(canCreateBlocks() && !current.breaking && Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)){
                 Build.beginPlace(unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
-            }else if(canCreateBlocks() && current.remove && Build.validBreak(unit.getTeam(), current.x, current.y)){
+            }else if(canCreateBlocks() && current.breaking && Build.validBreak(unit.getTeam(), current.x, current.y)){
                 Build.beginBreak(unit.getTeam(), current.x, current.y);
             }else{
                 getPlaceQueue().removeFirst();
@@ -222,7 +222,7 @@ public interface BuilderTrait extends Entity{
         //progress is synced, thus not updated clientside
         if(!Net.client()){
             //deconstructing is 2x as fast
-            if(current.remove){
+            if(current.breaking){
                 entity.deconstruct(unit, core, 2f / entity.buildCost * Timers.delta() * getBuildPower(tile));
             }else{
                 entity.construct(unit, core, 1f / entity.buildCost * Timers.delta() * getBuildPower(tile));
@@ -231,6 +231,11 @@ public interface BuilderTrait extends Entity{
             current.progress = entity.progress();
         }else{
             entity.progress = current.progress;
+        }
+
+        if(!current.initialized){
+            Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking));
+            current.initialized = true;
         }
     }
 
@@ -352,9 +357,10 @@ public interface BuilderTrait extends Entity{
     class BuildRequest{
         public final int x, y, rotation;
         public final Recipe recipe;
-        public final boolean remove;
+        public final boolean breaking;
 
         public float progress;
+        public boolean initialized;
 
         /**This creates a build request.*/
         public BuildRequest(int x, int y, int rotation, Recipe recipe){
@@ -362,7 +368,7 @@ public interface BuilderTrait extends Entity{
             this.y = y;
             this.rotation = rotation;
             this.recipe = recipe;
-            this.remove = false;
+            this.breaking = false;
         }
 
         /**This creates a remove request.*/
@@ -371,7 +377,7 @@ public interface BuilderTrait extends Entity{
             this.y = y;
             this.rotation = -1;
             this.recipe = Recipe.getByResult(world.tile(x, y).block());
-            this.remove = true;
+            this.breaking = true;
         }
     }
 }

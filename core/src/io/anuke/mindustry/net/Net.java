@@ -17,13 +17,14 @@ import io.anuke.mindustry.net.Streamable.StreamBuilder;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.BiConsumer;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Pooling;
+import io.anuke.ucore.util.Threads;
 
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.headless;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class Net{
     private static boolean server;
@@ -46,15 +47,43 @@ public class Net{
         return serverProvider != null;
     }
 
-    /**
-     * Display a network error.
-     */
-    public static void showError(String text){
+    /**Display a network error. Call on the graphics thread.*/
+    public static void showError(Throwable e){
+
         if(!headless){
-            ui.showError(text);
-        }else{
-            Log.err(text);
+            Threads.assertGraphics();
+
+            Throwable t = e;
+            while(t.getCause() != null){
+                t = t.getCause();
+            }
+
+            String error = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
+            String type = error.getClass().toString().toLowerCase();
+
+            if(error.equals("mismatch")){
+                error = Bundles.get("text.error.mismatch");
+            }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address"))){
+                error = Bundles.get("text.error.invalidaddress");
+            }else if(error.contains("connection refused") || error.contains("route to host") || type.contains("unknownhost")){
+                error = Bundles.get("text.error.unreachable");
+            }else if(type.contains("timeout")){
+                error = Bundles.get("text.error.timeout");
+            }else if(error.equals("alreadyconnected")){
+                error = Bundles.get("text.error.alreadyconnected");
+            }else if(!error.isEmpty()){
+                error = Bundles.get("text.error.any");
+            }
+
+            ui.showText("", Bundles.format("text.connectfail", error));
+            ui.loadfrag.hide();
+
+            if(Net.client()){
+                netClient.disconnectQuietly();
+            }
         }
+
+        Log.err(e);
     }
 
     /**
@@ -77,14 +106,18 @@ public class Net{
     /**
      * Connect to an address.
      */
-    public static void connect(String ip, int port) throws IOException{
-        lastIP = ip + ":" + port;
-        if(!active){
-            clientProvider.connect(ip, port);
-            active = true;
-            server = false;
-        }else{
-            throw new IOException("Already connected!");
+    public static void connect(String ip, int port, Runnable success){
+        try{
+            lastIP = ip + ":" + port;
+            if(!active){
+                clientProvider.connect(ip, port, success);
+                active = true;
+                server = false;
+            }else{
+                throw new IOException("alreadyconnected");
+            }
+        }catch(IOException e){
+            showError(e);
         }
     }
 
@@ -132,7 +165,7 @@ public class Net{
     }
 
     /**
-     * Starts discovering servers on a different thread. Does not work with GWT.
+     * Starts discovering servers on a different thread.
      * Callback is run on the main libGDX thread.
      */
     public static void discoverServers(Consumer<Host> cons, Runnable done){
@@ -346,7 +379,7 @@ public class Net{
     /**Client implementation.*/
     public interface ClientProvider{
         /**Connect to a server.*/
-        void connect(String ip, int port) throws IOException;
+        void connect(String ip, int port, Runnable success) throws IOException;
 
         /**Send an object to the server.*/
         void send(Object object, SendMode mode);

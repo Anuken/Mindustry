@@ -14,6 +14,11 @@ public class BattleMission extends Mission{
     final int spacing = 30;
 
     @Override
+    public String getIcon(){
+        return "icon-mission-battle";
+    }
+
+    @Override
     public GameMode getMode(){
         return GameMode.noWaves;
     }
@@ -25,7 +30,7 @@ public class BattleMission extends Mission{
 
     @Override
     public void generate(Generation gen){
-        super.generate(gen);
+        generateCoreAt(gen, 50, 50, defaultTeam);
 
         if(state.teams.get(defaultTeam).cores.size == 0){
             return;

@@ -127,7 +127,7 @@ public class HudFragment extends Fragment{
                 t.label(() -> tps.get(threads.getTPS())).visible(() -> threads.isEnabled());
                 t.row();
                 if(Net.hasClient()){
-                    t.label(() -> ping.get(Net.getPing())).visible(() -> Net.client() && !gwt).colspan(2);
+                    t.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
                 }
             }).size(-1).visible(() -> Settings.getBool("fps")).update(t -> t.setTranslation(0, (!waves.isVisible() ? wavetable.getHeight() : Math.min(wavetable.getTranslation().y, wavetable.getHeight())) )).get();
 

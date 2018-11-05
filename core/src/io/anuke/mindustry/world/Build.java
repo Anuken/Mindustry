@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.game.EventType.BlockBuildEvent;
+import io.anuke.mindustry.game.EventType.BlockBuildBeginEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Recipe;
@@ -59,6 +59,8 @@ public class Build{
             }
         }
 
+        Tile ftile = tile;
+        threads.runDelay(() -> Events.fire(new BlockBuildBeginEvent(ftile, team, true)));
     }
 
     /**Places a BuildBlock at this location.*/
@@ -100,8 +102,7 @@ public class Build{
             }
         }
 
-
-        threads.runDelay(() -> Events.fire(new BlockBuildEvent(tile, team)));
+        threads.runDelay(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
     }
 
     /**Returns whether a tile can be placed at this location by this team.*/
@@ -131,7 +132,7 @@ public class Build{
         if(tile == null) return false;
 
         if(type.isMultiblock()){
-            if(type.canReplace(tile.block()) && tile.block().size == type.size){
+            if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile)){
                 return true;
             }
 

@@ -420,7 +420,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             for(BuildRequest request : getPlaceQueue()){
                 if(getCurrentRequest() == request) continue;
 
-                if(request.remove){
+                if(request.breaking){
                     Block block = world.tile(request.x, request.y).target().block();
 
                     //draw removal request
@@ -494,6 +494,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }else{
             spawner = -1;
         }
+
+        avoidOthers(1f);
 
         Tile tile = world.tileWorld(x, y);
 

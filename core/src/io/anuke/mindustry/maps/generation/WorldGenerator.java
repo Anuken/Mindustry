@@ -309,6 +309,9 @@ public class WorldGenerator{
         double elevation = elevationOf(x, y, detailed);
         double temp =
             + sim3.octaveNoise2D(detailed ? 12 : 9, 0.6, 1f / 1100f, x - 120, y);
+        double lake = sim2.octaveNoise2D(1, 1, 1f / 110f, x, y);
+
+        elevation -= lake/3f;
 
         int lerpDst = 20;
         lerpDst *= lerpDst;
@@ -326,9 +329,9 @@ public class WorldGenerator{
             }
         }
 
-        if(elevation < 0.7){
+        if(elevation < 0.7 || lake > 0.96){
             floor = Blocks.deepwater;
-        }else if(elevation < 0.79){
+        }else if(elevation < 0.79 || lake > 0.948){
             floor = Blocks.water;
         }else if(elevation < 0.85){
             floor = Blocks.sand;

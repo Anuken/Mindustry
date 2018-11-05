@@ -6,13 +6,15 @@ import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Log;
+import io.anuke.ucore.util.Threads;
+import io.anuke.ucore.util.Threads.ThreadInfoProvider;
 
 import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.logic;
 
-public class ThreadHandler{
+public class ThreadHandler implements ThreadInfoProvider{
     private final Queue<Runnable> toRun = new Queue<>();
-    private final ThreadProvider impl;
+    private Thread thread, graphicsThread;
     private final Object updateLock = new Object();
     private float delta = 1f;
     private float smoothDelta = 1f;
@@ -22,11 +24,12 @@ public class ThreadHandler{
     private boolean rendered = true;
     private long lastFrameTime;
 
-    public ThreadHandler(ThreadProvider impl){
-        this.impl = impl;
+    public ThreadHandler(){
+        Threads.setThreadInfoProvider(this);
+        graphicsThread = Thread.currentThread();
 
         Timers.setDeltaProvider(() -> {
-            float result = impl.isOnThread() ? delta : Gdx.graphics.getDeltaTime() * 60f;
+            float result = isOnThread() ? delta : Gdx.graphics.getDeltaTime() * 60f;
             return Math.min(Float.isNaN(result) ? 1f : result, 15f);
         });
     }
@@ -86,7 +89,7 @@ public class ThreadHandler{
             long elapsed = TimeUtils.timeSinceMillis(lastFrameTime);
             if(elapsed < target){
                 try{
-                    impl.sleep(target - elapsed);
+                    Thread.sleep(target - elapsed);
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }
@@ -99,7 +102,7 @@ public class ThreadHandler{
 
         synchronized(updateLock){
             rendered = true;
-            impl.notify(updateLock);
+            updateLock.notify();
         }
     }
 
@@ -111,12 +114,25 @@ public class ThreadHandler{
         if(enabled){
             logic.doUpdate = false;
             Timers.runTask(2f, () -> {
-                impl.start(this::runLogic);
+                if(thread != null){
+                    thread.interrupt();
+                    thread = null;
+                }
+
+                thread = new Thread(this::runLogic);
+                thread.setDaemon(true);
+                thread.setName("Update Thread");
+                thread.start();
+                Log.info("Starting logic thread.");
+
                 this.enabled = true;
             });
         }else{
             this.enabled = false;
-            impl.stop();
+            if(thread != null){
+                thread.interrupt();
+                thread = null;
+            }
             Timers.runTask(2f, () -> {
                 logic.doUpdate = true;
             });
@@ -128,7 +144,17 @@ public class ThreadHandler{
     }
 
     public boolean isOnThread(){
-        return impl.isOnThread();
+        return Thread.currentThread() == thread;
+    }
+
+    @Override
+    public boolean isOnLogicThread() {
+        return !enabled || Thread.currentThread() == thread;
+    }
+
+    @Override
+    public boolean isOnGraphicsThread() {
+        return !enabled || Thread.currentThread() == graphicsThread;
     }
 
     private void runLogic(){
@@ -157,12 +183,12 @@ public class ThreadHandler{
                 long target = (long) ((1000) / 60f);
 
                 if(elapsed < target){
-                    impl.sleep(target - elapsed);
+                    Thread.sleep(target - elapsed);
                 }
 
                 synchronized(updateLock){
                     while(!rendered){
-                        impl.wait(updateLock);
+                        updateLock.wait();
                     }
                     rendered = false;
                 }
@@ -183,19 +209,5 @@ public class ThreadHandler{
         }catch(Throwable ex){
             control.setError(ex);
         }
-    }
-
-    public interface ThreadProvider{
-        boolean isOnThread();
-
-        void sleep(long ms) throws InterruptedException;
-
-        void start(Runnable run);
-
-        void stop();
-
-        void wait(Object object) throws InterruptedException;
-
-        void notify(Object object);
     }
 }

@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.ui.layout.Table;
 
@@ -19,6 +20,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class BlockConsumeFragment extends Fragment{
     private Table table;
+    private Tile lastTile;
     private boolean visible;
 
     @Override
@@ -26,6 +28,24 @@ public class BlockConsumeFragment extends Fragment{
         table = new Table();
         table.visible(() -> !state.is(State.menu) && visible);
         table.setTransform(true);
+
+        parent.addChild(new Element(){{update(() -> {
+            if(!ui.hasMouse()){
+                Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
+                if(tile == null) return;
+                tile = tile.target();
+
+                if(tile != lastTile){
+                    if(tile.block().consumes.hasAny()){
+                        show(tile);
+                    }else if(visible){
+                        hide();
+                    }
+                    lastTile = tile;
+                }
+            }
+        });}});
+
         parent.setTransform(true);
         parent.addChild(table);
     }
@@ -66,7 +86,7 @@ public class BlockConsumeFragment extends Fragment{
                 rebuild(block, entity);
             }
 
-            Vector2 v = Graphics.screen(tile.drawx() - tile.block().size * tilesize / 2f, tile.drawy() + tile.block().size * tilesize / 2f);
+            Vector2 v = Graphics.screen(tile.drawx() - tile.block().size * tilesize / 2f + 0.25f, tile.drawy() + tile.block().size * tilesize / 2f);
             table.pack();
             table.setPosition(v.x, v.y, Align.topRight);
         });
@@ -76,8 +96,7 @@ public class BlockConsumeFragment extends Fragment{
 
     public void hide(){
         table.clear();
-        table.update(() -> {
-        });
+        table.update(() -> {});
         visible = false;
     }
 

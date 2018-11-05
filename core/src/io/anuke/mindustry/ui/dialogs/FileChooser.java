@@ -21,15 +21,13 @@ import io.anuke.ucore.util.Pooling;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.gwt;
-
 public class FileChooser extends FloatingDialog{
     public static Predicate<FileHandle> pngFilter = file -> file.extension().equalsIgnoreCase("png");
     public static Predicate<FileHandle> mapFilter = file -> file.extension().equalsIgnoreCase(Vars.mapExtension);
     public static Predicate<FileHandle> jpegFilter = file -> file.extension().equalsIgnoreCase("png") || file.extension().equalsIgnoreCase("jpg") || file.extension().equalsIgnoreCase("jpeg");
     public static Predicate<FileHandle> defaultFilter = file -> true;
     private Table files;
-    private FileHandle homeDirectory = gwt ? Gdx.files.internal("") : Gdx.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" :
+    private FileHandle homeDirectory = Gdx.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" :
             Gdx.files.getExternalStoragePath());
     private FileHandle directory = homeDirectory;
     private ScrollPane pane;
@@ -175,7 +173,7 @@ public class FileChooser extends FloatingDialog{
         Arrays.sort(handles, (a, b) -> {
             if(a.isDirectory() && !b.isDirectory()) return -1;
             if(!a.isDirectory() && b.isDirectory()) return 1;
-            return a.name().toUpperCase().compareTo(b.name().toUpperCase());
+            return String.CASE_INSENSITIVE_ORDER.compare(a.name(), b.name());
         });
         return handles;
     }
