@@ -12,12 +12,14 @@ import static io.anuke.mindustry.Vars.*;
 
 public class BattleMission extends MissionWithStartingCore{
     final int spacing = 30;
+    public static final int defaultXCorePos = 50;
+    public static final int defaultYCorePos = 50;
 
     /**
-     * Creates a battle mission with the player core being in the center of the map.
+     * Creates a battle mission with the player core being at (@defaultXCorePos, @defaultYCorePos)
      */
     public BattleMission(){
-        super();
+        this(defaultXCorePos, defaultYCorePos);
     }
 
     /**
