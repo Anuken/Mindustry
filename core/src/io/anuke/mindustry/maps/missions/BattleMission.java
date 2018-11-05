@@ -10,8 +10,12 @@ import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class BattleMission extends Mission{
+public class BattleMission extends MissionWithStartingCore{
     final int spacing = 30;
+
+    public BattleMission(){
+        super((gen, team) -> gen.tiles[50][50]);
+    }
 
     @Override
     public String getIcon(){
@@ -30,7 +34,7 @@ public class BattleMission extends Mission{
 
     @Override
     public void generate(Generation gen){
-        generateCoreAt(gen, 50, 50, defaultTeam);
+        generateCore(gen, defaultTeam);
 
         if(state.teams.get(defaultTeam).cores.size == 0){
             return;
