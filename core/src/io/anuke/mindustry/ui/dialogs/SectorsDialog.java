@@ -15,6 +15,7 @@ import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.event.Touchable;
+import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
@@ -36,7 +37,7 @@ public class SectorsDialog extends FloatingDialog{
         table = new Table(){
             @Override
             public float getPrefWidth(){
-                return sectorSize*2f;
+                return Unit.dp.scl(sectorSize*2f);
             }
         };
         table.visible(() -> selected != null);
@@ -97,7 +98,7 @@ public class SectorsDialog extends FloatingDialog{
         }
 
         table.table(t -> {
-            t.addImageTextButton(sector.hasSave() ? "$text.sector.resume" : "$text.sector.deploy", "icon-play", 10*3, () -> {
+            Cell<?> cell = t.addImageTextButton(sector.hasSave() ? "$text.sector.resume" : "$text.sector.deploy", "icon-play", 10*3, () -> {
                 hide();
                 Vars.ui.loadLogic(() -> world.sectors.playSector(selected));
             }).height(60f).growX();
@@ -110,6 +111,7 @@ public class SectorsDialog extends FloatingDialog{
                         selectSector(selected);
                         })
                 ).width(sectorSize).height(60f);
+                cell.width(sectorSize);
             }
         }).pad(-5).growX().padTop(0);
 
