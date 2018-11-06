@@ -1,15 +1,5 @@
 {
 Font: {
-	default-font: {
-		file: square.fnt,
-		markup: true,
-		scale: 0.5
-	},
-	default-font-chat: {
-		file: square.fnt,
-		markup: false,
-		scale: 0.5
-	},
 	trad-chinese: {
 		file: trad_chinese.fnt,
 		markup: true,

@@ -95,6 +95,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.0'
     }
 }
@@ -129,6 +130,7 @@ project(":ios") {
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
     }
 }
 
@@ -157,6 +159,7 @@ project(":core") {
 
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
