@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Array.ArrayIterable;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
@@ -13,6 +14,7 @@ import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.SectorPresets.SectorPreset;
+import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.maps.missions.BattleMission;
 import io.anuke.mindustry.maps.missions.Mission;
@@ -23,6 +25,7 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.type.Recipe.RecipeVisibility;
 import io.anuke.mindustry.world.ColorMapper;
+import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.*;
@@ -156,7 +159,7 @@ public class Sectors{
         }
         grid.clear();
 
-        Array<Sector> out = Settings.getObject("sector-data", Array.class, Array::new);
+        Array<Sector> out = Settings.getObject("sectors", Array.class, Array::new);
 
         for(Sector sector : out){
             
@@ -185,7 +188,7 @@ public class Sectors{
             }
         }
 
-        Settings.putObject("sector-data", out);
+        Settings.putObject("sectors", out);
         Settings.save();
     }
 
@@ -225,12 +228,6 @@ public class Sectors{
 
     /**Generates a mission for a sector. This is deterministic and the same for each client.*/
     private void generate(Sector sector){
-        //empty sector
-        if(Mathf.randomSeed(sector.getSeed() + 213) < 0.2){
-            return;
-        }
-
-        //TODO check for core on impassable block.
 
         //50% chance to get a wave mission
         if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5){
@@ -244,6 +241,23 @@ public class Sectors{
 
         //possibly add another recipe mission
         addRecipeMission(sector, 11);
+
+        Generation gen = new Generation(sector, null, sectorSize, sectorSize, null);
+
+        Array<GridPoint2> points = new Array<>();
+        for(Mission mission : sector.missions){
+            points.addAll(mission.getSpawnPoints(gen));
+        }
+
+        GenResult result = new GenResult();
+
+        for(GridPoint2 point : new ArrayIterable<>(points)){
+            world.generator.generateTile(result, sector.x, sector.y, point.x, point.y, true, null, null);
+            if(((Floor)result.floor).isLiquid || result.wall.solid){
+                sector.missions.clear();
+                break;
+            }
+        }
     }
 
     private void addRecipeMission(Sector sector, int offset){
