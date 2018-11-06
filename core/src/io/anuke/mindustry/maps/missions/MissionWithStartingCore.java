@@ -12,14 +12,10 @@ import static io.anuke.mindustry.Vars.state;
 public abstract class MissionWithStartingCore extends Mission{
 
 
-    /**
-     * Stores a custom starting location for the core, or null if the default calculation (map center) shall be used
-     */
+    /** Stores a custom starting location for the core, or null if the default calculation (map center) shall be used. */
     private final GridPoint2 customStartingPoint;
 
-    /**
-     * Default constructor. Missions created this way will have a player starting core in the center of the map.
-     */
+    /** Default constructor. Missions created this way will have a player starting core in the center of the map. */
     MissionWithStartingCore(){
         this.customStartingPoint = null;
     }
@@ -52,9 +48,9 @@ public abstract class MissionWithStartingCore extends Mission{
 
     /**
      * Retrieves the spawn point in the center of the map or at a custom location which was provided through the constructor.
-     * @implNote Must return an array with at least one entry.
      * @param gen The generation parameters which provide the map size.
      * @return The center of the map or a custom location.
+     * @implNote Must return an array with at least one entry.
      */
     @Override
     public Array<GridPoint2> getSpawnPoints(Generation gen){
