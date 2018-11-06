@@ -1,6 +1,7 @@
 package io.anuke.mindustry.maps.missions;
 
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.Generation;
@@ -34,23 +35,33 @@ public abstract class MissionWithStartingCore extends Mission{
 
     /**
      * Generates a player core based on generation parameters.
-     * @param gen The map generation parameters.
+     * @param gen  The generation parameters which provide the map size.
      * @param team The team to generate the core for.
      */
-    public void generateCore(Generation gen, Team team){
-        int xPos, yPos;
-
-        if(this.customStartingPoint == null){
-            xPos = gen.width/2;
-            yPos = gen.height/2;
-        }else{
-            xPos = this.customStartingPoint.x;
-            yPos = this.customStartingPoint.y;
+    public void generateCoreAtFirstSpawnPoint(Generation gen, Team team){
+        Array<GridPoint2> spawnPoints = getSpawnPoints(gen);
+        if(spawnPoints == null || spawnPoints.size == 0){
+            throw new IllegalArgumentException("A MissionWithStartingCore subclass did not provide a spawn point in getSpawnPoints(). However, at least one point must always be provided.");
         }
 
-        Tile startingCoreTile = gen.tiles[xPos][yPos];
+        Tile startingCoreTile = gen.tiles[spawnPoints.first().x][spawnPoints.first().y];
         startingCoreTile.setBlock(StorageBlocks.core);
         startingCoreTile.setTeam(team);
         state.teams.get(team).cores.add(startingCoreTile);
+    }
+
+    /**
+     * Retrieves the spawn point in the center of the map or at a custom location which was provided through the constructor.
+     * @implNote Must return an array with at least one entry.
+     * @param gen The generation parameters which provide the map size.
+     * @return The center of the map or a custom location.
+     */
+    @Override
+    public Array<GridPoint2> getSpawnPoints(Generation gen){
+        if(this.customStartingPoint == null){
+            return Array.with(new GridPoint2(gen.width / 2, gen.height / 2));
+        }else{
+            return Array.with(this.customStartingPoint);
+        }
     }
 }

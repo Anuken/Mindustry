@@ -15,9 +15,7 @@ public class BattleMission extends MissionWithStartingCore{
     public static final int defaultXCorePos = 50;
     public static final int defaultYCorePos = 50;
 
-    /**
-     * Creates a battle mission with the player core being at (@defaultXCorePos, @defaultYCorePos)
-     */
+    /** Creates a battle mission with the player core being at (@defaultXCorePos, @defaultYCorePos) */
     public BattleMission(){
         this(defaultXCorePos, defaultYCorePos);
     }
@@ -48,7 +46,7 @@ public class BattleMission extends MissionWithStartingCore{
 
     @Override
     public void generate(Generation gen){
-        generateCore(gen, defaultTeam);
+        generateCoreAtFirstSpawnPoint(gen, defaultTeam);
 
         if(state.teams.get(defaultTeam).cores.size == 0){
             return;

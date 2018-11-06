@@ -46,7 +46,7 @@ public class WaveMission extends MissionWithStartingCore{
 
     @Override
     public void generate(Generation gen){
-        generateCore(gen, Team.blue);
+        generateCoreAtFirstSpawnPoint(gen, Team.blue);
     }
 
     @Override
@@ -86,10 +86,5 @@ public class WaveMission extends MissionWithStartingCore{
     @Override
     public boolean isComplete(){
         return state.wave > target && Vars.unitGroups[Vars.waveTeam.ordinal()].size() == 0;
-    }
-
-    @Override
-    public Array<GridPoint2> getSpawnPoints(Generation gen){
-        return Array.with(new GridPoint2(gen.width/2, gen.height/2));
     }
 }
