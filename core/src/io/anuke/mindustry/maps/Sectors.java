@@ -112,7 +112,6 @@ public class Sectors{
 
         for(GridPoint2 g : Geometry.d4){
             createSector(x + g.x, y + g.y);
-            Sector other = grid.get(x + g.x, y + g.y);
         }
     }
 

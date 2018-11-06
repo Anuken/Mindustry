@@ -77,6 +77,8 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
     }
 
     private static void deposit(Tile tile, Tile source, Liquid liquid, float amount, int generation){
+        if(tile == null) return;
+
         if(tile.floor().isLiquid && !canStayOn(liquid, tile.floor().liquidDrop)){
             reactPuddle(tile.floor().liquidDrop, liquid, amount, tile,
                     (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
