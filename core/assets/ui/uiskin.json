@@ -1,31 +1,4 @@
 {
-Font: {
-	default-font: {
-		file: square.fnt,
-		markup: true,
-		scale: 0.5
-	},
-	default-font-chat: {
-		file: square.fnt,
-		markup: false,
-		scale: 0.5
-	},
-	trad-chinese: {
-		file: trad_chinese.fnt,
-		markup: true,
-		scale: 0.5
-	},
-	simp-chinese: {
-		file: simp_chinese.fnt,
-		markup: true,
-		scale: 0.5
-	},
-	title: {
-		file: title.fnt,
-		markup: true,
-		scale: 2
-	}
-},
 Color: {
 	black: {a: 1, b: 0, g: 0, r: 0 },
 	white: {a: 1, b: 1, g: 1, r: 1 },
@@ -88,7 +61,6 @@ SliderStyle: {
 },
 LabelStyle: {
 	default: {font: default-font, fontColor: white },
-	title: {font: title, fontColor: white },
 	small: {font: default-font, fontColor: white }
 },
 TextFieldStyle: {
