@@ -323,7 +323,7 @@ public class BlocksFragment extends Fragment{
                 if(core == null || state.mode.infiniteResources) return "*/*";
 
                 int amount = core.items.get(stack.item);
-                String color = (amount < stack.amount / 2f ? "[red]" : amount < stack.amount ? "[orange]" : "[white]");
+                String color = (amount < stack.amount / 2f ? "[red]" : amount < stack.amount ? "[accent]" : "[white]");
 
                 return color + format(amount) + "[white]/" + stack.amount;
             });

@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Palette;
@@ -98,7 +97,7 @@ public class UI extends SceneModule{
     void generateFonts(){
         generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/pixel.ttf"));
         FreeTypeFontParameter param = new FreeTypeFontParameter();
-        param.size = 14*2;
+        param.size = (int)(14*2 * Math.max(Unit.dp.scl(1f), 0.5f));
         param.shadowColor = Color.DARK_GRAY;
         param.shadowOffsetY = 2;
         param.incremental = true;
@@ -117,7 +116,7 @@ public class UI extends SceneModule{
 
         for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
             font.setUseIntegerPositions(true);
-            font.getData().setScale(Vars.fontScale);
+            //font.getData().setScale(Vars.fontScale);
         }
     }
 

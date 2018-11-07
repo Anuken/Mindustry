@@ -37,7 +37,7 @@ public class SectorsDialog extends FloatingDialog{
         table = new Table(){
             @Override
             public float getPrefWidth(){
-                return Unit.dp.scl(sectorSize*2f);
+                return sectorSize*2f;
             }
         };
         table.visible(() -> selected != null);
@@ -101,7 +101,7 @@ public class SectorsDialog extends FloatingDialog{
             Cell<?> cell = t.addImageTextButton(sector.hasSave() ? "$text.sector.resume" : "$text.sector.deploy", "icon-play", 10*3, () -> {
                 hide();
                 Vars.ui.loadLogic(() -> world.sectors.playSector(selected));
-            }).height(60f).growX();
+            }).height(60f);
 
             if(selected.hasSave()){
                 t.addImageTextButton("$text.sector.abandon", "icon-cancel", 16 * 2, () ->
@@ -109,9 +109,11 @@ public class SectorsDialog extends FloatingDialog{
                         world.sectors.abandonSector(selected);
                         // Simulate a sector selection so the buttons get updated.
                         selectSector(selected);
-                        })
-                ).width(sectorSize).height(60f);
-                cell.width(sectorSize);
+                    })
+                ).width(sectorSize / Unit.dp.scl(1f)).height(60f);
+                cell.width(sectorSize / Unit.dp.scl(1f));
+            }else{
+                cell.width(sectorSize*2f / Unit.dp.scl(1f));
             }
         }).pad(-5).growX().padTop(0);
 
