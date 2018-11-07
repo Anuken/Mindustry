@@ -148,7 +148,9 @@ project(":core") {
         if(new File(projectDir.parent, '../uCore').exists() && comp){
             compile project(":uCore")
         }else{
-            compile "com.github.anuken:ucore:$uCoreVersion"
+            //compile "com.github.anuken:ucore:$uCoreVersion"
+			// FIXME ucore changed, need change uCoreVersion later
+			compile "com.github.islq:ucore:b171b83fe2c484fc3aaa0529bfaf9be233f5988e"
         }
 
         if(new File(projectDir.parent, '../GDXGifRecorder').exists() && comp) {
