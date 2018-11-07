@@ -26,7 +26,6 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-//TODO refactor to use consumers
 public class NuclearReactor extends PowerGenerator{
     protected final int timerFuel = timers++;
 
