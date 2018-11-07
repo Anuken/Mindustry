@@ -48,11 +48,11 @@ public class WaveMission extends Mission{
     @Override
     public String displayString(){
         return state.wave > target ?
-        Bundles.format(
-            Vars.unitGroups[Vars.waveTeam.ordinal()].size() > 1 ?
-            "text.mission.wave.enemies" :
-            "text.mission.wave.enemy", target, target, Vars.unitGroups[Vars.waveTeam.ordinal()].size()) :
-        Bundles.format("text.mission.wave", state.wave, target, (int)(state.wavetime/60));
+            Bundles.format(
+                Vars.unitGroups[Vars.waveTeam.ordinal()].size() > 1 ?
+                "text.mission.wave.enemies" :
+                "text.mission.wave.enemy", target, target, Vars.unitGroups[Vars.waveTeam.ordinal()].size()) :
+            Bundles.format("text.mission.wave", state.wave, target, (int)(state.wavetime/60));
     }
 
     @Override

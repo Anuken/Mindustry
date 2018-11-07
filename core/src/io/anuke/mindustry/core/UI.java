@@ -98,10 +98,9 @@ public class UI extends SceneModule{
     void generateFonts(){
         generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/pixel.ttf"));
         FreeTypeFontParameter param = new FreeTypeFontParameter();
-        param.size = 14;
-        param.gamma = param.borderGamma = 0f;
+        param.size = 14*2;
         param.shadowColor = Color.DARK_GRAY;
-        param.shadowOffsetY = 1;
+        param.shadowOffsetY = 2;
         param.incremental = true;
 
         skin.add("default-font", generator.generateFont(param));
