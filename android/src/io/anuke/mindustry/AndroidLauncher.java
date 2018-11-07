@@ -133,7 +133,7 @@ public class AndroidLauncher extends PatchedAndroidApplication{
         config.hideStatusBar = true;
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());
-        initialize(new Mindustry(), config);
+        initialize(new MindustryGame(), config);
         checkFiles(getIntent());
     }
 

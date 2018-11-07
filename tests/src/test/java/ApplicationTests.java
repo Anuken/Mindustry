@@ -1,3 +1,4 @@
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
@@ -62,12 +63,20 @@ public class ApplicationTests{
                 }
             };
 
+            Game game = new Game() {
+
+                @Override
+                public void create() {
+                    setScreen(core);
+                }
+            };
+
             HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
             config.preferencesDirectory = "test_files/";
 
             new File("tests_files/").delete();
 
-            new HeadlessApplication(core, config){{
+            new HeadlessApplication(game, config){{
                 Gdx.app.setApplicationLogger(new EmptyLogger());
             }};
 

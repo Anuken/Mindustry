@@ -5,7 +5,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
-import io.anuke.mindustry.Mindustry;
+import io.anuke.mindustry.MindustryGame;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.Net;
 
@@ -27,7 +27,7 @@ public class DesktopLauncher extends Lwjgl3Application{
 
             Net.setClientProvider(new KryoClient());
             Net.setServerProvider(new KryoServer());
-            new DesktopLauncher(new Mindustry(), config);
+            new DesktopLauncher(new MindustryGame(), config);
         }catch(Throwable e){
             CrashHandler.handle(e);
         }

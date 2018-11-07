@@ -75,7 +75,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
         };
 
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        return new IOSApplication(new Mindustry(), config);
+        return new IOSApplication(new MindustryGame(), config);
     }
 
     @Override

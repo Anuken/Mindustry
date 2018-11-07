@@ -56,7 +56,7 @@ public class SplashScreen implements Screen {
         batch.begin();
         sprite.draw(batch);
         batch.end();
-        Gdx.app.postRunnable(() -> myGame.setScreen(new GameScreen()));
+        Gdx.app.postRunnable(() -> myGame.setScreen(new Mindustry()));
     }
 
     @Override
