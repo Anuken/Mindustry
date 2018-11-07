@@ -28,7 +28,7 @@ public class ServerLauncher extends HeadlessApplication{
             HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
             config.preferencesDirectory = OS.getAppDataDirectoryString("Mindustry");
 
-            new ServerLauncher(new MindustryServer(args), config);
+            new ServerLauncher(new MindustryServerGame(args), config);
         }catch(Throwable t){
             CrashHandler.handle(t);
         }
