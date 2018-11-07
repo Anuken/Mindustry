@@ -105,7 +105,7 @@ public class HudFragment extends Fragment{
 
             Stack stack = new Stack();
             TextButton waves = new TextButton("");
-            Table btable = new Table();
+            Table btable = new Table().margin(14);
 
             stack.add(waves);
             stack.add(btable);
@@ -114,7 +114,7 @@ public class HudFragment extends Fragment{
 
             addWaveTable(waves);
             addPlayButton(btable);
-            cont.add(stack).fillX().height(66f);
+            cont.add(stack).fillX();
 
             cont.row();
 
