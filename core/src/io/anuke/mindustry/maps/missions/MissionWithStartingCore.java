@@ -10,8 +10,6 @@ import io.anuke.mindustry.world.Tile;
 import static io.anuke.mindustry.Vars.state;
 
 public abstract class MissionWithStartingCore extends Mission{
-
-
     /** Stores a custom starting location for the core, or null if the default calculation (map center) shall be used. */
     private final GridPoint2 customStartingPoint;
 
