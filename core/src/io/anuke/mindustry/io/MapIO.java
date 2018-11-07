@@ -47,23 +47,15 @@ public class MapIO{
         data.position(0, 0);
 
         TileDataMarker marker = data.newDataMarker();
-        Color color = new Color();
 
         for(int y = 0; y < data.height(); y++){
             for(int x = 0; x < data.width(); x++){
                 data.read(marker);
+                byte elev = y >= data.height() - 1 ? 0 : data.read(x, y + 1, DataPosition.elevation);
                 Block floor = content.block(marker.floor);
                 Block wall = content.block(marker.wall);
-                int wallc = ColorMapper.getBlockColor(wall);
-                if(wallc == 0 && (wall.update || wall.solid || wall.breakable)) wallc = Team.all[marker.team].intColor;
-                wallc = wallc == 0 ? ColorMapper.getBlockColor(floor) : wallc;
-                if(marker.elevation > 0){
-                    float scaling = 1f + marker.elevation / 8f;
-                    color.set(wallc);
-                    color.mul(scaling, scaling, scaling, 1f);
-                    wallc = Color.rgba8888(color);
-                }
-                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, wallc);
+                int color = ColorMapper.colorFor(floor, wall, Team.all[marker.team], marker.elevation, elev > marker.elevation ? (byte)(1 << 6) : (byte)0);
+                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, color);
             }
         }
 

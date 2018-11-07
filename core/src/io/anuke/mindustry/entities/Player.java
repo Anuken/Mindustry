@@ -512,14 +512,14 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             achievedFlight = true;
         }
 
-        if(boostHeat <= liftoffBoost + 0.05f && achievedFlight){
+        if(boostHeat <= liftoffBoost + 0.05f && achievedFlight && !mech.flying){
             if(tile != null){
                 if(mech.shake > 1f){
                     Effects.shake(mech.shake, mech.shake, this);
                 }
                 Effects.effect(UnitFx.unitLand, tile.floor().minimapColor, x, y, tile.floor().isLiquid ? 1f : 0.5f);
             }
-            if(!mech.flying) mech.onLand(this);
+            mech.onLand(this);
             achievedFlight = false;
         }
 
