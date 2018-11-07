@@ -321,7 +321,7 @@ public class Control extends Module{
         if(!Settings.getBool("4.0-warning-2", false)){
 
             Timers.run(5f, () -> {
-                FloatingDialog dialog = new FloatingDialog("[orange]WARNING![]");
+                FloatingDialog dialog = new FloatingDialog("[accent]WARNING![]");
                 dialog.buttons().addButton("$text.ok", () -> {
                     dialog.hide();
                     Settings.putBool("4.0-warning-2", true);

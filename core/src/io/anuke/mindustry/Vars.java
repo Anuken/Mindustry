@@ -86,8 +86,6 @@ public class Vars{
     public static FileHandle saveDirectory;
     public static String mapExtension = "mmap";
     public static String saveExtension = "msav";
-    //scale of the font
-    public static float fontScale;
     //camera zoom displayed on startup
     public static int baseCameraScale;
     public static boolean showBlockDebug = false;
@@ -173,8 +171,6 @@ public class Vars{
         dataDirectory = OS.getAppDataDirectory(appName);
         customMapDirectory = dataDirectory.child("maps/");
         saveDirectory = dataDirectory.child("saves/");
-
-        fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f);
         baseCameraScale = Math.round(Unit.dp.scl(4));
     }
 }

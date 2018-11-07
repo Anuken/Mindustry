@@ -32,12 +32,12 @@ public class MenuFragment extends Fragment{
         });
 
         //discord icon in top right
-        parent.fill(c -> c.top().right().addButton("", "discord", ui.discord::show).size(81, 42)
+        parent.fill(c -> c.top().right().addButton("", "discord", ui.discord::show).size(84, 45)
                 .visible(() -> state.is(State.menu)));
 
         //info icon
         if(mobile){
-            parent.fill(c -> c.top().left().addButton("", "info", ui.about::show).size(81, 42)
+            parent.fill(c -> c.top().left().addButton("", "info", ui.about::show).size(84, 45)
                     .visible(() -> state.is(State.menu)));
         }
 
