@@ -792,13 +792,13 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }else{
             CoreEntity entity = (CoreEntity) getClosestCore();
             if(entity != null && !netServer.isWaitingForPlayers()){
-                this.spawner = entity.tile.id();
+                this.spawner = entity.tile.pos();
             }
         }
     }
 
     public void beginRespawning(SpawnerTrait spawner){
-        this.spawner = spawner.getTile().packedPosition();
+        this.spawner = spawner.getTile().pos();
         this.dead = true;
     }
 
@@ -853,7 +853,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
-        buffer.writeInt(mining == null ? -1 : mining.packedPosition());
+        buffer.writeInt(mining == null ? -1 : mining.pos());
         buffer.writeInt(spawner);
         buffer.writeShort((short) (baseRotation * 2));
 

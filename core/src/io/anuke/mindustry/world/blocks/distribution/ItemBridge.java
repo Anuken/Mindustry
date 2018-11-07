@@ -15,6 +15,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Timers;
@@ -58,8 +59,8 @@ public class ItemBridge extends Block{
     public static void linkItemBridge(Player player, Tile tile, Tile other){
         ItemBridgeEntity entity = tile.entity();
         ItemBridgeEntity oe = other.entity();
-        entity.link = other.packedPosition();
-        oe.incoming.add(tile.packedPosition());
+        entity.link = other.pos();
+        oe.incoming.add(tile.pos());
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
@@ -68,7 +69,7 @@ public class ItemBridge extends Block{
         entity.link = -1;
         if(other != null){
             ItemBridgeEntity oe = other.entity();
-            oe.incoming.remove(tile.packedPosition());
+            oe.incoming.remove(tile.pos());
         }
     }
 
@@ -90,7 +91,7 @@ public class ItemBridge extends Block{
                 Call.linkItemBridge(null, last, tile);
             }
         }
-        lastPlaced = tile.packedPosition();
+        lastPlaced = tile.pos();
     }
 
     @Override
@@ -122,7 +123,7 @@ public class ItemBridge extends Block{
             for(int j = 0; j < 4; j++){
                 Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
                 if(linkValid(tile, other)){
-                    boolean linked = other.packedPosition() == entity.link;
+                    boolean linked = other.pos() == entity.link;
                     Draw.color(linked ? Palette.place : Palette.breakInvalid);
 
                     Lines.square(other.drawx(), other.drawy(),
@@ -139,7 +140,7 @@ public class ItemBridge extends Block{
         ItemBridgeEntity entity = tile.entity();
 
         if(linkValid(tile, other)){
-            if(entity.link == other.packedPosition()){
+            if(entity.link == other.pos()){
                 Call.unlinkItemBridge(null, tile, other);
             }else{
                 Call.linkItemBridge(null, tile, other);
@@ -254,7 +255,7 @@ public class ItemBridge extends Block{
 
             if(rel == rel2) return false;
         }else{
-            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>entity().link == tile.packedPosition() && tile.entity.items.total() < itemCapacity;
+            return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>entity().link == tile.pos() && tile.entity.items.total() < itemCapacity;
         }
 
         return tile.entity.items.total() < itemCapacity;
@@ -273,9 +274,7 @@ public class ItemBridge extends Block{
 
             while(it.hasNext){
                 int v = it.next();
-                int x = v % world.width();
-                int y = v / world.width();
-                if(tile.absoluteRelativeTo(x, y) == i){
+                if(tile.absoluteRelativeTo(Pos.x(v), Pos.y(v)) == i){
                     return false;
                 }
             }
@@ -315,7 +314,7 @@ public class ItemBridge extends Block{
             return false;
         }
 
-        return other.block() == this && (!checkDouble || other.<ItemBridgeEntity>entity().link != tile.packedPosition());
+        return other.block() == this && (!checkDouble || other.<ItemBridgeEntity>entity().link != tile.pos());
     }
 
     public static class ItemBridgeEntity extends TileEntity{

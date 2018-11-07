@@ -52,8 +52,8 @@ public class BlockIndexer{
 
     public BlockIndexer(){
         Events.on(TileChangeEvent.class, event -> {
-            if(typeMap.get(event.tile.packedPosition()) != null){
-                TileIndex index = typeMap.get(event.tile.packedPosition());
+            if(typeMap.get(event.tile.pos()) != null){
+                TileIndex index = typeMap.get(event.tile.pos());
                 for(BlockFlag flag : index.flags){
                     getFlagged(index.team)[flag.ordinal()].remove(event.tile);
                 }
@@ -230,7 +230,7 @@ public class BlockIndexer{
 
                 map[flag.ordinal()] = arr;
             }
-            typeMap.put(tile.packedPosition(), new TileIndex(tile.block().flags, tile.getTeam()));
+            typeMap.put(tile.pos(), new TileIndex(tile.block().flags, tile.getTeam()));
         }
 
         if(ores == null) return;

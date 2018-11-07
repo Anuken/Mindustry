@@ -14,6 +14,7 @@ import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.maps.generation.WorldGenerator;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.core.Events;
@@ -101,12 +102,8 @@ public class World extends Module{
         return tiles == null ? 0 : tiles[0].length;
     }
 
-    public int toPacked(int x, int y){
-        return x + y * width();
-    }
-
-    public Tile tile(int packed){
-        return tiles == null ? null : tile(packed % width(), packed / width());
+    public Tile tile(int pos){
+        return tiles == null ? null : tile(Pos.x(pos), Pos.y(pos));
     }
 
     public Tile tile(int x, int y){

@@ -119,7 +119,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void setSpawner(Tile tile){
-        this.spawner = tile.packedPosition();
+        this.spawner = tile.pos();
     }
 
     public void setIntSpawner(int pos){

@@ -134,9 +134,9 @@ public class PowerGraph{
             child.entity.power.graph = this;
             add(child);
             for(Tile next : child.block().getPowerConnections(child, outArray2)){
-                if(next.entity.power != null && next.entity.power.graph == null && !closedSet.contains(next.packedPosition())){
+                if(next.entity.power != null && next.entity.power.graph == null && !closedSet.contains(next.pos())){
                     queue.addLast(next);
-                    closedSet.add(next.packedPosition());
+                    closedSet.add(next.pos());
                 }
             }
         }
@@ -156,9 +156,9 @@ public class PowerGraph{
                 child.entity.power.graph = graph;
                 graph.add(child);
                 for(Tile next : child.block().getPowerConnections(child, outArray2)){
-                    if(next != tile && next.entity.power != null && next.entity.power.graph == null && !closedSet.contains(next.packedPosition())){
+                    if(next != tile && next.entity.power != null && next.entity.power.graph == null && !closedSet.contains(next.pos())){
                         queue.addLast(next);
-                        closedSet.add(next.packedPosition());
+                        closedSet.add(next.pos());
                     }
                 }
             }
