@@ -60,7 +60,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public boolean achievedFlight;
     public Color color = new Color();
     public Mech mech;
-    public int spawner = -1;
+    public int spawner = noSpawner;
 
     public NetConnection con;
     public int playerIndex = 0;
@@ -497,7 +497,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             updateRespawning();
             return;
         }else{
-            spawner = -1;
+            spawner = noSpawner;
         }
 
         avoidOthers(1f);
@@ -787,7 +787,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     public void updateRespawning(){
 
-        if(spawner != -1 && world.tile(spawner) != null && world.tile(spawner).entity instanceof SpawnerTrait){
+        if(spawner != noSpawner && world.tile(spawner) != null && world.tile(spawner).entity instanceof SpawnerTrait){
             ((SpawnerTrait) world.tile(spawner).entity).updateSpawning(this);
         }else{
             CoreEntity entity = (CoreEntity) getClosestCore();
@@ -803,7 +803,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     public void endRespawning(){
-        spawner = -1;
+        spawner = noSpawner;
     }
 
     //endregion

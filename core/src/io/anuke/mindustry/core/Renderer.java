@@ -145,7 +145,7 @@ public class Renderer extends RendererModule{
 
             if(players[0].isDead()){
                 TileEntity core = players[0].getClosestCore();
-                if(core != null && players[0].spawner == -1){
+                if(core != null && players[0].spawner == Unit.noSpawner){
                     smoothCamera(core.x, core.y, 0.08f);
                 }else{
                     smoothCamera(position.x + 0.0001f, position.y + 0.0001f, 0.08f);
