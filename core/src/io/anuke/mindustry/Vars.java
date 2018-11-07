@@ -174,7 +174,7 @@ public class Vars{
         customMapDirectory = dataDirectory.child("maps/");
         saveDirectory = dataDirectory.child("saves/");
 
-        fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f);
+        fontScale = Math.max(Unit.dp.scl(1f), 0.5f);
         baseCameraScale = Math.round(Unit.dp.scl(4));
     }
 }

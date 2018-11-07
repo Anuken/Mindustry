@@ -1,5 +1,7 @@
 package io.anuke.mindustry.maps.missions;
 
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
@@ -29,6 +31,11 @@ public class BattleMission extends Mission{
     }
 
     @Override
+    public Array<GridPoint2> getSpawnPoints(Generation gen){
+        return Array.with(new GridPoint2(50, 50), new GridPoint2(gen.width - 1 - spacing, gen.height - 1 - spacing));
+    }
+
+    @Override
     public void generate(Generation gen){
         generateCoreAt(gen, 50, 50, defaultTeam);
 
@@ -37,8 +44,8 @@ public class BattleMission extends Mission{
         }
 
         Tile core = state.teams.get(defaultTeam).cores.first();
-        int enx = world.width() - 1 - spacing;
-        int eny = world.height() - 1 - spacing;
+        int enx = gen.width - 1 - spacing;
+        int eny = gen.height - 1 - spacing;
         new FortressGenerator().generate(gen, Team.red, core.x, core.y, enx, eny);
     }
 

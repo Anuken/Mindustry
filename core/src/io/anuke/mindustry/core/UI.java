@@ -2,8 +2,11 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
 import io.anuke.mindustry.Vars;
@@ -31,6 +34,8 @@ import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
 
 public class UI extends SceneModule{
+    private FreeTypeFontGenerator generator;
+
     public final MenuFragment menufrag = new MenuFragment();
     public final HudFragment hudfrag = new HudFragment();
     public final ChatFragment chatfrag = new ChatFragment();
@@ -89,13 +94,29 @@ public class UI extends SceneModule{
 
         Colors.put("accent", Palette.accent);
     }
+    
+    void generateFonts(){
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/pixel.ttf"));
+        FreeTypeFontParameter param = new FreeTypeFontParameter();
+        param.size = 14*2;
+        param.shadowColor = Color.DARK_GRAY;
+        param.shadowOffsetY = 2;
+        param.incremental = true;
+
+        skin.add("default-font", generator.generateFont(param));
+        skin.add("default-font-chat", generator.generateFont(param));
+        skin.getFont("default-font").getData().markupEnabled = true;
+        skin.getFont("default-font").setOwnsTexture(false);
+    }
 
     @Override
     protected void loadSkin(){
-        skin = new Skin(Gdx.files.internal("ui/uiskin.json"), Core.atlas);
+        skin = new Skin(Core.atlas);
+        generateFonts();
+        skin.load(Gdx.files.internal("ui/uiskin.json"));
 
         for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
-            font.setUseIntegerPositions(false);
+            font.setUseIntegerPositions(true);
             font.getData().setScale(Vars.fontScale);
         }
     }
@@ -165,6 +186,12 @@ public class UI extends SceneModule{
         super.resize(width, height);
 
         Events.fire(new ResizeEvent());
+    }
+
+    @Override
+    public void dispose(){
+        super.dispose();
+        generator.dispose();
     }
 
     public void loadGraphics(Runnable call){

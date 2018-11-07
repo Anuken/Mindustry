@@ -2,7 +2,6 @@ package io.anuke.mindustry.ai;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
-import com.badlogic.gdx.utils.Bits;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -14,7 +13,10 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.EnumSet;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.ThreadArray;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -80,7 +82,7 @@ public class BlockIndexer{
 
             for(int x = 0; x < world.width(); x++){
                 for(int y = 0; y < world.height(); y++){
-                    Tile tile = world.tileWorld(x, y);
+                    Tile tile = world.tile(x, y);
 
                     process(tile);
 

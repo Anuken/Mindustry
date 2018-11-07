@@ -23,10 +23,10 @@ public class SectorPresets{
 
     public SectorPresets(){
 
-        //base tutorial mission
-        add(new SectorPreset(0, 0,
+        //base tutorial mission (disabled)
+        /*add(new SectorPreset(0, 0,
             TutorialSector.getMissions(),
-            Array.with(Items.copper, Items.coal, Items.lead)));
+            Array.with(Items.copper, Items.coal, Items.lead)));*/
 
         //command center mission
         add(new SectorPreset(0, 1,

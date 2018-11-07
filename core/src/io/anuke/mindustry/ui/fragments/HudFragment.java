@@ -198,7 +198,7 @@ public class HudFragment extends Fragment{
         blockfrag.build(Core.scene.getRoot());
     }
 
-    public void showText(String text){
+    public void showToast(String text){
         Table table = new Table("button");
         table.update(() -> {
             if(state.is(State.menu)){
@@ -219,9 +219,7 @@ public class HudFragment extends Fragment{
         Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.removeActor())));
     }
 
-    /**
-     * Show unlock notification for a new recipe.
-     */
+    /**Show unlock notification for a new recipe.*/
     public void showUnlock(Recipe recipe){
         blockfrag.rebuild();
 

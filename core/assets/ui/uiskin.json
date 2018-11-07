@@ -1,31 +1,4 @@
 {
-Font: {
-	default-font: {
-		file: square.fnt,
-		markup: true,
-		scale: 0.5
-	},
-	default-font-chat: {
-		file: square.fnt,
-		markup: false,
-		scale: 0.5
-	},
-	trad-chinese: {
-		file: trad_chinese.fnt,
-		markup: true,
-		scale: 0.5
-	},
-	simp-chinese: {
-		file: simp_chinese.fnt,
-		markup: true,
-		scale: 0.5
-	},
-	title: {
-		file: title.fnt,
-		markup: true,
-		scale: 2
-	}
-},
 Color: {
 	black: {a: 1, b: 0, g: 0, r: 0 },
 	white: {a: 1, b: 1, g: 1, r: 1 },
@@ -71,12 +44,12 @@ ImageButtonStyle: {
 ScrollPaneStyle: {
 	default: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
 	horizontal: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal},
-	volume: {background: button-map, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
+	volume: {background: button, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
 	clear: {vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
 	clear-black: {vScroll: scroll, vScrollKnob: scroll-knob-vertical-black}
 },
 WindowStyle: {
-	default: {titleFont: default-font, background: window, titleFontColor: accent },
+	default: {titleFont: default-font, titleFontColor: accent },
 	dialog: {stageBackground: dialogDim, titleFont: default-font, background: window-empty, titleFontColor: accent }
 },
 KeybindDialogStyle: {
@@ -88,7 +61,6 @@ SliderStyle: {
 },
 LabelStyle: {
 	default: {font: default-font, fontColor: white },
-	title: {font: title, fontColor: white },
 	small: {font: default-font, fontColor: white }
 },
 TextFieldStyle: {
