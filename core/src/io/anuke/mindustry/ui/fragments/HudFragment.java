@@ -54,54 +54,56 @@ public class HudFragment extends Fragment{
 
             cont.top().left().visible(() -> !state.is(State.menu));
 
-            cont.table(select -> {
-                select.left();
-                select.defaults().size(dsize).left();
+            if(mobile){
+                cont.table(select -> {
+                    select.left();
+                    select.defaults().size(dsize).left();
 
-                menu = select.addImageButton("icon-menu", isize, ui.paused::show).get();
-                flip = select.addImageButton("icon-arrow-up", isize, this::toggleMenus).get();
+                    menu = select.addImageButton("icon-menu", isize, ui.paused::show).get();
+                    flip = select.addImageButton("icon-arrow-up", isize, this::toggleMenus).get();
 
-                select.update(() -> {
-                    if(Inputs.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
-                        toggleMenus();
-                    }
+                    select.addImageButton("icon-pause", isize, () -> {
+                        if(Net.active()){
+                            ui.listfrag.toggle();
+                        }else{
+                            state.set(state.is(State.paused) ? State.playing : State.paused);
+                        }
+                    }).update(i -> {
+                        if(Net.active()){
+                            i.getStyle().imageUp = Core.skin.getDrawable("icon-players");
+                        }else{
+                            i.setDisabled(Net.active());
+                            i.getStyle().imageUp = Core.skin.getDrawable(state.is(State.paused) ? "icon-play" : "icon-pause");
+                        }
+                    }).get();
+
+                    select.addImageButton("icon-settings", isize, () -> {
+                        if(Net.active() && mobile){
+                            if(ui.chatfrag.chatOpen()){
+                                ui.chatfrag.hide();
+                            }else{
+                                ui.chatfrag.toggle();
+                            }
+                        }else{
+                            ui.unlocks.show();
+                        }
+                    }).update(i -> {
+                        if(Net.active() && mobile){
+                            i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
+                        }else{
+                            i.getStyle().imageUp = Core.skin.getDrawable("icon-unlocks");
+                        }
+                    }).get();
                 });
 
-                select.addImageButton("icon-pause", isize, () -> {
-                    if(Net.active()){
-                        ui.listfrag.toggle();
-                    }else{
-                        state.set(state.is(State.paused) ? State.playing : State.paused);
-                    }
-                }).update(i -> {
-                    if(Net.active()){
-                        i.getStyle().imageUp = Core.skin.getDrawable("icon-players");
-                    }else{
-                        i.setDisabled(Net.active());
-                        i.getStyle().imageUp = Core.skin.getDrawable(state.is(State.paused) ? "icon-play" : "icon-pause");
-                    }
-                }).get();
+                cont.row();
+            }
 
-                select.addImageButton("icon-settings", isize, () -> {
-                    if(Net.active() && mobile){
-                        if(ui.chatfrag.chatOpen()){
-                            ui.chatfrag.hide();
-                        }else{
-                            ui.chatfrag.toggle();
-                        }
-                    }else{
-                        ui.unlocks.show();
-                    }
-                }).update(i -> {
-                    if(Net.active() && mobile){
-                        i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
-                    }else{
-                        i.getStyle().imageUp = Core.skin.getDrawable("icon-unlocks");
-                    }
-                }).get();
+            cont.update(() -> {
+                if(Inputs.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
+                    toggleMenus();
+                }
             });
-
-            cont.row();
 
             Stack stack = new Stack();
             TextButton waves = new TextButton("");
@@ -114,7 +116,7 @@ public class HudFragment extends Fragment{
 
             addWaveTable(waves);
             addPlayButton(btable);
-            cont.add(stack).fillX();
+            cont.add(stack).width(dsize * 4);
 
             cont.row();
 
@@ -132,7 +134,9 @@ public class HudFragment extends Fragment{
             }).size(-1).visible(() -> Settings.getBool("fps")).update(t -> t.setTranslation(0, (!waves.isVisible() ? wavetable.getHeight() : Math.min(wavetable.getTranslation().y, wavetable.getHeight())) )).get();
 
             //make wave box appear below rest of menu
-            cont.swapActor(wavetable, menu.getParent());
+            if(mobile){
+                cont.swapActor(wavetable, menu.getParent());
+            }
         });
 
         //minimap
@@ -333,7 +337,9 @@ public class HudFragment extends Fragment{
         float dur = 0.3f;
         Interpolation in = Interpolation.pow3Out;
 
-        flip.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
+        if(flip != null){
+            flip.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
+        }
 
         if(shown){
             shown = false;

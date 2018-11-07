@@ -30,7 +30,7 @@ public class DefaultKeybinds{
                 "zoom", new Axis(Input.SCROLL),
                 "zoom_minimap", new Axis(Input.MINUS, Input.PLUS),
                 "menu", Gdx.app.getType() == ApplicationType.Android ? Input.BACK : Input.ESCAPE,
-                "pause", Input.Q,
+                "pause", Input.SPACE,
                 "toggle_menus", Input.C,
                 new Category("multiplayer"),
                 "player_list", Input.TAB,
