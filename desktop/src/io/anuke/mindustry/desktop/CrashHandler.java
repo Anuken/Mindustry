@@ -21,13 +21,17 @@ import java.time.format.DateTimeFormatter;
 public class CrashHandler{
 
     public static void handle(Throwable e){
-        try{
-            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-        }catch(Throwable ignored){}
+        e.printStackTrace();
+
+        if(!OS.isMac){
+            try{
+                javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+            }catch(Throwable ignored){}
+        }
 
         boolean badGPU = false;
 
-        if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
+        if(!OS.isMac && e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
             try{
                 javax.swing.JOptionPane.showMessageDialog(null, "Your graphics card does not support OpenGL 2.0!\n" +
                     "Try to update your graphics drivers.\n\n" +
@@ -36,8 +40,6 @@ public class CrashHandler{
                 badGPU = true;
             }catch(Throwable ignored){}
         }
-
-        e.printStackTrace();
 
         //don't create crash logs for me (anuke), as it's expected
         //also don't create logs for custom builds

@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities.effect;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
 import io.anuke.annotations.Annotations.Loc;
@@ -15,7 +14,6 @@ import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.TimedEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
@@ -29,7 +27,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
-import static io.anuke.mindustry.Vars.fontScale;
 
 public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, TimeTrait{
     public static final float lifetime = 10f;

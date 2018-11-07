@@ -53,7 +53,7 @@ public class SaveDialog extends LoadDialog{
             }catch(Throwable e){
                 e.printStackTrace();
 
-                ui.showError("[orange]" + Bundles.get("text.savefail"));
+                ui.showError("[accent]" + Bundles.get("text.savefail"));
             }
         });
     }

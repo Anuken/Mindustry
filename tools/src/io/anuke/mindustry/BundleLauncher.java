@@ -47,7 +47,7 @@ public class BundleLauncher {
                 int added = 0;
 
                 for(String key : base.orderedKeys()){
-                    if(!other.containsKey(key)){
+                    if(!other.containsKey(key) || other.get(key).trim().isEmpty()){
                         other.put(key, base.get(key));
                         added ++;
                         Log.info("&lc- Adding missing key '{0}'...", key);

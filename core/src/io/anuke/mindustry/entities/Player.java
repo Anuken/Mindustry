@@ -395,23 +395,28 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void drawName(){
         GlyphLayout layout = Pooling.obtain(GlyphLayout.class, GlyphLayout::new);
 
-        Draw.tscl(0.25f / 2);
+        boolean ints = Core.font.usesIntegerPositions();
+        Core.font.setUseIntegerPositions(false);
+        Draw.tscl(0.25f / io.anuke.ucore.scene.ui.layout.Unit.dp.scl(1f));
         layout.setText(Core.font, name);
         Draw.color(0f, 0f, 0f, 0.3f);
-        Draw.rect("blank", x, y + 8 - layout.height / 2, layout.width + 2, layout.height + 2);
+        Draw.rect("blank", x, y + 8 - layout.height / 2, layout.width + 2, layout.height + 3);
         Draw.color();
         Draw.tcolor(color);
         Draw.text(name, x, y + 8);
 
         if(isAdmin){
-            Draw.color(color);
             float s = 3f;
+            Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
+            Draw.rect("icon-admin-small", x + layout.width / 2f + 2 + 1, y + 6.5f, s, s);
+            Draw.color(color);
             Draw.rect("icon-admin-small", x + layout.width / 2f + 2 + 1, y + 7f, s, s);
         }
 
         Draw.reset();
         Pooling.free(layout);
-        Draw.tscl(fontScale);
+        Draw.tscl(1f);
+        Core.font.setUseIntegerPositions(ints);
     }
 
     /**Draw all current build requests. Does not draw the beam effect, only the positions.*/
