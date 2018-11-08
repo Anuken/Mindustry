@@ -41,7 +41,7 @@ public class Sectors{
     private final AsyncExecutor executor = new AsyncExecutor(6);
 
     public void playSector(Sector sector){
-        if(sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
+        if(!headless && sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
             sector.getSave().delete();
             ui.showInfo("$text.save.old");
         }

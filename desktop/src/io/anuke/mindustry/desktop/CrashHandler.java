@@ -23,6 +23,16 @@ public class CrashHandler{
     public static void handle(Throwable e){
         e.printStackTrace();
 
+        try{
+            //check crash report setting
+            if(!Settings.getBool("crashreport")){
+                return;
+            }
+        }catch(Throwable ignored){
+            //don't send since we don't know if the user has the setting set
+            return;
+        }
+
         if(!OS.isMac){
             try{
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());

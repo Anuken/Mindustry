@@ -1,5 +1,6 @@
 ##Packr, build stuff
 
+logs/
 /core/assets/mindustry-saves/
 /core/assets/mindustry-maps/
 /core/assets/bundles/output/
