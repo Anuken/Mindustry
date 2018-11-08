@@ -167,7 +167,7 @@ public class Logic extends Module{
             if(!state.isPaused()){
                 Timers.update();
 
-                if(!state.mode.disableWaveTimer && !state.mode.disableWaves){
+                if(!state.mode.disableWaveTimer && !state.mode.disableWaves && !state.gameOver){
                     state.wavetime -= Timers.delta();
                 }
 

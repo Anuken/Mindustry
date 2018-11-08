@@ -229,7 +229,7 @@ public class Sectors{
     private void generate(Sector sector){
 
         //50% chance to get a wave mission
-        if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5){
+        if(Mathf.randomSeed(sector.getSeed() + 7) < 0.5){
             //recipe mission (maybe)
             addRecipeMission(sector, 3);
             sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 1, 4)*5));

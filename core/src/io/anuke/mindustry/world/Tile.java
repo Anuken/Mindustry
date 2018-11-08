@@ -133,8 +133,9 @@ public class Tile implements PosTrait, TargetTrait{
         return wall;
     }
 
+    @Override
     public Team getTeam(){
-        return Team.all[team];
+        return Team.all[target().team];
     }
 
     public void setTeam(Team team){

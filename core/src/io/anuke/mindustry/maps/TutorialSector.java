@@ -2,12 +2,15 @@ package io.anuke.mindustry.maps;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.content.blocks.*;
-import io.anuke.mindustry.maps.generation.Generation;
-import io.anuke.mindustry.maps.missions.*;
+import io.anuke.mindustry.content.blocks.CraftingBlocks;
+import io.anuke.mindustry.content.blocks.ProductionBlocks;
+import io.anuke.mindustry.content.blocks.StorageBlocks;
+import io.anuke.mindustry.content.blocks.UnitBlocks;
+import io.anuke.mindustry.maps.missions.BlockMission;
+import io.anuke.mindustry.maps.missions.ItemMission;
+import io.anuke.mindustry.maps.missions.Mission;
+import io.anuke.mindustry.maps.missions.WaveMission;
 import io.anuke.mindustry.world.Block;
-import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -16,7 +19,7 @@ public class TutorialSector{
     private static int droneIndex;
 
     public static Array<Mission> getMissions(){
-
+/*
         Array<Mission> missions = Array.with(
             new ItemMission(Items.copper, 60).setMessage("$tutorial.begin"),
 
@@ -83,9 +86,21 @@ public class TutorialSector{
                 droneIndex = i;
                 break;
             }
-        }
+        }*/
 
-        return missions;
+        return Array.with(
+            //intentionally unlocalized
+            new ItemMission(Items.copper, 10).setMessage("An updated tutorial will return next build.\nFor now, you'll have to deal with... this."),
+
+            new BlockMission(ProductionBlocks.mechanicalDrill),
+
+            new ItemMission(Items.copper, 100),
+            new ItemMission(Items.lead, 50),
+
+            new BlockMission(CraftingBlocks.smelter),
+            new ItemMission(Items.densealloy, 10),
+            new WaveMission(5)
+        );
     }
 
     public static boolean supressDrone(){
