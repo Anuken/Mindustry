@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Timers;
 
 import static io.anuke.mindustry.Vars.threads;
 
@@ -37,63 +38,38 @@ public class PowerGraph{
 
         lastFrameUpdated = threads.getFrameID();
 
-        boolean charge = false;
-        
         float totalInput = 0f;
-        float bufferInput = 0f;
+
         for(Tile producer : producers){
-            if (producer.block().consumesPower) {
-                bufferInput += producer.entity.power.amount;
-            } else {
-                totalInput += producer.entity.power.amount;
-            }
+            totalInput += producer.entity.power.amount;
         }
 
-        float maxOutput = 0f;
-        float bufferOutput = 0f;
-        for(Tile consumer : consumers){
-            if (consumer.block().outputsPower) {
-                bufferOutput += consumer.block().powerCapacity - consumer.entity.power.amount;
-            } else {
-                maxOutput += consumer.block().powerCapacity - consumer.entity.power.amount;
-            }
-        }
-
-        if (maxOutput < totalInput) {
-            charge = true;
-        }
-
-        if (totalInput + bufferInput <= 0.0001f || maxOutput + bufferOutput <= 0.0001f) {
-            return;
-        }
-
-        float bufferUsed = 0;
-        if (charge) {
-            bufferUsed = Math.min((totalInput - maxOutput) / bufferOutput, 1f);
-        } else {
-            bufferUsed = Math.min((maxOutput - totalInput) / bufferInput, 1f);
-        }
-
-        float inputUsed = charge ? Math.min((maxOutput + bufferOutput) / totalInput, 1f) : 1f;
         for(Tile producer : producers){
-            if (producer.block().consumesPower) {
-                if (!charge) {
-                    producer.entity.power.amount -= producer.entity.power.amount * bufferUsed;
-                }
+            float accumulator = producer.entity.power.amount;
+
+            if(accumulator <= 0.0001f) continue;
+
+            float toEach = accumulator / consumers.size;
+            float outputs = 0f;
+
+            for(Tile tile : consumers){
+                outputs += Math.min(tile.block().powerCapacity - tile.entity.power.amount, toEach) / toEach;
+            }
+
+            float finalEach = toEach / outputs * Timers.delta();
+            float buffer = 0f;
+
+            if(Float.isNaN(finalEach) || Float.isInfinite(finalEach)){
                 continue;
             }
-            producer.entity.power.amount -= producer.entity.power.amount * inputUsed;
-        }
 
-        float outputSatisfied = charge ? 1f : Math.min((totalInput + bufferInput) / maxOutput, 1f);
-        for(Tile consumer : consumers){
-            if (consumer.block().outputsPower) {
-                if (charge) {
-                    consumer.entity.power.amount +=  (consumer.block().powerCapacity - consumer.entity.power.amount) * bufferUsed;
-                }
-                continue;
+            for(Tile tile : consumers){
+                float used = Math.min(tile.block().powerCapacity - tile.entity.power.amount, finalEach) * accumulator / totalInput;
+                buffer += used;
+                tile.entity.power.amount += used;
             }
-            consumer.entity.power.amount += (consumer.block().powerCapacity - consumer.entity.power.amount) * outputSatisfied;
+
+            producer.entity.power.amount -= buffer;
         }
     }
 
