@@ -271,7 +271,7 @@ public class Control extends Module{
         outer:
         for(int i = 0; i < content.recipes().size; i ++){
             Recipe recipe = content.recipes().get(i);
-            if(!recipe.hidden && recipe.requirements != null){
+            if(!recipe.isHidden() && recipe.requirements != null){
                 for(ItemStack stack : recipe.requirements){
                     if(!entity.items.has(stack.item, Math.min((int) (stack.amount * unlockResourceScaling), 2000))) continue outer;
                 }

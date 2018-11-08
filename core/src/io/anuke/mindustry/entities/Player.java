@@ -323,7 +323,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         if(floor.isLiquid){
-            Draw.tint(Color.WHITE, floor.liquidColor, Mathf.clamp(drownTime));
+            Draw.tint(Color.WHITE, floor.liquidColor, Mathf.clamp(drownTime, 0, 0.99f));
         }else{
             Draw.tint(Color.WHITE);
         }
