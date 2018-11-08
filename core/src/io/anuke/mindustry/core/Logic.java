@@ -10,9 +10,11 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
@@ -35,7 +37,11 @@ public class Logic extends Module{
     public boolean doUpdate = true;
 
     public Logic(){
-        state = new GameState();
+        Events.on(TileChangeEvent.class, event -> {
+            if(event.tile.getTeam() == defaultTeam && Recipe.getByResult(event.tile.block()) != null){
+                handleContent(Recipe.getByResult(event.tile.block()));
+            }
+        });
     }
 
     @Override
@@ -45,6 +51,17 @@ public class Logic extends Module{
             Tile tile = world.tile(x, y);
             return tile != null && tile.solid();
         });
+    }
+
+    /**Handles the event of content being used by either the player or some block.*/
+    public void handleContent(UnlockableContent content){
+        if(world.getSector() != null){
+            world.getSector().currentMission().onContentUsed(content);
+        }
+
+        if(!headless){
+            control.unlocks.unlockContent(content);
+        }
     }
 
     public void play(){
@@ -145,7 +162,8 @@ public class Logic extends Module{
 
         world.sectors.completeSector(world.getSector().x, world.getSector().y);
         world.sectors.save();
-        if(!headless){
+
+        if(!headless && !Net.client()){
             ui.missions.show(world.getSector());
         }
 

@@ -230,7 +230,7 @@ public class Block extends BaseBlock {
     /**Call when some content is produced. This unlocks the content if it is applicable.*/
     public void useContent(Tile tile, UnlockableContent content){
         if(!headless && tile.getTeam() == players[0].getTeam()){
-            control.unlocks.handleContentUsed(content);
+            logic.handleContent(content);
         }
     }
 

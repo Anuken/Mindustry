@@ -90,7 +90,7 @@ public class TutorialSector{
 
         return Array.with(
             //intentionally unlocalized
-            new ItemMission(Items.copper, 10).setMessage("An updated tutorial will return next build.\nFor now, you'll have to deal with... this."),
+            new ItemMission(Items.copper, 50).setMessage("An updated tutorial will return next build.\nFor now, you'll have to deal with... this."),
 
             new BlockMission(ProductionBlocks.mechanicalDrill),
 

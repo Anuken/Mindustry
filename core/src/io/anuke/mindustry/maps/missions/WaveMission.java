@@ -8,6 +8,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
+import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
@@ -35,7 +36,6 @@ public class WaveMission extends MissionWithStartingCore{
         this.target = target;
     }
 
-
     @Override
     public Array<SpawnGroup> getWaves(Sector sector){
         return Waves.getSpawns();
@@ -62,7 +62,7 @@ public class WaveMission extends MissionWithStartingCore{
     public String displayString(){
         return state.wave > target ?
             Bundles.format(
-                Vars.unitGroups[Vars.waveTeam.ordinal()].size() > 1 ?
+                Vars.unitGroups[Vars.waveTeam.ordinal()].size() > 1 && !Net.client() ?
                 "text.mission.wave.enemies" :
                 "text.mission.wave.enemy", target, target, Vars.unitGroups[Vars.waveTeam.ordinal()].size()) :
             Bundles.format("text.mission.wave", state.wave, target, (int)(state.wavetime/60));

@@ -319,6 +319,10 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             TileEntity entity = (TileEntity) target;
             entity.health += type.healSpeed * Timers.delta();
             entity.health = Mathf.clamp(entity.health, 0, entity.tile.block().health);
+
+            if(timer.get(timerRepairEffect, 30)){
+                Effects.effect(BlockFx.healBlockFull, Palette.heal, entity.x, entity.y, entity.tile.block().size);
+            }
         }
 
         updateBuilding(this);

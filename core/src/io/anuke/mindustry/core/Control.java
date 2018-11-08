@@ -178,12 +178,6 @@ public class Control extends Module{
         });
 
         Events.on(WorldLoadEvent.class, event -> threads.runGraphics(() -> Events.fire(new WorldLoadGraphicsEvent())));
-
-        Events.on(TileChangeEvent.class, event -> {
-            if(event.tile.getTeam() == players[0].getTeam() && Recipe.getByResult(event.tile.block()) != null){
-                unlocks.handleContentUsed(Recipe.getByResult(event.tile.block()));
-            }
-        });
     }
 
     public void addPlayer(int index){

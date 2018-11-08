@@ -62,8 +62,9 @@ public class Mechs implements ContentList{
                             drone.leader = player;
                             drone.set(player.x, player.y);
                             drone.add();
+
+                            Effects.effect(UnitFx.unitLand, player);
                         }
-                        Effects.effect(UnitFx.unitLand, player);
                     }
                 }
             }
