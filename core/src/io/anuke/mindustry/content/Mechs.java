@@ -37,7 +37,7 @@ public class Mechs implements ContentList{
 
         alpha = new Mech("alpha-mech", false){
             int maxDrones = 3;
-            float buildTime = 200f;
+            float buildTime = 20f;
 
             {
                 drillPower = 1;
@@ -53,7 +53,7 @@ public class Mechs implements ContentList{
             @Override
             public void updateAlt(Player player){
 
-                if(getDrones(player) < maxDrones && !TutorialSector.supressDrone() && player.timer.get(Player.timerAbility, buildTime)){
+                if(player.isShooting && player.timer.get(Player.timerAbility, buildTime) && getDrones(player) < maxDrones && !TutorialSector.supressDrone()){
                     if(!Net.client()) {
                         AlphaDrone drone = (AlphaDrone) UnitTypes.alphaDrone.create(player.getTeam());
                         drone.leader = player;
