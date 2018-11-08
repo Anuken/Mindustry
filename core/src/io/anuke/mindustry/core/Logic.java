@@ -180,11 +180,6 @@ public class Logic extends Module{
 
         if(!state.is(State.menu)){
 
-            if(!Net.client() && !world.isInvalidMap()){
-                updateSectors();
-                checkGameOver();
-            }
-
             if(!state.isPaused()){
                 Timers.update();
 
@@ -236,6 +231,11 @@ public class Logic extends Module{
                 EntityQuery.collideGroups(playerGroup, playerGroup);
 
                 world.pathfinder.update();
+            }
+
+            if(!Net.client() && !world.isInvalidMap()){
+                updateSectors();
+                checkGameOver();
             }
         }
 

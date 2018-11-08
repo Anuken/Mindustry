@@ -1,7 +1,6 @@
 package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.entities.traits.SaveTrait;
@@ -215,7 +214,6 @@ public abstract class SaveFileVersion{
     }
 
     public void readEntities(DataInputStream stream) throws IOException{
-        ObjectSet<EntityGroup<?>> set = new ObjectSet<>();
         byte groups = stream.readByte();
 
         for(int i = 0; i < groups; i++){
@@ -224,12 +222,7 @@ public abstract class SaveFileVersion{
                 byte typeid = stream.readByte();
                 SaveTrait trait = (SaveTrait) TypeTrait.getTypeByID(typeid).get();
                 trait.readSave(stream);
-                set.add(trait.targetGroup());
             }
-        }
-
-        for(EntityGroup<?> group : set){
-            group.updateEvents();
         }
     }
 
