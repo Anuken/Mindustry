@@ -41,7 +41,7 @@ public class AlphaDrone extends FlyingUnit {
             target = leader;
 
             if(last == null){
-                circle(leader.isShooting ? 50f : 0f);
+                circle(leader.isShooting ? 60f : 0f);
             }
 
             target = last;

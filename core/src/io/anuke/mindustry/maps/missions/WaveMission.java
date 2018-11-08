@@ -1,6 +1,5 @@
 package io.anuke.mindustry.maps.missions;
 
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
@@ -11,9 +10,7 @@ import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.ucore.util.Bundles;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.waveTeam;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class WaveMission extends MissionWithStartingCore{
     private final int target;

@@ -88,9 +88,7 @@ public class Sectors{
 
     public Difficulty getDifficulty(Sector sector){
         if(sector.difficulty == 0){
-            //yes, this means hard tutorial difficulty
-            //(((have fun)))
-            return Difficulty.hard;
+            return Difficulty.normal;
         }else if(sector.difficulty < 4){
             return Difficulty.normal;
         }else if(sector.difficulty < 9){

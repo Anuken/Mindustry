@@ -41,7 +41,10 @@ public class Logic extends Module{
     @Override
     public void init(){
         EntityQuery.init();
-        EntityQuery.collisions().setCollider(tilesize, world::solid);
+        EntityQuery.collisions().setCollider(tilesize, (x, y) -> {
+            Tile tile = world.tile(x, y);
+            return tile != null && tile.solid();
+        });
     }
 
     public void play(){

@@ -53,14 +53,18 @@ public class Mechs implements ContentList{
             @Override
             public void updateAlt(Player player){
 
-                if(player.isShooting && player.timer.get(Player.timerAbility, buildTime) && getDrones(player) < maxDrones && !TutorialSector.supressDrone()){
-                    if(!Net.client()) {
-                        AlphaDrone drone = (AlphaDrone) UnitTypes.alphaDrone.create(player.getTeam());
-                        drone.leader = player;
-                        drone.set(player.x, player.y);
-                        drone.add();
+                if(player.isShooting && getDrones(player) < maxDrones && !TutorialSector.supressDrone()){
+                    player.timer.get(Player.timerAbility, buildTime);
+
+                    if(player.timer.getTime(Player.timerAbility) > buildTime/2f){
+                        if(!Net.client()){
+                            AlphaDrone drone = (AlphaDrone) UnitTypes.alphaDrone.create(player.getTeam());
+                            drone.leader = player;
+                            drone.set(player.x, player.y);
+                            drone.add();
+                        }
+                        Effects.effect(UnitFx.unitLand, player);
                     }
-                    Effects.effect(UnitFx.unitLand, player);
                 }
             }
 
