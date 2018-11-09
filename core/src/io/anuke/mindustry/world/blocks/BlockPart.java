@@ -17,6 +17,7 @@ public class BlockPart extends Block{
         solid = false;
         hasPower = hasItems = hasLiquids = true;
         viewRange = -1;
+        configurable = false;
     }
 
     @Override

@@ -53,7 +53,6 @@ public class MassDriver extends Block{
         super(name);
         update = true;
         solid = true;
-        configurable = true;
         hasItems = true;
         layer = Layer.turret;
         hasPower = true;

@@ -54,6 +54,16 @@ public abstract class StorageBlock extends Block{
     }
 
     @Override
+    public void enabled(Tile tile) {
+        onProximityAdded(tile);
+    }
+
+    @Override
+    public void disabled(Tile tile) {
+        onProximityRemoved(tile);
+    }
+
+    @Override
     public void drawSelect(Tile tile){
 
         StorageEntity entity = tile.entity();

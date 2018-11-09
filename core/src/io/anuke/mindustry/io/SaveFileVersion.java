@@ -62,6 +62,7 @@ public abstract class SaveFileVersion{
             }else if(tile.entity != null){
                 stream.writeByte(Bits.packByte(tile.getTeamID(), tile.getRotation())); //team + rotation
                 stream.writeShort((short) tile.entity.health); //health
+                stream.writeBoolean(tile.entity.enabled); //enable
 
                 if(tile.entity.items != null) tile.entity.items.write(stream);
                 if(tile.entity.power != null) tile.entity.power.write(stream);
@@ -139,6 +140,7 @@ public abstract class SaveFileVersion{
             }else if(tile.entity != null){
                 byte tr = stream.readByte();
                 short health = stream.readShort();
+                boolean enabled = stream.readBoolean();
 
                 byte team = Bits.getLeftByte(tr);
                 byte rotation = Bits.getRightByte(tr);
@@ -147,6 +149,7 @@ public abstract class SaveFileVersion{
 
                 tile.setTeam(Team.all[team]);
                 tile.entity.health = health;
+                tile.entity.enabled = enabled;
                 tile.setRotation(rotation);
 
                 if(tile.entity.items != null) tile.entity.items.read(stream);

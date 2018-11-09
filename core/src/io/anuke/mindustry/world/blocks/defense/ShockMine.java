@@ -27,6 +27,7 @@ public class ShockMine extends Block{
         shadow = "shadow-shock-mine";
         targetable = false;
         layer = Layer.overlay;
+        configurable = false;
     }
 
     @Override

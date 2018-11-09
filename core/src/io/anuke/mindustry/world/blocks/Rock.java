@@ -14,6 +14,7 @@ public class Rock extends Block{
         super(name);
         breakable = true;
         alwaysReplace = true;
+        configurable = false;
     }
 
     @Override

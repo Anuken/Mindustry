@@ -24,6 +24,7 @@ public class Conduit extends LiquidBlock{
         rotate = true;
         solid = false;
         floating = true;
+        configurable = false;
     }
 
     @Override

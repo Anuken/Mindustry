@@ -22,6 +22,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.meta.*;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.function.BooleanConsumer;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
@@ -90,7 +91,7 @@ public class Block extends BaseBlock {
     /** Name of shadow region to load. Null to indicate normal shadow. */
     public String shadow = null;
     /** Whether the block can be tapped and selected to configure. */
-    public boolean configurable;
+    public boolean configurable = true;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
     /** The color of this block when displayed on the minimap or map preview. */
@@ -222,6 +223,14 @@ public class Block extends BaseBlock {
     public void unitOn(Tile tile, Unit unit){
     }
 
+    /** Called when it is being enabled. */
+    public void enabled(Tile tile){
+    }
+
+    /** Called when it is being disabled. */
+    public void disabled(Tile tile){
+    }
+
     /** Returns whether ot not this block can be place on the specified tile. */
     public boolean canPlaceOn(Tile tile){
         return true;
@@ -292,6 +301,8 @@ public class Block extends BaseBlock {
      * {@link #configurable} able} must return true for this to be called.
      */
     public void buildTable(Tile tile, Table table){
+        table.addCheck("Enable", tile.entity.enabled, b->{if (tile.entity.enabled = b) enabled(tile); else disabled(tile);});
+        table.row();
     }
 
     /**

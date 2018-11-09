@@ -46,6 +46,7 @@ public class Conveyor extends Block{
         hasItems = true;
         autoSleep = true;
         itemCapacity = 4;
+        configurable = false;
     }
 
     private static int compareItems(long a, long b){

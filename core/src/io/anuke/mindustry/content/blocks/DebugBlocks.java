@@ -42,6 +42,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             {
                 powerCapacity = Float.MAX_VALUE;
                 shadow = "shadow-round-1";
+                configurable = false;
             }
 
             @Override
@@ -133,6 +134,8 @@ public class DebugBlocks extends BlockList implements ContentList{
 
             @Override
             public void buildTable(Tile tile, Table table){
+                super.buildTable(tile, table);
+
                 LiquidSourceEntity entity = tile.entity();
 
                 Array<Liquid> items = content.liquids();
@@ -173,7 +176,7 @@ public class DebugBlocks extends BlockList implements ContentList{
 
             @Override
             public boolean acceptItem(Item item, Tile tile, Tile source){
-                return true;
+                return tile.entity.enabled;
             }
         };
     }

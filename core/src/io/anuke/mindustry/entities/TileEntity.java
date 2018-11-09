@@ -45,6 +45,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public Timer timer;
     public float health;
     public float timeScale = 1f, timeScaleDuration;
+    public boolean enabled = true;
 
     public PowerModule power;
     public ItemModule items;
@@ -276,9 +277,12 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
                 onDeath();
             }
             Block previous = tile.block();
-            tile.block().update(tile);
-            if(tile.block() == previous && cons != null){
-                cons.update(this);
+
+            if (enabled){
+                tile.block().update(tile);
+                if (tile.block() == previous && cons != null) {
+                    cons.update(this);
+                }
             }
         }
     }

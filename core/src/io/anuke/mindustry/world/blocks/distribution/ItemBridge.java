@@ -49,7 +49,6 @@ public class ItemBridge extends Block{
         layer = Layer.power;
         expanded = true;
         itemCapacity = 10;
-        configurable = true;
         hasItems = true;
         group = BlockGroup.transportation;
     }

@@ -42,7 +42,6 @@ public class CommandCenter extends Block{
         flags = EnumSet.of(BlockFlag.comandCenter);
         destructible = true;
         solid = true;
-        configurable = true;
     }
 
     @Override

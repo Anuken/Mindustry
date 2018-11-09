@@ -42,7 +42,6 @@ public class Reconstructor extends Block{
         update = true;
         solidifes = true;
         hasPower = true;
-        configurable = true;
     }
 
     protected static boolean checkValidTap(Tile tile, ReconstructorEntity entity, Player player){

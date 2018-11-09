@@ -21,7 +21,6 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
 
     public SortedUnloader(String name){
         super(name);
-        configurable = true;
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
@@ -62,6 +61,7 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
 
     @Override
     public void buildTable(Tile tile, Table table){
+        super.buildTable(tile, table);
         SortedUnloaderEntity entity = tile.entity();
         buildItemTable(table, true, () -> entity.sortItem, item -> Call.setSortedUnloaderItem(null, tile, item));
     }

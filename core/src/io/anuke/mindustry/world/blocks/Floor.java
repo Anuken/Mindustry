@@ -67,6 +67,7 @@ public class Floor extends Block{
 
     public Floor(String name){
         super(name);
+        configurable = false;
         variants = 3;
     }
 

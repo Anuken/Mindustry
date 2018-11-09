@@ -71,7 +71,6 @@ public class WarpGate extends PowerBlock{
         hasLiquids = true;
         hasItems = true;
         liquidCapacity = 100f;
-        configurable = true;
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
@@ -237,6 +236,8 @@ public class WarpGate extends PowerBlock{
 
     @Override
     public void buildTable(Tile tile, Table table){
+        super.buildTable(tile, table);
+
         TeleporterEntity entity = tile.entity();
 
         //TODO call event for change

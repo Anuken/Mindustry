@@ -16,6 +16,7 @@ import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
@@ -40,7 +41,6 @@ public class PowerNode extends PowerBlock{
         expanded = true;
         layer = Layer.power;
         powerCapacity = 5f;
-        configurable = true;
         consumesPower = false;
         outputsPower = false;
     }
@@ -137,6 +137,10 @@ public class PowerNode extends PowerBlock{
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void buildTable(Tile tile, Table table){
     }
 
     @Override
