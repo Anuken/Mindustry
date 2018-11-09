@@ -120,7 +120,7 @@ project(":ios") {
         }
     }
 
-    build.dependsOn(copyGen)
+    //build.dependsOn(copyGen)
 
     dependencies {
         compile project(":core")
@@ -131,6 +131,7 @@ project(":ios") {
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
+        compileOnly project(":annotations")
     }
 }
 
