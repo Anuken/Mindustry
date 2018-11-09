@@ -535,7 +535,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(mode == breaking){
             Effects.effect(Fx.tapBlock, cursor.worldx(), cursor.worldy(), 1f);
-        }else{
+        }else if(recipe != null){
             Effects.effect(Fx.tapBlock, cursor.worldx() + recipe.result.offset(), cursor.worldy() + recipe.result.offset(), recipe.result.size);
         }
 
