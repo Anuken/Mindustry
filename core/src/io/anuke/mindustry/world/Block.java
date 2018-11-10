@@ -224,11 +224,11 @@ public class Block extends BaseBlock {
     }
 
     /** Called when it is being enabled. */
-    public void enabled(Tile tile){
+    public void onEnable(Tile tile){
     }
 
     /** Called when it is being disabled. */
-    public void disabled(Tile tile){
+    public void onDisable(Tile tile){
     }
 
     /** Returns whether ot not this block can be place on the specified tile. */
@@ -302,8 +302,8 @@ public class Block extends BaseBlock {
      */
     public void buildTable(Tile tile, Table table){
         table.addCheck(Bundles.get("text.blocks.enable"), tile.entity.enabled, b -> {
-            if (tile.entity.enabled = b) enabled(tile);
-            else disabled(tile);
+            if (tile.entity.enabled = b) onEnable(tile);
+            else onDisable(tile);
         });
         table.row();
     }
