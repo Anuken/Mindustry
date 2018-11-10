@@ -130,13 +130,16 @@ public class SettingsMenuDialog extends SettingsDialog{
         sound.volumePrefs();
 
         game.screenshakePref();
-        //game.checkPref("smoothcam", true);
         game.checkPref("effects", true);
         if(mobile){
             game.checkPref("autotarget", true);
         }
-        //game.sliderPref("sensitivity", 100, 10, 300, i -> i + "%");
         game.sliderPref("saveinterval", 120, 10, 5 * 120, i -> Bundles.format("setting.seconds", i));
+
+        if(!mobile){
+            game.checkPref("crashreport", true);
+        }
+
         game.pref(new Setting(){
             @Override
             public void add(SettingsTable table){
@@ -186,17 +189,12 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        if(!mobile){
-            game.checkPref("crashreport", true);
-        }
-
         graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Bundles.get("setting.fpscap.none") : Bundles.format("setting.fpscap.text", s)));
         graphics.checkPref("multithread", mobile, threads::setEnabled);
 
         if(Settings.getBool("multithread")){
             threads.setEnabled(true);
         }
-
 
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));

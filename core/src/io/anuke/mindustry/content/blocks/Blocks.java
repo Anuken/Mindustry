@@ -139,7 +139,7 @@ public class Blocks extends BlockList implements ContentList{
         }};
 
         ice = new Floor("ice"){{
-            dragMultiplier = 0.3f;
+            dragMultiplier = 0.2f;
             speedMultiplier = 0.4f;
             minimapColor = Color.valueOf("b8eef8");
             hasOres = true;

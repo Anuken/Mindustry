@@ -276,7 +276,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
             drownTime = Mathf.clamp(drownTime);
 
-            if(drownTime >= 0.999f){
+            if(drownTime >= 0.999f && !Net.client()){
                 damage(health + 1);
             }
 

@@ -71,6 +71,7 @@ public class BlockIndexer{
                     flagMap[i][j] = new ObjectSet<>();
                 }
             }
+
             typeMap.clear();
             ores = null;
 

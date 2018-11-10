@@ -156,7 +156,7 @@ public class Sectors{
         }
         grid.clear();
 
-        Array<Sector> out = Settings.getObject("sectors", Array.class, Array::new);
+        Array<Sector> out = Settings.getObject("sector-data-2", Array.class, Array::new);
 
         for(Sector sector : out){
             
@@ -185,7 +185,7 @@ public class Sectors{
             }
         }
 
-        Settings.putObject("sectors", out);
+        Settings.putObject("sector-data-2", out);
         Settings.save();
     }
 

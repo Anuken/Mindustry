@@ -20,9 +20,9 @@ public class PowerBlocks extends BlockList implements ContentList{
         }};
 
         thermalGenerator = new LiquidHeatGenerator("thermal-generator"){{
-            maxLiquidGenerate = 0.5f;
+            maxLiquidGenerate = 4f;
             powerCapacity = 40f;
-            powerPerLiquid = 1f;
+            powerPerLiquid = 0.1f;
             generateEffect = BlockFx.redgeneratespark;
             size = 2;
         }};

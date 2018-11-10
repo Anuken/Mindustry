@@ -128,7 +128,7 @@ public class MechPad extends Block{
 
         if(checkValidTap(tile, player)){
             Call.onMechFactoryTap(player, tile);
-        }else if(player.isLocal && mobile){
+        }else if(player.isLocal && mobile && !player.isDead()){
             player.moveTarget = tile.entity;
         }
     }
