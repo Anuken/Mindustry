@@ -56,8 +56,8 @@ public class SectorPresets{
                 Missions.blockRecipe(ProductionBlocks.waterExtractor),
                 new ContentMission(Items.biomatter),
                 Missions.blockRecipe(CraftingBlocks.biomatterCompressor),
-                new ContentMission(Liquids.oil)//,
-                //new BattleMission()
+                new ContentMission(Liquids.oil),
+                new BattleMission()
             ),
             Array.with(Items.copper, Items.lead, Items.coal, Items.titanium)));
     }
