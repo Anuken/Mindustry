@@ -74,20 +74,18 @@ public class MinimapRenderer implements Disposable{
         dx = Mathf.clamp(dx, sz, world.width() - sz);
         dy = Mathf.clamp(dy, sz, world.height() - sz);
 
-        synchronized(units){
-            rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
-            Graphics.beginClip(x, y, w, h);
+        rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
+        Graphics.beginClip(x, y, w, h);
 
-            for(Unit unit : units){
-                float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
-                Draw.color(unit.getTeam().color);
-                Draw.rect("white", x + rx, y + ry, w / (sz * 2), h / (sz * 2));
-            }
-
-            Draw.color();
-
-            Graphics.endClip();
+        for(Unit unit : units){
+            float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
+            Draw.color(unit.getTeam().color);
+            Draw.rect("white", x + rx, y + ry, w / (sz * 2), h / (sz * 2));
         }
+
+        Draw.color();
+
+        Graphics.endClip();
     }
 
     public TextureRegion getRegion(){
@@ -128,11 +126,9 @@ public class MinimapRenderer implements Disposable{
         dx = Mathf.clamp(dx, sz, world.width() - sz);
         dy = Mathf.clamp(dy, sz, world.height() - sz);
 
-        synchronized(units){
-            rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
-            units.clear();
-            Units.getNearby(rect, units::add);
-        }
+        rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
+        units.clear();
+        Units.getNearby(rect, units::add);
     }
 
     private int colorFor(Tile tile){
