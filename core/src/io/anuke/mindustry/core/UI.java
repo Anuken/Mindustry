@@ -155,6 +155,7 @@ public class UI extends SceneModule{
         load = new LoadDialog();
         levels = new CustomGameDialog();
         language = new LanguageDialog();
+        unlocks = new UnlocksDialog();
         settings = new SettingsMenuDialog();
         host = new HostDialog();
         paused = new PausedDialog();
@@ -165,7 +166,6 @@ public class UI extends SceneModule{
         traces = new TraceDialog();
         maps = new MapsDialog();
         localplayers = new LocalPlayerDialog();
-        unlocks = new UnlocksDialog();
         content = new ContentInfoDialog();
         sectors = new SectorsDialog();
         missions = new MissionDialog();
