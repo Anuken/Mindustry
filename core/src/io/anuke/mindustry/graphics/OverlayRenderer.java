@@ -34,12 +34,7 @@ public class OverlayRenderer{
 
             if(!input.isDrawing() || player.isDead()) continue;
 
-            Shaders.outline.color.set(Palette.accent);
-            Graphics.beginShaders(Shaders.outline);
-
             input.drawOutlined();
-
-            Graphics.endShaders();
         }
     }
 

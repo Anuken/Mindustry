@@ -1,6 +1,5 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
@@ -53,6 +52,7 @@ public class Renderer extends RendererModule{
 
     public Renderer(){
         Core.batch = new SpriteBatch(4096);
+        Graphics.setScaleEffects(false);
 
         Lines.setCircleVertices(14);
 
@@ -109,7 +109,7 @@ public class Renderer extends RendererModule{
 
         clearColor = new Color(0f, 0f, 0f, 1f);
 
-        effectSurface = Graphics.createSurface(Core.cameraScale);
+        effectSurface = Graphics.createSurface(1);
         pixelSurface = Graphics.createSurface(Core.cameraScale);
     }
 
@@ -147,35 +147,17 @@ public class Renderer extends RendererModule{
                 if(core != null && players[0].spawner == -1){
                     smoothCamera(core.x, core.y, 0.08f);
                 }else{
-                    smoothCamera(position.x + 0.0001f, position.y + 0.0001f, 0.08f);
+                    smoothCamera(position.x, position.y, 0.08f);
                 }
             }else if(!mobile){
-                setCamera(position.x + 0.0001f, position.y + 0.0001f);
+                smoothCamera(position.x, position.y, 0.08f);
             }
             camera.position.x = Mathf.clamp(camera.position.x, -tilesize / 2f, world.width() * tilesize - tilesize / 2f);
             camera.position.y = Mathf.clamp(camera.position.y, -tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
-            float prex = camera.position.x, prey = camera.position.y;
             updateShake(0.75f);
 
-            float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
-            float lastx = camera.position.x, lasty = camera.position.y;
-
-            if(snapCamera){
-                camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
-            }
-
-            if(Gdx.graphics.getHeight() / Core.cameraScale % 2 == 1){
-                camera.position.add(0, -0.5f, 0);
-            }
-
-            if(Gdx.graphics.getWidth() / Core.cameraScale % 2 == 1){
-                camera.position.add(-0.5f, 0, 0);
-            }
-
             draw();
-
-            camera.position.set(lastx - deltax, lasty - deltay, 0);
         }
 
         if(!ui.chatfrag.chatOpen()){
@@ -310,10 +292,10 @@ public class Renderer extends RendererModule{
             Shaders.mix.color.set(Color.WHITE);
 
             //Graphics.beginShaders(Shaders.outline);
-            //Graphics.shader(Shaders.mix, true);
+            Graphics.shader(Shaders.mix, true);
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
-            //Graphics.shader();
+            Graphics.shader();
             blocks.drawTeamBlocks(Layer.turret, team);
            // Graphics.endShaders();
 
@@ -362,10 +344,6 @@ public class Renderer extends RendererModule{
     public void setCameraScale(int amount){
         targetscale = amount;
         clampScale();
-        //scale up all surfaces in preparation for the zoom
-        for(Surface surface : Graphics.getSurfaces()){
-            surface.setScale(targetscale);
-        }
     }
 
     public void scaleCamera(int amount){

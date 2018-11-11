@@ -30,6 +30,7 @@ import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.*;
@@ -385,11 +386,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     public float snappedX(){
-        return snapCamera && isLocal ? (int) (x + 0.0001f) : x;
+        return x;
     }
 
     public float snappedY(){
-        return snapCamera && isLocal ? (int) (y + 0.0001f) : y;
+        return y;
     }
 
     public void drawName(){

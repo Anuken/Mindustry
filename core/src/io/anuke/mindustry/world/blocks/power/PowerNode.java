@@ -257,15 +257,16 @@ public class PowerNode extends PowerBlock{
         Draw.color(Palette.power, Palette.powerLight, Mathf.absin(Timers.time(), 5f, 1f));
         Lines.stroke(1f);
 
-        for(int i = 0; i < segments; i++){
-            float f1 = (float)i / segments;
-            float f2 = (float)(i+1) / segments;
-            t1.trns(angle1 + 90f, Mathf.lerp(Mathf.sin(tile.entity.id * 124f + Timers.time()/tscl + f1 * space, scl, mag), 0f, Math.abs(f1 - 0.5f)*2f));
-            t2.trns(angle1 + 90f, Mathf.lerp(Mathf.sin(tile.entity.id * 124f + Timers.time()/tscl + f2 * space, scl, mag), 0f, Math.abs(f2 - 0.5f)*2f));
+        Lines.beginLine();
 
-            Lines.line(x1 + (x2 - x1) * f1 + t1.x, y1 + (y2 - y1) * f1 + t1.y,
-                        x1 + (x2 - x1) * f2 + t2.x, y1 + (y2 - y1) * f2 + t2.y);
+        for(int i = 0; i < segments + 1; i++){
+            float f1 = (float)i / segments;
+            t1.trns(angle1 + 90f, Mathf.lerp(Mathf.sin(tile.entity.id * 124f + Timers.time()/tscl + f1 * space, scl, mag), 0f, Math.abs(f1 - 0.5f)*2f));
+
+            Lines.linePoint(x1 + (x2 - x1) * f1 + t1.x, y1 + (y2 - y1) * f1 + t1.y);
         }
+
+        Lines.endLine();
     }
 
 }

@@ -1,17 +1,12 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -60,16 +55,16 @@ public abstract class StorageBlock extends Block{
 
         if(entity.graph.getTiles().size > 1){
 
-            Shaders.outline.color.set(Palette.accent);
-            Graphics.beginShaders(Shaders.outline);
+            //Shaders.outline.color.set(Palette.accent);
+            //Graphics.beginShaders(Shaders.outline);
 
             for(Tile other : entity.graph.getTiles()){
                 Fill.square(other.drawx(), other.drawy(), other.block().size * tilesize);
             }
 
-            Draw.color(Color.CLEAR);
-            Graphics.endShaders();
-            Draw.color();
+           // Draw.color(Color.CLEAR);
+            //Graphics.endShaders();
+            //Draw.color();
         }
     }
 
