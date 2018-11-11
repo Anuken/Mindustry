@@ -65,15 +65,16 @@ public enum CacheLayer{
 
     protected void beginShader(){
         //renderer.getBlocks().endFloor();
-        renderer.effectSurface.getBuffer().bind();
+        renderer.effectSurface.getBuffer().begin();
         Graphics.clear(Color.CLEAR);
         //renderer.getBlocks().beginFloor();
     }
 
     public void endShader(Shader shader){
-        renderer.blocks.endFloor();
+        renderer.blocks.floor.endDraw();
 
-        renderer.pixelSurface.getBuffer().bind();
+        renderer.effectSurface.getBuffer().end();
+        //renderer.pixelSurface.getBuffer().bind();
 
         Graphics.shader(shader);
         Graphics.begin();
@@ -81,6 +82,6 @@ public enum CacheLayer{
                 Core.camera.viewportWidth * Core.camera.zoom, -Core.camera.viewportHeight * Core.camera.zoom);
         Graphics.end();
         Graphics.shader();
-        renderer.blocks.beginFloor();
+        renderer.blocks.floor.beginDraw();
     }
 }

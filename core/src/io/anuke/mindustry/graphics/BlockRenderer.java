@@ -23,7 +23,7 @@ public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 4;
 
-    private FloorRenderer floorRenderer;
+    public final FloorRenderer floor = new FloorRenderer();
 
     private Array<BlockRequest> requests = new Array<>(true, initialRequests, BlockRequest.class);
     private IntSet teamChecks = new IntSet();
@@ -34,7 +34,6 @@ public class BlockRenderer{
     private Surface shadows = Graphics.createSurface().setSize(2, 2);
 
     public BlockRenderer(){
-        floorRenderer = new FloorRenderer();
 
         for(int i = 0; i < requests.size; i++){
             requests.set(i, new BlockRequest());
@@ -220,18 +219,6 @@ public class BlockRenderer{
                 break;
             }
         }
-    }
-
-    public void beginFloor(){
-        floorRenderer.beginDraw();
-    }
-
-    public void endFloor(){
-        floorRenderer.endDraw();
-    }
-
-    public void drawFloor(){
-        floorRenderer.drawFloor();
     }
 
     private void layerBegins(Layer layer){

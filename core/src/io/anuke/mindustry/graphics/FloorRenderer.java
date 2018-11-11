@@ -85,7 +85,7 @@ public class FloorRenderer{
 
         drawnLayers.sort();
 
-        Graphics.end();
+        //Graphics.end();
         beginDraw();
 
         for(int i = 0; i < drawnLayers.size; i++){

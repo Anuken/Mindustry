@@ -45,7 +45,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
     protected Item targetItem;
     protected Tile mineTile;
-    protected Queue<BuildRequest> placeQueue = new ThreadQueue<>();
+    protected Queue<BuildRequest> placeQueue = new Queue<>();
     protected boolean isBreaking;
 
     public final UnitState
