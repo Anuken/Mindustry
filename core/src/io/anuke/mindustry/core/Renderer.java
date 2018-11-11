@@ -187,7 +187,8 @@ public class Renderer extends RendererModule{
         drawAndInterpolate(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
 
         blocks.processBlocks();
-        //blocks.drawShadows();
+        blocks.drawShadows();
+
         for(Team team : Team.all){
             if(blocks.isTeamShown(team)){
                 boolean outline = team != players[0].getTeam() && team != Team.none;
@@ -218,7 +219,7 @@ public class Renderer extends RendererModule{
         blocks.skipLayer(Layer.turret);
         blocks.drawBlocks(Layer.laser);
 
-        //drawFlyerShadows();
+        drawFlyerShadows();
 
         drawAllTeams(true);
 
@@ -260,6 +261,7 @@ public class Renderer extends RendererModule{
 
     private void drawFlyerShadows(){
         Graphics.surface(effectSurface, true, false);
+
 
         float trnsX = -12, trnsY = -13;
 

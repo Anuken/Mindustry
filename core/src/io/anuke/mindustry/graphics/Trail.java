@@ -58,7 +58,7 @@ public class Trail{
         }
 
         if(points.size >= 2){
-            Fill.circle(points.get(points.size - 2), points.get(points.size - 1), stroke / 2f);
+            Fill.circle(points.get(points.size - 2), points.get(points.size - 1), stroke / 2f * (points.size - 3f) / points.size);
         }
 
         Draw.reset();

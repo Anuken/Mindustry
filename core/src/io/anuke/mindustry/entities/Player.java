@@ -376,10 +376,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         drawBuilding(this);
 
         if(mech.flying || boostHeat > 0.001f){
-            float wobblyness = 0.6f;
+            float wobblyness = 0f;
             if(!state.isPaused()) trail.update(x + Angles.trnsx(rotation + 180f, 5f) + Mathf.range(wobblyness),
                     y + Angles.trnsy(rotation + 180f, 5f) + Mathf.range(wobblyness));
-            trail.draw(Hue.mix(mech.trailColor, mech.trailColorTo, mech.flying ? 0f : boostHeat, Tmp.c1), 5f * (isFlying() ? 1f : boostHeat));
+            trail.draw(Hue.mix(mech.trailColor, mech.trailColorTo, mech.flying ? 0f : boostHeat, Tmp.c1), 5f * (isFlying() ? 1f : boostHeat) * Mathf.clamp(velocity.len(), 0f, 2f) / 2f);
         }else{
             trail.clear();
         }

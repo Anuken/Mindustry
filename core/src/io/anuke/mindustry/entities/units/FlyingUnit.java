@@ -18,7 +18,7 @@ import static io.anuke.mindustry.Vars.world;
 
 public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected static Translator vec = new Translator();
-    protected static float wobblyness = 0.6f;
+    protected static float wobblyness = 0f;
 
     protected Trail trail = new Trail(8);
     protected CarriableTrait carrying;
@@ -171,7 +171,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
     @Override
     public void drawOver(){
-        trail.draw(type.trailColor, 5f);
+        trail.draw(type.trailColor, 5f * Mathf.clamp(velocity.len(), 0f, 2f) / 2f);
     }
 
     @Override
