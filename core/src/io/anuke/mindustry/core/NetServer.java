@@ -416,7 +416,6 @@ public class NetServer extends Module{
     }
 
     public void update(){
-        if(threads.isEnabled() && !threads.isOnThread()) return;
 
         if(!headless && !closing && Net.server() && state.is(State.menu)){
             closing = true;
