@@ -15,6 +15,7 @@ import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -46,9 +47,13 @@ public class BlockConfigFragment extends Fragment{
         configTile = tile;
         configBlock = tile.block();
 
+        showConfig(tile, () -> table.addButton(Bundles.get("text.blocks.config"), () -> showConfig(tile, () -> tile.block().buildTable(tile, table))).size(100f, 48f));
+    }
+
+    private void showConfig(Tile tile, Runnable action){
         table.setVisible(true);
         table.clear();
-        tile.block().buildTable(tile, table);
+        action.run();
         table.pack();
         table.setTransform(true);
         table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),

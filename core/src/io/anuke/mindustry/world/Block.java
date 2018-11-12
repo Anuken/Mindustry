@@ -301,7 +301,7 @@ public class Block extends BaseBlock {
      * {@link #configurable} able} must return true for this to be called.
      */
     public void buildTable(Tile tile, Table table){
-        table.addCheck(Bundles.get("text.blocks.enable"), tile.entity.enabled, b -> {
+        table.addCheck(Bundles.get("text.blocks.config.enable"), tile.entity.enabled, b -> {
             if (tile.entity.enabled = b) onEnable(tile);
             else onDisable(tile);
         });
