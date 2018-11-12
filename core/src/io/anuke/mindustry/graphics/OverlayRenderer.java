@@ -53,10 +53,7 @@ public class OverlayRenderer{
             //draw config selected block
             if(input.frag.config.isShown()){
                 Tile tile = input.frag.config.getSelectedTile();
-
-                synchronized(Tile.tileSetLock){
-                    tile.block().drawConfigure(tile);
-                }
+                tile.block().drawConfigure(tile);
             }
 
             input.drawTop();
@@ -113,53 +110,52 @@ public class OverlayRenderer{
                         Draw.reset();
                     }
 
-                    synchronized(Tile.tileSetLock){
-                        Block block = target.block();
-                        TileEntity entity = target.entity;
+                    Block block = target.block();
+                    TileEntity entity = target.entity;
 
-                        if(entity != null){
-                            int[] values = {0, 0};
-                            boolean[] doDraw = {false};
+                    if(entity != null){
+                        int[] values = {0, 0};
+                        boolean[] doDraw = {false};
 
-                            Runnable drawbars = () -> {
-                                for(BlockBar bar : block.bars.list()){
-                                    float offset = Mathf.sign(bar.top) * (block.size / 2f * tilesize + 2f + (bar.top ? values[0] : values[1]));
+                        Runnable drawbars = () -> {
+                            for(BlockBar bar : block.bars.list()){
+                                float offset = Mathf.sign(bar.top) * (block.size / 2f * tilesize + 2f + (bar.top ? values[0] : values[1]));
 
-                                    float value = bar.value.get(target);
+                                float value = bar.value.get(target);
 
-                                    if(MathUtils.isEqual(value, -1f)) continue;
+                                if(MathUtils.isEqual(value, -1f)) continue;
 
-                                    if(doDraw[0]){
-                                        drawBar(bar.type.color, target.drawx(), target.drawy() + offset, value);
-                                    }
-
-                                    if(bar.top)
-                                        values[0]++;
-                                    else
-                                        values[1]++;
+                                if(doDraw[0]){
+                                    drawBar(bar.type.color, target.drawx(), target.drawy() + offset, value);
                                 }
-                            };
 
-                            drawbars.run();
-
-                            if(values[0] > 0){
-                                drawEncloser(target.drawx(), target.drawy() + block.size * tilesize / 2f + 2f, values[0]);
+                                if(bar.top)
+                                    values[0]++;
+                                else
+                                    values[1]++;
                             }
+                        };
 
-                            if(values[1] > 0){
-                                drawEncloser(target.drawx(), target.drawy() - block.size * tilesize / 2f - 2f - values[1], values[1]);
-                            }
+                        drawbars.run();
 
-                            doDraw[0] = true;
-                            values[0] = 0;
-                            values[1] = 1;
-
-                            drawbars.run();
+                        if(values[0] > 0){
+                            drawEncloser(target.drawx(), target.drawy() + block.size * tilesize / 2f + 2f, values[0]);
                         }
 
+                        if(values[1] > 0){
+                            drawEncloser(target.drawx(), target.drawy() - block.size * tilesize / 2f - 2f - values[1], values[1]);
+                        }
 
-                        target.block().drawSelect(target);
+                        doDraw[0] = true;
+                        values[0] = 0;
+                        values[1] = 1;
+
+                        drawbars.run();
                     }
+
+
+                    target.block().drawSelect(target);
+
                 }
             }
 

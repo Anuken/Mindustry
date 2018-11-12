@@ -22,7 +22,6 @@ import static io.anuke.mindustry.Vars.*;
 
 
 public class Tile implements PosTrait, TargetTrait{
-    public static final Object tileSetLock = new Object();
     /**
      * The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
      * This is relative to the block it is linked to; negate coords to find the link.
@@ -147,33 +146,27 @@ public class Tile implements PosTrait, TargetTrait{
     }
 
     public void setBlock(Block type, int rotation){
-        synchronized(tileSetLock){
-            preChanged();
-            if(rotation < 0) rotation = (-rotation + 2);
-            this.wall = type;
-            this.link = 0;
-            setRotation((byte) (rotation % 4));
-            changed();
-        }
+        preChanged();
+        if(rotation < 0) rotation = (-rotation + 2);
+        this.wall = type;
+        this.link = 0;
+        setRotation((byte) (rotation % 4));
+        changed();
     }
 
     public void setBlock(Block type, Team team){
-        synchronized(tileSetLock){
-            preChanged();
-            this.wall = type;
-            this.team = (byte)team.ordinal();
-            this.link = 0;
-            changed();
-        }
+        preChanged();
+        this.wall = type;
+        this.team = (byte)team.ordinal();
+        this.link = 0;
+        changed();
     }
 
     public void setBlock(Block type){
-        synchronized(tileSetLock){
-            preChanged();
-            this.wall = type;
-            this.link = 0;
-            changed();
-        }
+        preChanged();
+        this.wall = type;
+        this.link = 0;
+        changed();
     }
 
     public void setFloor(Floor type){
@@ -270,7 +263,7 @@ public class Tile implements PosTrait, TargetTrait{
      * Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
      * This array contains all linked tiles, including this tile itself.
      */
-    public synchronized Array<Tile> getLinkedTiles(Array<Tile> tmpArray){
+    public Array<Tile> getLinkedTiles(Array<Tile> tmpArray){
         Block block = block();
         tmpArray.clear();
         if(block.isMultiblock()){
@@ -292,7 +285,7 @@ public class Tile implements PosTrait, TargetTrait{
      * Returns the list of all tiles linked to this multiblock if it were this block, or an empty array if it's not a multiblock.
      * This array contains all linked tiles, including this tile itself.
      */
-    public synchronized Array<Tile> getLinkedTilesAs(Block block, Array<Tile> tmpArray){
+    public Array<Tile> getLinkedTilesAs(Block block, Array<Tile> tmpArray){
         tmpArray.clear();
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;
@@ -394,51 +387,46 @@ public class Tile implements PosTrait, TargetTrait{
     }
 
     private void preChanged(){
-        synchronized(tileSetLock){
-            block().removed(this);
-            if(entity != null){
-                entity.removeFromProximity();
-            }
-            team = 0;
+        block().removed(this);
+        if(entity != null){
+            entity.removeFromProximity();
         }
+        team = 0;
     }
 
     private void changed(){
-
-        synchronized(tileSetLock){
-            if(entity != null){
-                entity.remove();
-                entity = null;
-            }
-
-            Block block = block();
-
-            if(block.hasEntity()){
-                entity = block.newEntity().init(this, block.update);
-                entity.cons = new ConsumeModule();
-                if(block.hasItems) entity.items = new ItemModule();
-                if(block.hasLiquids) entity.liquids = new LiquidModule();
-                if(block.hasPower){
-                    entity.power = new PowerModule();
-                    entity.power.graph.add(this);
-                }
-
-                if(!world.isGenerating()){
-                    entity.updateProximity();
-                }
-            }else if(!(block instanceof BlockPart) && !world.isGenerating()){
-                //since the entity won't update proximity for us, update proximity for all nearby tiles manually
-                for(GridPoint2 p : Geometry.d4){
-                    Tile tile = world.tile(x + p.x, y + p.y);
-                    if(tile != null){
-                        tile = tile.target();
-                        tile.block().onProximityUpdate(tile);
-                    }
-                }
-            }
-
-            updateOcclusion();
+        if(entity != null){
+            entity.remove();
+            entity = null;
         }
+
+        Block block = block();
+
+        if(block.hasEntity()){
+            entity = block.newEntity().init(this, block.update);
+            entity.cons = new ConsumeModule();
+            if(block.hasItems) entity.items = new ItemModule();
+            if(block.hasLiquids) entity.liquids = new LiquidModule();
+            if(block.hasPower){
+                entity.power = new PowerModule();
+                entity.power.graph.add(this);
+            }
+
+            if(!world.isGenerating()){
+                entity.updateProximity();
+            }
+        }else if(!(block instanceof BlockPart) && !world.isGenerating()){
+            //since the entity won't update proximity for us, update proximity for all nearby tiles manually
+            for(GridPoint2 p : Geometry.d4){
+                Tile tile = world.tile(x + p.x, y + p.y);
+                if(tile != null){
+                    tile = tile.target();
+                    tile.block().onProximityUpdate(tile);
+                }
+            }
+        }
+
+        updateOcclusion();
 
         world.notifyChanged(this);
     }

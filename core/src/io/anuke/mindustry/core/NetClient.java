@@ -399,11 +399,11 @@ public class NetClient extends Module{
         quiet = true;
     }
 
-    public synchronized void addRemovedEntity(int id){
+    public void addRemovedEntity(int id){
         removed.add(id);
     }
 
-    public synchronized boolean isEntityUsed(int id){
+    public boolean isEntityUsed(int id){
         return removed.contains(id);
     }
 
@@ -414,11 +414,9 @@ public class NetClient extends Module{
 
             BuildRequest[] requests;
 
-            synchronized(player.getPlaceQueue()){
-                requests = new BuildRequest[player.getPlaceQueue().size];
-                for(int i = 0; i < requests.length; i++){
-                    requests[i] = player.getPlaceQueue().get(i);
-                }
+            requests = new BuildRequest[player.getPlaceQueue().size];
+            for(int i = 0; i < requests.length; i++){
+                requests[i] = player.getPlaceQueue().get(i);
             }
 
             Call.onClientShapshot(lastSent++, TimeUtils.millis(), player.x, player.y,
