@@ -59,7 +59,7 @@ public class Net{
             }
 
             String error = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
-            String type = error.getClass().toString().toLowerCase();
+            String type = t.getClass().toString().toLowerCase();
 
             if(error.equals("mismatch")){
                 error = Bundles.get("text.error.mismatch");
