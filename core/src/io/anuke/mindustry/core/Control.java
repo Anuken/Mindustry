@@ -25,6 +25,7 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EntityQuery;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.modules.Module;
 import io.anuke.ucore.util.*;
 
@@ -67,6 +68,8 @@ public class Control extends Module{
         Core.atlas = new Atlas("sprites.atlas");
         Core.atlas.setErrorRegion("error");
         content.initialize(Content::load);
+
+        scaling = 1f / Draw.region("blank").getRegionWidth();
 
         unlocks.load();
 
@@ -321,7 +324,7 @@ public class Control extends Module{
                     Settings.putBool("4.0-warning-2", true);
                     Settings.save();
                 }).size(100f, 60f);
-                dialog.content().add("Reminder: The beta version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
+                dialog.content().add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
                         "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
                         "All current art and UI is temporary, and will be re-drawn before release. " +
                         "\n\n[accent]Saves and maps may be corrupted without warning between updates.").wrap().width(400f);

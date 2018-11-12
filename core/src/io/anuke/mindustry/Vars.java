@@ -37,7 +37,7 @@ public class Vars{
     //time between waves in frames (on normal mode)
     public static final float wavespace = 60 * 60 * 1.5f;
 
-    public static final float scaling = 1f/4f;
+    public static float scaling;
     public static final float mineTransferRange = 220f;
     //set ridiculously high for now
     public static final float coreBuildRange = 999999f;
@@ -51,7 +51,6 @@ public class Vars{
     public static final float itemSize = 5f;
     public static final int tilesize = 8;
     public static final int sectorSize = 250;
-    public static final int mapPadding = 3;
     public static final int invalidSector = Integer.MAX_VALUE;
     public static Locale[] locales;
     public static final Color[] playerColors = {

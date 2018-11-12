@@ -11,14 +11,14 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
-import static io.anuke.mindustry.Vars.*;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class Generators {
 
     public static void generate(ImageContext context){
 
-        context.generate("block-icons", () -> {
+        ImageContext.generate("block-icons", () -> {
             for(Block block : content.blocks()){
                 TextureRegion[] regions = block.getBlockIcon();
 
@@ -27,30 +27,19 @@ public class Generators {
                 }
 
                 if(block.turretIcon){
-                    Color color = Color.ROYAL;
 
-                    Image image = context.get(block.name);
+                    Image image = ImageContext.get(block.name);
 
-                    Image read = context.create(image.width(), image.height());
+                    Image read = ImageContext.create(image.width(), image.height());
                     read.draw(image);
 
-                    for (int x = 0; x < image.width(); x++) {
-                        for (int y = 0; y < image.height(); y++) {
-                            if(read.isEmpty(x, y) &&
-                                    (!read.isEmpty(x, y + 1) || !read.isEmpty(x, y - 1) || !read.isEmpty(x + 1, y) || !read.isEmpty(x - 1, y))){
-                                image.draw(x, y, color);
-                            }
-                        }
-                    }
-
-                    Image base = context.get("block-" + block.size);
-                    Image top = context.get("block-" + block.size + "-top");
+                    Image base = ImageContext.get("block-" + block.size);
+                    Image top = ImageContext.get("block-" + block.size + "-top");
 
                     for (int x = 0; x < base.width(); x++) {
                         for (int y = 0; y < base.height(); y++) {
                             Color result = top.getColor(x, y);
                             if(result.a > 0.01f){
-                                Hue.mix(result, color, 0.45f, result);
                                 base.draw(x, y, result);
                             }
                         }
@@ -61,7 +50,7 @@ public class Generators {
                     base.save("block-icon-" + block.name);
                 }else {
 
-                    Image image = context.get(regions[0]);
+                    Image image = ImageContext.get(regions[0]);
 
                     for (TextureRegion region : regions) {
                         image.draw(region);
@@ -72,13 +61,13 @@ public class Generators {
             }
         });
 
-        context.generate("mech-icons", () -> {
+        ImageContext.generate("mech-icons", () -> {
             for(Mech mech : content.<Mech>getBy(ContentType.mech)){
 
                 mech.load();
                 mech.weapon.load();
 
-                Image image = context.get(mech.region);
+                Image image = ImageContext.get(mech.region);
 
                 if(!mech.flying){
                     image.drawCenter(mech.baseRegion);
@@ -97,13 +86,13 @@ public class Generators {
             }
         });
 
-        context.generate("unit-icons", () -> {
+        ImageContext.generate("unit-icons", () -> {
             for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
 
                 type.load();
                 type.weapon.load();
 
-                Image image = context.get(type.region);
+                Image image = ImageContext.get(type.region);
 
                 if(!type.isFlying){
                     image.draw(type.baseRegion);
@@ -125,9 +114,9 @@ public class Generators {
             }
         });
 
-        context.generate("liquid-icons", () -> {
+        ImageContext.generate("liquid-icons", () -> {
             for(Liquid liquid : content.liquids()){
-                Image image = context.get("liquid-icon");
+                Image image = ImageContext.get("liquid-icon");
                 for (int x = 0; x < image.width(); x++) {
                     for (int y = 0; y < image.height(); y++) {
                         Color color = image.getColor(x, y);
@@ -140,17 +129,17 @@ public class Generators {
             }
         });
 
-        context.generate("block-edges", () -> {
+        ImageContext.generate("block-edges", () -> {
             for(Block block : content.blocks()){
                 if(!(block instanceof Floor)) continue;
                 Floor floor = (Floor)block;
                 if(floor.getIcon().length > 0 && !Draw.hasRegion(floor.name + "-cliff-side")){
-                    Image floori = context.get(floor.getIcon()[0]);
+                    Image floori = ImageContext.get(floor.getIcon()[0]);
                     Color color = floori.getColor(0, 0).mul(1.3f, 1.3f, 1.3f, 1f);
 
                     String[] names = {"cliff-edge-2", "cliff-edge", "cliff-edge-1", "cliff-side"};
                     for(String str : names){
-                        Image image = context.get("generic-" + str);
+                        Image image = ImageContext.get("generic-" + str);
 
                         for(int x = 0; x < image.width(); x++){
                             for(int y = 0; y < image.height(); y++){
@@ -167,7 +156,7 @@ public class Generators {
             }
         });
 
-        context.generate("ore-icons", () -> {
+        ImageContext.generate("ore-icons", () -> {
             for(Block block : content.blocks()){
                 if(!(block instanceof OreBlock)) continue;
 
@@ -177,8 +166,8 @@ public class Generators {
 
                 for (int i = 0; i < 3; i++) {
                     //get base image to draw on
-                    Image image = context.get(base.name + (i+1));
-                    Image shadow = context.get(item.name + (i+1));
+                    Image image = ImageContext.get(base.name + (i+1));
+                    Image shadow = ImageContext.get(item.name + (i+1));
 
                     for (int x = 0; x < image.width(); x++) {
                         for (int y = 1; y < image.height(); y++) {
@@ -192,7 +181,7 @@ public class Generators {
                         }
                     }
 
-                    image.draw(context.get(item.name + (i+1)));
+                    image.draw(ImageContext.get(item.name + (i+1)));
                     image.save("ore-" + item.name + "-" + base.name + (i+1));
                 }
 

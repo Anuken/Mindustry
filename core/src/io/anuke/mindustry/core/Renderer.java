@@ -15,6 +15,7 @@ import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
@@ -231,13 +232,14 @@ public class Renderer extends RendererModule{
         overlays.drawBottom();
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
-        /*
-        Graphics.beginShaders(Shaders.shield);
-        EntityDraw.draw(shieldGroup);
-        EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
-        Draw.color(Palette.accent);
-        Graphics.endShaders();
-        Draw.color();*/
+        if(shieldGroup.size() > 0){
+            Graphics.beginShaders(Shaders.shield);
+            EntityDraw.draw(shieldGroup);
+            EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity) shield).drawOver());
+            Draw.color(Palette.accent);
+            Graphics.endShaders();
+            Draw.color();
+        }
 
         overlays.drawTop();
 
@@ -299,13 +301,11 @@ public class Renderer extends RendererModule{
             Shaders.outline.color.set(team.color);
             Shaders.mix.color.set(Color.WHITE);
 
-            //Graphics.beginShaders(Shaders.outline);
             Graphics.shader(Shaders.mix, true);
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
             Graphics.shader();
             blocks.drawTeamBlocks(Layer.turret, team);
-           // Graphics.endShaders();
 
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);

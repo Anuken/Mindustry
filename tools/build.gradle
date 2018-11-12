@@ -10,7 +10,7 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 
-def textureFolder = "../core/assets-raw/sprites/generated/"
+def genFolder = "../core/assets-raw/sprites/generated/"
 
 task swapColors(){
     doLast{
@@ -47,6 +47,15 @@ task swapColors(){
 
 task scaleSprites2x(){
     doLast{
+        delete{
+            delete "../core/assets-raw/sprites"
+        }
+
+        copy{
+            from "../core/assets-raw/sprites_source/"
+            into "../core/assets-raw/sprites/"
+        }
+
         fileTree(dir: '../core/assets-raw/sprites', include: "**/*.png").visit { file ->
             if(file.isDirectory() || file.toString().contains("/ui/")) return;
             def image = ImageIO.read(file.file)
@@ -137,6 +146,41 @@ task scaleSprites3x(){
     }
 }
 
+task scaleSpritesnx(){
+    doLast{
+        def arguments = ["mono", "ImageResizer.exe"]
+
+        delete{
+            delete "../core/assets-raw/sprites"
+        }
+
+        fileTree(dir: '../core/assets-raw/sprites_source', include: "**/*.png").visit { file ->
+            if(file.isDirectory() || file.toString().contains("/ui/")) return;
+
+            def write = new File(file.file.toString().replace("sprites_source", "sprites"))
+
+            write.parentFile.mkdirs()
+
+            arguments += ["/load", file.file.toString(), "/resize",
+                          "auto", "XBRZ 3x(centered=1,thresholds=1)", "/save", write.toString()]
+        }
+
+        copy{
+            from "../core/assets-raw/sprites_source/pack.json"
+            into "../core/assets-raw/sprites/"
+        }
+
+        copy{
+            from "../core/assets-raw/sprites_source/ui/"
+            into "../core/assets-raw/sprites/ui/"
+        }
+
+        exec{
+            commandLine arguments
+        }
+    }
+}
+
 task pack(){
     dependsOn 'prePack'
 
@@ -144,7 +188,7 @@ task pack(){
         TexturePacker.process("core/assets-raw/sprites/", "core/assets/sprites/", "sprites.atlas")
 
         delete{
-            delete textureFolder
+            delete genFolder
         }
     }
 }
@@ -152,30 +196,26 @@ task pack(){
 task prePack(){
     dependsOn "cleanup"
 
-    doLast{
-        TexturePacker.process("core/assets-raw/sprites/", "core/assets/sprites/", "sprites.atlas")
-    }
-
     finalizedBy 'generateSprites'
 }
 
 task cleanup(){
     delete{
-        delete textureFolder
+        delete genFolder
     }
 }
 
 task generateSprites(dependsOn: classes, type: JavaExec) {
-    file(textureFolder).mkdirs()
+    file(genFolder).mkdirs()
 
     main = "io.anuke.mindustry.PackerLauncher"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
-    workingDir = textureFolder
+    workingDir = genFolder
 }
 
 task updateBundles(dependsOn: classes, type: JavaExec) {
-    file(textureFolder).mkdirs()
+    file(genFolder).mkdirs()
 
     main = "io.anuke.mindustry.BundleLauncher"
     classpath = sourceSets.main.runtimeClasspath
