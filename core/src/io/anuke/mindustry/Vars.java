@@ -94,6 +94,7 @@ public class Vars{
     public static float controllerMin = 0.25f;
     public static float baseControllerSpeed = 11f;
     public static boolean snapCamera = true;
+
     public static ContentLoader content;
     public static GameState state;
     public static ThreadHandler threads;
@@ -162,6 +163,7 @@ public class Vars{
             });
         }
 
+        state = new GameState();
         threads = new ThreadHandler();
 
         mobile = Gdx.app.getType() == ApplicationType.Android || Gdx.app.getType() == ApplicationType.iOS || testMobile;

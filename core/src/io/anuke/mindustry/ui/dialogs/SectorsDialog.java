@@ -60,7 +60,7 @@ public class SectorsDialog extends FloatingDialog{
         margin(0);
         getTitleTable().clear();
         clear();
-        stack(content(), buttons(), container).grow();
+        stack(content(), container, buttons()).grow();
 
         shown(this::setup);
     }
@@ -128,7 +128,7 @@ public class SectorsDialog extends FloatingDialog{
     class SectorView extends Element{
         float lastX, lastY;
         boolean clicked = false;
-        float panX = 0, panY = -sectorSize/2f;
+        float panX = sectorSize/2f, panY = sectorSize/2f;
 
         SectorView(){
             addListener(new InputListener(){

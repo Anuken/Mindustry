@@ -179,12 +179,6 @@ public class Control extends Module{
         });
 
         Events.on(WorldLoadEvent.class, event -> threads.runGraphics(() -> Events.fire(new WorldLoadGraphicsEvent())));
-
-        Events.on(TileChangeEvent.class, event -> {
-            if(event.tile.getTeam() == players[0].getTeam() && Recipe.getByResult(event.tile.block()) != null){
-                unlocks.handleContentUsed(Recipe.getByResult(event.tile.block()));
-            }
-        });
     }
 
     public void addPlayer(int index){
@@ -278,7 +272,7 @@ public class Control extends Module{
         outer:
         for(int i = 0; i < content.recipes().size; i ++){
             Recipe recipe = content.recipes().get(i);
-            if(!recipe.hidden && recipe.requirements != null){
+            if(!recipe.isHidden() && recipe.requirements != null){
                 for(ItemStack stack : recipe.requirements){
                     if(!entity.items.has(stack.item, Math.min((int) (stack.amount * unlockResourceScaling), 2000))) continue outer;
                 }

@@ -68,7 +68,7 @@ public class ServerControl extends Module{
         );
 
         Log.setLogger(new LogHandler(){
-            DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");  
+            DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");
 
             @Override
             public void info(String text, Object... args){

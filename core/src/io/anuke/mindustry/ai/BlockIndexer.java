@@ -71,6 +71,7 @@ public class BlockIndexer{
                     flagMap[i][j] = new ObjectSet<>();
                 }
             }
+
             typeMap.clear();
             ores = null;
 
@@ -246,7 +247,7 @@ public class BlockIndexer{
         for(int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++){
             for(int y = quadrantY * structQuadrantSize; y < world.height() && y < (quadrantY + 1) * structQuadrantSize; y++){
                 Tile result = world.tile(x, y);
-                if(result.block().drops == null || !scanOres.contains(result.block().drops.item)) continue;
+                if( result == null || result.block().drops == null || !scanOres.contains(result.block().drops.item)) continue;
 
                 itemSet.add(result.block().drops.item);
             }

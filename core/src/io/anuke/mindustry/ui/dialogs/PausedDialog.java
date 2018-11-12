@@ -58,6 +58,9 @@ public class PausedDialog extends FloatingDialog{
             });
 
             content().row();
+            content().addButton("$text.unlocks", ui.unlocks::show);
+
+            content().row();
             content().addButton("$text.settings", ui.settings::show);
 
             content().row();

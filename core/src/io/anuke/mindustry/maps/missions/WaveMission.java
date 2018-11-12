@@ -1,6 +1,5 @@
 package io.anuke.mindustry.maps.missions;
 
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
@@ -9,16 +8,31 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
+import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.util.Bundles;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.waveTeam;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
-public class WaveMission extends Mission{
+public class WaveMission extends MissionWithStartingCore{
     private final int target;
 
+    /**
+     * Creates a wave survival mission with the player core being in the center of the map.
+     * @param target The number of waves to be survived.
+     */
     public WaveMission(int target){
+        super();
+        this.target = target;
+    }
+
+    /**
+     * Creates a wave survival with the player core being at a custom location.
+     * @param target The number of waves to be survived.
+     * @param xCorePos The X coordinate of the custom core position.
+     * @param yCorePos The Y coordinate of the custom core position.
+     */
+    public WaveMission(int target, int xCorePos, int yCorePos){
+        super(xCorePos, yCorePos);
         this.target = target;
     }
 
@@ -29,8 +43,7 @@ public class WaveMission extends Mission{
 
     @Override
     public void generate(Generation gen){
-        int coreX = gen.width/2, coreY = gen.height/2;
-        generateCoreAt(gen, coreX, coreY, Team.blue);
+        generateCoreAtFirstSpawnPoint(gen, Team.blue);
     }
 
     @Override
@@ -49,7 +62,7 @@ public class WaveMission extends Mission{
     public String displayString(){
         return state.wave > target ?
             Bundles.format(
-                Vars.unitGroups[Vars.waveTeam.ordinal()].size() > 1 ?
+                Vars.unitGroups[Vars.waveTeam.ordinal()].size() > 1 && !Net.client() ?
                 "text.mission.wave.enemies" :
                 "text.mission.wave.enemy", target, target, Vars.unitGroups[Vars.waveTeam.ordinal()].size()) :
             Bundles.format("text.mission.wave", state.wave, target, (int)(state.wavetime/60));
@@ -70,10 +83,5 @@ public class WaveMission extends Mission{
     @Override
     public boolean isComplete(){
         return state.wave > target && Vars.unitGroups[Vars.waveTeam.ordinal()].size() == 0;
-    }
-
-    @Override
-    public Array<GridPoint2> getSpawnPoints(Generation gen){
-        return Array.with(new GridPoint2(gen.width/2, gen.height/2));
     }
 }

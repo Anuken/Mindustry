@@ -34,6 +34,8 @@
         <true/>
         <key>UIRequiresFullScreen</key>
         <true/>
+        <key>LSSupportsOpeningDocumentsInPlace</key>
+        <true/>
         <key>NSPhotoLibraryAddUsageDescription</key>
         <string>Mindustry</string>
         <key>UIDeviceFamily</key>

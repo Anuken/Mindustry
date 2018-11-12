@@ -25,7 +25,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.8'
         roboVMVersion = '2.3.0'
-        uCoreVersion = 'eb1503dfb786f5f727bdb4b6a302718490444335'
+        uCoreVersion = '8919cb7b6881d040fb720149779fcf58c1927893'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -120,7 +120,7 @@ project(":ios") {
         }
     }
 
-    build.dependsOn(copyGen)
+    //build.dependsOn(copyGen)
 
     dependencies {
         compile project(":core")
@@ -131,6 +131,7 @@ project(":ios") {
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
+        compileOnly project(":annotations")
     }
 }
 

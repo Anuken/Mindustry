@@ -42,12 +42,13 @@ public class TextFieldDialogListener extends ClickListener{
 
         AndroidTextFieldDialog dialog = new AndroidTextFieldDialog();
 
-        dialog.setTextPromptListener(text -> {
-            field.clearText();
-            field.appendText(text);
-            field.fire(new ChangeListener.ChangeEvent());
-            Gdx.graphics.requestRendering();
-        });
+        dialog.setTextPromptListener(text ->
+            Gdx.app.postRunnable(() -> {
+                field.clearText();
+                field.appendText(text);
+                field.fire(new ChangeListener.ChangeEvent());
+                Gdx.graphics.requestRendering();
+            }));
 
         if(type == 0){
             dialog.setInputType(InputType.TYPE_CLASS_TEXT);

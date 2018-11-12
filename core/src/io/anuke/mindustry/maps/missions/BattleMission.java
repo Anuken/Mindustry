@@ -12,8 +12,24 @@ import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class BattleMission extends Mission{
+public class BattleMission extends MissionWithStartingCore{
     final int spacing = 30;
+    public static final int defaultXCorePos = 50;
+    public static final int defaultYCorePos = 50;
+
+    /** Creates a battle mission with the player core being at (@defaultXCorePos, @defaultYCorePos) */
+    public BattleMission(){
+        this(defaultXCorePos, defaultYCorePos);
+    }
+
+    /**
+     * Creates a wave survival with the player core being at a custom location.
+     * @param xCorePos The X coordinate of the custom core position.
+     * @param yCorePos The Y coordinate of the custom core position.
+     */
+    public BattleMission(int xCorePos, int yCorePos){
+        super(xCorePos, yCorePos);
+    }
 
     @Override
     public String getIcon(){
@@ -37,7 +53,7 @@ public class BattleMission extends Mission{
 
     @Override
     public void generate(Generation gen){
-        generateCoreAt(gen, 50, 50, defaultTeam);
+        generateCoreAtFirstSpawnPoint(gen, defaultTeam);
 
         if(state.teams.get(defaultTeam).cores.size == 0){
             return;

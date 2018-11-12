@@ -28,10 +28,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timer;
+import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -316,8 +313,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         if(target != null) behavior();
 
         if(!isWave && !isFlying()){
-            x = Mathf.clamp(x, 0, world.width() * tilesize);
-            y = Mathf.clamp(y, 0, world.height() * tilesize);
+            x = Mathf.clamp(x, tilesize/2f, world.width() * tilesize - tilesize/2f);
+            y = Mathf.clamp(y, tilesize/2f, world.height() * tilesize - tilesize/2f);
         }
     }
 

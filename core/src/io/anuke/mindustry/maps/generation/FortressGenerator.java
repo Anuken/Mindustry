@@ -57,6 +57,7 @@ public class FortressGenerator{
 
     void gen(){
         gen.setBlock(enemyX, enemyY, StorageBlocks.core, team);
+        gen.random.nextBoolean();
 
         float difficultyScl = Mathf.clamp(gen.sector.difficulty / 20f + gen.random.range(0.25f), 0f, 0.9999f);
         float dscl2 = Mathf.clamp(0.5f + gen.sector.difficulty / 20f + gen.random.range(0.1f), 0f, 1.5f);

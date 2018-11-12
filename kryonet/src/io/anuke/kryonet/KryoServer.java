@@ -30,7 +30,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import static io.anuke.mindustry.Vars.threads;
 
 public class KryoServer implements ServerProvider {
-    final boolean tcpOnly = System.getProperty("java.version") == null;
     final Server server;
     final CopyOnWriteArrayList<KryoConnection> connections = new CopyOnWriteArrayList<>();
     final CopyOnWriteArraySet<Integer> missing = new CopyOnWriteArraySet<>();
@@ -150,11 +149,7 @@ public class KryoServer implements ServerProvider {
         lastconnection = 0;
         connections.clear();
         missing.clear();
-        if(tcpOnly){
-            server.bind(port);
-        }else{
-            server.bind(port, port);
-        }
+        server.bind(port, port);
 
         serverThread = new Thread(() -> {
             try{
@@ -172,7 +167,7 @@ public class KryoServer implements ServerProvider {
         connections.clear();
         lastconnection = 0;
 
-        async(server::close);
+        async(server::stop);
     }
 
     @Override

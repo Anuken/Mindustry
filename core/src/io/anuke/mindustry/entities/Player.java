@@ -70,7 +70,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public TargetTrait moveTarget;
 
     private float walktime;
-    private Queue<BuildRequest> placeQueue = new ThreadQueue<>();
+    private Queue<BuildRequest> placeQueue = new Queue<>();
     private Tile mining;
     private CarriableTrait carrying;
     private Trail trail = new Trail(12);
@@ -323,7 +323,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         if(floor.isLiquid){
-            Draw.tint(Color.WHITE, floor.liquidColor, Mathf.clamp(drownTime));
+            Draw.tint(Color.WHITE, floor.liquidColor, drownTime);
         }else{
             Draw.tint(Color.WHITE);
         }
@@ -421,55 +421,53 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     /**Draw all current build requests. Does not draw the beam effect, only the positions.*/
     public void drawBuildRequests(){
-        synchronized(getPlaceQueue()){
-            for(BuildRequest request : getPlaceQueue()){
-                if(getCurrentRequest() == request) continue;
+        for(BuildRequest request : getPlaceQueue()){
+            if(getCurrentRequest() == request) continue;
 
-                if(request.breaking){
-                    Block block = world.tile(request.x, request.y).target().block();
+            if(request.breaking){
+                Block block = world.tile(request.x, request.y).target().block();
 
-                    //draw removal request
-                    Lines.stroke(2f);
+                //draw removal request
+                Lines.stroke(2f);
 
-                    Draw.color(Palette.removeBack);
+                Draw.color(Palette.removeBack);
 
-                    float rad = Mathf.absin(Timers.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
+                float rad = Mathf.absin(Timers.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
 
-                    Lines.square(
-                            request.x * tilesize + block.offset(),
-                            request.y * tilesize + block.offset() - 1,
-                            rad);
+                Lines.square(
+                        request.x * tilesize + block.offset(),
+                        request.y * tilesize + block.offset() - 1,
+                        rad);
 
-                    Draw.color(Palette.remove);
+                Draw.color(Palette.remove);
 
-                    Lines.square(
-                            request.x * tilesize + block.offset(),
-                            request.y * tilesize + block.offset(),
-                            rad);
-                }else{
-                    //draw place request
-                    Lines.stroke(2f);
+                Lines.square(
+                        request.x * tilesize + block.offset(),
+                        request.y * tilesize + block.offset(),
+                        rad);
+            }else{
+                //draw place request
+                Lines.stroke(2f);
 
-                    Draw.color(Palette.accentBack);
+                Draw.color(Palette.accentBack);
 
-                    float rad = Mathf.absin(Timers.time(), 7f, 1f) - 2f + request.recipe.result.size * tilesize / 2f;
+                float rad = Mathf.absin(Timers.time(), 7f, 1f) - 2f + request.recipe.result.size * tilesize / 2f;
 
-                    Lines.square(
-                            request.x * tilesize + request.recipe.result.offset(),
-                            request.y * tilesize + request.recipe.result.offset() - 1,
-                            rad);
+                Lines.square(
+                        request.x * tilesize + request.recipe.result.offset(),
+                        request.y * tilesize + request.recipe.result.offset() - 1,
+                        rad);
 
-                    Draw.color(Palette.accent);
+                Draw.color(Palette.accent);
 
-                    Lines.square(
-                            request.x * tilesize + request.recipe.result.offset(),
-                            request.y * tilesize + request.recipe.result.offset(),
-                            rad);
-                }
+                Lines.square(
+                        request.x * tilesize + request.recipe.result.offset(),
+                        request.y * tilesize + request.recipe.result.offset(),
+                        rad);
             }
-
-            Draw.reset();
         }
+
+        Draw.reset();
     }
 
     //endregion
@@ -512,14 +510,14 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             achievedFlight = true;
         }
 
-        if(boostHeat <= liftoffBoost + 0.05f && achievedFlight){
+        if(boostHeat <= liftoffBoost + 0.05f && achievedFlight && !mech.flying){
             if(tile != null){
                 if(mech.shake > 1f){
                     Effects.shake(mech.shake, mech.shake, this);
                 }
                 Effects.effect(UnitFx.unitLand, tile.floor().minimapColor, x, y, tile.floor().isLiquid ? 1f : 0.5f);
             }
-            if(!mech.flying) mech.onLand(this);
+            mech.onLand(this);
             achievedFlight = false;
         }
 

@@ -248,11 +248,12 @@ public class Renderer extends RendererModule{
         overlays.drawBottom();
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
-        Shaders.shield.color.set(Palette.accent);
         Graphics.beginShaders(Shaders.shield);
         EntityDraw.draw(shieldGroup);
         EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
+        Draw.color(Palette.accent);
         Graphics.endShaders();
+        Draw.color();
 
         overlays.drawTop();
 

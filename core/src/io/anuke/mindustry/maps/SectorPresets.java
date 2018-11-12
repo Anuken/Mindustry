@@ -23,10 +23,10 @@ public class SectorPresets{
 
     public SectorPresets(){
 
-        //base tutorial mission (disabled)
-        /*add(new SectorPreset(0, 0,
+        //base tutorial mission
+        add(new SectorPreset(0, 0,
             TutorialSector.getMissions(),
-            Array.with(Items.copper, Items.coal, Items.lead)));*/
+            Array.with(Items.copper, Items.coal, Items.lead)));
 
         //command center mission
         add(new SectorPreset(0, 1,
@@ -56,7 +56,8 @@ public class SectorPresets{
                 Missions.blockRecipe(ProductionBlocks.waterExtractor),
                 new ContentMission(Items.biomatter),
                 Missions.blockRecipe(CraftingBlocks.biomatterCompressor),
-                new ContentMission(Liquids.oil)
+                new ContentMission(Liquids.oil),
+                new BattleMission()
             ),
             Array.with(Items.copper, Items.lead, Items.coal, Items.titanium)));
     }
@@ -68,6 +69,8 @@ public class SectorPresets{
     public SectorPreset get(int x, int y){
         return presets.get(x, y);
     }
+
+    public GridMap<SectorPreset> getPresets() { return presets; }
 
     private void add(SectorPreset preset){
         presets.put(preset.x, preset.y, preset);
