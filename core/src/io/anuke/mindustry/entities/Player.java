@@ -30,7 +30,6 @@ import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.*;
@@ -317,7 +316,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 Draw.rect(mech.legRegion,
                         x + Angles.trnsx(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
                         y + Angles.trnsy(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
-                        mech.legRegion.getRegionWidth() * i, mech.legRegion.getRegionHeight() - Mathf.clamp(ft * i, 0, 2), baseRotation - 90 + boostAng * i);
+                        mech.legRegion.getRegionWidth() * i * Draw.scale(),
+                        (mech.legRegion.getRegionHeight() - Mathf.clamp(ft * i, 0, 2)) * Draw.scale(),
+                        baseRotation - 90 + boostAng * i);
             }
 
             Draw.rect(mech.baseRegion, x, y, baseRotation - 90);
@@ -337,8 +338,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             float tra = rotation - 90, trY = -mech.weapon.getRecoil(this, i > 0) + mech.weaponOffsetY;
             float w = i > 0 ? -mech.weapon.equipRegion.getRegionWidth() : mech.weapon.equipRegion.getRegionWidth();
             Draw.rect(mech.weapon.equipRegion,
-                    x + Angles.trnsx(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY),
-                    y + Angles.trnsy(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY), w, mech.weapon.equipRegion.getRegionHeight(), rotation - 90);
+                    x + Angles.trnsx(tra, (mech.weaponOffsetX * Draw.scale() + mech.spreadX(this)) * i, trY),
+                    y + Angles.trnsy(tra, (mech.weaponOffsetX * Draw.scale() + mech.spreadX(this)) * i, trY),
+                    w * Draw.scale(),
+                    mech.weapon.equipRegion.getRegionHeight() * Draw.scale(), rotation - 90);
         }
 
         float backTrns = 4f, itemSize = 5f;

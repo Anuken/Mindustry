@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 
 import javax.imageio.ImageIO
+import java.awt.image.BufferedImage
 
 def textureFolder = "../core/assets-raw/sprites/generated/"
 
@@ -40,6 +41,98 @@ task swapColors(){
             println "Swapped $swaps images."
         }else{
             throw new InvalidUserDataException("No replacement colors specified. Use -Pcolors=\"<path to color file>\"")
+        }
+    }
+}
+
+task scaleSprites2x(){
+    doLast{
+        fileTree(dir: '../core/assets-raw/sprites', include: "**/*.png").visit { file ->
+            if(file.isDirectory() || file.toString().contains("/ui/")) return;
+            def image = ImageIO.read(file.file)
+            def scaled = new BufferedImage(image.getWidth() * 2, image.getHeight() * 2, BufferedImage.TYPE_INT_ARGB)
+
+            def getRGB = { int ix, int iy ->
+                return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
+            }
+
+            for(int x = 0; x < image.getWidth(); x++){
+                for(int y = 0; y < image.getHeight(); y++){
+                    int p = image.getRGB(x, y)
+                    int p1 = p , p2 = p, p3 = p, p4 = p
+
+                    int A = getRGB(x, y + 1),
+                        B = getRGB(x + 1, y),
+                        C = getRGB(x - 1, y),
+                        D = getRGB(x, y - 1);
+
+                    if (C==A && C!=D && A!=B) p1=A
+                    if (A==B && A!=C && B!=D) p2=B
+                    if (D==C && D!=B && C!=A) p3=C
+                    if (B==D && B!=A && D!=C) p4=D
+
+                    scaled.setRGB(x*2, y*2 + 1, p1)
+                    scaled.setRGB(x*2 + 1, y*2 + 1, p2)
+                    scaled.setRGB(x*2, y*2, p3)
+                    scaled.setRGB(x*2 + 1, y*2, p4)
+                }
+            }
+
+            ImageIO.write(scaled, "png", file.file)
+        }
+    }
+}
+
+task scaleSprites3x(){
+    doLast{
+        fileTree(dir: '../core/assets-raw/sprites', include: "**/*.png").visit { file ->
+            if(file.isDirectory() || file.toString().contains("/ui/")) return;
+            def image = ImageIO.read(file.file)
+            def scaled = new BufferedImage(image.getWidth() * 3, image.getHeight() * 3, BufferedImage.TYPE_INT_ARGB)
+
+            def getRGB = { int ix, int iy ->
+                return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
+            }
+
+            for(int x = 0; x < image.getWidth(); x++){
+                for(int y = 0; y < image.getHeight(); y++){
+                    int A = getRGB(x - 1, y + 1),
+                        B = getRGB(x, y + 1),
+                        C = getRGB(x + 1, y + 1),
+                        D = getRGB(x - 1, y),
+                        E = getRGB(x, y),
+                        F= getRGB(x + 1, y),
+                        G = getRGB(x - 1, y - 1),
+                        H = getRGB(x, y - 1),
+                        I = getRGB(x + 1, y - 1)
+
+                    int p1=E, p2=E, p3=E, p4=E, p5=E, p6=E, p7=E, p8=E, p9=E;
+
+                    if(D==B && D!=H && B!=F) p1=D
+                    if((D==B && D!=H && B!=F && E!=C) || (B==F && B!=D && F!=H && E!=A)) p2=B
+                    if(B==F && B!=D && F!=H) p3=F
+                    if((H==D && H!=F && D!=B && E!=A) || (D==B && D!=H && B!=F && E!=G)) p4=D
+                    p5=E
+                    if((B==F && B!=D && F!=H && E!=I) || (F==H && F!=B && H!=D && E!=C)) p6=F
+                    if(H==D && H!=F && D!=B) p7=D
+                    if((F==H && F!=B && H!=D && E!=G) || (H==D && H!=F && D!=B && E!=I)) p8=H
+                    if(F==H && F!=B && H!=D) p9=F
+
+                    int bx = x*3, by = y*3;
+
+                    scaled.setRGB(bx, by+2, p1)
+                    scaled.setRGB(bx+1, by+2, p2)
+                    scaled.setRGB(bx+2, by+2, p3)
+                    scaled.setRGB(bx, by+1, p4)
+                    scaled.setRGB(bx+1, by+1, p5)
+                    scaled.setRGB(bx+2, by+1, p6)
+                    scaled.setRGB(bx, by, p7)
+                    scaled.setRGB(bx+1, by, p8)
+                    scaled.setRGB(bx+2, by, p9)
+                }
+            }
+
+            ImageIO.write(scaled, "png", file.file)
         }
     }
 }

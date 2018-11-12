@@ -495,8 +495,8 @@ public class Block extends BaseBlock {
     /** Crops a regionto 8x8 */
     protected TextureRegion iconRegion(TextureRegion src){
         TextureRegion region = new TextureRegion(src);
-        region.setRegionWidth(8);
-        region.setRegionHeight(8);
+        region.setRegionWidth((int)(8 / scaling));
+        region.setRegionHeight((int)(8 / scaling));
         return region;
     }
 

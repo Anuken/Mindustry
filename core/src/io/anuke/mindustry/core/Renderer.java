@@ -175,10 +175,12 @@ public class Renderer extends RendererModule{
 
         Graphics.clear(clearColor);
 
+
         batch.setProjectionMatrix(camera.combined);
 
        // Graphics.surface(pixelSurface, false);
         //Graphics.clear(clearColor);
+        Draw.scale(scaling);
 
         blocks.floor.drawFloor();
 
@@ -251,12 +253,16 @@ public class Renderer extends RendererModule{
         //    fog.draw();
         }
 
+        batch.getTransformMatrix().idt();
+
         //Graphics.beginCam();
         EntityDraw.setClip(false);
         drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
         EntityDraw.setClip(true);
         Graphics.end();
         Draw.color();
+
+
     }
 
     private void drawFlyerShadows(){

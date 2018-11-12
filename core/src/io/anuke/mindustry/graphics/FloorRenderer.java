@@ -1,7 +1,6 @@
 package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.IntArray;
@@ -9,7 +8,6 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
-import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.core.Core;
@@ -18,15 +16,13 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.CacheBatch;
 import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Structs;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class FloorRenderer{
     private final static int chunksize = 64;
@@ -147,18 +143,10 @@ public class FloorRenderer{
         layer.end();
     }
 
-    private void fillChunk(float x, float y){
-        Draw.color(Color.BLACK);
-        Fill.crect(x, y, chunksize * tilesize, chunksize * tilesize);
-        Draw.color();
-    }
-
     private void cacheChunk(int cx, int cy){
         Chunk chunk = cache[cx][cy];
 
         ObjectSet<CacheLayer> used = new ObjectSet<>();
-
-        Sector sector = world.getSector();
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
@@ -179,8 +167,6 @@ public class FloorRenderer{
 
         Graphics.useBatch(cbatch);
         cbatch.begin();
-
-        Sector sector = world.getSector();
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
@@ -216,6 +202,8 @@ public class FloorRenderer{
 
         Timers.mark();
 
+        Draw.scale(scaling);
+
         for(int x = 0; x < chunksx; x++){
             for(int y = 0; y < chunksy; y++){
                 cache[x][y] = new Chunk();
@@ -224,6 +212,8 @@ public class FloorRenderer{
                 cacheChunk(x, y);
             }
         }
+
+        Draw.scale(1f);
 
         Log.info("Time to cache: {0}", Timers.elapsed());
     }
