@@ -396,7 +396,7 @@ public class Conveyor extends Block{
         public void read(DataInput stream) throws IOException{
             convey.clear();
             int amount = stream.readInt();
-            convey.ensureCapacity(amount);
+            convey.ensureCapacity(Math.min(amount, 10));
 
             for(int i = 0; i < amount; i++){
                 convey.add(ItemPos.toLong(stream.readInt()));

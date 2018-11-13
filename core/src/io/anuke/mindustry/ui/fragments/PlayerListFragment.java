@@ -129,7 +129,7 @@ public class PlayerListFragment extends Fragment{
                         b.setDisabled(Net.client());
                     }).get().setTouchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled);
 
-                    t.addImageButton("icon-zoom-small", 14 * 2, () -> Call.onAdminRequest(player, AdminAction.trace));
+                    t.addImageButton("icon-zoom-small", 14 * 2, () -> ui.showError("Currently unimplemented.")/*Call.onAdminRequest(player, AdminAction.trace)*/);
 
                 }).padRight(12).padTop(-5).padLeft(0).padBottom(-10).size(bs + 10f, bs);
 
