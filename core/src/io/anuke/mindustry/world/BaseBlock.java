@@ -43,14 +43,6 @@ public abstract class BaseBlock extends MappableContent{
         return 0f;
     }
 
-    public float getPowerConsumption(Tile tile){
-        return 0f;
-    }
-
-    public float usePower(Tile tile){
-        return 0f;
-    }
-
     /**Returns the amount of items this block can accept.*/
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
         if(acceptItem(item, tile, tile) && hasItems && (source == null || source.getTeam() == tile.getTeam())){
