@@ -16,6 +16,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
+import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.ContentType;
@@ -847,7 +848,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     @Override
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
-        buffer.writeUTF(name); //TODO writing strings is very inefficient
+        TypeIO.writeStringData(buffer, name); //TODO writing strings is very inefficient
         buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
@@ -862,7 +863,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void read(DataInput buffer, long time) throws IOException{
         float lastx = x, lasty = y, lastrot = rotation;
         super.readSave(buffer);
-        name = buffer.readUTF();
+        name = TypeIO.readStringData(buffer);
         byte bools = buffer.readByte();
         isAdmin = (bools & 1) != 0;
         dead = (bools & 2) != 0;

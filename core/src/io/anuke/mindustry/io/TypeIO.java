@@ -23,6 +23,9 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entities;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -371,5 +374,36 @@ public class TypeIO{
         byte[] bytes = new byte[length];
         buffer.get(bytes);
         return bytes;
+    }
+
+    public static void writeStringData(DataOutput buffer, String string) throws IOException{
+        if(string != null){
+            Charset charset = Charset.defaultCharset();
+            byte[] nameBytes = charset.toString().getBytes(StandardCharsets.UTF_8);
+            buffer.writeByte((byte)nameBytes.length);
+            buffer.write(nameBytes);
+
+            byte[] bytes = string.getBytes(charset);
+            buffer.writeShort((short) bytes.length);
+            buffer.write(bytes);
+        }else{
+            buffer.writeByte((byte) -1);
+        }
+    }
+
+    public static String readStringData(DataInput buffer) throws IOException{
+        byte length = buffer.readByte();
+        if(length != -1){
+            byte[] cbytes = new byte[length];
+            buffer.readFully(cbytes);
+            Charset charset = Charset.forName(new String(cbytes, StandardCharsets.UTF_8));
+
+            short slength = buffer.readShort();
+            byte[] bytes = new byte[slength];
+            buffer.readByte(bytes);
+            return new String(bytes, charset);
+        }else{
+            return null;
+        }
     }
 }
