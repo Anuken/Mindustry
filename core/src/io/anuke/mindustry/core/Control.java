@@ -27,7 +27,10 @@ import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Atlas;
+import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
+import io.anuke.ucore.util.Timer;
 
 import java.io.IOException;
 
@@ -66,10 +69,9 @@ public class Control extends Module{
 
         content.initialize(Content::init);
         Core.atlas = new Atlas("sprites.atlas");
+        scaling = 1f / Draw.region("blank").getRegionWidth();
         Core.atlas.setErrorRegion("error");
         content.initialize(Content::load);
-
-        scaling = 1f / Draw.region("blank").getRegionWidth();
 
         unlocks.load();
 

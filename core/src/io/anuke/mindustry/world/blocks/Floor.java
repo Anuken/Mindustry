@@ -87,7 +87,7 @@ public class Floor extends Block{
 
                 TextureRegion result = new TextureRegion();
 
-                int padSize = (int)(tilesize/2/scaling);
+                int padSize = (int)(tilesize/scaling/2);
                 int texSize = (int)(tilesize/scaling);
                 int totSize = padSize + texSize;
 
