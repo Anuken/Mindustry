@@ -165,6 +165,8 @@ public class NetworkIO{
                 world.sectors.createSector(Bits.getLeftShort(sector), Bits.getRightShort(sector));
                 world.setSector(world.sectors.get(sector));
                 world.getSector().completedMissions = missions;
+            }else{
+                world.setSector(null);
             }
 
             ObjectMap<String, String> tags = new ObjectMap<>();
