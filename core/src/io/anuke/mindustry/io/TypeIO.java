@@ -25,13 +25,13 @@ import io.anuke.ucore.entities.Entities;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static io.anuke.mindustry.Vars.*;
 
 /** Class for specifying read/write methods for code generation.*/
 @SuppressWarnings("unused")
 public class TypeIO{
-    private static final Charset charset = Charset.forName("UTF-8");
 
     @WriteClass(Player.class)
     public static void writePlayer(ByteBuffer buffer, Player player){
@@ -329,19 +329,29 @@ public class TypeIO{
     @WriteClass(String.class)
     public static void writeString(ByteBuffer buffer, String string){
         if(string != null){
+            Charset charset = Charset.defaultCharset();
+            byte[] nameBytes = charset.toString().getBytes(StandardCharsets.UTF_8);
+            buffer.put((byte)nameBytes.length);
+            buffer.put(nameBytes);
+
             byte[] bytes = string.getBytes(charset);
             buffer.putShort((short) bytes.length);
             buffer.put(bytes);
         }else{
-            buffer.putShort((short) -1);
+            buffer.put((byte) -1);
         }
     }
 
     @ReadClass(String.class)
     public static String readString(ByteBuffer buffer){
-        short length = buffer.getShort();
+        byte length = buffer.get();
         if(length != -1){
-            byte[] bytes = new byte[length];
+            byte[] cbytes = new byte[length];
+            buffer.get(cbytes);
+            Charset charset = Charset.forName(new String(cbytes, StandardCharsets.UTF_8));
+
+            short slength = buffer.getShort();
+            byte[] bytes = new byte[slength];
             buffer.get(bytes);
             return new String(bytes, charset);
         }else{
