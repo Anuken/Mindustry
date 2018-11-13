@@ -252,7 +252,7 @@ public class UI extends SceneModule{
     public void showInfo(String info){
         Threads.assertGraphics();
 
-        new Dialog("$text.info.title", "dialog"){{
+        new Dialog("", "dialog"){{
             getCell(content()).growX();
             content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
             buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
@@ -262,7 +262,7 @@ public class UI extends SceneModule{
     public void showInfo(String info, Runnable clicked){
         Threads.assertGraphics();
 
-        new Dialog("$text.info.title", "dialog"){{
+        new Dialog("", "dialog"){{
             getCell(content()).growX();
             content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
             buttons().addButton("$text.ok", () -> {
