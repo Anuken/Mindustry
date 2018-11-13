@@ -26,7 +26,7 @@ public class ImageContext {
         Vars.content.load();
         Log.setLogger(new LogHandler());
 
-        Files.walk(Paths.get("../../../assets-raw/sprites")).forEach(path -> {
+        Files.walk(Paths.get("../../../assets-raw/sprites_out")).forEach(path -> {
             try{
                 if(Files.isDirectory(path)) return;
 

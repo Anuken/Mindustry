@@ -34,16 +34,6 @@ public class Generators {
                     read.draw(image);
 
                     Image base = ImageContext.get("block-" + block.size);
-                    Image top = ImageContext.get("block-" + block.size + "-top");
-
-                    for (int x = 0; x < base.width(); x++) {
-                        for (int y = 0; y < base.height(); y++) {
-                            Color result = top.getColor(x, y);
-                            if(result.a > 0.01f){
-                                base.draw(x, y, result);
-                            }
-                        }
-                    }
 
                     base.draw(image);
 
