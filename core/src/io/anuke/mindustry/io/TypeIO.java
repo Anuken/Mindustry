@@ -333,7 +333,7 @@ public class TypeIO{
     public static void writeString(ByteBuffer buffer, String string){
         if(string != null){
             Charset charset = Charset.defaultCharset();
-            byte[] nameBytes = charset.toString().getBytes(StandardCharsets.UTF_8);
+            byte[] nameBytes = charset.name().getBytes(StandardCharsets.UTF_8);
             buffer.put((byte)nameBytes.length);
             buffer.put(nameBytes);
 
@@ -379,7 +379,7 @@ public class TypeIO{
     public static void writeStringData(DataOutput buffer, String string) throws IOException{
         if(string != null){
             Charset charset = Charset.defaultCharset();
-            byte[] nameBytes = charset.toString().getBytes(StandardCharsets.UTF_8);
+            byte[] nameBytes = charset.name().getBytes(StandardCharsets.UTF_8);
             buffer.writeByte((byte)nameBytes.length);
             buffer.write(nameBytes);
 
@@ -400,7 +400,7 @@ public class TypeIO{
 
             short slength = buffer.readShort();
             byte[] bytes = new byte[slength];
-            buffer.readByte(bytes);
+            buffer.readFully(bytes);
             return new String(bytes, charset);
         }else{
             return null;
