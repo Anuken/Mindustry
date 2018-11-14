@@ -173,7 +173,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             for(TextureRegion region : regions){
                 Draw.rect(region, tile.worldx() + offset, tile.worldy() + offset,
-                        region.getRegionWidth() * request.scale, region.getRegionHeight() * request.scale,
+                        region.getRegionWidth() * request.scale  * scaling, region.getRegionHeight() * request.scale * scaling,
                         request.recipe.result.rotate ? request.rotation * 90 : 0);
             }
         }else{
@@ -364,7 +364,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                         for(TextureRegion region : regions){
                             Draw.rect(region, x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(),
-                                    region.getRegionWidth() * lineScale, region.getRegionHeight() * lineScale, recipe.result.rotate ? result.rotation * 90 : 0);
+                                    region.getRegionWidth() * lineScale * scaling, region.getRegionHeight() * lineScale * scaling, recipe.result.rotate ? result.rotation * 90 : 0);
                         }
                     }else{
                         Draw.color(Palette.removeBack);
