@@ -20,7 +20,6 @@ import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Pooling;
-import io.anuke.ucore.util.Threads;
 
 import java.io.IOException;
 
@@ -51,7 +50,6 @@ public class Net{
     public static void showError(Throwable e){
 
         if(!headless){
-            Threads.assertGraphics();
 
             Throwable t = e;
             while(t.getCause() != null){

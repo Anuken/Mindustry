@@ -300,10 +300,6 @@ public interface BuilderTrait extends Entity{
 
         float x1 = tmptr[0].x, y1 = tmptr[0].y,
                 x3 = tmptr[1].x, y3 = tmptr[1].y;
-        Translator close = Geometry.findClosest(unit.x, unit.y, tmptr);
-        float x2 = close.x, y2 = close.y;
-
-        Draw.alpha(0.3f + Mathf.absin(Timers.time(), 0.9f, 0.2f));
 
         Draw.alpha(1f);
 

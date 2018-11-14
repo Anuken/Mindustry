@@ -13,7 +13,6 @@ import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Threads;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -63,45 +62,20 @@ public class Units{
 
     /**Can be called from any thread.*/
     public static boolean anyEntities(Rectangle rect){
-        if(Threads.isLogic()){
-            boolResult = false;
+        boolResult = false;
 
-            Units.getNearby(rect, unit -> {
-                if(boolResult) return;
-                if(!unit.isFlying()){
-                    unit.getHitbox(hitrect);
+        Units.getNearby(rect, unit -> {
+            if(boolResult) return;
+            if(!unit.isFlying()){
+                unit.getHitbox(hitrect);
 
-                    if(hitrect.overlaps(rect)){
-                        boolResult = true;
-                    }
+                if(hitrect.overlaps(rect)){
+                    boolResult = true;
                 }
-            });
-
-            return boolResult;
-        }else{
-            boolResultGraphics = false;
-
-            for(EntityGroup<? extends BaseUnit> g : unitGroups){
-                g.forEach(u -> {
-                    if(u.isFlying()) return;
-                    u.getHitbox(rectGraphics);
-                    if(rectGraphics.overlaps(rect)){
-                        boolResultGraphics = true;
-                    }
-                });
-                if(boolResultGraphics) return true;
             }
+        });
 
-            playerGroup.forEach(u -> {
-                if(u.isFlying()) return;
-                u.getHitbox(rectGraphics);
-                if(rectGraphics.overlaps(rect)){
-                    boolResultGraphics = true;
-                }
-            });
-
-            return boolResultGraphics;
-        }
+        return boolResult;
     }
 
     /**Returns whether there are any entities on this tile, with the hitbox expanded.*/
