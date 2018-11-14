@@ -73,6 +73,10 @@ public class Control extends Module{
         Core.atlas.setErrorRegion("error");
         content.initialize(Content::load);
 
+        if(Core.atlas.getTextures().size != 1){
+            throw new IllegalStateException("Atlas must be exactly one texture.");
+        }
+
         unlocks.load();
 
         Sounds.setFalloff(9000f);
