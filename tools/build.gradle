@@ -3,16 +3,16 @@ apply plugin: "java"
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-
-
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 
 import javax.imageio.ImageIO
+import java.awt.image.BufferedImage
 
 def outFolder = "../core/assets-raw/sprites_out/"
 def genFolder = "../core/assets-raw/sprites_out/generated/"
 def scaling = "XBRZ 4x"
+def do4 = true
 
 task swapColors(){
     doLast{
@@ -47,8 +47,52 @@ task swapColors(){
     }
 }
 
+task scaleSprites4x(){
+    doLast{
+        fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit { file ->
+            if(file.isDirectory() || file.toString().contains("/ui/")) return;
+
+            for(int iteration in 0..1) {
+                def image = ImageIO.read(file.file)
+                def scaled = new BufferedImage(image.getWidth() * 2, image.getHeight() * 2, BufferedImage.TYPE_INT_ARGB)
+
+                def getRGB = { int ix, int iy ->
+                    return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
+                }
+
+                for (int x = 0; x < image.getWidth(); x++) {
+                    for (int y = 0; y < image.getHeight(); y++) {
+                        int p = image.getRGB(x, y)
+                        int p1 = p, p2 = p, p3 = p, p4 = p
+
+                        int A = getRGB(x, y + 1),
+                            B = getRGB(x + 1, y),
+                            C = getRGB(x - 1, y),
+                            D = getRGB(x, y - 1);
+
+                        if (C == A && C != D && A != B) p1 = A
+                        if (A == B && A != C && B != D) p2 = B
+                        if (D == C && D != B && C != A) p3 = C
+                        if (B == D && B != A && D != C) p4 = D
+
+                        scaled.setRGB(x * 2, y * 2 + 1, p1)
+                        scaled.setRGB(x * 2 + 1, y * 2 + 1, p2)
+                        scaled.setRGB(x * 2, y * 2, p3)
+                        scaled.setRGB(x * 2 + 1, y * 2, p4)
+                    }
+                }
+
+                ImageIO.write(scaled, "png", file.file)
+            }
+        }
+    }
+}
+
+
 task scaleSprites(){
     finalizedBy 'genSprites'
+
+    if(do4) dependsOn 'scaleSprites4x'
 
     doLast{
         def arguments = ["mono", "ImageResizer.exe"]
@@ -62,9 +106,7 @@ task scaleSprites(){
                           "auto", scaling, "/save", write.toString()]
         }
 
-        exec{
-            commandLine arguments
-        }
+        if(!do4) exec{ commandLine arguments }
     }
 }
 
@@ -73,11 +115,15 @@ task pack(){
 
     doLast{
 
+        copy{
+            from "../core/assets-raw/sprites_replacement/"
+            into "../core/assets-raw/sprites_out/"
+        }
+
         TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites.atlas")
 
         delete{
-            delete outFolder
-            delete genFolder
+        //    delete outFolder
         }
     }
 }
