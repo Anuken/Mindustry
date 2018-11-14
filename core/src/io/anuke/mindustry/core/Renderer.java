@@ -176,20 +176,18 @@ public class Renderer extends RendererModule{
 
         Graphics.clear(clearColor);
 
-
-        batch.setProjectionMatrix(camera.combined);
-
-       // Graphics.surface(pixelSurface, false);
-        //Graphics.clear(clearColor);
         Draw.scale(scaling);
 
         blocks.floor.drawFloor();
+
+        Graphics.beginCam();
 
         drawAndInterpolate(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
         drawAndInterpolate(puddleGroup);
         drawAndInterpolate(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
 
         blocks.processBlocks();
+
         blocks.drawShadows();
 
         for(Team team : Team.all){
