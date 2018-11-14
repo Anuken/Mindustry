@@ -241,8 +241,8 @@ public class PowerNode extends PowerBlock{
         float angle1 = Angles.angle(x1, y1, x2, y2);
         float angle2 = angle1 + 180f;
 
-        t1.trns(angle1, tile.block().size * tilesize / 2f - 1f);
-        t2.trns(angle2, target.block().size * tilesize / 2f - 1f);
+        t1.trns(angle1, tile.block().size * tilesize / 2f - 1.5f);
+        t2.trns(angle2, target.block().size * tilesize / 2f - 1.5f);
 
         x1 += t1.x;
         y1 += t1.y;
@@ -254,7 +254,7 @@ public class PowerNode extends PowerBlock{
 
         int segments = Mathf.ceil(space / segscl);
 
-        Draw.color(Palette.power, Palette.powerLight, Mathf.absin(Timers.time(), 5f, 1f));
+        Draw.color(Palette.powerLight);
         Lines.stroke(1f);
 
         Lines.beginLine();
