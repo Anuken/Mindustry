@@ -6,7 +6,7 @@ filter: Nearest,Nearest
 repeat: none
 force-projector-top
   rotate: false
-  xy: 691, 1145
+  xy: 593, 1145
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -321,7 +321,7 @@ junction
   index: -1
 mass-driver-turret
   rotate: false
-  xy: 907, 920
+  xy: 1103, 1018
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -345,6 +345,13 @@ phase-conveyor-end
   xy: 561, 414
   size: 32, 32
   orig: 32, 32
+  offset: 0, 0
+  index: -1
+warp-gate
+  rotate: false
+  xy: 1295, 1559
+  size: 96, 96
+  orig: 96, 96
   offset: 0, 0
   index: -1
 warp-gate-top
@@ -426,28 +433,28 @@ mechanical-drill-top
   index: -1
 oil-extractor
   rotate: false
-  xy: 1005, 920
+  xy: 907, 920
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 oil-extractor-liquid
   rotate: false
-  xy: 1103, 920
+  xy: 1005, 920
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 oil-extractor-rotator
   rotate: false
-  xy: 1197, 1755
+  xy: 1103, 920
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 oil-extractor-top
   rotate: false
-  xy: 1197, 1657
+  xy: 1197, 1755
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -1140,7 +1147,7 @@ cross-2
   index: -1
 cross-3
   rotate: false
-  xy: 495, 1145
+  xy: 397, 1145
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -1203,14 +1210,14 @@ rubble-2-1
   index: -1
 rubble-3-0
   rotate: false
-  xy: 1295, 1657
+  xy: 1197, 1559
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 rubble-3-1
   rotate: false
-  xy: 1295, 1657
+  xy: 1197, 1559
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -1462,21 +1469,21 @@ liquid-router-top
   index: -1
 liquid-tank-bottom
   rotate: false
-  xy: 907, 1018
+  xy: 809, 978
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 liquid-tank-liquid
   rotate: false
-  xy: 1005, 1018
+  xy: 907, 1018
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 liquid-tank-top
   rotate: false
-  xy: 1103, 1018
+  xy: 1005, 1018
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -1693,14 +1700,14 @@ rtg-generator-top
   index: -1
 thorium-reactor-center
   rotate: false
-  xy: 1393, 1755
+  xy: 1295, 1657
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 thorium-reactor-lights
   rotate: false
-  xy: 1197, 1461
+  xy: 1393, 1755
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -1938,14 +1945,14 @@ separator-liquid
   index: -1
 core-open
   rotate: false
-  xy: 1923, 1853
+  xy: 1825, 1853
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 core-top
   rotate: false
-  xy: 397, 1145
+  xy: 1923, 1853
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -2029,7 +2036,7 @@ arc-heat
   index: -1
 cyclone
   rotate: false
-  xy: 593, 1145
+  xy: 495, 1145
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -2043,7 +2050,7 @@ duo
   index: -1
 fuse
   rotate: false
-  xy: 809, 1076
+  xy: 711, 1047
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -2092,14 +2099,14 @@ meltdown-heat
   index: -1
 ripple
   rotate: false
-  xy: 1295, 1755
+  xy: 1197, 1657
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 ripple-heat
   rotate: false
-  xy: 1197, 1559
+  xy: 1295, 1755
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -2197,56 +2204,56 @@ dagger-factory-top-open
   index: -1
 fortress-factory
   rotate: false
-  xy: 515, 1047
+  xy: 691, 1145
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 fortress-factory-top
   rotate: false
-  xy: 613, 1047
+  xy: 515, 1047
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 ghoul-factory-top
   rotate: false
-  xy: 613, 1047
+  xy: 515, 1047
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 titan-factory-top
   rotate: false
-  xy: 613, 1047
+  xy: 515, 1047
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 fortress-factory-top-open
   rotate: false
-  xy: 711, 1047
+  xy: 613, 1047
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 ghoul-factory-top-open
   rotate: false
-  xy: 711, 1047
+  xy: 613, 1047
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 titan-factory-top-open
   rotate: false
-  xy: 711, 1047
+  xy: 613, 1047
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 ghoul-factory
   rotate: false
-  xy: 809, 978
+  xy: 809, 1076
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -2316,7 +2323,7 @@ spirit-factory-top-open
   index: -1
 titan-factory
   rotate: false
-  xy: 1295, 1559
+  xy: 1197, 1461
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
@@ -4011,20 +4018,6 @@ block-icon-vault
 vault
   rotate: false
   xy: 1727, 1853
-  size: 96, 96
-  orig: 96, 96
-  offset: 0, 0
-  index: -1
-block-icon-warp-gate
-  rotate: false
-  xy: 1825, 1853
-  size: 96, 96
-  orig: 96, 96
-  offset: 0, 0
-  index: -1
-warp-gate
-  rotate: false
-  xy: 1825, 1853
   size: 96, 96
   orig: 96, 96
   offset: 0, 0

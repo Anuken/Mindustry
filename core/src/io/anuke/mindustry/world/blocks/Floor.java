@@ -91,7 +91,7 @@ public class Floor extends Block{
                 int texSize = (int)(tilesize/scaling);
                 int totSize = padSize + texSize;
 
-                int sx = -dx * texSize + padSize/2, sy = -dy * texSize + padSize;
+                int sx = -dx * texSize + padSize/2, sy = -dy * texSize + padSize/2;
                 int x = Mathf.clamp(sx, 0, totSize);
                 int y = Mathf.clamp(sy, 0, totSize);
                 int w = Mathf.clamp(sx + texSize, 0, totSize) - x, h = Mathf.clamp(sy + texSize, 0, totSize) - y;
@@ -187,9 +187,12 @@ public class Floor extends Block{
             if(other == null) continue;
 
             Floor floor = other.floor();
+            Floor cur = this;
+            if(floor instanceof OreBlock) floor = ((OreBlock) floor).base;
+            if(cur instanceof OreBlock) cur = ((OreBlock) cur).base;
 
-            if((floor.id <= this.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!blends.test(floor) && !tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > this.cacheLayer.ordinal() && !sameLayer) ||
-                    (sameLayer && floor.cacheLayer == this.cacheLayer)) continue;
+            if((floor.id <= cur.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!cur.blends.test(floor) && !cur.tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > cur.cacheLayer.ordinal() && !sameLayer) ||
+                    (sameLayer && floor.cacheLayer == cur.cacheLayer)) continue;
 
             TextureRegion region = floor.edgeRegions[i];
             //Draw.color(Hue.random());
@@ -199,7 +202,7 @@ public class Floor extends Block{
                 tile.worldy() + floor.offsets[i].y * scaling,
                 region.getRegionWidth() * scaling,
                 region.getRegionHeight() * scaling);
-            //Draw.color();
+           // Draw.color();
         }
     }
 

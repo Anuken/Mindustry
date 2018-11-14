@@ -2,39 +2,46 @@ package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.IntSet.IntSetIterator;
+import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Events;
+import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
+import io.anuke.ucore.graphics.CacheBatch;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Structs;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import java.util.Arrays;
 
+import static io.anuke.mindustry.Vars.*;
+
+//TODO point shader mesh
 public class FloorRenderer{
-    private final static int chunksize = 32;
-    private final static int vertexSize = 6;
-    private float[] vertices = new float[vertexSize];
-    private Chunk[][] chunks;
-    private ShaderProgram shader = createDefaultShader();
-    private Mesh mesh;
+    private final static int chunksize = 64;
+
+    private Chunk[][] cache;
+    private CacheBatch cbatch;
+    private IntSet drawnLayerSet = new IntSet();
+    private IntArray drawnLayers = new IntArray();
 
     public FloorRenderer(){
         Events.on(WorldLoadGraphicsEvent.class, event -> clearTiles());
     }
 
-    /**Draws all the floor tiles in the camera range.*/
     public void drawFloor(){
+        if(cache == null){
+            return;
+        }
+
         OrthographicCamera camera = Core.camera;
 
         int crangex = (int) (camera.viewportWidth * camera.zoom / (chunksize * tilesize)) + 1;
@@ -43,121 +50,175 @@ public class FloorRenderer{
         int camx = Mathf.scl(camera.position.x, chunksize * tilesize);
         int camy = Mathf.scl(camera.position.y, chunksize * tilesize);
 
-        Gdx.gl.glEnable(GL20.GL_VERTEX_PROGRAM_POINT_SIZE);
-        Gdx.gl.glEnable( 0x8861);
-        Core.atlas.getTextures().first().bind(0);
-        shader.begin();
-        shader.setUniformMatrix("u_projectionViewMatrix", Core.camera.combined);
-        shader.setUniformi("u_texture", 0);
+        int layers = CacheLayer.values().length;
 
+        drawnLayers.clear();
+        drawnLayerSet.clear();
+
+        //preliminary layer check
         for(int x = -crangex; x <= crangex; x++){
             for(int y = -crangey; y <= crangey; y++){
                 int worldx = camx + x;
                 int worldy = camy + y;
 
-                if(!Structs.inBounds(worldx, worldy, chunks))
+                if(!Structs.inBounds(worldx, worldy, cache))
                     continue;
 
-                Chunk chunk = chunks[worldx][worldy];
-                mesh.render(shader, GL20.GL_POINTS, chunk.start / vertexSize, chunk.end / vertexSize);
+                Chunk chunk = cache[worldx][worldy];
+
+                //loop through all layers, and add layer index if it exists
+                for(int i = 0; i < layers; i++){
+                    if(chunk.caches[i] != -1){
+                        drawnLayerSet.add(i);
+                    }
+                }
             }
         }
 
-        shader.end();
-    }
-
-    /**Clears the mesh and renders the entire world to it.*/
-    public void clearTiles(){
-        if(mesh != null){
-            mesh.dispose();
+        IntSetIterator it = drawnLayerSet.iterator();
+        while(it.hasNext){
+            drawnLayers.add(it.next());
         }
 
-        int size = world.width() * world.height() * vertexSize;
+        drawnLayers.sort();
 
-        mesh = new Mesh(true, size, 0,
-            new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
-            new VertexAttribute(Usage.TextureCoordinates, 4, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
+        //Graphics.end();
+        beginDraw();
 
-        mesh.getVerticesBuffer().position(0);
-        mesh.getVerticesBuffer().limit(mesh.getMaxVertices());
-        cache();
+        for(int i = 0; i < drawnLayers.size; i++){
+            CacheLayer layer = CacheLayer.values()[drawnLayers.get(i)];
+
+            drawLayer(layer);
+        }
+
+        endDraw();
     }
 
-    private void addSprite(TextureRegion region, float x, float y){
-        vertices[0] = x;
-        vertices[1] = y;
-        vertices[2] = region.getU();
-        vertices[3] = region.getV();
-        vertices[4] = region.getU2();
-        vertices[5] = region.getV2();
+    public void beginDraw(){
+        if(cache == null){
+            return;
+        }
 
-        mesh.getVerticesBuffer().put(vertices);
+        cbatch.setProjectionMatrix(Core.camera.combined);
+        cbatch.beginDraw();
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
     }
 
-    private void cache(){
-        Timers.mark();
+    public void endDraw(){
+        if(cache == null){
+            return;
+        }
+
+        cbatch.endDraw();
+    }
+
+    public void drawLayer(CacheLayer layer){
+        if(cache == null){
+            return;
+        }
+
+        OrthographicCamera camera = Core.camera;
+
+        int crangex = (int) (camera.viewportWidth * camera.zoom / (chunksize * tilesize)) + 1;
+        int crangey = (int) (camera.viewportHeight * camera.zoom / (chunksize * tilesize)) + 1;
+
+        layer.begin();
+
+        for(int x = -crangex; x <= crangex; x++){
+            for(int y = -crangey; y <= crangey; y++){
+                int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
+                int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
+
+                if(!Structs.inBounds(worldx, worldy, cache)){
+                    continue;
+                }
+
+                Chunk chunk = cache[worldx][worldy];
+                if(chunk.caches[layer.ordinal()] == -1) continue;
+                cbatch.drawCache(chunk.caches[layer.ordinal()]);
+            }
+        }
+
+        layer.end();
+    }
+
+    private void cacheChunk(int cx, int cy){
+        Chunk chunk = cache[cx][cy];
+
+        ObjectSet<CacheLayer> used = new ObjectSet<>();
+
+        for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
+            for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
+                Tile tile = world.tile(tilex, tiley);
+
+                if(tile != null){
+                    used.add(tile.floor().cacheLayer);
+                }
+            }
+        }
+
+        for(CacheLayer layer : used){
+            cacheChunkLayer(cx, cy, chunk, layer);
+        }
+    }
+
+    private void cacheChunkLayer(int cx, int cy, Chunk chunk, CacheLayer layer){
+
+        Graphics.useBatch(cbatch);
+        cbatch.begin();
+
+        for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
+            for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
+                Tile tile = world.tile(tilex , tiley);
+                Floor floor;
+
+                if(tile == null){
+                    continue;
+                }else{
+                    floor = tile.floor();
+                }
+
+                if(floor.cacheLayer == layer){
+                    floor.draw(tile);
+                }else if(floor.cacheLayer.ordinal() < layer.ordinal()){
+                    floor.drawNonLayer(tile);
+                }
+            }
+        }
+
+        cbatch.end();
+        Graphics.popBatch();
+        chunk.caches[layer.ordinal()] = cbatch.getLastCache();
+    }
+
+    public void clearTiles(){
+        if(cbatch != null) cbatch.dispose();
 
         int chunksx = Mathf.ceil((float) (world.width()) / chunksize),
-                chunksy = Mathf.ceil((float) (world.height()) / chunksize);
-        chunks = new Chunk[chunksx][chunksy];
+        chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
+        cache = new Chunk[chunksx][chunksy];
+        cbatch = new CacheBatch(world.width() * world.height() * 4 * 4);
+
+        Timers.mark();
+
+        Draw.scale(scaling);
 
         for(int x = 0; x < chunksx; x++){
             for(int y = 0; y < chunksy; y++){
-                int offset = mesh.getVerticesBuffer().position();
+                cache[x][y] = new Chunk();
+                Arrays.fill(cache[x][y].caches, -1);
 
-                for(int cx = x*chunksize; cx < (x + 1) * chunksize && cx < world.width(); cx++){
-                    for(int cy = y*chunksize; cy < (y + 1) * chunksize && cy < world.height(); cy++){
-                        Tile tile = world.tile(cx, cy);
-
-                        Floor floor = tile.floor();
-                        TextureRegion region = floor.getEditorIcon();
-                        addSprite(region, tile.worldx(), tile.worldy());
-                    }
-                }
-
-                chunks[x][y] = new Chunk(offset, mesh.getVerticesBuffer().position() - offset);
-
+                cacheChunk(x, y);
             }
         }
-        Log.info("Cache: " + Timers.elapsed());
+
+        Draw.scale(1f);
+
+        Log.info("Time to cache: {0}", Timers.elapsed());
     }
 
-    static ShaderProgram createDefaultShader () {
-        String vertexShader =
-        "#version 120\n"
-        + "attribute vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
-        + "attribute vec4 " + ShaderProgram.COLOR_ATTRIBUTE + ";\n" //
-        + "attribute vec4 " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
-        //+ "attribute float a_size;\n"
-        + "uniform mat4 u_projectionViewMatrix;\n" //
-        + "varying vec4 v_texCoords;\n" //
-        + "\n" //
-        + "void main(){\n" //
-        + "   v_texCoords = " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
-        + "   gl_Position = u_projectionViewMatrix * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
-        + "   gl_PointSize = 33.0;\n"
-        + "}\n";
-        String fragmentShader =
-        "#version 120\n"
-        + "#ifdef GL_ES\n" //
-        + "precision mediump float;\n" //
-        + "#endif\n" //
-        + "varying vec4 v_texCoords;\n" //
-        + "uniform sampler2D u_texture;\n" //
-        + "void main(){\n"//
-        + "  gl_FragColor = texture2D(u_texture, gl_PointCoord * (v_texCoords.zw - v_texCoords.xy) + v_texCoords.xy);\n" //
-        + "}";
-        ShaderProgram shader = new ShaderProgram(vertexShader, fragmentShader);
-        if (shader.isCompiled() == false) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
-        return shader;
-    }
-
-    class Chunk{
-        final int start, end;
-
-        public Chunk(int start, int end){
-            this.start = start;
-            this.end = end;
-        }
+    private class Chunk{
+        int[] caches = new int[CacheLayer.values().length];
     }
 }
