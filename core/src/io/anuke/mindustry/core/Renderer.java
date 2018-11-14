@@ -268,8 +268,8 @@ public class Renderer extends RendererModule{
     }
 
     private void drawFlyerShadows(){
-        Graphics.surface(effectSurface, true, false);
-
+        //Graphics.surface(effectSurface, true, false);
+        Draw.color(0, 0, 0, 0.15f);
 
         float trnsX = -12, trnsY = -13;
 
@@ -283,8 +283,8 @@ public class Renderer extends RendererModule{
             drawAndInterpolate(playerGroup, unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
         }
 
-        Draw.color(0, 0, 0, 0.15f);
-        Graphics.flushSurface();
+
+        //Graphics.flushSurface();
         Draw.color();
     }
 

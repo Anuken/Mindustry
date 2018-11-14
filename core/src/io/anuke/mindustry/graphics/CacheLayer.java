@@ -1,12 +1,6 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.graphics.Color;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Shader;
-
-import static io.anuke.mindustry.Vars.renderer;
 
 public enum CacheLayer{
     water{
@@ -65,12 +59,13 @@ public enum CacheLayer{
 
     protected void beginShader(){
         //renderer.getBlocks().endFloor();
-        renderer.effectSurface.getBuffer().begin();
-        Graphics.clear(Color.CLEAR);
+       // renderer.effectSurface.getBuffer().begin();
+        //Graphics.clear(Color.CLEAR);
         //renderer.getBlocks().beginFloor();
     }
 
     public void endShader(Shader shader){
+        /*
         renderer.blocks.floor.endDraw();
 
         renderer.effectSurface.getBuffer().end();
@@ -82,6 +77,6 @@ public enum CacheLayer{
                 Core.camera.viewportWidth * Core.camera.zoom, -Core.camera.viewportHeight * Core.camera.zoom);
         Graphics.end();
         Graphics.shader();
-        renderer.blocks.floor.beginDraw();
+        renderer.blocks.floor.beginDraw();*/
     }
 }

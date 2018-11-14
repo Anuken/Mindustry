@@ -24,6 +24,7 @@ import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
 
+//TODO point shader mesh
 public class FloorRenderer{
     private final static int chunksize = 64;
 
