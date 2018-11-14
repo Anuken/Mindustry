@@ -263,8 +263,6 @@ public class Renderer extends RendererModule{
         EntityDraw.setClip(true);
         Graphics.end();
         Draw.color();
-
-
     }
 
     private void drawFlyerShadows(){
