@@ -40,7 +40,6 @@ import static io.anuke.mindustry.Vars.unitGroups;
 import static io.anuke.mindustry.Vars.world;
 
 public class Drone extends FlyingUnit implements BuilderTrait{
-    protected static float discoverRange = 120f;
     protected static int timerRepairEffect = timerIndex++;
 
     protected Item targetItem;
@@ -250,14 +249,12 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             for(BaseUnit unit : group.all()){
                 if(unit instanceof Drone){
                     Drone drone = (Drone)unit;
-                    synchronized(drone.getPlaceQueue()){
-                        if(drone.isBuilding()){
-                            //stop building if opposite building begins.
-                            BuildRequest req = drone.getCurrentRequest();
-                            if(req.breaking != event.breaking && req.x == event.tile.x && req.y == event.tile.y){
-                                drone.clearBuilding();
-                                drone.setState(drone.repair);
-                            }
+                    if(drone.isBuilding()){
+                        //stop building if opposite building begins.
+                        BuildRequest req = drone.getCurrentRequest();
+                        if(req.breaking != event.breaking && req.x == event.tile.x && req.y == event.tile.y){
+                            drone.clearBuilding();
+                            drone.setState(drone.repair);
                         }
                     }
 

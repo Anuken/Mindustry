@@ -36,7 +36,7 @@ public class BlockConsumeFragment extends Fragment{
                 tile = tile.target();
 
                 if(tile != lastTile){
-                    if(tile.block().consumes.hasAny()){
+                    if(tile.getTeam() == players[0].getTeam() && tile.block().consumes.hasAny()){
                         show(tile);
                     }else if(visible){
                         hide();

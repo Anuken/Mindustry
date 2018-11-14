@@ -105,32 +105,29 @@ public class BlockRenderer{
         for(int x = minx; x <= maxx; x++){
             for(int y = miny; y <= maxy; y++){
                 boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
+                Tile tile = world.rawTile(x, y);
 
-                synchronized(Tile.tileSetLock){
-                    Tile tile = world.rawTile(x, y);
+                if(tile != null){
+                    Block block = tile.block();
+                    Team team = tile.getTeam();
 
-                    if(tile != null){
-                        Block block = tile.block();
-                        Team team = tile.getTeam();
+                    if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
+                        tile.block().drawShadow(tile);
+                    }
 
-                        if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
-                            tile.block().drawShadow(tile);
+                    if(block != Blocks.air){
+                        if(!expanded){
+                            addRequest(tile, Layer.block);
+                            teamChecks.add(team.ordinal());
                         }
 
-                        if(block != Blocks.air){
-                            if(!expanded){
-                                addRequest(tile, Layer.block);
-                                teamChecks.add(team.ordinal());
+                        if(block.expanded || !expanded){
+                            if(block.layer != null && block.isLayer(tile)){
+                                addRequest(tile, block.layer);
                             }
 
-                            if(block.expanded || !expanded){
-                                if(block.layer != null && block.isLayer(tile)){
-                                    addRequest(tile, block.layer);
-                                }
-
-                                if(block.layer2 != null && block.isLayer2(tile)){
-                                    addRequest(tile, block.layer2);
-                                }
+                            if(block.layer2 != null && block.isLayer2(tile)){
+                                addRequest(tile, block.layer2);
                             }
                         }
                     }
@@ -170,16 +167,14 @@ public class BlockRenderer{
                 layerBegins(req.layer);
             }
 
-            synchronized(Tile.tileSetLock){
-                Block block = req.tile.block();
+            Block block = req.tile.block();
 
-                if(req.layer == Layer.block){
-                    block.draw(req.tile);
-                }else if(req.layer == block.layer){
-                    block.drawLayer(req.tile);
-                }else if(req.layer == block.layer2){
-                    block.drawLayer2(req.tile);
-                }
+            if(req.layer == Layer.block){
+                block.draw(req.tile);
+            }else if(req.layer == block.layer){
+                block.drawLayer(req.tile);
+            }else if(req.layer == block.layer2){
+                block.drawLayer2(req.tile);
             }
 
             lastLayer = req.layer;
@@ -198,17 +193,16 @@ public class BlockRenderer{
             BlockRequest req = requests.get(index);
             if(req.tile.getTeam() != team) continue;
 
-            synchronized(Tile.tileSetLock){
-                Block block = req.tile.block();
+            Block block = req.tile.block();
 
-                if(req.layer == Layer.block){
-                    block.draw(req.tile);
-                }else if(req.layer == block.layer){
-                    block.drawLayer(req.tile);
-                }else if(req.layer == block.layer2){
-                    block.drawLayer2(req.tile);
-                }
+            if(req.layer == Layer.block){
+                block.draw(req.tile);
+            }else if(req.layer == block.layer){
+                block.drawLayer(req.tile);
+            }else if(req.layer == block.layer2){
+                block.drawLayer2(req.tile);
             }
+
         }
     }
 

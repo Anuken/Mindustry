@@ -172,7 +172,6 @@ public class Logic extends Module{
 
     @Override
     public void update(){
-        if(threads.isEnabled() && !threads.isOnThread()) return;
 
         if(Vars.control != null){
             control.runUpdateLogic();
@@ -237,10 +236,6 @@ public class Logic extends Module{
                 updateSectors();
                 checkGameOver();
             }
-        }
-
-        if(threads.isEnabled()){
-            netServer.update();
         }
     }
 }

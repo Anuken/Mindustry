@@ -22,7 +22,7 @@ public class Trail{
         this.length = length;
     }
 
-    public synchronized void update(float curx, float cury){
+    public void update(float curx, float cury){
         if(Vector2.dst(curx, cury, lastX, lastY) >= maxJump){
             points.clear();
         }
@@ -39,11 +39,11 @@ public class Trail{
         lastY = cury;
     }
 
-    public synchronized void clear(){
+    public void clear(){
         points.clear();
     }
 
-    public synchronized void draw(Color color, float stroke){
+    public void draw(Color color, float stroke){
         Draw.color(color);
 
         for(int i = 0; i < points.size - 2; i += 2){

@@ -28,7 +28,6 @@ import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
 import io.anuke.ucore.scene.ui.TooltipManager;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Threads;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
@@ -155,6 +154,7 @@ public class UI extends SceneModule{
         load = new LoadDialog();
         levels = new CustomGameDialog();
         language = new LanguageDialog();
+        unlocks = new UnlocksDialog();
         settings = new SettingsMenuDialog();
         host = new HostDialog();
         paused = new PausedDialog();
@@ -165,7 +165,6 @@ public class UI extends SceneModule{
         traces = new TraceDialog();
         maps = new MapsDialog();
         localplayers = new LocalPlayerDialog();
-        unlocks = new UnlocksDialog();
         content = new ContentInfoDialog();
         sectors = new SectorsDialog();
         missions = new MissionDialog();
@@ -240,8 +239,6 @@ public class UI extends SceneModule{
     }
 
     public void showInfoFade(String info){
-        Threads.assertGraphics();
-
         Table table = new Table();
         table.setFillParent(true);
         table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.removeActor());
@@ -250,9 +247,7 @@ public class UI extends SceneModule{
     }
 
     public void showInfo(String info){
-        Threads.assertGraphics();
-
-        new Dialog("$text.info.title", "dialog"){{
+        new Dialog("", "dialog"){{
             getCell(content()).growX();
             content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
             buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
@@ -260,9 +255,7 @@ public class UI extends SceneModule{
     }
 
     public void showInfo(String info, Runnable clicked){
-        Threads.assertGraphics();
-
-        new Dialog("$text.info.title", "dialog"){{
+        new Dialog("", "dialog"){{
             getCell(content()).growX();
             content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
             buttons().addButton("$text.ok", () -> {

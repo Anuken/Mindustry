@@ -126,7 +126,6 @@ public class HudFragment extends Fragment{
                 IntFormat tps = new IntFormat("text.tps");
                 IntFormat ping = new IntFormat("text.ping");
                 t.label(() -> fps.get(Gdx.graphics.getFramesPerSecond())).padRight(10);
-                t.label(() -> tps.get(threads.getTPS())).visible(() -> threads.isEnabled());
                 t.row();
                 if(Net.hasClient()){
                     t.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
