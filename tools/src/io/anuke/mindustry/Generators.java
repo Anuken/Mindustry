@@ -159,9 +159,11 @@ public class Generators {
                     Image image = ImageContext.get(base.name + (i+1));
                     Image shadow = ImageContext.get(item.name + (i+1));
 
+                    int offset = 3;
+
                     for (int x = 0; x < image.width(); x++) {
-                        for (int y = 2; y < image.height(); y++) {
-                            Color color = shadow.getColor(x, y - 2);
+                        for (int y = offset; y < image.height(); y++) {
+                            Color color = shadow.getColor(x, y - offset);
 
                             //draw semi transparent background
                             if(color.a > 0.001f){

@@ -242,15 +242,9 @@ public class Renderer extends RendererModule{
         overlays.drawTop();
 
         if(showFog){
-        //    Graphics.surface();
-        }else{
-        //    Graphics.flushSurface();
-        }
-
-        //batch.end();
-
-        if(showFog){
-        //    fog.draw();
+            batch.end();
+            fog.draw();
+            batch.begin();
         }
 
         batch.getTransformMatrix().idt();
