@@ -69,7 +69,7 @@ public class Control extends Module{
 
         content.initialize(Content::init);
         Core.atlas = new Atlas("sprites.atlas");
-        scaling = 1f / Draw.region("blank").getRegionWidth();
+        scaling = 1f / Draw.region("scale_marker").getRegionWidth();
         Core.atlas.setErrorRegion("error");
         content.initialize(Content::load);
 
