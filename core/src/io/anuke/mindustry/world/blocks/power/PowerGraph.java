@@ -94,7 +94,7 @@ public class PowerGraph{
 
     public void clear(){
         for(Tile other : all){
-            other.entity.power.graph = null;
+            if(other.entity != null && other.entity.power != null) other.entity.power.graph = null;
         }
         all.clear();
         producers.clear();
