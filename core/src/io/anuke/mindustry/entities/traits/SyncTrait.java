@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.traits;
 
+import io.anuke.mindustry.core.NetClient;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.entities.trait.Entity;
@@ -32,7 +33,9 @@ public interface SyncTrait extends Entity, TypeTrait{
 
         if(isClipped()){
             //move off screen when no longer in bounds
-            if(!Tmp.r1.setSize(Core.camera.viewportWidth * Core.camera.zoom, Core.camera.viewportHeight * Core.camera.zoom)
+            if(!Tmp.r1.setSize(
+                    Core.camera.viewportWidth * Core.camera.zoom * NetClient.viewScale,
+                    Core.camera.viewportHeight * Core.camera.zoom * NetClient.viewScale)
                     .setCenter(Core.camera.position.x, Core.camera.position.y).contains(getX(), getY())){
                 set(-99999f, -99999f);
                 return;
