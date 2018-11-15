@@ -1,7 +1,9 @@
 package io.anuke.mindustry.entities.traits;
 
 import io.anuke.mindustry.net.Interpolator;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.entities.trait.Entity;
+import io.anuke.ucore.util.Tmp;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -24,8 +26,18 @@ public interface SyncTrait extends Entity, TypeTrait{
 
     /**Interpolate entity position only. Override if you need to interpolate rotations or other values.*/
     default void interpolate(){
-        if(getInterpolator() == null)
+        if(getInterpolator() == null){
             throw new RuntimeException("This entity must have an interpolator to interpolate()!");
+        }
+
+        if(isClipped()){
+            //move off screen when no longer in bounds
+            if(!Tmp.r1.setSize(Core.camera.viewportWidth * Core.camera.zoom, Core.camera.viewportHeight * Core.camera.zoom)
+                    .setCenter(Core.camera.position.x, Core.camera.position.y).contains(getX(), getY())){
+                set(-99999f, -99999f);
+                return;
+            }
+        }
 
         getInterpolator().update();
 
