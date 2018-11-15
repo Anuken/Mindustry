@@ -17,16 +17,16 @@ public class StorageBlocks extends BlockList implements ContentList{
 
         vault = new Vault("vault"){{
             size = 3;
-            itemCapacity = 1000;
+            itemCapacity = 900;
         }};
 
         container = new Vault("container"){{
             size = 2;
-            itemCapacity = 250;
+            itemCapacity = 200;
         }};
 
         unloader = new SortedUnloader("unloader"){{
-            speed = 5;
+            speed = 12f;
         }};
     }
 }
