@@ -4,9 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Threads.ThreadInfoProvider;
 
-public class ThreadHandler implements ThreadInfoProvider{
+public class ThreadHandler{
     private long lastFrameTime;
 
     public ThreadHandler(){
@@ -50,16 +49,6 @@ public class ThreadHandler implements ThreadInfoProvider{
                 }
             }
         }
-    }
-
-    @Override
-    public boolean isOnLogicThread() {
-        return true;
-    }
-
-    @Override
-    public boolean isOnGraphicsThread() {
-        return true;
     }
 
 }

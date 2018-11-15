@@ -90,7 +90,7 @@ public abstract class BaseBlock extends MappableContent{
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         return hasLiquids && tile.entity.liquids.get(liquid) + amount < liquidCapacity &&
-                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f)) &&
+                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f)) &&
                 (!consumes.has(ConsumeLiquid.class) || consumes.liquid() == liquid);
     }
 

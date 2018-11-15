@@ -25,7 +25,6 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Threads;
 
 import static io.anuke.mindustry.Vars.content;
 public class Drill extends Block{
@@ -221,7 +220,7 @@ public class Drill extends Block{
     @Override
     public boolean canPlaceOn(Tile tile){
         if(isMultiblock()){
-            for(Tile other : tile.getLinkedTilesAs(this, Threads.isLogic() ? tempTiles : drawTiles)){
+            for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
                 if(isValid(other)){
                     return true;
                 }

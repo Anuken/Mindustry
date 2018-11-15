@@ -131,7 +131,7 @@ public class Recipes implements ContentList{
         new Recipe(power, PowerBlocks.thoriumReactor, new ItemStack(Items.lead, 600), new ItemStack(Items.silicon, 400), new ItemStack(Items.densealloy, 300), new ItemStack(Items.thorium, 300));
         new Recipe(power, PowerBlocks.rtgGenerator, new ItemStack(Items.lead, 200), new ItemStack(Items.silicon, 150), new ItemStack(Items.phasefabric, 50), new ItemStack(Items.plastanium, 150), new ItemStack(Items.thorium, 100));
 
-        new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.densealloy, 40), new ItemStack(Items.silicon, 50));
+        new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.densealloy, 50), new ItemStack(Items.silicon, 60));
         new Recipe(distribution, StorageBlocks.container, new ItemStack(Items.densealloy, 200));
         new Recipe(distribution, StorageBlocks.vault, new ItemStack(Items.densealloy, 500), new ItemStack(Items.thorium, 250));
         //core disabled due to being broken

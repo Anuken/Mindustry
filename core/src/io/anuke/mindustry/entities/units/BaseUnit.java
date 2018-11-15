@@ -320,10 +320,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         if(target != null) behavior();
 
-        if(!isWave && !isFlying()){
-            x = Mathf.clamp(x, tilesize/2f, world.width() * tilesize - tilesize/2f);
-            y = Mathf.clamp(y, tilesize/2f, world.height() * tilesize - tilesize/2f);
-        }
+        x = Mathf.clamp(x, tilesize, world.width() * tilesize - tilesize);
+        y = Mathf.clamp(y, tilesize, world.height() * tilesize - tilesize);
     }
 
     @Override
