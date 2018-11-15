@@ -358,7 +358,20 @@ public class ServerControl extends Module{
 
             for(Item item : content.items()){
                 if(item.type == ItemType.material){
-                    state.teams.get(Team.blue).cores.first().entity.items.add(item, 2000);
+                    switch(arg[0]){
+                        case "blue":
+                            state.teams.get(Team.blue).cores.first().entity.items.add(item, 2000);
+                        case "red":
+                            state.teams.get(Team.red).cores.first().entity.items.add(item, 2000);
+                        case "green":
+                            state.teams.get(Team.green).cores.first().entity.items.add(item, 2000);
+                        case "purple":
+                            state.teams.get(Team.purple).cores.first().entity.items.add(item, 2000);
+                        case "yellow":
+                            state.teams.get(Team.yellow).cores.first().entity.items.add(item, 2000);
+                        default:
+                            err("No known team provided.");
+                    }
                 }
             }
             info("Core filled.");
