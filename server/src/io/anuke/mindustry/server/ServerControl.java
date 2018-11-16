@@ -358,7 +358,11 @@ public class ServerControl extends Module{
 
             for(Item item : content.items()){
                 if(item.type == ItemType.material){
-                    state.teams.get(Team.blue).cores.first().entity.items.add(item, 2000);
+                    if(team.valueOf(arg[0]) != null){
+                        state.teams.get(Team.valueOf(arg[0])).cores.first().entity.items.add(item, 2000);
+                    }else{
+                        err("No such team exists.");
+                    }
                 }
             }
             info("Core filled.");
