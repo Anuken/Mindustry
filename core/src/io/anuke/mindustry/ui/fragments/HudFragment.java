@@ -107,7 +107,7 @@ public class HudFragment extends Fragment{
 
             Stack stack = new Stack();
             TextButton waves = new TextButton("");
-            Table btable = new Table().margin(14);
+            Table btable = new Table().margin(0);
 
             stack.add(waves);
             stack.add(btable);
@@ -126,7 +126,6 @@ public class HudFragment extends Fragment{
                 IntFormat tps = new IntFormat("text.tps");
                 IntFormat ping = new IntFormat("text.ping");
                 t.label(() -> fps.get(Gdx.graphics.getFramesPerSecond())).padRight(10);
-                t.label(() -> tps.get(threads.getTPS())).visible(() -> threads.isEnabled());
                 t.row();
                 if(Net.hasClient()){
                     t.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
@@ -375,7 +374,7 @@ public class HudFragment extends Fragment{
                     (!state.mode.disableWaveTimer ?
                     Bundles.format("text.wave.waiting", (int)(state.wavetime/60)) :
                     Bundles.get("text.waiting"))) :
-            Bundles.format("text.mission.display", world.getSector().currentMission().displayString())).growX();
+            Bundles.format("text.mission.display", world.getSector().currentMission().displayString())).growX().pad(8f);
 
         table.clicked(() -> {
             if(world.getSector() != null && world.getSector().currentMission().hasMessage()){

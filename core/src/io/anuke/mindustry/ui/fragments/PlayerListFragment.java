@@ -97,7 +97,7 @@ public class PlayerListFragment extends Fragment{
             button.labelWrap("[#" + player.color.toString().toUpperCase() + "]" + player.name).width(170f).pad(10);
             button.add().grow();
 
-            button.addImage("icon-admin").size(14 * 2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5);
+            button.addImage("icon-admin").size(14 * 2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5).get().updateVisibility();
 
             if((Net.server() || players[0].isAdmin) && !player.isLocal && (!player.isAdmin || Net.server())){
                 button.add().growY();
@@ -124,12 +124,13 @@ public class PlayerListFragment extends Fragment{
                         }else{
                             ui.showConfirm("$text.confirm", "$text.confirmadmin", () -> netServer.admins.adminPlayer(id, player.usid));
                         }
-                    }).update(b -> {
-                        b.setChecked(player.isAdmin);
-                        b.setDisabled(Net.client());
-                    }).get().setTouchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled);
+                    })
+                    .update(b -> b.setChecked(player.isAdmin))
+                    .disabled(b -> Net.client())
+                    .touchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled)
+                    .checked(player.isAdmin);
 
-                    t.addImageButton("icon-zoom-small", 14 * 2, () -> Call.onAdminRequest(player, AdminAction.trace));
+                    t.addImageButton("icon-zoom-small", 14 * 2, () -> ui.showError("Currently unimplemented.")/*Call.onAdminRequest(player, AdminAction.trace)*/);
 
                 }).padRight(12).padTop(-5).padLeft(0).padBottom(-10).size(bs + 10f, bs);
 

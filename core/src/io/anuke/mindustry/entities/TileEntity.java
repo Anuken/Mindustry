@@ -260,31 +260,29 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     @Override
     public void update(){
-        synchronized(Tile.tileSetLock){
-            //TODO better smoke effect, this one is awful
-            if(health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
-                    Mathf.chance(0.009f * Timers.delta() * (1f - health / tile.block().health))){
+        //TODO better smoke effect, this one is awful
+        if(health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
+                Mathf.chance(0.009f * Timers.delta() * (1f - health / tile.block().health))){
 
-                Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
-            }
-
-            timeScaleDuration -= Timers.delta();
-            if(timeScaleDuration <= 0f || !tile.block().canOverdrive){
-                timeScale = 1f;
-            }
-
-            if(health <= 0){
-                onDeath();
-            }
-            Block previous = tile.block();
-
-            if (enabled){
-                tile.block().update(tile);
-                if (tile.block() == previous && cons != null){
-                    cons.update(this);
-                }
-            }
+            Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
         }
+
+        timeScaleDuration -= Timers.delta();
+        if(timeScaleDuration <= 0f || !tile.block().canOverdrive){
+            timeScale = 1f;
+        }
+
+        if(health <= 0){
+            onDeath();
+        }
+
+        if (enabled) {
+            Block previous = tile.block();
+            tile.block().update(tile);
+            if(tile.block() == previous && cons != null){
+                cons.update(this);
+            }
+	}
     }
 
     @Override
