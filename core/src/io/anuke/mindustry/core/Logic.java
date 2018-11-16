@@ -125,7 +125,7 @@ public class Logic extends Module{
     }
 
     private void updateSectors(){
-        if(world.getSector() == null) return;
+        if(world.getSector() == null || state.gameOver) return;
 
         world.getSector().currentMission().update();
 

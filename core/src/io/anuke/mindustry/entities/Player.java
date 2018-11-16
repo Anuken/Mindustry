@@ -550,8 +550,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         updateBuilding(this);
 
-        x = Mathf.clamp(x, 0, world.width() * tilesize);
-        y = Mathf.clamp(y, 0, world.height() * tilesize);
+        x = Mathf.clamp(x, tilesize, world.width() * tilesize - tilesize);
+        y = Mathf.clamp(y, tilesize, world.height() * tilesize - tilesize);
     }
 
     protected void updateMech(){
