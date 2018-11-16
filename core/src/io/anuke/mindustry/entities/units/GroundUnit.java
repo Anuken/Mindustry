@@ -238,7 +238,7 @@ public abstract class GroundUnit extends BaseUnit{
     }
 
     protected void patrol(){
-        vec.trns(baseRotation, type.speed);
+        vec.trns(baseRotation, type.speed * Timers.delta());
         velocity.add(vec.x, vec.y);
         vec.trns(baseRotation, type.hitsizeTile);
         Tile tile = world.tileWorld(x + vec.x, y + vec.y);

@@ -293,7 +293,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         float x = snappedX(), y = snappedY();
 
         if(!movement.isZero() && moved && !state.isPaused()){
-            walktime += Timers.delta() * movement.len() / 0.7f * getFloorOn().speedMultiplier;
+            walktime += movement.len() / 0.7f * getFloorOn().speedMultiplier;
             baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
         }
 
@@ -608,11 +608,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         pointerY = vec.y;
         updateShooting();
 
-        movement.limit(speed * Timers.delta());
+        movement.limit(speed).scl(Timers.delta());
 
         if(getCarrier() == null){
             if(!ui.chatfrag.chatOpen()){
-                velocity.add(movement);
+                velocity.add(movement.x, movement.y);
             }
             float prex = x, prey = y;
             updateVelocityStatus();
