@@ -809,6 +809,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     //region read and write methods
 
+
+    @Override
+    public boolean isClipped(){
+        return false;
+    }
+
     @Override
     public void writeSave(DataOutput stream) throws IOException{
         stream.writeBoolean(isLocal);

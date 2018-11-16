@@ -494,7 +494,7 @@ public class NetServer extends Module{
         //check for syncable groups
         for(EntityGroup<?> group : Entities.getAllGroups()){
             if(group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
-            //clipping is done by represntatives
+            //clipping is done by representatives
             SyncTrait represent = (SyncTrait) group.all().get(0);
 
             //make sure mapping is enabled for this group
