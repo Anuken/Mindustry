@@ -41,11 +41,11 @@ public class PowerGraph{
         float totalInput = 0f;
 
         for(Tile producer : producers){
-            totalInput += producer.entity.power.amount;
+            totalInput += producer.entity.power.getAmount();
         }
 
         for(Tile producer : producers){
-            float accumulator = producer.entity.power.amount;
+            float accumulator = producer.entity.power.getAmount();
 
             if(accumulator <= 0.0001f) continue;
 
@@ -53,7 +53,7 @@ public class PowerGraph{
             float outputs = 0f;
 
             for(Tile tile : consumers){
-                outputs += Math.min(tile.block().powerCapacity - tile.entity.power.amount, toEach) / toEach;
+                outputs += Math.min(tile.block().powerCapacity - tile.entity.power.getAmount(), toEach) / toEach;
             }
 
             float finalEach = toEach / outputs * Timers.delta();
@@ -64,12 +64,12 @@ public class PowerGraph{
             }
 
             for(Tile tile : consumers){
-                float used = Math.min(tile.block().powerCapacity - tile.entity.power.amount, finalEach) * accumulator / totalInput;
+                float used = Math.min(tile.block().powerCapacity - tile.entity.power.getAmount(), finalEach) * accumulator / totalInput;
                 buffer += used;
-                tile.entity.power.amount += used;
+                tile.entity.power.add(used, tile.block().powerCapacity);
             }
 
-            producer.entity.power.amount -= buffer;
+            producer.entity.power.reduceBy(buffer);
         }
     }
 

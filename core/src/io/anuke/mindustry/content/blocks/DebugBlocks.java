@@ -69,7 +69,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             @Override
             public void update(Tile tile){
                 super.update(tile);
-                tile.entity.power.amount = powerCapacity;
+                tile.entity.power.setAmount(powerCapacity);
             }
         };
 

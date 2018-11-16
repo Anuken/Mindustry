@@ -53,10 +53,10 @@ public abstract class LiquidGenerator extends PowerGenerator{
         if(entity.liquids.get(entity.liquids.current()) >= 0.001f){
             float powerPerLiquid = getEfficiency(entity.liquids.current()) * this.powerPerLiquid;
             float used = Math.min(entity.liquids.currentAmount(), maxLiquidGenerate * entity.delta());
-            used = Math.min(used, (powerCapacity - entity.power.amount) / powerPerLiquid);
+            used = Math.min(used, (powerCapacity - entity.power.getAmount()) / powerPerLiquid);
 
             entity.liquids.remove(entity.liquids.current(), used);
-            entity.power.amount += used * powerPerLiquid;
+            entity.power.add(used * powerPerLiquid, powerCapacity);
 
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));

@@ -29,7 +29,7 @@ public class MindustryServer extends ModuleCore{
         content.initialize(Content::init);
 
         module(logic = new Logic());
-        module(world = new World());
+        module(wssorld = new World());
         module(netServer = new NetServer());
         module(new ServerControl(args));
     }

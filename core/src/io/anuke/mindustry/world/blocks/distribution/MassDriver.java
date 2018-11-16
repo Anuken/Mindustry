@@ -78,7 +78,7 @@ public class MassDriver extends Block{
         MassDriverEntity other = target.entity();
 
         entity.reload = 1f;
-        entity.power.amount = 0f;
+        entity.power.setAmount(0f);
 
         DriverBulletData data = Pooling.obtain(DriverBulletData.class, DriverBulletData::new);
         data.from = entity;
@@ -166,7 +166,7 @@ public class MassDriver extends Block{
                 entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(waiter), rotateSpeed);
             }else if(tile.entity.items.total() >= minDistribute &&
                     linkValid(tile) && //only fire when at least at half-capacity and power
-                    tile.entity.power.amount >= powerCapacity * 0.8f &&
+                    tile.entity.power.getAmount() >= powerCapacity * 0.8f &&
                     link.block().itemCapacity - link.entity.items.total() >= minDistribute && entity.reload <= 0.0001f){
 
                 MassDriverEntity other = link.entity();

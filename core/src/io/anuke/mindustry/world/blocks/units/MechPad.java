@@ -69,7 +69,7 @@ public class MechPad extends Block{
         if(player == null || !checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.entity();
-        entity.power.amount = 0f;
+        entity.power.setAmount(0f);
         player.beginRespawning(entity);
     }
 
