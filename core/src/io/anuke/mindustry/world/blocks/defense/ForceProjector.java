@@ -107,7 +107,7 @@ public class ForceProjector extends Block {
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.1f);
             float powerUse = Math.min(powerDamage * entity.delta() * (1f + entity.buildup / breakage), powerCapacity);
-            entity.power.amount -= powerUse;
+            entity.power.reduceBy(powerUse);
         }
 
         if(entity.buildup > 0){
@@ -144,9 +144,9 @@ public class ForceProjector extends Block {
                     Effects.effect(BulletFx.absorb, trait);
                     float hit = trait.getShieldDamage()*powerDamage;
                     entity.hit = 1f;
-                    entity.power.amount -= Math.min(hit, entity.power.amount);
+                    entity.power.reduceBy(hit);
 
-                    if(entity.power.amount <= 0.0001f){
+                    if(entity.power.getAmount() <= 0.0001f){
                         entity.buildup += trait.getShieldDamage() * entity.warmup*2f;
                     }
                     entity.buildup += trait.getShieldDamage() * entity.warmup;

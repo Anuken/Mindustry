@@ -27,12 +27,12 @@ public class ConsumePower extends Consume{
     @Override
     public void update(Block block, TileEntity entity){
         if(entity.power == null) return;
-        entity.power.amount -= Math.min(use(block, entity), entity.power.amount);
+        entity.power.reduceBy(use(block, entity));
     }
 
     @Override
     public boolean valid(Block block, TileEntity entity){
-        return entity.power != null && entity.power.amount >= use(block, entity);
+        return entity.power != null && entity.power.getAmount() >= use(block, entity);
     }
 
     @Override

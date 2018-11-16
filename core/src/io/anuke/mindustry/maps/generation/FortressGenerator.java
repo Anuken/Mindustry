@@ -181,7 +181,7 @@ public class FortressGenerator{
                 Block block = tile.block();
 
                 if(block instanceof PowerTurret){
-                    tile.entity.power.amount = block.powerCapacity;
+                    tile.entity.power.setAmount(block.powerCapacity);
                 }else if(block instanceof ItemTurret){
                     ItemTurret turret = (ItemTurret)block;
                     AmmoType[] type = turret.getAmmoTypes();

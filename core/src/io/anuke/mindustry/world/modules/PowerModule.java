@@ -8,9 +8,27 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class PowerModule extends BlockModule{
-    public float amount;
+    private float amount;
     public PowerGraph graph = new PowerGraph();
     public IntArray links = new IntArray();
+
+    public void setAmount(float amount){
+        if( amount < 0f ){
+            this.amount = 0f;
+        }else{
+            this.amount = amount;
+        }
+    }
+
+    public float getAmount(){ return amount; }
+
+    public void add(float amount, float capacity){
+        setAmount(Math.min(this.amount + amount, capacity));
+    }
+
+    public void reduceBy(float amount){
+        setAmount(this.amount - amount);
+    }
 
     @Override
     public void write(DataOutput stream) throws IOException{
@@ -28,7 +46,7 @@ public class PowerModule extends BlockModule{
         if(Float.isNaN(amount)){
             amount = 0f;
         }
-        // Workaround: If power went negative for some reason, at least fix it when reloading the map
+        // Power could be negative in old saves
         if(amount < 0f){
             amount = 0f;
         }

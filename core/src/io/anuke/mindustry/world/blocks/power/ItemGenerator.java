@@ -84,7 +84,7 @@ public abstract class ItemGenerator extends PowerGenerator{
     public void update(Tile tile){
         ItemGeneratorEntity entity = tile.entity();
 
-        float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * entity.delta()) * entity.efficiency;
+        float maxPower = Math.min(powerCapacity - entity.power.getAmount(), powerOutput * entity.delta()) * entity.efficiency;
 
         if(entity.generateTime <= 0f && entity.items.total() > 0){
             Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
@@ -98,7 +98,7 @@ public abstract class ItemGenerator extends PowerGenerator{
 
         if(entity.generateTime > 0f){
             entity.generateTime -= 1f / itemDuration * entity.delta();
-            entity.power.amount += maxPower;
+            entity.power.add(maxPower, powerCapacity);
             entity.generateTime = Mathf.clamp(entity.generateTime);
 
             if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){

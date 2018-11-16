@@ -337,7 +337,7 @@ public class Block extends BaseBlock {
 
     //TODO make this easier to config.
     public void setBars(){
-        if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
+        if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.getAmount() / powerCapacity));
         if(hasLiquids)
             bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
         if(hasItems)
@@ -404,7 +404,7 @@ public class Block extends BaseBlock {
         }
 
         if(hasPower){
-            power += tile.entity.power.amount;
+            power += tile.entity.power.getAmount();
         }
 
         tempColor.mul(1f / units);

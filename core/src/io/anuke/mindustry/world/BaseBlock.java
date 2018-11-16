@@ -104,9 +104,9 @@ public abstract class BaseBlock extends MappableContent{
 
     /**Returns how much power is accepted.*/
     public float addPower(Tile tile, float amount){
-        float canAccept = Math.min(powerCapacity - tile.entity.power.amount, amount);
+        float canAccept = Math.min(powerCapacity - tile.entity.power.getAmount(), amount);
 
-        tile.entity.power.amount += canAccept;
+        tile.entity.power.add(canAccept, powerCapacity);
 
         return canAccept;
     }

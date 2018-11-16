@@ -49,7 +49,7 @@ public class Reconstructor extends Block{
         return validLink(tile, entity.link) &&
                 Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
                 Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f &&
-                entity.current == null && entity.power.amount >= ((Reconstructor) tile.block()).powerPerTeleport;
+                entity.current == null && entity.power.getAmount() >= ((Reconstructor) tile.block()).powerPerTeleport;
     }
 
     protected static boolean validLink(Tile tile, int position){
@@ -74,13 +74,13 @@ public class Reconstructor extends Block{
     public static void reconstructPlayer(Player player, Tile tile){
         ReconstructorEntity entity = tile.entity();
 
-        if(!checkValidTap(tile, entity, player) || entity.power.amount < ((Reconstructor) tile.block()).powerPerTeleport)
+        if(!checkValidTap(tile, entity, player) || entity.power.getAmount() < ((Reconstructor) tile.block()).powerPerTeleport)
             return;
 
         entity.departing = true;
         entity.current = player;
         entity.solid = false;
-        entity.power.amount -= ((Reconstructor) tile.block()).powerPerTeleport;
+        entity.power.reduceBy(((Reconstructor) tile.block()).powerPerTeleport);
         entity.updateTime = 1f;
         entity.set(tile.drawx(), tile.drawy());
         player.rotation = 90f;
@@ -246,13 +246,13 @@ public class Reconstructor extends Block{
                 entity.updateTime -= Timers.delta() / departTime;
                 if(entity.updateTime <= 0f){
                     //no power? death.
-                    if(other.power.amount < powerPerTeleport){
+                    if(other.power.getAmount() < powerPerTeleport){
                         entity.current.setDead(true);
                         //entity.current.setRespawning(false);
                         entity.current = null;
                         return;
                     }
-                    other.power.amount -= powerPerTeleport;
+                    other.power.reduceBy(powerPerTeleport);
                     other.current = entity.current;
                     other.departing = false;
                     other.current.set(other.x, other.y);
@@ -276,8 +276,8 @@ public class Reconstructor extends Block{
 
             if(validLink(tile, entity.link)){
                 Tile other = world.tile(entity.link);
-                if(other.entity.power.amount >= powerPerTeleport && Units.anyEntities(tile, 4f, unit -> unit.getTeam() == entity.getTeam() && unit instanceof Player) &&
-                        entity.power.amount >= powerPerTeleport){
+                if(other.entity.power.getAmount() >= powerPerTeleport && Units.anyEntities(tile, 4f, unit -> unit.getTeam() == entity.getTeam() && unit instanceof Player) &&
+                        entity.power.getAmount() >= powerPerTeleport){
                     entity.solid = false;
                     stayOpen = true;
                 }

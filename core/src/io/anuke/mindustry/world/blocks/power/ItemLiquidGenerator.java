@@ -51,17 +51,17 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
         if(liquid != null && entity.liquids.get(liquid) >= 0.001f && entity.cons.valid()){
             float powerPerLiquid = getLiquidEfficiency(liquid) * this.powerPerLiquid;
             float used = Math.min(entity.liquids.get(liquid), maxLiquidGenerate * entity.delta());
-            used = Math.min(used, (powerCapacity - entity.power.amount) / powerPerLiquid);
+            used = Math.min(used, (powerCapacity - entity.power.getAmount()) / powerPerLiquid);
 
             entity.liquids.remove(liquid, used);
-            entity.power.amount += used * powerPerLiquid;
+            entity.power.add(used * powerPerLiquid, powerCapacity);
 
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
             }
         }else if(entity.cons.valid()){
 
-            float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * entity.delta()) * entity.efficiency;
+            float maxPower = Math.min(powerCapacity - entity.power.getAmount(), powerOutput * entity.delta()) * entity.efficiency;
 
             if(entity.generateTime <= 0f && entity.items.total() > 0){
                 Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
@@ -73,7 +73,7 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
 
             if(entity.generateTime > 0f){
                 entity.generateTime -= 1f / itemDuration * entity.delta();
-                entity.power.amount += maxPower;
+                entity.power.add(maxPower, powerCapacity);
                 entity.generateTime = Mathf.clamp(entity.generateTime);
 
                 if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
