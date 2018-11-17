@@ -16,6 +16,7 @@ import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.Minimap;
+import io.anuke.mindustry.ui.SelectionTable;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.graphics.Hue;
@@ -196,6 +197,12 @@ public class HudFragment extends Fragment{
         parent.fill(t -> {
             t.bottom().visible(() -> !state.is(State.menu) && control.saves.isSaving());
             t.add("$text.saveload");
+        });
+
+        //tapped block indicator
+        parent.fill(t -> {
+            t.bottom().visible(() -> !state.is(State.menu));
+            t.add(new SelectionTable());
         });
 
         blockfrag.build(Core.scene.getRoot());
