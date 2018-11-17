@@ -25,7 +25,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.9'
         roboVMVersion = '2.3.0'
-        uCoreVersion = 'b276342625ac843932266aff194b9d4f5c26707b'
+        uCoreVersion = 'c93c55179ec05b44926d59c5878534a3177d804f'
 
         getVersionString = {
             String buildVersion = getBuildVersion()

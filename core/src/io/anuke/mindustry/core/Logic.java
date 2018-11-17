@@ -218,12 +218,6 @@ public class Logic extends Module{
                     if(group.isEmpty()) continue;
 
                     EntityQuery.collideGroups(bulletGroup, group);
-                    EntityQuery.collideGroups(group, playerGroup);
-
-                    for(EntityGroup other : unitGroups){
-                        if(other.isEmpty()) continue;
-                        EntityQuery.collideGroups(group, other);
-                    }
                 }
 
                 EntityQuery.collideGroups(bulletGroup, playerGroup);
