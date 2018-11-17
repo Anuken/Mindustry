@@ -60,7 +60,7 @@ public class BlockRenderer{
     }
 
     public void drawShadows(){
-        Draw.color(0, 0, 0, 0.15f);
+        Draw.color(0, 0, 0, 0.25f);
         Draw.rect(shadowWrite.texture(),
             Core.camera.position.x - Core.camera.position.x % tilesize,
             Core.camera.position.y - Core.camera.position.y % tilesize,
@@ -117,7 +117,8 @@ public class BlockRenderer{
                     Team team = tile.getTeam();
 
                     if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
-                        Draw.rect(tile.block().getEditorIcon(), tile.drawx(), tile.drawy());
+                        tile.block().draw(tile);
+                        //Draw.rect(tile.block().getEditorIcon(), tile.drawx(), tile.drawy());
                         //tile.block().drawShadow(tile);
                     }
 
