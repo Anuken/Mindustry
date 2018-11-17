@@ -92,21 +92,23 @@ task scaleSprites4x(){
 task scaleSprites(){
     finalizedBy 'genSprites'
 
-    if(do4) dependsOn 'scaleSprites4x'
+    if(do4){
+        dependsOn 'scaleSprites4x'
+    }else{
+        doLast {
+            def arguments = ["mono", "ImageResizer.exe"]
 
-    doLast{
-        def arguments = ["mono", "ImageResizer.exe"]
+            fileTree(dir: '../core/assets-raw/sprites/', include: "**/*.png").visit { file ->
+                if (file.isDirectory() || file.toString().contains("/ui/")) return;
 
-        fileTree(dir: '../core/assets-raw/sprites/', include: "**/*.png").visit { file ->
-            if(file.isDirectory() || file.toString().contains("/ui/")) return;
+                def write = new File(file.file.toString().replace("/sprites", "/sprites_out"))
 
-            def write = new File(file.file.toString().replace("/sprites", "/sprites_out"))
+                arguments += ["/load", file.file.toString(), "/resize",
+                              "auto", scaling, "/save", write.toString()]
+            }
 
-            arguments += ["/load", file.file.toString(), "/resize",
-                          "auto", scaling, "/save", write.toString()]
+            exec { commandLine arguments }
         }
-
-        if(!do4) exec{ commandLine arguments }
     }
 }
 
