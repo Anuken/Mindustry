@@ -477,6 +477,7 @@ public class NetServer extends Module{
         //write wave datas
         dataStream.writeFloat(state.wavetime);
         dataStream.writeInt(state.wave);
+        dataStream.writeInt(state.enemies());
 
         ObjectSet<Tile> cores = state.teams.get(player.getTeam()).cores;
 

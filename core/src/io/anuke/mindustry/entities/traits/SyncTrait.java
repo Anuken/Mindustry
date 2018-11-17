@@ -33,10 +33,11 @@ public interface SyncTrait extends Entity, TypeTrait{
 
         if(isClipped()){
             //move off screen when no longer in bounds
-            if(!Tmp.r1.setSize(
-                    Core.camera.viewportWidth * Core.camera.zoom * NetClient.viewScale,
-                    Core.camera.viewportHeight * Core.camera.zoom * NetClient.viewScale)
-                    .setCenter(Core.camera.position.x, Core.camera.position.y).contains(getX(), getY())){
+            Tmp.r1.setSize(Core.camera.viewportWidth * Core.camera.zoom * NetClient.viewScale,
+            Core.camera.viewportHeight * Core.camera.zoom * NetClient.viewScale)
+            .setCenter(Core.camera.position.x, Core.camera.position.y);
+
+            if(!Tmp.r1.contains(getX(), getY()) && !Tmp.r1.contains(getInterpolator().last.x, getInterpolator().last.y)){
                 set(-99999f, -99999f);
                 return;
             }

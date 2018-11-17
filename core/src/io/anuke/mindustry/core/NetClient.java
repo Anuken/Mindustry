@@ -284,6 +284,7 @@ public class NetClient extends Module{
         //read wave info
         state.wavetime = input.readFloat();
         state.wave = input.readInt();
+        state.enemies = input.readInt();
 
         byte cores = input.readByte();
         for(int i = 0; i < cores; i++){
