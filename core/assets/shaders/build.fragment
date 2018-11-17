@@ -29,18 +29,11 @@ void main() {
 
 	vec4 c = texture2D(u_texture, v_texCoord.xy);
 	
-	vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
-	float step = 1.0;
-	
-	bool outline = texture2D(u_texture, t).a < 0.1 &&
-		(id(texture2D(u_texture, t + vec2(0, step) * v)) || id(texture2D(u_texture, t + vec2(0, -step) * v)) ||
-		id(texture2D(u_texture, t + vec2(step, 0) * v)) || id(texture2D(u_texture, t + vec2(-step, 0) * v)));
-	
     if(1.0-abs(coords.x - 0.5)*2.0 < 1.0-u_progress){
         c = vec4(0.0);
     }
 
-    if(c.a > 0.01 || outline){
+    if(c.a > 0.01){
         float f = abs(sin(coords.x*2.0 + u_time));
         if(f > 0.9 )
             f = 1.0;
