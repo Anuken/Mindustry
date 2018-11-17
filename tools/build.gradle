@@ -65,15 +65,24 @@ task scaleSprites4x(){
                         int p = image.getRGB(x, y)
                         int p1 = p, p2 = p, p3 = p, p4 = p
 
-                        int A = getRGB(x, y + 1),
-                            B = getRGB(x + 1, y),
-                            C = getRGB(x - 1, y),
-                            D = getRGB(x, y - 1);
+                        int A = getRGB(x - 1, y + 1),
+                            B = getRGB(x, y + 1),
+                            C = getRGB(x + 1, y + 1),
+                            D = getRGB(x - 1, y),
+                            E = getRGB(x, y),
+                            F = getRGB(x + 1, y),
+                            G = getRGB(x - 1, y - 1),
+                            H = getRGB(x, y - 1),
+                            I = getRGB(x +  1, y - 1),
+                            J = getRGB(x, y + 2),
+                            K = getRGB(x - 2, y),
+                            L = getRGB(x + 2, y),
+                            M = getRGB(x, y - 2);
 
-                        if (C == A && C != D && A != B) p1 = A
-                        if (A == B && A != C && B != D) p2 = B
-                        if (D == C && D != B && C != A) p3 = C
-                        if (B == D && B != A && D != C) p4 = D
+                        if (B==D && B!=F && D!=H && (E!=A || E==C || E==G || A==J || A==K)) p1 = B
+                        if (B==F & B!=D & F!=H && (E!=C || E==A || E==I || C==J || C==L)) p2 = F
+                        if (D==H & B!=D & F!=H && (E!=G || E==A || E==I || G==K || G==M)) p3 = D
+                        if (F==H & B!=F & D!=H && (E!=I || E==C || E==G || I==L || I==M)) p4 = H
 
                         scaled.setRGB(x * 2, y * 2 + 1, p1)
                         scaled.setRGB(x * 2 + 1, y * 2 + 1, p2)
