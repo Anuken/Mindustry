@@ -153,16 +153,7 @@ public class BuildBlock extends Block{
 
     @Override
     public void drawShadow(Tile tile){
-        BuildEntity entity = tile.entity();
-
-        Recipe recipe = entity.recipe;
-        Block previous = entity.previous;
-
-        if(recipe != null){
-            Draw.rect(recipe.result.shadowRegion, tile.drawx(), tile.drawy());
-        }else if(previous != null && !(previous instanceof BuildBlock)){
-            previous.drawShadow(tile);
-        }
+        //don't
     }
 
     @Override

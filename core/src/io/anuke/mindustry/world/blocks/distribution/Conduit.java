@@ -38,17 +38,6 @@ public class Conduit extends LiquidBlock{
     }
 
     @Override
-    public void drawShadow(Tile tile){
-        ConduitEntity entity = tile.entity();
-
-        if(entity.blendshadowrot == -1){
-            super.drawShadow(tile);
-        }else{
-            Draw.rect("shadow-corner", tile.drawx(), tile.drawy(), (tile.getRotation() + 3 + entity.blendshadowrot) * 90);
-        }
-    }
-
-    @Override
     public void onProximityUpdate(Tile tile){
         super.onProximityUpdate(tile);
 

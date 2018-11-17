@@ -12,13 +12,11 @@ public class LiquidBlocks extends BlockList implements ContentList{
     public void load(){
 
         mechanicalPump = new Pump("mechanical-pump"){{
-            shadow = "shadow-round-1";
             pumpAmount = 0.1f;
             tier = 0;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
-            shadow = "shadow-rounded-2";
             pumpAmount = 0.2f;
             consumes.power(0.015f);
             liquidCapacity = 30f;
@@ -29,7 +27,6 @@ public class LiquidBlocks extends BlockList implements ContentList{
         }};
 
         thermalPump = new Pump("thermal-pump"){{
-            shadow = "shadow-rounded-2";
             pumpAmount = 0.275f;
             consumes.power(0.03f);
             liquidCapacity = 40f;

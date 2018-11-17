@@ -117,9 +117,7 @@ public class BlockRenderer{
                     Team team = tile.getTeam();
 
                     if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
-                        tile.block().draw(tile);
-                        //Draw.rect(tile.block().getEditorIcon(), tile.drawx(), tile.drawy());
-                        //tile.block().drawShadow(tile);
+                        tile.block().drawShadow(tile);
                     }
 
                     if(block != Blocks.air){

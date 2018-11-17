@@ -75,23 +75,6 @@ public class Conveyor extends Block{
     }
 
     @Override
-    public void drawShadow(Tile tile){
-        //fixes build block crash
-        if(!(tile.entity instanceof ConveyorEntity)){
-            super.drawShadow(tile);
-            return;
-        }
-
-        ConveyorEntity entity = tile.entity();
-
-        if(entity.blendshadowrot == -1){
-            super.drawShadow(tile);
-        }else{
-            Draw.rect("shadow-corner", tile.drawx(), tile.drawy(), (tile.getRotation() + 3 + entity.blendshadowrot) * 90);
-        }
-    }
-
-    @Override
     public void draw(Tile tile){
         ConveyorEntity entity = tile.entity();
         byte rotation = tile.getRotation();

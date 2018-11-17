@@ -41,7 +41,6 @@ public class DebugBlocks extends BlockList implements ContentList{
         powerVoid = new PowerBlock("powervoid"){
             {
                 powerCapacity = Float.MAX_VALUE;
-                shadow = "shadow-round-1";
             }
 
             @Override
@@ -63,7 +62,6 @@ public class DebugBlocks extends BlockList implements ContentList{
                 maxNodes = 100;
                 outputsPower = true;
                 consumesPower = false;
-                shadow = "shadow-round-1";
             }
 
             @Override

@@ -87,8 +87,6 @@ public class Block extends BaseBlock {
     public EnumSet<BlockFlag> flags;
     /** Whether to automatically set the entity to 'sleeping' when created. */
     public boolean autoSleep;
-    /** Name of shadow region to load. Null to indicate normal shadow. */
-    public String shadow = null;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
@@ -111,7 +109,6 @@ public class Block extends BaseBlock {
     protected TextureRegion[] compactIcon;
     protected TextureRegion editorIcon;
 
-    public TextureRegion shadowRegion;
     public TextureRegion region;
 
     public Block(String name){
@@ -260,7 +257,6 @@ public class Block extends BaseBlock {
 
     @Override
     public void load(){
-        shadowRegion = Draw.region(shadow == null ? "shadow-" + size : shadow);
         region = Draw.region(name);
     }
 
@@ -516,7 +512,7 @@ public class Block extends BaseBlock {
     }
 
     public void drawShadow(Tile tile){
-        Draw.rect(shadowRegion, tile.drawx(), tile.drawy());
+        draw(tile);
     }
 
     /** Offset for placing and drawing multiblocks. */
