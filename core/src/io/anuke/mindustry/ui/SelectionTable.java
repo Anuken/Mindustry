@@ -41,10 +41,10 @@ public class SelectionTable extends Table{
         Image image = new Image(new TextureRegionDrawable(new TextureRegion(Draw.region("clear"))));
         image.update(() ->
             ((TextureRegionDrawable)image.getDrawable()).setRegion(lastTile == null ? Draw.getBlankRegion() :
-            lastTile.block().getDisplayIcon(lastTile)));
+            (lastTile.block().synthetic() ? lastTile.block() : lastTile.floor()).getDisplayIcon(lastTile)));
 
         add(image).size(8*5).padRight(4);
-        label(() -> lastTile == null ? "" : lastTile.block().getDisplayName(lastTile));
+        label(() -> lastTile == null ? "" : (lastTile.block().synthetic() ? lastTile.block() : lastTile.floor()).getDisplayName(lastTile));
 
         pack();
         getTranslation().y = - getHeight();
