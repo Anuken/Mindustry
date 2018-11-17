@@ -43,7 +43,7 @@ public class SelectionTable extends Table{
             ((TextureRegionDrawable)image.getDrawable()).setRegion(lastTile == null ? Draw.getBlankRegion() :
             lastTile.block().getDisplayIcon(lastTile)));
 
-        add(image).size(16*2).padRight(4);
+        add(image).size(8*5).padRight(4);
         label(() -> lastTile == null ? "" : lastTile.block().getDisplayName(lastTile));
 
         pack();
