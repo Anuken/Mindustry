@@ -16,6 +16,7 @@ import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.CursorType;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.BarType;
@@ -26,6 +27,7 @@ import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
@@ -66,6 +68,18 @@ public class BuildBlock extends Block{
             //event first before they can recieve the placed() event modification results
             threads.runDelay(() -> tile.block().playerPlaced(tile));
         }
+    }
+
+    @Override
+    public String getDisplayName(Tile tile){
+        BuildEntity entity = tile.entity();
+        return Bundles.format("block.constructing", entity.recipe == null ? entity.previous.formalName : entity.recipe.result.formalName);
+    }
+
+    @Override
+    public TextureRegion getDisplayIcon(Tile tile){
+        BuildEntity entity = tile.entity();
+        return (entity.recipe == null ? entity.previous : entity.recipe.result).getEditorIcon();
     }
 
     @Override

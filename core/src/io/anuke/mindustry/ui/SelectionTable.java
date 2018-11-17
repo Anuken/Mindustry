@@ -1,7 +1,6 @@
 package io.anuke.mindustry.ui;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
@@ -15,12 +14,12 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.world;
 
 public class SelectionTable extends Table{
-    Block selected = Blocks.air;
+    Tile lastTile;
 
     public SelectionTable(){
         super("clear");
 
-        margin(4f);
+        margin(5f);
 
         update(() -> {
             Block result;
@@ -32,16 +31,20 @@ public class SelectionTable extends Table{
                 result = null;
             }
 
-            if(result != null) selected = result;
+            if(result != null){
+                lastTile = tile;
+            }
 
             getTranslation().y = Mathf.lerp(getTranslation().y, result == null ? -getHeight() : 0f, 0.2f);
         });
 
         Image image = new Image(new TextureRegionDrawable(new TextureRegion(Draw.region("clear"))));
-        image.update(() -> ((TextureRegionDrawable)image.getDrawable()).setRegion(selected.getEditorIcon()));
+        image.update(() ->
+            ((TextureRegionDrawable)image.getDrawable()).setRegion(lastTile == null ? Draw.getBlankRegion() :
+            lastTile.block().getDisplayIcon(lastTile)));
 
-        add(image).size(16*2);
-        label(() -> selected instanceof OreBlock ? selected.drops.item.localizedName() : selected.formalName).pad(4);
+        add(image).size(16*2).padRight(4);
+        label(() -> lastTile == null ? "" : lastTile.block().getDisplayName(lastTile));
 
         pack();
         getTranslation().y = - getHeight();

@@ -34,7 +34,6 @@ import static io.anuke.mindustry.Vars.*;
  * This class should <i>not</i> call any outside methods to change state of modules, but instead fire events.
  */
 public class Logic extends Module{
-    public boolean doUpdate = true;
 
     public Logic(){
         Events.on(TileChangeEvent.class, event -> {
