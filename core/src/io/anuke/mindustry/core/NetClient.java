@@ -45,7 +45,7 @@ import static io.anuke.mindustry.Vars.*;
 public class NetClient extends Module{
     private final static float dataTimeout = 60 * 18;
     private final static float playerSyncTime = 2;
-    private final static float viewScale = 1.75f;
+    public final static float viewScale = 2f;
 
     private Timer timer = new Timer(5);
     /**Whether the client is currently connecting.*/
@@ -284,6 +284,7 @@ public class NetClient extends Module{
         //read wave info
         state.wavetime = input.readFloat();
         state.wave = input.readInt();
+        state.enemies = input.readInt();
 
         byte cores = input.readByte();
         for(int i = 0; i < cores; i++){

@@ -17,12 +17,12 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Translator;
 
 import java.util.Arrays;
@@ -169,7 +169,7 @@ public class Vars{
         ios = Gdx.app.getType() == ApplicationType.iOS;
         android = Gdx.app.getType() == ApplicationType.Android;
 
-        dataDirectory = OS.getAppDataDirectory(appName);
+        dataDirectory = Settings.getDataDirectory(appName);
         customMapDirectory = dataDirectory.child("maps/");
         saveDirectory = dataDirectory.child("saves/");
         baseCameraScale = Math.round(Unit.dp.scl(4));

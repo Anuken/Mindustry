@@ -366,10 +366,10 @@ public class HudFragment extends Fragment{
 
         table.labelWrap(() ->
             world.getSector() == null ?
-                (unitGroups[waveTeam.ordinal()].size() > 0 && state.mode.disableWaveTimer ?
-                wavef.get(state.wave) + "\n" + (unitGroups[waveTeam.ordinal()].size() == 1 ?
-                    enemyf.get(unitGroups[waveTeam.ordinal()].size()) :
-                    enemiesf.get(unitGroups[waveTeam.ordinal()].size())) :
+                (state.enemies() > 0 && state.mode.disableWaveTimer ?
+                wavef.get(state.wave) + "\n" + (state.enemies() == 1 ?
+                    enemyf.get(state.enemies()) :
+                    enemiesf.get(state.enemies())) :
                 wavef.get(state.wave) + "\n" +
                     (!state.mode.disableWaveTimer ?
                     Bundles.format("text.wave.waiting", (int)(state.wavetime/60)) :

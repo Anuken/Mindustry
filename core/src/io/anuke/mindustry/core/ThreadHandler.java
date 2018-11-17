@@ -11,7 +11,7 @@ public class ThreadHandler{
     public ThreadHandler(){
         Timers.setDeltaProvider(() -> {
             float result = Gdx.graphics.getDeltaTime() * 60f;
-            return Math.min(Float.isNaN(result) || Float.isInfinite(result) ? 1f : result, 15f);
+            return Float.isNaN(result) || Float.isInfinite(result) ? 1f : Math.min(result, 60f / 10f);
         });
     }
 

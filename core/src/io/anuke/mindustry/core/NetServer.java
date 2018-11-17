@@ -412,7 +412,16 @@ public class NetServer extends Module{
     }
 
     public boolean isWaitingForPlayers(){
-        return state.mode.isPvp && playerGroup.size() < 2;
+        if(state.mode.isPvp){
+            int used = 0;
+            for(Team t : Team.all){
+                if(playerGroup.count(p -> p.getTeam() == t) > 0){
+                    used ++;
+                }
+            }
+            return used < 2;
+        }
+        return false;
     }
 
     public void update(){
@@ -468,6 +477,7 @@ public class NetServer extends Module{
         //write wave datas
         dataStream.writeFloat(state.wavetime);
         dataStream.writeInt(state.wave);
+        dataStream.writeInt(state.enemies());
 
         ObjectSet<Tile> cores = state.teams.get(player.getTeam()).cores;
 
@@ -494,7 +504,7 @@ public class NetServer extends Module{
         //check for syncable groups
         for(EntityGroup<?> group : Entities.getAllGroups()){
             if(group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
-            //clipping is done by represntatives
+            //clipping is done by representatives
             SyncTrait represent = (SyncTrait) group.all().get(0);
 
             //make sure mapping is enabled for this group

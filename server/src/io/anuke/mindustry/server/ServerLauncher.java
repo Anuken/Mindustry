@@ -7,8 +7,8 @@ import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.net.Net;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.EmptyLogger;
-import io.anuke.ucore.util.OS;
 
 public class ServerLauncher extends HeadlessApplication{
 
@@ -26,7 +26,7 @@ public class ServerLauncher extends HeadlessApplication{
             Net.setServerProvider(new KryoServer());
 
             HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-            config.preferencesDirectory = OS.getAppDataDirectoryString("Mindustry");
+            Settings.setPrefHandler((appName) -> Gdx.files.local("config"));
 
             new ServerLauncher(new MindustryServer(args), config);
         }catch(Throwable t){

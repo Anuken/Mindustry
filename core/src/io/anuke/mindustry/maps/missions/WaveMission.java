@@ -1,14 +1,12 @@
 package io.anuke.mindustry.maps.missions;
 
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
-import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
@@ -62,9 +60,9 @@ public class WaveMission extends MissionWithStartingCore{
     public String displayString(){
         return state.wave > target ?
             Bundles.format(
-                Vars.unitGroups[Vars.waveTeam.ordinal()].size() > 1 && !Net.client() ?
+                state.enemies() > 1 ?
                 "text.mission.wave.enemies" :
-                "text.mission.wave.enemy", target, target, Vars.unitGroups[Vars.waveTeam.ordinal()].size()) :
+                "text.mission.wave.enemy", target, target, state.enemies()) :
             Bundles.format("text.mission.wave", state.wave, target, (int)(state.wavetime/60));
     }
 
@@ -82,6 +80,6 @@ public class WaveMission extends MissionWithStartingCore{
 
     @Override
     public boolean isComplete(){
-        return state.wave > target && Vars.unitGroups[Vars.waveTeam.ordinal()].size() == 0;
+        return state.wave > target && state.enemies() == 0;
     }
 }

@@ -27,7 +27,6 @@ import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Strings;
@@ -53,11 +52,6 @@ public class AndroidLauncher extends PatchedAndroidApplication{
         config.numSamples = 2;
         config.depth = 0;
         Platform.instance = new Platform(){
-
-            @Override
-            public void addDialog(TextField field, int length){
-                TextFieldDialogListener.add(field, 0, length);
-            }
 
             @Override
             public void openDonations(){
