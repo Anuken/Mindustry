@@ -355,17 +355,20 @@ public class ServerControl extends Module{
                 err("Not playing. Host first.");
                 return;
             }
-
-            for(Item item : content.items()){
-                if(item.type == ItemType.material){
-                    if(team.valueOf(arg[0]) != null){
-                        state.teams.get(Team.valueOf(arg[0])).cores.first().entity.items.add(item, 2000);
-                    }else{
-                        err("No such team exists.");
+            
+            try{
+                Team team = Team.valueOf(arg[0]);
+                
+                for(Item item : content.items()){
+                    if(item.type == ItemType.material){
+                        state.teams.get(team).cores.first().entity.items.add(item, 2000);
                     }
                 }
+                
+                info("Core filled.");
+            }catch(IllegalArgumentException ignored){
+                err("No such team exists.");
             }
-            info("Core filled.");
         });
 
         handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
