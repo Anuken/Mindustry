@@ -25,7 +25,6 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class ItemGenerator extends PowerGenerator{
     protected float minItemEfficiency = 0.2f;
-    protected float powerOutput;
     protected float itemDuration = 70f;
     protected Effect generateEffect = BlockFx.generatespark, explodeEffect =
             BlockFx.generatespark;
@@ -44,13 +43,6 @@ public abstract class ItemGenerator extends PowerGenerator{
     public void load(){
         super.load();
         topRegion = Draw.region(name + "-top");
-    }
-
-    @Override
-    public void setStats(){
-        super.setStats();
-
-        stats.add(BlockStat.basePowerGeneration, powerOutput * 60f * 0.5f, StatUnit.powerSecond);
     }
 
     @Override
@@ -84,22 +76,16 @@ public abstract class ItemGenerator extends PowerGenerator{
     public void update(Tile tile){
         ItemGeneratorEntity entity = tile.entity();
 
-        float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * entity.delta()) * entity.efficiency;
-
         if(entity.generateTime <= 0f && entity.items.total() > 0){
             Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
             Item item = entity.items.take();
-            entity.efficiency = getItemEfficiency(item);
+            entity.productionEfficiency = getItemEfficiency(item);
             entity.explosiveness = item.explosiveness;
             entity.generateTime = 1f;
         }
 
-        entity.power.graph.update();
-
         if(entity.generateTime > 0f){
-            entity.generateTime -= 1f / itemDuration * entity.delta();
-            entity.power.amount += maxPower;
-            entity.generateTime = Mathf.clamp(entity.generateTime);
+            entity.generateTime -= Math.min(1f / itemDuration * entity.delta(), entity.generateTime);
 
             if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
                 //this block is run last so that in the event of a block destruction, no code relies on the block type
@@ -117,18 +103,6 @@ public abstract class ItemGenerator extends PowerGenerator{
     }
 
     public static class ItemGeneratorEntity extends GeneratorEntity{
-        public float efficiency;
         public float explosiveness;
-
-        @Override
-        public void write(DataOutput stream) throws IOException{
-            stream.writeFloat(efficiency);
-        }
-
-        @Override
-        public void read(DataInput stream) throws IOException{
-            efficiency = stream.readFloat();
-        }
     }
-
 }

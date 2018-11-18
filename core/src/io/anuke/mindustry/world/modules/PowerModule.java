@@ -9,6 +9,7 @@ import java.io.IOException;
 
 public class PowerModule extends BlockModule{
     public float satisfaction;
+    public float extraUse = 0f;
     public PowerGraph graph = new PowerGraph();
     public IntArray links = new IntArray();
 

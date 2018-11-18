@@ -43,13 +43,13 @@ public class PowerBlocks extends BlockList implements ContentList{
             itemDuration = 220f;
         }};
 
-        solarPanel = new SolarGenerator("solar-panel"){{
-            generation = 0.0045f;
+        solarPanel = new PowerGenerator("solar-panel"){{
+            powerGeneration = 0.0045f;
         }};
 
-        largeSolarPanel = new SolarGenerator("solar-panel-large"){{
+        largeSolarPanel = new PowerGenerator("solar-panel-large"){{
+            powerGeneration = 0.055f;
             size = 3;
-            generation = 0.055f;
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{

@@ -28,6 +28,8 @@ public abstract class BaseBlock extends MappableContent{
     public boolean consumesPower;
     public boolean outputsPower;
 
+    public float basePowerUse = 0;
+
     public int itemCapacity;
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
