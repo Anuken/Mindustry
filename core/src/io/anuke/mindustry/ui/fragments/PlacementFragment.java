@@ -89,7 +89,7 @@ public class PlacementFragment extends Fragment{
                         topTable.table(header -> {
                             header.left();
                             header.add(new ImageStack(lastDisplay.getCompactIcon())).size(8*4);
-                            header.labelWrap(lastDisplay.formalName).left().width(150f).padLeft(5);
+                            header.labelWrap(lastDisplay.formalName).left().width(200f).padLeft(5);
                         }).growX().left();
                         topTable.row();
                         //add requirement table

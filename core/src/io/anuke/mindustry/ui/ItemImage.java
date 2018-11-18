@@ -18,10 +18,12 @@ public class ItemImage extends Stack{
     }
 
     public ItemImage(ItemStack stack){
-        Table t = new Table().left().bottom();
-        t.add(stack.amount + "");
-
         add(new Image(stack.item.region));
-        add(t);
+
+        if(stack.amount != 0){
+            Table t = new Table().left().bottom();
+            t.add(stack.amount + "");
+            add(t);
+        }
     }
 }
