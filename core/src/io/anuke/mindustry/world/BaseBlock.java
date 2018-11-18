@@ -28,6 +28,7 @@ public abstract class BaseBlock extends MappableContent{
     public boolean consumesPower;
     public boolean outputsPower;
 
+    public boolean bufferedPowerConsumer = false;
     public float basePowerUse = 0;
 
     public int itemCapacity;

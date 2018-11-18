@@ -330,7 +330,10 @@ public class Block extends BaseBlock {
 
         consumes.forEach(cons -> cons.display(stats));
 
-        if(hasPower) stats.add(BlockStat.powerCapacity, powerCapacity, StatUnit.powerUnits);
+        if(hasPower){
+            if(bufferedPowerConsumer) stats.add(BlockStat.powerUse, basePowerUse, StatUnit.powerUnits);
+            else stats.add(BlockStat.powerCapacity, basePowerUse, StatUnit.powerUnits);
+        }
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
     }

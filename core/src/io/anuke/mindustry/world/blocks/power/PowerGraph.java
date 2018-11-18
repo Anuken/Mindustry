@@ -45,7 +45,11 @@ public class PowerGraph{
 
         float powerNeeded = 0f;
         for(Tile consumer : consumers){
-            powerNeeded += consumer.block().basePowerUse + consumer.entity.power.extraUse;
+            if(consumer.block().bufferedPowerConsumer){
+                powerNeeded += (1f - consumer.entity.power.satisfaction) * consumer.block().basePowerUse;
+            }else{
+                powerNeeded += consumer.block().basePowerUse + consumer.entity.power.extraUse;
+            }
         }
 
         float totalAccumulator = 0f;
@@ -64,9 +68,13 @@ public class PowerGraph{
             powerProduced += accumulatorUsed;
         }
 
-        float powerSatisfaction = Math.max(1, powerProduced / powerNeeded);
+        float powerSatisfaction = Math.min(1, powerProduced / powerNeeded);
         for(Tile consumer : producers){
-            consumer.power.satisfaction = powerSatisfaction;
+            if(consumer.block().bufferedPowerConsumer){
+                consumer.power.satisfaction += (1 - consumer.power.satisfaction) * powerSatisfaction;
+            }else{
+                consumer.power.satisfaction = powerSatisfaction;
+            }
         }
 
         if(powerProduced > powerNeeded){
