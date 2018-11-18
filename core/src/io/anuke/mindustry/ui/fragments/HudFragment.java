@@ -16,6 +16,7 @@ import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.Minimap;
+import io.anuke.mindustry.ui.SelectionTable;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.graphics.Hue;
@@ -107,7 +108,7 @@ public class HudFragment extends Fragment{
 
             Stack stack = new Stack();
             TextButton waves = new TextButton("");
-            Table btable = new Table().margin(14);
+            Table btable = new Table().margin(0);
 
             stack.add(waves);
             stack.add(btable);
@@ -126,7 +127,6 @@ public class HudFragment extends Fragment{
                 IntFormat tps = new IntFormat("text.tps");
                 IntFormat ping = new IntFormat("text.ping");
                 t.label(() -> fps.get(Gdx.graphics.getFramesPerSecond())).padRight(10);
-                t.label(() -> tps.get(threads.getTPS())).visible(() -> threads.isEnabled());
                 t.row();
                 if(Net.hasClient()){
                     t.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
@@ -197,6 +197,12 @@ public class HudFragment extends Fragment{
         parent.fill(t -> {
             t.bottom().visible(() -> !state.is(State.menu) && control.saves.isSaving());
             t.add("$text.saveload");
+        });
+
+        //tapped block indicator
+        parent.fill(t -> {
+            t.bottom().visible(() -> !state.is(State.menu));
+            t.add(new SelectionTable());
         });
 
         blockfrag.build(Core.scene.getRoot());
@@ -367,15 +373,15 @@ public class HudFragment extends Fragment{
 
         table.labelWrap(() ->
             world.getSector() == null ?
-                (unitGroups[waveTeam.ordinal()].size() > 0 && state.mode.disableWaveTimer ?
-                wavef.get(state.wave) + "\n" + (unitGroups[waveTeam.ordinal()].size() == 1 ?
-                    enemyf.get(unitGroups[waveTeam.ordinal()].size()) :
-                    enemiesf.get(unitGroups[waveTeam.ordinal()].size())) :
+                (state.enemies() > 0 && state.mode.disableWaveTimer ?
+                wavef.get(state.wave) + "\n" + (state.enemies() == 1 ?
+                    enemyf.get(state.enemies()) :
+                    enemiesf.get(state.enemies())) :
                 wavef.get(state.wave) + "\n" +
                     (!state.mode.disableWaveTimer ?
                     Bundles.format("text.wave.waiting", (int)(state.wavetime/60)) :
                     Bundles.get("text.waiting"))) :
-            Bundles.format("text.mission.display", world.getSector().currentMission().displayString())).growX();
+            Bundles.format("text.mission.display", world.getSector().currentMission().displayString())).growX().pad(8f);
 
         table.clicked(() -> {
             if(world.getSector() != null && world.getSector().currentMission().hasMessage()){

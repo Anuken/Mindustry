@@ -15,9 +15,11 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import static io.anuke.mindustry.Vars.*;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class SortedUnloader extends Unloader implements SelectionTrait{
+    protected float speed = 1f;
 
     public SortedUnloader(String name){
         super(name);
@@ -35,13 +37,13 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
     public void update(Tile tile){
         SortedUnloaderEntity entity = tile.entity();
 
-        if(entity.items.total() == 0 && entity.timer.get(timerUnload, speed)){
-            tile.allNearby(other -> {
+        if(tile.entity.timer.get(timerUnload, speed) && tile.entity.items.total() == 0){
+            for(Tile other : tile.entity.proximity()){
                 if(other.getTeam() == tile.getTeam() && other.block() instanceof StorageBlock && entity.items.total() == 0 &&
                 ((entity.sortItem == null && other.entity.items.total() > 0) || ((StorageBlock) other.block()).hasItem(other, entity.sortItem))){
                     offloadNear(tile, ((StorageBlock) other.block()).removeItem(other, entity.sortItem));
                 }
-            });
+            }
         }
 
         if(entity.items.total() > 0){

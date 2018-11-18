@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
 
 import static io.anuke.mindustry.Vars.threads;
 
@@ -100,7 +99,7 @@ public class PowerGraph{
 
     public void clear(){
         for(Tile other : all){
-            other.entity.power.graph = null;
+            if(other.entity != null && other.entity.power != null) other.entity.power.graph = null;
         }
         all.clear();
         producers.clear();

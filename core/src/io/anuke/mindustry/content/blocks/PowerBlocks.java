@@ -4,12 +4,11 @@ import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.distribution.WarpGate;
 import io.anuke.mindustry.world.blocks.power.*;
 
 public class PowerBlocks extends BlockList implements ContentList{
     public static Block combustionGenerator, thermalGenerator, turbineGenerator, rtgGenerator, solarPanel, largeSolarPanel,
-            thoriumReactor, fusionReactor, battery, batteryLarge, powerNode, powerNodeLarge, warpGate;
+            thoriumReactor, fusionReactor, battery, batteryLarge, powerNode, powerNodeLarge;
 
     @Override
     public void load(){
@@ -84,8 +83,6 @@ public class PowerBlocks extends BlockList implements ContentList{
             laserRange = 9.5f;
             shadow = "shadow-round-2";
         }};
-
-        warpGate = new WarpGate("warp-gate");
 
     }
 }
