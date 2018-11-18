@@ -466,6 +466,14 @@ public class Block extends BaseBlock {
         }
     }
 
+    public String getDisplayName(Tile tile){
+        return formalName;
+    }
+
+    public TextureRegion getDisplayIcon(Tile tile){
+        return getEditorIcon();
+    }
+
     public TextureRegion getEditorIcon(){
         if(editorIcon == null){
             editorIcon = Draw.region("block-icon-" + name, Draw.region("clear"));

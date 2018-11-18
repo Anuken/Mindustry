@@ -11,12 +11,12 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.SelectionTrait;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Log;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import static io.anuke.mindustry.Vars.*;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class SortedUnloader extends Unloader implements SelectionTrait{
     protected float speed = 1f;
@@ -37,7 +37,6 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
         SortedUnloaderEntity entity = tile.entity();
 
         if(tile.entity.timer.get(timerUnload, speed) && tile.entity.items.total() == 0){
-            Log.info(threads.getFrameID());
             for(Tile other : tile.entity.proximity()){
                 if(other.getTeam() == tile.getTeam() && other.block() instanceof StorageBlock && entity.items.total() == 0 &&
                 ((entity.sortItem == null && other.entity.items.total() > 0) || ((StorageBlock) other.block()).hasItem(other, entity.sortItem))){

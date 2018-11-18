@@ -34,7 +34,6 @@ import static io.anuke.mindustry.Vars.*;
  * This class should <i>not</i> call any outside methods to change state of modules, but instead fire events.
  */
 public class Logic extends Module{
-    public boolean doUpdate = true;
 
     public Logic(){
         Events.on(TileChangeEvent.class, event -> {
@@ -125,7 +124,7 @@ public class Logic extends Module{
     }
 
     private void updateSectors(){
-        if(world.getSector() == null) return;
+        if(world.getSector() == null || state.gameOver) return;
 
         world.getSector().currentMission().update();
 
@@ -218,12 +217,6 @@ public class Logic extends Module{
                     if(group.isEmpty()) continue;
 
                     EntityQuery.collideGroups(bulletGroup, group);
-                    EntityQuery.collideGroups(group, playerGroup);
-
-                    for(EntityGroup other : unitGroups){
-                        if(other.isEmpty()) continue;
-                        EntityQuery.collideGroups(group, other);
-                    }
                 }
 
                 EntityQuery.collideGroups(bulletGroup, playerGroup);

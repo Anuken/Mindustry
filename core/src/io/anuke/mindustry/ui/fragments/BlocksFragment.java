@@ -128,7 +128,7 @@ public class BlocksFragment extends Fragment{
             recipeTable.margin(4).top().left().marginRight(15);
 
             //add a new row here when needed
-            if(cati == secrows){
+            if(cati % secrows == 0){
                 catTable = new Table();
                 selectTable.row();
                 selectTable.add(catTable).colspan(secrows).padTop(-5).growX();

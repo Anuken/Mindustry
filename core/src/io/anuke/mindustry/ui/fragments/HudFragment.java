@@ -16,6 +16,7 @@ import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.Minimap;
+import io.anuke.mindustry.ui.SelectionTable;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.graphics.Hue;
@@ -198,6 +199,12 @@ public class HudFragment extends Fragment{
             t.add("$text.saveload");
         });
 
+        //tapped block indicator
+        parent.fill(t -> {
+            t.bottom().visible(() -> !state.is(State.menu));
+            t.add(new SelectionTable());
+        });
+
         blockfrag.build(Core.scene.getRoot());
     }
 
@@ -366,10 +373,10 @@ public class HudFragment extends Fragment{
 
         table.labelWrap(() ->
             world.getSector() == null ?
-                (unitGroups[waveTeam.ordinal()].size() > 0 && state.mode.disableWaveTimer ?
-                wavef.get(state.wave) + "\n" + (unitGroups[waveTeam.ordinal()].size() == 1 ?
-                    enemyf.get(unitGroups[waveTeam.ordinal()].size()) :
-                    enemiesf.get(unitGroups[waveTeam.ordinal()].size())) :
+                (state.enemies() > 0 && state.mode.disableWaveTimer ?
+                wavef.get(state.wave) + "\n" + (state.enemies() == 1 ?
+                    enemyf.get(state.enemies()) :
+                    enemiesf.get(state.enemies())) :
                 wavef.get(state.wave) + "\n" +
                     (!state.mode.disableWaveTimer ?
                     Bundles.format("text.wave.waiting", (int)(state.wavetime/60)) :

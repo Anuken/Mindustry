@@ -71,7 +71,7 @@ public class UnitFactory extends Block{
         if(!Net.client()){
             BaseUnit unit = factory.type.create(tile.getTeam());
             unit.setSpawner(tile);
-            unit.set(tile.drawx(), tile.drawy());
+            unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
             unit.add();
             unit.getVelocity().y = factory.launchVelocity;
         }
