@@ -10,7 +10,6 @@ import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.scene.ui.TextField;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Strings;
@@ -39,16 +38,6 @@ public class IOSLauncher extends IOSApplication.Delegate {
         }
 
         Platform.instance = new Platform() {
-
-            @Override
-            public void addDialog(TextField field) {
-                TextFieldDialogListener.add(field, 16);
-            }
-
-            @Override
-            public void addDialog(TextField field, int maxLength) {
-                TextFieldDialogListener.add(field, maxLength);
-            }
 
             @Override
             public void shareFile(FileHandle file){

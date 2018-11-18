@@ -8,6 +8,9 @@ import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Events;
 
+import static io.anuke.mindustry.Vars.unitGroups;
+import static io.anuke.mindustry.Vars.waveTeam;
+
 public class GameState{
     public int wave = 1;
     public float wavetime;
@@ -16,7 +19,12 @@ public class GameState{
     public Difficulty difficulty = Difficulty.normal;
     public WaveSpawner spawner = new WaveSpawner();
     public Teams teams = new Teams();
+    public int enemies;
     private State state = State.menu;
+
+    public int enemies(){
+        return Net.client() ? enemies : unitGroups[waveTeam.ordinal()].size();
+    }
 
     public void set(State astate){
         Events.fire(new StateChangeEvent(state, astate));

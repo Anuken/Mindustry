@@ -17,7 +17,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Build{
     private static final Rectangle rect = new Rectangle();
-    private static final Rectangle hitrect = new Rectangle();
 
     /**Returns block type that was broken, or null if unsuccesful.*/
     public static void beginBreak(Team team, int x, int y){

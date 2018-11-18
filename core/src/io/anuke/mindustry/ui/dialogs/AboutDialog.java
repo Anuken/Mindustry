@@ -12,6 +12,7 @@ import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.OS;
+import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.ios;
 import static io.anuke.mindustry.Vars.ui;
@@ -55,7 +56,7 @@ public class AboutDialog extends FloatingDialog{
             }).size(h - 5, h);
 
             table.table(inset -> {
-                inset.add("[accent]" + link.name.replace("-", " ")).growX().left();
+                inset.add("[accent]" + Strings.capitalize(link.name.replace("-", " "))).growX().left();
                 inset.row();
                 inset.labelWrap(link.description).width(w - 100f).color(Color.LIGHT_GRAY).growX();
             }).padLeft(8);
@@ -93,7 +94,7 @@ public class AboutDialog extends FloatingDialog{
     public void showCredits(){
         FloatingDialog dialog = new FloatingDialog("$text.credits");
         dialog.addCloseButton();
-        dialog.content().add("$text.credits.text");
+        dialog.content().labelWrap("$text.credits.text").width(400f);
         dialog.show();
     }
 }

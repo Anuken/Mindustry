@@ -68,7 +68,7 @@ public class ServerControl extends Module{
         );
 
         Log.setLogger(new LogHandler(){
-            DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");  
+            DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");
 
             @Override
             public void info(String text, Object... args){
@@ -355,13 +355,20 @@ public class ServerControl extends Module{
                 err("Not playing. Host first.");
                 return;
             }
-
-            for(Item item : content.items()){
-                if(item.type == ItemType.material){
-                    state.teams.get(Team.blue).cores.first().entity.items.add(item, 2000);
+            
+            try{
+                Team team = Team.valueOf(arg[0]);
+                
+                for(Item item : content.items()){
+                    if(item.type == ItemType.material){
+                        state.teams.get(team).cores.first().entity.items.add(item, 2000);
+                    }
                 }
+                
+                info("Core filled.");
+            }catch(IllegalArgumentException ignored){
+                err("No such team exists.");
             }
-            info("Core filled.");
         });
 
         handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {

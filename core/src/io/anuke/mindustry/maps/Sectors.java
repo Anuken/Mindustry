@@ -41,7 +41,7 @@ public class Sectors{
     private final AsyncExecutor executor = new AsyncExecutor(6);
 
     public void playSector(Sector sector){
-        if(sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
+        if(!headless && sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
             sector.getSave().delete();
             ui.showInfo("$text.save.old");
         }
@@ -88,8 +88,6 @@ public class Sectors{
 
     public Difficulty getDifficulty(Sector sector){
         if(sector.difficulty == 0){
-            //yes, this means hard tutorial difficulty
-            //(((have fun)))
             return Difficulty.hard;
         }else if(sector.difficulty < 4){
             return Difficulty.normal;
@@ -158,7 +156,7 @@ public class Sectors{
         }
         grid.clear();
 
-        Array<Sector> out = Settings.getObject("sectors", Array.class, Array::new);
+        Array<Sector> out = Settings.getObject("sector-data-2", Array.class, Array::new);
 
         for(Sector sector : out){
             
@@ -187,7 +185,7 @@ public class Sectors{
             }
         }
 
-        Settings.putObject("sectors", out);
+        Settings.putObject("sector-data-2", out);
         Settings.save();
     }
 
@@ -229,7 +227,7 @@ public class Sectors{
     private void generate(Sector sector){
 
         //50% chance to get a wave mission
-        if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5){
+        if(Mathf.randomSeed(sector.getSeed() + 7) < 0.5){
             //recipe mission (maybe)
             addRecipeMission(sector, 3);
             sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 1, 4)*5));

@@ -45,6 +45,8 @@ public class Blocks extends BlockList implements ContentList{
             }
         };
 
+        //Registers build blocks from size 1-6
+        //no reference is needed here since they can be looked up by name later
         for(int i = 1; i <= 6; i++){
             new BuildBlock("build" + i);
         }
@@ -139,7 +141,7 @@ public class Blocks extends BlockList implements ContentList{
         }};
 
         ice = new Floor("ice"){{
-            dragMultiplier = 0.3f;
+            dragMultiplier = 0.2f;
             speedMultiplier = 0.4f;
             minimapColor = Color.valueOf("b8eef8");
             hasOres = true;

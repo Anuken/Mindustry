@@ -38,13 +38,13 @@ public class PowerGraph{
         lastFrameUpdated = threads.getFrameID();
 
         boolean charge = false;
-        
+
         float totalInput = 0f;
         float bufferInput = 0f;
         for(Tile producer : producers){
-            if (producer.block().consumesPower) {
+            if(producer.block().consumesPower){
                 bufferInput += producer.entity.power.amount;
-            } else {
+            }else{
                 totalInput += producer.entity.power.amount;
             }
         }
@@ -52,32 +52,32 @@ public class PowerGraph{
         float maxOutput = 0f;
         float bufferOutput = 0f;
         for(Tile consumer : consumers){
-            if (consumer.block().outputsPower) {
+            if(consumer.block().outputsPower){
                 bufferOutput += consumer.block().powerCapacity - consumer.entity.power.amount;
-            } else {
+            }else{
                 maxOutput += consumer.block().powerCapacity - consumer.entity.power.amount;
             }
         }
 
-        if (maxOutput < totalInput) {
+        if(maxOutput < totalInput){
             charge = true;
         }
 
-        if (totalInput + bufferInput <= 0.0001f || maxOutput + bufferOutput <= 0.0001f) {
+        if(totalInput + bufferInput <= 0.0001f || maxOutput + bufferOutput <= 0.0001f){
             return;
         }
 
-        float bufferUsed = 0;
-        if (charge) {
+        float bufferUsed;
+        if(charge){
             bufferUsed = Math.min((totalInput - maxOutput) / bufferOutput, 1f);
-        } else {
+        }else{
             bufferUsed = Math.min((maxOutput - totalInput) / bufferInput, 1f);
         }
 
         float inputUsed = charge ? Math.min((maxOutput + bufferOutput) / totalInput, 1f) : 1f;
         for(Tile producer : producers){
-            if (producer.block().consumesPower) {
-                if (!charge) {
+            if(producer.block().consumesPower){
+                if(!charge){
                     producer.entity.power.amount -= producer.entity.power.amount * bufferUsed;
                 }
                 continue;
@@ -87,9 +87,9 @@ public class PowerGraph{
 
         float outputSatisfied = charge ? 1f : Math.min((totalInput + bufferInput) / maxOutput, 1f);
         for(Tile consumer : consumers){
-            if (consumer.block().outputsPower) {
-                if (charge) {
-                    consumer.entity.power.amount +=  (consumer.block().powerCapacity - consumer.entity.power.amount) * bufferUsed;
+            if(consumer.block().outputsPower){
+                if(charge){
+                    consumer.entity.power.amount += (consumer.block().powerCapacity - consumer.entity.power.amount) * bufferUsed;
                 }
                 continue;
             }
@@ -118,7 +118,7 @@ public class PowerGraph{
 
     public void clear(){
         for(Tile other : all){
-            other.entity.power.graph = null;
+            if(other.entity != null && other.entity.power != null) other.entity.power.graph = null;
         }
         all.clear();
         producers.clear();

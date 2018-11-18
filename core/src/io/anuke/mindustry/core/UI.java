@@ -154,6 +154,7 @@ public class UI extends SceneModule{
         load = new LoadDialog();
         levels = new CustomGameDialog();
         language = new LanguageDialog();
+        unlocks = new UnlocksDialog();
         settings = new SettingsMenuDialog();
         host = new HostDialog();
         paused = new PausedDialog();
@@ -164,7 +165,6 @@ public class UI extends SceneModule{
         traces = new TraceDialog();
         maps = new MapsDialog();
         localplayers = new LocalPlayerDialog();
-        unlocks = new UnlocksDialog();
         content = new ContentInfoDialog();
         sectors = new SectorsDialog();
         missions = new MissionDialog();
@@ -247,7 +247,7 @@ public class UI extends SceneModule{
     }
 
     public void showInfo(String info){
-        new Dialog("$text.info.title", "dialog"){{
+        new Dialog("", "dialog"){{
             getCell(content()).growX();
             content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
             buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
@@ -255,7 +255,7 @@ public class UI extends SceneModule{
     }
 
     public void showInfo(String info, Runnable clicked){
-        new Dialog("$text.info.title", "dialog"){{
+        new Dialog("", "dialog"){{
             getCell(content()).growX();
             content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
             buttons().addButton("$text.ok", () -> {

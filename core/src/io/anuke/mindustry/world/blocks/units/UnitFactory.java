@@ -51,7 +51,7 @@ public class UnitFactory extends Block{
         hasItems = true;
         solid = false;
         itemCapacity = 10;
-        flags = EnumSet.of(BlockFlag.producer);
+        flags = EnumSet.of(BlockFlag.producer, BlockFlag.target);
 
         consumes.require(ConsumeItems.class);
     }
@@ -71,7 +71,7 @@ public class UnitFactory extends Block{
         if(!Net.client()){
             BaseUnit unit = factory.type.create(tile.getTeam());
             unit.setSpawner(tile);
-            unit.set(tile.drawx(), tile.drawy());
+            unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
             unit.add();
             unit.getVelocity().y = factory.launchVelocity;
         }

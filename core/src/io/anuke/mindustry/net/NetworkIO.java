@@ -145,9 +145,6 @@ public class NetworkIO{
         }
     }
 
-    /**
-     * Return whether a custom map is expected, and thus whether the client should wait for additional data.
-     */
     public static void loadWorld(InputStream is){
 
         Player player = players[0];
@@ -165,6 +162,8 @@ public class NetworkIO{
                 world.sectors.createSector(Bits.getLeftShort(sector), Bits.getRightShort(sector));
                 world.setSector(world.sectors.get(sector));
                 world.getSector().completedMissions = missions;
+            }else{
+                world.setSector(null);
             }
 
             ObjectMap<String, String> tags = new ObjectMap<>();
