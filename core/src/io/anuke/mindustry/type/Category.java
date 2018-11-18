@@ -16,5 +16,9 @@ public enum Category{
     /**Blocks that craft things.*/
     crafting,
     /**Blocks that create units.*/
-    units
+    units,
+    /**Things that upgrade the player such as mech pads.*/
+    upgrade,
+    /**Things for storage or passive effects.*/
+    effect
 }

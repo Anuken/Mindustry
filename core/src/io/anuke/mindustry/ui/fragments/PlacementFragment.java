@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
@@ -14,14 +15,15 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.Group;
+import io.anuke.ucore.scene.event.Touchable;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class BlocksFragment extends Fragment{
-    final int rowWidth = 3;
+public class PlacementFragment extends Fragment{
+    final int rowWidth = 4;
 
     Category currentCategory = Category.turret;
     Block hovered;
@@ -34,7 +36,6 @@ public class BlocksFragment extends Fragment{
         InputHandler input = control.input(0);
 
         parent.fill(frame -> {
-            //rebuilds the top table with the selected recipe
 
             //rebuilds the category table with the correct recipes
             Runnable rebuildCategory = () -> {
@@ -61,13 +62,14 @@ public class BlocksFragment extends Fragment{
 
                     button.replaceImage(new ImageStack(recipe.result.getCompactIcon()));
 
-                    button.hovered(() -> hovered = recipe.result);
-
-                    button.exited(() -> {
-                        if(hovered == recipe.result){
-                            hovered = null;
-                        }
-                    });
+                    if(!mobile){
+                        button.hovered(() -> hovered = recipe.result);
+                        button.exited(() -> {
+                            if(hovered == recipe.result){
+                                hovered = null;
+                            }
+                        });
+                    }
                 }
             };
 
@@ -98,7 +100,7 @@ public class BlocksFragment extends Fragment{
                                 req.table(line -> {
                                     line.left();
                                     line.addImage(stack.item.region).size(8*2);
-                                    line.add(stack.item.localizedName()).padLeft(2).left().get().setFontScale(0.5f);
+                                    line.add(stack.item.localizedName()).color(Color.LIGHT_GRAY).padLeft(2).left();
                                     line.labelWrap(() -> {
                                         TileEntity core = players[0].getClosestCore();
                                         if(core == null || state.mode.infiniteResources) return "*/*";
@@ -107,7 +109,7 @@ public class BlocksFragment extends Fragment{
                                         String color = (amount < stack.amount / 2f ? "[red]" : amount < stack.amount ? "[accent]" : "[white]");
 
                                         return color + ui.formatAmount(amount) + "[white]/" + stack.amount;
-                                    }).padLeft(5).get().setFontScale(0.5f);
+                                    }).padLeft(5);
                                 }).left();
                                 req.row();
                             }
@@ -121,10 +123,10 @@ public class BlocksFragment extends Fragment{
                 });
                 top.row();
                 top.addImage("blank").growX().color(Palette.accent).height(3f);
-            }).colspan(2).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null);
+            }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
             frame.row();
             frame.table(categories -> {
-                categories.defaults().size(45f);
+                categories.defaults().size(48f);
 
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
@@ -134,11 +136,12 @@ public class BlocksFragment extends Fragment{
                         rebuildCategory.run();
                     }).group(group);
 
-                    categories.row();
+                    if(cat.ordinal() %2 == 1) categories.row();
                 }
-            });
+            }).touchable(Touchable.enabled);
+            frame.addImage("blank").width(3f).fillY().color(Palette.accent);
 
-            frame.table("clear", blocks -> blockTable = blocks).fillY().bottom();
+            frame.table("clear", blocks -> blockTable = blocks).fillY().bottom().touchable(Touchable.enabled);
 
             rebuildCategory.run();
         });

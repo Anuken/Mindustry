@@ -14,12 +14,11 @@ TintedDrawable: {
 	chatfield: {name: white, color: {r: 0, g: 0, b: 0, a: 0.2}},
 	clear: {name: white, color: {r: 0.1, g: 0.1, b: 0.1, a: 0.75}},
 	none: {name: white, color: {r: 0, g: 0, b: 0, a: 0}},
-	clear-over: {name: white, color: { hex: "#ffd37f82" } },
+	clear-over: {name: white, color: { hex: "#ffffff82" } },
 	clear-down: {name: white, color: { hex: "#ffd37fff" } }
 },
 ButtonStyle: {
 	default: {down: button-down, up: button },
-	menu: {up: text-sides, over: text-sides-over, down: text-sides-down},
 	toggle: {checked: button-down, down: button-down, up: button }
 },
 TextButtonStyle: {
