@@ -52,18 +52,18 @@ public class Recipes implements ContentList{
             .setDependencies(Items.blastCompound);
 
         //TURRETS
-        new Recipe(weapon, TurretBlocks.duo, new ItemStack(Items.copper, 40)).setAlwaysUnlocked(true);
-        new Recipe(weapon, TurretBlocks.arc, new ItemStack(Items.copper, 50), new ItemStack(Items.lead, 30), new ItemStack(Items.silicon, 20));
-        new Recipe(weapon, TurretBlocks.hail, new ItemStack(Items.copper, 60), new ItemStack(Items.densealloy, 35));
-        new Recipe(weapon, TurretBlocks.lancer, new ItemStack(Items.copper, 50), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 90));
-        new Recipe(weapon, TurretBlocks.wave, new ItemStack(Items.densealloy, 60), new ItemStack(Items.titanium, 70), new ItemStack(Items.lead, 150));
-        new Recipe(weapon, TurretBlocks.salvo, new ItemStack(Items.copper, 210), new ItemStack(Items.densealloy, 190), new ItemStack(Items.thorium, 130));
-        new Recipe(weapon, TurretBlocks.swarmer, new ItemStack(Items.densealloy, 70), new ItemStack(Items.titanium, 70), new ItemStack(Items.plastanium, 90), new ItemStack(Items.silicon, 60));
-        new Recipe(weapon, TurretBlocks.ripple, new ItemStack(Items.copper, 300), new ItemStack(Items.densealloy, 220), new ItemStack(Items.thorium, 120));
-        new Recipe(weapon, TurretBlocks.cyclone, new ItemStack(Items.copper, 400), new ItemStack(Items.densealloy, 400), new ItemStack(Items.surgealloy, 200), new ItemStack(Items.plastanium, 150));
-        new Recipe(weapon, TurretBlocks.fuse, new ItemStack(Items.copper, 450), new ItemStack(Items.densealloy, 450), new ItemStack(Items.surgealloy, 250));
-        new Recipe(weapon, TurretBlocks.spectre, new ItemStack(Items.copper, 700), new ItemStack(Items.densealloy, 600), new ItemStack(Items.surgealloy, 500), new ItemStack(Items.plastanium, 350), new ItemStack(Items.thorium, 500));
-        new Recipe(weapon, TurretBlocks.meltdown, new ItemStack(Items.copper, 500), new ItemStack(Items.lead, 700), new ItemStack(Items.densealloy, 600), new ItemStack(Items.surgealloy, 650), new ItemStack(Items.silicon, 650));
+        new Recipe(turret, TurretBlocks.duo, new ItemStack(Items.copper, 40)).setAlwaysUnlocked(true);
+        new Recipe(turret, TurretBlocks.arc, new ItemStack(Items.copper, 50), new ItemStack(Items.lead, 30), new ItemStack(Items.silicon, 20));
+        new Recipe(turret, TurretBlocks.hail, new ItemStack(Items.copper, 60), new ItemStack(Items.densealloy, 35));
+        new Recipe(turret, TurretBlocks.lancer, new ItemStack(Items.copper, 50), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 90));
+        new Recipe(turret, TurretBlocks.wave, new ItemStack(Items.densealloy, 60), new ItemStack(Items.titanium, 70), new ItemStack(Items.lead, 150));
+        new Recipe(turret, TurretBlocks.salvo, new ItemStack(Items.copper, 210), new ItemStack(Items.densealloy, 190), new ItemStack(Items.thorium, 130));
+        new Recipe(turret, TurretBlocks.swarmer, new ItemStack(Items.densealloy, 70), new ItemStack(Items.titanium, 70), new ItemStack(Items.plastanium, 90), new ItemStack(Items.silicon, 60));
+        new Recipe(turret, TurretBlocks.ripple, new ItemStack(Items.copper, 300), new ItemStack(Items.densealloy, 220), new ItemStack(Items.thorium, 120));
+        new Recipe(turret, TurretBlocks.cyclone, new ItemStack(Items.copper, 400), new ItemStack(Items.densealloy, 400), new ItemStack(Items.surgealloy, 200), new ItemStack(Items.plastanium, 150));
+        new Recipe(turret, TurretBlocks.fuse, new ItemStack(Items.copper, 450), new ItemStack(Items.densealloy, 450), new ItemStack(Items.surgealloy, 250));
+        new Recipe(turret, TurretBlocks.spectre, new ItemStack(Items.copper, 700), new ItemStack(Items.densealloy, 600), new ItemStack(Items.surgealloy, 500), new ItemStack(Items.plastanium, 350), new ItemStack(Items.thorium, 500));
+        new Recipe(turret, TurretBlocks.meltdown, new ItemStack(Items.copper, 500), new ItemStack(Items.lead, 700), new ItemStack(Items.densealloy, 600), new ItemStack(Items.surgealloy, 650), new ItemStack(Items.silicon, 650));
 
         //DISTRIBUTION
         new Recipe(distribution, DistributionBlocks.conveyor, new ItemStack(Items.copper, 1)).setAlwaysUnlocked(true);

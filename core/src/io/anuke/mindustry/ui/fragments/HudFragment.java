@@ -199,12 +199,6 @@ public class HudFragment extends Fragment{
             t.add("$text.saveload");
         });
 
-        //tapped block indicator
-        parent.fill(t -> {
-            t.bottom().visible(() -> !state.is(State.menu));
-            t.add(new SelectionTable());
-        });
-
         blockfrag.build(Core.scene.getRoot());
     }
 
