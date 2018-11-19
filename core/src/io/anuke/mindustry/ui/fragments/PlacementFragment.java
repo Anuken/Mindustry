@@ -2,7 +2,6 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Palette;
@@ -29,7 +28,6 @@ import static io.anuke.mindustry.Vars.*;
 public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
-    Array<Recipe> returned = new Array<>();
     Category currentCategory = Category.turret;
     Block hovered, lastDisplay;
     Tile hoverTile;
@@ -44,6 +42,7 @@ public class PlacementFragment extends Fragment{
 
             full.table(frame -> {
                 InputHandler input = control.input(0);
+
                 //rebuilds the category table with the correct recipes
                 Runnable rebuildCategory = () -> {
                     blockTable.clear();
@@ -54,7 +53,7 @@ public class PlacementFragment extends Fragment{
                     ButtonGroup<ImageButton> group = new ButtonGroup<>();
                     group.setMinCheckCount(0);
 
-                    for(Recipe recipe : recipes(currentCategory)){
+                    for(Recipe recipe : Recipe.getByCategory(currentCategory)){
 
                         if(index++ % rowWidth == 0){
                             blockTable.row();
@@ -98,6 +97,7 @@ public class PlacementFragment extends Fragment{
                     blockTable.act(0f);
                 };
 
+                //top table with hover info
                 frame.table("clear", top -> {
                     top.add(new Table()).growX().update(topTable -> {
                         if((tileDisplayBlock() == null && lastDisplay == getSelected()) ||
@@ -113,12 +113,12 @@ public class PlacementFragment extends Fragment{
                                 header.left();
                                 header.add(new ImageStack(lastDisplay.getCompactIcon())).size(8*4);
                                 header.labelWrap(() ->
-                                !control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay)) ? Bundles.get("text.blocks.unknown") : lastDisplay.formalName)
-                                .left().width(190f).padLeft(5);
+                                    !control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay)) ? Bundles.get("text.blocks.unknown") : lastDisplay.formalName)
+                                    .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay))){
                                     header.addButton("?", "clear-partial", () -> ui.content.show(Recipe.getByResult(lastDisplay)))
-                                    .size(8 * 5).padTop(-5).padRight(-5).right().grow();
+                                        .size(8 * 5).padTop(-5).padRight(-5).right().grow();
                                 }
                             }).growX().left();
                             topTable.row();
@@ -155,15 +155,19 @@ public class PlacementFragment extends Fragment{
                     top.addImage("blank").growX().color(Palette.accent).height(3f);
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
                 frame.row();
-                frame.table("clear", blocks -> blockTable = blocks).fillY().bottom().touchable(Touchable.enabled);
+                frame.table("clear", blocksSelect -> {
+                    blocksSelect.table(blocks -> blockTable = blocks).grow();
+                    blocksSelect.row();
+                    blocksSelect.table(input::buildUI).growX();
+                }).fillY().bottom().touchable(Touchable.enabled);
                 frame.addImage("blank").width(3f).fillY().color(Palette.accent);
                 frame.table(categories -> {
-                    categories.defaults().size(48f);
+                    categories.defaults().size(50f);
 
                     ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
                     for(Category cat : Category.values()){
-                        if(recipes(cat).isEmpty()) continue;
+                        if(Recipe.getByCategory(cat).isEmpty()) continue;
 
                         categories.addImageButton("icon-" + cat.name(), "clear-toggle",  16*2, () -> {
                             currentCategory = cat;
@@ -213,15 +217,7 @@ public class PlacementFragment extends Fragment{
         return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.floor() instanceof OreBlock ? hoverTile.floor() : null;
     }
 
-    Array<Recipe> recipes(Category cat){
-        returned.clear();
-        for(Recipe recipe : content.recipes()){
-            if(recipe.category != cat || recipe.isHidden()) continue;
-            returned.add(recipe);
-        }
-        return returned;
-    }
-
+    /**Show or hide the placement menu.*/
     void toggle(float t, Interpolation ip){
         if(shown){
             shown = false;

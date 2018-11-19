@@ -40,7 +40,9 @@ ImageButtonStyle: {
 	toggle: {checked: button-down, down: button-down, up: button, imageDisabledColor: gray, imageUpColor: white  },
 	select: {checked: button-select, up: none },
 	clear: {down: clear-down, up: clear, over: clear-over},
+	clear-partial: {down: clear-down, up: none, over: clear-over},
 	clear-toggle: {down: clear-down, checked: clear-down, up: clear, over: clear-over},
+	clear-toggle-partial: {down: clear-down, checked: clear-down, up: none, over: clear-over},
 },
 ScrollPaneStyle: {
 	default: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
