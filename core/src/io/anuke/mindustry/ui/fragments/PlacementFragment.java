@@ -114,6 +114,11 @@ public class PlacementFragment extends Fragment{
                             header.labelWrap(() ->
                                 !control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay)) ? Bundles.get("text.blocks.unknown") : lastDisplay.formalName)
                                 .left().width(200f).padLeft(5);
+                            header.add().growX();
+                            if(control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay))){
+                                header.addButton("?", "clear-partial", () -> ui.content.show(Recipe.getByResult(lastDisplay)))
+                                .size(8 * 5).padTop(-5).padRight(-5).right().grow();
+                            }
                         }).growX().left();
                         topTable.row();
                         //add requirement table
