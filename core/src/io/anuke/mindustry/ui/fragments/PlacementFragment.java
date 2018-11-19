@@ -70,7 +70,7 @@ public class PlacementFragment extends Fragment{
                         button.update(() -> { //color unplacable things gray
                             boolean ulock = control.unlocks.isUnlocked(recipe);
                             TileEntity core = players[0].getClosestCore();
-                            Color color = core != null && core.items.has(recipe.requirements) ? Color.WHITE : ulock ? Color.GRAY : Color.WHITE;
+                            Color color = core != null && (core.items.has(recipe.requirements) || state.mode.infiniteResources) ? Color.WHITE : ulock ? Color.GRAY : Color.WHITE;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.recipe == recipe);
 
