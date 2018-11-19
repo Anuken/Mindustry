@@ -34,12 +34,12 @@ public class PowerGraph{
     public float getPowerProduced(){
         float powerProduced = 0f;
         for(Tile producer : producers){
-            totalInput += producer.block().getPowerProduction(producer);
+            powerProduced += producer.block().getPowerProduction(producer);
         }
         return powerProduced;
     }
 
-    public float getPowrerNeeded(){
+    public float getPowerNeeded(){
         float powerNeeded = 0f;
         for(Tile consumer : consumers){
             if(consumer.block().bufferedPowerConsumer){
@@ -56,6 +56,7 @@ public class PowerGraph{
         for(Tile battery : batteries){
             totalAccumulator += battery.entity.power.satisfaction * battery.block().basePowerUse;
         }
+        return totalAccumulator;
     }
 
     public float getBatteryCapacity(){
@@ -63,6 +64,7 @@ public class PowerGraph{
         for(Tile battery : batteries){
             totalCapacity += (1f - battery.entity.power.satisfaction) * battery.block().basePowerUse;
         }
+        return totalCapacity;
     }
 
     public float useBatteries(float needed){
@@ -78,8 +80,8 @@ public class PowerGraph{
     public float chargeBatteries(float excess){
         float capacity = getBatteryCapacity();
         float thing = Math.min(1, excess / capacity);
-        for(tile battery : batteries){
-            battery.power.satisfaction += (1 - battery.power.satisfaction) * thing;
+        for(Tile battery : batteries){
+            battery.entity.power.satisfaction += (1 - battery.entity.power.satisfaction) * thing;
         }
         return Math.min(excess, capacity);
     }
@@ -88,9 +90,9 @@ public class PowerGraph{
         float satisfaction = Math.min(1, produced / needed);
         for(Tile consumer : consumers){
             if(consumer.block().bufferedPowerConsumer){
-                consumer.power.satisfaction += (1 - consumer.power.satisfaction) * satisfaction;
+                consumer.entity.power.satisfaction += (1 - consumer.entity.power.satisfaction) * satisfaction;
             }else{
-                consumer.power.satisfaction = satisfaction;
+                consumer.entity.power.satisfaction = satisfaction;
             }
         }
     }
@@ -102,7 +104,7 @@ public class PowerGraph{
 
         lastFrameUpdated = threads.getFrameID();
 
-        float powerNeeded = getPowrerNeeded();
+        float powerNeeded = getPowerNeeded();
         float powerProduced = getPowerProduced();
 
         if(powerNeeded > powerProduced){
