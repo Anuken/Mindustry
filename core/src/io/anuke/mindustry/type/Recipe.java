@@ -60,7 +60,7 @@ public class Recipe extends UnlockableContent{
     public static Array<Recipe> getByCategory(Category category){
         returnArray.clear();
         for(Recipe recipe : content.recipes()){
-            if(recipe.category == category && !recipe.isHidden()){
+            if(recipe.category == category && recipe.visibility.shown() && (recipe.mode == state.mode || recipe.mode == null)){
                 returnArray.add(recipe);
             }
         }
@@ -90,7 +90,6 @@ public class Recipe extends UnlockableContent{
         this.alwaysUnlocked = unlocked;
         return this;
     }
-
 
     @Override
     public boolean alwaysUnlocked(){

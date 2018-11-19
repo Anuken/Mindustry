@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Category;
@@ -13,6 +14,7 @@ import io.anuke.mindustry.ui.ImageStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
@@ -33,6 +35,14 @@ public class PlacementFragment extends Fragment{
     Tile hoverTile;
     Table blockTable, toggler;
     boolean shown = true;
+
+    public PlacementFragment(){
+        Events.on(WorldLoadGraphicsEvent.class, event -> {
+            Group group = toggler.getParent();
+            toggler.remove();
+            build(group);
+        });
+    }
 
     @Override
     public void build(Group parent){
@@ -84,16 +94,13 @@ public class PlacementFragment extends Fragment{
                             }
                         });
 
-                        if(!mobile){
-                            button.hovered(() -> hovered = recipe.result);
-                            button.exited(() -> {
-                                if(hovered == recipe.result){
-                                    hovered = null;
-                                }
-                            });
-                        }
+                        button.hovered(() -> hovered = recipe.result);
+                        button.exited(() -> {
+                            if(hovered == recipe.result){
+                                hovered = null;
+                            }
+                        });
                     }
-
                     blockTable.act(0f);
                 };
 
