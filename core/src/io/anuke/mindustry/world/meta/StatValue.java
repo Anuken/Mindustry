@@ -8,7 +8,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 public interface StatValue{
     /**
      * This method should provide all elements necessary to display this stat to the specified table.
-     * For example, a stat that is just text would add label to the table.
+     * For example, a stat that is just text would add a label to the table.
      */
     void display(Table table);
 }

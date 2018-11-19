@@ -224,7 +224,6 @@ public class HudFragment extends Fragment{
 
     /**Show unlock notification for a new recipe.*/
     public void showUnlock(Recipe recipe){
-        blockfrag.rebuild();
 
         //if there's currently no unlock notification...
         if(lastUnlockTable == null){

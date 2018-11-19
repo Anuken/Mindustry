@@ -4,16 +4,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.ObjectSet;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.ucore.core.Settings;
 
-import static io.anuke.mindustry.Vars.*;
-
 /**Stores player unlocks. Clientside only.*/
 public class Unlocks{
-    private ObjectMap<String, ContentUnlockSet> sets = new ObjectMap<>();
+    ContentUnlockSet set = new ContentUnlockSet();
 
     static{
         Settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
@@ -21,7 +17,7 @@ public class Unlocks{
 
     /** Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(UnlockableContent content){
-        return rootSet().isUnlocked(content) || currentSet().isUnlocked(content);
+        return set.isUnlocked(content);
     }
 
     /**
@@ -32,77 +28,42 @@ public class Unlocks{
      * @return whether or not this content was newly unlocked.
      */
     public boolean unlockContent(UnlockableContent content){
-        return !rootSet().isUnlocked(content) && currentSet().unlockContent(content);
+        return !set.isUnlocked(content) && currentSet().unlockContent(content);
     }
 
     private ContentUnlockSet currentSet(){
-        //client connected to server: always return the IP-specific set
-        if(Net.client()){
-            return getSet(Net.getLastIP());
-        }else if((world.getSector() != null || state.mode.infiniteResources) || state.is(State.menu)){ //sector-sandbox have shared set
-            return rootSet();
-        }else{ //per-mode set
-            return getSet(state.mode.name());
-        }
-    }
-
-    private ContentUnlockSet rootSet(){
-        return getSet("root");
-    }
-
-    private ContentUnlockSet getSet(String name){
-        if(!sets.containsKey(name)){
-            sets.put(name, new ContentUnlockSet());
-        }
-        return sets.get(name);
+        return set;
     }
 
     /** Returns whether unlockables have changed since the last save.*/
     public boolean isDirty(){
-        for(ContentUnlockSet set : sets.values()){
-            if(set.isDirty()){
-                return true;
-            }
-        }
-        return false;
+        return set.isDirty();
     }
 
     /** Clears all unlocked content. Automatically saves.*/
     public void reset(){
-        sets.clear();
         save();
     }
 
     public void load(){
-        sets.clear();
+        ObjectMap<ContentType, Array<String>> outer = Settings.getObject("unlocks", ObjectMap.class, ObjectMap::new);
+        ContentUnlockSet cset = new ContentUnlockSet();
 
-        ObjectMap<String, ObjectMap<ContentType, Array<String>>> result = Settings.getObject("content-sets", ObjectMap.class, ObjectMap::new);
-
-        for(Entry<String, ObjectMap<ContentType, Array<String>>> outer : result.entries()){
-            ContentUnlockSet cset = new ContentUnlockSet();
-            for (Entry<ContentType, Array<String>> entry : outer.value.entries()){
-                ObjectSet<String> set = new ObjectSet<>();
-                set.addAll(entry.value);
-                cset.getUnlocked().put(entry.key, set);
-            }
-            sets.put(outer.key, cset);
+        for (Entry<ContentType, Array<String>> entry : outer.entries()){
+            ObjectSet<String> set = new ObjectSet<>();
+            set.addAll(entry.value);
+            cset.getUnlocked().put(entry.key, set);
         }
     }
 
     public void save(){
-        ObjectMap<String, ObjectMap<ContentType, Array<String>>> output = new ObjectMap<>();
+        ObjectMap<ContentType, Array<String>> write = new ObjectMap<>();
 
-        for(Entry<String, ContentUnlockSet> centry : sets.entries()){
-            ObjectMap<ContentType, Array<String>> write = new ObjectMap<>();
-
-            for(Entry<ContentType, ObjectSet<String>> entry : centry.value.getUnlocked().entries()){
-                write.put(entry.key, entry.value.iterator().toArray());
-            }
-
-            output.put(centry.key, write);
+        for(Entry<ContentType, ObjectSet<String>> entry : set.getUnlocked().entries()){
+            write.put(entry.key, entry.value.iterator().toArray());
         }
 
-        Settings.putObject("content-sets", output);
+        Settings.putObject("unlocks", write);
         Settings.save();
     }
 
