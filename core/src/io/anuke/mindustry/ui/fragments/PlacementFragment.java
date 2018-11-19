@@ -38,7 +38,6 @@ public class PlacementFragment extends Fragment{
     @Override
     public void build(Group parent){
         parent.fill(frame -> {
-            frame.clear();
             InputHandler input = control.input(0);
 
             //rebuilds the category table with the correct recipes
@@ -63,7 +62,7 @@ public class PlacementFragment extends Fragment{
                         if(control.unlocks.isUnlocked(recipe)){
                             input.recipe = input.recipe == recipe ? null : recipe;
                         }
-                    }).size(50f).group(group).get();
+                    }).size(46f).group(group).get();
 
                     button.update(() -> { //color unplacable things gray
                         boolean ulock = control.unlocks.isUnlocked(recipe);
@@ -95,7 +94,7 @@ public class PlacementFragment extends Fragment{
                 blockTable.act(0f);
             };
 
-            frame.bottom().left().visible(() -> !state.is(State.menu));
+            frame.bottom().right().visible(() -> !state.is(State.menu));
 
             frame.table("clear", top -> {
                 top.add(new Table()).growX().update(topTable -> {
@@ -113,7 +112,7 @@ public class PlacementFragment extends Fragment{
                             header.add(new ImageStack(lastDisplay.getCompactIcon())).size(8*4);
                             header.labelWrap(() ->
                                 !control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay)) ? Bundles.get("text.blocks.unknown") : lastDisplay.formalName)
-                                .left().width(200f).padLeft(5);
+                                .left().width(190f).padLeft(5);
                             header.add().growX();
                             if(control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay))){
                                 header.addButton("?", "clear-partial", () -> ui.content.show(Recipe.getByResult(lastDisplay)))
@@ -147,13 +146,15 @@ public class PlacementFragment extends Fragment{
                     }else if(tileDisplayBlock() != null){ //show selected tile
                         lastDisplay = tileDisplayBlock();
                         topTable.add(new ImageStack(lastDisplay.getDisplayIcon(hoverTile))).size(8*4);
-                        topTable.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(200f).padLeft(5);
+                        topTable.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
                     }
                 });
                 top.row();
                 top.addImage("blank").growX().color(Palette.accent).height(3f);
             }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
             frame.row();
+            frame.table("clear", blocks -> blockTable = blocks).fillY().bottom().touchable(Touchable.enabled);
+            frame.addImage("blank").width(3f).fillY().color(Palette.accent);
             frame.table(categories -> {
                 categories.defaults().size(48f);
 
@@ -170,9 +171,6 @@ public class PlacementFragment extends Fragment{
                     if(cat.ordinal() %2 == 1) categories.row();
                 }
             }).touchable(Touchable.enabled);
-            frame.addImage("blank").width(3f).fillY().color(Palette.accent);
-
-            frame.table("clear", blocks -> blockTable = blocks).fillY().bottom().touchable(Touchable.enabled);
 
             rebuildCategory.run();
         });
