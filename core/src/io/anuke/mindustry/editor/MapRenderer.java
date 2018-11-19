@@ -18,6 +18,7 @@ import io.anuke.ucore.util.Bits;
 import io.anuke.ucore.util.Geometry;
 
 import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.scaling;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class MapRenderer implements Disposable{
@@ -120,12 +121,12 @@ public class MapRenderer implements Disposable{
             if(wall.rotate){
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
                         wx * tilesize + wall.offset(), wy * tilesize + wall.offset(),
-                        region.getRegionWidth(), region.getRegionHeight(), rotation * 90 - 90);
+                        region.getRegionWidth() * scaling, region.getRegionHeight() * scaling, rotation * 90 - 90);
             }else{
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
-                        wx * tilesize + wall.offset() + (tilesize - region.getRegionWidth())/2f,
-                        wy * tilesize + wall.offset() + (tilesize - region.getRegionHeight())/2f,
-                        region.getRegionWidth(), region.getRegionHeight());
+                        wx * tilesize + wall.offset() + (tilesize - region.getRegionWidth() * scaling)/2f,
+                        wy * tilesize + wall.offset() + (tilesize - region.getRegionHeight() * scaling)/2f,
+                        region.getRegionWidth() * scaling, region.getRegionHeight() * scaling);
             }
         }else{
             region = floor.getEditorIcon();
@@ -149,7 +150,7 @@ public class MapRenderer implements Disposable{
 
         mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize, region,
                 wx * tilesize - (wall.size/3) * tilesize, wy * tilesize - (wall.size/3) * tilesize,
-                region.getRegionWidth(), region.getRegionHeight());
+                region.getRegionWidth() * scaling, region.getRegionHeight() * scaling);
         mesh.setColor(Color.WHITE);
     }
 
