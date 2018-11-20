@@ -24,7 +24,8 @@ public class FusionReactor extends PowerGenerator{
         super(name);
         hasPower = true;
         hasLiquids = true;
-        powerCapacity = 100f;
+        // TODO Adapt to new power system
+        //powerCapacity = 100f;
         liquidCapacity = 30f;
         hasItems = true;
     }
@@ -33,6 +34,8 @@ public class FusionReactor extends PowerGenerator{
     public void setStats(){
         super.setStats();
 
+        // TODO Verify for new power system
+        stats.remove(BlockStat.basePowerGeneration);
         stats.add(BlockStat.basePowerGeneration, maxPowerProduced * 60f, StatUnit.powerSecond);
     }
 
@@ -46,8 +49,9 @@ public class FusionReactor extends PowerGenerator{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.01f);
         }
 
-        float powerAdded = Math.min(powerCapacity - entity.power.amount, maxPowerProduced * Mathf.pow(entity.warmup, 4f) * Timers.delta());
-        entity.power.amount += powerAdded;
+        // TODO Adapt to new power system
+        //float powerAdded = Math.min(powerCapacity - entity.power.amount, maxPowerProduced * Mathf.pow(entity.warmup, 4f) * Timers.delta());
+        //entity.power.amount += powerAdded;
         entity.totalProgress += entity.warmup * Timers.delta();
 
         tile.entity.power.graph.update();

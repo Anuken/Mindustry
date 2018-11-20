@@ -29,6 +29,9 @@ public abstract class BaseBlock extends MappableContent{
     public boolean outputsPower;
 
     public boolean bufferedPowerConsumer = false;
+    /** In case of unbuffered consumers, this stores the amount of power which is required per tick in order to work at maximum efficiency.
+     *  In case of buffered consumers, this stores the maximum power capacity.
+     */
     public float basePowerUse = 0;
 
     public int itemCapacity;

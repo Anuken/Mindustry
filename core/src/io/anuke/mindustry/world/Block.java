@@ -331,8 +331,8 @@ public class Block extends BaseBlock {
         consumes.forEach(cons -> cons.display(stats));
 
         if(hasPower){
-            if(bufferedPowerConsumer) stats.add(BlockStat.powerUse, basePowerUse, StatUnit.powerUnits);
-            else stats.add(BlockStat.powerCapacity, basePowerUse, StatUnit.powerUnits);
+            if(bufferedPowerConsumer) stats.add(BlockStat.powerCapacity, basePowerUse, StatUnit.powerUnits);
+            else stats.add(BlockStat.powerUse, basePowerUse * 60, StatUnit.powerUnits);
         }
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
@@ -340,7 +340,7 @@ public class Block extends BaseBlock {
 
     //TODO make this easier to config.
     public void setBars(){
-        if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
+        if(bufferedPowerConsumer) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.satisfaction));
         if(hasLiquids)
             bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
         if(hasItems)
@@ -406,8 +406,8 @@ public class Block extends BaseBlock {
             explosiveness += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
         }
 
-        if(hasPower){
-            power += tile.entity.power.amount;
+        if(bufferedPowerConsumer){
+            power += tile.entity.power.satisfaction * tile.block().basePowerUse;
         }
 
         tempColor.mul(1f / units);

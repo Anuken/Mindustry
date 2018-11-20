@@ -36,6 +36,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
+// TODO Adapt whole class to new power system
 public class MassDriver extends Block{
     protected float range;
     protected float rotateSpeed = 0.04f;
@@ -78,7 +79,8 @@ public class MassDriver extends Block{
         MassDriverEntity other = target.entity();
 
         entity.reload = 1f;
-        entity.power.amount = 0f;
+
+        entity.power.satisfaction = 0f;
 
         DriverBulletData data = Pooling.obtain(DriverBulletData.class, DriverBulletData::new);
         data.from = entity;
@@ -126,7 +128,7 @@ public class MassDriver extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.powerShot, powerCapacity, StatUnit.powerUnits);
+        stats.add(BlockStat.powerShot, basePowerUse, StatUnit.powerUnits);
     }
 
     @Override
@@ -166,7 +168,8 @@ public class MassDriver extends Block{
                 entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(waiter), rotateSpeed);
             }else if(tile.entity.items.total() >= minDistribute &&
                     linkValid(tile) && //only fire when at least at half-capacity and power
-                    tile.entity.power.amount >= powerCapacity * 0.8f &&
+                    // TODO adapt
+                    //tile.entity.power.amount >= powerCapacity * 0.8f &&
                     link.block().itemCapacity - link.entity.items.total() >= minDistribute && entity.reload <= 0.0001f){
 
                 MassDriverEntity other = link.entity();

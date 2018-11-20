@@ -25,7 +25,6 @@ import io.anuke.mindustry.world.blocks.defense.turrets.PowerTurret;
 import io.anuke.mindustry.world.blocks.defense.turrets.Turret;
 import io.anuke.mindustry.world.blocks.power.NuclearReactor;
 import io.anuke.mindustry.world.blocks.power.PowerGenerator;
-import io.anuke.mindustry.world.blocks.power.SolarGenerator;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.storage.StorageBlock;
 import io.anuke.mindustry.world.blocks.units.UnitFactory;
@@ -115,7 +114,8 @@ public class FortressGenerator{
             seeder.get(PowerBlocks.solarPanel, tile -> tile.block() == PowerBlocks.largeSolarPanel && gen.random.chance(0.3)),
 
             //coal gens
-            seeder.get(PowerBlocks.combustionGenerator, tile -> tile.block() instanceof SolarGenerator && gen.random.chance(0.2)),
+            // TODO Verify - This used to be solar panel
+            seeder.get(PowerBlocks.combustionGenerator, tile -> tile.block() instanceof PowerGenerator && gen.random.chance(0.2)),
 
             //water extractors
             seeder.get(ProductionBlocks.waterExtractor, tile -> tile.block() instanceof NuclearReactor && gen.random.chance(0.5)),
@@ -181,7 +181,7 @@ public class FortressGenerator{
                 Block block = tile.block();
 
                 if(block instanceof PowerTurret){
-                    tile.entity.power.amount = block.powerCapacity;
+                    tile.entity.power.satisfaction = 1.0f;
                 }else if(block instanceof ItemTurret){
                     ItemTurret turret = (ItemTurret)block;
                     AmmoType[] type = turret.getAmmoTypes();

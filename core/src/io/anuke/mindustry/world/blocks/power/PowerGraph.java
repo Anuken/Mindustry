@@ -87,6 +87,8 @@ public class PowerGraph{
     }
 
     public void distributePower(float needed, float produced){
+        if(needed == 0f){ return; }
+
         float satisfaction = Math.min(1, produced / needed);
         for(Tile consumer : consumers){
             if(consumer.block().bufferedPowerConsumer){

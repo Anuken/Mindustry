@@ -39,7 +39,6 @@ public class PowerNode extends PowerBlock{
         super(name);
         expanded = true;
         layer = Layer.power;
-        powerCapacity = 5f;
         configurable = true;
         consumesPower = false;
         outputsPower = false;

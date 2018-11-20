@@ -49,7 +49,8 @@ public class NuclearReactor extends PowerGenerator{
         super(name);
         itemCapacity = 30;
         liquidCapacity = 50;
-        powerCapacity = 80f;
+        // TODO Adapt to new power system
+        //powerCapacity = 80f;
         hasItems = true;
         hasLiquids = true;
 
@@ -75,6 +76,9 @@ public class NuclearReactor extends PowerGenerator{
     public void setStats(){
         super.setStats();
         stats.add(BlockStat.inputLiquid, new LiquidFilterValue(liquid -> liquid.temperature <= 0.5f));
+
+        // TODO Verify for new power system
+        stats.remove(BlockStat.basePowerGeneration);
         stats.add(BlockStat.basePowerGeneration, powerMultiplier * 60f * 0.5f, StatUnit.powerSecond);
     }
 
@@ -87,8 +91,9 @@ public class NuclearReactor extends PowerGenerator{
 
         if(fuel > 0){
             entity.heat += fullness * heating * Math.min(entity.delta(), 4f);
-            entity.power.amount += powerMultiplier * fullness * entity.delta();
-            entity.power.amount = Mathf.clamp(entity.power.amount, 0f, powerCapacity);
+            // TODO Adapt to new power system
+            //entity.power.amount += powerMultiplier * fullness * entity.delta();
+            //entity.power.amount = Mathf.clamp(entity.power.amount, 0f, powerCapacity);
             if(entity.timer.get(timerFuel, fuelUseTime)){
                 entity.items.remove(consumes.item(), 1);
             }

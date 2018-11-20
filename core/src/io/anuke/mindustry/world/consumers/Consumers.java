@@ -30,12 +30,6 @@ public class Consumers{
         }
     }
 
-    public ConsumePower power(float amount){
-        ConsumePower p = new ConsumePower(amount);
-        add(p);
-        return p;
-    }
-
     public ConsumeLiquid liquid(Liquid liquid, float amount){
         ConsumeLiquid c = new ConsumeLiquid(liquid, amount);
         add(c);
