@@ -226,6 +226,7 @@ public class PlacementFragment extends Fragment{
 
     /**Show or hide the placement menu.*/
     void toggle(float t, Interpolation ip){
+        toggler.clearActions();
         if(shown){
             shown = false;
             toggler.actions(Actions.translateBy(toggler.getTranslation().x + toggler.getWidth(), 0, t, ip));
