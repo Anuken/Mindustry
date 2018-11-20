@@ -13,41 +13,40 @@ public class PowerBlocks extends BlockList implements ContentList{
     @Override
     public void load(){
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
-            powerOutput = 0.09f;
-            powerCapacity = 40f;
+            powerProduction = 0.09f;
             itemDuration = 40f;
         }};
 
         thermalGenerator = new LiquidHeatGenerator("thermal-generator"){{
             maxLiquidGenerate = 4f;
-            powerCapacity = 40f;
+            // TODO: Adapt to new power system
+            powerProduction = -1;
             powerPerLiquid = 0.1f;
             generateEffect = BlockFx.redgeneratespark;
             size = 2;
         }};
 
         turbineGenerator = new TurbineGenerator("turbine-generator"){{
-            powerOutput = 0.28f;
-            powerCapacity = 40f;
+            // TODO: Adapt to new power system
+            powerProduction = 0.28f;
+            powerPerLiquid = 0.1f;
             itemDuration = 30f;
-            powerPerLiquid = 0.7f;
             consumes.liquid(Liquids.water, 0.05f);
             size = 2;
         }};
 
         rtgGenerator = new DecayGenerator("rtg-generator"){{
-            powerCapacity = 40f;
             size = 2;
-            powerOutput = 0.3f;
+            powerProduction = 0.3f;
             itemDuration = 220f;
         }};
 
         solarPanel = new PowerGenerator("solar-panel"){{
-            powerGeneration = 0.0045f;
+            powerProduction = 0.0045f;
         }};
 
         largeSolarPanel = new PowerGenerator("solar-panel-large"){{
-            powerGeneration = 0.055f;
+            powerProduction = 0.055f;
             size = 3;
         }};
 
@@ -63,12 +62,12 @@ public class PowerBlocks extends BlockList implements ContentList{
         }};
 
         battery = new Battery("battery"){{
-            powerCapacity = 320f;
+            basePowerUse = 320f;
         }};
 
         batteryLarge = new Battery("battery-large"){{
             size = 3;
-            powerCapacity = 2000f;
+            basePowerUse = 2000f;
         }};
 
         powerNode = new PowerNode("power-node"){{

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.util.EnumSet;
 
 import io.anuke.mindustry.entities.TileEntity;
@@ -8,6 +9,7 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockStat;
 
 public class PowerGenerator extends PowerDistributor{
+    /** The amount of power produced per tick. */
     public float powerProduction;
     public BlockStat generationType = BlockStat.basePowerGeneration;
 
@@ -20,7 +22,7 @@ public class PowerGenerator extends PowerDistributor{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(generationType, baseGeneration * 60f, StatUnit.powerSecond);
+        stats.add(generationType, powerProduction, StatUnit.powerSecond);
     }
 
     @Override

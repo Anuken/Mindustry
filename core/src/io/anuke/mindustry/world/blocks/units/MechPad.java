@@ -17,7 +17,6 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumePowerExact;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
@@ -37,6 +36,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 public class MechPad extends Block{
     protected Mech mech;
     protected float buildTime = 60 * 5;
+    protected float requiredSatisfaction = 1f;
 
     protected TextureRegion openRegion;
 
@@ -45,18 +45,19 @@ public class MechPad extends Block{
         update = true;
         solidifes = true;
         hasPower = true;
+        bufferedPowerConsumer = true;
     }
 
     @Override
     public void init(){
-        consumes.add(new ConsumePowerExact(powerCapacity * 0.8f));
         super.init();
     }
 
     @Override
     public void setStats(){
         super.setStats();
-        stats.remove(BlockStat.powerUse);
+        // TODO Verify for new power system
+        //stats.remove(BlockStat.powerUse);
     }
 
     @Override
@@ -66,10 +67,14 @@ public class MechPad extends Block{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void onMechFactoryTap(Player player, Tile tile){
-        if(player == null || !checkValidTap(tile, player)) return;
+        if(player == null || !checkValidTap(tile, player) || !(tile.block() instanceof MechPad)) return;
 
         MechFactoryEntity entity = tile.entity();
-        entity.power.amount = 0f;
+        MechPad pad = (MechPad)tile.block();
+
+        if(entity.power.satisfaction < pad.requiredSatisfaction) return;
+
+        entity.power.satisfaction -= Math.min(entity.power.satisfaction, pad.requiredSatisfaction);
         player.beginRespawning(entity);
     }
 
@@ -102,7 +107,7 @@ public class MechPad extends Block{
 
     protected static boolean checkValidTap(Tile tile, Player player){
         MechFactoryEntity entity = tile.entity();
-        return Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
+        return  Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
                 Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.cons.valid() && entity.player == null;
     }
 

@@ -51,29 +51,34 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
         if(liquid != null && entity.liquids.get(liquid) >= 0.001f && entity.cons.valid()){
             float powerPerLiquid = getLiquidEfficiency(liquid) * this.powerPerLiquid;
             float used = Math.min(entity.liquids.get(liquid), maxLiquidGenerate * entity.delta());
-            used = Math.min(used, (powerCapacity - entity.power.amount) / powerPerLiquid);
+            // TODO: Adapt to new power system
+            //used = Math.min(used, (powerCapacity - entity.power.amount) / powerPerLiquid);
 
             entity.liquids.remove(liquid, used);
-            entity.power.amount += used * powerPerLiquid;
+            // TODO: Adapt to new power system
+            //entity.power.amount += used * powerPerLiquid;
 
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
             }
         }else if(entity.cons.valid()){
 
-            float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * entity.delta()) * entity.efficiency;
+            // TODO: Adapt to new power system
+            //float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * entity.delta()) * entity.efficiency;
 
             if(entity.generateTime <= 0f && entity.items.total() > 0){
                 Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
                 Item item = entity.items.take();
-                entity.efficiency = getItemEfficiency(item);
+                // TODO: Adapt to new power system
+                //entity.efficiency = getItemEfficiency(item);
                 entity.explosiveness = item.explosiveness;
                 entity.generateTime = 1f;
             }
 
             if(entity.generateTime > 0f){
                 entity.generateTime -= 1f / itemDuration * entity.delta();
-                entity.power.amount += maxPower;
+                // TODO: Adapt to new power system
+                //entity.power.amount += maxPower;
                 entity.generateTime = Mathf.clamp(entity.generateTime);
 
                 if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){

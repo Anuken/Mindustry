@@ -51,7 +51,7 @@ public class ForceProjector extends Block {
         hasPower = true;
         canOverdrive = false;
         hasLiquids = true;
-        powerCapacity = 60f;
+        basePowerUse = 60f;
         hasItems = true;
         itemCapacity = 10;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).optional(true).update(false);
@@ -106,8 +106,9 @@ public class ForceProjector extends Block {
             }
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.1f);
-            float powerUse = Math.min(powerDamage * entity.delta() * (1f + entity.buildup / breakage), powerCapacity);
-            entity.power.amount -= powerUse;
+            // TODO Adapt power calculations to new power system
+//            float powerUse = Math.min(powerDamage * entity.delta() * (1f + entity.buildup / breakage), powerCapacity);
+//            entity.power.amount -= powerUse;
         }
 
         if(entity.buildup > 0){
@@ -144,11 +145,12 @@ public class ForceProjector extends Block {
                     Effects.effect(BulletFx.absorb, trait);
                     float hit = trait.getShieldDamage()*powerDamage;
                     entity.hit = 1f;
-                    entity.power.amount -= Math.min(hit, entity.power.amount);
-
-                    if(entity.power.amount <= 0.0001f){
-                        entity.buildup += trait.getShieldDamage() * entity.warmup*2f;
-                    }
+                    // TODO Adapt power calculations to new power system
+//                    entity.power.amount -= Math.min(hit, entity.power.amount);
+//
+//                    if(entity.power.amount <= 0.0001f){
+//                        entity.buildup += trait.getShieldDamage() * entity.warmup*2f;
+//                    }
                     entity.buildup += trait.getShieldDamage() * entity.warmup;
                 }
             });

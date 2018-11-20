@@ -33,7 +33,8 @@ import static io.anuke.mindustry.Vars.*;
 public class Reconstructor extends Block{
     protected float departTime = 30f;
     protected float arriveTime = 40f;
-    protected float powerPerTeleport = 5f;
+    /** Stores the percentage of buffered power to be used upon teleporting. */
+    protected float powerPerTeleport = 0.5f;
     protected Effect arriveEffect = Fx.spawn;
     protected TextureRegion openRegion;
 
@@ -43,13 +44,15 @@ public class Reconstructor extends Block{
         solidifes = true;
         hasPower = true;
         configurable = true;
+        basePowerUse = 30f; // capacity
+        bufferedPowerConsumer = true;
     }
 
     protected static boolean checkValidTap(Tile tile, ReconstructorEntity entity, Player player){
         return validLink(tile, entity.link) &&
                 Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
                 Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f &&
-                entity.current == null && entity.power.amount >= ((Reconstructor) tile.block()).powerPerTeleport;
+                entity.current == null && entity.power.satisfaction >= ((Reconstructor) tile.block()).powerPerTeleport;
     }
 
     protected static boolean validLink(Tile tile, int position){
@@ -74,13 +77,13 @@ public class Reconstructor extends Block{
     public static void reconstructPlayer(Player player, Tile tile){
         ReconstructorEntity entity = tile.entity();
 
-        if(!checkValidTap(tile, entity, player) || entity.power.amount < ((Reconstructor) tile.block()).powerPerTeleport)
+        if(!checkValidTap(tile, entity, player) || entity.power.satisfaction < ((Reconstructor) tile.block()).powerPerTeleport)
             return;
 
         entity.departing = true;
         entity.current = player;
         entity.solid = false;
-        entity.power.amount -= ((Reconstructor) tile.block()).powerPerTeleport;
+        entity.power.satisfaction -= Math.min(entity.power.satisfaction, ((Reconstructor) tile.block()).powerPerTeleport);
         entity.updateTime = 1f;
         entity.set(tile.drawx(), tile.drawy());
         player.rotation = 90f;
@@ -246,13 +249,13 @@ public class Reconstructor extends Block{
                 entity.updateTime -= Timers.delta() / departTime;
                 if(entity.updateTime <= 0f){
                     //no power? death.
-                    if(other.power.amount < powerPerTeleport){
+                    if(other.power.satisfaction < powerPerTeleport){
                         entity.current.setDead(true);
                         //entity.current.setRespawning(false);
                         entity.current = null;
                         return;
                     }
-                    other.power.amount -= powerPerTeleport;
+                    other.power.satisfaction -= Math.min(other.power.satisfaction, powerPerTeleport);
                     other.current = entity.current;
                     other.departing = false;
                     other.current.set(other.x, other.y);
@@ -276,8 +279,8 @@ public class Reconstructor extends Block{
 
             if(validLink(tile, entity.link)){
                 Tile other = world.tile(entity.link);
-                if(other.entity.power.amount >= powerPerTeleport && Units.anyEntities(tile, 4f, unit -> unit.getTeam() == entity.getTeam() && unit instanceof Player) &&
-                        entity.power.amount >= powerPerTeleport){
+                if(other.entity.power.satisfaction >= powerPerTeleport && Units.anyEntities(tile, 4f, unit -> unit.getTeam() == entity.getTeam() && unit instanceof Player) &&
+                        entity.power.satisfaction >= powerPerTeleport){
                     entity.solid = false;
                     stayOpen = true;
                 }

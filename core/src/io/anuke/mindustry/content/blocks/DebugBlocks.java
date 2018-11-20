@@ -40,7 +40,8 @@ public class DebugBlocks extends BlockList implements ContentList{
     public void load(){
         powerVoid = new PowerBlock("powervoid"){
             {
-                powerCapacity = Float.MAX_VALUE;
+                // TODO Adapt to new power system if necessary
+                basePowerUse = Float.MAX_VALUE;
                 shadow = "shadow-round-1";
             }
 
@@ -53,23 +54,23 @@ public class DebugBlocks extends BlockList implements ContentList{
             @Override
             public void init(){
                 super.init();
-                stats.remove(BlockStat.powerCapacity);
+                // TODO Adapt to new power system if necessary
+                //stats.remove(BlockStat.powerCapacity);
             }
         };
 
         powerInfinite = new PowerNode("powerinfinite"){
             {
-                powerCapacity = 10000f;
                 maxNodes = 100;
                 outputsPower = true;
                 consumesPower = false;
                 shadow = "shadow-round-1";
             }
 
+            // TODO Adapt to new power system if necessary
             @Override
-            public void update(Tile tile){
-                super.update(tile);
-                tile.entity.power.amount = powerCapacity;
+            public float getPowerProduction(Tile tile){
+                return 10000f;
             }
         };
 
