@@ -50,8 +50,8 @@ public class DistributionBlocks extends BlockList implements ContentList{
 
         massDriver = new MassDriver("mass-driver"){{
             size = 3;
-            itemCapacity = 80;
-            range = 340f;
+            itemCapacity = 60;
+            range = 440f;
         }};
     }
 }
