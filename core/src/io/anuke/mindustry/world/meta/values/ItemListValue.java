@@ -38,11 +38,11 @@ public class ItemListValue implements ContentStatValue{
     public void display(Table table){
         if(items != null){
             for(Item item : items){
-                table.add(new ItemDisplay(item));
+                table.add(new ItemDisplay(item)).padRight(5);
             }
         }else{
             for(ItemStack stack : stacks){
-                new ItemDisplay(stack.item, stack.amount);
+                table.add(new ItemDisplay(stack.item, stack.amount)).padRight(5);
             }
         }
     }
