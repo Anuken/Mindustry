@@ -25,8 +25,8 @@ public abstract class BaseBlock extends MappableContent{
 
     public boolean outputsLiquid = false;
     public boolean singleLiquid = true;
-    public boolean consumesPower;
-    public boolean outputsPower;
+    public boolean consumesPower = true;
+    public boolean outputsPower = false;
 
     public boolean bufferedPowerConsumer = false;
     /** In case of unbuffered consumers, this stores the amount of power which is required per tick in order to work at maximum efficiency.

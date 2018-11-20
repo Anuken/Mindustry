@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static io.anuke.mindustry.Vars.threads;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PowerTests{
@@ -60,32 +61,31 @@ public class PowerTests{
     void test_balancedPower(){
         PowerGraph powerGraph = new PowerGraph();
 
-        // Create one water extractor (5.4 power consumed)
+        // Create one water extractor (5.4 power/Second = 0.09/tick)
         Tile waterExtractorTile = createFakeTile(0, 0, (Floor)Blocks.sand, ProductionBlocks.waterExtractor);
         powerGraph.add(waterExtractorTile);
 
-        // Create 20 small solar panels (20*0.27=5.4 power produced)
+        // Create 20 small solar panels (20*0.27=5.4 power/second = 0.09/tick)
         List<Tile> solarPanelTiles = new LinkedList<>();
-        float producedPowerSum = 0.0f;
         for(int counter = 0; counter < 20; counter++){
             Tile solarPanelTile = createFakeTile( 2 + counter / 2, counter % 2, (Floor)Blocks.sand, PowerBlocks.solarPanel);
             powerGraph.add(solarPanelTile);
             solarPanelTiles.add(solarPanelTile);
         }
 
+        float powerNeeded = powerGraph.getPowerNeeded();
+        float powerProduced = powerGraph.getPowerProduced();
+
         // If these lines fail, you probably changed power production/consumption and need to adapt this test
+        // OR their implementation is corrupt.
         // TODO: Create fake blocks which are independent of such changes
-        powerGraph.update();
+        float epsilon = 0.00001f;
+        assertEquals(powerNeeded, 0.09f, epsilon);
+        assertEquals(powerProduced, 0.09f, epsilon);
+        // Note: The assertions above induce that powerNeeded = powerProduced (with floating point inaccuracy)
 
-        powerGraph.getPowerNeeded();
-        powerGraph.getPowerProduced();
-
-/*        if(powerNeeded > powerProduced){
-            powerProduced += useBatteries(powerNeeded - powerProduced);
-        }else if(powerProduced > powerNeeded){
-            powerProduced -= chargeBatteries(powerProduced - powerNeeded);
-        }
-
-        distributePower(powerNeeded, powerProduced);*/
+        // Distribute power and make sure the water extractor is powered
+        powerGraph.distributePower(powerNeeded, powerProduced);
+        assertEquals(waterExtractorTile.entity.power.satisfaction, 1.0f, epsilon);
     }
 }

@@ -109,10 +109,12 @@ public class PowerGraph{
         float powerNeeded = getPowerNeeded();
         float powerProduced = getPowerProduced();
 
-        if(powerNeeded > powerProduced){
-            powerProduced += useBatteries(powerNeeded - powerProduced);
-        }else if(powerProduced > powerNeeded){
-            powerProduced -= chargeBatteries(powerProduced - powerNeeded);
+        if(Math.abs(powerNeeded - powerProduced) > 0.0001f){
+            if(powerNeeded > powerProduced){
+                powerProduced += useBatteries(powerNeeded-powerProduced);
+            }else if(powerProduced > powerNeeded){
+                powerProduced -= chargeBatteries(powerProduced-powerNeeded);
+            }
         }
 
         distributePower(powerNeeded, powerProduced);
