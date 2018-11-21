@@ -110,17 +110,28 @@ project(":ios") {
                 include "**/*.java"
             }
 
-            into "ios/src/io/anuke/mindustry/gen"
+            into "core/src/io/anuke/mindustry/gen"
         }
 
         doFirst{
             delete{
-                delete "ios/src/io/anuke/mindustry/gen/"
+                delete "core/src/io/anuke/mindustry/gen/"
             }
         }
     }
 
-    //build.dependsOn(copyGen)
+    task incrementConfig{
+        def vfile = file('robovm.properties')
+
+        def props = new Properties()
+        props.load(new FileInputStream(vfile))
+
+        props['app.build'] = (props['app.build'].toInteger() + 1)+""
+        props.store(vfile.newWriter(), null)
+    }
+
+    build.dependsOn(incrementConfig)
+    build.dependsOn(copyGen)
 
     dependencies {
         compile project(":core")
