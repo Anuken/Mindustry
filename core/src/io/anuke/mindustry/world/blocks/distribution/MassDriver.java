@@ -61,6 +61,7 @@ public class MassDriver extends Block{
         layer = Layer.turret;
         hasPower = true;
         consumes.powerBuffered(30f);
+        consumes.require(ConsumePower.class);
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
@@ -131,10 +132,7 @@ public class MassDriver extends Block{
     public void setStats(){
         super.setStats();
 
-        if(!consumes.has(ConsumePower.class) || !consumes.get(ConsumePower.class).isBuffered){
-            throw new RuntimeException("Mass Driver did not have a buffered power consumer object attached.");
-        }
-        stats.add(BlockStat.powerShot, consumes.get(ConsumePower.class).powerCapacity, StatUnit.powerUnits);
+        stats.add(BlockStat.powerShot, consumes.get(ConsumePower.class).powerCapacity * powerPercentageUsed, StatUnit.powerUnits);
     }
 
     @Override
