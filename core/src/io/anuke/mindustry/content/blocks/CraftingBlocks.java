@@ -38,7 +38,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             fluxNeeded = 2;
 
             consumes.items(new ItemStack[]{new ItemStack(Items.copper, 1), new ItemStack(Items.lead, 2)});
-            basePowerUse = 0.1f;
+            consumes.powerDirect(0.1f);
         }};
 
         siliconsmelter = new PowerSmelter("silicon-smelter"){{
@@ -51,7 +51,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             flameColor = Color.valueOf("ffef99");
 
             consumes.items(new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2)});
-            basePowerUse = 0.05f;
+            consumes.powerDirect(0.05f);
         }};
 
         plastaniumCompressor = new PlastaniumCompressor("plastanium-compressor"){{
@@ -67,7 +67,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             updateEffect = BlockFx.plasticburn;
 
             consumes.liquid(Liquids.oil, 0.25f);
-            basePowerUse = 0.3f;
+            consumes.powerDirect(0.3f);
             consumes.item(Items.titanium, 2);
         }};
 
@@ -78,7 +78,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             size = 2;
 
             consumes.items(new ItemStack[]{new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10)});
-            basePowerUse = 0.5f;
+            consumes.powerDirect(0.5f);
         }};
 
         alloySmelter = new PowerSmelter("alloy-smelter"){{
@@ -90,7 +90,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             useFlux = true;
             fluxNeeded = 3;
 
-            basePowerUse = 0.4f;
+            consumes.powerDirect(0.4f);
             consumes.items(new ItemStack[]{new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 3)});
         }};
 
@@ -101,7 +101,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             size = 2;
             hasPower = true;
 
-            basePowerUse = 0.1f;
+            consumes.powerDirect(0.1f);
             consumes.item(Items.titanium);
             consumes.liquid(Liquids.water, 0.3f);
         }};
@@ -116,7 +116,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
 
             consumes.liquid(Liquids.oil, 0.05f);
             consumes.item(Items.pyratite, 1);
-            basePowerUse = 0.04f;
+            consumes.powerDirect(0.04f);
         }};
 
         pyratiteMixer = new PowerSmelter("pyratite-mixer"){{
@@ -128,7 +128,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
 
             size = 2;
 
-            basePowerUse = 0.02f;
+            consumes.powerDirect(0.02f);
             consumes.items(new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.lead, 2), new ItemStack(Items.sand, 2)});
         }};
 
@@ -140,7 +140,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             craftTime = 10f;
             hasLiquids = hasPower = true;
 
-            basePowerUse = 0.1f;
+            consumes.powerDirect(0.1f);
             consumes.item(Items.stone, 2);
         }};
 
@@ -185,7 +185,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             size = 2;
 
             consumes.item(Items.stone, 2);
-            basePowerUse = 0.2f;
+            consumes.powerDirect(0.2f);
             consumes.liquid(Liquids.water, 0.5f);
         }};
 
@@ -200,7 +200,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             hasLiquids = true;
 
             consumes.item(Items.biomatter, 1);
-            basePowerUse = 0.06f;
+            consumes.powerDirect(0.06f);
         }};
 
         pulverizer = new Pulverizer("pulverizer"){{
@@ -213,7 +213,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             hasItems = hasPower = true;
 
             consumes.item(Items.stone, 1);
-            basePowerUse = 0.05f;
+            consumes.powerDirect(0.05f);
         }};
 
         solidifier = new GenericCrafter("solidifer"){{

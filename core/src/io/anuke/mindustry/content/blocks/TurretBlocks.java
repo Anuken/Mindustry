@@ -103,7 +103,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             reload = 100f;
             cooldown = 0.03f;
             powerUsed = 1 / 3f;
-            basePowerUse = 60f; // capacity
+            consumes.powerBuffered(60f);
             shootShake = 2f;
             shootEffect = ShootFx.lancerLaserShoot;
             smokeEffect = ShootFx.lancerLaserShootSmoke;
@@ -122,7 +122,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             shootCone = 40f;
             rotatespeed = 8f;
             powerUsed = 7 / 30f;
-            basePowerUse = 30f; // capacity
+            consumes.powerBuffered(30f);
             range = 150f;
             shootEffect = ShootFx.lightningShoot;
             heatColor = Color.RED;
@@ -256,7 +256,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             size = 4;
             shootShake = 2f;
             powerUsed = 0.5f;
-            basePowerUse = 120f; // capacity
+            consumes.powerBuffered(120f);
             range = 160f;
             reload = 200f;
             firingMoveFract = 0.1f;

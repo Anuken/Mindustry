@@ -41,7 +41,7 @@ public class DebugBlocks extends BlockList implements ContentList{
         powerVoid = new PowerBlock("powervoid"){
             {
                 // TODO Adapt to new power system if necessary
-                basePowerUse = Float.MAX_VALUE;
+                consumes.powerDirect(Float.MAX_VALUE);
                 shadow = "shadow-round-1";
             }
 

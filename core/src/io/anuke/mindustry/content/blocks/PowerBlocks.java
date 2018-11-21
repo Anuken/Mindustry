@@ -62,12 +62,12 @@ public class PowerBlocks extends BlockList implements ContentList{
         }};
 
         battery = new Battery("battery"){{
-            basePowerUse = 320f;
+            consumes.powerBuffered(320f, 120f);
         }};
 
         batteryLarge = new Battery("battery-large"){{
             size = 3;
-            basePowerUse = 2000f;
+            consumes.powerBuffered(2000f, 600f);
         }};
 
         powerNode = new PowerNode("power-node"){{

@@ -45,7 +45,6 @@ public class MechPad extends Block{
         update = true;
         solidifes = true;
         hasPower = true;
-        bufferedPowerConsumer = true;
     }
 
     @Override

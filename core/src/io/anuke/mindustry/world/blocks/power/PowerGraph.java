@@ -1,10 +1,15 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.Consume;
+import io.anuke.mindustry.world.consumers.ConsumePower;
+import io.anuke.mindustry.world.consumers.ConsumePowerBuffered;
+import io.anuke.mindustry.world.consumers.Consumers;
 
 import static io.anuke.mindustry.Vars.threads;
 
@@ -42,10 +47,9 @@ public class PowerGraph{
     public float getPowerNeeded(){
         float powerNeeded = 0f;
         for(Tile consumer : consumers){
-            if(consumer.block().bufferedPowerConsumer){
-                powerNeeded += (1f - consumer.entity.power.satisfaction) * consumer.block().basePowerUse;
-            }else{
-                powerNeeded += consumer.block().basePowerUse + consumer.entity.power.extraUse;
+            Consumers consumes = consumer.block().consumes;
+            if(consumes.hasSubclassOf(ConsumePower.class)){
+                powerNeeded += consumes.getFirstSubclassOf(ConsumePower.class).requestedPower(consumer.block(), consumer.entity);
             }
         }
         return powerNeeded;
@@ -54,7 +58,10 @@ public class PowerGraph{
     public float getBatteryStored(){
         float totalAccumulator = 0f;
         for(Tile battery : batteries){
-            totalAccumulator += battery.entity.power.satisfaction * battery.block().basePowerUse;
+            Consumers consumes = battery.block().consumes;
+            if(consumes.hasSubclassOf(ConsumePowerBuffered.class)){
+                totalAccumulator += battery.entity.power.satisfaction * consumes.getFirstSubclassOf(ConsumePowerBuffered.class).powerCapacity;
+            }
         }
         return totalAccumulator;
     }
@@ -62,23 +69,30 @@ public class PowerGraph{
     public float getBatteryCapacity(){
         float totalCapacity = 0f;
         for(Tile battery : batteries){
-            totalCapacity += (1f - battery.entity.power.satisfaction) * battery.block().basePowerUse;
+            Consumers consumes = battery.block().consumes;
+            if(consumes.hasSubclassOf(ConsumePower.class)){
+                totalCapacity += consumes.getFirstSubclassOf(ConsumePower.class).requestedPower(battery.block(), battery.entity);
+            }
         }
         return totalCapacity;
     }
 
     public float useBatteries(float needed){
         float stored = getBatteryStored();
+        if(MathUtils.isEqual(stored, 0f)){ return 0f; }
+
         float used = Math.min(stored, needed);
-        float thing = 1f - (used / stored);
+        float percentageRemaining = 1f - (used / stored);
         for(Tile battery : batteries){
-            battery.entity.power.satisfaction *= thing;
+            battery.entity.power.satisfaction *= percentageRemaining;
         }
         return used;
     }
 
     public float chargeBatteries(float excess){
         float capacity = getBatteryCapacity();
+        if(MathUtils.isEqual(capacity, 0f)){ return 0f; }
+
         float thing = Math.min(1, excess / capacity);
         for(Tile battery : batteries){
             battery.entity.power.satisfaction += (1 - battery.entity.power.satisfaction) * thing;
@@ -87,14 +101,14 @@ public class PowerGraph{
     }
 
     public void distributePower(float needed, float produced){
-        if(needed == 0f){ return; }
+        if(MathUtils.isEqual(needed,0f)){ return; }
 
-        float satisfaction = Math.min(1, produced / needed);
+        float coverage = Math.min(1, produced / needed);
         for(Tile consumer : consumers){
-            if(consumer.block().bufferedPowerConsumer){
-                consumer.entity.power.satisfaction += (1 - consumer.entity.power.satisfaction) * satisfaction;
+            if(consumer.block().consumes.hasSubclassOf(ConsumePowerBuffered.class)){
+                consumer.entity.power.satisfaction += (1 - consumer.entity.power.satisfaction) * coverage;
             }else{
-                consumer.entity.power.satisfaction = satisfaction;
+                consumer.entity.power.satisfaction = coverage;
             }
         }
     }
@@ -109,11 +123,11 @@ public class PowerGraph{
         float powerNeeded = getPowerNeeded();
         float powerProduced = getPowerProduced();
 
-        if(Math.abs(powerNeeded - powerProduced) > 0.0001f){
+        if(!MathUtils.isEqual(powerNeeded, powerProduced)){
             if(powerNeeded > powerProduced){
-                powerProduced += useBatteries(powerNeeded-powerProduced);
+                powerProduced += useBatteries(powerNeeded - powerProduced);
             }else if(powerProduced > powerNeeded){
-                powerProduced -= chargeBatteries(powerProduced-powerNeeded);
+                powerProduced -= chargeBatteries(powerProduced - powerNeeded);
             }
         }
 
@@ -141,7 +155,7 @@ public class PowerGraph{
 
     public void clear(){
         for(Tile other : all){
-            if(other.entity != null && other.entity.power != null) other.entity.power.graph = null;
+            if(other.entity != null && other.entity.power != null){ other.entity.power.graph = null; }
         }
         all.clear();
         producers.clear();
@@ -171,7 +185,7 @@ public class PowerGraph{
         closedSet.clear();
 
         for(Tile other : tile.block().getPowerConnections(tile, outArray1)){
-            if(other.entity.power == null || other.entity.power.graph != null) continue;
+            if(other.entity.power == null || other.entity.power.graph != null){ continue; }
             PowerGraph graph = new PowerGraph();
             queue.clear();
             queue.addLast(other);
@@ -192,12 +206,12 @@ public class PowerGraph{
     @Override
     public String toString(){
         return "PowerGraph{" +
-        "producers=" + producers +
-        ", consumers=" + consumers +
-        ", batteries=" + batteries +
-        ", all=" + all +
-        ", lastFrameUpdated=" + lastFrameUpdated +
-        ", graphID=" + graphID +
-        '}';
+                "producers=" + producers +
+                ", consumers=" + consumers +
+                ", batteries=" + batteries +
+                ", all=" + all +
+                ", lastFrameUpdated=" + lastFrameUpdated +
+                ", graphID=" + graphID +
+                '}';
     }
 }

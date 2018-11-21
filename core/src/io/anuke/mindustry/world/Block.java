@@ -20,6 +20,7 @@ import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.world.consumers.ConsumePowerBuffered;
 import io.anuke.mindustry.world.meta.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -330,17 +331,16 @@ public class Block extends BaseBlock {
 
         consumes.forEach(cons -> cons.display(stats));
 
-        if(hasPower){
-            if(bufferedPowerConsumer) stats.add(BlockStat.powerCapacity, basePowerUse, StatUnit.powerUnits);
-            else stats.add(BlockStat.powerUse, basePowerUse * 60, StatUnit.powerUnits);
-        }
+        // Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
     }
 
     //TODO make this easier to config.
     public void setBars(){
-        if(bufferedPowerConsumer) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.satisfaction));
+        if(consumes.has(ConsumePowerBuffered.class)){
+            bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.satisfaction));
+        }
         if(hasLiquids)
             bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
         if(hasItems)
@@ -406,8 +406,8 @@ public class Block extends BaseBlock {
             explosiveness += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
         }
 
-        if(bufferedPowerConsumer){
-            power += tile.entity.power.satisfaction * tile.block().basePowerUse;
+        if(consumes.has(ConsumePowerBuffered.class)){
+            power += tile.entity.power.satisfaction * consumes.get(ConsumePowerBuffered.class).powerCapacity;
         }
 
         tempColor.mul(1f / units);

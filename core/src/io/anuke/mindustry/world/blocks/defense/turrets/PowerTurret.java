@@ -13,8 +13,6 @@ public abstract class PowerTurret extends CooledTurret{
     public PowerTurret(String name){
         super(name);
         hasPower = true;
-        // TODO Verify for new power system
-        bufferedPowerConsumer = true;
     }
 
     @Override
@@ -26,7 +24,6 @@ public abstract class PowerTurret extends CooledTurret{
 
     @Override
     public boolean hasAmmo(Tile tile){
-        // TODO Verify for new power system
         // Allow shooting as long as the turret is at least at 50% power
         return tile.entity.power.satisfaction >= powerUsed;
     }

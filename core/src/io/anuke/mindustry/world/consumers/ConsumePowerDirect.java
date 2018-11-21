@@ -14,14 +14,6 @@ public class ConsumePowerDirect extends ConsumePower{
     protected final float minimumSatisfaction;
 
     /**
-     * Makes the owner consume powerPerTick each tick and disables it unless 60% of that power is being supplied.
-     * @param powerPerTick The maximum amount of power which is required per tick for 100% efficiency.
-     */
-    public ConsumePowerDirect(float powerPerTick){
-        this(powerPerTick, 0.75f);
-    }
-
-    /**
      * Makes the owner consume powerPerTick each tick and disables it unless minimumSatisfaction (1.0 = 100%) of that power is being supplied.
      * @param powerPerTick The maximum amount of power which is required per tick for 100% efficiency.
      * @param minimumSatisfaction The percentage of powerPerTick which must be available for the module to work.

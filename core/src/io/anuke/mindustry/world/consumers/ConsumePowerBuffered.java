@@ -11,7 +11,7 @@ import io.anuke.mindustry.world.meta.StatUnit;
 /** Consumer class for blocks which directly consume power without buffering it. */
 public class ConsumePowerBuffered extends ConsumePower{
     /** The maximum power capacity in power units. */
-    protected final float powerCapacity;
+    public final float powerCapacity;
 
     /**
      * Adds a power buffer to the owner which takes ticksToFill number of ticks to be filled.

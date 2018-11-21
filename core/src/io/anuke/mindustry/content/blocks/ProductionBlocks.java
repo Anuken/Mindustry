@@ -38,7 +38,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             updateEffect = BlockFx.pulverizeMedium;
             drillEffect = BlockFx.mineBig;
 
-            basePowerUse = 0.11f;
+            consumes.powerDirect(0.11f);
         }};
 
         blastDrill = new Drill("blast-drill"){{
@@ -53,7 +53,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
 
-            basePowerUse = 0.3f;
+            consumes.powerDirect(0.3f);
         }};
 
         plasmaDrill = new Drill("plasma-drill"){{
@@ -70,7 +70,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             drillEffect = BlockFx.mineHuge;
             warmupSpeed = 0.005f;
 
-            basePowerUse = 0.7f;
+            consumes.powerDirect(0.7f);
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
@@ -80,7 +80,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             liquidCapacity = 30f;
             rotateSpeed = 1.4f;
 
-            basePowerUse = 0.09f;
+            consumes.powerDirect(0.09f);
         }};
 
         oilExtractor = new Fracker("oil-extractor"){{
@@ -93,7 +93,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             liquidCapacity = 30f;
 
             consumes.item(Items.sand);
-            basePowerUse = 0.3f;
+            consumes.powerDirect(0.3f);
             consumes.liquid(Liquids.water, 0.15f);
         }};
 
@@ -104,7 +104,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             hasLiquids = true;
             hasPower = true;
 
-            basePowerUse = 0.08f;
+            consumes.powerDirect(0.08f);
             consumes.liquid(Liquids.water, 0.2f);
         }};
 
