@@ -2,7 +2,7 @@ package io.anuke.mindustry.net;
 
 import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.mindustry.game.Version;
-import io.anuke.ucore.io.IOUtils;
+import io.anuke.mindustry.io.TypeIO;
 import io.anuke.ucore.util.Bundles;
 
 import java.nio.ByteBuffer;
@@ -65,6 +65,7 @@ public class Packets{
 
     public static class ConnectPacket implements Packet{
         public int version;
+        public String versionType;
         public String name, uuid, usid;
         public boolean mobile;
         public int color;
@@ -72,8 +73,9 @@ public class Packets{
         @Override
         public void write(ByteBuffer buffer){
             buffer.putInt(Version.build);
-            IOUtils.writeString(buffer, name);
-            IOUtils.writeString(buffer, usid);
+            TypeIO.writeString(buffer, versionType);
+            TypeIO.writeString(buffer, name);
+            TypeIO.writeString(buffer, usid);
             buffer.put(mobile ? (byte) 1 : 0);
             buffer.putInt(color);
             buffer.put(Base64Coder.decode(uuid));
@@ -82,8 +84,9 @@ public class Packets{
         @Override
         public void read(ByteBuffer buffer){
             version = buffer.getInt();
-            name = IOUtils.readString(buffer);
-            usid = IOUtils.readString(buffer);
+            versionType = TypeIO.readString(buffer);
+            name = TypeIO.readString(buffer);
+            usid = TypeIO.readString(buffer);
             mobile = buffer.get() == 1;
             color = buffer.getInt();
             byte[] idbytes = new byte[8];

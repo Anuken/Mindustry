@@ -19,7 +19,7 @@ allprojects {
     version = 'release'
 
     ext {
-        versionNumber = '4.0'
+        versionNumber = '4'
         versionModifier = 'alpha'
         versionType = 'official'
         appName = 'Mindustry'
@@ -124,9 +124,16 @@ project(":ios") {
         def vfile = file('robovm.properties')
 
         def props = new Properties()
-        props.load(new FileInputStream(vfile))
+        if(vfile.exists()){
+            props.load(new FileInputStream(vfile))
+        }
 
-        props['app.build'] = (props['app.build'].toInteger() + 1)+""
+        props['app.id'] = 'io.anuke.mindustry'
+        props['app.version'] = '4.0'
+        props['app.mainclass'] = 'io.anuke.mindustry.IOSLauncher'
+        props['app.executable'] = 'IOSLauncher'
+        props['app.name'] = 'Mindustry'
+        props['app.build'] = (!props.hasProperty("app.build") ? 40 : props['app.build'].toInteger() + 1)+""
         props.store(vfile.newWriter(), null)
     }
 
