@@ -6,9 +6,7 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.consumers.ConsumePower;
-import io.anuke.mindustry.world.consumers.ConsumePowerBuffered;
 import io.anuke.mindustry.world.consumers.Consumers;
 
 import static io.anuke.mindustry.Vars.threads;
@@ -48,8 +46,8 @@ public class PowerGraph{
         float powerNeeded = 0f;
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
-            if(consumes.hasSubclassOf(ConsumePower.class)){
-                powerNeeded += consumes.getFirstSubclassOf(ConsumePower.class).requestedPower(consumer.block(), consumer.entity);
+            if(consumes.has(ConsumePower.class)){
+                powerNeeded += consumes.get(ConsumePower.class).requestedPower(consumer.block(), consumer.entity);
             }
         }
         return powerNeeded;
@@ -59,8 +57,8 @@ public class PowerGraph{
         float totalAccumulator = 0f;
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
-            if(consumes.hasSubclassOf(ConsumePowerBuffered.class)){
-                totalAccumulator += battery.entity.power.satisfaction * consumes.getFirstSubclassOf(ConsumePowerBuffered.class).powerCapacity;
+            if(consumes.has(ConsumePower.class)){
+                totalAccumulator += battery.entity.power.satisfaction * consumes.get(ConsumePower.class).powerCapacity;
             }
         }
         return totalAccumulator;
@@ -70,8 +68,8 @@ public class PowerGraph{
         float totalCapacity = 0f;
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
-            if(consumes.hasSubclassOf(ConsumePower.class)){
-                totalCapacity += consumes.getFirstSubclassOf(ConsumePower.class).requestedPower(battery.block(), battery.entity);
+            if(consumes.has(ConsumePower.class)){
+                totalCapacity += consumes.get(ConsumePower.class).requestedPower(battery.block(), battery.entity);
             }
         }
         return totalCapacity;
@@ -105,7 +103,8 @@ public class PowerGraph{
 
         float coverage = Math.min(1, produced / needed);
         for(Tile consumer : consumers){
-            if(consumer.block().consumes.hasSubclassOf(ConsumePowerBuffered.class)){
+            Consumers consumes = consumer.block().consumes;
+            if(consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
                 consumer.entity.power.satisfaction += (1 - consumer.entity.power.satisfaction) * coverage;
             }else{
                 consumer.entity.power.satisfaction = coverage;

@@ -20,7 +20,7 @@ import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.world.consumers.ConsumePowerBuffered;
+import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.*;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -338,7 +338,7 @@ public class Block extends BaseBlock {
 
     //TODO make this easier to config.
     public void setBars(){
-        if(consumes.has(ConsumePowerBuffered.class)){
+        if(consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
             bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.satisfaction));
         }
         if(hasLiquids)
@@ -406,8 +406,8 @@ public class Block extends BaseBlock {
             explosiveness += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
         }
 
-        if(consumes.has(ConsumePowerBuffered.class)){
-            power += tile.entity.power.satisfaction * consumes.get(ConsumePowerBuffered.class).powerCapacity;
+        if(consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
+            power += tile.entity.power.satisfaction * consumes.get(ConsumePower.class).powerCapacity;
         }
 
         tempColor.mul(1f / units);

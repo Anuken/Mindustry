@@ -51,7 +51,7 @@ public class Consumers{
      * @return the created consumer object.
      */
     public ConsumePower powerDirect(float powerPerTick, float minimumSatisfaction){
-        ConsumePower c = new ConsumePowerDirect(powerPerTick, minimumSatisfaction);
+        ConsumePower c = ConsumePower.consumePowerDirect(powerPerTick, minimumSatisfaction);
         add(c);
         return c;
     }
@@ -72,7 +72,7 @@ public class Consumers{
      * @param ticksToFill   The number of ticks it shall take to fill the buffer.
      */
     public ConsumePower powerBuffered(float powerCapacity, float ticksToFill){
-        ConsumePower c = new ConsumePowerBuffered(powerCapacity, ticksToFill);
+        ConsumePower c = ConsumePower.consumePowerBuffered(powerCapacity, ticksToFill);
         add(c);
         return c;
     }
@@ -122,29 +122,11 @@ public class Consumers{
         return map.containsKey(type);
     }
 
-    public boolean hasSubclassOf(Class<? extends Consume> type){
-        for(Consume consume : all()){
-            if(type.isAssignableFrom(consume.getClass())){
-                return true;
-            }
-        }
-        return false;
-    }
-
     public <T extends Consume> T get(Class<T> type){
         if(!map.containsKey(type)){
             throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "'!");
         }
         return (T) map.get(type);
-    }
-
-    public <T extends Consume> T getFirstSubclassOf(Class<T> type){
-        for(Consume consume : all()){
-            if(type.isAssignableFrom(consume.getClass())){
-                return (T)consume;
-            }
-        }
-        throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "' (subclasses included)!");
     }
 
     public Iterable<Consume> all(){

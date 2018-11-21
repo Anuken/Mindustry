@@ -19,7 +19,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumePowerBuffered;
+import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Effects;
@@ -131,10 +131,10 @@ public class MassDriver extends Block{
     public void setStats(){
         super.setStats();
 
-        if(!consumes.hasSubclassOf(ConsumePowerBuffered.class)){
+        if(!consumes.has(ConsumePower.class) || !consumes.get(ConsumePower.class).isBuffered){
             throw new RuntimeException("Mass Driver did not have a buffered power consumer object attached.");
         }
-        stats.add(BlockStat.powerShot, consumes.getFirstSubclassOf(ConsumePowerBuffered.class).powerCapacity, StatUnit.powerUnits);
+        stats.add(BlockStat.powerShot, consumes.get(ConsumePower.class).powerCapacity, StatUnit.powerUnits);
     }
 
     @Override

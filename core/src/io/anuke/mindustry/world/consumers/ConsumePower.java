@@ -9,12 +9,40 @@ import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatUnit;
 
 /** Consumer class for blocks which consume power while being connected to a power graph. */
-public abstract class ConsumePower extends Consume{
+public class ConsumePower extends Consume{
     /** The maximum amount of power which can be processed per tick. This might influence efficiency or load a buffer. */
     protected final float powerPerTick;
+    /** The minimum power satisfaction (fraction of powerPerTick) which must be achieved before the module may work. */
+    protected final float minimumSatisfaction;
+    /** The maximum power capacity in power units. */
+    public final float powerCapacity;
+    /** True if the module can store power. */
+    public final boolean isBuffered;
 
-    public ConsumePower(float powerPerTick){
+    protected ConsumePower(float powerPerTick, float minimumSatisfaction, float powerCapacity, boolean isBuffered){
         this.powerPerTick = powerPerTick;
+        this.minimumSatisfaction = minimumSatisfaction;
+        this.powerCapacity = powerCapacity;
+        this.isBuffered = isBuffered;
+    }
+
+    /**
+     * Makes the owner consume powerPerTick each tick and disables it unless minimumSatisfaction (1.0 = 100%) of that power is being supplied.
+     * @param powerPerTick The maximum amount of power which is required per tick for 100% efficiency.
+     * @param minimumSatisfaction The percentage of powerPerTick which must be available for the module to work.
+     */
+    public static ConsumePower consumePowerBuffered(float powerPerTick, float minimumSatisfaction){
+        return new ConsumePower(powerPerTick, minimumSatisfaction, 0.0f, true);
+    }
+
+    /**
+     * Adds a power buffer to the owner which takes ticksToFill number of ticks to be filled.
+     * Note that this object does not remove power from the buffer.
+     * @param powerCapacity The maximum capacity in power units.
+     * @param ticksToFill   The number of ticks it shall take to fill the buffer.
+     */
+    public static ConsumePower consumePowerDirect(float powerCapacity, float ticksToFill){
+        return new ConsumePower(powerCapacity / ticksToFill, 0.0f, powerCapacity, false);
     }
 
     @Override
@@ -32,8 +60,24 @@ public abstract class ConsumePower extends Consume{
         // Nothing to do since PowerGraph directly updates entity.power.satisfaction
     }
 
-    // valid(...) is implemented in subclass
-    // display(...) is implemented in subclass
+    @Override
+    public boolean valid(Block block, TileEntity entity){
+        if(isBuffered){
+            // TODO - Verify: It might be necessary to know about the power required per shot/event here.
+            return true;
+        }else{
+            return entity.power.satisfaction >= minimumSatisfaction;
+        }
+    }
+
+    @Override
+    public void display(BlockStats stats){
+        if(isBuffered){
+            stats.add(BlockStat.powerCapacity, powerCapacity, StatUnit.powerSecond);
+        }else{
+            stats.add(BlockStat.powerUse, powerPerTick * 60f, StatUnit.powerSecond);
+        }
+    }
 
     /**
      * Retrieves the amount of power which is requested for the given block and entity.
@@ -45,4 +89,6 @@ public abstract class ConsumePower extends Consume{
         // TODO Is it possible to make the block not consume power while items/liquids are missing?
         return powerPerTick;
     }
+
+
 }
