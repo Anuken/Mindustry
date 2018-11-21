@@ -45,7 +45,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 3600;
             size = 3;
             consumes.power(0.2f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 30), new ItemStack(Items.plastanium, 20)});
+            consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 30), new ItemStack(Items.plastanium, 20));
         }};
 
         revenantFactory = new UnitFactory("revenant-factory"){{
@@ -53,7 +53,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 8000;
             size = 4;
             consumes.power(0.3f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 80), new ItemStack(Items.titanium, 80), new ItemStack(Items.plastanium, 50)});
+            consumes.items(new ItemStack(Items.silicon, 80), new ItemStack(Items.titanium, 80), new ItemStack(Items.plastanium, 50));
         }};
 
         daggerFactory = new UnitFactory("dagger-factory"){{
@@ -69,7 +69,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 3400;
             size = 3;
             consumes.power(0.15f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 20), new ItemStack(Items.thorium, 30)});
+            consumes.items(new ItemStack(Items.silicon, 20), new ItemStack(Items.thorium, 30));
         }};
 
         fortressFactory = new UnitFactory("fortress-factory"){{
@@ -77,7 +77,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 5000;
             size = 3;
             consumes.power(0.2f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 40), new ItemStack(Items.thorium, 50)});
+            consumes.items(new ItemStack(Items.silicon, 40), new ItemStack(Items.thorium, 50));
         }};
 
         repairPoint = new RepairPoint("repair-point"){{
