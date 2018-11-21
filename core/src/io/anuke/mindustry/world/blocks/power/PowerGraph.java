@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Timers;
 
 import static io.anuke.mindustry.Vars.threads;
 
@@ -30,11 +31,34 @@ public class PowerGraph{
         return graphID;
     }
 
+    public static class PowerAmountInfo {
+        public float ts;
+        public float produce;
+        public float consume;
+        public float buffer;
+        public float avgProduce;
+        public float avgConsume;
+
+        public void update() {
+            float dt = Timers.delta();
+            if (ts + dt > 60) {
+                avgProduce = produce * 60F / ts;
+                avgConsume = consume * 60F / ts;
+                produce = 0;
+                consume = 0;
+                ts = 0;
+            }
+            ts += dt;
+        }
+    }
+    //private Array<PowerAmountInfo> history;
+    transient public PowerAmountInfo lastAmountInfo = new PowerAmountInfo();
+
     public void update(){
         if(threads.getFrameID() == lastFrameUpdated || consumers.size == 0 || producers.size == 0){
             return;
         }
-
+        lastAmountInfo.update();
         lastFrameUpdated = threads.getFrameID();
 
         boolean charge = false;
@@ -59,6 +83,8 @@ public class PowerGraph{
             }
         }
 
+        lastAmountInfo.buffer = bufferInput;
+
         if(maxOutput < totalInput){
             charge = true;
         }
@@ -82,7 +108,9 @@ public class PowerGraph{
                 }
                 continue;
             }
-            producer.entity.power.amount -= producer.entity.power.amount * inputUsed;
+            float used = producer.entity.power.amount * inputUsed;
+            producer.entity.power.amount -= used;
+            lastAmountInfo.produce += used;
         }
 
         float outputSatisfied = charge ? 1f : Math.min((totalInput + bufferInput) / maxOutput, 1f);
@@ -93,7 +121,9 @@ public class PowerGraph{
                 }
                 continue;
             }
-            consumer.entity.power.amount += (consumer.block().powerCapacity - consumer.entity.power.amount) * outputSatisfied;
+            float used = (consumer.block().powerCapacity - consumer.entity.power.amount) * outputSatisfied;
+            consumer.entity.power.amount += used;
+            lastAmountInfo.consume += used;
         }
     }
 

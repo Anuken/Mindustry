@@ -170,6 +170,7 @@ public abstract class InputHandler extends InputAdapter{
         tile = tile.target();
 
         boolean consumed = false, showedInventory = false, showedConsume = false;
+        boolean showPower = false;
 
         //check if tapped block is configurable
         if(tile.block().configurable && tile.getTeam() == player.getTeam()){
@@ -206,10 +207,17 @@ public abstract class InputHandler extends InputAdapter{
                 consumed = true;
                 showedInventory = true;
             }
+            if (tile.block().outputsPower && tile.block().consumesPower) {
+                frag.power.show(tile);
+                showPower = true;
+            }
         }
 
         if(!showedInventory){
             frag.inv.hide();
+        }
+        if (!showPower) {
+            frag.power.hide();
         }
 
         if(!consumed && player.isBuilding()){

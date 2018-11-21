@@ -11,6 +11,8 @@ public class OverlayFragment extends Fragment{
     public final BlockConfigFragment config;
     public final BlockConsumeFragment consume;
 
+    public final PowerInfoFragment power;
+
     private Group group = new Group();
     private InputHandler input;
 
@@ -20,6 +22,7 @@ public class OverlayFragment extends Fragment{
         inv = new BlockInventoryFragment(input);
         config = new BlockConfigFragment(input);
         consume = new BlockConsumeFragment();
+        power = new PowerInfoFragment();
     }
 
     @Override
@@ -30,6 +33,7 @@ public class OverlayFragment extends Fragment{
         inv.build(group);
         config.build(group);
         consume.build(group);
+        power.build(group);
 
         //input.buildUI(group);
     }
