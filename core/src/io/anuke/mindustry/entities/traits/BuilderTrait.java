@@ -236,7 +236,7 @@ public interface BuilderTrait extends Entity{
         Tile tile = getMineTile();
         TileEntity core = unit.getClosestCore();
 
-        if(core == null || tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance || !unit.inventory.canAcceptItem(tile.floor().drops.item)){
+        if(core == null || tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance || tile.floor().drops == null || !unit.inventory.canAcceptItem(tile.floor().drops.item)){
             setMineTile(null);
         }else{
             Item item = tile.floor().drops.item;

@@ -6,10 +6,10 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.scene.event.HandCursorListener;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.ScrollPane;
+import io.anuke.ucore.scene.ui.Tooltip;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.UIUtils;
 
@@ -65,7 +65,10 @@ public class UnlocksDialog extends FloatingDialog{
 
                     if(control.unlocks.isUnlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));
-                        StatValue.addToolTip(image, unlock);
+                        image.addListener(new Tooltip<>(new Table("clear"){{
+                            add(unlock.localizedName());
+                            margin(4);
+                        }}));
                     }
 
                     if((++count) % maxWidth == 0){

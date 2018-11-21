@@ -29,6 +29,7 @@ public class Palette{
 
     lightishGray = Color.valueOf("a2a2a2"),
     darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f),
+    darkerGray = new Color(0.2f, 0.2f, 0.2f, 1f),
 
     boostTo = Color.valueOf("ffad4d"),
     boostFrom = Color.valueOf("ff7f57"),

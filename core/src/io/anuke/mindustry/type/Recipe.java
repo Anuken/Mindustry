@@ -23,6 +23,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Recipe extends UnlockableContent{
     private static ObjectMap<Block, Recipe> recipeMap = new ObjectMap<>();
+    private static Array<Recipe> returnArray = new Array<>();
 
     public final Block result;
     public final ItemStack[] requirements;
@@ -55,34 +56,15 @@ public class Recipe extends UnlockableContent{
         recipeMap.put(result, this);
     }
 
-    /**
-     * Returns unlocked recipes in a category.
-     * Do not call on the server backend, as unlocking does not exist!
-     */
-    public static void getUnlockedByCategory(Category category, Array<Recipe> arr){
-        if(headless){
-            throw new RuntimeException("Not implemented on the headless backend!");
-        }
-
-        arr.clear();
-        for(Recipe r : content.recipes()){
-            if(r.category == category && (control.unlocks.isUnlocked(r)) &&
-            !((r.mode != null && r.mode != state.mode) || !r.visibility.shown())){
-                arr.add(r);
-            }
-        }
-    }
-
-    /**
-     * Returns all recipes in a category.
-     */
-    public static void getByCategory(Category category, Array<Recipe> r){
-        r.clear();
+    /**Returns all non-hidden recipes in a category.*/
+    public static Array<Recipe> getByCategory(Category category){
+        returnArray.clear();
         for(Recipe recipe : content.recipes()){
-            if(recipe.category == category){
-                r.add(recipe);
+            if(recipe.category == category && recipe.visibility.shown() && (recipe.mode == state.mode || recipe.mode == null)){
+                returnArray.add(recipe);
             }
         }
+        return returnArray;
     }
 
     public static Recipe getByResult(Block block){
@@ -108,7 +90,6 @@ public class Recipe extends UnlockableContent{
         this.alwaysUnlocked = unlocked;
         return this;
     }
-
 
     @Override
     public boolean alwaysUnlocked(){

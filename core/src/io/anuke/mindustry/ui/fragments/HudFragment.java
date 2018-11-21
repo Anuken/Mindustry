@@ -32,7 +32,7 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class HudFragment extends Fragment{
-    public final BlocksFragment blockfrag = new BlocksFragment();
+    public final PlacementFragment blockfrag = new PlacementFragment();
 
     private ImageButton menu, flip;
     private Stack wavetable;
@@ -224,7 +224,6 @@ public class HudFragment extends Fragment{
 
     /**Show unlock notification for a new recipe.*/
     public void showUnlock(Recipe recipe){
-        blockfrag.rebuild();
 
         //if there's currently no unlock notification...
         if(lastUnlockTable == null){
