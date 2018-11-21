@@ -31,8 +31,8 @@ public class ConsumePower extends Consume{
      * @param powerPerTick The maximum amount of power which is required per tick for 100% efficiency.
      * @param minimumSatisfaction The percentage of powerPerTick which must be available for the module to work.
      */
-    public static ConsumePower consumePowerBuffered(float powerPerTick, float minimumSatisfaction){
-        return new ConsumePower(powerPerTick, minimumSatisfaction, 0.0f, true);
+    public static ConsumePower consumePowerDirect(float powerPerTick, float minimumSatisfaction){
+        return new ConsumePower(powerPerTick, minimumSatisfaction, 0.0f, false);
     }
 
     /**
@@ -41,8 +41,8 @@ public class ConsumePower extends Consume{
      * @param powerCapacity The maximum capacity in power units.
      * @param ticksToFill   The number of ticks it shall take to fill the buffer.
      */
-    public static ConsumePower consumePowerDirect(float powerCapacity, float ticksToFill){
-        return new ConsumePower(powerCapacity / ticksToFill, 0.0f, powerCapacity, false);
+    public static ConsumePower consumePowerBuffered(float powerCapacity, float ticksToFill){
+        return new ConsumePower(powerCapacity / ticksToFill, 0.0f, powerCapacity, true);
     }
 
     @Override
