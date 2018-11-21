@@ -36,6 +36,47 @@ public class Consumers{
         return c;
     }
 
+    /**
+     * Creates a consumer which directly uses power without buffering it. The module will work while at least 60% of power is supplied.
+     * @param powerPerTick The amount of power which is required each tick for 100% efficiency.
+     * @return the created consumer object.
+     */
+    public ConsumePower powerDirect(float powerPerTick){
+        return powerDirect(powerPerTick, 0.6f);
+    }
+
+    /**
+     * Creates a consumer which directly uses power without buffering it. The module will work while the available power is greater than or equal to the minimumSatisfaction percentage (0..1).
+     * @param powerPerTick The amount of power which is required each tick for 100% efficiency.
+     * @return the created consumer object.
+     */
+    public ConsumePower powerDirect(float powerPerTick, float minimumSatisfaction){
+        ConsumePower c = ConsumePower.consumePowerDirect(powerPerTick, minimumSatisfaction);
+        add(c);
+        return c;
+    }
+
+    /**
+     * Creates a consumer which stores power and uses it only in case of certain events (e.g. a turret firing).
+     * It will take 60 ticks (one second) to fill the buffer, given enough power supplied.
+     * @param powerCapacity The maximum capacity in power units.
+     */
+    public ConsumePower powerBuffered(float powerCapacity){
+        // TODO Balance: How long should it take to fill a buffer? The lower this value, the more power will be "stolen" from direct consumers.
+        return powerBuffered(powerCapacity, 60);
+    }
+
+    /**
+     * Creates a consumer which stores power and uses it only in case of certain events (e.g. a turret firing).
+     * @param powerCapacity The maximum capacity in power units.
+     * @param ticksToFill   The number of ticks it shall take to fill the buffer.
+     */
+    public ConsumePower powerBuffered(float powerCapacity, float ticksToFill){
+        ConsumePower c = ConsumePower.consumePowerBuffered(powerCapacity, ticksToFill);
+        add(c);
+        return c;
+    }
+
     public ConsumeItem item(Item item){
         return item(item, 1);
     }

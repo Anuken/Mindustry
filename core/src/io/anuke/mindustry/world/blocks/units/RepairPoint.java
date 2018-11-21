@@ -38,8 +38,7 @@ public class RepairPoint extends Block{
         layer2 = Layer.laser;
         hasPower = true;
         // TODO Adapt to new power system - Make it use power while repairing
-        basePowerUse = 20f; // capacity
-        bufferedPowerConsumer = true;
+        consumes.powerBuffered(20f);
     }
 
     @Override

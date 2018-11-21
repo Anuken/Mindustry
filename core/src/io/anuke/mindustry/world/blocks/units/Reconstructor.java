@@ -44,8 +44,7 @@ public class Reconstructor extends Block{
         solidifes = true;
         hasPower = true;
         configurable = true;
-        basePowerUse = 30f; // capacity
-        bufferedPowerConsumer = true;
+        consumes.powerBuffered(30f);
     }
 
     protected static boolean checkValidTap(Tile tile, ReconstructorEntity entity, Player player){

@@ -20,7 +20,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             type = UnitTypes.spirit;
             produceTime = 5700;
             size = 2;
-            basePowerUse = 0.08f;
+            consumes.powerDirect(0.08f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30)});
         }};
 
@@ -28,7 +28,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             type = UnitTypes.phantom;
             produceTime = 7300;
             size = 2;
-            basePowerUse = 0.2f;
+            consumes.powerDirect(0.2f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80)});
         }};
 
@@ -36,7 +36,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             type = UnitTypes.wraith;
             produceTime = 1800;
             size = 2;
-            basePowerUse = 0.1f;
+            consumes.powerDirect(0.1f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10), new ItemStack(Items.titanium, 10)});
         }};
 
@@ -44,7 +44,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             type = UnitTypes.ghoul;
             produceTime = 3600;
             size = 3;
-            basePowerUse = 0.2f;
+            consumes.powerDirect(0.2f);
             shadow = "shadow-round-3";
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 30), new ItemStack(Items.plastanium, 20)});
         }};
@@ -53,7 +53,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             type = UnitTypes.revenant;
             produceTime = 8000;
             size = 4;
-            basePowerUse = 0.3f;
+            consumes.powerDirect(0.3f);
             shadow = "shadow-round-4";
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 80), new ItemStack(Items.titanium, 80), new ItemStack(Items.plastanium, 50)});
         }};
@@ -62,7 +62,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             type = UnitTypes.dagger;
             produceTime = 1700;
             size = 2;
-            basePowerUse = 0.05f;
+            consumes.powerDirect(0.05f);
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 10)});
         }};
 
@@ -70,7 +70,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             type = UnitTypes.titan;
             produceTime = 3400;
             size = 3;
-            basePowerUse = 0.15f;
+            consumes.powerDirect(0.15f);
             shadow = "shadow-round-3";
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 20), new ItemStack(Items.thorium, 30)});
         }};
@@ -79,7 +79,7 @@ public class UnitBlocks extends BlockList implements ContentList{
             type = UnitTypes.fortress;
             produceTime = 5000;
             size = 3;
-            basePowerUse = 0.2f;
+            consumes.powerDirect(0.2f);
             shadow = "shadow-round-3";
             consumes.items(new ItemStack[]{new ItemStack(Items.silicon, 40), new ItemStack(Items.thorium, 50)});
         }};

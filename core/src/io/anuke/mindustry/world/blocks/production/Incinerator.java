@@ -26,7 +26,7 @@ public class Incinerator extends Block{
         update = true;
         solid = true;
 
-        basePowerUse = 0.05f;
+        consumes.powerDirect(0.05f);
     }
 
     @Override
