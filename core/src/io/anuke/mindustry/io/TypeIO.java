@@ -335,15 +335,14 @@ public class TypeIO{
             buffer.putShort((short) bytes.length);
             buffer.put(bytes);
         }else{
-            buffer.put((byte) -1);
+            buffer.putShort((short) -1);
         }
     }
 
     @ReadClass(String.class)
     public static String readString(ByteBuffer buffer){
-        byte length = buffer.get();
-        if(length != -1){
-            short slength = buffer.getShort();
+        short slength = buffer.getShort();
+        if(slength != -1){
             byte[] bytes = new byte[slength];
             buffer.get(bytes);
             return new String(bytes, StandardCharsets.UTF_8);
@@ -372,14 +371,13 @@ public class TypeIO{
             buffer.writeShort((short) bytes.length);
             buffer.write(bytes);
         }else{
-            buffer.writeByte((byte) -1);
+            buffer.writeShort((short) -1);
         }
     }
 
     public static String readStringData(DataInput buffer) throws IOException{
-        byte length = buffer.readByte();
-        if(length != -1){
-            short slength = buffer.readShort();
+        short slength = buffer.readShort();
+        if(slength != -1){
             byte[] bytes = new byte[slength];
             buffer.readFully(bytes);
             return new String(bytes, StandardCharsets.UTF_8);
