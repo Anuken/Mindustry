@@ -280,6 +280,11 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     }
 
     @Override
+    public boolean canMine(Item item){
+        return type.toMine.contains(item);
+    }
+
+    @Override
     public float getBuildPower(Tile tile){
         return type.buildPower;
     }
