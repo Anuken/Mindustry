@@ -99,15 +99,22 @@ public class PowerGraph{
     }
 
     public void distributePower(float needed, float produced){
-        if(MathUtils.isEqual(needed,0f)){ return; }
+        if(MathUtils.isEqual(needed, 0f)){ return; }
 
         float coverage = Math.min(1, produced / needed);
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
-            if(consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
-                consumer.entity.power.satisfaction += (1 - consumer.entity.power.satisfaction) * coverage;
-            }else{
-                consumer.entity.power.satisfaction = coverage;
+            if(consumes.has(ConsumePower.class)){
+                ConsumePower consumePower = consumes.get(ConsumePower.class);
+                if(consumePower.isBuffered){
+                    // Add a percentage of the requested amount, but limit it to the mission amount.
+                    // TODO This can maybe be calculated without converting to absolute values first
+                    float maximumRate = consumePower.requestedPower(consumer.block(), consumer.entity()) * coverage;
+                    float missingAmount = consumePower.powerCapacity * (1 - consumer.entity.power.satisfaction);
+                    consumer.entity.power.satisfaction += Math.min(missingAmount, maximumRate) / consumePower.powerCapacity;
+                }else{
+                    consumer.entity.power.satisfaction = coverage;
+                }
             }
         }
     }
@@ -205,12 +212,12 @@ public class PowerGraph{
     @Override
     public String toString(){
         return "PowerGraph{" +
-                "producers=" + producers +
-                ", consumers=" + consumers +
-                ", batteries=" + batteries +
-                ", all=" + all +
-                ", lastFrameUpdated=" + lastFrameUpdated +
-                ", graphID=" + graphID +
-                '}';
+            "producers=" + producers +
+            ", consumers=" + consumers +
+            ", batteries=" + batteries +
+            ", all=" + all +
+            ", lastFrameUpdated=" + lastFrameUpdated +
+            ", graphID=" + graphID +
+            '}';
     }
 }
