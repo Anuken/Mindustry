@@ -1,126 +1,105 @@
+import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.PowerBlocks;
 import io.anuke.mindustry.content.blocks.ProductionBlocks;
 import io.anuke.mindustry.core.ContentLoader;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.power.PowerGraph;
-import io.anuke.mindustry.world.blocks.production.SolidPump;
-import io.anuke.mindustry.world.modules.PowerModule;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.ParameterizedTest;
 
-import java.lang.reflect.Field;
-import java.util.LinkedList;
-import java.util.List;
-
-import static io.anuke.mindustry.Vars.threads;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-public class PowerTests{
+public class PowerTests extends PowerTestFixture{
 
     @BeforeAll
     static void initializeDependencies(){
         Vars.content = new ContentLoader();
         Vars.content.load();
+        Vars.threads = new FakeThreadHandler();
     }
 
     @BeforeEach
     void initTest(){
     }
 
-    /**
-     * Creates a fake tile on the given location using the given floor and block.
-     * @param x     The X coordinate.
-     * @param y     The y coordinate.
-     * @param floor The floor.
-     * @param block The block on the tile.
-     * @return The created tile or null in case of exceptions.
-     */
-    private static Tile createFakeTile(int x, int y, Block block){
-        try{
-            Tile tile = new Tile(x, y);
-            Field field = Tile.class.getDeclaredField("wall");
-            field.setAccessible(true);
-            field.set(tile, block);
-            field = Tile.class.getDeclaredField("floor");
-            field.setAccessible(true);
-            field.set(tile, (Floor)Blocks.sand);
-            tile.entity = block.newEntity();
-            tile.entity.power = new PowerModule();
-            return tile;
-        }catch(Exception ex){
-            return null;
+    @Nested
+    class PowerGraphTests{
+
+        /** Tests the satisfaction of a single consumer after a single update of the power graph which contains a single producer.
+         *
+         *  Assumption: When the consumer requests zero power, satisfaction does not change. Default is 0.0f.
+         */
+        @TestFactory
+        DynamicTest[] testDirectConsumption(){
+            return new DynamicTest[]{
+                // Note: Unfortunately, the display names are not yet output through gradle. See https://github.com/gradle/gradle/issues/5975
+                // That's why we inject the description into the test method for now.
+                dynamicTest("01", () -> test_directConsumptionCalculation(0.0f, 1.0f, 0.0f, "0.0 produced, 1.0 consumed (no power available)")),
+                dynamicTest("02", () -> test_directConsumptionCalculation(0.0f, 0.0f, 0.0f, "0.0 produced, 0.0 consumed (no power anywhere)")),
+                dynamicTest("03", () -> test_directConsumptionCalculation(1.0f, 0.0f, 0.0f, "1.0 produced, 0.0 consumed (no power requested)")),
+                dynamicTest("04", () -> test_directConsumptionCalculation(1.0f, 1.0f, 1.0f, "1.0 produced, 1.0 consumed (stable consumption)")),
+                dynamicTest("05", () -> test_directConsumptionCalculation(0.5f, 1.0f, 0.5f, "0.5 produced, 1.0 consumed (power shortage)")),
+                dynamicTest("06", () -> test_directConsumptionCalculation(1.0f, 0.5f, 1.0f, "1.0 produced, 0.5 consumed (power excess)")),
+                dynamicTest("07", () -> test_directConsumptionCalculation(0.09f, 0.09f - MathUtils.FLOAT_ROUNDING_ERROR / 10.0f, 1.0f, "floating point inaccuracy (stable consumption)"))
+            };
         }
-    }
-    private static final float epsilon = 0.00001f;
+        void test_directConsumptionCalculation(float producedPower, float requiredPower, float expectedSatisfaction, String parameterDescription){
+            Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
+            Tile directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requiredPower, 0.6f));
 
-    /** Makes sure calculations are accurate for the case where produced power = consumed power. */
-    @Test
-    void test_balancedPower(){
-        PowerGraph powerGraph = new PowerGraph();
+            PowerGraph powerGraph = new PowerGraph();
+            powerGraph.add(producerTile);
+            powerGraph.add(directConsumerTile);
 
-        // Create one water extractor (5.4 power/Second = 0.09/tick)
-        Tile waterExtractorTile = createFakeTile(0, 0, ProductionBlocks.waterExtractor);
-        powerGraph.add(waterExtractorTile);
+            assumeTrue(MathUtils.isEqual(producedPower, powerGraph.getPowerProduced()));
+            assumeTrue(MathUtils.isEqual(requiredPower, powerGraph.getPowerNeeded()));
 
-        // Create 20 small solar panels (20*0.27=5.4 power/second = 0.09/tick)
-        List<Tile> solarPanelTiles = new LinkedList<>();
-        for(int counter = 0; counter < 20; counter++){
-            Tile solarPanelTile = createFakeTile( 2 + counter / 2, counter % 2, PowerBlocks.solarPanel);
-            powerGraph.add(solarPanelTile);
-            solarPanelTiles.add(solarPanelTile);
+            // Update and check for the expected power satisfaction of the consumer
+            powerGraph.update();
+            assertEquals(expectedSatisfaction, directConsumerTile.entity.power.satisfaction, MathUtils.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
         }
 
-        float powerNeeded = powerGraph.getPowerNeeded();
-        float powerProduced = powerGraph.getPowerProduced();
+        /** Tests the satisfaction of a single buffered consumer after a single update of the power graph which contains a single producer. */
+        @TestFactory
+        DynamicTest[] testBufferedConsumption(){
+            return new DynamicTest[]{
+                // Note: powerPerTick may not be 0 in any of the test cases. This would equal a "ticksToFill" of infinite.
+                dynamicTest("01", () -> test_bufferedConsumptionCalculation(0.0f, 0.0f, 0.1f, 0.0f, 0.0f, "Empty Buffer, No power anywhere")),
+                dynamicTest("02", () -> test_bufferedConsumptionCalculation(0.0f, 1.0f, 0.1f, 0.0f, 0.0f, "Empty Buffer, No power provided")),
+                dynamicTest("03", () -> test_bufferedConsumptionCalculation(1.0f, 0.0f, 0.1f, 0.0f, 0.0f, "Empty Buffer, No power requested")),
+                dynamicTest("04", () -> test_bufferedConsumptionCalculation(1.0f, 1.0f, 1.0f, 0.0f, 1.0f, "Empty Buffer, Stable Power, One tick to fill")),
+                dynamicTest("05", () -> test_bufferedConsumptionCalculation(1.0f, 1.0f, 0.1f, 0.0f, 0.1f, "Empty Buffer, Stable Power, multiple ticks to fill")),
+                dynamicTest("06", () -> test_bufferedConsumptionCalculation(1.0f, 0.5f, 0.5f, 0.0f, 1.0f, "Empty Buffer, Power excess, one tick to fill")),
+                dynamicTest("07", () -> test_bufferedConsumptionCalculation(1.0f, 0.5f, 0.1f, 0.0f, 0.2f, "Empty Buffer, Power excess, multiple ticks to fill")),
+                dynamicTest("08", () -> test_bufferedConsumptionCalculation(0.5f, 1.0f, 1.0f, 0.0f, 0.5f, "Empty Buffer, Power shortage, one tick to fill")),
+                dynamicTest("09", () -> test_bufferedConsumptionCalculation(0.5f, 1.0f, 0.1f, 0.0f, 0.1f, "Empty Buffer, Power shortage, multiple ticks to fill")),
+                dynamicTest("10", () -> test_bufferedConsumptionCalculation(0.0f, 1.0f, 0.1f, 0.5f, 0.5f, "Unchanged buffer with no power produced")),
+                dynamicTest("11", () -> test_bufferedConsumptionCalculation(1.0f, 1.0f, 0.1f, 1.0f, 1.0f, "Unchanged buffer when already full")),
+                dynamicTest("12", () -> test_bufferedConsumptionCalculation(0.2f, 1.0f, 0.5f, 0.5f, 0.7f, "Half buffer, power shortage")),
+                dynamicTest("13", () -> test_bufferedConsumptionCalculation(1.0f, 1.0f, 0.5f, 0.7f, 1.0f, "Buffer does not get exceeded")),
+                dynamicTest("14", () -> test_bufferedConsumptionCalculation(1.0f, 1.0f, 0.5f, 0.5f, 1.0f, "Half buffer, filled with excess"))
+            };
+        }
+        void test_bufferedConsumptionCalculation(float producedPower, float maxBuffer, float powerPerTick, float initialSatisfaction, float expectedSatisfaction, String parameterDescription){
+            Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
+            Tile bufferedConsumerTile = createFakeTile(0, 1, createFakeBufferedConsumer(maxBuffer, maxBuffer > 0.0f ? maxBuffer/powerPerTick : 1.0f));
+            bufferedConsumerTile.entity.power.satisfaction = initialSatisfaction;
 
-        // If these lines fail, you probably changed power production/consumption and need to adapt this test
-        // OR their implementation is corrupt.
-        // TODO: Create fake blocks which are independent of such changes
-        assertEquals(powerNeeded, 0.09f, epsilon);
-        assertEquals(powerProduced, 0.09f, epsilon);
-        // Note: The assertions above induce that powerNeeded = powerProduced (with floating point inaccuracy)
+            PowerGraph powerGraph = new PowerGraph();
+            powerGraph.add(producerTile);
+            powerGraph.add(bufferedConsumerTile);
 
-        // Distribute power and make sure the water extractor is powered
-        powerGraph.distributePower(powerNeeded, powerProduced);
-        assertEquals(waterExtractorTile.entity.power.satisfaction, 1.0f, epsilon);
-    }
+            assumeTrue(MathUtils.isEqual(producedPower, powerGraph.getPowerProduced()));
+            //assumeTrue(MathUtils.isEqual(Math.min(maxBuffer, powerPerTick), powerGraph.getPowerNeeded()));
 
-    /** Makes sure there are no problems with zero production. */
-    @Test
-    void test_noProducers(){
-        PowerGraph powerGraph = new PowerGraph();
-
-        Tile waterExtractorTile = createFakeTile(0, 0, ProductionBlocks.waterExtractor);
-        powerGraph.add(waterExtractorTile);
-
-        float powerNeeded = powerGraph.getPowerNeeded();
-        float powerProduced = powerGraph.getPowerProduced();
-
-        assertEquals(powerGraph.getPowerNeeded(), 0.09f, epsilon);
-        assertEquals(powerGraph.getPowerProduced(), 0.0f, epsilon);
-
-        powerGraph.distributePower(powerNeeded, powerProduced);
-        assertEquals(waterExtractorTile.entity.power.satisfaction, 0.0f, epsilon);
-    }
-
-    /** Makes sure there are no problems with zero consumers. */
-    @Test
-    void test_noConsumers(){
-        PowerGraph powerGraph = new PowerGraph();
-
-        Tile solarPanelTile = createFakeTile( 0, 0, PowerBlocks.solarPanel);
-        powerGraph.add(solarPanelTile);
-
-        float powerNeeded = powerGraph.getPowerNeeded();
-        float powerProduced = powerGraph.getPowerProduced();
-
-        assertEquals(powerGraph.getPowerNeeded(), 0.0f, epsilon);
-        assertEquals(powerGraph.getPowerProduced(), 0.0045f, epsilon);
-
-        powerGraph.distributePower(powerNeeded, powerProduced);
+            // Update and check for the expected power satisfaction of the consumer
+            powerGraph.update();
+            assertEquals(expectedSatisfaction, bufferedConsumerTile.entity.power.satisfaction, MathUtils.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of buffered consumer did not match");
+        }
     }
 }
