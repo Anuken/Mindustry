@@ -350,14 +350,19 @@ public class ServerControl extends Module{
             }
         });
 
-        handler.register("fillitems", "Fill the core with 2000 items.", arg -> {
+        handler.register("fillitems", "[team]", "Fill the core with 2000 items.", arg -> {
             if(!state.is(State.playing)){
                 err("Not playing. Host first.");
                 return;
             }
             
             try{
-                Team team = Team.valueOf(arg[0]);
+                Team team = arg.length == 0 ? Team.blue : Team.valueOf(arg[0]);
+
+                if(state.teams.get(team).cores.isEmpty()){
+                    err("That team has no cores.");
+                    return;
+                }
                 
                 for(Item item : content.items()){
                     if(item.type == ItemType.material){
