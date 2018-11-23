@@ -33,6 +33,7 @@ public class Vars{
     public static final String appName = "Mindustry";
     public static final String discordURL = "https://discord.gg/mindustry";
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
+    public static final String contributorsURL = "https://api.github.com/repos/Anuken/Mindustry/contributors";
     public static final String crashReportURL = "http://mindustry.us.to/report";
     //time between waves in frames (on normal mode)
     public static final float wavespace = 60 * 60 * 1.5f;
