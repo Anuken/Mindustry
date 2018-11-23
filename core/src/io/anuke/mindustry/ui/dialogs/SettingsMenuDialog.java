@@ -212,7 +212,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("fps", false);
         graphics.checkPref("lasers", true);
         graphics.checkPref("minimap", !mobile); //minimap is disabled by default on mobile devices
-        if(!gwt){
+        if(!mobile){
             //int[] currentScales = {Settings.getInt("fontScale"), Settings.getInt("baseCameraScale"), Settings.getInt("UIScale")};
             graphics.sliderPref("fontScale", 10, 4, 22, 2, s -> {
                 if(scaleValues[0] == -1) scaleValues[0] = s;

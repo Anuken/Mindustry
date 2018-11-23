@@ -171,7 +171,7 @@ public class Vars{
         ios = Gdx.app.getType() == ApplicationType.iOS;
         android = Gdx.app.getType() == ApplicationType.Android;
 
-        dataDirectory = OS.getAppDataDirectory(appName);
+        dataDirectory = Settings.getDataDirectory(appName);
         customMapDirectory = dataDirectory.child("maps/");
         saveDirectory = dataDirectory.child("saves/");
 
