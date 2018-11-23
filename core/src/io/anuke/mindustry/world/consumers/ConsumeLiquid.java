@@ -32,7 +32,7 @@ public class ConsumeLiquid extends Consume{
 
     @Override
     public String getIcon(){
-        return "icon-liquid";
+        return "icon-liquid-small";
     }
 
     @Override
