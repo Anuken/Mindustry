@@ -21,6 +21,7 @@ public class LiquidMixer extends LiquidBlock{
         hasItems = true;
         rotate = false;
         solid = true;
+        singleLiquid = false;
         outputsLiquid = true;
     }
 
