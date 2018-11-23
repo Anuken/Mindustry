@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.Gdx;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
@@ -9,7 +10,10 @@ import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.MobileButton;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Events;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.scene.Group;
+import io.anuke.ucore.scene.ui.ConfirmDialog;
+import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Strings;
 
@@ -56,14 +60,14 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-            play = new MobileButton("icon-play-2", isize, "$text.play", this::showPlaySelect),
-            maps = new MobileButton("icon-map", isize, "$text.maps", ui.maps::show),
-            load = new MobileButton("icon-load", isize, "$text.load", ui.load::show),
-            join = new MobileButton("icon-add", isize, "$text.joingame", ui.join::show),
-            editor = new MobileButton("icon-editor", isize, "$text.editor", () -> ui.loadGraphics(ui.editor::show)),
-            tools = new MobileButton("icon-tools", isize, "$text.settings", ui.settings::show),
-            unlocks = new MobileButton("icon-unlocks", isize, "$text.unlocks", ui.unlocks::show),
-            donate = new MobileButton("icon-donate", isize, "$text.donate", Platform.instance::openDonations);
+                play = new MobileButton("icon-play-2", isize, "$text.play", this::showPlaySelect),
+                maps = new MobileButton("icon-map", isize, "$text.maps", ui.maps::show),
+                load = new MobileButton("icon-load", isize, "$text.load", ui.load::show),
+                join = new MobileButton("icon-add", isize, "$text.joingame", ui.join::show),
+                editor = new MobileButton("icon-editor", isize, "$text.editor", () -> ui.loadGraphics(ui.editor::show)),
+                tools = new MobileButton("icon-tools", isize, "$text.settings", ui.settings::show),
+                unlocks = new MobileButton("icon-unlocks", isize, "$text.unlocks", ui.unlocks::show),
+                donate = new MobileButton("icon-donate", isize, "$text.donate", Platform.instance::openDonations);
 
         if(Gdx.graphics.getWidth() > Gdx.graphics.getHeight()){
             container.add(play);
@@ -134,6 +138,20 @@ public class MenuFragment extends Fragment{
             out.row();
 
             out.add(new MenuButton("icon-exit", "$text.quit", Gdx.app::exit)).width(bw).colspan(2);
+            if(Vars.changedScale){
+                Settings.putBool("changedScale", false);
+                int old_ui, old_baseCam;
+                old_ui = Settings.prefs().getInteger("UIScale");
+                old_baseCam = Settings.prefs().getInteger("baseCameraScale");
+                Settings.prefs().putInteger("UIScale", 10);
+                Settings.prefs().putInteger("baseCameraScale", 1);
+                Settings.save();
+                new ConfirmDialog("$text.scaleConfirm", "$text.scaleConfirmText", () -> {
+                    Settings.prefs().putInteger("UIScale", old_ui);
+                    Settings.prefs().putInteger("baseCameraScale", old_baseCam);
+                    Settings.save();
+                }, () -> Gdx.app.exit()).show();
+            }
         });
     }
 

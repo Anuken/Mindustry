@@ -73,6 +73,7 @@ public class Vars{
     //server port
     public static final int port = 6567;
     public static boolean testMobile;
+    public static boolean changedScale;
     //shorthand for whether or not this is running on android or ios
     public static boolean mobile;
     public static boolean ios;
@@ -85,8 +86,6 @@ public class Vars{
     public static FileHandle saveDirectory;
     public static String mapExtension = "mmap";
     public static String saveExtension = "msav";
-    //scale of the font
-    public static float fontScale;
     //camera zoom displayed on startup
     public static int baseCameraScale;
     public static boolean showBlockDebug = false;

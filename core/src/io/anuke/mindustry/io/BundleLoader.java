@@ -24,9 +24,10 @@ public class BundleLoader{
     }
 
     private static void loadGraphicSetting(){
-        Unit.dp.product = Settings.prefs().getInteger("UIScale") / 10.0f;
-        Vars.fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f) * Settings.prefs().getInteger("fontScale") / 10.0f;
-        Vars.baseCameraScale = Math.round(Unit.dp.scl(Settings.prefs().getInteger("baseCameraScale")));
+        Unit.dp.product = Settings.prefs().getInteger("UIScale", 10) / 10.0f;
+        //Vars.fontScale = Math.max(Unit.dp.scl(1f) / 2f, 0.5f) * Settings.prefs().getInteger("fontScale") / 10.0f;
+        Vars.baseCameraScale = Math.round(Unit.dp.scl(Settings.prefs().getInteger("baseCameraScale", 1)));
+        Vars.changedScale = Settings.prefs().getBoolean("changedScale", false);
     }
 
     private static Locale getLocale(){

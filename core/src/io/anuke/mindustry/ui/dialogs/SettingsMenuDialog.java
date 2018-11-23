@@ -214,19 +214,25 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("minimap", !mobile); //minimap is disabled by default on mobile devices
         if(!mobile){
             //int[] currentScales = {Settings.getInt("fontScale"), Settings.getInt("baseCameraScale"), Settings.getInt("UIScale")};
-            graphics.sliderPref("fontScale", 10, 4, 22, 2, s -> {
+            /*graphics.sliderPref("fontScale", 10, 4, 22, 2, s -> {
                 if(scaleValues[0] == -1) scaleValues[0] = s;
                 else if(scaleValues[0] != s) scaleChanged = true;
                 return String.valueOf(s / 10.0f);
-            });
+            });*/
             graphics.sliderPref("baseCameraScale", 4, 1, 6, 1, s -> {
                 if(scaleValues[1] == -1) scaleValues[1] = s;
-                else if(scaleValues[1] != s) scaleChanged = true;
+                else if(scaleValues[1] != s){
+                    scaleChanged = true;
+                    Settings.putBool("changedScale",true);
+                }
                 return String.valueOf(s);
             });
             graphics.sliderPref("UIScale", 10, 4, 22, 2, s -> {
                 if(scaleValues[2] == -1) scaleValues[2] = s;
-                else if(scaleValues[2] != s) scaleChanged = true;
+                else if(scaleValues[2] != s){
+                    scaleChanged = true;
+                    Settings.putBool("changedScale",true);
+                }
                 return String.valueOf(s / 10.0f);
             });
         }
