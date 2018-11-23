@@ -528,7 +528,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         //ignore off-screen taps
         if(cursor == null || ui.hasMouse(x, y)) return false;
 
-        threads.run(() -> checkTargets(worldx, worldy));
+        checkTargets(worldx, worldy);
 
         //remove if request present
         if(hasRequest(cursor)){
@@ -548,14 +548,13 @@ public class MobileInput extends InputHandler implements GestureListener{
                     consumed = true;
                     player.dropCarry(); //drop off unit
                 }else{
-                    threads.run(() -> {
-                        Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
+                    Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
 
-                        if(unit != null){
-                            player.moveTarget = unit;
-                            Effects.effect(Fx.select, unit.getX(), unit.getY());
-                        }
-                    });
+                    if(unit != null){
+                        consumed = true;
+                        player.moveTarget = unit;
+                        Effects.effect(Fx.select, unit.getX(), unit.getY());
+                    }
                 }
             }
 

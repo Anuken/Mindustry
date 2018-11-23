@@ -285,6 +285,11 @@ public class JoinDialog extends FloatingDialog{
     }
 
     void connect(String ip, int port){
+        if(Settings.getString("name").trim().isEmpty()){
+            ui.showInfo("$text.noname");
+            return;
+        }
+
         ui.loadfrag.show("$text.connecting");
 
         ui.loadfrag.setButton(() -> {

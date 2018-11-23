@@ -46,7 +46,7 @@ public class SectorTests{
      * This is achieved by adding at least one mission which defines a spawn point.
      */
     @Test
-    void test_sectorHasACore(){
+    void sectorHasACore(){
         for(SectorPresets.SectorPreset preset : this.presets.getPresets().values()){
             assertTrue(spawnPointIsDefined(preset.missions), "Sector at (" + preset.x + "|" + preset.y + ") contains no missions which define a spawn point. Add a battle or wave mission.");
         }
