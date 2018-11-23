@@ -50,6 +50,11 @@ public class HostDialog extends FloatingDialog{
         content().add().width(65f);
 
         content().addButton("$text.host", () -> {
+            if(Settings.getString("name").trim().isEmpty()){
+                ui.showInfo("$text.noname");
+                return;
+            }
+
             ui.loadfrag.show("$text.hosting");
             Timers.runTask(5f, () -> {
                 try{
