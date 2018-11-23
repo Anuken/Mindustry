@@ -22,6 +22,7 @@ import io.anuke.ucore.scene.ui.Slider;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.scene.ui.layout.Cell;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,6 +81,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics = new SettingsTable(s);
         sound = new SettingsTable(s);
         cheats = new SettingsTable(s);
+        cheats.visible(() -> Settings.getBool("enable-cheats", false));
 
         prefs = new Table();
         prefs.top();
@@ -98,7 +100,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         menu.row();
         menu.addButton("$text.settings.language", ui.language::show);
         menu.row();
-        menu.addButton("$text.settings.cheats", () -> visible(3));
+        Cell cheatsButton = menu.addButton("$text.settings.cheats", () -> visible(3));
+        cheatsButton.visible(() -> Settings.getBool("enable-cheats", false));
 
         prefs.clearChildren();
         prefs.add(menu);
@@ -192,6 +195,8 @@ public class SettingsMenuDialog extends SettingsDialog{
                 table.row();
             }
         });
+
+        game.checkPref("enable-cheats", false);
 
         graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Bundles.get("setting.fpscap.none") : Bundles.format("setting.fpscap.text", s)));
         graphics.checkPref("multithread", mobile, threads::setEnabled);
