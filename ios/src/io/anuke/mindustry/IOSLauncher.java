@@ -31,8 +31,6 @@ public class IOSLauncher extends IOSApplication.Delegate {
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());
 
-        Unit.dp.addition -= 0.2f;
-
         if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
             Unit.dp.addition = 0.5f;
         }
