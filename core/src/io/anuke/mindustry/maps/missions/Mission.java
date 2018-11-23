@@ -83,7 +83,7 @@ public abstract class Mission{
 
     public void onComplete(){
         if(showComplete && !headless){
-            threads.runGraphics(() -> ui.hudfrag.showText("[LIGHT_GRAY]"+menuDisplayString() + ":\n" + Bundles.get("text.mission.complete")));
+            threads.runGraphics(() -> ui.hudfrag.showToast("[LIGHT_GRAY]"+menuDisplayString() + ":\n" + Bundles.get("text.mission.complete")));
         }
     }
 
@@ -100,10 +100,4 @@ public abstract class Mission{
     }
 
     public void generate(Generation gen){}
-
-    public void generateCoreAt(Generation gen, int coreX, int coreY, Team team){
-        gen.tiles[coreX][coreY].setBlock(StorageBlocks.core);
-        gen.tiles[coreX][coreY].setTeam(team);
-        state.teams.get(team).cores.add(gen.tiles[coreX][coreY]);
-    }
 }

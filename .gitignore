@@ -1,5 +1,6 @@
 ##Packr, build stuff
 
+logs/
 /core/assets/mindustry-saves/
 /core/assets/mindustry-maps/
 /core/assets/bundles/output/
@@ -25,6 +26,8 @@
 /core/assets/version.properties
 /core/assets/locales
 /ios/src/io/anuke/mindustry/gen/
+/core/src/io/anuke/mindustry/gen/
+ios/robovm.properties
 *.gif
 
 version.properties

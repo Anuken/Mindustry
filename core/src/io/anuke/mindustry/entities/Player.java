@@ -16,12 +16,10 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
+import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Mech;
-import io.anuke.mindustry.type.Weapon;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -70,7 +68,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public TargetTrait moveTarget;
 
     private float walktime;
-    private Queue<BuildRequest> placeQueue = new ThreadQueue<>();
+    private Queue<BuildRequest> placeQueue = new Queue<>();
     private Tile mining;
     private CarriableTrait carrying;
     private Trail trail = new Trail(12);
@@ -192,6 +190,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
+    public boolean canMine(Item item){
+        return item.hardness <= mech.drillPower;
+    }
+
+    @Override
     public float getArmor(){
         return mech.armor + mech.getExtraArmor(this);
     }
@@ -292,7 +295,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         float x = snappedX(), y = snappedY();
 
         if(!movement.isZero() && moved && !state.isPaused()){
-            walktime += Timers.delta() * movement.len() / 0.7f * getFloorOn().speedMultiplier;
+            walktime += movement.len() / 0.7f * getFloorOn().speedMultiplier;
             baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
         }
 
@@ -323,7 +326,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         if(floor.isLiquid){
-            Draw.tint(Color.WHITE, floor.liquidColor, Mathf.clamp(drownTime));
+            Draw.tint(Color.WHITE, floor.liquidColor, drownTime);
         }else{
             Draw.tint(Color.WHITE);
         }
@@ -395,76 +398,79 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void drawName(){
         GlyphLayout layout = Pooling.obtain(GlyphLayout.class, GlyphLayout::new);
 
-        Draw.tscl(0.25f / 2);
+        boolean ints = Core.font.usesIntegerPositions();
+        Core.font.setUseIntegerPositions(false);
+        Draw.tscl(0.25f / io.anuke.ucore.scene.ui.layout.Unit.dp.scl(1f));
         layout.setText(Core.font, name);
         Draw.color(0f, 0f, 0f, 0.3f);
-        Draw.rect("blank", x, y + 8 - layout.height / 2, layout.width + 2, layout.height + 2);
+        Draw.rect("blank", x, y + 8 - layout.height / 2, layout.width + 2, layout.height + 3);
         Draw.color();
         Draw.tcolor(color);
         Draw.text(name, x, y + 8);
 
         if(isAdmin){
-            Draw.color(color);
             float s = 3f;
+            Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
+            Draw.rect("icon-admin-small", x + layout.width / 2f + 2 + 1, y + 6.5f, s, s);
+            Draw.color(color);
             Draw.rect("icon-admin-small", x + layout.width / 2f + 2 + 1, y + 7f, s, s);
         }
 
         Draw.reset();
         Pooling.free(layout);
-        Draw.tscl(fontScale);
+        Draw.tscl(1f);
+        Core.font.setUseIntegerPositions(ints);
     }
 
     /**Draw all current build requests. Does not draw the beam effect, only the positions.*/
     public void drawBuildRequests(){
-        synchronized(getPlaceQueue()){
-            for(BuildRequest request : getPlaceQueue()){
-                if(getCurrentRequest() == request) continue;
+        for(BuildRequest request : getPlaceQueue()){
+            if(getCurrentRequest() == request) continue;
 
-                if(request.breaking){
-                    Block block = world.tile(request.x, request.y).target().block();
+            if(request.breaking){
+                Block block = world.tile(request.x, request.y).target().block();
 
-                    //draw removal request
-                    Lines.stroke(2f);
+                //draw removal request
+                Lines.stroke(2f);
 
-                    Draw.color(Palette.removeBack);
+                Draw.color(Palette.removeBack);
 
-                    float rad = Mathf.absin(Timers.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
+                float rad = Mathf.absin(Timers.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
 
-                    Lines.square(
-                            request.x * tilesize + block.offset(),
-                            request.y * tilesize + block.offset() - 1,
-                            rad);
+                Lines.square(
+                        request.x * tilesize + block.offset(),
+                        request.y * tilesize + block.offset() - 1,
+                        rad);
 
-                    Draw.color(Palette.remove);
+                Draw.color(Palette.remove);
 
-                    Lines.square(
-                            request.x * tilesize + block.offset(),
-                            request.y * tilesize + block.offset(),
-                            rad);
-                }else{
-                    //draw place request
-                    Lines.stroke(2f);
+                Lines.square(
+                        request.x * tilesize + block.offset(),
+                        request.y * tilesize + block.offset(),
+                        rad);
+            }else{
+                //draw place request
+                Lines.stroke(2f);
 
-                    Draw.color(Palette.accentBack);
+                Draw.color(Palette.accentBack);
 
-                    float rad = Mathf.absin(Timers.time(), 7f, 1f) - 2f + request.recipe.result.size * tilesize / 2f;
+                float rad = Mathf.absin(Timers.time(), 7f, 1f) - 2f + request.recipe.result.size * tilesize / 2f;
 
-                    Lines.square(
-                            request.x * tilesize + request.recipe.result.offset(),
-                            request.y * tilesize + request.recipe.result.offset() - 1,
-                            rad);
+                Lines.square(
+                        request.x * tilesize + request.recipe.result.offset(),
+                        request.y * tilesize + request.recipe.result.offset() - 1,
+                        rad);
 
-                    Draw.color(Palette.accent);
+                Draw.color(Palette.accent);
 
-                    Lines.square(
-                            request.x * tilesize + request.recipe.result.offset(),
-                            request.y * tilesize + request.recipe.result.offset(),
-                            rad);
-                }
+                Lines.square(
+                        request.x * tilesize + request.recipe.result.offset(),
+                        request.y * tilesize + request.recipe.result.offset(),
+                        rad);
             }
-
-            Draw.reset();
         }
+
+        Draw.reset();
     }
 
     //endregion
@@ -507,14 +513,14 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             achievedFlight = true;
         }
 
-        if(boostHeat <= liftoffBoost + 0.05f && achievedFlight){
+        if(boostHeat <= liftoffBoost + 0.05f && achievedFlight && !mech.flying){
             if(tile != null){
                 if(mech.shake > 1f){
                     Effects.shake(mech.shake, mech.shake, this);
                 }
                 Effects.effect(UnitFx.unitLand, tile.floor().minimapColor, x, y, tile.floor().isLiquid ? 1f : 0.5f);
             }
-            if(!mech.flying) mech.onLand(this);
+            mech.onLand(this);
             achievedFlight = false;
         }
 
@@ -546,8 +552,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         updateBuilding(this);
 
-        x = Mathf.clamp(x, 0, world.width() * tilesize);
-        y = Mathf.clamp(y, 0, world.height() * tilesize);
+        x = Mathf.clamp(x, tilesize, world.width() * tilesize - tilesize);
+        y = Mathf.clamp(y, tilesize, world.height() * tilesize - tilesize);
     }
 
     protected void updateMech(){
@@ -604,11 +610,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         pointerY = vec.y;
         updateShooting();
 
-        movement.limit(speed * Timers.delta());
+        movement.limit(speed).scl(Timers.delta());
 
         if(getCarrier() == null){
             if(!ui.chatfrag.chatOpen()){
-                velocity.add(movement);
+                velocity.add(movement.x, movement.y);
             }
             float prex = x, prey = y;
             updateVelocityStatus();
@@ -805,6 +811,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     //region read and write methods
 
+
+    @Override
+    public boolean isClipped(){
+        return false;
+    }
+
     @Override
     public void writeSave(DataOutput stream) throws IOException{
         stream.writeBoolean(isLocal);
@@ -844,7 +856,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     @Override
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
-        buffer.writeUTF(name); //TODO writing strings is very inefficient
+        TypeIO.writeStringData(buffer, name); //TODO writing strings is very inefficient
         buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
@@ -859,7 +871,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void read(DataInput buffer, long time) throws IOException{
         float lastx = x, lasty = y, lastrot = rotation;
         super.readSave(buffer);
-        name = buffer.readUTF();
+        name = TypeIO.readStringData(buffer);
         byte bools = buffer.readByte();
         isAdmin = (bools & 1) != 0;
         dead = (bools & 2) != 0;

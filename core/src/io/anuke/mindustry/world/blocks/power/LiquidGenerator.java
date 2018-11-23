@@ -13,19 +13,21 @@ import io.anuke.ucore.util.Mathf;
 
 public abstract class LiquidGenerator extends PowerGenerator{
     protected float minEfficiency = 0.2f;
-    protected float powerPerLiquid = 0.13f;
-    /**
-     * Maximum liquid used per frame.
-     */
-    protected float maxLiquidGenerate = 0.4f;
+    protected float powerPerLiquid;
+    /**Maximum liquid used per frame.*/
+    protected float maxLiquidGenerate;
     protected Effect generateEffect = BlockFx.generatespark;
 
     public LiquidGenerator(String name){
         super(name);
         liquidCapacity = 30f;
         hasLiquids = true;
+    }
 
-        consumes.add(new ConsumeLiquidFilter(liquid -> getEfficiency(liquid) >= minEfficiency, 0.001f)).update(false);
+    @Override
+    public void setStats(){
+        consumes.add(new ConsumeLiquidFilter(liquid -> getEfficiency(liquid) >= minEfficiency, maxLiquidGenerate)).update(false);
+        super.setStats();
     }
 
     @Override

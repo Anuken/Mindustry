@@ -38,7 +38,7 @@ public class LanguageDialog extends FloatingDialog{
                 Log.info("Setting locale: {0}", loc.toString());
                 ui.showInfo("$text.language.restart");
             });
-            langs.add(button).group(group).update(t -> t.setChecked(loc.equals(getLocale()))).size(400f, 60f).row();
+            langs.add(button).group(group).update(t -> t.setChecked(loc.equals(getLocale()))).size(400f, 50f).row();
         }
 
         content().add(pane);

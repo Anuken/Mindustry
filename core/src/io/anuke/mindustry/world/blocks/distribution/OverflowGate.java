@@ -17,6 +17,11 @@ public class OverflowGate extends Router{
     @Override
     public void update(Tile tile){
         SplitterEntity entity = tile.entity();
+
+        if(entity.lastItem == null && entity.items.total() > 0){
+            entity.items.clear();
+        }
+
         if(entity.lastItem != null){
             entity.time += 1f/speed * Timers.delta();
             Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);

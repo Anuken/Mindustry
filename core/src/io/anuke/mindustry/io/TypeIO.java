@@ -23,15 +23,17 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entities;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static io.anuke.mindustry.Vars.*;
 
 /** Class for specifying read/write methods for code generation.*/
 @SuppressWarnings("unused")
 public class TypeIO{
-    private static final Charset charset = Charset.forName("UTF-8");
 
     @WriteClass(Player.class)
     public static void writePlayer(ByteBuffer buffer, Player player){
@@ -329,7 +331,7 @@ public class TypeIO{
     @WriteClass(String.class)
     public static void writeString(ByteBuffer buffer, String string){
         if(string != null){
-            byte[] bytes = string.getBytes(charset);
+            byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
             buffer.putShort((short) bytes.length);
             buffer.put(bytes);
         }else{
@@ -339,11 +341,11 @@ public class TypeIO{
 
     @ReadClass(String.class)
     public static String readString(ByteBuffer buffer){
-        short length = buffer.getShort();
-        if(length != -1){
-            byte[] bytes = new byte[length];
+        short slength = buffer.getShort();
+        if(slength != -1){
+            byte[] bytes = new byte[slength];
             buffer.get(bytes);
-            return new String(bytes, charset);
+            return new String(bytes, StandardCharsets.UTF_8);
         }else{
             return null;
         }
@@ -361,5 +363,26 @@ public class TypeIO{
         byte[] bytes = new byte[length];
         buffer.get(bytes);
         return bytes;
+    }
+
+    public static void writeStringData(DataOutput buffer, String string) throws IOException{
+        if(string != null){
+            byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+            buffer.writeShort((short) bytes.length);
+            buffer.write(bytes);
+        }else{
+            buffer.writeShort((short) -1);
+        }
+    }
+
+    public static String readStringData(DataInput buffer) throws IOException{
+        short slength = buffer.readShort();
+        if(slength != -1){
+            byte[] bytes = new byte[slength];
+            buffer.readFully(bytes);
+            return new String(bytes, StandardCharsets.UTF_8);
+        }else{
+            return null;
+        }
     }
 }

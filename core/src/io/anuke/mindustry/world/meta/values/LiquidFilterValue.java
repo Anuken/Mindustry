@@ -2,13 +2,12 @@ package io.anuke.mindustry.world.meta.values;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.ui.LiquidDisplay;
 import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.Tooltip;
-import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
-import static io.anuke.mindustry.Vars.*;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class LiquidFilterValue implements StatValue{
     private final Predicate<Liquid> filter;
@@ -26,10 +25,7 @@ public class LiquidFilterValue implements StatValue{
         }
 
         for(int i = 0; i < list.size; i++){
-            Liquid item = list.get(i);
-
-            Cell<Image> imageCell = StatValue.addImageWithToolTip(table, item);
-            imageCell.size(8 * 3).padRight(2).padLeft(2).padTop(2).padBottom(2);
+            table.add(new LiquidDisplay(list.get(i))).padRight(5);
 
             if(i != list.size - 1){
                 table.add("/");

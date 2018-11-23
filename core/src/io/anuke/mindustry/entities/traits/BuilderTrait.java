@@ -58,6 +58,9 @@ public interface BuilderTrait extends Entity{
     /**Build power, can be any float. 1 = builds recipes in normal time, 0 = doesn't build at all.*/
     float getBuildPower(Tile tile);
 
+    /**Returns whether or not this builder can mine a specific item type.*/
+    boolean canMine(Item item);
+
     /**Whether this type of builder can begin creating new blocks.*/
     default boolean canCreateBlocks(){
         return true;
@@ -84,30 +87,28 @@ public interface BuilderTrait extends Entity{
     }
 
     default void readBuilding(DataInput input, boolean applyChanges) throws IOException{
-        synchronized(getPlaceQueue()){
-            if(applyChanges) getPlaceQueue().clear();
+        if(applyChanges) getPlaceQueue().clear();
 
-            byte type = input.readByte();
-            if(type != -1){
-                int position = input.readInt();
-                float progress = input.readFloat();
-                BuildRequest request;
+        byte type = input.readByte();
+        if(type != -1){
+            int position = input.readInt();
+            float progress = input.readFloat();
+            BuildRequest request;
 
-                if(type == 1){ //remove
-                    request = new BuildRequest(position % world.width(), position / world.width());
-                }else{ //place
-                    byte recipe = input.readByte();
-                    byte rotation = input.readByte();
-                    request = new BuildRequest(position % world.width(), position / world.width(), rotation, content.recipe(recipe));
-                }
+            if(type == 1){ //remove
+                request = new BuildRequest(position % world.width(), position / world.width());
+            }else{ //place
+                byte recipe = input.readByte();
+                byte rotation = input.readByte();
+                request = new BuildRequest(position % world.width(), position / world.width(), rotation, content.recipe(recipe));
+            }
 
-                request.progress = progress;
+            request.progress = progress;
 
-                if(applyChanges){
-                    getPlaceQueue().addLast(request);
-                }else if(isBuilding()){
-                    getCurrentRequest().progress = progress;
-                }
+            if(applyChanges){
+                getPlaceQueue().addLast(request);
+            }else if(isBuilding()){
+                getCurrentRequest().progress = progress;
             }
         }
     }
@@ -122,13 +123,11 @@ public interface BuilderTrait extends Entity{
      * Otherwise, a new place request is added to the queue.
      */
     default void replaceBuilding(int x, int y, int rotation, Recipe recipe){
-        synchronized(getPlaceQueue()){
-            for(BuildRequest request : getPlaceQueue()){
-                if(request.x == x && request.y == y){
-                    clearBuilding();
-                    addBuildRequest(request);
-                    return;
-                }
+        for(BuildRequest request : getPlaceQueue()){
+            if(request.x == x && request.y == y){
+                clearBuilding();
+                addBuildRequest(request);
+                return;
             }
         }
 
@@ -142,18 +141,16 @@ public interface BuilderTrait extends Entity{
 
     /**Add another build requests to the tail of the queue, if it doesn't exist there yet.*/
     default void addBuildRequest(BuildRequest place){
-        synchronized(getPlaceQueue()){
-            for(BuildRequest request : getPlaceQueue()){
-                if(request.x == place.x && request.y == place.y){
-                    return;
-                }
+        for(BuildRequest request : getPlaceQueue()){
+            if(request.x == place.x && request.y == place.y){
+                return;
             }
-            Tile tile = world.tile(place.x, place.y);
-            if(tile != null && tile.entity instanceof BuildEntity){
-                place.progress = tile.<BuildEntity>entity().progress;
-            }
-            getPlaceQueue().addLast(place);
         }
+        Tile tile = world.tile(place.x, place.y);
+        if(tile != null && tile.entity instanceof BuildEntity){
+            place.progress = tile.<BuildEntity>entity().progress;
+        }
+        getPlaceQueue().addLast(place);
     }
 
     /**
@@ -161,9 +158,7 @@ public interface BuilderTrait extends Entity{
      * May return null.
      */
     default BuildRequest getCurrentRequest(){
-        synchronized(getPlaceQueue()){
-            return getPlaceQueue().size == 0 ? null : getPlaceQueue().first();
-        }
+        return getPlaceQueue().size == 0 ? null : getPlaceQueue().first();
     }
 
     /**
@@ -244,7 +239,8 @@ public interface BuilderTrait extends Entity{
         Tile tile = getMineTile();
         TileEntity core = unit.getClosestCore();
 
-        if(core == null || tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance || !unit.inventory.canAcceptItem(tile.floor().drops.item)){
+        if(core == null || tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance
+                || tile.floor().drops == null || !unit.inventory.canAcceptItem(tile.floor().drops.item) || !canMine(tile.floor().drops.item)){
             setMineTile(null);
         }else{
             Item item = tile.floor().drops.item;
@@ -275,17 +271,14 @@ public interface BuilderTrait extends Entity{
     /**Draw placement effects for an entity. This includes mining*/
     default void drawBuilding(Unit unit){
         BuildRequest request;
-
-        synchronized(getPlaceQueue()){
-            if(!isBuilding()){
-                if(getMineTile() != null){
-                    drawMining(unit);
-                }
-                return;
+        if(!isBuilding()){
+            if(getMineTile() != null){
+                drawMining(unit);
             }
-
-            request = getCurrentRequest();
+            return;
         }
+
+        request = getCurrentRequest();
 
         Tile tile = world.tile(request.x, request.y);
 
@@ -311,10 +304,6 @@ public interface BuilderTrait extends Entity{
 
         float x1 = tmptr[0].x, y1 = tmptr[0].y,
                 x3 = tmptr[1].x, y3 = tmptr[1].y;
-        Translator close = Geometry.findClosest(unit.x, unit.y, tmptr);
-        float x2 = close.x, y2 = close.y;
-
-        Draw.alpha(0.3f + Mathf.absin(Timers.time(), 0.9f, 0.2f));
 
         Draw.alpha(1f);
 

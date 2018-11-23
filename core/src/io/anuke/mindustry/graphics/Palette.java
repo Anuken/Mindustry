@@ -29,6 +29,7 @@ public class Palette{
 
     lightishGray = Color.valueOf("a2a2a2"),
     darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f),
+    darkerGray = new Color(0.2f, 0.2f, 0.2f, 1f),
 
     boostTo = Color.valueOf("ffad4d"),
     boostFrom = Color.valueOf("ff7f57"),
@@ -43,8 +44,8 @@ public class Palette{
 
     heal = Color.valueOf("98ffa9"),
     bar = Color.SLATE,
-    accent = Color.valueOf("f4ba6e"),
-    accentBack = Color.valueOf("d58c4b"),
+    accent = Color.valueOf("ffd37f"),
+    accentBack = Color.valueOf("d4816b"),
     place = Color.valueOf("6335f8"),
     remove = Color.valueOf("e55454"),
     removeBack = Color.valueOf("a73e3e"),

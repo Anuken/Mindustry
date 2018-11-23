@@ -10,9 +10,11 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
@@ -32,16 +34,33 @@ import static io.anuke.mindustry.Vars.*;
  * This class should <i>not</i> call any outside methods to change state of modules, but instead fire events.
  */
 public class Logic extends Module{
-    public boolean doUpdate = true;
 
     public Logic(){
-        state = new GameState();
+        Events.on(TileChangeEvent.class, event -> {
+            if(event.tile.getTeam() == defaultTeam && Recipe.getByResult(event.tile.block()) != null){
+                handleContent(Recipe.getByResult(event.tile.block()));
+            }
+        });
     }
 
     @Override
     public void init(){
         EntityQuery.init();
-        EntityQuery.collisions().setCollider(tilesize, world::solid);
+        EntityQuery.collisions().setCollider(tilesize, (x, y) -> {
+            Tile tile = world.tile(x, y);
+            return tile != null && tile.solid();
+        });
+    }
+
+    /**Handles the event of content being used by either the player or some block.*/
+    public void handleContent(UnlockableContent content){
+        if(world.getSector() != null){
+            world.getSector().currentMission().onContentUsed(content);
+        }
+
+        if(!headless){
+            control.unlocks.unlockContent(content);
+        }
     }
 
     public void play(){
@@ -105,7 +124,7 @@ public class Logic extends Module{
     }
 
     private void updateSectors(){
-        if(world.getSector() == null) return;
+        if(world.getSector() == null || state.gameOver) return;
 
         world.getSector().currentMission().update();
 
@@ -142,7 +161,8 @@ public class Logic extends Module{
 
         world.sectors.completeSector(world.getSector().x, world.getSector().y);
         world.sectors.save();
-        if(!headless){
+
+        if(!headless && !Net.client()){
             ui.missions.show(world.getSector());
         }
 
@@ -151,7 +171,6 @@ public class Logic extends Module{
 
     @Override
     public void update(){
-        if(threads.isEnabled() && !threads.isOnThread()) return;
 
         if(Vars.control != null){
             control.runUpdateLogic();
@@ -159,15 +178,10 @@ public class Logic extends Module{
 
         if(!state.is(State.menu)){
 
-            if(!Net.client() && !world.isInvalidMap()){
-                updateSectors();
-                checkGameOver();
-            }
-
             if(!state.isPaused()){
                 Timers.update();
 
-                if(!state.mode.disableWaveTimer && !state.mode.disableWaves){
+                if(!state.mode.disableWaveTimer && !state.mode.disableWaves && !state.gameOver){
                     state.wavetime -= Timers.delta();
                 }
 
@@ -203,12 +217,6 @@ public class Logic extends Module{
                     if(group.isEmpty()) continue;
 
                     EntityQuery.collideGroups(bulletGroup, group);
-                    EntityQuery.collideGroups(group, playerGroup);
-
-                    for(EntityGroup other : unitGroups){
-                        if(other.isEmpty()) continue;
-                        EntityQuery.collideGroups(group, other);
-                    }
                 }
 
                 EntityQuery.collideGroups(bulletGroup, playerGroup);
@@ -216,10 +224,11 @@ public class Logic extends Module{
 
                 world.pathfinder.update();
             }
-        }
 
-        if(threads.isEnabled()){
-            netServer.update();
+            if(!Net.client() && !world.isInvalidMap()){
+                updateSectors();
+                checkGameOver();
+            }
         }
     }
 }

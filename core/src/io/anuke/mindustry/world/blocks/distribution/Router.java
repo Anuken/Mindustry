@@ -34,8 +34,7 @@ public class Router extends Block{
         SplitterEntity entity = tile.entity();
 
         if(entity.lastItem == null && entity.items.total() > 0){
-            entity.lastItem = entity.items.take();
-            entity.items.add(entity.lastItem, 1);
+            entity.items.clear();
         }
 
         if(entity.lastItem != null){

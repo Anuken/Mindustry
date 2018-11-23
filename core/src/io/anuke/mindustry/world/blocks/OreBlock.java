@@ -25,6 +25,11 @@ public class OreBlock extends Floor{
     }
 
     @Override
+    public String getDisplayName(Tile tile){
+        return drops.item.localizedName();
+    }
+
+    @Override
     public TextureRegion getEditorIcon(){
         if(editorIcon == null){
             editorIcon = variantRegions[0];

@@ -2,11 +2,13 @@ package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Align;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Palette;
@@ -26,11 +28,14 @@ import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
 import io.anuke.ucore.scene.ui.TooltipManager;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
 
 public class UI extends SceneModule{
+    private FreeTypeFontGenerator generator;
+
     public final MenuFragment menufrag = new MenuFragment();
     public final HudFragment hudfrag = new HudFragment();
     public final ChatFragment chatfrag = new ChatFragment();
@@ -89,14 +94,30 @@ public class UI extends SceneModule{
 
         Colors.put("accent", Palette.accent);
     }
+    
+    void generateFonts(){
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/pixel.ttf"));
+        FreeTypeFontParameter param = new FreeTypeFontParameter();
+        param.size = (int)(14*2 * Math.max(Unit.dp.scl(1f), 0.5f));
+        param.shadowColor = Color.DARK_GRAY;
+        param.shadowOffsetY = 2;
+        param.incremental = true;
+
+        skin.add("default-font", generator.generateFont(param));
+        skin.add("default-font-chat", generator.generateFont(param));
+        skin.getFont("default-font").getData().markupEnabled = true;
+        skin.getFont("default-font").setOwnsTexture(false);
+    }
 
     @Override
     protected void loadSkin(){
-        skin = new Skin(Gdx.files.internal("ui/uiskin.json"), Core.atlas);
+        skin = new Skin(Core.atlas);
+        generateFonts();
+        skin.load(Gdx.files.internal("ui/uiskin.json"));
 
         for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
-            font.setUseIntegerPositions(false);
-            font.getData().setScale(Vars.fontScale);
+            font.setUseIntegerPositions(true);
+            //font.getData().setScale(Vars.fontScale);
         }
     }
 
@@ -134,6 +155,7 @@ public class UI extends SceneModule{
         load = new LoadDialog();
         levels = new CustomGameDialog();
         language = new LanguageDialog();
+        unlocks = new UnlocksDialog();
         settings = new SettingsMenuDialog();
         host = new HostDialog();
         paused = new PausedDialog();
@@ -144,7 +166,6 @@ public class UI extends SceneModule{
         traces = new TraceDialog();
         maps = new MapsDialog();
         localplayers = new LocalPlayerDialog();
-        unlocks = new UnlocksDialog();
         content = new ContentInfoDialog();
         sectors = new SectorsDialog();
         missions = new MissionDialog();
@@ -165,6 +186,12 @@ public class UI extends SceneModule{
         super.resize(width, height);
 
         Events.fire(new ResizeEvent());
+    }
+
+    @Override
+    public void dispose(){
+        super.dispose();
+        generator.dispose();
     }
 
     public void loadGraphics(Runnable call){
@@ -221,7 +248,7 @@ public class UI extends SceneModule{
     }
 
     public void showInfo(String info){
-        new Dialog("$text.info.title", "dialog"){{
+        new Dialog("", "dialog"){{
             getCell(content()).growX();
             content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
             buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
@@ -229,7 +256,7 @@ public class UI extends SceneModule{
     }
 
     public void showInfo(String info, Runnable clicked){
-        new Dialog("$text.info.title", "dialog"){{
+        new Dialog("", "dialog"){{
             getCell(content()).growX();
             content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
             buttons().addButton("$text.ok", () -> {
@@ -266,5 +293,17 @@ public class UI extends SceneModule{
         dialog.keyDown(Keys.ESCAPE, dialog::hide);
         dialog.keyDown(Keys.BACK, dialog::hide);
         dialog.show();
+    }
+
+    public String formatAmount(int number){
+        if(number >= 1000000){
+            return Strings.toFixed(number / 1000000f, 1) + "[gray]mil[]";
+        }else if(number >= 10000){
+            return number / 1000 + "[gray]k[]";
+        }else if(number >= 1000){
+            return Strings.toFixed(number / 1000f, 1) + "[gray]k[]";
+        }else{
+            return number + "";
+        }
     }
 }

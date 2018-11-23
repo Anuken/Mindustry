@@ -58,6 +58,9 @@ public class PausedDialog extends FloatingDialog{
             });
 
             content().row();
+            content().addButton("$text.unlocks", ui.unlocks::show);
+
+            content().row();
             content().addButton("$text.settings", ui.settings::show);
 
             content().row();
@@ -116,7 +119,7 @@ public class PausedDialog extends FloatingDialog{
                 control.saves.getCurrent().save();
             }catch(Throwable e){
                 e.printStackTrace();
-                threads.runGraphics(() -> ui.showError("[orange]" + Bundles.get("text.savefail")));
+                threads.runGraphics(() -> ui.showError("[accent]" + Bundles.get("text.savefail")));
             }
             state.set(State.menu);
         });

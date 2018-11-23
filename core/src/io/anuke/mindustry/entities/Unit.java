@@ -233,7 +233,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         status.update(this);
 
-        velocity.limit(getMaxVelocity()).scl(status.getSpeedMultiplier());
+        velocity.limit(getMaxVelocity()).scl(1f + (status.getSpeedMultiplier()-1f) * Timers.delta());
 
         if(isFlying()){
             x += velocity.x * Timers.delta();
@@ -276,7 +276,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
             drownTime = Mathf.clamp(drownTime);
 
-            if(drownTime >= 0.999f){
+            if(drownTime >= 0.999f && !Net.client()){
                 damage(health + 1);
             }
 

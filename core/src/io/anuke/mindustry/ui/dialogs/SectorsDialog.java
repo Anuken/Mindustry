@@ -15,6 +15,7 @@ import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
 import io.anuke.ucore.scene.event.Touchable;
+import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.scene.utils.Cursors;
@@ -59,7 +60,7 @@ public class SectorsDialog extends FloatingDialog{
         margin(0);
         getTitleTable().clear();
         clear();
-        stack(content(), buttons(), container).grow();
+        stack(content(), container, buttons()).grow();
 
         shown(this::setup);
     }
@@ -97,10 +98,10 @@ public class SectorsDialog extends FloatingDialog{
         }
 
         table.table(t -> {
-            t.addImageTextButton(sector.hasSave() ? "$text.sector.resume" : "$text.sector.deploy", "icon-play", 10*3, () -> {
+            Cell<?> cell = t.addImageTextButton(sector.hasSave() ? "$text.sector.resume" : "$text.sector.deploy", "icon-play", 10*3, () -> {
                 hide();
                 Vars.ui.loadLogic(() -> world.sectors.playSector(selected));
-            }).height(60f).growX();
+            }).height(60f);
 
             if(selected.hasSave()){
                 t.addImageTextButton("$text.sector.abandon", "icon-cancel", 16 * 2, () ->
@@ -108,8 +109,11 @@ public class SectorsDialog extends FloatingDialog{
                         world.sectors.abandonSector(selected);
                         // Simulate a sector selection so the buttons get updated.
                         selectSector(selected);
-                        })
-                ).width(sectorSize).height(60f);
+                    })
+                ).width(sectorSize / Unit.dp.scl(1f)).height(60f);
+                cell.width(sectorSize / Unit.dp.scl(1f));
+            }else{
+                cell.width(sectorSize*2f / Unit.dp.scl(1f));
             }
         }).pad(-5).growX().padTop(0);
 
@@ -124,7 +128,7 @@ public class SectorsDialog extends FloatingDialog{
     class SectorView extends Element{
         float lastX, lastY;
         boolean clicked = false;
-        float panX = 0, panY = -sectorSize/2f;
+        float panX = sectorSize/2f, panY = sectorSize/2f;
 
         SectorView(){
             addListener(new InputListener(){
