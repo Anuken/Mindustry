@@ -181,7 +181,7 @@ public class Floor extends Block{
 
             Floor floor = other.floor();
 
-            if((floor.id <= this.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!blends.test(floor) && !tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > this.cacheLayer.ordinal() && !sameLayer) ||
+            if(floor.edgeRegions == null || (floor.id <= this.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!blends.test(floor) && !tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > this.cacheLayer.ordinal() && !sameLayer) ||
                     (sameLayer && floor.cacheLayer == this.cacheLayer)) continue;
 
             TextureRegion region = floor.edgeRegions[i];
