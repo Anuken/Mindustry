@@ -32,6 +32,7 @@ public class SettingsMenuDialog extends SettingsDialog{
     public SettingsTable graphics;
     public SettingsTable game;
     public SettingsTable sound;
+    public SettingsTable cheats;
 
     private Table prefs;
     private Table menu;
@@ -78,6 +79,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         game = new SettingsTable(s);
         graphics = new SettingsTable(s);
         sound = new SettingsTable(s);
+        cheats = new SettingsTable(s);
 
         prefs = new Table();
         prefs.top();
@@ -95,6 +97,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
         menu.row();
         menu.addButton("$text.settings.language", ui.language::show);
+        menu.row();
+        menu.addButton("$text.settings.cheats", () -> visible(3));
 
         prefs.clearChildren();
         prefs.add(menu);
@@ -132,7 +136,6 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     void addSettings(){
         sound.volumePrefs();
-
         game.screenshakePref();
         //game.checkPref("smoothcam", true);
         game.checkPref("effects", true);
@@ -217,6 +220,22 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("fps", false);
         graphics.checkPref("lasers", true);
         graphics.checkPref("minimap", !mobile); //minimap is disabled by default on mobile devices
+
+        cheats.sliderPref("distribution-speed", 1, 1, 5, 1, 
+                          x -> (x == 1 ? Bundles.get("setting.distribution-speed.none") : Bundles.format("setting.distribution-speed.text", x)
+                        ));
+        cheats.sliderPref("crafting-speed", 1, 1, 5, 1, 
+                          y -> (y == 1 ? Bundles.get("setting.crafting-speed.none") : Bundles.format("setting.crafting-speed.text", y)
+                        ));
+        cheats.sliderPref("production-speed", 1, 1, 5, 1, 
+                          z -> (z == 1 ? Bundles.get("setting.production-speed.none") : Bundles.format("setting.production-speed.text", z)
+                        ));
+        cheats.sliderPref("power-amount", 1, 1, 5, 1, 
+                          z -> (z == 1 ? Bundles.get("setting.power-amount.none") : Bundles.format("setting.power-amount.text", z)
+                        ));
+        cheats.sliderPref("movement-speed", 1, 1, 5, 1, 
+                        z -> (z == 1 ? Bundles.get("setting.movement-speed.none") : Bundles.format("setting.movement-speed.text", z)
+                        ));
     }
 
     private void back(){
@@ -226,7 +245,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     private void visible(int index){
         prefs.clearChildren();
-        Table table = Mathf.select(index, game, graphics, sound);
+        Table table = Mathf.select(index, game, graphics, sound, cheats);
         prefs.add(table);
     }
 
