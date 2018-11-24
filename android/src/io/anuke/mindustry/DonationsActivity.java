@@ -68,7 +68,6 @@ public class DonationsActivity extends FragmentActivity{
         Fragment fragment = fragmentManager.findFragmentByTag("donationsFragment");
         if(fragment != null){
             fragment.onActivityResult(requestCode, resultCode, data);
-            //TODO donation event, set settings?
         }
     }
 }

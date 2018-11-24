@@ -30,7 +30,7 @@ public class TutorialSector{
             new ItemMission(Items.copper, 100).setMessage("$tutorial.morecopper"),
 
             new BlockMission(TurretBlocks.duo).setMessage("$tutorial.turret"),
-            //TODO fill turret with items mission
+            /
             //new BlockMission(ProductionBlocks.mechanicalDrill).setMessage("$tutorial.drillturret"),
 
             // Create a wave mission which spawns the core at 60, 60 rather than in the center of the map

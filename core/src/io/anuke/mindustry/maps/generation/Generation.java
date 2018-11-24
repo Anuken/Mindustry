@@ -30,7 +30,6 @@ public class Generation{
         return tiles[x][y];
     }
 
-    //TODO implement
     Item drillItem(int x, int y, Drill block){
         if(block.isMultiblock()){
             Item result = null;

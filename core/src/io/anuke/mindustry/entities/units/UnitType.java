@@ -19,7 +19,6 @@ import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
-//TODO merge unit type with mech
 public class UnitType extends UnlockableContent{
     protected final Supplier<? extends BaseUnit> constructor;
 
