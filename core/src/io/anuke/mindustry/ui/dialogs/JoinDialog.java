@@ -205,7 +205,6 @@ public class JoinDialog extends FloatingDialog{
         content().table(t -> {
             t.add("$text.name").padRight(10);
             t.addField(Settings.getString("name"), text -> {
-                if(text.isEmpty()) return;
                 player.name = text;
                 Settings.put("name", text);
                 Settings.save();
