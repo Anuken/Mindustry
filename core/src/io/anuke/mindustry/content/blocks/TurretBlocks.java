@@ -106,7 +106,7 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         arc = new PowerTurret("arc"){{
             shootType = AmmoTypes.arc;
-            reload = 75f;
+            reload = 85f;
             shootShake = 1f;
             shootCone = 40f;
             rotatespeed = 8f;
@@ -121,7 +121,7 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         swarmer = new BurstTurret("swarmer"){{
             ammoTypes = new AmmoType[]{AmmoTypes.missileExplosive, AmmoTypes.missileIncindiary, AmmoTypes.missileSurge};
-            reload = 5f;
+            reload = 50f;
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;

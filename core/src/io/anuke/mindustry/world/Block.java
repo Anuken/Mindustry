@@ -153,7 +153,7 @@ public class Block extends BaseBlock {
         TileEntity entity = tile.entity();
 
         for(Tile other : getPowerConnections(tile, tempTiles)){
-            if(other.entity.power != null){
+            if(other.entity.power != null && other.entity.power.graph != null){
                 other.entity.power.graph.add(entity.power.graph);
             }
         }

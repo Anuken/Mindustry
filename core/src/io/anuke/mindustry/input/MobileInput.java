@@ -230,7 +230,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             player.clearBuilding();
             mode = none;
             recipe = null;
-        }).visible(() -> player.isBuilding() || recipe != null);
+        }).visible(() -> player.isBuilding() || recipe != null || mode == breaking);
 
         //confirm button
         table.addImageButton("icon-check", "clear-partial", 16 * 2f, () -> {
