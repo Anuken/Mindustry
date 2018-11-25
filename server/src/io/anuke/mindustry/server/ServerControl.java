@@ -350,18 +350,30 @@ public class ServerControl extends Module{
             }
         });
 
-        handler.register("fillitems", "Fill the core with 2000 items.", arg -> {
+        handler.register("fillitems", "[team]", "Fill the core with 2000 items.", arg -> {
             if(!state.is(State.playing)){
                 err("Not playing. Host first.");
                 return;
             }
+            
+            try{
+                Team team = arg.length == 0 ? Team.blue : Team.valueOf(arg[0]);
 
-            for(Item item : content.items()){
-                if(item.type == ItemType.material){
-                    state.teams.get(Team.blue).cores.first().entity.items.add(item, 2000);
+                if(state.teams.get(team).cores.isEmpty()){
+                    err("That team has no cores.");
+                    return;
                 }
+                
+                for(Item item : content.items()){
+                    if(item.type == ItemType.material){
+                        state.teams.get(team).cores.first().entity.items.add(item, 2000);
+                    }
+                }
+                
+                info("Core filled.");
+            }catch(IllegalArgumentException ignored){
+                err("No such team exists.");
             }
-            info("Core filled.");
         });
 
         handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {

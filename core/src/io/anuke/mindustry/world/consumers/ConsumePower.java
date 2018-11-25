@@ -21,7 +21,7 @@ public class ConsumePower extends Consume{
 
     @Override
     public String getIcon(){
-        return "icon-power";
+        return "icon-power-small";
     }
 
     @Override

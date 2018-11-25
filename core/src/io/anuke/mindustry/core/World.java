@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
+import io.anuke.mindustry.ai.WaveSpawner;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -30,6 +31,7 @@ public class World extends Module{
     public final WorldGenerator generator = new WorldGenerator();
     public final BlockIndexer indexer = new BlockIndexer();
     public final Pathfinder pathfinder = new Pathfinder();
+    public final WaveSpawner spawner = new WaveSpawner();
 
     private Map currentMap;
     private Sector currentSector;

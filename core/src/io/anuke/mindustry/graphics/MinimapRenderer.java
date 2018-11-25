@@ -80,7 +80,7 @@ public class MinimapRenderer implements Disposable{
         for(Unit unit : units){
             float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
             Draw.color(unit.getTeam().color);
-            Draw.rect("white", x + rx, y + ry, w / (sz * 2), h / (sz * 2));
+            Draw.crect(Draw.getBlankRegion(), x + rx, y + ry, w / (sz * 2), h / (sz * 2));
         }
 
         Draw.color();

@@ -15,6 +15,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadClient;
 import io.anuke.mindustry.net.Net;
@@ -95,6 +96,7 @@ public class NetClient extends Module{
             ConnectPacket c = new ConnectPacket();
             c.name = player.name;
             c.mobile = mobile;
+            c.versionType = Version.type;
             c.color = Color.rgba8888(player.color);
             c.usid = getUsid(packet.addressTCP);
             c.uuid = Platform.instance.getUUID();
@@ -284,6 +286,7 @@ public class NetClient extends Module{
         //read wave info
         state.wavetime = input.readFloat();
         state.wave = input.readInt();
+        state.enemies = input.readInt();
 
         byte cores = input.readByte();
         for(int i = 0; i < cores; i++){

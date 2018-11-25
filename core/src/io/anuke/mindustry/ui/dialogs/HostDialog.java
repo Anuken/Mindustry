@@ -28,7 +28,6 @@ public class HostDialog extends FloatingDialog{
         content().table(t -> {
             t.add("$text.name").padRight(10);
             t.addField(Settings.getString("name"), text -> {
-                if(text.isEmpty()) return;
                 player.name = text;
                 Settings.put("name", text);
                 Settings.save();
@@ -50,6 +49,11 @@ public class HostDialog extends FloatingDialog{
         content().add().width(65f);
 
         content().addButton("$text.host", () -> {
+            if(Settings.getString("name").trim().isEmpty()){
+                ui.showInfo("$text.noname");
+                return;
+            }
+
             ui.loadfrag.show("$text.hosting");
             Timers.runTask(5f, () -> {
                 try{

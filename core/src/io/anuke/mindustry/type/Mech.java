@@ -11,7 +11,6 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
-//TODO merge unit type with mech
 public class Mech extends UnlockableContent{
     public final String name;
     public final String description;

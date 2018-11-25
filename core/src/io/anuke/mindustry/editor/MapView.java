@@ -175,7 +175,6 @@ public class MapView extends Element implements GestureListener{
 
     public void clearStack(){
         stack.clear();
-        //TODO clear und obuffer
     }
 
     public OperationStack getStack(){
@@ -292,7 +291,6 @@ public class MapView extends Element implements GestureListener{
             }
         }
 
-        //todo is it really math.max?
         float scaling = zoom * Math.min(width, height) / editor.getMap().width();
 
         Draw.color(Palette.accent);

@@ -17,12 +17,12 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.EffectEntity;
 import io.anuke.ucore.entities.trait.DrawTrait;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Translator;
 
 import java.util.Arrays;
@@ -33,6 +33,7 @@ public class Vars{
     public static final String appName = "Mindustry";
     public static final String discordURL = "https://discord.gg/mindustry";
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
+    public static final String contributorsURL = "https://api.github.com/repos/Anuken/Mindustry/contributors";
     public static final String crashReportURL = "http://mindustry.us.to/report";
     //time between waves in frames (on normal mode)
     public static final float wavespace = 60 * 60 * 1.5f;
@@ -49,8 +50,7 @@ public class Vars{
     public static final int maxNameLength = 40;
     public static final float itemSize = 5f;
     public static final int tilesize = 8;
-    public static final int sectorSize = 250;
-    public static final int mapPadding = 3;
+    public static final int sectorSize = 256;
     public static final int invalidSector = Integer.MAX_VALUE;
     public static Locale[] locales;
     public static final Color[] playerColors = {
@@ -170,7 +170,7 @@ public class Vars{
         ios = Gdx.app.getType() == ApplicationType.iOS;
         android = Gdx.app.getType() == ApplicationType.Android;
 
-        dataDirectory = OS.getAppDataDirectory(appName);
+        dataDirectory = Settings.getDataDirectory(appName);
         customMapDirectory = dataDirectory.child("maps/");
         saveDirectory = dataDirectory.child("saves/");
         baseCameraScale = Math.round(Unit.dp.scl(4));

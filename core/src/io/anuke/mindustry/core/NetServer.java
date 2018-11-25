@@ -120,7 +120,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            if(packet.version == -1 && Version.build != -1 && !admins.allowsCustomClients()){
+            if(packet.versionType == null || ((packet.version == -1 || !packet.versionType.equals("official")) && Version.build != -1 && !admins.allowsCustomClients())){
                 kick(id, KickReason.customClient);
                 return;
             }
@@ -412,7 +412,16 @@ public class NetServer extends Module{
     }
 
     public boolean isWaitingForPlayers(){
-        return state.mode.isPvp && playerGroup.size() < 2;
+        if(state.mode.isPvp){
+            int used = 0;
+            for(Team t : Team.all){
+                if(playerGroup.count(p -> p.getTeam() == t) > 0){
+                    used ++;
+                }
+            }
+            return used < 2;
+        }
+        return false;
     }
 
     public void update(){
@@ -468,6 +477,7 @@ public class NetServer extends Module{
         //write wave datas
         dataStream.writeFloat(state.wavetime);
         dataStream.writeInt(state.wave);
+        dataStream.writeInt(state.enemies());
 
         ObjectSet<Tile> cores = state.teams.get(player.getTeam()).cores;
 

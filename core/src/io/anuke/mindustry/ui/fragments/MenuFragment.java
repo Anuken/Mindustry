@@ -11,6 +11,7 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -42,7 +43,7 @@ public class MenuFragment extends Fragment{
         }
 
         //version info
-        parent.fill(c -> c.bottom().left().add("Mindustry " + Version.number + "-" + Version.modifier + " " + Version.type + " / " + (Version.build == -1 ? "custom build" : "build " + Version.build))
+        parent.fill(c -> c.bottom().left().add(Strings.formatArgs("Mindustry v{0} {1}-{2} {3}", Version.number, Version.modifier, Version.type, (Version.build == -1 ? "custom build" : "build " + Version.build)))
                 .visible(() -> state.is(State.menu)));
     }
 
@@ -55,14 +56,14 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-                play = new MobileButton("icon-play-2", isize, "$text.play", this::showPlaySelect),
-                maps = new MobileButton("icon-map", isize, "$text.maps", ui.maps::show),
-                load = new MobileButton("icon-load", isize, "$text.load", ui.load::show),
-                join = new MobileButton("icon-add", isize, "$text.joingame", ui.join::show),
-                editor = new MobileButton("icon-editor", isize, "$text.editor", () -> ui.loadGraphics(ui.editor::show)),
-                tools = new MobileButton("icon-tools", isize, "$text.settings", ui.settings::show),
-                unlocks = new MobileButton("icon-unlocks", isize, "$text.unlocks", ui.unlocks::show),
-                donate = new MobileButton("icon-donate", isize, "$text.donate", Platform.instance::openDonations);
+            play = new MobileButton("icon-play-2", isize, "$text.play", this::showPlaySelect),
+            maps = new MobileButton("icon-map", isize, "$text.maps", ui.maps::show),
+            load = new MobileButton("icon-load", isize, "$text.load", ui.load::show),
+            join = new MobileButton("icon-add", isize, "$text.joingame", ui.join::show),
+            editor = new MobileButton("icon-editor", isize, "$text.editor", () -> ui.loadGraphics(ui.editor::show)),
+            tools = new MobileButton("icon-tools", isize, "$text.settings", ui.settings::show),
+            unlocks = new MobileButton("icon-unlocks", isize, "$text.unlocks", ui.unlocks::show),
+            donate = new MobileButton("icon-donate", isize, "$text.donate", Platform.instance::openDonations);
 
         if(Gdx.graphics.getWidth() > Gdx.graphics.getHeight()){
             container.add(play);

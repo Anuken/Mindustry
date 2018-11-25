@@ -335,7 +335,6 @@ public class Block extends BaseBlock {
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
     }
 
-    //TODO make this easier to config.
     public void setBars(){
         if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
         if(hasLiquids)
@@ -450,6 +449,14 @@ public class Block extends BaseBlock {
 
             return result;
         }
+    }
+
+    public String getDisplayName(Tile tile){
+        return formalName;
+    }
+
+    public TextureRegion getDisplayIcon(Tile tile){
+        return getEditorIcon();
     }
 
     public TextureRegion getEditorIcon(){

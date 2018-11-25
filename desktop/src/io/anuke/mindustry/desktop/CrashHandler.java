@@ -80,12 +80,11 @@ public class CrashHandler{
         ex(() -> value.addChild("gamemode", new JsonValue(Vars.state.mode.name())));
         ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
         ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name"))));
-        ex(() -> value.addChild("multithreading", new JsonValue(Settings.getBool("multithread"))));
         ex(() -> value.addChild("trace", new JsonValue(parseException(e))));
 
         try{
             Path path = Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes",
-                "crash-report-" + DateTimeFormatter.ofPattern("MM-dd-yyyy-HH:mm:ss").format(LocalDateTime.now()) + ".txt");
+                "crash-report-" + DateTimeFormatter.ofPattern("MM dd yyyy  HH mm ss").format(LocalDateTime.now()) + ".txt");
             Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
 
             Files.write(path, parseException(e).getBytes());
@@ -117,7 +116,7 @@ public class CrashHandler{
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-        return sw.toString().replace(e.getMessage(), e.getMessage().replace(System.getProperty("user.name"), "[USERNAME]"));
+        return sw.toString();
     }
 
     private static void ex(Runnable r){

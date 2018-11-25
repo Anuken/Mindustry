@@ -45,8 +45,6 @@ public class Sorter extends Block implements SelectionTrait{
     public void draw(Tile tile){
         super.draw(tile);
 
-        //TODO call event for change
-
         SorterEntity entity = tile.entity();
 
         Draw.color(entity.sortItem.color);
