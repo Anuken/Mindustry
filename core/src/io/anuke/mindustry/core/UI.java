@@ -123,6 +123,8 @@ public class UI extends SceneModule{
 
     @Override
     public void update(){
+        if(disableUI) return;
+
         if(Graphics.drawing()) Graphics.end();
 
         act();

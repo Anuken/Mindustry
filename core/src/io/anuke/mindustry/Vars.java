@@ -73,6 +73,7 @@ public class Vars{
     };
     //server port
     public static final int port = 6567;
+    public static boolean disableUI;
     public static boolean testMobile;
     //shorthand for whether or not this is running on android or ios
     public static boolean mobile;
