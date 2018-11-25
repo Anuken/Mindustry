@@ -120,7 +120,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            if(packet.version == -1 && Version.build != -1 && !admins.allowsCustomClients()){
+            if((packet.version == -1 || !packet.versionType.equals("official")) && Version.build != -1 && !admins.allowsCustomClients()){
                 kick(id, KickReason.customClient);
                 return;
             }
