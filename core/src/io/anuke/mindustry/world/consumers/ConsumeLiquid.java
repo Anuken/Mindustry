@@ -32,7 +32,7 @@ public class ConsumeLiquid extends Consume{
 
     @Override
     public String getIcon(){
-        return "icon-liquid";
+        return "icon-liquid-small";
     }
 
     @Override
@@ -47,8 +47,12 @@ public class ConsumeLiquid extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        stats.add(BlockStat.liquidUse, use * 60f, StatUnit.liquidSecond);
-        stats.add(BlockStat.inputLiquid, liquid);
+        if(!optional){
+            stats.add(BlockStat.liquidUse, use * 60f, StatUnit.liquidSecond);
+            stats.add(BlockStat.inputLiquid, liquid);
+        }else{
+            stats.add(BlockStat.boostLiquid, liquid);
+        }
     }
 
     float use(Block block, TileEntity entity){

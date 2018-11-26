@@ -25,7 +25,7 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.Group;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
@@ -145,7 +145,7 @@ public abstract class InputHandler extends InputAdapter{
         return false;
     }
 
-    public void buildUI(Group group){
+    public void buildUI(Table table){
 
     }
 
@@ -193,7 +193,7 @@ public abstract class InputHandler extends InputAdapter{
         }
 
         //call tapped event
-        if(tile.getTeam() == player.getTeam()){
+        if(!consumed && tile.getTeam() == player.getTeam()){
             Call.onTileTapped(player, tile);
         }
 

@@ -172,6 +172,25 @@ public class WorldGenerator{
 
             prepareTiles(tiles);
 
+            for(int x = 0; x < width; x++){
+                for(int y = 0; y < height; y++){
+                    Tile tile = tiles[x][y];
+
+                    byte elevation = tile.getElevation();
+
+                    for(GridPoint2 point : Geometry.d4){
+                        if(!Structs.inBounds(x + point.x, y + point.y, width, height)) continue;
+                        if(tiles[x + point.x][y + point.y].getElevation() < elevation){
+
+                            if(sim2.octaveNoise2D(1, 1, 1.0 / 8, x, y) > 0.8){
+                                tile.setElevation(-1);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
             world.setBlock(tiles[spawns.get(0).x][spawns.get(0).y], StorageBlocks.core, Team.blue);
 
             if(state.mode.isPvp){

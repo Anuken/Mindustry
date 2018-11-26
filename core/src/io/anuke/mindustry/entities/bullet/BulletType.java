@@ -55,6 +55,10 @@ public abstract class BulletType extends Content implements BaseBulletType<Bulle
         despawneffect = BulletFx.hitBulletSmall;
     }
 
+    public boolean collides(Bullet bullet, Tile tile){
+        return true;
+    }
+
     public void hitTile(Bullet b, Tile tile){
         hit(b);
     }

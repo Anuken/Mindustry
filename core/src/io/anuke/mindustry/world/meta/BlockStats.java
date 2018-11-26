@@ -12,9 +12,7 @@ import io.anuke.ucore.util.Log;
 
 import java.util.Locale;
 
-/**
- * Hold and organizes a list of block stats.
- */
+/**Hold and organizes a list of block stats.*/
 public class BlockStats{
     private static final boolean errorWhenMissing = false;
 
@@ -26,52 +24,37 @@ public class BlockStats{
         this.block = block;
     }
 
-    /**
-     * Adds a single float value with this stat, formatted to 2 decimal places.
-     */
+    /**Adds a single float value with this stat, formatted to 2 decimal places.*/
     public void add(BlockStat stat, float value, StatUnit unit){
         add(stat, new NumberValue(value, unit));
     }
 
-    /**
-     * Adds a single y/n boolean value.
-     */
+    /**Adds a single y/n boolean value.*/
     public void add(BlockStat stat, boolean value){
         add(stat, new BooleanValue(value));
     }
 
-    /**
-     * Adds an item value.
-     */
+    /**Adds an item value.*/
     public void add(BlockStat stat, Item item){
         add(stat, new ItemValue(new ItemStack(item, 1)));
     }
 
-    /**
-     * Adds a liquid value.
-     */
+    /**Adds a liquid value.*/
     public void add(BlockStat stat, Liquid liquid){
         add(stat, new LiquidValue(liquid));
     }
 
-
-    /**
-     * Adds an item value.
-     */
+    /**Adds an item value.*/
     public void add(BlockStat stat, ItemStack item){
         add(stat, new ItemValue(item));
     }
 
-    /**
-     * Adds a single string value with this stat.
-     */
+    /**Adds a single string value with this stat.*/
     public void add(BlockStat stat, String format, Object... args){
         add(stat, new StringValue(format, args));
     }
 
-    /**
-     * Adds a stat value.
-     */
+    /**Adds a stat value.*/
     public void add(BlockStat stat, StatValue value){
         if(!Bundles.has("text.blocks." + stat.name().toLowerCase(Locale.ROOT))){
             if(!errorWhenMissing){
@@ -102,6 +85,7 @@ public class BlockStats{
         dirty = true;
     }
 
+    /**Removes a stat, if it exists.*/
     public void remove(BlockStat stat){
         if(!map.containsKey(stat.category) || !map.get(stat.category).containsKey(stat)){
             throw new RuntimeException("No stat entry found: \"" + stat + "\" in block '" + block.name + "'!");

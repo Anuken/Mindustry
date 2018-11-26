@@ -45,8 +45,10 @@ public enum BlockStat{
     shots(StatCategory.shooting),
     reload(StatCategory.shooting),
     powerShot(StatCategory.shooting),
-    targetsAir(StatCategory.shooting),;
+    targetsAir(StatCategory.shooting),
 
+    boostItem(StatCategory.optional),
+    boostLiquid(StatCategory.optional),;
 
     public final StatCategory category;
 

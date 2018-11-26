@@ -65,7 +65,7 @@ public enum CacheLayer{
 
     protected void beginShader(){
         //renderer.getBlocks().endFloor();
-        renderer.effectSurface.getBuffer().bind();
+        renderer.effectSurface.getBuffer().begin();
         Graphics.clear(Color.CLEAR);
         //renderer.getBlocks().beginFloor();
     }
@@ -73,7 +73,9 @@ public enum CacheLayer{
     public void endShader(Shader shader){
         renderer.blocks.endFloor();
 
-        renderer.pixelSurface.getBuffer().bind();
+        //renderer.effectSurface.getBuffer().end();
+
+        renderer.pixelSurface.getBuffer().begin();
 
         Graphics.shader(shader);
         Graphics.begin();
