@@ -373,6 +373,10 @@ public class Control extends Module{
                 }
             }
 
+            if(Inputs.keyTap("screenshot")){
+                renderer.takeMapScreenshot();
+            }
+
         }else{
             if(!state.isPaused()){
                 Timers.update();

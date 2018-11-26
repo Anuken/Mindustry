@@ -81,6 +81,8 @@ public class Vars{
     public static boolean android;
     //main data directory
     public static FileHandle dataDirectory;
+    //subdirectory for screenshots
+    public static FileHandle screenshotDirectory;
     //directory for user-created map data
     public static FileHandle customMapDirectory;
     //save file directory
@@ -172,6 +174,7 @@ public class Vars{
         android = Gdx.app.getType() == ApplicationType.Android;
 
         dataDirectory = Settings.getDataDirectory(appName);
+        screenshotDirectory = dataDirectory.child("screenshots/");
         customMapDirectory = dataDirectory.child("maps/");
         saveDirectory = dataDirectory.child("saves/");
         baseCameraScale = Math.round(Unit.dp.scl(4));
