@@ -73,7 +73,7 @@ public enum CacheLayer{
     public void endShader(Shader shader){
         renderer.blocks.endFloor();
 
-        renderer.effectSurface.getBuffer().end();
+        //renderer.effectSurface.getBuffer().end();
 
         renderer.pixelSurface.getBuffer().begin();
 

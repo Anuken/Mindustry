@@ -157,17 +157,14 @@ public class Shaders{
 
         @Override
         public void apply(){
-            // shader.setUniformf("u_progress", progress);
             shader.setUniformf("u_color", color);
             shader.setUniformf("u_uv", region.getU(), region.getV());
             shader.setUniformf("u_uv2", region.getU2(), region.getV2());
-            //shader.setUniformf("u_time", Timers.time());
             shader.setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
         }
     }
 
     public static class Shield extends Shader{
-        //public Color color = new Color();
 
         public Shield(){
             super("shield", "default");
