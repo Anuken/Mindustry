@@ -5,7 +5,6 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
@@ -30,7 +29,6 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
     @Override
     public void init(){
         super.init();
-        stats.remove(BlockStat.liquidFuelUse);
     }
 
     @Override

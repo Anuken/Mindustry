@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
@@ -8,10 +7,9 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bits;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.content;
 
 public class Junction extends Block{
     protected float speed = 26; //frames taken to go through this junction
@@ -34,8 +32,8 @@ public class Junction extends Block{
     public void update(Tile tile){
         JunctionEntity entity = tile.entity();
 
-        for(int i = 0; i < 2; i++){
-            Buffer buffer = (i == 0 ? entity.bx : entity.by);
+        for(int i = 0; i < 4; i++){
+            Buffer buffer = entity.buffers[i];
 
             if(buffer.index > 0){
                 if(buffer.index > buffer.items.length) buffer.index = buffer.items.length;
@@ -44,17 +42,11 @@ public class Junction extends Block{
 
                 if(Timers.time() >= time + speed || Timers.time() < time){
 
-                    int val = Bits.getRightInt(l);
+                    Item item = content.item(Bits.getRightInt(l));
+                    Tile dest = tile.getNearby(i);
 
-                    Item item = content.item(Bits.getLeftShort(val));
-                    int direction = Bits.getRightShort(val);
-                    Tile dest = tile.getNearby(direction);
-
+                    //skip blocks that don't want the item, keep waiting until they do
                     if(dest == null || !dest.block().acceptItem(item, dest, tile)){
-                        if(buffer.index > 1 && Bits.getRightShort(Bits.getRightInt(buffer.items[1])) != direction){
-                            System.arraycopy(buffer.items, 1, buffer.items, 0, buffer.index - 1);
-                            buffer.index--;
-                        }
                         continue;
                     }
 
@@ -69,25 +61,19 @@ public class Junction extends Block{
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
         JunctionEntity entity = tile.entity();
-        boolean x = tile.x == source.x;
-        long value = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), Bits.packInt((short) item.id, source.relativeTo(tile.x, tile.y)));
-        if(x){
-            entity.bx.add(value);
-        }else{
-            entity.by.add(value);
-        }
+        long value = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), item.id);
+        int relative = source.relativeTo(tile.x, tile.y);
+        entity.buffers[relative].add(value);
     }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         JunctionEntity entity = tile.entity();
-        boolean x = tile.x == source.x;
+        int relative = source.relativeTo(tile.x, tile.y);
 
-        if(entity == null || entity.bx == null || entity.by == null || (x && entity.bx.full()) || (!x && entity.by.full()))
+        if(entity == null || relative == -1 || entity.buffers[relative].full())
             return false;
-        int dir = source.relativeTo(tile.x, tile.y);
-        if(dir == -1) return false;
-        Tile to = tile.getNearby(dir);
+        Tile to = tile.getNearby(relative);
         return to != null && to.block().acceptItem(item, to, tile);
     }
 
@@ -96,41 +82,8 @@ public class Junction extends Block{
         return new JunctionEntity();
     }
 
-    @Override
-    public Array<Object> getDebugInfo(Tile tile){
-        JunctionEntity entity = tile.entity();
-        Array<Object> arr = super.getDebugInfo(tile);
-        for(int i = 0; i < 4; i++){
-            arr.add("nearby." + i);
-            arr.add(tile.getNearby(i));
-        }
-
-        Consumer<Buffer> write = b -> {
-            for(int i = 0; i < b.index; i++){
-                long l = b.items[i];
-                float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
-                int val = Bits.getRightInt(l);
-                Item item = content.item(Bits.getLeftShort(val));
-                int direction = Bits.getRightShort(val);
-                Tile dest = tile.getNearby(direction);
-                arr.add("  bufferx.item");
-                arr.add(time + " | " + item.name + " | " + dest.block() + ":" + dest.floor());
-            }
-        };
-
-        arr.add("buffer.bx");
-        arr.add(entity.bx.index);
-        write.accept(entity.bx);
-        arr.add("buffer.by");
-        arr.add(entity.bx.index);
-        write.accept(entity.by);
-
-        return arr;
-    }
-
     class JunctionEntity extends TileEntity{
-        Buffer bx = new Buffer();
-        Buffer by = new Buffer();
+        Buffer[] buffers = {new Buffer(), new Buffer(), new Buffer(), new Buffer()};
     }
 
     class Buffer{

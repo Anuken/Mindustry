@@ -16,7 +16,6 @@ import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.Minimap;
-import io.anuke.mindustry.ui.SelectionTable;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.graphics.Hue;
@@ -33,7 +32,7 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class HudFragment extends Fragment{
-    public final BlocksFragment blockfrag = new BlocksFragment();
+    public final PlacementFragment blockfrag = new PlacementFragment();
 
     private ImageButton menu, flip;
     private Stack wavetable;
@@ -199,12 +198,6 @@ public class HudFragment extends Fragment{
             t.add("$text.saveload");
         });
 
-        //tapped block indicator
-        parent.fill(t -> {
-            t.bottom().visible(() -> !state.is(State.menu));
-            t.add(new SelectionTable());
-        });
-
         blockfrag.build(Core.scene.getRoot());
     }
 
@@ -231,7 +224,6 @@ public class HudFragment extends Fragment{
 
     /**Show unlock notification for a new recipe.*/
     public void showUnlock(Recipe recipe){
-        blockfrag.rebuild();
 
         //if there's currently no unlock notification...
         if(lastUnlockTable == null){

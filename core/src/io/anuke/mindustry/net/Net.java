@@ -66,7 +66,7 @@ public class Net{
             }else if(error.contains("connection refused") || error.contains("route to host") || type.contains("unknownhost")){
                 error = Bundles.get("text.error.unreachable");
             }else if(type.contains("timeout")){
-                error = Bundles.get("text.error.timeout");
+                error = Bundles.get("text.error.timedout");
             }else if(error.equals("alreadyconnected")){
                 error = Bundles.get("text.error.alreadyconnected");
             }else if(!error.isEmpty()){
@@ -356,12 +356,13 @@ public class Net{
         Gdx.net.sendHttpRequest(req, new HttpResponseListener(){
             @Override
             public void handleHttpResponse(HttpResponse httpResponse){
-                listener.accept(httpResponse.getResultAsString());
+                String result = httpResponse.getResultAsString();
+                Gdx.app.postRunnable(() -> listener.accept(result));
             }
 
             @Override
             public void failed(Throwable t){
-                failure.accept(t);
+                Gdx.app.postRunnable(() -> failure.accept(t));
             }
 
             @Override

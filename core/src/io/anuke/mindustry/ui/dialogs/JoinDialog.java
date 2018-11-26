@@ -205,7 +205,6 @@ public class JoinDialog extends FloatingDialog{
         content().table(t -> {
             t.add("$text.name").padRight(10);
             t.addField(Settings.getString("name"), text -> {
-                if(text.isEmpty()) return;
                 player.name = text;
                 Settings.put("name", text);
                 Settings.save();
@@ -285,6 +284,11 @@ public class JoinDialog extends FloatingDialog{
     }
 
     void connect(String ip, int port){
+        if(Settings.getString("name").trim().isEmpty()){
+            ui.showInfo("$text.noname");
+            return;
+        }
+
         ui.loadfrag.show("$text.connecting");
 
         ui.loadfrag.setButton(() -> {

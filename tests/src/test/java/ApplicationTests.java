@@ -4,17 +4,23 @@ import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.blocks.CraftingBlocks;
+import io.anuke.mindustry.content.blocks.PowerBlocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Logic;
 import io.anuke.mindustry.core.NetServer;
 import io.anuke.mindustry.core.World;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Timers;
@@ -205,7 +211,14 @@ public class ApplicationTests{
     }
 
     @Test
-    void edgeTest(){
+    void inventoryDeposit(){
+        depositTest(CraftingBlocks.smelter, Items.copper);
+        depositTest(StorageBlocks.vault, Items.copper);
+        depositTest(PowerBlocks.thoriumReactor, Items.thorium);
+    }
+
+    @Test
+    void edges(){
         GridPoint2[] edges = Edges.getEdges(1);
         assertEquals(edges[0], new GridPoint2(1, 0));
         assertEquals(edges[1], new GridPoint2(0, 1));
@@ -214,5 +227,23 @@ public class ApplicationTests{
 
         GridPoint2[] edges2 = Edges.getEdges(2);
         assertEquals(8, edges2.length);
+    }
+
+    void depositTest(Block block, Item item){
+        BaseUnit unit = UnitTypes.alphaDrone.create(Team.none);
+        Tile tile = new Tile(0, 0, Blocks.air.id, block.id);
+        int capacity = tile.block().itemCapacity;
+
+        int deposited = tile.block().acceptStack(item, capacity - 1, tile, unit);
+        assertEquals(capacity - 1, deposited);
+
+        tile.block().handleStack(item, capacity - 1, tile, unit);
+        assertEquals(tile.entity.items.get(item), capacity - 1);
+
+        int overflow = tile.block().acceptStack(item, 10, tile, unit);
+        assertEquals(1, overflow);
+
+        tile.block().handleStack(item, 1, tile, unit);
+        assertEquals(capacity, tile.entity.items.get(item));
     }
 }

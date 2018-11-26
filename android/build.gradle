@@ -93,7 +93,7 @@ android {
 
         applicationId "io.anuke.mindustry"
         minSdkVersion 14
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode code
         versionName versionNameResult
     }

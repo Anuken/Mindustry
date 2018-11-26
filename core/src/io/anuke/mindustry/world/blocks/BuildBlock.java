@@ -42,7 +42,7 @@ public class BuildBlock extends Block{
         super(name);
         update = true;
         size = Integer.parseInt(name.charAt(name.length() - 1) + "");
-        health = 1;
+        health = 10;
         layer = Layer.placement;
         consumesTap = true;
         solidifes = true;
@@ -115,15 +115,6 @@ public class BuildBlock extends Block{
 
         if(!tile.floor().solid && !tile.floor().isLiquid){
             RubbleDecal.create(tile.drawx(), tile.drawy(), size);
-        }
-    }
-
-    @Override
-    public void afterDestroyed(Tile tile, TileEntity e){
-        BuildEntity entity = (BuildEntity) e;
-
-        if(entity.previous != null && entity.previous.synthetic()){
-            tile.setBlock(entity.previous);
         }
     }
 

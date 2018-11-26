@@ -42,7 +42,7 @@ public class Cultivator extends Drill{
         stats.remove(BlockStat.drillTier);
         stats.add(BlockStat.drillTier, table -> {
             table.addImage("grass1").size(8 * 3).padBottom(3).padTop(3);
-            // TODO: find out localized name and add tool tip
+            table.add(Blocks.grass.formalName).padLeft(3);
         });
     }
 

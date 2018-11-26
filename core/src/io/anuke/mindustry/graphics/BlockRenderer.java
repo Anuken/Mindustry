@@ -21,7 +21,7 @@ import static io.anuke.ucore.core.Core.camera;
 
 public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
-    private final static int expandr = 4;
+    private final static int expandr = 6;
 
     private FloorRenderer floorRenderer;
 

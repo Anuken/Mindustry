@@ -5,8 +5,7 @@ Color: {
 	gray: {a: 1, b: 0.32, g: 0.32, r: 0.32 },
     lightgray: {a: 1, b: 0.65, g: 0.65, r: 0.65 }
 	orange: {hex: "FFA500"},
-	accent: {hex: "f4ba6e"},
-	accentDark: {hex: "f4ba6e"},
+	accent: {hex: "ffd37f"}
 },
 TintedDrawable: {
 	dialogDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.9} },
@@ -15,12 +14,12 @@ TintedDrawable: {
 	chatfield: {name: white, color: {r: 0, g: 0, b: 0, a: 0.2}},
 	clear: {name: white, color: {r: 0.1, g: 0.1, b: 0.1, a: 0.75}},
 	none: {name: white, color: {r: 0, g: 0, b: 0, a: 0}},
-	clear-over: {name: white, color: {r: 1, g: 1, b: 1, a: 0.2} },
-	clear-down: {name: white, color: {r: 1, g: 1, b: 1, a: 0.4} }
+	clear-over: {name: white, color: { hex: "#ffffff82" }},
+	clear-alpha: {name: white, color: { hex: "#ffd37fff" }},
+	clear-down: {name: white, color: { hex: "#ffd37fff" }}
 },
 ButtonStyle: {
 	default: {down: button-down, up: button },
-	menu: {up: text-sides, over: text-sides-over, down: text-sides-down},
 	toggle: {checked: button-down, down: button-down, up: button }
 },
 TextButtonStyle: {
@@ -28,6 +27,7 @@ TextButtonStyle: {
 	discord: {font: default-font, fontColor: white, up: discord-banner},
 	info: {font: default-font, fontColor: white, up: info-banner},
 	clear: {down: clear-down, up: clear, over: clear-over, font: default-font, fontColor: white, disabledFontColor: gray },
+	clear-partial: {down: white, up: button-select, over: clear-down, font: default-font, fontColor: white, disabledFontColor: gray },
 	empty: {font: default-font},
 	toggle: {font: default-font, fontColor: white, checked: button-down, down: button-down, up: button, over: button-over, disabled: button, disabledFontColor: gray }
 },
@@ -40,6 +40,9 @@ ImageButtonStyle: {
 	toggle: {checked: button-down, down: button-down, up: button, imageDisabledColor: gray, imageUpColor: white  },
 	select: {checked: button-select, up: none },
 	clear: {down: clear-down, up: clear, over: clear-over},
+	clear-partial: {down: clear-down, up: none, over: clear-over},
+	clear-toggle: {down: clear-down, checked: clear-down, up: clear, over: clear-over},
+	clear-toggle-partial: {down: clear-down, checked: clear-down, up: none, over: clear-over},
 },
 ScrollPaneStyle: {
 	default: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},

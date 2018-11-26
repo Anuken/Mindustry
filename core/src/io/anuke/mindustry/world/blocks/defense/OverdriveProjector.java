@@ -36,6 +36,7 @@ public class OverdriveProjector extends Block{
     protected float speedBoost = 1.5f;
     protected float speedBoostPhase = 0.75f;
     protected float useTime = 400f;
+    protected float phaseRangeBoost = 20f;
 
     public OverdriveProjector(String name){
         super(name);
@@ -66,7 +67,7 @@ public class OverdriveProjector extends Block{
         }
 
         if(entity.charge >= reload){
-            float realRange = range + entity.phaseHeat * 20f;
+            float realRange = range + entity.phaseHeat * phaseRangeBoost;
             float realBoost = speedBoost + entity.phaseHeat*speedBoostPhase;
 
             Effects.effect(BlockFx.overdriveWave, Hue.mix(color, phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
@@ -97,8 +98,11 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawSelect(Tile tile){
+        OverdriveEntity entity = tile.entity();
+        float realRange = range + entity.phaseHeat * phaseRangeBoost;
+
         Draw.color(color);
-        Lines.dashCircle(tile.drawx(), tile.drawy() - 1f, range);
+        Lines.dashCircle(tile.drawx(), tile.drawy(), realRange);
         Draw.color();
     }
 
