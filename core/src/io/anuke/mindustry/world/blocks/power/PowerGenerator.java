@@ -27,7 +27,7 @@ public class PowerGenerator extends PowerDistributor{
 
     @Override
     public float getPowerProduction(Tile tile){
-        return powerProduction * tile.<GeneratorEntity>entity().productionEfficiency * tile.entity.delta();
+        return powerProduction * tile.<GeneratorEntity>entity().productionEfficiency;
     }
 
     @Override

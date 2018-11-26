@@ -338,7 +338,7 @@ public class Block extends BaseBlock {
 
     //TODO make this easier to config.
     public void setBars(){
-        if(consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
+        if(consumes.has(ConsumePower.class)){
             bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.satisfaction));
         }
         if(hasLiquids)

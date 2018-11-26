@@ -37,7 +37,7 @@ public class PowerGraph{
     public float getPowerProduced(){
         float powerProduced = 0f;
         for(Tile producer : producers){
-            powerProduced += producer.block().getPowerProduction(producer);
+            powerProduced += producer.block().getPowerProduction(producer) * producer.entity.delta();
         }
         return powerProduced;
     }
@@ -47,7 +47,7 @@ public class PowerGraph{
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
             if(consumes.has(ConsumePower.class)){
-                powerNeeded += consumes.get(ConsumePower.class).requestedPower(consumer.block(), consumer.entity);
+                powerNeeded += consumes.get(ConsumePower.class).requestedPower(consumer.block(), consumer.entity) * consumer.entity.delta();
             }
         }
         return powerNeeded;
@@ -69,7 +69,7 @@ public class PowerGraph{
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
             if(consumes.has(ConsumePower.class)){
-                totalCapacity += consumes.get(ConsumePower.class).requestedPower(battery.block(), battery.entity);
+                totalCapacity += consumes.get(ConsumePower.class).requestedPower(battery.block(), battery.entity) * battery.entity.delta();
             }
         }
         return totalCapacity;
@@ -218,6 +218,8 @@ public class PowerGraph{
                     }
                 }
             }
+            // Update the graph once so direct consumers without any connected producer lose their power
+            graph.update();
         }
     }
 
