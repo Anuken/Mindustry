@@ -22,12 +22,12 @@ public class PowerGenerator extends PowerDistributor{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(generationType, powerProduction, StatUnit.powerSecond);
+        stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
     }
 
     @Override
     public float getPowerProduction(Tile tile){
-        return powerProduction * tile.<GeneratorEntity>entity().productionEfficiency * tile.entity.delta();
+        return powerProduction * tile.<GeneratorEntity>entity().productionEfficiency;
     }
 
     @Override

@@ -101,5 +101,47 @@ public class PowerTests extends PowerTestFixture{
             powerGraph.update();
             assertEquals(expectedSatisfaction, bufferedConsumerTile.entity.power.satisfaction, MathUtils.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of buffered consumer did not match");
         }
+
+        /** Tests the satisfaction of a single direct consumer after a single update of the power graph which contains a single producer and a single battery.
+         *  The used battery is created with a maximum capacity of 100 and receives ten power per tick.
+         */
+        @TestFactory
+        DynamicTest[] testDirectConsumptionWithBattery(){
+            return new DynamicTest[]{
+                dynamicTest("01", () -> test_directConsumptionWithBattery(10.0f, 0.0f, 0.0f, 10.0f, 0.0f, "Empty battery, no consumer")),
+                dynamicTest("02", () -> test_directConsumptionWithBattery(10.0f, 0.0f, 90.0f, 100.0f, 0.0f, "Battery full after update, no consumer")),
+                dynamicTest("03", () -> test_directConsumptionWithBattery(10.0f, 0.0f, 100.0f, 100.0f, 0.0f, "Full battery, no consumer")),
+                dynamicTest("04", () -> test_directConsumptionWithBattery(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, "No producer, no consumer, empty battery")),
+                dynamicTest("05", () -> test_directConsumptionWithBattery(0.0f, 0.0f, 100.0f, 100.0f, 0.0f, "No producer, no consumer, full battery")),
+                dynamicTest("06", () -> test_directConsumptionWithBattery(0.0f, 10.0f, 0.0f, 0.0f, 0.0f, "No producer, empty battery")),
+                dynamicTest("07", () -> test_directConsumptionWithBattery(0.0f, 10.0f, 100.0f, 90.0f, 1.0f, "No producer, full battery")),
+                dynamicTest("08", () -> test_directConsumptionWithBattery(0.0f, 10.0f, 5.0f, 0.0f, 0.5f, "No producer, low battery")),
+                dynamicTest("09", () -> test_directConsumptionWithBattery(5.0f, 10.0f, 5.0f, 0.0f, 1.0f, "Producer + Battery = Consumed")),
+            };
+        }
+        void test_directConsumptionWithBattery(float producedPower, float requestedPower, float initialBatteryCapacity, float expectedBatteryCapacity, float expectedSatisfaction, String parameterDescription){
+            PowerGraph powerGraph = new PowerGraph();
+
+            if(producedPower > 0.0f){
+                Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
+                powerGraph.add(producerTile);
+            }
+            Tile directConsumerTile = null;
+            if(requestedPower > 0.0f){
+                directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requestedPower, 0.6f));
+                powerGraph.add(directConsumerTile);
+            }
+            float maxCapacity = 100f;
+            Tile batteryTile = createFakeTile(0, 2, createFakeBattery(maxCapacity, 10 ));
+            batteryTile.entity.power.satisfaction = initialBatteryCapacity / maxCapacity;
+
+            powerGraph.add(batteryTile);
+
+            powerGraph.update();
+            assertEquals(expectedBatteryCapacity, batteryTile.entity.power.satisfaction * maxCapacity, MathUtils.FLOAT_ROUNDING_ERROR, parameterDescription + ": Expected battery capacity did not match");
+            if(directConsumerTile != null){
+                assertEquals(expectedSatisfaction, directConsumerTile.entity.power.satisfaction, MathUtils.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
+            }
+        }
     }
 }

@@ -37,7 +37,7 @@ public class PowerGraph{
     public float getPowerProduced(){
         float powerProduced = 0f;
         for(Tile producer : producers){
-            powerProduced += producer.block().getPowerProduction(producer);
+            powerProduced += producer.block().getPowerProduction(producer) * producer.entity.delta();
         }
         return powerProduced;
     }
@@ -47,7 +47,7 @@ public class PowerGraph{
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
             if(consumes.has(ConsumePower.class)){
-                powerNeeded += consumes.get(ConsumePower.class).requestedPower(consumer.block(), consumer.entity);
+                powerNeeded += consumes.get(ConsumePower.class).requestedPower(consumer.block(), consumer.entity) * consumer.entity.delta();
             }
         }
         return powerNeeded;
@@ -69,7 +69,7 @@ public class PowerGraph{
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
             if(consumes.has(ConsumePower.class)){
-                totalCapacity += consumes.get(ConsumePower.class).requestedPower(battery.block(), battery.entity);
+                totalCapacity += consumes.get(ConsumePower.class).requestedPower(battery.block(), battery.entity) * battery.entity.delta();
             }
         }
         return totalCapacity;
@@ -80,9 +80,15 @@ public class PowerGraph{
         if(MathUtils.isEqual(stored, 0f)){ return 0f; }
 
         float used = Math.min(stored, needed);
-        float percentageRemaining = 1f - (used / stored);
+        float consumedPowerPercentage = Math.min(1.0f, needed / stored);
         for(Tile battery : batteries){
-            battery.entity.power.satisfaction *= percentageRemaining;
+            Consumers consumes = battery.block().consumes;
+            if(consumes.has(ConsumePower.class)){
+                ConsumePower consumePower = consumes.get(ConsumePower.class);
+                if(consumePower.powerCapacity > 0f){
+                    battery.entity.power.satisfaction = Math.max(0.0f, battery.entity.power.satisfaction - consumedPowerPercentage);
+                }
+            }
         }
         return used;
     }
@@ -91,9 +97,15 @@ public class PowerGraph{
         float capacity = getBatteryCapacity();
         if(MathUtils.isEqual(capacity, 0f)){ return 0f; }
 
-        float thing = Math.min(1, excess / capacity);
         for(Tile battery : batteries){
-            battery.entity.power.satisfaction += (1 - battery.entity.power.satisfaction) * thing;
+            Consumers consumes = battery.block().consumes;
+            if(consumes.has(ConsumePower.class)){
+                ConsumePower consumePower = consumes.get(ConsumePower.class);
+                if(consumePower.powerCapacity > 0f){
+                    float additionalPowerPercentage = Math.min(1.0f, excess / consumePower.powerCapacity);
+                    battery.entity.power.satisfaction = Math.min(1.0f, battery.entity.power.satisfaction + additionalPowerPercentage);
+                }
+            }
         }
         return Math.min(excess, capacity);
     }
@@ -120,7 +132,7 @@ public class PowerGraph{
     }
 
     public void update(){
-        if(threads.getFrameID() == lastFrameUpdated || consumers.size == 0 || producers.size == 0){
+        if(threads.getFrameID() == lastFrameUpdated || consumers.size == 0 && producers.size == 0 && batteries.size == 0){
             return;
         }
 
@@ -206,6 +218,8 @@ public class PowerGraph{
                     }
                 }
             }
+            // Update the graph once so direct consumers without any connected producer lose their power
+            graph.update();
         }
     }
 
