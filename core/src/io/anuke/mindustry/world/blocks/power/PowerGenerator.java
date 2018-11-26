@@ -22,7 +22,7 @@ public class PowerGenerator extends PowerDistributor{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(generationType, powerProduction, StatUnit.powerSecond);
+        stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
     }
 
     @Override

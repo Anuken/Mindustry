@@ -132,7 +132,7 @@ public class PowerGraph{
     }
 
     public void update(){
-        if(threads.getFrameID() == lastFrameUpdated || consumers.size == 0 || producers.size == 0){
+        if(threads.getFrameID() == lastFrameUpdated || consumers.size == 0 && producers.size == 0 && batteries.size == 0){
             return;
         }
 
