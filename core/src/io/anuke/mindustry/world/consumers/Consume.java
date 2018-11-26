@@ -11,8 +11,8 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import static io.anuke.mindustry.Vars.mobile;
 
 public abstract class Consume{
-    private boolean optional;
-    private boolean update = true;
+    protected boolean optional;
+    protected boolean update = true;
 
     public Consume optional(boolean optional){
         this.optional = optional;

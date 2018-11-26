@@ -356,12 +356,13 @@ public class Net{
         Gdx.net.sendHttpRequest(req, new HttpResponseListener(){
             @Override
             public void handleHttpResponse(HttpResponse httpResponse){
-                listener.accept(httpResponse.getResultAsString());
+                String result = httpResponse.getResultAsString();
+                Gdx.app.postRunnable(() -> listener.accept(result));
             }
 
             @Override
             public void failed(Throwable t){
-                failure.accept(t);
+                Gdx.app.postRunnable(() -> failure.accept(t));
             }
 
             @Override

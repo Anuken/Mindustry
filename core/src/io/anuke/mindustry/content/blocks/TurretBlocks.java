@@ -32,24 +32,13 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         hail = new ArtilleryTurret("hail"){{
             ammoTypes = new AmmoType[]{AmmoTypes.artilleryDense, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
-            reload = 70f;
+            reload = 60f;
             recoil = 2f;
             range = 230f;
             inaccuracy = 1f;
             shootCone = 10f;
             health = 120;
         }};
-/*
-        scatter = new BurstTurret("scatter"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.flakCopper};
-            reload = 70f;
-            recoil = 2f;
-            shots = 3;
-            range = 220f;
-            inaccuracy = 2f;
-            shootCone = 40f;
-            health = 120;
-        }};*/
 
         scorch = new LiquidTurret("scorch"){
             protected TextureRegion shootRegion;
@@ -117,11 +106,11 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         arc = new PowerTurret("arc"){{
             shootType = AmmoTypes.arc;
-            reload = 55f;
+            reload = 85f;
             shootShake = 1f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUsed = 7f;
+            powerUsed = 10f;
             powerCapacity = 30f;
             range = 150f;
             shootEffect = ShootFx.lightningShoot;
@@ -132,7 +121,7 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         swarmer = new BurstTurret("swarmer"){{
             ammoTypes = new AmmoType[]{AmmoTypes.missileExplosive, AmmoTypes.missileIncindiary, AmmoTypes.missileSurge};
-            reload = 60f;
+            reload = 50f;
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
@@ -156,7 +145,7 @@ public class TurretBlocks extends BlockList implements ContentList{
                 size = 2;
                 range = 120f;
                 ammoTypes = new AmmoType[]{AmmoTypes.bulletCopper, AmmoTypes.bulletDense, AmmoTypes.bulletPyratite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
-                reload = 40f;
+                reload = 35f;
                 restitution = 0.03f;
                 ammoEjectBack = 3f;
                 cooldown = 0.03f;
@@ -216,7 +205,6 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         fuse = new ItemTurret("fuse"){{
-            //TODO make it use power
             ammoTypes = new AmmoType[]{AmmoTypes.fuseShotgun};
             reload = 50f;
             shootShake = 4f;

@@ -10,7 +10,6 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.TextField;
-import io.anuke.ucore.util.Log;
 
 import java.util.Random;
 
@@ -29,7 +28,6 @@ public abstract class Platform {
         if(!mobile) return; //this is mobile only, desktop doesn't need dialogs
 
         field.tapped(() -> {
-            Log.info("yappd");
             Dialog dialog = new Dialog("", "dialog");
             dialog.setFillParent(true);
             dialog.content().top();

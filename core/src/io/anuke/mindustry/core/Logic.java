@@ -93,7 +93,7 @@ public class Logic extends Module{
     }
 
     public void runWave(){
-        state.spawner.spawnEnemies();
+        world.spawner.spawnEnemies();
         state.wave++;
         state.wavetime = wavespace * state.difficulty.timeScaling;
 

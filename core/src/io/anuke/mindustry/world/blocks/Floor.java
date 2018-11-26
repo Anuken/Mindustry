@@ -191,7 +191,7 @@ public class Floor extends Block{
             if(floor instanceof OreBlock) floor = ((OreBlock) floor).base;
             if(cur instanceof OreBlock) cur = ((OreBlock) cur).base;
 
-            if((floor.id <= cur.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!cur.blends.test(floor) && !cur.tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > cur.cacheLayer.ordinal() && !sameLayer) ||
+            if(floor.edgeRegions == null || (floor.id <= cur.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!cur.blends.test(floor) && !cur.tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > cur.cacheLayer.ordinal() && !sameLayer) ||
                     (sameLayer && floor.cacheLayer == cur.cacheLayer)) continue;
 
             TextureRegion region = floor.edgeRegions[i];

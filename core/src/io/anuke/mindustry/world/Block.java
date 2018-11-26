@@ -150,7 +150,7 @@ public class Block extends BaseBlock {
         TileEntity entity = tile.entity();
 
         for(Tile other : getPowerConnections(tile, tempTiles)){
-            if(other.entity.power != null){
+            if(other.entity.power != null && other.entity.power.graph != null){
                 other.entity.power.graph.add(entity.power.graph);
             }
         }
@@ -331,7 +331,6 @@ public class Block extends BaseBlock {
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
     }
 
-    //TODO make this easier to config.
     public void setBars(){
         if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
         if(hasLiquids)

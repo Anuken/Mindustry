@@ -80,7 +80,6 @@ public class CrashHandler{
         ex(() -> value.addChild("gamemode", new JsonValue(Vars.state.mode.name())));
         ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
         ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name"))));
-        ex(() -> value.addChild("multithreading", new JsonValue(Settings.getBool("multithread"))));
         ex(() -> value.addChild("trace", new JsonValue(parseException(e))));
 
         try{

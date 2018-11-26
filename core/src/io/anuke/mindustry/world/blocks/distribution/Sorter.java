@@ -4,7 +4,6 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -13,13 +12,17 @@ import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.mindustry.gen.Call;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import static io.anuke.mindustry.Vars.*;
+
+import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.threads;
 
 public class Sorter extends Block implements SelectionTrait{
+    private static Item lastItem;
 
     public Sorter(String name){
         super(name);
@@ -35,6 +38,13 @@ public class Sorter extends Block implements SelectionTrait{
         return true;
     }
 
+    @Override
+    public void playerPlaced(Tile tile){
+        if(lastItem != null){
+            threads.runDelay(() -> Call.setSorterItem(null, tile, lastItem));
+        }
+    }
+
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSorterItem(Player player, Tile tile, Item item){
         SorterEntity entity = tile.entity();
@@ -44,8 +54,6 @@ public class Sorter extends Block implements SelectionTrait{
     @Override
     public void draw(Tile tile){
         super.draw(tile);
-
-        //TODO call event for change
 
         SorterEntity entity = tile.entity();
 
@@ -110,7 +118,10 @@ public class Sorter extends Block implements SelectionTrait{
     @Override
     public void buildTable(Tile tile, Table table){
         SorterEntity entity = tile.entity();
-        buildItemTable(table, () -> entity.sortItem, item -> Call.setSorterItem(null, tile, item));
+        buildItemTable(table, () -> entity.sortItem, item -> {
+            lastItem = item;
+            Call.setSorterItem(null, tile, item);
+        });
     }
 
     @Override
