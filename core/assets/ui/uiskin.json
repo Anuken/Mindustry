@@ -14,7 +14,7 @@ TintedDrawable: {
 	chatfield: {name: white, color: {r: 0, g: 0, b: 0, a: 0.2}},
 	dark: {name: white, color: {hex: "#000000ff"}},
 	none: {name: white, color: {r: 0, g: 0, b: 0, a: 0}},
-	flat: {name: white, color: {r: 0.0, g: 0.0, b: 0.0, a: 0.42}},
+	flat: {name: white, color: {r: 0.0, g: 0.0, b: 0.0, a: 0.6}},
     flat-over: {name: white, color: { hex: "#ffffff82" }},
     flat-alpha: {name: white, color: { hex: "#ffd37fff" }},
     flat-down: {name: white, color: { hex: "#ffd37fff" }}

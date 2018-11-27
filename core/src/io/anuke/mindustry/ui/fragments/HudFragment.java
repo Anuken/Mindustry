@@ -59,10 +59,10 @@ public class HudFragment extends Fragment{
                     select.left();
                     select.defaults().size(dsize).left();
 
-                    menu = select.addImageButton("icon-menu", isize, ui.paused::show).get();
-                    flip = select.addImageButton("icon-arrow-up", isize, this::toggleMenus).get();
+                    menu = select.addImageButton("icon-menu", "clear", isize, ui.paused::show).get();
+                    flip = select.addImageButton("icon-arrow-up", "clear", isize, this::toggleMenus).get();
 
-                    select.addImageButton("icon-pause", isize, () -> {
+                    select.addImageButton("icon-pause", "clear", isize, () -> {
                         if(Net.active()){
                             ui.listfrag.toggle();
                         }else{
@@ -77,7 +77,7 @@ public class HudFragment extends Fragment{
                         }
                     }).get();
 
-                    select.addImageButton("icon-settings", isize, () -> {
+                    select.addImageButton("icon-settings", "clear", isize, () -> {
                         if(Net.active() && mobile){
                             if(ui.chatfrag.chatOpen()){
                                 ui.chatfrag.hide();
@@ -150,7 +150,7 @@ public class HudFragment extends Fragment{
 
         parent.fill(t -> {
             t.visible(() -> netServer.isWaitingForPlayers() && !state.is(State.menu));
-            t.table("clear", c -> c.margin(10).add("$text.waiting.players"));
+            t.table("button", c -> c.add("$text.waiting.players"));
         });
 
         //'core is under attack' table
