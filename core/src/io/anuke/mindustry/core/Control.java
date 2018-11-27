@@ -53,7 +53,6 @@ public class Control extends Module{
     private Throwable error;
 
     public Control(){
-
         saves = new Saves();
         unlocks = new Unlocks();
 

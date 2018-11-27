@@ -165,6 +165,7 @@ public class PlacementFragment extends Fragment{
                 frame.addImage("blank").color(Palette.accent).colspan(3).height(3*2).growX();
                 frame.row();
                 frame.table("pane-2", blocksSelect -> {
+                    blocksSelect.margin(4).marginTop(0);
                     blocksSelect.table(blocks -> blockTable = blocks).grow();
                     blocksSelect.row();
                     blocksSelect.table(input::buildUI).growX();

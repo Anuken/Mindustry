@@ -11,6 +11,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.type.Recipe;
@@ -94,6 +95,8 @@ public class HudFragment extends Fragment{
                             i.getStyle().imageUp = Core.skin.getDrawable("icon-unlocks");
                         }
                     }).get();
+
+                    select.addImage("blank").color(Palette.accent).width(6f).fillY();
                 });
 
                 cont.row();
@@ -106,7 +109,7 @@ public class HudFragment extends Fragment{
             });
 
             Stack stack = new Stack();
-            TextButton waves = new TextButton("");
+            TextButton waves = new TextButton("", "wave");
             Table btable = new Table().margin(0);
 
             stack.add(waves);
@@ -116,7 +119,7 @@ public class HudFragment extends Fragment{
 
             addWaveTable(waves);
             addPlayButton(btable);
-            cont.add(stack).width(dsize * 4);
+            cont.add(stack).width(dsize * 4 + 6f);
 
             cont.row();
 
@@ -360,8 +363,6 @@ public class HudFragment extends Fragment{
 
         table.clearChildren();
         table.setTouchable(Touchable.enabled);
-
-        table.background("button");
 
         table.labelWrap(() ->
             world.getSector() == null ?

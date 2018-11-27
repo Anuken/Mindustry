@@ -105,12 +105,12 @@ public class PlayerListFragment extends Fragment{
                 float bs = (h + 14) / 2f;
 
                 button.table(t -> {
-                    t.defaults().size(bs - 1, bs + 3);
+                    t.defaults().size(bs);
 
                     t.addImageButton("icon-ban", 14 * 2,
-                        () -> ui.showConfirm("$text.confirm", "$text.confirmban", () -> Call.onAdminRequest(player, AdminAction.ban))).padBottom(-5.1f);
+                        () -> ui.showConfirm("$text.confirm", "$text.confirmban", () -> Call.onAdminRequest(player, AdminAction.ban)));
                     t.addImageButton("icon-cancel", 16 * 2,
-                        () -> ui.showConfirm("$text.confirm", "$text.confirmkick", () -> Call.onAdminRequest(player, AdminAction.kick))).padBottom(-5.1f);
+                        () -> ui.showConfirm("$text.confirm", "$text.confirmkick", () -> Call.onAdminRequest(player, AdminAction.kick)));
 
                     t.row();
 
