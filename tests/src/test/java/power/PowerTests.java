@@ -1,27 +1,21 @@
+package power;
+
 import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.blocks.PowerBlocks;
-import io.anuke.mindustry.content.blocks.ProductionBlocks;
 import io.anuke.mindustry.core.ContentLoader;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.power.PowerGraph;
+import io.anuke.mindustry.world.consumers.ConsumePower;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.jupiter.params.ParameterizedTest;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class PowerTests extends PowerTestFixture{
-
-    @BeforeAll
-    static void initializeDependencies(){
-        Vars.content = new ContentLoader();
-        Vars.content.load();
-        Vars.threads = new FakeThreadHandler();
-    }
 
     @BeforeEach
     void initTest(){
@@ -141,6 +135,30 @@ public class PowerTests extends PowerTestFixture{
             assertEquals(expectedBatteryCapacity, batteryTile.entity.power.satisfaction * maxCapacity, MathUtils.FLOAT_ROUNDING_ERROR, parameterDescription + ": Expected battery capacity did not match");
             if(directConsumerTile != null){
                 assertEquals(expectedSatisfaction, directConsumerTile.entity.power.satisfaction, MathUtils.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
+            }
+        }
+
+        /** Makes sure a direct consumer stops working after power production is set to zero. */
+        @Test
+        void testDirectConsumptionStopsWithNoPower(){
+            Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(10.0f));
+            Tile consumerTile = createFakeTile(0, 1, createFakeDirectConsumer(5.0f, 0.6f));
+
+            PowerGraph powerGraph = new PowerGraph();
+            powerGraph.add(producerTile);
+            powerGraph.add(consumerTile);
+            powerGraph.update();
+
+            assertEquals(1.0f, consumerTile.entity.power.satisfaction, MathUtils.FLOAT_ROUNDING_ERROR);
+
+            powerGraph.remove(producerTile);
+            powerGraph.add(consumerTile);
+            powerGraph.update();
+
+            assertEquals(0.0f, consumerTile.entity.power.satisfaction, MathUtils.FLOAT_ROUNDING_ERROR);
+            if(consumerTile.block().consumes.has(ConsumePower.class)){
+                ConsumePower consumePower = consumerTile.block().consumes.get(ConsumePower.class);
+                assertFalse(consumePower.valid(consumerTile.block(), consumerTile.entity()));
             }
         }
     }

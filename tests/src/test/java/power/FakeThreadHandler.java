@@ -1,4 +1,5 @@
-import com.badlogic.gdx.Gdx;
+package power;
+
 import io.anuke.mindustry.core.ThreadHandler;
 import io.anuke.ucore.core.Timers;
 

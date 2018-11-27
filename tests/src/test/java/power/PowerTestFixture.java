@@ -1,17 +1,30 @@
+package power;
+
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.core.ContentLoader;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.blocks.power.Battery;
 import io.anuke.mindustry.world.blocks.power.PowerGenerator;
 import io.anuke.mindustry.world.modules.PowerModule;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /** This class provides objects commonly used by power related unit tests.
  *  For now, this is a helper with static methods, but this might change.
  * */
 public class PowerTestFixture{
+
+    @BeforeAll
+    static void initializeDependencies(){
+        Vars.content = new ContentLoader();
+        Vars.content.load();
+        Vars.threads = new FakeThreadHandler();
+    }
 
     protected static PowerGenerator createFakeProducerBlock(float producedPower){
         return new PowerGenerator("fakegen"){{
@@ -26,13 +39,13 @@ public class PowerTestFixture{
     }
 
     protected static Block createFakeDirectConsumer(float powerPerTick, float minimumSatisfaction){
-        return new Block("fakedirectconsumer"){{
+        return new PowerBlock("fakedirectconsumer"){{
             consumes.powerDirect(powerPerTick, minimumSatisfaction);
         }};
     }
 
     protected static Block createFakeBufferedConsumer(float capacity, float ticksToFill){
-        return new Block("fakebufferedconsumer"){{
+        return new PowerBlock("fakebufferedconsumer"){{
             consumes.powerBuffered(capacity, ticksToFill);
         }};
     }
@@ -47,6 +60,10 @@ public class PowerTestFixture{
         try{
             Tile tile = new Tile(x, y);
 
+            // Using the Tile(int, int, byte, byte) constructor would require us to register any fake block or tile we create
+            // Since this part shall not be part of the test and would require more work anyway, we manually set the block and floor
+            // and call the private changed() method through reflections.
+
             Field field = Tile.class.getDeclaredField("wall");
             field.setAccessible(true);
             field.set(tile, block);
@@ -55,8 +72,10 @@ public class PowerTestFixture{
             field.setAccessible(true);
             field.set(tile, Blocks.sand);
 
-            tile.entity = block.newEntity();
-            tile.entity.power = new PowerModule();
+            Method method = Tile.class.getDeclaredMethod("changed");
+            method.setAccessible(true);
+            method.invoke(tile);
+
             return tile;
         }catch(Exception ex){
             return null;
