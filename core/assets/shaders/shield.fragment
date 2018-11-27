@@ -12,7 +12,6 @@ precision highp int;
 uniform sampler2D u_texture;
 uniform vec2 u_texsize;
 uniform float u_time;
-uniform float u_scaling;
 uniform float u_dp;
 uniform vec2 u_offset;
 
@@ -28,7 +27,7 @@ void main() {
     vec2 T = v_texCoord.xy;
     vec2 coords = (T * u_texsize) + u_offset;
 
-    T += vec2(sin(coords.y / 3.0 + u_time / 20.0) / 240.0, sin(coords.x / 3.0 + u_time / 20.0) / 240.0) * u_scaling;
+    T += vec2(sin(coords.y / 3.0 + u_time / 20.0), sin(coords.x / 3.0 + u_time / 20.0)) / u_texsize;
     
     float si = sin(u_time / 20.0) / 8.0;
 	vec4 color = texture2D(u_texture, T);

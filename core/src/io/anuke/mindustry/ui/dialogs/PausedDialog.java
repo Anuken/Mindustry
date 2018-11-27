@@ -51,27 +51,22 @@ public class PausedDialog extends FloatingDialog{
         content().row();
 
         if(!mobile){
-            content().defaults().width(220).height(50);
+            float dw = 210f;
+            content().defaults().width(dw).height(50).pad(5f);
 
-            content().addButton("$text.back", () -> {
-                hide();
-            });
+            content().addButton("$text.back", this::hide).colspan(2).width(dw*2 + 10f);
 
             content().row();
             content().addButton("$text.unlocks", ui.unlocks::show);
-
-            content().row();
             content().addButton("$text.settings", ui.settings::show);
 
             content().row();
             content().addButton("$text.savegame", save::show).disabled(s -> world.getSector() != null);
-
-            content().row();
             content().addButton("$text.loadgame", load::show).disabled(b -> Net.active());
 
             content().row();
 
-            content().addButton("$text.hostserver", ui.host::show).disabled(b -> Net.active());
+            content().addButton("$text.hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw*2 + 10f);
 
             content().row();
 
@@ -81,7 +76,7 @@ public class PausedDialog extends FloatingDialog{
                     runExitSave();
                     hide();
                 });
-            });
+            }).colspan(2).width(dw + 10f);
 
         }else{
             content().defaults().size(120f).pad(5);

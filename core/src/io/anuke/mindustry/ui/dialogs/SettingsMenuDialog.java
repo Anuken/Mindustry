@@ -95,7 +95,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         prefs.clearChildren();
         prefs.add(menu);
 
-        ScrollPane pane = new ScrollPane(prefs, "clear");
+        ScrollPane pane = new ScrollPane(prefs);
         pane.addCaptureListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
@@ -148,21 +148,21 @@ public class SettingsMenuDialog extends SettingsDialog{
                     dialog.setFillParent(false);
                     dialog.content().defaults().size(230f, 60f).pad(3);
                     dialog.addCloseButton();
-                    dialog.content().addButton("$text.settings.clearsectors", "clear", () -> {
+                    dialog.content().addButton("$text.settings.clearsectors", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
                             world.sectors.clear();
                             dialog.hide();
                         });
                     });
                     dialog.content().row();
-                    dialog.content().addButton("$text.settings.clearunlocks", "clear", () -> {
+                    dialog.content().addButton("$text.settings.clearunlocks", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
                             control.unlocks.reset();
                             dialog.hide();
                         });
                     });
                     dialog.content().row();
-                    dialog.content().addButton("$text.settings.clearall", "clear", () -> {
+                    dialog.content().addButton("$text.settings.clearall", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clearall.confirm", () -> {
                             Map<String, Object> map = new HashMap<>();
                             for(String value : Settings.prefs().get().keySet()){
@@ -208,6 +208,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
 
         graphics.checkPref("fps", false);
+        graphics.checkPref("indicators", true);
         graphics.checkPref("lasers", true);
         graphics.checkPref("minimap", !mobile); //minimap is disabled by default on mobile devices
     }

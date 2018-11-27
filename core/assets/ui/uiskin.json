@@ -5,29 +5,31 @@ Color: {
 	gray: {a: 1, b: 0.32, g: 0.32, r: 0.32 },
     lightgray: {a: 1, b: 0.65, g: 0.65, r: 0.65 }
 	orange: {hex: "FFA500"},
-	accent: {hex: "f4ba6e"},
-	accentDark: {hex: "f4ba6e"},
+	accent: {hex: "ffd37f"}
 },
 TintedDrawable: {
 	dialogDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.9} },
 	invis: {name: white, color: {r: 0, g: 0, b: 0, a: 0} }
 	loadDim: {name: white, color: {r: 0, g: 0, b: 0, a: 0.8} },
 	chatfield: {name: white, color: {r: 0, g: 0, b: 0, a: 0.2}},
-	clear: {name: white, color: {r: 0.1, g: 0.1, b: 0.1, a: 0.75}},
+	dark: {name: white, color: {hex: "#000000ff"}},
 	none: {name: white, color: {r: 0, g: 0, b: 0, a: 0}},
-	clear-over: {name: white, color: {r: 1, g: 1, b: 1, a: 0.2} },
-	clear-down: {name: white, color: {r: 1, g: 1, b: 1, a: 0.4} }
+	flat: {name: white, color: {r: 0.0, g: 0.0, b: 0.0, a: 0.6}},
+    flat-over: {name: white, color: { hex: "#ffffff82" }},
+    flat-alpha: {name: white, color: { hex: "#ffd37fff" }},
+    flat-down: {name: white, color: { hex: "#ffd37fff" }}
 },
 ButtonStyle: {
 	default: {down: button-down, up: button },
-	menu: {up: text-sides, over: text-sides-over, down: text-sides-down},
 	toggle: {checked: button-down, down: button-down, up: button }
 },
 TextButtonStyle: {
-	default: {over: button-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: gray, down: button-down, up: button, transition: 0 },
+	default: {over: button-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: gray, down: button-down, up: button},
+	wave: {font: default-font, fontColor: white, disabledFontColor: gray, up: button-edge-4},
+	clear: {over: flat-over, font: default-font, fontColor: white, disabledFontColor: gray, down: pane, up: flat},
 	discord: {font: default-font, fontColor: white, up: discord-banner},
 	info: {font: default-font, fontColor: white, up: info-banner},
-	clear: {down: clear-down, up: clear, over: clear-over, font: default-font, fontColor: white, disabledFontColor: gray },
+	clear-partial: {down: white, up: button-select, over: flat-down, font: default-font, fontColor: white, disabledFontColor: gray },
 	empty: {font: default-font},
 	toggle: {font: default-font, fontColor: white, checked: button-down, down: button-down, up: button, over: button-over, disabled: button, disabledFontColor: gray }
 },
@@ -39,21 +41,22 @@ ImageButtonStyle: {
 	static-down: {up: button-down },
 	toggle: {checked: button-down, down: button-down, up: button, imageDisabledColor: gray, imageUpColor: white  },
 	select: {checked: button-select, up: none },
-	clear: {down: clear-down, up: clear, over: clear-over},
+	clear: {down: flat-down, up: flat, over: flat-over},
+    clear-full: {down: white, up: button-select, over: flat-down},
+    clear-partial: {down: flat-down, up: none, over: flat-over},
+	clear-toggle: {down: flat-down, checked: flat-down, up: flat, over: flat-over},
+	clear-toggle-partial: {down: flat-down, checked: flat-down, up: none, over: flat-over},
 },
 ScrollPaneStyle: {
-	default: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
-	horizontal: {background: border, vScroll: scroll, vScrollKnob: scroll-knob-vertical, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal},
-	volume: {background: button, vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
-	clear: {vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
-	clear-black: {vScroll: scroll, vScrollKnob: scroll-knob-vertical-black}
+	default: {vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
+	horizontal: {vScroll: scroll, vScrollKnob: scroll-knob-vertical, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal},
 },
 WindowStyle: {
 	default: {titleFont: default-font, titleFontColor: accent },
 	dialog: {stageBackground: dialogDim, titleFont: default-font, background: window-empty, titleFontColor: accent }
 },
 KeybindDialogStyle: {
-	default: {keyColor: accent, keyNameColor: white, controllerColor: lightgray, paneStyle: clear},
+	default: {keyColor: accent, keyNameColor: white, controllerColor: lightgray},
 },
 SliderStyle: {
 	default-horizontal: {background: slider, knob: slider-knob, knobOver: slider-knob-over, knobDown: slider-knob-down},
@@ -64,8 +67,8 @@ LabelStyle: {
 	small: {font: default-font, fontColor: white }
 },
 TextFieldStyle: {
-	default: {font: default-font-chat, fontColor: white, disabledFontColor: gray, selection: selection, background: button, cursor: cursor, messageFont: default-font, messageFontColor: gray }
-	textarea: {font: default-font-chat, fontColor: white, disabledFontColor: gray, selection: selection, background: textarea, cursor: cursor, messageFont: default-font, messageFontColor: gray }
+	default: {font: default-font-chat, fontColor: white, disabledFontColor: gray, selection: selection, background: underline, cursor: cursor, messageFont: default-font, messageFontColor: gray }
+	textarea: {font: default-font-chat, fontColor: white, disabledFontColor: gray, selection: selection, background: underline, cursor: cursor, messageFont: default-font, messageFontColor: gray }
 },
 CheckBoxStyle: {
 	default: {checkboxOn: check-on, checkboxOff: check-off, checkboxOnOver: check-on-over, checkboxOver: check-over, font: default-font, fontColor: white, disabledFontColor: gray }

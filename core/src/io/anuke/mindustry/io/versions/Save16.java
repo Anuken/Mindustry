@@ -45,7 +45,7 @@ public class Save16 extends SaveFileVersion{
 
         content.setTemporaryMapper(readContentHeader(stream));
 
-        state.spawner.read(stream);
+        world.spawner.read(stream);
 
         readEntities(stream);
 
@@ -71,7 +71,7 @@ public class Save16 extends SaveFileVersion{
 
         writeContentHeader(stream);
 
-        state.spawner.write(stream); //spawnes
+        world.spawner.write(stream); //spawnes
 
         //--ENTITIES--
 

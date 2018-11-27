@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
@@ -58,7 +59,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private ButtonGroup<ImageButton> blockgroup;
 
     public MapEditorDialog(){
-        super("$text.mapeditor", "dialog");
+        super("", "dialog");
+
+        background("dark");
 
         editor = new MapEditor();
         view = new MapView(editor);
@@ -227,6 +230,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
     }
 
+    @Override
+    protected void drawBackground(Batch batch, float parentAlpha, float x, float y){
+        drawDefaultBackground(batch, parentAlpha, x, y);
+    }
+
     private void save(){
         String name = editor.getTags().get("name", "");
 
@@ -352,7 +360,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         table(cont -> {
             cont.left();
 
-            cont.table("button", mid -> {
+            cont.table(mid -> {
                 mid.top();
 
                 Table tools = new Table().top();
@@ -360,7 +368,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
                 Consumer<EditorTool> addTool = tool -> {
-                    ImageButton button = new ImageButton("icon-" + tool.name(), "toggle");
+                    ImageButton button = new ImageButton("icon-" + tool.name(), "clear-toggle");
                     button.clicked(() -> view.setTool(tool));
                     button.resizeImage(16 * 2f);
                     button.update(() -> button.setChecked(view.getTool() == tool));
@@ -368,21 +376,21 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     if(tool == EditorTool.pencil)
                         button.setChecked(true);
 
-                    tools.add(button).padBottom(-5.1f);
+                    tools.add(button);
                 };
 
-                tools.defaults().size(size, size + 4f).padBottom(-5.1f);
+                tools.defaults().size(size, size + 4f);
 
-                tools.addImageButton("icon-menu-large", 16 * 2f, menu::show);
+                tools.addImageButton("icon-menu-large", "clear", 16 * 2f, menu::show);
 
-                ImageButton grid = tools.addImageButton("icon-grid", "toggle", 16 * 2f, () -> view.setGrid(!view.isGrid())).get();
+                ImageButton grid = tools.addImageButton("icon-grid", "clear-toggle", 16 * 2f, () -> view.setGrid(!view.isGrid())).get();
 
                 addTool.accept(EditorTool.zoom);
 
                 tools.row();
 
-                ImageButton undo = tools.addImageButton("icon-undo", 16 * 2f, () -> view.undo()).get();
-                ImageButton redo = tools.addImageButton("icon-redo", 16 * 2f, () -> view.redo()).get();
+                ImageButton undo = tools.addImageButton("icon-undo", "clear", 16 * 2f, () -> view.undo()).get();
+                ImageButton redo = tools.addImageButton("icon-redo", "clear", 16 * 2f, () -> view.redo()).get();
 
                 addTool.accept(EditorTool.pick);
 
@@ -404,7 +412,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 addTool.accept(EditorTool.fill);
                 addTool.accept(EditorTool.elevation);
 
-                ImageButton rotate = tools.addImageButton("icon-arrow-16", 16 * 2f, () -> editor.setDrawRotation((editor.getDrawRotation() + 1) % 4)).get();
+                ImageButton rotate = tools.addImageButton("icon-arrow-16", "clear", 16 * 2f, () -> editor.setDrawRotation((editor.getDrawRotation() + 1) % 4)).get();
                 rotate.getImage().update(() -> {
                     rotate.getImage().setRotation(editor.getDrawRotation() * 90);
                     rotate.getImage().setOrigin(Align.center);
@@ -412,8 +420,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.row();
 
-                tools.table("button", t -> t.add("$text.editor.teams"))
-                        .colspan(3).height(40).width(size * 3f);
+                tools.table("underline", t -> t.add("$text.editor.teams"))
+                        .colspan(3).height(40).width(size * 3f).padBottom(3);
 
                 tools.row();
 
@@ -422,14 +430,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 int i = 0;
 
                 for(Team team : Team.all){
-                    ImageButton button = new ImageButton("white", "toggle");
-                    button.margin(4f, 4f, 10f, 4f);
+                    ImageButton button = new ImageButton("white", "clear-toggle-partial");
+                    button.margin(4f);
                     button.getImageCell().grow();
                     button.getStyle().imageUpColor = team.color;
                     button.clicked(() -> editor.setDrawTeam(team));
                     button.update(() -> button.setChecked(editor.getDrawTeam() == team));
                     teamgroup.add(button);
-                    tools.add(button).padBottom(-5.1f);
+                    tools.add(button);
 
                     if(i++ % 3 == 2) tools.row();
                 }
@@ -438,7 +446,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 mid.row();
 
-                mid.table("button", t -> {
+                mid.table("underline", t -> {
                     Slider slider = new Slider(0, MapEditor.brushSizes.length - 1, 1, false);
                     slider.moved(f -> editor.setBrushSize(MapEditor.brushSizes[(int) (float) f]));
 
@@ -450,28 +458,27 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 mid.row();
 
-                mid.table("button", t -> t.add("$text.editor.elevation"))
+                mid.table("underline", t -> t.add("$text.editor.elevation"))
                     .colspan(3).height(40).width(size * 3f);
 
                 mid.row();
 
-                mid.table("button", t -> {
+                mid.table("underline", t -> {
                     t.margin(0);
-                    t.addImageButton("icon-arrow-left", 16 * 2f, () -> editor.setDrawElevation(editor.getDrawElevation() - 1))
+                    t.addImageButton("icon-arrow-left", "clear-partial", 16 * 2f, () -> editor.setDrawElevation(editor.getDrawElevation() - 1))
                     .disabled(b -> editor.getDrawElevation() <= -1).size(size);
 
                     t.label(() -> editor.getDrawElevation() == -1 ? "$text.editor.slope" : (editor.getDrawElevation() + ""))
                     .size(size).get().setAlignment(Align.center, Align.center);
 
-                    t.addImageButton("icon-arrow-right", 16 * 2f, () -> editor.setDrawElevation(editor.getDrawElevation() + 1))
+                    t.addImageButton("icon-arrow-right", "clear-partial", 16 * 2f, () -> editor.setDrawElevation(editor.getDrawElevation() + 1))
                     .disabled(b -> editor.getDrawElevation() >= 63).size(size);
-                }).colspan(3).height(size).padTop(-5).width(size * 3f);
+                }).colspan(3).height(size).width(size * 3f);
 
             }).margin(0).left().growY();
 
 
-            cont.table("button", t -> t.add(view).grow())
-                    .margin(5).marginBottom(10).grow();
+            cont.table(t -> t.add(view).grow()).grow();
 
             cont.table(this::addBlockSelection).right().growY();
 
@@ -525,7 +532,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     private void addBlockSelection(Table table){
         Table content = new Table();
-        pane = new ScrollPane(content, "volume");
+        pane = new ScrollPane(content);
         pane.setFadeScrollBars(false);
         pane.setOverscroll(true, false);
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
@@ -552,7 +559,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 stack.add(new Image(region));
             }
 
-            ImageButton button = new ImageButton("white", "toggle");
+            ImageButton button = new ImageButton("white", "clear-toggle");
             button.clicked(() -> editor.setDrawBlock(block));
             button.resizeImage(8 * 4f);
             button.getImageCell().setActor(stack);
@@ -560,7 +567,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             button.getImage().remove();
             button.update(() -> button.setChecked(editor.getDrawBlock() == block));
             group.add(button);
-            content.add(button).pad(4f).size(53f, 58f);
+            content.add(button).size(60f);
 
             if(i++ % 3 == 2){
                 content.row();
@@ -569,9 +576,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         group.getButtons().get(2).setChecked(true);
 
-        Table extra = new Table("button");
-        extra.labelWrap(() -> editor.getDrawBlock().formalName).width(220f).center();
-        table.add(extra).growX();
+        table.table("underline", extra -> extra.labelWrap(() -> editor.getDrawBlock().formalName).width(220f).center()).growX();
         table.row();
         table.add(pane).growY().fillX();
     }

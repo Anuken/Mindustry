@@ -3,8 +3,8 @@ jdk:
 - openjdk8
 script:
 - "./gradlew test"
-- "./gradlew desktop:dist"
-- "./gradlew server:dist"
+- "./gradlew desktop:dist -Pbuildversion=${TRAVIS_TAG:1}"
+- "./gradlew server:dist -Pbuildversion=${TRAVIS_TAG:1}"
 
 deploy:
   provider: releases

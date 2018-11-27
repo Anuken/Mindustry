@@ -24,7 +24,7 @@ public class AdminsDialog extends FloatingDialog{
 
         Table table = new Table();
 
-        ScrollPane pane = new ScrollPane(table, "clear");
+        ScrollPane pane = new ScrollPane(table);
         pane.setFadeScrollBars(false);
 
         if(netServer.admins.getAdmins().size == 0){

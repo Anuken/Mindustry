@@ -4,7 +4,6 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 
-//TODO
 public class TurbineGenerator extends BurnerGenerator{
 
     public TurbineGenerator(String name){

@@ -17,8 +17,6 @@ import io.anuke.ucore.util.OS;
 import io.anuke.ucore.util.Strings;
 
 import java.net.NetworkInterface;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 
 import static io.anuke.mindustry.Vars.*;
@@ -26,7 +24,6 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopPlatform extends Platform{
     final static boolean useDiscord = OS.is64Bit;
     final static String applicationId = "398246104468291591";
-    final static DateFormat format = SimpleDateFormat.getDateTimeInstance();
     String[] args;
 
     public DesktopPlatform(String[] args){

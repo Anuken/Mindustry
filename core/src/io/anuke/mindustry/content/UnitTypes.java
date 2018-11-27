@@ -37,6 +37,7 @@ public class UnitTypes implements ContentList{
         };
 
         spirit = new UnitType("spirit", Spirit.class, Spirit::new){{
+            weapon = Weapons.healBlasterDrone;
             isFlying = true;
             drag = 0.01f;
             speed = 0.2f;

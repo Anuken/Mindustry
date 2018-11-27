@@ -23,7 +23,7 @@ import static io.anuke.mindustry.Vars.*;
 public class CustomGameDialog extends FloatingDialog{
 
     public CustomGameDialog(){
-        super("$text.level.select");
+        super("$text.customgame");
         addCloseButton();
         shown(this::setup);
 
@@ -35,7 +35,7 @@ public class CustomGameDialog extends FloatingDialog{
 
         Table maps = new Table();
         maps.marginRight(14);
-        ScrollPane pane = new ScrollPane(maps, "clear-black");
+        ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
         int maxwidth = (Gdx.graphics.getHeight() > Gdx.graphics.getHeight() ? 2 : 4);
@@ -52,7 +52,7 @@ public class CustomGameDialog extends FloatingDialog{
             if(mode.hidden) continue;
 
             modes.addButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode)
-                .update(b -> b.setChecked(state.mode == mode)).group(group).size(140f, 54f).padBottom(-5);
+                .update(b -> b.setChecked(state.mode == mode)).group(group).size(140f, 54f);
             if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);
@@ -139,7 +139,7 @@ public class CustomGameDialog extends FloatingDialog{
         d.setFillParent(false);
         Table table = new Table();
         table.defaults().pad(1f);
-        ScrollPane pane = new ScrollPane(table, "clear");
+        ScrollPane pane = new ScrollPane(table);
         pane.setFadeScrollBars(false);
         table.row();
         for(GameMode mode : GameMode.values()){

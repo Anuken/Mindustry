@@ -24,12 +24,12 @@ public interface SelectionTrait{
 
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         Table cont = new Table();
-        cont.defaults().size(38, 42).padBottom(-5.1f);
+        cont.defaults().size(38);
 
         int i = 0;
 
         if(nullItem){
-            ImageButton button = cont.addImageButton("white", "toggle", 24, () -> consumer.accept(null)).group(group).get();
+            ImageButton button = cont.addImageButton("white", "clear-toggle", 24, () -> consumer.accept(null)).group(group).get();
             button.getStyle().imageUp = new TextureRegionDrawable(Draw.region("icon-nullitem"));
             button.setChecked(holder.get() == null);
 
@@ -39,7 +39,7 @@ public interface SelectionTrait{
         for(Item item : items){
             if(!control.unlocks.isUnlocked(item)) continue;
 
-            ImageButton button = cont.addImageButton("white", "toggle", 24, () -> consumer.accept(item))
+            ImageButton button = cont.addImageButton("white", "clear-toggle", 24, () -> consumer.accept(item))
                     .group(group).get();
             button.getStyle().imageUp = new TextureRegionDrawable(item.region);
             button.setChecked(holder.get() == item);
