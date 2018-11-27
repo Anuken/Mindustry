@@ -45,8 +45,12 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
             }
         }
 
-        //liquid takes priority over solids
+        entity.productionEfficiency = 0.0f;
+        // Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
+        //       Power amount is delta'd by PowerGraph class already.
         float calculationDelta = entity.delta();
+
+        //liquid takes priority over solids
         if(liquid != null && entity.liquids.get(liquid) >= 0.001f && entity.cons.valid()){
             float baseLiquidEfficiency = getLiquidEfficiency(liquid) * this.liquidPowerMultiplier;
             float maximumPossible = maxLiquidGenerate * calculationDelta;
@@ -62,22 +66,16 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
             }
         }else if(entity.cons.valid()){
 
-            // TODO: Adapt to new power system
-            //float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * entity.delta()) * entity.efficiency;
-
             if(entity.generateTime <= 0f && entity.items.total() > 0){
                 Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
                 Item item = entity.items.take();
-                // TODO: Adapt to new power system
-                //entity.efficiency = getItemEfficiency(item);
+                entity.productionEfficiency = getItemEfficiency(item);
                 entity.explosiveness = item.explosiveness;
                 entity.generateTime = 1f;
             }
 
             if(entity.generateTime > 0f){
                 entity.generateTime -= 1f / itemDuration * entity.delta();
-                // TODO: Adapt to new power system
-                //entity.power.amount += maxPower;
                 entity.generateTime = Mathf.clamp(entity.generateTime);
 
                 if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
