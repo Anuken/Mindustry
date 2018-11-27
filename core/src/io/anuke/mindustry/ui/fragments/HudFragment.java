@@ -100,6 +100,8 @@ public class HudFragment extends Fragment{
                 });
 
                 cont.row();
+                cont.addImage("blank").height(6f).color(Palette.accent).fillX();
+                cont.row();
             }
 
             cont.update(() -> {
@@ -345,7 +347,7 @@ public class HudFragment extends Fragment{
         if(shown){
             shown = false;
             blockfrag.toggle(dur, in);
-            wavetable.actions(Actions.translateBy(0, (wavetable.getHeight() + dsize) - wavetable.getTranslation().y, dur, in));
+            wavetable.actions(Actions.translateBy(0, (wavetable.getHeight() + dsize + 6) - wavetable.getTranslation().y, dur, in));
             infolabel.actions(Actions.translateBy(0, (wavetable.getHeight()) - wavetable.getTranslation().y, dur, in));
         }else{
             shown = true;
