@@ -22,7 +22,7 @@ public class MenuButton extends TextButton{
 
         table(t -> {
             t.addImage(icon).size(14 * 3);
-            t.update(() -> t.setBackground(getClickListener().isOver() || getClickListener().isVisualPressed() ? "button-over" : "button"));
+            t.update(() -> t.setBackground(getClickListener().isVisualPressed() ? "button-down" : getClickListener().isOver() ? "button-over" : "button"));
         }).size(s - 5, s);
 
 

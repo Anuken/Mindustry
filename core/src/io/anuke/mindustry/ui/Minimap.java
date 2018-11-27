@@ -16,10 +16,9 @@ import static io.anuke.mindustry.Vars.*;
 public class Minimap extends Table{
 
     public Minimap(){
-        super("button");
+        super("pane");
 
         margin(5);
-        marginBottom(10);
 
         TextureRegion r = new TextureRegion();
 

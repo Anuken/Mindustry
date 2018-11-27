@@ -1,14 +1,11 @@
 package io.anuke.mindustry.entities.units.types;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
-import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnit;
 import io.anuke.mindustry.entities.units.UnitCommand;
@@ -16,7 +13,6 @@ import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.ItemType;
@@ -24,13 +20,11 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Structs;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -117,12 +111,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             if(target.distanceTo(Drone.this) > type.range){
                 circle(type.range*0.9f);
             }else{
-                TileEntity entity = (TileEntity) target;
-                entity.healBy(type.healSpeed * entity.tile.block().health / 100f * Timers.delta());
-
-                if(timer.get(timerRepairEffect, 30)){
-                    Effects.effect(BlockFx.healBlockFull, Palette.heal, entity.x, entity.y, entity.tile.block().size);
-                }
+                getWeapon().update(Drone.this, target.getX(), target.getY());
             }
         }
     },
@@ -280,6 +269,11 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     }
 
     @Override
+    public boolean canMine(Item item){
+        return type.toMine.contains(item);
+    }
+
+    @Override
     public float getBuildPower(Tile tile){
         return type.buildPower;
     }
@@ -312,16 +306,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             target = null;
         }
 
-        if(Net.client() && state.is(repair) && target instanceof TileEntity && target.distanceTo(this) < type.range){
-            TileEntity entity = (TileEntity) target;
-            entity.health += type.healSpeed * Timers.delta();
-            entity.health = Mathf.clamp(entity.health, 0, entity.tile.block().health);
-
-            if(timer.get(timerRepairEffect, 30)){
-                Effects.effect(BlockFx.healBlockFull, Palette.heal, entity.x, entity.y, entity.tile.block().size);
-            }
-        }
-
         updateBuilding(this);
     }
 
@@ -350,19 +334,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     @Override
     public void drawOver(){
         trail.draw(Palette.lightTrail, 3f);
-
-        TargetTrait entity = target;
-
-        if(entity instanceof TileEntity && state.is(repair) && target.distanceTo(this) < type.range){
-            float len = 5f;
-            Draw.color(Color.BLACK, Color.WHITE, 0.95f + Mathf.absin(Timers.time(), 0.8f, 0.05f));
-            Shapes.laser("beam", "beam-end",
-                    x + Angles.trnsx(rotation, len),
-                    y + Angles.trnsy(rotation, len),
-                    entity.getX(), entity.getY());
-            Draw.color();
-        }
-
         drawBuilding(this);
     }
 

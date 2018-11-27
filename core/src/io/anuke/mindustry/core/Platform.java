@@ -1,12 +1,19 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Base64Coder;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.TextField;
 
 import java.util.Random;
+
+import static io.anuke.mindustry.Vars.mobile;
 
 public abstract class Platform {
     /**Each separate game platform should set this instance to their own implementation.*/
@@ -17,7 +24,33 @@ public abstract class Platform {
         addDialog(field, 16);
     }
     /**See addDialog().*/
-    public void addDialog(TextField field, int maxLength){}
+    public void addDialog(TextField field, int maxLength){
+        if(!mobile) return; //this is mobile only, desktop doesn't need dialogs
+
+        field.tapped(() -> {
+            Dialog dialog = new Dialog("", "dialog");
+            dialog.setFillParent(true);
+            dialog.content().top();
+            dialog.content().defaults().height(65f);
+            TextField to = dialog.content().addField(field.getText(), t-> {}).pad(15).width(250f).get();
+            to.setMaxLength(maxLength);
+            to.keyDown(Keys.ENTER, () -> dialog.content().find("okb").fireClick());
+            dialog.content().addButton("$text.ok", () -> {
+                field.clearText();
+                field.appendText(to.getText());
+                field.change();
+                dialog.hide();
+                Gdx.input.setOnscreenKeyboardVisible(false);
+            }).width(90f).name("okb");
+
+            dialog.show();
+            Timers.runTask(1f, () -> {
+                to.setCursorPosition(to.getText().length());
+                Core.scene.setKeyboardFocus(to);
+                Gdx.input.setOnscreenKeyboardVisible(true);
+            });
+        });
+    }
     /**Update discord RPC.*/
     public void updateRPC(){}
     /**Called when the game is exited.*/

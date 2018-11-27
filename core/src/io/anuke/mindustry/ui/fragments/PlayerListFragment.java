@@ -45,13 +45,13 @@ public class PlayerListFragment extends Fragment{
                 }
             });
 
-            cont.table("pane", pane -> {
+            cont.table("button", pane -> {
                 pane.label(() -> Bundles.format(playerGroup.size() == 1 ? "text.players.single" : "text.players", playerGroup.size()));
                 pane.row();
-                pane.pane("clear", content).grow().get().setScrollingDisabled(true, false);
+                pane.pane(content).grow().get().setScrollingDisabled(true, false);
                 pane.row();
 
-                pane.table("pane", menu -> {
+                pane.table(menu -> {
                     menu.defaults().growX().height(50f).fillY();
 
                     menu.addButton("$text.server.bans", ui.bans::show).disabled(b -> Net.client());
@@ -70,12 +70,14 @@ public class PlayerListFragment extends Fragment{
 
         float h = 74f;
 
+        playerGroup.all().sort((p1, p2) -> p1.getTeam().compareTo(p2.getTeam()));
+
         playerGroup.forEach(player -> {
             NetConnection connection = player.con;
 
             if(connection == null && Net.server() && !player.isLocal) return;
 
-            Table button = new Table("button");
+            Table button = new Table();
             button.left();
             button.margin(5).marginBottom(10);
 
@@ -97,7 +99,7 @@ public class PlayerListFragment extends Fragment{
             button.labelWrap("[#" + player.color.toString().toUpperCase() + "]" + player.name).width(170f).pad(10);
             button.add().grow();
 
-            button.addImage("icon-admin").size(14 * 2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5);
+            button.addImage("icon-admin").size(14 * 2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5).get().updateVisibility();
 
             if((Net.server() || players[0].isAdmin) && !player.isLocal && (!player.isAdmin || Net.server())){
                 button.add().growY();
@@ -105,12 +107,12 @@ public class PlayerListFragment extends Fragment{
                 float bs = (h + 14) / 2f;
 
                 button.table(t -> {
-                    t.defaults().size(bs - 1, bs + 3);
+                    t.defaults().size(bs);
 
                     t.addImageButton("icon-ban", 14 * 2,
-                        () -> ui.showConfirm("$text.confirm", "$text.confirmban", () -> Call.onAdminRequest(player, AdminAction.ban))).padBottom(-5.1f);
+                        () -> ui.showConfirm("$text.confirm", "$text.confirmban", () -> Call.onAdminRequest(player, AdminAction.ban)));
                     t.addImageButton("icon-cancel", 16 * 2,
-                        () -> ui.showConfirm("$text.confirm", "$text.confirmkick", () -> Call.onAdminRequest(player, AdminAction.kick))).padBottom(-5.1f);
+                        () -> ui.showConfirm("$text.confirm", "$text.confirmkick", () -> Call.onAdminRequest(player, AdminAction.kick)));
 
                     t.row();
 
@@ -124,19 +126,20 @@ public class PlayerListFragment extends Fragment{
                         }else{
                             ui.showConfirm("$text.confirm", "$text.confirmadmin", () -> netServer.admins.adminPlayer(id, player.usid));
                         }
-                    }).update(b -> {
-                        b.setChecked(player.isAdmin);
-                        b.setDisabled(Net.client());
-                    }).get().setTouchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled);
+                    })
+                    .update(b -> b.setChecked(player.isAdmin))
+                    .disabled(b -> Net.client())
+                    .touchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled)
+                    .checked(player.isAdmin);
 
                     t.addImageButton("icon-zoom-small", 14 * 2, () -> ui.showError("Currently unimplemented.")/*Call.onAdminRequest(player, AdminAction.trace)*/);
 
                 }).padRight(12).padTop(-5).padLeft(0).padBottom(-10).size(bs + 10f, bs);
-
-
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
+            content.row();
+            content.addImage("blank").height(3f).color(state.mode.isPvp ? player.getTeam().color : Palette.accent).growX();
             content.row();
         });
 

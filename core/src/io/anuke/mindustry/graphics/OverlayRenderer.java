@@ -2,6 +2,7 @@ package io.anuke.mindustry.graphics;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
@@ -12,16 +13,21 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Tmp;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class OverlayRenderer{
+    private static final float indicatorLength = 14f;
+    private static final Rectangle rect = new Rectangle();
     private float buildFadeTime;
 
     public void drawBottom(){
@@ -44,6 +50,21 @@ public class OverlayRenderer{
     }
 
     public void drawTop(){
+
+        for(Player player : playerGroup.all()){
+            if(Settings.getBool("indicators") && player != players[0] && player.getTeam() == players[0].getTeam()){
+                if(!rect.setSize(Core.camera.viewportWidth * Core.camera.zoom * 0.9f, Core.camera.viewportHeight * Core.camera.zoom * 0.9f)
+                .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
+
+                    Tmp.v1.set(player.x, player.y).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+
+                    Draw.color(player.getTeam().color);
+                    Lines.stroke(2f);
+                    Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 4f);
+                    Draw.reset();
+                }
+            }
+        }
 
         for(Player player : players){
             if(player.isDead()) continue; //dead players don't draw

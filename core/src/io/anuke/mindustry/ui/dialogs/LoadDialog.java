@@ -45,7 +45,7 @@ public class LoadDialog extends FloatingDialog{
         content().clear();
 
         slots = new Table();
-        pane = new ScrollPane(slots, "clear-black");
+        pane = new ScrollPane(slots);
         pane.setFadeScrollBars(false);
         pane.setScrollingDisabled(true, false);
 
@@ -146,7 +146,7 @@ public class LoadDialog extends FloatingDialog{
         if(!valids){
 
             slots.row();
-            slots.addButton("$text.save.none", "clear", () -> {
+            slots.addButton("$text.save.none", () -> {
             }).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
         }
 
@@ -154,7 +154,7 @@ public class LoadDialog extends FloatingDialog{
 
         if(ios) return;
 
-        slots.addImageTextButton("$text.save.import", "icon-add", "clear", 14 * 3, () -> {
+        slots.addImageTextButton("$text.save.import", "icon-add", 14 * 3, () -> {
             Platform.instance.showFileChooser(Bundles.get("text.save.import"), "Mindustry Save", file -> {
                 if(SaveIO.isSaveValid(file)){
                     try{

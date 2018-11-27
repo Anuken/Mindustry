@@ -52,7 +52,7 @@ public class Consumers{
         return i;
     }
 
-    public ConsumeItems items(ItemStack[] items){
+    public ConsumeItems items(ItemStack... items){
         ConsumeItems i = new ConsumeItems(items);
         add(i);
         return i;

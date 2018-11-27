@@ -16,6 +16,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
@@ -24,6 +25,7 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
@@ -76,6 +78,9 @@ public class NetServer extends Module{
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
 
     public NetServer(){
+        Events.on(WorldLoadEvent.class, event -> {
+            connections.clear();
+        });
 
         Net.handleServer(Connect.class, (id, connect) -> {
             if(admins.isIPBanned(connect.addressTCP)){
@@ -120,7 +125,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            if(packet.version == -1 && Version.build != -1 && !admins.allowsCustomClients()){
+            if(packet.versionType == null || ((packet.version == -1 || !packet.versionType.equals("official")) && Version.build != -1 && !admins.allowsCustomClients())){
                 kick(id, KickReason.customClient);
                 return;
             }
@@ -412,7 +417,16 @@ public class NetServer extends Module{
     }
 
     public boolean isWaitingForPlayers(){
-        return state.mode.isPvp && playerGroup.size() < 2;
+        if(state.mode.isPvp){
+            int used = 0;
+            for(Team t : Team.all){
+                if(playerGroup.count(p -> p.getTeam() == t) > 0){
+                    used ++;
+                }
+            }
+            return used < 2;
+        }
+        return false;
     }
 
     public void update(){
@@ -468,6 +482,7 @@ public class NetServer extends Module{
         //write wave datas
         dataStream.writeFloat(state.wavetime);
         dataStream.writeInt(state.wave);
+        dataStream.writeInt(state.enemies());
 
         ObjectSet<Tile> cores = state.teams.get(player.getTeam()).cores;
 
@@ -494,7 +509,7 @@ public class NetServer extends Module{
         //check for syncable groups
         for(EntityGroup<?> group : Entities.getAllGroups()){
             if(group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
-            //clipping is done by represntatives
+            //clipping is done by representatives
             SyncTrait represent = (SyncTrait) group.all().get(0);
 
             //make sure mapping is enabled for this group

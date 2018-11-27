@@ -20,7 +20,6 @@ import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Pooling;
-import io.anuke.ucore.util.Threads;
 
 import java.io.IOException;
 
@@ -51,7 +50,6 @@ public class Net{
     public static void showError(Throwable e){
 
         if(!headless){
-            Threads.assertGraphics();
 
             Throwable t = e;
             while(t.getCause() != null){
@@ -68,7 +66,7 @@ public class Net{
             }else if(error.contains("connection refused") || error.contains("route to host") || type.contains("unknownhost")){
                 error = Bundles.get("text.error.unreachable");
             }else if(type.contains("timeout")){
-                error = Bundles.get("text.error.timeout");
+                error = Bundles.get("text.error.timedout");
             }else if(error.equals("alreadyconnected")){
                 error = Bundles.get("text.error.alreadyconnected");
             }else if(!error.isEmpty()){

@@ -4,15 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Threads.ThreadInfoProvider;
 
-public class ThreadHandler implements ThreadInfoProvider{
+public class ThreadHandler{
     private long lastFrameTime;
 
     public ThreadHandler(){
         Timers.setDeltaProvider(() -> {
             float result = Gdx.graphics.getDeltaTime() * 60f;
-            return Math.min(Float.isNaN(result) || Float.isInfinite(result) ? 1f : result, 15f);
+            return Float.isNaN(result) || Float.isInfinite(result) ? 1f : Math.min(result, 60f / 10f);
         });
     }
 
@@ -50,16 +49,6 @@ public class ThreadHandler implements ThreadInfoProvider{
                 }
             }
         }
-    }
-
-    @Override
-    public boolean isOnLogicThread() {
-        return true;
-    }
-
-    @Override
-    public boolean isOnGraphicsThread() {
-        return true;
     }
 
 }

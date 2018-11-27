@@ -3,35 +3,16 @@ package io.anuke.mindustry.world.blocks.storage;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockGroup;
 
-public class Unloader extends Block{
+public abstract class Unloader extends Block{
     protected final int timerUnload = timers++;
-    protected int speed = 5;
 
     public Unloader(String name){
         super(name);
         update = true;
         solid = true;
         health = 70;
-        group = BlockGroup.transportation;
         hasItems = true;
-    }
-
-    @Override
-    public void update(Tile tile){
-        if(tile.entity.items.total() == 0 && tile.entity.timer.get(timerUnload, speed)){
-            tile.allNearby(other -> {
-                if(other.getTeam() == tile.getTeam() && other.block() instanceof StorageBlock && tile.entity.items.total() == 0 &&
-                        ((StorageBlock) other.block()).hasItem(other, null)){
-                    offloadNear(tile, ((StorageBlock) other.block()).removeItem(other, null));
-                }
-            });
-        }
-
-        if(tile.entity.items.total() > 0){
-            tryDump(tile);
-        }
     }
 
     @Override
@@ -41,6 +22,5 @@ public class Unloader extends Block{
     }
 
     @Override
-    public void setBars(){
-    }
+    public void setBars(){}
 }

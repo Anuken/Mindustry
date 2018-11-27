@@ -182,7 +182,7 @@ public class Pathfinder{
             }
         }
 
-        state.spawner.checkAllQuadrants();
+        world.spawner.checkAllQuadrants();
     }
 
     class PathData{

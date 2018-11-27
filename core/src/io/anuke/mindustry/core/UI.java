@@ -28,7 +28,7 @@ import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
 import io.anuke.ucore.scene.ui.TooltipManager;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Threads;
+import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.scene.actions.Actions.*;
@@ -123,6 +123,8 @@ public class UI extends SceneModule{
 
     @Override
     public void update(){
+        if(disableUI) return;
+
         if(Graphics.drawing()) Graphics.end();
 
         act();
@@ -240,8 +242,6 @@ public class UI extends SceneModule{
     }
 
     public void showInfoFade(String info){
-        Threads.assertGraphics();
-
         Table table = new Table();
         table.setFillParent(true);
         table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.removeActor());
@@ -250,9 +250,7 @@ public class UI extends SceneModule{
     }
 
     public void showInfo(String info){
-        Threads.assertGraphics();
-
-        new Dialog("$text.info.title", "dialog"){{
+        new Dialog("", "dialog"){{
             getCell(content()).growX();
             content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
             buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
@@ -260,9 +258,7 @@ public class UI extends SceneModule{
     }
 
     public void showInfo(String info, Runnable clicked){
-        Threads.assertGraphics();
-
-        new Dialog("$text.info.title", "dialog"){{
+        new Dialog("", "dialog"){{
             getCell(content()).growX();
             content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
             buttons().addButton("$text.ok", () -> {
@@ -299,5 +295,17 @@ public class UI extends SceneModule{
         dialog.keyDown(Keys.ESCAPE, dialog::hide);
         dialog.keyDown(Keys.BACK, dialog::hide);
         dialog.show();
+    }
+
+    public String formatAmount(int number){
+        if(number >= 1000000){
+            return Strings.toFixed(number / 1000000f, 1) + "[gray]mil[]";
+        }else if(number >= 10000){
+            return number / 1000 + "[gray]k[]";
+        }else if(number >= 1000){
+            return Strings.toFixed(number / 1000f, 1) + "[gray]k[]";
+        }else{
+            return number + "";
+        }
     }
 }

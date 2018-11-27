@@ -19,13 +19,13 @@ allprojects {
     version = 'release'
 
     ext {
-        versionNumber = '4.0'
+        versionNumber = '4'
         versionModifier = 'alpha'
         versionType = 'official'
         appName = 'Mindustry'
-        gdxVersion = '1.9.8'
+        gdxVersion = '1.9.9'
         roboVMVersion = '2.3.0'
-        uCoreVersion = '8919cb7b6881d040fb720149779fcf58c1927893'
+        uCoreVersion = '7eb80a9765557d025d589f28fa1910dffa3fc8ed'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -110,17 +110,35 @@ project(":ios") {
                 include "**/*.java"
             }
 
-            into "ios/src/io/anuke/mindustry/gen"
+            into "core/src/io/anuke/mindustry/gen"
         }
 
         doFirst{
             delete{
-                delete "ios/src/io/anuke/mindustry/gen/"
+                delete "core/src/io/anuke/mindustry/gen/"
             }
         }
     }
 
-    //build.dependsOn(copyGen)
+    task incrementConfig{
+        def vfile = file('robovm.properties')
+
+        def props = new Properties()
+        if(vfile.exists()){
+            props.load(new FileInputStream(vfile))
+        }
+
+        props['app.id'] = 'io.anuke.mindustry'
+        props['app.version'] = '4.0'
+        props['app.mainclass'] = 'io.anuke.mindustry.IOSLauncher'
+        props['app.executable'] = 'IOSLauncher'
+        props['app.name'] = 'Mindustry'
+        props['app.build'] = (!props.hasProperty("app.build") ? 40 : props['app.build'].toInteger() + 1)+""
+        props.store(vfile.newWriter(), null)
+    }
+
+    build.dependsOn(incrementConfig)
+    build.dependsOn(copyGen)
 
     dependencies {
         compile project(":core")

@@ -16,12 +16,10 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
+import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Mech;
-import io.anuke.mindustry.type.Weapon;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -192,6 +190,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
+    public boolean canMine(Item item){
+        return item.hardness <= mech.drillPower;
+    }
+
+    @Override
     public float getArmor(){
         return mech.armor + mech.getExtraArmor(this);
     }
@@ -292,7 +295,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         float x = snappedX(), y = snappedY();
 
         if(!movement.isZero() && moved && !state.isPaused()){
-            walktime += Timers.delta() * movement.len() / 0.7f * getFloorOn().speedMultiplier;
+            walktime += movement.len() / 0.7f * getFloorOn().speedMultiplier;
             baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
         }
 
@@ -549,8 +552,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         updateBuilding(this);
 
-        x = Mathf.clamp(x, 0, world.width() * tilesize);
-        y = Mathf.clamp(y, 0, world.height() * tilesize);
+        x = Mathf.clamp(x, tilesize, world.width() * tilesize - tilesize);
+        y = Mathf.clamp(y, tilesize, world.height() * tilesize - tilesize);
     }
 
     protected void updateMech(){
@@ -607,11 +610,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         pointerY = vec.y;
         updateShooting();
 
-        movement.limit(speed * Timers.delta());
+        movement.limit(speed).scl(Timers.delta());
 
         if(getCarrier() == null){
             if(!ui.chatfrag.chatOpen()){
-                velocity.add(movement);
+                velocity.add(movement.x, movement.y);
             }
             float prex = x, prey = y;
             updateVelocityStatus();
@@ -808,6 +811,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     //region read and write methods
 
+
+    @Override
+    public boolean isClipped(){
+        return false;
+    }
+
     @Override
     public void writeSave(DataOutput stream) throws IOException{
         stream.writeBoolean(isLocal);
@@ -847,7 +856,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     @Override
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
-        buffer.writeUTF(name); //TODO writing strings is very inefficient
+        TypeIO.writeStringData(buffer, name); //TODO writing strings is very inefficient
         buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
@@ -862,7 +871,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void read(DataInput buffer, long time) throws IOException{
         float lastx = x, lasty = y, lastrot = rotation;
         super.readSave(buffer);
-        name = buffer.readUTF();
+        name = TypeIO.readStringData(buffer);
         byte bools = buffer.readByte();
         isAdmin = (bools & 1) != 0;
         dead = (bools & 2) != 0;

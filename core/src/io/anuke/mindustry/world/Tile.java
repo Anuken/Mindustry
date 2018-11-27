@@ -241,7 +241,7 @@ public class Tile implements PosTrait, TargetTrait{
         if(link == 0){
             return (block.destructible || block.breakable || block.update);
         }else{
-            return getLinked() != this && getLinked().breakable();
+            return getLinked() != this && getLinked().getLinked() == null && getLinked().breakable();
         }
     }
 

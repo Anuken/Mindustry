@@ -30,8 +30,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.event.Touchable;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -208,78 +207,53 @@ public class MobileInput extends InputHandler implements GestureListener{
     //region UI and drawing
 
     @Override
-    public void buildUI(Group group){
+    public void buildUI(Table table){
+        table.addImage("blank").color(Palette.accent).height(3f).colspan(4).growX();
+        table.row();
+        table.left().margin(0f).defaults().size(48f);
 
-        //Create confirm/cancel table
-        group.fill(c -> {
-            c.bottom().left().visible(() -> !state.is(State.menu));
+        table.addImageButton("icon-break", "clear-toggle-partial", 16 * 2f, () -> {
+            mode = mode == breaking ? recipe == null ? none : placing : breaking;
+            lastRecipe = recipe;
+            if(mode == breaking){
+                showGuide("deconstruction");
+            }
+        }).update(l -> l.setChecked(mode == breaking));
 
-            c.table("pane", act -> {
-                act.margin(5);
-                act.defaults().size(60f);
+        //rotate button
+        table.addImageButton("icon-arrow", "clear-partial", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
+        .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center))
+        .visible(() -> recipe != null && recipe.result.rotate);
 
-                //Add a cancel button
-                act.addImageButton("icon-cancel", 16*2f, () -> {
-                    mode = none;
-                    recipe = null;
-                });
+        //cancel button
+        table.addImageButton("icon-cancel", "clear-partial", 16 * 2f, () -> {
+            player.clearBuilding();
+            mode = none;
+            recipe = null;
+        }).visible(() -> player.isBuilding() || recipe != null || mode == breaking);
 
-                act.row();
+        //confirm button
+        table.addImageButton("icon-check", "clear-partial", 16 * 2f, () -> {
+            for(PlaceRequest request : selection){
+                Tile tile = request.tile();
 
-                //Add an accept button, which places everything.
-                act.addImageButton("icon-check", 16 * 2f, () -> {
-                    for(PlaceRequest request : selection){
-                        Tile tile = request.tile();
-
-                        //actually place/break all selected blocks
-                        if(tile != null){
-                            if(!request.remove){
-                                rotation = request.rotation;
-                                recipe = request.recipe;
-                                tryPlaceBlock(tile.x, tile.y);
-                            }else{
-                                tryBreakBlock(tile.x, tile.y);
-                            }
-                        }
+                //actually place/break all selected blocks
+                if(tile != null){
+                    if(!request.remove){
+                        rotation = request.rotation;
+                        recipe = request.recipe;
+                        tryPlaceBlock(tile.x, tile.y);
+                    }else{
+                        tryBreakBlock(tile.x, tile.y);
                     }
+                }
+            }
 
-                    //move all current requests to removal array so they fade out
-                    removals.addAll(selection);
-                    selection.clear();
-                    selecting = false;
-                }).disabled(i -> selection.size == 0);
-
-                act.row();
-
-                //Add a rotate button
-                act.addImageButton("icon-arrow", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
-                        .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center))
-                        .disabled(i -> recipe == null || !recipe.result.rotate);
-            }).visible(() -> mode != none).touchable(Touchable.enabled);
-
-            c.row();
-
-            c.table("pane", remove -> {
-                remove.defaults().size(60f);
-
-                //Add a break button.
-                remove.addImageButton("icon-break", "toggle", 16 * 2f, () -> {
-                    mode = mode == breaking ? recipe == null ? none : placing : breaking;
-                    lastRecipe = recipe;
-                    if(mode == breaking){
-                        showGuide("deconstruction");
-                    }
-                }).update(l -> l.setChecked(mode == breaking));
-            }).margin(5).touchable(Touchable.enabled);
-
-            c.table("pane", cancel -> {
-                cancel.defaults().size(60f);
-
-                //Add a 'cancel building' button.
-                cancel.addImageButton("icon-cancel", 16 * 2f, player::clearBuilding);
-
-            }).left().colspan(2).margin(5).touchable(Touchable.enabled).visible(() -> player.getPlaceQueue().size > 0);
-        });
+            //move all current requests to removal array so they fade out
+            removals.addAll(selection);
+            selection.clear();
+            selecting = false;
+        }).visible(() -> !selection.isEmpty());
     }
 
     @Override
@@ -554,7 +528,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         //ignore off-screen taps
         if(cursor == null || ui.hasMouse(x, y)) return false;
 
-        threads.run(() -> checkTargets(worldx, worldy));
+        checkTargets(worldx, worldy);
 
         //remove if request present
         if(hasRequest(cursor)){
@@ -574,14 +548,13 @@ public class MobileInput extends InputHandler implements GestureListener{
                     consumed = true;
                     player.dropCarry(); //drop off unit
                 }else{
-                    threads.run(() -> {
-                        Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
+                    Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
 
-                        if(unit != null){
-                            player.moveTarget = unit;
-                            Effects.effect(Fx.select, unit.getX(), unit.getY());
-                        }
-                    });
+                    if(unit != null){
+                        consumed = true;
+                        player.moveTarget = unit;
+                        Effects.effect(Fx.select, unit.getX(), unit.getY());
+                    }
                 }
             }
 

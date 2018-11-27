@@ -11,6 +11,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.type.Recipe;
@@ -32,7 +33,7 @@ import io.anuke.ucore.util.Mathf;
 import static io.anuke.mindustry.Vars.*;
 
 public class HudFragment extends Fragment{
-    public final BlocksFragment blockfrag = new BlocksFragment();
+    public final PlacementFragment blockfrag = new PlacementFragment();
 
     private ImageButton menu, flip;
     private Stack wavetable;
@@ -59,10 +60,10 @@ public class HudFragment extends Fragment{
                     select.left();
                     select.defaults().size(dsize).left();
 
-                    menu = select.addImageButton("icon-menu", isize, ui.paused::show).get();
-                    flip = select.addImageButton("icon-arrow-up", isize, this::toggleMenus).get();
+                    menu = select.addImageButton("icon-menu", "clear", isize, ui.paused::show).get();
+                    flip = select.addImageButton("icon-arrow-up", "clear", isize, this::toggleMenus).get();
 
-                    select.addImageButton("icon-pause", isize, () -> {
+                    select.addImageButton("icon-pause", "clear", isize, () -> {
                         if(Net.active()){
                             ui.listfrag.toggle();
                         }else{
@@ -77,7 +78,7 @@ public class HudFragment extends Fragment{
                         }
                     }).get();
 
-                    select.addImageButton("icon-settings", isize, () -> {
+                    select.addImageButton("icon-settings", "clear", isize, () -> {
                         if(Net.active() && mobile){
                             if(ui.chatfrag.chatOpen()){
                                 ui.chatfrag.hide();
@@ -94,8 +95,12 @@ public class HudFragment extends Fragment{
                             i.getStyle().imageUp = Core.skin.getDrawable("icon-unlocks");
                         }
                     }).get();
+
+                    select.addImage("blank").color(Palette.accent).width(6f).fillY();
                 });
 
+                cont.row();
+                cont.addImage("blank").height(6f).color(Palette.accent).fillX();
                 cont.row();
             }
 
@@ -106,7 +111,7 @@ public class HudFragment extends Fragment{
             });
 
             Stack stack = new Stack();
-            TextButton waves = new TextButton("");
+            TextButton waves = new TextButton("", "wave");
             Table btable = new Table().margin(0);
 
             stack.add(waves);
@@ -116,7 +121,7 @@ public class HudFragment extends Fragment{
 
             addWaveTable(waves);
             addPlayButton(btable);
-            cont.add(stack).width(dsize * 4);
+            cont.add(stack).width(dsize * 4 + 6f);
 
             cont.row();
 
@@ -150,7 +155,7 @@ public class HudFragment extends Fragment{
 
         parent.fill(t -> {
             t.visible(() -> netServer.isWaitingForPlayers() && !state.is(State.menu));
-            t.table("clear", c -> c.margin(10).add("$text.waiting.players"));
+            t.table("button", c -> c.add("$text.waiting.players"));
         });
 
         //'core is under attack' table
@@ -224,7 +229,6 @@ public class HudFragment extends Fragment{
 
     /**Show unlock notification for a new recipe.*/
     public void showUnlock(Recipe recipe){
-        blockfrag.rebuild();
 
         //if there's currently no unlock notification...
         if(lastUnlockTable == null){
@@ -343,7 +347,7 @@ public class HudFragment extends Fragment{
         if(shown){
             shown = false;
             blockfrag.toggle(dur, in);
-            wavetable.actions(Actions.translateBy(0, (wavetable.getHeight() + dsize) - wavetable.getTranslation().y, dur, in));
+            wavetable.actions(Actions.translateBy(0, (wavetable.getHeight() + dsize + 6) - wavetable.getTranslation().y, dur, in));
             infolabel.actions(Actions.translateBy(0, (wavetable.getHeight()) - wavetable.getTranslation().y, dur, in));
         }else{
             shown = true;
@@ -362,14 +366,12 @@ public class HudFragment extends Fragment{
         table.clearChildren();
         table.setTouchable(Touchable.enabled);
 
-        table.background("button");
-
         table.labelWrap(() ->
             world.getSector() == null ?
-                (unitGroups[waveTeam.ordinal()].size() > 0 && state.mode.disableWaveTimer ?
-                wavef.get(state.wave) + "\n" + (unitGroups[waveTeam.ordinal()].size() == 1 ?
-                    enemyf.get(unitGroups[waveTeam.ordinal()].size()) :
-                    enemiesf.get(unitGroups[waveTeam.ordinal()].size())) :
+                (state.enemies() > 0 && state.mode.disableWaveTimer ?
+                wavef.get(state.wave) + "\n" + (state.enemies() == 1 ?
+                    enemyf.get(state.enemies()) :
+                    enemiesf.get(state.enemies())) :
                 wavef.get(state.wave) + "\n" +
                     (!state.mode.disableWaveTimer ?
                     Bundles.format("text.wave.waiting", (int)(state.wavetime/60)) :
