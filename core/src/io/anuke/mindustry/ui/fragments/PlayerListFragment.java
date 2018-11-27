@@ -45,10 +45,10 @@ public class PlayerListFragment extends Fragment{
                 }
             });
 
-            cont.table("pane", pane -> {
+            cont.table("clear", pane -> {
                 pane.label(() -> Bundles.format(playerGroup.size() == 1 ? "text.players.single" : "text.players", playerGroup.size()));
                 pane.row();
-                pane.pane("clear", content).grow().get().setScrollingDisabled(true, false);
+                pane.pane(content).grow().get().setScrollingDisabled(true, false);
                 pane.row();
 
                 pane.table("pane", menu -> {

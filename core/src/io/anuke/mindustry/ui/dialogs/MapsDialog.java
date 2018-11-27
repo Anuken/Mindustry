@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.io.MapIO;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.ui.BorderImage;
@@ -73,7 +73,7 @@ public class MapsDialog extends FloatingDialog{
         Table maps = new Table();
         maps.marginRight(24);
 
-        ScrollPane pane = new ScrollPane(maps, "clear-black");
+        ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
         int maxwidth = 4;
@@ -88,7 +88,7 @@ public class MapsDialog extends FloatingDialog{
 
             TextButton button = maps.addButton("", "clear", () -> showMapInfo(map)).width(mapsize).pad(8).get();
             button.clearChildren();
-            button.margin(6);
+            button.margin(9);
             button.add(map.meta.tags.get("name", map.name)).growX().center().get().setEllipsis(true);
             button.row();
             button.addImage("white").growX().pad(4).color(Color.GRAY);
@@ -121,7 +121,7 @@ public class MapsDialog extends FloatingDialog{
             Table t = new Table();
             t.margin(6);
 
-            ScrollPane pane = new ScrollPane(t, "clear-black");
+            ScrollPane pane = new ScrollPane(t);
             desc.add(pane).grow();
 
             t.top();
@@ -146,7 +146,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.row();
 
-        table.addImageTextButton("$text.editor.openin", "icon-load-map", "clear", 16 * 2, () -> {
+        table.addImageTextButton("$text.editor.openin", "icon-load-map", 16 * 2, () -> {
             try{
                 Vars.ui.editor.beginEditMap(map.stream.get());
                 dialog.hide();
@@ -155,15 +155,15 @@ public class MapsDialog extends FloatingDialog{
                 e.printStackTrace();
                 ui.showError("$text.error.mapnotfound");
             }
-        }).fillX().height(50f).marginLeft(6);
+        }).fillX().height(54f).marginLeft(10);
 
-        table.addImageTextButton("$text.delete", "icon-trash-16", "clear", 16 * 2, () -> {
+        table.addImageTextButton("$text.delete", "icon-trash-16", 16 * 2, () -> {
             ui.showConfirm("$text.confirm", Bundles.format("text.map.delete", map.name), () -> {
                 world.maps.removeMap(map);
                 dialog.hide();
                 setup();
             });
-        }).fillX().height(50f).marginLeft(6).disabled(!map.custom).touchable(map.custom ? Touchable.enabled : Touchable.disabled);
+        }).fillX().height(54f).marginLeft(10).disabled(!map.custom).touchable(map.custom ? Touchable.enabled : Touchable.disabled);
 
         dialog.show();
     }

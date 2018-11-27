@@ -42,14 +42,14 @@ public class AboutDialog extends FloatingDialog{
         float w = UIUtils.portrait() ? 330f : 600f;
 
         Table in = new Table();
-        ScrollPane pane = new ScrollPane(in, "clear");
+        ScrollPane pane = new ScrollPane(in);
 
         for(LinkEntry link : Links.getLinks()){
             if((ios || OS.isMac) && bannedItems.contains(link.name)){ //because Apple doesn't like me mentioning things
                 continue;
             }
 
-            Table table = new Table("button");
+            Table table = new Table("underline-2");
             table.margin(0);
             table.table(img -> {
                 img.addImage("white").height(h - 5).width(40f).color(link.color);
@@ -58,7 +58,7 @@ public class AboutDialog extends FloatingDialog{
             }).expandY();
 
             table.table(i -> {
-                i.background("button");
+                i.background("button-edge-3");
                 i.addImage("icon-" + link.name).size(14 * 3f);
             }).size(h - 5, h);
 
