@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.meta.BlockStat;
 
 public class PowerGenerator extends PowerDistributor{
     /** The amount of power produced per tick. */
-    public float powerProduction;
+    protected float powerProduction;
     public BlockStat generationType = BlockStat.basePowerGeneration;
 
     public PowerGenerator(String name){

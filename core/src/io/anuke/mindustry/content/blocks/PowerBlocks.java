@@ -19,17 +19,17 @@ public class PowerBlocks extends BlockList implements ContentList{
 
         thermalGenerator = new LiquidHeatGenerator("thermal-generator"){{
             maxLiquidGenerate = 4f;
-            // TODO: Adapt to new power system
-            powerProduction = -1;
-            powerPerLiquid = 0.1f;
+            // TODO: Balance
+            powerProduction = 0.17f;
+            liquidPowerMultiplier = 0.1f;
             generateEffect = BlockFx.redgeneratespark;
             size = 2;
         }};
 
         turbineGenerator = new TurbineGenerator("turbine-generator"){{
-            // TODO: Adapt to new power system
+            // TODO: Balance
             powerProduction = 0.28f;
-            powerPerLiquid = 0.1f;
+            liquidPowerMultiplier = 0.3f;
             itemDuration = 30f;
             consumes.liquid(Liquids.water, 0.05f);
             size = 2;

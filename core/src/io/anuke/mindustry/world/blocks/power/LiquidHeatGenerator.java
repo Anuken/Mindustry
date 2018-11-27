@@ -14,9 +14,9 @@ public class LiquidHeatGenerator extends LiquidGenerator{
     public void setStats(){
         super.setStats();
 
-        // TODO Verify for new power system
         stats.remove(BlockStat.basePowerGeneration);
-        stats.add(BlockStat.basePowerGeneration, maxLiquidGenerate * powerPerLiquid * 60f, StatUnit.powerSecond);
+        // TODO Adapt to new new power system. Maybe this override can be removed.
+        //stats.add(BlockStat.basePowerGeneration, <Do something with maxLiquidGenerate, basePowerGeneration and liquidPowerMultiplier> * 60f, StatUnit.powerSecond);
     }
 
     @Override

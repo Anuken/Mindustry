@@ -3,16 +3,24 @@ package power;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.ContentLoader;
+import io.anuke.mindustry.core.World;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.blocks.power.Battery;
 import io.anuke.mindustry.world.blocks.power.PowerGenerator;
+import io.anuke.mindustry.world.modules.ConsumeModule;
+import io.anuke.mindustry.world.modules.ItemModule;
+import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.mindustry.world.modules.PowerModule;
+import io.anuke.ucore.entities.Entities;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import static io.anuke.mindustry.Vars.world;
 
 /** This class provides objects commonly used by power related unit tests.
  *  For now, this is a helper with static methods, but this might change.
@@ -62,7 +70,7 @@ public class PowerTestFixture{
 
             // Using the Tile(int, int, byte, byte) constructor would require us to register any fake block or tile we create
             // Since this part shall not be part of the test and would require more work anyway, we manually set the block and floor
-            // and call the private changed() method through reflections.
+            // through reflections and then simulate part of what the changed() method does.
 
             Field field = Tile.class.getDeclaredField("wall");
             field.setAccessible(true);
@@ -72,10 +80,15 @@ public class PowerTestFixture{
             field.setAccessible(true);
             field.set(tile, Blocks.sand);
 
-            Method method = Tile.class.getDeclaredMethod("changed");
-            method.setAccessible(true);
-            method.invoke(tile);
-
+            // Simulate the "changed" method. Calling it through reflections would require half the game to be initialized.
+            tile.entity = block.newEntity().init(tile, false);
+            tile.entity.cons = new ConsumeModule();
+            if(block.hasItems) tile.entity.items = new ItemModule();
+            if(block.hasLiquids) tile.entity.liquids = new LiquidModule();
+            if(block.hasPower){
+                tile.entity.power = new PowerModule();
+                tile.entity.power.graph.add(tile);
+            }
             return tile;
         }catch(Exception ex){
             return null;

@@ -14,7 +14,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class ItemLiquidGenerator extends ItemGenerator{
     protected float minLiquidEfficiency = 0.2f;
-    protected float powerPerLiquid = 0.13f;
+    protected float liquidPowerMultiplier = 1.3f; // A liquid with 100% flammability will be 30% more efficient than an item with 100% flammability.
     /**Maximum liquid used per frame.*/
     protected float maxLiquidGenerate = 0.4f;
 
@@ -46,15 +46,16 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
         }
 
         //liquid takes priority over solids
+        float calculationDelta = entity.delta();
         if(liquid != null && entity.liquids.get(liquid) >= 0.001f && entity.cons.valid()){
-            float powerPerLiquid = getLiquidEfficiency(liquid) * this.powerPerLiquid;
-            float used = Math.min(entity.liquids.get(liquid), maxLiquidGenerate * entity.delta());
-            // TODO: Adapt to new power system
-            //used = Math.min(used, (powerCapacity - entity.power.amount) / powerPerLiquid);
+            float baseLiquidEfficiency = getLiquidEfficiency(liquid) * this.liquidPowerMultiplier;
+            float maximumPossible = maxLiquidGenerate * calculationDelta;
+            float used = Math.min(entity.liquids.get(liquid), maximumPossible);
 
             entity.liquids.remove(liquid, used);
-            // TODO: Adapt to new power system
-            //entity.power.amount += used * powerPerLiquid;
+
+            // Note: 1 Item with 100% Flammability = 100% efficiency. This means 100% is not max but rather a reference point for this generator.
+            entity.productionEfficiency = baseLiquidEfficiency * used / maximumPossible;
 
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
