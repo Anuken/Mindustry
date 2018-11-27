@@ -379,7 +379,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     tools.add(button);
                 };
 
-                tools.defaults().size(size, size + 4f);
+                tools.defaults().size(size, size);
 
                 tools.addImageButton("icon-menu-large", "clear", 16 * 2f, menu::show);
 
