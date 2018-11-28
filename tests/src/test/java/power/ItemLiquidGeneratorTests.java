@@ -49,17 +49,17 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
     /** Tests the consumption and efficiency when being supplied with liquids. */
     @TestFactory
-    DynamicTest[] testLiquidConsumption(){
+    DynamicTest[] generatorWorksProperlyWithLiquidInput(){
         return new DynamicTest[]{
-            dynamicTest("01", () -> test_liquidConsumption(Liquids.oil, 0.0f, "No liquids provided")),
-            dynamicTest("02", () -> test_liquidConsumption(Liquids.oil, maximumLiquidUsage / 4.0f, "Low oil provided")),
-            dynamicTest("03", () -> test_liquidConsumption(Liquids.oil, maximumLiquidUsage * 1.0f, "Sufficient oil provided")),
-            dynamicTest("04", () -> test_liquidConsumption(Liquids.oil, maximumLiquidUsage * 2.0f, "Excess oil provided"))
+            dynamicTest("01", () -> simulateLiquidConsumption(Liquids.oil, 0.0f, "No liquids provided")),
+            dynamicTest("02", () -> simulateLiquidConsumption(Liquids.oil, maximumLiquidUsage / 4.0f, "Low oil provided")),
+            dynamicTest("03", () -> simulateLiquidConsumption(Liquids.oil, maximumLiquidUsage * 1.0f, "Sufficient oil provided")),
+            dynamicTest("04", () -> simulateLiquidConsumption(Liquids.oil, maximumLiquidUsage * 2.0f, "Excess oil provided"))
             // Note: The generator will decline any other liquid since it's not flammable
         };
     }
 
-    void test_liquidConsumption(Liquid liquid, float availableLiquidAmount, String parameterDescription){
+    void simulateLiquidConsumption(Liquid liquid, float availableLiquidAmount, String parameterDescription){
         final float baseEfficiency = fakeLiquidPowerMultiplier * liquid.flammability;
         final float expectedEfficiency = Math.min(1.0f, availableLiquidAmount / maximumLiquidUsage) * baseEfficiency;
         final float expectedConsumptionPerTick = Math.min(maximumLiquidUsage, availableLiquidAmount);
@@ -84,19 +84,19 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
     /** Tests the consumption and efficiency when being supplied with items. */
     @TestFactory
-    DynamicTest[] testItemConsumption(){
+    DynamicTest[] generatorWorksProperlyWithItemInput(){
         return new DynamicTest[]{
-            dynamicTest("01", () -> test_itemConsumption(Items.coal, 0, "No items provided")),
-            dynamicTest("02", () -> test_itemConsumption(Items.coal, 1, "Sufficient coal provided")),
-            dynamicTest("03", () -> test_itemConsumption(Items.coal, 10, "Excess coal provided")),
-            dynamicTest("04", () -> test_itemConsumption(Items.blastCompound, 1, "Blast compound provided")),
-            //dynamicTest("03", () -> test_itemConsumption(Items.plastanium, 1, "Plastanium provided")), // Not accepted by generator due to low flammability
-            dynamicTest("05", () -> test_itemConsumption(Items.biomatter, 1, "Biomatter provided")),
-            dynamicTest("06", () -> test_itemConsumption(Items.pyratite, 1, "Pyratite provided"))
+            dynamicTest("01", () -> simulateItemConsumption(Items.coal, 0, "No items provided")),
+            dynamicTest("02", () -> simulateItemConsumption(Items.coal, 1, "Sufficient coal provided")),
+            dynamicTest("03", () -> simulateItemConsumption(Items.coal, 10, "Excess coal provided")),
+            dynamicTest("04", () -> simulateItemConsumption(Items.blastCompound, 1, "Blast compound provided")),
+            //dynamicTest("03", () -> simulateItemConsumption(Items.plastanium, 1, "Plastanium provided")), // Not accepted by generator due to low flammability
+            dynamicTest("05", () -> simulateItemConsumption(Items.biomatter, 1, "Biomatter provided")),
+            dynamicTest("06", () -> simulateItemConsumption(Items.pyratite, 1, "Pyratite provided"))
         };
     }
 
-    void test_itemConsumption(Item item, int amount, String parameterDescription){
+    void simulateItemConsumption(Item item, int amount, String parameterDescription){
         final float expectedEfficiency = Math.min(1.0f, amount > 0 ? item.flammability : 0f);
         final float expectedRemainingItemAmount = Math.max(0, amount - 1);
         assertTrue(generator.acceptItem(item, tile, null), parameterDescription + ": Items which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
@@ -122,7 +122,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
     /** Makes sure the efficiency stays equal during the item duration. */
     @Test
-    void test_efficiencyConstantDuringItemDuration(){
+    void efficiencyRemainsConstantWithinItemDuration(){
 
         // Burn a single coal and test for the duration
         entity.items.add(Items.coal, 1);
