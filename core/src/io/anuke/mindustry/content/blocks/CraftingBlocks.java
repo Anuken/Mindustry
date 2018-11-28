@@ -139,13 +139,13 @@ public class CraftingBlocks extends BlockList implements ContentList{
         melter = new PowerCrafter("melter"){{
             health = 200;
             outputLiquid = Liquids.lava;
-            outputLiquidAmount = 0.75f;
-            itemCapacity = 50;
+            outputLiquidAmount = 1f;
+            itemCapacity = 20;
             craftTime = 10f;
             hasLiquids = hasPower = true;
 
             consumes.power(0.1f);
-            consumes.item(Items.stone, 2);
+            consumes.item(Items.stone, 1);
         }};
 
         separator = new Separator("separator"){{
