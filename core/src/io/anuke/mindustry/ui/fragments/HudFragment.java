@@ -193,7 +193,7 @@ public class HudFragment extends Fragment{
 
                 return coreAttackOpacity > 0;
             });
-            t.table("clear", top -> top.add("$text.coreattack").pad(6)
+            t.table("button", top -> top.add("$text.coreattack").pad(2)
             .update(label -> label.setColor(Hue.mix(Color.ORANGE, Color.SCARLET, Mathf.absin(Timers.time(), 2f, 1f)))));
         });
 

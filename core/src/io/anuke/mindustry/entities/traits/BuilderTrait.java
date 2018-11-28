@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.traits;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.Vars;
@@ -229,7 +230,7 @@ public interface BuilderTrait extends Entity{
         }
 
         if(!current.initialized){
-            Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking));
+            Gdx.app.postRunnable(() -> Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking)));
             current.initialized = true;
         }
     }

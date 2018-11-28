@@ -16,7 +16,6 @@ TintedDrawable: {
 	none: {name: white, color: {r: 0, g: 0, b: 0, a: 0}},
 	flat: {name: white, color: {r: 0.0, g: 0.0, b: 0.0, a: 0.6}},
     flat-over: {name: white, color: { hex: "#ffffff82" }},
-    flat-alpha: {name: white, color: { hex: "#ffd37fff" }},
     flat-down: {name: white, color: { hex: "#ffd37fff" }}
 },
 ButtonStyle: {
@@ -42,7 +41,7 @@ ImageButtonStyle: {
 	static-down: {up: button-down },
 	toggle: {checked: button-down, down: button-down, up: button, imageDisabledColor: gray, imageUpColor: white  },
 	select: {checked: button-select, up: none },
-	clear: {down: flat-down, up: flat, over: flat-over},
+	clear: {down: flat-over, up: flat, over: flat-over},
     clear-full: {down: white, up: button-select, over: flat-down},
     clear-partial: {down: flat-down, up: none, over: flat-over},
 	clear-toggle: {down: flat-down, checked: flat-down, up: flat, over: flat-over},
