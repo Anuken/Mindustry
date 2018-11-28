@@ -49,7 +49,7 @@ ImageButtonStyle: {
 },
 ScrollPaneStyle: {
 	default: {vScroll: scroll, vScrollKnob: scroll-knob-vertical-black},
-	horizontal: {vScroll: scroll, vScrollKnob: scroll-knob-vertical, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal},
+	horizontal: {vScroll: scroll, vScrollKnob: scroll-knob-vertical-black, hScroll: scroll-horizontal, hScrollKnob: scroll-knob-horizontal-black},
 },
 WindowStyle: {
 	default: {titleFont: default-font, titleFontColor: accent },
