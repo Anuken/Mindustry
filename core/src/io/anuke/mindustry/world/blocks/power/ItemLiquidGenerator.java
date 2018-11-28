@@ -45,13 +45,16 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
             }
         }
 
-        entity.productionEfficiency = 0.0f;
         // Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
         //       Power amount is delta'd by PowerGraph class already.
         float calculationDelta = entity.delta();
 
+        if(!entity.cons.valid()){
+            entity.productionEfficiency = 0.0f;
+            return;
+        }
         //liquid takes priority over solids
-        if(liquid != null && entity.liquids.get(liquid) >= 0.001f && entity.cons.valid()){
+        if(liquid != null && entity.liquids.get(liquid) >= 0.001f){
             float baseLiquidEfficiency = getLiquidEfficiency(liquid) * this.liquidPowerMultiplier;
             float maximumPossible = maxLiquidGenerate * calculationDelta;
             float used = Math.min(entity.liquids.get(liquid) * calculationDelta, maximumPossible);
@@ -64,7 +67,7 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
             }
-        }else if(entity.cons.valid()){
+        }else{
 
             if(entity.generateTime <= 0f && entity.items.total() > 0){
                 Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
@@ -82,6 +85,8 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
                     entity.damage(Mathf.random(8f));
                     Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
                 }
+            }else{
+                entity.productionEfficiency = 0.0f;
             }
         }
     }

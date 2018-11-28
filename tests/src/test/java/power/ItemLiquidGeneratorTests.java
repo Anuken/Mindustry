@@ -29,7 +29,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     private Tile tile;
     private ItemGenerator.ItemGeneratorEntity entity;
     private final float fakeLiquidPowerMultiplier = 2.0f;
-    private final float fakeItemDuration = 0.5f;
+    private final float fakeItemDuration = 60f; // 60 ticks
     private final float maximumLiquidUsage = 0.5f;
 
     @BeforeEach
@@ -102,8 +102,11 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         assertTrue(generator.acceptItem(item, tile, null), parameterDescription + ": Items which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
 
 
-        // Reset items since BeforeEach will not be called between dynamic tests
+        // Clean up manually since BeforeEach will not be called between dynamic tests
         entity.items.clear();
+        entity.generateTime = 0.0f;
+        entity.productionEfficiency = 0.0f;
+
         if(amount > 0){
             entity.items.add(item, amount);
         }
@@ -115,5 +118,25 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
         assertEquals(expectedRemainingItemAmount, entity.items.get(item), parameterDescription + ": Remaining item amount mismatch.");
         assertEquals(expectedEfficiency, entity.productionEfficiency, parameterDescription + ": Efficiency mismatch.");
+    }
+
+    /** Makes sure the efficiency stays equal during the item duration. */
+    @Test
+    void test_efficiencyConstantDuringItemDuration(){
+
+        // Burn a single coal and test for the duration
+        entity.items.add(Items.coal, 1);
+        entity.cons.update(tile.entity);
+        generator.update(tile);
+
+        float expectedEfficiency = entity.productionEfficiency;
+
+        float currentDuration = 0.0f;
+        while((currentDuration += FakeThreadHandler.fakeDelta) <= fakeItemDuration){
+            generator.update(tile);
+            assertEquals(expectedEfficiency, entity.productionEfficiency, "Duration: " + String.valueOf(currentDuration));
+        }
+        generator.update(tile);
+        assertEquals(0.0f, entity.productionEfficiency, "Duration: " + String.valueOf(currentDuration));
     }
 }
