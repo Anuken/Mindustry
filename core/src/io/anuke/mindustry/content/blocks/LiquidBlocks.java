@@ -22,8 +22,6 @@ public class LiquidBlocks extends BlockList implements ContentList{
             pumpAmount = 0.2f;
             consumes.powerDirect(0.015f);
             liquidCapacity = 30f;
-            // TODO Verify: No longer buffered
-            consumes.powerDirect(20f / 60f);
             hasPower = true;
             size = 2;
             tier = 1;
@@ -35,8 +33,6 @@ public class LiquidBlocks extends BlockList implements ContentList{
             consumes.powerDirect(0.03f);
             liquidCapacity = 40f;
             hasPower = true;
-            // TODO Verify: No longer buffered
-            consumes.powerDirect(20f / 60f);
             size = 2;
             tier = 2;
         }};
