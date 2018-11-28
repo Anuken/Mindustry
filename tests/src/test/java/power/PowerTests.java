@@ -2,6 +2,7 @@ package power;
 
 import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.power.PowerGenerator;
 import io.anuke.mindustry.world.blocks.power.PowerGraph;
 import io.anuke.mindustry.world.consumers.ConsumePower;
 import org.junit.jupiter.api.*;
@@ -48,6 +49,7 @@ public class PowerTests extends PowerTestFixture{
         }
         void test_directConsumptionCalculation(float producedPower, float requiredPower, float expectedSatisfaction, String parameterDescription){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
+            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1.0f;
             Tile directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requiredPower, 0.6f));
 
             PowerGraph powerGraph = new PowerGraph();
@@ -87,6 +89,7 @@ public class PowerTests extends PowerTestFixture{
         }
         void test_bufferedConsumptionCalculation(float producedPower, float maxBuffer, float powerConsumedPerTick, float initialSatisfaction, float expectedSatisfaction, String parameterDescription){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
+            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1.0f;
             Tile bufferedConsumerTile = createFakeTile(0, 1, createFakeBufferedConsumer(maxBuffer, maxBuffer > 0.0f ? maxBuffer/powerConsumedPerTick : 1.0f));
             bufferedConsumerTile.entity.power.satisfaction = initialSatisfaction;
 
@@ -125,6 +128,7 @@ public class PowerTests extends PowerTestFixture{
 
             if(producedPower > 0.0f){
                 Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
+                producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1.0f;
                 powerGraph.add(producerTile);
             }
             Tile directConsumerTile = null;
@@ -149,6 +153,7 @@ public class PowerTests extends PowerTestFixture{
         @Test
         void testDirectConsumptionStopsWithNoPower(){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(10.0f));
+            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1.0f;
             Tile consumerTile = createFakeTile(0, 1, createFakeDirectConsumer(5.0f, 0.6f));
 
             PowerGraph powerGraph = new PowerGraph();

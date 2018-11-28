@@ -86,7 +86,9 @@ public class ConsumePower extends Consume{
      * @return The amount of power which is requested per tick.
      */
     public float requestedPower(Block block, TileEntity entity){
-        // TODO Is it possible to make the block not consume power while items/liquids are missing?
+        // TODO Make the block not consume power on the following conditions, either here or in PowerGraph:
+        //      - Other consumers are not valid, e.g. additional input items/liquids are missing
+        //      - Buffer is full
         return powerPerTick;
     }
 
