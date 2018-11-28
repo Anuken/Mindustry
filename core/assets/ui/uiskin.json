@@ -24,6 +24,8 @@ ButtonStyle: {
 },
 TextButtonStyle: {
 	default: {over: button-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: gray, down: button-down, up: button},
+	left: {over: button-left-over, font: default-font, fontColor: white, disabledFontColor: gray, down: button-left-down, up: button-left},
+	right: {over: button-right-over, font: default-font, fontColor: white, disabledFontColor: gray, down: button-right-down, up: button-right},
 	wave: {font: default-font, fontColor: white, disabledFontColor: gray, up: button-edge-4},
 	clear: {over: flat-over, font: default-font, fontColor: white, disabledFontColor: gray, down: pane, up: flat},
 	discord: {font: default-font, fontColor: white, up: discord-banner},
@@ -35,6 +37,7 @@ TextButtonStyle: {
 },
 ImageButtonStyle: {
 	default: {down: button-down, up: button, over: button-over, imageDisabledColor: gray, imageUpColor: white },
+	right: {over: button-right-over, down: button-right-down, up: button-right},
 	empty: { imageDownColor: accent, imageUpColor: white},
 	emptytoggle: {imageCheckedColor: white, imageDownColor: white, imageUpColor: gray},
 	static: {up: button },
