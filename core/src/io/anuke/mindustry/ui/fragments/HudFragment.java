@@ -150,7 +150,7 @@ public class HudFragment extends Fragment{
         //paused table
         parent.fill(t -> {
             t.top().visible(() -> state.is(State.paused) && !Net.active());
-            t.table("clear", top -> top.add("$text.paused").pad(6).get().setFontScale(1.5f));
+            t.table("button", top -> top.add("$text.paused").pad(6f));
         });
 
         parent.fill(t -> {

@@ -33,7 +33,7 @@ public abstract class Consume{
     }
 
     public void build(Table table){
-        Table t = new Table("clear");
+        Table t = new Table("flat");
         t.margin(4);
         buildTooltip(t);
 

@@ -108,7 +108,7 @@ public class AboutDialog extends FloatingDialog{
             dialog.content().row();
             dialog.content().add("$text.contributors");
             dialog.content().row();
-            dialog.content().pane("clear", new Table(){{
+            dialog.content().pane(new Table(){{
                 int i = 0;
                 left();
                 for(Contributor c : contributors){

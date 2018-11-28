@@ -116,7 +116,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize);
 
-        table.table("clear", desc -> {
+        table.table("flat", desc -> {
             desc.top();
             Table t = new Table();
             t.margin(6);
