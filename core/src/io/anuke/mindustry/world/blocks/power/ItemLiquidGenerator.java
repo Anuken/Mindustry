@@ -14,7 +14,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class ItemLiquidGenerator extends ItemGenerator{
     protected float minLiquidEfficiency = 0.2f;
-    protected float powerPerLiquid = 0.13f;
+    protected float liquidPowerMultiplier = 1.3f; // A liquid with 100% flammability will be 30% more efficient than an item with 100% flammability.
     /**Maximum liquid used per frame.*/
     protected float maxLiquidGenerate = 0.4f;
 
@@ -45,44 +45,48 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
             }
         }
 
+        // Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
+        //       Power amount is delta'd by PowerGraph class already.
+        float calculationDelta = entity.delta();
+
+        if(!entity.cons.valid()){
+            entity.productionEfficiency = 0.0f;
+            return;
+        }
         //liquid takes priority over solids
-        if(liquid != null && entity.liquids.get(liquid) >= 0.001f && entity.cons.valid()){
-            float powerPerLiquid = getLiquidEfficiency(liquid) * this.powerPerLiquid;
-            float used = Math.min(entity.liquids.get(liquid), maxLiquidGenerate * entity.delta());
-            // TODO: Adapt to new power system
-            //used = Math.min(used, (powerCapacity - entity.power.amount) / powerPerLiquid);
+        if(liquid != null && entity.liquids.get(liquid) >= 0.001f){
+            float baseLiquidEfficiency = getLiquidEfficiency(liquid) * this.liquidPowerMultiplier;
+            float maximumPossible = maxLiquidGenerate * calculationDelta;
+            float used = Math.min(entity.liquids.get(liquid) * calculationDelta, maximumPossible);
 
             entity.liquids.remove(liquid, used);
-            // TODO: Adapt to new power system
-            //entity.power.amount += used * powerPerLiquid;
+
+            // Note: 1 Item with 100% Flammability = 100% efficiency. This means 100% is not max but rather a reference point for this generator.
+            entity.productionEfficiency = baseLiquidEfficiency * used / maximumPossible;
 
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
             }
-        }else if(entity.cons.valid()){
-
-            // TODO: Adapt to new power system
-            //float maxPower = Math.min(powerCapacity - entity.power.amount, powerOutput * entity.delta()) * entity.efficiency;
+        }else{
 
             if(entity.generateTime <= 0f && entity.items.total() > 0){
                 Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
                 Item item = entity.items.take();
-                // TODO: Adapt to new power system
-                //entity.efficiency = getItemEfficiency(item);
+                entity.productionEfficiency = getItemEfficiency(item);
                 entity.explosiveness = item.explosiveness;
                 entity.generateTime = 1f;
             }
 
             if(entity.generateTime > 0f){
                 entity.generateTime -= 1f / itemDuration * entity.delta();
-                // TODO: Adapt to new power system
-                //entity.power.amount += maxPower;
                 entity.generateTime = Mathf.clamp(entity.generateTime);
 
                 if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
                     entity.damage(Mathf.random(8f));
                     Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
                 }
+            }else{
+                entity.productionEfficiency = 0.0f;
             }
         }
     }

@@ -4,6 +4,7 @@ import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.power.*;
 
 public class PowerBlocks extends BlockList implements ContentList{
@@ -19,17 +20,17 @@ public class PowerBlocks extends BlockList implements ContentList{
 
         thermalGenerator = new LiquidHeatGenerator("thermal-generator"){{
             maxLiquidGenerate = 4f;
-            // TODO: Adapt to new power system
-            powerProduction = -1;
-            powerPerLiquid = 0.1f;
+            // TODO: Balance
+            powerProduction = 0.17f;
+            liquidPowerMultiplier = 0.1f;
             generateEffect = BlockFx.redgeneratespark;
             size = 2;
         }};
 
         turbineGenerator = new TurbineGenerator("turbine-generator"){{
-            // TODO: Adapt to new power system
+            // TODO: Balance
             powerProduction = 0.28f;
-            powerPerLiquid = 0.1f;
+            liquidPowerMultiplier = 0.3f;
             itemDuration = 30f;
             consumes.liquid(Liquids.water, 0.05f);
             size = 2;
@@ -41,14 +42,26 @@ public class PowerBlocks extends BlockList implements ContentList{
             itemDuration = 220f;
         }};
 
-        solarPanel = new PowerGenerator("solar-panel"){{
-            powerProduction = 0.0045f;
-        }};
+        // TODO: Maybe reintroduce a class for the initial production efficiency
+        solarPanel = new PowerGenerator("solar-panel"){
+            {
+                powerProduction = 0.0045f;
+            }
+            @Override
+            public void update(Tile tile){
+                tile.<GeneratorEntity>entity().productionEfficiency = 1.0f;
+            }
+        };
 
-        largeSolarPanel = new PowerGenerator("solar-panel-large"){{
-            powerProduction = 0.055f;
-            size = 3;
-        }};
+        largeSolarPanel = new PowerGenerator("solar-panel-large"){
+            {
+                powerProduction = 0.055f;
+            }
+            @Override
+            public void update(Tile tile){
+                tile.<GeneratorEntity>entity().productionEfficiency = 1.0f;
+            }
+        };
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
             size = 3;

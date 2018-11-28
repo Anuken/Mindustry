@@ -1,5 +1,7 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import io.anuke.mindustry.world.BarType;
+import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.util.EnumSet;
 
@@ -10,7 +12,12 @@ import io.anuke.mindustry.world.meta.BlockStat;
 
 public class PowerGenerator extends PowerDistributor{
     /** The amount of power produced per tick. */
-    public float powerProduction;
+    protected float powerProduction;
+    /** The maximum possible efficiency for this generator. Supply values larger than 1.0f if more than 100% is possible.
+     *  This could be the case when e.g. an item with 100% flammability is the reference point, but a more effective liquid
+     *  can be supplied as an alternative.
+     */
+    protected float maxEfficiency = 1.0f;
     public BlockStat generationType = BlockStat.basePowerGeneration;
 
     public PowerGenerator(String name){
@@ -40,8 +47,16 @@ public class PowerGenerator extends PowerDistributor{
         return new GeneratorEntity();
     }
 
+    @Override
+    public void setBars(){
+        super.setBars();
+        if(hasPower){
+            bars.add(new BlockBar(BarType.power, true, tile -> tile.<GeneratorEntity>entity().productionEfficiency / maxEfficiency));
+        }
+    }
+
     public static class GeneratorEntity extends TileEntity{
         public float generateTime;
-        public float productionEfficiency = 1;
+        public float productionEfficiency = 0.0f;
     }
 }
