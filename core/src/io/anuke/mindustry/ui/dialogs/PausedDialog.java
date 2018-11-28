@@ -29,13 +29,8 @@ public class PausedDialog extends FloatingDialog{
 
     void rebuild(){
         missionTable.clear();
-        if(world.getSector() != null && !world.getSector().complete){
-            missionTable.add("[LIGHT_GRAY]" + Bundles.format("text.mission", ""));
-            missionTable.row();
-            missionTable.table(t -> {
-                world.getSector().currentMission().display(t);
-            });
-            missionTable.row();
+        missionTable.background("underline");
+        if(world.getSector() != null){
             missionTable.add(Bundles.format("text.sector", world.getSector().x + ", " + world.getSector().y));
         }
     }
@@ -47,7 +42,7 @@ public class PausedDialog extends FloatingDialog{
             }
         });
 
-        content().table(t -> missionTable = t).colspan(mobile ? 3 : 1);
+        content().table(t -> missionTable = t).colspan(mobile ? 3 : 2);
         content().row();
 
         if(!mobile){
