@@ -389,7 +389,7 @@ public class HudFragment extends Fragment{
     }
 
     private void addPlayButton(Table table){
-        table.right().addImageButton("icon-play", 30f, () -> {
+        table.right().addImageButton("icon-play", "right", 30f, () -> {
             if(Net.client() && players[0].isAdmin){
                 Call.onAdminRequest(players[0], AdminAction.wave);
             }else{
