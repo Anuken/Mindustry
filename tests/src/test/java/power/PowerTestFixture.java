@@ -1,5 +1,6 @@
 package power;
 
+import com.badlogic.gdx.math.MathUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.ContentLoader;
@@ -24,8 +25,14 @@ import static io.anuke.mindustry.Vars.world;
 
 /** This class provides objects commonly used by power related unit tests.
  *  For now, this is a helper with static methods, but this might change.
+ *
+ *  Note: All tests which subclass this will run with a fixed delta of 0.5!
  * */
 public class PowerTestFixture{
+
+    public static final float smallRoundingTolerance = MathUtils.FLOAT_ROUNDING_ERROR;
+    public static final float mediumRoundingTolerance = MathUtils.FLOAT_ROUNDING_ERROR * 10;
+    public static final float highRoundingTolerance = MathUtils.FLOAT_ROUNDING_ERROR * 100;
 
     @BeforeAll
     static void initializeDependencies(){

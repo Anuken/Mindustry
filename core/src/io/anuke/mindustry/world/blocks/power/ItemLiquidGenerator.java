@@ -54,7 +54,7 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
         if(liquid != null && entity.liquids.get(liquid) >= 0.001f && entity.cons.valid()){
             float baseLiquidEfficiency = getLiquidEfficiency(liquid) * this.liquidPowerMultiplier;
             float maximumPossible = maxLiquidGenerate * calculationDelta;
-            float used = Math.min(entity.liquids.get(liquid), maximumPossible);
+            float used = Math.min(entity.liquids.get(liquid) * calculationDelta, maximumPossible);
 
             entity.liquids.remove(liquid, used);
 

@@ -121,7 +121,7 @@ public class PowerGraph{
                 if(consumePower.isBuffered){
                     // Add a percentage of the requested amount, but limit it to the mission amount.
                     // TODO This can maybe be calculated without converting to absolute values first
-                    float maximumRate = consumePower.requestedPower(consumer.block(), consumer.entity()) * coverage;
+                    float maximumRate = consumePower.requestedPower(consumer.block(), consumer.entity()) * coverage * consumer.entity.delta();
                     float missingAmount = consumePower.powerCapacity * (1 - consumer.entity.power.satisfaction);
                     consumer.entity.power.satisfaction += Math.min(missingAmount, maximumRate) / consumePower.powerCapacity;
                 }else{

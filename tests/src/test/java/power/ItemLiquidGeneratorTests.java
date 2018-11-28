@@ -9,10 +9,8 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.power.BurnerGenerator;
 import io.anuke.mindustry.world.blocks.power.ItemGenerator;
 import io.anuke.mindustry.world.blocks.power.ItemLiquidGenerator;
-import io.anuke.mindustry.world.blocks.power.PowerGenerator;
 import org.junit.jupiter.api.*;
 
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
@@ -20,6 +18,10 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 /**
  * This class tests ItemLiquidGenerators. Currently, testing is only performed on the BurnerGenerator subclass,
  * which means only power calculations based on flammability are tested.
+ * All tests are run with a fixed delta of 0.5 so delta considerations can be tested as well.
+ * Additionally, each PowerGraph::update() call will have its own thread frame, i.e. the method will never be called twice within the same frame.
+ * Both of these constraints are handled by FakeThreadHandler within PowerTestFixture.
+ * Any power amount (produced, consumed, buffered) should be affected by FakeThreadHandler.fakeDelta but satisfaction should not!
  */
 public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
@@ -58,8 +60,11 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     }
 
     void test_liquidConsumption(Liquid liquid, float availableLiquidAmount, String parameterDescription){
-        final float expectedEfficiency = Math.min(1.0f, availableLiquidAmount / maximumLiquidUsage) * fakeLiquidPowerMultiplier * liquid.flammability;
-        final float expectedRemainingLiquidAmount = liquid.flammability > 0f ? Math.max(0.0f, availableLiquidAmount - maximumLiquidUsage) : availableLiquidAmount;
+        final float baseEfficiency = fakeLiquidPowerMultiplier * liquid.flammability;
+        final float expectedEfficiency = Math.min(1.0f, availableLiquidAmount / maximumLiquidUsage) * baseEfficiency;
+        final float expectedConsumptionPerTick = Math.min(maximumLiquidUsage, availableLiquidAmount);
+        final float expectedRemainingLiquidAmount = Math.max(0.0f, availableLiquidAmount - expectedConsumptionPerTick * FakeThreadHandler.fakeDelta);
+
         assertTrue(generator.acceptLiquid(tile, null, liquid, availableLiquidAmount), parameterDescription + ": Liquids which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
 
         // Reset liquids since BeforeEach will not be called between dynamic tests
