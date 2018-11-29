@@ -96,11 +96,11 @@ public class JoinDialog extends FloatingDialog{
             //why are java lambdas this bad
             TextButton[] buttons = {null};
 
-            TextButton button = buttons[0] = remote.addButton("[accent]" + server.displayIP(), () -> {
+            TextButton button = buttons[0] = remote.addButton("[accent]" + server.displayIP(), "clear", () -> {
                 if(!buttons[0].childrenPressed()){
                     connect(server.ip, server.port);
                 }
-            }).width(targetWidth()).height(150f).pad(4f).get();
+            }).width(targetWidth()).height(155f).pad(4f).get();
 
             button.getLabel().setWrap(true);
 
@@ -159,7 +159,7 @@ public class JoinDialog extends FloatingDialog{
                         Bundles.format("text.server.version", host.version);
             }else if(host.version > Version.build && Version.build != -1){
                 versionString = Bundles.get("text.server.outdated.client") + "\n" +
-                        Bundles.format("text.server.version", host.version);
+                        Bundles.format("text.server.version", host.version, "");
             }else{
                 versionString = Bundles.format("text.server.version", host.version, host.versionType);
             }
