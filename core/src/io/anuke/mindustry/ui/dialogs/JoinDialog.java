@@ -273,7 +273,7 @@ public class JoinDialog extends FloatingDialog{
 
         local.row();
 
-        TextButton button = local.addButton("[accent]" + host.name, () -> connect(host.address, port))
+        TextButton button = local.addButton("[accent]" + host.name, "clear", () -> connect(host.address, port))
         .width(w).height(80f).pad(4f).get();
         button.left();
         button.row();
