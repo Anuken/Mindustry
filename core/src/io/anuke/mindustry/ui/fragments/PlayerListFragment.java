@@ -104,19 +104,19 @@ public class PlayerListFragment extends Fragment{
             if((Net.server() || players[0].isAdmin) && !player.isLocal && (!player.isAdmin || Net.server())){
                 button.add().growY();
 
-                float bs = (h + 14) / 2f;
+                float bs = (h) / 2f;
 
                 button.table(t -> {
                     t.defaults().size(bs);
 
-                    t.addImageButton("icon-ban", 14 * 2,
+                    t.addImageButton("icon-ban", "clear-partial", 14 * 2,
                         () -> ui.showConfirm("$text.confirm", "$text.confirmban", () -> Call.onAdminRequest(player, AdminAction.ban)));
-                    t.addImageButton("icon-cancel", 16 * 2,
+                    t.addImageButton("icon-cancel", "clear-partial", 16 * 2,
                         () -> ui.showConfirm("$text.confirm", "$text.confirmkick", () -> Call.onAdminRequest(player, AdminAction.kick)));
 
                     t.row();
 
-                    t.addImageButton("icon-admin", "toggle", 14 * 2, () -> {
+                    t.addImageButton("icon-admin", "clear-toggle", 14 * 2, () -> {
                         if(Net.client()) return;
 
                         String id = player.uuid;
@@ -132,9 +132,9 @@ public class PlayerListFragment extends Fragment{
                     .touchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled)
                     .checked(player.isAdmin);
 
-                    t.addImageButton("icon-zoom-small", 14 * 2, () -> ui.showError("Currently unimplemented.")/*Call.onAdminRequest(player, AdminAction.trace)*/);
+                    t.addImageButton("icon-zoom-small", "clear-partial", 14 * 2, () -> ui.showError("Currently unimplemented.")/*Call.onAdminRequest(player, AdminAction.trace)*/);
 
-                }).padRight(12).padTop(-5).padLeft(0).padBottom(-10).size(bs + 10f, bs);
+                }).padRight(12).size(bs + 10f, bs);
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
