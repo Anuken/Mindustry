@@ -24,9 +24,13 @@ import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.Image;
+import io.anuke.ucore.scene.ui.ImageButton;
+import io.anuke.ucore.scene.ui.Label;
+import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Stack;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 
@@ -347,7 +351,7 @@ public class HudFragment extends Fragment{
         if(shown){
             shown = false;
             blockfrag.toggle(dur, in);
-            wavetable.actions(Actions.translateBy(0, (wavetable.getHeight() + dsize + 6) - wavetable.getTranslation().y, dur, in));
+            wavetable.actions(Actions.translateBy(0, (wavetable.getHeight() + dsize + Unit.dp.scl(6)) - wavetable.getTranslation().y, dur, in));
             infolabel.actions(Actions.translateBy(0, (wavetable.getHeight()) - wavetable.getTranslation().y, dur, in));
         }else{
             shown = true;
