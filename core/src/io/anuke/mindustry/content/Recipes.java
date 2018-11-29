@@ -87,7 +87,6 @@ public class Recipes implements ContentList{
         //CRAFTING
 
         //smelting
-        new Recipe(crafting, CraftingBlocks.smelter, new ItemStack(Items.copper, 100));
         new Recipe(crafting, CraftingBlocks.arcsmelter, new ItemStack(Items.copper, 110), new ItemStack(Items.densealloy, 70), new ItemStack(Items.lead, 50));
         new Recipe(crafting, CraftingBlocks.siliconsmelter, new ItemStack(Items.copper, 60), new ItemStack(Items.lead, 50));
 
@@ -180,7 +179,7 @@ public class Recipes implements ContentList{
         new Recipe(units, UnitBlocks.commandCenter, new ItemStack(Items.lead, 100), new ItemStack(Items.densealloy, 100), new ItemStack(Items.silicon, 200));
 
         //LIQUIDS
-        new Recipe(liquid, LiquidBlocks.conduit, new ItemStack(Items.lead, 1)).setDependencies(CraftingBlocks.smelter);
+        new Recipe(liquid, LiquidBlocks.conduit, new ItemStack(Items.lead, 1));
         new Recipe(liquid, LiquidBlocks.pulseConduit, new ItemStack(Items.titanium, 1), new ItemStack(Items.lead, 1));
         new Recipe(liquid, LiquidBlocks.phaseConduit, new ItemStack(Items.phasefabric, 10), new ItemStack(Items.silicon, 15), new ItemStack(Items.lead, 20), new ItemStack(Items.titanium, 20));
 
@@ -189,7 +188,7 @@ public class Recipes implements ContentList{
         new Recipe(liquid, LiquidBlocks.liquidJunction, new ItemStack(Items.titanium, 4), new ItemStack(Items.lead, 4));
         new Recipe(liquid, LiquidBlocks.bridgeConduit, new ItemStack(Items.titanium, 8), new ItemStack(Items.lead, 8));
 
-        new Recipe(liquid, LiquidBlocks.mechanicalPump, new ItemStack(Items.copper, 30), new ItemStack(Items.lead, 20)).setDependencies(CraftingBlocks.smelter);
+        new Recipe(liquid, LiquidBlocks.mechanicalPump, new ItemStack(Items.copper, 30), new ItemStack(Items.lead, 20));
         new Recipe(liquid, LiquidBlocks.rotaryPump, new ItemStack(Items.copper, 140), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 70));
         new Recipe(liquid, LiquidBlocks.thermalPump, new ItemStack(Items.copper, 160), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 60), new ItemStack(Items.titanium, 80), new ItemStack(Items.thorium, 70));
     }
