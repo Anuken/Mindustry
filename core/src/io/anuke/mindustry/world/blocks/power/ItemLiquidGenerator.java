@@ -35,8 +35,6 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
     public void update(Tile tile){
         ItemGeneratorEntity entity = tile.entity();
 
-        entity.power.graph.update();
-
         Liquid liquid = null;
         for(Liquid other : content.liquids()){
             if(entity.liquids.get(other) >= 0.001f && getLiquidEfficiency(other) >= minLiquidEfficiency){
@@ -67,30 +65,13 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
             }
+
+            // Update the graph manually instead of letting the base class do it since that would consume items
+            entity.power.graph.update();
         }else{
-
-            if(entity.generateTime <= 0f && entity.items.total() > 0){
-                Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
-                Item item = entity.items.take();
-                entity.productionEfficiency = getItemEfficiency(item);
-                entity.explosiveness = item.explosiveness;
-                entity.generateTime = 1f;
-            }
-
-            if(entity.generateTime > 0f){
-                entity.generateTime -= 1f / itemDuration * entity.delta();
-                entity.generateTime = Mathf.clamp(entity.generateTime);
-
-                if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
-                    entity.damage(Mathf.random(8f));
-                    Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
-                }
-            }else{
-                entity.productionEfficiency = 0.0f;
-            }
+            // No liquids accepted, act like a default ItemGenerator
+            super.update(tile);
         }
-
-        super.update(tile);
     }
 
     @Override

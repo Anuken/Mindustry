@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
  * Additionally, each PowerGraph::update() call will have its own thread frame, i.e. the method will never be called twice within the same frame.
  * Both of these constraints are handled by FakeThreadHandler within PowerTestFixture.
  * Any power amount (produced, consumed, buffered) should be affected by FakeThreadHandler.fakeDelta but satisfaction should not!
+ * TODO Find a way to reuse these tests for LiquidGenerator and ItemGenerator
  */
 public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
