@@ -40,7 +40,6 @@ public class DebugBlocks extends BlockList implements ContentList{
     public void load(){
         powerVoid = new PowerBlock("powervoid"){
             {
-                // TODO Adapt to new power system if necessary
                 consumes.powerDirect(Float.MAX_VALUE);
                 shadow = "shadow-round-1";
             }
@@ -54,8 +53,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             @Override
             public void init(){
                 super.init();
-                // TODO Adapt to new power system if necessary
-                //stats.remove(BlockStat.powerCapacity);
+                stats.remove(BlockStat.powerUse);
             }
         };
 
@@ -67,7 +65,6 @@ public class DebugBlocks extends BlockList implements ContentList{
                 shadow = "shadow-round-1";
             }
 
-            // TODO Adapt to new power system if necessary
             @Override
             public float getPowerProduction(Tile tile){
                 return 10000f;

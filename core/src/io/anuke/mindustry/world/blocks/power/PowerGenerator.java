@@ -10,6 +10,10 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockStat;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public class PowerGenerator extends PowerDistributor{
     /** The amount of power produced per tick. */
     protected float powerProduction;
@@ -58,5 +62,15 @@ public class PowerGenerator extends PowerDistributor{
     public static class GeneratorEntity extends TileEntity{
         public float generateTime;
         public float productionEfficiency = 0.0f;
+
+        @Override
+        public void write(DataOutput stream) throws IOException{
+            stream.writeFloat(productionEfficiency);
+        }
+
+        @Override
+        public void read(DataInput stream) throws IOException{
+            productionEfficiency = stream.readFloat();
+        }
     }
 }

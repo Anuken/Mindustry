@@ -42,26 +42,13 @@ public class PowerBlocks extends BlockList implements ContentList{
             itemDuration = 220f;
         }};
 
-        // TODO: Maybe reintroduce a class for the initial production efficiency
-        solarPanel = new PowerGenerator("solar-panel"){
-            {
-                powerProduction = 0.0045f;
-            }
-            @Override
-            public void update(Tile tile){
-                tile.<GeneratorEntity>entity().productionEfficiency = 1.0f;
-            }
-        };
+        solarPanel = new SolarGenerator("solar-panel"){{
+            powerProduction = 0.0045f;
+        }};
 
-        largeSolarPanel = new PowerGenerator("solar-panel-large"){
-            {
-                powerProduction = 0.055f;
-            }
-            @Override
-            public void update(Tile tile){
-                tile.<GeneratorEntity>entity().productionEfficiency = 1.0f;
-            }
-        };
+        largeSolarPanel = new PowerGenerator("solar-panel-large"){{
+            powerProduction = 0.055f;
+        }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
             size = 3;
