@@ -89,6 +89,8 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
                 entity.productionEfficiency = 0.0f;
             }
         }
+
+        super.update(tile);
     }
 
     @Override

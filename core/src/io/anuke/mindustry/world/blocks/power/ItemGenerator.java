@@ -93,6 +93,8 @@ public abstract class ItemGenerator extends PowerGenerator{
                 Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
             }
         }
+
+        super.update(tile);
     }
 
     protected abstract float getItemEfficiency(Item item);

@@ -44,7 +44,7 @@ public class FusionReactor extends PowerGenerator{
         float efficiencyAdded = Mathf.pow(entity.warmup, 4f) * Timers.delta();
         entity.productionEfficiency = Mathf.clamp(entity.productionEfficiency + efficiencyAdded * increaseOrDecrease);
 
-        tile.entity.power.graph.update();
+        super.update(tile);
     }
 
     @Override
