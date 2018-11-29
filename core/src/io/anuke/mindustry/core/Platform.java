@@ -32,9 +32,22 @@ public abstract class Platform {
             dialog.setFillParent(true);
             dialog.content().top();
             dialog.content().defaults().height(65f);
+
+            TextField[] use = {null};
+
+            dialog.content().addImageButton("icon-copy", "clear", 16*3, () -> use[0].copy())
+                    .visible(() -> !use[0].getSelection().isEmpty()).width(65f);
+
+            dialog.content().addImageButton("icon-paste", "clear", 16*3, () ->
+                    use[0].paste(Gdx.app.getClipboard().getContents(), false))
+                    .visible(() -> !Gdx.app.getClipboard().getContents().isEmpty()).width(65f);
+
             TextField to = dialog.content().addField(field.getText(), t-> {}).pad(15).width(250f).get();
             to.setMaxLength(maxLength);
             to.keyDown(Keys.ENTER, () -> dialog.content().find("okb").fireClick());
+
+            use[0] = to;
+
             dialog.content().addButton("$text.ok", () -> {
                 field.clearText();
                 field.appendText(to.getText());
