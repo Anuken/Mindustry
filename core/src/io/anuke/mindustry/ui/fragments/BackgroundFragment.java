@@ -29,13 +29,13 @@ public class BackgroundFragment extends Fragment{
             Draw.color();
 
             boolean portrait = Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
-            float logoscl = (int) Unit.dp.scl(7) * (portrait ? 5f / 7f : 1f);
             TextureRegion logo = Core.skin.getRegion("logotext");
-            float logow = logo.getRegionWidth() * logoscl;
-            float logoh = logo.getRegionHeight() * logoscl;
+            float ratio = (float)logo.getRegionWidth() / logo.getRegionHeight();
+            float logow = 810f;
+            float logoh = logow / ratio;
 
             Draw.color();
-            Core.batch.draw(logo, (int) (w / 2 - logow / 2), (int) (h - logoh + 15 - Unit.dp.scl(portrait ? 30f : 0)), logow, logoh);
+            Core.batch.draw(logo, (int) (w / 2 - logow / 2), (int) (h - logoh - Unit.dp.scl(portrait ? 30f : 20)), logow, logoh);
         }).visible(() -> state.is(State.menu)).grow();
     }
 }
