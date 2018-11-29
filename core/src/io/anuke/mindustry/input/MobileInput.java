@@ -45,6 +45,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     //gesture data
     private Vector2 vector = new Vector2();
+    private boolean canPan;
     private boolean zoomed = false;
     /** Set of completed guides. */
     private ObjectSet<String> guides = new ObjectSet<>();
@@ -650,7 +651,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
-        if(ui.hasMouse()) return false;
+        if(!canPan) return false;
 
         //can't pan in line mode with one finger or while dropping items!
         if((lineMode && !Gdx.input.isTouched(1)) || droppingItem){
@@ -704,6 +705,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean touchDown(float x, float y, int pointer, int button){
+        canPan = !ui.hasMouse();
         return false;
     }
 

@@ -38,7 +38,7 @@ void main() {
 	else if(m > 0.35) gl_FragColor.rgb = p4;
 	else gl_FragColor.rgb = vec3(0.0);
 
-	gl_FragColor.rgb *= 0.75;
+	gl_FragColor.rgb *= 0.5;
 
     gl_FragColor.a = mod(abs(float(coords.x)) + abs(float(coords.y)), 110.0) < 35.0 ? 1.0 : 0.0;
 }
