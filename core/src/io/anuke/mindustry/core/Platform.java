@@ -40,7 +40,7 @@ public abstract class Platform {
 
             dialog.content().addImageButton("icon-paste", "clear", 16*3, () ->
                     use[0].paste(Gdx.app.getClipboard().getContents(), false))
-                    .visible(() -> !Gdx.app.getClipboard().getContents().isEmpty()).width(65f);
+                    .visible(() -> Gdx.app.getClipboard() != null && Gdx.app.getClipboard().getContents() != null && !Gdx.app.getClipboard().getContents().isEmpty()).width(65f);
 
             TextField to = dialog.content().addField(field.getText(), t-> {}).pad(15).width(250f).get();
             to.setMaxLength(maxLength);
