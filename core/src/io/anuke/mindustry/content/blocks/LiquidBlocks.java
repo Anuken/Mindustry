@@ -5,21 +5,27 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.distribution.*;
 import io.anuke.mindustry.world.blocks.production.Pump;
 
+import io.anuke.ucore.core.Settings;
+
 public class LiquidBlocks extends BlockList implements ContentList{
     public static Block mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidtank, liquidJunction, bridgeConduit, phaseConduit;
+    public static float pumpSpeedMultiplier;
 
     @Override
     public void load(){
+        pumpSpeedMultiplier = (float)Settings.getInt("pump-speed", 1);
 
         mechanicalPump = new Pump("mechanical-pump"){{
             shadow = "shadow-round-1";
             pumpAmount = 0.1f;
+            pumpAmount *= pumpSpeedMultiplier;
             tier = 0;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
             shadow = "shadow-rounded-2";
             pumpAmount = 0.2f;
+            pumpAmount *= pumpSpeedMultiplier;
             consumes.power(0.015f);
             liquidCapacity = 30f;
             powerCapacity = 20f;
@@ -31,6 +37,7 @@ public class LiquidBlocks extends BlockList implements ContentList{
         thermalPump = new Pump("thermal-pump"){{
             shadow = "shadow-rounded-2";
             pumpAmount = 0.3f;
+            pumpAmount *= pumpSpeedMultiplier;
             consumes.power(0.03f);
             liquidCapacity = 40f;
             hasPower = true;

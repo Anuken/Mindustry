@@ -9,18 +9,25 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.production.*;
 
+import io.anuke.ucore.core.Settings;
+
 public class CraftingBlocks extends BlockList implements ContentList{
     public static Block smelter, arcsmelter, siliconsmelter, plastaniumCompressor, phaseWeaver, alloySmelter,
             pyratiteMixer, blastMixer,
             cryofluidmixer, melter, separator, centrifuge, biomatterCompressor, pulverizer, solidifier, incinerator;
+    public static float craftingSpeedMultiplier;
 
     @Override
     public void load(){
+        craftingSpeedMultiplier = (float)Settings.getInt("crafting-speed", 1);
+
         smelter = new Smelter("smelter"){{
             health = 70;
             result = Items.densealloy;
             craftTime = 45f;
+            craftTime /= craftingSpeedMultiplier;
             burnDuration = 46f;
+            burnDuration /= craftingSpeedMultiplier;
             useFlux = true;
 
             consumes.items(new ItemStack[]{new ItemStack(Items.copper, 1), new ItemStack(Items.lead, 2)});
@@ -32,6 +39,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             craftEffect = BlockFx.smeltsmoke;
             result = Items.densealloy;
             craftTime = 30f;
+            craftTime /= craftingSpeedMultiplier;
             size = 2;
 
             useFlux = true;
@@ -46,6 +54,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             craftEffect = BlockFx.smeltsmoke;
             result = Items.silicon;
             craftTime = 40f;
+            craftTime /= craftingSpeedMultiplier;
             powerCapacity = 20f;
             size = 2;
             hasLiquids = false;
@@ -59,6 +68,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             hasItems = true;
             liquidCapacity = 60f;
             craftTime = 60f;
+            craftTime /= craftingSpeedMultiplier;
             output = Items.plastanium;
             itemCapacity = 30;
             powerCapacity = 40f;
@@ -77,6 +87,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             craftEffect = BlockFx.smeltsmoke;
             result = Items.phasefabric;
             craftTime = 120f;
+            craftTime /= craftingSpeedMultiplier;
             powerCapacity = 50f;
             size = 2;
 
@@ -88,6 +99,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             craftEffect = BlockFx.smeltsmoke;
             result = Items.surgealloy;
             craftTime = 75f;
+            craftTime /= craftingSpeedMultiplier;
             powerCapacity = 60f;
             size = 2;
 
@@ -142,6 +154,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             outputLiquidAmount = 0.75f;
             itemCapacity = 50;
             craftTime = 10f;
+            craftTime /= craftingSpeedMultiplier;
             hasLiquids = hasPower = true;
 
             consumes.power(0.1f);
@@ -159,6 +172,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
                 new ItemStack(Items.titanium, 1),
             };
             filterTime = 40f;
+            filterTime /= craftingSpeedMultiplier;
             itemCapacity = 40;
             health = 50;
 
@@ -180,12 +194,14 @@ public class CraftingBlocks extends BlockList implements ContentList{
 
             hasPower = true;
             filterTime = 15f;
+            filterTime /= craftingSpeedMultiplier;
             itemCapacity = 60;
             health = 50 * 4;
             spinnerLength = 1.5f;
             spinnerRadius = 3.5f;
             spinnerThickness = 1.5f;
             spinnerSpeed = 3f;
+            spinnerSpeed *= craftingSpeedMultiplier;
             size = 2;
 
             consumes.item(Items.stone, 2);
@@ -197,6 +213,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             liquidCapacity = 60f;
             itemCapacity = 50;
             craftTime = 25f;
+            craftTime /= craftingSpeedMultiplier;
             outputLiquid = Liquids.oil;
             outputLiquidAmount = 1.5f;
             size = 2;
@@ -213,6 +230,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             health = 80;
             craftEffect = BlockFx.pulverize;
             craftTime = 40f;
+            craftTime /= craftingSpeedMultiplier;
             updateEffect = BlockFx.pulverizeSmall;
             hasItems = hasPower = true;
 
@@ -223,6 +241,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
         solidifier = new GenericCrafter("solidifer"){{
             liquidCapacity = 21f;
             craftTime = 14;
+            craftTime /= craftingSpeedMultiplier;
             output = Items.stone;
             itemCapacity = 20;
             health = 80;

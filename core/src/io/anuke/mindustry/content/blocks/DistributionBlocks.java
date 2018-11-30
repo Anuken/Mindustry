@@ -4,21 +4,27 @@ import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.distribution.*;
 
+import io.anuke.ucore.core.Settings;
+
 public class DistributionBlocks extends BlockList implements ContentList{
     public static Block conveyor, titaniumconveyor, distributor, junction,
     itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver;
+    public static float distributionSpeedMultiplier;
 
     @Override
     public void load(){
+        distributionSpeedMultiplier = ((float)Settings.getInt("distribution-speed", 1));
 
         conveyor = new Conveyor("conveyor"){{
             health = 45;
             speed = 0.03f;
+            speed *= distributionSpeedMultiplier;
         }};
 
         titaniumconveyor = new Conveyor("titanium-conveyor"){{
             health = 65;
             speed = 0.07f;
+            speed *= distributionSpeedMultiplier;
         }};
 
         junction = new Junction("junction"){{
@@ -30,6 +36,7 @@ public class DistributionBlocks extends BlockList implements ContentList{
             range = 4;
             speed = 60f;
             bufferCapacity = 15;
+            speed *= distributionSpeedMultiplier;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{

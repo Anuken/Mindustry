@@ -11,14 +11,20 @@ import io.anuke.mindustry.world.blocks.production.Drill;
 import io.anuke.mindustry.world.blocks.production.Fracker;
 import io.anuke.mindustry.world.blocks.production.SolidPump;
 
+import io.anuke.ucore.core.Settings;
+
 public class ProductionBlocks extends BlockList implements ContentList{
     public static Block mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, plasmaDrill, waterExtractor, oilExtractor, cultivator;
+    public static float productionSpeedMultiplier;
 
     @Override
     public void load(){
+        productionSpeedMultiplier = (float)Settings.getInt("production-speed", 1);
+
         mechanicalDrill = new Drill("mechanical-drill"){{
             tier = 2;
             drillTime = 300;
+            drillTime /= productionSpeedMultiplier;
             size = 2;
             drawMineItem = true;
         }};
@@ -26,12 +32,14 @@ public class ProductionBlocks extends BlockList implements ContentList{
         pneumaticDrill = new Drill("pneumatic-drill"){{
             tier = 3;
             drillTime = 240;
+            drillTime /= productionSpeedMultiplier;
             size = 2;
             drawMineItem = true;
         }};
 
         laserDrill = new Drill("laser-drill"){{
             drillTime = 140;
+            drillTime /= productionSpeedMultiplier;
             size = 2;
             hasPower = true;
             tier = 4;
@@ -43,6 +51,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
 
         blastDrill = new Drill("blast-drill"){{
             drillTime = 60;
+            drillTime /= productionSpeedMultiplier;
             size = 3;
             drawRim = true;
             hasPower = true;
@@ -51,7 +60,9 @@ public class ProductionBlocks extends BlockList implements ContentList{
             updateEffectChance = 0.03f;
             drillEffect = BlockFx.mineHuge;
             rotateSpeed = 6f;
+            rotateSpeed *= productionSpeedMultiplier;
             warmupSpeed = 0.01f;
+            warmupSpeed *= productionSpeedMultiplier;
 
             consumes.power(0.3f);
         }};
@@ -59,16 +70,19 @@ public class ProductionBlocks extends BlockList implements ContentList{
         plasmaDrill = new Drill("plasma-drill"){{
             heatColor = Color.valueOf("ff461b");
             drillTime = 50;
+            drillTime /= productionSpeedMultiplier;
             size = 4;
             hasLiquids = true;
             hasPower = true;
             tier = 5;
             rotateSpeed = 9f;
+            rotateSpeed *= productionSpeedMultiplier;
             drawRim = true;
             updateEffect = BlockFx.pulverizeRedder;
             updateEffectChance = 0.04f;
             drillEffect = BlockFx.mineHuge;
             warmupSpeed = 0.005f;
+            warmupSpeed *= productionSpeedMultiplier;
 
             consumes.power(0.7f);
         }};
@@ -76,9 +90,11 @@ public class ProductionBlocks extends BlockList implements ContentList{
         waterExtractor = new SolidPump("water-extractor"){{
             result = Liquids.water;
             pumpAmount = 0.065f;
+            pumpAmount *= productionSpeedMultiplier;
             size = 2;
             liquidCapacity = 30f;
             rotateSpeed = 1.4f;
+            rotateSpeed /= productionSpeedMultiplier;
 
             consumes.power(0.09f);
         }};
@@ -89,6 +105,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             liquidCapacity = 50f;
             updateEffectChance = 0.05f;
             pumpAmount = 0.09f;
+            pumpAmount *= productionSpeedMultiplier;
             size = 3;
             liquidCapacity = 30f;
 
@@ -100,6 +117,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
         cultivator = new Cultivator("cultivator"){{
             result = Items.biomatter;
             drillTime = 260;
+            drillTime /= productionSpeedMultiplier;
             size = 2;
             hasLiquids = true;
             hasPower = true;

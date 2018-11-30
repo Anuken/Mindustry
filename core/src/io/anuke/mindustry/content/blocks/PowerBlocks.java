@@ -7,14 +7,20 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.distribution.WarpGate;
 import io.anuke.mindustry.world.blocks.power.*;
 
+import io.anuke.ucore.core.Settings;
+
 public class PowerBlocks extends BlockList implements ContentList{
     public static Block combustionGenerator, thermalGenerator, turbineGenerator, rtgGenerator, solarPanel, largeSolarPanel,
             thoriumReactor, fusionReactor, battery, batteryLarge, powerNode, powerNodeLarge, warpGate;
+    public static float powerAmountMultiplier;
 
     @Override
     public void load(){
+        powerAmountMultiplier = (float)Settings.getInt("power-amount", 1);
+
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
             powerOutput = 0.09f;
+            powerOutput *= powerAmountMultiplier;
             powerCapacity = 40f;
             itemDuration = 40f;
         }};
@@ -23,15 +29,18 @@ public class PowerBlocks extends BlockList implements ContentList{
             maxLiquidGenerate = 0.5f;
             powerCapacity = 40f;
             powerPerLiquid = 1f;
+            powerPerLiquid *= powerAmountMultiplier;
             generateEffect = BlockFx.redgeneratespark;
             size = 2;
         }};
 
         turbineGenerator = new TurbineGenerator("turbine-generator"){{
             powerOutput = 0.28f;
+            powerOutput *= powerAmountMultiplier;
             powerCapacity = 40f;
             itemDuration = 30f;
             powerPerLiquid = 0.7f;
+            powerPerLiquid *= powerAmountMultiplier;
             consumes.liquid(Liquids.water, 0.05f);
             size = 2;
         }};
@@ -40,22 +49,26 @@ public class PowerBlocks extends BlockList implements ContentList{
             powerCapacity = 40f;
             size = 2;
             powerOutput = 0.3f;
+            powerOutput *= powerAmountMultiplier;
             itemDuration = 220f;
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
             generation = 0.0045f;
+            generation *= powerAmountMultiplier;
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
             size = 3;
             generation = 0.055f;
+            generation *= powerAmountMultiplier;
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
             size = 3;
             health = 700;
             powerMultiplier = 1.1f;
+            powerMultiplier *= powerAmountMultiplier;
         }};
 
         fusionReactor = new FusionReactor("fusion-reactor"){{
