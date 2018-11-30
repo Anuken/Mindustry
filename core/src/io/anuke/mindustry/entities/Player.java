@@ -558,7 +558,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             isBoosting = true;
         }
 
-        float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
+        float speed = isBoosting && !mech.flying ? mech.boostSpeed * (float)Settings.getInt("movement-speed", 1) : mech.speed;
         //fraction of speed when at max load
         float carrySlowdown = 0.7f;
 

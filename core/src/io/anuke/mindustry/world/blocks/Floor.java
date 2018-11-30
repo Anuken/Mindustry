@@ -18,6 +18,7 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.core.Settings;
 
 public class Floor extends Block{
     //TODO implement proper bitmasking
@@ -73,6 +74,8 @@ public class Floor extends Block{
     @Override
     public void load(){
         super.load();
+
+        speedMultiplier *= (float)Settings.getInt("movement-speed", 1);
 
         if(blend){
             edgeRegion = Draw.hasRegion(name + "edge") ? Draw.region(name + "edge") : Draw.region(edge + "edge");
