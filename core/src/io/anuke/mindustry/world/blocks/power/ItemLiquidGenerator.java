@@ -30,7 +30,6 @@ public class ItemLiquidGenerator extends PowerGenerator{
     protected float itemDuration = 70f;
 
     protected float minLiquidEfficiency = 0.2f;
-    protected float liquidPowerMultiplier = 1.3f; // A liquid with 100% flammability will be 30% more efficient than an item with 100% flammability.
     /** Maximum liquid used per frame. */
     protected float maxLiquidGenerate = 0.4f;
 
@@ -100,14 +99,14 @@ public class ItemLiquidGenerator extends PowerGenerator{
         }
         //liquid takes priority over solids
         if(hasLiquids && liquid != null && entity.liquids.get(liquid) >= 0.001f){
-            float baseLiquidEfficiency = getLiquidEfficiency(liquid) * this.liquidPowerMultiplier;
+            float baseLiquidEfficiency = getLiquidEfficiency(liquid);
             float maximumPossible = maxLiquidGenerate * calculationDelta;
             float used = Math.min(entity.liquids.get(liquid) * calculationDelta, maximumPossible);
 
             entity.liquids.remove(liquid, used);
 
-            // Note: 1 Item with 100% Flammability = 100% efficiency. This means 100% is not max but rather a reference point for this generator.
-            entity.productionEfficiency = baseLiquidEfficiency * used / maximumPossible;
+            // Note: 0.5 = 100%. PowerGraph will multiply this efficiency by two on its own.
+            entity.productionEfficiency = Mathf.clamp(baseLiquidEfficiency * used / maximumPossible);
 
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));

@@ -26,7 +26,6 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     private ItemLiquidGenerator generator;
     private Tile tile;
     private ItemLiquidGenerator.ItemLiquidGeneratorEntity entity;
-    private final float fakeLiquidPowerMultiplier = 2.0f;
     private final float fakeItemDuration = 60f; // 60 ticks
     private final float maximumLiquidUsage = 0.5f;
 
@@ -35,7 +34,6 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
             {
                 powerProduction = 0.1f;
                 itemDuration = 60f;
-                liquidPowerMultiplier = fakeLiquidPowerMultiplier;
                 itemDuration = fakeItemDuration;
                 maxLiquidGenerate = maximumLiquidUsage;
             }
@@ -79,7 +77,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     }
 
     void simulateLiquidConsumption(ItemLiquidGenerator.InputType inputType, Liquid liquid, float availableLiquidAmount, String parameterDescription){
-        final float baseEfficiency = fakeLiquidPowerMultiplier * liquid.flammability;
+        final float baseEfficiency = liquid.flammability;
         final float expectedEfficiency = Math.min(1.0f, availableLiquidAmount / maximumLiquidUsage) * baseEfficiency;
         final float expectedConsumptionPerTick = Math.min(maximumLiquidUsage, availableLiquidAmount);
         final float expectedRemainingLiquidAmount = Math.max(0.0f, availableLiquidAmount - expectedConsumptionPerTick * FakeThreadHandler.fakeDelta);

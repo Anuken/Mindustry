@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -16,8 +16,8 @@ public class LiquidHeatGenerator extends ItemLiquidGenerator{
         super.setStats();
 
         stats.remove(BlockStat.basePowerGeneration);
-        // TODO Adapt to new new power system. Maybe this override can be removed.
-        //stats.add(BlockStat.basePowerGeneration, <Do something with maxLiquidGenerate, basePowerGeneration and liquidPowerMultiplier> * 60f, StatUnit.powerSecond);
+        // Right now, Lava is the only thing that can be used.
+        stats.add(BlockStat.basePowerGeneration, powerProduction * getLiquidEfficiency(Liquids.lava) / maxLiquidGenerate * 60f, StatUnit.powerSecond);
     }
 
     @Override

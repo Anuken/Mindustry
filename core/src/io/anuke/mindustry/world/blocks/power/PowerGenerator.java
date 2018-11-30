@@ -33,12 +33,14 @@ public class PowerGenerator extends PowerDistributor{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
+        // Divide power production by two since that is what is produced at an efficiency of 0.5, which currently represents 100%
+        stats.add(generationType, powerProduction * 60.0f / 2.0f, StatUnit.powerSecond);
     }
 
     @Override
     public float getPowerProduction(Tile tile){
-        return powerProduction * tile.<GeneratorEntity>entity().productionEfficiency;
+        // Multiply all efficiencies by two since 0.5 = 100% efficiency
+        return powerProduction * tile.<GeneratorEntity>entity().productionEfficiency * 2.0f;
     }
 
     @Override
