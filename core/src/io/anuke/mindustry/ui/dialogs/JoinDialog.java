@@ -156,7 +156,7 @@ public class JoinDialog extends FloatingDialog{
                 versionString = Bundles.get("text.server.outdated");
             }else if(host.version < Version.build && Version.build != -1){
                 versionString = Bundles.get("text.server.outdated") + "\n" +
-                        Bundles.format("text.server.version", host.version);
+                        Bundles.format("text.server.version", host.version, "");
             }else if(host.version > Version.build && Version.build != -1){
                 versionString = Bundles.get("text.server.outdated.client") + "\n" +
                         Bundles.format("text.server.version", host.version, "");
@@ -273,7 +273,7 @@ public class JoinDialog extends FloatingDialog{
 
         local.row();
 
-        TextButton button = local.addButton("[accent]" + host.name, () -> connect(host.address, port))
+        TextButton button = local.addButton("[accent]" + host.name, "clear", () -> connect(host.address, port))
         .width(w).height(80f).pad(4f).get();
         button.left();
         button.row();

@@ -67,7 +67,7 @@ public class PowerNode extends PowerBlock{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unlinkPowerNodes(Player player, Tile tile, Tile other){
-        if(tile.entity.power == null) return;
+        if(tile.entity.power == null || other.entity == null || other.entity.power == null) return;
 
         TileEntity entity = tile.entity();
 

@@ -602,7 +602,8 @@ public class NetServer extends Module{
         try{
 
             //iterate through each player
-            for(Player player : playerGroup.all()){
+            for(int i = 0; i < playerGroup.size(); i ++){
+                Player player = playerGroup.all().get(i);
                 if(player.isLocal) continue;
 
                 NetConnection connection = player.con;
