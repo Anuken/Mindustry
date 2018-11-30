@@ -40,9 +40,7 @@ public class Sorter extends Block implements SelectionTrait{
 
     @Override
     public void playerPlaced(Tile tile){
-        if(lastItem != null){
-            threads.runDelay(() -> Call.setSorterItem(null, tile, lastItem));
-        }
+        threads.runDelay(() -> Call.setSorterItem(null, tile, lastItem));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)

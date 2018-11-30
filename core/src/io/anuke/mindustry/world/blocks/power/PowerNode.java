@@ -249,23 +249,10 @@ public class PowerNode extends PowerBlock{
         x2 += t2.x;
         y2 += t2.y;
 
-        float space = Vector2.dst(x1, y1, x2, y2);
-        float scl = 4f, mag = 2f, tscl = 4f, segscl = 3f;
+        Draw.color(Palette.powerLight, Palette.power, Mathf.absin(Timers.time(), 8f, 1f));
+        Lines.stroke(2f);
+        Lines.line(x1, y1, x2, y2);
 
-        int segments = Mathf.ceil(space / segscl);
-
-        Draw.color(Palette.power, Palette.powerLight, Mathf.absin(Timers.time(), 5f, 1f));
-        Lines.stroke(1f);
-
-        for(int i = 0; i < segments; i++){
-            float f1 = (float)i / segments;
-            float f2 = (float)(i+1) / segments;
-            t1.trns(angle1 + 90f, Mathf.lerp(Mathf.sin(tile.entity.id * 124f + Timers.time()/tscl + f1 * space, scl, mag), 0f, Math.abs(f1 - 0.5f)*2f));
-            t2.trns(angle1 + 90f, Mathf.lerp(Mathf.sin(tile.entity.id * 124f + Timers.time()/tscl + f2 * space, scl, mag), 0f, Math.abs(f2 - 0.5f)*2f));
-
-            Lines.line(x1 + (x2 - x1) * f1 + t1.x, y1 + (y2 - y1) * f1 + t1.y,
-                        x1 + (x2 - x1) * f2 + t2.x, y1 + (y2 - y1) * f2 + t2.y);
-        }
     }
 
 }
