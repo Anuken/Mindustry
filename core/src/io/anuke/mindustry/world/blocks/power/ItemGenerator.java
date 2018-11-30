@@ -76,6 +76,11 @@ public abstract class ItemGenerator extends PowerGenerator{
     public void update(Tile tile){
         ItemGeneratorEntity entity = tile.entity();
 
+        if(!entity.cons.valid()){
+            entity.productionEfficiency = 0.0f;
+            return;
+        }
+
         if(entity.generateTime <= 0f && entity.items.total() > 0){
             Effects.effect(generateEffect, tile.worldx() + Mathf.range(3f), tile.worldy() + Mathf.range(3f));
             Item item = entity.items.take();
@@ -92,7 +97,11 @@ public abstract class ItemGenerator extends PowerGenerator{
                 entity.damage(Mathf.random(8f));
                 Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
             }
+        }else{
+            entity.productionEfficiency = 0.0f;
         }
+
+        super.update(tile);
     }
 
     protected abstract float getItemEfficiency(Item item);

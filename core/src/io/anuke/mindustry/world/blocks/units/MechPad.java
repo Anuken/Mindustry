@@ -53,13 +53,6 @@ public class MechPad extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
-        // TODO Verify for new power system
-        //stats.remove(BlockStat.powerUse);
-    }
-
-    @Override
     public boolean shouldConsume(Tile tile){
         return false;
     }

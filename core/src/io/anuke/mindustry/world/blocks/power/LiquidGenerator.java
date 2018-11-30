@@ -48,25 +48,28 @@ public abstract class LiquidGenerator extends PowerGenerator{
 
     @Override
     public void update(Tile tile){
-        TileEntity entity = tile.entity();
+        ItemGeneratorEntity entity = tile.entity();
 
-        // TODO Code duplication with ItemLiquidGenerator
+        // Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
+        //       Power amount is delta'd by PowerGraph class already.
+        float calculationDelta = entity.delta();
+
         if(entity.liquids.get(entity.liquids.current()) >= 0.001f){
-            //float powerPerLiquid = getEfficiency(entity.liquids.current()) * this.powerPerLiquid;
-            float used = Math.min(entity.liquids.currentAmount(), maxLiquidGenerate * entity.delta());
-            // TODO Adapt to new power system
-            //used = Math.min(used, (powerCapacity - entity.power.amount) / powerPerLiquid);
+            float baseLiquidEfficiency = getEfficiency(entity.liquids.current()) * this.liquidPowerMultiplier;
+            float maximumPossible = maxLiquidGenerate * calculationDelta;
+            float used = Math.min(entity.liquids.currentAmount() * calculationDelta, maximumPossible);
 
             entity.liquids.remove(entity.liquids.current(), used);
-            // TODO Adapt to new power system
-            //entity.power.amount += used * powerPerLiquid;
+
+            // Note: 1 Item with 100% Flammability = 100% efficiency. This means 100% is not max but rather a reference point for this generator.
+            entity.productionEfficiency = baseLiquidEfficiency * used / maximumPossible;
 
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
             }
         }
 
-        tile.entity.power.graph.update();
+        super.update(tile);
     }
 
     @Override
