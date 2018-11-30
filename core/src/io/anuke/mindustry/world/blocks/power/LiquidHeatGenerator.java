@@ -1,13 +1,14 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-public class LiquidHeatGenerator extends LiquidGenerator{
+public class LiquidHeatGenerator extends ItemLiquidGenerator{
 
     public LiquidHeatGenerator(String name){
-        super(name);
+        super(InputType.LiquidsOnly, name);
     }
 
     @Override
@@ -20,7 +21,7 @@ public class LiquidHeatGenerator extends LiquidGenerator{
     }
 
     @Override
-    protected float getEfficiency(Liquid liquid){
+    protected float getLiquidEfficiency(Liquid liquid){
         return liquid.temperature - 0.5f;
     }
 }
