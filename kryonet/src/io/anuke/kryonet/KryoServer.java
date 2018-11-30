@@ -71,7 +71,6 @@ public class KryoServer implements ServerProvider {
             @Override
             public void disconnected (Connection connection) {
                 KryoConnection k = getByKryoID(connection.getID());
-                Log.info("&bLost kryonet connection {0}", connection.getID());
                 if(k == null) return;
 
                 Disconnect c = new Disconnect();

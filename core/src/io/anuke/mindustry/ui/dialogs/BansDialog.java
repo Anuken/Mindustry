@@ -25,7 +25,7 @@ public class BansDialog extends FloatingDialog{
 
         Table table = new Table();
 
-        ScrollPane pane = new ScrollPane(table, "clear");
+        ScrollPane pane = new ScrollPane(table);
         pane.setFadeScrollBars(false);
 
         if(netServer.admins.getBanned().size == 0){

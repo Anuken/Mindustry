@@ -1,8 +1,6 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.type.ContentType;
@@ -67,27 +65,8 @@ public class Unlocks{
         save();
     }
 
-    /**Loads 'legacy' unlocks. Will be removed in final release.*/
-    public void tryLoadLegacy(){
-        try{
-            ObjectMap<String, ObjectMap<ContentType, Array<String>>> sets = Settings.getObject("content-sets", ObjectMap.class, ObjectMap::new);
-            for(Entry<ContentType, Array<String>> entry : sets.get("root").entries()){
-                unlocked.put(entry.key, new ObjectSet<>());
-                unlocked.get(entry.key).addAll(entry.value);
-            }
-        }catch(Throwable t){
-            t.printStackTrace();
-        }
-        Settings.prefs().remove("content-sets");
-        Settings.save();
-    }
-
     public void load(){
         unlocked = Settings.getObject("unlockset", ObjectMap.class, ObjectMap::new);
-
-        if(Settings.has("content-sets")){
-            tryLoadLegacy();
-        }
     }
 
     public void save(){

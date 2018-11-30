@@ -100,7 +100,7 @@ public class JoinDialog extends FloatingDialog{
                 if(!buttons[0].childrenPressed()){
                     connect(server.ip, server.port);
                 }
-            }).width(targetWidth()).height(150f).pad(4f).get();
+            }).width(targetWidth()).height(155f).pad(4f).get();
 
             button.getLabel().setWrap(true);
 
@@ -156,10 +156,10 @@ public class JoinDialog extends FloatingDialog{
                 versionString = Bundles.get("text.server.outdated");
             }else if(host.version < Version.build && Version.build != -1){
                 versionString = Bundles.get("text.server.outdated") + "\n" +
-                        Bundles.format("text.server.version", host.version);
+                        Bundles.format("text.server.version", host.version, "");
             }else if(host.version > Version.build && Version.build != -1){
                 versionString = Bundles.get("text.server.outdated.client") + "\n" +
-                        Bundles.format("text.server.version", host.version);
+                        Bundles.format("text.server.version", host.version, "");
             }else{
                 versionString = Bundles.format("text.server.version", host.version, host.versionType);
             }
@@ -194,7 +194,7 @@ public class JoinDialog extends FloatingDialog{
         hosts.row();
         hosts.add(local).width(w);
 
-        ScrollPane pane = new ScrollPane(hosts, "clear");
+        ScrollPane pane = new ScrollPane(hosts);
         pane.setFadeScrollBars(false);
         pane.setScrollingDisabled(true, false);
 
@@ -210,19 +210,19 @@ public class JoinDialog extends FloatingDialog{
                 Settings.save();
             }).grow().pad(8).get().setMaxLength(maxNameLength);
 
-            ImageButton button = t.addImageButton("white", 40, () -> {
+            ImageButton button = t.addImageButton("white", "clear-full", 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
                     Settings.putInt("color-0", Color.rgba8888(color));
                     Settings.save();
                 });
-            }).size(50f, 54f).get();
+            }).size(54f).get();
             button.update(() -> button.getStyle().imageUpColor = player.color);
         }).width(w).height(70f).pad(4);
         content().row();
         content().add(pane).width(w + 38).pad(0);
         content().row();
-        content().addCenteredImageTextButton("$text.server.add", "icon-add", "clear", 14 * 3, () -> {
+        content().addCenteredImageTextButton("$text.server.add", "icon-add", 14 * 3, () -> {
             renaming = null;
             add.show();
         }).marginLeft(6).width(w).height(80f).update(button -> {
@@ -258,7 +258,7 @@ public class JoinDialog extends FloatingDialog{
             local.background("button");
             local.add("$text.hosts.none").pad(10f);
             local.add().growX();
-            local.addImageButton("icon-loading", 16 * 2f, this::refreshLocal).pad(-10f).padLeft(0).padTop(-6).size(70f, 74f);
+            local.addImageButton("icon-loading", 16 * 2f, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
         }else{
             local.background((Drawable) null);
         }

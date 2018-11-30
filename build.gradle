@@ -8,12 +8,11 @@ buildscript {
     }
     dependencies {
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
-        classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
+        classpath "com.badlogicgames.gdx:gdx-tools:1.9.9"
     }
 }
 
 allprojects {
-    apply plugin: "eclipse"
     apply plugin: "idea"
 
     version = 'release'
@@ -25,7 +24,7 @@ allprojects {
         appName = 'Mindustry'
         gdxVersion = '1.9.9'
         roboVMVersion = '2.3.0'
-        uCoreVersion = 'f73e538757ac66ff62d7f25d93011142b6abb8df'
+        uCoreVersion = '3dfb820142a0fc583ad19413a24fc5038aa29d89'
 
         getVersionString = {
             String buildVersion = getBuildVersion()

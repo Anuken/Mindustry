@@ -25,10 +25,10 @@ public class ColorPickDialog extends Dialog{
         for(int i = 0; i < playerColors.length; i++){
             Color color = playerColors[i];
 
-            ImageButton button = table.addImageButton("white", "toggle", 34, () -> {
+            ImageButton button = table.addImageButton("white", "clear-toggle", 34, () -> {
                 cons.accept(color);
                 hide();
-            }).size(44, 48).pad(0).padBottom(-5.1f).get();
+            }).size(48).get();
             button.setChecked(players[0].color.equals(color));
             button.getStyle().imageUpColor = color;
 

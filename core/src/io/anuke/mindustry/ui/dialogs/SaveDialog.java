@@ -22,7 +22,7 @@ public class SaveDialog extends LoadDialog{
 
     public void addSetup(){
         slots.row();
-        slots.addImageTextButton("$text.save.new", "icon-add", "clear", 14 * 3, () ->
+        slots.addImageTextButton("$text.save.new", "icon-add",14 * 3, () ->
                 ui.showTextInput("$text.save", "$text.save.newslot", "", text -> {
                     ui.loadGraphics("$text.saving", () -> {
                         control.saves.addSave(text);

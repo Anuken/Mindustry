@@ -30,8 +30,8 @@ public class World extends Module{
     public final Sectors sectors = new Sectors();
     public final WorldGenerator generator = new WorldGenerator();
     public final BlockIndexer indexer = new BlockIndexer();
-    public final Pathfinder pathfinder = new Pathfinder();
     public final WaveSpawner spawner = new WaveSpawner();
+    public final Pathfinder pathfinder = new Pathfinder();
 
     private Map currentMap;
     private Sector currentSector;

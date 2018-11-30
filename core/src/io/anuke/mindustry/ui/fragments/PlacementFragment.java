@@ -106,7 +106,7 @@ public class PlacementFragment extends Fragment{
                 };
 
                 //top table with hover info
-                frame.table("clear", top -> {
+                frame.table("button-edge-2", top -> {
                     topTable = top;
                     top.add(new Table()).growX().update(topTable -> {
                         if((tileDisplayBlock() == null && lastDisplay == getSelected()) ||
@@ -160,16 +160,16 @@ public class PlacementFragment extends Fragment{
                             topTable.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
                         }
                     });
-                    top.row();
-                    top.addImage("blank").growX().color(Palette.accent).height(3f);
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
                 frame.row();
-                frame.table("clear", blocksSelect -> {
+                frame.addImage("blank").color(Palette.accent).colspan(3).height(3*2).growX();
+                frame.row();
+                frame.table("pane-2", blocksSelect -> {
+                    blocksSelect.margin(4).marginTop(0);
                     blocksSelect.table(blocks -> blockTable = blocks).grow();
                     blocksSelect.row();
                     blocksSelect.table(input::buildUI).growX();
                 }).fillY().bottom().touchable(Touchable.enabled);
-                frame.addImage("blank").width(3f).fillY().color(Palette.accent);
                 frame.table(categories -> {
                     categories.defaults().size(50f);
 

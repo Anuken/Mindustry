@@ -298,7 +298,7 @@ public class NetworkIO{
         int maxlen = 32;
 
         String host = (headless ? "Server" : players[0].name);
-        String map = world.getMap().name;
+        String map = world.getMap() == null ? "None" : world.getMap().name;
 
         host = host.substring(0, Math.min(host.length(), maxlen));
         map = map.substring(0, Math.min(map.length(), maxlen));
