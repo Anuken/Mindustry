@@ -156,7 +156,7 @@ public class JoinDialog extends FloatingDialog{
                 versionString = Bundles.get("text.server.outdated");
             }else if(host.version < Version.build && Version.build != -1){
                 versionString = Bundles.get("text.server.outdated") + "\n" +
-                        Bundles.format("text.server.version", host.version);
+                        Bundles.format("text.server.version", host.version, "");
             }else if(host.version > Version.build && Version.build != -1){
                 versionString = Bundles.get("text.server.outdated.client") + "\n" +
                         Bundles.format("text.server.version", host.version, "");

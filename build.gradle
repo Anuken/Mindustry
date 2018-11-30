@@ -8,12 +8,11 @@ buildscript {
     }
     dependencies {
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
-        classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
+        classpath "com.badlogicgames.gdx:gdx-tools:1.9.9"
     }
 }
 
 allprojects {
-    apply plugin: "eclipse"
     apply plugin: "idea"
 
     version = 'release'
