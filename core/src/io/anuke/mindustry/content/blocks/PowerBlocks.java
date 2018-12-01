@@ -43,6 +43,7 @@ public class PowerBlocks extends BlockList implements ContentList{
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
+            size = 3;
             powerProduction = 0.055f;
         }};
 

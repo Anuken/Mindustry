@@ -63,7 +63,7 @@ public class Consumers{
      */
     public ConsumePower powerBuffered(float powerCapacity){
         // TODO Balance: How long should it take to fill a buffer? The lower this value, the more power will be "stolen" from direct consumers.
-        return powerBuffered(powerCapacity, 60);
+        return powerBuffered(powerCapacity, 60f);
     }
 
     /**

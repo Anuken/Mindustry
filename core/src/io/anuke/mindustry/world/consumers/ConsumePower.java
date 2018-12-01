@@ -14,7 +14,7 @@ public class ConsumePower extends Consume{
     /** The maximum amount of power which can be processed per tick. This might influence efficiency or load a buffer. */
     protected final float powerPerTick;
     /** The minimum power satisfaction (fraction of powerPerTick) which must be achieved before the module may work. */
-    protected final float minimumSatisfaction;
+    public final float minimumSatisfaction;
     /** The maximum power capacity in power units. */
     public final float powerCapacity;
     /** True if the module can store power. */
@@ -64,7 +64,6 @@ public class ConsumePower extends Consume{
     @Override
     public boolean valid(Block block, TileEntity entity){
         if(isBuffered){
-            // TODO - Verify: It might be necessary to know about the power required per shot/event here.
             return true;
         }else{
             return entity.power.satisfaction >= minimumSatisfaction;
