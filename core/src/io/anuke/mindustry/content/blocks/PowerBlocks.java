@@ -20,7 +20,7 @@ public class PowerBlocks extends BlockList implements ContentList{
 
         thermalGenerator = new LiquidHeatGenerator("thermal-generator"){{
             maxLiquidGenerate = 2f;
-            powerProduction = 4f;
+            powerProduction = 2f;
             generateEffect = BlockFx.redgeneratespark;
             size = 2;
         }};
@@ -42,14 +42,14 @@ public class PowerBlocks extends BlockList implements ContentList{
             powerProduction = 0.0045f;
         }};
 
-        largeSolarPanel = new PowerGenerator("solar-panel-large"){{
+        largeSolarPanel = new SolarGenerator("solar-panel-large"){{
             powerProduction = 0.055f;
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
             size = 3;
             health = 700;
-            powerMultiplier = 1.1f;
+            powerProduction = 1.1f;
         }};
 
         fusionReactor = new FusionReactor("fusion-reactor"){{
