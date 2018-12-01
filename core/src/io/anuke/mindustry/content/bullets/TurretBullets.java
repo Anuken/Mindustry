@@ -39,6 +39,8 @@ public class TurretBullets extends BulletList implements ContentList{
                 lifetime = Lightning.lifetime;
                 hiteffect = BulletFx.hitLancer;
                 despawneffect = Fx.none;
+                status = StatusEffects.shocked;
+                statusIntensity = 1f;
             }
         };
 
