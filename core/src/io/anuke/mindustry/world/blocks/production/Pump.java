@@ -95,6 +95,9 @@ public class Pump extends LiquidBlock{
 
         if(tile.entity.cons.valid() && liquidDrop != null){
             float maxPump = Math.min(liquidCapacity - tile.entity.liquids.total(), tiles * pumpAmount * tile.entity.delta());
+            if(hasPower){
+                maxPump *= tile.entity.power.satisfaction; // Produce slower if not at full power
+            }
             tile.entity.liquids.add(liquidDrop, maxPump);
         }
 

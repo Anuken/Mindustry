@@ -186,6 +186,14 @@ public class Block extends BaseBlock {
         return out;
     }
 
+    protected float getProgressIncrease(TileEntity entity, float baseTime){
+        float progressIncrease = 1f / baseTime * entity.delta();
+        if(hasPower){
+            progressIncrease *= entity.power.satisfaction; // Reduced increase in case of low power
+        }
+        return progressIncrease;
+    }
+
     public boolean isLayer(Tile tile){
         return true;
     }

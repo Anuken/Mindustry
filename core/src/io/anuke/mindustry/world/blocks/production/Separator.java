@@ -87,7 +87,7 @@ public class Separator extends Block{
         entity.totalProgress += entity.warmup * entity.delta();
 
         if(entity.cons.valid()){
-            entity.progress += 1f / filterTime*entity.delta();
+            entity.progress += getProgressIncrease(entity, filterTime);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
