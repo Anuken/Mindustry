@@ -110,7 +110,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             shootShake = 1f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUsed = 10f;
+            powerUsed = 1f / 3f;
             consumes.powerBuffered(30f);
             range = 150f;
             shootEffect = ShootFx.lightningShoot;
