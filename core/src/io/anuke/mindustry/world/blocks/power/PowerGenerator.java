@@ -15,13 +15,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class PowerGenerator extends PowerDistributor{
-    /** The amount of power produced per tick. */
+    /** The amount of power produced per tick in case of an efficiency of 1.0, which currently represents 200%. */
     protected float powerProduction;
-    /** The maximum possible efficiency for this generator. Supply values larger than 1.0f if more than 100% is possible.
-     *  This could be the case when e.g. an item with 100% flammability is the reference point, but a more effective liquid
-     *  can be supplied as an alternative.
-     */
-    protected float maxEfficiency = 1.0f;
     public BlockStat generationType = BlockStat.basePowerGeneration;
 
     public PowerGenerator(String name){
@@ -39,8 +34,9 @@ public class PowerGenerator extends PowerDistributor{
 
     @Override
     public float getPowerProduction(Tile tile){
-        // Multiply all efficiencies by two since 0.5 = 100% efficiency
-        return powerProduction * tile.<GeneratorEntity>entity().productionEfficiency * 2.0f;
+        // While 0.5 efficiency currently reflects 100%, we do not need to multiply by any factor since powerProduction states the
+        // power which would be produced at 1.0 efficiency
+        return powerProduction * tile.<GeneratorEntity>entity().productionEfficiency;
     }
 
     @Override
@@ -57,12 +53,13 @@ public class PowerGenerator extends PowerDistributor{
     public void setBars(){
         super.setBars();
         if(hasPower){
-            bars.add(new BlockBar(BarType.power, true, tile -> tile.<GeneratorEntity>entity().productionEfficiency / maxEfficiency));
+            bars.add(new BlockBar(BarType.power, true, tile -> tile.<GeneratorEntity>entity().productionEfficiency));
         }
     }
 
     public static class GeneratorEntity extends TileEntity{
         public float generateTime;
+        /** The efficiency of the producer. Currently, an efficiency of 0.5 means 100% */
         public float productionEfficiency = 0.0f;
 
         @Override
