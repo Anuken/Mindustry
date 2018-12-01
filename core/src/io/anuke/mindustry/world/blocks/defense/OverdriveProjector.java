@@ -85,11 +85,11 @@ public class OverdriveProjector extends Block{
                     if(other == null) continue;
                     other = other.target();
 
-                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.packedPosition()) && other.entity != null){
+                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null){
                         other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
                         other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
                         Effects.effect(BlockFx.overdriveBlockFull, Hue.mix(color, phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
-                        healed.add(other.packedPosition());
+                        healed.add(other.pos());
                     }
                 }
             }

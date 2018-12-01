@@ -492,7 +492,7 @@ public class NetServer extends Module{
 
         //write all core inventory data
         for(Tile tile : cores){
-            dataStream.writeInt(tile.packedPosition());
+            dataStream.writeInt(tile.pos());
             tile.entity.items.write(dataStream);
         }
 

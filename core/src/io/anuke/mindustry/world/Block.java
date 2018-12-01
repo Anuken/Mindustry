@@ -164,7 +164,7 @@ public class Block extends BaseBlock {
         for(int i = 0; i < tile.entity.power.links.size; i++){
             Tile other = world.tile(tile.entity.power.links.get(i));
             if(other != null && other.entity != null && other.entity.power != null){
-                other.entity.power.links.removeValue(tile.packedPosition());
+                other.entity.power.links.removeValue(tile.pos());
             }
         }
     }
@@ -173,7 +173,7 @@ public class Block extends BaseBlock {
         out.clear();
         for(Tile other : tile.entity.proximity()){
             if(other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
-                    && !tile.entity.power.links.contains(other.packedPosition())){
+                    && !tile.entity.power.links.contains(other.pos())){
                 out.add(other);
             }
         }

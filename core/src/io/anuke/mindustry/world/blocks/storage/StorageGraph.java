@@ -101,9 +101,9 @@ public class StorageGraph{
             add(child);
 
             for(Tile next : child.entity.proximity()){
-                if(next != base && next.block() instanceof StorageBlock && next.<StorageEntity>entity().graph == null && !closedSet.contains(next.packedPosition())){
+                if(next != base && next.block() instanceof StorageBlock && next.<StorageEntity>entity().graph == null && !closedSet.contains(next.pos())){
                     queue.addLast(next);
-                    closedSet.add(next.packedPosition());
+                    closedSet.add(next.pos());
                 }
             }
         }

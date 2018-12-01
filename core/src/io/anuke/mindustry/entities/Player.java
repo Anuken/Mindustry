@@ -58,7 +58,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public boolean achievedFlight;
     public Color color = new Color();
     public Mech mech;
-    public int spawner = -1;
+    public int spawner = noSpawner;
 
     public NetConnection con;
     public int playerIndex = 0;
@@ -498,7 +498,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             updateRespawning();
             return;
         }else{
-            spawner = -1;
+            spawner = noSpawner;
         }
 
         avoidOthers(1f);
@@ -788,23 +788,23 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     public void updateRespawning(){
 
-        if(spawner != -1 && world.tile(spawner) != null && world.tile(spawner).entity instanceof SpawnerTrait){
+        if(spawner != noSpawner && world.tile(spawner) != null && world.tile(spawner).entity instanceof SpawnerTrait){
             ((SpawnerTrait) world.tile(spawner).entity).updateSpawning(this);
         }else{
             CoreEntity entity = (CoreEntity) getClosestCore();
             if(entity != null && !netServer.isWaitingForPlayers()){
-                this.spawner = entity.tile.id();
+                this.spawner = entity.tile.pos();
             }
         }
     }
 
     public void beginRespawning(SpawnerTrait spawner){
-        this.spawner = spawner.getTile().packedPosition();
+        this.spawner = spawner.getTile().pos();
         this.dead = true;
     }
 
     public void endRespawning(){
-        spawner = -1;
+        spawner = noSpawner;
     }
 
     //endregion
@@ -860,7 +860,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
-        buffer.writeInt(mining == null ? -1 : mining.packedPosition());
+        buffer.writeInt(mining == null ? -1 : mining.pos());
         buffer.writeInt(spawner);
         buffer.writeShort((short) (baseRotation * 2));
 

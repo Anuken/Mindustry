@@ -32,7 +32,7 @@ public class NetworkIO{
             //--GENERAL STATE--
             stream.writeByte(state.mode.ordinal()); //gamemode
             stream.writeUTF(world.getMap().name); //map name
-            stream.writeInt(world.getSector() == null ? invalidSector : world.getSector().packedPosition()); //sector ID
+            stream.writeInt(world.getSector() == null ? invalidSector : world.getSector().pos()); //sector ID
             stream.writeInt(world.getSector() == null ? 0 : world.getSector().completedMissions);
 
             //write tags
@@ -56,7 +56,7 @@ public class NetworkIO{
             stream.writeShort(world.height());
 
             for(int i = 0; i < world.width() * world.height(); i++){
-                Tile tile = world.tile(i);
+                Tile tile = world.tile(i % world.width(), i / world.width());
 
                 stream.writeByte(tile.getFloorID());
                 stream.writeByte(tile.getBlockID());
@@ -79,7 +79,7 @@ public class NetworkIO{
                     int consecutives = 0;
 
                     for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
-                        Tile nextTile = world.tile(j);
+                        Tile nextTile = world.tile(j % world.width(), j / world.width());
 
                         if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getElevation() != tile.getElevation()){
                             break;
@@ -95,13 +95,13 @@ public class NetworkIO{
 
             //write visibility, length-run encoded
             for(int i = 0; i < world.width() * world.height(); i++){
-                Tile tile = world.tile(i);
+                Tile tile = world.tile(i % world.width(), i / world.width());;
                 boolean discovered = tile.discovered();
 
                 int consecutives = 0;
 
                 for(int j = i + 1; j < world.width() * world.height() && consecutives < 32767*2-1; j++){
-                    Tile nextTile = world.tile(j);
+                    Tile nextTile = world.tile(j % world.width(), j / world.width());;
 
                     if(nextTile.discovered() != discovered){
                         break;
@@ -129,7 +129,7 @@ public class NetworkIO{
 
                 stream.writeByte(data.cores.size);
                 for(Tile tile : data.cores){
-                    stream.writeInt(tile.packedPosition());
+                    stream.writeInt(tile.pos());
                 }
             }
 

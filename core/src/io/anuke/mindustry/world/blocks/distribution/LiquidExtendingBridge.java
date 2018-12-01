@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.distribution;
 import com.badlogic.gdx.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.ucore.core.Timers;
@@ -65,9 +66,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
 
             while(it.hasNext){
                 int v = it.next();
-                int x = v % world.width();
-                int y = v / world.width();
-                if(tile.absoluteRelativeTo(x, y) == i){
+                if(tile.absoluteRelativeTo(Pos.x(v), Pos.y(v)) == i){
                     return false;
                 }
             }
