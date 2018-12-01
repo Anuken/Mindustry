@@ -180,7 +180,9 @@ public class BlockInventoryFragment extends Fragment{
 
     private String round(float f){
         f = (int) f;
-        if(f >= 1000){
+        if(f >= 1000000){
+            return Strings.toFixed(f / 1000000f, 1) + "[gray]mil[]";
+        }else if(f >= 1000){
             return Strings.toFixed(f / 1000, 1) + "k";
         }else{
             return (int) f + "";

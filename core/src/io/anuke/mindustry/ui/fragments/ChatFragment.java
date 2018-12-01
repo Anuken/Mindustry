@@ -1,5 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -8,13 +10,13 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Inputs;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.scene.Group;
+import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.Label;
 import io.anuke.ucore.scene.ui.Label.LabelStyle;
 import io.anuke.ucore.scene.ui.TextField;
@@ -22,8 +24,7 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.ui.layout.Unit;
 import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.players;
-import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.*;
 import static io.anuke.ucore.core.Core.scene;
 import static io.anuke.ucore.core.Core.skin;
 
@@ -113,19 +114,41 @@ public class ChatFragment extends Table{
         chatfield.getStyle().font = skin.getFont("default-font-chat");
         chatfield.getStyle().fontColor = Color.WHITE;
         chatfield.setStyle(chatfield.getStyle());
-        Platform.instance.addDialog(chatfield, Vars.maxTextLength);
 
-        bottom().left().marginBottom(offsety).marginLeft(offsetx * 2).add(fieldlabel).padBottom(4f);
+        if(mobile){
+            chatfield.tapped(() -> {
+                Dialog dialog = new Dialog("", "dialog");
+                dialog.setFillParent(true);
+                dialog.content().top();
+                dialog.content().defaults().height(65f);
+                TextField to = dialog.content().addField("", t-> {}).pad(15).width(250f).get();
+                to.setMaxLength(maxTextLength);
+                to.keyDown(Keys.ENTER, () -> dialog.content().find("okb").fireClick());
+                dialog.content().addButton("$text.ok", () -> {
+                    chatfield.clearText();
+                    chatfield.appendText(to.getText());
+                    chatfield.change();
+                    dialog.hide();
+                    Gdx.input.setOnscreenKeyboardVisible(false);
+                    toggle();
+                }).width(90f).name("okb");
+
+                dialog.show();
+                Timers.runTask(1f, () -> {
+                    to.setCursorPosition(to.getText().length());
+                    Core.scene.setKeyboardFocus(to);
+                    Gdx.input.setOnscreenKeyboardVisible(true);
+                });
+            });
+        }
+
+        bottom().left().marginBottom(offsety).marginLeft(offsetx * 2).add(fieldlabel).padBottom(6f);
 
         add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
 
         if(Vars.mobile){
             marginBottom(105f);
             marginRight(240f);
-        }
-
-        if(Vars.mobile){
-            addImageButton("icon-arrow-right", 14 * 2, this::toggle).size(46f, 51f).visible(() -> chatOpen).pad(2f);
         }
     }
 

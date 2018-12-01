@@ -153,11 +153,6 @@ public class Smelter extends Block{
     }
 
     @Override
-    public int getMaximumAccepted(Tile tile, Item item){
-        return itemCapacity;
-    }
-
-    @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         boolean isInput = false;
 

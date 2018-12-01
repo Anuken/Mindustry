@@ -27,6 +27,8 @@ logs/
 /core/assets/locales
 /ios/src/io/anuke/mindustry/gen/
 /core/src/io/anuke/mindustry/gen/
+ios/robovm.properties
+config/
 *.gif
 
 version.properties

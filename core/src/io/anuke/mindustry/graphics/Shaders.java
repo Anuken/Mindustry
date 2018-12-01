@@ -157,17 +157,14 @@ public class Shaders{
 
         @Override
         public void apply(){
-            // shader.setUniformf("u_progress", progress);
             shader.setUniformf("u_color", color);
             shader.setUniformf("u_uv", region.getU(), region.getV());
             shader.setUniformf("u_uv2", region.getU2(), region.getV2());
-            //shader.setUniformf("u_time", Timers.time());
             shader.setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
         }
     }
 
     public static class Shield extends Shader{
-        //public Color color = new Color();
 
         public Shield(){
             super("shield", "default");
@@ -175,17 +172,13 @@ public class Shaders{
 
         @Override
         public void apply(){
-            float scaling = Core.cameraScale / 4f / Core.camera.zoom;
-
             shader.setUniformf("u_dp", Unit.dp.scl(1f));
-            //shader.setUniformf("u_color", color);
             shader.setUniformf("u_time", Timers.time() / Unit.dp.scl(1f));
-            shader.setUniformf("u_scaling", scaling);
             shader.setUniformf("u_offset",
                     Core.camera.position.x - Core.camera.viewportWidth / 2 * Core.camera.zoom,
                     Core.camera.position.y - Core.camera.viewportHeight / 2 * Core.camera.zoom);
-            shader.setUniformf("u_texsize", Gdx.graphics.getWidth() / Core.cameraScale * Core.camera.zoom,
-                    Gdx.graphics.getHeight() / Core.cameraScale * Core.camera.zoom);
+            shader.setUniformf("u_texsize", Core.camera.viewportWidth * Core.camera.zoom,
+            Core.camera.viewportHeight * Core.camera.zoom);
         }
     }
 
@@ -200,8 +193,8 @@ public class Shaders{
             shader.setUniformf("camerapos",
                     Core.camera.position.x - Core.camera.viewportWidth / 2 * Core.camera.zoom,
                     Core.camera.position.y - Core.camera.viewportHeight / 2 * Core.camera.zoom);
-            shader.setUniformf("screensize", Gdx.graphics.getWidth() / Core.cameraScale * Core.camera.zoom,
-                    Gdx.graphics.getHeight() / Core.cameraScale * Core.camera.zoom);
+            shader.setUniformf("screensize", Core.camera.viewportWidth* Core.camera.zoom,
+            Core.camera.viewportHeight * Core.camera.zoom);
             shader.setUniformf("time", Timers.time());
         }
     }

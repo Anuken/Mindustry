@@ -31,7 +31,7 @@ public class OverlayFragment extends Fragment{
         config.build(group);
         consume.build(group);
 
-        input.buildUI(group);
+        //input.buildUI(group);
     }
 
     public void remove(){

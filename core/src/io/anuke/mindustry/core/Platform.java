@@ -10,7 +10,6 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.TextField;
-import io.anuke.ucore.util.Log;
 
 import java.util.Random;
 
@@ -29,14 +28,26 @@ public abstract class Platform {
         if(!mobile) return; //this is mobile only, desktop doesn't need dialogs
 
         field.tapped(() -> {
-            Log.info("yappd");
             Dialog dialog = new Dialog("", "dialog");
             dialog.setFillParent(true);
             dialog.content().top();
             dialog.content().defaults().height(65f);
+
+            TextField[] use = {null};
+
+            dialog.content().addImageButton("icon-copy", "clear", 16*3, () -> use[0].copy())
+                    .visible(() -> !use[0].getSelection().isEmpty()).width(65f);
+
+            dialog.content().addImageButton("icon-paste", "clear", 16*3, () ->
+                    use[0].paste(Gdx.app.getClipboard().getContents(), false))
+                    .visible(() -> Gdx.app.getClipboard() != null && Gdx.app.getClipboard().getContents() != null && !Gdx.app.getClipboard().getContents().isEmpty()).width(65f);
+
             TextField to = dialog.content().addField(field.getText(), t-> {}).pad(15).width(250f).get();
             to.setMaxLength(maxLength);
             to.keyDown(Keys.ENTER, () -> dialog.content().find("okb").fireClick());
+
+            use[0] = to;
+
             dialog.content().addButton("$text.ok", () -> {
                 field.clearText();
                 field.appendText(to.getText());

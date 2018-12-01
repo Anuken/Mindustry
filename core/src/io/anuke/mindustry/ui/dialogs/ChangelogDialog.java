@@ -38,7 +38,7 @@ public class ChangelogDialog extends FloatingDialog{
 
     void setup(){
         Table table = new Table();
-        ScrollPane pane = new ScrollPane(table, "clear");
+        ScrollPane pane = new ScrollPane(table);
 
         content().clear();
         content().add(pane).grow();
@@ -60,7 +60,7 @@ public class ChangelogDialog extends FloatingDialog{
 
                 desc = desc.replace("Android", "Mobile");
 
-                Table in = new Table("clear");
+                Table in = new Table("underline");
                 in.top().left().margin(10);
 
                 in.add("[accent]" + info.name + "[LIGHT_GRAY]  | " + info.date);

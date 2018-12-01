@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.traits;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.Vars;
@@ -57,6 +58,9 @@ public interface BuilderTrait extends Entity{
 
     /**Build power, can be any float. 1 = builds recipes in normal time, 0 = doesn't build at all.*/
     float getBuildPower(Tile tile);
+
+    /**Returns whether or not this builder can mine a specific item type.*/
+    boolean canMine(Item item);
 
     /**Whether this type of builder can begin creating new blocks.*/
     default boolean canCreateBlocks(){
@@ -226,7 +230,7 @@ public interface BuilderTrait extends Entity{
         }
 
         if(!current.initialized){
-            Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking));
+            Gdx.app.postRunnable(() -> Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking)));
             current.initialized = true;
         }
     }
@@ -236,7 +240,8 @@ public interface BuilderTrait extends Entity{
         Tile tile = getMineTile();
         TileEntity core = unit.getClosestCore();
 
-        if(core == null || tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance || !unit.inventory.canAcceptItem(tile.floor().drops.item)){
+        if(core == null || tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance
+                || tile.floor().drops == null || !unit.inventory.canAcceptItem(tile.floor().drops.item) || !canMine(tile.floor().drops.item)){
             setMineTile(null);
         }else{
             Item item = tile.floor().drops.item;

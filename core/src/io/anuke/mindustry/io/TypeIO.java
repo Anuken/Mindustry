@@ -27,7 +27,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import static io.anuke.mindustry.Vars.*;
@@ -332,31 +331,21 @@ public class TypeIO{
     @WriteClass(String.class)
     public static void writeString(ByteBuffer buffer, String string){
         if(string != null){
-            Charset charset = Charset.defaultCharset();
-            byte[] nameBytes = charset.name().getBytes(StandardCharsets.UTF_8);
-            buffer.put((byte)nameBytes.length);
-            buffer.put(nameBytes);
-
-            byte[] bytes = string.getBytes(charset);
+            byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
             buffer.putShort((short) bytes.length);
             buffer.put(bytes);
         }else{
-            buffer.put((byte) -1);
+            buffer.putShort((short) -1);
         }
     }
 
     @ReadClass(String.class)
     public static String readString(ByteBuffer buffer){
-        byte length = buffer.get();
-        if(length != -1){
-            byte[] cbytes = new byte[length];
-            buffer.get(cbytes);
-            Charset charset = Charset.forName(new String(cbytes, StandardCharsets.UTF_8));
-
-            short slength = buffer.getShort();
+        short slength = buffer.getShort();
+        if(slength != -1){
             byte[] bytes = new byte[slength];
             buffer.get(bytes);
-            return new String(bytes, charset);
+            return new String(bytes, StandardCharsets.UTF_8);
         }else{
             return null;
         }
@@ -378,30 +367,20 @@ public class TypeIO{
 
     public static void writeStringData(DataOutput buffer, String string) throws IOException{
         if(string != null){
-            Charset charset = Charset.defaultCharset();
-            byte[] nameBytes = charset.name().getBytes(StandardCharsets.UTF_8);
-            buffer.writeByte((byte)nameBytes.length);
-            buffer.write(nameBytes);
-
-            byte[] bytes = string.getBytes(charset);
+            byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
             buffer.writeShort((short) bytes.length);
             buffer.write(bytes);
         }else{
-            buffer.writeByte((byte) -1);
+            buffer.writeShort((short) -1);
         }
     }
 
     public static String readStringData(DataInput buffer) throws IOException{
-        byte length = buffer.readByte();
-        if(length != -1){
-            byte[] cbytes = new byte[length];
-            buffer.readFully(cbytes);
-            Charset charset = Charset.forName(new String(cbytes, StandardCharsets.UTF_8));
-
-            short slength = buffer.readShort();
+        short slength = buffer.readShort();
+        if(slength != -1){
             byte[] bytes = new byte[slength];
             buffer.readFully(bytes);
-            return new String(bytes, charset);
+            return new String(bytes, StandardCharsets.UTF_8);
         }else{
             return null;
         }

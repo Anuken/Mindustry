@@ -37,4 +37,13 @@ public class MapMeta{
     public boolean hasOreGen(){
         return !tags.get("oregen", "0").equals("0");
     }
+
+    @Override
+    public String toString(){
+        return "MapMeta{" +
+                "tags=" + tags +
+                ", width=" + width +
+                ", height=" + height +
+                '}';
+    }
 }

@@ -32,4 +32,13 @@ public class Map{
     public String getDisplayName(){
         return meta.tags.get("name", name);
     }
+
+    @Override
+    public String toString(){
+        return "Map{" +
+                "name='" + name + '\'' +
+                ", custom=" + custom +
+                ", meta=" + meta +
+                '}';
+    }
 }

@@ -1,5 +1,6 @@
 {
 	duplicatePadding: true,
 	combineSubdirectories: true,
-	flattenPaths: true
+	flattenPaths: true,
+	fast: true
 }

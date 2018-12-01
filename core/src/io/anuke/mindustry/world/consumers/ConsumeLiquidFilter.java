@@ -47,7 +47,7 @@ public class ConsumeLiquidFilter extends Consume{
 
     @Override
     public String getIcon(){
-        return "icon-liquid";
+        return "icon-liquid-small";
     }
 
     @Override
@@ -62,10 +62,12 @@ public class ConsumeLiquidFilter extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        if(isFuel){
+        if(optional){
+            stats.add(BlockStat.boostLiquid, new LiquidFilterValue(filter));
+        }else if(isFuel){
             stats.add(BlockStat.inputLiquidFuel, new LiquidFilterValue(filter));
             stats.add(BlockStat.liquidFuelUse, 60f * use, StatUnit.liquidSecond);
-        }else{
+        }else {
             stats.add(BlockStat.inputLiquid, new LiquidFilterValue(filter));
             stats.add(BlockStat.liquidUse, 60f * use, StatUnit.liquidSecond);
         }
