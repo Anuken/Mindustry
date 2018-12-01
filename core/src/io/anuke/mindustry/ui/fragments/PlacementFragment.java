@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.fragments;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
@@ -33,7 +34,7 @@ public class PlacementFragment extends Fragment{
     Category currentCategory = Category.turret;
     Block hovered, lastDisplay;
     Tile hoverTile;
-    Table blockTable, toggler;
+    Table blockTable, toggler, topTable;
     boolean shown = true;
 
     public PlacementFragment(){
@@ -105,7 +106,8 @@ public class PlacementFragment extends Fragment{
                 };
 
                 //top table with hover info
-                frame.table("clear", top -> {
+                frame.table("button-edge-2", top -> {
+                    topTable = top;
                     top.add(new Table()).growX().update(topTable -> {
                         if((tileDisplayBlock() == null && lastDisplay == getSelected()) ||
                         (tileDisplayBlock() != null && lastDisplay == tileDisplayBlock())) return;
@@ -158,16 +160,16 @@ public class PlacementFragment extends Fragment{
                             topTable.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
                         }
                     });
-                    top.row();
-                    top.addImage("blank").growX().color(Palette.accent).height(3f);
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
                 frame.row();
-                frame.table("clear", blocksSelect -> {
+                frame.addImage("blank").color(Palette.accent).colspan(3).height(3*2).growX();
+                frame.row();
+                frame.table("pane-2", blocksSelect -> {
+                    blocksSelect.margin(4).marginTop(0);
                     blocksSelect.table(blocks -> blockTable = blocks).grow();
                     blocksSelect.row();
                     blocksSelect.table(input::buildUI).growX();
                 }).fillY().bottom().touchable(Touchable.enabled);
-                frame.addImage("blank").width(3f).fillY().color(Palette.accent);
                 frame.table(categories -> {
                     categories.defaults().size(50f);
 
@@ -194,8 +196,10 @@ public class PlacementFragment extends Fragment{
     Block getSelected(){
         Block toDisplay = null;
 
+        Vector2 v = topTable.stageToLocalCoordinates(Graphics.mouse());
+
         //setup hovering tile
-        if(!ui.hasMouse()){
+        if(!ui.hasMouse() && topTable.hit(v.x, v.y, false) == null){
             Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
             if(tile != null){
                 hoverTile = tile.target();

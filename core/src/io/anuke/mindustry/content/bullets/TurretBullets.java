@@ -39,16 +39,23 @@ public class TurretBullets extends BulletList implements ContentList{
                 lifetime = Lightning.lifetime;
                 hiteffect = BulletFx.hitLancer;
                 despawneffect = Fx.none;
+                status = StatusEffects.shocked;
+                statusIntensity = 1f;
             }
         };
 
         healBullet = new BulletType(5.2f, 13){
-            float healAmount = 21f;
+            float healPercent = 3f;
 
             {
                 hiteffect = BulletFx.hitLaser;
                 despawneffect = BulletFx.hitLaser;
                 collidesTeam = true;
+            }
+
+            @Override
+            public boolean collides(Bullet b, Tile tile){
+                return tile.getTeam() != b.getTeam() || tile.entity.healthf() < 1f;
             }
 
             @Override
@@ -67,8 +74,8 @@ public class TurretBullets extends BulletList implements ContentList{
                 tile = tile.target();
 
                 if(tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
-                    Effects.effect(BlockFx.healBlock, tile.drawx(), tile.drawy(), tile.block().size);
-                    tile.entity.healBy(healAmount);
+                    Effects.effect(BlockFx.healBlockFull, Palette.heal, tile.drawx(), tile.drawy(), tile.block().size);
+                    tile.entity.healBy(healPercent / 100f * tile.entity.maxHealth());
                 }
             }
         };

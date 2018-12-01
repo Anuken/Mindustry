@@ -153,7 +153,7 @@ public class Block extends BaseBlock {
         TileEntity entity = tile.entity();
 
         for(Tile other : getPowerConnections(tile, tempTiles)){
-            if(other.entity.power != null){
+            if(other.entity.power != null && other.entity.power.graph != null){
                 other.entity.power.graph.add(entity.power.graph);
             }
         }
@@ -385,10 +385,11 @@ public class Block extends BaseBlock {
         tempColor.set(Palette.darkFlame);
 
         if(hasItems){
+            float scaling = inventoryScaling(tile);
             for(Item item : content.items()){
                 int amount = tile.entity.items.get(item);
-                explosiveness += item.explosiveness * amount;
-                flammability += item.flammability * amount;
+                explosiveness += item.explosiveness * amount * scaling;
+                flammability += item.flammability * amount * scaling;
 
                 if(item.flammability * amount > 0.5){
                     units++;
@@ -414,7 +415,7 @@ public class Block extends BaseBlock {
                 float splash = Mathf.clamp(amount / 4f, 0f, 10f);
 
                 for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
-                    Timers.run(i / 2, () -> {
+                    Timers.run(i / 2f, () -> {
                         Tile other = world.tile(tile.x + Mathf.range(size / 2), tile.y + Mathf.range(size / 2));
                         if(other != null){
                             Puddle.deposit(other, liquid, splash);
@@ -428,6 +429,11 @@ public class Block extends BaseBlock {
         if(!tile.floor().solid && !tile.floor().isLiquid){
             RubbleDecal.create(tile.drawx(), tile.drawy(), size);
         }
+    }
+
+    /**Returns scaled # of inventories in this block.*/
+    public float inventoryScaling(Tile tile){
+        return 1f;
     }
 
     /**

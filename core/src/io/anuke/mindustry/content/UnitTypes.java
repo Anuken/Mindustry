@@ -37,12 +37,12 @@ public class UnitTypes implements ContentList{
         };
 
         spirit = new UnitType("spirit", Spirit.class, Spirit::new){{
+            weapon = Weapons.healBlasterDrone;
             isFlying = true;
             drag = 0.01f;
             speed = 0.2f;
             maxVelocity = 0.8f;
             range = 50f;
-            healSpeed = 0.22f;
             health = 60;
         }};
 
@@ -114,6 +114,7 @@ public class UnitTypes implements ContentList{
         }};
 
         phantom = new UnitType("phantom", Phantom.class, Phantom::new){{
+            weapon = Weapons.healBlasterDrone2;
             isFlying = true;
             drag = 0.01f;
             mass = 2f;
@@ -124,7 +125,6 @@ public class UnitTypes implements ContentList{
             health = 220;
             buildPower = 0.9f;
             minePower = 1.1f;
-            healSpeed = 0.5f;
             toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium);
         }};
     }

@@ -95,8 +95,11 @@ public class MendProjector extends Block{
 
     @Override
     public void drawSelect(Tile tile){
+        MendEntity entity = tile.entity();
+        float realRange = range + entity.phaseHeat * phaseRangeBoost;
+
         Draw.color(color);
-        Lines.dashCircle(tile.drawx(), tile.drawy() - 1f, range);
+        Lines.dashCircle(tile.drawx(), tile.drawy(), realRange);
         Draw.color();
     }
 

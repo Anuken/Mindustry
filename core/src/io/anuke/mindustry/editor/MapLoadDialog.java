@@ -4,11 +4,9 @@ import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.ucore.core.Core;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.ScrollPane.ScrollPaneStyle;
 import io.anuke.ucore.scene.ui.TextButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
@@ -69,7 +67,6 @@ public class MapLoadDialog extends FloatingDialog{
         }
 
         if(world.maps.all().size == 0){
-            pane.setStyle(Core.skin.get("clear", ScrollPaneStyle.class));
             table.add("$text.maps.none").center();
         }else{
             content().add("$text.editor.loadmap");

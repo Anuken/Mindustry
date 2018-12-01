@@ -91,7 +91,6 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
                 x += Angles.trnsx(rotation, hitRange/2f);
                 y += Angles.trnsy(rotation, hitRange/2f);
             }
-
         }
     }
 

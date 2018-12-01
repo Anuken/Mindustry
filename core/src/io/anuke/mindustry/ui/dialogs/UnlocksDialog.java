@@ -32,7 +32,7 @@ public class UnlocksDialog extends FloatingDialog{
 
         Table table = new Table();
         table.margin(20);
-        ScrollPane pane = new ScrollPane(table, "clear-black");
+        ScrollPane pane = new ScrollPane(table);
 
         Array<Content>[] allContent = content.getContentMap();
 
@@ -65,9 +65,8 @@ public class UnlocksDialog extends FloatingDialog{
 
                     if(control.unlocks.isUnlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));
-                        image.addListener(new Tooltip<>(new Table("clear"){{
+                        image.addListener(new Tooltip<>(new Table("button"){{
                             add(unlock.localizedName());
-                            margin(4);
                         }}));
                     }
 

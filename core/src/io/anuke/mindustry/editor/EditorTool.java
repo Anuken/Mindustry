@@ -17,6 +17,8 @@ import static io.anuke.mindustry.Vars.ui;
 public enum EditorTool{
     pick{
         public void touched(MapEditor editor, int x, int y){
+            if(!Structs.inBounds(x, y, editor.getMap().width(), editor.getMap().height())) return;
+
             byte bf = editor.getMap().read(x, y, DataPosition.floor);
             byte bw = editor.getMap().read(x, y, DataPosition.wall);
             byte link = editor.getMap().read(x, y, DataPosition.link);

@@ -16,6 +16,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
@@ -24,6 +25,7 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
@@ -76,6 +78,11 @@ public class NetServer extends Module{
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
 
     public NetServer(){
+        Events.on(WorldLoadEvent.class, event -> {
+            if(!headless){
+                connections.clear();
+            }
+        });
 
         Net.handleServer(Connect.class, (id, connect) -> {
             if(admins.isIPBanned(connect.addressTCP)){
@@ -591,14 +598,18 @@ public class NetServer extends Module{
     }
 
     void sync(){
+
         try{
 
             //iterate through each player
-            for(Player player : connections.values()){
+            for(int i = 0; i < playerGroup.size(); i ++){
+                Player player = playerGroup.all().get(i);
+                if(player.isLocal) continue;
+
                 NetConnection connection = player.con;
 
-                if(!connection.isConnected()){
-                    //player disconnected, ignore them
+                if(!connection.isConnected() || !connections.containsKey(connection.id)){
+                    //player disconnected, call d/c event
                     onDisconnect(player);
                     return;
                 }

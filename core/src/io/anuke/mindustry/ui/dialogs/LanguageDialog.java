@@ -24,7 +24,7 @@ public class LanguageDialog extends FloatingDialog{
     private void setup(){
         Table langs = new Table();
         langs.marginRight(24f).marginLeft(24f);
-        ScrollPane pane = new ScrollPane(langs, "clear");
+        ScrollPane pane = new ScrollPane(langs);
         pane.setFadeScrollBars(false);
 
         ButtonGroup<TextButton> group = new ButtonGroup<>();
@@ -38,7 +38,7 @@ public class LanguageDialog extends FloatingDialog{
                 Log.info("Setting locale: {0}", loc.toString());
                 ui.showInfo("$text.language.restart");
             });
-            langs.add(button).group(group).update(t -> t.setChecked(loc.equals(getLocale()))).size(400f, 50f).row();
+            langs.add(button).group(group).update(t -> t.setChecked(loc.equals(getLocale()))).size(400f, 50f).pad(2).row();
         }
 
         content().add(pane);

@@ -41,7 +41,7 @@ public class UnitType extends UnlockableContent{
     public float carryWeight = 1f;
     public int itemCapacity = 30;
     public ObjectSet<Item> toMine = ObjectSet.with(Items.lead, Items.copper);
-    public float buildPower = 0.3f, minePower = 0.7f, healSpeed = 2f;
+    public float buildPower = 0.3f, minePower = 0.7f;
     public Weapon weapon = Weapons.blaster;
     public float weaponOffsetX, weaponOffsetY;
     public Color trailColor = Color.valueOf("ffa665");

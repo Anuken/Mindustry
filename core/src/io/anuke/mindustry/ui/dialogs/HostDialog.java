@@ -34,13 +34,13 @@ public class HostDialog extends FloatingDialog{
                 ui.listfrag.rebuild();
             }).grow().pad(8).get().setMaxLength(40);
 
-            ImageButton button = t.addImageButton("white", 40, () -> {
+            ImageButton button = t.addImageButton("white", "clear-full", 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
                     Settings.putInt("color-0", Color.rgba8888(color));
                     Settings.save();
                 });
-            }).size(50f, 54f).get();
+            }).size(54f).get();
             button.update(() -> button.getStyle().imageUpColor = player.color);
         }).width(w).height(70f).pad(4).colspan(3);
 
