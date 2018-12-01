@@ -40,7 +40,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");
 
-            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2));
+            consumes.items(new ItemStack(Items.sand, 2));
             consumes.power(0.05f);
         }};
 
