@@ -8,6 +8,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
 
 public class ShockMine extends Block{
@@ -27,7 +28,6 @@ public class ShockMine extends Block{
         shadow = "shadow-shock-mine";
         targetable = false;
         layer = Layer.overlay;
-        configurable = false;
     }
 
     @Override
@@ -52,5 +52,10 @@ public class ShockMine extends Block{
             }
             tile.entity.damage(tileDamage);
         }
+    }
+
+    @Override
+    public boolean buildLogic(Tile tile, Table table) {
+        return false;
     }
 }

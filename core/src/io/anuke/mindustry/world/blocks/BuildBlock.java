@@ -46,7 +46,6 @@ public class BuildBlock extends Block{
         layer = Layer.placement;
         consumesTap = true;
         solidifes = true;
-        configurable = false;
     }
 
     @Remote(called = Loc.server)

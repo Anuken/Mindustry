@@ -171,23 +171,24 @@ public abstract class InputHandler extends InputAdapter{
 
         boolean consumed = false, showedInventory = false, showedConsume = false;
 
-        //check if tapped block is configurable
-        if(tile.block().configurable && tile.getTeam() == player.getTeam()){
+        //check if tapped block is selectable
+        if(tile.block().canBeSelected(tile) && tile.getTeam() == player.getTeam()){
             consumed = true;
-            if(((!frag.config.isShown() && tile.block().shouldShowConfigure(tile, player)) //if the config fragment is hidden, show
-                    //alternatively, the current selected block can 'agree' to switch config tiles
-                    || (frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)))){
-                frag.config.showConfig(tile);
+            if(!frag.details.isShown() && tile.block().shouldShowDetails(tile, player)) //if the details fragment is hidden, show
+                frag.details.showDetails(tile);
+            else if(frag.details.isShown() && frag.details.getSelectedTile().block().onDetailsTileTapped(frag.details.getSelectedTile(), tile)){ //the current selected block can 'agree' to switch details tile
+                frag.details.hideDetails(); //needed to reset the variables
+                frag.details.showDetails(tile);
             }
             //otherwise...
-        }else if(!frag.config.hasConfigMouse()){ //make sure a configuration fragment isn't on the cursor
+        }else if(!frag.details.hasDetailsMouse()){ //make sure a configuration fragment isn't on the cursor
             //then, if it's shown and the current block 'agrees' to hide, hide it.
-            if(frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)){
+            if(frag.details.isShown() && frag.details.getSelectedTile().block().onDetailsTileTapped(frag.details.getSelectedTile(), tile)){
                 consumed = true;
-                frag.config.hideConfig();
+                frag.details.hideDetails();
             }
 
-            if(frag.config.isShown()){
+            if(frag.details.isShown()){
                 consumed = true;
             }
         }

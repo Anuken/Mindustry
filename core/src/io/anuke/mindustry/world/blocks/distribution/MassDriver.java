@@ -219,7 +219,7 @@ public class MassDriver extends Block{
     }
 
     @Override
-    public boolean onConfigureTileTapped(Tile tile, Tile other){
+    public boolean onDetailsTileTapped(Tile tile, Tile other){
         if(tile == other) return false;
 
         MassDriverEntity entity = tile.entity();

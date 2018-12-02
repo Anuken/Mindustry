@@ -42,7 +42,11 @@ public class DebugBlocks extends BlockList implements ContentList{
             {
                 powerCapacity = Float.MAX_VALUE;
                 shadow = "shadow-round-1";
-                configurable = false;
+            }
+
+            @Override
+            public boolean buildLogic(Tile tile, Table table) {
+                return false;
             }
 
             @Override
@@ -112,7 +116,6 @@ public class DebugBlocks extends BlockList implements ContentList{
                 solid = true;
                 hasLiquids = true;
                 liquidCapacity = 100f;
-                configurable = true;
                 outputsLiquid = true;
             }
 
@@ -136,30 +139,26 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public void buildTable(Tile tile, Table table){
-                super.buildTable(tile, table);
-
+            public boolean buildConfig(Tile tile, Table table){
                 LiquidSourceEntity entity = tile.entity();
 
                 Array<Liquid> items = content.liquids();
 
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
-                Table cont = new Table();
 
                 for(int i = 0; i < items.size; i++){
                     if(!control.unlocks.isUnlocked(items.get(i))) continue;
 
                     final int f = i;
-                    ImageButton button = cont.addImageButton("liquid-icon-" + items.get(i).name, "clear-toggle", 24,
+                    ImageButton button = table.addImageButton("liquid-icon-" + items.get(i).name, "clear-toggle", 24,
                             () -> Call.setLiquidSourceLiquid(null, tile, items.get(f))).size(38).group(group).get();
                     button.setChecked(entity.source.id == f);
 
                     if(i % 4 == 3){
-                        cont.row();
+                        table.row();
                     }
                 }
-
-                table.add(cont);
+                return true;
             }
 
             @Override

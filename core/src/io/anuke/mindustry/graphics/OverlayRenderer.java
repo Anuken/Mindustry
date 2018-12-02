@@ -71,9 +71,9 @@ public class OverlayRenderer{
 
             InputHandler input = control.input(player.playerIndex);
 
-            //draw config selected block
-            if(input.frag.config.isShown()){
-                Tile tile = input.frag.config.getSelectedTile();
+            //draw details selected block
+            if(input.frag.details.isShown()){
+                Tile tile = input.frag.details.getSelectedTile();
                 tile.block().drawConfigure(tile);
             }
 

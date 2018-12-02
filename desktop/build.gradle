@@ -99,7 +99,7 @@ task packrCmd() {
                     "--icon", ICON_DIR.getAbsolutePath(),
                     "--vmargs", (getPlatform() == "mac" ? "XstartOnFirstThread" : "Xms256m"),
                     "Djava.net.preferIPv4Stack=true",
-                    "--classpath", "--", PACKR_DIR + "config.json")
+                    "--classpath", "--", PACKR_DIR + "details.json")
         }
     }
 }

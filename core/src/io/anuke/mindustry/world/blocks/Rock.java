@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
 
 public class Rock extends Block{
@@ -14,7 +15,11 @@ public class Rock extends Block{
         super(name);
         breakable = true;
         alwaysReplace = true;
-        configurable = false;
+    }
+
+    @Override
+    public boolean buildLogic(Tile tile, Table table) {
+        return false;
     }
 
     @Override

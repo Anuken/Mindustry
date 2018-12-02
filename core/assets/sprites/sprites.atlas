@@ -5615,6 +5615,13 @@ icon-check
   orig: 16, 16
   offset: 0, 0
   index: -1
+icon-config
+  rotate: false
+  xy: 576, 225
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 icon-copy
   rotate: false
   xy: 436, 296

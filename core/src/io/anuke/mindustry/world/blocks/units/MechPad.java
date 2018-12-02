@@ -24,6 +24,7 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
@@ -45,7 +46,6 @@ public class MechPad extends Block{
         update = true;
         solidifes = true;
         hasPower = true;
-        configurable = false;
     }
 
     @Override
@@ -172,6 +172,11 @@ public class MechPad extends Block{
 
             Draw.reset();
         }
+    }
+
+    @Override
+    public boolean buildLogic(Tile tile, Table table) {
+        return false;
     }
 
     @Override

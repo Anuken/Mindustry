@@ -7,6 +7,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
@@ -24,7 +25,6 @@ public class Conduit extends LiquidBlock{
         rotate = true;
         solid = false;
         floating = true;
-        configurable = false;
     }
 
     @Override
@@ -96,6 +96,11 @@ public class Conduit extends LiquidBlock{
         Draw.color();
 
         Draw.rect(topRegions[entity.blendbits], tile.drawx(), tile.drawy(), rotation);
+    }
+
+    @Override
+    public boolean buildLogic(Tile tile, Table table) {
+        return false;
     }
 
     @Override

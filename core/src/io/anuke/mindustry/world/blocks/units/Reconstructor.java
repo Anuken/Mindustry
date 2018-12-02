@@ -155,7 +155,7 @@ public class Reconstructor extends Block{
     }
 
     @Override
-    public boolean onConfigureTileTapped(Tile tile, Tile other){
+    public boolean onDetailsTileTapped(Tile tile, Tile other){
         if(tile == other) return false;
 
         ReconstructorEntity entity = tile.entity();
@@ -172,13 +172,13 @@ public class Reconstructor extends Block{
     }
 
     @Override
-    public boolean shouldShowConfigure(Tile tile, Player player){
+    public boolean shouldShowDetails(Tile tile, Player player){
         ReconstructorEntity entity = tile.entity();
         return !checkValidTap(tile, entity, player);
     }
 
     @Override
-    public boolean shouldHideConfigure(Tile tile, Player player){
+    public boolean shouldHideDetails(Tile tile, Player player){
         ReconstructorEntity entity = tile.entity();
         return checkValidTap(tile, entity, player);
     }

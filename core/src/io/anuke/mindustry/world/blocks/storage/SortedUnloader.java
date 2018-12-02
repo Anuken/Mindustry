@@ -62,10 +62,10 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
     }
 
     @Override
-    public void buildTable(Tile tile, Table table){
-        super.buildTable(tile, table);
+    public boolean buildConfig(Tile tile, Table table){
         SortedUnloaderEntity entity = tile.entity();
         buildItemTable(table, () -> entity.sortItem, item -> Call.setSortedUnloaderItem(null, tile, item));
+        return true;
     }
 
     @Override

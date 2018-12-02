@@ -14,6 +14,7 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
@@ -46,7 +47,6 @@ public class Conveyor extends Block{
         hasItems = true;
         autoSleep = true;
         itemCapacity = 4;
-        configurable = false;
     }
 
     private static int compareItems(long a, long b){
@@ -196,6 +196,11 @@ public class Conveyor extends Block{
         if(entity.convey.size * itemSpace < 0.9f){
             unit.getVelocity().add((tx * speed + centerx) * entity.delta(), (ty * speed + centery) * entity.delta());
         }
+    }
+
+    @Override
+    public boolean buildLogic(Tile tile, Table table) {
+        return false;
     }
 
     @Override

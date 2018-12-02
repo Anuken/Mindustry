@@ -77,7 +77,7 @@ public class CommandCenter extends Block{
     }
 
     @Override
-    public void buildTable(Tile tile, Table table){
+    public boolean buildConfig(Tile tile, Table table){
         CommandCenterEntity entity = tile.entity();
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         Table buttons = new Table();
@@ -89,6 +89,7 @@ public class CommandCenter extends Block{
         table.add(buttons);
         table.row();
         table.table("pane", t -> t.label(() -> entity.command.localized()).center().growX()).growX();
+        return true;
     }
 
     @Remote(called = Loc.server, forward = true, targets = Loc.both)

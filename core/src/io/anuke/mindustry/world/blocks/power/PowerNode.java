@@ -117,12 +117,17 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
+    public boolean buildLogic(Tile tile, Table table) {
+        return false;
+    }
+
+    @Override
     public void update(Tile tile){
         tile.entity.power.graph.update();
     }
 
     @Override
-    public boolean onConfigureTileTapped(Tile tile, Tile other){
+    public boolean onDetailsTileTapped(Tile tile, Tile other){
         TileEntity entity = tile.entity();
         other = other.target();
 
@@ -137,10 +142,6 @@ public class PowerNode extends PowerBlock{
             return false;
         }
         return true;
-    }
-
-    @Override
-    public void buildTable(Tile tile, Table table){
     }
 
     @Override

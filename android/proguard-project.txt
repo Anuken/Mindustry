@@ -1,5 +1,5 @@
 # To enable ProGuard in your project, edit project.properties
-# to define the proguard.config property as described in that file.
+# to define the proguard.details property as described in that file.
 #
 # Add project specific ProGuard rules here.
 # By default, the flags in this file are appended to flags specified

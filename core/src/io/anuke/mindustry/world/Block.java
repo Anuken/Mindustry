@@ -90,8 +90,6 @@ public class Block extends BaseBlock {
     public boolean autoSleep;
     /** Name of shadow region to load. Null to indicate normal shadow. */
     public String shadow = null;
-    /** Whether the block can be tapped and selected to configure. */
-    public boolean configurable = true;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
     /** The color of this block when displayed on the minimap or map preview. */
@@ -293,36 +291,68 @@ public class Block extends BaseBlock {
 
     /** Returns whether or not a hand cursor should be shown over this block. */
     public CursorType getCursor(Tile tile){
-        return configurable ? CursorType.hand : CursorType.normal;
+        return canBeSelected(tile) ? CursorType.hand : CursorType.normal;
+    }
+
+    public boolean canBeSelected(Tile tile){
+        return buildInfo(tile, new Table()) || buildPower(tile, new Table()) || buildConfig(tile, new Table()) || buildLogic(tile, new Table()) || buildTable(tile, new Table());
     }
 
     /**
-     * Called when this block is tapped to build a UI on the table.
-     * {@link #configurable} able} must return true for this to be called.
+     * Called when this block is tapped to build a info UI on the table.
      */
-    public void buildTable(Tile tile, Table table){
+    public boolean buildInfo(Tile tile, Table table){
+        return false;
+    }
+
+    /**
+     * Called when this block is tapped to build a power UI on the table.
+     */
+    public boolean buildPower(Tile tile, Table table){
+        return false;
+    }
+
+    /**
+     * Called when this block is tapped to build a details UI on the table.
+     */
+    public boolean buildConfig(Tile tile, Table table){
+        return false;
+    }
+
+    /**
+     * Called when this block is tapped to build a logic UI on the table.
+     */
+    public boolean buildLogic(Tile tile, Table table){
         table.addCheck(Bundles.get("text.blocks.config.enable"), tile.entity.enabled, b -> {
             if (tile.entity.enabled = b) onEnable(tile);
             else onDisable(tile);
         });
         table.row();
+        return true;
+    }
+
+    /**
+     * Called when this block is tapped to build a custom UI on the table.
+     */
+    public boolean buildTable(Tile tile, Table table){
+        return false;
     }
 
     /**
      * Called when another tile is tapped while this block is selected.
      * Returns whether or not this block should be deselected.
      */
-    public boolean onConfigureTileTapped(Tile tile, Tile other){
+    public boolean onDetailsTileTapped(Tile tile, Tile other){
         return tile != other;
     }
 
-    /** Returns whether this config menu should show when the specified player taps it. */
-    public boolean shouldShowConfigure(Tile tile, Player player){
+    /** Returns whether this details menu should show when the specified player taps it. */
+    public boolean shouldShowDetails(Tile tile, Player player){
         return true;
     }
 
-    /** Whether this configuration should be hidden now. Called every frame the config is open. */
-    public boolean shouldHideConfigure(Tile tile, Player player){
+    /** Whether this details should be hidden now. Called every frame the details is open. */
+    public boolean shouldHideDetails(Tile tile, Player player){
         return false;
     }
 

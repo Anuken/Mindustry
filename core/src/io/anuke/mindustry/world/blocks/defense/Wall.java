@@ -1,7 +1,9 @@
 package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.ucore.scene.ui.layout.Table;
 
 public class Wall extends Block{
 
@@ -10,7 +12,6 @@ public class Wall extends Block{
         solid = true;
         destructible = true;
         group = BlockGroup.walls;
-        configurable = false;
     }
 
     @Override
@@ -18,4 +19,8 @@ public class Wall extends Block{
         return super.canReplace(other) && health > other.health;
     }
 
+    @Override
+    public boolean buildLogic(Tile tile, Table table) {
+        return false;
+    }
 }

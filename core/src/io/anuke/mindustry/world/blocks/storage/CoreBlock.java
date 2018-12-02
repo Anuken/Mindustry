@@ -27,6 +27,7 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
 
@@ -53,7 +54,6 @@ public class CoreBlock extends StorageBlock{
         hasItems = true;
         itemCapacity = 2000;
         viewRange = 200f;
-        configurable = false;
         flags = EnumSet.of(BlockFlag.resupplyPoint, BlockFlag.target);
     }
 
@@ -166,6 +166,11 @@ public class CoreBlock extends StorageBlock{
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
         if(Net.server() || !Net.active()) super.handleItem(item, tile, source);
+    }
+
+    @Override
+    public boolean buildLogic(Tile tile, Table table) {
+        return false;
     }
 
     @Override

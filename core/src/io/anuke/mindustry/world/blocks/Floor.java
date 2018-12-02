@@ -15,6 +15,7 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.function.BiPredicate;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.graphics.Draw;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
@@ -67,7 +68,6 @@ public class Floor extends Block{
 
     public Floor(String name){
         super(name);
-        configurable = false;
         variants = 3;
     }
 
@@ -164,6 +164,11 @@ public class Floor extends Block{
         Draw.reset();
 
         drawEdges(tile, false);
+    }
+
+    @Override
+    public boolean buildLogic(Tile tile, Table table) {
+        return false;
     }
 
     public boolean blendOverride(Block block){

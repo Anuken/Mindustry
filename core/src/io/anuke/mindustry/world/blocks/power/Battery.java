@@ -1,11 +1,18 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.scene.ui.layout.Table;
+
 public class Battery extends PowerDistributor{
 
     public Battery(String name){
         super(name);
         outputsPower = true;
         consumesPower = true;
-        configurable = false;
+    }
+
+    @Override
+    public boolean buildLogic(Tile tile, Table table) {
+        return false;
     }
 }

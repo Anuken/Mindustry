@@ -134,7 +134,7 @@ public class ItemBridge extends Block{
     }
 
     @Override
-    public boolean onConfigureTileTapped(Tile tile, Tile other){
+    public boolean onDetailsTileTapped(Tile tile, Tile other){
         ItemBridgeEntity entity = tile.entity();
 
         if(linkValid(tile, other)){
