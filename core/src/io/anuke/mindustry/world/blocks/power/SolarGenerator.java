@@ -18,6 +18,14 @@ public class SolarGenerator extends PowerGenerator{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+        // Solar Generators don't really have an efficiency (yet), so for them 100% = 1.0f
+        stats.remove(generationType);
+        stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
+    }
+
+    @Override
     public TileEntity newEntity(){
         return new PowerGenerator.GeneratorEntity(){{
             productionEfficiency = 1.0f;
