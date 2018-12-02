@@ -281,6 +281,7 @@ public class NetServer extends Module{
         }
         player.remove();
         netServer.connections.remove(player.con.id);
+        Log.info("&lc{0} has disconnected.", player.name);
     }
 
     private static float compound(float speed, float drag){
