@@ -156,7 +156,7 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void drawConfigure(Tile tile){
+    public void drawDetails(Tile tile){
         TileEntity entity = tile.entity();
 
         Draw.color(Palette.accent);

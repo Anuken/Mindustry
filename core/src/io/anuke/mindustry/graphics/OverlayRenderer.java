@@ -74,7 +74,7 @@ public class OverlayRenderer{
             //draw details selected block
             if(input.frag.details.isShown()){
                 Tile tile = input.frag.details.getSelectedTile();
-                tile.block().drawConfigure(tile);
+                tile.block().drawDetails(tile);
             }
 
             input.drawTop();

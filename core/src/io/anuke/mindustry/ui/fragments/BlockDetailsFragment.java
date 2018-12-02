@@ -26,8 +26,8 @@ public class BlockDetailsFragment extends Fragment{
     private Array<Integer> offset = new Array<>(new Integer[]{0, 0, 0, 0});
     private Array<Runnable> runnable = new Array<>();
     private InputHandler input;
-    private Tile configTile;
-    private Block configBlock;
+    private Tile detailsTile;
+    private Block detailsBlock;
 
     private enum Shown{
         none,
@@ -47,16 +47,16 @@ public class BlockDetailsFragment extends Fragment{
     }
 
     public boolean isShown(){
-        return table.isVisible() && configTile != null;
+        return table.isVisible() && detailsTile != null;
     }
 
     public Tile getSelectedTile(){
-        return configTile;
+        return detailsTile;
     }
 
     public void showDetails(Tile tile){
-        configTile = tile;
-        configBlock = tile.block();
+        detailsTile = tile;
+        detailsBlock = tile.block();
 
         info.clear();
         power.clear();
@@ -65,11 +65,11 @@ public class BlockDetailsFragment extends Fragment{
         table.clear();
 
         int offset = 0;
-        if (configBlock.buildInfo(tile, info)){
+        if(detailsBlock.buildInfo(tile, info)){
             this.offset.set(0, offset++);
             table.addImageButton("icon-info", "clear-partial", 16 * 2f, () -> {
-                if (shown != Shown.info) runnable.add(() -> {
-                    // for (int i = 0; i < this.offset.get(0); i++) table.add();
+                if(shown != Shown.info) runnable.add(() -> {
+                    // for(int i = 0; i < this.offset.get(0); i++) table.add();
                     table.add(info);
                     shown = Shown.info;
                 });
@@ -77,11 +77,11 @@ public class BlockDetailsFragment extends Fragment{
                 showDetails(tile);
             });
         }
-        if (configBlock.buildPower(tile, power)){
+        if(detailsBlock.buildPower(tile, power)){
             this.offset.set(1, offset++);
             table.addImageButton("icon-power", "clear-partial", 16 * 2f, () -> {
-                if (shown != Shown.power) runnable.add(() -> {
-                    for (int i = 0; i < this.offset.get(1); i++) table.add();
+                if(shown != Shown.power) runnable.add(() -> {
+                    for(int i = 0; i < this.offset.get(1); i++) table.add();
                     table.add(power);
                     shown = Shown.power;
                 });
@@ -89,11 +89,11 @@ public class BlockDetailsFragment extends Fragment{
                 showDetails(tile);
             });
         }
-        if (configBlock.buildConfig(tile, config)){
+        if(detailsBlock.buildConfig(tile, config)){
             this.offset.set(2, offset++);
             table.addImageButton("icon-config", "clear-partial", 16 * 2f, () -> {
-                if (shown != Shown.config) runnable.add(() -> {
-                    for (int i = 0; i < this.offset.get(2); i++) table.add();
+                if(shown != Shown.config) runnable.add(() -> {
+                    for(int i = 0; i < this.offset.get(2); i++) table.add();
                     table.add(config);
                     shown = Shown.config;
                 });
@@ -101,11 +101,11 @@ public class BlockDetailsFragment extends Fragment{
                 showDetails(tile);
             });
         }
-        if (configBlock.buildLogic(tile, logic)){
+        if (detailsBlock.buildLogic(tile, logic)){
             this.offset.set(3, offset++);
             table.addImageButton("icon-logic", "clear-partial", 16 * 2f, () -> {
-                if (shown != Shown.logic) runnable.add(() -> {
-                    for (int i = 0; i < this.offset.get(3); i++) table.add();
+                if(shown != Shown.logic) runnable.add(() -> {
+                    for(int i = 0; i < this.offset.get(3); i++) table.add();
                     table.add(logic);
                     shown = Shown.logic;
                 });
@@ -113,10 +113,10 @@ public class BlockDetailsFragment extends Fragment{
                 showDetails(tile);
             });
         }
-        configBlock.buildTable(tile, table);
+        detailsBlock.buildTable(tile, table);
 
-        if (!runnable.isEmpty()) table.row();
-        for (int i = 0; i < runnable.size; i++) runnable.get(i).run();
+        if(!runnable.isEmpty()) table.row();
+        for(int i = 0; i < runnable.size; i++) runnable.get(i).run();
         runnable.clear();
 
         table.pack();
@@ -131,7 +131,7 @@ public class BlockDetailsFragment extends Fragment{
                 return;
             }
 
-            if(configTile != null && configTile.block().shouldHideDetails(configTile, input.player)){
+            if(detailsTile != null && detailsTile.block().shouldHideDetails(detailsTile, input.player)){
                 hideDetails();
                 return;
             }
@@ -139,7 +139,7 @@ public class BlockDetailsFragment extends Fragment{
             table.setOrigin(Align.center);
             Vector2 pos = Graphics.screen(tile.drawx(), tile.drawy() - tile.block().size * tilesize / 2f - 1);
             table.setPosition(pos.x, pos.y, Align.top);
-            if(configTile == null || configTile.block() == Blocks.air || configTile.block() != configBlock){
+            if(detailsTile == null || detailsTile.block() == Blocks.air || detailsTile.block() != detailsBlock){
                 hideDetails();
             }
         });
@@ -151,7 +151,7 @@ public class BlockDetailsFragment extends Fragment{
     }
 
     public void hideDetails(){
-        configTile = null;
+        detailsTile = null;
         offset.clear();
         offset.setSize(4);
         shown = Shown.none;

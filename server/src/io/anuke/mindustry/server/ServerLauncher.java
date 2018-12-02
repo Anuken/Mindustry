@@ -26,7 +26,7 @@ public class ServerLauncher extends HeadlessApplication{
             Net.setServerProvider(new KryoServer());
 
             HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-            Settings.setPrefHandler((appName) -> Gdx.files.local("details"));
+            Settings.setPrefHandler((appName) -> Gdx.files.local("config"));
 
             new ServerLauncher(new MindustryServer(args), config);
         }catch(Throwable t){

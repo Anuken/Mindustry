@@ -360,7 +360,7 @@ public class Block extends BaseBlock {
         return update || destructible || solid;
     }
 
-    public void drawConfigure(Tile tile){
+    public void drawDetails(Tile tile){
         Draw.color(Palette.accent);
         Lines.stroke(1f);
         Lines.square(tile.drawx(), tile.drawy(),

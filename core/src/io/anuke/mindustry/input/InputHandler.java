@@ -180,8 +180,8 @@ public abstract class InputHandler extends InputAdapter{
                 frag.details.hideDetails(); //needed to reset the variables
                 frag.details.showDetails(tile);
             }
-            //otherwise...
-        }else if(!frag.details.hasDetailsMouse()){ //make sure a configuration fragment isn't on the cursor
+        //otherwise...
+        }else if(!frag.details.hasDetailsMouse()){ //make sure a details fragment isn't on the cursor
             //then, if it's shown and the current block 'agrees' to hide, hide it.
             if(frag.details.isShown() && frag.details.getSelectedTile().block().onDetailsTileTapped(frag.details.getSelectedTile(), tile)){
                 consumed = true;
