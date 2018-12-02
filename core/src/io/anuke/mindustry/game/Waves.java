@@ -96,6 +96,14 @@ public class Waves{
                 max = 10;
             }},
 
+            new SpawnGroup(UnitTypes.fortress){{
+                begin = 40;
+                spacing = 5;
+                unitAmount = 2;
+                unitScaling = 3;
+                max = 10;
+            }},
+
             new SpawnGroup(UnitTypes.dagger){{
                 begin = 35;
                 spacing = 3;
@@ -131,6 +139,15 @@ public class Waves{
                 spacing = 5;
                 groupAmount = 2;
                 effect = StatusEffects.overdrive;
+                max = 8;
+            }},
+
+            new SpawnGroup(UnitTypes.revenant){{
+                begin = 50;
+                unitAmount = 4;
+                unitScaling = 3;
+                spacing = 5;
+                groupAmount = 2;
                 max = 8;
             }},
 
