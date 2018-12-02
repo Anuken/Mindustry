@@ -53,6 +53,10 @@ public class TypeIO{
 
     @WriteClass(Unit.class)
     public static void writeUnit(ByteBuffer buffer, Unit unit){
+        if(unit.getGroup() == null){
+            buffer.put((byte)-1);
+            return;
+        }
         buffer.put((byte) unit.getGroup().getID());
         buffer.putInt(unit.getID());
     }
@@ -60,6 +64,7 @@ public class TypeIO{
     @ReadClass(Unit.class)
     public static Unit readUnit(ByteBuffer buffer){
         byte gid = buffer.get();
+        if(gid == -1) return null;
         int id = buffer.getInt();
         return (Unit) Entities.getGroup(gid).getByID(id);
     }
