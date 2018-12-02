@@ -381,7 +381,7 @@ public class NetServer extends Module{
             return;
         }
 
-        if(other == null || (other.isAdmin && other != player)){ //fun fact: this means you can ban yourself
+        if(other == null || ((other.isAdmin && !player.isLocal) && other != player)){
             Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
             return;
         }

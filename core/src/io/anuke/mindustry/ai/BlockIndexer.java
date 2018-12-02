@@ -86,7 +86,7 @@ public class BlockIndexer{
 
                     process(tile);
 
-                    if(tile.entity != null && tile.entity.healthf() < 0.9999f){
+                    if(tile.entity != null && tile.entity.damaged()){
                         notifyTileDamaged(tile.entity);
                     }
                 }
@@ -116,7 +116,7 @@ public class BlockIndexer{
 
         ObjectSet<Tile> set = damagedTiles[team.ordinal()];
         for(Tile tile : set){
-            if(tile.entity == null || tile.entity.getTeam() != team || tile.entity.healthf() >= 0.9999f){
+            if(tile.entity == null || tile.entity.getTeam() != team || !tile.entity.damaged()){
                 returnArray.add(tile);
             }
         }
