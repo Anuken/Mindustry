@@ -83,7 +83,7 @@ public class GenericCrafter extends Block{
 
         if(entity.cons.valid() && tile.entity.items.get(output) < itemCapacity){
 
-            entity.progress += 1f / craftTime * entity.delta();
+            entity.progress += getProgressIncrease(entity, craftTime);
             entity.totalProgress += entity.delta();
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
 

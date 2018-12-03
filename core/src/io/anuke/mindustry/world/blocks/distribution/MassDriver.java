@@ -37,7 +37,6 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-// TODO Adapt whole class to new power system
 public class MassDriver extends Block{
     protected float range;
     protected float rotateSpeed = 0.04f;
@@ -49,7 +48,7 @@ public class MassDriver extends Block{
     protected Effect smokeEffect = ShootFx.shootBigSmoke2;
     protected Effect recieveEffect = BlockFx.mineBig;
     protected float shake = 3f;
-    protected final static float powerPercentageUsed = 0.8f;
+    protected final static float powerPercentageUsed = 1.0f;
     protected TextureRegion turretRegion;
 
     public MassDriver(String name){
@@ -171,8 +170,8 @@ public class MassDriver extends Block{
 
                 entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(waiter), rotateSpeed);
             }else if(tile.entity.items.total() >= minDistribute &&
-                    linkValid(tile) && //only fire when at least at 80% power capacity
-                    tile.entity.power.satisfaction > powerPercentageUsed &&
+                    linkValid(tile) && //only fire when at 100% power capacity
+                    tile.entity.power.satisfaction >= powerPercentageUsed &&
                     link.block().itemCapacity - link.entity.items.total() >= minDistribute && entity.reload <= 0.0001f){
 
                 MassDriverEntity other = link.entity();

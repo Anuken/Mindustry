@@ -90,6 +90,12 @@ public abstract class StorageBlock extends Block{
     }
 
     @Override
+    public float inventoryScaling(Tile tile){
+        StorageEntity entity = tile.entity();
+        return 1f / entity.graph.getTiles().size;
+    }
+
+    @Override
     public TileEntity newEntity(){
         return new StorageEntity();
     }

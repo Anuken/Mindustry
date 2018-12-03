@@ -45,7 +45,7 @@ public class Pathfinder{
     }
 
     public void update(){
-        if(Net.client()) return;
+        if(Net.client() || paths == null) return;
 
         for(Team team : Team.all){
             if(state.teams.isActive(team)){

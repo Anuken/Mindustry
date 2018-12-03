@@ -60,6 +60,9 @@ public class LiquidMixer extends LiquidBlock{
 
         if(tile.entity.cons.valid()){
             float use = Math.min(consumes.get(ConsumeLiquid.class).used() * entity.delta(), liquidCapacity - entity.liquids.get(outputLiquid));
+            if(hasPower){
+                use *= entity.power.satisfaction; // Produce less liquid if power is not maxed
+            }
             entity.accumulator += use;
             entity.liquids.add(outputLiquid, use);
             for(int i = 0; i < (int) (entity.accumulator / liquidPerItem); i++){

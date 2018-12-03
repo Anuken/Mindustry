@@ -68,7 +68,7 @@ public class OverdriveProjector extends Block{
 
         if(entity.charge >= reload){
             float realRange = range + entity.phaseHeat * phaseRangeBoost;
-            float realBoost = speedBoost + entity.phaseHeat*speedBoostPhase;
+            float realBoost = (speedBoost + entity.phaseHeat*speedBoostPhase) * entity.power.satisfaction;
 
             Effects.effect(BlockFx.overdriveWave, Hue.mix(color, phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
             entity.charge = 0f;

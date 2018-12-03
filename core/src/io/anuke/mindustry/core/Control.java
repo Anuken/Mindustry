@@ -53,7 +53,6 @@ public class Control extends Module{
     private Throwable error;
 
     public Control(){
-
         saves = new Saves();
         unlocks = new Unlocks();
 
@@ -373,7 +372,7 @@ public class Control extends Module{
                 }
             }
 
-            if(Inputs.keyTap("screenshot")){
+            if(Inputs.keyTap("screenshot") && !ui.chatfrag.chatOpen()){
                 renderer.takeMapScreenshot();
             }
 

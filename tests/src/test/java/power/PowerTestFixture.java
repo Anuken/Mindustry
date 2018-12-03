@@ -42,8 +42,9 @@ public class PowerTestFixture{
     }
 
     protected static PowerGenerator createFakeProducerBlock(float producedPower){
+        // Multiply produced power by 2 since production efficiency is defined to be 0.5 = 100%
         return new PowerGenerator("fakegen"){{
-            powerProduction = producedPower;
+            powerProduction = producedPower * 2.0f;
         }};
     }
 
@@ -96,6 +97,10 @@ public class PowerTestFixture{
                 tile.entity.power = new PowerModule();
                 tile.entity.power.graph.add(tile);
             }
+
+            // Assign incredibly high health so the block does not get destroyed on e.g. burning Blast Compound
+            block.health *= 100.0f;
+
             return tile;
         }catch(Exception ex){
             return null;

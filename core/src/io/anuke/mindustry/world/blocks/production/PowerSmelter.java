@@ -122,7 +122,7 @@ public class PowerSmelter extends PowerBlock{
             }
         }
 
-        entity.craftTime += entity.delta();
+        entity.craftTime += entity.delta() * entity.power.satisfaction;
 
         if(entity.items.get(result) >= itemCapacity //output full
                 || entity.heat <= minHeat //not burning

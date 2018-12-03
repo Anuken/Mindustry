@@ -11,6 +11,7 @@ import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
+import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -41,8 +42,11 @@ public class ForceProjector extends Block {
     protected float cooldownNormal = 1.75f;
     protected float cooldownLiquid = 1.5f;
     protected float cooldownBrokenBase = 0.35f;
+    protected float basePowerDraw = 0.2f;
     protected float powerDamage = 0.1f;
+    protected final ConsumePower consumePower;
     protected TextureRegion topRegion;
+
 
     public ForceProjector(String name) {
         super(name);
@@ -54,7 +58,7 @@ public class ForceProjector extends Block {
         hasItems = true;
         itemCapacity = 10;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).optional(true).update(false);
-        consumes.powerBuffered(60f);
+        consumePower = consumes.powerBuffered(60f);
     }
 
     @Override
@@ -67,6 +71,7 @@ public class ForceProjector extends Block {
     public void setStats(){
         super.setStats();
 
+        stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
         stats.add(BlockStat.powerDamage, powerDamage, StatUnit.powerUnits);
     }
 
@@ -99,16 +104,18 @@ public class ForceProjector extends Block {
             Effects.effect(BlockFx.reactorsmoke, tile.drawx() + Mathf.range(tilesize/2f), tile.drawy() + Mathf.range(tilesize/2f));
         }
 
-        if(!entity.cons.valid() && !cheat){
+        // Draw base power from buffer manually (ConsumePower doesn't support both filling a buffer and drawing power additionally so we have to do it here)
+        entity.power.satisfaction -= Math.min(entity.power.satisfaction, basePowerDraw / consumePower.powerCapacity);
+
+        if(entity.power.satisfaction == 0.0f && !cheat){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.15f);
             if(entity.warmup <= 0.09f){
                 entity.broken = true;
             }
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.1f);
-            // TODO Adapt power calculations to new power system
-//            float powerUse = Math.min(powerDamage * entity.delta() * (1f + entity.buildup / breakage), powerCapacity);
-//            entity.power.amount -= powerUse;
+            float relativePowerDraw = powerDamage * entity.delta() * (1f + entity.buildup / breakage) / consumePower.powerCapacity;
+            entity.power.satisfaction -= Math.min(relativePowerDraw, entity.power.satisfaction);
         }
 
         if(entity.buildup > 0){
@@ -143,14 +150,13 @@ public class ForceProjector extends Block {
                 if(trait.canBeAbsorbed() && trait.getTeam() != tile.getTeam() && isInsideHexagon(trait.getX(), trait.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
                     trait.absorb();
                     Effects.effect(BulletFx.absorb, trait);
-                    float hit = trait.getShieldDamage()*powerDamage;
+                    float relativePowerDraw = trait.getShieldDamage() * powerDamage / consumePower.powerCapacity;
                     entity.hit = 1f;
-                    // TODO Adapt power calculations to new power system
-//                    entity.power.amount -= Math.min(hit, entity.power.amount);
-//
-//                    if(entity.power.amount <= 0.0001f){
-//                        entity.buildup += trait.getShieldDamage() * entity.warmup*2f;
-//                    }
+
+                    entity.power.satisfaction -= Math.min(relativePowerDraw, entity.power.satisfaction);
+                    if(entity.power.satisfaction <= 0.0001f){
+                       entity.buildup += trait.getShieldDamage() * entity.warmup * 2f;
+                    }
                     entity.buildup += trait.getShieldDamage() * entity.warmup;
                 }
             });

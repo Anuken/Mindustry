@@ -159,7 +159,7 @@ public class UnitFactory extends Block{
 
             if(hasRequirements(entity.items, entity.buildTime / produceTime) && entity.cons.valid()){
 
-                entity.buildTime += entity.delta();
+                entity.buildTime += entity.delta() * entity.power.satisfaction;
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
             }else{
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);

@@ -188,6 +188,9 @@ public class Drill extends Block{
             if(entity.consumed(ConsumeLiquid.class) && !liquidRequired){
                 speed = liquidBoostIntensity;
             }
+            if(hasPower){
+                speed *= entity.power.satisfaction; // Drill slower when not at full power
+            }
 
             entity.warmup = Mathf.lerpDelta(entity.warmup, speed, warmupSpeed);
             entity.progress += entity.delta()

@@ -76,7 +76,7 @@ public class SolidPump extends Pump{
         }
 
         if(tile.entity.cons.valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
-            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction);
+            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction * entity.power.satisfaction);
             tile.entity.liquids.add(result, maxPump);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
             if(Mathf.chance(entity.delta() * updateEffectChance))

@@ -65,7 +65,7 @@ public class PowerCrafter extends Block{
         GenericCrafterEntity entity = tile.entity();
 
         if(entity.cons.valid()){
-            entity.progress += 1f / craftTime * entity.delta();
+            entity.progress += getProgressIncrease(entity, craftTime);
             entity.totalProgress += entity.delta();
         }
 

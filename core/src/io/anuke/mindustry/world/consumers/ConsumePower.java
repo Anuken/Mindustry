@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.consumers;
 
+import com.badlogic.gdx.math.MathUtils;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 import io.anuke.mindustry.entities.TileEntity;
@@ -13,7 +14,7 @@ public class ConsumePower extends Consume{
     /** The maximum amount of power which can be processed per tick. This might influence efficiency or load a buffer. */
     protected final float powerPerTick;
     /** The minimum power satisfaction (fraction of powerPerTick) which must be achieved before the module may work. */
-    protected final float minimumSatisfaction;
+    public final float minimumSatisfaction;
     /** The maximum power capacity in power units. */
     public final float powerCapacity;
     /** True if the module can store power. */
@@ -63,7 +64,6 @@ public class ConsumePower extends Consume{
     @Override
     public boolean valid(Block block, TileEntity entity){
         if(isBuffered){
-            // TODO - Verify: It might be necessary to know about the power required per shot/event here.
             return true;
         }else{
             return entity.power.satisfaction >= minimumSatisfaction;
@@ -86,10 +86,12 @@ public class ConsumePower extends Consume{
      * @return The amount of power which is requested per tick.
      */
     public float requestedPower(Block block, TileEntity entity){
-        // TODO Make the block not consume power on the following conditions, either here or in PowerGraph:
-        //      - Other consumers are not valid, e.g. additional input items/liquids are missing
-        //      - Buffer is full
-        return powerPerTick;
+        if(isBuffered){
+            // Stop requesting power once the buffer is full.
+            return MathUtils.isEqual(entity.power.satisfaction, 1.0f) ? 0.0f : powerPerTick;
+        }else{
+            return powerPerTick;
+        }
     }
 
 

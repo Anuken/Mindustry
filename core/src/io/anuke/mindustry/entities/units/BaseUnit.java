@@ -97,7 +97,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public boolean isCommanded(){
-        return !isWave && world.indexer.getAllied(team, BlockFlag.comandCenter).size != 0;
+        return !isWave && world.indexer.getAllied(team, BlockFlag.comandCenter).size != 0 && world.indexer.getAllied(team, BlockFlag.comandCenter).first().entity instanceof CommandCenterEntity;
     }
 
     public UnitCommand getCommand(){

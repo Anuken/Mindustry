@@ -49,7 +49,7 @@ public class PowerTests extends PowerTestFixture{
         }
         void simulateDirectConsumption(float producedPower, float requiredPower, float expectedSatisfaction, String parameterDescription){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1.0f;
+            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 0.5f; // Currently, 0.5f = 100%
             Tile directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requiredPower, 0.6f));
 
             PowerGraph powerGraph = new PowerGraph();
@@ -89,7 +89,7 @@ public class PowerTests extends PowerTestFixture{
         }
         void simulateBufferedConsumption(float producedPower, float maxBuffer, float powerConsumedPerTick, float initialSatisfaction, float expectedSatisfaction, String parameterDescription){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1.0f;
+            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 0.5f; // Currently, 0.5 = 100%
             Tile bufferedConsumerTile = createFakeTile(0, 1, createFakeBufferedConsumer(maxBuffer, maxBuffer > 0.0f ? maxBuffer/powerConsumedPerTick : 1.0f));
             bufferedConsumerTile.entity.power.satisfaction = initialSatisfaction;
 
@@ -98,7 +98,13 @@ public class PowerTests extends PowerTestFixture{
             powerGraph.add(bufferedConsumerTile);
 
             assertEquals(producedPower * FakeThreadHandler.fakeDelta, powerGraph.getPowerProduced(), MathUtils.FLOAT_ROUNDING_ERROR, parameterDescription + ": Produced power did not match");
-            assertEquals(Math.min(maxBuffer, powerConsumedPerTick * FakeThreadHandler.fakeDelta), powerGraph.getPowerNeeded(), MathUtils.FLOAT_ROUNDING_ERROR, parameterDescription + ": ConsumedPower did not match");
+            float expectedPowerUsage;
+            if(initialSatisfaction == 1.0f){
+                expectedPowerUsage = 0f;
+            }else{
+                expectedPowerUsage = Math.min(maxBuffer, powerConsumedPerTick * FakeThreadHandler.fakeDelta);
+            }
+            assertEquals(expectedPowerUsage, powerGraph.getPowerNeeded(), MathUtils.FLOAT_ROUNDING_ERROR, parameterDescription + ": Consumed power did not match");
 
             // Update and check for the expected power satisfaction of the consumer
             powerGraph.update();
@@ -128,7 +134,7 @@ public class PowerTests extends PowerTestFixture{
 
             if(producedPower > 0.0f){
                 Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-                producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1.0f;
+                producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 0.5f;
                 powerGraph.add(producerTile);
             }
             Tile directConsumerTile = null;

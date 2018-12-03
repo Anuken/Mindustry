@@ -10,7 +10,10 @@ import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
@@ -26,6 +29,8 @@ public class RepairPoint extends Block{
 
     protected float repairRadius = 50f;
     protected float repairSpeed = 0.3f;
+    protected float powerPerEvent = 0.06f;
+    protected ConsumePower consumePower;
 
     protected TextureRegion topRegion;
 
@@ -37,8 +42,7 @@ public class RepairPoint extends Block{
         layer = Layer.turret;
         layer2 = Layer.laser;
         hasPower = true;
-        // TODO Adapt to new power system - Make it use power while repairing
-        consumes.powerBuffered(20f);
+        consumePower = consumes.powerBuffered(20f);
     }
 
     @Override
@@ -46,6 +50,12 @@ public class RepairPoint extends Block{
         super.load();
 
         topRegion = Draw.region(name + "-turret");
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        stats.add(BlockStat.powerUse, powerPerEvent * 60f, StatUnit.powerSecond);
     }
 
     @Override
@@ -83,17 +93,22 @@ public class RepairPoint extends Block{
     public void update(Tile tile){
         RepairPointEntity entity = tile.entity();
 
+        boolean targetIsBeingRepaired = false;
         if(entity.target != null && (entity.target.isDead() || entity.target.distanceTo(tile) > repairRadius ||
                 entity.target.health >= entity.target.maxHealth())){
             entity.target = null;
         }else if(entity.target != null){
-            entity.target.health += repairSpeed * Timers.delta() * entity.strength;
-            entity.target.clampHealth();
-            // TODO: Make it use power here and reset power once target goes null
-            entity.rotation = Mathf.slerpDelta(entity.rotation, entity.angleTo(entity.target), 0.5f);
+            float relativeConsumption = powerPerEvent / consumePower.powerCapacity;
+            if(entity.power.satisfaction > 0.0f){
+                entity.target.health += repairSpeed * Timers.delta() * entity.strength * Mathf.clamp(entity.power.satisfaction / relativeConsumption);
+                entity.target.clampHealth();
+                entity.rotation = Mathf.slerpDelta(entity.rotation, entity.angleTo(entity.target), 0.5f);
+                entity.power.satisfaction -= Math.min(entity.power.satisfaction, relativeConsumption);
+                targetIsBeingRepaired = true;
+            }
         }
 
-        if(entity.target != null && entity.cons.valid()){
+        if(entity.target != null && targetIsBeingRepaired){
             entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.08f * Timers.delta());
         }else{
             entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.07f * Timers.delta());
