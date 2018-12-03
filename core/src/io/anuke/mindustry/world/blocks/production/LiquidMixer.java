@@ -45,8 +45,28 @@ public class LiquidMixer extends LiquidBlock{
         super.setBars();
 
         bars.remove(BarType.liquid);
-        bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.get(consumes.liquid()) / liquidCapacity));
-        bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.get(outputLiquid) / liquidCapacity));
+        bars.add(new BlockBar(BarType.liquid, true, new BlockBar.ValueSupplier(){
+            @Override
+            public float getValue(Tile tile) {
+                return tile.entity.liquids.get(consumes.liquid());
+            }
+
+            @Override
+            public float getMax(Tile tile) {
+                return liquidCapacity;
+            }
+        }));
+        bars.add(new BlockBar(BarType.liquid, true, new BlockBar.ValueSupplier(){
+            @Override
+            public float getValue(Tile tile) {
+                return tile.entity.liquids.get(outputLiquid);
+            }
+
+            @Override
+            public float getMax(Tile tile) {
+                return liquidCapacity;
+            }
+        }));
     }
 
     @Override

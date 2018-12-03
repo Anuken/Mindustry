@@ -99,8 +99,17 @@ public class UnitFactory extends Block{
     @Override
     public void setBars(){
         super.setBars();
+        bars.add(new BlockBar(BarType.production, true, new BlockBar.ValueSupplier(){
+            @Override
+            public float getValue(Tile tile) {
+                return tile.<UnitFactoryEntity>entity().buildTime;
+            }
 
-        bars.add(new BlockBar(BarType.production, true, tile -> tile.<UnitFactoryEntity>entity().buildTime / produceTime));
+            @Override
+            public float getMax(Tile tile) {
+                return produceTime;
+            }
+        }));
         bars.remove(BarType.inventory);
     }
 

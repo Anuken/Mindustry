@@ -45,7 +45,7 @@ public class Control extends Module{
     public final Saves saves;
     public final Unlocks unlocks;
 
-    private Timer timerRPC= new Timer(), timerUnlock = new Timer();
+    private Timer timerRPC = new Timer(), timerUnlock = new Timer();
     private boolean hiscore = false;
     private boolean wasPaused = false;
     private InputHandler[] inputs = {};

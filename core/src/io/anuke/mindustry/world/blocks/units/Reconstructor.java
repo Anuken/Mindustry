@@ -136,8 +136,8 @@ public class Reconstructor extends Block{
     }
 
     @Override
-    public void drawDetails(Tile tile){
-        super.drawDetails(tile);
+    public void drawConfiguration(Tile tile){
+        super.drawConfiguration(tile);
 
         ReconstructorEntity entity = tile.entity();
 

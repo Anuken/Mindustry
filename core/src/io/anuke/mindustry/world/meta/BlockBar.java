@@ -15,6 +15,12 @@ public class BlockBar{
     }
 
     public interface ValueSupplier{
-        float get(Tile tile);
+        default float get(Tile tile){
+            return getValue(tile) / getMax(tile);
+        }
+
+        float getValue(Tile tile);
+
+        float getMax(Tile tile);
     }
 }

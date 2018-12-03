@@ -94,7 +94,17 @@ public class ItemTurret extends CooledTurret{
     @Override
     public void setBars(){
         super.setBars();
-        bars.replace(new BlockBar(BarType.inventory, true, tile -> (float) tile.<TurretEntity>entity().totalAmmo / maxAmmo));
+        bars.replace(new BlockBar(BarType.inventory, true, new BlockBar.ValueSupplier(){
+            @Override
+            public float getValue(Tile tile) {
+                return tile.<TurretEntity>entity().totalAmmo;
+            }
+
+            @Override
+            public float getMax(Tile tile) {
+                return maxAmmo;
+            }
+        }));
     }
 
     @Override

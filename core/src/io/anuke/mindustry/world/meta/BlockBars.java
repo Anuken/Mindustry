@@ -2,9 +2,10 @@ package io.anuke.mindustry.world.meta;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.world.BarType;
+import io.anuke.mindustry.world.Tile;
 
 public class BlockBars{
-    private Array<BlockBar> list = Array.with(new BlockBar(BarType.health, false, tile -> tile.entity.health / (float) tile.block().health));
+    private Array<BlockBar> list = new Array<>();
 
     public void add(BlockBar bar){
         list.add(bar);

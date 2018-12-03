@@ -56,7 +56,17 @@ public abstract class ItemGenerator extends PowerGenerator{
     @Override
     public void setBars(){
         super.setBars();
-        bars.replace(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.total() / itemCapacity));
+        bars.replace(new BlockBar(BarType.inventory, true, new BlockBar.ValueSupplier(){
+            @Override
+            public float getValue(Tile tile) {
+                return tile.entity.items.total();
+            }
+
+            @Override
+            public float getMax(Tile tile) {
+                return itemCapacity;
+            }
+        }));
     }
 
     @Override

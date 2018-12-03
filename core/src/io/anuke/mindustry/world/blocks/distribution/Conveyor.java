@@ -7,8 +7,10 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -56,7 +58,10 @@ public class Conveyor extends Block{
     }
 
     @Override
-    public void setBars(){}
+    public void setBars(){
+        super.setBars();
+        bars.removeAll(BarType.inventory);
+    }
 
     @Override
     public void setStats(){

@@ -8,8 +8,10 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
+import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Settings;
@@ -90,10 +92,6 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void setBars(){
-    }
-
-    @Override
     public void playerPlaced(Tile tile){
         Tile before = world.tile(lastPlaced);
         if(linkValid(tile, before) && before.block() instanceof PowerNode){
@@ -156,7 +154,7 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void drawDetails(Tile tile){
+    public void drawConfiguration(Tile tile){
         TileEntity entity = tile.entity();
 
         Draw.color(Palette.accent);

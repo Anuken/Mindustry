@@ -62,7 +62,17 @@ public abstract class LiquidTurret extends Turret{
     public void setBars(){
         super.setBars();
         bars.remove(BarType.inventory);
-        bars.replace(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
+        bars.replace(new BlockBar(BarType.liquid, true, new BlockBar.ValueSupplier(){
+            @Override
+            public float getValue(Tile tile) {
+                return tile.entity.liquids.total();
+            }
+
+            @Override
+            public float getMax(Tile tile) {
+                return liquidCapacity;
+            }
+        }));
     }
 
     @Override

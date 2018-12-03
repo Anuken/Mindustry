@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.storage;
 
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -22,5 +23,8 @@ public abstract class Unloader extends Block{
     }
 
     @Override
-    public void setBars(){}
+    public void setBars(){
+        super.setBars();
+        bars.removeAll(BarType.inventory);
+    }
 }

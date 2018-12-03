@@ -74,7 +74,17 @@ public class ForceProjector extends Block {
     public void setBars(){
         super.setBars();
 
-        bars.add(new BlockBar(BarType.heat, true, tile -> tile.<ForceEntity>entity().buildup / breakage));
+        bars.add(new BlockBar(BarType.heat, true, new BlockBar.ValueSupplier(){
+            @Override
+            public float getValue(Tile tile) {
+                return tile.<ForceEntity>entity().buildup;
+            }
+
+            @Override
+            public float getMax(Tile tile) {
+                return breakage;
+            }
+        }));
     }
 
     @Override

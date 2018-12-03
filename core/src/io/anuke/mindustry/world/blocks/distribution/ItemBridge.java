@@ -109,7 +109,7 @@ public class ItemBridge extends Block{
     }
 
     @Override
-    public void drawDetails(Tile tile){
+    public void drawConfiguration(Tile tile){
         ItemBridgeEntity entity = tile.entity();
 
         Draw.color(Palette.accent);

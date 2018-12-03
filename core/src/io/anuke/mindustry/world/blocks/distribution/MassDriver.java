@@ -196,7 +196,7 @@ public class MassDriver extends Block{
     }
 
     @Override
-    public void drawDetails(Tile tile){
+    public void drawConfiguration(Tile tile){
         float sin = Mathf.absin(Timers.time(), 6f, 1f);
 
         Draw.color(Palette.accent);

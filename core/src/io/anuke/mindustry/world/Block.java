@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.OrderedMap;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -30,6 +32,8 @@ import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
+
+import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -302,7 +306,10 @@ public class Block extends BaseBlock {
      * Called when this block is tapped to build a info UI on the table.
      */
     public boolean buildInfo(Tile tile, Table table){
-        return false;
+        for(BlockBar bar : bars.list()){
+            table.add(Bundles.get("text.blocks." + bar.type.name()) + ": " + bar.value.getValue(tile) + "/" + bar.value.getMax(tile)).row();
+        }
+        return !bars.list().isEmpty();
     }
 
     /**
@@ -360,7 +367,7 @@ public class Block extends BaseBlock {
         return update || destructible || solid;
     }
 
-    public void drawDetails(Tile tile){
+    public void drawConfiguration(Tile tile){
         Draw.color(Palette.accent);
         Lines.stroke(1f);
         Lines.square(tile.drawx(), tile.drawy(),
@@ -380,11 +387,54 @@ public class Block extends BaseBlock {
     }
 
     public void setBars(){
-        if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
+        if (hasEntity())
+            bars.add(new BlockBar(BarType.health, false, new BlockBar.ValueSupplier(){
+                @Override
+                public float getValue(Tile tile) {
+                    return tile.entity.health;
+                }
+
+                @Override
+                public float getMax(Tile tile) {
+                    return tile.block().health;
+                }
+            }));
+        if(hasPower)
+            bars.add(new BlockBar(BarType.power, true, new BlockBar.ValueSupplier(){
+                @Override
+                public float getValue(Tile tile) {
+                return tile.entity.power.amount;
+            }
+
+                @Override
+                public float getMax(Tile tile) {
+                return powerCapacity;
+            }
+            }));
         if(hasLiquids)
-            bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
+            bars.add(new BlockBar(BarType.liquid, true, new BlockBar.ValueSupplier(){
+                @Override
+                public float getValue(Tile tile) {
+                    return tile.entity.liquids.total();
+                }
+
+                @Override
+                public float getMax(Tile tile) {
+                    return liquidCapacity;
+                }
+            }));
         if(hasItems)
-            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.total() / itemCapacity));
+            bars.add(new BlockBar(BarType.inventory, true, new BlockBar.ValueSupplier() {
+                @Override
+                public float getValue(Tile tile) {
+                    return tile.entity.items.total();
+                }
+
+                @Override
+                public float getMax(Tile tile) {
+                    return itemCapacity;
+                }
+            }));
     }
 
     public String name(){
