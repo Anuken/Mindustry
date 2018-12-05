@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.consumers.Consumers;
 import io.anuke.ucore.util.Mathf;
@@ -48,7 +49,10 @@ public class PowerGraph{
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
             if(consumes.has(ConsumePower.class)){
-                powerNeeded += consumes.get(ConsumePower.class).requestedPower(consumer.block(), consumer.entity) * consumer.entity.delta();
+                ConsumePower consumePower = consumes.get(ConsumePower.class);
+                if(otherConsumersAreValid(consumer, consumePower)){
+                    powerNeeded += consumePower.requestedPower(consumer.block(), consumer.entity) * consumer.entity.delta();
+                }
             }
         }
         return powerNeeded;
@@ -119,12 +123,16 @@ public class PowerGraph{
             Consumers consumes = consumer.block().consumes;
             if(consumes.has(ConsumePower.class)){
                 ConsumePower consumePower = consumes.get(ConsumePower.class);
-                if(consumePower.isBuffered){
-                    // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
-                    float maximumRate = consumePower.requestedPower(consumer.block(), consumer.entity()) * coverage * consumer.entity.delta();
-                    consumer.entity.power.satisfaction = Mathf.clamp(consumer.entity.power.satisfaction + maximumRate / consumePower.powerCapacity);
+                if(!otherConsumersAreValid(consumer, consumePower)){
+                    consumer.entity.power.satisfaction = 0.0f; // Only supply power if the consumer would get valid that way
                 }else{
-                    consumer.entity.power.satisfaction = coverage;
+                    if(consumePower.isBuffered){
+                        // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
+                        float maximumRate = consumePower.requestedPower(consumer.block(), consumer.entity()) * coverage * consumer.entity.delta();
+                        consumer.entity.power.satisfaction = Mathf.clamp(consumer.entity.power.satisfaction + maximumRate / consumePower.powerCapacity);
+                    }else{
+                        consumer.entity.power.satisfaction = coverage;
+                    }
                 }
             }
         }
@@ -220,6 +228,15 @@ public class PowerGraph{
             // Update the graph once so direct consumers without any connected producer lose their power
             graph.update();
         }
+    }
+
+    private boolean otherConsumersAreValid(Tile tile, Consume consumePower){
+        for(Consume cons : tile.block().consumes.all()){
+            if(cons != consumePower && !cons.isOptional() && !cons.valid(tile.block(), tile.entity())){
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
