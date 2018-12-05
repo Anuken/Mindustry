@@ -49,14 +49,6 @@ public class PowerGenerator extends PowerDistributor{
         return new GeneratorEntity();
     }
 
-    @Override
-    public void setBars(){
-        super.setBars();
-        if(hasPower){
-            bars.add(new BlockBar(BarType.power, true, tile -> tile.<GeneratorEntity>entity().productionEfficiency));
-        }
-    }
-
     public static class GeneratorEntity extends TileEntity{
         public float generateTime;
         /** The efficiency of the producer. Currently, an efficiency of 0.5 means 100% */
