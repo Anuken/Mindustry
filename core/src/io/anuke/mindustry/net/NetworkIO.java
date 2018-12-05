@@ -21,6 +21,7 @@ import io.anuke.ucore.util.Bits;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -305,17 +306,18 @@ public class NetworkIO{
 
         ByteBuffer buffer = ByteBuffer.allocate(128);
 
-        buffer.put((byte) host.getBytes().length);
-        buffer.put(host.getBytes());
+        buffer.put((byte) host.getBytes(StandardCharsets.UTF_8).length);
+        buffer.put(host.getBytes(StandardCharsets.UTF_8));
 
-        buffer.put((byte) map.getBytes().length);
-        buffer.put(map.getBytes());
+        buffer.put((byte) map.getBytes(StandardCharsets.UTF_8).length);
+        buffer.put(map.getBytes(StandardCharsets.UTF_8));
 
         buffer.putInt(playerGroup.size());
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
-        buffer.put((byte)Version.type.getBytes().length);
-        buffer.put(Version.type.getBytes());
+        buffer.put((byte)Version.type.getBytes(StandardCharsets.UTF_8).length);
+        buffer.put(Version.type.getBytes(StandardCharsets.UTF_8));
+        buffer.put((byte)state.mode.ordinal());
         return buffer;
     }
 
@@ -328,8 +330,8 @@ public class NetworkIO{
         byte[] mb = new byte[mlength];
         buffer.get(mb);
 
-        String host = new String(hb);
-        String map = new String(mb);
+        String host = new String(hb, StandardCharsets.UTF_8);
+        String map = new String(mb, StandardCharsets.UTF_8);
 
         int players = buffer.getInt();
         int wave = buffer.getInt();
@@ -337,8 +339,9 @@ public class NetworkIO{
         byte tlength = buffer.get();
         byte[] tb = new byte[tlength];
         buffer.get(tb);
-        String vertype = new String(tb);
+        String vertype = new String(tb, StandardCharsets.UTF_8);
+        GameMode mode = GameMode.values()[buffer.get()];
 
-        return new Host(host, hostAddress, map, wave, players, version, vertype);
+        return new Host(host, hostAddress, map, wave, players, version, vertype, mode);
     }
 }

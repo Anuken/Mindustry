@@ -60,7 +60,7 @@ public class DesktopPlatform extends Platform{
                 presence.largeImageText = "Wave " + state.wave;
             }
 
-            if(state.mode != GameMode.noWaves){
+            if(state.mode != GameMode.attack){
                 presence.state = Strings.capitalize(state.mode.name());
             }else{
                 presence.state = unitGroups[players[0].getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
