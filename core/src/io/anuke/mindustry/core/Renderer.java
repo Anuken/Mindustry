@@ -395,8 +395,8 @@ public class Renderer extends RendererModule{
         Graphics.getEffectSurface().setSize(w, h, true);
         Core.camera.viewportWidth = w;
         Core.camera.viewportHeight = h;
-        Core.camera.position.x = w/2f;
-        Core.camera.position.y = h/2f;
+        Core.camera.position.x = w/2f + tilesize/2f;
+        Core.camera.position.y = h/2f + tilesize/2f;
 
         draw();
 
