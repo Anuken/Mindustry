@@ -345,7 +345,9 @@ public class Block extends BaseBlock {
     }
 
     public void setBars(){
-        if(consumes.has(ConsumePower.class)) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.satisfaction));
+        if(consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
+            bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.satisfaction));
+        }
         if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
         if(hasItems) bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.total() / itemCapacity));
     }
