@@ -171,8 +171,8 @@ public abstract class InputHandler extends InputAdapter{
 
         boolean consumed = false, showedInventory = false, showedConsume = false;
 
-        //check if tapped block is selectable
-        if(tile.block().canBeSelected(tile) && tile.getTeam() == player.getTeam()){
+        //check if tapped block has details
+        if(tile.block().hasDetails(tile) && tile.getTeam() == player.getTeam()){
             consumed = true;
             if(!frag.details.isShown() && tile.block().shouldShowDetails(tile, player)) //if the details fragment is hidden, show
                 frag.details.showDetails(tile);

@@ -77,18 +77,23 @@ public class CommandCenter extends Block{
     }
 
     @Override
-    public boolean buildConfig(Tile tile, Table table){
-        CommandCenterEntity entity = tile.entity();
-        ButtonGroup<ImageButton> group = new ButtonGroup<>();
-        Table buttons = new Table();
+    public boolean buildConfig(Tile tile, Table table, boolean update){
+        if(!update){
+            CommandCenterEntity entity = tile.entity();
+            ButtonGroup<ImageButton> group = new ButtonGroup<>();
+            Table buttons = new Table();
 
-        for(UnitCommand cmd : UnitCommand.values()){
-            buttons.addImageButton("command-" + cmd.name(), "clear-toggle", 8*3, () -> threads.run(() -> Call.onCommandCenterSet(players[0], tile, cmd)))
-            .size(38f).checked(entity.command == cmd).group(group);
+            for(UnitCommand cmd : UnitCommand.values()){
+                ImageButton button = buttons.addImageButton("command-" + cmd.name(), "clear-toggle", 8 * 3, () -> {})
+                        .size(38f).checked(entity.command == cmd).group(group).get();
+                button.setProgrammaticChangeEvents(false);
+                button.update(() -> button.setChecked(entity.command == cmd));
+                button.changed(() -> threads.run(() -> Call.onCommandCenterSet(players[0], tile, cmd)));
+            }
+            table.add(buttons);
+            table.row();
+            table.table("pane", t -> t.label(() -> entity.command.localized()).center().growX()).growX();
         }
-        table.add(buttons);
-        table.row();
-        table.table("pane", t -> t.label(() -> entity.command.localized()).center().growX()).growX();
         return true;
     }
 

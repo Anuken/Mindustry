@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.OrderedMap;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -15,6 +15,7 @@ import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
@@ -24,16 +25,15 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.meta.*;
 import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.BooleanConsumer;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
+import io.anuke.ucore.scene.ui.*;
+import io.anuke.ucore.scene.ui.Button;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.EnumSet;
 import io.anuke.ucore.util.Mathf;
-
-import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -295,47 +295,93 @@ public class Block extends BaseBlock {
 
     /** Returns whether or not a hand cursor should be shown over this block. */
     public CursorType getCursor(Tile tile){
-        return canBeSelected(tile) ? CursorType.hand : CursorType.normal;
+        return hasDetails(tile) ? CursorType.hand : CursorType.normal;
     }
 
-    public boolean canBeSelected(Tile tile){
+    public boolean hasDetails(Tile tile){
         return buildInfo(tile, new Table()) || buildPower(tile, new Table()) || buildConfig(tile, new Table()) || buildLogic(tile, new Table()) || buildTable(tile, new Table());
     }
 
     /**
      * Called when this block is tapped to build a info UI on the table.
      */
-    public boolean buildInfo(Tile tile, Table table){
+    public boolean buildInfo(Tile tile, Table table, boolean update){
         for(BlockBar bar : bars.list()){
-            table.add(Bundles.get("text.blocks." + bar.type.name()) + ": " + bar.value.getValue(tile) + "/" + bar.value.getMax(tile)).row();
+            table.add(Bundles.format("text.blocks.info." + bar.type.name(), bar.value.getValue(tile), bar.value.getMax(tile))).row();
         }
         return !bars.list().isEmpty();
+    }
+
+    public final boolean buildInfo(Tile tile, Table table){
+        return buildInfo(tile, table, false);
     }
 
     /**
      * Called when this block is tapped to build a power UI on the table.
      */
-    public boolean buildPower(Tile tile, Table table){
-        return false;
+    public boolean buildPower(Tile tile, Table table, boolean update){
+        if(hasPower){
+            ButtonGroup<Button> group = new ButtonGroup<>();
+            for(byte i = 1; i <= 9; i++){
+                TextButton button = table.addButton(String.valueOf(i), "clear", () -> {}).group(group).get();
+                button.setChecked(i == tile.entity.power.priority);
+                button.changed(() -> Call.onPowerPrioritySet(players[0], tile, Byte.parseByte(button.getText().toString())));
+            }
+            table.row();
+            table.add(Bundles.format("text.blocks.power.produced", tile.entity.power.graph.getProduced(), Bundles.get("text.unit.powersecond"))).row();
+            table.add(Bundles.format("text.blocks.power.stored", tile.entity.power.graph.getStored(), Bundles.get("text.unit.powersecond"))).row();
+            table.add(Bundles.format("text.blocks.power.used", tile.entity.power.graph.getUsed(), Bundles.get("text.unit.powersecond"))).row();
+            table.add(Bundles.format("text.blocks.power.charged", tile.entity.power.graph.getCharged(), Bundles.get("text.unit.powersecond"))).row();
+        }
+        return hasPower;
+    }
+
+    public final boolean buildPower(Tile tile, Table table){
+        return buildPower(tile, table, false);
+    }
+
+    @Remote(called = Loc.server, forward = true, targets = Loc.both)
+    public static void onPowerPrioritySet(Player player, Tile tile, byte priority){
+        tile.entity.power.priority = priority;
+        tile.entity.power.graph.sort();
     }
 
     /**
      * Called when this block is tapped to build a details UI on the table.
      */
-    public boolean buildConfig(Tile tile, Table table){
+    public boolean buildConfig(Tile tile, Table table, boolean update){
         return false;
+    }
+
+    public final boolean buildConfig(Tile tile, Table table){
+        return buildConfig(tile, table, false);
     }
 
     /**
      * Called when this block is tapped to build a logic UI on the table.
      */
-    public boolean buildLogic(Tile tile, Table table){
-        table.addCheck(Bundles.get("text.blocks.config.enable"), tile.entity.enabled, b -> {
-            if (tile.entity.enabled = b) onEnable(tile);
-            else onDisable(tile);
-        });
-        table.row();
+    public boolean buildLogic(Tile tile, Table table, boolean update){
+        if(!update){
+            CheckBox check = table.addCheck(Bundles.get("text.blocks.config.enable"), tile.entity.enabled, checked -> {}).get();
+            check.setProgrammaticChangeEvents(false);
+            check.update(() -> {
+                if(tile.entity != null) check.setChecked(tile.entity.enabled);
+            });
+            check.changed(() -> Call.onEnableSet(players[0], tile, check.isChecked()));
+            table.row();
+        }
         return true;
+    }
+
+    public final boolean buildLogic(Tile tile, Table table){
+        return buildLogic(tile, table, false);
+    }
+
+    @Remote(called = Loc.server, forward = true, targets = Loc.both)
+    public static void onEnableSet(Player player, Tile tile, boolean checked){
+        Block block = tile.block();
+        if(tile.entity.enabled = checked) block.onEnable(tile);
+        else block.onDisable(tile);
     }
 
     /**

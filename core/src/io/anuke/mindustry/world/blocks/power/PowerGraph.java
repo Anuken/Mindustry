@@ -6,6 +6,9 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.world.Tile;
 
+import java.util.Comparator;
+import java.util.Iterator;
+
 import static io.anuke.mindustry.Vars.threads;
 
 public class PowerGraph{
@@ -15,8 +18,13 @@ public class PowerGraph{
     private final static IntSet closedSet = new IntSet();
 
     private final ObjectSet<Tile> producers = new ObjectSet<>();
-    private final ObjectSet<Tile> consumers = new ObjectSet<>();
+    private final Array<Tile> consumers = new Array<>();
     private final ObjectSet<Tile> all = new ObjectSet<>();
+
+    private float produced = 0f;
+    private float stored = 0f;
+    private float used = 0f;
+    private float charged = 0f;
 
     private long lastFrameUpdated;
     private final int graphID;
@@ -37,63 +45,81 @@ public class PowerGraph{
 
         lastFrameUpdated = threads.getFrameID();
 
-        boolean charge = false;
+        produced = 0f;
+        stored = 0f;
+        used = 0f;
+        charged = 0f;
 
-        float totalInput = 0f;
-        float bufferInput = 0f;
+        // Gather power.
+        ObjectSet<Tile> storage = new ObjectSet<>();
         for(Tile producer : producers){
             if(producer.block().consumesPower){
-                bufferInput += producer.entity.power.amount;
-            }else{
-                totalInput += producer.entity.power.amount;
-            }
+                storage.add(producer);
+                stored += producer.entity.power.amount;
+            }else produced += producer.entity.power.amount;
         }
 
-        float maxOutput = 0f;
-        float bufferOutput = 0f;
+        // Distribute power.
+        boolean hasPower = true;
+        byte priority = 9;
+        float localProduced = produced;
+        float localStored = stored;
+        float currentUsed = 0f;
+        ObjectSet<Tile> currentConsumers = new ObjectSet<>();
+        Array<Tile> modifiedConsumers = new Array<>(consumers);
+        modifiedConsumers.add(null);
         for(Tile consumer : consumers){
-            if(consumer.block().outputsPower){
-                bufferOutput += consumer.block().powerCapacity - consumer.entity.power.amount;
-            }else{
-                maxOutput += consumer.block().powerCapacity - consumer.entity.power.amount;
+            if(!hasPower) break;
+            if(consumer == null || consumer.entity.power.priority != priority){
+                if(localProduced > currentUsed){
+                    for(Tile currentConsumer : currentConsumers){
+                        if(currentConsumer.block().outputsPower) charged += currentConsumer.block().powerCapacity;
+                        currentConsumer.entity.power.amount = currentConsumer.block().powerCapacity;
+                    }
+                    used += currentUsed;
+                    localProduced -= currentUsed;
+                }else if(hasPower = localProduced + localStored > currentUsed){
+                    for(Tile currentConsumer : currentConsumers){
+                        if(currentConsumer.block().outputsPower) charged += currentConsumer.block().powerCapacity;
+                        currentConsumer.entity.power.amount = currentConsumer.block().powerCapacity;
+                    }
+                    used += currentUsed;
+                    localProduced = 0f;
+                    localStored -= currentUsed - localProduced;
+                }else{
+                    float fill = localStored / currentUsed;
+                    for(Tile currentConsumer : currentConsumers){
+                        float amount = (currentConsumer.block().powerCapacity - currentConsumer.entity.power.amount) * fill;
+                        if(currentConsumer.block().outputsPower) charged += amount;
+                        currentConsumer.entity.power.amount = amount;
+                    }
+                    used += currentUsed * fill;
+                    // localStored = 0f;
+                }
+                currentConsumers.clear();
+                currentUsed = 0f;
             }
+            if(consumer == null) break;
+            priority = consumer.entity.power.priority;
+            currentConsumers.add(consumer);
+            currentUsed += consumer.block().powerCapacity - consumer.entity.power.amount;
         }
 
-        if(maxOutput < totalInput){
-            charge = true;
-        }
-
-        if(totalInput + bufferInput <= 0.0001f || maxOutput + bufferOutput <= 0.0001f){
-            return;
-        }
-
-        float bufferUsed;
-        if(charge){
-            bufferUsed = Math.min((totalInput - maxOutput) / bufferOutput, 1f);
-        }else{
-            bufferUsed = Math.min((maxOutput - totalInput) / bufferInput, 1f);
-        }
-
-        float inputUsed = charge ? Math.min((maxOutput + bufferOutput) / totalInput, 1f) : 1f;
+        // Remove power.
+        float localUsed = used;
         for(Tile producer : producers){
-            if(producer.block().consumesPower){
-                if(!charge){
-                    producer.entity.power.amount -= producer.entity.power.amount * bufferUsed;
-                }
-                continue;
+            if(localUsed <= 0f) break;
+            if(!producer.block().consumesPower){
+                float amount = Math.min(producer.entity.power.amount, localUsed);
+                producer.entity.power.amount -= amount;
+                localUsed -= amount;
             }
-            producer.entity.power.amount -= producer.entity.power.amount * inputUsed;
         }
-
-        float outputSatisfied = charge ? 1f : Math.min((totalInput + bufferInput) / maxOutput, 1f);
-        for(Tile consumer : consumers){
-            if(consumer.block().outputsPower){
-                if(charge){
-                    consumer.entity.power.amount += (consumer.block().powerCapacity - consumer.entity.power.amount) * bufferUsed;
-                }
-                continue;
-            }
-            consumer.entity.power.amount += (consumer.block().powerCapacity - consumer.entity.power.amount) * outputSatisfied;
+        for(Tile producer : storage){
+            if(localUsed <= 0f) break;
+            float amount = Math.min(producer.entity.power.amount, localUsed);
+            producer.entity.power.amount -= amount;
+            localUsed -= amount;
         }
     }
 
@@ -113,7 +139,17 @@ public class PowerGraph{
 
         if(tile.block().consumesPower){
             consumers.add(tile);
+            sort();
         }
+    }
+
+    private static Comparator<Tile> comparator = (o1, o2) -> {
+        int result = o2.entity.power.priority - o1.entity.power.priority;
+        return result == 0 ? 0 : result / Math.abs(result);
+    };
+
+    public void sort(){
+        consumers.sort(comparator);
     }
 
     public void clear(){
@@ -163,6 +199,22 @@ public class PowerGraph{
                 }
             }
         }
+    }
+
+    public float getProduced(){
+        return produced;
+    }
+
+    public float getStored(){
+        return stored;
+    }
+
+    public float getUsed(){
+        return used;
+    }
+
+    public float getCharged(){
+        return charged;
     }
 
     @Override

@@ -116,12 +116,14 @@ public class Sorter extends Block implements SelectionTrait{
     }
 
     @Override
-    public boolean buildConfig(Tile tile, Table table){
-        SorterEntity entity = tile.entity();
-        buildItemTable(table, () -> entity.sortItem, item -> {
-            lastItem = item;
-            Call.setSorterItem(null, tile, item);
-        });
+    public boolean buildConfig(Tile tile, Table table, boolean update){
+        if(!update){
+            SorterEntity entity = tile.entity();
+            buildItemTable(table, () -> entity.sortItem, item -> {
+                lastItem = item;
+                Call.setSorterItem(null, tile, item);
+            });
+        }
         return true;
     }
 

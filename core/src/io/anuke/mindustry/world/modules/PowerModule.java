@@ -9,12 +9,14 @@ import java.io.IOException;
 
 public class PowerModule extends BlockModule{
     public float amount;
+    public byte priority = 5;
     public PowerGraph graph = new PowerGraph();
     public IntArray links = new IntArray();
 
     @Override
     public void write(DataOutput stream) throws IOException{
         stream.writeFloat(amount);
+        stream.writeByte(priority);
 
         stream.writeShort(links.size);
         for(int i = 0; i < links.size; i++){
@@ -32,6 +34,11 @@ public class PowerModule extends BlockModule{
         if(amount < 0f){
             amount = 0f;
         }
+
+        priority = stream.readByte();
+        // Priority should be between 1 and 9.
+        if(priority < 1) priority = 1;
+        if(priority > 9) priority = 9;
 
         short amount = stream.readShort();
         for(int i = 0; i < amount; i++){

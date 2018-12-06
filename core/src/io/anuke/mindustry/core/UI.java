@@ -37,7 +37,6 @@ import static io.anuke.ucore.scene.actions.Actions.*;
 public class UI extends SceneModule{
     private FreeTypeFontGenerator generator;
 
-    private Timer timerBlockDetails = new Timer();
     public final MenuFragment menufrag = new MenuFragment();
     public final HudFragment hudfrag = new HudFragment();
     public final ChatFragment chatfrag = new ChatFragment();
@@ -130,12 +129,6 @@ public class UI extends SceneModule{
         if(Graphics.drawing()) Graphics.end();
 
         act();
-
-        //updates block ui every second if needed
-        BlockDetailsFragment blockDetailsFrag = control.input(0).getFrag().details;
-        if(blockDetailsFrag.shouldUpdate() && blockDetailsFrag.isShown() && timerBlockDetails.get(60)){
-            blockDetailsFrag.showDetails(blockDetailsFrag.getSelectedTile(), true);
-        }
 
         Graphics.begin();
 

@@ -45,7 +45,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public boolean buildLogic(Tile tile, Table table) {
+            public boolean buildLogic(Tile tile, Table table, boolean update) {
                 return false;
             }
 
@@ -139,23 +139,27 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public boolean buildConfig(Tile tile, Table table){
-                LiquidSourceEntity entity = tile.entity();
+            public boolean buildConfig(Tile tile, Table table, boolean update){
+                if(!update){
+                    LiquidSourceEntity entity = tile.entity();
 
-                Array<Liquid> items = content.liquids();
+                    Array<Liquid> items = content.liquids();
 
-                ButtonGroup<ImageButton> group = new ButtonGroup<>();
+                    ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
-                for(int i = 0; i < items.size; i++){
-                    if(!control.unlocks.isUnlocked(items.get(i))) continue;
+                    for (int i = 0; i < items.size; i++) {
+                        if (!control.unlocks.isUnlocked(items.get(i))) continue;
 
-                    final int f = i;
-                    ImageButton button = table.addImageButton("liquid-icon-" + items.get(i).name, "clear-toggle", 24,
-                            () -> Call.setLiquidSourceLiquid(null, tile, items.get(f))).size(38).group(group).get();
-                    button.setChecked(entity.source.id == f);
+                        final int f = i;
+                        ImageButton button = table.addImageButton("liquid-icon-" + items.get(i).name, "clear-toggle", 24,
+                                () -> Call.setLiquidSourceLiquid(null, tile, items.get(f))).size(38).group(group).get();
+                        button.setProgrammaticChangeEvents(false);
+                        button.setChecked(entity.source.id == f);
+                        button.update(() -> button.setChecked(entity.source.id == f));
 
-                    if(i % 4 == 3){
-                        table.row();
+                        if (i % 4 == 3) {
+                            table.row();
+                        }
                     }
                 }
                 return true;

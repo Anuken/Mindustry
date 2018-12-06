@@ -18,7 +18,7 @@ public class Rock extends Block{
     }
 
     @Override
-    public boolean buildLogic(Tile tile, Table table) {
+    public boolean buildLogic(Tile tile, Table table, boolean update) {
         return false;
     }
 

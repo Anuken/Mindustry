@@ -12,7 +12,7 @@ public class Battery extends PowerDistributor{
     }
 
     @Override
-    public boolean buildLogic(Tile tile, Table table) {
+    public boolean buildLogic(Tile tile, Table table, boolean update){
         return false;
     }
 }

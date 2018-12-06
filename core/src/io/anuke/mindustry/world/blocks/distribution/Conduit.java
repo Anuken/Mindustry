@@ -99,7 +99,7 @@ public class Conduit extends LiquidBlock{
     }
 
     @Override
-    public boolean buildLogic(Tile tile, Table table) {
+    public boolean buildLogic(Tile tile, Table table, boolean update){
         return false;
     }
 

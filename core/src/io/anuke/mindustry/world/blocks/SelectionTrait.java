@@ -32,6 +32,8 @@ public interface SelectionTrait{
             button.changed(() -> consumer.accept(button.isChecked() ? item : null));
             button.getStyle().imageUp = new TextureRegionDrawable(item.region);
             button.setChecked(holder.get() == item);
+            button.setProgrammaticChangeEvents(false);
+            button.update(() -> button.setChecked(holder.get() == item));
 
             if(i++ % 4 == 3){
                 cont.row();
