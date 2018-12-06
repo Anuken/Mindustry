@@ -62,7 +62,7 @@ public class KryoServer implements ServerProvider {
                 c.id = kn.id;
                 c.addressTCP = ip;
 
-                Log.info("&bRecieved connection: {0} / {1}. Kryonet ID: {2}", c.id, c.addressTCP, connection.getID());
+                Log.info("&bRecieved connection: {0}", c.addressTCP);
 
                 connections.add(kn);
                 threads.runDelay(() -> Net.handleServerReceived(kn.id, c));
@@ -75,8 +75,6 @@ public class KryoServer implements ServerProvider {
 
                 Disconnect c = new Disconnect();
                 c.id = k.id;
-
-                Log.info("&bLost connection: {0}", k.id);
 
                 threads.runDelay(() -> {
                     Net.handleServerReceived(k.id, c);

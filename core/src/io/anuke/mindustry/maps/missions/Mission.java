@@ -2,10 +2,8 @@ package io.anuke.mindustry.maps.missions;
 
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
@@ -34,7 +32,7 @@ public abstract class Mission{
     }
 
     public GameMode getMode(){
-        return GameMode.noWaves;
+        return GameMode.attack;
     }
 
     /**Sets the message displayed on mission begin. Returns this mission for chaining.*/

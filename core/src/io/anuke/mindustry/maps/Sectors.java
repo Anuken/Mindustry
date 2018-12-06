@@ -53,7 +53,7 @@ public class Sectors{
             world.loadSector(sector);
             logic.play();
             if(!headless){
-                sector.saveID = control.saves.addSave("sector-" + sector.packedPosition()).index;
+                sector.saveID = control.saves.addSave("sector-" + sector.pos()).index;
             }
             world.sectors.save();
             world.setSector(sector);

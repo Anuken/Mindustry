@@ -50,14 +50,14 @@ public class PowerNode extends PowerBlock{
 
         TileEntity entity = tile.entity();
 
-        if(!entity.power.links.contains(other.packedPosition())){
-            entity.power.links.add(other.packedPosition());
+        if(!entity.power.links.contains(other.pos())){
+            entity.power.links.add(other.pos());
         }
 
         if(other.getTeamID() == tile.getTeamID()){
 
-            if(!other.entity.power.links.contains(tile.packedPosition())){
-                other.entity.power.links.add(tile.packedPosition());
+            if(!other.entity.power.links.contains(tile.pos())){
+                other.entity.power.links.add(tile.pos());
             }
         }
 
@@ -74,8 +74,8 @@ public class PowerNode extends PowerBlock{
         PowerGraph tg = entity.power.graph;
         tg.clear();
 
-        entity.power.links.removeValue(other.packedPosition());
-        other.entity.power.links.removeValue(tile.packedPosition());
+        entity.power.links.removeValue(other.pos());
+        other.entity.power.links.removeValue(tile.pos());
 
         //reflow from this point, covering all tiles on this side
         tg.reflow(tile);
@@ -98,14 +98,14 @@ public class PowerNode extends PowerBlock{
         if(linkValid(tile, before) && before.block() instanceof PowerNode){
             for(Tile near : before.entity.proximity()){
                 if(near.target() == tile){
-                    lastPlaced = tile.packedPosition();
+                    lastPlaced = tile.pos();
                     return;
                 }
             }
             Call.linkPowerNodes(null, tile, before);
         }
 
-        lastPlaced = tile.packedPosition();
+        lastPlaced = tile.pos();
     }
 
     @Override
@@ -201,7 +201,7 @@ public class PowerNode extends PowerBlock{
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));
             if(linkValid(tile, link) && (!(link.block() instanceof PowerNode)
-                || ((tile.block().size > link.block().size) || (tile.block().size == link.block().size && tile.id() < link.id())))){
+                || ((tile.block().size > link.block().size) || (tile.block().size == link.block().size && tile.pos() < link.pos())))){
                 drawLaser(tile, link);
             }
         }
@@ -210,7 +210,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected boolean linked(Tile tile, Tile other){
-        return tile.entity.power.links.contains(other.packedPosition());
+        return tile.entity.power.links.contains(other.pos());
     }
 
     protected boolean linkValid(Tile tile, Tile link){
@@ -226,7 +226,7 @@ public class PowerNode extends PowerBlock{
             return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
                     ((PowerNode) link.block()).laserRange * tilesize)
                     + (link.block().size - 1) * tilesize / 2f + (tile.block().size - 1) * tilesize / 2f &&
-                    (!checkMaxNodes || (oe.power.links.size < ((PowerNode) link.block()).maxNodes || oe.power.links.contains(tile.packedPosition())));
+                    (!checkMaxNodes || (oe.power.links.size < ((PowerNode) link.block()).maxNodes || oe.power.links.contains(tile.pos())));
         }else{
             return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
                     <= laserRange * tilesize + (link.block().size - 1) * tilesize;
@@ -251,7 +251,6 @@ public class PowerNode extends PowerBlock{
         Draw.color(Palette.powerLight, Palette.power, Mathf.absin(Timers.time(), 8f, 1f));
         Lines.stroke(2f);
         Lines.line(x1, y1, x2, y2);
-
     }
 
 }
