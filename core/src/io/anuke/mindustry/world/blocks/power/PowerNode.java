@@ -252,7 +252,6 @@ public class PowerNode extends PowerBlock{
         Draw.color(Palette.powerLight, Palette.power, Mathf.absin(Timers.time(), 8f, 1f));
         Lines.stroke(2f);
         Lines.line(x1, y1, x2, y2);
-
     }
 
 }

@@ -202,7 +202,7 @@ public class OverlayRenderer{
     void drawBar(Color color, float x, float y, float finion){
         finion = Mathf.clamp(finion);
 
-        if(finion > 0) finion = Mathf.clamp(finion + 0.2f, 0.24f, 1f);
+        if(finion > 0) finion = Mathf.clamp(finion, 0.24f, 1f);
 
         float len = 3;
 
