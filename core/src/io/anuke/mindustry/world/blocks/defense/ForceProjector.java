@@ -44,7 +44,7 @@ public class ForceProjector extends Block {
     protected float cooldownBrokenBase = 0.35f;
     protected float basePowerDraw = 0.2f;
     protected float powerDamage = 0.1f;
-    protected final ConsumePower consumePower;
+    protected final ConsumeForceProjectorPower consumePower;
     protected TextureRegion topRegion;
 
 
@@ -58,7 +58,8 @@ public class ForceProjector extends Block {
         hasItems = true;
         itemCapacity = 10;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).optional(true).update(false);
-        consumePower = consumes.powerBuffered(60f);
+        consumePower = new ConsumeForceProjectorPower(60f, 60f);
+        consumes.add(consumePower);
     }
 
     @Override
@@ -104,18 +105,27 @@ public class ForceProjector extends Block {
             Effects.effect(BlockFx.reactorsmoke, tile.drawx() + Mathf.range(tilesize/2f), tile.drawy() + Mathf.range(tilesize/2f));
         }
 
-        // Draw base power from buffer manually (ConsumePower doesn't support both filling a buffer and drawing power additionally so we have to do it here)
-        entity.power.satisfaction -= Math.min(entity.power.satisfaction, basePowerDraw / consumePower.powerCapacity);
+        // Use Cases:
+        // - There is enough power in the buffer, and there are no shots fired => Draw base power and keep shield up
+        // - There is enough power in the buffer, but not enough power to cope for shots being fired => Draw all power and break shield
+        // - There is enough power in the buffer and enough power to cope for shots being fired => Draw base power + additional power based on shots absorbed
+        // - There is not enough base power in the buffer => Draw all power and break shield
+        // - The generator is in the AI base and uses cheat mode => Only draw power from shots being absorbed
 
-        if(entity.power.satisfaction == 0.0f && !cheat){
+        float relativePowerDraw = 0.0f;
+        if(!cheat){
+            relativePowerDraw = basePowerDraw / consumePower.powerCapacity;
+        }
+
+        if(entity.power.satisfaction < relativePowerDraw){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.15f);
+            entity.power.satisfaction = .0f;
             if(entity.warmup <= 0.09f){
                 entity.broken = true;
             }
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.1f);
-            float relativePowerDraw = powerDamage * entity.delta() * (1f + entity.buildup / breakage) / consumePower.powerCapacity;
-            entity.power.satisfaction -= Math.min(relativePowerDraw, entity.power.satisfaction);
+            entity.power.satisfaction -= Math.min(entity.power.satisfaction, relativePowerDraw);
         }
 
         if(entity.buildup > 0){
@@ -150,10 +160,10 @@ public class ForceProjector extends Block {
                 if(trait.canBeAbsorbed() && trait.getTeam() != tile.getTeam() && isInsideHexagon(trait.getX(), trait.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
                     trait.absorb();
                     Effects.effect(BulletFx.absorb, trait);
-                    float relativePowerDraw = trait.getShieldDamage() * powerDamage / consumePower.powerCapacity;
+                    float relativeDamagePowerDraw = trait.getShieldDamage() * powerDamage / consumePower.powerCapacity;
                     entity.hit = 1f;
 
-                    entity.power.satisfaction -= Math.min(relativePowerDraw, entity.power.satisfaction);
+                    entity.power.satisfaction -= Math.min(relativeDamagePowerDraw, entity.power.satisfaction);
                     if(entity.power.satisfaction <= 0.0001f){
                        entity.buildup += trait.getShieldDamage() * entity.warmup * 2f;
                     }
@@ -262,6 +272,16 @@ public class ForceProjector extends Block {
         @Override
         public EntityGroup targetGroup(){
             return shieldGroup;
+        }
+    }
+
+    public class ConsumeForceProjectorPower extends ConsumePower{
+        public ConsumeForceProjectorPower(float powerCapacity, float ticksToFill){
+            super(powerCapacity / ticksToFill, 0.0f, powerCapacity, true);
+        }
+        @Override
+        public boolean valid(Block block, TileEntity entity){
+            return entity.power.satisfaction >= basePowerDraw / powerCapacity && super.valid(block, entity);
         }
     }
 }
