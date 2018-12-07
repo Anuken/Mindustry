@@ -200,6 +200,7 @@ public class OverlayRenderer{
     }
 
     void drawBar(Color color, float x, float y, float finion){
+        if(finion > 0.9f) finion = 1f; //fixes precision errors
         finion = Mathf.clamp(finion);
 
         if(finion > 0) finion = Mathf.clamp(finion, 0.24f, 1f);
