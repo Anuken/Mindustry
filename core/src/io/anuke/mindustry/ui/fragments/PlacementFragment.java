@@ -184,7 +184,7 @@ public class PlacementFragment extends Fragment{
                         categories.addImageButton("icon-" + cat.name(), "clear-toggle",  16*2, () -> {
                             currentCategory = cat;
                             rebuildCategory.run();
-                        }).group(group).update(i -> i.setChecked(group.getChecked() == i));
+                        }).group(group).update(i -> i.setChecked(currentCategory == cat));
 
                         if(cat.ordinal() %2 == 1) categories.row();
                     }
