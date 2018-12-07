@@ -45,7 +45,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public boolean buildLogic(Tile tile, Table table, boolean update) {
+            public boolean buildLogic(Tile tile, Table table, boolean build){
                 return false;
             }
 
@@ -139,8 +139,8 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public boolean buildConfig(Tile tile, Table table, boolean update){
-                if(!update){
+            public boolean buildConfig(Tile tile, Table table, boolean build){
+                if(build){
                     LiquidSourceEntity entity = tile.entity();
 
                     Array<Liquid> items = content.liquids();

@@ -10,7 +10,6 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -204,7 +203,7 @@ public class Conveyor extends Block{
     }
 
     @Override
-    public boolean buildLogic(Tile tile, Table table, boolean update){
+    public boolean buildLogic(Tile tile, Table table, boolean build){
         return false;
     }
 

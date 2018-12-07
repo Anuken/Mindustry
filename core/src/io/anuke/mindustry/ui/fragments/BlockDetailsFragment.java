@@ -68,21 +68,21 @@ public class BlockDetailsFragment extends Fragment{
 
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
-        if(detailsBlock.buildInfo(tile, info)){
+        if(detailsBlock.buildInfo(tile, info, true)){
             showTable(info, "icon-info", group);
-            updateTable(tile, info, () -> detailsBlock.buildInfo(tile, info, true));
+            updateTable(tile, info, () -> detailsBlock.buildInfo(tile, info));
         }
-        if(detailsBlock.buildPower(tile, power)){
+        if(detailsBlock.buildPower(tile, power, true)){
             showTable(power, "icon-power", group);
-            updateTable(tile, power, () -> detailsBlock.buildPower(tile, power, true));
+            updateTable(tile, power, () -> detailsBlock.buildPower(tile, power));
         }
-        if(detailsBlock.buildConfig(tile, config)){
+        if(detailsBlock.buildConfig(tile, config, true)){
             showTable(config, "icon-config", group);
-            updateTable(tile, config, () -> detailsBlock.buildConfig(tile, config, true));
+            updateTable(tile, config, () -> detailsBlock.buildConfig(tile, config));
         }
-        if (detailsBlock.buildLogic(tile, logic)){
+        if (detailsBlock.buildLogic(tile, logic, true)){
             showTable(logic, "icon-logic", group);
-            updateTable(tile, logic, () -> detailsBlock.buildLogic(tile, logic, true));
+            updateTable(tile, logic, () -> detailsBlock.buildLogic(tile, logic));
         }
         detailsBlock.buildTable(tile, table);
 
@@ -136,24 +136,30 @@ public class BlockDetailsFragment extends Fragment{
     private void updateTable(Tile tile, Table table, Runnable runnable){
         table.update(() -> {
             if(state.is(State.menu)){
-                hideDetails();
+                stopUpdate(table);
                 return;
             }
 
             if(detailsTile != null && detailsTile.block().shouldHideDetails(detailsTile, input.player)){
-                hideDetails();
+                stopUpdate(table);
                 return;
             }
 
             if(detailsTile == null || detailsTile.block() == Blocks.air || detailsTile.block() != detailsBlock){
-                hideDetails();
+                stopUpdate(table);
                 return;
             }
+
+            runnable.run();
 
             table.setOrigin(Align.center);
             Vector2 pos = Graphics.screen(tile.drawx(), tile.drawy() - tile.block().size * tilesize / 2f - 1);
             table.setPosition(pos.x, pos.y - this.table.getHeight(), Align.top);
         });
+    }
+
+    private void stopUpdate(Table table){
+        table.forEach(element -> element.update(() -> {}));
     }
 
     public boolean hasDetailsMouse(){
@@ -162,6 +168,7 @@ public class BlockDetailsFragment extends Fragment{
     }
 
     public void hideDetails(){
+        stopUpdate(table);
         detailsTile = null;
         for(Element element : group.getChildren()) element.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.visible(false));
         table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.visible(false));

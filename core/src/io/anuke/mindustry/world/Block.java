@@ -305,9 +305,13 @@ public class Block extends BaseBlock {
     /**
      * Called when this block is tapped to build a info UI on the table.
      */
-    public boolean buildInfo(Tile tile, Table table, boolean update){
-        for(BlockBar bar : bars.list()){
-            table.add(Bundles.format("text.blocks.info." + bar.type.name(), bar.value.getValue(tile), bar.value.getMax(tile))).row();
+    public boolean buildInfo(Tile tile, Table table, boolean build){
+        if(build){
+            for(BlockBar bar : bars.list()){
+                Label label = table.add(Bundles.format("text.blocks.info." + bar.type.name(), bar.value.getValue(tile), bar.value.getMax(tile))).get();
+                label.update(() -> label.setText(Bundles.format("text.blocks.info." + bar.type.name(), bar.value.getValue(tile), bar.value.getMax(tile))));
+                table.row();
+            }
         }
         return !bars.list().isEmpty();
     }
@@ -319,19 +323,36 @@ public class Block extends BaseBlock {
     /**
      * Called when this block is tapped to build a power UI on the table.
      */
-    public boolean buildPower(Tile tile, Table table, boolean update){
-        if(hasPower){
-            ButtonGroup<Button> group = new ButtonGroup<>();
-            for(byte i = 1; i <= 9; i++){
-                TextButton button = table.addButton(String.valueOf(i), "clear", () -> {}).group(group).get();
-                button.setChecked(i == tile.entity.power.priority);
-                button.changed(() -> Call.onPowerPrioritySet(players[0], tile, Byte.parseByte(button.getText().toString())));
+    public boolean buildPower(Tile tile, Table table, boolean build){
+        if(build){
+            if(hasPower){
+                ButtonGroup<Button> group = new ButtonGroup<>();
+                for(byte i = 1; i <= 9; i++){
+                    TextButton button = table.addButton(String.valueOf(i), "clear", () -> {
+                    }).size(16f).group(group).get();
+                    button.setChecked(i == tile.entity.power.priority);
+                    button.changed(() -> Call.onPowerPrioritySet(players[0], tile, Byte.parseByte(button.getText().toString())));
+                    button.setProgrammaticChangeEvents(false);
+                    button.update(() -> button.setChecked(Byte.parseByte(button.getText().toString()) == tile.entity.power.priority));
+                }
+                table.row();
+
+                Label produced = table.add(Bundles.format("text.blocks.power.produced", tile.entity.power.graph.getProduced(), Bundles.get("text.unit.powersecond"))).get();
+                produced.update(() -> produced.setText(Bundles.format("text.blocks.power.produced", tile.entity.power.graph.getProduced(), Bundles.get("text.unit.powersecond"))));
+                table.row();
+
+                Label stored = table.add(Bundles.format("text.blocks.power.stored", tile.entity.power.graph.getStored(), Bundles.get("text.unit.powersecond"))).get();
+                stored.update(() -> stored.setText(Bundles.format("text.blocks.power.stored", tile.entity.power.graph.getStored(), Bundles.get("text.unit.powersecond"))));
+                table.row();
+
+                Label used = table.add(Bundles.format("text.blocks.power.used", tile.entity.power.graph.getUsed(), Bundles.get("text.unit.powersecond"))).get();
+                used.update(() -> used.setText(Bundles.format("text.blocks.power.used", tile.entity.power.graph.getUsed(), Bundles.get("text.unit.powersecond"))));
+                table.row();
+
+                Label charged = table.add(Bundles.format("text.blocks.power.charged", tile.entity.power.graph.getCharged(), Bundles.get("text.unit.powersecond"))).get();
+                charged.update(() -> charged.setText(Bundles.format("text.blocks.power.charged", tile.entity.power.graph.getCharged(), Bundles.get("text.unit.powersecond"))));
+                table.row();
             }
-            table.row();
-            table.add(Bundles.format("text.blocks.power.produced", tile.entity.power.graph.getProduced(), Bundles.get("text.unit.powersecond"))).row();
-            table.add(Bundles.format("text.blocks.power.stored", tile.entity.power.graph.getStored(), Bundles.get("text.unit.powersecond"))).row();
-            table.add(Bundles.format("text.blocks.power.used", tile.entity.power.graph.getUsed(), Bundles.get("text.unit.powersecond"))).row();
-            table.add(Bundles.format("text.blocks.power.charged", tile.entity.power.graph.getCharged(), Bundles.get("text.unit.powersecond"))).row();
         }
         return hasPower;
     }
@@ -349,7 +370,7 @@ public class Block extends BaseBlock {
     /**
      * Called when this block is tapped to build a details UI on the table.
      */
-    public boolean buildConfig(Tile tile, Table table, boolean update){
+    public boolean buildConfig(Tile tile, Table table, boolean build){
         return false;
     }
 
@@ -360,13 +381,11 @@ public class Block extends BaseBlock {
     /**
      * Called when this block is tapped to build a logic UI on the table.
      */
-    public boolean buildLogic(Tile tile, Table table, boolean update){
-        if(!update){
+    public boolean buildLogic(Tile tile, Table table, boolean build){
+        if(build){
             CheckBox check = table.addCheck(Bundles.get("text.blocks.config.enable"), tile.entity.enabled, checked -> {}).get();
             check.setProgrammaticChangeEvents(false);
-            check.update(() -> {
-                if(tile.entity != null) check.setChecked(tile.entity.enabled);
-            });
+            check.update(() -> check.setChecked(tile.entity.enabled));
             check.changed(() -> Call.onEnableSet(players[0], tile, check.isChecked()));
             table.row();
         }

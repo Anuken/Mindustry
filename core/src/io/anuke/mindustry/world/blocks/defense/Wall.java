@@ -20,7 +20,7 @@ public class Wall extends Block{
     }
 
     @Override
-    public boolean buildLogic(Tile tile, Table table, boolean update){
+    public boolean buildLogic(Tile tile, Table table, boolean build){
         return false;
     }
 }

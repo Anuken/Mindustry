@@ -169,7 +169,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public boolean buildLogic(Tile tile, Table table, boolean update) {
+    public boolean buildLogic(Tile tile, Table table, boolean build){
         return false;
     }
 

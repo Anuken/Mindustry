@@ -8,10 +8,8 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.ucore.core.Settings;
@@ -115,7 +113,7 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public boolean buildLogic(Tile tile, Table table, boolean update){
+    public boolean buildLogic(Tile tile, Table table, boolean build){
         return false;
     }
 

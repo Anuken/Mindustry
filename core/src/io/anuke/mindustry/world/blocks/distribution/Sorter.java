@@ -116,8 +116,8 @@ public class Sorter extends Block implements SelectionTrait{
     }
 
     @Override
-    public boolean buildConfig(Tile tile, Table table, boolean update){
-        if(!update){
+    public boolean buildConfig(Tile tile, Table table, boolean build){
+        if(build){
             SorterEntity entity = tile.entity();
             buildItemTable(table, () -> entity.sortItem, item -> {
                 lastItem = item;

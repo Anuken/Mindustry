@@ -77,8 +77,8 @@ public class CommandCenter extends Block{
     }
 
     @Override
-    public boolean buildConfig(Tile tile, Table table, boolean update){
-        if(!update){
+    public boolean buildConfig(Tile tile, Table table, boolean build){
+        if(build){
             CommandCenterEntity entity = tile.entity();
             ButtonGroup<ImageButton> group = new ButtonGroup<>();
             Table buttons = new Table();
