@@ -131,7 +131,7 @@ public class MassDriver extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.powerShot, consumes.get(ConsumePower.class).powerCapacity * powerPercentageUsed, StatUnit.powerUnits);
+        stats.add(BlockStat.powerShot, consumes.getSubtypeOf(ConsumePower.class).powerCapacity * powerPercentageUsed, StatUnit.powerUnits);
     }
 
     @Override
@@ -230,11 +230,11 @@ public class MassDriver extends Block{
 
         MassDriverEntity entity = tile.entity();
 
-        if(entity.link == other.packedPosition()){
+        if(entity.link == other.pos()){
             Call.linkMassDriver(null, tile, -1);
             return false;
         }else if(other.block() instanceof MassDriver && other.distanceTo(tile) <= range){
-            Call.linkMassDriver(null, tile, other.packedPosition());
+            Call.linkMassDriver(null, tile, other.pos());
             return false;
         }
 

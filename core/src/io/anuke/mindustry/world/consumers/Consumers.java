@@ -37,12 +37,12 @@ public class Consumers{
     }
 
     /**
-     * Creates a consumer which directly uses power without buffering it. The module will work while at least 60% of power is supplied.
+     * Creates a consumer which directly uses power without buffering it. The module will work while at least 50% of power is supplied.
      * @param powerPerTick The amount of power which is required each tick for 100% efficiency.
      * @return the created consumer object.
      */
     public ConsumePower powerDirect(float powerPerTick){
-        return powerDirect(powerPerTick, 0.6f);
+        return powerDirect(powerPerTick, 0.5f);
     }
 
     /**
@@ -122,11 +122,29 @@ public class Consumers{
         return map.containsKey(type);
     }
 
+    public boolean hasSubtypeOf(Class<? extends Consume> type){
+        for(Consume consume : all()){
+            if(type.isAssignableFrom(consume.getClass())){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public <T extends Consume> T get(Class<T> type){
         if(!map.containsKey(type)){
             throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "'!");
         }
         return (T) map.get(type);
+    }
+
+    public <T extends Consume> T getSubtypeOf(Class<T> type){
+        for(Consume consume : all()){
+            if(type.isAssignableFrom(consume.getClass())){
+                return (T)consume;
+            }
+        }
+        throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "' or any of its subtypes!");
     }
 
     public Iterable<Consume> all(){

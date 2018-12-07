@@ -48,10 +48,10 @@ public class LiquidBlocks extends BlockList implements ContentList{
         }};
 
         liquidRouter = new LiquidRouter("liquid-router"){{
-            liquidCapacity = 40f;
+            liquidCapacity = 20f;
         }};
 
-        liquidtank = new LiquidRouter("liquid-tank"){{
+        liquidtank = new LiquidTank("liquid-tank"){{
             size = 3;
             liquidCapacity = 1500f;
             health = 500;
@@ -67,7 +67,7 @@ public class LiquidBlocks extends BlockList implements ContentList{
         phaseConduit = new LiquidBridge("phase-conduit"){{
             range = 12;
             hasPower = true;
-            consumes.powerDirect(0.03f);
+            consumes.powerDirect(0.03f, 1.0f);
         }};
     }
 }

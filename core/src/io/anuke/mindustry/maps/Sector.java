@@ -67,7 +67,7 @@ public class Sector{
         return !headless && control.saves.getByID(saveID) != null;
     }
 
-    public int packedPosition(){
+    public int pos(){
         return Bits.packInt(x, y);
     }
 }

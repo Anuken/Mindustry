@@ -73,7 +73,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
 
     /**Returns the puddle on the specified tile. May return null.*/
     public static Puddle getPuddle(Tile tile){
-        return map.get(tile.packedPosition());
+        return map.get(tile.pos());
     }
 
     private static void deposit(Tile tile, Tile source, Liquid liquid, float amount, int generation){
@@ -83,7 +83,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             reactPuddle(tile.floor().liquidDrop, liquid, amount, tile,
                     (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
 
-            Puddle p = map.get(tile.packedPosition());
+            Puddle p = map.get(tile.pos());
 
             if(generation == 0 && p != null && p.lastRipple <= Timers.time() - 40f){
                 Effects.effect(BlockFx.ripple, tile.floor().liquidDrop.color,
@@ -93,7 +93,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             return;
         }
 
-        Puddle p = map.get(tile.packedPosition());
+        Puddle p = map.get(tile.pos());
         if(p == null){
             if(Net.client()) return; //not clientside.
 
@@ -104,7 +104,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             puddle.generation = (byte) generation;
             puddle.set((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
             puddle.add();
-            map.put(tile.packedPosition(), puddle);
+            map.put(tile.pos(), puddle);
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
 
@@ -249,7 +249,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
 
     @Override
     public void writeSave(DataOutput stream) throws IOException{
-        stream.writeInt(tile.packedPosition());
+        stream.writeInt(tile.pos());
         stream.writeFloat(x);
         stream.writeFloat(y);
         stream.writeByte(liquid.id);
@@ -288,7 +288,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
 
     @Override
     public void removed(){
-        map.remove(tile.packedPosition());
+        map.remove(tile.pos());
         reset();
     }
 
@@ -298,7 +298,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
         data.writeFloat(y);
         data.writeByte(liquid.id);
         data.writeShort((short) (amount * 4));
-        data.writeInt(tile.packedPosition());
+        data.writeInt(tile.pos());
     }
 
     @Override
@@ -309,7 +309,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
         targetAmount = data.readShort() / 4f;
         tile = world.tile(data.readInt());
 
-        map.put(tile.packedPosition(), this);
+        map.put(tile.pos(), this);
     }
 
     @Override
