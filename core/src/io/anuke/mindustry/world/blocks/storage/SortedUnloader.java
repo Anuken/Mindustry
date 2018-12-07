@@ -17,12 +17,19 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.threads;
 
 public class SortedUnloader extends Unloader implements SelectionTrait{
     protected float speed = 1f;
+    private static Item lastItem;
 
     public SortedUnloader(String name){
         super(name);
+    }
+
+    @Override
+    public void playerPlaced(Tile tile){
+        threads.runDelay(() -> Call.setSortedUnloaderItem(null, tile, lastItem));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
@@ -65,7 +72,10 @@ public class SortedUnloader extends Unloader implements SelectionTrait{
     public boolean buildConfig(Tile tile, Table table, boolean build){
         if(build){
             SortedUnloaderEntity entity = tile.entity();
-            buildItemTable(table, () -> entity.sortItem, item -> Call.setSortedUnloaderItem(null, tile, item));
+            buildItemTable(table, () -> entity.sortItem, item -> {
+                lastItem = item;
+                Call.setSortedUnloaderItem(null, tile, item);
+            });
         }
         return true;
     }

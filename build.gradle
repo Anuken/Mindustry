@@ -20,11 +20,11 @@ allprojects {
     ext {
         versionNumber = '4'
         versionModifier = 'alpha'
-        versionType = 'official'
+        if (!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         gdxVersion = '1.9.9'
         roboVMVersion = '2.3.0'
-        uCoreVersion = '3dfb820142a0fc583ad19413a24fc5038aa29d89'
+        uCoreVersion = '5871d2d0385370bc937fed3e5e301d6962a50476'
 
         getVersionString = {
             String buildVersion = getBuildVersion()

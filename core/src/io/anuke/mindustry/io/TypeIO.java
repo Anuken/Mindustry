@@ -18,6 +18,7 @@ import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
@@ -52,6 +53,10 @@ public class TypeIO{
 
     @WriteClass(Unit.class)
     public static void writeUnit(ByteBuffer buffer, Unit unit){
+        if(unit.getGroup() == null){
+            buffer.put((byte)-1);
+            return;
+        }
         buffer.put((byte) unit.getGroup().getID());
         buffer.putInt(unit.getID());
     }
@@ -59,6 +64,7 @@ public class TypeIO{
     @ReadClass(Unit.class)
     public static Unit readUnit(ByteBuffer buffer){
         byte gid = buffer.get();
+        if(gid == -1) return null;
         int id = buffer.getInt();
         return (Unit) Entities.getGroup(gid).getByID(id);
     }
@@ -142,13 +148,12 @@ public class TypeIO{
 
     @WriteClass(Tile.class)
     public static void writeTile(ByteBuffer buffer, Tile tile){
-        buffer.putInt(tile == null ? -1 : tile.packedPosition());
+        buffer.putInt(tile == null ? Pos.get(-1, -1) : tile.pos());
     }
 
     @ReadClass(Tile.class)
     public static Tile readTile(ByteBuffer buffer){
-        int position = buffer.getInt();
-        return position == -1 ? null : world.tile(position);
+        return world.tile(buffer.getInt());
     }
 
     @WriteClass(Block.class)
@@ -166,7 +171,7 @@ public class TypeIO{
         buffer.putShort((short)requests.length);
         for(BuildRequest request : requests){
             buffer.put(request.breaking ? (byte) 1 : 0);
-            buffer.putInt(world.toPacked(request.x, request.y));
+            buffer.putInt(Pos.get(request.x, request.y));
             if(!request.breaking){
                 buffer.put(request.recipe.id);
                 buffer.put((byte) request.rotation);
@@ -184,11 +189,11 @@ public class TypeIO{
             BuildRequest currentRequest;
 
             if(type == 1){ //remove
-                currentRequest = new BuildRequest(position % world.width(), position / world.width());
+                currentRequest = new BuildRequest(Pos.x(position), Pos.y(position));
             }else{ //place
                 byte recipe = buffer.get();
                 byte rotation = buffer.get();
-                currentRequest = new BuildRequest(position % world.width(), position / world.width(), rotation, content.recipe(recipe));
+                currentRequest = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.recipe(recipe));
             }
 
             reqs[i] = (currentRequest);

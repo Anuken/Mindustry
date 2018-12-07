@@ -47,7 +47,8 @@ public class StatusEffects implements ContentList{
         freezing = new StatusEffect(5 * 60f){
             {
                 oppositeScale = 0.4f;
-                speedMultiplier = 0.5f;
+                speedMultiplier = 0.6f;
+                armorMultiplier = 0.8f;
             }
 
             @Override

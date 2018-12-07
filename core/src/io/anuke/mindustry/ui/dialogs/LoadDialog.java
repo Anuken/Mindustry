@@ -161,6 +161,7 @@ public class LoadDialog extends FloatingDialog{
                         control.saves.importSave(file);
                         setup();
                     }catch(IOException e){
+                        e.printStackTrace();
                         ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
                     }
                 }else{
