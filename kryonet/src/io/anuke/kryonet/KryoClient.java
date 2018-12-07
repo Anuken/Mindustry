@@ -35,14 +35,14 @@ public class KryoClient implements ClientProvider{
     public KryoClient(){
         KryoCore.init();
 
-        handler = new ClientDiscoveryHandler() {
+        handler = new ClientDiscoveryHandler(){
             @Override
-            public DatagramPacket onRequestNewDatagramPacket() {
+            public DatagramPacket onRequestNewDatagramPacket(){
                 return new DatagramPacket(new byte[128], 128);
             }
 
             @Override
-            public void onDiscoveredHost(DatagramPacket datagramPacket) {
+            public void onDiscoveredHost(DatagramPacket datagramPacket){
                 ByteBuffer buffer = ByteBuffer.wrap(datagramPacket.getData());
                 Host host = NetworkIO.readServerData(datagramPacket.getAddress().getHostAddress(), buffer);
                 for(InetAddress address : foundAddresses){
@@ -55,7 +55,7 @@ public class KryoClient implements ClientProvider{
             }
 
             @Override
-            public void onFinally() {
+            public void onFinally(){
 
             }
         };
@@ -65,7 +65,7 @@ public class KryoClient implements ClientProvider{
 
         Listener listener = new Listener(){
             @Override
-            public void connected (Connection connection) {
+            public void connected(Connection connection){
                 Connect c = new Connect();
                 c.addressTCP = connection.getRemoteAddressTCP().getAddress().getHostAddress();
                 c.id = connection.getID();
@@ -75,7 +75,7 @@ public class KryoClient implements ClientProvider{
             }
 
             @Override
-            public void disconnected (Connection connection) {
+            public void disconnected(Connection connection){
                 if(connection.getLastProtocolError() != null){
                     netClient.setQuiet();
                 }
@@ -85,13 +85,13 @@ public class KryoClient implements ClientProvider{
             }
 
             @Override
-            public void received (Connection connection, Object object) {
+            public void received(Connection connection, Object object){
                 if(object instanceof FrameworkMessage) return;
 
                 threads.runDelay(() -> {
                     try{
                         Net.handleClientReceived(object);
-                    }catch (Exception e){
+                    }catch(Exception e){
                         handleException(e);
                     }
                 });
@@ -106,12 +106,12 @@ public class KryoClient implements ClientProvider{
         }
     }
 
-    private static boolean isLocal(InetAddress addr) {
-        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) return true;
+    private static boolean isLocal(InetAddress addr){
+        if(addr.isAnyLocalAddress() || addr.isLoopbackAddress()) return true;
 
-        try {
+        try{
             return NetworkInterface.getByInetAddress(addr) != null;
-        } catch (Exception e) {
+        }catch(Exception e){
             return false;
         }
     }
@@ -150,12 +150,12 @@ public class KryoClient implements ClientProvider{
     }
 
     @Override
-    public void disconnect() {
+    public void disconnect(){
         client.close();
     }
 
     @Override
-    public void send(Object object, SendMode mode) {
+    public void send(Object object, SendMode mode){
         if(mode == SendMode.tcp){
             client.sendTCP(object);
         }else{
@@ -166,12 +166,12 @@ public class KryoClient implements ClientProvider{
     }
 
     @Override
-    public void updatePing() {
+    public void updatePing(){
         client.updateReturnTripTime();
     }
 
     @Override
-    public int getPing() {
+    public int getPing(){
         return client.getReturnTripTime();
     }
 
@@ -218,7 +218,7 @@ public class KryoClient implements ClientProvider{
     public void dispose(){
         try{
             client.dispose();
-        }catch (IOException e){
+        }catch(IOException e){
             throw new RuntimeException(e);
         }
     }
