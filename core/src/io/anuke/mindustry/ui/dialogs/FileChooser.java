@@ -198,7 +198,7 @@ public class FileChooser extends FloatingDialog{
         //macs are confined to the Downloads/ directory
         if(!OS.isMac){
             Image upimage = new Image("icon-folder-parent");
-            TextButton upbutton = new TextButton(".." + directory.toString(), "clear");
+            TextButton upbutton = new TextButton(".." + directory.toString(), "clear-toggle");
             upbutton.clicked(() -> {
                 directory = directory.parent();
                 updateFiles(true);
@@ -220,7 +220,7 @@ public class FileChooser extends FloatingDialog{
 
             String filename = file.name();
 
-            TextButton button = new TextButton(shorten(filename), "clear");
+            TextButton button = new TextButton(shorten(filename), "clear-toggle");
             group.add(button);
 
             button.clicked(() -> {
