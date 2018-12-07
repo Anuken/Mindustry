@@ -67,7 +67,7 @@ public class LiquidBlocks extends BlockList implements ContentList{
         phaseConduit = new LiquidBridge("phase-conduit"){{
             range = 12;
             hasPower = true;
-            consumes.powerDirect(0.03f);
+            consumes.powerDirect(0.03f, 1.0f);
         }};
     }
 }
