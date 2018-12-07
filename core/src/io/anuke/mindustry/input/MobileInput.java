@@ -598,6 +598,10 @@ public class MobileInput extends InputHandler implements GestureListener{
             showGuide("construction");
         }
 
+        if(recipe == null && mode == placing){
+            mode = none;
+        }
+
         //automatically switch to placing after a new recipe is selected
         if(lastRecipe != recipe && mode == breaking && recipe != null){
             mode = placing;

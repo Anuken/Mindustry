@@ -154,6 +154,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         }
     }
 
+    public boolean damaged(){
+        return health < maxHealth() - 0.00001f;
+    }
+
     public Tile getTile(){
         return tile;
     }

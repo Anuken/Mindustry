@@ -127,6 +127,7 @@ public class Saves{
         saveMap.put(slot.index, slot);
         slot.meta = SaveIO.getData(slot.index);
         current = slot;
+        slot.meta.sector = invalidSector;
         saveSlots();
         return slot;
     }

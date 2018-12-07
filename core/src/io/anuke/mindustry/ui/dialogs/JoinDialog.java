@@ -268,6 +268,7 @@ public class JoinDialog extends FloatingDialog{
         if(totalHosts == 0){
             local.clear();
         }
+        local.background((Drawable) null);
         totalHosts ++;
         float w = targetWidth();
 

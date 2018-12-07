@@ -73,7 +73,7 @@ public class TurretBullets extends BulletList implements ContentList{
                 super.hit(b);
                 tile = tile.target();
 
-                if(tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
+                if(tile != null && tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
                     Effects.effect(BlockFx.healBlockFull, Palette.heal, tile.drawx(), tile.drawy(), tile.block().size);
                     tile.entity.healBy(healPercent / 100f * tile.entity.maxHealth());
                 }

@@ -16,6 +16,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Build;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
@@ -27,7 +28,10 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Angles;
+import io.anuke.ucore.util.Geometry;
+import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Translator;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -72,7 +76,7 @@ public interface BuilderTrait extends Entity{
 
         if(request != null){
             output.writeByte(request.breaking ? 1 : 0);
-            output.writeInt(world.toPacked(request.x, request.y));
+            output.writeInt(Pos.get(request.x, request.y));
             output.writeFloat(request.progress);
             if(!request.breaking){
                 output.writeByte(request.recipe.id);
@@ -96,13 +100,13 @@ public interface BuilderTrait extends Entity{
             float progress = input.readFloat();
             BuildRequest request;
 
-            if(type == 1){ //remove
-                request = new BuildRequest(position % world.width(), position / world.width());
-            }else{ //place
-                byte recipe = input.readByte();
-                byte rotation = input.readByte();
-                request = new BuildRequest(position % world.width(), position / world.width(), rotation, content.recipe(recipe));
-            }
+                if(type == 1){ //remove
+                    request = new BuildRequest(Pos.x(position), Pos.y(position));
+                }else{ //place
+                    byte recipe = input.readByte();
+                    byte rotation = input.readByte();
+                    request = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.recipe(recipe));
+                }
 
             request.progress = progress;
 

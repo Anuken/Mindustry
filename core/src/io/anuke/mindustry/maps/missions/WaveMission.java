@@ -74,7 +74,7 @@ public class WaveMission extends MissionWithStartingCore{
     @Override
     public void update(){
         if(state.wave > target){
-            state.mode = GameMode.noWaves;
+            state.mode = GameMode.attack;
         }
     }
 

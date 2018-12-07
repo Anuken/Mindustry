@@ -567,16 +567,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
             button.getImage().remove();
             button.update(() -> button.setChecked(editor.getDrawBlock() == block));
             group.add(button);
-            content.add(button).size(60f);
+            content.add(button).size(50f);
 
-            if(i++ % 3 == 2){
+            if(++i % 4 == 0){
                 content.row();
             }
         }
 
         group.getButtons().get(2).setChecked(true);
 
-        table.table("underline", extra -> extra.labelWrap(() -> editor.getDrawBlock().formalName).width(220f).center()).growX();
+        table.table("underline", extra -> extra.labelWrap(() -> editor.getDrawBlock().formalName).width(200f).center()).growX();
         table.row();
         table.add(pane).growY().fillX();
     }

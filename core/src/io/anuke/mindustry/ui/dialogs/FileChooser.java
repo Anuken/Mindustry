@@ -38,10 +38,6 @@ public class FileChooser extends FloatingDialog{
     private Consumer<FileHandle> selectListener;
     private boolean open;
 
-    public FileChooser(String title, boolean open, Consumer<FileHandle> result){
-        this(title, defaultFilter, open, result);
-    }
-
     public FileChooser(String title, Predicate<FileHandle> filter, boolean open, Consumer<FileHandle> result){
         super(title);
         this.open = open;
@@ -127,7 +123,7 @@ public class FileChooser extends FloatingDialog{
             updateFiles(true);
         });
 
-        icontable.defaults().height(50).growX().uniform();
+        icontable.defaults().height(50).growX().padTop(5).uniform();
         icontable.add(home);
         icontable.add(back);
         icontable.add(forward);
@@ -202,7 +198,7 @@ public class FileChooser extends FloatingDialog{
         //macs are confined to the Downloads/ directory
         if(!OS.isMac){
             Image upimage = new Image("icon-folder-parent");
-            TextButton upbutton = new TextButton(".." + directory.toString());
+            TextButton upbutton = new TextButton(".." + directory.toString(), "clear-toggle");
             upbutton.clicked(() -> {
                 directory = directory.parent();
                 updateFiles(true);
@@ -224,7 +220,7 @@ public class FileChooser extends FloatingDialog{
 
             String filename = file.name();
 
-            TextButton button = new TextButton(shorten(filename), "toggle");
+            TextButton button = new TextButton(shorten(filename), "clear-toggle");
             group.add(button);
 
             button.clicked(() -> {
