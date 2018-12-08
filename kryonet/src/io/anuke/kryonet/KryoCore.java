@@ -10,8 +10,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static io.anuke.mindustry.Vars.headless;
 
-/**Utilities and configs for kryo module.*/
-public class KryoCore {
+/** Utilities and configs for kryo module. */
+public class KryoCore{
     public static boolean fakeLag = false;
     public static final int fakeLagMax = 500;
     public static final int fakeLagMin = 0;
@@ -26,7 +26,7 @@ public class KryoCore {
         Log.set(fakeLag ? Log.LEVEL_DEBUG : Log.LEVEL_WARN);
 
         Log.setLogger(new Logger(){
-            public void log (int level, String category, String message, Throwable ex) {
+            public void log(int level, String category, String message, Throwable ex){
                 if(fakeLag){
                     if(message.contains("UDP")){
                         lastUDP = true;
@@ -45,7 +45,7 @@ public class KryoCore {
 
                 builder.append(message);
 
-                if (ex != null) {
+                if(ex != null){
                     StringWriter writer = new StringWriter(256);
                     ex.printStackTrace(new PrintWriter(writer));
                     builder.append('\n');
@@ -60,7 +60,7 @@ public class KryoCore {
         });
     }
 
-    private static int calculateLag() {
-        return fakeLagMin + (int)(Math.random() * (fakeLagMax - fakeLagMin));
+    private static int calculateLag(){
+        return fakeLagMin + (int) (Math.random() * (fakeLagMax - fakeLagMin));
     }
 }
