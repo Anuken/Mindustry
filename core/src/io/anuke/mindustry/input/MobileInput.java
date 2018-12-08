@@ -221,17 +221,17 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }).update(l -> l.setChecked(mode == breaking));
 
-        //rotate button
-        table.addImageButton("icon-arrow", "clear-partial", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
-        .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center))
-        .visible(() -> recipe != null && recipe.result.rotate);
-
         //cancel button
         table.addImageButton("icon-cancel", "clear-partial", 16 * 2f, () -> {
             player.clearBuilding();
             mode = none;
             recipe = null;
         }).visible(() -> player.isBuilding() || recipe != null || mode == breaking);
+
+        //rotate button
+        table.addImageButton("icon-arrow", "clear-partial", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
+        .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center))
+        .visible(() -> recipe != null && recipe.result.rotate);
 
         //confirm button
         table.addImageButton("icon-check", "clear-partial", 16 * 2f, () -> {
