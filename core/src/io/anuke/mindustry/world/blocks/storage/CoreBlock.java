@@ -83,6 +83,11 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
+    public int getMaximumAccepted(Tile tile, Item item){
+        return itemCapacity * state.teams.get(tile.getTeam()).cores.size;
+    }
+
+    @Override
     public void onProximityUpdate(Tile tile) {
         for(Tile other : state.teams.get(tile.getTeam()).cores){
             if(other != tile){
@@ -100,6 +105,11 @@ public class CoreBlock extends StorageBlock{
     @Override
     public void removed(Tile tile){
         state.teams.get(tile.getTeam()).cores.remove(tile);
+
+        int max = itemCapacity * state.teams.get(tile.getTeam()).cores.size;
+        for(Item item : content.items()){
+            tile.entity.items.set(item, Math.min(tile.entity.items.get(item), max));
+        }
     }
 
     @Override

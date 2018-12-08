@@ -15,7 +15,7 @@ public abstract class StorageBlock extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return tile.entity.items.get(item) < itemCapacity;
+        return tile.entity.items.get(item) < getMaximumAccepted(tile, item);
     }
 
     @Override
