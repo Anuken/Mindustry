@@ -75,7 +75,7 @@ public class PowerGraph{
         modifiedConsumers.add(null);
         for(Tile consumer : modifiedConsumers){
             if(!hasPower) break;
-            if(!currentConsumers.isEmpty() || consumer == null || consumer.entity.power.priority != priority){
+            if(!currentConsumers.isEmpty() && (consumer == null || consumer.entity.power.priority != priority)){
                 if(hasPower = localStored > currentUsed){
                     for(Tile currentConsumer : currentConsumers){
                         if(currentConsumer.block().outputsPower) charged += currentConsumer.block().powerCapacity;

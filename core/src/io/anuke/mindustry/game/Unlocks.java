@@ -26,7 +26,7 @@ public class Unlocks{
 
         ObjectSet<String> set = unlocked.get(content.getContentType());
 
-        return true || set.contains(content.getContentName());
+        return set.contains(content.getContentName());
     }
 
     /**
