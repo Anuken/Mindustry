@@ -118,11 +118,6 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void update(Tile tile){
-        tile.entity.power.graph.update();
-    }
-
-    @Override
     public boolean onDetailsTileTapped(Tile tile, Tile other){
         TileEntity entity = tile.entity();
         other = other.target();

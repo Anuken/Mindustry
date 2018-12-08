@@ -35,8 +35,6 @@ public abstract class ItemLiquidGenerator extends ItemGenerator{
     public void update(Tile tile){
         ItemGeneratorEntity entity = tile.entity();
 
-        entity.power.graph.update();
-
         Liquid liquid = null;
         for(Liquid other : content.liquids()){
             if(entity.liquids.get(other) >= 0.001f && getLiquidEfficiency(other) >= minLiquidEfficiency){

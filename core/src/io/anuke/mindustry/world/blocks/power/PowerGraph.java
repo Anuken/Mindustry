@@ -24,6 +24,7 @@ public class PowerGraph{
     private float produced = 0f;
     private float stored = 0f;
     private float used = 0f;
+    private float change = 0f;
     private float charged = 0f;
 
     private long lastFrameUpdated;
@@ -39,59 +40,55 @@ public class PowerGraph{
     }
 
     public void update(){
-        if(threads.getFrameID() == lastFrameUpdated || consumers.size == 0 || producers.size == 0){
+        if(threads.getFrameID() == lastFrameUpdated || (consumers.isEmpty() && producers.isEmpty())){
             return;
         }
 
         lastFrameUpdated = threads.getFrameID();
 
-        produced = 0f;
-        stored = 0f;
+        // produced = 0f;
+        // stored = 0f;
         used = 0f;
+        // change = 0f;
         charged = 0f;
 
+        float newStored = 0f;
         // Gather power.
         ObjectSet<Tile> storage = new ObjectSet<>();
+        ObjectSet<Tile> realProducers = new ObjectSet<>();
         for(Tile producer : producers){
             if(producer.block().consumesPower){
                 storage.add(producer);
-                stored += producer.entity.power.amount;
-            }else produced += producer.entity.power.amount;
+            }else{
+                realProducers.add(producer);
+            }
+            newStored += producer.entity.power.amount;
         }
 
         // Distribute power.
-        boolean hasPower = true;
+        boolean hasPower = !producers.isEmpty();
         byte priority = 9;
-        float localProduced = produced;
-        float localStored = stored;
+        float localStored = newStored;
         float currentUsed = 0f;
         ObjectSet<Tile> currentConsumers = new ObjectSet<>();
         Array<Tile> modifiedConsumers = new Array<>(consumers);
         modifiedConsumers.add(null);
-        for(Tile consumer : consumers){
+        for(Tile consumer : modifiedConsumers){
             if(!hasPower) break;
-            if(consumer == null || consumer.entity.power.priority != priority){
-                if(localProduced > currentUsed){
+            if(!currentConsumers.isEmpty() || consumer == null || consumer.entity.power.priority != priority){
+                if(hasPower = localStored > currentUsed){
                     for(Tile currentConsumer : currentConsumers){
                         if(currentConsumer.block().outputsPower) charged += currentConsumer.block().powerCapacity;
                         currentConsumer.entity.power.amount = currentConsumer.block().powerCapacity;
                     }
                     used += currentUsed;
-                    localProduced -= currentUsed;
-                }else if(hasPower = localProduced + localStored > currentUsed){
-                    for(Tile currentConsumer : currentConsumers){
-                        if(currentConsumer.block().outputsPower) charged += currentConsumer.block().powerCapacity;
-                        currentConsumer.entity.power.amount = currentConsumer.block().powerCapacity;
-                    }
-                    used += currentUsed;
-                    localProduced = 0f;
-                    localStored -= currentUsed - localProduced;
+                    localStored -= currentUsed;
                 }else{
                     float fill = localStored / currentUsed;
                     for(Tile currentConsumer : currentConsumers){
                         float amount = (currentConsumer.block().powerCapacity - currentConsumer.entity.power.amount) * fill;
                         if(currentConsumer.block().outputsPower) charged += amount;
-                        currentConsumer.entity.power.amount = amount;
+                        currentConsumer.entity.power.amount += amount;
                     }
                     used += currentUsed * fill;
                     // localStored = 0f;
@@ -107,13 +104,11 @@ public class PowerGraph{
 
         // Remove power.
         float localUsed = used;
-        for(Tile producer : producers){
+        for(Tile producer : realProducers){
             if(localUsed <= 0f) break;
-            if(!producer.block().consumesPower){
-                float amount = Math.min(producer.entity.power.amount, localUsed);
-                producer.entity.power.amount -= amount;
-                localUsed -= amount;
-            }
+            float amount = Math.min(producer.entity.power.amount, localUsed);
+            producer.entity.power.amount -= amount;
+            localUsed -= amount;
         }
         for(Tile producer : storage){
             if(localUsed <= 0f) break;
@@ -121,6 +116,12 @@ public class PowerGraph{
             producer.entity.power.amount -= amount;
             localUsed -= amount;
         }
+
+        // Calculate variables.
+        used -= charged;
+        change = newStored - stored;
+        produced = change + used;
+        stored = newStored;
     }
 
     public void add(PowerGraph graph){
@@ -211,6 +212,10 @@ public class PowerGraph{
 
     public float getUsed(){
         return used;
+    }
+
+    public float getChange(){
+        return change;
     }
 
     public float getCharged(){

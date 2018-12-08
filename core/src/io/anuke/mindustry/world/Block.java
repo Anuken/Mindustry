@@ -143,9 +143,7 @@ public class Block extends BaseBlock {
     }
 
     public void onProximityRemoved(Tile tile){
-        if(tile.entity.power != null){
-            tile.block().powerGraphRemoved(tile);
-        }
+        if(tile.entity.power != null) tile.block().powerGraphRemoved(tile);
     }
 
     public void onProximityAdded(Tile tile){
@@ -309,8 +307,8 @@ public class Block extends BaseBlock {
         if(build){
             for(BlockBar bar : bars.list()){
                 if(bar.type == BarType.inventory) continue;
-                Label label = table.add(Bundles.format("text.blocks.info." + bar.type.name(), bar.value.getValue(tile), bar.value.getMax(tile))).get();
-                label.update(() -> label.setText(Bundles.format("text.blocks.info." + bar.type.name(), bar.value.getValue(tile), bar.value.getMax(tile))));
+                Label label = table.add(Bundles.format("text.blocks.info." + bar.type.name(), (float)Math.round(bar.value.getValue(tile) * 100f) / 100f, bar.value.getMax(tile))).get();
+                label.update(() -> label.setText(Bundles.format("text.blocks.info." + bar.type.name(), (float)Math.round(bar.value.getValue(tile) * 100f) / 100f, bar.value.getMax(tile))));
                 table.row();
             }
         }
@@ -328,30 +326,36 @@ public class Block extends BaseBlock {
         if(build){
             if(hasPower){
                 ButtonGroup<Button> group = new ButtonGroup<>();
-                for(byte i = 1; i <= 9; i++){
-                    TextButton button = table.addButton(String.valueOf(i), "clear", () -> {
-                    }).size(16f).group(group).get();
-                    button.setChecked(i == tile.entity.power.priority);
-                    button.changed(() -> Call.onPowerPrioritySet(players[0], tile, Byte.parseByte(button.getText().toString())));
-                    button.setProgrammaticChangeEvents(false);
-                    button.update(() -> button.setChecked(Byte.parseByte(button.getText().toString()) == tile.entity.power.priority));
+                group.setMinCheckCount(1);
+                if(consumesPower){
+                    for(byte i = 1; i <= 9; i++){
+                        TextButton button = table.addButton(String.valueOf(i), "toggle", () -> {}).size(16f).group(group).get();
+                        button.setChecked(i == tile.entity.power.priority);
+                        button.changed(() -> Call.onPowerPrioritySet(players[0], tile, Byte.parseByte(button.getText().toString())));
+                        button.setProgrammaticChangeEvents(false);
+                        button.update(() -> button.setChecked(Byte.parseByte(button.getText().toString()) == tile.entity.power.priority));
+                    }
+                    table.row();
                 }
+
+                Label produced = table.add(Bundles.format("text.blocks.power.produced", (float)Math.round(tile.entity.power.graph.getProduced() * 100f) / 100f, Bundles.get("text.unit.powersecond"))).get();
+                produced.update(() -> produced.setText(Bundles.format("text.blocks.power.produced", (float)Math.round(tile.entity.power.graph.getProduced() * 100f) / 100f, Bundles.get("text.unit.powersecond"))));
                 table.row();
 
-                Label produced = table.add(Bundles.format("text.blocks.power.produced", tile.entity.power.graph.getProduced(), Bundles.get("text.unit.powersecond"))).get();
-                produced.update(() -> produced.setText(Bundles.format("text.blocks.power.produced", tile.entity.power.graph.getProduced(), Bundles.get("text.unit.powersecond"))));
+                Label stored = table.add(Bundles.format("text.blocks.power.stored", (float)Math.round(tile.entity.power.graph.getStored() * 100f) / 100f, Bundles.get("text.unit.powerunits"))).get();
+                stored.update(() -> stored.setText(Bundles.format("text.blocks.power.stored", (float)Math.round(tile.entity.power.graph.getStored() * 100f) / 100f, Bundles.get("text.unit.powerunits"))));
                 table.row();
 
-                Label stored = table.add(Bundles.format("text.blocks.power.stored", tile.entity.power.graph.getStored(), Bundles.get("text.unit.powersecond"))).get();
-                stored.update(() -> stored.setText(Bundles.format("text.blocks.power.stored", tile.entity.power.graph.getStored(), Bundles.get("text.unit.powersecond"))));
+                Label used = table.add(Bundles.format("text.blocks.power.used", (float)Math.round(tile.entity.power.graph.getUsed() * 100f) / 100f, Bundles.get("text.unit.powersecond"))).get();
+                used.update(() -> used.setText(Bundles.format("text.blocks.power.used", (float)Math.round(tile.entity.power.graph.getUsed() * 100f) / 100f, Bundles.get("text.unit.powersecond"))));
                 table.row();
 
-                Label used = table.add(Bundles.format("text.blocks.power.used", tile.entity.power.graph.getUsed(), Bundles.get("text.unit.powersecond"))).get();
-                used.update(() -> used.setText(Bundles.format("text.blocks.power.used", tile.entity.power.graph.getUsed(), Bundles.get("text.unit.powersecond"))));
+                Label change = table.add(Bundles.format("text.blocks.power.change", (float)Math.round(tile.entity.power.graph.getChange() * 100f) / 100f, Bundles.get("text.unit.powersecond"))).get();
+                change.update(() -> change.setText(Bundles.format("text.blocks.power.change", (float)Math.round(tile.entity.power.graph.getChange() * 100f) / 100f, Bundles.get("text.unit.powersecond"))));
                 table.row();
 
-                Label charged = table.add(Bundles.format("text.blocks.power.charged", tile.entity.power.graph.getCharged(), Bundles.get("text.unit.powersecond"))).get();
-                charged.update(() -> charged.setText(Bundles.format("text.blocks.power.charged", tile.entity.power.graph.getCharged(), Bundles.get("text.unit.powersecond"))));
+                Label charged = table.add(Bundles.format("text.blocks.power.charged", (float)Math.round(tile.entity.power.graph.getCharged() * 100f) / 100f, Bundles.get("text.unit.powersecond"))).get();
+                charged.update(() -> charged.setText(Bundles.format("text.blocks.power.charged", (float)Math.round(tile.entity.power.graph.getCharged() * 100f) / 100f, Bundles.get("text.unit.powersecond"))));
                 table.row();
             }
         }

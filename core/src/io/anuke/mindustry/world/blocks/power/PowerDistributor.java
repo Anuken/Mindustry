@@ -10,9 +10,4 @@ public class PowerDistributor extends PowerBlock{
         consumesPower = false;
         outputsPower = true;
     }
-
-    @Override
-    public void update(Tile tile){
-        tile.entity.power.graph.update();
-    }
 }

@@ -94,8 +94,6 @@ public abstract class ItemGenerator extends PowerGenerator{
             entity.generateTime = 1f;
         }
 
-        entity.power.graph.update();
-
         if(entity.generateTime > 0f){
             entity.generateTime -= 1f / itemDuration * entity.delta();
             entity.power.amount += maxPower;

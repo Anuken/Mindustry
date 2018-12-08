@@ -11,16 +11,18 @@ public class ConsumeModule extends BlockModule{
     private boolean valid;
 
     public void update(TileEntity entity){
-        boolean prevValid = valid;
-        valid = true;
+        if(entity.enabled){
+            boolean prevValid = valid;
+            valid = true;
 
-        for(Consume cons : entity.tile.block().consumes.all()){
-            if(cons.isUpdate() && prevValid && entity.tile.block().shouldConsume(entity.tile) && cons.valid(entity.getTile().block(), entity)){
-                cons.update(entity.getTile().block(), entity);
-            }
+            for(Consume cons : entity.tile.block().consumes.all()){
+                if(cons.isUpdate() && prevValid && entity.tile.block().shouldConsume(entity.tile) && cons.valid(entity.getTile().block(), entity)){
+                    cons.update(entity.getTile().block(), entity);
+                }
 
-            if(!cons.isOptional()){
-                valid &= cons.valid(entity.getTile().block(), entity);
+                if(!cons.isOptional()){
+                    valid &= cons.valid(entity.getTile().block(), entity);
+                }
             }
         }
     }

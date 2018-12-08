@@ -27,8 +27,6 @@ public class SolarGenerator extends PowerGenerator{
     @Override
     public void update(Tile tile){
         addPower(tile, generation * Timers.delta());
-
-        tile.entity.power.graph.update();
     }
 
 }

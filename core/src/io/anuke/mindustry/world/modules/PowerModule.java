@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.modules;
 
 import com.badlogic.gdx.utils.IntArray;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.blocks.power.PowerGraph;
 
 import java.io.DataInput;
@@ -8,10 +9,15 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class PowerModule extends BlockModule{
-    public float amount;
+    // Initialization is required to prevent blocks from having NaN power and sucks all the power away.
+    public float amount = 0f;
     public byte priority = 5;
     public PowerGraph graph = new PowerGraph();
     public IntArray links = new IntArray();
+
+    public void update(TileEntity entity){
+        graph.update();
+    }
 
     @Override
     public void write(DataOutput stream) throws IOException{
@@ -27,9 +33,6 @@ public class PowerModule extends BlockModule{
     @Override
     public void read(DataInput stream) throws IOException{
         amount = stream.readFloat();
-        if(Float.isNaN(amount)){
-            amount = 0f;
-        }
         // Workaround: If power went negative for some reason, at least fix it when reloading the map
         if(amount < 0f){
             amount = 0f;
