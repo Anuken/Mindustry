@@ -67,28 +67,8 @@ public class NuclearReactor extends PowerGenerator{
     @Override
     public void setBars(){
         super.setBars();
-        bars.replace(new BlockBar(BarType.inventory, true, new BlockBar.ValueSupplier(){
-            @Override
-            public float getValue(Tile tile) {
-                return tile.entity.items.get(consumes.item());
-            }
-
-            @Override
-            public float getMax(Tile tile) {
-                return itemCapacity;
-            }
-        }));
-        bars.replace(new BlockBar(BarType.inventory, true, new BlockBar.ValueSupplier(){
-            @Override
-            public float getValue(Tile tile) {
-                return tile.<NuclearReactorEntity>entity().heat;
-            }
-
-            @Override
-            public float getMax(Tile tile) {
-                return 1;
-            }
-        }));
+        bars.replace(new BlockBar(BarType.inventory, true, new BlockBar.Value(tile -> tile.entity.items.get(consumes.item()), tile -> itemCapacity)));
+        bars.replace(new BlockBar(BarType.inventory, true, new BlockBar.Value(tile -> tile.<NuclearReactorEntity>entity().heat, tile -> 1f)));
     }
 
     @Override

@@ -106,17 +106,7 @@ public class BuildBlock extends Block{
 
     @Override
     public void setBars(){
-        bars.replace(new BlockBar(BarType.health, true, new BlockBar.ValueSupplier(){
-            @Override
-            public float getValue(Tile tile) {
-                return tile.<BuildEntity>entity().progress;
-            }
-
-            @Override
-            public float getMax(Tile tile) {
-                return 1;
-            }
-        }));
+        bars.replace(new BlockBar(BarType.health, true, new BlockBar.Value(tile -> tile.<BuildEntity>entity().progress, tile -> 1f)));
     }
 
     @Override

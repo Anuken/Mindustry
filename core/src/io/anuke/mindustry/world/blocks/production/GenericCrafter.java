@@ -41,19 +41,7 @@ public class GenericCrafter extends Block{
     @Override
     public void setBars(){
         super.setBars();
-
-        if(consumes.has(ConsumeItem.class))
-            bars.replace(new BlockBar(BarType.inventory, true, new BlockBar.ValueSupplier(){
-                @Override
-                public float getValue(Tile tile) {
-                    return tile.entity.items.get(consumes.item());
-                }
-
-                @Override
-                public float getMax(Tile tile) {
-                    return itemCapacity;
-                }
-            }));
+        if(consumes.has(ConsumeItem.class)) bars.replace(new BlockBar(BarType.inventory, true, new BlockBar.Value(tile -> tile.entity.items.get(consumes.item()), tile -> itemCapacity)));
     }
 
     @Override

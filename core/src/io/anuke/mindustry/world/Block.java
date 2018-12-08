@@ -452,54 +452,10 @@ public class Block extends BaseBlock {
     }
 
     public void setBars(){
-        if(hasEntity())
-            bars.add(new BlockBar(BarType.health, false, new BlockBar.ValueSupplier(){
-                @Override
-                public float getValue(Tile tile) {
-                    return tile.entity.health;
-                }
-
-                @Override
-                public float getMax(Tile tile) {
-                    return tile.block().health;
-                }
-            }));
-        if(hasPower)
-            bars.add(new BlockBar(BarType.power, true, new BlockBar.ValueSupplier(){
-                @Override
-                public float getValue(Tile tile) {
-                return tile.entity.power.amount;
-            }
-
-                @Override
-                public float getMax(Tile tile) {
-                return powerCapacity;
-            }
-            }));
-        if(hasLiquids)
-            bars.add(new BlockBar(BarType.liquid, true, new BlockBar.ValueSupplier(){
-                @Override
-                public float getValue(Tile tile) {
-                    return tile.entity.liquids.total();
-                }
-
-                @Override
-                public float getMax(Tile tile) {
-                    return liquidCapacity;
-                }
-            }));
-        if(hasItems)
-            bars.add(new BlockBar(BarType.inventory, true, new BlockBar.ValueSupplier() {
-                @Override
-                public float getValue(Tile tile) {
-                    return tile.entity.items.total();
-                }
-
-                @Override
-                public float getMax(Tile tile) {
-                    return itemCapacity;
-                }
-            }));
+        if(hasEntity()) bars.add(new BlockBar(BarType.health, false, new BlockBar.Value(tile -> tile.entity.health, tile -> tile.block().health)));
+        if(hasPower) bars.add(new BlockBar(BarType.power, true, new BlockBar.Value(tile -> tile.entity.power.amount, tile -> powerCapacity)));
+        if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, new BlockBar.Value(tile -> tile.entity.liquids.total(), tile -> liquidCapacity)));
+        if(hasItems) bars.add(new BlockBar(BarType.inventory, true, new BlockBar.Value(tile -> tile.entity.items.total(), tile -> itemCapacity)));
     }
 
     public String name(){

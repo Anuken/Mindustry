@@ -75,17 +75,7 @@ public class PowerSmelter extends PowerBlock{
         bars.remove(BarType.inventory);
 
         for(ItemStack item : consumes.items()){
-            bars.add(new BlockBar(BarType.inventory, true, new BlockBar.ValueSupplier(){
-                @Override
-                public float getValue(Tile tile) {
-                    return tile.entity.items.get(item.item);
-                }
-
-                @Override
-                public float getMax(Tile tile) {
-                    return itemCapacity;
-                }
-            }));
+            bars.add(new BlockBar(BarType.inventory, true, new BlockBar.Value(tile -> tile.entity.items.get(item.item), tile -> itemCapacity)));
         }
     }
 
