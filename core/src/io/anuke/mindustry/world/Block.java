@@ -308,6 +308,7 @@ public class Block extends BaseBlock {
     public boolean buildInfo(Tile tile, Table table, boolean build){
         if(build){
             for(BlockBar bar : bars.list()){
+                if(bar.type == BarType.inventory) continue;
                 Label label = table.add(Bundles.format("text.blocks.info." + bar.type.name(), bar.value.getValue(tile), bar.value.getMax(tile))).get();
                 label.update(() -> label.setText(Bundles.format("text.blocks.info." + bar.type.name(), bar.value.getValue(tile), bar.value.getMax(tile))));
                 table.row();
