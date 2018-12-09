@@ -76,10 +76,13 @@ public class PlacementFragment extends Fragment{
             return true;
         } else if (Inputs.keyDown("select")) { // Mouse eyedropper select
             Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y).target();
-            if (control.unlocks.isUnlocked(Recipe.getByResult(tile.block()))) {
-                input.recipe = Recipe.getByResult(tile.block());
-                currentCategory = input.recipe.category;
-                return true;
+            if (tile.block() !=null) {
+                Recipe tryRecipe = Recipe.getByResult(tile.block());
+                if ((tryRecipe != null) && control.unlocks.isUnlocked(tryRecipe)) {
+                    input.recipe = tryRecipe;
+                    currentCategory = input.recipe.category;
+                    return true;
+                }
             }
         } else {    // Select block
             int i = 0;
