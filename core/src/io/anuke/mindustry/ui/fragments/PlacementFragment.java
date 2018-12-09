@@ -31,7 +31,7 @@ import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class PlacementFragment extends Fragment{
+public class PlacementFragment extends Fragment {
     final int rowWidth = 4;
 
     Category currentCategory = Category.turret;
@@ -53,7 +53,7 @@ public class PlacementFragment extends Fragment{
             Input.Z, Input.X, Input.C, Input.V,
     };
 
-    public PlacementFragment(){
+    public PlacementFragment() {
         Events.on(WorldLoadGraphicsEvent.class, event -> {
             currentCategory = Category.turret;
             Group group = toggler.getParent();
@@ -62,24 +62,26 @@ public class PlacementFragment extends Fragment{
         });
     }
 
-    /* return true if category update required */
     boolean gridUpdate(InputHandler input) {
-        if (Inputs.keyDown("gridMode")&&Inputs.keyDown(Input.SHIFT_LEFT)) {
+        if (!Inputs.keyDown("gridMode")) return false;
+        if (Inputs.keyDown(Input.SHIFT_LEFT)) { // Select Category
             int i = 0;
             for (Input key : inputCatGrid) {
                 if (Inputs.keyDown(key)) {
                     input.recipe = Recipe.getByCategory(Category.values()[i]).first();
                     currentCategory = input.recipe.category;
-                    return true;
                 }
                 i++;
             }
-        } else if (Inputs.keyDown("gridMode")) {
-            if (Inputs.keyDown(Input.MOUSE_LEFT)) {
-                Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y).target();
+            return true;
+        } else if (Inputs.keyDown("select")) { // Mouse eyedropper select
+            Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y).target();
+            if (control.unlocks.isUnlocked(Recipe.getByResult(tile.block()))) {
                 input.recipe = Recipe.getByResult(tile.block());
+                currentCategory = input.recipe.category;
                 return true;
             }
+        } else {    // Select block
             int i = 0;
             Array<Recipe> recipes = Recipe.getByCategory(currentCategory);
             for (Input key : inputGrid) {
@@ -92,7 +94,7 @@ public class PlacementFragment extends Fragment{
     }
 
     @Override
-    public void build(Group parent){
+    public void build(Group parent) {
         parent.fill(full -> {
             toggler = full;
             full.bottom().right().visible(() -> !state.is(State.menu));
@@ -110,16 +112,16 @@ public class PlacementFragment extends Fragment{
                     ButtonGroup<ImageButton> group = new ButtonGroup<>();
                     group.setMinCheckCount(0);
 
-                    for(Recipe recipe : Recipe.getByCategory(currentCategory)){
+                    for (Recipe recipe : Recipe.getByCategory(currentCategory)) {
 
-                        if(index++ % rowWidth == 0){
+                        if (index++ % rowWidth == 0) {
                             blockTable.row();
                         }
 
                         boolean[] unlocked = {false};
 
-                        ImageButton button = blockTable.addImageButton("icon-locked", "select", 8*4, () -> {
-                            if(control.unlocks.isUnlocked(recipe)){
+                        ImageButton button = blockTable.addImageButton("icon-locked", "select", 8 * 4, () -> {
+                            if (control.unlocks.isUnlocked(recipe)) {
                                 input.recipe = input.recipe == recipe ? null : recipe;
                             }
                         }).size(46f).group(group).get();
@@ -131,19 +133,19 @@ public class PlacementFragment extends Fragment{
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.recipe == recipe);
 
-                            if(ulock == unlocked[0]) return;
+                            if (ulock == unlocked[0]) return;
                             unlocked[0] = ulock;
 
-                            if(!ulock){
+                            if (!ulock) {
                                 button.replaceImage(new Image("icon-locked"));
-                            }else{
+                            } else {
                                 button.replaceImage(new ImageStack(recipe.result.getCompactIcon()));
                             }
                         });
 
                         button.hovered(() -> hovered = recipe.result);
                         button.exited(() -> {
-                            if(hovered == recipe.result){
+                            if (hovered == recipe.result) {
                                 hovered = null;
                             }
                         });
@@ -155,8 +157,8 @@ public class PlacementFragment extends Fragment{
                 frame.table("button-edge-2", top -> {
                     topTable = top;
                     top.add(new Table()).growX().update(topTable -> {
-                        if((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround) ||
-                        (tileDisplayBlock() != null && lastDisplay == tileDisplayBlock() && lastGround)) return;
+                        if ((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround) ||
+                                (tileDisplayBlock() != null && lastDisplay == tileDisplayBlock() && lastGround)) return;
 
                         topTable.clear();
                         topTable.top().left().margin(5);
@@ -164,17 +166,17 @@ public class PlacementFragment extends Fragment{
                         lastDisplay = getSelected();
                         lastGround = tileDisplayBlock() != null;
 
-                        if(lastDisplay != null){ //show selected recipe
+                        if (lastDisplay != null) { //show selected recipe
                             topTable.table(header -> {
                                 header.left();
-                                header.add(new ImageStack(lastDisplay.getCompactIcon())).size(8*4);
+                                header.add(new ImageStack(lastDisplay.getCompactIcon())).size(8 * 4);
                                 header.labelWrap(() ->
-                                    !control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay)) ? Bundles.get("text.blocks.unknown") : lastDisplay.formalName)
-                                    .left().width(190f).padLeft(5);
+                                        !control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay)) ? Bundles.get("text.blocks.unknown") : lastDisplay.formalName)
+                                        .left().width(190f).padLeft(5);
                                 header.add().growX();
-                                if(control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay))){
+                                if (control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay))) {
                                     header.addButton("?", "clear-partial", () -> ui.content.show(Recipe.getByResult(lastDisplay)))
-                                        .size(8 * 5).padTop(-5).padRight(-5).right().grow();
+                                            .size(8 * 5).padTop(-5).padRight(-5).right().grow();
                                 }
                             }).growX().left();
                             topTable.row();
@@ -182,14 +184,14 @@ public class PlacementFragment extends Fragment{
                             topTable.table(req -> {
                                 req.top().left();
 
-                                for(ItemStack stack : Recipe.getByResult(lastDisplay).requirements){
+                                for (ItemStack stack : Recipe.getByResult(lastDisplay).requirements) {
                                     req.table(line -> {
                                         line.left();
-                                        line.addImage(stack.item.region).size(8*2);
+                                        line.addImage(stack.item.region).size(8 * 2);
                                         line.add(stack.item.localizedName()).color(Color.LIGHT_GRAY).padLeft(2).left();
                                         line.labelWrap(() -> {
                                             TileEntity core = players[0].getClosestCore();
-                                            if(core == null || state.mode.infiniteResources) return "*/*";
+                                            if (core == null || state.mode.infiniteResources) return "*/*";
 
                                             int amount = core.items.get(stack.item);
                                             String color = (amount < stack.amount / 2f ? "[red]" : amount < stack.amount ? "[accent]" : "[white]");
@@ -201,15 +203,15 @@ public class PlacementFragment extends Fragment{
                                 }
                             }).growX().left().margin(3);
 
-                        }else if(tileDisplayBlock() != null){ //show selected tile
+                        } else if (tileDisplayBlock() != null) { //show selected tile
                             lastDisplay = tileDisplayBlock();
-                            topTable.add(new ImageStack(lastDisplay.getDisplayIcon(hoverTile))).size(8*4);
+                            topTable.add(new ImageStack(lastDisplay.getDisplayIcon(hoverTile))).size(8 * 4);
                             topTable.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
                         }
                     });
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
                 frame.row();
-                frame.addImage("blank").color(Palette.accent).colspan(3).height(3*2).growX();
+                frame.addImage("blank").color(Palette.accent).colspan(3).height(3 * 2).growX();
                 frame.row();
                 frame.table("pane-2", blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
@@ -222,17 +224,18 @@ public class PlacementFragment extends Fragment{
 
                     ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
-                    for(Category cat : Category.values()){
-                        if(Recipe.getByCategory(cat).isEmpty()) continue;
+                    for (Category cat : Category.values()) {
+                        if (Recipe.getByCategory(cat).isEmpty()) continue;
 
-                        categories.addImageButton("icon-" + cat.name(), "clear-toggle",  16*2, () -> {
+                        categories.addImageButton("icon-" + cat.name(), "clear-toggle", 16 * 2, () -> {
                             currentCategory = cat;
                             rebuildCategory.run();
                         }).group(group).update(i -> i.setChecked(currentCategory == cat));
 
-                        if(cat.ordinal() %2 == 1) categories.row();
+                        if (cat.ordinal() % 2 == 1) categories.row();
                     }
                 }).touchable(Touchable.enabled);
+
 
                 rebuildCategory.run();
 
@@ -243,49 +246,55 @@ public class PlacementFragment extends Fragment{
         });
     }
 
-    /**Returns the currently displayed block in the top box.*/
-    Block getSelected(){
+    /**
+     * Returns the currently displayed block in the top box.
+     */
+    Block getSelected() {
         Block toDisplay = null;
 
         Vector2 v = topTable.stageToLocalCoordinates(Graphics.mouse());
 
         //setup hovering tile
-        if(!ui.hasMouse() && topTable.hit(v.x, v.y, false) == null){
+        if (!ui.hasMouse() && topTable.hit(v.x, v.y, false) == null) {
             Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
-            if(tile != null){
+            if (tile != null) {
                 hoverTile = tile.target();
-            }else{
+            } else {
                 hoverTile = null;
             }
-        }else{
+        } else {
             hoverTile = null;
         }
 
         //block currently selected
-        if(control.input(0).recipe != null){
+        if (control.input(0).recipe != null) {
             toDisplay = control.input(0).recipe.result;
         }
 
         //block hovered on in build menu
-        if(hovered != null){
+        if (hovered != null) {
             toDisplay = hovered;
         }
 
         return toDisplay;
     }
 
-    /**Returns the block currently being hovered over in the world.*/
-    Block tileDisplayBlock(){
+    /**
+     * Returns the block currently being hovered over in the world.
+     */
+    Block tileDisplayBlock() {
         return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.floor() instanceof OreBlock ? hoverTile.floor() : null;
     }
 
-    /**Show or hide the placement menu.*/
-    void toggle(float t, Interpolation ip){
+    /**
+     * Show or hide the placement menu.
+     */
+    void toggle(float t, Interpolation ip) {
         toggler.clearActions();
-        if(shown){
+        if (shown) {
             shown = false;
             toggler.actions(Actions.translateBy(toggler.getTranslation().x + toggler.getWidth(), 0, t, ip));
-        }else{
+        } else {
             shown = true;
             toggler.actions(Actions.translateBy(-toggler.getTranslation().x, 0, t, ip));
         }
