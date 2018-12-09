@@ -325,9 +325,9 @@ public class Block extends BaseBlock {
     public boolean buildPower(Tile tile, Table table, boolean build){
         if(build){
             if(hasPower){
-                ButtonGroup<Button> group = new ButtonGroup<>();
-                group.setMinCheckCount(1);
                 if(consumesPower){
+                    ButtonGroup<TextButton> group = new ButtonGroup<>();
+                    group.setMinCheckCount(1);
                     for(byte i = 1; i <= 9; i++){
                         TextButton button = table.addButton(String.valueOf(i), "toggle", () -> {}).size(16f).group(group).get();
                         button.setChecked(i == tile.entity.power.priority);
