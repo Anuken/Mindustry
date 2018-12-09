@@ -14,7 +14,7 @@ public class LiquidHeatGenerator extends LiquidGenerator{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.basePowerGeneration, maxLiquidGenerate * powerPerLiquid * 60f, StatUnit.powerSecond);
+        stats.add(BlockStat.basePowerGeneration, maxLiquidGenerate * powerPerLiquid * 60f * 0.5f, StatUnit.powerSecond);
     }
 
     @Override

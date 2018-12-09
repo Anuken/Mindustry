@@ -21,6 +21,7 @@ import io.anuke.ucore.util.Bits;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -32,7 +33,7 @@ public class NetworkIO{
             //--GENERAL STATE--
             stream.writeByte(state.mode.ordinal()); //gamemode
             stream.writeUTF(world.getMap().name); //map name
-            stream.writeInt(world.getSector() == null ? invalidSector : world.getSector().packedPosition()); //sector ID
+            stream.writeInt(world.getSector() == null ? invalidSector : world.getSector().pos()); //sector ID
             stream.writeInt(world.getSector() == null ? 0 : world.getSector().completedMissions);
 
             //write tags
@@ -56,7 +57,7 @@ public class NetworkIO{
             stream.writeShort(world.height());
 
             for(int i = 0; i < world.width() * world.height(); i++){
-                Tile tile = world.tile(i);
+                Tile tile = world.tile(i % world.width(), i / world.width());
 
                 stream.writeByte(tile.getFloorID());
                 stream.writeByte(tile.getBlockID());
@@ -79,7 +80,7 @@ public class NetworkIO{
                     int consecutives = 0;
 
                     for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
-                        Tile nextTile = world.tile(j);
+                        Tile nextTile = world.tile(j % world.width(), j / world.width());
 
                         if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getElevation() != tile.getElevation()){
                             break;
@@ -95,13 +96,13 @@ public class NetworkIO{
 
             //write visibility, length-run encoded
             for(int i = 0; i < world.width() * world.height(); i++){
-                Tile tile = world.tile(i);
+                Tile tile = world.tile(i % world.width(), i / world.width());;
                 boolean discovered = tile.discovered();
 
                 int consecutives = 0;
 
                 for(int j = i + 1; j < world.width() * world.height() && consecutives < 32767*2-1; j++){
-                    Tile nextTile = world.tile(j);
+                    Tile nextTile = world.tile(j % world.width(), j / world.width());;
 
                     if(nextTile.discovered() != discovered){
                         break;
@@ -129,7 +130,7 @@ public class NetworkIO{
 
                 stream.writeByte(data.cores.size);
                 for(Tile tile : data.cores){
-                    stream.writeInt(tile.packedPosition());
+                    stream.writeInt(tile.pos());
                 }
             }
 
@@ -298,24 +299,25 @@ public class NetworkIO{
         int maxlen = 32;
 
         String host = (headless ? "Server" : players[0].name);
-        String map = world.getMap().name;
+        String map = world.getMap() == null ? "None" : world.getMap().name;
 
         host = host.substring(0, Math.min(host.length(), maxlen));
         map = map.substring(0, Math.min(map.length(), maxlen));
 
         ByteBuffer buffer = ByteBuffer.allocate(128);
 
-        buffer.put((byte) host.getBytes().length);
-        buffer.put(host.getBytes());
+        buffer.put((byte) host.getBytes(StandardCharsets.UTF_8).length);
+        buffer.put(host.getBytes(StandardCharsets.UTF_8));
 
-        buffer.put((byte) map.getBytes().length);
-        buffer.put(map.getBytes());
+        buffer.put((byte) map.getBytes(StandardCharsets.UTF_8).length);
+        buffer.put(map.getBytes(StandardCharsets.UTF_8));
 
         buffer.putInt(playerGroup.size());
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
-        buffer.put((byte)Version.type.getBytes().length);
-        buffer.put(Version.type.getBytes());
+        buffer.put((byte)Version.type.getBytes(StandardCharsets.UTF_8).length);
+        buffer.put(Version.type.getBytes(StandardCharsets.UTF_8));
+        buffer.put((byte)state.mode.ordinal());
         return buffer;
     }
 
@@ -328,8 +330,8 @@ public class NetworkIO{
         byte[] mb = new byte[mlength];
         buffer.get(mb);
 
-        String host = new String(hb);
-        String map = new String(mb);
+        String host = new String(hb, StandardCharsets.UTF_8);
+        String map = new String(mb, StandardCharsets.UTF_8);
 
         int players = buffer.getInt();
         int wave = buffer.getInt();
@@ -337,8 +339,9 @@ public class NetworkIO{
         byte tlength = buffer.get();
         byte[] tb = new byte[tlength];
         buffer.get(tb);
-        String vertype = new String(tb);
+        String vertype = new String(tb, StandardCharsets.UTF_8);
+        GameMode mode = GameMode.values()[buffer.get()];
 
-        return new Host(host, hostAddress, map, wave, players, version, vertype);
+        return new Host(host, hostAddress, map, wave, players, version, vertype, mode);
     }
 }

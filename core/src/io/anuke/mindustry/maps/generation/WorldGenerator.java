@@ -17,6 +17,7 @@ import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.missions.Mission;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
@@ -86,7 +87,7 @@ public class WorldGenerator{
                 Tile tile = tiles[x][y];
 
                 if(tile.block().isMultiblock()){
-                    multiblocks.add(tile.packedPosition());
+                    multiblocks.add(tile.pos());
                 }
             }
         }
@@ -95,8 +96,8 @@ public class WorldGenerator{
         for(int i = 0; i < multiblocks.size; i++){
             int pos = multiblocks.get(i);
 
-            int x = pos % tiles.length;
-            int y = pos / tiles.length;
+            int x = Pos.x(pos);
+            int y = Pos.y(pos);
 
             Block result = tiles[x][y].block();
             Team team = tiles[x][y].getTeam();

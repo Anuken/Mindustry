@@ -74,7 +74,7 @@ public class Cultivator extends Drill{
 
         Draw.color(bottomColor, plantColorLight, entity.warmup);
 
-        random.setSeed(tile.packedPosition());
+        random.setSeed(tile.pos());
         for(int i = 0; i < 12; i++){
             float offset = random.nextFloat() * 999999f;
             float x = random.range(4f), y = random.range(4f);

@@ -127,6 +127,7 @@ public class Saves{
         saveMap.put(slot.index, slot);
         slot.meta = SaveIO.getData(slot.index);
         current = slot;
+        slot.meta.sector = invalidSector;
         saveSlots();
         return slot;
     }
@@ -164,26 +165,17 @@ public class Saves{
 
         public void save(){
             long time = totalPlaytime;
+            renderer.fog.writeFog();
+            long prev = totalPlaytime;
+            totalPlaytime = time;
 
-            threads.runGraphics(() -> {
-                //Renderer fog needs to be written on graphics thread, but save() can run on logic thread
-                //thus, runGraphics is required here
-                renderer.fog.writeFog();
+            SaveIO.saveToSlot(index);
+            meta = SaveIO.getData(index);
+            if(!state.is(State.menu)){
+                current = this;
+            }
 
-                //save on the logic thread
-                threads.run(() -> {
-                    long prev = totalPlaytime;
-                    totalPlaytime = time;
-
-                    SaveIO.saveToSlot(index);
-                    meta = SaveIO.getData(index);
-                    if(!state.is(State.menu)){
-                        current = this;
-                    }
-
-                    totalPlaytime = prev;
-                });
-            });
+            totalPlaytime = prev;
         }
 
         public boolean isHidden(){

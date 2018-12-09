@@ -92,8 +92,11 @@ public class DebugBlocks extends BlockList implements ContentList{
             @Override
             public void update(Tile tile){
                 SorterEntity entity = tile.entity();
+                if(entity.sortItem == null) return;
+
                 entity.items.set(entity.sortItem, 1);
                 tryDump(tile, entity.sortItem);
+                entity.items.set(entity.sortItem, 0);
             }
 
             @Override

@@ -58,7 +58,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public boolean achievedFlight;
     public Color color = new Color();
     public Mech mech;
-    public int spawner = -1;
+    public int spawner = noSpawner;
 
     public NetConnection con;
     public int playerIndex = 0;
@@ -498,7 +498,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             updateRespawning();
             return;
         }else{
-            spawner = -1;
+            spawner = noSpawner;
         }
 
         avoidOthers(1f);
@@ -645,7 +645,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     protected void updateFlying(){
-        if(Units.invalidateTarget(target, this)){
+        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
+        mech.canHeal && distanceTo(target) < getWeapon().getAmmo().getRange())){
             target = null;
         }
 
@@ -726,11 +727,22 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                     isShooting = false;
                     if(Settings.getBool("autotarget")){
                         target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
+
+                        if(mech.canHeal && target == null){
+                            target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));
+                            if(target != null && distanceTo(target) > getWeapon().getAmmo().getRange()){
+                                target = null;
+                            }else if(target != null){
+                                target = ((Tile)target).entity;
+                            }
+                        }
+
                         if(target != null){
                             setMineTile(null);
                         }
                     }
-                }else if(target.isValid()){
+                }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
+                            mech.canHeal && distanceTo(target) < getWeapon().getAmmo().getRange())){
                     //rotate toward and shoot the target
                     if(mech.turnCursor){
                         rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
@@ -788,23 +800,23 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     public void updateRespawning(){
 
-        if(spawner != -1 && world.tile(spawner) != null && world.tile(spawner).entity instanceof SpawnerTrait){
+        if(spawner != noSpawner && world.tile(spawner) != null && world.tile(spawner).entity instanceof SpawnerTrait){
             ((SpawnerTrait) world.tile(spawner).entity).updateSpawning(this);
         }else{
             CoreEntity entity = (CoreEntity) getClosestCore();
             if(entity != null && !netServer.isWaitingForPlayers()){
-                this.spawner = entity.tile.id();
+                this.spawner = entity.tile.pos();
             }
         }
     }
 
     public void beginRespawning(SpawnerTrait spawner){
-        this.spawner = spawner.getTile().packedPosition();
+        this.spawner = spawner.getTile().pos();
         this.dead = true;
     }
 
     public void endRespawning(){
-        spawner = -1;
+        spawner = noSpawner;
     }
 
     //endregion
@@ -860,7 +872,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
-        buffer.writeInt(mining == null ? -1 : mining.packedPosition());
+        buffer.writeInt(mining == null ? -1 : mining.pos());
         buffer.writeInt(spawner);
         buffer.writeShort((short) (baseRotation * 2));
 

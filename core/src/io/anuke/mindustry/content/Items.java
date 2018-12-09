@@ -83,7 +83,7 @@ public class Items implements ContentList{
         }};
 
         biomatter = new Item("biomatter", Color.valueOf("648b55")){{
-            flammability = 0.4f;
+            flammability = 0.55f;
             fluxiness = 0.3f;
         }};
 

@@ -79,7 +79,9 @@ public class NetServer extends Module{
 
     public NetServer(){
         Events.on(WorldLoadEvent.class, event -> {
-            connections.clear();
+            if(!headless){
+                connections.clear();
+            }
         });
 
         Net.handleServer(Connect.class, (id, connect) -> {
@@ -125,7 +127,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            if(packet.versionType == null || ((packet.version == -1 || !packet.versionType.equals("official")) && Version.build != -1 && !admins.allowsCustomClients())){
+            if(packet.versionType == null || ((packet.version == -1 || !packet.versionType.equals(Version.type)) && Version.build != -1 && !admins.allowsCustomClients())){
                 kick(id, KickReason.customClient);
                 return;
             }
@@ -279,6 +281,7 @@ public class NetServer extends Module{
         }
         player.remove();
         netServer.connections.remove(player.con.id);
+        Log.info("&lc{0} has disconnected.", player.name);
     }
 
     private static float compound(float speed, float drag){
@@ -379,7 +382,7 @@ public class NetServer extends Module{
             return;
         }
 
-        if(other == null || (other.isAdmin && other != player)){ //fun fact: this means you can ban yourself
+        if(other == null || ((other.isAdmin && !player.isLocal) && other != player)){
             Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
             return;
         }
@@ -490,7 +493,7 @@ public class NetServer extends Module{
 
         //write all core inventory data
         for(Tile tile : cores){
-            dataStream.writeInt(tile.packedPosition());
+            dataStream.writeInt(tile.pos());
             tile.entity.items.write(dataStream);
         }
 
@@ -596,14 +599,18 @@ public class NetServer extends Module{
     }
 
     void sync(){
+
         try{
 
             //iterate through each player
-            for(Player player : connections.values()){
+            for(int i = 0; i < playerGroup.size(); i ++){
+                Player player = playerGroup.all().get(i);
+                if(player.isLocal) continue;
+
                 NetConnection connection = player.con;
 
-                if(!connection.isConnected()){
-                    //player disconnected, ignore them
+                if(!connection.isConnected() || !connections.containsKey(connection.id)){
+                    //player disconnected, call d/c event
                     onDisconnect(player);
                     return;
                 }

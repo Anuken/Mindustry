@@ -41,17 +41,10 @@ public class AdminsDialog extends FloatingDialog{
                 ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
                     netServer.admins.unAdminPlayer(info.id);
                     playerGroup.forEach(player -> {
-                        if(player.uuid.equals(info.id)){
+                        if(player != null && player.uuid != null && player.uuid.equals(info.id)){
                             player.isAdmin = false;
                         }
                     });
-                    /*
-                    for(Player player : playerGroup.all()){
-                        if(player.con != null){
-                            player.isAdmin = false;
-                            break;
-                        }
-                    }*/
                     setup();
                 });
             }).size(h).pad(-14f);

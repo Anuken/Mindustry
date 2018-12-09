@@ -38,7 +38,7 @@ public class BattleMission extends MissionWithStartingCore{
 
     @Override
     public GameMode getMode(){
-        return GameMode.noWaves;
+        return GameMode.attack;
     }
 
     @Override

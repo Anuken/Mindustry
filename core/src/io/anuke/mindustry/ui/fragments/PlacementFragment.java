@@ -36,9 +36,11 @@ public class PlacementFragment extends Fragment{
     Tile hoverTile;
     Table blockTable, toggler, topTable;
     boolean shown = true;
+    boolean lastGround;
 
     public PlacementFragment(){
         Events.on(WorldLoadGraphicsEvent.class, event -> {
+            currentCategory = Category.turret;
             Group group = toggler.getParent();
             toggler.remove();
             build(group);
@@ -109,13 +111,14 @@ public class PlacementFragment extends Fragment{
                 frame.table("button-edge-2", top -> {
                     topTable = top;
                     top.add(new Table()).growX().update(topTable -> {
-                        if((tileDisplayBlock() == null && lastDisplay == getSelected()) ||
-                        (tileDisplayBlock() != null && lastDisplay == tileDisplayBlock())) return;
+                        if((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround) ||
+                        (tileDisplayBlock() != null && lastDisplay == tileDisplayBlock() && lastGround)) return;
 
                         topTable.clear();
                         topTable.top().left().margin(5);
 
                         lastDisplay = getSelected();
+                        lastGround = tileDisplayBlock() != null;
 
                         if(lastDisplay != null){ //show selected recipe
                             topTable.table(header -> {
@@ -181,7 +184,7 @@ public class PlacementFragment extends Fragment{
                         categories.addImageButton("icon-" + cat.name(), "clear-toggle",  16*2, () -> {
                             currentCategory = cat;
                             rebuildCategory.run();
-                        }).group(group);
+                        }).group(group).update(i -> i.setChecked(currentCategory == cat));
 
                         if(cat.ordinal() %2 == 1) categories.row();
                     }

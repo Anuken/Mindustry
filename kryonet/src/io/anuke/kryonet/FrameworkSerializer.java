@@ -5,32 +5,32 @@ import com.esotericsoftware.kryonet.FrameworkMessage.*;
 
 import java.nio.ByteBuffer;
 
-public class FrameworkSerializer {
+public class FrameworkSerializer{
 
     public static void write(ByteBuffer buffer, FrameworkMessage message){
         if(message instanceof Ping){
-            Ping p = (Ping)message;
+            Ping p = (Ping) message;
 
-            buffer.put((byte)0);
+            buffer.put((byte) 0);
             buffer.putInt(p.id);
-            buffer.put(p.isReply ? 1 : (byte)0);
+            buffer.put(p.isReply ? 1 : (byte) 0);
         }else if(message instanceof DiscoverHost){
-            DiscoverHost p = (DiscoverHost)message;
+            DiscoverHost p = (DiscoverHost) message;
 
-            buffer.put((byte)1);
+            buffer.put((byte) 1);
         }else if(message instanceof KeepAlive){
-            KeepAlive p = (KeepAlive)message;
+            KeepAlive p = (KeepAlive) message;
 
-            buffer.put((byte)2);
+            buffer.put((byte) 2);
         }else if(message instanceof RegisterUDP){
-            RegisterUDP p = (RegisterUDP)message;
+            RegisterUDP p = (RegisterUDP) message;
 
-            buffer.put((byte)3);
+            buffer.put((byte) 3);
             buffer.putInt(p.connectionID);
         }else if(message instanceof RegisterTCP){
-            RegisterTCP p = (RegisterTCP)message;
+            RegisterTCP p = (RegisterTCP) message;
 
-            buffer.put((byte)4);
+            buffer.put((byte) 4);
             buffer.putInt(p.connectionID);
         }
     }

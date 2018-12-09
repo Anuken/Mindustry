@@ -164,7 +164,7 @@ public class Block extends BaseBlock {
         for(int i = 0; i < tile.entity.power.links.size; i++){
             Tile other = world.tile(tile.entity.power.links.get(i));
             if(other != null && other.entity != null && other.entity.power != null){
-                other.entity.power.links.removeValue(tile.packedPosition());
+                other.entity.power.links.removeValue(tile.pos());
             }
         }
     }
@@ -173,7 +173,7 @@ public class Block extends BaseBlock {
         out.clear();
         for(Tile other : tile.entity.proximity()){
             if(other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
-                    && !tile.entity.power.links.contains(other.packedPosition())){
+                    && !tile.entity.power.links.contains(other.pos())){
                 out.add(other);
             }
         }
@@ -337,10 +337,8 @@ public class Block extends BaseBlock {
 
     public void setBars(){
         if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
-        if(hasLiquids)
-            bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
-        if(hasItems)
-            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.total() / itemCapacity));
+        if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
+        if(hasItems) bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.total() / itemCapacity));
     }
 
     public String name(){
@@ -543,16 +541,16 @@ public class Block extends BaseBlock {
 
     public Array<Object> getDebugInfo(Tile tile){
         return Array.with(
-                "block", tile.block().name,
-                "floor", tile.floor().name,
-                "x", tile.x,
-                "y", tile.y,
-                "entity.name", tile.entity.getClass(),
-                "entity.x", tile.entity.x,
-                "entity.y", tile.entity.y,
-                "entity.id", tile.entity.id,
-                "entity.items.total", hasItems ? tile.entity.items.total() : null,
-                "entity.graph", tile.entity.power != null && tile.entity.power.graph != null ? tile.entity.power.graph.getID() : null
+            "block", tile.block().name,
+            "floor", tile.floor().name,
+            "x", tile.x,
+            "y", tile.y,
+            "entity.name", tile.entity.getClass(),
+            "entity.x", tile.entity.x,
+            "entity.y", tile.entity.y,
+            "entity.id", tile.entity.id,
+            "entity.items.total", hasItems ? tile.entity.items.total() : null,
+            "entity.graph", tile.entity.power != null && tile.entity.power.graph != null ? tile.entity.power.graph.getID() : null
         );
     }
 }

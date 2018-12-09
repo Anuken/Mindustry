@@ -69,7 +69,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             inaccuracy = 5f;
             shootCone = 50f;
             shootEffect = ShootFx.shootLiquid;
-            range = 70f;
+            range = 90f;
             health = 360;
 
             drawer = (tile, entity) -> {

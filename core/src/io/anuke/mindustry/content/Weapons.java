@@ -152,7 +152,7 @@ public class Weapons implements ContentList{
         bomberTrident = new Weapon("bomber"){{
             length = 0f;
             width = 2f;
-            reload = 9f;
+            reload = 8f;
             shots = 2;
             roundrobin = true;
             ejectEffect = Fx.none;
