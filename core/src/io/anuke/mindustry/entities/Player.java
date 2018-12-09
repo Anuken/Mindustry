@@ -645,7 +645,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     protected void updateFlying(){
-        if(Units.invalidateTarget(target, this)){
+        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
+        mech.canHeal && distanceTo(target) < getWeapon().getAmmo().getRange())){
             target = null;
         }
 
@@ -726,11 +727,22 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                     isShooting = false;
                     if(Settings.getBool("autotarget")){
                         target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
+
+                        if(mech.canHeal && target == null){
+                            target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));
+                            if(target != null && distanceTo(target) > getWeapon().getAmmo().getRange()){
+                                target = null;
+                            }else if(target != null){
+                                target = ((Tile)target).entity;
+                            }
+                        }
+
                         if(target != null){
                             setMineTile(null);
                         }
                     }
-                }else if(target.isValid()){
+                }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
+                            mech.canHeal && distanceTo(target) < getWeapon().getAmmo().getRange())){
                     //rotate toward and shoot the target
                     if(mech.turnCursor){
                         rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);

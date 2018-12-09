@@ -334,7 +334,7 @@ public class TurretBullets extends BulletList implements ContentList{
                 lifetime = 200f;
                 despawneffect = BlockFx.smeltsmoke;
                 hiteffect = BulletFx.hitBulletBig;
-                drag = 0.01f;
+                drag = 0.005f;
             }
 
             @Override
