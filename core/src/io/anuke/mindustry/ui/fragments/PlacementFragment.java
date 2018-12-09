@@ -64,7 +64,7 @@ public class PlacementFragment extends Fragment {
 
     boolean gridUpdate(InputHandler input) {
         if (!Inputs.keyDown("gridMode")) return false;
-        if (Inputs.keyDown(Input.SHIFT_LEFT)) { // Select Category
+        if (Inputs.keyDown("gridModeShift")) { // Select Category
             int i = 0;
             for (Input key : inputCatGrid) {
                 if (Inputs.keyDown(key)) {

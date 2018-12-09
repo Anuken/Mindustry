@@ -26,6 +26,7 @@ public class DefaultKeybinds{
                 "dash", Input.SHIFT_LEFT,
                 "drop_unit", Input.SHIFT_LEFT,
                 "gridMode", Input.ALT_LEFT,
+                "gridModeShift", Input.SHIFT_LEFT,
                 new Category("view"),
                 "zoom_hold", Input.CONTROL_LEFT,
                 "zoom", new Axis(Input.SCROLL),
