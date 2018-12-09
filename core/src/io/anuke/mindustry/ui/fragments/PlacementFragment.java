@@ -157,8 +157,7 @@ public class PlacementFragment extends Fragment{
                 frame.table("button-edge-2", top -> {
                     topTable = top;
                     top.add(new Table()).growX().update(topTable -> {
-                        if((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround) ||
-                                (tileDisplayBlock() != null && lastDisplay == tileDisplayBlock() && lastGround)) return;
+                        if((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround) || (tileDisplayBlock() != null && lastDisplay == tileDisplayBlock() && lastGround)) return;
 
                         topTable.clear();
                         topTable.top().left().margin(5);
