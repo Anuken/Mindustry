@@ -96,6 +96,9 @@ public class MobileInput extends InputHandler implements GestureListener{
                 TileEntity entity = tile.entity;
                 player.setMineTile(null);
                 player.target = entity;
+            }else if(tile != null && player.mech.canHeal && tile.entity != null && tile.getTeam() == player.getTeam() && tile.entity.damaged()){
+                player.setMineTile(null);
+                player.target = tile.entity;
             }
         }
     }
