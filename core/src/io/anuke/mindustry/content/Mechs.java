@@ -123,6 +123,7 @@ public class Mechs implements ContentList{
                 speed = 0.44f;
                 drag = 0.35f;
                 boostSpeed = 0.8f;
+                canHeal = true;
                 weapon = Weapons.healBlaster;
                 armor = 15f;
                 trailColorTo = Palette.heal;
@@ -287,8 +288,8 @@ public class Mechs implements ContentList{
         trident = new Mech("trident-ship", true){
             {
                 drillPower = 2;
-                speed = 0.12f;
-                drag = 0.035f;
+                speed = 0.14f;
+                drag = 0.034f;
                 mass = 2.5f;
                 turnCursor = false;
                 armor = 20f;

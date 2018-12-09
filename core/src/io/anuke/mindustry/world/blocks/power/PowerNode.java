@@ -47,7 +47,8 @@ public class PowerNode extends PowerBlock{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void linkPowerNodes(Player player, Tile tile, Tile other){
-        if(tile.entity.power == null || !((PowerNode)tile.block()).linkValid(tile, other)) return;
+        if(tile.entity.power == null || !((PowerNode)tile.block()).linkValid(tile, other)
+            || tile.entity.power.links.size >= ((PowerNode)tile.block()).maxNodes) return;
 
         TileEntity entity = tile.entity();
 
