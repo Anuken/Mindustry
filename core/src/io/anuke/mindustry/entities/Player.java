@@ -601,9 +601,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         float xa = Inputs.getAxis(section, "move_x");
         float ya = Inputs.getAxis(section, "move_y");
-
-        movement.y += ya * speed;
-        movement.x += xa * speed;
+        if (!Inputs.keyDown("gridMode")) {
+            movement.y += ya * speed;
+            movement.x += xa * speed;
+        }
 
         Vector2 vec = Graphics.world(control.input(playerIndex).getMouseX(), control.input(playerIndex).getMouseY());
         pointerX = vec.x;

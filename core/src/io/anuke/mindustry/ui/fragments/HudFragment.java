@@ -109,7 +109,7 @@ public class HudFragment extends Fragment{
             }
 
             cont.update(() -> {
-                if(Inputs.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
+                if(!Inputs.keyDown("gridMode") && Inputs.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
                     toggleMenus();
                 }
             });

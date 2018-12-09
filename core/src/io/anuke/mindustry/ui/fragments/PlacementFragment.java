@@ -3,6 +3,7 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
@@ -17,6 +18,8 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.core.Inputs;
+import io.anuke.ucore.input.Input;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.actions.Actions;
 import io.anuke.ucore.scene.event.Touchable;
@@ -38,6 +41,18 @@ public class PlacementFragment extends Fragment{
     boolean shown = true;
     boolean lastGround;
 
+    final Input[] inputGrid = {
+            Input.NUM_1, Input.NUM_2, Input.NUM_3, Input.NUM_4,
+            Input.Q, Input.W, Input.E, Input.R,
+            Input.A, Input.S, Input.D, Input.F,
+            Input.Z, Input.X, Input.C, Input.V,
+    }, inputCatGrid = {
+            Input.NUM_1, Input.NUM_2,
+            Input.Q, Input.W,
+            Input.A, Input.S,
+            Input.Z, Input.X, Input.C, Input.V,
+    };
+
     public PlacementFragment(){
         Events.on(WorldLoadGraphicsEvent.class, event -> {
             currentCategory = Category.turret;
@@ -45,6 +60,35 @@ public class PlacementFragment extends Fragment{
             toggler.remove();
             build(group);
         });
+    }
+
+    /* return true if category update required */
+    boolean gridUpdate(InputHandler input) {
+        if (Inputs.keyDown("gridMode")&&Inputs.keyDown(Input.SHIFT_LEFT)) {
+            int i = 0;
+            for (Input key : inputCatGrid) {
+                if (Inputs.keyDown(key)) {
+                    input.recipe = Recipe.getByCategory(Category.values()[i]).first();
+                    currentCategory = input.recipe.category;
+                    return true;
+                }
+                i++;
+            }
+        } else if (Inputs.keyDown("gridMode")) {
+            if (Inputs.keyDown(Input.MOUSE_LEFT)) {
+                Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y).target();
+                input.recipe = Recipe.getByResult(tile.block());
+                return true;
+            }
+            int i = 0;
+            Array<Recipe> recipes = Recipe.getByCategory(currentCategory);
+            for (Input key : inputGrid) {
+                if (Inputs.keyDown(key))
+                    input.recipe = (i < recipes.size && control.unlocks.isUnlocked(recipes.get(i))) ? recipes.get(i) : null;
+                i++;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -191,6 +235,10 @@ public class PlacementFragment extends Fragment{
                 }).touchable(Touchable.enabled);
 
                 rebuildCategory.run();
+
+                frame.update(() -> {
+                    if (gridUpdate(input)) rebuildCategory.run();
+                });
             });
         });
     }
