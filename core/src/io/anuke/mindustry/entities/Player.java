@@ -787,6 +787,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         placeQueue.clear();
         dead = true;
         trail.clear();
+        target = null;
+        moveTarget = null;
         carrier = null;
         health = maxHealth();
         boostHeat = drownTime = hitTime = 0f;
