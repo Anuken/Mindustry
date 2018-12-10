@@ -42,15 +42,15 @@ public class PlacementFragment extends Fragment{
     boolean lastGround;
 
     final Input[] inputGrid = {
-            Input.NUM_1, Input.NUM_2, Input.NUM_3, Input.NUM_4,
-            Input.Q, Input.W, Input.E, Input.R,
-            Input.A, Input.S, Input.D, Input.F,
-            Input.Z, Input.X, Input.C, Input.V
+    Input.NUM_1, Input.NUM_2, Input.NUM_3, Input.NUM_4,
+    Input.Q, Input.W, Input.E, Input.R,
+    Input.A, Input.S, Input.D, Input.F,
+    Input.Z, Input.X, Input.C, Input.V
     }, inputCatGrid = {
-            Input.NUM_1, Input.NUM_2,
-            Input.Q, Input.W,
-            Input.A, Input.S,
-            Input.Z, Input.X, Input.C, Input.V
+    Input.NUM_1, Input.NUM_2,
+    Input.Q, Input.W,
+    Input.A, Input.S,
+    Input.Z, Input.X, Input.C, Input.V
     };
 
     public PlacementFragment(){
@@ -62,33 +62,33 @@ public class PlacementFragment extends Fragment{
         });
     }
 
-    boolean gridUpdate(InputHandler input) {
-        if (!Inputs.keyDown("gridMode")) return false;
-        if (Inputs.keyDown("gridModeShift")) { // Select Category
+    boolean gridUpdate(InputHandler input){
+        if(!Inputs.keyDown("gridMode")) return false;
+        if(Inputs.keyDown("gridModeShift")){ // Select Category
             int i = 0;
-            for (Input key : inputCatGrid) {
-                if (Inputs.keyDown(key)) {
+            for(Input key : inputCatGrid){
+                if(Inputs.keyDown(key)){
                     input.recipe = Recipe.getByCategory(Category.values()[i]).first();
                     currentCategory = input.recipe.category;
                 }
                 i++;
             }
             return true;
-        } else if (Inputs.keyDown("select")) { // Mouse eyedropper select
+        }else if(Inputs.keyDown("select")){ // Mouse eyedropper select
             Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y).target();
-            if (tile.block() !=null) {
+            if(tile.block() != null){
                 Recipe tryRecipe = Recipe.getByResult(tile.block());
-                if ((tryRecipe != null) && control.unlocks.isUnlocked(tryRecipe)) {
+                if((tryRecipe != null) && control.unlocks.isUnlocked(tryRecipe)){
                     input.recipe = tryRecipe;
                     currentCategory = input.recipe.category;
                     return true;
                 }
             }
-        } else {    // Select block
+        }else{    // Select block
             int i = 0;
             Array<Recipe> recipes = Recipe.getByCategory(currentCategory);
-            for (Input key : inputGrid) {
-                if (Inputs.keyDown(key))
+            for(Input key : inputGrid){
+                if(Inputs.keyDown(key))
                     input.recipe = (i < recipes.size && control.unlocks.isUnlocked(recipes.get(i))) ? recipes.get(i) : null;
                 i++;
             }
@@ -123,7 +123,7 @@ public class PlacementFragment extends Fragment{
 
                         boolean[] unlocked = {false};
 
-                        ImageButton button = blockTable.addImageButton("icon-locked", "select", 8*4, () -> {
+                        ImageButton button = blockTable.addImageButton("icon-locked", "select", 8 * 4, () -> {
                             if(control.unlocks.isUnlocked(recipe)){
                                 input.recipe = input.recipe == recipe ? null : recipe;
                             }
@@ -160,7 +160,8 @@ public class PlacementFragment extends Fragment{
                 frame.table("button-edge-2", top -> {
                     topTable = top;
                     top.add(new Table()).growX().update(topTable -> {
-                        if((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround) || (tileDisplayBlock() != null && lastDisplay == tileDisplayBlock() && lastGround)) return;
+                        if((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround) || (tileDisplayBlock() != null && lastDisplay == tileDisplayBlock() && lastGround))
+                            return;
 
                         topTable.clear();
                         topTable.top().left().margin(5);
@@ -171,14 +172,14 @@ public class PlacementFragment extends Fragment{
                         if(lastDisplay != null){ //show selected recipe
                             topTable.table(header -> {
                                 header.left();
-                                header.add(new ImageStack(lastDisplay.getCompactIcon())).size(8*4);
+                                header.add(new ImageStack(lastDisplay.getCompactIcon())).size(8 * 4);
                                 header.labelWrap(() ->
-                                        !control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay)) ? Bundles.get("text.blocks.unknown") : lastDisplay.formalName)
-                                        .left().width(190f).padLeft(5);
+                                !control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay)) ? Bundles.get("text.blocks.unknown") : lastDisplay.formalName)
+                                .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay))){
                                     header.addButton("?", "clear-partial", () -> ui.content.show(Recipe.getByResult(lastDisplay)))
-                                            .size(8 * 5).padTop(-5).padRight(-5).right().grow();
+                                    .size(8 * 5).padTop(-5).padRight(-5).right().grow();
                                 }
                             }).growX().left();
                             topTable.row();
@@ -189,7 +190,7 @@ public class PlacementFragment extends Fragment{
                                 for(ItemStack stack : Recipe.getByResult(lastDisplay).requirements){
                                     req.table(line -> {
                                         line.left();
-                                        line.addImage(stack.item.region).size(8*2);
+                                        line.addImage(stack.item.region).size(8 * 2);
                                         line.add(stack.item.localizedName()).color(Color.LIGHT_GRAY).padLeft(2).left();
                                         line.labelWrap(() -> {
                                             TileEntity core = players[0].getClosestCore();
@@ -207,13 +208,13 @@ public class PlacementFragment extends Fragment{
 
                         }else if(tileDisplayBlock() != null){ //show selected tile
                             lastDisplay = tileDisplayBlock();
-                            topTable.add(new ImageStack(lastDisplay.getDisplayIcon(hoverTile))).size(8*4);
+                            topTable.add(new ImageStack(lastDisplay.getDisplayIcon(hoverTile))).size(8 * 4);
                             topTable.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
                         }
                     });
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
                 frame.row();
-                frame.addImage("blank").color(Palette.accent).colspan(3).height(3*2).growX();
+                frame.addImage("blank").color(Palette.accent).colspan(3).height(3 * 2).growX();
                 frame.row();
                 frame.table("pane-2", blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
@@ -229,22 +230,24 @@ public class PlacementFragment extends Fragment{
                     for(Category cat : Category.values()){
                         if(Recipe.getByCategory(cat).isEmpty()) continue;
 
-                        categories.addImageButton("icon-" + cat.name(), "clear-toggle",  16*2, () -> {
+                        categories.addImageButton("icon-" + cat.name(), "clear-toggle", 16 * 2, () -> {
                             currentCategory = cat;
                             rebuildCategory.run();
                         }).group(group).update(i -> i.setChecked(currentCategory == cat));
 
-                        if(cat.ordinal() %2 == 1) categories.row();
+                        if(cat.ordinal() % 2 == 1) categories.row();
                     }
                 }).touchable(Touchable.enabled);
 
                 rebuildCategory.run();
-                frame.update(() -> { if (gridUpdate(input)) rebuildCategory.run(); });
+                frame.update(() -> {
+                    if(gridUpdate(input)) rebuildCategory.run();
+                });
             });
         });
     }
 
-    /**Returns the currently displayed block in the top box.*/
+    /** Returns the currently displayed block in the top box. */
     Block getSelected(){
         Block toDisplay = null;
 
@@ -275,12 +278,12 @@ public class PlacementFragment extends Fragment{
         return toDisplay;
     }
 
-    /**Returns the block currently being hovered over in the world.*/
+    /** Returns the block currently being hovered over in the world. */
     Block tileDisplayBlock(){
         return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.floor() instanceof OreBlock ? hoverTile.floor() : null;
     }
 
-    /**Show or hide the placement menu.*/
+    /** Show or hide the placement menu. */
     void toggle(float t, Interpolation ip){
         toggler.clearActions();
         if(shown){
