@@ -76,7 +76,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         Effects.effect(ExplosionFx.explosion, unit);
         Effects.shake(2f, 2f, unit);
 
-        //must run afterwards so the unit's group is not null
+        //must run afterwards so the unit's group is not null when sending the removal packet
         threads.runDelay(unit::remove);
     }
 
