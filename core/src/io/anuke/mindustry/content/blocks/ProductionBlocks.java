@@ -99,13 +99,13 @@ public class ProductionBlocks extends BlockList implements ContentList{
 
         cultivator = new Cultivator("cultivator"){{
             result = Items.biomatter;
-            drillTime = 260;
+            drillTime = 200;
             size = 2;
             hasLiquids = true;
             hasPower = true;
 
             consumes.power(0.08f);
-            consumes.liquid(Liquids.water, 0.2f);
+            consumes.liquid(Liquids.water, 0.15f);
         }};
 
     }

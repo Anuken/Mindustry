@@ -62,7 +62,7 @@ public class Reconstructor extends Block{
 
         if(other != null && other.block() instanceof Reconstructor){
             ReconstructorEntity oe = other.entity();
-            if(oe.link == entity.tile.packedPosition()){
+            if(oe.link == entity.tile.pos()){
                 oe.link = -1;
             }
         }
@@ -103,8 +103,8 @@ public class Reconstructor extends Block{
             unlink(entity);
             unlink(oe);
 
-            entity.link = other.packedPosition();
-            oe.link = tile.packedPosition();
+            entity.link = other.pos();
+            oe.link = tile.pos();
         });
     }
 
@@ -161,7 +161,7 @@ public class Reconstructor extends Block{
 
         ReconstructorEntity entity = tile.entity();
 
-        if(entity.link == other.packedPosition()){
+        if(entity.link == other.pos()){
             Call.unlinkReconstructor(null, tile, other);
             return false;
         }else if(other.block() instanceof Reconstructor){

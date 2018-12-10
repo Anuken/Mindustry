@@ -48,7 +48,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     public static void create(Tile tile){
         if(Net.client() || tile == null) return; //not clientside.
 
-        Fire fire = map.get(tile.packedPosition());
+        Fire fire = map.get(tile.pos());
 
         if(fire == null){
             fire = Pooling.obtain(Fire.class, Fire::new);
@@ -56,7 +56,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
             fire.lifetime = baseLifetime;
             fire.set(tile.worldx(), tile.worldy());
             fire.add();
-            map.put(tile.packedPosition(), fire);
+            map.put(tile.pos(), fire);
         }else{
             fire.lifetime = baseLifetime;
             fire.time = 0f;
@@ -75,8 +75,8 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
      * Attempts to extinguish a fire by shortening its life. If there is no fire here, does nothing.
      */
     public static void extinguish(Tile tile, float intensity){
-        if(tile != null && map.containsKey(tile.packedPosition())){
-            map.get(tile.packedPosition()).time += intensity * Timers.delta();
+        if(tile != null && map.containsKey(tile.pos())){
+            map.get(tile.pos()).time += intensity * Timers.delta();
         }
     }
 
@@ -157,7 +157,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
 
     @Override
     public void writeSave(DataOutput stream) throws IOException{
-        stream.writeInt(tile.packedPosition());
+        stream.writeInt(tile.pos());
         stream.writeFloat(lifetime);
         stream.writeFloat(time);
     }
@@ -202,7 +202,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     @Override
     public void removed(){
         if(tile != null){
-            map.remove(tile.packedPosition());
+            map.remove(tile.pos());
         }
         reset();
     }

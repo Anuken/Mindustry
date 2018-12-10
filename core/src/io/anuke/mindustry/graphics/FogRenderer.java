@@ -77,9 +77,11 @@ public class FogRenderer implements Disposable{
 
         pixelBuffer.position(0);
         for(int i = 0; i < world.width() * world.height(); i++){
+            int x = i % world.width();
+            int y = i / world.width();
             byte r = pixelBuffer.get();
             if(r != 0){
-                world.tile(i).setVisibility((byte)1);
+                world.tile(x, y).setVisibility((byte)1);
             }
             pixelBuffer.position(pixelBuffer.position() + 3);
         }
@@ -128,10 +130,12 @@ public class FogRenderer implements Disposable{
         changeQueue.clear();
 
         if(dirty){
-            for(int i = 0; i < world.width() * world.height(); i++){
-                Tile tile = world.tile(i);
-                if(tile.discovered()){
-                    Fill.rect(tile.worldx(), tile.worldy(), tilesize, tilesize);
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
+                    Tile tile = world.tile(x, y);
+                    if(tile.discovered()){
+                        Fill.rect(tile.worldx(), tile.worldy(), tilesize, tilesize);
+                    }
                 }
             }
             dirty = false;

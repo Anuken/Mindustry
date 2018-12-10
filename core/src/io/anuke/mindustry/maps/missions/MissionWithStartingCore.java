@@ -42,6 +42,13 @@ public abstract class MissionWithStartingCore extends Mission{
         startingCoreTile.setBlock(StorageBlocks.core);
         startingCoreTile.setTeam(team);
         state.teams.get(team).cores.add(startingCoreTile);
+
+        //makes sure there's a flat area around core
+        for(int dx = -2; dx <= 2; dx++){
+            for(int dy = -2; dy <= 2; dy++){
+                gen.tiles[startingCoreTile.x + dx][startingCoreTile.y + dy].setElevation(startingCoreTile.getElevation());
+            }
+        }
     }
 
     /**

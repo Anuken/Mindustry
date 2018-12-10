@@ -71,8 +71,9 @@ public class Tile implements PosTrait, TargetTrait{
         return visibility > 0;
     }
 
-    public int packedPosition(){
-        return x + y * world.width();
+    /**Returns this tile's position as a {@link Pos}.*/
+    public int pos(){
+        return Pos.get(x, y);
     }
 
     public byte getBlockID(){
@@ -102,10 +103,6 @@ public class Tile implements PosTrait, TargetTrait{
 
     public <T extends TileEntity> T entity(){
         return (T) entity;
-    }
-
-    public int id(){
-        return x + y * world.width();
     }
 
     public float worldx(){

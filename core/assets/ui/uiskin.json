@@ -32,6 +32,7 @@ TextButtonStyle: {
 	clear-partial: {down: white, up: button-select, over: flat-down, font: default-font, fontColor: white, disabledFontColor: gray },
 	clear-partial-2: {down: flat-over, up: none, over: flat-over, font: default-font, fontColor: white, disabledFontColor: gray },
 	empty: {font: default-font},
+	clear-toggle: {font: default-font, fontColor: white, checked: flat-down, down: flat-down, up: flat, over: flat-over, disabled: flat, disabledFontColor: gray }
 	toggle: {font: default-font, fontColor: white, checked: button-down, down: button-down, up: button, over: button-over, disabled: button, disabledFontColor: gray }
 },
 ImageButtonStyle: {

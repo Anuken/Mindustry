@@ -96,11 +96,11 @@ public class JoinDialog extends FloatingDialog{
             //why are java lambdas this bad
             TextButton[] buttons = {null};
 
-            TextButton button = buttons[0] = remote.addButton("[accent]" + server.displayIP(), () -> {
+            TextButton button = buttons[0] = remote.addButton("[accent]" + server.displayIP(), "clear", () -> {
                 if(!buttons[0].childrenPressed()){
                     connect(server.ip, server.port);
                 }
-            }).width(targetWidth()).height(150f).pad(4f).get();
+            }).width(targetWidth()).height(155f).pad(4f).get();
 
             button.getLabel().setWrap(true);
 
@@ -156,10 +156,10 @@ public class JoinDialog extends FloatingDialog{
                 versionString = Bundles.get("text.server.outdated");
             }else if(host.version < Version.build && Version.build != -1){
                 versionString = Bundles.get("text.server.outdated") + "\n" +
-                        Bundles.format("text.server.version", host.version);
+                        Bundles.format("text.server.version", host.version, "");
             }else if(host.version > Version.build && Version.build != -1){
                 versionString = Bundles.get("text.server.outdated.client") + "\n" +
-                        Bundles.format("text.server.version", host.version);
+                        Bundles.format("text.server.version", host.version, "");
             }else{
                 versionString = Bundles.format("text.server.version", host.version, host.versionType);
             }
@@ -268,12 +268,13 @@ public class JoinDialog extends FloatingDialog{
         if(totalHosts == 0){
             local.clear();
         }
+        local.background((Drawable) null);
         totalHosts ++;
         float w = targetWidth();
 
         local.row();
 
-        TextButton button = local.addButton("[accent]" + host.name, () -> connect(host.address, port))
+        TextButton button = local.addButton("[accent]" + host.name, "clear", () -> connect(host.address, port))
         .width(w).height(80f).pad(4f).get();
         button.left();
         button.row();

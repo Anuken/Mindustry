@@ -12,6 +12,7 @@ import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.Weapon;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.core.Effects;
@@ -39,6 +40,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public static final float velocityPercision = 8f;
     /**Maximum absolute value of a velocity vector component.*/
     public static final float maxAbsVelocity = 127f / velocityPercision;
+    public static final int noSpawner = Pos.get(-1, 1);
 
     private static final Rectangle queryRect = new Rectangle();
     private static final Vector2 moveVector = new Vector2();

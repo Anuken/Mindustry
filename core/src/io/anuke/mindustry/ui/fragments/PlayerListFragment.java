@@ -116,7 +116,7 @@ public class PlayerListFragment extends Fragment{
 
                     t.row();
 
-                    t.addImageButton("icon-admin", "clear-toggle", 14 * 2, () -> {
+                    t.addImageButton("icon-admin", "clear-toggle-partial", 14 * 2, () -> {
                         if(Net.client()) return;
 
                         String id = player.uuid;

@@ -34,6 +34,7 @@ public class Mech extends UnlockableContent{
     public Color trailColorTo = Palette.boostTo;
     public int itemCapacity = 30;
     public boolean turnCursor = true;
+    public boolean canHeal = false;
 
     public float weaponOffsetX, weaponOffsetY;
     public Weapon weapon = Weapons.blaster;

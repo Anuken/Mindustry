@@ -19,7 +19,7 @@ public class Rock extends Block{
     @Override
     public void draw(Tile tile){
         if(variants > 0){
-            Draw.rect(regions[Mathf.randomSeed(tile.id(), 0, Math.max(0, regions.length - 1))], tile.worldx(), tile.worldy());
+            Draw.rect(regions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, regions.length - 1))], tile.worldx(), tile.worldy());
         }else{
             Draw.rect(region, tile.worldx(), tile.worldy());
         }
