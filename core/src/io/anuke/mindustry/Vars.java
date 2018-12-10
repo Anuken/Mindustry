@@ -93,7 +93,6 @@ public class Vars{
     //camera zoom displayed on startup
     public static int baseCameraScale;
     public static boolean showBlockDebug = false;
-    public static boolean showFog = false;
     public static boolean headless = false;
     public static float controllerMin = 0.25f;
     public static float baseControllerSpeed = 11f;

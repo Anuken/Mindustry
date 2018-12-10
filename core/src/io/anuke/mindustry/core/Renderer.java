@@ -1,6 +1,5 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -53,7 +52,6 @@ public class Renderer extends RendererModule{
     public final BlockRenderer blocks = new BlockRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
-    public final FogRenderer fog = new FogRenderer();
 
     private int targetscale = baseCameraScale;
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
@@ -249,12 +247,6 @@ public class Renderer extends RendererModule{
 
         overlays.drawTop();
 
-        if(showFog){
-            batch.end();
-            fog.draw();
-            batch.begin();
-        }
-
         batch.getTransformMatrix().idt();
 
         //Graphics.beginCam();
@@ -333,11 +325,6 @@ public class Renderer extends RendererModule{
         camera.position.set(lastX, lastY, 0f);
     }
 
-    @Override
-    public void dispose(){
-        fog.dispose();
-    }
-
     public Vector2 averagePosition(){
         avgPosition.setZero();
 
@@ -365,7 +352,6 @@ public class Renderer extends RendererModule{
         float vpW = Core.camera.viewportWidth, vpH = Core.camera.viewportHeight;
         int w = world.width()*tilesize, h =  world.height()*tilesize;
         int pw = pixelSurface.width(), ph = pixelSurface.height();
-        showFog = false;
         disableUI = true;
         pixelSurface.setSize(w, h, true);
         Graphics.getEffectSurface().setSize(w, h, true);
@@ -376,7 +362,6 @@ public class Renderer extends RendererModule{
 
         draw();
 
-        showFog = true;
         disableUI = false;
         Core.camera.viewportWidth = vpW;
         Core.camera.viewportHeight = vpH;

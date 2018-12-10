@@ -165,7 +165,6 @@ public class Saves{
 
         public void save(){
             long time = totalPlaytime;
-            renderer.fog.writeFog();
             long prev = totalPlaytime;
             totalPlaytime = time;
 
