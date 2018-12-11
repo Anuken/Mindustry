@@ -45,9 +45,9 @@ public class Build{
 
             for(int dx = 0; dx < previous.size; dx++){
                 for(int dy = 0; dy < previous.size; dy++){
-                    int worldx = dx + offsetx + x;
-                    int worldy = dy + offsety + y;
-                    if(!(worldx == x && worldy == y)){
+                    int worldx = dx + offsetx + tile.x;
+                    int worldy = dy + offsety + tile.y;
+                    if(!(worldx == tile.x && worldy == tile.y)){
                         Tile toplace = world.tile(worldx, worldy);
                         if(toplace != null){
                             toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));

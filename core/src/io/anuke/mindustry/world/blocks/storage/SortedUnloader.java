@@ -7,6 +7,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.SelectionTrait;
 import io.anuke.ucore.graphics.Draw;
@@ -19,14 +20,29 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.threads;
 
-public class SortedUnloader extends Unloader implements SelectionTrait{
+public class SortedUnloader extends Block implements SelectionTrait{
     protected float speed = 1f;
+    protected final int timerUnload = timers++;
+
     private static Item lastItem;
 
     public SortedUnloader(String name){
         super(name);
+        update = true;
+        solid = true;
+        health = 70;
+        hasItems = true;
         configurable = true;
     }
+
+    @Override
+    public boolean canDump(Tile tile, Tile to, Item item){
+        Block block = to.target().block();
+        return !(block instanceof StorageBlock);
+    }
+
+    @Override
+    public void setBars(){}
 
     @Override
     public void playerPlaced(Tile tile){

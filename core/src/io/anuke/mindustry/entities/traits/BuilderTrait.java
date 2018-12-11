@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities.traits;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
@@ -29,9 +30,7 @@ import io.anuke.ucore.graphics.Fill;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Shapes;
 import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -47,6 +46,7 @@ public interface BuilderTrait extends Entity{
     //these are not instance variables!
     float placeDistance = 150f;
     float mineDistance = 70f;
+    Array<BuildRequest> removal = new Array<>();
 
     /**Returns the queue for storing build requests.*/
     Queue<BuildRequest> getPlaceQueue();
@@ -171,6 +171,19 @@ public interface BuilderTrait extends Entity{
      * This includes mining.
      */
     default void updateBuilding(Unit unit){
+        //remove already completed build requests
+        removal.clear();
+        for(BuildRequest request : getPlaceQueue()){
+            if((request.breaking && world.tile(request.x, request.y).block() == Blocks.air) ||
+                (!request.breaking && world.tile(request.x, request.y).block() == request.recipe.result)){
+                removal.add(request);
+            }
+        }
+
+        for(BuildRequest req : removal){
+            getPlaceQueue().removeValue(req, true);
+        }
+
         BuildRequest current = getCurrentRequest();
 
         //update mining here
@@ -372,6 +385,19 @@ public interface BuilderTrait extends Entity{
             this.rotation = -1;
             this.recipe = Recipe.getByResult(world.tile(x, y).block());
             this.breaking = true;
+        }
+
+        @Override
+        public String toString(){
+            return "BuildRequest{" +
+            "x=" + x +
+            ", y=" + y +
+            ", rotation=" + rotation +
+            ", recipe=" + recipe +
+            ", breaking=" + breaking +
+            ", progress=" + progress +
+            ", initialized=" + initialized +
+            '}';
         }
     }
 }

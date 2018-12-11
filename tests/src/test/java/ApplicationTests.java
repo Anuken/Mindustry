@@ -5,21 +5,22 @@ import com.badlogic.gdx.math.GridPoint2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.blocks.CraftingBlocks;
-import io.anuke.mindustry.content.blocks.PowerBlocks;
-import io.anuke.mindustry.content.blocks.StorageBlocks;
+import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Logic;
 import io.anuke.mindustry.core.NetServer;
 import io.anuke.mindustry.core.World;
+import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.units.types.Spirit;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
@@ -227,6 +228,70 @@ public class ApplicationTests{
 
         GridPoint2[] edges2 = Edges.getEdges(2);
         assertEquals(8, edges2.length);
+    }
+
+    @Test
+    void buildingOverlap(){
+        initBuilding();
+
+        Spirit d1 = (Spirit) UnitTypes.spirit.create(Team.blue);
+        Spirit d2 = (Spirit) UnitTypes.spirit.create(Team.blue);
+
+        d1.set(10f, 20f);
+        d2.set(10f, 20f);
+
+        d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
+        d2.addBuildRequest(new BuildRequest(1, 1, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
+
+        Timers.setDeltaProvider(() -> 9999999f);
+        d1.updateBuilding(d1);
+        d2.updateBuilding(d2);
+
+        assertEquals(DefenseBlocks.copperWallLarge, world.tile(0, 0).block());
+        assertEquals(Blocks.air, world.tile(2, 2).block());
+        assertEquals(Blocks.blockpart, world.tile(1, 1).block());
+    }
+
+    @Test
+    void buildingDestruction(){
+        initBuilding();
+
+        Spirit d1 = (Spirit) UnitTypes.spirit.create(Team.blue);
+        Spirit d2 = (Spirit) UnitTypes.spirit.create(Team.blue);
+
+        d1.set(10f, 20f);
+        d2.set(10f, 20f);
+
+        d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
+        d2.addBuildRequest(new BuildRequest(1, 1));
+
+        Timers.setDeltaProvider(() -> 3f);
+        d1.updateBuilding(d1);
+        Timers.setDeltaProvider(() -> 1f);
+        d2.updateBuilding(d2);
+
+        assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
+
+        Timers.setDeltaProvider(() -> 9999f);
+
+        d1.updateBuilding(d1);
+        d2.updateBuilding(d2);
+
+        assertEquals(Blocks.air, world.tile(0, 0).block());
+        assertEquals(Blocks.air, world.tile(2, 2).block());
+        assertEquals(Blocks.air, world.tile(1, 1).block());
+    }
+
+    void initBuilding(){
+        createMap();
+
+        Tile core = world.tile(5, 5);
+        world.setBlock(core, StorageBlocks.core, Team.blue);
+        for(Item item : content.items()){
+            core.entity.items.set(item, 3000);
+        }
+
+        assertEquals(core, state.teams.get(Team.blue).cores.first());
     }
 
     void depositTest(Block block, Item item){

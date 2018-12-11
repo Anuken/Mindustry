@@ -215,10 +215,10 @@ public class DesktopInput extends InputHandler{
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
                 if (!tileTapped(selected) && !tryTapPlayer(Graphics.mouseWorld().x, Graphics.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
-                        !tryBeginMine(selected) && player.getMineTile() == null) {
+                        !tryBeginMine(selected) && player.getMineTile() == null && !ui.chatfrag.chatOpen()) {
                     player.isShooting = true;
                 }
-            }else{ //if it's out of bounds, shooting is just fine
+            }else if(!ui.chatfrag.chatOpen()){ //if it's out of bounds, shooting is just fine
                 player.isShooting = true;
             }
         }else if(Inputs.keyTap(section, "deselect") && (recipe != null || mode != none || player.isBuilding()) &&

@@ -96,6 +96,9 @@ public class MobileInput extends InputHandler implements GestureListener{
                 TileEntity entity = tile.entity;
                 player.setMineTile(null);
                 player.target = entity;
+            }else if(tile != null && player.mech.canHeal && tile.entity != null && tile.getTeam() == player.getTeam() && tile.entity.damaged()){
+                player.setMineTile(null);
+                player.target = tile.entity;
             }
         }
     }
@@ -221,17 +224,17 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }).update(l -> l.setChecked(mode == breaking));
 
-        //rotate button
-        table.addImageButton("icon-arrow", "clear-partial", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
-        .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center))
-        .visible(() -> recipe != null && recipe.result.rotate);
-
         //cancel button
         table.addImageButton("icon-cancel", "clear-partial", 16 * 2f, () -> {
             player.clearBuilding();
             mode = none;
             recipe = null;
         }).visible(() -> player.isBuilding() || recipe != null || mode == breaking);
+
+        //rotate button
+        table.addImageButton("icon-arrow", "clear-partial", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
+        .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center))
+        .visible(() -> recipe != null && recipe.result.rotate);
 
         //confirm button
         table.addImageButton("icon-check", "clear-partial", 16 * 2f, () -> {

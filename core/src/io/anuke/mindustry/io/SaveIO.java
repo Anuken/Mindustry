@@ -14,7 +14,7 @@ import java.util.zip.InflaterInputStream;
 import static io.anuke.mindustry.Vars.*;
 
 public class SaveIO{
-    public static final IntArray breakingVersions = IntArray.with(47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58);
+    public static final IntArray breakingVersions = IntArray.with(47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 63);
     public static final IntMap<SaveFileVersion> versions = new IntMap<>();
     public static final Array<SaveFileVersion> versionArray = Array.with(
         new Save16()
