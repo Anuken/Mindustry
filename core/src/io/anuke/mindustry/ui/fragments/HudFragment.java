@@ -198,7 +198,7 @@ public class HudFragment extends Fragment{
                 return coreAttackOpacity > 0;
             });
             t.table("button", top -> top.add("$text.coreattack").pad(2)
-            .update(label -> label.setColor(Hue.mix(Color.ORANGE, Color.SCARLET, Mathf.absin(Timers.time(), 2f, 1f)))));
+                .update(label -> label.setColor(Hue.mix(Color.ORANGE, Color.SCARLET, Mathf.absin(Timers.time(), 2f, 1f)))));
         });
 
         //'saving' indicator
@@ -371,16 +371,16 @@ public class HudFragment extends Fragment{
         table.setTouchable(Touchable.enabled);
 
         table.labelWrap(() ->
-        world.getSector() == null ?
-        (state.enemies() > 0 && state.mode.disableWaveTimer ?
-        wavef.get(state.wave) + "\n" + (state.enemies() == 1 ?
-        enemyf.get(state.enemies()) :
-        enemiesf.get(state.enemies())) :
-        wavef.get(state.wave) + "\n" +
-        (!state.mode.disableWaveTimer ?
-        Bundles.format("text.wave.waiting", (int) (state.wavetime / 60)) :
-        Bundles.get("text.waiting"))) :
-        Bundles.format("text.mission.display", world.getSector().currentMission().displayString())).growX().pad(8f);
+            world.getSector() == null ?
+                (state.enemies() > 0 && state.mode.disableWaveTimer ?
+                wavef.get(state.wave) + "\n" + (state.enemies() == 1 ?
+                    enemyf.get(state.enemies()) :
+                    enemiesf.get(state.enemies())) :
+                wavef.get(state.wave) + "\n" +
+                    (!state.mode.disableWaveTimer ?
+                    Bundles.format("text.wave.waiting", (int)(state.wavetime/60)) :
+                    Bundles.get("text.waiting"))) :
+            Bundles.format("text.mission.display", world.getSector().currentMission().displayString())).growX().pad(8f);
 
         table.clicked(() -> {
             if(world.getSector() != null && world.getSector().currentMission().hasMessage()){

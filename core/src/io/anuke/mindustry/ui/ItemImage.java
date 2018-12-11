@@ -11,7 +11,7 @@ public class ItemImage extends Stack{
 
     public ItemImage(TextureRegion region, Supplier<CharSequence> text){
         Table t = new Table().left().bottom();
-        t.label(text);
+        t.label(text).name("item-label");
 
         add(new Image(region));
         add(t);
@@ -22,7 +22,7 @@ public class ItemImage extends Stack{
 
         if(stack.amount != 0){
             Table t = new Table().left().bottom();
-            t.add(stack.amount + "");
+            t.add(stack.amount + "").name("item-label");
             add(t);
         }
     }

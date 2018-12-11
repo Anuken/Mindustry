@@ -42,15 +42,15 @@ public class PlacementFragment extends Fragment{
     boolean lastGround;
 
     final Input[] inputGrid = {
-    Input.NUM_1, Input.NUM_2, Input.NUM_3, Input.NUM_4,
-    Input.Q, Input.W, Input.E, Input.R,
-    Input.A, Input.S, Input.D, Input.F,
-    Input.Z, Input.X, Input.C, Input.V
+        Input.NUM_1, Input.NUM_2, Input.NUM_3, Input.NUM_4,
+        Input.Q, Input.W, Input.E, Input.R,
+        Input.A, Input.S, Input.D, Input.F,
+        Input.Z, Input.X, Input.C, Input.V
     }, inputCatGrid = {
-    Input.NUM_1, Input.NUM_2,
-    Input.Q, Input.W,
-    Input.A, Input.S,
-    Input.Z, Input.X, Input.C, Input.V
+        Input.NUM_1, Input.NUM_2,
+        Input.Q, Input.W,
+        Input.A, Input.S,
+        Input.Z, Input.X, Input.C, Input.V
     };
 
     public PlacementFragment(){
@@ -75,10 +75,12 @@ public class PlacementFragment extends Fragment{
             }
             return true;
         }else if(Inputs.keyDown("select")){ // Mouse eyedropper select
-            Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y).target();
-            if(tile.block() != null){
+            Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
+
+            if(tile != null){
+                tile = tile.target();
                 Recipe tryRecipe = Recipe.getByResult(tile.block());
-                if((tryRecipe != null) && control.unlocks.isUnlocked(tryRecipe)){
+                if(tryRecipe != null && control.unlocks.isUnlocked(tryRecipe)){
                     input.recipe = tryRecipe;
                     currentCategory = input.recipe.category;
                     return true;
