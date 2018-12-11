@@ -25,7 +25,7 @@ public class DefaultKeybinds{
                 "rotate", new Axis(Input.SCROLL),
                 "dash", Input.SHIFT_LEFT,
                 "drop_unit", Input.SHIFT_LEFT,
-                "gridMode", Input.ALT_LEFT,
+                "gridMode", Input.CONTROL_LEFT,
                 "gridModeShift", Input.SHIFT_LEFT,
                 new Category("view"),
                 "zoom_hold", Input.CONTROL_LEFT,

@@ -41,6 +41,7 @@ public class PlacementFragment extends Fragment{
     boolean shown = true;
     boolean lastGround;
 
+    //TODO make this configurable
     final Input[] inputGrid = {
         Input.NUM_1, Input.NUM_2, Input.NUM_3, Input.NUM_4,
         Input.Q, Input.W, Input.E, Input.R,
@@ -64,7 +65,7 @@ public class PlacementFragment extends Fragment{
 
     boolean gridUpdate(InputHandler input){
         if(!Inputs.keyDown("gridMode")) return false;
-        if(Inputs.keyDown("gridModeShift")){ // Select Category
+        if(Inputs.keyDown("gridModeShift")){ //select category
             int i = 0;
             for(Input key : inputCatGrid){
                 if(Inputs.keyDown(key)){
@@ -74,7 +75,7 @@ public class PlacementFragment extends Fragment{
                 i++;
             }
             return true;
-        }else if(Inputs.keyDown("select")){ // Mouse eyedropper select
+        }else if(Inputs.keyDown("select")){ //mouse eyedropper select
             Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
 
             if(tile != null){
@@ -86,7 +87,7 @@ public class PlacementFragment extends Fragment{
                     return true;
                 }
             }
-        }else{    // Select block
+        }else{ //select block
             int i = 0;
             Array<Recipe> recipes = Recipe.getByCategory(currentCategory);
             for(Input key : inputGrid){
