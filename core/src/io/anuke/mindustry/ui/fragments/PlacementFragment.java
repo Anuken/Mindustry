@@ -64,7 +64,7 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean gridUpdate(InputHandler input){
-        if(!Inputs.keyDown("gridMode")) return false;
+        if(!Inputs.keyDown("gridMode") || ui.chatfrag.chatOpen()) return false;
         if(Inputs.keyDown("gridModeShift")){ //select category
             int i = 0;
             for(Input key : inputCatGrid){

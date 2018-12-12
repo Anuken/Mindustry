@@ -40,7 +40,6 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import static io.anuke.mindustry.Vars.*;
@@ -171,8 +170,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
         });
 
-        loadDialog = new MapLoadDialog(map -> {
-
+        loadDialog = new MapLoadDialog(map ->
             ui.loadGraphics(() -> {
                 try(DataInputStream stream = new DataInputStream(map.stream.get())){
                     MapMeta meta = MapIO.readMapMeta(stream);
@@ -180,12 +178,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                     editor.beginEdit(data, meta.tags, false);
                     view.clearStack();
-                }catch(IOException e){
+                }catch(Exception e){
                     ui.showError(Bundles.format("text.editor.errormapload", Strings.parseException(e, false)));
                     Log.err(e);
                 }
-            });
-        });
+            }));
 
         setFillParent(true);
 
