@@ -275,18 +275,18 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 listenable.run();
                 dialog.hide();
                 menu.hide();
-            }).left().get();
+            }).left().margin(0).get();
 
             button.clearChildren();
             button.table("button", t -> {
                 t.addImage(iconname).size(16 * 3);
-                t.update(() -> t.background(button.getClickListener().isOver() ? "button-over" : "button"));
-            }).padLeft(-10).padBottom(-3).size(h);
+                t.update(() -> t.background(button.getClickListener().isPressed() ? "button-down" : button.getClickListener().isOver() ? "button-over" : "button"));
+            }).size(h);
             button.table(t -> {
                 t.add(name).growX().wrap();
                 t.row();
                 t.add(description).color(Color.GRAY).growX().wrap();
-            }).growX().padLeft(8);
+            }).growX().pad(10f);
 
             button.row();
 
