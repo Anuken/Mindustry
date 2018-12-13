@@ -310,6 +310,7 @@ public class JoinDialog extends FloatingDialog{
         return UIUtils.portrait() ? 350f : 500f;
     }
 
+    @SuppressWarnings("unchecked")
     private void loadServers(){
         servers = Settings.getObject("server-list", Array.class, Array::new);
     }

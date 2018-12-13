@@ -87,6 +87,7 @@ public class Consumers{
         return map.containsKey(type);
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Consume> T get(Class<T> type){
         if(!map.containsKey(type)){
             throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "'!");

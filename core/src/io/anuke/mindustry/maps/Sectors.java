@@ -150,6 +150,7 @@ public class Sectors{
         save();
     }
 
+    @SuppressWarnings("unchecked")
     public void load(){
         for(Sector sector : grid.values()){
             sector.texture.dispose();
