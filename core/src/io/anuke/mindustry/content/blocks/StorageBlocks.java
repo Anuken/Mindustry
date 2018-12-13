@@ -13,6 +13,7 @@ public class StorageBlocks extends BlockList implements ContentList{
     public void load(){
         core = new CoreBlock("core"){{
             health = 1100;
+            itemCapacity = 3000;
         }};
 
         vault = new Vault("vault"){{
@@ -22,11 +23,11 @@ public class StorageBlocks extends BlockList implements ContentList{
 
         container = new Vault("container"){{
             size = 2;
-            itemCapacity = 250;
+            itemCapacity = 300;
         }};
 
         unloader = new SortedUnloader("unloader"){{
-            speed = 5;
+            speed = 7f;
         }};
     }
 }

@@ -16,7 +16,8 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
 public class Blocks extends BlockList implements ContentList{
-    public static Block air, blockpart, spawn, space, metalfloor, deepwater, water, lava, oil, stone, blackstone, dirt, sand, ice, snow, grass, shrub, rock, icerock, blackrock;
+    public static Block air, blockpart, spawn, space, metalfloor, deepwater, water, lava, tar, stone,
+    blackstone, dirt, sand, ice, snow, grass, shrub, rock, icerock, blackrock;
 
 
     @Override
@@ -45,6 +46,8 @@ public class Blocks extends BlockList implements ContentList{
             }
         };
 
+        //Registers build blocks from size 1-6
+        //no reference is needed here since they can be looked up by name later
         for(int i = 1; i <= 6; i++){
             new BuildBlock("build" + i);
         }
@@ -88,6 +91,7 @@ public class Blocks extends BlockList implements ContentList{
         }};
 
         lava = new Floor("lava"){{
+            drownTime = 100f;
             liquidColor = Color.valueOf("ed5334");
             speedMultiplier = 0.2f;
             damageTaken = 0.5f;
@@ -100,11 +104,12 @@ public class Blocks extends BlockList implements ContentList{
             minimapColor = Color.valueOf("ed5334");
         }};
 
-        oil = new Floor("oil"){{
+        tar = new Floor("tar"){{
+            drownTime = 150f;
             liquidColor = Color.valueOf("292929");
             status = StatusEffects.tarred;
             statusIntensity = 1f;
-            speedMultiplier = 0.2f;
+            speedMultiplier = 0.19f;
             variants = 0;
             liquidDrop = Liquids.oil;
             isLiquid = true;
@@ -139,7 +144,7 @@ public class Blocks extends BlockList implements ContentList{
         }};
 
         ice = new Floor("ice"){{
-            dragMultiplier = 0.3f;
+            dragMultiplier = 0.2f;
             speedMultiplier = 0.4f;
             minimapColor = Color.valueOf("b8eef8");
             hasOres = true;

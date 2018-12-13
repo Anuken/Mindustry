@@ -2,12 +2,10 @@ package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save16;
-import io.anuke.ucore.core.Settings;
 
 import java.io.*;
 import java.util.zip.DeflaterOutputStream;
@@ -16,7 +14,7 @@ import java.util.zip.InflaterInputStream;
 import static io.anuke.mindustry.Vars.*;
 
 public class SaveIO{
-    public static final IntArray breakingVersions = IntArray.with(47, 48, 49, 50, 51, 52, 53, 54, 55, 56);
+    public static final IntArray breakingVersions = IntArray.with(47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 63);
     public static final IntMap<SaveFileVersion> versions = new IntMap<>();
     public static final Array<SaveFileVersion> versionArray = Array.with(
         new Save16()
@@ -33,40 +31,23 @@ public class SaveIO{
     }
 
     public static void saveToSlot(int slot){
-        if(gwt){
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            write(stream);
-            Settings.putString("save-" + slot + "-data", new String(Base64Coder.encode(stream.toByteArray())));
-            Settings.save();
-        }else{
-            FileHandle file = fileFor(slot);
-            boolean exists = file.exists();
-            if(exists) file.moveTo(file.sibling(file.name() + "-backup." + file.extension()));
-            try{
-                write(fileFor(slot));
-            }catch(Exception e){
-                if(exists) file.sibling(file.name() + "-backup." + file.extension()).moveTo(file);
-                throw new RuntimeException(e);
-            }
+        FileHandle file = fileFor(slot);
+        boolean exists = file.exists();
+        if(exists) file.moveTo(file.sibling(file.name() + "-backup." + file.extension()));
+        try{
+            write(fileFor(slot));
+        }catch(Exception e){
+            if(exists) file.sibling(file.name() + "-backup." + file.extension()).moveTo(file);
+            throw new RuntimeException(e);
         }
     }
 
     public static void loadFromSlot(int slot){
-        if(gwt){
-            load(getSlotStream(slot));
-        }else{
-            load(fileFor(slot));
-        }
+        load(fileFor(slot));
     }
 
     public static DataInputStream getSlotStream(int slot){
-        if(gwt){
-            String string = Settings.getString("save-" + slot + "-data", "");
-            byte[] bytes = Base64Coder.decode(string);
-            return new DataInputStream(new ByteArrayInputStream(bytes));
-        }else{
-            return new DataInputStream(new InflaterInputStream(fileFor(slot).read()));
-        }
+        return new DataInputStream(new InflaterInputStream(fileFor(slot).read()));
     }
 
     public static boolean isSaveValid(int slot){
@@ -165,6 +146,7 @@ public class SaveIO{
 
             stream.close();
         }catch(Exception e){
+            content.setTemporaryMapper(null);
             throw new RuntimeException(e);
         }
     }

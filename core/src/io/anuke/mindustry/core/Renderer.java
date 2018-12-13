@@ -1,10 +1,16 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.BufferUtils;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -33,6 +39,7 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.graphics.Surface;
 import io.anuke.ucore.modules.RendererModule;
 import io.anuke.ucore.scene.utils.Cursors;
+import io.anuke.ucore.util.Bundles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Pooling;
 import io.anuke.ucore.util.Translator;
@@ -145,7 +152,7 @@ public class Renderer extends RendererModule{
 
             if(players[0].isDead()){
                 TileEntity core = players[0].getClosestCore();
-                if(core != null && players[0].spawner == -1){
+                if(core != null && players[0].spawner == Unit.noSpawner){
                     smoothCamera(core.x, core.y, 0.08f);
                 }else{
                     smoothCamera(position.x + 0.0001f, position.y + 0.0001f, 0.08f);
@@ -248,11 +255,12 @@ public class Renderer extends RendererModule{
         overlays.drawBottom();
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
-        Shaders.shield.color.set(Palette.accent);
         Graphics.beginShaders(Shaders.shield);
         EntityDraw.draw(shieldGroup);
         EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
+        Draw.color(Palette.accent);
         Graphics.endShaders();
+        Draw.color();
 
         overlays.drawTop();
 
@@ -375,6 +383,46 @@ public class Renderer extends RendererModule{
     public void clampScale(){
         float s = io.anuke.ucore.scene.ui.layout.Unit.dp.scl(1f);
         targetscale = Mathf.clamp(targetscale, Math.round(s * 2), Math.round(s * 5));
+    }
+
+    public void takeMapScreenshot(){
+        float vpW = Core.camera.viewportWidth, vpH = Core.camera.viewportHeight;
+        int w = world.width()*tilesize, h =  world.height()*tilesize;
+        int pw = pixelSurface.width(), ph = pixelSurface.height();
+        showFog = false;
+        disableUI = true;
+        pixelSurface.setSize(w, h, true);
+        Graphics.getEffectSurface().setSize(w, h, true);
+        Core.camera.viewportWidth = w;
+        Core.camera.viewportHeight = h;
+        Core.camera.position.x = w/2f + tilesize/2f;
+        Core.camera.position.y = h/2f + tilesize/2f;
+
+        draw();
+
+        showFog = true;
+        disableUI = false;
+        Core.camera.viewportWidth = vpW;
+        Core.camera.viewportHeight = vpH;
+
+        pixelSurface.getBuffer().begin();
+        byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
+        for(int i = 0; i < lines.length; i+= 4){
+            lines[i + 3] = (byte)255;
+        }
+        pixelSurface.getBuffer().end();
+
+        Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+
+        BufferUtils.copy(lines, 0, fullPixmap.getPixels(), lines.length);
+        FileHandle file = screenshotDirectory.child("screenshot-" + TimeUtils.millis() + ".png");
+        PixmapIO.writePNG(file, fullPixmap);
+        fullPixmap.dispose();
+
+        pixelSurface.setSize(pw, ph, false);
+        Graphics.getEffectSurface().setSize(pw, ph, false);
+
+        ui.showInfoFade(Bundles.format("text.screenshot", file.toString()));
     }
 
 }

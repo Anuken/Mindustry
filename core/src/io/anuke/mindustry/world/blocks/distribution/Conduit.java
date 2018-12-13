@@ -9,8 +9,8 @@ import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 public class Conduit extends LiquidBlock{
@@ -136,12 +136,12 @@ public class Conduit extends LiquidBlock{
         int blendshadowrot;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeFloat(smoothLiquid);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             smoothLiquid = stream.readFloat();
         }
     }

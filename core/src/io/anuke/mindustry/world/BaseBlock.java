@@ -43,7 +43,7 @@ public abstract class BaseBlock extends MappableContent{
     /**Returns the amount of items this block can accept.*/
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
         if(acceptItem(item, tile, tile) && hasItems && (source == null || source.getTeam() == tile.getTeam())){
-            return Math.min(getMaximumAccepted(tile, item), amount);
+            return Math.min(getMaximumAccepted(tile, item) - tile.entity.items.get(item), amount);
         }else{
             return 0;
         }
@@ -90,7 +90,7 @@ public abstract class BaseBlock extends MappableContent{
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         return hasLiquids && tile.entity.liquids.get(liquid) + amount < liquidCapacity &&
-                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f)) &&
+                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f)) &&
                 (!consumes.has(ConsumeLiquid.class) || consumes.liquid() == liquid);
     }
 

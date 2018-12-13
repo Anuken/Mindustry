@@ -2,10 +2,12 @@ package io.anuke.mindustry.world.meta.values;
 
 import com.badlogic.gdx.utils.Array;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.ui.ItemDisplay;
 import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.ucore.function.Predicate;
 import io.anuke.ucore.scene.ui.layout.Table;
-import static io.anuke.mindustry.Vars.*;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class ItemFilterValue implements StatValue{
     private final Predicate<Item> filter;
@@ -24,7 +26,9 @@ public class ItemFilterValue implements StatValue{
 
         for(int i = 0; i < list.size; i++){
             Item item = list.get(i);
-            table.addImage(item.region).size(8 * 3).padRight(2).padLeft(2);
+
+            table.add(new ItemDisplay(item)).padRight(5);
+
             if(i != list.size - 1){
                 table.add("/");
             }

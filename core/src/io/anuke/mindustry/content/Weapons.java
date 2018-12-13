@@ -7,8 +7,8 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
 
 public class Weapons implements ContentList{
-    public static Weapon blaster, blasterSmall, glaiveBlaster, droneBlaster, healBlaster, chainBlaster, shockgun,
-    sapper, swarmer, bomber, bomberTrident, flakgun, flamethrower, missiles, artillery, laserBurster;
+    public static Weapon blaster, blasterSmall, glaiveBlaster, droneBlaster, healBlaster, healBlasterDrone, chainBlaster, shockgun,
+    sapper, swarmer, bomber, bomberTrident, flakgun, flamethrower, missiles, artillery, laserBurster, healBlasterDrone2;
 
     @Override
     public void load(){
@@ -152,7 +152,7 @@ public class Weapons implements ContentList{
         bomberTrident = new Weapon("bomber"){{
             length = 0f;
             width = 2f;
-            reload = 9f;
+            reload = 8f;
             shots = 2;
             roundrobin = true;
             ejectEffect = Fx.none;
@@ -168,6 +168,26 @@ public class Weapons implements ContentList{
             roundrobin = true;
             ejectEffect = Fx.none;
             ammo = AmmoTypes.lancerLaser;
+        }};
+
+        healBlasterDrone = new Weapon("heal-blaster"){{
+            length = 1.5f;
+            reload = 40f;
+            width = 0.5f;
+            roundrobin = true;
+            ejectEffect = Fx.none;
+            recoil = 2f;
+            ammo = AmmoTypes.healBlaster;
+        }};
+
+        healBlasterDrone2 = new Weapon("heal-blaster"){{
+            length = 1.5f;
+            reload = 20f;
+            width = 0.5f;
+            roundrobin = true;
+            ejectEffect = Fx.none;
+            recoil = 2f;
+            ammo = AmmoTypes.healBlaster;
         }};
     }
 

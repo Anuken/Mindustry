@@ -20,7 +20,7 @@ public class ContentInfoDialog extends FloatingDialog{
 
         content.displayInfo(table);
 
-        ScrollPane pane = new ScrollPane(table, "clear-black");
+        ScrollPane pane = new ScrollPane(table);
         content().add(pane);
 
         show();

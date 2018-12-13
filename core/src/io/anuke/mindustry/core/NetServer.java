@@ -16,6 +16,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
@@ -24,6 +25,7 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.ucore.core.Events;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.entities.Entities;
 import io.anuke.ucore.entities.EntityGroup;
@@ -76,6 +78,11 @@ public class NetServer extends Module{
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
 
     public NetServer(){
+        Events.on(WorldLoadEvent.class, event -> {
+            if(!headless){
+                connections.clear();
+            }
+        });
 
         Net.handleServer(Connect.class, (id, connect) -> {
             if(admins.isIPBanned(connect.addressTCP)){
@@ -106,11 +113,9 @@ public class NetServer extends Module{
 
             connection.hasBegunConnecting = true;
 
-            TraceInfo trace = admins.getTraceByID(uuid);
             PlayerInfo info = admins.getInfo(uuid);
-            trace.uuid = uuid;
-            trace.ip = connection.address;
-            trace.android = packet.mobile;
+
+            connection.mobile = packet.mobile;
 
             if(admins.isIDBanned(uuid)){
                 kick(id, KickReason.banned);
@@ -122,7 +127,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            if(packet.version == -1 && Version.build != -1 && !admins.allowsCustomClients()){
+            if(packet.versionType == null || ((packet.version == -1 || !packet.versionType.equals(Version.type)) && Version.build != -1 && !admins.allowsCustomClients())){
                 kick(id, KickReason.customClient);
                 return;
             }
@@ -150,7 +155,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            Log.info("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, trace.ip);
+            Log.info("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, connection.address);
 
             String ip = Net.getConnection(id).address;
 
@@ -162,7 +167,7 @@ public class NetServer extends Module{
             }
 
             if(packet.version == -1){
-                trace.modclient = true;
+                connection.modclient = true;
             }
 
             Player player = new Player();
@@ -206,8 +211,6 @@ public class NetServer extends Module{
             }
 
             connections.put(id, player);
-
-            trace.playerid = player.id;
 
             sendWorldData(player, id);
 
@@ -278,6 +281,7 @@ public class NetServer extends Module{
         }
         player.remove();
         netServer.connections.remove(player.con.id);
+        Log.info("&lc{0} has disconnected.", player.name);
     }
 
     private static float compound(float speed, float drag){
@@ -327,9 +331,9 @@ public class NetServer extends Module{
         player.getPlaceQueue().clear();
         for(BuildRequest req : requests){
             //auto-skip done requests
-            if(req.remove && world.tile(req.x, req.y).block() == Blocks.air){
+            if(req.breaking && world.tile(req.x, req.y).block() == Blocks.air){
                 continue;
-            }else if(!req.remove && world.tile(req.x, req.y).block() == req.recipe.result && (!req.recipe.result.rotate || world.tile(req.x, req.y).getRotation() == req.rotation)){
+            }else if(!req.breaking && world.tile(req.x, req.y).block() == req.recipe.result && (!req.recipe.result.rotate || world.tile(req.x, req.y).getRotation() == req.rotation)){
                 continue;
             }
             player.getPlaceQueue().addLast(req);
@@ -378,7 +382,7 @@ public class NetServer extends Module{
             return;
         }
 
-        if(other == null || (other.isAdmin && other != player)){ //fun fact: this means you can ban yourself
+        if(other == null || ((other.isAdmin && !player.isLocal) && other != player)){
             Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
             return;
         }
@@ -395,11 +399,11 @@ public class NetServer extends Module{
             netServer.kick(other.con.id, KickReason.kick);
             Log.info("&lc{0} has kicked {1}.", player.name, other.name);
         }else if(action == AdminAction.trace){
-            //TODO
+            //TODO implement
             if(player.con != null){
-                Call.onTraceInfo(player.con.id, netServer.admins.getTraceByID(other.uuid));
+                //Call.onTraceInfo(player.con.id, other.con.trace);
             }else{
-                NetClient.onTraceInfo(netServer.admins.getTraceByID(other.uuid));
+                //NetClient.onTraceInfo(other.con.trace);
             }
             Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
         }
@@ -416,15 +420,22 @@ public class NetServer extends Module{
     }
 
     public boolean isWaitingForPlayers(){
-        return state.mode.isPvp && playerGroup.size() < 2;
+        if(state.mode.isPvp){
+            int used = 0;
+            for(Team t : Team.all){
+                if(playerGroup.count(p -> p.getTeam() == t) > 0){
+                    used ++;
+                }
+            }
+            return used < 2;
+        }
+        return false;
     }
 
     public void update(){
-        if(threads.isEnabled() && !threads.isOnThread()) return;
 
         if(!headless && !closing && Net.server() && state.is(State.menu)){
             closing = true;
-            reset();
             threads.runGraphics(() -> ui.loadfrag.show("$text.server.closing"));
             Timers.runTask(5f, () -> {
                 Net.closeServer();
@@ -436,10 +447,6 @@ public class NetServer extends Module{
         if(!state.is(State.menu) && Net.server()){
             sync();
         }
-    }
-
-    public void reset(){
-        admins.clearTraces();
     }
 
     public void kickAll(KickReason reason){
@@ -478,6 +485,7 @@ public class NetServer extends Module{
         //write wave datas
         dataStream.writeFloat(state.wavetime);
         dataStream.writeInt(state.wave);
+        dataStream.writeInt(state.enemies());
 
         ObjectSet<Tile> cores = state.teams.get(player.getTeam()).cores;
 
@@ -485,7 +493,7 @@ public class NetServer extends Module{
 
         //write all core inventory data
         for(Tile tile : cores){
-            dataStream.writeInt(tile.packedPosition());
+            dataStream.writeInt(tile.pos());
             tile.entity.items.write(dataStream);
         }
 
@@ -504,7 +512,7 @@ public class NetServer extends Module{
         //check for syncable groups
         for(EntityGroup<?> group : Entities.getAllGroups()){
             if(group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
-            //clipping is done by represntatives
+            //clipping is done by representatives
             SyncTrait represent = (SyncTrait) group.all().get(0);
 
             //make sure mapping is enabled for this group
@@ -591,14 +599,18 @@ public class NetServer extends Module{
     }
 
     void sync(){
+
         try{
 
             //iterate through each player
-            for(Player player : connections.values()){
+            for(int i = 0; i < playerGroup.size(); i ++){
+                Player player = playerGroup.all().get(i);
+                if(player.isLocal) continue;
+
                 NetConnection connection = player.con;
 
-                if(!connection.isConnected()){
-                    //player disconnected, ignore them
+                if(!connection.isConnected() || !connections.containsKey(connection.id)){
+                    //player disconnected, call d/c event
                     onDisconnect(player);
                     return;
                 }

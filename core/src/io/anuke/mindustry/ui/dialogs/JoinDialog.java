@@ -18,7 +18,6 @@ import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
 import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
@@ -101,7 +100,7 @@ public class JoinDialog extends FloatingDialog{
                 if(!buttons[0].childrenPressed()){
                     connect(server.ip, server.port);
                 }
-            }).width(targetWidth()).height(150f).pad(4f).get();
+            }).width(targetWidth()).height(155f).pad(4f).get();
 
             button.getLabel().setWrap(true);
 
@@ -157,10 +156,10 @@ public class JoinDialog extends FloatingDialog{
                 versionString = Bundles.get("text.server.outdated");
             }else if(host.version < Version.build && Version.build != -1){
                 versionString = Bundles.get("text.server.outdated") + "\n" +
-                        Bundles.format("text.server.version", host.version);
+                        Bundles.format("text.server.version", host.version, "");
             }else if(host.version > Version.build && Version.build != -1){
                 versionString = Bundles.get("text.server.outdated.client") + "\n" +
-                        Bundles.format("text.server.version", host.version);
+                        Bundles.format("text.server.version", host.version, "");
             }else{
                 versionString = Bundles.format("text.server.version", host.version, host.versionType);
             }
@@ -177,8 +176,6 @@ public class JoinDialog extends FloatingDialog{
                 t.row();
                 t.add("[lightgray]" + Bundles.format("text.save.map", host.mapname) + " / " + Bundles.format("text.save.wave", host.wave)).left();
             }).expand().left().bottom().padLeft(12f).padBottom(8);
-
-            //server.content.add(versionString).top().expandY().top().expandX();
 
         }, e -> {
             server.content.clear();
@@ -197,7 +194,7 @@ public class JoinDialog extends FloatingDialog{
         hosts.row();
         hosts.add(local).width(w);
 
-        ScrollPane pane = new ScrollPane(hosts, "clear");
+        ScrollPane pane = new ScrollPane(hosts);
         pane.setFadeScrollBars(false);
         pane.setScrollingDisabled(true, false);
 
@@ -208,25 +205,24 @@ public class JoinDialog extends FloatingDialog{
         content().table(t -> {
             t.add("$text.name").padRight(10);
             t.addField(Settings.getString("name"), text -> {
-                if(text.isEmpty()) return;
                 player.name = text;
                 Settings.put("name", text);
                 Settings.save();
             }).grow().pad(8).get().setMaxLength(maxNameLength);
 
-            ImageButton button = t.addImageButton("white", 40, () -> {
+            ImageButton button = t.addImageButton("white", "clear-full", 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
                     Settings.putInt("color-0", Color.rgba8888(color));
                     Settings.save();
                 });
-            }).size(50f, 54f).get();
+            }).size(54f).get();
             button.update(() -> button.getStyle().imageUpColor = player.color);
         }).width(w).height(70f).pad(4);
         content().row();
         content().add(pane).width(w + 38).pad(0);
         content().row();
-        content().addCenteredImageTextButton("$text.server.add", "icon-add", "clear", 14 * 3, () -> {
+        content().addCenteredImageTextButton("$text.server.add", "icon-add", 14 * 3, () -> {
             renaming = null;
             add.show();
         }).marginLeft(6).width(w).height(80f).update(button -> {
@@ -248,16 +244,12 @@ public class JoinDialog extends FloatingDialog{
     }
 
     void refreshLocal(){
-        if(!Vars.gwt){
-            totalHosts = 0;
+        totalHosts = 0;
 
-            local.clear();
-            local.background((Drawable)null);
-            local.table("button", t -> {
-                t.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + Strings.animated(4, 10f, ".")).pad(10f);
-            }).growX();
-            Net.discoverServers(this::addLocalHost, this::finishLocalHosts);
-        }
+        local.clear();
+        local.background((Drawable)null);
+        local.table("button", t -> t.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + Strings.animated(4, 10f, ".")).pad(10f)).growX();
+        Net.discoverServers(this::addLocalHost, this::finishLocalHosts);
     }
 
     void finishLocalHosts(){
@@ -266,7 +258,7 @@ public class JoinDialog extends FloatingDialog{
             local.background("button");
             local.add("$text.hosts.none").pad(10f);
             local.add().growX();
-            local.addImageButton("icon-loading", 16 * 2f, this::refreshLocal).pad(-10f).padLeft(0).padTop(-6).size(70f, 74f);
+            local.addImageButton("icon-loading", 16 * 2f, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
         }else{
             local.background((Drawable) null);
         }
@@ -276,6 +268,7 @@ public class JoinDialog extends FloatingDialog{
         if(totalHosts == 0){
             local.clear();
         }
+        local.background((Drawable) null);
         totalHosts ++;
         float w = targetWidth();
 
@@ -292,6 +285,11 @@ public class JoinDialog extends FloatingDialog{
     }
 
     void connect(String ip, int port){
+        if(Settings.getString("name").trim().isEmpty()){
+            ui.showInfo("$text.noname");
+            return;
+        }
+
         ui.loadfrag.show("$text.connecting");
 
         ui.loadfrag.setButton(() -> {
@@ -300,34 +298,11 @@ public class JoinDialog extends FloatingDialog{
         });
 
         Timers.runTask(2f, () -> {
-            try{
-                Vars.netClient.beginConnecting();
-                Net.connect(ip, port);
+            Vars.netClient.beginConnecting();
+            Net.connect(ip, port, () -> {
                 hide();
                 add.hide();
-            }catch(Exception e){
-                Throwable t = e;
-                while(t.getCause() != null){
-                    t = t.getCause();
-                }
-                //TODO localize
-                String error = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
-                if(error.contains("connection refused")){
-                    error = "connection refused";
-                }else if(error.contains("port out of range")){
-                    error = "invalid port!";
-                }else if(error.contains("invalid argument")){
-                    error = "invalid IP or port!";
-                }else if(t.getClass().toString().toLowerCase().contains("sockettimeout")){
-                    error = "timed out!\nmake sure the host has port forwarding set up,\nand that the address is correct!";
-                }else{
-                    error = Strings.parseException(e, false);
-                }
-                ui.showError(Bundles.format("text.connectfail", error));
-                ui.loadfrag.hide();
-
-                Log.err(e);
-            }
+            });
         });
     }
 
@@ -349,7 +324,6 @@ public class JoinDialog extends FloatingDialog{
         public String ip;
         public int port;
 
-        transient Host host;
         transient Table content;
 
         void setIP(String ip){

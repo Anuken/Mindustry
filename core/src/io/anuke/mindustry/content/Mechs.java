@@ -37,7 +37,7 @@ public class Mechs implements ContentList{
 
         alpha = new Mech("alpha-mech", false){
             int maxDrones = 3;
-            float buildTime = 200f;
+            float buildTime = 20f;
 
             {
                 drillPower = 1;
@@ -53,14 +53,19 @@ public class Mechs implements ContentList{
             @Override
             public void updateAlt(Player player){
 
-                if(getDrones(player) < maxDrones && !TutorialSector.supressDrone() && player.timer.get(Player.timerAbility, buildTime)){
-                    if(!Net.client()) {
-                        AlphaDrone drone = (AlphaDrone) UnitTypes.alphaDrone.create(player.getTeam());
-                        drone.leader = player;
-                        drone.set(player.x, player.y);
-                        drone.add();
+                if(player.isShooting && getDrones(player) < maxDrones && !TutorialSector.supressDrone()){
+                    player.timer.get(Player.timerAbility, buildTime);
+
+                    if(player.timer.getTime(Player.timerAbility) > buildTime/2f){
+                        if(!Net.client()){
+                            AlphaDrone drone = (AlphaDrone) UnitTypes.alphaDrone.create(player.getTeam());
+                            drone.leader = player;
+                            drone.set(player.x, player.y);
+                            drone.add();
+
+                            Effects.effect(UnitFx.unitLand, player);
+                        }
                     }
-                    Effects.effect(UnitFx.unitLand, player);
                 }
             }
 
@@ -118,6 +123,7 @@ public class Mechs implements ContentList{
                 speed = 0.44f;
                 drag = 0.35f;
                 boostSpeed = 0.8f;
+                canHeal = true;
                 weapon = Weapons.healBlaster;
                 armor = 15f;
                 trailColorTo = Palette.heal;
@@ -282,8 +288,8 @@ public class Mechs implements ContentList{
         trident = new Mech("trident-ship", true){
             {
                 drillPower = 2;
-                speed = 0.12f;
-                drag = 0.035f;
+                speed = 0.14f;
+                drag = 0.034f;
                 mass = 2.5f;
                 turnCursor = false;
                 armor = 20f;

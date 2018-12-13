@@ -3,14 +3,12 @@ package io.anuke.mindustry.ui.fragments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.scene.Group;
@@ -47,13 +45,13 @@ public class PlayerListFragment extends Fragment{
                 }
             });
 
-            cont.table("pane", pane -> {
+            cont.table("button", pane -> {
                 pane.label(() -> Bundles.format(playerGroup.size() == 1 ? "text.players.single" : "text.players", playerGroup.size()));
                 pane.row();
-                pane.pane("clear", content).grow().get().setScrollingDisabled(true, false);
+                pane.pane(content).grow().get().setScrollingDisabled(true, false);
                 pane.row();
 
-                pane.table("pane", menu -> {
+                pane.table(menu -> {
                     menu.defaults().growX().height(50f).fillY();
 
                     menu.addButton("$text.server.bans", ui.bans::show).disabled(b -> Net.client());
@@ -72,12 +70,14 @@ public class PlayerListFragment extends Fragment{
 
         float h = 74f;
 
+        playerGroup.all().sort((p1, p2) -> p1.getTeam().compareTo(p2.getTeam()));
+
         playerGroup.forEach(player -> {
-            NetConnection connection = gwt ? null : player.con;
+            NetConnection connection = player.con;
 
             if(connection == null && Net.server() && !player.isLocal) return;
 
-            Table button = new Table("button");
+            Table button = new Table();
             button.left();
             button.margin(5).marginBottom(10);
 
@@ -99,46 +99,47 @@ public class PlayerListFragment extends Fragment{
             button.labelWrap("[#" + player.color.toString().toUpperCase() + "]" + player.name).width(170f).pad(10);
             button.add().grow();
 
-            button.addImage("icon-admin").size(14 * 2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5);
+            button.addImage("icon-admin").size(14 * 2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5).get().updateVisibility();
 
             if((Net.server() || players[0].isAdmin) && !player.isLocal && (!player.isAdmin || Net.server())){
                 button.add().growY();
 
-                float bs = (h + 14) / 2f;
+                float bs = (h) / 2f;
 
                 button.table(t -> {
-                    t.defaults().size(bs - 1, bs + 3);
+                    t.defaults().size(bs);
 
-                    t.addImageButton("icon-ban", 14 * 2,
-                        () -> ui.showConfirm("$text.confirm", "$text.confirmban", () -> Call.onAdminRequest(player, AdminAction.ban))).padBottom(-5.1f);
-                    t.addImageButton("icon-cancel", 16 * 2,
-                        () -> ui.showConfirm("$text.confirm", "$text.confirmkick", () -> Call.onAdminRequest(player, AdminAction.kick))).padBottom(-5.1f);
+                    t.addImageButton("icon-ban", "clear-partial", 14 * 2,
+                        () -> ui.showConfirm("$text.confirm", "$text.confirmban", () -> Call.onAdminRequest(player, AdminAction.ban)));
+                    t.addImageButton("icon-cancel", "clear-partial", 16 * 2,
+                        () -> ui.showConfirm("$text.confirm", "$text.confirmkick", () -> Call.onAdminRequest(player, AdminAction.kick)));
 
                     t.row();
 
-                    t.addImageButton("icon-admin", "toggle", 14 * 2, () -> {
+                    t.addImageButton("icon-admin", "clear-toggle-partial", 14 * 2, () -> {
                         if(Net.client()) return;
 
-                        String id = netServer.admins.getTraceByID(player.uuid).uuid;
+                        String id = player.uuid;
 
                         if(netServer.admins.isAdmin(id, connection.address)){
                             ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> netServer.admins.unAdminPlayer(id));
                         }else{
                             ui.showConfirm("$text.confirm", "$text.confirmadmin", () -> netServer.admins.adminPlayer(id, player.usid));
                         }
-                    }).update(b -> {
-                        b.setChecked(player.isAdmin);
-                        b.setDisabled(Net.client());
-                    }).get().setTouchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled);
+                    })
+                    .update(b -> b.setChecked(player.isAdmin))
+                    .disabled(b -> Net.client())
+                    .touchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled)
+                    .checked(player.isAdmin);
 
-                    t.addImageButton("icon-zoom-small", 14 * 2, () -> Call.onAdminRequest(player, AdminAction.trace));
+                    t.addImageButton("icon-zoom-small", "clear-partial", 14 * 2, () -> ui.showError("Currently unimplemented.")/*Call.onAdminRequest(player, AdminAction.trace)*/);
 
-                }).padRight(12).padTop(-5).padLeft(0).padBottom(-10).size(bs + 10f, bs);
-
-
+                }).padRight(12).size(bs + 10f, bs);
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
+            content.row();
+            content.addImage("blank").height(3f).color(state.mode.isPvp ? player.getTeam().color : Palette.accent).growX();
             content.row();
         });
 

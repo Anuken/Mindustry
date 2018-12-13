@@ -22,8 +22,8 @@ import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
@@ -92,8 +92,11 @@ public class DebugBlocks extends BlockList implements ContentList{
             @Override
             public void update(Tile tile){
                 SorterEntity entity = tile.entity();
+                if(entity.sortItem == null) return;
+
                 entity.items.set(entity.sortItem, 1);
                 tryDump(tile, entity.sortItem);
+                entity.items.set(entity.sortItem, 0);
             }
 
             @Override
@@ -144,8 +147,8 @@ public class DebugBlocks extends BlockList implements ContentList{
                     if(!control.unlocks.isUnlocked(items.get(i))) continue;
 
                     final int f = i;
-                    ImageButton button = cont.addImageButton("liquid-icon-" + items.get(i).name, "toggle", 24,
-                            () -> Call.setLiquidSourceLiquid(null, tile, items.get(f))).size(38, 42).padBottom(-5.1f).group(group).get();
+                    ImageButton button = cont.addImageButton("liquid-icon-" + items.get(i).name, "clear-toggle", 24,
+                            () -> Call.setLiquidSourceLiquid(null, tile, items.get(f))).size(38).group(group).get();
                     button.setChecked(entity.source.id == f);
 
                     if(i % 4 == 3){
@@ -182,12 +185,12 @@ public class DebugBlocks extends BlockList implements ContentList{
         public Liquid source = Liquids.water;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void writeConfig(DataOutput stream) throws IOException{
             stream.writeByte(source.id);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void readConfig(DataInput stream) throws IOException{
             source = content.liquid(stream.readByte());
         }
     }

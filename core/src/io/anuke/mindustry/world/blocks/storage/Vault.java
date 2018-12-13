@@ -7,7 +7,6 @@ public class Vault extends StorageBlock{
         solid = true;
         update = false;
         destructible = true;
-        itemCapacity = 1000;
     }
 
 }

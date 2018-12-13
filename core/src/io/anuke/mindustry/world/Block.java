@@ -153,7 +153,7 @@ public class Block extends BaseBlock {
         TileEntity entity = tile.entity();
 
         for(Tile other : getPowerConnections(tile, tempTiles)){
-            if(other.entity.power != null){
+            if(other.entity.power != null && other.entity.power.graph != null){
                 other.entity.power.graph.add(entity.power.graph);
             }
         }
@@ -164,7 +164,7 @@ public class Block extends BaseBlock {
         for(int i = 0; i < tile.entity.power.links.size; i++){
             Tile other = world.tile(tile.entity.power.links.get(i));
             if(other != null && other.entity != null && other.entity.power != null){
-                other.entity.power.links.removeValue(tile.packedPosition());
+                other.entity.power.links.removeValue(tile.pos());
             }
         }
     }
@@ -173,7 +173,7 @@ public class Block extends BaseBlock {
         out.clear();
         for(Tile other : tile.entity.proximity()){
             if(other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
-                    && !tile.entity.power.links.contains(other.packedPosition())){
+                    && !tile.entity.power.links.contains(other.pos())){
                 out.add(other);
             }
         }
@@ -230,7 +230,7 @@ public class Block extends BaseBlock {
     /**Call when some content is produced. This unlocks the content if it is applicable.*/
     public void useContent(Tile tile, UnlockableContent content){
         if(!headless && tile.getTeam() == players[0].getTeam()){
-            control.unlocks.handleContentUsed(content);
+            logic.handleContent(content);
         }
     }
 
@@ -335,13 +335,10 @@ public class Block extends BaseBlock {
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
     }
 
-    //TODO make this easier to config.
     public void setBars(){
         if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
-        if(hasLiquids)
-            bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
-        if(hasItems)
-            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.total() / itemCapacity));
+        if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
+        if(hasItems) bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.total() / itemCapacity));
     }
 
     public String name(){
@@ -386,10 +383,11 @@ public class Block extends BaseBlock {
         tempColor.set(Palette.darkFlame);
 
         if(hasItems){
+            float scaling = inventoryScaling(tile);
             for(Item item : content.items()){
                 int amount = tile.entity.items.get(item);
-                explosiveness += item.explosiveness * amount;
-                flammability += item.flammability * amount;
+                explosiveness += item.explosiveness * amount * scaling;
+                flammability += item.flammability * amount * scaling;
 
                 if(item.flammability * amount > 0.5){
                     units++;
@@ -415,7 +413,7 @@ public class Block extends BaseBlock {
                 float splash = Mathf.clamp(amount / 4f, 0f, 10f);
 
                 for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
-                    Timers.run(i / 2, () -> {
+                    Timers.run(i / 2f, () -> {
                         Tile other = world.tile(tile.x + Mathf.range(size / 2), tile.y + Mathf.range(size / 2));
                         if(other != null){
                             Puddle.deposit(other, liquid, splash);
@@ -429,6 +427,11 @@ public class Block extends BaseBlock {
         if(!tile.floor().solid && !tile.floor().isLiquid){
             RubbleDecal.create(tile.drawx(), tile.drawy(), size);
         }
+    }
+
+    /**Returns scaled # of inventories in this block.*/
+    public float inventoryScaling(Tile tile){
+        return 1f;
     }
 
     /**
@@ -450,6 +453,14 @@ public class Block extends BaseBlock {
 
             return result;
         }
+    }
+
+    public String getDisplayName(Tile tile){
+        return formalName;
+    }
+
+    public TextureRegion getDisplayIcon(Tile tile){
+        return getEditorIcon();
     }
 
     public TextureRegion getEditorIcon(){
@@ -530,16 +541,16 @@ public class Block extends BaseBlock {
 
     public Array<Object> getDebugInfo(Tile tile){
         return Array.with(
-                "block", tile.block().name,
-                "floor", tile.floor().name,
-                "x", tile.x,
-                "y", tile.y,
-                "entity.name", tile.entity.getClass(),
-                "entity.x", tile.entity.x,
-                "entity.y", tile.entity.y,
-                "entity.id", tile.entity.id,
-                "entity.items.total", hasItems ? tile.entity.items.total() : null,
-                "entity.graph", tile.entity.power != null && tile.entity.power.graph != null ? tile.entity.power.graph.getID() : null
+            "block", tile.block().name,
+            "floor", tile.floor().name,
+            "x", tile.x,
+            "y", tile.y,
+            "entity.name", tile.entity.getClass(),
+            "entity.x", tile.entity.x,
+            "entity.y", tile.entity.y,
+            "entity.id", tile.entity.id,
+            "entity.items.total", hasItems ? tile.entity.items.total() : null,
+            "entity.graph", tile.entity.power != null && tile.entity.power.graph != null ? tile.entity.power.graph.getID() : null
         );
     }
 }

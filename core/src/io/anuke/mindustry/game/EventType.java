@@ -1,8 +1,9 @@
 package io.anuke.mindustry.game;
 
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.function.Event;
+import io.anuke.ucore.core.Events.Event;
 
 public class EventType{
 
@@ -76,14 +77,33 @@ public class EventType{
         }
     }
 
-    /**Called when block building begins. The tile's block will nearly always be a BuildBlock.*/
-    public static class BlockBuildEvent implements Event{
+    /**Called when block building begins by placing down the BuildBlock.
+     * The tile's block will nearly always be a BuildBlock.*/
+    public static class BlockBuildBeginEvent implements Event{
         public final Tile tile;
         public final Team team;
+        public final boolean breaking;
 
-        public BlockBuildEvent(Tile tile, Team team){
+        public BlockBuildBeginEvent(Tile tile, Team team, boolean breaking){
             this.tile = tile;
             this.team = team;
+            this.breaking = breaking;
+        }
+    }
+
+    /**Called when a player or drone begins building something.
+     * This does not necessarily happen when a new BuildBlock is created.*/
+    public static class BuildSelectEvent implements Event{
+        public final Tile tile;
+        public final Team team;
+        public final BuilderTrait builder;
+        public final boolean breaking;
+
+        public BuildSelectEvent(Tile tile, Team team, BuilderTrait builder, boolean breaking){
+            this.tile = tile;
+            this.team = team;
+            this.builder = builder;
+            this.breaking = breaking;
         }
     }
 

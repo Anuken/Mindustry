@@ -15,8 +15,8 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.SeedRandom;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 public class Cultivator extends Drill{
@@ -42,6 +42,7 @@ public class Cultivator extends Drill{
         stats.remove(BlockStat.drillTier);
         stats.add(BlockStat.drillTier, table -> {
             table.addImage("grass1").size(8 * 3).padBottom(3).padTop(3);
+            table.add(Blocks.grass.formalName).padLeft(3);
         });
     }
 
@@ -73,7 +74,7 @@ public class Cultivator extends Drill{
 
         Draw.color(bottomColor, plantColorLight, entity.warmup);
 
-        random.setSeed(tile.packedPosition());
+        random.setSeed(tile.pos());
         for(int i = 0; i < 12; i++){
             float offset = random.nextFloat() * 999999f;
             float x = random.range(4f), y = random.range(4f);
@@ -113,12 +114,12 @@ public class Cultivator extends Drill{
         public float warmup;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeFloat(warmup);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             warmup = stream.readFloat();
         }
     }

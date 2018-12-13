@@ -16,8 +16,8 @@ import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -34,8 +34,9 @@ public class OverdriveProjector extends Block{
     protected float reload = 260f;
     protected float range = 80f;
     protected float speedBoost = 1.5f;
-    protected float speedBoostPhase = 0.5f;
-    protected float useTime = 300f;
+    protected float speedBoostPhase = 0.75f;
+    protected float useTime = 400f;
+    protected float phaseRangeBoost = 20f;
 
     public OverdriveProjector(String name){
         super(name);
@@ -66,7 +67,7 @@ public class OverdriveProjector extends Block{
         }
 
         if(entity.charge >= reload){
-            float realRange = range + entity.phaseHeat * 20f;
+            float realRange = range + entity.phaseHeat * phaseRangeBoost;
             float realBoost = speedBoost + entity.phaseHeat*speedBoostPhase;
 
             Effects.effect(BlockFx.overdriveWave, Hue.mix(color, phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
@@ -84,11 +85,11 @@ public class OverdriveProjector extends Block{
                     if(other == null) continue;
                     other = other.target();
 
-                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.packedPosition()) && other.entity != null){
+                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null){
                         other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
                         other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
                         Effects.effect(BlockFx.overdriveBlockFull, Hue.mix(color, phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
-                        healed.add(other.packedPosition());
+                        healed.add(other.pos());
                     }
                 }
             }
@@ -97,8 +98,11 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawSelect(Tile tile){
+        OverdriveEntity entity = tile.entity();
+        float realRange = range + entity.phaseHeat * phaseRangeBoost;
+
         Draw.color(color);
-        Lines.dashCircle(tile.drawx(), tile.drawy() - 1f, range);
+        Lines.dashCircle(tile.drawx(), tile.drawy(), realRange);
         Draw.color();
     }
 
@@ -133,13 +137,13 @@ public class OverdriveProjector extends Block{
         float phaseHeat;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeFloat(heat);
             stream.writeFloat(phaseHeat);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
         }

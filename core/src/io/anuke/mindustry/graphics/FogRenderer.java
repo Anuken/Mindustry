@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import io.anuke.mindustry.entities.Unit;
@@ -20,7 +19,6 @@ import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.entities.EntityDraw;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.scene.utils.ScissorStack;
 
 import java.nio.ByteBuffer;
 
@@ -28,51 +26,26 @@ import static io.anuke.mindustry.Vars.*;
 
 /**Used for rendering fog of war. A framebuffer is used for this.*/
 public class FogRenderer implements Disposable{
-    private static final int extraPadding = 3;
-    private static final int fshadowPadding = 1;
-
     private TextureRegion region = new TextureRegion();
     private FrameBuffer buffer;
     private ByteBuffer pixelBuffer;
     private Array<Tile> changeQueue = new Array<>();
-    private int padding;
     private int shadowPadding;
-    private Rectangle rect = new Rectangle();
     private boolean dirty;
-
-    private boolean isOffseted;
-    private int offsettedX, offsettedY;
 
     public FogRenderer(){
         Events.on(WorldLoadGraphicsEvent.class, event -> {
-            if(!isOffseted){
-                dispose();
-            }
+            dispose();
 
-            padding = world.getSector() != null ? mapPadding + extraPadding : 0;
-            shadowPadding = world.getSector() != null ? fshadowPadding : -1;
+            shadowPadding = -1;
 
-            FrameBuffer lastBuffer = buffer;
-
-            buffer = new FrameBuffer(Format.RGBA8888, world.width() + padding*2, world.height() + padding*2, false);
+            buffer = new FrameBuffer(Format.RGBA8888, world.width(), world.height(), false);
             changeQueue.clear();
 
             //clear buffer to black
             buffer.begin();
             Graphics.clear(0, 0, 0, 1f);
-
-            if(isOffseted){
-                Core.batch.getProjectionMatrix().setToOrtho2D(-padding, -padding, buffer.getWidth(), buffer.getHeight());
-                Core.batch.begin();
-                Core.batch.draw(lastBuffer.getColorBufferTexture(), offsettedX, offsettedY + lastBuffer.getColorBufferTexture().getHeight(),
-                            lastBuffer.getColorBufferTexture().getWidth(), -lastBuffer.getColorBufferTexture().getHeight());
-                Core.batch.end();
-            }
             buffer.end();
-
-            if(isOffseted){
-                lastBuffer.dispose();
-            }
 
             for(int x = 0; x < world.width(); x++){
                 for(int y = 0; y < world.height(); y++){
@@ -85,8 +58,6 @@ public class FogRenderer implements Disposable{
 
             pixelBuffer = ByteBuffer.allocateDirect(world.width() * world.height() * 4);
             dirty = true;
-
-            isOffseted = false;
         });
 
         Events.on(TileChangeEvent.class, event -> threads.runGraphics(() -> {
@@ -102,13 +73,15 @@ public class FogRenderer implements Disposable{
         buffer.begin();
         pixelBuffer.position(0);
         Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
-        Gdx.gl.glReadPixels(padding, padding, world.width(), world.height(), GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
+        Gdx.gl.glReadPixels(0, 0, world.width(), world.height(), GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
 
         pixelBuffer.position(0);
         for(int i = 0; i < world.width() * world.height(); i++){
+            int x = i % world.width();
+            int y = i / world.width();
             byte r = pixelBuffer.get();
             if(r != 0){
-                world.tile(i).setVisibility((byte)1);
+                world.tile(x, y).setVisibility((byte)1);
             }
             pixelBuffer.position(pixelBuffer.position() + 3);
         }
@@ -116,7 +89,7 @@ public class FogRenderer implements Disposable{
     }
 
     public int getPadding(){
-        return padding;
+        return -shadowPadding;
     }
 
     public void draw(){
@@ -128,21 +101,19 @@ public class FogRenderer implements Disposable{
         float px = Core.camera.position.x - vw / 2f;
         float py = Core.camera.position.y - vh / 2f;
 
-        float u = (px / tilesize + padding) / buffer.getWidth();
-        float v = (py / tilesize + padding) / buffer.getHeight();
+        float u = (px / tilesize) / buffer.getWidth();
+        float v = (py / tilesize) / buffer.getHeight();
 
-        float u2 = ((px + vw) / tilesize + padding) / buffer.getWidth();
-        float v2 = ((py + vh) / tilesize + padding) / buffer.getHeight();
+        float u2 = ((px + vw) / tilesize) / buffer.getWidth();
+        float v2 = ((py + vh) / tilesize) / buffer.getHeight();
 
-        Core.batch.getProjectionMatrix().setToOrtho2D(-padding * tilesize, -padding * tilesize, buffer.getWidth() * tilesize, buffer.getHeight() * tilesize);
+        Core.batch.getProjectionMatrix().setToOrtho2D(0, 0, buffer.getWidth() * tilesize, buffer.getHeight() * tilesize);
 
         Draw.color(Color.WHITE);
 
         buffer.begin();
 
-        boolean pop = ScissorStack.pushScissors(rect.set((padding-shadowPadding), (padding-shadowPadding),
-                    (world.width() + shadowPadding*2) ,
-                    (world.height() + shadowPadding*2)));
+        Graphics.beginClip((-shadowPadding), (-shadowPadding), (world.width() + shadowPadding*2), (world.height() + shadowPadding*2));
 
         Graphics.begin();
         EntityDraw.setClip(false);
@@ -159,10 +130,12 @@ public class FogRenderer implements Disposable{
         changeQueue.clear();
 
         if(dirty){
-            for(int i = 0; i < world.width() * world.height(); i++){
-                Tile tile = world.tile(i);
-                if(tile.discovered()){
-                    Fill.rect(tile.worldx(), tile.worldy(), tilesize, tilesize);
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
+                    Tile tile = world.tile(x, y);
+                    if(tile.discovered()){
+                        Fill.rect(tile.worldx(), tile.worldy(), tilesize, tilesize);
+                    }
                 }
             }
             dirty = false;
@@ -172,7 +145,7 @@ public class FogRenderer implements Disposable{
         Graphics.end();
         buffer.end();
 
-        if(pop) ScissorStack.popScissors();
+        Graphics.endClip();
 
         region.setTexture(buffer.getColorBufferTexture());
         region.setRegion(u, v2, u2, v);

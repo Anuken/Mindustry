@@ -2,6 +2,7 @@ package io.anuke.mindustry.maps;
 
 import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.ucore.util.Bundles;
 
 public class MapMeta{
     public final int version;
@@ -18,18 +19,31 @@ public class MapMeta{
     }
 
     public String author(){
-        return tags.get("author", "unknown");
+        return tag("author");
     }
 
     public String description(){
-        return tags.get("description", "unknown");
+        return tag("description");
     }
 
     public String name(){
-        return tags.get("name", "unknown");
+        return tag("name");
+    }
+
+    public String tag(String name){
+        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Bundles.get("text.unknown");
     }
 
     public boolean hasOreGen(){
         return !tags.get("oregen", "0").equals("0");
+    }
+
+    @Override
+    public String toString(){
+        return "MapMeta{" +
+                "tags=" + tags +
+                ", width=" + width +
+                ", height=" + height +
+                '}';
     }
 }

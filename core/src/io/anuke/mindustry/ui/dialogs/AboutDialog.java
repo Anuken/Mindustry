@@ -2,7 +2,11 @@ package io.anuke.mindustry.ui.dialogs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.io.Contributors;
+import io.anuke.mindustry.io.Contributors.Contributor;
 import io.anuke.mindustry.ui.Links;
 import io.anuke.mindustry.ui.Links.LinkEntry;
 import io.anuke.ucore.core.Core;
@@ -12,15 +16,19 @@ import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.scene.utils.UIUtils;
 import io.anuke.ucore.util.OS;
+import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.ios;
 import static io.anuke.mindustry.Vars.ui;
 
 public class AboutDialog extends FloatingDialog{
+    private Array<Contributor> contributors = new Array<>();
     private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "trello");
 
     public AboutDialog(){
         super("$text.about.button");
+
+        Contributors.getContributors(out -> contributors = out, Throwable::printStackTrace);
 
         shown(this::setup);
         onResize(this::setup);
@@ -34,14 +42,14 @@ public class AboutDialog extends FloatingDialog{
         float w = UIUtils.portrait() ? 330f : 600f;
 
         Table in = new Table();
-        ScrollPane pane = new ScrollPane(in, "clear");
+        ScrollPane pane = new ScrollPane(in);
 
         for(LinkEntry link : Links.getLinks()){
             if((ios || OS.isMac) && bannedItems.contains(link.name)){ //because Apple doesn't like me mentioning things
                 continue;
             }
 
-            Table table = new Table("button");
+            Table table = new Table("underline-2");
             table.margin(0);
             table.table(img -> {
                 img.addImage("white").height(h - 5).width(40f).color(link.color);
@@ -50,12 +58,12 @@ public class AboutDialog extends FloatingDialog{
             }).expandY();
 
             table.table(i -> {
-                i.background("button");
+                i.background("button-edge-3");
                 i.addImage("icon-" + link.name).size(14 * 3f);
             }).size(h - 5, h);
 
             table.table(inset -> {
-                inset.add("[accent]" + link.name.replace("-", " ")).growX().left();
+                inset.add("[accent]" + Strings.capitalize(link.name.replace("-", " "))).growX().left();
                 inset.row();
                 inset.labelWrap(link.description).width(w - 100f).color(Color.LIGHT_GRAY).growX();
             }).padLeft(8);
@@ -94,6 +102,23 @@ public class AboutDialog extends FloatingDialog{
         FloatingDialog dialog = new FloatingDialog("$text.credits");
         dialog.addCloseButton();
         dialog.content().add("$text.credits.text");
+        dialog.content().row();
+        if(!contributors.isEmpty()){
+            dialog.content().addImage("blank").color(Palette.accent).fillX().height(3f).pad(3f);
+            dialog.content().row();
+            dialog.content().add("$text.contributors");
+            dialog.content().row();
+            dialog.content().pane(new Table(){{
+                int i = 0;
+                left();
+                for(Contributor c : contributors){
+                    add("[lightgray]" + c.login).left().pad(3).padLeft(6).padRight(6);
+                    if(++i % 3 == 0){
+                        row();
+                    }
+                }
+            }});
+        }
         dialog.show();
     }
 }

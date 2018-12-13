@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.traits.*;
@@ -11,6 +12,7 @@ import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.Weapon;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.ucore.core.Effects;
@@ -38,6 +40,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public static final float velocityPercision = 8f;
     /**Maximum absolute value of a velocity vector component.*/
     public static final float maxAbsVelocity = 127f / velocityPercision;
+    public static final int noSpawner = Pos.get(-1, 1);
+
+    private static final Rectangle queryRect = new Rectangle();
+    private static final Vector2 moveVector = new Vector2();
 
     public final UnitInventory inventory = new UnitInventory(this);
     public float rotation;
@@ -182,6 +188,18 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return status.hasEffect(effect);
     }
 
+    public void avoidOthers(float scaling){
+        getHitbox(queryRect);
+        queryRect.setSize(queryRect.getWidth() * scaling);
+
+        Units.getNearby(queryRect, t -> {
+            if(t == this || t.getCarrier() == this || getCarrier() == t || t.isFlying() != isFlying()) return;
+            float dst = distanceTo(t);
+            moveVector.set(x, y).sub(t.getX(), t.getY()).setLength(1f * (1f - (dst / queryRect.getWidth())));
+            applyImpulse(moveVector.x, moveVector.y);
+        });
+    }
+
     public TileEntity getClosestCore(){
         TeamData data = state.teams.get(team);
 
@@ -217,7 +235,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         status.update(this);
 
-        velocity.limit(getMaxVelocity()).scl(status.getSpeedMultiplier());
+        velocity.limit(getMaxVelocity()).scl(1f + (status.getSpeedMultiplier()-1f) * Timers.delta());
 
         if(isFlying()){
             x += velocity.x * Timers.delta();
@@ -260,7 +278,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
             drownTime = Mathf.clamp(drownTime);
 
-            if(drownTime >= 0.999f){
+            if(drownTime >= 0.999f && !Net.client()){
                 damage(health + 1);
             }
 

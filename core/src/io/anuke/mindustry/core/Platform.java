@@ -1,31 +1,69 @@
 package io.anuke.mindustry.core;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Base64Coder;
-import io.anuke.mindustry.core.ThreadHandler.ThreadProvider;
+import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
+import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.function.Consumer;
+import io.anuke.ucore.scene.ui.Dialog;
 import io.anuke.ucore.scene.ui.TextField;
 
-import java.util.Date;
-import java.util.Locale;
 import java.util.Random;
+
+import static io.anuke.mindustry.Vars.mobile;
 
 public abstract class Platform {
     /**Each separate game platform should set this instance to their own implementation.*/
     public static Platform instance = new Platform() {};
-
-    /**Format the date using the default date formatter.*/
-    public String format(Date date){return "invalid";}
-    /**Format a number by adding in commas or periods where needed.*/
-    public String format(int number){return "invalid";}
 
     /**Add a text input dialog that should show up after the field is tapped.*/
     public void addDialog(TextField field){
         addDialog(field, 16);
     }
     /**See addDialog().*/
-    public void addDialog(TextField field, int maxLength){}
+    public void addDialog(TextField field, int maxLength){
+        if(!mobile) return; //this is mobile only, desktop doesn't need dialogs
+
+        field.tapped(() -> {
+            Dialog dialog = new Dialog("", "dialog");
+            dialog.setFillParent(true);
+            dialog.content().top();
+            dialog.content().defaults().height(65f);
+
+            TextField[] use = {null};
+
+            dialog.content().addImageButton("icon-copy", "clear", 16*3, () -> use[0].copy())
+                    .visible(() -> !use[0].getSelection().isEmpty()).width(65f);
+
+            dialog.content().addImageButton("icon-paste", "clear", 16*3, () ->
+                    use[0].paste(Gdx.app.getClipboard().getContents(), false))
+                    .visible(() -> Gdx.app.getClipboard() != null && Gdx.app.getClipboard().getContents() != null && !Gdx.app.getClipboard().getContents().isEmpty()).width(65f);
+
+            TextField to = dialog.content().addField(field.getText(), t-> {}).pad(15).width(250f).get();
+            to.setMaxLength(maxLength);
+            to.keyDown(Keys.ENTER, () -> dialog.content().find("okb").fireClick());
+
+            use[0] = to;
+
+            dialog.content().addButton("$text.ok", () -> {
+                field.clearText();
+                field.appendText(to.getText());
+                field.change();
+                dialog.hide();
+                Gdx.input.setOnscreenKeyboardVisible(false);
+            }).width(90f).name("okb");
+
+            dialog.show();
+            Timers.runTask(1f, () -> {
+                to.setCursorPosition(to.getText().length());
+                Core.scene.setKeyboardFocus(to);
+                Gdx.input.setOnscreenKeyboardVisible(true);
+            });
+        });
+    }
     /**Update discord RPC.*/
     public void updateRPC(){}
     /**Called when the game is exited.*/
@@ -35,10 +73,6 @@ public abstract class Platform {
     /**Whether donating is supported.*/
     public boolean canDonate(){
         return false;
-    }
-    /**Return the localized name for the locale. This is basically a workaround for GWT not supporting getName().*/
-    public String getLocaleName(Locale locale){
-        return locale.toString();
     }
     /**Must be a base64 string 8 bytes in length.*/
     public String getUUID(){
@@ -55,8 +89,6 @@ public abstract class Platform {
     }
     /**Only used for iOS or android: open the share menu for a map or save.*/
     public void shareFile(FileHandle file){}
-    /**Download a file. Only used on GWT backend.*/
-    public void downloadFile(String name, byte[] bytes){}
 
     /**Show a file chooser. Desktop only.
      *
@@ -67,17 +99,6 @@ public abstract class Platform {
      * @param filetype File extension to filter
      */
     public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype){}
-    /**Use the default thread provider from the kryonet module for this.*/
-    public ThreadProvider getThreadProvider(){
-        return new ThreadProvider() {
-            @Override public boolean isOnThread() {return true;}
-            @Override public void sleep(long ms) {}
-            @Override public void start(Runnable run) {}
-            @Override public void stop() {}
-            @Override public void notify(Object object) {}
-            @Override public void wait(Object object) {}
-        };
-    }
 
     /**Forces the app into landscape mode. Currently Android only.*/
     public void beginForceLandscape(){}

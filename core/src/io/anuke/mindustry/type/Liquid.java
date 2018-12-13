@@ -18,7 +18,7 @@ public class Liquid extends UnlockableContent{
     public float flammability;
     /**temperature: 0.5 is 'room' temperature, 0 is very cold, 1 is molten hot*/
     public float temperature = 0.5f;
-    /**how much heat this liquid can store. 0.75=water (high), anything lower is probably less dense and bad at cooling.*/
+    /**how much heat this liquid can store. 0.4=water (decent), anything lower is probably less dense and bad at cooling.*/
     public float heatCapacity = 0.5f;
     /**how thick this liquid is. 0.5=water (relatively viscous), 1 would be something like tar (very slow)*/
     public float viscosity = 0.5f;

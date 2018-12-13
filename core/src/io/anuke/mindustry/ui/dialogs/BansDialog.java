@@ -21,13 +21,11 @@ public class BansDialog extends FloatingDialog{
     private void setup(){
         content().clear();
 
-        if(gwt) return;
-
         float w = 400f, h = 80f;
 
         Table table = new Table();
 
-        ScrollPane pane = new ScrollPane(table, "clear");
+        ScrollPane pane = new ScrollPane(table);
         pane.setFadeScrollBars(false);
 
         if(netServer.admins.getBanned().size == 0){

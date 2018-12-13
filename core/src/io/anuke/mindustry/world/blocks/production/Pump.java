@@ -64,15 +64,11 @@ public class Pump extends LiquidBlock{
         if(isMultiblock()){
             Liquid last = null;
             for(Tile other : tile.getLinkedTilesAs(this, drawTiles)){
-                if(other == null) return false;
-                //can't place pump on block with multiple liquids
-                if(last != null && other.floor().liquidDrop != last){
+                if(other.floor().liquidDrop == null)
+                    continue;
+                if(other.floor().liquidDrop != last && last != null)
                     return false;
-                }
-
-                if(isValid(other)){
-                    last = other.floor().liquidDrop;
-                }
+                last = other.floor().liquidDrop;
             }
             return last != null;
         }else{

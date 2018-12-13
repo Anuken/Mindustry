@@ -17,6 +17,7 @@ import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.missions.Mission;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
@@ -86,7 +87,7 @@ public class WorldGenerator{
                 Tile tile = tiles[x][y];
 
                 if(tile.block().isMultiblock()){
-                    multiblocks.add(tile.packedPosition());
+                    multiblocks.add(tile.pos());
                 }
             }
         }
@@ -95,8 +96,8 @@ public class WorldGenerator{
         for(int i = 0; i < multiblocks.size; i++){
             int pos = multiblocks.get(i);
 
-            int x = pos % tiles.length;
-            int y = pos / tiles.length;
+            int x = Pos.x(pos);
+            int y = Pos.y(pos);
 
             Block result = tiles[x][y].block();
             Team team = tiles[x][y].getTeam();
@@ -171,6 +172,25 @@ public class WorldGenerator{
             }
 
             prepareTiles(tiles);
+
+            for(int x = 0; x < width; x++){
+                for(int y = 0; y < height; y++){
+                    Tile tile = tiles[x][y];
+
+                    byte elevation = tile.getElevation();
+
+                    for(GridPoint2 point : Geometry.d4){
+                        if(!Structs.inBounds(x + point.x, y + point.y, width, height)) continue;
+                        if(tiles[x + point.x][y + point.y].getElevation() < elevation){
+
+                            if(sim2.octaveNoise2D(1, 1, 1.0 / 8, x, y) > 0.8){
+                                tile.setElevation(-1);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
 
             world.setBlock(tiles[spawns.get(0).x][spawns.get(0).y], StorageBlocks.core, Team.blue);
 
@@ -309,6 +329,9 @@ public class WorldGenerator{
         double elevation = elevationOf(x, y, detailed);
         double temp =
             + sim3.octaveNoise2D(detailed ? 12 : 9, 0.6, 1f / 1100f, x - 120, y);
+        double lake = sim2.octaveNoise2D(1, 1, 1f / 110f, x, y);
+
+        elevation -= Math.pow(lake + 0.15, 5);
 
         int lerpDst = 20;
         lerpDst *= lerpDst;

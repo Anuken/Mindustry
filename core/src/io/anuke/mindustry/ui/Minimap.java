@@ -1,38 +1,34 @@
 package io.anuke.mindustry.ui;
 
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
+import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
-import io.anuke.ucore.scene.style.TextureRegionDrawable;
-import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.layout.Table;
 
-import static io.anuke.mindustry.Vars.renderer;
-import static io.anuke.mindustry.Vars.showFog;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Minimap extends Table{
 
     public Minimap(){
-        super("button");
+        super("pane");
 
         margin(5);
-        marginBottom(10);
 
-        Image image = new Image(new TextureRegionDrawable(new TextureRegion())){
+        TextureRegion r = new TextureRegion();
+
+        Element elem = new Element(){
             @Override
-            public void draw(Batch batch, float parentAlpha){
+            public void draw(){
                 if(renderer.minimap.getRegion() == null) return;
 
-                TextureRegionDrawable draw = (TextureRegionDrawable) getDrawable();
-                draw.getRegion().setRegion(renderer.minimap.getRegion());
-                super.draw(batch, parentAlpha);
+                Draw.crect(renderer.minimap.getRegion(), x, y, width, height);
+
                 if(renderer.minimap.getTexture() != null){
                     renderer.minimap.drawEntities(x, y, width, height);
                 }
@@ -40,7 +36,7 @@ public class Minimap extends Table{
                 if(showFog){
                     renderer.fog.getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
-                    TextureRegion r = draw.getRegion();
+                    r.setRegion(renderer.minimap.getRegion());
                     float pad = renderer.fog.getPadding();
 
                     float px = r.getU() * world.width() + pad;
@@ -55,7 +51,7 @@ public class Minimap extends Table{
                     r.setV2(1f - py2 / (world.height() + pad*2f));
 
                     Graphics.shader(Shaders.fog);
-                    super.draw(batch, parentAlpha);
+                    Draw.crect(r, x, y, width, height);
                     Graphics.shader();
 
                     renderer.fog.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -70,7 +66,7 @@ public class Minimap extends Table{
             }
         });
 
-        image.update(() -> {
+        elem.update(() -> {
 
             Element e = Core.scene.hit(Graphics.mouse().x, Graphics.mouse().y, true);
             if(e != null && e.isDescendantOf(this)){
@@ -79,6 +75,7 @@ public class Minimap extends Table{
                 Core.scene.setScrollFocus(null);
             }
         });
-        add(image).size(140f, 140f);
+
+        add(elem).size(140f, 140f);
     }
 }

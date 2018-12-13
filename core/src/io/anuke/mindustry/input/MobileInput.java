@@ -30,8 +30,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.event.Touchable;
+import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
@@ -46,6 +45,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     //gesture data
     private Vector2 vector = new Vector2();
+    private boolean canPan;
     private boolean zoomed = false;
     /** Set of completed guides. */
     private ObjectSet<String> guides = new ObjectSet<>();
@@ -92,10 +92,13 @@ public class MobileInput extends InputHandler implements GestureListener{
             Tile tile = world.tileWorld(x, y);
             if(tile != null) tile = tile.target();
 
-            if(tile != null && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
+            if(tile != null && tile.synthetic() && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
                 TileEntity entity = tile.entity;
                 player.setMineTile(null);
                 player.target = entity;
+            }else if(tile != null && player.mech.canHeal && tile.entity != null && tile.getTeam() == player.getTeam() && tile.entity.damaged()){
+                player.setMineTile(null);
+                player.target = tile.entity;
             }
         }
     }
@@ -208,78 +211,55 @@ public class MobileInput extends InputHandler implements GestureListener{
     //region UI and drawing
 
     @Override
-    public void buildUI(Group group){
+    public void buildUI(Table table){
+        table.addImage("blank").color(Palette.accent).height(3f).colspan(4).growX();
+        table.row();
+        table.left().margin(0f).defaults().size(48f);
 
-        //Create confirm/cancel table
-        group.fill(c -> {
-            c.bottom().left().visible(() -> !state.is(State.menu));
+        table.addImageButton("icon-break", "clear-toggle-partial", 16 * 2f, () -> {
+            mode = mode == breaking ? recipe == null ? none : placing : breaking;
+            lastRecipe = recipe;
+            if(mode == breaking){
+                showGuide("deconstruction");
+            }
+        }).update(l -> l.setChecked(mode == breaking));
 
-            c.table("pane", act -> {
-                act.margin(5);
-                act.defaults().size(60f);
+        //cancel button
+        table.addImageButton("icon-cancel", "clear-partial", 16 * 2f, () -> {
+            player.clearBuilding();
+            mode = none;
+            recipe = null;
+        }).visible(() -> player.isBuilding() || recipe != null || mode == breaking);
 
-                //Add a cancel button
-                act.addImageButton("icon-cancel", 16*2f, () -> {
-                    mode = none;
-                    recipe = null;
-                });
+        //rotate button
+        table.addImageButton("icon-arrow", "clear-partial", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
+        .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center))
+        .visible(() -> recipe != null && recipe.result.rotate);
 
-                act.row();
+        //confirm button
+        table.addImageButton("icon-check", "clear-partial", 16 * 2f, () -> {
+            for(PlaceRequest request : selection){
+                Tile tile = request.tile();
 
-                //Add an accept button, which places everything.
-                act.addImageButton("icon-check", 16 * 2f, () -> {
-                    for(PlaceRequest request : selection){
-                        Tile tile = request.tile();
-
-                        //actually place/break all selected blocks
-                        if(tile != null){
-                            if(!request.remove){
-                                rotation = request.rotation;
-                                recipe = request.recipe;
-                                tryPlaceBlock(tile.x, tile.y);
-                            }else{
-                                tryBreakBlock(tile.x, tile.y);
-                            }
-                        }
+                //actually place/break all selected blocks
+                if(tile != null){
+                    if(!request.remove){
+                        rotation = request.rotation;
+                        Recipe before = recipe;
+                        recipe = request.recipe;
+                        tryPlaceBlock(tile.x, tile.y);
+                        recipe = before;
+                    }else{
+                        tryBreakBlock(tile.x, tile.y);
                     }
+                }
+            }
 
-                    //move all current requests to removal array so they fade out
-                    removals.addAll(selection);
-                    selection.clear();
-                    selecting = false;
-                }).disabled(i -> selection.size == 0);
-
-                act.row();
-
-                //Add a rotate button
-                act.addImageButton("icon-arrow", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
-                        .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center))
-                        .disabled(i -> recipe == null || !recipe.result.rotate);
-            }).visible(() -> mode != none).touchable(Touchable.enabled);
-
-            c.row();
-
-            c.table("pane", remove -> {
-                remove.defaults().size(60f);
-
-                //Add a break button.
-                remove.addImageButton("icon-break", "toggle", 16 * 2f, () -> {
-                    mode = mode == breaking ? recipe == null ? none : placing : breaking;
-                    lastRecipe = recipe;
-                    if(mode == breaking){
-                        showGuide("deconstruction");
-                    }
-                }).update(l -> l.setChecked(mode == breaking));
-            }).margin(5).touchable(Touchable.enabled);
-
-            c.table("pane", cancel -> {
-                cancel.defaults().size(60f);
-
-                //Add a 'cancel building' button.
-                cancel.addImageButton("icon-cancel", 16 * 2f, player::clearBuilding);
-
-            }).left().colspan(2).margin(5).touchable(Touchable.enabled).visible(() -> player.getPlaceQueue().size > 0);
-        });
+            //move all current requests to removal array so they fade out
+            removals.addAll(selection);
+            selection.clear();
+            selecting = false;
+        }).visible(() -> !selection.isEmpty());
     }
 
     @Override
@@ -430,7 +410,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button){
-        if(state.is(State.menu)) return false;
+        if(state.is(State.menu) || player.isDead()) return false;
 
         //get tile on cursor
         Tile cursor = tileAt(screenX, screenY);
@@ -519,7 +499,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean longPress(float x, float y){
-        if(state.is(State.menu) || mode == none) return false;
+        if(state.is(State.menu) || mode == none || player.isDead()) return false;
 
         //get tile on cursor
         Tile cursor = tileAt(x, y);
@@ -535,7 +515,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(mode == breaking){
             Effects.effect(Fx.tapBlock, cursor.worldx(), cursor.worldy(), 1f);
-        }else{
+        }else if(recipe != null){
             Effects.effect(Fx.tapBlock, cursor.worldx() + recipe.result.offset(), cursor.worldy() + recipe.result.offset(), recipe.result.size);
         }
 
@@ -554,7 +534,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         //ignore off-screen taps
         if(cursor == null || ui.hasMouse(x, y)) return false;
 
-        threads.run(() -> checkTargets(worldx, worldy));
+        checkTargets(worldx, worldy);
 
         //remove if request present
         if(hasRequest(cursor)){
@@ -577,8 +557,8 @@ public class MobileInput extends InputHandler implements GestureListener{
                     Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
 
                     if(unit != null){
-                        player.moveTarget = unit;
                         consumed = true;
+                        player.moveTarget = unit;
                         Effects.effect(Fx.select, unit.getX(), unit.getY());
                     }
                 }
@@ -594,7 +574,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void update(){
-        if(state.is(State.menu)){
+        if(state.is(State.menu) || player.isDead()){
             selection.clear();
             removals.clear();
             mode = none;
@@ -619,6 +599,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(recipe != null){
             showGuide("construction");
+        }
+
+        if(recipe == null && mode == placing){
+            mode = none;
         }
 
         //automatically switch to placing after a new recipe is selected
@@ -676,7 +660,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
-        if(ui.hasMouse()) return false;
+        if(!canPan) return false;
 
         //can't pan in line mode with one finger or while dropping items!
         if((lineMode && !Gdx.input.isTouched(1)) || droppingItem){
@@ -730,6 +714,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean touchDown(float x, float y, int pointer, int button){
+        canPan = !ui.hasMouse();
         return false;
     }
 

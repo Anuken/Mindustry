@@ -15,13 +15,13 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadClient;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.modules.ItemModule;
@@ -46,7 +46,7 @@ import static io.anuke.mindustry.Vars.*;
 public class NetClient extends Module{
     private final static float dataTimeout = 60 * 18;
     private final static float playerSyncTime = 2;
-    private final static float viewScale = 1.75f;
+    public final static float viewScale = 2f;
 
     private Timer timer = new Timer(5);
     /**Whether the client is currently connecting.*/
@@ -96,6 +96,7 @@ public class NetClient extends Module{
             ConnectPacket c = new ConnectPacket();
             c.name = player.name;
             c.mobile = mobile;
+            c.versionType = Version.type;
             c.color = Color.rgba8888(player.color);
             c.usid = getUsid(packet.addressTCP);
             c.uuid = Platform.instance.getUUID();
@@ -166,14 +167,17 @@ public class NetClient extends Module{
     public static void onKick(KickReason reason){
         netClient.disconnectQuietly();
         state.set(State.menu);
-        if(!reason.quiet){
-            if(reason.extraText() != null){
-                ui.showText(reason.toString(), reason.extraText());
-            }else{
-                ui.showText("$text.disconnect", reason.toString());
+
+        threads.runGraphics(() -> {
+            if(!reason.quiet){
+                if(reason.extraText() != null){
+                    ui.showText(reason.toString(), reason.extraText());
+                }else{
+                    ui.showText("$text.disconnect", reason.toString());
+                }
             }
-        }
-        ui.loadfrag.hide();
+            ui.loadfrag.hide();
+        });
     }
 
     @Remote(variants = Variant.both)
@@ -205,12 +209,6 @@ public class NetClient extends Module{
     public static void onPositionSet(float x, float y){
         players[0].x = x;
         players[0].y = y;
-    }
-
-    @Remote(variants = Variant.one)
-    public static void onTraceInfo(TraceInfo info){
-        Player player = playerGroup.getByID(info.playerid);
-        ui.traces.show(player, info);
     }
 
     @Remote
@@ -288,6 +286,7 @@ public class NetClient extends Module{
         //read wave info
         state.wavetime = input.readFloat();
         state.wave = input.readInt();
+        state.enemies = input.readInt();
 
         byte cores = input.readByte();
         for(int i = 0; i < cores; i++){
@@ -403,11 +402,11 @@ public class NetClient extends Module{
         quiet = true;
     }
 
-    public synchronized void addRemovedEntity(int id){
+    public void addRemovedEntity(int id){
         removed.add(id);
     }
 
-    public synchronized boolean isEntityUsed(int id){
+    public boolean isEntityUsed(int id){
         return removed.contains(id);
     }
 
@@ -418,11 +417,9 @@ public class NetClient extends Module{
 
             BuildRequest[] requests;
 
-            synchronized(player.getPlaceQueue()){
-                requests = new BuildRequest[player.getPlaceQueue().size];
-                for(int i = 0; i < requests.length; i++){
-                    requests[i] = player.getPlaceQueue().get(i);
-                }
+            requests = new BuildRequest[player.getPlaceQueue().size];
+            for(int i = 0; i < requests.length; i++){
+                requests[i] = player.getPlaceQueue().get(i);
             }
 
             Call.onClientShapshot(lastSent++, TimeUtils.millis(), player.x, player.y,

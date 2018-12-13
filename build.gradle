@@ -8,26 +8,23 @@ buildscript {
     }
     dependencies {
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
-        classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:3.2.1'
-        classpath "com.badlogicgames.gdx:gdx-tools:1.9.8"
+        classpath "com.badlogicgames.gdx:gdx-tools:1.9.9"
     }
 }
 
 allprojects {
-    apply plugin: "eclipse"
     apply plugin: "idea"
 
     version = 'release'
 
     ext {
-        versionNumber = '4.0'
+        versionNumber = '4'
         versionModifier = 'alpha'
-        versionType = 'official'
+        if (!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
-        gdxVersion = '1.9.8'
+        gdxVersion = '1.9.9'
         roboVMVersion = '2.3.0'
-        uCoreVersion = '6080b6fb8c81f9c8e8dcb5809c2399061e15a63f'
+        uCoreVersion = '5871d2d0385370bc937fed3e5e301d6962a50476'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -97,25 +94,8 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.0'
-    }
-}
-
-project(":html") {
-    apply plugin: "gwt"
-    apply plugin: "war"
-
-    dependencies {
-        compile project(":core")
-        compileOnly project(":annotations")
-
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-
-        compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion:sources"
     }
 }
 
@@ -124,21 +104,41 @@ project(":ios") {
     apply plugin: "robovm"
 
     task copyGen{
-        copy{
-            from ("core/build/classes/java/main/io/anuke/mindustry/gen/"){
-                include "**/*.java"
-            }
+        doLast {
+            copy {
+                from("../core/build/classes/java/main/io/anuke/mindustry/gen/") {
+                    include "**/*.java"
+                }
 
-            into "ios/src/io/anuke/mindustry/gen"
+                into "../core/src/io/anuke/mindustry/gen"
+            }
         }
 
         doFirst{
             delete{
-                delete "ios/src/io/anuke/mindustry/gen/"
+                delete "../core/src/io/anuke/mindustry/gen/"
             }
         }
     }
 
+    task incrementConfig{
+        def vfile = file('robovm.properties')
+
+        def props = new Properties()
+        if(vfile.exists()){
+            props.load(new FileInputStream(vfile))
+        }
+
+        props['app.id'] = 'io.anuke.mindustry'
+        props['app.version'] = '4.0'
+        props['app.mainclass'] = 'io.anuke.mindustry.IOSLauncher'
+        props['app.executable'] = 'IOSLauncher'
+        props['app.name'] = 'Mindustry'
+        props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1)+""
+        props.store(vfile.newWriter(), null)
+    }
+
+    build.dependsOn(incrementConfig)
     build.dependsOn(copyGen)
 
     dependencies {
@@ -149,6 +149,8 @@ project(":ios") {
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
+        //compileOnly project(":annotations")
     }
 }
 
@@ -160,7 +162,6 @@ project(":core") {
     }
 
     dependencies {
-        compileOnly project(":annotations")
         build.finalizedBy(finish)
 
         def comp = System.properties["release"] == null || System.properties["release"] == "false"
@@ -178,11 +179,11 @@ project(":core") {
 
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
-    }
+        compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
-    compileJava.options.compilerArgs = [
-        "-processor", "io.anuke.annotations.RemoteMethodAnnotationProcessor,io.anuke.annotations.SerializeAnnotationProcessor"
-    ]
+        compileOnly project(":annotations")
+        annotationProcessor project(":annotations")
+    }
 }
 
 project(":server") {
@@ -195,7 +196,6 @@ project(":server") {
     }
     
     dependencies {
-        compileOnly project(":annotations")
 
         compile project(":core")
         compile project(":kryonet")

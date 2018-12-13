@@ -75,7 +75,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
 
         phaseWeaver = new PhaseWeaver("phase-weaver"){{
             craftEffect = BlockFx.smeltsmoke;
-            result = Items.phasematter;
+            result = Items.phasefabric;
             craftTime = 120f;
             powerCapacity = 50f;
             size = 2;
@@ -139,13 +139,13 @@ public class CraftingBlocks extends BlockList implements ContentList{
         melter = new PowerCrafter("melter"){{
             health = 200;
             outputLiquid = Liquids.lava;
-            outputLiquidAmount = 0.75f;
-            itemCapacity = 50;
+            outputLiquidAmount = 1f;
+            itemCapacity = 20;
             craftTime = 10f;
             hasLiquids = hasPower = true;
 
             consumes.power(0.1f);
-            consumes.item(Items.stone, 2);
+            consumes.item(Items.stone, 1);
         }};
 
         separator = new Separator("separator"){{
@@ -196,9 +196,9 @@ public class CraftingBlocks extends BlockList implements ContentList{
         biomatterCompressor = new Compressor("biomattercompressor"){{
             liquidCapacity = 60f;
             itemCapacity = 50;
-            craftTime = 25f;
+            craftTime = 20f;
             outputLiquid = Liquids.oil;
-            outputLiquidAmount = 1.5f;
+            outputLiquidAmount = 2.5f;
             size = 2;
             health = 320;
             hasLiquids = true;

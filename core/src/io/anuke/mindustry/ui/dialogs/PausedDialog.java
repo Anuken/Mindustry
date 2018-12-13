@@ -1,34 +1,38 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import com.badlogic.gdx.Input.Keys;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
+import io.anuke.ucore.scene.style.Drawable;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class PausedDialog extends FloatingDialog{
-    public boolean wasPaused = false;
     private SaveDialog save = new SaveDialog();
     private LoadDialog load = new LoadDialog();
     private Table missionTable;
 
     public PausedDialog(){
         super("$text.menu");
+        shouldPause = true;
         setup();
 
         shown(this::rebuild);
+
+        keyDown(key -> {
+            if(key == Keys.ESCAPE || key == Keys.BACK) {
+                hide();
+            }
+        });
     }
 
     void rebuild(){
         missionTable.clear();
-        if(world.getSector() != null && !world.getSector().complete){
-            missionTable.add("[LIGHT_GRAY]" + Bundles.format("text.mission", ""));
-            missionTable.row();
-            missionTable.table(t -> {
-                world.getSector().currentMission().display(t);
-            });
-            missionTable.row();
+        missionTable.background((Drawable) null);
+        if(world.getSector() != null){
+            missionTable.background("underline");
             missionTable.add(Bundles.format("text.sector", world.getSector().x + ", " + world.getSector().y));
         }
     }
@@ -40,46 +44,26 @@ public class PausedDialog extends FloatingDialog{
             }
         });
 
-        shown(() -> {
-            wasPaused = state.is(State.paused);
-            if(!Net.active()) state.set(State.paused);
-        });
-
-        content().table(t -> missionTable = t).colspan(mobile ? 3 : 1);
+        content().table(t -> missionTable = t).colspan(mobile ? 3 : 2);
         content().row();
 
         if(!mobile){
-            content().defaults().width(220).height(50);
+            float dw = 210f;
+            content().defaults().width(dw).height(50).pad(5f);
 
-            content().addButton("$text.back", () -> {
-                hide();
-                if((!wasPaused || Net.active()) && !state.is(State.menu))
-                    state.set(State.playing);
-            });
+            content().addButton("$text.back", this::hide).colspan(2).width(dw*2 + 20f);
 
             content().row();
+            content().addButton("$text.unlocks", ui.unlocks::show);
             content().addButton("$text.settings", ui.settings::show);
 
             content().row();
-            content().addButton("$text.savegame", () -> {
-                save.show();
-            }).disabled(s -> world.getSector() != null);
-
-            content().row();
-            content().addButton("$text.loadgame", () -> {
-                load.show();
-            }).disabled(b -> Net.active());
+            content().addButton("$text.savegame", save::show).disabled(s -> world.getSector() != null);
+            content().addButton("$text.loadgame", load::show).disabled(b -> Net.active());
 
             content().row();
 
-            content().addButton("$text.hostserver", () -> {
-                if(!gwt){
-                    ui.host.show();
-                }else{
-                    ui.showInfo("$text.web.unsupported");
-                }
-            }).disabled(b -> Net.active());
-
+            content().addButton("$text.hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw*2 + 20f);
 
             content().row();
 
@@ -89,7 +73,7 @@ public class PausedDialog extends FloatingDialog{
                     runExitSave();
                     hide();
                 });
-            });
+            }).colspan(2).width(dw + 10f);
 
         }else{
             content().defaults().size(120f).pad(5);
@@ -97,8 +81,6 @@ public class PausedDialog extends FloatingDialog{
 
             content().addRowImageTextButton("$text.back", "icon-play-2", isize, () -> {
                 hide();
-                if(!wasPaused && !state.is(State.menu))
-                    state.set(State.playing);
             });
             content().addRowImageTextButton("$text.settings", "icon-tools", isize, ui.settings::show);
             content().addRowImageTextButton("$text.save", "icon-save", isize, save::show).disabled(b -> world.getSector() != null);
@@ -129,7 +111,7 @@ public class PausedDialog extends FloatingDialog{
                 control.saves.getCurrent().save();
             }catch(Throwable e){
                 e.printStackTrace();
-                threads.runGraphics(() -> ui.showError("[orange]" + Bundles.get("text.savefail")));
+                threads.runGraphics(() -> ui.showError("[accent]" + Bundles.get("text.savefail")));
             }
             state.set(State.menu);
         });

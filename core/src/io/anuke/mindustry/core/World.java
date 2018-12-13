@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
+import io.anuke.mindustry.ai.WaveSpawner;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -14,6 +15,7 @@ import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.maps.generation.WorldGenerator;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.ucore.core.Events;
@@ -29,6 +31,7 @@ public class World extends Module{
     public final Sectors sectors = new Sectors();
     public final WorldGenerator generator = new WorldGenerator();
     public final BlockIndexer indexer = new BlockIndexer();
+    public final WaveSpawner spawner = new WaveSpawner();
     public final Pathfinder pathfinder = new Pathfinder();
 
     private Map currentMap;
@@ -101,12 +104,8 @@ public class World extends Module{
         return tiles == null ? 0 : tiles[0].length;
     }
 
-    public int toPacked(int x, int y){
-        return x + y * width();
-    }
-
-    public Tile tile(int packed){
-        return tiles == null ? null : tile(packed % width(), packed / width());
+    public Tile tile(int pos){
+        return tiles == null ? null : tile(Pos.x(pos), Pos.y(pos));
     }
 
     public Tile tile(int x, int y){
@@ -243,7 +242,7 @@ public class World extends Module{
         EntityQuery.resizeTree(0, 0, width * tilesize, height * tilesize);
 
         try{
-            generator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), 0);
+            generator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), Mathf.random(99999));
         } catch(Exception e){
             Log.err(e);
             if(!headless){
@@ -256,6 +255,8 @@ public class World extends Module{
         }
 
         endMapLoad();
+
+        invalidMap = false;
 
         if(!headless){
             if(state.teams.get(players[0].getTeam()).cores.size == 0){

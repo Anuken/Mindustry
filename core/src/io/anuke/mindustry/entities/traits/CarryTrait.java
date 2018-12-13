@@ -9,9 +9,10 @@ import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.entities.trait.SolidTrait;
 
 public interface CarryTrait extends TeamTrait, SolidTrait, TargetTrait{
+
     @Remote(called = Loc.both, targets = Loc.both, forward = true)
     static void dropSelf(Player player){
-        if(player.getCarrier() != null){
+        if(player != null && player.getCarrier() != null){
             player.getCarrier().dropCarry();
         }
     }
@@ -40,24 +41,16 @@ public interface CarryTrait extends TeamTrait, SolidTrait, TargetTrait{
         }
     }
 
-    /**
-     * Returns the thing this carrier is carrying.
-     */
+    /**Returns the thing this carrier is carrying.*/
     CarriableTrait getCarry();
 
-    /**
-     * Sets the carrying unit. Internal use only! Use {@link #carry(CarriableTrait)} to set state.
-     */
+    /**Sets the carrying unit. Internal use only! Use {@link #carry(CarriableTrait)} to set state.*/
     void setCarry(CarriableTrait unit);
 
-    /**
-     * Returns maximum mass this carrier can carry.
-     */
+    /**Returns maximum mass this carrier can carry.*/
     float getCarryWeight();
 
-    /**
-     * Drops the unit that is being carried, if applicable.
-     */
+    /**Drops the unit that is being carried, if applicable.*/
     default void dropCarry(){
         carry(null);
     }

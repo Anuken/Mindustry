@@ -27,8 +27,8 @@ import io.anuke.ucore.graphics.Lines;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.mobile;
@@ -127,7 +127,7 @@ public class MechPad extends Block{
 
         if(checkValidTap(tile, player)){
             Call.onMechFactoryTap(player, tile);
-        }else if(player.isLocal && mobile){
+        }else if(player.isLocal && mobile && !player.isDead()){
             player.moveTarget = tile.entity;
         }
     }
@@ -237,14 +237,14 @@ public class MechPad extends Block{
         }
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeFloat(progress);
             stream.writeFloat(time);
             stream.writeFloat(heat);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             progress = stream.readFloat();
             time = stream.readFloat();
             heat = stream.readFloat();

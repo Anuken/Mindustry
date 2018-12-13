@@ -6,6 +6,9 @@ public abstract class NetConnection{
     public final int id;
     public final String address;
 
+    public boolean modclient;
+    public boolean mobile;
+
     public int lastSentSnapshotID = -1;
 
     /**ID of last recieved client snapshot.*/

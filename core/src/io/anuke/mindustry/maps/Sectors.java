@@ -1,16 +1,20 @@
 package io.anuke.mindustry.maps;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Array.ArrayIterable;
+import com.badlogic.gdx.utils.async.AsyncExecutor;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.SectorPresets.SectorPreset;
+import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.maps.missions.BattleMission;
 import io.anuke.mindustry.maps.missions.Mission;
@@ -21,6 +25,7 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.type.Recipe.RecipeVisibility;
 import io.anuke.mindustry.world.ColorMapper;
+import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.util.*;
@@ -28,14 +33,15 @@ import io.anuke.ucore.util.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class Sectors{
-    private static final int sectorImageSize = 32;
+    public static final int sectorImageSize = 32;
 
     private final GridMap<Sector> grid = new GridMap<>();
     private final SectorPresets presets = new SectorPresets();
     private final Array<Item> allOres = Item.getAllOres();
+    private final AsyncExecutor executor = new AsyncExecutor(6);
 
     public void playSector(Sector sector){
-        if(sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
+        if(!headless && sector.hasSave() && SaveIO.breakingVersions.contains(sector.getSave().getBuild())){
             sector.getSave().delete();
             ui.showInfo("$text.save.old");
         }
@@ -47,7 +53,7 @@ public class Sectors{
             world.loadSector(sector);
             logic.play();
             if(!headless){
-                sector.saveID = control.saves.addSave("sector-" + sector.packedPosition()).index;
+                sector.saveID = control.saves.addSave("sector-" + sector.pos()).index;
             }
             world.sectors.save();
             world.setSector(sector);
@@ -82,8 +88,6 @@ public class Sectors{
 
     public Difficulty getDifficulty(Sector sector){
         if(sector.difficulty == 0){
-            //yes, this means hard tutorial difficulty
-            //(((have fun)))
             return Difficulty.hard;
         }else if(sector.difficulty < 4){
             return Difficulty.normal;
@@ -125,6 +129,10 @@ public class Sectors{
         if(sector.texture == null){
             threads.runGraphics(() -> createTexture(sector));
         }
+
+        if(sector.missions.size == 0){
+            completeSector(sector.x, sector.y);
+        }
     }
 
     public void abandonSector(Sector sector){
@@ -148,7 +156,7 @@ public class Sectors{
         }
         grid.clear();
 
-        Array<Sector> out = Settings.getObject("sector-data", Array.class, Array::new);
+        Array<Sector> out = Settings.getObject("sector-data-2", Array.class, Array::new);
 
         for(Sector sector : out){
             
@@ -177,7 +185,7 @@ public class Sectors{
             }
         }
 
-        Settings.putObject("sector-data", out);
+        Settings.putObject("sector-data-2", out);
         Settings.save();
     }
 
@@ -219,7 +227,7 @@ public class Sectors{
     private void generate(Sector sector){
 
         //50% chance to get a wave mission
-        if(Mathf.randomSeed(sector.getSeed() + 6) < 0.5){
+        if(Mathf.randomSeed(sector.getSeed() + 7) < 0.5){
             //recipe mission (maybe)
             addRecipeMission(sector, 3);
             sector.missions.add(new WaveMission(sector.difficulty*5 + Mathf.randomSeed(sector.getSeed(), 1, 4)*5));
@@ -228,13 +236,25 @@ public class Sectors{
             sector.missions.add(new BattleMission());
         }
 
-        //possibly another battle mission
-        if(Mathf.randomSeed(sector.getSeed() + 3) < 0.3){
-            sector.missions.add(new BattleMission());
-        }
-
         //possibly add another recipe mission
         addRecipeMission(sector, 11);
+
+        Generation gen = new Generation(sector, null, sectorSize, sectorSize, null);
+
+        Array<GridPoint2> points = new Array<>();
+        for(Mission mission : sector.missions){
+            points.addAll(mission.getSpawnPoints(gen));
+        }
+
+        GenResult result = new GenResult();
+
+        for(GridPoint2 point : new ArrayIterable<>(points)){
+            world.generator.generateTile(result, sector.x, sector.y, point.x, point.y, true, null, null);
+            if(((Floor)result.floor).isLiquid || result.wall.solid){
+                sector.missions.clear();
+                break;
+            }
+        }
     }
 
     private void addRecipeMission(Sector sector, int offset){
@@ -264,24 +284,31 @@ public class Sectors{
             sector.texture.dispose();
         }
 
-        Pixmap pixmap = new Pixmap(sectorImageSize, sectorImageSize, Format.RGBA8888);
-        GenResult secResult = new GenResult();
+        executor.submit(() -> {
+            Pixmap pixmap = new Pixmap(sectorImageSize, sectorImageSize, Format.RGBA8888);
+            GenResult result = new GenResult();
+            GenResult secResult = new GenResult();
 
-        for(int x = 0; x < pixmap.getWidth(); x++){
-            for(int y = 0; y < pixmap.getHeight(); y++){
-                int toX = x * sectorSize / sectorImageSize;
-                int toY = y * sectorSize / sectorImageSize;
+            for(int x = 0; x < pixmap.getWidth(); x++){
+                for(int y = 0; y < pixmap.getHeight(); y++){
+                    int toX = x * sectorSize / sectorImageSize;
+                    int toY = y * sectorSize / sectorImageSize;
 
-                GenResult result = world.generator.generateTile(sector.x, sector.y, toX, toY, false);
-                world.generator.generateTile(secResult, sector.x, sector.y, toX, ((y+1) * sectorSize / sectorImageSize), false, null, null);
+                    world.generator.generateTile(result, sector.x, sector.y, toX, toY, false, null, null);
+                    world.generator.generateTile(secResult, sector.x, sector.y, toX, ((y+1) * sectorSize / sectorImageSize), false, null, null);
 
-                int color = ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation, secResult.elevation > result.elevation ? (byte)(1 << 6) : (byte)0);
-                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, color);
+                    int color = ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation, secResult.elevation > result.elevation ? (byte)(1 << 6) : (byte)0);
+                    pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, color);
+                }
             }
-        }
 
-        sector.texture = new Texture(pixmap);
-        pixmap.dispose();
+            Gdx.app.postRunnable(() -> {
+                sector.texture = new Texture(pixmap);
+                pixmap.dispose();
+            });
+
+            return null;
+        });
     }
 
 

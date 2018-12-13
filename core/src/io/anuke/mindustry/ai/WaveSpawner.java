@@ -10,9 +10,9 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Events;
-import io.anuke.ucore.util.Structs;
 import io.anuke.ucore.util.GridBits;
 import io.anuke.ucore.util.Mathf;
+import io.anuke.ucore.util.Structs;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -21,7 +21,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class WaveSpawner{
-    private static final int quadsize = 4;
+    private static final int quadsize = 6;
 
     private GridBits quadrants;
 
@@ -164,7 +164,7 @@ public class WaveSpawner{
             for(int y = quady * quadsize; y < world.height() && y < (quady + 1) * quadsize; y++){
                 Tile tile = world.tile(x, y);
 
-                if(tile == null || tile.solid() || world.pathfinder.getValueforTeam(Team.red, x, y) == Float.MAX_VALUE){
+                if(tile == null || tile.solid() || tile.getTeam() == defaultTeam || world.pathfinder.getValueforTeam(Team.red, x, y) == Float.MAX_VALUE || tile.floor().isLiquid){
                     setQuad(quadx, quady, false);
                     break outer;
                 }
@@ -217,8 +217,8 @@ public class WaveSpawner{
 
     //TODO instead of randomly scattering locations around the map, find spawns close to each other
     private void findLocation(GroundSpawn spawn){
-        spawn.x = -1;
-        spawn.y = -1;
+        spawn.x = Mathf.random(quadWidth()-1);
+        spawn.y = Mathf.random(quadHeight()-1);
 
         int shellWidth = quadWidth() * 2 + quadHeight() * 2 * 6;
         shellWidth = Math.min(quadWidth() * quadHeight() / 4, shellWidth);

@@ -11,7 +11,7 @@ import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Mathf;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded;
+    public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded, shocked;
 
     @Override
     public void load(){
@@ -47,7 +47,8 @@ public class StatusEffects implements ContentList{
         freezing = new StatusEffect(5 * 60f){
             {
                 oppositeScale = 0.4f;
-                speedMultiplier = 0.5f;
+                speedMultiplier = 0.6f;
+                armorMultiplier = 0.8f;
             }
 
             @Override
@@ -63,6 +64,17 @@ public class StatusEffects implements ContentList{
             {
                 oppositeScale = 0.5f;
                 speedMultiplier = 0.9f;
+            }
+
+            @Override
+            public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
+                if(to == shocked){
+                    //get shocked when wet
+                    unit.damage(15f);
+                    return result.set(this, time);
+                }
+
+                return super.getTransition(unit, to, time, newTime, result);
             }
 
             @Override
@@ -145,6 +157,13 @@ public class StatusEffects implements ContentList{
             }
         };
 
+        shocked = new StatusEffect(1f){
+            {
+                armorMultiplier = 3f;
+            }
+        };
+
+        wet.setOpposites(shocked);
         melting.setOpposites(wet, freezing);
         wet.setOpposites(burning);
         freezing.setOpposites(burning, melting);

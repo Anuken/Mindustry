@@ -21,8 +21,8 @@ public class UnlocksDialog extends FloatingDialog{
     public UnlocksDialog(){
         super("$text.unlocks");
 
-        addCloseButton();
         shouldPause = true;
+        addCloseButton();
         shown(this::rebuild);
         onResize(this::rebuild);
     }
@@ -32,11 +32,11 @@ public class UnlocksDialog extends FloatingDialog{
 
         Table table = new Table();
         table.margin(20);
-        ScrollPane pane = new ScrollPane(table, "clear-black");
+        ScrollPane pane = new ScrollPane(table);
 
         Array<Content>[] allContent = content.getContentMap();
 
-        for(int j =0; j< allContent.length; j ++){
+        for(int j = 0; j < allContent.length; j ++){
             ContentType type = ContentType.values()[j];
 
             Array<Content> array = allContent[j];
@@ -65,9 +65,8 @@ public class UnlocksDialog extends FloatingDialog{
 
                     if(control.unlocks.isUnlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));
-                        image.addListener(new Tooltip<>(new Table("clear"){{
+                        image.addListener(new Tooltip<>(new Table("button"){{
                             add(unlock.localizedName());
-                            margin(4);
                         }}));
                     }
 

@@ -38,7 +38,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             updateEffect = BlockFx.pulverizeMedium;
             drillEffect = BlockFx.mineBig;
 
-            consumes.power(0.16f);
+            consumes.power(0.11f);
         }};
 
         blastDrill = new Drill("blast-drill"){{
@@ -80,7 +80,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
             liquidCapacity = 30f;
             rotateSpeed = 1.4f;
 
-            consumes.power(0.1f);
+            consumes.power(0.09f);
         }};
 
         oilExtractor = new Fracker("oil-extractor"){{
@@ -99,13 +99,13 @@ public class ProductionBlocks extends BlockList implements ContentList{
 
         cultivator = new Cultivator("cultivator"){{
             result = Items.biomatter;
-            drillTime = 260;
+            drillTime = 200;
             size = 2;
             hasLiquids = true;
             hasPower = true;
 
             consumes.power(0.08f);
-            consumes.liquid(Liquids.water, 0.2f);
+            consumes.liquid(Liquids.water, 0.15f);
         }};
 
     }

@@ -121,10 +121,6 @@ public abstract class GroundUnit extends BaseUnit{
 
         stuckTime = !vec.set(x, y).sub(lastPosition()).isZero(0.0001f) ? 0f : stuckTime + Timers.delta();
 
-        if(!velocity.isZero(0.0001f) && (Units.invalidateTarget(target, this) || (distanceTo(target) > getWeapon().getAmmo().getRange()))){
-            rotation = Mathf.slerpDelta(rotation, velocity.angle(), type.rotatespeed);
-        }
-
         if(!velocity.isZero()){
             baseRotation = Mathf.slerpDelta(baseRotation, velocity.angle(), 0.05f);
         }
@@ -242,13 +238,15 @@ public abstract class GroundUnit extends BaseUnit{
     }
 
     protected void patrol(){
-        vec.trns(baseRotation, type.speed);
+        vec.trns(baseRotation, type.speed * Timers.delta());
         velocity.add(vec.x, vec.y);
         vec.trns(baseRotation, type.hitsizeTile);
         Tile tile = world.tileWorld(x + vec.x, y + vec.y);
         if((tile == null || tile.solid() || tile.floor().drownTime > 0) || stuckTime > 10f){
             baseRotation += Mathf.sign(id % 2 - 0.5f) * Timers.delta() * 3f;
         }
+
+        rotation = Mathf.slerpDelta(rotation, velocity.angle(), type.rotatespeed);
     }
 
     protected void circle(float circleLength){
@@ -272,7 +270,10 @@ public abstract class GroundUnit extends BaseUnit{
 
         if(tile == targetTile) return;
 
-        velocity.add(vec.trns(angleTo(targetTile), type.speed));
+        float angle = angleTo(targetTile);
+
+        velocity.add(vec.trns(angleTo(targetTile), type.speed*Timers.delta()));
+        rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
     }
 
     protected void moveAwayFromCore(){
@@ -293,6 +294,9 @@ public abstract class GroundUnit extends BaseUnit{
 
         if(tile == targetTile || core == null || distanceTo(core) < 90f) return;
 
-        velocity.add(vec.trns(angleTo(targetTile), type.speed));
+        float angle = angleTo(targetTile);
+
+        velocity.add(vec.trns(angleTo(targetTile), type.speed*Timers.delta()));
+        rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
     }
 }

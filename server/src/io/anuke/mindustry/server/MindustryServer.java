@@ -24,6 +24,7 @@ public class MindustryServer extends ModuleCore{
         headless = true;
 
         BundleLoader.load();
+        content.verbose(false);
         content.load();
         content.initialize(Content::init);
 

@@ -1,10 +1,7 @@
 package io.anuke.mindustry.core;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -26,7 +23,10 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.*;
 import io.anuke.ucore.entities.EntityQuery;
 import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.*;
+import io.anuke.ucore.util.Atlas;
+import io.anuke.ucore.util.Bundles;
+import io.anuke.ucore.util.Strings;
+import io.anuke.ucore.util.Timer;
 
 import java.io.IOException;
 
@@ -39,25 +39,20 @@ import static io.anuke.mindustry.Vars.*;
  * This class is not created in the headless server.
  */
 public class Control extends Module{
-    /** Minimum period of time between the same sound being played.*/
-    private static final long minSoundPeriod = 100;
-
     public final Saves saves;
     public final Unlocks unlocks;
 
-    private Timer timerRPC= new Timer(), timerUnlock = new Timer();
+    private Timer timerRPC = new Timer(), timerUnlock = new Timer();
     private boolean hiscore = false;
     private boolean wasPaused = false;
     private InputHandler[] inputs = {};
-    private ObjectMap<Sound, Long> soundMap = new ObjectMap<>();
     private Throwable error;
 
     public Control(){
-
         saves = new Saves();
         unlocks = new Unlocks();
 
-        Inputs.useControllers(!gwt);
+        Inputs.useControllers(true);
 
         Gdx.input.setCatchBackKey(true);
 
@@ -70,17 +65,6 @@ public class Control extends Module{
 
         unlocks.load();
 
-        Sounds.setFalloff(9000f);
-        Sounds.setPlayer((sound, volume) -> {
-            long time = TimeUtils.millis();
-            long value = soundMap.get(sound, 0L);
-
-            if(TimeUtils.timeSinceMillis(value) >= minSoundPeriod){
-                threads.runGraphics(() -> sound.play(volume));
-                soundMap.put(sound, time);
-            }
-        });
-
         DefaultKeybinds.load();
 
         Settings.defaultList(
@@ -89,7 +73,7 @@ public class Control extends Module{
             "color-1", Color.rgba8888(playerColors[11]),
             "color-2", Color.rgba8888(playerColors[13]),
             "color-3", Color.rgba8888(playerColors[9]),
-            "name", "player",
+            "name", "",
             "lastBuild", 0
         );
 
@@ -111,20 +95,11 @@ public class Control extends Module{
             }
 
             state.set(State.playing);
-
-            if(world.getSector() == null && !Settings.getBool("custom-warning-for-real-1", false)){
-                threads.runGraphics(() -> ui.showInfo("$mode.custom.warning", () ->
-                    ui.showInfo("$mode.custom.warning.read", () -> {
-                        Settings.putBool("custom-warning-for-real-1", true);
-                        Settings.save();
-                    })));
-
-            }
         });
 
         Events.on(WorldLoadGraphicsEvent.class, event -> {
             if(mobile){
-                Core.camera.position.set(players[0].x, players[0].y, 0);
+                Gdx.app.postRunnable(() -> Core.camera.position.set(players[0].x, players[0].y, 0));
             }
         });
 
@@ -178,12 +153,6 @@ public class Control extends Module{
         });
 
         Events.on(WorldLoadEvent.class, event -> threads.runGraphics(() -> Events.fire(new WorldLoadGraphicsEvent())));
-
-        Events.on(TileChangeEvent.class, event -> {
-            if(event.tile.getTeam() == players[0].getTeam() && Recipe.getByResult(event.tile.block()) != null){
-                unlocks.handleContentUsed(Recipe.getByResult(event.tile.block()));
-            }
-        });
     }
 
     public void addPlayer(int index){
@@ -277,7 +246,7 @@ public class Control extends Module{
         outer:
         for(int i = 0; i < content.recipes().size; i ++){
             Recipe recipe = content.recipes().get(i);
-            if(!recipe.hidden && recipe.requirements != null){
+            if(!recipe.isHidden() && recipe.requirements != null){
                 for(ItemStack stack : recipe.requirements){
                     if(!entity.items.has(stack.item, Math.min((int) (stack.amount * unlockResourceScaling), 2000))) continue outer;
                 }
@@ -321,7 +290,7 @@ public class Control extends Module{
         if(!Settings.getBool("4.0-warning-2", false)){
 
             Timers.run(5f, () -> {
-                FloatingDialog dialog = new FloatingDialog("[orange]WARNING![]");
+                FloatingDialog dialog = new FloatingDialog("[accent]WARNING![]");
                 dialog.buttons().addButton("$text.ok", () -> {
                     dialog.hide();
                     Settings.putBool("4.0-warning-2", true);
@@ -379,18 +348,17 @@ public class Control extends Module{
                 state.set(state.is(State.playing) ? State.paused : State.playing);
             }
 
-            if(Inputs.keyTap("menu")){
-                if(state.is(State.paused)){
-                    ui.paused.hide();
-                    state.set(State.playing);
-                }else if(!ui.restart.isShown()){
-                    if(ui.chatfrag.chatOpen()){
-                        ui.chatfrag.hide();
-                    }else{
-                        ui.paused.show();
-                        state.set(State.paused);
-                    }
+            if(Inputs.keyTap("menu") && !ui.restart.isShown()){
+                if(ui.chatfrag.chatOpen()){
+                    ui.chatfrag.hide();
+                }else if(!ui.paused.isShown() && !ui.hasDialog()){
+                    ui.paused.show();
+                    state.set(State.paused);
                 }
+            }
+
+            if(!mobile && Inputs.keyTap("screenshot") && !ui.chatfrag.chatOpen()){
+                renderer.takeMapScreenshot();
             }
 
         }else{

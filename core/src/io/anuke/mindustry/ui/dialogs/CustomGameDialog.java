@@ -3,6 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.maps.Map;
@@ -22,7 +23,7 @@ import static io.anuke.mindustry.Vars.*;
 public class CustomGameDialog extends FloatingDialog{
 
     public CustomGameDialog(){
-        super("$text.level.select");
+        super("$text.customgame");
         addCloseButton();
         shown(this::setup);
 
@@ -34,7 +35,7 @@ public class CustomGameDialog extends FloatingDialog{
 
         Table maps = new Table();
         maps.marginRight(14);
-        ScrollPane pane = new ScrollPane(maps, "clear-black");
+        ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
         int maxwidth = (Gdx.graphics.getHeight() > Gdx.graphics.getHeight() ? 2 : 4);
@@ -48,10 +49,10 @@ public class CustomGameDialog extends FloatingDialog{
         modes.marginBottom(5);
 
         for(GameMode mode : GameMode.values()){
-            if(mode.hidden || (mode.isPvp && gwt)) continue;
+            if(mode.hidden) continue;
 
             modes.addButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode)
-                .update(b -> b.setChecked(state.mode == mode)).group(group).size(140f, 54f).padBottom(-5);
+                .update(b -> b.setChecked(state.mode == mode)).group(group).size(140f, 54f);
             if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);
@@ -101,11 +102,12 @@ public class CustomGameDialog extends FloatingDialog{
             image.getImageCell().size(images);
             image.top();
             image.row();
-            image.add("[accent]" + Bundles.get("map." + map.name + ".name", map.name)).pad(3f).growX().wrap().get().setAlignment(Align.center, Align.center);
+            image.add("[accent]" + map.getDisplayName()).pad(3f).growX().wrap().get().setAlignment(Align.center, Align.center);
             image.row();
             image.label((() -> Bundles.format("text.level.highscore", Settings.getInt("hiscore" + map.name, 0)))).pad(3f);
 
             BorderImage border = new BorderImage(map.texture, 3f);
+            border.setScaling(Scaling.fit);
             image.replaceImage(border);
 
             image.clicked(() -> {
@@ -137,7 +139,7 @@ public class CustomGameDialog extends FloatingDialog{
         d.setFillParent(false);
         Table table = new Table();
         table.defaults().pad(1f);
-        ScrollPane pane = new ScrollPane(table, "clear");
+        ScrollPane pane = new ScrollPane(table);
         pane.setFadeScrollBars(false);
         table.row();
         for(GameMode mode : GameMode.values()){

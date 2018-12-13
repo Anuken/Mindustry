@@ -1,7 +1,6 @@
 package io.anuke.mindustry.io;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Base64Coder;
 import io.anuke.annotations.Annotations.ReadClass;
 import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.mindustry.entities.Player;
@@ -17,14 +16,17 @@ import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.net.Packets.KickReason;
-import io.anuke.mindustry.net.TraceInfo;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.core.Effects;
 import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.entities.Entities;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
@@ -51,6 +53,10 @@ public class TypeIO{
 
     @WriteClass(Unit.class)
     public static void writeUnit(ByteBuffer buffer, Unit unit){
+        if(unit.getGroup() == null){
+            buffer.put((byte)-1);
+            return;
+        }
         buffer.put((byte) unit.getGroup().getID());
         buffer.putInt(unit.getID());
     }
@@ -58,6 +64,7 @@ public class TypeIO{
     @ReadClass(Unit.class)
     public static Unit readUnit(ByteBuffer buffer){
         byte gid = buffer.get();
+        if(gid == -1) return null;
         int id = buffer.getInt();
         return (Unit) Entities.getGroup(gid).getByID(id);
     }
@@ -141,13 +148,12 @@ public class TypeIO{
 
     @WriteClass(Tile.class)
     public static void writeTile(ByteBuffer buffer, Tile tile){
-        buffer.putInt(tile == null ? -1 : tile.packedPosition());
+        buffer.putInt(tile == null ? Pos.get(-1, -1) : tile.pos());
     }
 
     @ReadClass(Tile.class)
     public static Tile readTile(ByteBuffer buffer){
-        int position = buffer.getInt();
-        return position == -1 ? null : world.tile(position);
+        return world.tile(buffer.getInt());
     }
 
     @WriteClass(Block.class)
@@ -164,9 +170,9 @@ public class TypeIO{
     public static void writeRequests(ByteBuffer buffer, BuildRequest[] requests){
         buffer.putShort((short)requests.length);
         for(BuildRequest request : requests){
-            buffer.put(request.remove ? (byte) 1 : 0);
-            buffer.putInt(world.toPacked(request.x, request.y));
-            if(!request.remove){
+            buffer.put(request.breaking ? (byte) 1 : 0);
+            buffer.putInt(Pos.get(request.x, request.y));
+            if(!request.breaking){
                 buffer.put(request.recipe.id);
                 buffer.put((byte) request.rotation);
             }
@@ -183,11 +189,11 @@ public class TypeIO{
             BuildRequest currentRequest;
 
             if(type == 1){ //remove
-                currentRequest = new BuildRequest(position % world.width(), position / world.width());
+                currentRequest = new BuildRequest(Pos.x(position), Pos.y(position));
             }else{ //place
                 byte recipe = buffer.get();
                 byte rotation = buffer.get();
-                currentRequest = new BuildRequest(position % world.width(), position / world.width(), rotation, content.recipe(recipe));
+                currentRequest = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.recipe(recipe));
             }
 
             reqs[i] = (currentRequest);
@@ -340,9 +346,9 @@ public class TypeIO{
 
     @ReadClass(String.class)
     public static String readString(ByteBuffer buffer){
-        short length = buffer.getShort();
-        if(length != -1){
-            byte[] bytes = new byte[length];
+        short slength = buffer.getShort();
+        if(slength != -1){
+            byte[] bytes = new byte[slength];
             buffer.get(bytes);
             return new String(bytes, StandardCharsets.UTF_8);
         }else{
@@ -364,44 +370,24 @@ public class TypeIO{
         return bytes;
     }
 
-    @WriteClass(TraceInfo.class)
-    public static void writeTrace(ByteBuffer buffer, TraceInfo info){
-        buffer.putInt(info.playerid);
-        buffer.putShort((short) info.ip.getBytes().length);
-        buffer.put(info.ip.getBytes());
-        buffer.put(info.modclient ? (byte) 1 : 0);
-        buffer.put(info.android ? (byte) 1 : 0);
-
-        buffer.putInt(info.totalBlocksBroken);
-        buffer.putInt(info.structureBlocksBroken);
-        buffer.putInt(info.lastBlockBroken.id);
-
-        buffer.putInt(info.totalBlocksPlaced);
-        buffer.putInt(info.lastBlockPlaced.id);
-        buffer.put(Base64Coder.decode(info.uuid));
+    public static void writeStringData(DataOutput buffer, String string) throws IOException{
+        if(string != null){
+            byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+            buffer.writeShort((short) bytes.length);
+            buffer.write(bytes);
+        }else{
+            buffer.writeShort((short) -1);
+        }
     }
 
-    @ReadClass(TraceInfo.class)
-    public static TraceInfo readTrace(ByteBuffer buffer){
-        int id = buffer.getInt();
-        short iplen = buffer.getShort();
-        byte[] ipb = new byte[iplen];
-        buffer.get(ipb);
-
-        TraceInfo info = new TraceInfo(new String(ipb));
-
-        info.playerid = id;
-        info.modclient = buffer.get() == 1;
-        info.android = buffer.get() == 1;
-        info.totalBlocksBroken = buffer.getInt();
-        info.structureBlocksBroken = buffer.getInt();
-        info.lastBlockBroken = content.block(buffer.getInt());
-        info.totalBlocksPlaced = buffer.getInt();
-        info.lastBlockPlaced = content.block(buffer.getInt());
-        byte[] uuid = new byte[8];
-        buffer.get(uuid);
-
-        info.uuid = new String(Base64Coder.encode(uuid));
-        return info;
+    public static String readStringData(DataInput buffer) throws IOException{
+        short slength = buffer.readShort();
+        if(slength != -1){
+            byte[] bytes = new byte[slength];
+            buffer.readFully(bytes);
+            return new String(bytes, StandardCharsets.UTF_8);
+        }else{
+            return null;
+        }
     }
 }

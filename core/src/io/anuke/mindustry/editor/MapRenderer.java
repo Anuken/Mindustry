@@ -74,6 +74,11 @@ public class MapRenderer implements Disposable{
             for(int y = 0; y < chunks[0].length; y++){
                 IndexedRenderer mesh = chunks[x][y];
 
+                if(mesh == null){
+                    chunks[x][y] = new IndexedRenderer(chunksize * chunksize * 2);
+                    mesh = chunks[x][y];
+                }
+
                 mesh.getTransformMatrix().setToTranslation(tx, ty, 0).scl(tw / (width * tilesize),
                         th / (height * tilesize), 1f);
                 mesh.setProjectionMatrix(Core.batch.getProjectionMatrix());

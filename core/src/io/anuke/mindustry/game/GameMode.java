@@ -11,9 +11,8 @@ public enum GameMode{
     freebuild{{
         disableWaveTimer = true;
     }},
-    noWaves{{
+    attack{{
         disableWaves = true;
-        hidden = true;
         enemyCheat = true;
     }},
     victory{{

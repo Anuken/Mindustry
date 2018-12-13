@@ -30,8 +30,8 @@ import io.anuke.ucore.util.Angles;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Pooling;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
@@ -225,11 +225,11 @@ public class MassDriver extends Block{
 
         MassDriverEntity entity = tile.entity();
 
-        if(entity.link == other.packedPosition()){
+        if(entity.link == other.pos()){
             Call.linkMassDriver(null, tile, -1);
             return false;
         }else if(other.block() instanceof MassDriver && other.distanceTo(tile) <= range){
-            Call.linkMassDriver(null, tile, other.packedPosition());
+            Call.linkMassDriver(null, tile, other.pos());
             return false;
         }
 
@@ -322,13 +322,13 @@ public class MassDriver extends Block{
         }
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeInt(link);
             stream.writeFloat(rotation);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             link = stream.readInt();
             rotation = stream.readFloat();
         }

@@ -14,11 +14,7 @@ public class ColorMapper implements ContentList{
     private static ObjectIntMap<Block> colorMap = new ObjectIntMap<>();
     private static ThreadLocal<Color> tmpColors = new ThreadLocal<>();
 
-    public static Block getByColor(int color){
-        return blockMap.get(color);
-    }
-
-    public static int getBlockColor(Block block){
+    private static int getBlockColor(Block block){
         return colorMap.get(block, 0);
     }
 

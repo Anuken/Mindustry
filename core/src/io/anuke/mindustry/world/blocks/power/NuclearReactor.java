@@ -20,13 +20,12 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Translator;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
-//TODO refactor to use consumers
 public class NuclearReactor extends PowerGenerator{
     protected final int timerFuel = timers++;
 
@@ -202,14 +201,12 @@ public class NuclearReactor extends PowerGenerator{
         public float flash;
 
         @Override
-        public void write(DataOutputStream stream) throws IOException{
-            super.write(stream);
+        public void write(DataOutput stream) throws IOException{
             stream.writeFloat(heat);
         }
 
         @Override
-        public void read(DataInputStream stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream) throws IOException{
             heat = stream.readFloat();
         }
     }

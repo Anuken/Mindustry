@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.game.EventType.BlockBuildEvent;
+import io.anuke.mindustry.game.EventType.BlockBuildBeginEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Recipe;
@@ -17,7 +17,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Build{
     private static final Rectangle rect = new Rectangle();
-    private static final Rectangle hitrect = new Rectangle();
 
     /**Returns block type that was broken, or null if unsuccesful.*/
     public static void beginBreak(Team team, int x, int y){
@@ -46,9 +45,9 @@ public class Build{
 
             for(int dx = 0; dx < previous.size; dx++){
                 for(int dy = 0; dy < previous.size; dy++){
-                    int worldx = dx + offsetx + x;
-                    int worldy = dy + offsety + y;
-                    if(!(worldx == x && worldy == y)){
+                    int worldx = dx + offsetx + tile.x;
+                    int worldy = dy + offsety + tile.y;
+                    if(!(worldx == tile.x && worldy == tile.y)){
                         Tile toplace = world.tile(worldx, worldy);
                         if(toplace != null){
                             toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));
@@ -59,6 +58,8 @@ public class Build{
             }
         }
 
+        Tile ftile = tile;
+        threads.runDelay(() -> Events.fire(new BlockBuildBeginEvent(ftile, team, true)));
     }
 
     /**Places a BuildBlock at this location.*/
@@ -100,8 +101,7 @@ public class Build{
             }
         }
 
-
-        threads.runDelay(() -> Events.fire(new BlockBuildEvent(tile, team)));
+        threads.runDelay(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
     }
 
     /**Returns whether a tile can be placed at this location by this team.*/
@@ -131,7 +131,7 @@ public class Build{
         if(tile == null) return false;
 
         if(type.isMultiblock()){
-            if(type.canReplace(tile.block()) && tile.block().size == type.size){
+            if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile)){
                 return true;
             }
 

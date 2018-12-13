@@ -11,7 +11,6 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.Bundles;
 
-//TODO merge unit type with mech
 public class Mech extends UnlockableContent{
     public final String name;
     public final String description;
@@ -35,6 +34,7 @@ public class Mech extends UnlockableContent{
     public Color trailColorTo = Palette.boostTo;
     public int itemCapacity = 30;
     public boolean turnCursor = true;
+    public boolean canHeal = false;
 
     public float weaponOffsetX, weaponOffsetY;
     public Weapon weapon = Weapons.blaster;

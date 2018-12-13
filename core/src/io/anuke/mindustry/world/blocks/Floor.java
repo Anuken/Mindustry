@@ -130,16 +130,16 @@ public class Floor extends Block{
 
     @Override
     public void drawNonLayer(Tile tile){
-        MathUtils.random.setSeed(tile.id());
+        MathUtils.random.setSeed(tile.pos());
 
         drawEdges(tile, true);
     }
 
     @Override
     public void draw(Tile tile){
-        MathUtils.random.setSeed(tile.id());
+        MathUtils.random.setSeed(tile.pos());
 
-        Draw.rect(variantRegions[Mathf.randomSeed(tile.id(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
+        Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
 
         if(tile.hasCliffs() && cliffRegions != null){
             for(int i = 0; i < 4; i++){
@@ -181,7 +181,7 @@ public class Floor extends Block{
 
             Floor floor = other.floor();
 
-            if((floor.id <= this.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!blends.test(floor) && !tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > this.cacheLayer.ordinal() && !sameLayer) ||
+            if(floor.edgeRegions == null || (floor.id <= this.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!blends.test(floor) && !tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > this.cacheLayer.ordinal() && !sameLayer) ||
                     (sameLayer && floor.cacheLayer == this.cacheLayer)) continue;
 
             TextureRegion region = floor.edgeRegions[i];

@@ -11,6 +11,7 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Events;
 import io.anuke.ucore.scene.Group;
 import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -32,17 +33,18 @@ public class MenuFragment extends Fragment{
         });
 
         //discord icon in top right
-        parent.fill(c -> c.top().right().addButton("", "discord", ui.discord::show).size(81, 42)
+        parent.fill(c -> c.top().right().addButton("", "discord", ui.discord::show).size(84, 45)
                 .visible(() -> state.is(State.menu)));
 
         //info icon
         if(mobile){
-            parent.fill(c -> c.top().left().addButton("", "info", ui.about::show).size(81, 42)
+            parent.fill(c -> c.top().left().addButton("", "info", ui.about::show).size(84, 45)
                     .visible(() -> state.is(State.menu)));
         }
 
         //version info
-        parent.fill(c -> c.bottom().left().add("Mindustry " + Version.number + "-" + Version.modifier + " " + Version.type + " / " + (Version.build == -1 ? "custom build" : "build " + Version.build))
+        parent.fill(c -> c.bottom().left().add(Strings.formatArgs("Mindustry v{0} {1}-{2} {3}{4}", Version.number, Version.modifier, Version.type,
+                (Version.build == -1 ? "custom build" : "build " + Version.build), Version.revision == 0 ? "" : "." + Version.revision))
                 .visible(() -> state.is(State.menu)));
     }
 
@@ -55,14 +57,14 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-                play = new MobileButton("icon-play-2", isize, "$text.play", this::showPlaySelect),
-                maps = new MobileButton("icon-map", isize, "$text.maps", ui.maps::show),
-                load = new MobileButton("icon-load", isize, "$text.load", ui.load::show),
-                join = new MobileButton("icon-add", isize, "$text.joingame", ui.join::show),
-                editor = new MobileButton("icon-editor", isize, "$text.editor", () -> ui.loadGraphics(ui.editor::show)),
-                tools = new MobileButton("icon-tools", isize, "$text.settings", ui.settings::show),
-                unlocks = new MobileButton("icon-unlocks", isize, "$text.unlocks", ui.unlocks::show),
-                donate = new MobileButton("icon-donate", isize, "$text.donate", Platform.instance::openDonations);
+            play = new MobileButton("icon-play-2", isize, "$text.play", this::showPlaySelect),
+            maps = new MobileButton("icon-map", isize, "$text.maps", ui.maps::show),
+            load = new MobileButton("icon-load", isize, "$text.load", ui.load::show),
+            join = new MobileButton("icon-add", isize, "$text.joingame", ui.join::show),
+            editor = new MobileButton("icon-editor", isize, "$text.editor", () -> ui.loadGraphics(ui.editor::show)),
+            tools = new MobileButton("icon-tools", isize, "$text.settings", ui.settings::show),
+            unlocks = new MobileButton("icon-unlocks", isize, "$text.unlocks", ui.unlocks::show),
+            donate = new MobileButton("icon-donate", isize, "$text.donate", Platform.instance::openDonations);
 
         if(Gdx.graphics.getWidth() > Gdx.graphics.getHeight()){
             container.add(play);
@@ -132,9 +134,7 @@ public class MenuFragment extends Fragment{
 
             out.row();
 
-            if(!gwt){
-                out.add(new MenuButton("icon-exit", "$text.quit", Gdx.app::exit)).width(bw).colspan(2);
-            }
+            out.add(new MenuButton("icon-exit", "$text.quit", Gdx.app::exit)).width(bw).colspan(2);
         });
     }
 
@@ -153,12 +153,8 @@ public class MenuFragment extends Fragment{
         dialog.content().row();
 
         dialog.content().add(new MenuButton("icon-add", "$text.joingame", () -> {
-            if(!gwt){
-                ui.join.show();
-                dialog.hide();
-            }else{
-                ui.showInfo("$text.web.unsupported");
-            }
+            ui.join.show();
+            dialog.hide();
         }));
 
         dialog.content().add(new MenuButton("icon-editor", "$text.customgame", () -> {
