@@ -71,7 +71,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     }
 
     /**Sets this tile entity data to this tile, and adds it if necessary.*/
-    public TileEntity init(Tile tile, boolean added){
+    public TileEntity init(Tile tile, boolean shouldAdd){
         this.tile = tile;
         x = tile.drawx();
         y = tile.drawy();
@@ -80,7 +80,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
         timer = new Timer(tile.block().timers);
 
-        if(added){
+        if(shouldAdd){
             add();
         }
 

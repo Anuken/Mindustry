@@ -83,7 +83,7 @@ public class Recipes implements ContentList{
         new Recipe(distribution, DistributionBlocks.junction, new ItemStack(Items.copper, 2)).setAlwaysUnlocked(true);
         new Recipe(distribution, DistributionBlocks.router, new ItemStack(Items.copper, 6)).setAlwaysUnlocked(true);
 
-        //advanced densealloy transporat
+        //advanced densealloy transport
         new Recipe(distribution, DistributionBlocks.distributor, new ItemStack(Items.densealloy, 8), new ItemStack(Items.copper, 8));
         new Recipe(distribution, DistributionBlocks.sorter, new ItemStack(Items.densealloy, 4), new ItemStack(Items.copper, 4));
         new Recipe(distribution, DistributionBlocks.overflowGate, new ItemStack(Items.densealloy, 4), new ItemStack(Items.copper, 8));
