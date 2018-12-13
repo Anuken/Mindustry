@@ -159,6 +159,26 @@ public class SectorsDialog extends FloatingDialog{
             });
 
             clicked(() -> clicked = true);
+
+            this.focus();
+        }
+
+        private void focus(){
+            Sector focusSector = null;
+            long newestTimestamp = 0;
+            for(Sector sector : world.sectors.getSectors()){
+                if(sector.hasSave()){
+                    long timestamp = sector.getSave().getTimestamp();
+                    if(timestamp > newestTimestamp){
+                        focusSector = sector;
+                        newestTimestamp = timestamp;
+                    }
+                }
+            }
+            if(focusSector != null) {
+                panX = (focusSector.x + 0.5f) * sectorSize;
+                panY = (focusSector.y + 0.5f) * sectorSize;
+            }
         }
 
         @Override
