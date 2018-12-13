@@ -17,6 +17,8 @@ import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.ThreadArray;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -186,8 +188,12 @@ public class Saves{
             return Strings.formatMillis(current == this ? totalPlaytime : meta.timePlayed);
         }
 
+        public long getTimestamp(){
+            return meta.timestamp;
+        }
+
         public String getDate(){
-            return meta.date;
+            return SimpleDateFormat.getDateTimeInstance().format(new Date(meta.timestamp));
         }
 
         public Map getMap(){

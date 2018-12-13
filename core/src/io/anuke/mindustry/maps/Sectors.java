@@ -86,6 +86,10 @@ public class Sectors{
         return grid.get(Bits.getLeftShort(position), Bits.getRightShort(position));
     }
 
+    public Iterable<Sector> getSectors(){
+        return grid.values();
+    }
+
     public Difficulty getDifficulty(Sector sector){
         if(sector.difficulty == 0){
             return Difficulty.hard;
