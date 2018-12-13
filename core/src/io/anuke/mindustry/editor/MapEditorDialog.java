@@ -278,15 +278,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }).left().margin(0).get();
 
             button.clearChildren();
-            button.table("button", t -> {
-                t.addImage(iconname).size(16 * 3);
-                t.update(() -> t.background(button.getClickListener().isPressed() ? "button-down" : button.getClickListener().isOver() ? "button-over" : "button"));
-            }).size(h);
+            button.addImage(iconname).size(16 * 3).padLeft(10);
             button.table(t -> {
                 t.add(name).growX().wrap();
                 t.row();
                 t.add(description).color(Color.GRAY).growX().wrap();
-            }).growX().pad(10f);
+            }).growX().pad(10f).padLeft(5);
 
             button.row();
 
