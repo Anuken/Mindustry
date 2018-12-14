@@ -279,7 +279,7 @@ public class JoinDialog extends FloatingDialog{
         button.left();
         button.row();
         button.add("[lightgray]" + (host.players != 1 ? Bundles.format("text.players", host.players) :
-        Bundles.format("text.players.single", host.players)));
+        Bundles.format("text.players.single", host.players))).padBottom(5);
     }
 
     void connect(String ip, int port){
