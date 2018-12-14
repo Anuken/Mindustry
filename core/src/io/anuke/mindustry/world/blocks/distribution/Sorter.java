@@ -30,7 +30,6 @@ public class Sorter extends Block implements SelectionTrait{
         solid = true;
         instantTransfer = true;
         group = BlockGroup.transportation;
-        configurable = true;
     }
 
     @Override
@@ -117,12 +116,13 @@ public class Sorter extends Block implements SelectionTrait{
     }
 
     @Override
-    public void buildTable(Tile tile, Table table){
+    public boolean buildTable(Tile tile, Table table){
         SorterEntity entity = tile.entity();
         buildItemTable(table, () -> entity.sortItem, item -> {
             lastItem = item;
             Call.setSorterItem(null, tile, item);
         });
+        return true;
     }
 
     @Override

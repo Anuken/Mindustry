@@ -79,8 +79,10 @@ public class BlockConfigFragment extends Fragment{
         return e != null && (e == table || e.isDescendantOf(table));
     }
 
+    private static final Runnable empty = () -> {};
     public void hideConfig(){
         configTile = null;
+        for(Element e : table.getChildren()) e.update(empty);
         table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.visible(false));
     }
 }

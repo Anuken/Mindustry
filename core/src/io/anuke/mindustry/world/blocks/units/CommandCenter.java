@@ -21,6 +21,7 @@ import io.anuke.ucore.core.Effects.Effect;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.ButtonGroup;
 import io.anuke.ucore.scene.ui.ImageButton;
+import io.anuke.ucore.scene.ui.layout.Cell;
 import io.anuke.ucore.scene.ui.layout.Table;
 import io.anuke.ucore.util.EnumSet;
 
@@ -42,7 +43,6 @@ public class CommandCenter extends Block{
         flags = EnumSet.of(BlockFlag.comandCenter);
         destructible = true;
         solid = true;
-        configurable = true;
     }
 
     @Override
@@ -78,18 +78,21 @@ public class CommandCenter extends Block{
     }
 
     @Override
-    public void buildTable(Tile tile, Table table){
+    public boolean buildTable(Tile tile, Table table){
         CommandCenterEntity entity = tile.entity();
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         Table buttons = new Table();
 
         for(UnitCommand cmd : UnitCommand.values()){
-            buttons.addImageButton("command-" + cmd.name(), "clear-toggle", 8*3, () -> threads.run(() -> Call.onCommandCenterSet(players[0], tile, cmd)))
-            .size(38f).checked(entity.command == cmd).group(group);
+            ImageButton button = buttons.addImageButton("command-" + cmd.name(), "clear-toggle", 8*3, () -> threads.run(() -> Call.onCommandCenterSet(players[0], tile, cmd)))
+            .size(38f).group(group).get();
+            button.setProgrammaticChangeEvents(false);
+            button.update(() -> button.setChecked(entity.command == cmd));
         }
         table.add(buttons);
         table.row();
         table.table("pane", t -> t.label(() -> entity.command.localized()).center().growX()).growX();
+        return true;
     }
 
     @Remote(called = Loc.server, forward = true, targets = Loc.both)

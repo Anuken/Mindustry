@@ -111,7 +111,6 @@ public class DebugBlocks extends BlockList implements ContentList{
                 solid = true;
                 hasLiquids = true;
                 liquidCapacity = 100f;
-                configurable = true;
                 outputsLiquid = true;
             }
 
@@ -135,7 +134,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public void buildTable(Tile tile, Table table){
+            public boolean buildTable(Tile tile, Table table){
                 LiquidSourceEntity entity = tile.entity();
 
                 Array<Liquid> items = content.liquids();
@@ -149,7 +148,8 @@ public class DebugBlocks extends BlockList implements ContentList{
                     final int f = i;
                     ImageButton button = cont.addImageButton("liquid-icon-" + items.get(i).name, "clear-toggle", 24,
                             () -> Call.setLiquidSourceLiquid(null, tile, items.get(f))).size(38).group(group).get();
-                    button.setChecked(entity.source.id == f);
+                    button.setProgrammaticChangeEvents(false);
+                    button.update(() -> button.setChecked(entity.source.id == f));
 
                     if(i % 4 == 3){
                         cont.row();
@@ -157,6 +157,7 @@ public class DebugBlocks extends BlockList implements ContentList{
                 }
 
                 table.add(cont);
+                return true;
             }
 
             @Override

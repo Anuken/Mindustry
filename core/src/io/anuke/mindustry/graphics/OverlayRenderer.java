@@ -72,10 +72,8 @@ public class OverlayRenderer{
             InputHandler input = control.input(player.playerIndex);
 
             //draw config selected block
-            if(input.frag.config.isShown()){
-                Tile tile = input.frag.config.getSelectedTile();
-                tile.block().drawConfigure(tile);
-            }
+            Tile tile = input.frag.config.getSelectedTile();
+            if(tile != null) tile.block().drawConfigure(tile);
 
             input.drawTop();
 
@@ -103,7 +101,7 @@ public class OverlayRenderer{
             //draw selected block bars and info
             if(input.recipe == null && !ui.hasMouse()){
                 Vector2 vec = Graphics.world(input.getMouseX(), input.getMouseY());
-                Tile tile = world.tileWorld(vec.x, vec.y);
+                tile = world.tileWorld(vec.x, vec.y);
 
                 if(tile != null && tile.block() != Blocks.air && tile.target().getTeam() == players[0].getTeam()){
                     Tile target = tile.target();
@@ -188,7 +186,7 @@ public class OverlayRenderer{
                 Lines.circle(v.x, v.y, 6 + Mathf.absin(Timers.time(), 5f, 1f));
                 Draw.reset();
 
-                Tile tile = world.tileWorld(v.x, v.y);
+                tile = world.tileWorld(v.x, v.y);
                 if(tile != null) tile = tile.target();
                 if(tile != null && tile.getTeam() == player.getTeam() && tile.block().acceptStack(player.inventory.getItem().item, player.inventory.getItem().amount, tile, player) > 0){
                     Draw.color(Palette.place);

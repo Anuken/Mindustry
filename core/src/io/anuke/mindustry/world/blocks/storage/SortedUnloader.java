@@ -32,7 +32,6 @@ public class SortedUnloader extends Block implements SelectionTrait{
         solid = true;
         health = 70;
         hasItems = true;
-        configurable = true;
     }
 
     @Override
@@ -86,12 +85,13 @@ public class SortedUnloader extends Block implements SelectionTrait{
     }
 
     @Override
-    public void buildTable(Tile tile, Table table){
+    public boolean buildTable(Tile tile, Table table){
         SortedUnloaderEntity entity = tile.entity();
         buildItemTable(table, () -> entity.sortItem, item -> {
             lastItem = item;
             Call.setSortedUnloaderItem(null, tile, item);
         });
+        return true;
     }
 
     @Override

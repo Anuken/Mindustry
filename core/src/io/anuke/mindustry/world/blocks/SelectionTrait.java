@@ -31,7 +31,8 @@ public interface SelectionTrait{
             ImageButton button = cont.addImageButton("white", "clear-toggle", 24, () -> {}).group(group).get();
             button.changed(() -> consumer.accept(button.isChecked() ? item : null));
             button.getStyle().imageUp = new TextureRegionDrawable(item.region);
-            button.setChecked(holder.get() == item);
+            button.setProgrammaticChangeEvents(false);
+            button.update(() -> button.setChecked(holder.get() == item));
 
             if(i++ % 4 == 3){
                 cont.row();
