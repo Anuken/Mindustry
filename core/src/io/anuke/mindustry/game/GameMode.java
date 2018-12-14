@@ -13,7 +13,6 @@ public enum GameMode{
     }},
     attack{{
         disableWaves = true;
-        hidden = true;
         enemyCheat = true;
     }},
     victory{{

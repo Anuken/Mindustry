@@ -42,17 +42,23 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.surgeWall, new ItemStack(Items.surgealloy, 12));
         new Recipe(defense, DefenseBlocks.surgeWallLarge, new ItemStack(Items.surgealloy, 12 * 4));
 
+        new Recipe(effect, StorageBlocks.container, new ItemStack(Items.densealloy, 200));
+        new Recipe(effect, StorageBlocks.vault, new ItemStack(Items.densealloy, 500), new ItemStack(Items.thorium, 250));
+
+        //core disabled due to being broken
+        new Recipe(effect, StorageBlocks.core,
+            new ItemStack(Items.copper, 2000), new ItemStack(Items.densealloy, 1500),
+            new ItemStack(Items.silicon, 1500), new ItemStack(Items.thorium, 500),
+            new ItemStack(Items.surgealloy, 500), new ItemStack(Items.phasefabric, 750)
+        );
+
         //projectors
         new Recipe(effect, DefenseBlocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 50), new ItemStack(Items.silicon, 180));
         new Recipe(effect, DefenseBlocks.overdriveProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
         new Recipe(effect, DefenseBlocks.forceProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
 
-        new Recipe(effect, StorageBlocks.unloader, new ItemStack(Items.densealloy, 50), new ItemStack(Items.silicon, 60));
-        new Recipe(effect, StorageBlocks.container, new ItemStack(Items.densealloy, 200));
-        new Recipe(effect, StorageBlocks.vault, new ItemStack(Items.densealloy, 500), new ItemStack(Items.thorium, 250));
-
         new Recipe(effect, DefenseBlocks.shockMine, new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 25))
-            .setDependencies(Items.blastCompound);
+                .setDependencies(Items.blastCompound);
 
         //TURRETS
         new Recipe(turret, TurretBlocks.duo, new ItemStack(Items.copper, 40)).setAlwaysUnlocked(true);
@@ -82,6 +88,7 @@ public class Recipes implements ContentList{
         new Recipe(distribution, DistributionBlocks.sorter, new ItemStack(Items.densealloy, 4), new ItemStack(Items.copper, 4));
         new Recipe(distribution, DistributionBlocks.overflowGate, new ItemStack(Items.densealloy, 4), new ItemStack(Items.copper, 8));
         new Recipe(distribution, DistributionBlocks.itemBridge, new ItemStack(Items.densealloy, 8), new ItemStack(Items.copper, 8));
+        new Recipe(distribution, StorageBlocks.unloader, new ItemStack(Items.densealloy, 50), new ItemStack(Items.silicon, 60));
         new Recipe(distribution, DistributionBlocks.massDriver, new ItemStack(Items.densealloy, 250), new ItemStack(Items.silicon, 150), new ItemStack(Items.lead, 250), new ItemStack(Items.thorium, 100));
 
         //CRAFTING
@@ -133,13 +140,6 @@ public class Recipes implements ContentList{
         //generators - nuclear
         new Recipe(power, PowerBlocks.thoriumReactor, new ItemStack(Items.lead, 600), new ItemStack(Items.silicon, 400), new ItemStack(Items.densealloy, 300), new ItemStack(Items.thorium, 300));
         new Recipe(power, PowerBlocks.rtgGenerator, new ItemStack(Items.lead, 200), new ItemStack(Items.silicon, 150), new ItemStack(Items.phasefabric, 50), new ItemStack(Items.plastanium, 150), new ItemStack(Items.thorium, 100));
-
-        //core disabled due to being broken
-        /*new Recipe(distribution, StorageBlocks.core,
-            new ItemStack(Items.copper, 2000), new ItemStack(Items.densealloy, 1500),
-            new ItemStack(Items.silicon, 1500), new ItemStack(Items.thorium, 500),
-            new ItemStack(Items.surgealloy, 500), new ItemStack(Items.phasefabric, 750)
-        );*/
 
         //DRILLS, PRODUCERS
         new Recipe(production, ProductionBlocks.mechanicalDrill, new ItemStack(Items.copper, 45)).setAlwaysUnlocked(true);

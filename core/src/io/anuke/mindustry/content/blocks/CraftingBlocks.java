@@ -196,9 +196,9 @@ public class CraftingBlocks extends BlockList implements ContentList{
         biomatterCompressor = new Compressor("biomattercompressor"){{
             liquidCapacity = 60f;
             itemCapacity = 50;
-            craftTime = 25f;
+            craftTime = 20f;
             outputLiquid = Liquids.oil;
-            outputLiquidAmount = 1.5f;
+            outputLiquidAmount = 2.5f;
             size = 2;
             health = 320;
             hasLiquids = true;

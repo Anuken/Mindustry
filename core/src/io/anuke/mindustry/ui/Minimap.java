@@ -9,20 +9,16 @@ import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.Element;
 import io.anuke.ucore.scene.event.InputEvent;
 import io.anuke.ucore.scene.event.InputListener;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.ucore.scene.ui.layout.Container;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Minimap extends Table{
+public class Minimap extends Container<Element>{
 
     public Minimap(){
-        super("pane");
+        super(new Element(){
+            TextureRegion r = new TextureRegion();
 
-        margin(5);
-
-        TextureRegion r = new TextureRegion();
-
-        Element elem = new Element(){
             @Override
             public void draw(){
                 if(renderer.minimap.getRegion() == null) return;
@@ -57,7 +53,12 @@ public class Minimap extends Table{
                     renderer.fog.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
                 }
             }
-        };
+        });
+
+        background("pane");
+
+        size(140f);
+        margin(5f);
 
         addListener(new InputListener(){
             public boolean scrolled(InputEvent event, float x, float y, int amount){
@@ -66,7 +67,7 @@ public class Minimap extends Table{
             }
         });
 
-        elem.update(() -> {
+        update(() -> {
 
             Element e = Core.scene.hit(Graphics.mouse().x, Graphics.mouse().y, true);
             if(e != null && e.isDescendantOf(this)){
@@ -75,7 +76,5 @@ public class Minimap extends Table{
                 Core.scene.setScrollFocus(null);
             }
         });
-
-        add(elem).size(140f, 140f);
     }
 }

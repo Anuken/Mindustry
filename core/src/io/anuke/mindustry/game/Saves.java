@@ -17,6 +17,8 @@ import io.anuke.ucore.util.Strings;
 import io.anuke.ucore.util.ThreadArray;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -165,26 +167,17 @@ public class Saves{
 
         public void save(){
             long time = totalPlaytime;
+            renderer.fog.writeFog();
+            long prev = totalPlaytime;
+            totalPlaytime = time;
 
-            threads.runGraphics(() -> {
-                //Renderer fog needs to be written on graphics thread, but save() can run on logic thread
-                //thus, runGraphics is required here
-                renderer.fog.writeFog();
+            SaveIO.saveToSlot(index);
+            meta = SaveIO.getData(index);
+            if(!state.is(State.menu)){
+                current = this;
+            }
 
-                //save on the logic thread
-                threads.run(() -> {
-                    long prev = totalPlaytime;
-                    totalPlaytime = time;
-
-                    SaveIO.saveToSlot(index);
-                    meta = SaveIO.getData(index);
-                    if(!state.is(State.menu)){
-                        current = this;
-                    }
-
-                    totalPlaytime = prev;
-                });
-            });
+            totalPlaytime = prev;
         }
 
         public boolean isHidden(){
@@ -195,8 +188,12 @@ public class Saves{
             return Strings.formatMillis(current == this ? totalPlaytime : meta.timePlayed);
         }
 
+        public long getTimestamp(){
+            return meta.timestamp;
+        }
+
         public String getDate(){
-            return meta.date;
+            return SimpleDateFormat.getDateTimeInstance().format(new Date(meta.timestamp));
         }
 
         public Map getMap(){

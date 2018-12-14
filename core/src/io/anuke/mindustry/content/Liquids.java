@@ -26,7 +26,7 @@ public class Liquids implements ContentList{
 
         lava = new Liquid("lava", Color.valueOf("e37341")){
             {
-                temperature = 0.8f;
+                temperature = 1f;
                 viscosity = 0.8f;
                 tier = 2;
                 effect = StatusEffects.melting;
