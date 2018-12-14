@@ -181,7 +181,10 @@ public class PowerGraph{
     public void clear(){
         for(Tile other : all){
             if(other.entity != null && other.entity.power != null){
-                other.entity.power.satisfaction = 0.0f;
+                if(other.block().consumes.hasSubtypeOf(ConsumePower.class) && !other.block().consumes.getSubtypeOf(ConsumePower.class).isBuffered){
+                    // Reset satisfaction to zero in case of direct consumer. There is no reason to clear power from buffered consumers.
+                    other.entity.power.satisfaction = 0.0f;
+                }
                 other.entity.power.graph = null;
             }
         }
