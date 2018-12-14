@@ -12,21 +12,15 @@ public class MenuButton extends TextButton{
 
     public MenuButton(String icon, String text, String description, Runnable clicked){
         super("default");
-        float s = 66f;
 
         clicked(clicked);
-
         clearChildren();
 
         margin(0);
 
         table(t -> {
-            t.addImage(icon).size(14 * 3);
-            t.update(() -> t.setBackground(getClickListener().isVisualPressed() ? "button-down" : getClickListener().isOver() ? "button-over" : "button"));
-        }).size(s - 5, s);
+            t.addImage(icon).size(14 * 3).padLeft(6);
 
-
-        table(t -> {
             t.add(text).wrap().growX().get().setAlignment(Align.center, Align.left);
             if(description != null){
                 t.row();

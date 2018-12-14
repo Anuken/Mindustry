@@ -1,7 +1,7 @@
 apply plugin: "java"
 
 sourceCompatibility = 1.8
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.java.srcDirs = ["src/"]
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
@@ -12,25 +12,25 @@ def textureFolder = "../core/assets-raw/sprites/generated/"
 
 task swapColors(){
     doLast{
-        if (project.hasProperty("colors")) {
+        if(project.hasProperty("colors")){
             def carr = new File(getProperty("colors")).text.split("\n")
             def map = [:]
             def swaps = 0
-            carr.each {str -> map[Color.argb8888(Color.valueOf(str.split("=")[0]))] = Color.argb8888(Color.valueOf(str.split("=")[1]))}
+            carr.each{ str -> map[Color.argb8888(Color.valueOf(str.split("=")[0]))] = Color.argb8888(Color.valueOf(str.split("=")[1])) }
             def tmpc = new Color()
 
-            fileTree(dir: '../core/assets-raw/sprites', include: "**/*.png").visit { file ->
+            fileTree(dir: '../core/assets-raw/sprites', include: "**/*.png").visit{ file ->
                 if(file.isDirectory()) return
-                swaps ++
+                swaps++
 
                 def img = ImageIO.read(file.file)
-                for (x in (0..img.getWidth()-1)) {
-                    for (y in (0..img.getHeight()-1)) {
+                for(x in (0..img.getWidth() - 1)){
+                    for(y in (0..img.getHeight() - 1)){
                         def c = img.getRGB(x, y)
                         Color.argb8888ToColor(tmpc, c)
                         if(tmpc.a < 0.1f) continue
                         if(map.containsKey(c)){
-                            img.setRGB(x, y, (int)map.get(c))
+                            img.setRGB(x, y, (int) map.get(c))
                         }
                     }
                 }
@@ -46,7 +46,7 @@ task swapColors(){
 task pack(){
     dependsOn 'prePack'
 
-    doLast {
+    doLast{
         TexturePacker.process("core/assets-raw/sprites/", "core/assets/sprites/", "sprites.atlas")
 
         delete{
@@ -71,7 +71,7 @@ task cleanup(){
     }
 }
 
-task generateSprites(dependsOn: classes, type: JavaExec) {
+task generateSprites(dependsOn: classes, type: JavaExec){
     file(textureFolder).mkdirs()
 
     main = "io.anuke.mindustry.PackerLauncher"
@@ -80,7 +80,7 @@ task generateSprites(dependsOn: classes, type: JavaExec) {
     workingDir = textureFolder
 }
 
-task updateBundles(dependsOn: classes, type: JavaExec) {
+task updateBundles(dependsOn: classes, type: JavaExec){
     file(textureFolder).mkdirs()
 
     main = "io.anuke.mindustry.BundleLauncher"

@@ -40,7 +40,6 @@ import io.anuke.ucore.util.Mathf;
 import io.anuke.ucore.util.Strings;
 
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import static io.anuke.mindustry.Vars.*;
@@ -96,26 +95,24 @@ public class MapEditorDialog extends Dialog implements Disposable{
             t.addImageTextButton("$text.editor.import", "icon-load-map", isize, () ->
                     createDialog("$text.editor.import",
                             "$text.editor.importmap", "$text.editor.importmap.description", "icon-load-map", (Runnable) loadDialog::show,
-                            "$text.editor.importfile", "$text.editor.importfile.description", "icon-file", (Runnable) () -> {
-                                Platform.instance.showFileChooser("$text.loadimage", "Map Files", file -> {
-                                    ui.loadGraphics(() -> {
-                                        try{
-                                            DataInputStream stream = new DataInputStream(file.read());
+                            "$text.editor.importfile", "$text.editor.importfile.description", "icon-file", (Runnable) () ->
+                                Platform.instance.showFileChooser("$text.loadimage", "Map Files", file -> ui.loadGraphics(() -> {
+                                    try{
+                                        DataInputStream stream = new DataInputStream(file.read());
 
-                                            MapMeta meta = MapIO.readMapMeta(stream);
-                                            MapTileData data = MapIO.readTileData(stream, meta, false);
+                                        MapMeta meta = MapIO.readMapMeta(stream);
+                                        MapTileData data = MapIO.readTileData(stream, meta, false);
 
-                                            editor.beginEdit(data, meta.tags, false);
-                                            view.clearStack();
-                                        }catch(Exception e){
-                                            ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
-                                            Log.err(e);
-                                        }
-                                    });
-                                }, true, mapExtension);
-                            },
-						"$text.editor.importimage", "$text.editor.importimage.description", "icon-file-image", (Runnable)() -> {
-                            Platform.instance.showFileChooser("$text.loadimage", "Image Files", file -> {
+                                        editor.beginEdit(data, meta.tags, false);
+                                        view.clearStack();
+                                    }catch(Exception e){
+                                        ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
+                                        Log.err(e);
+                                    }
+                                }), true, mapExtension),
+
+						"$text.editor.importimage", "$text.editor.importimage.description", "icon-file-image", (Runnable)() ->
+                            Platform.instance.showFileChooser("$text.loadimage", "Image Files", file ->
                                 ui.loadGraphics(() -> {
                                     try{
                                         MapTileData data = MapIO.readLegacyPixmap(new Pixmap(file));
@@ -126,12 +123,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                         ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
                                         Log.err(e);
                                     }
-                                });
-                            }, true, "png");
-						}));
+                                }), true, "png")
+                    ));
 
             t.addImageTextButton("$text.editor.export", "icon-save-map", isize, () -> createDialog("$text.editor.export",
-                    "$text.editor.exportfile", "$text.editor.exportfile.description", "icon-file", (Runnable) () -> {
+                    "$text.editor.exportfile", "$text.editor.exportfile.description", "icon-file", (Runnable) () ->
                         Platform.instance.showFileChooser("$text.saveimage", "Map Files", file -> {
                             file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
                             FileHandle result = file;
@@ -147,8 +143,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                     Log.err(e);
                                 }
                             });
-                        }, false, mapExtension);
-                    }));
+                        }, false, mapExtension)));
 
             t.row();
 
@@ -171,8 +166,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
         });
 
-        loadDialog = new MapLoadDialog(map -> {
-
+        loadDialog = new MapLoadDialog(map ->
             ui.loadGraphics(() -> {
                 try(DataInputStream stream = new DataInputStream(map.stream.get())){
                     MapMeta meta = MapIO.readMapMeta(stream);
@@ -180,12 +174,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                     editor.beginEdit(data, meta.tags, false);
                     view.clearStack();
-                }catch(IOException e){
+                }catch(Exception e){
                     ui.showError(Bundles.format("text.editor.errormapload", Strings.parseException(e, false)));
                     Log.err(e);
                 }
-            });
-        });
+            }));
 
         setFillParent(true);
 
@@ -261,7 +254,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
      * 2) icon name
      * 3) listener
      */
-    private FloatingDialog createDialog(String title, Object... arguments){
+    private void createDialog(String title, Object... arguments){
         FloatingDialog dialog = new FloatingDialog(title);
 
         float h = 90f;
@@ -278,18 +271,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 listenable.run();
                 dialog.hide();
                 menu.hide();
-            }).left().get();
+            }).left().margin(0).get();
 
             button.clearChildren();
-            button.table("button", t -> {
-                t.addImage(iconname).size(16 * 3);
-                t.update(() -> t.background(button.getClickListener().isOver() ? "button-over" : "button"));
-            }).padLeft(-10).padBottom(-3).size(h);
+            button.addImage(iconname).size(16 * 3).padLeft(10);
             button.table(t -> {
                 t.add(name).growX().wrap();
                 t.row();
                 t.add(description).color(Color.GRAY).growX().wrap();
-            }).growX().padLeft(8);
+            }).growX().pad(10f).padLeft(5);
 
             button.row();
 
@@ -298,8 +288,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         dialog.addCloseButton();
         dialog.show();
-
-        return dialog;
     }
 
     @Override
@@ -562,9 +550,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             ImageButton button = new ImageButton("white", "clear-toggle");
             button.clicked(() -> editor.setDrawBlock(block));
             button.resizeImage(8 * 4f);
-            button.getImageCell().setActor(stack);
-            button.addChild(stack);
-            button.getImage().remove();
+            button.replaceImage(stack);
             button.update(() -> button.setChecked(editor.getDrawBlock() == block));
             group.add(button);
             content.add(button).size(50f);

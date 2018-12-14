@@ -173,15 +173,19 @@ public interface BuilderTrait extends Entity{
     default void updateBuilding(Unit unit){
         //remove already completed build requests
         removal.clear();
-        for(BuildRequest request : getPlaceQueue()){
-            if((request.breaking && world.tile(request.x, request.y).block() == Blocks.air) ||
-                (!request.breaking && world.tile(request.x, request.y).block() == request.recipe.result)){
-                removal.add(request);
-            }
+        for(BuildRequest req : getPlaceQueue()){
+            removal.add(req);
         }
 
-        for(BuildRequest req : removal){
-            getPlaceQueue().removeValue(req, true);
+        getPlaceQueue().clear();
+
+        for(BuildRequest request : removal){
+            if(!((request.breaking && world.tile(request.x, request.y).block() == Blocks.air) ||
+                (!request.breaking &&
+                (world.tile(request.x, request.y).getRotation() == request.rotation || !request.recipe.result.rotate)
+                && world.tile(request.x, request.y).block() == request.recipe.result))){
+                getPlaceQueue().addLast(request);
+            }
         }
 
         BuildRequest current = getCurrentRequest();

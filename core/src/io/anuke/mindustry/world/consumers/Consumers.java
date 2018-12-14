@@ -130,6 +130,7 @@ public class Consumers{
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Consume> T get(Class<T> type){
         if(!map.containsKey(type)){
             throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "'!");
@@ -137,6 +138,7 @@ public class Consumers{
         return (T) map.get(type);
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Consume> T getSubtypeOf(Class<T> type){
         for(Consume consume : all()){
             if(type.isAssignableFrom(consume.getClass())){
