@@ -261,6 +261,7 @@ public class Administration{
         Settings.save();
     }
 
+    @SuppressWarnings("unchecked")
     private void load(){
         playerInfo = Settings.getObject("player-info", ObjectMap.class, ObjectMap::new);
         bannedIPs = Settings.getObject("banned-ips", Array.class, Array::new);

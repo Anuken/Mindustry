@@ -86,6 +86,10 @@ public class Sectors{
         return grid.get(Bits.getLeftShort(position), Bits.getRightShort(position));
     }
 
+    public Iterable<Sector> getSectors(){
+        return grid.values();
+    }
+
     public Difficulty getDifficulty(Sector sector){
         if(sector.difficulty == 0){
             return Difficulty.hard;
@@ -150,6 +154,7 @@ public class Sectors{
         save();
     }
 
+    @SuppressWarnings("unchecked")
     public void load(){
         for(Sector sector : grid.values()){
             sector.texture.dispose();

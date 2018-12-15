@@ -279,9 +279,7 @@ public class JoinDialog extends FloatingDialog{
         button.left();
         button.row();
         button.add("[lightgray]" + (host.players != 1 ? Bundles.format("text.players", host.players) :
-        Bundles.format("text.players.single", host.players)));
-        button.row();
-        button.add("[lightgray]" + host.address).pad(4).left();
+        Bundles.format("text.players.single", host.players))).padBottom(5);
     }
 
     void connect(String ip, int port){
@@ -310,6 +308,7 @@ public class JoinDialog extends FloatingDialog{
         return UIUtils.portrait() ? 350f : 500f;
     }
 
+    @SuppressWarnings("unchecked")
     private void loadServers(){
         servers = Settings.getObject("server-list", Array.class, Array::new);
     }
