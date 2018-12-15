@@ -131,7 +131,7 @@ public class MassDriver extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.powerShot, consumes.getSubtypeOf(ConsumePower.class).powerCapacity * powerPercentageUsed, StatUnit.powerUnits);
+        stats.add(BlockStat.powerShot, consumes.get(ConsumePower.class).powerCapacity * powerPercentageUsed, StatUnit.powerUnits);
     }
 
     @Override

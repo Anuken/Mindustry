@@ -109,7 +109,7 @@ public class Consumers{
     }
 
     public Consume add(Consume consume){
-        map.put(consume.getClass(), consume);
+        map.put((consume instanceof ConsumePower ? ConsumePower.class : consume.getClass()), consume);
         return consume;
     }
 
@@ -121,32 +121,13 @@ public class Consumers{
         return map.containsKey(type);
     }
 
-    public boolean hasSubtypeOf(Class<? extends Consume> type){
-        for(Consume consume : all()){
-            if(type.isAssignableFrom(consume.getClass())){
-                return true;
-            }
-        }
-        return false;
-    }
-
     @SuppressWarnings("unchecked")
     public <T extends Consume> T get(Class<T> type){
         if(!map.containsKey(type)){
             throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "'!");
         }
         return (T) map.get(type);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends Consume> T getSubtypeOf(Class<T> type){
-        for(Consume consume : all()){
-            if(type.isAssignableFrom(consume.getClass())){
-                return (T)consume;
-            }
-        }
-        throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "' or any of its subtypes!");
-    }
+    }<
 
     public Iterable<Consume> all(){
         return map.values();

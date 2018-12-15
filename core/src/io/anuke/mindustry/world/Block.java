@@ -345,7 +345,7 @@ public class Block extends BaseBlock {
     }
 
     public void setBars(){
-        if(consumes.hasSubtypeOf(ConsumePower.class) && consumes.getSubtypeOf(ConsumePower.class).isBuffered){
+        if(consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
             bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.satisfaction));
         }
         if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
@@ -412,8 +412,8 @@ public class Block extends BaseBlock {
             explosiveness += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
         }
 
-        if(consumes.hasSubtypeOf(ConsumePower.class) && consumes.getSubtypeOf(ConsumePower.class).isBuffered){
-            power += tile.entity.power.satisfaction * consumes.getSubtypeOf(ConsumePower.class).powerCapacity;
+        if(consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
+            power += tile.entity.power.satisfaction * consumes.get(ConsumePower.class).powerCapacity;
         }
 
         tempColor.mul(1f / units);

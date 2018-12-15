@@ -48,8 +48,8 @@ public class PowerGraph{
         float powerNeeded = 0f;
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
-            if(consumes.hasSubtypeOf(ConsumePower.class)){
-                ConsumePower consumePower = consumes.getSubtypeOf(ConsumePower.class);
+            if(consumes.has(ConsumePower.class)){
+                ConsumePower consumePower = consumes.get(ConsumePower.class);
                 if(otherConsumersAreValid(consumer, consumePower)){
                     powerNeeded += consumePower.requestedPower(consumer.block(), consumer.entity) * consumer.entity.delta();
                 }
@@ -62,8 +62,8 @@ public class PowerGraph{
         float totalAccumulator = 0f;
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
-            if(consumes.hasSubtypeOf(ConsumePower.class)){
-                totalAccumulator += battery.entity.power.satisfaction * consumes.getSubtypeOf(ConsumePower.class).powerCapacity;
+            if(consumes.has(ConsumePower.class)){
+                totalAccumulator += battery.entity.power.satisfaction * consumes.get(ConsumePower.class).powerCapacity;
             }
         }
         return totalAccumulator;
@@ -73,8 +73,8 @@ public class PowerGraph{
         float totalCapacity = 0f;
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
-            if(consumes.hasSubtypeOf(ConsumePower.class)){
-                totalCapacity += consumes.getSubtypeOf(ConsumePower.class).requestedPower(battery.block(), battery.entity) * battery.entity.delta();
+            if(consumes.has(ConsumePower.class)){
+                totalCapacity += consumes.get(ConsumePower.class).requestedPower(battery.block(), battery.entity) * battery.entity.delta();
             }
         }
         return totalCapacity;
@@ -88,8 +88,8 @@ public class PowerGraph{
         float consumedPowerPercentage = Math.min(1.0f, needed / stored);
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
-            if(consumes.hasSubtypeOf(ConsumePower.class)){
-                ConsumePower consumePower = consumes.getSubtypeOf(ConsumePower.class);
+            if(consumes.has(ConsumePower.class)){
+                ConsumePower consumePower = consumes.get(ConsumePower.class);
                 if(consumePower.powerCapacity > 0f){
                     battery.entity.power.satisfaction = Math.max(0.0f, battery.entity.power.satisfaction - consumedPowerPercentage);
                 }
@@ -104,8 +104,8 @@ public class PowerGraph{
 
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
-            if(consumes.hasSubtypeOf(ConsumePower.class)){
-                ConsumePower consumePower = consumes.getSubtypeOf(ConsumePower.class);
+            if(consumes.has(ConsumePower.class)){
+                ConsumePower consumePower = consumes.get(ConsumePower.class);
                 if(consumePower.powerCapacity > 0f){
                     float additionalPowerPercentage = Math.min(1.0f, excess / consumePower.powerCapacity);
                     battery.entity.power.satisfaction = Math.min(1.0f, battery.entity.power.satisfaction + additionalPowerPercentage);
@@ -121,8 +121,8 @@ public class PowerGraph{
         float coverage = Math.min(1, produced / needed);
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
-            if(consumes.hasSubtypeOf(ConsumePower.class)){
-                ConsumePower consumePower = consumes.getSubtypeOf(ConsumePower.class);
+            if(consumes.has(ConsumePower.class)){
+                ConsumePower consumePower = consumes.get(ConsumePower.class);
                 if(!otherConsumersAreValid(consumer, consumePower)){
                     consumer.entity.power.satisfaction = 0.0f; // Only supply power if the consumer would get valid that way
                 }else{
@@ -181,7 +181,7 @@ public class PowerGraph{
     public void clear(){
         for(Tile other : all){
             if(other.entity != null && other.entity.power != null){
-                if(other.block().consumes.hasSubtypeOf(ConsumePower.class) && !other.block().consumes.getSubtypeOf(ConsumePower.class).isBuffered){
+                if(other.block().consumes.has(ConsumePower.class) && !other.block().consumes.get(ConsumePower.class).isBuffered){
                     // Reset satisfaction to zero in case of direct consumer. There is no reason to clear power from buffered consumers.
                     other.entity.power.satisfaction = 0.0f;
                 }
