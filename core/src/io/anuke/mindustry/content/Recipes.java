@@ -45,10 +45,9 @@ public class Recipes implements ContentList{
         new Recipe(effect, StorageBlocks.container, new ItemStack(Items.densealloy, 200));
         new Recipe(effect, StorageBlocks.vault, new ItemStack(Items.densealloy, 500), new ItemStack(Items.thorium, 250));
 
-        //core disabled due to being broken
         new Recipe(effect, StorageBlocks.core,
-            new ItemStack(Items.copper, 2000), new ItemStack(Items.densealloy, 1500),
-            new ItemStack(Items.silicon, 1500), new ItemStack(Items.thorium, 500),
+            new ItemStack(Items.copper, 2000), new ItemStack(Items.densealloy, 2000),
+            new ItemStack(Items.silicon, 1750), new ItemStack(Items.thorium, 1000),
             new ItemStack(Items.surgealloy, 500), new ItemStack(Items.phasefabric, 750)
         );
 

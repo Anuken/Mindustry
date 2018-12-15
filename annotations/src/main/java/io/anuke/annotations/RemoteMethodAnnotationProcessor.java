@@ -107,8 +107,6 @@ public class RemoteMethodAnnotationProcessor extends AbstractProcessor{
                         ClassEntry clas = new ClassEntry(callLocation);
                         classMap.put(callLocation, clas);
                         classes.add(clas);
-
-                        Utils.messager.printMessage(Kind.NOTE, "Generating class '" + clas.name + "'.");
                     }
 
                     ClassEntry entry = classMap.get(callLocation);

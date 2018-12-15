@@ -352,7 +352,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
     @Override
     public boolean canCreateBlocks(){
-        return false;
+        return true;
     }
 
     @Override

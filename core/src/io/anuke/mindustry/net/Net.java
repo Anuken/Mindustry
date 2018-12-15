@@ -25,11 +25,11 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
+@SuppressWarnings("unchecked")
 public class Net{
     private static boolean server;
     private static boolean active;
     private static boolean clientLoaded;
-    private static String lastIP;
     private static Array<Object> packetQueue = new Array<>();
     private static ObjectMap<Class<?>, Consumer> clientListeners = new ObjectMap<>();
     private static ObjectMap<Class<?>, BiConsumer<Integer, Object>> serverListeners = new ObjectMap<>();
@@ -106,7 +106,6 @@ public class Net{
      */
     public static void connect(String ip, int port, Runnable success){
         try{
-            lastIP = ip + ":" + port;
             if(!active){
                 clientProvider.connect(ip, port, success);
                 active = true;
@@ -117,11 +116,6 @@ public class Net{
         }catch(IOException e){
             showError(e);
         }
-    }
-
-    /**Returns the last IP connected to.*/
-    public static String getLastIP() {
-        return lastIP;
     }
 
     /**

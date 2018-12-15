@@ -22,8 +22,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.headless;
-import static io.anuke.mindustry.Vars.players;
+import static io.anuke.mindustry.Vars.*;
 
 public class AlphaDrone extends FlyingUnit {
     static final float followDistance = 80f;
@@ -62,7 +61,7 @@ public class AlphaDrone extends FlyingUnit {
                 }
             }
 
-            if(!leader.isShooting && distanceTo(leader) < 8f){
+            if(!leader.isShooting && distanceTo(leader) < 7f){
                 Call.onAlphaDroneFade(AlphaDrone.this);
             }
         }
@@ -71,8 +70,9 @@ public class AlphaDrone extends FlyingUnit {
     @Remote(called = Loc.server)
     public static void onAlphaDroneFade(BaseUnit drone){
         if(drone == null) return;
-        drone.remove();
         Effects.effect(UnitFx.pickup, drone);
+        //must run afterwards so the unit's group is not null when sending the removal packet
+        threads.runDelay(drone::remove);
     }
 
     @Override

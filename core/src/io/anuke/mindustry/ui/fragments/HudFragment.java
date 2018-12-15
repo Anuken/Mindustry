@@ -109,7 +109,7 @@ public class HudFragment extends Fragment{
             }
 
             cont.update(() -> {
-                if(Inputs.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
+                if(!Inputs.keyDown("gridMode") && Inputs.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
                     toggleMenus();
                 }
             });
@@ -139,7 +139,7 @@ public class HudFragment extends Fragment{
                 if(Net.hasClient()){
                     t.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
                 }
-            }).size(-1).visible(() -> Settings.getBool("fps")).update(t -> t.setTranslation(0, (!waves.isVisible() ? wavetable.getHeight() : Math.min(wavetable.getTranslation().y, wavetable.getHeight())) )).get();
+            }).size(-1).visible(() -> Settings.getBool("fps")).update(t -> t.setTranslation(0, (!waves.isVisible() ? wavetable.getHeight() : Math.min(wavetable.getTranslation().y, wavetable.getHeight())))).get();
 
             //make wave box appear below rest of menu
             if(mobile){
@@ -149,7 +149,7 @@ public class HudFragment extends Fragment{
 
         //minimap
         parent.fill(t -> t.top().right().add(new Minimap())
-            .visible(() -> !state.is(State.menu) && Settings.getBool("minimap")));
+        .visible(() -> !state.is(State.menu) && Settings.getBool("minimap")));
 
         //paused table
         parent.fill(t -> {
@@ -198,7 +198,7 @@ public class HudFragment extends Fragment{
                 return coreAttackOpacity > 0;
             });
             t.table("button", top -> top.add("$text.coreattack").pad(2)
-            .update(label -> label.setColor(Hue.mix(Color.ORANGE, Color.SCARLET, Mathf.absin(Timers.time(), 2f, 1f)))));
+                .update(label -> label.setColor(Hue.mix(Color.ORANGE, Color.SCARLET, Mathf.absin(Timers.time(), 2f, 1f)))));
         });
 
         //'saving' indicator
@@ -218,7 +218,7 @@ public class HudFragment extends Fragment{
             }
         });
         table.margin(12);
-        table.addImage("icon-check").size(16*2).pad(3);
+        table.addImage("icon-check").size(16 * 2).pad(3);
         table.add(text).wrap().width(280f).get().setAlignment(Align.center, Align.center);
         table.pack();
 
@@ -231,7 +231,7 @@ public class HudFragment extends Fragment{
         Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.removeActor())));
     }
 
-    /**Show unlock notification for a new recipe.*/
+    /** Show unlock notification for a new recipe. */
     public void showUnlock(Recipe recipe){
 
         //if there's currently no unlock notification...
@@ -268,11 +268,11 @@ public class HudFragment extends Fragment{
             container.top().add(table);
             container.setTranslation(0, table.getPrefHeight());
             container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(4f),
-                    //nesting actions() calls is necessary so the right prefHeight() is used
-                    Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.run(() -> {
-                        lastUnlockTable = null;
-                        lastUnlockLayout = null;
-                    }), Actions.removeActor())));
+            //nesting actions() calls is necessary so the right prefHeight() is used
+            Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.run(() -> {
+                lastUnlockTable = null;
+                lastUnlockLayout = null;
+            }), Actions.removeActor())));
 
             lastUnlockTable = container;
             lastUnlockLayout = in;
