@@ -1,7 +1,7 @@
 apply plugin: "java"
 
 sourceCompatibility = 1.8
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.java.srcDirs = ["src/"]
 
 project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
@@ -10,25 +10,25 @@ def PACKR_DIR = "$System.env.PACKR_DIR"
 def ICON_DIR = new File("core/assets/sprites/icon.icns")
 
 ext.getPlatform = {
-    if (project.hasProperty("platform")) {
+    if(project.hasProperty("platform")){
         def lc = platform.toLowerCase()
-        if (lc == "windows64") {
+        if(lc == "windows64"){
             return "windows64"
-        } else if (lc == "windows32") {
+        }else if(lc == "windows32"){
             return "windows32"
-        } else if (lc == "linux") {
+        }else if(lc == "linux"){
             return "linux64"
-        } else if (lc == "mac") {
+        }else if(lc == "mac"){
             return "mac"
-        } else {
+        }else{
             throw new InvalidUserDataException("Invalid platform. Set platform with -Pplatform=windows/linux/mac")
         }
-    } else {
+    }else{
         throw new InvalidUserDataException("No platform defined. Set platform with -Pplatform=windows/linux/mac")
     }
 }
 
-task run(dependsOn: classes, type: JavaExec) {
+task run(dependsOn: classes, type: JavaExec){
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
@@ -37,7 +37,7 @@ task run(dependsOn: classes, type: JavaExec) {
         jvmArgs "-XstartOnFirstThread"
     }
     ignoreExitValue = true
-    if (project.hasProperty("args")) {
+    if(project.hasProperty("args")){
         args Eval.me(project.getProperties()["args"])
     }
 
@@ -46,7 +46,7 @@ task run(dependsOn: classes, type: JavaExec) {
     }
 }
 
-task debug(dependsOn: classes, type: JavaExec) {
+task debug(dependsOn: classes, type: JavaExec){
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
@@ -55,38 +55,38 @@ task debug(dependsOn: classes, type: JavaExec) {
     debug = true
 }
 
-task dist(type: Jar) {
+task dist(type: Jar){
     dependsOn classes
-    
+
     writeVersion()
 
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {zipTree(it)}}
+    from{ configurations.compile.collect{ zipTree(it) } }
     from files(project.assetsDir)
 
-    manifest {
+    manifest{
         attributes 'Main-Class': project.mainClassName
     }
 }
 
 task clearOut(type: Delete){
-    doLast {
+    doLast{
         delete "packr-out/"
     }
 }
 
 //note: call desktop:dist beforehand
-task packrCmd() {
+task packrCmd(){
 
-    doLast {
+    doLast{
 
-        copy {
+        copy{
             into PACKR_DIR
             from "build/libs/desktop-release.jar"
         }
 
-        exec {
+        exec{
 
             commandLine("java", "-jar", PACKR_DIR + "packr.jar",
                     "--verbose",
@@ -104,7 +104,7 @@ task packrCmd() {
     }
 }
 
-task fixMac (type: Copy){
+task fixMac(type: Copy){
     dependsOn "packrCmd"
 
     into "packr-out/" + appName + ".app/Contents/"
@@ -117,12 +117,12 @@ task fixMac (type: Copy){
     }
 }
 
-task fixWindows32 (type: Copy){
+task fixWindows32(type: Copy){
     dependsOn "packrCmd"
 
     into "packr-out/jre/bin/"
     from PACKR_DIR + "zip.dll"
-    rename ("zip.dll", "ojdkbuild_zlib.dll")
+    rename("zip.dll", "ojdkbuild_zlib.dll")
 
     doLast{
         copy{
@@ -132,21 +132,21 @@ task fixWindows32 (type: Copy){
     }
 }
 
-task packrZip() {
+task packrZip(){
     dependsOn "packrCmd"
     finalizedBy "clearOut"
 
-    if(project.hasProperty("platform")) {
+    if(project.hasProperty("platform")){
 
-        if (getPlatform() == "mac") {
+        if(getPlatform() == "mac"){
             dependsOn "fixMac"
         }
 
-        if (getPlatform() == "windows32") {
+        if(getPlatform() == "windows32"){
             dependsOn "fixWindows32"
         }
 
-        task zip (type: Zip){
+        task zip(type: Zip){
             from "packr-out/"
             archiveName "$appName-${getPlatform()}-${getVersionString()}.zip"
             destinationDir(file("packr-export"))

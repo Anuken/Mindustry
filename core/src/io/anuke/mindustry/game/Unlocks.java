@@ -65,6 +65,7 @@ public class Unlocks{
         save();
     }
 
+    @SuppressWarnings("unchecked")
     public void load(){
         unlocked = Settings.getObject("unlockset", ObjectMap.class, ObjectMap::new);
     }

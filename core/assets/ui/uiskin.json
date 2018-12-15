@@ -26,7 +26,7 @@ TextButtonStyle: {
 	default: {over: button-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: gray, down: button-down, up: button},
 	right: {over: button-right-over, font: default-font, fontColor: white, disabledFontColor: gray, down: button-right-down, up: button-right},
 	wave: {font: default-font, fontColor: white, disabledFontColor: gray, up: button-edge-4},
-	clear: {over: flat-over, font: default-font, fontColor: white, disabledFontColor: gray, down: pane, up: flat},
+	clear: {over: flat-over, font: default-font, fontColor: white, disabledFontColor: gray, down: flat-over, up: flat},
 	discord: {font: default-font, fontColor: white, up: discord-banner},
 	info: {font: default-font, fontColor: white, up: info-banner},
 	clear-partial: {down: white, up: button-select, over: flat-down, font: default-font, fontColor: white, disabledFontColor: gray },

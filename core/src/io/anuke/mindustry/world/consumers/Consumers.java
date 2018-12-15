@@ -58,12 +58,11 @@ public class Consumers{
 
     /**
      * Creates a consumer which stores power and uses it only in case of certain events (e.g. a turret firing).
-     * It will take 60 ticks (one second) to fill the buffer, given enough power supplied.
+     * It will take 180 ticks (three second) to fill the buffer, given enough power supplied.
      * @param powerCapacity The maximum capacity in power units.
      */
     public ConsumePower powerBuffered(float powerCapacity){
-        // TODO Balance: How long should it take to fill a buffer? The lower this value, the more power will be "stolen" from direct consumers.
-        return powerBuffered(powerCapacity, 60f);
+        return powerBuffered(powerCapacity, 1f);
     }
 
     /**
@@ -131,6 +130,7 @@ public class Consumers{
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Consume> T get(Class<T> type){
         if(!map.containsKey(type)){
             throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "'!");
@@ -138,6 +138,7 @@ public class Consumers{
         return (T) map.get(type);
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Consume> T getSubtypeOf(Class<T> type){
         for(Consume consume : all()){
             if(type.isAssignableFrom(consume.getClass())){
