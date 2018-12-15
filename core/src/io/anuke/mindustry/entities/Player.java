@@ -283,9 +283,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     @Override
     public void drawShadow(float offsetX, float offsetY){
         float x = snappedX(), y = snappedY();
-        float scl = mech.flying ? 1f : boostHeat/2f;
+        float scl = mech.flying ? 1f : boostHeat / 2f;
 
-        Draw.rect(mech.iconRegion, x + offsetX*scl, y + offsetY*scl, rotation - 90);
+        Draw.rect(mech.iconRegion, x + offsetX * scl, y + offsetY * scl, rotation - 90);
     }
 
     @Override
@@ -356,9 +356,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 1, 60f);
                 float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 1f) - 1f;
                 Draw.rect(stack.item.region,
-                        x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
-                        y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
-                        itemSize, itemSize, rotation);
+                x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
+                y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
+                itemSize, itemSize, rotation);
             }
         }
 
@@ -369,7 +369,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void drawStats(){
         float x = snappedX(), y = snappedY();
 
-        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Timers.time(), healthf()*5f, 1f - healthf()));
+        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Timers.time(), healthf() * 5f, 1f - healthf()));
         Draw.alpha(hitTime / hitDuration);
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.color();
@@ -426,7 +426,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         Core.font.setUseIntegerPositions(ints);
     }
 
-    /**Draw all current build requests. Does not draw the beam effect, only the positions.*/
+    /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     public void drawBuildRequests(){
         for(BuildRequest request : getPlaceQueue()){
             if(getCurrentRequest() == request) continue;
@@ -442,16 +442,16 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 float rad = Mathf.absin(Timers.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
 
                 Lines.square(
-                        request.x * tilesize + block.offset(),
-                        request.y * tilesize + block.offset() - 1,
-                        rad);
+                request.x * tilesize + block.offset(),
+                request.y * tilesize + block.offset() - 1,
+                rad);
 
                 Draw.color(Palette.remove);
 
                 Lines.square(
-                        request.x * tilesize + block.offset(),
-                        request.y * tilesize + block.offset(),
-                        rad);
+                request.x * tilesize + block.offset(),
+                request.y * tilesize + block.offset(),
+                rad);
             }else{
                 //draw place request
                 Lines.stroke(2f);
@@ -461,16 +461,16 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 float rad = Mathf.absin(Timers.time(), 7f, 1f) - 2f + request.recipe.result.size * tilesize / 2f;
 
                 Lines.square(
-                        request.x * tilesize + request.recipe.result.offset(),
-                        request.y * tilesize + request.recipe.result.offset() - 1,
-                        rad);
+                request.x * tilesize + request.recipe.result.offset(),
+                request.y * tilesize + request.recipe.result.offset() - 1,
+                rad);
 
                 Draw.color(Palette.accent);
 
                 Lines.square(
-                        request.x * tilesize + request.recipe.result.offset(),
-                        request.y * tilesize + request.recipe.result.offset(),
-                        rad);
+                request.x * tilesize + request.recipe.result.offset(),
+                request.y * tilesize + request.recipe.result.offset(),
+                rad);
             }
         }
 
@@ -605,9 +605,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         float xa = Inputs.getAxis(section, "move_x");
         float ya = Inputs.getAxis(section, "move_y");
-
-        movement.y += ya * speed;
-        movement.x += xa * speed;
+        if(!Inputs.keyDown("gridMode")){
+            movement.y += ya * speed;
+            movement.x += xa * speed;
+        }
 
         Vector2 vec = Graphics.world(control.input(playerIndex).getMouseX(), control.input(playerIndex).getMouseY());
         pointerX = vec.x;
@@ -699,8 +700,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         getHitbox(rect);
         rect.x -= expansion;
         rect.y -= expansion;
-        rect.width += expansion*2f;
-        rect.height += expansion*2f;
+        rect.width += expansion * 2f;
+        rect.height += expansion * 2f;
 
         isBoosting = EntityQuery.collisions().overlapsTile(rect) || distanceTo(targetX, targetY) > 85f;
 
@@ -737,7 +738,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                             if(target != null && distanceTo(target) > getWeapon().getAmmo().getRange()){
                                 target = null;
                             }else if(target != null){
-                                target = ((Tile)target).entity;
+                                target = ((Tile) target).entity;
                             }
                         }
 
@@ -746,14 +747,14 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                         }
                     }
                 }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
-                            mech.canHeal && distanceTo(target) < getWeapon().getAmmo().getRange())){
+                mech.canHeal && distanceTo(target) < getWeapon().getAmmo().getRange())){
                     //rotate toward and shoot the target
                     if(mech.turnCursor){
                         rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
                     }
 
                     Vector2 intercept =
-                            Predict.intercept(x, y, target.getX(), target.getY(), target.getVelocity().x - velocity.x, target.getVelocity().y - velocity.y, getWeapon().getAmmo().bullet.speed);
+                    Predict.intercept(x, y, target.getX(), target.getY(), target.getVelocity().x - velocity.x, target.getVelocity().y - velocity.y, getWeapon().getAmmo().bullet.speed);
 
                     pointerX = intercept.x;
                     pointerY = intercept.y;
@@ -764,7 +765,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
             }else if(isShooting()){
                 Vector2 vec = Graphics.world(control.input(playerIndex).getMouseX(),
-                        control.input(playerIndex).getMouseY());
+                control.input(playerIndex).getMouseY());
                 pointerX = vec.x;
                 pointerY = vec.y;
 
@@ -777,7 +778,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     //region utility methods
 
-    /** Resets all values of the player.*/
+    /** Resets all values of the player. */
     public void reset(){
         resetNoAdd();
 
@@ -791,6 +792,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         placeQueue.clear();
         dead = true;
         trail.clear();
+        target = null;
+        moveTarget = null;
         carrier = null;
         health = maxHealth();
         boostHeat = drownTime = hitTime = 0f;

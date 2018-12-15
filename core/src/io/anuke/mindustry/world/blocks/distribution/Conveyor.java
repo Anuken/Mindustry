@@ -35,7 +35,6 @@ public class Conveyor extends Block{
     private TextureRegion[][] regions = new TextureRegion[7][4];
 
     protected float speed = 0f;
-    protected float carryCapacity = 8f;
 
     protected Conveyor(String name){
         super(name);
@@ -342,9 +341,9 @@ public class Conveyor extends Block{
     public Array<Object> getDebugInfo(Tile tile){
         ConveyorEntity entity = tile.entity();
         Array<Object> arr = super.getDebugInfo(tile);
-        arr.addAll(Array.with(
-                "clogHeat", entity.clogHeat,
-                "sleeping", entity.isSleeping()
+        arr.addAll(Array.<Object>with(
+            "clogHeat", entity.clogHeat,
+            "sleeping", entity.isSleeping()
         ));
         return arr;
     }

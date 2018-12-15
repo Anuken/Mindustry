@@ -1,30 +1,30 @@
-buildscript {
-    repositories {
+buildscript{
+    repositories{
         mavenLocal()
         mavenCentral()
         google()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
     }
-    dependencies {
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
+    dependencies{
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.5'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.9"
     }
 }
 
-allprojects {
+allprojects{
     apply plugin: "idea"
 
     version = 'release'
 
-    ext {
+    ext{
         versionNumber = '4'
         versionModifier = 'alpha'
-        if (!project.hasProperty("versionType")) versionType = 'official'
+        if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         gdxVersion = '1.9.9'
         roboVMVersion = '2.3.0'
-        uCoreVersion = '5871d2d0385370bc937fed3e5e301d6962a50476'
+        uCoreVersion = '7ffeb2a9c754f4d31ca13e02dd857876b0707dc5'
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -43,7 +43,7 @@ allprojects {
         generateLocales = {
             def output = 'en\n'
             def bundles = new File(project(':core').projectDir, 'assets/bundles/')
-            bundles.listFiles().each { other ->
+            bundles.listFiles().each{ other ->
                 if(other.name == "bundle.properties") return
                 output += other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + "\n"
             }
@@ -56,9 +56,9 @@ allprojects {
 
             try{
                 pfile.createNewFile()
-            }catch (Exception ignored){}
+            }catch(Exception ignored){}
 
-            if(pfile.exists()) {
+            if(pfile.exists()){
 
                 props.load(new FileInputStream(pfile))
 
@@ -74,19 +74,19 @@ allprojects {
         }
     }
 
-    repositories {
+    repositories{
         mavenLocal()
         mavenCentral()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-        maven { url 'https://jitpack.io' }
+        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
+        maven{ url 'https://jitpack.io' }
     }
 }
 
-project(":desktop") {
+project(":desktop"){
     apply plugin: "java"
 
-    dependencies {
+    dependencies{
         compile project(":core")
         compile project(":kryonet")
         if(new File(projectDir.parent, '../debug').exists() && System.properties["release"] == null) compile project(":debug")
@@ -99,14 +99,14 @@ project(":desktop") {
     }
 }
 
-project(":ios") {
+project(":ios"){
     apply plugin: "java"
     apply plugin: "robovm"
 
     task copyGen{
-        doLast {
-            copy {
-                from("../core/build/classes/java/main/io/anuke/mindustry/gen/") {
+        doLast{
+            copy{
+                from("../core/build/classes/java/main/io/anuke/mindustry/gen/"){
                     include "**/*.java"
                 }
 
@@ -134,14 +134,16 @@ project(":ios") {
         props['app.mainclass'] = 'io.anuke.mindustry.IOSLauncher'
         props['app.executable'] = 'IOSLauncher'
         props['app.name'] = 'Mindustry'
-        props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1)+""
+        props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1) + ""
         props.store(vfile.newWriter(), null)
     }
 
     build.dependsOn(incrementConfig)
-    build.dependsOn(copyGen)
+    if(file('robovm.properties').exists()){
+        build.dependsOn(copyGen)
+    }
 
-    dependencies {
+    dependencies{
         compile project(":core")
         implementation project(":kryonet")
 
@@ -150,18 +152,17 @@ project(":ios") {
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
-        //compileOnly project(":annotations")
     }
 }
 
-project(":core") {
+project(":core"){
     apply plugin: "java"
 
-    task finish {
+    task finish{
         generateLocales()
     }
 
-    dependencies {
+    dependencies{
         build.finalizedBy(finish)
 
         def comp = System.properties["release"] == null || System.properties["release"] == "false"
@@ -173,7 +174,7 @@ project(":core") {
             compile "com.github.anuken:ucore:$uCoreVersion"
         }
 
-        if(new File(projectDir.parent, '../GDXGifRecorder').exists() && comp) {
+        if(new File(projectDir.parent, '../GDXGifRecorder').exists() && comp){
             compile project(":GDXGifRecorder")
         }
 
@@ -186,16 +187,16 @@ project(":core") {
     }
 }
 
-project(":server") {
+project(":server"){
     apply plugin: "java"
 
-    configurations {
+    configurations{
         if(findProject(":android") != null){
             compile.exclude module: android
         }
     }
-    
-    dependencies {
+
+    dependencies{
 
         compile project(":core")
         compile project(":kryonet")
@@ -207,7 +208,7 @@ project(":server") {
 project(":tests"){
     apply plugin: "java"
 
-    dependencies {
+    dependencies{
         testImplementation project(":core")
         testImplementation('org.junit.jupiter:junit-jupiter-api:5.1.0')
         testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.1.0')
@@ -215,32 +216,32 @@ project(":tests"){
         testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
 
-    test {
+    test{
         useJUnitPlatform()
         workingDir = new File("../core/assets")
     }
 }
 
-project(":tools") {
+project(":tools"){
     apply plugin: "java"
 
-    dependencies {
+    dependencies{
         compile project(":core")
     }
 }
 
-project(":annotations") {
+project(":annotations"){
     apply plugin: "java"
 
-    dependencies {
+    dependencies{
         compile 'com.squareup:javapoet:1.11.0'
     }
 }
 
-project(":kryonet") {
+project(":kryonet"){
     apply plugin: "java"
 
-    dependencies {
+    dependencies{
         compile project(":core")
         compile "org.lz4:lz4-java:1.4.1"
         compile 'com.github.Anuken:kryonet:53b10247b1'

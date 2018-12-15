@@ -101,6 +101,7 @@ public class Tile implements PosTrait, TargetTrait{
         return -1;
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends TileEntity> T entity(){
         return (T) entity;
     }

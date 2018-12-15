@@ -90,6 +90,8 @@ public class KryoServer implements ServerProvider{
                 threads.runDelay(() -> {
                     try{
                         Net.handleServerReceived(k.id, object);
+                    }catch(ValidateException e){
+                        Log.err("Validate failed: {0} ({1})", e.player.name, e.getMessage());
                     }catch(Exception e){
                         e.printStackTrace();
                     }
