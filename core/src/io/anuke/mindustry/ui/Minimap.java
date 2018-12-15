@@ -1,6 +1,5 @@
 package io.anuke.mindustry.ui;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;
@@ -15,8 +14,6 @@ public class Minimap extends Container<Element>{
 
     public Minimap(){
         super(new Element(){
-            TextureRegion r = new TextureRegion();
-
             @Override
             public void draw(){
                 if(renderer.minimap.getRegion() == null) return;
