@@ -32,7 +32,7 @@ public class WaveSpawner{
     private Array<GroundSpawn> groundSpawns = new Array<>();
 
     public WaveSpawner(){
-        Events.on(WorldLoadEvent.class, this::reset);
+        Events.on(WorldLoadEvent.class, e -> reset());
     }
 
     public void write(DataOutput output) throws IOException{
@@ -172,7 +172,7 @@ public class WaveSpawner{
         }
     }
 
-    private void reset(WorldLoadEvent event){
+    private void reset(){
         dynamicSpawn = false;
         flySpawns.clear();
         groundSpawns.clear();
