@@ -174,8 +174,8 @@ public class PowerTests extends PowerTestFixture{
             powerGraph.update();
 
             assertEquals(0.0f, consumerTile.entity.power.satisfaction, MathUtils.FLOAT_ROUNDING_ERROR);
-            if(consumerTile.block().consumes.hasSubtypeOf(ConsumePower.class)){
-                ConsumePower consumePower = consumerTile.block().consumes.getSubtypeOf(ConsumePower.class);
+            if(consumerTile.block().consumes.has(ConsumePower.class)){
+                ConsumePower consumePower = consumerTile.block().consumes.get(ConsumePower.class);
                 assertFalse(consumePower.valid(consumerTile.block(), consumerTile.entity()));
             }
         }
