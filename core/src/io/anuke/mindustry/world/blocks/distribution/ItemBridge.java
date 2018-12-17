@@ -50,6 +50,7 @@ public class ItemBridge extends Block{
         layer = Layer.power;
         expanded = true;
         itemCapacity = 10;
+        configurable = true;
         hasItems = true;
         group = BlockGroup.transportation;
     }
@@ -107,11 +108,6 @@ public class ItemBridge extends Block{
         }
 
         Draw.reset();
-    }
-
-    @Override
-    public boolean isConfigurable(Tile tile){
-        return true;
     }
 
     @Override

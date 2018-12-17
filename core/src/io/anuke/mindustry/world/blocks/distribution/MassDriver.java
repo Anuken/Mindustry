@@ -53,6 +53,7 @@ public class MassDriver extends Block{
         super(name);
         update = true;
         solid = true;
+        configurable = true;
         hasItems = true;
         layer = Layer.turret;
         hasPower = true;
@@ -193,11 +194,6 @@ public class MassDriver extends Block{
                 tile.drawx() + Angles.trnsx(entity.rotation + 180f, entity.reload * knockback),
                 tile.drawy() + Angles.trnsy(entity.rotation + 180f, entity.reload * knockback),
                 entity.rotation - 90);
-    }
-
-    @Override
-    public boolean isConfigurable(Tile tile){
-        return true;
     }
 
     @Override

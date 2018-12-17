@@ -42,6 +42,7 @@ public class Reconstructor extends Block{
         update = true;
         solidifes = true;
         hasPower = true;
+        configurable = true;
     }
 
     protected static boolean checkValidTap(Tile tile, ReconstructorEntity entity, Player player){
@@ -133,11 +134,6 @@ public class Reconstructor extends Block{
         ReconstructorEntity entity = tile.entity();
 
         return entity.solid;
-    }
-
-    @Override
-    public boolean isConfigurable(Tile tile){
-        return true;
     }
 
     @Override

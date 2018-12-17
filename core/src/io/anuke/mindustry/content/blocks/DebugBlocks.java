@@ -111,6 +111,7 @@ public class DebugBlocks extends BlockList implements ContentList{
                 solid = true;
                 hasLiquids = true;
                 liquidCapacity = 100f;
+                configurable = true;
                 outputsLiquid = true;
             }
 
@@ -134,7 +135,7 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public boolean buildTable(Tile tile, Table table){
+            public void buildTable(Tile tile, Table table){
                 LiquidSourceEntity entity = tile.entity();
 
                 Array<Liquid> items = content.liquids();
@@ -157,7 +158,6 @@ public class DebugBlocks extends BlockList implements ContentList{
                 }
 
                 table.add(cont);
-                return true;
             }
 
             @Override

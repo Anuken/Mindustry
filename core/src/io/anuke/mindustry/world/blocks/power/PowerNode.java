@@ -40,6 +40,7 @@ public class PowerNode extends PowerBlock{
         expanded = true;
         layer = Layer.power;
         powerCapacity = 5f;
+        configurable = true;
         consumesPower = false;
         outputsPower = false;
     }
@@ -148,11 +149,6 @@ public class PowerNode extends PowerBlock{
         Draw.color(Palette.accent);
         Lines.poly(tile.drawx(), tile.drawy(), 50, laserRange*tilesize);
         Draw.reset();
-    }
-
-    @Override
-    public boolean isConfigurable(Tile tile){
-        return true;
     }
 
     @Override

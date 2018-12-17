@@ -89,6 +89,8 @@ public class Block extends BaseBlock {
     public boolean autoSleep;
     /** Name of shadow region to load. Null to indicate normal shadow. */
     public String shadow = null;
+    /** Whether the block can be tapped and selected to configure. */
+    public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
     /** The color of this block when displayed on the minimap or map preview. */
@@ -282,22 +284,14 @@ public class Block extends BaseBlock {
 
     /** Returns whether or not a hand cursor should be shown over this block. */
     public CursorType getCursor(Tile tile){
-        return isConfigurable(tile) ? CursorType.hand : CursorType.normal;
+        return configurable ? CursorType.hand : CursorType.normal;
     }
 
     /**
      * Called when this block is tapped to build a UI on the table.
-     * @return Whether the table is modified.
+     * {@link #configurable} must return true for this to be called.
      */
-    public boolean buildTable(Tile tile, Table table){
-        return false;
-    }
-
-    private static final Table table = new Table();
-    public synchronized boolean isConfigurable(Tile tile){
-        table.reset();
-        return buildTable(tile, table);
-    }
+    public void buildTable(Tile tile, Table table){}
 
     /**
      * Called when another tile is tapped while this block is selected.
@@ -322,7 +316,6 @@ public class Block extends BaseBlock {
     }
 
     public void drawConfigure(Tile tile){
-        if(!isConfigurable(tile)) return;
         Draw.color(Palette.accent);
         Lines.stroke(1f);
         Lines.square(tile.drawx(), tile.drawy(),
