@@ -2,9 +2,9 @@ package io.anuke.mindustry.entities.traits;
 
 import io.anuke.mindustry.core.NetClient;
 import io.anuke.mindustry.net.Interpolator;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.entities.trait.Entity;
+import io.anuke.arc.util.Tmp;
 
 import java.io.DataInput;
 import java.io.DataOutput;

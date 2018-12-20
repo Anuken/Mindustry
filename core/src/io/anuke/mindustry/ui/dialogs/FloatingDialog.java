@@ -7,10 +7,10 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.scene.ui.Dialog;
-import io.anuke.ucore.scene.ui.ScrollPane;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.scene.ui.Dialog;
+import io.anuke.arc.scene.ui.ScrollPane;
 
 import static io.anuke.mindustry.Vars.state;
 
@@ -43,7 +43,7 @@ public class FloatingDialog extends Dialog{
 
         boolean[] done = {false};
 
-        shown(() -> Core.app.postRunnable(() ->
+        shown(() -> Core.app.post(() ->
                 forEach(child -> {
                     if(done[0]) return;
 
@@ -68,7 +68,7 @@ public class FloatingDialog extends Dialog{
 
         keyDown(key -> {
             if(key == Keys.ESCAPE || key == Keys.BACK) {
-                Core.app.postRunnable(this::hide);
+                Core.app.post(this::hide);
             }
         });
     }

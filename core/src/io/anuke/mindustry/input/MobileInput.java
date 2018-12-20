@@ -27,11 +27,11 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.*;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.*;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
@@ -41,7 +41,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private static final float maxPanSpeed = 1.3f;
     private static Rectangle r1 = new Rectangle(), r2 = new Rectangle();
     /** Distance to edge of screen to start panning. */
-    private final float edgePan = io.anuke.ucore.scene.ui.layout.Unit.dp.scl(60f);
+    private final float edgePan = io.anuke.arc.scene.ui.layout.Unit.dp.scl(60f);
 
     //gesture data
     private Vector2 vector = new Vector2();
@@ -191,15 +191,15 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     void showGuide(String type){
-        if(!guides.contains(type) && !Settings.getBool(type, false)){
+        if(!guides.contains(type) && !Core.settings.getBool(type, false)){
             FloatingDialog dialog = new FloatingDialog("$text." + type + ".title");
             dialog.addCloseButton();
             dialog.content().left();
             dialog.content().add("$text." + type).growX().wrap();
             dialog.content().row();
             dialog.content().addCheck("$text.showagain", false, checked -> {
-                Settings.putBool(type, checked);
-                Settings.save();
+                Core.settings.putBool(type, checked);
+                Core.settings.save();
             }).growX().left().get().left();
             dialog.show();
             guides.add(type);
@@ -397,8 +397,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             float radius = Interpolation.swingIn.apply(crosshairScale);
 
-            Lines.poly(target.getX(), target.getY(), 4, 7f * radius, Timers.time() * 1.5f);
-            Lines.spikes(target.getX(), target.getY(), 3f * radius, 6f * radius, 4, Timers.time() * 1.5f);
+            Lines.poly(target.getX(), target.getY(), 4, 7f * radius, Time.time() * 1.5f);
+            Lines.spikes(target.getX(), target.getY(), 3f * radius, 6f * radius, 4, Time.time() * 1.5f);
         }
 
         Draw.reset();
@@ -697,9 +697,9 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     public boolean zoom(float initialDistance, float distance){
 
-        if(Math.abs(distance - initialDistance) > io.anuke.ucore.scene.ui.layout.Unit.dp.scl(100f) && !zoomed){
+        if(Math.abs(distance - initialDistance) > io.anuke.arc.scene.ui.layout.Unit.dp.scl(100f) && !zoomed){
             int amount = (distance > initialDistance ? 1 : -1);
-            renderer.scaleCamera(Math.round(io.anuke.ucore.scene.ui.layout.Unit.dp.scl(amount)));
+            renderer.scaleCamera(Math.round(io.anuke.arc.scene.ui.layout.Unit.dp.scl(amount)));
             zoomed = true;
             return true;
         }

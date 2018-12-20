@@ -1,7 +1,7 @@
 package io.anuke.mindustry.game;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.util.Bundles;
 
 public enum Team{
     none(Color.valueOf("4d4e58")),
@@ -21,6 +21,6 @@ public enum Team{
     }
 
     public String localized(){
-        return Bundles.get("team." + name() + ".name");
+        return Core.bundle.get("team." + name() + ".name");
     }
 }

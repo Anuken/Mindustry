@@ -15,23 +15,23 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
-import io.anuke.ucore.core.*;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.modules.SceneModule;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.Skin;
-import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.ui.Dialog;
-import io.anuke.ucore.scene.ui.TextField;
-import io.anuke.ucore.scene.ui.TextField.TextFieldFilter;
-import io.anuke.ucore.scene.ui.TooltipManager;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.core.*;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.modules.SceneModule;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.Skin;
+import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.ui.Dialog;
+import io.anuke.arc.scene.ui.TextField;
+import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
+import io.anuke.arc.scene.ui.TooltipManager;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.scene.actions.Actions.*;
+import static io.anuke.arc.scene.actions.Actions.*;
 
 public class UI extends SceneModule{
     private FreeTypeFontGenerator generator;
@@ -87,7 +87,7 @@ public class UI extends SceneModule{
 
         TooltipManager.getInstance().animations = false;
 
-        Settings.setErrorHandler(() -> Timers.run(1f, () -> showError("[crimson]Failed to access local storage.\nSettings will not be saved.")));
+        Core.settings.setErrorHandler(() -> Time.run(1f, () -> showError("[crimson]Failed to access local storage.\nSettings will not be saved.")));
 
         Dialog.closePadR = -1;
         Dialog.closePadT = 5;
@@ -202,7 +202,7 @@ public class UI extends SceneModule{
 
     public void loadGraphics(String text, Runnable call){
         loadfrag.show(text);
-        Timers.runTask(7f, () -> {
+        Time.runTask(7f, () -> {
             call.run();
             loadfrag.hide();
         });
@@ -214,7 +214,7 @@ public class UI extends SceneModule{
 
     public void loadLogic(String text, Runnable call){
         loadfrag.show(text);
-        Timers.runTask(7f, () ->
+        Time.runTask(7f, () ->
             threads.run(() -> {
                 call.run();
                 threads.runGraphics(loadfrag::hide);

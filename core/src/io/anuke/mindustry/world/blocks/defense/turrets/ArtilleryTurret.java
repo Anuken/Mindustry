@@ -5,7 +5,7 @@ import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 

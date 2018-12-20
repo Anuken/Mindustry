@@ -3,7 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.ucore.scene.ui.Dialog;
+import io.anuke.arc.scene.ui.Dialog;
 
 import static io.anuke.mindustry.Vars.discordURL;
 import static io.anuke.mindustry.Vars.ui;

@@ -10,15 +10,15 @@ import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.BulletEntity;
-import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.entities.trait.SolidTrait;
-import io.anuke.ucore.entities.trait.VelocityTrait;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Pooling;
-import io.anuke.ucore.util.Timer;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.BulletEntity;
+import io.anuke.arc.entities.trait.Entity;
+import io.anuke.arc.entities.trait.SolidTrait;
+import io.anuke.arc.entities.trait.VelocityTrait;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Pooling;
+import io.anuke.arc.util.Timer;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -69,7 +69,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
         bullet.type = type;
         bullet.lifeScl = lifetimeScl;
 
-        bullet.set(x - bullet.velocity.x * Timers.delta(), y - bullet.velocity.y * Timers.delta());
+        bullet.set(x - bullet.velocity.x * Time.delta(), y - bullet.velocity.y * Time.delta());
         bullet.add();
 
         return bullet;
@@ -236,7 +236,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
     @Override
     protected void updateLife(){
-        time += Timers.delta() * 1f/(lifeScl);
+        time += Time.delta() * 1f/(lifeScl);
         time = Mathf.clamp(time, 0, type.lifetime());
 
         if(time >= type.lifetime){

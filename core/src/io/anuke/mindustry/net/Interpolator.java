@@ -3,7 +3,7 @@ package io.anuke.mindustry.net;
 
 import io.anuke.arc.math.Vector2;
 import io.anuke.arc.utils.TimeUtils;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.util.Mathf;
 
 public class Interpolator{
     //used for movement

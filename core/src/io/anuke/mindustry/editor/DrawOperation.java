@@ -4,7 +4,7 @@ import io.anuke.arc.utils.Array;
 import io.anuke.arc.utils.IntSet;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
-import io.anuke.ucore.util.Bits;
+import io.anuke.arc.util.Bits;
 
 public class DrawOperation{
     /**

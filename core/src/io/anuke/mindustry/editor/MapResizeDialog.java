@@ -2,11 +2,11 @@ package io.anuke.mindustry.editor;
 
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.ucore.function.BiConsumer;
-import io.anuke.ucore.scene.ui.ButtonGroup;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.function.BiConsumer;
+import io.anuke.arc.scene.ui.ButtonGroup;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Mathf;
 
 public class MapResizeDialog extends FloatingDialog{
     int[] validMapSizes = {200, 300, 400, 500};

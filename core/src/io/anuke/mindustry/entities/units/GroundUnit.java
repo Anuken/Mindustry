@@ -12,11 +12,11 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Angles;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Translator;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -119,14 +119,14 @@ public abstract class GroundUnit extends BaseUnit{
     public void update(){
         super.update();
 
-        stuckTime = !vec.set(x, y).sub(lastPosition()).isZero(0.0001f) ? 0f : stuckTime + Timers.delta();
+        stuckTime = !vec.set(x, y).sub(lastPosition()).isZero(0.0001f) ? 0f : stuckTime + Time.delta();
 
         if(!velocity.isZero()){
             baseRotation = Mathf.slerpDelta(baseRotation, velocity.angle(), 0.05f);
         }
 
         if(stuckTime < 1f){
-            walkTime += Timers.delta();
+            walkTime += Time.delta();
         }
     }
 
@@ -238,12 +238,12 @@ public abstract class GroundUnit extends BaseUnit{
     }
 
     protected void patrol(){
-        vec.trns(baseRotation, type.speed * Timers.delta());
+        vec.trns(baseRotation, type.speed * Time.delta());
         velocity.add(vec.x, vec.y);
         vec.trns(baseRotation, type.hitsizeTile);
         Tile tile = world.tileWorld(x + vec.x, y + vec.y);
         if((tile == null || tile.solid() || tile.floor().drownTime > 0) || stuckTime > 10f){
-            baseRotation += Mathf.sign(id % 2 - 0.5f) * Timers.delta() * 3f;
+            baseRotation += Mathf.sign(id % 2 - 0.5f) * Time.delta() * 3f;
         }
 
         rotation = Mathf.slerpDelta(rotation, velocity.angle(), type.rotatespeed);
@@ -258,7 +258,7 @@ public abstract class GroundUnit extends BaseUnit{
             vec.rotate((circleLength - vec.len()) / circleLength * 180f);
         }
 
-        vec.setLength(type.speed * Timers.delta());
+        vec.setLength(type.speed * Time.delta());
 
         velocity.add(vec);
     }
@@ -272,7 +272,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         float angle = angleTo(targetTile);
 
-        velocity.add(vec.trns(angleTo(targetTile), type.speed*Timers.delta()));
+        velocity.add(vec.trns(angleTo(targetTile), type.speed*Time.delta()));
         rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
     }
 
@@ -296,7 +296,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         float angle = angleTo(targetTile);
 
-        velocity.add(vec.trns(angleTo(targetTile), type.speed*Timers.delta()));
+        velocity.add(vec.trns(angleTo(targetTile), type.speed*Time.delta()));
         rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
     }
 }

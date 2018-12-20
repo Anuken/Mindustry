@@ -16,12 +16,12 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityQuery;
-import io.anuke.ucore.modules.Module;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.modules.Module;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -85,7 +85,7 @@ public class Logic extends Module{
         state.gameOver = false;
         state.teams = new Teams();
 
-        Timers.clear();
+        Time.clear();
         Entities.clear();
         TileEntity.sleepingEntities = 0;
 
@@ -179,10 +179,10 @@ public class Logic extends Module{
         if(!state.is(State.menu)){
 
             if(!state.isPaused()){
-                Timers.update();
+                Time.update();
 
                 if(!state.mode.disableWaveTimer && !state.mode.disableWaves && !state.gameOver){
-                    state.wavetime -= Timers.delta();
+                    state.wavetime -= Time.delta();
                 }
 
                 if(!Net.client() && state.wavetime <= 0 && !state.mode.disableWaves){

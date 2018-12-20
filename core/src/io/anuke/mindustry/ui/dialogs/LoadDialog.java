@@ -8,14 +8,14 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.game.Saves.SaveSlot;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Strings;
 
 import java.io.IOException;
 
@@ -35,7 +35,7 @@ public class LoadDialog extends FloatingDialog{
 
         shown(() -> {
             setup();
-            Timers.runTask(2f, () -> Core.scene.setScrollFocus(pane));
+            Time.runTask(2f, () -> Core.scene.setScrollFocus(pane));
         });
 
         addCloseButton();
@@ -51,7 +51,7 @@ public class LoadDialog extends FloatingDialog{
 
         slots.marginRight(24);
 
-        Timers.runTask(2f, () -> Core.scene.setScrollFocus(pane));
+        Time.runTask(2f, () -> Core.scene.setScrollFocus(pane));
 
         Array<SaveSlot> array = control.saves.getSaveSlots();
 
@@ -88,12 +88,12 @@ public class LoadDialog extends FloatingDialog{
 
                 t.addImageButton("icon-save", "empty", 14 * 3, () -> {
                     if(!ios){
-                        Platform.instance.showFileChooser(Bundles.get("text.save.export"), "Mindustry Save", file -> {
+                        Platform.instance.showFileChooser(Core.bundle.get("text.save.export"), "Mindustry Save", file -> {
                             try{
                                 slot.exportFile(file);
                                 setup();
                             }catch(IOException e){
-                                ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
+                                ui.showError(Core.bundle.format("text.save.export.fail", Strings.parseException(e, false)));
                             }
                         }, false, saveExtension);
                     }else{
@@ -102,7 +102,7 @@ public class LoadDialog extends FloatingDialog{
                             slot.exportFile(file);
                             Platform.instance.shareFile(file);
                         }catch(Exception e){
-                            ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
+                            ui.showError(Core.bundle.format("text.save.export.fail", Strings.parseException(e, false)));
                         }
                     }
                 }).size(14 * 3).right();
@@ -114,19 +114,19 @@ public class LoadDialog extends FloatingDialog{
 
             button.defaults().padBottom(3);
             button.row();
-            button.add(Bundles.format("text.save.map", color + (slot.getMap() == null ? "Unknown" : slot.getMap().meta.name())));
+            button.add(Core.bundle.format("text.save.map", color + (slot.getMap() == null ? "Unknown" : slot.getMap().meta.name())));
             button.row();
-            button.add(Bundles.get("text.level.mode") + " " + color + slot.getMode());
+            button.add(Core.bundle.get("text.level.mode") + " " + color + slot.getMode());
             button.row();
-            button.add(Bundles.format("text.save.wave", color + slot.getWave()));
+            button.add(Core.bundle.format("text.save.wave", color + slot.getWave()));
             button.row();
-            button.add(Bundles.format("text.save.difficulty", color + slot.getDifficulty()));
+            button.add(Core.bundle.format("text.save.difficulty", color + slot.getDifficulty()));
             button.row();
-            button.label(() -> Bundles.format("text.save.autosave", color + Bundles.get(slot.isAutosave() ? "text.on" : "text.off")));
+            button.label(() -> Core.bundle.format("text.save.autosave", color + Core.bundle.get(slot.isAutosave() ? "text.on" : "text.off")));
             button.row();
-            button.label(() -> Bundles.format("text.save.playtime", color + slot.getPlayTime()));
+            button.label(() -> Core.bundle.format("text.save.playtime", color + slot.getPlayTime()));
             button.row();
-            button.add(Bundles.format("text.save.date", color + slot.getDate())).colspan(2).padTop(5).right();
+            button.add(Core.bundle.format("text.save.date", color + slot.getDate())).colspan(2).padTop(5).right();
             button.row();
             modifyButton(button, slot);
 
@@ -155,14 +155,14 @@ public class LoadDialog extends FloatingDialog{
         if(ios) return;
 
         slots.addImageTextButton("$text.save.import", "icon-add", 14 * 3, () -> {
-            Platform.instance.showFileChooser(Bundles.get("text.save.import"), "Mindustry Save", file -> {
+            Platform.instance.showFileChooser(Core.bundle.get("text.save.import"), "Mindustry Save", file -> {
                 if(SaveIO.isSaveValid(file)){
                     try{
                         control.saves.importSave(file);
                         setup();
                     }catch(IOException e){
                         e.printStackTrace();
-                        ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
+                        ui.showError(Core.bundle.format("text.save.import.fail", Strings.parseException(e, false)));
                     }
                 }else{
                     ui.showError("$text.save.import.invalid");

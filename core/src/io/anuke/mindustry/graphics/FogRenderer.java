@@ -13,12 +13,12 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.entities.EntityDraw;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.entities.EntityDraw;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Fill;
 
 import java.nio.ByteBuffer;
 

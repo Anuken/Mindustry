@@ -5,9 +5,9 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
 
 public class Liquid extends UnlockableContent{
     public final Color color;
@@ -36,7 +36,7 @@ public class Liquid extends UnlockableContent{
     public Liquid(String name, Color color){
         this.name = name;
         this.color = new Color(color);
-        this.description = Bundles.getOrNull("liquid." + name + ".description");
+        this.description = Core.bundle.getOrNull("liquid." + name + ".description");
     }
 
     public boolean canExtinguish(){
@@ -55,7 +55,7 @@ public class Liquid extends UnlockableContent{
 
     @Override
     public String localizedName(){
-        return Bundles.get("liquid." + this.name + ".name");
+        return Core.bundle.get("liquid." + this.name + ".name");
     }
 
     @Override

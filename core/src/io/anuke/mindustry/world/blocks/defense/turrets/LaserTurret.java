@@ -7,10 +7,10 @@ import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.util.Angles;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -39,7 +39,7 @@ public class LaserTurret extends PowerTurret{
             entity.bullet.time(0f);
             entity.heat = 1f;
             entity.recoil = recoil;
-            entity.bulletLife -= Timers.delta();
+            entity.bulletLife -= Time.delta();
             if(entity.bulletLife <= 0f){
                 entity.bullet = null;
             }
@@ -63,7 +63,7 @@ public class LaserTurret extends PowerTurret{
         }else{
             Liquid liquid = entity.liquids.current();
 
-            float used = Math.min(Math.min(entity.liquids.get(liquid), maxCoolantUsed * Timers.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity));
+            float used = Math.min(Math.min(entity.liquids.get(liquid), maxCoolantUsed * Time.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity));
             entity.reload += (used * liquid.heatCapacity) / liquid.heatCapacity;
             entity.liquids.remove(liquid, used);
 

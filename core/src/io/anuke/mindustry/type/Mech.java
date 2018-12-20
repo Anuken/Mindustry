@@ -7,9 +7,9 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
 
 public class Mech extends UnlockableContent{
     public final String name;
@@ -44,11 +44,11 @@ public class Mech extends UnlockableContent{
     public Mech(String name, boolean flying){
         this.flying = flying;
         this.name = name;
-        this.description = Bundles.get("mech." + name + ".description");
+        this.description = Core.bundle.get("mech." + name + ".description");
     }
 
     public String localizedName(){
-        return Bundles.get("mech." + name + ".name");
+        return Core.bundle.get("mech." + name + ".name");
     }
 
     public void updateAlt(Player player){}

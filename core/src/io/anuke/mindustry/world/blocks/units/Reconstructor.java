@@ -15,13 +15,13 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -230,7 +230,7 @@ public class Reconstructor extends Block{
         boolean stayOpen = false;
 
         if(entity.current != null){
-            entity.time += Timers.delta();
+            entity.time += Time.delta();
 
             entity.solid = true;
 
@@ -243,7 +243,7 @@ public class Reconstructor extends Block{
 
                 ReconstructorEntity other = world.tile(entity.link).entity();
 
-                entity.updateTime -= Timers.delta() / departTime;
+                entity.updateTime -= Time.delta() / departTime;
                 if(entity.updateTime <= 0f){
                     //no power? death.
                     if(other.power.amount < powerPerTeleport){
@@ -260,7 +260,7 @@ public class Reconstructor extends Block{
                     entity.current = null;
                 }
             }else{ //else, arriving
-                entity.updateTime -= Timers.delta() / arriveTime;
+                entity.updateTime -= Time.delta() / arriveTime;
 
                 if(entity.updateTime <= 0f){
                     entity.solid = false;

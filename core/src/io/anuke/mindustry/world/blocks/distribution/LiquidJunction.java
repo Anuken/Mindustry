@@ -6,7 +6,7 @@ import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.ucore.graphics.Draw;
+import io.anuke.arc.graphics.Draw;
 
 public class LiquidJunction extends LiquidBlock{
 

@@ -24,11 +24,11 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -60,20 +60,20 @@ public class BuildBlock extends Block{
         tile.setRotation(rotation);
         world.setBlock(tile, block, team);
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
-        threads.runDelay(() -> tile.block().placed(tile));
+        Core.app.post(() -> tile.block().placed(tile));
 
         //last builder was this local client player, call placed()
         if(!headless && builderID == players[0].id){
             //this is run delayed, since if this is called on the server, all clients need to recieve the onBuildFinish()
             //event first before they can recieve the placed() event modification results
-            threads.runDelay(() -> tile.block().playerPlaced(tile));
+            Core.app.post(() -> tile.block().playerPlaced(tile));
         }
     }
 
     @Override
     public String getDisplayName(Tile tile){
         BuildEntity entity = tile.entity();
-        return Bundles.format("block.constructing", entity.recipe == null ? entity.previous.formalName : entity.recipe.result.formalName);
+        return Core.bundle.format("block.constructing", entity.recipe == null ? entity.previous.formalName : entity.recipe.result.formalName);
     }
 
     @Override

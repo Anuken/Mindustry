@@ -10,8 +10,8 @@ import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Hue;
 import static io.anuke.mindustry.Vars.*;
 
 public class Generators {

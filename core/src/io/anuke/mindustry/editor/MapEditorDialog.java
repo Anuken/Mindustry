@@ -21,23 +21,23 @@ import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.input.Input;
-import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.ui.*;
-import io.anuke.ucore.scene.ui.layout.Stack;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.scene.utils.UIUtils;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Inputs;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.input.Input;
+import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.Stack;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.utils.UIUtils;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Strings;
 
 import java.io.DataInputStream;
 import java.io.InputStream;
@@ -106,7 +106,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                         editor.beginEdit(data, meta.tags, false);
                                         view.clearStack();
                                     }catch(Exception e){
-                                        ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
+                                        ui.showError(Core.bundle.format("text.editor.errorimageload", Strings.parseException(e, false)));
                                         Log.err(e);
                                     }
                                 }), true, mapExtension),
@@ -120,7 +120,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                         editor.beginEdit(data, editor.getTags(), false);
                                         view.clearStack();
                                     }catch (Exception e){
-                                        ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
+                                        ui.showError(Core.bundle.format("text.editor.errorimageload", Strings.parseException(e, false)));
                                         Log.err(e);
                                     }
                                 }), true, "png")
@@ -139,7 +139,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                     }
                                     MapIO.writeMap(result.write(false), editor.getTags(), editor.getMap());
                                 }catch(Exception e){
-                                    ui.showError(Bundles.format("text.editor.errorimagesave", Strings.parseException(e, false)));
+                                    ui.showError(Core.bundle.format("text.editor.errorimagesave", Strings.parseException(e, false)));
                                     Log.err(e);
                                 }
                             });
@@ -175,7 +175,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     editor.beginEdit(data, meta.tags, false);
                     view.clearStack();
                 }catch(Exception e){
-                    ui.showError(Bundles.format("text.editor.errormapload", Strings.parseException(e, false)));
+                    ui.showError(Core.bundle.format("text.editor.errormapload", Strings.parseException(e, false)));
                     Log.err(e);
                 }
             }));
@@ -214,7 +214,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
             shownWithMap = false;
 
-            Timers.runTask(10f, Platform.instance::updateRPC);
+            Time.runTask(10f, Platform.instance::updateRPC);
         });
 
         hidden(() -> {
@@ -311,7 +311,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 show();
             }catch(Exception e){
                 Log.err(e);
-                ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
+                ui.showError(Core.bundle.format("text.editor.errorimageload", Strings.parseException(e, false)));
             }
         });
     }

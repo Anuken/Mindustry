@@ -1,6 +1,6 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.util.Bundles;
 
 public enum Difficulty{
     training(3f, 3f),
@@ -24,7 +24,7 @@ public enum Difficulty{
     @Override
     public String toString(){
         if(value == null){
-            value = Bundles.get("setting.difficulty." + name());
+            value = Core.bundle.get("setting.difficulty." + name());
         }
         return value;
     }

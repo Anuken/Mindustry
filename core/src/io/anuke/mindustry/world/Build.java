@@ -10,8 +10,8 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.util.Geometry;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.util.Geometry;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -59,7 +59,7 @@ public class Build{
         }
 
         Tile ftile = tile;
-        threads.runDelay(() -> Events.fire(new BlockBuildBeginEvent(ftile, team, true)));
+        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(ftile, team, true)));
     }
 
     /**Places a BuildBlock at this location.*/
@@ -101,7 +101,7 @@ public class Build{
             }
         }
 
-        threads.runDelay(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
+        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
     }
 
     /**Returns whether a tile can be placed at this location by this team.*/

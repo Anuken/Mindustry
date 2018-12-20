@@ -1,7 +1,7 @@
 package io.anuke.mindustry.maps.missions;
 
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.util.Bundles;
 
 public class ContentMission extends Mission {
     private final UnlockableContent content;
@@ -30,6 +30,6 @@ public class ContentMission extends Mission {
 
     @Override
     public String displayString() {
-        return Bundles.format("text.mission.create", content.localizedName());
+        return Core.bundle.format("text.mission.create", content.localizedName());
     }
 }

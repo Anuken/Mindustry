@@ -2,7 +2,7 @@ package io.anuke.mindustry.entities;
 
 import io.anuke.arc.math.Vector2;
 import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.util.Mathf;
 
 /**
  * Class for predicting shoot angles based on velocities of targets.

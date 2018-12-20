@@ -7,10 +7,10 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Mathf;
 
 /**
  * Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.

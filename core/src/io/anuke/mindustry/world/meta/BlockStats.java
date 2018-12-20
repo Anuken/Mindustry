@@ -7,8 +7,8 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.values.*;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Log;
 
 import java.util.Locale;
 
@@ -56,7 +56,7 @@ public class BlockStats{
 
     /**Adds a stat value.*/
     public void add(BlockStat stat, StatValue value){
-        if(!Bundles.has("text.blocks." + stat.name().toLowerCase(Locale.ROOT))){
+        if(!Core.bundle.has("text.blocks." + stat.name().toLowerCase(Locale.ROOT))){
             if(!errorWhenMissing){
                 Log.err("Warning: No bundle entry for stat type \"" + stat + "\"!");
             }else{
@@ -64,7 +64,7 @@ public class BlockStats{
             }
         }
 
-        if(!Bundles.has("text.category." + stat.category.name().toLowerCase(Locale.ROOT))){
+        if(!Core.bundle.has("text.category." + stat.category.name().toLowerCase(Locale.ROOT))){
             if(!errorWhenMissing){
                 Log.err("Warning: No bundle entry for stat category \"" + stat.category + "\"!");
             }else{

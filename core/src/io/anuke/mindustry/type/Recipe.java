@@ -12,10 +12,10 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.ContentStatValue;
 import io.anuke.mindustry.world.meta.StatValue;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Strings;
 
 import java.util.Arrays;
 
@@ -118,7 +118,7 @@ public class Recipe extends UnlockableContent{
 
     @Override
     public void init(){
-        if(!Bundles.has("block." + result.name + ".name")){
+        if(!Core.bundle.has("block." + result.name + ".name")){
             Log.err("WARNING: Recipe block '{0}' does not have a formal name defined. Add the following to bundle.properties:", result.name);
             Log.err("block.{0}.name={1}", result.name, Strings.capitalize(result.name.replace('-', '_')));
         }/*else if(result.fullDescription == null){

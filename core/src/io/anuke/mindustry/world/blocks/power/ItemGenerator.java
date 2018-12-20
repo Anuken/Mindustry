@@ -11,11 +11,11 @@ import io.anuke.mindustry.world.consumers.ConsumeItemFilter;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -68,7 +68,7 @@ public abstract class ItemGenerator extends PowerGenerator{
         if(entity.generateTime > 0){
             Draw.color(heatColor);
             float alpha = (entity.items.total() > 0 ? 1f : Mathf.clamp(entity.generateTime));
-            alpha = alpha * 0.7f + Mathf.absin(Timers.time(), 12f, 0.3f) * alpha;
+            alpha = alpha * 0.7f + Mathf.absin(Time.time(), 12f, 0.3f) * alpha;
             Draw.alpha(alpha);
             Draw.rect(topRegion, tile.drawx(), tile.drawy());
             Draw.reset();

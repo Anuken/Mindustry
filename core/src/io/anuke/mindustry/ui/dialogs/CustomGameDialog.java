@@ -8,15 +8,15 @@ import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.ButtonGroup;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.ButtonGroup;
+import io.anuke.arc.scene.ui.ImageButton;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -104,7 +104,7 @@ public class CustomGameDialog extends FloatingDialog{
             image.row();
             image.add("[accent]" + map.getDisplayName()).pad(3f).growX().wrap().get().setAlignment(Align.center, Align.center);
             image.row();
-            image.label((() -> Bundles.format("text.level.highscore", Settings.getInt("hiscore" + map.name, 0)))).pad(3f);
+            image.label((() -> Core.bundle.format("text.level.highscore", Core.settings.getInt("hiscore" + map.name, 0)))).pad(3f);
 
             BorderImage border = new BorderImage(map.texture, 3f);
             border.setScaling(Scaling.fit);
@@ -135,7 +135,7 @@ public class CustomGameDialog extends FloatingDialog{
     }
 
     private void displayGameModeHelp(){
-        FloatingDialog d = new FloatingDialog(Bundles.get("mode.text.help.title"));
+        FloatingDialog d = new FloatingDialog(Core.bundle.get("mode.text.help.title"));
         d.setFillParent(false);
         Table table = new Table();
         table.defaults().pad(1f);

@@ -1,11 +1,11 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.CapStyle;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.graphics.CapStyle;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Geometry;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;

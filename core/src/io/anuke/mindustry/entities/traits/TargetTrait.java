@@ -1,9 +1,9 @@
 package io.anuke.mindustry.entities.traits;
 
 import io.anuke.mindustry.game.Team;
-import io.anuke.ucore.entities.trait.PosTrait;
-import io.anuke.ucore.entities.trait.SolidTrait;
-import io.anuke.ucore.entities.trait.VelocityTrait;
+import io.anuke.arc.entities.trait.PosTrait;
+import io.anuke.arc.entities.trait.SolidTrait;
+import io.anuke.arc.entities.trait.VelocityTrait;
 
 /**
  * Base interface for targetable entities.

@@ -5,12 +5,12 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Fill;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.ui.layout.Unit;
 
 import static io.anuke.mindustry.Vars.state;
 

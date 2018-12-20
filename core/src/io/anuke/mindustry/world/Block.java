@@ -21,14 +21,14 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.meta.*;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Hue;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.EnumSet;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -116,8 +116,8 @@ public class Block extends BaseBlock {
 
     public Block(String name){
         this.name = name;
-        this.formalName = Bundles.get("block." + name + ".name", name);
-        this.fullDescription = Bundles.getOrNull("block." + name + ".description");
+        this.formalName = Core.bundle.get("block." + name + ".name", name);
+        this.fullDescription = Core.bundle.getOrNull("block." + name + ".description");
         this.solid = false;
     }
 
@@ -413,7 +413,7 @@ public class Block extends BaseBlock {
                 float splash = Mathf.clamp(amount / 4f, 0f, 10f);
 
                 for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
-                    Timers.run(i / 2f, () -> {
+                    Time.run(i / 2f, () -> {
                         Tile other = world.tile(tile.x + Mathf.range(size / 2), tile.y + Mathf.range(size / 2));
                         if(other != null){
                             Puddle.deposit(other, liquid, splash);

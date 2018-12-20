@@ -4,7 +4,7 @@ import io.anuke.arc.utils.Array;
 import io.anuke.arc.utils.JsonReader;
 import io.anuke.arc.utils.JsonValue;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.function.Consumer;
+import io.anuke.arc.function.Consumer;
 
 import static io.anuke.mindustry.Vars.contributorsURL;
 

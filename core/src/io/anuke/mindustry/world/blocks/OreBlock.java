@@ -6,8 +6,8 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Mathf;
 
 public class OreBlock extends Floor{
     public Floor base;

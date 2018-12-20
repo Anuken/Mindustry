@@ -13,10 +13,10 @@ import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.mindustry.world.modules.PowerModule;
-import io.anuke.ucore.entities.trait.PosTrait;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Geometry;
+import io.anuke.arc.entities.trait.PosTrait;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.util.Bits;
+import io.anuke.arc.util.Geometry;
 
 import static io.anuke.mindustry.Vars.*;
 

@@ -16,12 +16,12 @@ import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
 public class Drill extends Block{
@@ -95,7 +95,7 @@ public class Drill extends Block{
         if(drawRim){
             Graphics.setAdditiveBlending();
             Draw.color(heatColor);
-            Draw.alpha(entity.warmup * ts * (1f - s + Mathf.absin(Timers.time(), 3f, s)));
+            Draw.alpha(entity.warmup * ts * (1f - s + Mathf.absin(Time.time(), 3f, s)));
             Draw.rect(rimRegion, tile.drawx(), tile.drawy());
             Draw.color();
             Graphics.setNormalBlending();
@@ -193,7 +193,7 @@ public class Drill extends Block{
             entity.progress += entity.delta()
             * entity.dominantItems * speed * entity.warmup;
 
-            if(Mathf.chance(Timers.delta() * updateEffectChance * entity.warmup))
+            if(Mathf.chance(Time.delta() * updateEffectChance * entity.warmup))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, warmupSpeed);

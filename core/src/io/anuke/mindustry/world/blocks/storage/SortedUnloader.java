@@ -10,8 +10,8 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.SelectionTrait;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.scene.ui.layout.Table;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -46,7 +46,7 @@ public class SortedUnloader extends Block implements SelectionTrait{
 
     @Override
     public void playerPlaced(Tile tile){
-        threads.runDelay(() -> Call.setSortedUnloaderItem(null, tile, lastItem));
+        Core.app.post(() -> Call.setSortedUnloaderItem(null, tile, lastItem));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)

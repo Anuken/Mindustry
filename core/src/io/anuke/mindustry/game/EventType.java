@@ -1,9 +1,9 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.Events.Event;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Events.Event;
 
 public class EventType{
 

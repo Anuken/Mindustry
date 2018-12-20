@@ -12,11 +12,11 @@ import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -87,7 +87,7 @@ public class GenericCrafter extends Block{
             entity.totalProgress += entity.delta();
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
 
-            if(Mathf.chance(Timers.delta() * updateEffectChance))
+            if(Mathf.chance(Time.delta() * updateEffectChance))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 4f), entity.y + Mathf.range(size * 4));
         }else{
             entity.warmup = Mathf.lerp(entity.warmup, 0f, 0.02f);

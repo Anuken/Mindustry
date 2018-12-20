@@ -8,10 +8,10 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.MobileButton;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 

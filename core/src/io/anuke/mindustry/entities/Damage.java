@@ -13,14 +13,14 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Physics;
-import io.anuke.ucore.util.Translator;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Physics;
+import io.anuke.arc.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -34,19 +34,19 @@ public class Damage{
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
         for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
             int branches = 5 + Mathf.clamp((int) (power / 30), 1, 20);
-            Timers.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.none, Palette.power, 3,
+            Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.none, Palette.power, 3,
                     x, y, Mathf.random(360f), branches + Mathf.range(2)));
         }
 
         for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
-            Timers.run(i / 2f, () -> Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f)));
+            Time.run(i / 2f, () -> Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f)));
         }
 
         int waves = Mathf.clamp((int) (explosiveness / 4), 0, 30);
 
         for(int i = 0; i < waves; i++){
             int f = i;
-            Timers.run(i * 2f, () -> {
+            Time.run(i * 2f, () -> {
                 threads.run(() -> Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f));
                 Effects.effect(ExplosionFx.blockExplosionSmoke, x + Mathf.range(radius), y + Mathf.range(radius));
             });

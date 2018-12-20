@@ -19,13 +19,13 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumePowerExact;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Geometry;
+import io.anuke.arc.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -110,7 +110,7 @@ public class MechPad extends Block{
     public void drawSelect(Tile tile){
         Draw.color(Palette.accent);
         for(int i = 0; i < 4; i ++){
-            float length = tilesize * size/2f + 3 + Mathf.absin(Timers.time(), 5f, 2f);
+            float length = tilesize * size/2f + 3 + Mathf.absin(Time.time(), 5f, 2f);
             Draw.rect("transfer-arrow", tile.drawx() + Geometry.d4[i].x * length, tile.drawy() + Geometry.d4[i].y * length, (i+2) * 90);
         }
         Draw.color();

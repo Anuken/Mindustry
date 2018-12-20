@@ -7,8 +7,8 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.scene.ui.layout.Table;
 import static io.anuke.mindustry.Vars.*;
 
 public class ConsumeItemFilter extends Consume{

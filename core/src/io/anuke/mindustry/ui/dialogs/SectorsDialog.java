@@ -8,20 +8,20 @@ import io.anuke.arc.utils.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.maps.Sector;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.event.InputEvent;
-import io.anuke.ucore.scene.event.InputListener;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.layout.Cell;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.event.InputEvent;
+import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.layout.Cell;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.utils.Cursors;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Geometry;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -84,16 +84,16 @@ public class SectorsDialog extends FloatingDialog{
         table.background("button").margin(5);
 
         table.defaults().pad(3);
-        table.add(Bundles.format("text.sector", sector.x + ", " + sector.y));
+        table.add(Core.bundle.format("text.sector", sector.x + ", " + sector.y));
         table.row();
 
         if(selected.completedMissions < selected.missions.size && !selected.complete){
-            table.labelWrap(Bundles.format("text.mission", selected.getDominantMission().menuDisplayString())).growX();
+            table.labelWrap(Core.bundle.format("text.mission", selected.getDominantMission().menuDisplayString())).growX();
             table.row();
         }
 
         if(selected.hasSave()){
-            table.labelWrap(Bundles.format("text.sector.time", selected.getSave().getPlayTime())).growX();
+            table.labelWrap(Core.bundle.format("text.sector.time", selected.getSave().getPlayTime())).growX();
             table.row();
         }
 

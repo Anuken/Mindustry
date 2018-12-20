@@ -4,8 +4,8 @@ import io.anuke.arc.utils.ObjectMap;
 import io.anuke.arc.utils.ObjectSet;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Settings;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.core.Settings;
 
 /**Stores player unlocks. Clientside only.*/
 public class Unlocks{
@@ -13,7 +13,7 @@ public class Unlocks{
     private boolean dirty;
 
     static{
-        Settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
+        Core.settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
     }
 
     /** Returns whether or not this piece of content is unlocked yet.*/
@@ -67,12 +67,12 @@ public class Unlocks{
 
     @SuppressWarnings("unchecked")
     public void load(){
-        unlocked = Settings.getObject("unlockset", ObjectMap.class, ObjectMap::new);
+        unlocked = Core.settings.getObject("unlockset", ObjectMap.class, ObjectMap::new);
     }
 
     public void save(){
-        Settings.putObject("unlockset", unlocked);
-        Settings.save();
+        Core.settings.putObject("unlockset", unlocked);
+        Core.settings.save();
     }
 
 }

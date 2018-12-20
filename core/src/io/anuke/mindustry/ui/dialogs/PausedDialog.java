@@ -3,9 +3,9 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.Input.Keys;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.scene.style.Drawable;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.scene.style.Drawable;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -33,7 +33,7 @@ public class PausedDialog extends FloatingDialog{
         missionTable.background((Drawable) null);
         if(world.getSector() != null){
             missionTable.background("underline");
-            missionTable.add(Bundles.format("text.sector", world.getSector().x + ", " + world.getSector().y));
+            missionTable.add(Core.bundle.format("text.sector", world.getSector().x + ", " + world.getSector().y));
         }
     }
 
@@ -111,7 +111,7 @@ public class PausedDialog extends FloatingDialog{
                 control.saves.getCurrent().save();
             }catch(Throwable e){
                 e.printStackTrace();
-                threads.runGraphics(() -> ui.showError("[accent]" + Bundles.get("text.savefail")));
+                threads.runGraphics(() -> ui.showError("[accent]" + Core.bundle.get("text.savefail")));
             }
             state.set(State.menu);
         });

@@ -11,13 +11,13 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.ColorMapper;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.event.InputEvent;
-import io.anuke.ucore.scene.event.InputListener;
-import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.util.GridMap;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.event.InputEvent;
+import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.scene.utils.Cursors;
+import io.anuke.arc.util.GridMap;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.sectorSize;
 import static io.anuke.mindustry.Vars.world;
@@ -89,7 +89,7 @@ public class GenViewDialog extends FloatingDialog{
                                     pixmap.drawPixel(i, sectorSize - 1 - j, ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation, (byte)0));
                                 }
                             }
-                            Core.app.postRunnable(() -> map.put(wx, wy, new Texture(pixmap)));
+                            Core.app.post(() -> map.put(wx, wy, new Texture(pixmap)));
                             return pixmap;
                         });
 

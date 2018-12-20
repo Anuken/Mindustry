@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.util.Bundles;
 
 public class Links{
     private static LinkEntry[] links;
@@ -33,7 +33,7 @@ public class Links{
         public LinkEntry(String name, String link, Color color){
             this.name = name;
             this.color = color;
-            this.description = Bundles.getNotNull("text.link." + name + ".description");
+            this.description = Core.bundle.getNotNull("text.link." + name + ".description");
             this.link = link;
         }
     }

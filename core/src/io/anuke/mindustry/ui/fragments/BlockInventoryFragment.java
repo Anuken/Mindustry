@@ -13,18 +13,18 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.BooleanProvider;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.event.HandCursorListener;
-import io.anuke.ucore.scene.event.InputEvent;
-import io.anuke.ucore.scene.event.InputListener;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.function.BooleanProvider;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.event.HandCursorListener;
+import io.anuke.arc.scene.event.InputEvent;
+import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -50,7 +50,7 @@ public class BlockInventoryFragment extends Fragment{
 
         player.inventory.addItem(item, removed);
         for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-            Timers.run(j * 3f, () -> Call.transferItemEffect(item, tile.drawx(), tile.drawy(), player));
+            Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.drawx(), tile.drawy(), player));
         }
     }
 
@@ -93,7 +93,7 @@ public class BlockInventoryFragment extends Fragment{
                 hide();
             }else{
                 if(holding && lastItem != null){
-                    holdTime += Timers.delta();
+                    holdTime += Time.delta();
 
                     if(holdTime >= holdWithdraw){
                         int amount = Math.min(tile.entity.items.get(lastItem), player.inventory.itemCapacityUsed(lastItem));

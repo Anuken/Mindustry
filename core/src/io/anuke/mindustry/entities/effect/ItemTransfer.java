@@ -1,23 +1,23 @@
 package io.anuke.mindustry.entities.effect;
 
-import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.TimedEntity;
+import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.arc.entities.trait.PosTrait;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Fill;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Pooling;
+import io.anuke.arc.utils.Time;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.TimedEntity;
-import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.entities.trait.PosTrait;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Pooling;
 
 import static io.anuke.mindustry.Vars.effectGroup;
 import static io.anuke.mindustry.Vars.threads;
@@ -51,7 +51,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
         if(tile == null || tile.entity == null || tile.entity.items == null) return;
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
-            Timers.run(i * 3, () -> create(item, x, y, tile, () -> {
+            Time.run(i * 3, () -> create(item, x, y, tile, () -> {
             }));
         }
         tile.entity.items.add(item, amount);

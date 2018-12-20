@@ -18,11 +18,11 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.*;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.util.Angles;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
@@ -105,18 +105,18 @@ public class TurretBullets extends BulletList implements ContentList{
 
             @Override
             public void update(Bullet b){
-                if(Mathf.chance(0.04 * Timers.delta())){
+                if(Mathf.chance(0.04 * Time.delta())){
                     Tile tile = world.tileWorld(b.x, b.y);
                     if(tile != null){
                         Fire.create(tile);
                     }
                 }
 
-                if(Mathf.chance(0.1 * Timers.delta())){
+                if(Mathf.chance(0.1 * Time.delta())){
                     Effects.effect(EnvironmentFx.fireballsmoke, b.x, b.y);
                 }
 
-                if(Mathf.chance(0.1 * Timers.delta())){
+                if(Mathf.chance(0.1 * Time.delta())){
                     Effects.effect(EnvironmentFx.ballfire, b.x, b.y);
                 }
             }
@@ -213,10 +213,10 @@ public class TurretBullets extends BulletList implements ContentList{
 
                 Lines.lineAngle(b.x, b.y, b.angle(), baseLen);
                 for(int s = 0; s < colors.length; s++){
-                    Draw.color(tmpColor.set(colors[s]).mul(1f + Mathf.absin(Timers.time(), 1f, 0.1f)));
+                    Draw.color(tmpColor.set(colors[s]).mul(1f + Mathf.absin(Time.time(), 1f, 0.1f)));
                     for(int i = 0; i < tscales.length; i++){
                         vector.trns(b.angle() + 180f, (lenscales[i] - 1f) * 35f);
-                        Lines.stroke((9f + Mathf.absin(Timers.time(), 0.8f, 1.5f)) * b.fout() * strokes[s] * tscales[i]);
+                        Lines.stroke((9f + Mathf.absin(Time.time(), 0.8f, 1.5f)) * b.fout() * strokes[s] * tscales[i]);
                         Lines.lineAngle(b.x + vector.x, b.y + vector.y, b.angle(), baseLen * lenscales[i], CapStyle.none);
                     }
                 }

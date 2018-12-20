@@ -3,8 +3,8 @@ package io.anuke.mindustry.game;
 import io.anuke.arc.utils.ObjectSet;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.ThreadSet;
+import io.anuke.arc.util.EnumSet;
+import io.anuke.arc.util.ThreadSet;
 
 /**
  * Class for various team-based utilities.

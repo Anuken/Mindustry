@@ -8,7 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings.Secure;
+import android.provider.Core.settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import com.badlogic.gdx.Gdx;
@@ -26,10 +26,10 @@ import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Strings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -171,7 +171,7 @@ public class AndroidLauncher extends PatchedAndroidApplication{
                                 SaveSlot slot = control.saves.importSave(file);
                                 ui.load.runLoadSave(slot);
                             }catch(IOException e){
-                                ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
+                                ui.showError(Core.bundle.format("text.save.import.fail", Strings.parseException(e, false)));
                             }
                         }else{
                             ui.showError("$text.save.import.invalid");

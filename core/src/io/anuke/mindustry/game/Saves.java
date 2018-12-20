@@ -10,11 +10,11 @@ import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.SaveMeta;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.ThreadArray;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.ThreadArray;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -47,7 +47,7 @@ public class Saves{
 
     public void load(){
         saves.clear();
-        IntArray slots = Settings.getObject("save-slots", IntArray.class, IntArray::new);
+        IntArray slots = Core.settings.getObject("save-slots", IntArray.class, IntArray::new);
 
         for(int i = 0; i < slots.size; i ++){
             int index = slots.get(i);
@@ -77,11 +77,11 @@ public class Saves{
         }
 
         if(!state.is(State.menu) && !state.gameOver && current != null && current.isAutosave()){
-            time += Timers.delta();
-            if(time > Settings.getInt("saveinterval") * 60){
+            time += Time.delta();
+            if(time > Core.settings.getInt("saveinterval") * 60){
                 saving = true;
 
-                Timers.runTask(2f, () -> {
+                Time.runTask(2f, () -> {
                     try{
                         current.save();
                     }catch(Exception e){
@@ -146,8 +146,8 @@ public class Saves{
         IntArray result = new IntArray(saves.size);
         for(int i = 0; i < saves.size; i++) result.add(saves.get(i).index);
 
-        Settings.putObject("save-slots", result);
-        Settings.save();
+        Core.settings.putObject("save-slots", result);
+        Core.settings.save();
     }
 
     public class SaveSlot{
@@ -201,12 +201,12 @@ public class Saves{
         }
 
         public String getName(){
-            return Settings.getString("save-" + index + "-name", "untittled");
+            return Core.settings.getString("save-" + index + "-name", "untittled");
         }
 
         public void setName(String name){
-            Settings.putString("save-" + index + "-name", name);
-            Settings.save();
+            Core.settings.putString("save-" + index + "-name", name);
+            Core.settings.save();
         }
 
         public int getBuild(){
@@ -226,12 +226,12 @@ public class Saves{
         }
 
         public boolean isAutosave(){
-            return Settings.getBool("save-" + index + "-autosave", true);
+            return Core.settings.getBool("save-" + index + "-autosave", true);
         }
 
         public void setAutosave(boolean save){
-            Settings.putBool("save-" + index + "-autosave", save);
-            Settings.save();
+            Core.settings.putBool("save-" + index + "-autosave", save);
+            Core.settings.save();
         }
 
         public void importFile(FileHandle file) throws IOException{

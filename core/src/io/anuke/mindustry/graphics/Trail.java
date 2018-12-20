@@ -3,11 +3,11 @@ package io.anuke.mindustry.graphics;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Vector2;
 import io.anuke.arc.utils.FloatArray;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Fill;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Mathf;
 
 /**
  * Class that renders a colored trail.
@@ -29,7 +29,7 @@ public class Trail{
 
         points.add(curx, cury);
 
-        while(points.size > (int)(length * 2 / Math.min(Timers.delta(), 1f))){
+        while(points.size > (int)(length * 2 / Math.min(Time.delta(), 1f))){
             float[] items = points.items;
             System.arraycopy(items, 2, items, 0, points.size - 2);
             points.size -= 2;

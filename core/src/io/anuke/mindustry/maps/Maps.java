@@ -7,9 +7,9 @@ import io.anuke.arc.utils.Array;
 import io.anuke.arc.utils.Disposable;
 import io.anuke.arc.utils.ObjectMap;
 import io.anuke.mindustry.io.MapIO;
-import io.anuke.ucore.function.Supplier;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.ThreadArray;
+import io.anuke.arc.function.Supplier;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.ThreadArray;
 
 import java.io.DataInputStream;
 import java.io.IOException;

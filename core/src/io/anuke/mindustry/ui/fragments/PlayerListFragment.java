@@ -8,16 +8,16 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.Packets.AdminAction;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Timer;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Timer;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -46,7 +46,7 @@ public class PlayerListFragment extends Fragment{
             });
 
             cont.table("button", pane -> {
-                pane.label(() -> Bundles.format(playerGroup.size() == 1 ? "text.players.single" : "text.players", playerGroup.size()));
+                pane.label(() -> Core.bundle.format(playerGroup.size() == 1 ? "text.players.single" : "text.players", playerGroup.size()));
                 pane.row();
                 pane.pane(content).grow().get().setScrollingDisabled(true, false);
                 pane.row();

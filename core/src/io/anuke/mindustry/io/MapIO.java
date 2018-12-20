@@ -19,8 +19,8 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper.LegacyBlock;
-import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Structs;
+import io.anuke.arc.util.Bits;
+import io.anuke.arc.util.Structs;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

@@ -16,14 +16,14 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.TimedEntity;
-import io.anuke.ucore.util.Structs;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Pooling;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.TimedEntity;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Geometry;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Pooling;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -76,7 +76,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
      */
     public static void extinguish(Tile tile, float intensity){
         if(tile != null && map.containsKey(tile.pos())){
-            map.get(tile.pos()).time += intensity * Timers.delta();
+            map.get(tile.pos()).time += intensity * Time.delta();
         }
     }
 
@@ -92,11 +92,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
 
     @Override
     public void update(){
-        if(Mathf.chance(0.1 * Timers.delta())){
+        if(Mathf.chance(0.1 * Time.delta())){
             Effects.effect(EnvironmentFx.fire, x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
-        if(Mathf.chance(0.05 * Timers.delta())){
+        if(Mathf.chance(0.05 * Time.delta())){
             Effects.effect(EnvironmentFx.smoke, x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
@@ -104,7 +104,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
             return;
         }
 
-        time = Mathf.clamp(time + Timers.delta(), 0, lifetime());
+        time = Mathf.clamp(time + Time.delta(), 0, lifetime());
 
         if(time >= lifetime() || tile == null){
             Call.onFireRemoved(getID());
@@ -118,7 +118,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
         float flammability = baseFlammability + puddleFlammability;
 
         if(!damage && flammability <= 0){
-            time += Timers.delta() * 8;
+            time += Time.delta() * 8;
         }
 
         if(baseFlammability < 0 || block != tile.block()){
@@ -127,20 +127,20 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
         }
 
         if(damage){
-            lifetime += Mathf.clamp(flammability / 8f, 0f, 0.6f) * Timers.delta();
+            lifetime += Mathf.clamp(flammability / 8f, 0f, 0.6f) * Time.delta();
         }
 
-        if(flammability > 1f && Mathf.chance(spreadChance * Timers.delta() * Mathf.clamp(flammability / 5f, 0.3f, 2f))){
+        if(flammability > 1f && Mathf.chance(spreadChance * Time.delta() * Mathf.clamp(flammability / 5f, 0.3f, 2f))){
             GridPoint2 p = Mathf.select(Geometry.d4);
             Tile other = world.tile(tile.x + p.x, tile.y + p.y);
             create(other);
 
-            if(Mathf.chance(fireballChance * Timers.delta() * Mathf.clamp(flammability / 10.0))){
+            if(Mathf.chance(fireballChance * Time.delta() * Mathf.clamp(flammability / 10.0))){
                 Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f));
             }
         }
 
-        if(Mathf.chance(0.1 * Timers.delta())){
+        if(Mathf.chance(0.1 * Time.delta())){
             Puddle p = Puddle.getPuddle(tile);
             if(p != null){
                 puddleFlammability = p.getFlammability() / 3f;

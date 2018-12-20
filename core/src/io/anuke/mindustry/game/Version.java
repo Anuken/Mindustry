@@ -4,7 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.utils.ObjectMap;
 import io.anuke.arc.utils.PropertiesUtils;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.util.Strings;
 
 import java.io.IOException;
 

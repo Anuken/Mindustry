@@ -9,15 +9,15 @@ import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Surface;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Surface;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.core.Core.camera;
+import static io.anuke.arc.core.Core.camera;
 
 public class BlockRenderer{
     private final static int initialRequests = 32 * 32;

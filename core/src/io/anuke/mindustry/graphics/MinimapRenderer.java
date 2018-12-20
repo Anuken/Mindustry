@@ -14,13 +14,13 @@ import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Pixmaps;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadArray;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Pixmaps;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.ThreadArray;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -41,7 +41,7 @@ public class MinimapRenderer implements Disposable{
         });
 
         //make sure to call on the graphics thread
-        Events.on(TileChangeEvent.class, event -> Core.app.postRunnable(() -> update(event.tile)));
+        Events.on(TileChangeEvent.class, event -> Core.app.post(() -> update(event.tile)));
     }
 
     public Texture getTexture(){

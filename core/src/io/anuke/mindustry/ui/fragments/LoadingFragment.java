@@ -1,11 +1,11 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.Label;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.Label;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.layout.Table;
 
 public class LoadingFragment extends Fragment{
     private Table table;

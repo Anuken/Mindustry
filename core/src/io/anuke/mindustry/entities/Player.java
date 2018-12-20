@@ -24,13 +24,13 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock.CoreEntity;
-import io.anuke.ucore.core.*;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityQuery;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
+import io.anuke.arc.core.*;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Hue;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -150,7 +150,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         if(interpolator.target.dst(interpolator.last) > 1f){
-            walktime += Timers.delta();
+            walktime += Time.delta();
         }
     }
 
@@ -365,7 +365,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void drawStats(){
         float x = snappedX(), y = snappedY();
 
-        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Timers.time(), healthf() * 5f, 1f - healthf()));
+        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
         Draw.alpha(hitTime / hitDuration);
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.color();
@@ -400,7 +400,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         boolean ints = Core.font.usesIntegerPositions();
         Core.font.setUseIntegerPositions(false);
-        Draw.tscl(0.25f / io.anuke.ucore.scene.ui.layout.Unit.dp.scl(1f));
+        Draw.tscl(0.25f / io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f));
         layout.setText(Core.font, name);
         Draw.color(0f, 0f, 0f, 0.3f);
         Draw.rect("blank", x, y + 8 - layout.height / 2, layout.width + 2, layout.height + 3);
@@ -435,7 +435,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
                 Draw.color(Palette.removeBack);
 
-                float rad = Mathf.absin(Timers.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
+                float rad = Mathf.absin(Time.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
 
                 Lines.square(
                 request.x * tilesize + block.offset(),
@@ -454,7 +454,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
                 Draw.color(Palette.accentBack);
 
-                float rad = Mathf.absin(Timers.time(), 7f, 1f) - 2f + request.recipe.result.size * tilesize / 2f;
+                float rad = Mathf.absin(Time.time(), 7f, 1f) - 2f + request.recipe.result.size * tilesize / 2f;
 
                 Lines.square(
                 request.x * tilesize + request.recipe.result.offset(),
@@ -479,7 +479,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void update(){
-        hitTime -= Timers.delta();
+        hitTime -= Time.delta();
 
         if(Float.isNaN(x) || Float.isNaN(y)){
             velocity.set(0f, 0f);
@@ -611,7 +611,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         pointerY = vec.y;
         updateShooting();
 
-        movement.limit(speed).scl(Timers.delta());
+        movement.limit(speed).scl(Time.delta());
 
         if(getCarrier() == null){
             if(!ui.chatfrag.chatOpen()){
@@ -701,10 +701,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         isBoosting = EntityQuery.collisions().overlapsTile(rect) || distanceTo(targetX, targetY) > 85f;
 
-        velocity.add(movement.scl(Timers.delta()));
+        velocity.add(movement.scl(Time.delta()));
 
         if(velocity.len() <= 0.2f && mech.flying){
-            rotation += Mathf.sin(Timers.time() + id * 99, 10f, 1f);
+            rotation += Mathf.sin(Time.time() + id * 99, 10f, 1f);
         }else if(target == null){
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), velocity.len() / 10f);
         }
@@ -715,8 +715,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         if(mech.flying){
             //hovering effect
-            x += Mathf.sin(Timers.time() + id * 999, 25f, 0.08f);
-            y += Mathf.cos(Timers.time() + id * 999, 25f, 0.08f);
+            x += Mathf.sin(Time.time() + id * 999, 25f, 0.08f);
+            y += Mathf.cos(Time.time() + id * 999, 25f, 0.08f);
         }
 
         //update shooting if not building, not mining and there's ammo left
@@ -726,7 +726,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             if(mobile){
                 if(target == null){
                     isShooting = false;
-                    if(Settings.getBool("autotarget")){
+                    if(Core.settings.getBool("autotarget")){
                         target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
 
                         if(mech.canHeal && target == null){

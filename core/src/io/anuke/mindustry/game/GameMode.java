@@ -1,6 +1,6 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.util.Bundles;
 
 public enum GameMode{
     waves,
@@ -33,12 +33,12 @@ public enum GameMode{
     public float respawnTime = 60 * 4;
 
     public String description(){
-        return Bundles.get("mode." + name() + ".description");
+        return Core.bundle.get("mode." + name() + ".description");
     }
 
     @Override
     public String toString(){
-        return Bundles.get("mode." + name() + ".name");
+        return Core.bundle.get("mode." + name() + ".name");
     }
 
 }

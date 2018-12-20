@@ -13,10 +13,10 @@ import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
 import io.anuke.mindustry.world.meta.Producers;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Translator;
 
 public abstract class BaseBlock extends MappableContent{
     public boolean hasItems;
@@ -164,15 +164,15 @@ public abstract class BaseBlock extends MappableContent{
                     Liquid other = next.entity.liquids.current();
                     if((other.flammability > 0.3f && liquid.temperature > 0.7f) ||
                             (liquid.flammability > 0.3f && other.temperature > 0.7f)){
-                        tile.entity.damage(1 * Timers.delta());
-                        next.entity.damage(1 * Timers.delta());
-                        if(Mathf.chance(0.1 * Timers.delta())){
+                        tile.entity.damage(1 * Time.delta());
+                        next.entity.damage(1 * Time.delta());
+                        if(Mathf.chance(0.1 * Time.delta())){
                             Effects.effect(EnvironmentFx.fire, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
                         }
                     }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) ||
                             (other.temperature > 0.7f && liquid.temperature < 0.55f)){
-                        tile.entity.liquids.remove(liquid, Math.min(tile.entity.liquids.get(liquid), 0.7f * Timers.delta()));
-                        if(Mathf.chance(0.2f * Timers.delta())){
+                        tile.entity.liquids.remove(liquid, Math.min(tile.entity.liquids.get(liquid), 0.7f * Time.delta()));
+                        if(Mathf.chance(0.2f * Time.delta())){
                             Effects.effect(EnvironmentFx.steam, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
                         }
                     }

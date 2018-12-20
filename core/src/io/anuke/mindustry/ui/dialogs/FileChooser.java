@@ -7,17 +7,17 @@ import io.anuke.arc.utils.Align;
 import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.*;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.scene.utils.UIUtils;
-import io.anuke.ucore.util.OS;
-import io.anuke.ucore.util.Pooling;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.utils.UIUtils;
+import io.anuke.arc.util.OS;
+import io.anuke.arc.util.Pooling;
 
 import java.util.Arrays;
 
@@ -264,7 +264,7 @@ public class FileChooser extends FloatingDialog{
 
     @Override
     public Dialog show(){
-        Timers.runTask(2f, () -> {
+        Time.runTask(2f, () -> {
             content().clear();
             setupWidgets();
             super.show();

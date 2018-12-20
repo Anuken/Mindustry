@@ -12,12 +12,12 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.ucore.function.Supplier;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.function.Supplier;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Strings;
 
 public class UnitType extends UnlockableContent{
     protected final Supplier<? extends BaseUnit> constructor;
@@ -51,11 +51,11 @@ public class UnitType extends UnlockableContent{
     public <T extends BaseUnit> UnitType(String name, Class<T> type, Supplier<T> mainConstructor){
         this.name = name;
         this.constructor = mainConstructor;
-        this.description = Bundles.getOrNull("unit." + name + ".description");
+        this.description = Core.bundle.getOrNull("unit." + name + ".description");
 
         TypeTrait.registerType(type, mainConstructor);
 
-        if(!Bundles.has("unit." + this.name + ".name")){
+        if(!Core.bundle.has("unit." + this.name + ".name")){
             Log.err("Warning: unit '" + name + "' is missing a localized name. Add the follow to bundle.properties:");
             Log.err("unit." + this.name + ".name=" + Strings.capitalize(name.replace('-', '_')));
         }
@@ -68,7 +68,7 @@ public class UnitType extends UnlockableContent{
 
     @Override
     public String localizedName(){
-        return Bundles.get("unit." + name + ".name");
+        return Core.bundle.get("unit." + name + ".name");
     }
 
     @Override

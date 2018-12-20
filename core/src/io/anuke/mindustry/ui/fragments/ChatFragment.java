@@ -12,21 +12,21 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.ui.Dialog;
-import io.anuke.ucore.scene.ui.Label;
-import io.anuke.ucore.scene.ui.Label.LabelStyle;
-import io.anuke.ucore.scene.ui.TextField;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Inputs;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.ui.Dialog;
+import io.anuke.arc.scene.ui.Label;
+import io.anuke.arc.scene.ui.Label.LabelStyle;
+import io.anuke.arc.scene.ui.TextField;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.core.Core.scene;
-import static io.anuke.ucore.core.Core.skin;
+import static io.anuke.arc.core.Core.scene;
+import static io.anuke.arc.core.Core.skin;
 
 public class ChatFragment extends Table{
     private final static int messagesShown = 10;
@@ -134,7 +134,7 @@ public class ChatFragment extends Table{
                 }).width(90f).name("okb");
 
                 dialog.show();
-                Timers.runTask(1f, () -> {
+                Time.runTask(1f, () -> {
                     to.setCursorPosition(to.getText().length());
                     Core.scene.setKeyboardFocus(to);
                     Core.input.setOnscreenKeyboardVisible(true);
@@ -194,7 +194,7 @@ public class ChatFragment extends Table{
         batch.setColor(Color.WHITE);
 
         if(fadetime > 0 && !chatOpen)
-            fadetime -= Timers.delta() / 180f;
+            fadetime -= Time.delta() / 180f;
     }
 
     private void sendMessage(){

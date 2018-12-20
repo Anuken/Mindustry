@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
 import io.anuke.arc.math.Vector2;
-import io.anuke.ucore.util.Translator;
+import io.anuke.arc.util.Translator;
 
 import static io.anuke.mindustry.Vars.threads;
 

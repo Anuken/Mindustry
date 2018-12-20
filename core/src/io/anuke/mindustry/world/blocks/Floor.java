@@ -11,13 +11,13 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.function.BiPredicate;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Structs;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.function.BiPredicate;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Geometry;
+import io.anuke.arc.util.Mathf;
 
 public class Floor extends Block{
     //TODO implement proper bitmasking

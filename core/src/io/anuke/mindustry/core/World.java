@@ -18,11 +18,11 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityQuery;
-import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.*;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.modules.Module;
+import io.anuke.arc.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -209,8 +209,8 @@ public class World extends Module{
         currentSector = sector;
         state.difficulty = sectors.getDifficulty(sector);
         state.mode = sector.currentMission().getMode();
-        Timers.mark();
-        Timers.mark();
+        Time.mark();
+        Time.mark();
 
         logic.reset();
 
@@ -247,7 +247,7 @@ public class World extends Module{
             Log.err(e);
             if(!headless){
                 ui.showError("$text.map.invalid");
-                threads.runDelay(() -> state.set(State.menu));
+                Core.app.post(() -> state.set(State.menu));
                 invalidMap = true;
             }
             generating = false;
@@ -277,13 +277,13 @@ public class World extends Module{
             invalidMap = false;
         }
 
-        if(invalidMap) threads.runDelay(() -> state.set(State.menu));
+        if(invalidMap) Core.app.post(() -> state.set(State.menu));
 
     }
 
     public void notifyChanged(Tile tile){
         if(!generating){
-            threads.runDelay(() -> Events.fire(new TileChangeEvent(tile)));
+            Core.app.post(() -> Events.fire(new TileChangeEvent(tile)));
         }
     }
 

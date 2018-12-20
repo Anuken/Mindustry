@@ -13,10 +13,10 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.util.Bits;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.trait.Entity;
+import io.anuke.arc.util.Bits;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

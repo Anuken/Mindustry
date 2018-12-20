@@ -13,20 +13,20 @@ import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.GridImage;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.event.InputEvent;
-import io.anuke.ucore.scene.event.InputListener;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.TextField;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Inputs;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.event.InputEvent;
+import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.TextField;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Geometry;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Tmp;
 
 import static io.anuke.mindustry.Vars.mobile;
 import static io.anuke.mindustry.Vars.ui;
@@ -214,7 +214,7 @@ public class MapView extends Element implements GestureListener{
         super.act(delta);
 
         if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField) &&
-                !Inputs.keyDown(io.anuke.ucore.input.Input.CONTROL_LEFT)){
+                !Inputs.keyDown(io.anuke.arc.input.Input.CONTROL_LEFT)){
             float ax = Inputs.getAxis("move_x");
             float ay = Inputs.getAxis("move_y");
             offsetx -= ax * 15f / zoom;

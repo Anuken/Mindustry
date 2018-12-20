@@ -22,14 +22,14 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.BiConsumer;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.function.BiConsumer;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -254,7 +254,7 @@ public abstract class Turret extends Block{
         entry.amount -= ammoPerShot;
         if(entry.amount == 0) entity.ammo.pop();
         entity.totalAmmo -= ammoPerShot;
-        Timers.run(reload / 2f, () -> ejectEffects(tile));
+        Time.run(reload / 2f, () -> ejectEffects(tile));
         return entry.type;
     }
 

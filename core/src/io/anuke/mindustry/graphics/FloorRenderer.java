@@ -12,16 +12,16 @@ import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.CacheBatch;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Structs;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.CacheBatch;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Fill;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Structs;
 
 import java.util.Arrays;
 
@@ -214,7 +214,7 @@ public class FloorRenderer{
         cache = new Chunk[chunksx][chunksy];
         cbatch = new CacheBatch(world.width() * world.height() * 4 * 4);
 
-        Timers.mark();
+        Time.mark();
 
         for(int x = 0; x < chunksx; x++){
             for(int y = 0; y < chunksy; y++){
@@ -225,7 +225,7 @@ public class FloorRenderer{
             }
         }
 
-        Log.info("Time to cache: {0}", Timers.elapsed());
+        Log.info("Time to cache: {0}", Time.elapsed());
     }
 
     private class Chunk{

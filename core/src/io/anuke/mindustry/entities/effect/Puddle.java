@@ -19,18 +19,18 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.SolidEntity;
-import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Pooling;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.SolidEntity;
+import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Fill;
+import io.anuke.arc.graphics.Hue;
+import io.anuke.arc.util.Angles;
+import io.anuke.arc.util.Geometry;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Pooling;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -85,10 +85,10 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
 
             Puddle p = map.get(tile.pos());
 
-            if(generation == 0 && p != null && p.lastRipple <= Timers.time() - 40f){
+            if(generation == 0 && p != null && p.lastRipple <= Time.time() - 40f){
                 Effects.effect(BlockFx.ripple, tile.floor().liquidDrop.color,
                         (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
-                p.lastRipple = Timers.time();
+                p.lastRipple = Time.time();
             }
             return;
         }
@@ -108,9 +108,9 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
 
-            if(generation == 0  && p.lastRipple <= Timers.time() - 40f && p.amount >= maxLiquid / 2f){
+            if(generation == 0  && p.lastRipple <= Time.time() - 40f && p.amount >= maxLiquid / 2f){
                 Effects.effect(BlockFx.ripple, p.liquid.color, (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
-                p.lastRipple = Timers.time();
+                p.lastRipple = Time.time();
             }
         }else{
             p.amount += reactPuddle(p.liquid, liquid, amount, p.tile, p.x, p.y);
@@ -176,13 +176,13 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             //update code
             float addSpeed = accepting > 0 ? 3f : 0f;
 
-            amount -= Timers.delta() * (1f - liquid.viscosity) / (5f + addSpeed);
+            amount -= Time.delta() * (1f - liquid.viscosity) / (5f + addSpeed);
 
             amount += accepting;
             accepting = 0f;
 
             if(amount >= maxLiquid / 1.5f && generation < maxGeneration){
-                float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Timers.delta();
+                float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Time.delta();
                 for(GridPoint2 point : Geometry.d4){
                     Tile other = world.tile(tile.x + point.x, tile.y + point.y);
                     if(other != null && other.block() == Blocks.air && !other.hasCliffs()){
@@ -214,14 +214,14 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
                 }
             });
 
-            if(liquid.temperature > 0.7f && tile.entity != null && Mathf.chance(0.3 * Timers.delta())){
+            if(liquid.temperature > 0.7f && tile.entity != null && Mathf.chance(0.3 * Time.delta())){
                 Fire.create(tile);
             }
 
             updateTime = 20f;
         }
 
-        updateTime -= Timers.delta();
+        updateTime -= Time.delta();
     }
 
     @Override
@@ -233,10 +233,10 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
         float sscl = 20f;
 
         Draw.color(Hue.shift(tmp.set(liquid.color), 2, -0.05f));
-        Fill.circle(x + Mathf.sin(Timers.time() + seeds * 532, sscl, smag), y + Mathf.sin(Timers.time() + seeds * 53, sscl, smag), f * 8f);
+        Fill.circle(x + Mathf.sin(Time.time() + seeds * 532, sscl, smag), y + Mathf.sin(Time.time() + seeds * 53, sscl, smag), f * 8f);
         Angles.randLenVectors(id, 3, f * 6f, (ex, ey) -> {
-            Fill.circle(x + ex + Mathf.sin(Timers.time() + seeds * 532, sscl, smag),
-                    y + ey + Mathf.sin(Timers.time() + seeds * 53, sscl, smag), f * 5f);
+            Fill.circle(x + ex + Mathf.sin(Time.time() + seeds * 532, sscl, smag),
+                    y + ey + Mathf.sin(Time.time() + seeds * 53, sscl, smag), f * 5f);
             seeds++;
         });
         Draw.color();

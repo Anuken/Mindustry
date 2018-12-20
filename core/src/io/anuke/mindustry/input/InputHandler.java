@@ -1,11 +1,16 @@
 package io.anuke.mindustry.input;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.InputAdapter;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.utils.Time;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Player;
@@ -21,23 +26,15 @@ import io.anuke.mindustry.ui.fragments.OverlayFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 
-public abstract class InputHandler extends InputAdapter{
+public abstract class InputHandler implements InputListener{
     /**Used for dropping items.*/
     final static float playerSelectRange = mobile ? 17f : 11f;
     /**Maximum line length.*/
     final static int maxLength = 100;
-    final static Translator stackTrns = new Translator();
+    final static Vector2 stackTrns = new Vector2();
     /**Distance on the back from where items originate.*/
     final static float backTrns = 3f;
 
@@ -89,12 +86,12 @@ public abstract class InputHandler extends InputAdapter{
 
             for(int i = 0; i < sent; i++){
                 boolean end = i == sent - 1;
-                Timers.run(i * 3, () -> {
+                Time.run(i * 3, () -> {
                     tile.block().getStackOffset(item, tile, stackTrns);
 
                     ItemTransfer.create(item,
-                            player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
-                            new Translator(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
+                            player.x + Mathf.trnsx(player.rotation + 180f, backTrns), player.y + Mathf.trnsy(player.rotation + 180f, backTrns),
+                            new Vector2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
                                 if(tile.block() != block || tile.entity == null || tile.entity.items == null) return;
 
                                 tile.block().handleStack(item, removed, tile, player);

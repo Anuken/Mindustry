@@ -20,13 +20,13 @@ import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.mindustry.world.modules.PowerModule;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.BaseEntity;
-import io.anuke.ucore.entities.trait.HealthTrait;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timer;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.BaseEntity;
+import io.anuke.arc.entities.trait.HealthTrait;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Timer;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -89,12 +89,12 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     /**Scaled delta.*/
     public float delta(){
-        return Timers.delta() * timeScale;
+        return Time.delta() * timeScale;
     }
 
     /**Call when nothing is happening to the entity. This increments the internal sleep timer.*/
     public void sleep(){
-        sleepTime += Timers.delta();
+        sleepTime += Time.delta();
         if(!sleeping && sleepTime >= timeToSleep){
             remove();
             sleeping = true;
@@ -265,12 +265,12 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public void update(){
         //TODO better smoke effect, this one is awful
         if(health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
-                Mathf.chance(0.009f * Timers.delta() * (1f - health / tile.block().health))){
+                Mathf.chance(0.009f * Time.delta() * (1f - health / tile.block().health))){
 
             Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
         }
 
-        timeScaleDuration -= Timers.delta();
+        timeScaleDuration -= Time.delta();
         if(timeScaleDuration <= 0f || !tile.block().canOverdrive){
             timeScale = 1f;
         }

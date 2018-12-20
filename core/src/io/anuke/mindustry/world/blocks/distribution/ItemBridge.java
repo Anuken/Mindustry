@@ -18,12 +18,12 @@ import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.CapStyle;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.CapStyle;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Geometry;
+import io.anuke.arc.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -127,7 +127,7 @@ public class ItemBridge extends Block{
                     Draw.color(linked ? Palette.place : Palette.breakInvalid);
 
                     Lines.square(other.drawx(), other.drawy(),
-                            other.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Timers.time(), 4f, 1f)));
+                            other.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
                 }
             }
         }
@@ -212,7 +212,7 @@ public class ItemBridge extends Block{
 
         int i = tile.absoluteRelativeTo(other.x, other.y);
 
-        Draw.color(Color.WHITE, Color.BLACK, Mathf.absin(Timers.time(), 6f, 0.07f));
+        Draw.color(Color.WHITE, Color.BLACK, Mathf.absin(Time.time(), 6f, 0.07f));
         Draw.alpha(Math.max(entity.uptime, 0.25f));
 
         Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);

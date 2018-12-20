@@ -25,18 +25,18 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityQuery;
-import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.io.ByteBufferOutput;
-import io.anuke.ucore.io.CountableByteArrayOutputStream;
-import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Structs;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.entities.trait.Entity;
+import io.anuke.arc.io.ByteBufferOutput;
+import io.anuke.arc.io.CountableByteArrayOutputStream;
+import io.anuke.arc.modules.Module;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Mathf;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -256,7 +256,7 @@ public class NetServer extends Module{
     private static void scheduleSnapshot(Runnable r){
         if(debugSnapshots){
             if(!Mathf.chance(snapshotDropchance)){
-                Timers.run(maxSnapshotDelay / 1000f * 60f, r);
+                Time.run(maxSnapshotDelay / 1000f * 60f, r);
             }
         }else{
             r.run();
@@ -437,7 +437,7 @@ public class NetServer extends Module{
         if(!headless && !closing && Net.server() && state.is(State.menu)){
             closing = true;
             threads.runGraphics(() -> ui.loadfrag.show("$text.server.closing"));
-            Timers.runTask(5f, () -> {
+            Time.runTask(5f, () -> {
                 Net.closeServer();
                 ui.loadfrag.hide();
                 closing = false;
@@ -474,7 +474,7 @@ public class NetServer extends Module{
 
         Call.onKick(connection, reason);
 
-        Timers.runTask(2f, con::close);
+        Time.runTask(2f, con::close);
 
         admins.save();
     }
@@ -618,7 +618,7 @@ public class NetServer extends Module{
                 if(!player.timer.get(Player.timerSync, serverSyncTime) || !connection.hasConnected) continue;
 
                 //reset stream to begin writing
-                Timers.mark();
+                Time.mark();
                 syncStream.reset();
 
                 writeSnapshot(player, dataStream);

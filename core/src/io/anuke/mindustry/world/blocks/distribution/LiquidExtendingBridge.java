@@ -6,8 +6,8 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -25,8 +25,8 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
     public void update(Tile tile){
         ItemBridgeEntity entity = tile.entity();
 
-        entity.time += entity.cycleSpeed * Timers.delta();
-        entity.time2 += (entity.cycleSpeed - 1f) * Timers.delta();
+        entity.time += entity.cycleSpeed * Time.delta();
+        entity.time2 += (entity.cycleSpeed - 1f) * Time.delta();
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){

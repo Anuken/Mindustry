@@ -11,15 +11,15 @@ import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Inputs.DeviceType;
-import io.anuke.ucore.core.KeyBinds;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Inputs;
+import io.anuke.arc.core.Inputs.DeviceType;
+import io.anuke.arc.core.KeyBinds;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.input.CursorType.*;
@@ -310,7 +310,7 @@ public class DesktopInput extends InputHandler{
             float ya = Inputs.getAxis(section, "cursor_y");
 
             if(Math.abs(xa) > controllerMin || Math.abs(ya) > controllerMin){
-                float scl = Settings.getInt("sensitivity", 100) / 100f * Unit.dp.scl(1f);
+                float scl = Core.settings.getInt("sensitivity", 100) / 100f * Unit.dp.scl(1f);
                 controlx += xa * baseControllerSpeed * scl;
                 controly -= ya * baseControllerSpeed * scl;
                 controlling = true;

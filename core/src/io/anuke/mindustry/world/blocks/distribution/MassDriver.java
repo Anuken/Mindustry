@@ -21,14 +21,14 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Pooling;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Angles;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Pooling;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -198,7 +198,7 @@ public class MassDriver extends Block{
 
     @Override
     public void drawConfigure(Tile tile){
-        float sin = Mathf.absin(Timers.time(), 6f, 1f);
+        float sin = Mathf.absin(Time.time(), 6f, 1f);
 
         Draw.color(Palette.accent);
         Lines.stroke(1f);

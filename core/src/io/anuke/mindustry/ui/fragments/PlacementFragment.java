@@ -16,18 +16,18 @@ import io.anuke.mindustry.ui.ImageStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.input.Input;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.ButtonGroup;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Inputs;
+import io.anuke.arc.input.Input;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.ButtonGroup;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.ImageButton;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -177,7 +177,7 @@ public class PlacementFragment extends Fragment{
                                 header.left();
                                 header.add(new ImageStack(lastDisplay.getCompactIcon())).size(8 * 4);
                                 header.labelWrap(() ->
-                                !control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay)) ? Bundles.get("text.blocks.unknown") : lastDisplay.formalName)
+                                !control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay)) ? Core.bundle.get("text.blocks.unknown") : lastDisplay.formalName)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay))){

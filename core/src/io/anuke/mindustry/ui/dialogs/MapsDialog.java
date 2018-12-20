@@ -9,15 +9,15 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.utils.UIUtils;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.utils.UIUtils;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Strings;
 
 import java.io.DataInputStream;
 
@@ -41,7 +41,7 @@ public class MapsDialog extends FloatingDialog{
                     String name = meta.tags.get("name", file.nameWithoutExtension());
 
                     if(world.maps.getByName(name) != null && !world.maps.getByName(name).custom){
-                        ui.showError(Bundles.format("text.editor.import.exists", name));
+                        ui.showError(Core.bundle.format("text.editor.import.exists", name));
                     }else if(world.maps.getByName(name) != null){
                         ui.showConfirm("$text.confirm", "$text.editor.overwrite.confirm", () -> {
                             world.maps.saveMap(name, data, meta.tags);
@@ -53,7 +53,7 @@ public class MapsDialog extends FloatingDialog{
                     }
 
                 }catch(Exception e){
-                    ui.showError(Bundles.format("text.editor.errorimageload", Strings.parseException(e, false)));
+                    ui.showError(Core.bundle.format("text.editor.errorimageload", Strings.parseException(e, false)));
                     Log.err(e);
                 }
             }, true, mapExtension);
@@ -158,7 +158,7 @@ public class MapsDialog extends FloatingDialog{
         }).fillX().height(54f).marginLeft(10);
 
         table.addImageTextButton("$text.delete", "icon-trash-16", 16 * 2, () -> {
-            ui.showConfirm("$text.confirm", Bundles.format("text.map.delete", map.name), () -> {
+            ui.showConfirm("$text.confirm", Core.bundle.format("text.map.delete", map.name), () -> {
                 world.maps.removeMap(map);
                 dialog.hide();
                 setup();

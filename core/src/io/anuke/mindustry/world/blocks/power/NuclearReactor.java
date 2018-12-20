@@ -14,11 +14,11 @@ import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Translator;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -140,21 +140,21 @@ public class NuclearReactor extends PowerGenerator{
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
         Effects.effect(ExplosionFx.nuclearShockwave, tile.worldx(), tile.worldy());
         for(int i = 0; i < 6; i++){
-            Timers.run(Mathf.random(40), () -> Effects.effect(BlockFx.nuclearcloud, tile.worldx(), tile.worldy()));
+            Time.run(Mathf.random(40), () -> Effects.effect(BlockFx.nuclearcloud, tile.worldx(), tile.worldy()));
         }
 
         Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
 
 
         for(int i = 0; i < 20; i++){
-            Timers.run(Mathf.random(50), () -> {
+            Time.run(Mathf.random(50), () -> {
                 tr.rnd(Mathf.random(40f));
                 Effects.effect(ExplosionFx.explosion, tr.x + tile.worldx(), tr.y + tile.worldy());
             });
         }
 
         for(int i = 0; i < 70; i++){
-            Timers.run(Mathf.random(80), () -> {
+            Time.run(Mathf.random(80), () -> {
                 tr.rnd(Mathf.random(120f));
                 Effects.effect(BlockFx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
             });
@@ -182,7 +182,7 @@ public class NuclearReactor extends PowerGenerator{
 
         if(entity.heat > flashThreshold){
             float flash = 1f + ((entity.heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
-            entity.flash += flash * Timers.delta();
+            entity.flash += flash * Time.delta();
             Draw.color(Color.RED, Color.YELLOW, Mathf.absin(entity.flash, 9f, 1f));
             Draw.alpha(0.6f);
             Draw.rect(lightsRegion, tile.drawx(), tile.drawy());

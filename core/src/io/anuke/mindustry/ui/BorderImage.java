@@ -4,10 +4,10 @@ import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.graphics.g2d.Batch;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.layout.Unit;
 
 public class BorderImage extends Image{
     private float thickness = 3f;

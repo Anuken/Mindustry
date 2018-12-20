@@ -25,16 +25,16 @@ import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.io.ReusableByteArrayInputStream;
-import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timer;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.io.ReusableByteArrayInputStream;
+import io.anuke.arc.modules.Module;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Timer;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -114,7 +114,7 @@ public class NetClient extends Module{
         Net.handleClient(Disconnect.class, packet -> {
             if(quiet) return;
 
-            Timers.runTask(3f, ui.loadfrag::hide);
+            Time.runTask(3f, ui.loadfrag::hide);
 
             state.set(State.menu);
 
@@ -347,7 +347,7 @@ public class NetClient extends Module{
         }else if(!connecting){
             Net.disconnect();
         }else{ //...must be connecting
-            timeoutTime += Timers.delta();
+            timeoutTime += Time.delta();
             if(timeoutTime > dataTimeout){
                 Log.err("Failed to load data!");
                 ui.loadfrag.hide();
@@ -369,8 +369,8 @@ public class NetClient extends Module{
         ui.loadfrag.hide();
         ui.join.hide();
         Net.setClientLoaded(true);
-        Core.app.postRunnable(Call::connectConfirm);
-        Timers.runTask(40f, Platform.instance::updateRPC);
+        Core.app.post(Call::connectConfirm);
+        Time.runTask(40f, Platform.instance::updateRPC);
     }
 
     private void reset(){
@@ -437,14 +437,14 @@ public class NetClient extends Module{
     }
 
     String getUsid(String ip){
-        if(Settings.getString("usid-" + ip, null) != null){
-            return Settings.getString("usid-" + ip, null);
+        if(Core.settings.getString("usid-" + ip, null) != null){
+            return Core.settings.getString("usid-" + ip, null);
         }else{
             byte[] bytes = new byte[8];
             new Random().nextBytes(bytes);
             String result = new String(Base64Coder.encode(bytes));
-            Settings.putString("usid-" + ip, result);
-            Settings.save();
+            Core.settings.putString("usid-" + ip, result);
+            Core.settings.save();
             return result;
         }
     }

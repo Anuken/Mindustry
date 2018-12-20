@@ -8,13 +8,13 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Hue;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -108,10 +108,10 @@ public class MendProjector extends Block{
         super.draw(tile);
 
         MendEntity entity = tile.entity();
-        float f = 1f - (Timers.time() / 100f) % 1f;
+        float f = 1f - (Time.time() / 100f) % 1f;
 
         Draw.color(color, phase, entity.phaseHeat);
-        Draw.alpha(entity.heat * Mathf.absin(Timers.time(), 10f, 1f) * 0.5f);
+        Draw.alpha(entity.heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
         Graphics.setAdditiveBlending();
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
 

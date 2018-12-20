@@ -6,8 +6,8 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.util.ThreadArray;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.util.ThreadArray;
 
 public class Consumers{
     private ObjectMap<Class<? extends Consume>, Consume> map = new ObjectMap<>();

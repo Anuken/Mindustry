@@ -7,9 +7,9 @@ import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.ucore.function.IntPositionConsumer;
-import io.anuke.ucore.util.Structs;
-import io.anuke.ucore.util.Bits;
+import io.anuke.arc.function.IntPositionConsumer;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Bits;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.ui;

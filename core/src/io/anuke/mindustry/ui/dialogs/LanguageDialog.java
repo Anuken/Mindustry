@@ -1,11 +1,11 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.scene.ui.ButtonGroup;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Log;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.scene.ui.ButtonGroup;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Log;
 
 import java.util.Locale;
 
@@ -33,8 +33,8 @@ public class LanguageDialog extends FloatingDialog{
             TextButton button = new TextButton(loc.getDisplayName(loc), "toggle");
             button.clicked(() -> {
                 if(getLocale().equals(loc)) return;
-                Settings.putString("locale", loc.toString());
-                Settings.save();
+                Core.settings.putString("locale", loc.toString());
+                Core.settings.save();
                 Log.info("Setting locale: {0}", loc.toString());
                 ui.showInfo("$text.language.restart");
             });
@@ -45,7 +45,7 @@ public class LanguageDialog extends FloatingDialog{
     }
 
     public Locale getLocale(){
-        String loc = Settings.getString("locale");
+        String loc = Core.settings.getString("locale");
 
         if(loc.equals("default")){
             findClosestLocale();
@@ -67,7 +67,7 @@ public class LanguageDialog extends FloatingDialog{
         //check exact locale
         for(Locale l : locales){
             if(l.equals(Locale.getDefault())){
-                Settings.putString("locale", l.toString());
+                Core.settings.putString("locale", l.toString());
                 return;
             }
         }
@@ -75,11 +75,11 @@ public class LanguageDialog extends FloatingDialog{
         //find by language
         for(Locale l : locales){
             if(l.getLanguage().equals(Locale.getDefault().getLanguage())){
-                Settings.putString("locale", l.toString());
+                Core.settings.putString("locale", l.toString());
                 return;
             }
         }
 
-        Settings.putString("locale", new Locale("en").toString());
+        Core.settings.putString("locale", new Locale("en").toString());
     }
 }

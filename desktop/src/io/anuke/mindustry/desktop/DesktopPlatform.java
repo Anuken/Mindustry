@@ -12,9 +12,9 @@ import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.util.OS;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.util.OS;
+import io.anuke.arc.util.Strings;
 
 import java.net.NetworkInterface;
 import java.util.Enumeration;

@@ -9,10 +9,10 @@ import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.util.GridBits;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Structs;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.util.GridBits;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Structs;
 
 import java.io.DataInput;
 import java.io.DataOutput;

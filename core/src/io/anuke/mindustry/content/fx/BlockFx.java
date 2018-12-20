@@ -4,14 +4,14 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Fill;
+import io.anuke.arc.graphics.Hue;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Angles;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Tmp;
 
 import static io.anuke.mindustry.Vars.tilesize;
 

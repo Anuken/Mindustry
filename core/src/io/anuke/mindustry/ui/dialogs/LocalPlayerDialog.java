@@ -2,10 +2,10 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.utils.Scaling;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.layout.Stack;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.layout.Stack;
+import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.players;

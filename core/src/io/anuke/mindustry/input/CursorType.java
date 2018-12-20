@@ -1,6 +1,6 @@
 package io.anuke.mindustry.input;
 
-import io.anuke.ucore.scene.utils.Cursors;
+import io.anuke.arc.scene.utils.Cursors;
 
 /**
  * Type of cursor for displaying on desktop.

@@ -24,10 +24,10 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.modules.ModuleCore;
-import io.anuke.ucore.util.EmptyLogger;
-import io.anuke.ucore.util.Log;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.modules.ModuleCore;
+import io.anuke.arc.util.EmptyLogger;
+import io.anuke.arc.util.Log;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -98,7 +98,7 @@ public class ApplicationTests{
 
     @BeforeEach
     void resetWorld(){
-        Timers.setDeltaProvider(() ->  1f);
+        Time.setDeltaProvider(() ->  1f);
         logic.reset();
         state.set(State.menu);
     }
@@ -179,11 +179,11 @@ public class ApplicationTests{
     @Test
     void timers(){
         boolean[] ran = {false};
-        Timers.run(1.9999f, () -> ran[0] = true);
+        Time.run(1.9999f, () -> ran[0] = true);
 
-        Timers.update();
+        Time.update();
         assertFalse(ran[0]);
-        Timers.update();
+        Time.update();
         assertTrue(ran[0]);
     }
 
@@ -243,7 +243,7 @@ public class ApplicationTests{
         d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
         d2.addBuildRequest(new BuildRequest(1, 1, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
 
-        Timers.setDeltaProvider(() -> 9999999f);
+        Time.setDeltaProvider(() -> 9999999f);
         d1.updateBuilding(d1);
         d2.updateBuilding(d2);
 
@@ -265,14 +265,14 @@ public class ApplicationTests{
         d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
         d2.addBuildRequest(new BuildRequest(1, 1));
 
-        Timers.setDeltaProvider(() -> 3f);
+        Time.setDeltaProvider(() -> 3f);
         d1.updateBuilding(d1);
-        Timers.setDeltaProvider(() -> 1f);
+        Time.setDeltaProvider(() -> 1f);
         d2.updateBuilding(d2);
 
         assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
 
-        Timers.setDeltaProvider(() -> 9999f);
+        Time.setDeltaProvider(() -> 9999f);
 
         d1.updateBuilding(d1);
         d2.updateBuilding(d2);

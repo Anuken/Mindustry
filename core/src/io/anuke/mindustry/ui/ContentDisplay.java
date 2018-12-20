@@ -13,10 +13,10 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatCategory;
 import io.anuke.mindustry.world.meta.StatValue;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Strings;
 
 public class ContentDisplay{
 
@@ -88,13 +88,13 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        table.add(Bundles.format("text.item.explosiveness", (int) (item.explosiveness * 100 * 2f)));
+        table.add(Core.bundle.format("text.item.explosiveness", (int) (item.explosiveness * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.item.flammability", (int) (item.flammability * 100 * 2f)));
+        table.add(Core.bundle.format("text.item.flammability", (int) (item.flammability * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.item.radioactivity", (int) (item.radioactivity * 100 * 2f)));
+        table.add(Core.bundle.format("text.item.radioactivity", (int) (item.radioactivity * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.item.fluxiness", (int) (item.fluxiness * 100 * 2f)));
+        table.add(Core.bundle.format("text.item.fluxiness", (int) (item.fluxiness * 100 * 2f)));
         table.row();
     }
 
@@ -121,15 +121,15 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        table.add(Bundles.format("text.item.explosiveness", (int) (liquid.explosiveness * 100 * 2f)));
+        table.add(Core.bundle.format("text.item.explosiveness", (int) (liquid.explosiveness * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.item.flammability", (int) (liquid.flammability * 100 * 2f)));
+        table.add(Core.bundle.format("text.item.flammability", (int) (liquid.flammability * 100 * 2f)));
         table.row();
-        table.add(Bundles.format("text.liquid.heatcapacity", (int) (liquid.heatCapacity * 100)));
+        table.add(Core.bundle.format("text.liquid.heatcapacity", (int) (liquid.heatCapacity * 100)));
         table.row();
-        table.add(Bundles.format("text.liquid.temperature", (int) (liquid.temperature * 100)));
+        table.add(Core.bundle.format("text.liquid.temperature", (int) (liquid.temperature * 100)));
         table.row();
-        table.add(Bundles.format("text.liquid.viscosity", (int) (liquid.viscosity * 100)));
+        table.add(Core.bundle.format("text.liquid.viscosity", (int) (liquid.viscosity * 100)));
         table.row();
     }
 
@@ -155,23 +155,23 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        if(Bundles.has("mech." + mech.name + ".weapon")){
-            table.add(Bundles.format("text.mech.weapon", Bundles.get("mech." + mech.name + ".weapon")));
+        if(Core.bundle.has("mech." + mech.name + ".weapon")){
+            table.add(Core.bundle.format("text.mech.weapon", Core.bundle.get("mech." + mech.name + ".weapon")));
             table.row();
         }
-        if(Bundles.has("mech." + mech.name + ".ability")){
-            table.add(Bundles.format("text.mech.ability", Bundles.get("mech." + mech.name + ".ability")));
+        if(Core.bundle.has("mech." + mech.name + ".ability")){
+            table.add(Core.bundle.format("text.mech.ability", Core.bundle.get("mech." + mech.name + ".ability")));
             table.row();
         }
-        table.add(Bundles.format("text.mech.armor", mech.armor));
+        table.add(Core.bundle.format("text.mech.armor", mech.armor));
         table.row();
-        table.add(Bundles.format("text.mech.itemcapacity", mech.itemCapacity));
+        table.add(Core.bundle.format("text.mech.itemcapacity", mech.itemCapacity));
         table.row();
 
         if(mech.drillPower > 0){
-            table.add(Bundles.format("text.mech.minespeed", (int) (mech.mineSpeed * 10)));
+            table.add(Core.bundle.format("text.mech.minespeed", (int) (mech.mineSpeed * 10)));
             table.row();
-            table.add(Bundles.format("text.mech.minepower", mech.drillPower));
+            table.add(Core.bundle.format("text.mech.minepower", mech.drillPower));
             table.row();
         }
     }
@@ -198,9 +198,9 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        table.add(Bundles.format("text.unit.health", unit.health));
+        table.add(Core.bundle.format("text.unit.health", unit.health));
         table.row();
-        table.add(Bundles.format("text.unit.speed", Strings.toFixed(unit.speed, 1)));
+        table.add(Core.bundle.format("text.unit.speed", Strings.toFixed(unit.speed, 1)));
         table.row();
         table.row();
     }

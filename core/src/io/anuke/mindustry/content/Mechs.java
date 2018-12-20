@@ -17,12 +17,12 @@ import io.anuke.mindustry.maps.TutorialSector;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Mech;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.unitGroups;
 
@@ -100,7 +100,7 @@ public class Mechs implements ContentList{
                     Effects.shake(1f, 1f, player);
                     Effects.effect(UnitFx.landShock, player);
                     for(int i = 0; i < 8; i++){
-                        Timers.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), Palette.lancerLaser, 17f, player.x, player.y, Mathf.random(360f), 14));
+                        Time.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), Palette.lancerLaser, 17f, player.x, player.y, Mathf.random(360f), 14));
                     }
                 }
             }
@@ -205,7 +205,7 @@ public class Mechs implements ContentList{
                 float alpha = Core.batch.getColor().a;
                 Shaders.build.progress = player.shootHeat;
                 Shaders.build.region = armorRegion;
-                Shaders.build.time = Timers.time() / 10f;
+                Shaders.build.time = Time.time() / 10f;
                 Shaders.build.color.set(Palette.accent).a = player.shootHeat;
                 Graphics.shader(Shaders.build);
                 Draw.alpha(1f);
@@ -257,7 +257,7 @@ public class Mechs implements ContentList{
             @Override
             public void updateAlt(Player player){
                 float scl = scld(player);
-                if(Mathf.chance(Timers.delta() * (0.15*scl))){
+                if(Mathf.chance(Time.delta() * (0.15*scl))){
                     Effects.effect(BulletFx.hitLancer, Palette.lancerLaser, player.x, player.y);
                     Lightning.create(player.getTeam(), Palette.lancerLaser, 10f,
                     player.x + player.getVelocity().x, player.y + player.getVelocity().y, player.rotation, 14);

@@ -2,7 +2,7 @@ package io.anuke.mindustry.net;
 
 import io.anuke.arc.utils.ObjectIntMap;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.ucore.function.Supplier;
+import io.anuke.arc.function.Supplier;
 
 public class Registrator{
     private static ClassEntry[] classes = {

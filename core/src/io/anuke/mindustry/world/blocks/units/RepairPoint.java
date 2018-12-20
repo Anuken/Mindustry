@@ -11,13 +11,13 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.graphics.Shapes;
+import io.anuke.arc.util.Angles;
+import io.anuke.arc.util.EnumSet;
+import io.anuke.arc.util.Mathf;
 
 public class RepairPoint extends Block{
     private static Rectangle rect = new Rectangle();
@@ -87,15 +87,15 @@ public class RepairPoint extends Block{
                 entity.target.health >= entity.target.maxHealth())){
             entity.target = null;
         }else if(entity.target != null){
-            entity.target.health += repairSpeed * Timers.delta() * entity.strength;
+            entity.target.health += repairSpeed * Time.delta() * entity.strength;
             entity.target.clampHealth();
             entity.rotation = Mathf.slerpDelta(entity.rotation, entity.angleTo(entity.target), 0.5f);
         }
 
         if(entity.target != null && entity.cons.valid()){
-            entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.08f * Timers.delta());
+            entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.08f * Time.delta());
         }else{
-            entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.07f * Timers.delta());
+            entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.07f * Time.delta());
         }
 
         if(entity.timer.get(timerTarget, 20)){

@@ -8,7 +8,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.ucore.core.Timers;
+import io.anuke.arc.core.Timers;
 
 public class Router extends Block{
     protected float speed = 8f;
@@ -38,7 +38,7 @@ public class Router extends Block{
         }
 
         if(entity.lastItem != null){
-            entity.time += 1f/speed * Timers.delta();
+            entity.time += 1f/speed * Time.delta();
             Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
 
             if(target != null && (entity.time >= 1f || !(target.block() instanceof Router))){

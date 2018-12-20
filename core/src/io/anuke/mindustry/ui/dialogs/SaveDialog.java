@@ -2,9 +2,9 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -45,7 +45,7 @@ public class SaveDialog extends LoadDialog{
 
         ui.loadfrag.show("$text.saveload");
 
-        Timers.runTask(5f, () -> {
+        Time.runTask(5f, () -> {
             hide();
             ui.loadfrag.hide();
             try{
@@ -53,7 +53,7 @@ public class SaveDialog extends LoadDialog{
             }catch(Throwable e){
                 e.printStackTrace();
 
-                ui.showError("[accent]" + Bundles.get("text.savefail"));
+                ui.showError("[accent]" + Core.bundle.get("text.savefail"));
             }
         });
     }

@@ -21,12 +21,12 @@ import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.ucore.noise.RidgedPerlin;
-import io.anuke.ucore.noise.Simplex;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.SeedRandom;
-import io.anuke.ucore.util.Structs;
+import io.anuke.arc.noise.RidgedPerlin;
+import io.anuke.arc.noise.Simplex;
+import io.anuke.arc.util.Geometry;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.SeedRandom;
+import io.anuke.arc.util.Structs;
 
 import static io.anuke.mindustry.Vars.*;
 

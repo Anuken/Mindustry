@@ -1,8 +1,8 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.layout.Table;
 
 public class ContentInfoDialog extends FloatingDialog{
 

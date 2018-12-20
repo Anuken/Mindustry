@@ -16,8 +16,8 @@ import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.mindustry.net.Packets.StreamBegin;
 import io.anuke.mindustry.net.Packets.StreamChunk;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Log;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.util.Log;
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 
@@ -65,7 +65,7 @@ public class KryoServer implements ServerProvider{
                 Log.info("&bRecieved connection: {0}", c.addressTCP);
 
                 connections.add(kn);
-                threads.runDelay(() -> Net.handleServerReceived(kn.id, c));
+                Core.app.post(() -> Net.handleServerReceived(kn.id, c));
             }
 
             @Override
@@ -76,7 +76,7 @@ public class KryoServer implements ServerProvider{
                 Disconnect c = new Disconnect();
                 c.id = k.id;
 
-                threads.runDelay(() -> {
+                Core.app.post(() -> {
                     Net.handleServerReceived(k.id, c);
                     connections.remove(k);
                 });
@@ -87,7 +87,7 @@ public class KryoServer implements ServerProvider{
                 KryoConnection k = getByKryoID(connection.getID());
                 if(object instanceof FrameworkMessage || k == null) return;
 
-                threads.runDelay(() -> {
+                Core.app.post(() -> {
                     try{
                         Net.handleServerReceived(k.id, object);
                     }catch(ValidateException e){
@@ -254,7 +254,7 @@ public class KryoServer implements ServerProvider{
     }
 
     private void handleException(Throwable e){
-        Timers.run(0f, () -> {
+        Time.run(0f, () -> {
             throw new RuntimeException(e);
         });
     }

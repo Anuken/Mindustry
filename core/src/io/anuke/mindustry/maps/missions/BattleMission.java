@@ -8,7 +8,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.FortressGenerator;
 import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -43,7 +43,7 @@ public class BattleMission extends MissionWithStartingCore{
 
     @Override
     public String displayString(){
-        return Bundles.get("text.mission.battle");
+        return Core.bundle.get("text.mission.battle");
     }
 
     @Override

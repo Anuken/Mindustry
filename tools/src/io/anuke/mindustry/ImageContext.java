@@ -6,12 +6,12 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData.Region;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
 import io.anuke.mindustry.core.ContentLoader;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Atlas;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Log.LogHandler;
-import io.anuke.ucore.util.Log.NoopLogHandler;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.util.Atlas;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Log.LogHandler;
+import io.anuke.arc.util.Log.NoopLogHandler;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -89,9 +89,9 @@ public class ImageContext {
     }
 
     public void generate(String name, Runnable run){
-        Timers.mark();
+        Time.mark();
         run.run();
-        Log.info("&ly[Generator]&lc Time to generate &lm{0}&lc: &lg{1}&lcms", name, Timers.elapsed());
+        Log.info("&ly[Generator]&lc Time to generate &lm{0}&lc: &lg{1}&lcms", name, Time.elapsed());
     }
 
     public Image create(int width, int height){

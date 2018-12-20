@@ -2,7 +2,7 @@ package io.anuke.mindustry.maps;
 
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.utils.ObjectMap;
-import io.anuke.ucore.function.Supplier;
+import io.anuke.arc.function.Supplier;
 
 import java.io.InputStream;
 

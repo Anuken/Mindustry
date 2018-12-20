@@ -17,13 +17,13 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.EffectEntity;
-import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Translator;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.EffectEntity;
+import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Translator;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -173,7 +173,7 @@ public class Vars{
         ios = Core.app.getType() == ApplicationType.iOS;
         android = Core.app.getType() == ApplicationType.Android;
 
-        dataDirectory = Settings.getDataDirectory(appName);
+        dataDirectory = Core.settings.getDataDirectory(appName);
         screenshotDirectory = dataDirectory.child("screenshots/");
         customMapDirectory = dataDirectory.child("maps/");
         saveDirectory = dataDirectory.child("saves/");

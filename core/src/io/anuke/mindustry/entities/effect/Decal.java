@@ -2,11 +2,11 @@ package io.anuke.mindustry.entities.effect;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.TimedEntity;
-import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.TimedEntity;
+import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.groundEffectGroup;
 

@@ -24,11 +24,11 @@ import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.units.CommandCenter.CommandCenterEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.*;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -77,7 +77,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         Effects.shake(2f, 2f, unit);
 
         //must run afterwards so the unit's group is not null when sending the removal packet
-        threads.runDelay(unit::remove);
+        Core.app.post(unit::remove);
     }
 
     @Override
@@ -282,7 +282,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public void update(){
-        hitTime -= Timers.delta();
+        hitTime -= Time.delta();
 
         if(isDead()){
             updateRespawning();

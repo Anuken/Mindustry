@@ -12,8 +12,8 @@ import io.anuke.mindustry.content.blocks.UpgradeBlocks;
 import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.maps.missions.*;
 import io.anuke.mindustry.type.Item;
-import io.anuke.ucore.util.GridMap;
-import io.anuke.ucore.util.Structs;
+import io.anuke.arc.util.GridMap;
+import io.anuke.arc.util.Structs;
 
 import static io.anuke.mindustry.Vars.mobile;
 

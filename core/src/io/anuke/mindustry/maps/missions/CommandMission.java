@@ -3,7 +3,7 @@ package io.anuke.mindustry.maps.missions;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitCommand;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.util.Bundles;
 
 public class CommandMission extends Mission{
     private final UnitCommand command;
@@ -24,6 +24,6 @@ public class CommandMission extends Mission{
 
     @Override
     public String displayString(){
-        return Bundles.format("text.mission.command", command.localized());
+        return Core.bundle.format("text.mission.command", command.localized());
     }
 }

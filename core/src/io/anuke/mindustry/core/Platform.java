@@ -4,12 +4,12 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Input.Keys;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.utils.Base64Coder;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.scene.ui.Dialog;
-import io.anuke.ucore.scene.ui.TextField;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.scene.ui.Dialog;
+import io.anuke.arc.scene.ui.TextField;
 
 import java.util.Random;
 
@@ -57,7 +57,7 @@ public abstract class Platform {
             }).width(90f).name("okb");
 
             dialog.show();
-            Timers.runTask(1f, () -> {
+            Time.runTask(1f, () -> {
                 to.setCursorPosition(to.getText().length());
                 Core.scene.setKeyboardFocus(to);
                 Core.input.setOnscreenKeyboardVisible(true);
@@ -76,13 +76,13 @@ public abstract class Platform {
     }
     /**Must be a base64 string 8 bytes in length.*/
     public String getUUID(){
-        String uuid = Settings.getString("uuid", "");
+        String uuid = Core.settings.getString("uuid", "");
         if(uuid.isEmpty()){
             byte[] result = new byte[8];
             new Random().nextBytes(result);
             uuid = new String(Base64Coder.encode(result));
-            Settings.putString("uuid", uuid);
-            Settings.save();
+            Core.settings.putString("uuid", uuid);
+            Core.settings.save();
             return uuid;
         }
         return uuid;

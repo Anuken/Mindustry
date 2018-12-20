@@ -7,11 +7,11 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Physics;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Physics;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -41,7 +41,7 @@ public class DeflectorWall extends Wall{
         Draw.rect("blank", tile.drawx(), tile.drawy(), tilesize * size, tilesize * size);
         Draw.reset();
 
-        entity.hit = Mathf.clamp(entity.hit - Timers.delta() / hitTime);
+        entity.hit = Mathf.clamp(entity.hit - Time.delta() / hitTime);
 
         Graphics.setNormalBlending();
     }

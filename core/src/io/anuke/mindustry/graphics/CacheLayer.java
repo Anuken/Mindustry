@@ -1,10 +1,10 @@
 package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Shader;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Shader;
 
 import static io.anuke.mindustry.Vars.renderer;
 

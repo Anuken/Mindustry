@@ -8,20 +8,20 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.event.InputEvent;
-import io.anuke.ucore.scene.event.InputListener;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.SettingsDialog;
-import io.anuke.ucore.scene.ui.SettingsDialog.SettingsTable.Setting;
-import io.anuke.ucore.scene.ui.Slider;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.event.InputEvent;
+import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.SettingsDialog;
+import io.anuke.arc.scene.ui.SettingsDialog.SettingsTable.Setting;
+import io.anuke.arc.scene.ui.Slider;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Mathf;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -134,7 +134,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(mobile){
             game.checkPref("autotarget", true);
         }
-        game.sliderPref("saveinterval", 120, 10, 5 * 120, i -> Bundles.format("setting.seconds", i));
+        game.sliderPref("saveinterval", 120, 10, 5 * 120, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
             game.checkPref("crashreport", true);
@@ -165,14 +165,14 @@ public class SettingsMenuDialog extends SettingsDialog{
                     dialog.content().addButton("$text.settings.clearall", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clearall.confirm", () -> {
                             Map<String, Object> map = new HashMap<>();
-                            for(String value : Settings.prefs().get().keySet()){
+                            for(String value : Core.settings.prefs().get().keySet()){
                                 if(value.contains("usid") || value.contains("uuid")){
-                                    map.put(value, Settings.prefs().getString(value));
+                                    map.put(value, Core.settings.prefs().getString(value));
                                 }
                             }
-                            Settings.prefs().clear();
-                            Settings.prefs().put(map);
-                            Settings.save();
+                            Core.settings.prefs().clear();
+                            Core.settings.prefs().put(map);
+                            Core.settings.save();
 
                             for(FileHandle file : dataDirectory.list()){
                                 file.deleteDirectory();
@@ -189,7 +189,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Bundles.get("setting.fpscap.none") : Bundles.format("setting.fpscap.text", s)));
+        graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
 
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
@@ -201,8 +201,8 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }
             });
 
-            Core.graphics.setVSync(Settings.getBool("vsync"));
-            if(Settings.getBool("fullscreen")){
+            Core.graphics.setVSync(Core.settings.getBool("vsync"));
+            if(Core.settings.getBool("fullscreen")){
                 Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
             }
         }

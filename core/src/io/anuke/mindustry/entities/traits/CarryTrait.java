@@ -5,8 +5,8 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.entities.trait.SolidTrait;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.entities.trait.SolidTrait;
 
 public interface CarryTrait extends TeamTrait, SolidTrait, TargetTrait{
 

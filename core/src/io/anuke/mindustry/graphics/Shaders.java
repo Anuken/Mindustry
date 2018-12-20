@@ -3,11 +3,11 @@ package io.anuke.mindustry.graphics;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Shader;
-import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Shader;
+import io.anuke.arc.scene.ui.layout.Unit;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -143,7 +143,7 @@ public class Shaders{
             shader.setUniformf("u_color", color);
             shader.setUniformf("u_uv", region.getU(), region.getV());
             shader.setUniformf("u_uv2", region.getU2(), region.getV2());
-            shader.setUniformf("u_time", Timers.time());
+            shader.setUniformf("u_time", Time.time());
             shader.setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
         }
     }
@@ -173,7 +173,7 @@ public class Shaders{
         @Override
         public void apply(){
             shader.setUniformf("u_dp", Unit.dp.scl(1f));
-            shader.setUniformf("u_time", Timers.time() / Unit.dp.scl(1f));
+            shader.setUniformf("u_time", Time.time() / Unit.dp.scl(1f));
             shader.setUniformf("u_offset",
                     Core.camera.position.x - Core.camera.viewportWidth / 2 * Core.camera.zoom,
                     Core.camera.position.y - Core.camera.viewportHeight / 2 * Core.camera.zoom);
@@ -195,7 +195,7 @@ public class Shaders{
                     Core.camera.position.y - Core.camera.viewportHeight / 2 * Core.camera.zoom);
             shader.setUniformf("screensize", Core.camera.viewportWidth* Core.camera.zoom,
             Core.camera.viewportHeight * Core.camera.zoom);
-            shader.setUniformf("time", Timers.time());
+            shader.setUniformf("time", Time.time());
         }
     }
 }

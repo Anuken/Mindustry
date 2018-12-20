@@ -27,8 +27,8 @@ import io.anuke.mindustry.type.Recipe.RecipeVisibility;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.defense.Wall;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.util.*;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -161,7 +161,7 @@ public class Sectors{
         }
         grid.clear();
 
-        Array<Sector> out = Settings.getObject("sector-data-2", Array.class, Array::new);
+        Array<Sector> out = Core.settings.getObject("sector-data-2", Array.class, Array::new);
 
         for(Sector sector : out){
             
@@ -190,8 +190,8 @@ public class Sectors{
             }
         }
 
-        Settings.putObject("sector-data-2", out);
-        Settings.save();
+        Core.settings.putObject("sector-data-2", out);
+        Core.settings.save();
     }
 
     private void initSector(Sector sector){
@@ -307,7 +307,7 @@ public class Sectors{
                 }
             }
 
-            Core.app.postRunnable(() -> {
+            Core.app.post(() -> {
                 sector.texture = new Texture(pixmap);
                 pixmap.dispose();
             });

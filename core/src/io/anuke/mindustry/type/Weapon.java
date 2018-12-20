@@ -11,13 +11,13 @@ import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Angles;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Translator;
 
 public class Weapon extends Content{
     public final String name;

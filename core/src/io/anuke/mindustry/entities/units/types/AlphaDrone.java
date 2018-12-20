@@ -15,8 +15,8 @@ import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -72,7 +72,7 @@ public class AlphaDrone extends FlyingUnit {
         if(drone == null) return;
         Effects.effect(UnitFx.pickup, drone);
         //must run afterwards so the unit's group is not null when sending the removal packet
-        threads.runDelay(drone::remove);
+        Core.app.post(drone::remove);
     }
 
     @Override

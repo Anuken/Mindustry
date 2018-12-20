@@ -13,15 +13,15 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Fill;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Tmp;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -52,7 +52,7 @@ public class OverlayRenderer{
     public void drawTop(){
 
         for(Player player : playerGroup.all()){
-            if(Settings.getBool("indicators") && player != players[0] && player.getTeam() == players[0].getTeam()){
+            if(Core.settings.getBool("indicators") && player != players[0] && player.getTeam() == players[0].getTeam()){
                 if(!rect.setSize(Core.camera.viewportWidth * Core.camera.zoom * 0.9f, Core.camera.viewportHeight * Core.camera.zoom * 0.9f)
                 .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
 
@@ -91,7 +91,7 @@ public class OverlayRenderer{
                         if(dst < state.mode.enemyCoreBuildRadius * 1.5f){
                             Draw.color(Color.DARK_GRAY);
                             Lines.poly(core.drawx(), core.drawy() - 2, 200, state.mode.enemyCoreBuildRadius);
-                            Draw.color(Palette.accent, enemy.color, 0.5f + Mathf.absin(Timers.time(), 10f, 0.5f));
+                            Draw.color(Palette.accent, enemy.color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
                             Lines.poly(core.drawx(), core.drawy(), 200, state.mode.enemyCoreBuildRadius);
                         }
                     }
@@ -185,14 +185,14 @@ public class OverlayRenderer{
                 float size = 8;
                 Draw.rect(player.inventory.getItem().item.region, v.x, v.y, size, size);
                 Draw.color(Palette.accent);
-                Lines.circle(v.x, v.y, 6 + Mathf.absin(Timers.time(), 5f, 1f));
+                Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time(), 5f, 1f));
                 Draw.reset();
 
                 Tile tile = world.tileWorld(v.x, v.y);
                 if(tile != null) tile = tile.target();
                 if(tile != null && tile.getTeam() == player.getTeam() && tile.block().acceptStack(player.inventory.getItem().item, player.inventory.getItem().amount, tile, player) > 0){
                     Draw.color(Palette.place);
-                    Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1 + Mathf.absin(Timers.time(), 5f, 1f));
+                    Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1 + Mathf.absin(Time.time(), 5f, 1f));
                     Draw.color();
                 }
             }

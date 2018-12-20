@@ -10,10 +10,10 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Mathf;
 
 public class Blocks extends BlockList implements ContentList{
     public static Block air, blockpart, spawn, space, metalfloor, deepwater, water, lava, tar, stone,
@@ -41,7 +41,7 @@ public class Blocks extends BlockList implements ContentList{
 
             public void draw(Tile tile){
                 Draw.color(Color.SCARLET);
-                Lines.circle(tile.worldx(), tile.worldy(), 4f +Mathf.absin(Timers.time(), 6f, 6f));
+                Lines.circle(tile.worldx(), tile.worldy(), 4f +Mathf.absin(Time.time(), 6f, 6f));
                 Draw.color();
             }
         };

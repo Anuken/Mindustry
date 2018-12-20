@@ -6,9 +6,9 @@ import com.badlogic.gdx.utils.JsonWriter.OutputType;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.OS;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.OS;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -25,7 +25,7 @@ public class CrashHandler{
 
         try{
             //check crash report setting
-            if(!Settings.getBool("crashreport")){
+            if(!Core.settings.getBool("crashreport")){
                 return;
             }
         }catch(Throwable ignored){

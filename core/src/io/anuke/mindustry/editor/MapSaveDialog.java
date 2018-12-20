@@ -3,9 +3,9 @@ package io.anuke.mindustry.editor;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.TextField;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.TextField;
 
 import static io.anuke.mindustry.Vars.ui;
 import static io.anuke.mindustry.Vars.world;

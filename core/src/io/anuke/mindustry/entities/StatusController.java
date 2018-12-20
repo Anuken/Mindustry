@@ -6,10 +6,10 @@ import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.traits.Saveable;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Pooling;
-import io.anuke.ucore.util.ThreadArray;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.util.Pooling;
+import io.anuke.arc.util.ThreadArray;
+import io.anuke.arc.util.Tmp;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -88,7 +88,7 @@ public class StatusController implements Saveable{
         removals.clear();
 
         for(StatusEntry entry : statuses){
-            entry.time = Math.max(entry.time - Timers.delta(), 0);
+            entry.time = Math.max(entry.time - Time.delta(), 0);
 
             if(entry.time <= 0){
                 Pooling.free(entry);

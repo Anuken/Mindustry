@@ -13,12 +13,12 @@ import io.anuke.mindustry.world.consumers.ConsumeItems;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Fill;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -177,12 +177,12 @@ public class Smelter extends Block{
         if(entity.heat > 0f){
             float g = 0.1f;
 
-            Draw.alpha(((1f - g) + Mathf.absin(Timers.time(), 8f, g)) * entity.heat);
+            Draw.alpha(((1f - g) + Mathf.absin(Time.time(), 8f, g)) * entity.heat);
 
             Draw.tint(flameColor);
-            Fill.circle(tile.drawx(), tile.drawy(), 2f + Mathf.absin(Timers.time(), 5f, 0.8f));
+            Fill.circle(tile.drawx(), tile.drawy(), 2f + Mathf.absin(Time.time(), 5f, 0.8f));
             Draw.color(1f, 1f, 1f, entity.heat);
-            Fill.circle(tile.drawx(), tile.drawy(), 1f + Mathf.absin(Timers.time(), 5f, 0.7f));
+            Fill.circle(tile.drawx(), tile.drawy(), 1f + Mathf.absin(Time.time(), 5f, 0.7f));
 
             Draw.color();
         }

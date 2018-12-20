@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.meta;
 
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.util.Bundles;
 
 import java.util.Locale;
 
@@ -22,6 +22,6 @@ public enum StatUnit{
 
     public String localized(){
         if(this == none) return "";
-        return Bundles.get("text.unit." + name().toLowerCase(Locale.ROOT));
+        return Core.bundle.get("text.unit." + name().toLowerCase(Locale.ROOT));
     }
 }

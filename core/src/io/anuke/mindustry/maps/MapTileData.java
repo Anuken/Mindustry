@@ -4,8 +4,8 @@ import io.anuke.arc.utils.IntIntMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.Block;
-import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Structs;
+import io.anuke.arc.util.Bits;
+import io.anuke.arc.util.Structs;
 
 import java.nio.ByteBuffer;
 

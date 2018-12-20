@@ -10,9 +10,9 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.*;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.*;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -99,7 +99,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             });
 
             if(target != null){
-                circle(60f + Mathf.absin(Timers.time() + id * 23525, 70f, 1200f));
+                circle(60f + Mathf.absin(Time.time() + id * 23525, 70f, 1200f));
             }
         }
     },
@@ -200,11 +200,11 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected void wobble(){
         if(Net.client()) return;
 
-        x += Mathf.sin(Timers.time() + id * 999, 25f, 0.08f)*Timers.delta();
-        y += Mathf.cos(Timers.time() + id * 999, 25f, 0.08f)*Timers.delta();
+        x += Mathf.sin(Time.time() + id * 999, 25f, 0.08f)*Time.delta();
+        y += Mathf.cos(Time.time() + id * 999, 25f, 0.08f)*Time.delta();
 
         if(velocity.len() <= 0.05f){
-            rotation += Mathf.sin(Timers.time() + id * 99, 10f, 2.5f)*Timers.delta();
+            rotation += Mathf.sin(Time.time() + id * 99, 10f, 2.5f)*Time.delta();
         }
     }
 
@@ -225,7 +225,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             vec.rotate((circleLength - vec.len()) / circleLength * 180f);
         }
 
-        vec.setLength(speed * Timers.delta());
+        vec.setLength(speed * Time.delta());
 
         velocity.add(vec);
     }
@@ -237,7 +237,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((distanceTo(target) - circleLength) / 100f, -1f, 1f);
 
-        vec.setLength(type.speed * Timers.delta() * length);
+        vec.setLength(type.speed * Time.delta() * length);
         if(length < 0) vec.rotate(180f);
 
         velocity.add(vec);
@@ -255,7 +255,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             vec.setAngle(Mathf.slerpDelta(velocity.angle(), vec.angle(), 0.44f));
         }
 
-        vec.setLength(type.speed * Timers.delta());
+        vec.setLength(type.speed * Time.delta());
 
         velocity.add(vec);
     }

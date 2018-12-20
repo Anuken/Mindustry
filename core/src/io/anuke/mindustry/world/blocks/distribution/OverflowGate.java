@@ -3,8 +3,8 @@ package io.anuke.mindustry.world.blocks.distribution;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.util.Mathf;
 
 public class OverflowGate extends Router{
 
@@ -23,7 +23,7 @@ public class OverflowGate extends Router{
         }
 
         if(entity.lastItem != null){
-            entity.time += 1f/speed * Timers.delta();
+            entity.time += 1f/speed * Time.delta();
             Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
 
             if(target != null && (entity.time >= 1f)){

@@ -10,8 +10,8 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.util.Pooling;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.util.Pooling;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 
@@ -71,7 +71,7 @@ public class KryoClient implements ClientProvider{
                 c.id = connection.getID();
                 if(connection.getRemoteAddressTCP() != null) c.addressTCP = connection.getRemoteAddressTCP().toString();
 
-                threads.runDelay(() -> Net.handleClientReceived(c));
+                Core.app.post(() -> Net.handleClientReceived(c));
             }
 
             @Override
@@ -81,14 +81,14 @@ public class KryoClient implements ClientProvider{
                 }
 
                 Disconnect c = new Disconnect();
-                threads.runDelay(() -> Net.handleClientReceived(c));
+                Core.app.post(() -> Net.handleClientReceived(c));
             }
 
             @Override
             public void received(Connection connection, Object object){
                 if(object instanceof FrameworkMessage) return;
 
-                threads.runDelay(() -> {
+                Core.app.post(() -> {
                     try{
                         Net.handleClientReceived(object);
                     }catch(Exception e){

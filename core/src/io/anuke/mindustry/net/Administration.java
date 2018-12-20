@@ -4,7 +4,7 @@ import io.anuke.arc.utils.Array;
 import io.anuke.arc.utils.ObjectMap;
 import io.anuke.arc.utils.ObjectSet;
 import io.anuke.annotations.Annotations.Serialize;
-import io.anuke.ucore.core.Settings;
+import io.anuke.arc.core.Settings;
 
 import static io.anuke.mindustry.Vars.headless;
 
@@ -15,7 +15,7 @@ public class Administration{
     private Array<String> bannedIPs = new Array<>();
 
     public Administration(){
-        Settings.defaultList(
+        Core.settings.defaultList(
             "strict", true
         );
 
@@ -23,21 +23,21 @@ public class Administration{
     }
 
     public void setStrict(boolean on){
-        Settings.putBool("strict", on);
-        Settings.save();
+        Core.settings.putBool("strict", on);
+        Core.settings.save();
     }
 
     public boolean getStrict(){
-        return Settings.getBool("strict");
+        return Core.settings.getBool("strict");
     }
 
     public boolean allowsCustomClients(){
-        return Settings.getBool("allow-custom", !headless);
+        return Core.settings.getBool("allow-custom", !headless);
     }
 
     public void setCustomClients(boolean allowed){
-        Settings.putBool("allow-custom", allowed);
-        Settings.save();
+        Core.settings.putBool("allow-custom", allowed);
+        Core.settings.save();
     }
 
     /**Call when a player joins to update their information here.*/
@@ -256,15 +256,15 @@ public class Administration{
     }
 
     public void save(){
-        Settings.putObject("player-info", playerInfo);
-        Settings.putObject("banned-ips", bannedIPs);
-        Settings.save();
+        Core.settings.putObject("player-info", playerInfo);
+        Core.settings.putObject("banned-ips", bannedIPs);
+        Core.settings.save();
     }
 
     @SuppressWarnings("unchecked")
     private void load(){
-        playerInfo = Settings.getObject("player-info", ObjectMap.class, ObjectMap::new);
-        bannedIPs = Settings.getObject("banned-ips", Array.class, Array::new);
+        playerInfo = Core.settings.getObject("player-info", ObjectMap.class, ObjectMap::new);
+        bannedIPs = Core.settings.getObject("banned-ips", Array.class, Array::new);
     }
 
     @Serialize

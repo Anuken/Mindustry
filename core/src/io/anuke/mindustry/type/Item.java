@@ -7,11 +7,11 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Strings;
 
 public class Item extends UnlockableContent implements Comparable<Item>{
     public final String name;
@@ -46,9 +46,9 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     public Item(String name, Color color){
         this.name = name;
         this.color = color;
-        this.description = Bundles.getOrNull("item." + this.name + ".description");
+        this.description = Core.bundle.getOrNull("item." + this.name + ".description");
 
-        if(!Bundles.has("item." + this.name + ".name")){
+        if(!Core.bundle.has("item." + this.name + ".name")){
             Log.err("Warning: item '" + name + "' is missing a localized name. Add the following to bundle.properties:");
             Log.err("item." + this.name + ".name=" + Strings.capitalize(name.replace('-', '_')));
         }
@@ -70,7 +70,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
 
     @Override
     public String localizedName(){
-        return Bundles.get("item." + this.name + ".name");
+        return Core.bundle.get("item." + this.name + ".name");
     }
 
     @Override

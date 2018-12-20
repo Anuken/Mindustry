@@ -2,7 +2,7 @@ package io.anuke.mindustry.maps;
 
 import io.anuke.arc.utils.IntIntMap;
 import io.anuke.arc.utils.ObjectMap;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.util.Bundles;
 
 public class MapMeta{
     public final int version;
@@ -31,7 +31,7 @@ public class MapMeta{
     }
 
     public String tag(String name){
-        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Bundles.get("text.unknown");
+        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Core.bundle.get("text.unknown");
     }
 
     public boolean hasOreGen(){

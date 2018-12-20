@@ -1,6 +1,6 @@
 package io.anuke.mindustry.maps.missions;
 
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.util.Bundles;
 
 import static io.anuke.mindustry.Vars.threads;
 
@@ -27,6 +27,6 @@ public class ActionMission extends Mission{
 
     @Override
     public String displayString(){
-        return Bundles.get("text.loading");
+        return Core.bundle.get("text.loading");
     }
 }

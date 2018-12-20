@@ -10,9 +10,9 @@ import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.ucore.util.Structs;
-import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Bits;
+import io.anuke.arc.util.Mathf;
 import static io.anuke.mindustry.Vars.content;
 public class MapEditor{
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15};

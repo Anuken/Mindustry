@@ -14,10 +14,10 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.util.Bits;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.util.Bits;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -151,7 +151,7 @@ public class NetworkIO{
         Player player = players[0];
 
         try(DataInputStream stream = new DataInputStream(is)){
-            Timers.clear();
+            Time.clear();
 
             //general state
             byte mode = stream.readByte();

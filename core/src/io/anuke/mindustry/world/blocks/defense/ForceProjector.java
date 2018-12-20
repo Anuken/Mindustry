@@ -14,16 +14,16 @@ import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityQuery;
-import io.anuke.ucore.entities.impl.BaseEntity;
-import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.entities.impl.BaseEntity;
+import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Fill;
+import io.anuke.arc.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -95,7 +95,7 @@ public class ForceProjector extends Block {
 
         entity.radscl = Mathf.lerpDelta(entity.radscl, entity.broken ? 0f : 1f, 0.05f);
 
-        if(Mathf.chance(Timers.delta() * entity.buildup / breakage * 0.1f)){
+        if(Mathf.chance(Time.delta() * entity.buildup / breakage * 0.1f)){
             Effects.effect(BlockFx.reactorsmoke, tile.drawx() + Mathf.range(tilesize/2f), tile.drawy() + Mathf.range(tilesize/2f));
         }
 
@@ -117,7 +117,7 @@ public class ForceProjector extends Block {
                 scale *= (cooldownLiquid * (1f+(entity.liquids.current().heatCapacity-0.4f)*0.9f));
             }
 
-            entity.buildup -= Timers.delta()*scale;
+            entity.buildup -= Time.delta()*scale;
         }
 
         if(entity.broken && entity.buildup <= 0 && entity.warmup >= 0.9f){
@@ -131,7 +131,7 @@ public class ForceProjector extends Block {
         }
 
         if(entity.hit > 0f){
-            entity.hit -= 1f/5f * Timers.delta();
+            entity.hit -= 1f/5f * Time.delta();
         }
 
         float realRadius = realRadius(entity);

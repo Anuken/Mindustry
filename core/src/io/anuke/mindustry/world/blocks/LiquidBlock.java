@@ -5,7 +5,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.ucore.graphics.Draw;
+import io.anuke.arc.graphics.Draw;
 
 public class LiquidBlock extends Block{
     protected TextureRegion liquidRegion, bottomRegion, topRegion;

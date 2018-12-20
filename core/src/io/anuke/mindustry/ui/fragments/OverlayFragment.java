@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.ucore.scene.Group;
+import io.anuke.arc.scene.Group;
 
 /**
  * Fragment for displaying overlays such as block inventories. One is created for each input handler.

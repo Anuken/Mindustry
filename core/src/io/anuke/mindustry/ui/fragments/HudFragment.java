@@ -18,21 +18,21 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.Minimap;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.ucore.core.*;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.Label;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Stack;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.core.*;
+import io.anuke.arc.graphics.Hue;
+import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.ImageButton;
+import io.anuke.arc.scene.ui.Label;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.layout.Stack;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -139,7 +139,7 @@ public class HudFragment extends Fragment{
                 if(Net.hasClient()){
                     t.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
                 }
-            }).size(-1).visible(() -> Settings.getBool("fps")).update(t -> t.setTranslation(0, (!waves.isVisible() ? wavetable.getHeight() : Math.min(wavetable.getTranslation().y, wavetable.getHeight())))).get();
+            }).size(-1).visible(() -> Core.settings.getBool("fps")).update(t -> t.setTranslation(0, (!waves.isVisible() ? wavetable.getHeight() : Math.min(wavetable.getTranslation().y, wavetable.getHeight())))).get();
 
             //make wave box appear below rest of menu
             if(mobile){
@@ -149,7 +149,7 @@ public class HudFragment extends Fragment{
 
         //minimap
         parent.fill(t -> t.top().right().add(new Minimap())
-        .visible(() -> !state.is(State.menu) && Settings.getBool("minimap")));
+        .visible(() -> !state.is(State.menu) && Core.settings.getBool("minimap")));
 
         //paused table
         parent.fill(t -> {
@@ -193,12 +193,12 @@ public class HudFragment extends Fragment{
                     coreAttackOpacity = Mathf.lerpDelta(coreAttackOpacity, 0f, 0.1f);
                 }
 
-                coreAttackTime -= Timers.delta();
+                coreAttackTime -= Time.delta();
 
                 return coreAttackOpacity > 0;
             });
             t.table("button", top -> top.add("$text.coreattack").pad(2)
-                .update(label -> label.setColor(Hue.mix(Color.ORANGE, Color.SCARLET, Mathf.absin(Timers.time(), 2f, 1f)))));
+                .update(label -> label.setColor(Hue.mix(Color.ORANGE, Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)))));
         });
 
         //'saving' indicator
@@ -378,9 +378,9 @@ public class HudFragment extends Fragment{
                     enemiesf.get(state.enemies())) :
                 wavef.get(state.wave) + "\n" +
                     (!state.mode.disableWaveTimer ?
-                    Bundles.format("text.wave.waiting", (int)(state.wavetime/60)) :
-                    Bundles.get("text.waiting"))) :
-            Bundles.format("text.mission.display", world.getSector().currentMission().displayString())).growX().pad(8f);
+                    Core.bundle.format("text.wave.waiting", (int)(state.wavetime/60)) :
+                    Core.bundle.get("text.waiting"))) :
+            Core.bundle.format("text.mission.display", world.getSector().currentMission().displayString())).growX().pad(8f);
 
         table.clicked(() -> {
             if(world.getSector() != null && world.getSector().currentMission().hasMessage()){

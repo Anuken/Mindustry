@@ -2,8 +2,8 @@ package io.anuke.mindustry.world;
 
 import io.anuke.arc.utils.NumberUtils;
 import io.anuke.mindustry.type.Item;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Bits;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.util.Bits;
 import static io.anuke.mindustry.Vars.*;
 
 public class ItemBuffer{
@@ -23,7 +23,7 @@ public class ItemBuffer{
 
     public void accept(Item item, short data){
         //if(!accepts()) return;
-        buffer[index++] = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), Bits.packInt((short) item.id, data));
+        buffer[index++] = Bits.packLong(NumberUtils.floatToIntBits(Time.time()), Bits.packInt((short) item.id, data));
     }
 
     public void accept(Item item){
@@ -35,7 +35,7 @@ public class ItemBuffer{
             long l = buffer[0];
             float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
 
-            if(Timers.time() >= time + speed || Timers.time() < time){
+            if(Time.time() >= time + speed || Time.time() < time){
                 return content.item(Bits.getLeftShort(Bits.getRightInt(l)));
             }
         }
@@ -47,7 +47,7 @@ public class ItemBuffer{
             long l = buffer[0];
             float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
 
-            if(Timers.time() >= time + speed || Timers.time() < time){
+            if(Time.time() >= time + speed || Time.time() < time){
                 return Bits.getRightShort(Bits.getRightInt(l));
             }
         }

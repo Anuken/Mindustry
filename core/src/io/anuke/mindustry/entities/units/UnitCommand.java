@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities.units;
 
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.util.Bundles;
 
 public enum UnitCommand{
     attack, retreat, patrol;
@@ -8,7 +8,7 @@ public enum UnitCommand{
     private final String localized;
 
     UnitCommand(){
-        localized = Bundles.get("command." + name());
+        localized = Core.bundle.get("command." + name());
     }
 
     public String localized(){

@@ -6,7 +6,7 @@ import io.anuke.mindustry.core.NetServer;
 import io.anuke.mindustry.core.World;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.io.BundleLoader;
-import io.anuke.ucore.modules.ModuleCore;
+import io.anuke.arc.modules.ModuleCore;
 
 import static io.anuke.mindustry.Vars.*;
 

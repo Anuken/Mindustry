@@ -23,30 +23,30 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.entities.EntityDraw;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.EffectEntity;
-import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.graphics.Surface;
-import io.anuke.ucore.modules.RendererModule;
-import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Pooling;
-import io.anuke.ucore.util.Translator;
+import io.anuke.arc.core.Core;
+import io.anuke.arc.core.Effects;
+import io.anuke.arc.core.Graphics;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.entities.EntityDraw;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.EffectEntity;
+import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.arc.entities.trait.Entity;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.graphics.Surface;
+import io.anuke.arc.modules.RendererModule;
+import io.anuke.arc.scene.utils.Cursors;
+import io.anuke.arc.util.Bundles;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Pooling;
+import io.anuke.arc.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.core.Core.batch;
-import static io.anuke.ucore.core.Core.camera;
+import static io.anuke.arc.core.Core.batch;
+import static io.anuke.arc.core.Core.camera;
 
 public class Renderer extends RendererModule{
     public final Surface effectSurface;
@@ -69,7 +69,7 @@ public class Renderer extends RendererModule{
         Core.cameraScale = baseCameraScale;
         Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
             if(effect == Fx.none) return;
-            if(Settings.getBool("effects")){
+            if(Core.settings.getBool("effects")){
                 Rectangle view = rect.setSize(camera.viewportWidth, camera.viewportHeight)
                         .setCenter(camera.position.x, camera.position.y);
                 Rectangle pos = rect2.setSize(effect.size).setCenter(x, y);
@@ -381,7 +381,7 @@ public class Renderer extends RendererModule{
     }
 
     public void clampScale(){
-        float s = io.anuke.ucore.scene.ui.layout.Unit.dp.scl(1f);
+        float s = io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f);
         targetscale = Mathf.clamp(targetscale, Math.round(s * 2), Math.round(s * 5));
     }
 
@@ -422,7 +422,7 @@ public class Renderer extends RendererModule{
         pixelSurface.setSize(pw, ph, false);
         Graphics.getEffectSurface().setSize(pw, ph, false);
 
-        ui.showInfoFade(Bundles.format("text.screenshot", file.toString()));
+        ui.showInfoFade(Core.bundle.format("text.screenshot", file.toString()));
     }
 
 }

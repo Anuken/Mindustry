@@ -3,7 +3,7 @@ package io.anuke.mindustry.maps.missions;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.util.Bundles;
 
 public class UnitMission extends Mission{
     private final UnitType type;
@@ -24,6 +24,6 @@ public class UnitMission extends Mission{
 
     @Override
     public String displayString(){
-        return Bundles.format("text.mission.unit", type.localizedName());
+        return Core.bundle.format("text.mission.unit", type.localizedName());
     }
 }

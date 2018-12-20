@@ -29,11 +29,11 @@ import io.anuke.mindustry.world.blocks.power.SolarGenerator;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.storage.StorageBlock;
 import io.anuke.mindustry.world.blocks.units.UnitFactory;
-import io.anuke.ucore.function.BiFunction;
-import io.anuke.ucore.function.IntPositionConsumer;
-import io.anuke.ucore.function.TriFunction;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.function.BiFunction;
+import io.anuke.arc.function.IntPositionConsumer;
+import io.anuke.arc.function.TriFunction;
+import io.anuke.arc.util.Geometry;
+import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
 

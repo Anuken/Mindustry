@@ -7,9 +7,9 @@ import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -76,12 +76,12 @@ public abstract class Mission{
     }
 
     public void onBegin(){
-        Timers.runTask(60f, this::showMessage);
+        Time.runTask(60f, this::showMessage);
     }
 
     public void onComplete(){
         if(showComplete && !headless){
-            threads.runGraphics(() -> ui.hudfrag.showToast("[LIGHT_GRAY]"+menuDisplayString() + ":\n" + Bundles.get("text.mission.complete")));
+            threads.runGraphics(() -> ui.hudfrag.showToast("[LIGHT_GRAY]"+menuDisplayString() + ":\n" + Core.bundle.get("text.mission.complete")));
         }
     }
 

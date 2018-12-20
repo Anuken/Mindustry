@@ -6,8 +6,8 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.Drill;
-import io.anuke.ucore.util.Structs;
-import io.anuke.ucore.util.SeedRandom;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.SeedRandom;
 
 public class Generation{
     public final Sector sector;

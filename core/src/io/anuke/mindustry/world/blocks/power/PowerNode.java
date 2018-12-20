@@ -12,13 +12,13 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
+import io.anuke.arc.core.Settings;
+import io.anuke.arc.core.Timers;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Angles;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -159,7 +159,7 @@ public class PowerNode extends PowerBlock{
 
         Lines.stroke(1f);
         Lines.circle(tile.drawx(), tile.drawy(),
-                tile.block().size * tilesize / 2f + 1f + Mathf.absin(Timers.time(), 4f, 1f));
+                tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time(), 4f, 1f));
 
         Lines.poly(tile.drawx(), tile.drawy(), 50, laserRange*tilesize);
 
@@ -173,7 +173,7 @@ public class PowerNode extends PowerBlock{
                     Draw.color(linked ? Palette.place : Palette.breakInvalid);
 
                     Lines.circle(link.drawx(), link.drawy(),
-                            link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Timers.time(), 4f, 1f)));
+                            link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
 
                     if((entity.power.links.size >= maxNodes || (link.block() instanceof PowerNode && link.entity.power.links.size >= ((PowerNode) link.block()).maxNodes)) && !linked){
                         Draw.color();
@@ -196,7 +196,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void drawLayer(Tile tile){
-        if(!Settings.getBool("lasers")) return;
+        if(!Core.settings.getBool("lasers")) return;
 
         TileEntity entity = tile.entity();
 
@@ -250,7 +250,7 @@ public class PowerNode extends PowerBlock{
         x2 += t2.x;
         y2 += t2.y;
 
-        Draw.color(Palette.powerLight, Palette.power, Mathf.absin(Timers.time(), 8f, 1f));
+        Draw.color(Palette.powerLight, Palette.power, Mathf.absin(Time.time(), 8f, 1f));
         Lines.stroke(2f);
         Lines.line(x1, y1, x2, y2);
     }

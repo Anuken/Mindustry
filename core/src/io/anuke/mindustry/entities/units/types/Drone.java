@@ -20,11 +20,11 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Structs;
+import io.anuke.arc.core.Events;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.util.Geometry;
+import io.anuke.arc.util.Mathf;
+import io.anuke.arc.util.Structs;
 
 import java.io.DataInput;
 import java.io.DataOutput;
