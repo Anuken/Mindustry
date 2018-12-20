@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Align;
+import io.anuke.arc.Core;
+import io.anuke.arc.Input.Keys;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.utils.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.graphics.Palette;
@@ -178,7 +178,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                                 file.deleteDirectory();
                             }
 
-                            Gdx.app.exit();
+                            Core.app.exit();
                         });
                     });
                     dialog.content().row();
@@ -192,18 +192,18 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Bundles.get("setting.fpscap.none") : Bundles.format("setting.fpscap.text", s)));
 
         if(!mobile){
-            graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
+            graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
                 if(b){
-                    Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+                    Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
                 }else{
-                    Gdx.graphics.setWindowedMode(600, 480);
+                    Core.graphics.setWindowedMode(600, 480);
                 }
             });
 
-            Gdx.graphics.setVSync(Settings.getBool("vsync"));
+            Core.graphics.setVSync(Settings.getBool("vsync"));
             if(Settings.getBool("fullscreen")){
-                Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+                Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
             }
         }
 

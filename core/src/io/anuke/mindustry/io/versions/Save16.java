@@ -1,6 +1,6 @@
 package io.anuke.mindustry.io.versions;
 
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.utils.TimeUtils;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Version;

@@ -1,10 +1,10 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.MathUtils;
+import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;

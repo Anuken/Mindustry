@@ -1,8 +1,8 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.utils.ObjectSet;
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.ucore.core.Settings;
 

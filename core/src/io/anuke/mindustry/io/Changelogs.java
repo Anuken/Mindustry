@@ -1,8 +1,8 @@
 package io.anuke.mindustry.io;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.JsonReader;
+import io.anuke.arc.utils.JsonValue;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.function.Consumer;
 

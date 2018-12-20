@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.TileEntity;

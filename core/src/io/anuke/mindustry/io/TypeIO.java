@@ -1,6 +1,6 @@
 package io.anuke.mindustry.io;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.annotations.Annotations.ReadClass;
 import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.mindustry.entities.Player;

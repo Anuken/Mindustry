@@ -1,9 +1,9 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Base64Coder;
+import io.anuke.arc.Core;
+import io.anuke.arc.Input.Keys;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.utils.Base64Coder;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
@@ -39,8 +39,8 @@ public abstract class Platform {
                     .visible(() -> !use[0].getSelection().isEmpty()).width(65f);
 
             dialog.content().addImageButton("icon-paste", "clear", 16*3, () ->
-                    use[0].paste(Gdx.app.getClipboard().getContents(), false))
-                    .visible(() -> Gdx.app.getClipboard() != null && Gdx.app.getClipboard().getContents() != null && !Gdx.app.getClipboard().getContents().isEmpty()).width(65f);
+                    use[0].paste(Core.app.getClipboard().getContents(), false))
+                    .visible(() -> Core.app.getClipboard() != null && Core.app.getClipboard().getContents() != null && !Core.app.getClipboard().getContents().isEmpty()).width(65f);
 
             TextField to = dialog.content().addField(field.getText(), t-> {}).pad(15).width(250f).get();
             to.setMaxLength(maxLength);
@@ -53,14 +53,14 @@ public abstract class Platform {
                 field.appendText(to.getText());
                 field.change();
                 dialog.hide();
-                Gdx.input.setOnscreenKeyboardVisible(false);
+                Core.input.setOnscreenKeyboardVisible(false);
             }).width(90f).name("okb");
 
             dialog.show();
             Timers.runTask(1f, () -> {
                 to.setCursorPosition(to.getText().length());
                 Core.scene.setKeyboardFocus(to);
-                Gdx.input.setOnscreenKeyboardVisible(true);
+                Core.input.setOnscreenKeyboardVisible(true);
             });
         });
     }

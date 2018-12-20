@@ -1,6 +1,6 @@
 package io.anuke.mindustry.maps;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.Mechs;

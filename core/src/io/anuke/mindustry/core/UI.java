@@ -1,14 +1,14 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.utils.Align;
+import io.anuke.arc.Core;
+import io.anuke.arc.Input.Keys;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Colors;
+import io.anuke.arc.graphics.g2d.BitmapFont;
+import io.anuke.arc.graphics.g2d.freetype.FreeTypeFontGenerator;
+import io.anuke.arc.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.utils.Align;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Palette;
@@ -70,7 +70,7 @@ public class UI extends SceneModule{
         Dialog.setShowAction(() -> sequence(
             alpha(0f),
             originCenter(),
-            moveToAligned(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f, Align.center),
+            moveToAligned(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Align.center),
             scaleTo(0.0f, 1f),
             parallel(
                 scaleTo(1f, 1f, 0.1f, Interpolation.fade),
@@ -96,7 +96,7 @@ public class UI extends SceneModule{
     }
     
     void generateFonts(){
-        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/pixel.ttf"));
+        generator = new FreeTypeFontGenerator(Core.files.internal("fonts/pixel.ttf"));
         FreeTypeFontParameter param = new FreeTypeFontParameter();
         param.size = (int)(14*2 * Math.max(Unit.dp.scl(1f), 0.5f));
         param.shadowColor = Color.DARK_GRAY;
@@ -113,7 +113,7 @@ public class UI extends SceneModule{
     protected void loadSkin(){
         skin = new Skin(Core.atlas);
         generateFonts();
-        skin.load(Gdx.files.internal("ui/uiskin.json"));
+        skin.load(Core.files.internal("ui/uiskin.json"));
 
         for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
             font.setUseIntegerPositions(true);
@@ -139,7 +139,7 @@ public class UI extends SceneModule{
 
                 float scl = Unit.dp.scl(3f);
 
-                Draw.rect("controller-cursor", input.getMouseX(), Gdx.graphics.getHeight() - input.getMouseY(), 16 * scl, 16 * scl);
+                Draw.rect("controller-cursor", input.getMouseX(), Core.graphics.getHeight() - input.getMouseY(), 16 * scl, 16 * scl);
             }
         }
 

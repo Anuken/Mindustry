@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities.units.types;
 
-import com.badlogic.gdx.utils.Queue;
+import io.anuke.arc.utils.Queue;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;

@@ -15,11 +15,13 @@ if(new File(settingsDir, 'local.properties').exists()){
 }
 
 if(System.properties["release"] == null || System.properties["release"] == "false"){
-    if (new File(settingsDir, '../uCore').exists()) {
-        include ':uCore'
-        project(':uCore').projectDir = new File(settingsDir, '../uCore')
+    if (new File(settingsDir, '../Arc').exists()) {
+        //ARC ARC ARC ARC ARC
+        include ':Arc'
+        project(':Arc').projectDir = new File(settingsDir, '../Arc')
+        include ':Arc:core'
+        project(':Arc:core').projectDir = new File(settingsDir, '../Arc/core')
     }
-
     if (new File(settingsDir, '../GDXGifRecorder').exists()) {
         include ':GDXGifRecorder'
         project(':GDXGifRecorder').projectDir = new File(settingsDir, '../GDXGifRecorder')

@@ -1,9 +1,9 @@
 package io.anuke.mindustry.input;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
+import io.anuke.arc.Core;
+import io.anuke.arc.InputAdapter;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.blocks.Blocks;
@@ -130,11 +130,11 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     public float getMouseX(){
-        return Gdx.input.getX();
+        return Core.input.getX();
     }
 
     public float getMouseY(){
-        return Gdx.input.getY();
+        return Core.input.getY();
     }
 
     public void resetCursor(){

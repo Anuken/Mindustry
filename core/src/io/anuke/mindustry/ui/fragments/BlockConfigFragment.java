@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
+import io.anuke.arc.Core;
+import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Align;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
@@ -75,7 +75,7 @@ public class BlockConfigFragment extends Fragment{
     }
 
     public boolean hasConfigMouse(){
-        Element e = Core.scene.hit(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), true);
+        Element e = Core.scene.hit(Core.input.getX(), Core.graphics.getHeight() - Core.input.getY(), true);
         return e != null && (e == table || e.isDescendantOf(table));
     }
 

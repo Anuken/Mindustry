@@ -17,6 +17,7 @@
             android:appCategory="game"
             android:label="@string/app_name"
             android:theme="@style/GdxTheme" android:fullBackupContent="@xml/backup_rules">
+        <meta-data android:name="android.max_aspect" android:value="2.1" />
         <activity
             android:name="io.anuke.mindustry.AndroidLauncher"
             android:label="@string/app_name"

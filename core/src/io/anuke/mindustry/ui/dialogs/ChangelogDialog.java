@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.Core;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.Changelogs;
 import io.anuke.mindustry.io.Changelogs.VersionInfo;
@@ -28,10 +28,10 @@ public class ChangelogDialog extends FloatingDialog{
         if(!ios && !OS.isMac){
             Changelogs.getChangelog(result -> {
                 versions = result;
-                Gdx.app.postRunnable(this::setup);
+                Core.app.postRunnable(this::setup);
             }, t -> {
                 Log.err(t);
-                Gdx.app.postRunnable(this::setup);
+                Core.app.postRunnable(this::setup);
             });
         }
     }

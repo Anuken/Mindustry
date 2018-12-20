@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;

@@ -1,8 +1,8 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectMap.Entry;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.utils.ObjectMap.Entry;
+import io.anuke.arc.utils.TimeUtils;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.GameMode;

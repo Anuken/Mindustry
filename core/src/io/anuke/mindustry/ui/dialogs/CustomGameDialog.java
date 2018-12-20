@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Scaling;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.utils.Align;
+import io.anuke.arc.utils.Scaling;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.maps.Map;
@@ -38,7 +38,7 @@ public class CustomGameDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = (Gdx.graphics.getHeight() > Gdx.graphics.getHeight() ? 2 : 4);
+        int maxwidth = (Core.graphics.getHeight() > Core.graphics.getHeight() ? 2 : 4);
 
         Table selmode = new Table();
         ButtonGroup<TextButton> group = new ButtonGroup<>();

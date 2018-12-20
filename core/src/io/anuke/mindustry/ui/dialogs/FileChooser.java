@@ -1,10 +1,10 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.Core;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.graphics.g2d.GlyphLayout;
+import io.anuke.arc.utils.Align;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.ucore.core.Core;
@@ -27,8 +27,8 @@ public class FileChooser extends FloatingDialog{
     public static Predicate<FileHandle> jpegFilter = file -> file.extension().equalsIgnoreCase("png") || file.extension().equalsIgnoreCase("jpg") || file.extension().equalsIgnoreCase("jpeg");
     public static Predicate<FileHandle> defaultFilter = file -> true;
     private Table files;
-    private FileHandle homeDirectory = Gdx.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" :
-            Gdx.files.getExternalStoragePath());
+    private FileHandle homeDirectory = Core.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" :
+            Core.files.getExternalStoragePath());
     private FileHandle directory = homeDirectory;
     private ScrollPane pane;
     private TextField navigation, filefield;
@@ -82,7 +82,7 @@ public class FileChooser extends FloatingDialog{
 
         pane = new ScrollPane(files){
             public float getPrefHeight(){
-                return Gdx.graphics.getHeight();
+                return Core.graphics.getHeight();
             }
         };
         pane.setOverscroll(false, false);
@@ -142,7 +142,7 @@ public class FileChooser extends FloatingDialog{
         content.add(icontable).expandX().fillX();
         content.row();
 
-        content.center().add(pane).width(UIUtils.portrait() ? Gdx.graphics.getWidth() / Unit.dp.scl(1) : Gdx.graphics.getWidth() / Unit.dp.scl(2)).colspan(3).grow();
+        content.center().add(pane).width(UIUtils.portrait() ? Core.graphics.getWidth() / Unit.dp.scl(1) : Core.graphics.getWidth() / Unit.dp.scl(2)).colspan(3).grow();
         content.row();
 
         if(!open){

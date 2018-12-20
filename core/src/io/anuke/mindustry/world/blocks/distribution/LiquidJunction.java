@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;

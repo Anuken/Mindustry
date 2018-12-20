@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.function.Consumer;
 import io.anuke.ucore.function.Supplier;

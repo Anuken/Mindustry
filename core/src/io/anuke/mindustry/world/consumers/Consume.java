@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.consumers;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;

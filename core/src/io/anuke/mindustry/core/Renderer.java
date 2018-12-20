@@ -1,16 +1,16 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.BufferUtils;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.Core;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Pixmap;
+import io.anuke.arc.graphics.PixmapIO;
+import io.anuke.arc.graphics.g2d.SpriteBatch;
+import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.BufferUtils;
+import io.anuke.arc.utils.ScreenUtils;
+import io.anuke.arc.utils.TimeUtils;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -173,11 +173,11 @@ public class Renderer extends RendererModule{
                 camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
             }
 
-            if(Gdx.graphics.getHeight() / Core.cameraScale % 2 == 1){
+            if(Core.graphics.getHeight() / Core.cameraScale % 2 == 1){
                 camera.position.add(0, -0.5f, 0);
             }
 
-            if(Gdx.graphics.getWidth() / Core.cameraScale % 2 == 1){
+            if(Core.graphics.getWidth() / Core.cameraScale % 2 == 1){
                 camera.position.add(-0.5f, 0, 0);
             }
 
@@ -187,7 +187,7 @@ public class Renderer extends RendererModule{
         }
 
         if(!ui.chatfrag.chatOpen()){
-            renderer.record(); //this only does something if GdxGifRecorder is on the class path, which it usually isn't
+            renderer.record(); //this only does something if CoreGifRecorder is on the class path, which it usually isn't
         }
     }
 

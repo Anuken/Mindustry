@@ -1,10 +1,10 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.maps.Sector;
@@ -118,7 +118,7 @@ public class SectorsDialog extends FloatingDialog{
         }).pad(-5).growX().padTop(0);
 
         table.pack();
-        table.act(Gdx.graphics.getDeltaTime());
+        table.act(Core.graphics.getDeltaTime());
     }
 
     public Sector getSelected(){

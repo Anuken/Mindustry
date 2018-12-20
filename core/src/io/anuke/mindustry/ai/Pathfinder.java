@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ai;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.Queue;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.utils.IntArray;
+import io.anuke.arc.utils.Queue;
+import io.anuke.arc.utils.TimeUtils;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;

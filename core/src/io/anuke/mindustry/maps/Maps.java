@@ -1,11 +1,11 @@
 package io.anuke.mindustry.maps;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.Core;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.Disposable;
+import io.anuke.arc.utils.ObjectMap;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.ucore.function.Supplier;
 import io.anuke.ucore.util.Log;
@@ -62,7 +62,7 @@ public class Maps implements Disposable{
     public void load(){
         try {
             for (String name : defaultMapNames) {
-                FileHandle file = Gdx.files.internal("maps/" + name + "." + mapExtension);
+                FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
                 loadMap(file.nameWithoutExtension(), file::read, false);
             }
         }catch (IOException e){

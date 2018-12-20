@@ -1,9 +1,9 @@
 package io.anuke.mindustry.entities.effect;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntSet;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.IntSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.bullets.TurretBullets;

@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ai;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.Squad;

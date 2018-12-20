@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.consumers;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;

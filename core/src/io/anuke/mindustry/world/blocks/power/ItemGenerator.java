@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;

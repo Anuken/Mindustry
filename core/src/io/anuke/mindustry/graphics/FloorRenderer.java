@@ -1,13 +1,13 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.IntSet.IntSetIterator;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.GL20;
+import io.anuke.arc.graphics.OrthographicCamera;
+import io.anuke.arc.utils.IntArray;
+import io.anuke.arc.utils.IntSet;
+import io.anuke.arc.utils.IntSet.IntSetIterator;
+import io.anuke.arc.utils.ObjectSet;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.world.Tile;
@@ -106,7 +106,7 @@ public class FloorRenderer{
         cbatch.setProjectionMatrix(Core.camera.combined);
         cbatch.beginDraw();
 
-        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Core.gl.glEnable(GL20.GL_BLEND);
     }
 
     public void endDraw(){

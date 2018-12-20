@@ -1,7 +1,7 @@
 package io.anuke.mindustry.maps.missions;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.Generation;

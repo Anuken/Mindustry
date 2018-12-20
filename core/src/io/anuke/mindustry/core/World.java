@@ -1,8 +1,8 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.ObjectMap;
 import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
 import io.anuke.mindustry.ai.WaveSpawner;

@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.consumers;
 
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.utils.ObjectSet;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;

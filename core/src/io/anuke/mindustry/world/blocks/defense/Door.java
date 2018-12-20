@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks.defense;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Rectangle;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;

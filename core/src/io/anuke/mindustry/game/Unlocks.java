@@ -1,7 +1,7 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.utils.ObjectSet;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.ucore.core.Events;

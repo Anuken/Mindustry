@@ -1,10 +1,10 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.IntSet.IntSetIterator;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.utils.IntArray;
+import io.anuke.arc.utils.IntSet;
+import io.anuke.arc.utils.IntSet.IntSetIterator;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Player;

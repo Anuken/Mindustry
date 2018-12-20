@@ -1,9 +1,9 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.Queue;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.IntSet;
+import io.anuke.arc.utils.ObjectSet;
+import io.anuke.arc.utils.Queue;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.threads;

@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.utils.Align;
+import io.anuke.arc.Input.Keys;
+import io.anuke.arc.utils.Align;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.scene.ui.Image;
 import io.anuke.ucore.scene.ui.KeybindDialog;

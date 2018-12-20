@@ -1,6 +1,6 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.utils.Scaling;
+import io.anuke.arc.utils.Scaling;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;

@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Input.Keys;
+import io.anuke.arc.Input.Keys;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 import io.anuke.ucore.scene.style.Drawable;

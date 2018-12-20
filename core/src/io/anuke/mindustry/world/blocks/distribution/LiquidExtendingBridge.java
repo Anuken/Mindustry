@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import com.badlogic.gdx.utils.IntSet.IntSetIterator;
+import io.anuke.arc.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Pos;

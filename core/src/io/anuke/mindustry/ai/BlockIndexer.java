@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ai;
 
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.*;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.*;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;

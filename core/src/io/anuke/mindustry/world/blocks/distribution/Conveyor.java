@@ -1,8 +1,8 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.LongArray;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.LongArray;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Layer;

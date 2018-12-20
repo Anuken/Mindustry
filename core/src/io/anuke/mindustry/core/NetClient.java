@@ -1,10 +1,10 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Base64Coder;
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.utils.Base64Coder;
+import io.anuke.arc.utils.IntSet;
+import io.anuke.arc.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.PacketPriority;
 import io.anuke.annotations.Annotations.Remote;
@@ -369,7 +369,7 @@ public class NetClient extends Module{
         ui.loadfrag.hide();
         ui.join.hide();
         Net.setClientLoaded(true);
-        Gdx.app.postRunnable(Call::connectConfirm);
+        Core.app.postRunnable(Call::connectConfirm);
         Timers.runTask(40f, Platform.instance::updateRPC);
     }
 

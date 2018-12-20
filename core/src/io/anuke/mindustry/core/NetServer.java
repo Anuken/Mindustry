@@ -1,13 +1,13 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Colors;
+import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.IntMap;
+import io.anuke.arc.utils.ObjectSet;
+import io.anuke.arc.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Mechs;

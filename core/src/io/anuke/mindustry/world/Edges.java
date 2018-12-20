@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Vector2;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.math.Vector2;
 import io.anuke.ucore.util.Geometry;
 import io.anuke.ucore.util.Mathf;
 

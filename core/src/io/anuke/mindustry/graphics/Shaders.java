@@ -1,8 +1,8 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
@@ -54,8 +54,8 @@ public class Shaders{
         public void apply(){
             time = time % 158;
 
-            shader.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            shader.setUniformi("u_time", (int)(time += Gdx.graphics.getDeltaTime() * 60f));
+            shader.setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
+            shader.setUniformi("u_time", (int)(time += Core.graphics.getDeltaTime() * 60f));
             shader.setUniformf("u_uv", Draw.getBlankRegion().getU(), Draw.getBlankRegion().getV());
             shader.setUniformf("u_scl", Unit.dp.scl(1f));
             shader.setUniformf("u_uv2", Draw.getBlankRegion().getU2(), Draw.getBlankRegion().getV2());

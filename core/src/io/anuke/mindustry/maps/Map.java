@@ -1,7 +1,7 @@
 package io.anuke.mindustry.maps;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.utils.ObjectMap;
 import io.anuke.ucore.function.Supplier;
 
 import java.io.InputStream;

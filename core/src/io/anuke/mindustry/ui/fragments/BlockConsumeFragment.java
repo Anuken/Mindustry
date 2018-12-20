@@ -1,10 +1,10 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Align;
+import io.anuke.arc.utils.ObjectSet;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Palette;
@@ -91,7 +91,7 @@ public class BlockConsumeFragment extends Fragment{
             table.setPosition(v.x, v.y, Align.topRight);
         });
 
-        table.act(Gdx.graphics.getDeltaTime());
+        table.act(Core.graphics.getDeltaTime());
     }
 
     public void hide(){

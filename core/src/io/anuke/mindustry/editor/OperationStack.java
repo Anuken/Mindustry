@@ -1,6 +1,6 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.utils.Array;
 
 public class OperationStack{
     private final static int maxSize = 10;

@@ -1,8 +1,8 @@
 package io.anuke.mindustry.net;
 
 
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.TimeUtils;
 import io.anuke.ucore.util.Mathf;
 
 public class Interpolator{

@@ -1,7 +1,7 @@
 package io.anuke.mindustry.maps;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.utils.Array;
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;

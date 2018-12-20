@@ -1,6 +1,6 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.ObjectIntMap;
+import io.anuke.arc.utils.ObjectIntMap;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.ucore.function.Supplier;
 

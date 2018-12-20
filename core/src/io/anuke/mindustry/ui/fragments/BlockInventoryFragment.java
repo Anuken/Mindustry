@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.IntSet;
+import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Align;
+import io.anuke.arc.utils.IntSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.core.GameState.State;

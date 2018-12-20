@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.TileEntity;

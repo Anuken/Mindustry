@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
@@ -18,7 +18,6 @@ public class BackgroundFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-
         Core.scene.table().addRect((a, b, w, h) -> {
             Draw.colorl(0.1f);
             Fill.crect(0, 0, w, h);
@@ -28,7 +27,7 @@ public class BackgroundFragment extends Fragment{
             Graphics.shader();
             Draw.color();
 
-            boolean portrait = Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
+            boolean portrait = Core.graphics.getWidth() < Core.graphics.getHeight();
             float logoscl = (int) Unit.dp.scl(7) * (portrait ? 5f / 7f : 1f);
             TextureRegion logo = Core.skin.getRegion("logotext");
             float logow = logo.getRegionWidth() * logoscl;

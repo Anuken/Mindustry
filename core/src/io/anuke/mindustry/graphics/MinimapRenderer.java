@@ -1,13 +1,13 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Pixmap;
+import io.anuke.arc.graphics.Pixmap.Format;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.Disposable;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -41,7 +41,7 @@ public class MinimapRenderer implements Disposable{
         });
 
         //make sure to call on the graphics thread
-        Events.on(TileChangeEvent.class, event -> Gdx.app.postRunnable(() -> update(event.tile)));
+        Events.on(TileChangeEvent.class, event -> Core.app.postRunnable(() -> update(event.tile)));
     }
 
     public Texture getTexture(){

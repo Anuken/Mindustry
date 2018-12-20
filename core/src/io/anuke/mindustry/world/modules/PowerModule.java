@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.modules;
 
-import com.badlogic.gdx.utils.IntArray;
+import io.anuke.arc.utils.IntArray;
 import io.anuke.mindustry.world.blocks.power.PowerGraph;
 
 import java.io.DataInput;

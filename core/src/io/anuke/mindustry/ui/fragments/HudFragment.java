@@ -1,12 +1,12 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Scaling;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.utils.Align;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.Scaling;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
@@ -134,7 +134,7 @@ public class HudFragment extends Fragment{
                 IntFormat fps = new IntFormat("text.fps");
                 IntFormat tps = new IntFormat("text.tps");
                 IntFormat ping = new IntFormat("text.ping");
-                t.label(() -> fps.get(Gdx.graphics.getFramesPerSecond())).padRight(10);
+                t.label(() -> fps.get(Core.graphics.getFramesPerSecond())).padRight(10);
                 t.row();
                 if(Net.hasClient()){
                     t.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);

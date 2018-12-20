@@ -1,10 +1,10 @@
 package io.anuke.mindustry.maps.generation;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntIntMap;
-import com.badlogic.gdx.utils.Predicate;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.IntIntMap;
+import io.anuke.arc.utils.Predicate;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.blocks.*;

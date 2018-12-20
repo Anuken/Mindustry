@@ -1,8 +1,8 @@
 package io.anuke.mindustry.io;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.I18NBundle;
+import io.anuke.arc.Core;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.utils.I18NBundle;
 import io.anuke.mindustry.Vars;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Settings;
@@ -42,7 +42,7 @@ public class BundleLoader{
         I18NBundle.setExceptionOnMissingKey(false);
         try{
             //try loading external bundle
-            FileHandle handle = Gdx.files.local("bundle");
+            FileHandle handle = Core.files.local("bundle");
 
             Locale locale = Locale.ENGLISH;
             Core.bundle = I18NBundle.createBundle(handle, locale);
@@ -54,7 +54,7 @@ public class BundleLoader{
         }catch(Throwable e){
             //no external bundle found
 
-            FileHandle handle = Gdx.files.internal("bundles/bundle");
+            FileHandle handle = Core.files.internal("bundles/bundle");
 
             Locale locale = getLocale();
             Locale.setDefault(locale);

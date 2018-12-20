@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.OrderedMap;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.utils.OrderedMap;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;

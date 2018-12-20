@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 
 public enum BarType{
     health(Color.SCARLET),

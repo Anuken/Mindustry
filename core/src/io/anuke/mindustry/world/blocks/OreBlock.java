@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.MathUtils;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;

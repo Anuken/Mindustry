@@ -1,6 +1,6 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;

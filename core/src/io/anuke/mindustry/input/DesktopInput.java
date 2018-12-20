@@ -1,7 +1,7 @@
 package io.anuke.mindustry.input;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -71,8 +71,8 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void drawOutlined(){
-        int cursorX = tileX(Gdx.input.getX());
-        int cursorY = tileY(Gdx.input.getY());
+        int cursorX = tileX(Core.input.getX());
+        int cursorY = tileY(Core.input.getY());
 
         //draw selection(s)
         if(mode == placing && recipe != null){
@@ -169,7 +169,7 @@ public class DesktopInput extends InputHandler{
 
         rotation = Mathf.mod(rotation + (int) Inputs.getAxisTapped(section, "rotate"), 4);
 
-        Tile cursor = tileAt(Gdx.input.getX(), Gdx.input.getY());
+        Tile cursor = tileAt(Core.input.getX(), Core.input.getY());
 
         if(player.isDead()){
             cursorType = normal;
@@ -199,9 +199,9 @@ public class DesktopInput extends InputHandler{
     }
 
     void pollInput(){
-        Tile selected = tileAt(Gdx.input.getX(), Gdx.input.getY());
-        int cursorX = tileX(Gdx.input.getX());
-        int cursorY = tileY(Gdx.input.getY());
+        Tile selected = tileAt(Core.input.getX(), Core.input.getY());
+        int cursorX = tileX(Core.input.getX());
+        int cursorY = tileY(Core.input.getY());
 
         if(Inputs.keyTap(section, "deselect")){
             player.setMineTile(null);
@@ -232,8 +232,8 @@ public class DesktopInput extends InputHandler{
         }else if(Inputs.keyTap(section, "break") && !ui.hasMouse()){
             //is recalculated because setting the mode to breaking removes potential multiblock cursor offset
             mode = breaking;
-            selectX = tileX(Gdx.input.getX());
-            selectY = tileY(Gdx.input.getY());
+            selectX = tileX(Core.input.getX());
+            selectY = tileY(Core.input.getY());
         }
 
 
@@ -278,12 +278,12 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public float getMouseX(){
-        return !controlling ? Gdx.input.getX() : controlx;
+        return !controlling ? Core.input.getX() : controlx;
     }
 
     @Override
     public float getMouseY(){
-        return !controlling ? Gdx.input.getY() : controly;
+        return !controlling ? Core.input.getY() : controly;
     }
 
     @Override
@@ -295,7 +295,7 @@ public class DesktopInput extends InputHandler{
     public void updateController(){
         //TODO no controller support
         //TODO move controller input to new class, ControllerInput
-        boolean mousemove = Gdx.input.getDeltaX() > 1 || Gdx.input.getDeltaY() > 1;
+        boolean mousemove = Core.input.getDeltaX() > 1 || Core.input.getDeltaY() > 1;
 
         if(state.is(State.menu)){
             droppingItem = false;
@@ -316,22 +316,22 @@ public class DesktopInput extends InputHandler{
                 controlling = true;
 
                 if(player.playerIndex == 0){
-                    Gdx.input.setCursorCatched(true);
+                    Core.input.setCursorCatched(true);
                 }
 
                 Inputs.getProcessor().touchDragged((int) getMouseX(), (int) getMouseY(), player.playerIndex);
             }
 
-            controlx = Mathf.clamp(controlx, 0, Gdx.graphics.getWidth());
-            controly = Mathf.clamp(controly, 0, Gdx.graphics.getHeight());
+            controlx = Mathf.clamp(controlx, 0, Core.graphics.getWidth());
+            controly = Mathf.clamp(controly, 0, Core.graphics.getHeight());
         }else{
             controlling = false;
-            Gdx.input.setCursorCatched(false);
+            Core.input.setCursorCatched(false);
         }
 
         if(!controlling){
-            controlx = Gdx.input.getX();
-            controly = Gdx.input.getY();
+            controlx = Core.input.getX();
+            controly = Core.input.getY();
         }
     }
 

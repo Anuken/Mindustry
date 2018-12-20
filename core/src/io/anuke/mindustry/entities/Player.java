@@ -1,11 +1,11 @@
 package io.anuke.mindustry.entities;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Queue;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.GlyphLayout;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Queue;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Mechs;

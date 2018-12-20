@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.traits.Saveable;
 import io.anuke.mindustry.type.ContentType;

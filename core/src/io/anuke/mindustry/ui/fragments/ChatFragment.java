@@ -1,13 +1,13 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.Core;
+import io.anuke.arc.Input.Keys;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Batch;
+import io.anuke.arc.graphics.g2d.BitmapFont;
+import io.anuke.arc.graphics.g2d.GlyphLayout;
+import io.anuke.arc.utils.Align;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.gen.Call;
@@ -129,7 +129,7 @@ public class ChatFragment extends Table{
                     chatfield.appendText(to.getText());
                     chatfield.change();
                     dialog.hide();
-                    Gdx.input.setOnscreenKeyboardVisible(false);
+                    Core.input.setOnscreenKeyboardVisible(false);
                     toggle();
                 }).width(90f).name("okb");
 
@@ -137,7 +137,7 @@ public class ChatFragment extends Table{
                 Timers.runTask(1f, () -> {
                     to.setCursorPosition(to.getText().length());
                     Core.scene.setKeyboardFocus(to);
-                    Gdx.input.setOnscreenKeyboardVisible(true);
+                    Core.input.setOnscreenKeyboardVisible(true);
                 });
             });
         }

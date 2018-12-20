@@ -1,7 +1,7 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -54,7 +54,7 @@ public class Control extends Module{
 
         Inputs.useControllers(true);
 
-        Gdx.input.setCatchBackKey(true);
+        Core.input.setCatchBackKey(true);
 
         Effects.setShakeFalloff(10000f);
 
@@ -99,7 +99,7 @@ public class Control extends Module{
 
         Events.on(WorldLoadGraphicsEvent.class, event -> {
             if(mobile){
-                Gdx.app.postRunnable(() -> Core.camera.position.set(players[0].x, players[0].y, 0));
+                Core.app.postRunnable(() -> Core.camera.position.set(players[0].x, players[0].y, 0));
             }
         });
 

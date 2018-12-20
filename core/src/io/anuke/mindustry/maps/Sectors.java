@@ -1,13 +1,13 @@
 package io.anuke.mindustry.maps;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Array.ArrayIterable;
-import com.badlogic.gdx.utils.async.AsyncExecutor;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Pixmap;
+import io.anuke.arc.graphics.Pixmap.Format;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.Array.ArrayIterable;
+import io.anuke.arc.utils.async.AsyncExecutor;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Difficulty;
@@ -307,7 +307,7 @@ public class Sectors{
                 }
             }
 
-            Gdx.app.postRunnable(() -> {
+            Core.app.postRunnable(() -> {
                 sector.texture = new Texture(pixmap);
                 pixmap.dispose();
             });

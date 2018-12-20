@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.utils.Scaling;
+import io.anuke.arc.utils.Scaling;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.scene.ui.Image;

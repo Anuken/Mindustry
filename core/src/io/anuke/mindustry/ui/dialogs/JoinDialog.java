@@ -1,8 +1,8 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.MathUtils;
+import io.anuke.arc.utils.Array;
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;

@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.meta.values;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.ItemDisplay;
 import io.anuke.mindustry.world.meta.StatValue;

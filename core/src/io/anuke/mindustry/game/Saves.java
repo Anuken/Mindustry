@@ -1,10 +1,10 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.IntArray;
+import io.anuke.arc.utils.IntMap;
+import io.anuke.arc.utils.TimeUtils;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.io.SaveIO;

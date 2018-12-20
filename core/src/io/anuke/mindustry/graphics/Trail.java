@@ -1,8 +1,8 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.FloatArray;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.FloatArray;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.graphics.Draw;
 import io.anuke.ucore.graphics.Fill;

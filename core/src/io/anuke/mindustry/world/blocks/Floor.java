@@ -1,10 +1,10 @@
 package io.anuke.mindustry.world.blocks;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.IntIntMap;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.MathUtils;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.IntIntMap;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.type.Liquid;

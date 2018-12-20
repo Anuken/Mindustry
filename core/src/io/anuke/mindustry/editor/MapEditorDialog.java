@@ -1,15 +1,15 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.Core;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Pixmap;
+import io.anuke.arc.graphics.g2d.Batch;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Align;
+import io.anuke.arc.utils.Disposable;
+import io.anuke.arc.utils.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.core.Platform;
@@ -341,8 +341,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
     public void build(){
         float amount = 10f, baseSize = 60f;
 
-        float size = mobile ? (int) (Math.min(Gdx.graphics.getHeight(), Gdx.graphics.getWidth()) / amount / Unit.dp.scl(1f)) :
-                Math.min(Gdx.graphics.getDisplayMode().height / amount, baseSize);
+        float size = mobile ? (int) (Math.min(Core.graphics.getHeight(), Core.graphics.getWidth()) / amount / Unit.dp.scl(1f)) :
+                Math.min(Core.graphics.getDisplayMode().height / amount, baseSize);
 
         clearChildren();
         table(cont -> {

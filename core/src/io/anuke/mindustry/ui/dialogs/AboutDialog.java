@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.ObjectSet;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.io.Contributors;
 import io.anuke.mindustry.io.Contributors.Contributor;
@@ -69,9 +69,9 @@ public class AboutDialog extends FloatingDialog{
             }).padLeft(8);
 
             table.addImageButton("icon-link", 14 * 3, () -> {
-                if(!Gdx.net.openURI(link.link)){
+                if(!Core.net.openURI(link.link)){
                     ui.showError("$text.linkfail");
-                    Gdx.app.getClipboard().setContents(link.link);
+                    Core.app.getClipboard().setContents(link.link);
                 }
             }).size(h - 5, h);
 

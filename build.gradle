@@ -168,19 +168,21 @@ project(":core"){
         def comp = System.properties["release"] == null || System.properties["release"] == "false"
         if(!comp) println("Note: Compiling release build.")
 
-        if(new File(projectDir.parent, '../uCore').exists() && comp){
-            compile project(":uCore")
+        if(new File(projectDir.parent, '../Arc').exists() && comp){
+            compile project(":Arc:core")
         }else{
-            compile "com.github.anuken:ucore:$uCoreVersion"
+            //TODO compile arc from jitpack
+            //compile 'com.github.Anuken.Arc:arc:-SNAPSHOT'
         }
 
-        if(new File(projectDir.parent, '../GDXGifRecorder').exists() && comp){
-            compile project(":GDXGifRecorder")
-        }
+       // if(new File(projectDir.parent, '../GDXGifRecorder').exists() && comp){
+       //     compile project(":GDXGifRecorder")
+       // }
 
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+
+        //compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+        //compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+        //compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")

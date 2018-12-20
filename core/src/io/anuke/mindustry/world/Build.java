@@ -1,8 +1,8 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.BlockBuildBeginEvent;

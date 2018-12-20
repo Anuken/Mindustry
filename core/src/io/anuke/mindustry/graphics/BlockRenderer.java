@@ -1,8 +1,8 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.Sort;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.IntSet;
+import io.anuke.arc.utils.Sort;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;

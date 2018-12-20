@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities.bullet;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.ucore.core.Effects;

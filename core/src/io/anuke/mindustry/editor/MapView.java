@@ -1,15 +1,15 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.input.GestureDetector.GestureListener;
-import com.badlogic.gdx.math.Bresenham2;
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.Input.Buttons;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Batch;
+import io.anuke.arc.input.GestureDetector;
+import io.anuke.arc.input.GestureDetector.GestureListener;
+import io.anuke.arc.math.Bresenham2;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.GridImage;

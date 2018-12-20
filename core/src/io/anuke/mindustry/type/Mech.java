@@ -1,7 +1,7 @@
 package io.anuke.mindustry.type;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.UnlockableContent;

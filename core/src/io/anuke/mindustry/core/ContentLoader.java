@@ -1,8 +1,8 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.utils.ObjectSet;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.content.bullets.*;

@@ -1,11 +1,11 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.IntSet.IntSetIterator;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.utils.Disposable;
+import io.anuke.arc.utils.IntSet;
+import io.anuke.arc.utils.IntSet.IntSetIterator;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.world.Block;

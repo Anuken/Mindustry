@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;

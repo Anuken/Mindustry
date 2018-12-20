@@ -1,10 +1,10 @@
 package io.anuke.mindustry.entities.effect;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.Pool.Poolable;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.utils.IntMap;
+import io.anuke.arc.utils.Pool.Poolable;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Liquids;

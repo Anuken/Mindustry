@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.utils.NumberUtils;
+import io.anuke.arc.utils.NumberUtils;
 import io.anuke.mindustry.type.Item;
 import io.anuke.ucore.core.Timers;
 import io.anuke.ucore.util.Bits;

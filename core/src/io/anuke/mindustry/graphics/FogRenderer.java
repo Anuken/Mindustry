@@ -1,14 +1,14 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.GL20;
+import io.anuke.arc.graphics.Pixmap.Format;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.glutils.FrameBuffer;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.Disposable;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
@@ -72,8 +72,8 @@ public class FogRenderer implements Disposable{
 
         buffer.begin();
         pixelBuffer.position(0);
-        Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
-        Gdx.gl.glReadPixels(0, 0, world.width(), world.height(), GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
+        Core.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
+        Core.gl.glReadPixels(0, 0, world.width(), world.height(), GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
 
         pixelBuffer.position(0);
         for(int i = 0; i < world.width() * world.height(); i++){
@@ -162,7 +162,7 @@ public class FogRenderer implements Disposable{
         Graphics.shader();
 
         Graphics.setScreen();
-        Core.batch.draw(renderer.pixelSurface.texture(), 0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -Gdx.graphics.getHeight());
+        Core.batch.draw(renderer.pixelSurface.texture(), 0, Core.graphics.getHeight(), Core.graphics.getWidth(), -Core.graphics.getHeight());
         Graphics.end();
     }
 

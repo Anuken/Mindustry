@@ -1,7 +1,7 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.Core;
+import io.anuke.arc.utils.TimeUtils;
 import io.anuke.ucore.core.Settings;
 import io.anuke.ucore.core.Timers;
 
@@ -10,7 +10,7 @@ public class ThreadHandler{
 
     public ThreadHandler(){
         Timers.setDeltaProvider(() -> {
-            float result = Gdx.graphics.getDeltaTime() * 60f;
+            float result = Core.graphics.getDeltaTime() * 60f;
             return Float.isNaN(result) || Float.isInfinite(result) ? 1f : Math.min(result, 60f / 10f);
         });
     }
@@ -24,11 +24,11 @@ public class ThreadHandler{
     }
 
     public void runDelay(Runnable r){
-        Gdx.app.postRunnable(r);
+        Core.app.postRunnable(r);
     }
 
     public long getFrameID(){
-        return Gdx.graphics.getFrameId();
+        return Core.graphics.getFrameId();
     }
 
     public void handleBeginRender(){

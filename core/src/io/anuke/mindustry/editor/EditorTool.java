@@ -1,6 +1,6 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.utils.IntArray;
+import io.anuke.arc.utils.IntArray;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;

@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;

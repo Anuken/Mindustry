@@ -1,7 +1,7 @@
 package io.anuke.mindustry.maps;
 
-import com.badlogic.gdx.utils.IntIntMap;
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.utils.IntIntMap;
+import io.anuke.arc.utils.ObjectMap;
 import io.anuke.ucore.util.Bundles;
 
 public class MapMeta{

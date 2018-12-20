@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities;
 
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.Vector2;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;

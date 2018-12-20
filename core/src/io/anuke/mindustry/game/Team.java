@@ -1,6 +1,6 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.ucore.util.Bundles;
 
 public enum Team{

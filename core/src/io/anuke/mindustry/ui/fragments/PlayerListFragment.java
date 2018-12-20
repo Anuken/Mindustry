@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Batch;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.Batch;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
@@ -39,7 +39,7 @@ public class PlayerListFragment extends Fragment{
                 if(visible && timer.get(20)){
                     rebuild();
                     content.pack();
-                    content.act(Gdx.graphics.getDeltaTime());
+                    content.act(Core.graphics.getDeltaTime());
                     //TODO hack
                     Core.scene.act(0f);
                 }

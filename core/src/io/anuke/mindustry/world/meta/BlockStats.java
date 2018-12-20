@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.meta;
 
-import com.badlogic.gdx.utils.ObjectMap.Entry;
-import com.badlogic.gdx.utils.OrderedMap;
+import io.anuke.arc.utils.ObjectMap.Entry;
+import io.anuke.arc.utils.OrderedMap;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;

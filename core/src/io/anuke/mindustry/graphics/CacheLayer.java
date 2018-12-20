@@ -1,6 +1,6 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.ucore.core.Core;
 import io.anuke.ucore.core.Graphics;
 import io.anuke.ucore.graphics.Draw;

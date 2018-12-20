@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import com.badlogic.gdx.math.Vector2;
+import io.anuke.arc.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Player;

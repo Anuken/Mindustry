@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content.fx;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.ucore.core.Effects.Effect;

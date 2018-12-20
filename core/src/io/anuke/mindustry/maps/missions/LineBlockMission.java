@@ -1,8 +1,8 @@
 package io.anuke.mindustry.maps.missions;
 
-import com.badlogic.gdx.math.Bresenham2;
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.math.Bresenham2;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.world.Block;
 
 public class LineBlockMission extends Mission{

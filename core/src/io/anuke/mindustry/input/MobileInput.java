@@ -1,16 +1,16 @@
 package io.anuke.mindustry.input;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.input.GestureDetector.GestureListener;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.input.GestureDetector;
+import io.anuke.arc.input.GestureDetector.GestureListener;
+import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Align;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.ObjectSet;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
@@ -321,8 +321,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //Draw lines
         if(lineMode){
-            int tileX = tileX(Gdx.input.getX());
-            int tileY = tileY(Gdx.input.getY());
+            int tileX = tileX(Core.input.getX());
+            int tileY = tileY(Core.input.getY());
 
             //draw placing
             if(mode == placing && recipe != null){
@@ -615,7 +615,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             lineScale = Mathf.lerpDelta(lineScale, 1f, 0.1f);
 
             //When in line mode, pan when near screen edges automatically
-            if(Gdx.input.isTouched(0) && lineMode){
+            if(Core.input.isTouched(0) && lineMode){
                 float screenX = Graphics.mouse().x, screenY = Graphics.mouse().y;
 
                 float panX = 0, panY = 0;
@@ -624,19 +624,19 @@ public class MobileInput extends InputHandler implements GestureListener{
                     panX = -(edgePan - screenX);
                 }
 
-                if(screenX >= Gdx.graphics.getWidth() - edgePan){
-                    panX = (screenX - Gdx.graphics.getWidth()) + edgePan;
+                if(screenX >= Core.graphics.getWidth() - edgePan){
+                    panX = (screenX - Core.graphics.getWidth()) + edgePan;
                 }
 
                 if(screenY <= edgePan){
                     panY = -(edgePan - screenY);
                 }
 
-                if(screenY >= Gdx.graphics.getHeight() - edgePan){
-                    panY = (screenY - Gdx.graphics.getHeight()) + edgePan;
+                if(screenY >= Core.graphics.getHeight() - edgePan){
+                    panY = (screenY - Core.graphics.getHeight()) + edgePan;
                 }
 
-                vector.set(panX, panY).scl((Core.camera.viewportWidth * Core.camera.zoom) / Gdx.graphics.getWidth());
+                vector.set(panX, panY).scl((Core.camera.viewportWidth * Core.camera.zoom) / Core.graphics.getWidth());
                 vector.limit(maxPanSpeed);
 
                 //pan view
@@ -663,7 +663,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(!canPan) return false;
 
         //can't pan in line mode with one finger or while dropping items!
-        if((lineMode && !Gdx.input.isTouched(1)) || droppingItem){
+        if((lineMode && !Core.input.isTouched(1)) || droppingItem){
             return false;
         }
 

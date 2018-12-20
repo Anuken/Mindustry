@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.bullet;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.GridPoint2;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.GridPoint2;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.effect.Fire;

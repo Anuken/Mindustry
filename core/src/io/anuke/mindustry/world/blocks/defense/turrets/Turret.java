@@ -1,9 +1,9 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.TileEntity;

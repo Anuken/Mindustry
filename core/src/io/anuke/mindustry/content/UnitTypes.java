@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.utils.ObjectSet;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.entities.units.types.*;
 import io.anuke.mindustry.game.ContentList;

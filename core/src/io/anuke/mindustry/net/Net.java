@@ -1,13 +1,13 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Net.HttpRequest;
-import com.badlogic.gdx.Net.HttpResponse;
-import com.badlogic.gdx.Net.HttpResponseListener;
-import com.badlogic.gdx.net.HttpRequestBuilder;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.Core;
+import io.anuke.arc.Net.HttpRequest;
+import io.anuke.arc.Net.HttpResponse;
+import io.anuke.arc.Net.HttpResponseListener;
+import io.anuke.arc.net.HttpRequestBuilder;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.IntMap;
+import io.anuke.arc.utils.ObjectMap;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Packets.KickReason;
@@ -347,7 +347,7 @@ public class Net{
         HttpRequest req = new HttpRequestBuilder().newRequest()
         .method(method).url(url).content(body).build();
 
-        Gdx.net.sendHttpRequest(req, new HttpResponseListener(){
+        Core.net.sendHttpRequest(req, new HttpResponseListener(){
             @Override
             public void handleHttpResponse(HttpResponse httpResponse){
                 listener.accept(httpResponse.getResultAsString());

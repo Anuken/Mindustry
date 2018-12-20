@@ -1,6 +1,6 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.ucore.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.control;

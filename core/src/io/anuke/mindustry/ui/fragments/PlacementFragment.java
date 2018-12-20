@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;

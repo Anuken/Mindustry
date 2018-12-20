@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities.effect;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
 import io.anuke.ucore.entities.EntityGroup;
 import io.anuke.ucore.entities.impl.TimedEntity;

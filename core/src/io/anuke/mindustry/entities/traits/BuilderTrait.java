@@ -1,9 +1,9 @@
 package io.anuke.mindustry.entities.traits;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Queue;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.Queue;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
@@ -251,7 +251,7 @@ public interface BuilderTrait extends Entity{
         }
 
         if(!current.initialized){
-            Gdx.app.postRunnable(() -> Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking)));
+            Core.app.postRunnable(() -> Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking)));
             current.initialized = true;
         }
     }

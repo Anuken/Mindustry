@@ -1,11 +1,11 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.async.AsyncExecutor;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Pixmap;
+import io.anuke.arc.graphics.Pixmap.Format;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.async.AsyncExecutor;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
@@ -89,7 +89,7 @@ public class GenViewDialog extends FloatingDialog{
                                     pixmap.drawPixel(i, sectorSize - 1 - j, ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation, (byte)0));
                                 }
                             }
-                            Gdx.app.postRunnable(() -> map.put(wx, wy, new Texture(pixmap)));
+                            Core.app.postRunnable(() -> map.put(wx, wy, new Texture(pixmap)));
                             return pixmap;
                         });
 

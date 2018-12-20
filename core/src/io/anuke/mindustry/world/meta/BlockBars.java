@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.meta;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.utils.Array;
 import io.anuke.mindustry.world.BarType;
 
 public class BlockBars{

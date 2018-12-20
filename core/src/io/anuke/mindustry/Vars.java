@@ -1,9 +1,9 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.Application.ApplicationType;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.Application.ApplicationType;
+import io.anuke.arc.Core;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -128,7 +128,7 @@ public class Vars{
         Serialization.init();
 
         //load locales
-        String[] stra = Gdx.files.internal("locales").readString().split("\n");
+        String[] stra = Core.files.internal("locales").readString().split("\n");
         locales = new Locale[stra.length];
         for(int i = 0; i < locales.length; i++){
             String code = stra[i];
@@ -169,9 +169,9 @@ public class Vars{
         state = new GameState();
         threads = new ThreadHandler();
 
-        mobile = Gdx.app.getType() == ApplicationType.Android || Gdx.app.getType() == ApplicationType.iOS || testMobile;
-        ios = Gdx.app.getType() == ApplicationType.iOS;
-        android = Gdx.app.getType() == ApplicationType.Android;
+        mobile = Core.app.getType() == ApplicationType.Android || Core.app.getType() == ApplicationType.iOS || testMobile;
+        ios = Core.app.getType() == ApplicationType.iOS;
+        android = Core.app.getType() == ApplicationType.Android;
 
         dataDirectory = Settings.getDataDirectory(appName);
         screenshotDirectory = dataDirectory.child("screenshots/");

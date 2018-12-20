@@ -1,9 +1,9 @@
 package io.anuke.mindustry.type;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.OrderedMap;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.utils.OrderedMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.UnlockableContent;

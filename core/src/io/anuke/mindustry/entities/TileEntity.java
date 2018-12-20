@@ -1,9 +1,9 @@
 package io.anuke.mindustry.entities;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.math.Vector2;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.ObjectSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.Fx;

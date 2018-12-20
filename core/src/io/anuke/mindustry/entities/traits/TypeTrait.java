@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.traits;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectIntMap;
+import io.anuke.arc.utils.Array;
+import io.anuke.arc.utils.ObjectIntMap;
 import io.anuke.ucore.function.Supplier;
 
 public interface TypeTrait{

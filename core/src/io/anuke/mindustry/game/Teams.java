@@ -1,6 +1,6 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.utils.ObjectSet;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.ucore.util.EnumSet;

@@ -1,6 +1,6 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.utils.ObjectMap;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.ucore.core.Settings;

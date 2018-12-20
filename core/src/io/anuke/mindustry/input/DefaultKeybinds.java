@@ -1,7 +1,7 @@
 package io.anuke.mindustry.input;
 
-import com.badlogic.gdx.Application.ApplicationType;
-import com.badlogic.gdx.Gdx;
+import io.anuke.arc.Application.ApplicationType;
+import io.anuke.arc.Core;
 import io.anuke.ucore.core.Inputs.Axis;
 import io.anuke.ucore.core.Inputs.DeviceType;
 import io.anuke.ucore.core.KeyBinds;
@@ -31,7 +31,7 @@ public class DefaultKeybinds{
                 "zoom_hold", Input.CONTROL_LEFT,
                 "zoom", new Axis(Input.SCROLL),
                 "zoom_minimap", new Axis(Input.MINUS, Input.PLUS),
-                "menu", Gdx.app.getType() == ApplicationType.Android ? Input.BACK : Input.ESCAPE,
+                "menu", Core.app.getType() == ApplicationType.Android ? Input.BACK : Input.ESCAPE,
                 "pause", Input.SPACE,
                 "toggle_menus", Input.C,
                 "screenshot", Input.P,

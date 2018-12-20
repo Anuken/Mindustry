@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities.bullet;
 
-import com.badlogic.gdx.math.Rectangle;
+import io.anuke.arc.math.Rectangle;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.ucore.core.Timers;
