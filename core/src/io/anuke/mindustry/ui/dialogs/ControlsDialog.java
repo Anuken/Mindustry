@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Input.Keys;
-import io.anuke.arc.utils.Align;
+import io.anuke.arc.util.Align;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.KeybindDialog;

@@ -4,7 +4,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 public class Rock extends Block{
     protected TextureRegion[] shadowRegions, regions;
@@ -43,8 +43,8 @@ public class Rock extends Block{
             regions = new TextureRegion[variants];
 
             for(int i = 0; i < variants; i++){
-                shadowRegions[i] = Draw.region(name + "shadow" + (i + 1));
-                regions[i] = Draw.region(name + (i + 1));
+                shadowRegions[i] = Core.atlas.find(name + "shadow" + (i + 1));
+                regions[i] = Core.atlas.find(name + (i + 1));
             }
         }
     }

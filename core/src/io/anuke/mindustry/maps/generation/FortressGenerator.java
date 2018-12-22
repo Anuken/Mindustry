@@ -2,9 +2,9 @@ package io.anuke.mindustry.maps.generation;
 
 import io.anuke.arc.math.GridPoint2;
 import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.IntIntMap;
-import io.anuke.arc.utils.Predicate;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.IntIntMap;
+import io.anuke.arc.util.Predicate;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.blocks.*;
@@ -33,7 +33,7 @@ import io.anuke.arc.function.BiFunction;
 import io.anuke.arc.function.IntPositionConsumer;
 import io.anuke.arc.function.TriFunction;
 import io.anuke.arc.util.Geometry;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
 

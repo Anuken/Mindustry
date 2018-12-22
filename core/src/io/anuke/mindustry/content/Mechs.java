@@ -17,12 +17,12 @@ import io.anuke.mindustry.maps.TutorialSector;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Mech;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Graphics;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Core;
+import io.anuke.arc.Effects;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.unitGroups;
 
@@ -137,7 +137,7 @@ public class Mechs implements ContentList{
 
                     rect.setSize(healRange*2f).setCenter(player.x, player.y);
                     Units.getNearby(player.getTeam(), rect, unit -> {
-                        if(unit.distanceTo(player) <= healRange){
+                        if(unit.dst(player) <= healRange){
                             if(unit.health < unit.maxHealth()){
                                 Effects.effect(UnitFx.heal, unit);
                                 wasHealed = true;
@@ -184,7 +184,7 @@ public class Mechs implements ContentList{
             @Override
             public void load(){
                 super.load();
-                armorRegion = Draw.region(name + "-armor");
+                armorRegion = Core.atlas.find(name + "-armor");
             }
 
             @Override
@@ -246,7 +246,7 @@ public class Mechs implements ContentList{
             @Override
             public void load(){
                 super.load();
-                shield = Draw.region(name + "-shield");
+                shield = Core.atlas.find(name + "-shield");
             }
 
             @Override

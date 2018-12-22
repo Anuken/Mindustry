@@ -1,12 +1,12 @@
 package io.anuke.mindustry.entities;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.traits.Saveable;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 import io.anuke.arc.util.Pooling;
 import io.anuke.arc.util.ThreadArray;
 import io.anuke.arc.util.Tmp;

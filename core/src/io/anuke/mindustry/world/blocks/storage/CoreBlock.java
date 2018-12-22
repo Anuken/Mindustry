@@ -22,13 +22,13 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Graphics;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.util.EnumSet;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -128,15 +128,15 @@ public class CoreBlock extends StorageBlock{
     public void load(){
         super.load();
 
-        openRegion = Draw.region(name + "-open");
-        topRegion = Draw.region(name + "-top");
+        openRegion = Core.atlas.find(name + "-open");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
     public void draw(Tile tile){
         CoreEntity entity = tile.entity();
 
-        Draw.rect(entity.solid ? Draw.region(name) : openRegion, tile.drawx(), tile.drawy());
+        Draw.rect(entity.solid ? Core.atlas.find(name) : openRegion, tile.drawx(), tile.drawy());
 
         Draw.alpha(entity.heat);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());

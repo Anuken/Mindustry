@@ -3,7 +3,7 @@ package io.anuke.mindustry.ui.fragments;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
@@ -16,9 +16,9 @@ import io.anuke.mindustry.ui.ImageStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.arc.core.Events;
-import io.anuke.arc.core.Graphics;
-import io.anuke.arc.core.Inputs;
+import io.anuke.arc.Events;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.Inputs;
 import io.anuke.arc.input.Input;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
@@ -64,18 +64,18 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean gridUpdate(InputHandler input){
-        if(!Inputs.keyDown("gridMode") || ui.chatfrag.chatOpen()) return false;
-        if(Inputs.keyDown("gridModeShift")){ //select category
+        if(!Core.input.keyDown("gridMode") || ui.chatfrag.chatOpen()) return false;
+        if(Core.input.keyDown("gridModeShift")){ //select category
             int i = 0;
             for(Input key : inputCatGrid){
-                if(Inputs.keyDown(key)){
+                if(Core.input.keyDown(key)){
                     input.recipe = Recipe.getByCategory(Category.values()[i]).first();
                     currentCategory = input.recipe.category;
                 }
                 i++;
             }
             return true;
-        }else if(Inputs.keyDown("select")){ //mouse eyedropper select
+        }else if(Core.input.keyDown("select")){ //mouse eyedropper select
             Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
 
             if(tile != null){
@@ -91,7 +91,7 @@ public class PlacementFragment extends Fragment{
             int i = 0;
             Array<Recipe> recipes = Recipe.getByCategory(currentCategory);
             for(Input key : inputGrid){
-                if(Inputs.keyDown(key))
+                if(Core.input.keyDown(key))
                     input.recipe = (i < recipes.size && control.unlocks.isUnlocked(recipes.get(i))) ? recipes.get(i) : null;
                 i++;
             }

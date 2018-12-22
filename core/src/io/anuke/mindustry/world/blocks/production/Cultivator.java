@@ -9,10 +9,10 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.SeedRandom;
 
 import java.io.DataInput;
@@ -50,8 +50,8 @@ public class Cultivator extends Drill{
     public void load(){
         super.load();
 
-        middleRegion = Draw.region(name + "-middle");
-        topRegion = Draw.region(name + "-top");
+        middleRegion = Core.atlas.find(name + "-middle");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
@@ -92,7 +92,7 @@ public class Cultivator extends Drill{
 
     @Override
     public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-top"),};
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top"),};
     }
 
     @Override

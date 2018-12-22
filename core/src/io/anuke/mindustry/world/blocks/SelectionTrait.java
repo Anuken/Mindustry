@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.type.Item;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Supplier;

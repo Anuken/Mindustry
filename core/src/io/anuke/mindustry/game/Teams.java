@@ -1,10 +1,9 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.arc.utils.ObjectSet;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.util.EnumSet;
-import io.anuke.arc.util.ThreadSet;
 
 /**
  * Class for various team-based utilities.
@@ -52,7 +51,7 @@ public class Teams{
     }
 
     public class TeamData{
-        public final ObjectSet<Tile> cores = new ThreadSet<>();
+        public final ObjectSet<Tile> cores = new ObjectSet<>();
         public final EnumSet<Team> enemies;
         public final Team team;
 

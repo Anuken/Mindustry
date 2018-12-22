@@ -14,10 +14,10 @@ import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Translator;
 
 import java.io.DataInput;
@@ -60,8 +60,8 @@ public class NuclearReactor extends PowerGenerator{
     public void load(){
         super.load();
 
-        topRegion = Draw.region(name + "-center");
-        lightsRegion = Draw.region(name + "-lights");
+        topRegion = Core.atlas.find(name + "-center");
+        lightsRegion = Core.atlas.find(name + "-lights");
     }
 
     @Override

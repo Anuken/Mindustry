@@ -7,10 +7,10 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Graphics;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Physics;
 
 import static io.anuke.mindustry.Vars.tilesize;

@@ -34,7 +34,7 @@ public class LiquidJunction extends LiquidBlock{
 
     @Override
     public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Draw.region(name)};
+        return new TextureRegion[]{Core.atlas.find(name)};
     }
 
     @Override

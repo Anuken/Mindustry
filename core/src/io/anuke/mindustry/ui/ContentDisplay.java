@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.utils.OrderedMap;
+import io.anuke.arc.util.OrderedMap;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
@@ -26,7 +26,7 @@ public class ContentDisplay{
         table.table(title -> {
             int size = 8 * 6;
 
-            title.addImage(Draw.region("block-icon-" + block.name)).size(size);
+            title.addImage(Core.atlas.find("block-icon-" + block.name)).size(size);
             title.add("[accent]" + block.formalName).padLeft(5);
         });
 

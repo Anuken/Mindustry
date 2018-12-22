@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ai;
 
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.Squad;
@@ -9,9 +9,9 @@ import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Events;
+import io.anuke.arc.Events;
 import io.anuke.arc.util.GridBits;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Structs;
 
 import java.io.DataInput;

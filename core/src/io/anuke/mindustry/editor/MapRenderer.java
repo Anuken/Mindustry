@@ -3,14 +3,14 @@ package io.anuke.mindustry.editor;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.utils.Disposable;
-import io.anuke.arc.utils.IntSet;
-import io.anuke.arc.utils.IntSet.IntSetIterator;
+import io.anuke.arc.util.Disposable;
+import io.anuke.arc.util.IntSet;
+import io.anuke.arc.util.IntSet.IntSetIterator;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.world.Block;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Graphics;
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.IndexedRenderer;
 import io.anuke.arc.util.Structs;
@@ -142,14 +142,14 @@ public class MapRenderer implements Disposable{
 
         if(wall.update || wall.destructible){
             mesh.setColor(team.color);
-            region = Draw.region("block-border");
+            region = Core.atlas.find("block-border");
         }else if(elev > 0 && check){
             mesh.setColor(tmpColor.fromHsv((360f * elev / 127f * 4f) % 360f, 0.5f + (elev / 4f) % 0.5f, 1f));
-            region = Draw.region("block-elevation");
+            region = Core.atlas.find("block-elevation");
         }else if(elev == -1){
-            region = Draw.region("block-slope");
+            region = Core.atlas.find("block-slope");
         }else{
-            region = Draw.region("clear");
+            region = Core.atlas.find("clear");
         }
 
         mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize, region,

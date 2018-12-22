@@ -1,13 +1,13 @@
 package io.anuke.mindustry.maps.missions;
 
 import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Bundles;
 

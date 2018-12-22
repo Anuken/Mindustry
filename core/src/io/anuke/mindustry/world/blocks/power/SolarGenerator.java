@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.power;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 import io.anuke.arc.util.EnumSet;
 
 public class SolarGenerator extends PowerGenerator{

@@ -1,8 +1,16 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.GridPoint2;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
 import io.anuke.mindustry.ai.WaveSpawner;
@@ -18,15 +26,10 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.arc.core.Events;
-import io.anuke.arc.core.Timers;
-import io.anuke.arc.entities.EntityQuery;
-import io.anuke.arc.modules.Module;
-import io.anuke.arc.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class World extends Module{
+public class World implements ApplicationListener{
     public final Maps maps = new Maps();
     public final Sectors sectors = new Sectors();
     public final WorldGenerator generator = new WorldGenerator();
@@ -38,7 +41,7 @@ public class World extends Module{
     private Sector currentSector;
     private Tile[][] tiles;
 
-    private Array<Tile> tempTiles = new ThreadArray<>();
+    private Array<Tile> tempTiles = new Array<>();
     private boolean generating, invalidMap;
 
     public World(){
@@ -121,11 +124,11 @@ public class World extends Module{
     }
 
     public Tile tileWorld(float x, float y){
-        return tile(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize));
+        return tile(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
     public int toTile(float coord){
-        return Mathf.scl2(coord, tilesize);
+        return Math.round(coord / tilesize);
     }
 
     public Tile[][] getTiles(){
@@ -335,8 +338,8 @@ public class World extends Module{
      * Raycast, but with world coordinates.
      */
     public GridPoint2 raycastWorld(float x, float y, float x2, float y2){
-        return raycast(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize),
-                Mathf.scl2(x2, tilesize), Mathf.scl2(y2, tilesize));
+        return raycast(Math.round(x / tilesize), Math.round(y / tilesize),
+                Math.round(x2 / tilesize), Math.round(y2 / tilesize));
     }
 
     /**

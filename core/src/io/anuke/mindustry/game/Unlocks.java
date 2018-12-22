@@ -1,11 +1,11 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.arc.utils.ObjectMap;
-import io.anuke.arc.utils.ObjectSet;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.arc.core.Events;
-import io.anuke.arc.core.Settings;
+import io.anuke.arc.Events;
+import io.anuke.arc.Settings;
 
 /**Stores player unlocks. Clientside only.*/
 public class Unlocks{

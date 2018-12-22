@@ -8,8 +8,8 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.Draw;
 
 import java.io.DataInput;
@@ -36,7 +36,7 @@ public class Door extends Wall{
     @Override
     public void load(){
         super.load();
-        openRegion = Draw.region(name + "-open");
+        openRegion = Core.atlas.find(name + "-open");
     }
 
     @Override

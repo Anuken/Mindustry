@@ -2,8 +2,8 @@ package io.anuke.mindustry.entities.traits;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.Queue;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.Queue;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
@@ -21,16 +21,16 @@ import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Events;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.Events;
+import io.anuke.arc.Timers;
 import io.anuke.arc.entities.trait.Entity;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Fill;
 import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.graphics.Shapes;
 import io.anuke.arc.util.Angles;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -202,7 +202,7 @@ public interface BuilderTrait extends Entity{
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(unit.distanceTo(tile) > placeDistance){
+        if(unit.dst(tile) > placeDistance){
             return;
         }
 
@@ -232,7 +232,7 @@ public interface BuilderTrait extends Entity{
             return;
         }
 
-        if(unit.distanceTo(tile) <= placeDistance){
+        if(unit.dst(tile) <= placeDistance){
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
         }
 
@@ -261,7 +261,7 @@ public interface BuilderTrait extends Entity{
         Tile tile = getMineTile();
         TileEntity core = unit.getClosestCore();
 
-        if(core == null || tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance
+        if(core == null || tile.block() != Blocks.air || unit.dst(tile.worldx(), tile.worldy()) > mineDistance
                 || tile.floor().drops == null || !unit.inventory.canAcceptItem(tile.floor().drops.item) || !canMine(tile.floor().drops.item)){
             setMineTile(null);
         }else{
@@ -270,7 +270,7 @@ public interface BuilderTrait extends Entity{
 
             if(Mathf.chance(Time.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
 
-                if(unit.distanceTo(core) < mineTransferRange && core.tile.block().acceptStack(item, 1, core.tile, unit) == 1){
+                if(unit.dst(core) < mineTransferRange && core.tile.block().acceptStack(item, 1, core.tile, unit) == 1){
                     Call.transferItemTo(item, 1,
                         tile.worldx() + Mathf.range(tilesize / 2f),
                         tile.worldy() + Mathf.range(tilesize / 2f), core.tile);
@@ -304,7 +304,7 @@ public interface BuilderTrait extends Entity{
 
         Tile tile = world.tile(request.x, request.y);
 
-        if(unit.distanceTo(tile) > placeDistance){
+        if(unit.dst(tile) > placeDistance){
             return;
         }
 

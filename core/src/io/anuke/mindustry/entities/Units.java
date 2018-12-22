@@ -1,18 +1,18 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.arc.math.Rectangle;
-import io.anuke.arc.math.Vector2;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.EntityQuery;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.util.EnumSet;
-import io.anuke.arc.util.Geometry;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -38,7 +38,7 @@ public class Units{
      * @return whether the target is invalid
      */
     public static boolean invalidateTarget(TargetTrait target, Team team, float x, float y, float range){
-        return target == null || (range != Float.MAX_VALUE && target.distanceTo(x, y) > range) || target.getTeam() == team || !target.isValid();
+        return target == null || (range != Float.MAX_VALUE && target.dst(x, y) > range) || target.getTeam() == team || !target.isValid();
     }
 
     /**See {@link #invalidateTarget(TargetTrait, Team, float, float, float)}*/
@@ -221,7 +221,7 @@ public class Units{
         EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
         if(!group.isEmpty()){
             EntityQuery.getNearby(group, rect, entity -> {
-                if(entity.distanceTo(x, y) <= radius){
+                if(entity.dst(x, y) <= radius){
                     cons.accept((Unit) entity);
                 }
             });
@@ -229,7 +229,7 @@ public class Units{
 
         //now check all players
         EntityQuery.getNearby(playerGroup, rect, player -> {
-            if(((Unit) player).team == team && player.distanceTo(x, y) <= radius){
+            if(((Unit) player).team == team && player.dst(x, y) <= radius){
                 cons.accept((Unit) player);
             }
         });

@@ -1,18 +1,17 @@
 package io.anuke.mindustry.game;
 
 import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.IntArray;
-import io.anuke.arc.utils.IntMap;
-import io.anuke.arc.utils.TimeUtils;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.IntArray;
+import io.anuke.arc.util.IntMap;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.SaveMeta;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.arc.core.Events;
-import io.anuke.arc.core.Settings;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Events;
+import io.anuke.arc.Timers;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.ThreadArray;
 
@@ -71,9 +70,9 @@ public class Saves{
         if(current != null && !state.is(State.menu)
             && !(state.isPaused() && ui.hasDialog())){
             if(lastTimestamp != 0){
-                totalPlaytime += TimeUtils.timeSinceMillis(lastTimestamp);
+                totalPlaytime += Time.timeSinceMillis(lastTimestamp);
             }
-            lastTimestamp = TimeUtils.millis();
+            lastTimestamp = Time.millis();
         }
 
         if(!state.is(State.menu) && !state.gameOver && current != null && current.isAutosave()){

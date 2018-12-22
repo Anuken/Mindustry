@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.meta.values;
 
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.ItemDisplay;
 import io.anuke.mindustry.world.meta.StatValue;

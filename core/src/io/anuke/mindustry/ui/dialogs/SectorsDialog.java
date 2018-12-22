@@ -4,11 +4,11 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.GridPoint2;
 import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.Align;
+import io.anuke.arc.util.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.maps.Sector;
-import io.anuke.arc.core.Graphics;
+import io.anuke.arc.Graphics;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
@@ -21,7 +21,7 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.Cursors;
 import io.anuke.arc.util.Bundles;
 import io.anuke.arc.util.Geometry;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 

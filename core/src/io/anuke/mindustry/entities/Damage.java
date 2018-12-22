@@ -13,12 +13,12 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Effects.Effect;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.Timers;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Physics;
 import io.anuke.arc.util.Translator;
 
@@ -160,7 +160,7 @@ public class Damage{
     /**Damages all entities and blocks in a radius that are enemies of the team.*/
     public static void damage(Team team, float x, float y, float radius, float damage){
         Consumer<Unit> cons = entity -> {
-            if(entity.team == team || entity.distanceTo(x, y) > radius){
+            if(entity.team == team || entity.dst(x, y) > radius){
                 return;
             }
             float amount = calculateDamage(x, y, entity.x, entity.y, radius, damage);

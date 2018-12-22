@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.production;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 public class PlastaniumCompressor extends GenericCrafter{
     protected TextureRegion topRegion;
@@ -16,7 +16,7 @@ public class PlastaniumCompressor extends GenericCrafter{
     public void load(){
         super.load();
 
-        topRegion = Draw.region(name + "-top");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override

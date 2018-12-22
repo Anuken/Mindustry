@@ -23,12 +23,12 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Graphics;
+import io.anuke.arc.Effects;
+import io.anuke.arc.Graphics;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.util.EnumSet;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -81,7 +81,7 @@ public class UnitFactory extends Block{
     public void load(){
         super.load();
 
-        topRegion = Draw.region(name + "-top");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
@@ -107,8 +107,8 @@ public class UnitFactory extends Block{
     @Override
     public TextureRegion[] getIcon(){
         return new TextureRegion[]{
-            Draw.region(name),
-            Draw.region(name + "-top")
+            Core.atlas.find(name),
+            Core.atlas.find(name + "-top")
         };
     }
 

@@ -1,6 +1,6 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.arc.utils.Base64Coder;
+import io.anuke.arc.util.Base64Coder;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.io.TypeIO;
 import io.anuke.arc.util.Bundles;

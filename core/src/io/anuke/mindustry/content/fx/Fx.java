@@ -3,7 +3,7 @@ package io.anuke.mindustry.content.fx;
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Fill;
 import io.anuke.arc.graphics.Lines;

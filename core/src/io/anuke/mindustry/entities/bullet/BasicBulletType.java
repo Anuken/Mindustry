@@ -6,11 +6,11 @@ import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.util.Angles;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 /**
  * A BulletType for most ammo-based bullets shot from turrets and units.
@@ -47,8 +47,8 @@ public class BasicBulletType extends BulletType{
 
     @Override
     public void load(){
-        backRegion = Draw.region(bulletSprite + "-back");
-        frontRegion = Draw.region(bulletSprite);
+        backRegion = Core.atlas.find(bulletSprite + "-back");
+        frontRegion = Core.atlas.find(bulletSprite);
     }
 
     @Override

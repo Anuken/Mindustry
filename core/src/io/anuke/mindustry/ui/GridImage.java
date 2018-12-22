@@ -14,7 +14,7 @@ public class GridImage extends Element{
     }
 
     public void draw(Batch batch, float alpha){
-        TextureRegion blank = Draw.region("white");
+        TextureRegion blank = Core.atlas.find("white");
 
         float xspace = (getWidth() / imageWidth);
         float yspace = (getHeight() / imageHeight);

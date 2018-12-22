@@ -1,10 +1,10 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.ObjectMap;
-import io.anuke.arc.utils.ObjectSet;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.annotations.Annotations.Serialize;
-import io.anuke.arc.core.Settings;
+import io.anuke.arc.Settings;
 
 import static io.anuke.mindustry.Vars.headless;
 

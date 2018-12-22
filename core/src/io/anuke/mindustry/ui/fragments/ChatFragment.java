@@ -6,15 +6,14 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Batch;
 import io.anuke.arc.graphics.g2d.BitmapFont;
 import io.anuke.arc.graphics.g2d.GlyphLayout;
-import io.anuke.arc.utils.Align;
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Inputs;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Inputs;
+import io.anuke.arc.Timers;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.Label;
@@ -22,7 +21,7 @@ import io.anuke.arc.scene.ui.Label.LabelStyle;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.arc.core.Core.scene;
@@ -71,21 +70,21 @@ public class ChatFragment extends Table{
 
         update(() -> {
 
-            if(Net.active() && Inputs.keyTap("chat")){
+            if(Net.active() && Core.input.keyTap("chat")){
                 toggle();
             }
 
             if(chatOpen){
-                if(Inputs.keyTap("chat_history_prev") && historyPos < history.size - 1){
+                if(Core.input.keyTap("chat_history_prev") && historyPos < history.size - 1){
                     if(historyPos == 0) history.set(0, chatfield.getText());
                     historyPos++;
                     updateChat();
                 }
-                if(Inputs.keyTap("chat_history_next") && historyPos > 0){
+                if(Core.input.keyTap("chat_history_next") && historyPos > 0){
                     historyPos--;
                     updateChat();
                 }
-                scrollPos = (int) Mathf.clamp(scrollPos + Inputs.getAxis("chat_scroll"), 0, Math.max(0, messages.size - messagesShown));
+                scrollPos = (int) Mathf.clamp(scrollPos + Core.input.getAxis("chat_scroll"), 0, Math.max(0, messages.size - messagesShown));
             }
         });
 

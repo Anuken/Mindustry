@@ -5,7 +5,7 @@ import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -33,7 +33,7 @@ public class ArtilleryTurret extends ItemTurret{
 
         Vector2 predict = Predict.intercept(tile, entity.target, type.bullet.speed);
 
-        float dst = entity.distanceTo(predict.x, predict.y);
+        float dst = entity.dst(predict.x, predict.y);
         float maxTraveled = type.bullet.lifetime * type.bullet.speed;
 
         for(int i = 0; i < shots; i++){

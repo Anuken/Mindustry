@@ -94,12 +94,12 @@ public class Mech extends UnlockableContent{
     @Override
     public void load(){
         if(!flying){
-            legRegion = Draw.region(name + "-leg");
-            baseRegion = Draw.region(name + "-base");
+            legRegion = Core.atlas.find(name + "-leg");
+            baseRegion = Core.atlas.find(name + "-base");
         }
 
-        region = Draw.region(name);
-        iconRegion = Draw.region("mech-icon-" + name);
+        region = Core.atlas.find(name);
+        iconRegion = Core.atlas.find("mech-icon-" + name);
     }
 
     @Override

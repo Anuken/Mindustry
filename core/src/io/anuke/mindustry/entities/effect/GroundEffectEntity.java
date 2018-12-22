@@ -2,12 +2,12 @@ package io.anuke.mindustry.entities.effect;
 
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Effects.Effect;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.Timers;
 import io.anuke.arc.entities.impl.EffectEntity;
-import io.anuke.arc.core.Effects.EffectRenderer;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.Effects.EffectRenderer;
+import io.anuke.arc.math.Mathf;
 
 /**
  * A ground effect contains an effect that is rendered on the ground layer as opposed to the top layer.

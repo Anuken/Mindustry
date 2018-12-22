@@ -1,8 +1,14 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.utils.Array;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.Events;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
@@ -16,12 +22,6 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Events;
-import io.anuke.arc.core.Timers;
-import io.anuke.arc.entities.Entities;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.EntityQuery;
-import io.anuke.arc.modules.Module;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -33,7 +33,7 @@ import static io.anuke.mindustry.Vars.*;
  * <p>
  * This class should <i>not</i> call any outside methods to change state of modules, but instead fire events.
  */
-public class Logic extends Module{
+public class Logic implements ApplicationListener{
 
     public Logic(){
         Events.on(TileChangeEvent.class, event -> {
@@ -141,7 +141,7 @@ public class Logic extends Module{
 
     @Remote(called = Loc.both)
     public static void onGameOver(Team winner){
-        threads.runGraphics(() -> ui.restart.show(winner));
+        ui.restart.show(winner);
         netClient.setQuiet();
     }
 

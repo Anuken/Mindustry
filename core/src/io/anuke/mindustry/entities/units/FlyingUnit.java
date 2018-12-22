@@ -10,7 +10,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.util.*;
 

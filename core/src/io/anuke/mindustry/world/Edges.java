@@ -1,9 +1,9 @@
 package io.anuke.mindustry.world;
 
-import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.math.Vector2;
-import io.anuke.arc.util.Geometry;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.GridPoint2;
+import io.anuke.arc.math.geom.Vector2;
 
 import java.util.Arrays;
 

@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.defense.turrets;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.TileEntity;
@@ -22,10 +22,10 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Effects.Effect;
-import io.anuke.arc.core.Graphics;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.Timers;
 import io.anuke.arc.function.BiConsumer;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
@@ -106,9 +106,9 @@ public abstract class Turret extends Block{
     public void load(){
         super.load();
 
-        baseRegion = Draw.region("block-" + size);
-        baseTopRegion = Draw.region("block-" + size + "-top");
-        heatRegion = Draw.region(name + "-heat");
+        baseRegion = Core.atlas.find("block-" + size);
+        baseTopRegion = Core.atlas.find("block-" + size + "-top");
+        heatRegion = Core.atlas.find(name + "-heat");
     }
 
     @Override
@@ -142,7 +142,7 @@ public abstract class Turret extends Block{
 
         drawer.accept(tile, entity);
 
-        if(heatRegion != Draw.region("error")){
+        if(heatRegion != Core.atlas.find("error")){
             heatDrawer.accept(tile, entity);
         }
 
@@ -152,7 +152,7 @@ public abstract class Turret extends Block{
     @Override
     public TextureRegion[] getBlockIcon(){
         if(blockIcon == null){
-            blockIcon = new TextureRegion[]{Draw.region("block-icon-" + name)};
+            blockIcon = new TextureRegion[]{Core.atlas.find("block-icon-" + name)};
         }
         return blockIcon;
     }
@@ -160,7 +160,7 @@ public abstract class Turret extends Block{
     @Override
     public TextureRegion[] getCompactIcon(){
         if(compactIcon == null){
-            compactIcon = new TextureRegion[]{iconRegion(Draw.region("block-icon-" + name))};
+            compactIcon = new TextureRegion[]{iconRegion(Core.atlas.find("block-icon-" + name))};
         }
         return compactIcon;
     }

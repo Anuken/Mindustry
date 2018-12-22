@@ -1,7 +1,7 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.IntSet;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.IntSet;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.arc.util.Bits;

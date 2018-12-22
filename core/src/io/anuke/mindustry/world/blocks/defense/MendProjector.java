@@ -3,18 +3,18 @@ package io.anuke.mindustry.world.blocks.defense;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.IntSet;
+import io.anuke.arc.util.IntSet;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Graphics;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Hue;
 import io.anuke.arc.graphics.Lines;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -50,7 +50,7 @@ public class MendProjector extends Block{
     @Override
     public void load(){
         super.load();
-        topRegion = Draw.region(name + "-top");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override

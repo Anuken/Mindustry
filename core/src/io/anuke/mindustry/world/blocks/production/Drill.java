@@ -2,8 +2,8 @@ package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.ObjectIntMap;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.ObjectIntMap;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
@@ -16,12 +16,12 @@ import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Effects.Effect;
-import io.anuke.arc.core.Graphics;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
 public class Drill extends Block{
@@ -78,9 +78,9 @@ public class Drill extends Block{
     @Override
     public void load(){
         super.load();
-        rimRegion = Draw.region(name + "-rim");
-        rotatorRegion = Draw.region(name + "-rotator");
-        topRegion = Draw.region(name + "-top");
+        rimRegion = Core.atlas.find(name + "-rim");
+        rotatorRegion = Core.atlas.find(name + "-rotator");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
@@ -114,7 +114,7 @@ public class Drill extends Block{
 
     @Override
     public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-rotator"), Draw.region(name + "-top")};
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
     }
 
     @Override

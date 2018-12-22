@@ -14,7 +14,7 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 /**
  * Extracts a random list of items from an input item and an input liquid.
@@ -49,7 +49,7 @@ public class Separator extends Block{
     public void load(){
         super.load();
 
-        liquidRegion = Draw.region(name + "-liquid");
+        liquidRegion = Core.atlas.find(name + "-liquid");
     }
 
     @Override

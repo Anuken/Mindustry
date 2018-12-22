@@ -7,10 +7,10 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 /**
  * Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.
@@ -30,7 +30,7 @@ public class SolidPump extends Pump{
     public void load(){
         super.load();
 
-        liquidRegion = Draw.region(name + "-liquid");
+        liquidRegion = Core.atlas.find(name + "-liquid");
     }
 
     @Override
@@ -56,7 +56,7 @@ public class SolidPump extends Pump{
 
     @Override
     public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-rotator"), Draw.region(name + "-top")};
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
     }
 
     @Override

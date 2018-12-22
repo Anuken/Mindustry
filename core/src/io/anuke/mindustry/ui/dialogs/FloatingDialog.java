@@ -2,13 +2,12 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.Input.Keys;
-import io.anuke.arc.utils.Align;
+import io.anuke.arc.util.Align;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Events;
+import io.anuke.arc.Events;
 import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.ScrollPane;
 

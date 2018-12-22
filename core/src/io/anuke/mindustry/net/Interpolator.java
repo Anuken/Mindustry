@@ -1,9 +1,8 @@
 package io.anuke.mindustry.net;
 
-
-import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.TimeUtils;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 
 public class Interpolator{
     //used for movement
@@ -17,9 +16,9 @@ public class Interpolator{
     public float[] values = {};
 
     public void read(float cx, float cy, float x, float y, long sent, float... target1ds){
-        if(lastUpdated != 0) updateSpacing = TimeUtils.timeSinceMillis(lastUpdated);
+        if(lastUpdated != 0) updateSpacing = Time.timeSinceMillis(lastUpdated);
 
-        lastUpdated = TimeUtils.millis();
+        lastUpdated = Time.millis();
 
         targets = target1ds;
         last.set(cx, cy);
@@ -46,10 +45,10 @@ public class Interpolator{
         }*/
 
         if(lastUpdated != 0 && updateSpacing != 0){
-            float timeSinceUpdate = TimeUtils.timeSinceMillis(lastUpdated);
+            float timeSinceUpdate = Time.timeSinceMillis(lastUpdated);
             float alpha = Math.min(timeSinceUpdate / updateSpacing, 2f);
 
-            Mathf.lerp2(pos.set(last), target, alpha);
+            pos.set(last).lerpPast(target, alpha);
 
             if(values.length != targets.length){
                 values = new float[targets.length];

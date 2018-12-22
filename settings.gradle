@@ -21,6 +21,10 @@ if(System.properties["release"] == null || System.properties["release"] == "fals
         project(':Arc').projectDir = new File(settingsDir, '../Arc')
         include ':Arc:core'
         project(':Arc:core').projectDir = new File(settingsDir, '../Arc/core')
+        include ':Arc:extensions'
+        project(':Arc:extensions').projectDir = new File(settingsDir, '../Arc/extensions')
+        include ':Arc:extensions:freetype'
+        project(':Arc:extensions:freetype').projectDir = new File(settingsDir, '../Arc/extensions/freetype')
     }
     if (new File(settingsDir, '../GDXGifRecorder').exists()) {
         include ':GDXGifRecorder'

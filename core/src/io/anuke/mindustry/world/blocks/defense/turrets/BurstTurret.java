@@ -2,8 +2,8 @@ package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Timers;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.Timers;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 

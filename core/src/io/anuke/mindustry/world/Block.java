@@ -1,9 +1,17 @@
 package io.anuke.mindustry.world;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.Hue;
+import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.IntArray;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -21,14 +29,6 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.meta.*;
-import io.anuke.arc.core.Timers;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Hue;
-import io.anuke.arc.graphics.Lines;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.EnumSet;
-import io.anuke.arc.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -260,8 +260,8 @@ public class Block extends BaseBlock {
 
     @Override
     public void load(){
-        shadowRegion = Draw.region(shadow == null ? "shadow-" + size : shadow);
-        region = Draw.region(name);
+        shadowRegion = Core.atlas.find(shadow == null ? "shadow-" + size : shadow);
+        region = Core.atlas.find(name);
     }
 
     /**Called when the world is resized.
@@ -319,8 +319,7 @@ public class Block extends BaseBlock {
     public void drawConfigure(Tile tile){
         Draw.color(Palette.accent);
         Lines.stroke(1f);
-        Lines.square(tile.drawx(), tile.drawy(),
-                tile.block().size * tilesize / 2f + 1f);
+        Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1f);
         Draw.reset();
     }
 
@@ -465,7 +464,7 @@ public class Block extends BaseBlock {
 
     public TextureRegion getEditorIcon(){
         if(editorIcon == null){
-            editorIcon = Draw.region("block-icon-" + name, Draw.region("clear"));
+            editorIcon = Core.atlas.find("block-icon-" + name, Core.atlas.find("clear"));
         }
         return editorIcon;
     }
@@ -474,11 +473,11 @@ public class Block extends BaseBlock {
     public TextureRegion[] getIcon(){
         if(icon == null){
             if(Draw.hasRegion(name + "-icon")){
-                icon = new TextureRegion[]{Draw.region(name + "-icon")};
+                icon = new TextureRegion[]{Core.atlas.find(name + "-icon")};
             }else if(Draw.hasRegion(name)){
-                icon = new TextureRegion[]{Draw.region(name)};
+                icon = new TextureRegion[]{Core.atlas.find(name)};
             }else if(Draw.hasRegion(name + "1")){
-                icon = new TextureRegion[]{Draw.region(name + "1")};
+                icon = new TextureRegion[]{Core.atlas.find(name + "1")};
             }else{
                 icon = new TextureRegion[]{};
             }

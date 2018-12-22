@@ -2,8 +2,8 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.utils.ObjectMap;
-import io.anuke.arc.utils.PropertiesUtils;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.util.PropertiesUtils;
 import io.anuke.arc.util.Strings;
 
 import java.io.IOException;

@@ -1,13 +1,26 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.GlyphLayout;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Rectangle;
-import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.Queue;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.collection.Queue;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.GlyphLayout;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Bits;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Timer;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
@@ -16,6 +29,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Trail;
+import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
@@ -24,13 +38,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock.CoreEntity;
-import io.anuke.arc.core.*;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.EntityQuery;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Hue;
-import io.anuke.arc.graphics.Lines;
-import io.anuke.arc.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -63,7 +70,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public NetConnection con;
     public int playerIndex = 0;
     public boolean isLocal = false;
-    public Timer timer = new Timer(4);
+    public Interval timer = new Interval(4);
     public TargetTrait target;
     public TargetTrait moveTarget;
 
@@ -72,7 +79,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     private Tile mining;
     private CarriableTrait carrying;
     private Trail trail = new Trail(12);
-    private Vector2 movement = new Translator();
+    private Vector2 movement = new Vector2();
     private boolean moved;
 
     //endregion
@@ -112,7 +119,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
-    public Timer getTimer(){
+    public Interval getTimer(){
         return timer;
     }
 
@@ -559,7 +566,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     protected void updateMech(){
         Tile tile = world.tileWorld(x, y);
 
-        isBoosting = Inputs.keyDown("dash") && !mech.flying;
+        isBoosting = Core.input.keyDown("dash") && !mech.flying;
 
         //if player is in solid block
         if(tile != null && tile.solid()){
@@ -579,7 +586,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         //drop from carrier on key press
-        if(!ui.chatfrag.chatOpen() && Inputs.keyTap("drop_unit")){
+        if(!ui.chatfrag.chatOpen() && Core.input.keyTap("drop_unit")){
             if(!mech.flying){
                 if(getCarrier() != null){
                     Call.dropSelf(this);
@@ -599,9 +606,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         String section = control.input(playerIndex).section;
 
-        float xa = Inputs.getAxis(section, "move_x");
-        float ya = Inputs.getAxis(section, "move_y");
-        if(!Inputs.keyDown("gridMode")){
+        float xa = Core.input.axis(section, "move_x");
+        float ya = Core.input.axis(section, "move_y");
+        if(!Core.input.keyDown(Binding.gridMode)){
             movement.y += ya * speed;
             movement.x += xa * speed;
         }
@@ -619,7 +626,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             }
             float prex = x, prey = y;
             updateVelocityStatus();
-            moved = distanceTo(prex, prey) > 0.001f;
+            moved = dst(prex, prey) > 0.001f;
         }else{
             velocity.setZero();
             x = Mathf.lerpDelta(x, getCarrier().getX(), 0.1f);
@@ -647,7 +654,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     protected void updateFlying(){
         if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
-        mech.canHeal && distanceTo(target) < getWeapon().getAmmo().getRange())){
+        mech.canHeal && dst(target) < getWeapon().getAmmo().getRange())){
             target = null;
         }
 
@@ -664,7 +671,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 velocity.setAngle(Mathf.slerpDelta(velocity.angle(), angleTo(moveTarget), 0.1f));
             }
 
-            if(distanceTo(moveTarget) < 2f){
+            if(dst(moveTarget) < 2f){
                 if(moveTarget instanceof CarriableTrait){
                     carry((CarriableTrait) moveTarget);
                 }else if(tapping){
@@ -687,7 +694,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         movement.set(targetX - x, targetY - y).limit(isBoosting && !mech.flying ? mech.boostSpeed : mech.speed);
         movement.setAngle(Mathf.slerp(movement.angle(), velocity.angle(), 0.05f));
 
-        if(distanceTo(targetX, targetY) < attractDst){
+        if(dst(targetX, targetY) < attractDst){
             movement.setZero();
         }
 
@@ -699,7 +706,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         rect.width += expansion * 2f;
         rect.height += expansion * 2f;
 
-        isBoosting = EntityQuery.collisions().overlapsTile(rect) || distanceTo(targetX, targetY) > 85f;
+        isBoosting = EntityQuery.collisions().overlapsTile(rect) || dst(targetX, targetY) > 85f;
 
         velocity.add(movement.scl(Time.delta()));
 
@@ -711,7 +718,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         float lx = x, ly = y;
         updateVelocityStatus();
-        moved = distanceTo(lx, ly) > 0.001f && !isCarried();
+        moved = dst(lx, ly) > 0.001f && !isCarried();
 
         if(mech.flying){
             //hovering effect
@@ -731,7 +738,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
                         if(mech.canHeal && target == null){
                             target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));
-                            if(target != null && distanceTo(target) > getWeapon().getAmmo().getRange()){
+                            if(target != null && dst(target) > getWeapon().getAmmo().getRange()){
                                 target = null;
                             }else if(target != null){
                                 target = ((Tile) target).entity;
@@ -743,7 +750,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                         }
                     }
                 }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
-                mech.canHeal && distanceTo(target) < getWeapon().getAmmo().getRange())){
+                mech.canHeal && dst(target) < getWeapon().getAmmo().getRange())){
                     //rotate toward and shoot the target
                     if(mech.turnCursor){
                         rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);

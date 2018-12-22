@@ -1,6 +1,10 @@
 package io.anuke.mindustry.world;
 
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.TileEntity;
@@ -13,10 +17,6 @@ import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
 import io.anuke.mindustry.world.meta.Producers;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Timers;
-import io.anuke.arc.util.Mathf;
-import io.anuke.arc.util.Translator;
 
 public abstract class BaseBlock extends MappableContent{
     public boolean hasItems;
@@ -71,7 +71,7 @@ public abstract class BaseBlock extends MappableContent{
     }
 
     /**Returns offset for stack placement.*/
-    public void getStackOffset(Item item, Tile tile, Translator trns){
+    public void getStackOffset(Item item, Tile tile, Vector2 trns){
 
     }
 

@@ -4,9 +4,9 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.utils.Align;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.Scaling;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
@@ -18,7 +18,7 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.Minimap;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.arc.core.*;
+import io.anuke.arc.*;
 import io.anuke.arc.graphics.Hue;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
@@ -32,7 +32,7 @@ import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -109,7 +109,7 @@ public class HudFragment extends Fragment{
             }
 
             cont.update(() -> {
-                if(!Inputs.keyDown("gridMode") && Inputs.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
+                if(!Core.input.keyDown("gridMode") && Core.input.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
                     toggleMenus();
                 }
             });

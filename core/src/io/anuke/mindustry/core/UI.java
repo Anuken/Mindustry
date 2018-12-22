@@ -1,24 +1,16 @@
 package io.anuke.mindustry.core;
 
+import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
-import io.anuke.arc.Input.Keys;
+import io.anuke.arc.Events;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.function.Consumer;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Colors;
 import io.anuke.arc.graphics.g2d.BitmapFont;
-import io.anuke.arc.graphics.g2d.freetype.FreeTypeFontGenerator;
-import io.anuke.arc.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.utils.Align;
-import io.anuke.mindustry.editor.MapEditorDialog;
-import io.anuke.mindustry.game.EventType.ResizeEvent;
-import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.ui.dialogs.*;
-import io.anuke.mindustry.ui.fragments.*;
-import io.anuke.arc.core.*;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.modules.SceneModule;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.Skin;
 import io.anuke.arc.scene.actions.Actions;
@@ -28,12 +20,21 @@ import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
 import io.anuke.arc.scene.ui.TooltipManager;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.freetype.*;
+import io.anuke.mindustry.editor.MapEditorDialog;
+import io.anuke.mindustry.game.EventType.ResizeEvent;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.ui.dialogs.*;
+import io.anuke.mindustry.ui.fragments.*;
 
-import static io.anuke.mindustry.Vars.*;
 import static io.anuke.arc.scene.actions.Actions.*;
+import static io.anuke.mindustry.Vars.*;
 
-public class UI extends SceneModule{
+public class UI implements ApplicationListener{
     private FreeTypeFontGenerator generator;
 
     public final MenuFragment menufrag = new MenuFragment();
@@ -172,10 +173,10 @@ public class UI extends SceneModule{
         sectors = new SectorsDialog();
         missions = new MissionDialog();
 
-        Group group = Core.scene.getRoot();
+        Group group = Core.scene.root;
 
         backfrag.build(group);
-        control.input(0).getFrag().build(Core.scene.getRoot());
+        control.input(0).getFrag().build(group);
         hudfrag.build(group);
         menufrag.build(group);
         chatfrag.container().build(group);
@@ -215,9 +216,9 @@ public class UI extends SceneModule{
     public void loadLogic(String text, Runnable call){
         loadfrag.show(text);
         Time.runTask(7f, () ->
-            threads.run(() -> {
+            Core.app.post(() -> {
                 call.run();
-                threads.runGraphics(loadfrag::hide);
+                loadfrag.hide();
             }));
     }
 
@@ -292,8 +293,8 @@ public class UI extends SceneModule{
             dialog.hide();
             confirmed.run();
         });
-        dialog.keyDown(Keys.ESCAPE, dialog::hide);
-        dialog.keyDown(Keys.BACK, dialog::hide);
+        dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
+        dialog.keyDown(KeyCode.BACK, dialog::hide);
         dialog.show();
     }
 

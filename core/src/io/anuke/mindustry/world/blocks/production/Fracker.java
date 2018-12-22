@@ -27,9 +27,9 @@ public class Fracker extends SolidPump{
     public void load(){
         super.load();
 
-        liquidRegion = Draw.region(name + "-liquid");
-        rotatorRegion = Draw.region(name + "-rotator");
-        topRegion = Draw.region(name + "-top");
+        liquidRegion = Core.atlas.find(name + "-liquid");
+        rotatorRegion = Core.atlas.find(name + "-rotator");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
@@ -49,7 +49,7 @@ public class Fracker extends SolidPump{
 
     @Override
     public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-rotator"), Draw.region(name + "-top")};
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
     }
 
     @Override

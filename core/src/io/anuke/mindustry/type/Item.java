@@ -2,7 +2,7 @@ package io.anuke.mindustry.type;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
@@ -55,7 +55,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     }
 
     public void load(){
-        this.region = Draw.region("item-" + name);
+        this.region = Core.atlas.find("item-" + name);
     }
 
     @Override

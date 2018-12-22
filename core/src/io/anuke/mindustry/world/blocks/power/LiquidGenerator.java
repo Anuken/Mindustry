@@ -6,10 +6,10 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.power.ItemGenerator.ItemGeneratorEntity;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 public abstract class LiquidGenerator extends PowerGenerator{
     protected float minEfficiency = 0.2f;

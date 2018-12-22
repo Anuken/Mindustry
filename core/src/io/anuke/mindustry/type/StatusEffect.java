@@ -1,7 +1,7 @@
 package io.anuke.mindustry.type;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.utils.ObjectSet;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.entities.StatusController.StatusEntry;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Content;

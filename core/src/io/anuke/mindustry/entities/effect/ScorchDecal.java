@@ -4,7 +4,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.util.Angles;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -15,7 +15,7 @@ public class ScorchDecal extends Decal{
     public static void create(float x, float y){
         if(regions[0] == null){
             for(int i = 0; i < regions.length; i++){
-                regions[i] = Draw.region("scorch" + (i + 1));
+                regions[i] = Core.atlas.find("scorch" + (i + 1));
             }
         }
 

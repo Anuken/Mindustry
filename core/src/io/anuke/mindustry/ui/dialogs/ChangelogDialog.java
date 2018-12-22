@@ -1,12 +1,12 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.Changelogs;
 import io.anuke.mindustry.io.Changelogs.VersionInfo;
 import io.anuke.mindustry.game.Version;
-import io.anuke.arc.core.Settings;
+import io.anuke.arc.Settings;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Log;

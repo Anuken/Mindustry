@@ -8,8 +8,8 @@ import io.anuke.mindustry.entities.bullet.MissileBulletType;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.arc.core.Timers;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.Timers;
+import io.anuke.arc.math.Mathf;
 
 public class MissileBullets extends BulletList implements ContentList{
     public static BulletType explosive, incindiary, surge, javelin, swarm;

@@ -1,9 +1,9 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.arc.core.Settings;
+import io.anuke.arc.Settings;
 import io.anuke.arc.scene.ui.TextArea;
 import io.anuke.arc.scene.ui.TextField;
 

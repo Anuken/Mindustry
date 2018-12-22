@@ -1,6 +1,6 @@
 package io.anuke.mindustry.maps;
 
-import io.anuke.arc.utils.IntIntMap;
+import io.anuke.arc.util.IntIntMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.world.Block;

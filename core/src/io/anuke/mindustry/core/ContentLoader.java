@@ -4,7 +4,7 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.function.Consumer;
-import io.anuke.arc.utils.Log;
+import io.anuke.arc.util.Log;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.content.bullets.*;

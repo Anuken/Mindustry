@@ -2,9 +2,9 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.utils.IntArray;
-import io.anuke.arc.utils.IntSet;
-import io.anuke.arc.utils.IntSet.IntSetIterator;
+import io.anuke.arc.util.IntArray;
+import io.anuke.arc.util.IntSet;
+import io.anuke.arc.util.IntSet.IntSetIterator;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.entities.Player;
@@ -18,12 +18,12 @@ import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.CapStyle;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.util.Geometry;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -77,9 +77,9 @@ public class ItemBridge extends Block{
     public void load(){
         super.load();
 
-        endRegion = Draw.region(name + "-end");
-        bridgeRegion = Draw.region(name + "-bridge");
-        arrowRegion = Draw.region(name + "-arrow");
+        endRegion = Core.atlas.find(name + "-end");
+        bridgeRegion = Core.atlas.find(name + "-bridge");
+        arrowRegion = Core.atlas.find(name + "-arrow");
     }
 
     @Override

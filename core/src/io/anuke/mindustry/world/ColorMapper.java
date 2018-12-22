@@ -1,8 +1,8 @@
 package io.anuke.mindustry.world;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.utils.IntMap;
-import io.anuke.arc.utils.ObjectIntMap;
+import io.anuke.arc.util.IntMap;
+import io.anuke.arc.util.ObjectIntMap;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.ContentType;

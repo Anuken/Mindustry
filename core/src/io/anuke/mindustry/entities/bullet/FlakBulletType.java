@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities.bullet;
 import io.anuke.arc.math.Rectangle;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 
 public abstract class FlakBulletType extends BasicBulletType{
     protected static Rectangle rect = new Rectangle();
@@ -27,7 +27,7 @@ public abstract class FlakBulletType extends BasicBulletType{
             Units.getNearbyEnemies(b.getTeam(), rect.setSize(explodeRange*2f).setCenter(b.x, b.y), unit -> {
                 if(b.getData() instanceof Float) return;
 
-                if(unit.distanceTo(b) < explodeRange){
+                if(unit.dst(b) < explodeRange){
                     b.setData(0);
                     Time.run(5f, () -> {
                         if(b.getData() instanceof Integer){

@@ -1,6 +1,6 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.UnitTypes;

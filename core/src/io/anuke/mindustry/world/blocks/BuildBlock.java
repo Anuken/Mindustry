@@ -24,11 +24,11 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Graphics;
+import io.anuke.arc.Effects;
+import io.anuke.arc.Graphics;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;

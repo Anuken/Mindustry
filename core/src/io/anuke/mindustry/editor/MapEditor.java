@@ -1,6 +1,6 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Bits;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import static io.anuke.mindustry.Vars.content;
 public class MapEditor{
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15};

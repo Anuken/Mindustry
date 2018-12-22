@@ -1,8 +1,8 @@
 package io.anuke.mindustry.entities.effect;
 
 import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.utils.IntMap;
-import io.anuke.arc.utils.Pool.Poolable;
+import io.anuke.arc.util.IntMap;
+import io.anuke.arc.util.Pool.Poolable;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.StatusEffects;
@@ -16,13 +16,13 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.Timers;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.TimedEntity;
 import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Geometry;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Pooling;
 
 import java.io.DataInput;

@@ -169,7 +169,9 @@ project(":core"){
         if(!comp) println("Note: Compiling release build.")
 
         if(new File(projectDir.parent, '../Arc').exists() && comp){
+            println(project(":Arc:extensions").subprojects)
             compile project(":Arc:core")
+            compile project(":Arc:extensions:freetype")
         }else{
             //TODO compile arc from jitpack
             //compile 'com.github.Anuken.Arc:arc:-SNAPSHOT'

@@ -2,12 +2,12 @@ package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.FloatArray;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.util.FloatArray;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Fill;
 import io.anuke.arc.graphics.Lines;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 /**
  * Class that renders a colored trail.

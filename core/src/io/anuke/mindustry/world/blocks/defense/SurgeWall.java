@@ -4,7 +4,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 public class SurgeWall extends Wall{
     protected float lightningChance = 0.05f;

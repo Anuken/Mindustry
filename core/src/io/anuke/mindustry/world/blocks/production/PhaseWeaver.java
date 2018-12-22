@@ -5,10 +5,10 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Graphics;
+import io.anuke.arc.Graphics;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 public class PhaseWeaver extends PowerSmelter{
     protected TextureRegion bottomRegion;
@@ -22,14 +22,14 @@ public class PhaseWeaver extends PowerSmelter{
     public void load(){
         super.load();
 
-        bottomRegion = Draw.region(name + "-bottom");
-        weaveRegion = Draw.region(name + "-weave");
+        bottomRegion = Core.atlas.find(name + "-bottom");
+        weaveRegion = Core.atlas.find(name + "-weave");
     }
 
     @Override
     public TextureRegion[] getIcon(){
         if(icon == null){
-            icon = new TextureRegion[]{Draw.region(name + "-bottom"), Draw.region(name)};
+            icon = new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
         }
         return icon;
     }

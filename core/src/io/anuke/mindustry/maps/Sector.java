@@ -1,7 +1,7 @@
 package io.anuke.mindustry.maps;
 
 import io.anuke.arc.graphics.Texture;
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;

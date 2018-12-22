@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.utils.Align;
+import io.anuke.arc.util.Align;
 import io.anuke.arc.scene.ui.TextButton;
 
 public class MenuButton extends TextButton{

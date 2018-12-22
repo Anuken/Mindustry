@@ -1,9 +1,20 @@
 package io.anuke.mindustry.entities;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.impl.DestructibleEntity;
+import io.anuke.arc.entities.trait.DamageTrait;
+import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.arc.entities.trait.SolidTrait;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Rectangle;
-import io.anuke.arc.math.Vector2;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
@@ -15,16 +26,6 @@ import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Timers;
-import io.anuke.arc.entities.impl.DestructibleEntity;
-import io.anuke.arc.entities.trait.DamageTrait;
-import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.entities.trait.SolidTrait;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Fill;
-import io.anuke.arc.util.Geometry;
-import io.anuke.arc.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -194,7 +195,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         Units.getNearby(queryRect, t -> {
             if(t == this || t.getCarrier() == this || getCarrier() == t || t.isFlying() != isFlying()) return;
-            float dst = distanceTo(t);
+            float dst = dst(t);
             moveVector.set(x, y).sub(t.getX(), t.getY()).setLength(1f * (1f - (dst / queryRect.getWidth())));
             applyImpulse(moveVector.x, moveVector.y);
         });
@@ -324,7 +325,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public TextureRegion getPowerCellRegion(){
-        return Draw.region("power-cell");
+        return Core.atlas.find("power-cell");
     }
 
     public void drawAll(){

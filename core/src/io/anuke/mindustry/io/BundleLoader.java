@@ -2,11 +2,9 @@ package io.anuke.mindustry.io;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.utils.I18NBundle;
+import io.anuke.arc.util.I18NBundle;
 import io.anuke.mindustry.Vars;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Settings;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 import io.anuke.arc.util.Log;
 
 import java.util.Locale;

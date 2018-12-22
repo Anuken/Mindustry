@@ -1,9 +1,9 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.IntSet;
-import io.anuke.arc.utils.ObjectSet;
-import io.anuke.arc.utils.Queue;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.IntSet;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.util.Queue;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.threads;

@@ -7,7 +7,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -30,10 +30,10 @@ public class Conduit extends LiquidBlock{
     public void load(){
         super.load();
 
-        liquidRegion = Draw.region("conduit-liquid");
+        liquidRegion = Core.atlas.find("conduit-liquid");
         for(int i = 0; i < topRegions.length; i++){
-            topRegions[i] = Draw.region(name + "-top-" + i);
-            botRegions[i] = Draw.region("conduit-bottom-" + i);
+            topRegions[i] = Core.atlas.find(name + "-top-" + i);
+            botRegions[i] = Core.atlas.find("conduit-bottom-" + i);
         }
     }
 
@@ -113,7 +113,7 @@ public class Conduit extends LiquidBlock{
     @Override
     public TextureRegion[] getIcon(){
         if(icon == null){
-            icon = new TextureRegion[]{Draw.region("conduit-bottom"), Draw.region(name + "-top-0")};
+            icon = new TextureRegion[]{Core.atlas.find("conduit-bottom"), Core.atlas.find(name + "-top-0")};
         }
         return icon;
     }

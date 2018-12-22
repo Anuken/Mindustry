@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.utils.Scaling;
+import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.io.MapIO;

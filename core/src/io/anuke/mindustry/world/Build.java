@@ -10,7 +10,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
-import io.anuke.arc.core.Events;
+import io.anuke.arc.Events;
 import io.anuke.arc.util.Geometry;
 
 import static io.anuke.mindustry.Vars.*;

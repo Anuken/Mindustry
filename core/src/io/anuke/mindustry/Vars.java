@@ -17,7 +17,7 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
-import io.anuke.arc.core.Settings;
+import io.anuke.arc.Settings;
 import io.anuke.arc.entities.Entities;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.EffectEntity;

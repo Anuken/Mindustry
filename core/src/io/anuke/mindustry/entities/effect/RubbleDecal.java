@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.effect;
 
 import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 public class RubbleDecal extends Decal{
     private int size;

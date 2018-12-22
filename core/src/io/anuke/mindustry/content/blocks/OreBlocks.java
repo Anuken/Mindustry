@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content.blocks;
 
-import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;

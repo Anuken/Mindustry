@@ -1,8 +1,8 @@
 package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Graphics;
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Shader;
 

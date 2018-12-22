@@ -8,7 +8,7 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.MobileButton;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.arc.core.Events;
+import io.anuke.arc.Events;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;

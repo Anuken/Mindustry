@@ -11,15 +11,15 @@ import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Graphics;
-import io.anuke.arc.core.Inputs;
-import io.anuke.arc.core.Inputs.DeviceType;
-import io.anuke.arc.core.KeyBinds;
-import io.anuke.arc.core.Settings;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.Inputs;
+import io.anuke.arc.Core.input.DeviceType;
+import io.anuke.arc.KeyBinds;
+import io.anuke.arc.Settings;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.input.CursorType.*;
@@ -128,11 +128,11 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void update(){
-        if(Net.active() && Inputs.keyTap("player_list")){
+        if(Net.active() && Core.input.keyTap("player_list")){
             ui.listfrag.toggle();
         }
 
-        if(Inputs.keyRelease(section, "select")){
+        if(Core.input.keyRelease(section, "select")){
             player.isShooting = false;
         }
 
@@ -141,11 +141,11 @@ public class DesktopInput extends InputHandler{
         boolean controller = KeyBinds.getSection(section).device.type == DeviceType.controller;
 
         //zoom and rotate things
-        if(Inputs.getAxisActive("zoom") && (Inputs.keyDown(section, "zoom_hold") || controller)){
-            renderer.scaleCamera((int) Inputs.getAxisTapped(section, "zoom"));
+        if(Core.input.getAxisActive("zoom") && (Core.input.keyDown(section, "zoom_hold") || controller)){
+            renderer.scaleCamera((int) Core.input.getAxisTapped(section, "zoom"));
         }
 
-        renderer.minimap.zoomBy(-(int) Inputs.getAxisTapped(section, "zoom_minimap"));
+        renderer.minimap.zoomBy(-(int) Core.input.getAxisTapped(section, "zoom_minimap"));
 
         if(player.isDead()) return;
 
@@ -167,7 +167,7 @@ public class DesktopInput extends InputHandler{
             selectScale = 0f;
         }
 
-        rotation = Mathf.mod(rotation + (int) Inputs.getAxisTapped(section, "rotate"), 4);
+        rotation = Mathf.mod(rotation + (int) Core.input.getAxisTapped(section, "rotate"), 4);
 
         Tile cursor = tileAt(Core.input.getX(), Core.input.getY());
 
@@ -203,11 +203,11 @@ public class DesktopInput extends InputHandler{
         int cursorX = tileX(Core.input.getX());
         int cursorY = tileY(Core.input.getY());
 
-        if(Inputs.keyTap(section, "deselect")){
+        if(Core.input.keyTap(section, "deselect")){
             player.setMineTile(null);
         }
 
-        if(Inputs.keyTap(section, "select") && !ui.hasMouse()){
+        if(Core.input.keyTap(section, "select") && !ui.hasMouse()){
             if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
@@ -221,7 +221,7 @@ public class DesktopInput extends InputHandler{
             }else if(!ui.chatfrag.chatOpen()){ //if it's out of bounds, shooting is just fine
                 player.isShooting = true;
             }
-        }else if(Inputs.keyTap(section, "deselect") && (recipe != null || mode != none || player.isBuilding()) &&
+        }else if(Core.input.keyTap(section, "deselect") && (recipe != null || mode != none || player.isBuilding()) &&
         !(player.getCurrentRequest() != null && player.getCurrentRequest().breaking && KeyBinds.get(section, "deselect") == KeyBinds.get(section, "break"))){
             if(recipe == null){
                 player.clearBuilding();
@@ -229,7 +229,7 @@ public class DesktopInput extends InputHandler{
 
             recipe = null;
             mode = none;
-        }else if(Inputs.keyTap(section, "break") && !ui.hasMouse()){
+        }else if(Core.input.keyTap(section, "break") && !ui.hasMouse()){
             //is recalculated because setting the mode to breaking removes potential multiblock cursor offset
             mode = breaking;
             selectX = tileX(Core.input.getX());
@@ -237,7 +237,7 @@ public class DesktopInput extends InputHandler{
         }
 
 
-        if(Inputs.keyRelease(section, "break") || Inputs.keyRelease(section, "select")){
+        if(Core.input.keyRelease(section, "break") || Core.input.keyRelease(section, "select")){
 
             if(mode == placing){ //touch up while placing, place everything in selection
                 NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, true, maxLength);
@@ -306,8 +306,8 @@ public class DesktopInput extends InputHandler{
                 controlling = true;
             }
 
-            float xa = Inputs.getAxis(section, "cursor_x");
-            float ya = Inputs.getAxis(section, "cursor_y");
+            float xa = Core.input.getAxis(section, "cursor_x");
+            float ya = Core.input.getAxis(section, "cursor_y");
 
             if(Math.abs(xa) > controllerMin || Math.abs(ya) > controllerMin){
                 float scl = Core.settings.getInt("sensitivity", 100) / 100f * Unit.dp.scl(1f);
@@ -319,7 +319,7 @@ public class DesktopInput extends InputHandler{
                     Core.input.setCursorCatched(true);
                 }
 
-                Inputs.getProcessor().touchDragged((int) getMouseX(), (int) getMouseY(), player.playerIndex);
+                Core.input.getProcessor().touchDragged((int) getMouseX(), (int) getMouseY(), player.playerIndex);
             }
 
             controlx = Mathf.clamp(controlx, 0, Core.graphics.getWidth());

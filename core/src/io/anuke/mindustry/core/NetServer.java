@@ -1,15 +1,26 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Colors;
-import io.anuke.arc.math.Rectangle;
-import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.IntMap;
-import io.anuke.arc.utils.ObjectSet;
-import io.anuke.arc.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.entities.trait.Entity;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Colors;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.io.ByteBufferOutput;
+import io.anuke.arc.util.io.CountableByteArrayOutputStream;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
@@ -21,22 +32,13 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadServer;
-import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.net.Administration;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
+import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetConnection;
+import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Events;
-import io.anuke.arc.core.Timers;
-import io.anuke.arc.entities.Entities;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.EntityQuery;
-import io.anuke.arc.entities.trait.Entity;
-import io.anuke.arc.io.ByteBufferOutput;
-import io.anuke.arc.io.CountableByteArrayOutputStream;
-import io.anuke.arc.modules.Module;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Mathf;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -48,7 +50,7 @@ import java.util.zip.DeflaterOutputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class NetServer extends Module{
+public class NetServer implements ApplicationListener{
     public final static int maxSnapshotSize = 2047;
 
     public final static boolean debugSnapshots = false;
@@ -122,7 +124,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            if(TimeUtils.millis() - info.lastKicked < kickDuration){
+            if(Time.millis() - info.lastKicked < kickDuration){
                 kick(id, KickReason.recentKick);
                 return;
             }
@@ -311,14 +313,14 @@ public class NetServer extends Module{
 
         boolean verifyPosition = !player.isDead() && netServer.admins.getStrict() && headless && player.getCarrier() == null;
 
-        if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = TimeUtils.millis() - 16;
+        if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = Time.millis() - 16;
 
         connection.viewX = viewX;
         connection.viewY = viewY;
         connection.viewWidth = viewWidth;
         connection.viewHeight = viewHeight;
 
-        long elapsed = TimeUtils.timeSinceMillis(connection.lastRecievedClientTime);
+        long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
 
         float maxSpeed = boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
         float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.25f, player.mech.maxSpeed * 1.1f);
@@ -370,7 +372,7 @@ public class NetServer extends Module{
         player.getVelocity().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
 
         connection.lastRecievedClientSnapshot = snapshotID;
-        connection.lastRecievedClientTime = TimeUtils.millis();
+        connection.lastRecievedClientTime = Time.millis();
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
@@ -436,7 +438,7 @@ public class NetServer extends Module{
 
         if(!headless && !closing && Net.server() && state.is(State.menu)){
             closing = true;
-            threads.runGraphics(() -> ui.loadfrag.show("$text.server.closing"));
+            ui.loadfrag.show("$text.server.closing");
             Time.runTask(5f, () -> {
                 Net.closeServer();
                 ui.loadfrag.hide();
@@ -469,7 +471,7 @@ public class NetServer extends Module{
         if(player != null && (reason == KickReason.kick || reason == KickReason.banned) && player.uuid != null){
             PlayerInfo info = admins.getInfo(player.uuid);
             info.timesKicked++;
-            info.lastKicked = TimeUtils.millis();
+            info.lastKicked = Time.millis();
         }
 
         Call.onKick(connection, reason);
@@ -498,7 +500,7 @@ public class NetServer extends Module{
         }
 
         //write timestamp
-        dataStream.writeLong(TimeUtils.millis());
+        dataStream.writeLong(Time.millis());
 
         int totalGroups = 0;
 

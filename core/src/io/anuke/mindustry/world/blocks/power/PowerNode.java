@@ -12,12 +12,12 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.core.Settings;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Settings;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.util.Angles;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;

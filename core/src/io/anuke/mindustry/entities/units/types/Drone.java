@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities.units.types;
 
-import io.anuke.arc.utils.Queue;
+import io.anuke.arc.util.Queue;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -20,10 +20,10 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.core.Events;
+import io.anuke.arc.Events;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.util.Geometry;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Structs;
 
 import java.io.DataInput;
@@ -108,7 +108,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
             if(target == null) return;
 
-            if(target.distanceTo(Drone.this) > type.range){
+            if(target.dst(Drone.this) > type.range){
                 circle(type.range*0.9f);
             }else{
                 getWeapon().update(Drone.this, target.getX(), target.getY());
@@ -254,7 +254,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     }
 
     private void notifyPlaced(BuildEntity entity, boolean isBreaking){
-        float dist = Math.min(entity.distanceTo(x, y) - placeDistance, 0);
+        float dist = Math.min(entity.dst(x, y) - placeDistance, 0);
 
         if(!state.is(build) && dist / type.maxVelocity < entity.buildCost * 0.9f){
             target = entity;
@@ -311,7 +311,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
     @Override
     protected void updateRotation(){
-        if(target != null && ((state.is(repair) && target.distanceTo(this) < type.range) || state.is(mine))){
+        if(target != null && ((state.is(repair) && target.dst(this) < type.range) || state.is(mine))){
             rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.3f);
         }else{
             rotation = Mathf.slerpDelta(rotation, velocity.angle(), 0.3f);

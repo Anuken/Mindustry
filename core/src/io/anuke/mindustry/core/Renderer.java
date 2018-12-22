@@ -8,9 +8,9 @@ import io.anuke.arc.graphics.PixmapIO;
 import io.anuke.arc.graphics.g2d.SpriteBatch;
 import io.anuke.arc.math.Rectangle;
 import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.BufferUtils;
-import io.anuke.arc.utils.ScreenUtils;
-import io.anuke.arc.utils.TimeUtils;
+import io.anuke.arc.util.BufferUtils;
+import io.anuke.arc.util.ScreenUtils;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -23,10 +23,8 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Graphics;
-import io.anuke.arc.core.Settings;
+import io.anuke.arc.Effects;
+import io.anuke.arc.Graphics;
 import io.anuke.arc.entities.EntityDraw;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.EffectEntity;
@@ -40,7 +38,7 @@ import io.anuke.arc.graphics.Surface;
 import io.anuke.arc.modules.RendererModule;
 import io.anuke.arc.scene.utils.Cursors;
 import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Pooling;
 import io.anuke.arc.util.Translator;
 
@@ -415,7 +413,7 @@ public class Renderer extends RendererModule{
         Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
 
         BufferUtils.copy(lines, 0, fullPixmap.getPixels(), lines.length);
-        FileHandle file = screenshotDirectory.child("screenshot-" + TimeUtils.millis() + ".png");
+        FileHandle file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
         PixmapIO.writePNG(file, fullPixmap);
         fullPixmap.dispose();
 

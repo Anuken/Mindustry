@@ -3,15 +3,14 @@ package io.anuke.mindustry.core;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
-import io.anuke.arc.Settings;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureAtlas;
 import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.utils.Interval;
-import io.anuke.arc.utils.Strings;
-import io.anuke.arc.utils.Time;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -95,7 +94,7 @@ public class Control implements ApplicationListener{
             state.set(State.playing);
         });
 
-        Events.on(WorldLoadGraphicsEvent.class, event -> {
+        Events.on(WorldLoadEvent.class, event -> {
             if(mobile){
                 Core.app.post(() -> Core.camera.position.set(players[0]));
             }
@@ -146,8 +145,6 @@ public class Control implements ApplicationListener{
                 }
             }
         });
-
-        Events.on(WorldLoadEvent.class, event -> threads.runGraphics(() -> Events.fire(new WorldLoadGraphicsEvent())));
     }
 
     public void addPlayer(int index){

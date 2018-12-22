@@ -4,7 +4,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.ItemBuffer;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 public class BufferedItemBridge extends ExtendingItemBridge{
     protected int timerAccept = timers++;

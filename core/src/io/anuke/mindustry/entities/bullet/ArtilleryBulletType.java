@@ -1,8 +1,8 @@
 package io.anuke.mindustry.entities.bullet;
 
 import io.anuke.mindustry.content.fx.BulletFx;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.Draw;
 
 //TODO scale velocity depending on fslope()

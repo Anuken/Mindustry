@@ -1,8 +1,8 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.arc.utils.ObjectMap;
-import io.anuke.arc.utils.ObjectMap.Entry;
-import io.anuke.arc.utils.TimeUtils;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.util.ObjectMap.Entry;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.GameMode;
@@ -14,8 +14,8 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Core;
+import io.anuke.arc.Timers;
 import io.anuke.arc.entities.Entities;
 import io.anuke.arc.util.Bits;
 
@@ -186,7 +186,7 @@ public class NetworkIO{
             Entities.clear();
             int id = stream.readInt();
             player.resetNoAdd();
-            player.read(stream, TimeUtils.millis());
+            player.read(stream, Time.millis());
             player.resetID(id);
             player.add();
 

@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.blocks.SelectionTrait;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;

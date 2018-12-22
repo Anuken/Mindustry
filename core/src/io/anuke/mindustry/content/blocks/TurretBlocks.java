@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.util.Angles;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 public class TurretBlocks extends BlockList implements ContentList{
     public static Block duo, /*scatter,*/
@@ -46,7 +46,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             @Override
             public void load(){
                 super.load();
-                shootRegion = Draw.region(name + "-shoot");
+                shootRegion = Core.atlas.find(name + "-shoot");
             }
 
             {
@@ -137,8 +137,8 @@ public class TurretBlocks extends BlockList implements ContentList{
             @Override
             public void load() {
                 super.load();
-                panels[0] = Draw.region(name + "-panel-left");
-                panels[1] = Draw.region(name + "-panel-right");
+                panels[0] = Core.atlas.find(name + "-panel-left");
+                panels[1] = Core.atlas.find(name + "-panel-right");
             }
 
             {

@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.units;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.utils.ObjectSet;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.fx.BlockFx;
@@ -16,8 +16,8 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.scene.ui.ButtonGroup;
 import io.anuke.arc.scene.ui.ImageButton;
@@ -61,7 +61,7 @@ public class CommandCenter extends Block{
         super.load();
 
         for(UnitCommand cmd : UnitCommand.values()){
-            commandRegions[cmd.ordinal()] = Draw.region("command-" + cmd.name());
+            commandRegions[cmd.ordinal()] = Core.atlas.find("command-" + cmd.name());
         }
     }
 

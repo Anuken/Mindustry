@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
-import io.anuke.arc.core.Effects;
+import io.anuke.arc.Effects;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;

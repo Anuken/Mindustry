@@ -11,13 +11,13 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.graphics.Shapes;
 import io.anuke.arc.util.Angles;
 import io.anuke.arc.util.EnumSet;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 public class RepairPoint extends Block{
     private static Rectangle rect = new Rectangle();
@@ -45,7 +45,7 @@ public class RepairPoint extends Block{
     public void load(){
         super.load();
 
-        topRegion = Draw.region(name + "-turret");
+        topRegion = Core.atlas.find(name + "-turret");
     }
 
     @Override
@@ -83,7 +83,7 @@ public class RepairPoint extends Block{
     public void update(Tile tile){
         RepairPointEntity entity = tile.entity();
 
-        if(entity.target != null && (entity.target.isDead() || entity.target.distanceTo(tile) > repairRadius ||
+        if(entity.target != null && (entity.target.isDead() || entity.target.dst(tile) > repairRadius ||
                 entity.target.health >= entity.target.maxHealth())){
             entity.target = null;
         }else if(entity.target != null){

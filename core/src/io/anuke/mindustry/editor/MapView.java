@@ -9,13 +9,13 @@ import io.anuke.arc.math.Bresenham2;
 import io.anuke.arc.math.GridPoint2;
 import io.anuke.arc.math.Rectangle;
 import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.GridImage;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Graphics;
-import io.anuke.arc.core.Inputs;
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.Inputs;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.scene.Element;
@@ -25,7 +25,7 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Geometry;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Tmp;
 
 import static io.anuke.mindustry.Vars.mobile;
@@ -60,7 +60,7 @@ public class MapView extends Element implements GestureListener{
             brushPolygons[i] = Geometry.pixelCircle(size, (index, x, y) -> Vector2.dst(x, y, index, index) <= index - 0.5f);
         }
 
-        Inputs.addProcessor(0, new GestureDetector(20, 0.5f, 2, 0.15f, this));
+        Core.input.addProcessor(0, new GestureDetector(20, 0.5f, 2, 0.15f, this));
         setTouchable(Touchable.enabled);
 
         addListener(new InputListener(){
@@ -214,16 +214,16 @@ public class MapView extends Element implements GestureListener{
         super.act(delta);
 
         if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField) &&
-                !Inputs.keyDown(io.anuke.arc.input.Input.CONTROL_LEFT)){
-            float ax = Inputs.getAxis("move_x");
-            float ay = Inputs.getAxis("move_y");
+                !Core.input.keyDown(io.anuke.arc.input.Input.CONTROL_LEFT)){
+            float ax = Core.input.getAxis("move_x");
+            float ay = Core.input.getAxis("move_y");
             offsetx -= ax * 15f / zoom;
             offsety -= ay * 15f / zoom;
         }
 
         if(ui.editor.hasPane()) return;
 
-        zoom += Inputs.scroll() / 10f * zoom;
+        zoom += Core.input.scroll() / 10f * zoom;
         clampZoom();
     }
 

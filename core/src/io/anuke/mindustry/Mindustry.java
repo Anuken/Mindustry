@@ -3,10 +3,8 @@ package io.anuke.mindustry;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
-import io.anuke.arc.Settings;
-import io.anuke.arc.utils.Log;
-import io.anuke.arc.utils.Time;
-import io.anuke.arc.utils.TimeUtils;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.EventType.GameLoadEvent;
 import io.anuke.mindustry.io.BundleLoader;
@@ -47,7 +45,7 @@ public class Mindustry implements ApplicationListener{
 
     @Override
     public void update(){
-        lastFrameTime = TimeUtils.millis();
+        lastFrameTime = Time.millis();
 
         //TODO ??render it all??
 
@@ -55,7 +53,7 @@ public class Mindustry implements ApplicationListener{
 
         if(fpsCap <= 120){
             long target = 1000/fpsCap;
-            long elapsed = TimeUtils.timeSinceMillis(lastFrameTime);
+            long elapsed = Time.timeSinceMillis(lastFrameTime);
             if(elapsed < target){
                 try{
                     Thread.sleep(target - elapsed);

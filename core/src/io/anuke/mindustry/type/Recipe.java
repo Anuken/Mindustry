@@ -1,9 +1,9 @@
 package io.anuke.mindustry.type;
 
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.ObjectMap;
-import io.anuke.arc.utils.OrderedMap;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.util.OrderedMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.UnlockableContent;

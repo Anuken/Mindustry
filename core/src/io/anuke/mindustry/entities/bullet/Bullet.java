@@ -10,13 +10,13 @@ import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.BulletEntity;
 import io.anuke.arc.entities.trait.Entity;
 import io.anuke.arc.entities.trait.SolidTrait;
 import io.anuke.arc.entities.trait.VelocityTrait;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Pooling;
 import io.anuke.arc.util.Timer;
 

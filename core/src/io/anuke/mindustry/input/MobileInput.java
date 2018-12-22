@@ -8,9 +8,9 @@ import io.anuke.arc.input.GestureDetector.GestureListener;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.Rectangle;
 import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.Align;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.ObjectSet;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
@@ -27,11 +27,11 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.*;
+import io.anuke.arc.*;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
@@ -76,7 +76,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     public MobileInput(Player player){
         super(player);
-        Inputs.addProcessor(new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
+        Core.input.addProcessor(new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
     }
 
     //region utility methods

@@ -7,9 +7,9 @@ import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.g2d.Batch;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.Align;
-import io.anuke.arc.utils.Disposable;
-import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Disposable;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.core.Platform;
@@ -21,10 +21,9 @@ import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Graphics;
-import io.anuke.arc.core.Inputs;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.Inputs;
+import io.anuke.arc.Timers;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.input.Input;
@@ -36,7 +35,7 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.arc.util.Bundles;
 import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Strings;
 
 import java.io.DataInputStream;
@@ -476,35 +475,35 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private void doInput(){
         //tool select
         for(int i = 0; i < EditorTool.values().length; i++){
-            if(Inputs.keyTap(Input.valueOf("NUM_" + (i + 1)))){
+            if(Core.input.keyTap(Input.valueOf("NUM_" + (i + 1)))){
                 view.setTool(EditorTool.values()[i]);
                 break;
             }
         }
 
-        if(Inputs.keyTap(Input.R)){
+        if(Core.input.keyTap(Input.R)){
             editor.setDrawRotation((editor.getDrawRotation() + 1) % 4);
         }
 
-        if(Inputs.keyTap(Input.E)){
+        if(Core.input.keyTap(Input.E)){
             editor.setDrawRotation(Mathf.mod((editor.getDrawRotation() + 1), 4));
         }
 
         //ctrl keys (undo, redo, save)
         if(UIUtils.ctrl()){
-            if(Inputs.keyTap(Input.Z)){
+            if(Core.input.keyTap(Input.Z)){
                 view.undo();
             }
 
-            if(Inputs.keyTap(Input.Y)){
+            if(Core.input.keyTap(Input.Y)){
                 view.redo();
             }
 
-            if(Inputs.keyTap(Input.S)){
+            if(Core.input.keyTap(Input.S)){
                 save();
             }
 
-            if(Inputs.keyTap(Input.G)){
+            if(Core.input.keyTap(Input.G)){
                 view.setGrid(!view.isGrid());
             }
         }
@@ -539,7 +538,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 continue;
             }
 
-            if(regions.length == 0 || regions[0] == Draw.region("jjfgj")) continue;
+            if(regions.length == 0 || regions[0] == Core.atlas.find("jjfgj")) continue;
 
             Stack stack = new Stack();
 

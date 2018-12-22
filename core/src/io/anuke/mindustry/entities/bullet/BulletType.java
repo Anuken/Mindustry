@@ -6,8 +6,8 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.entities.impl.BaseBulletType;
 import io.anuke.arc.util.Translator;
 

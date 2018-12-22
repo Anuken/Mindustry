@@ -1,15 +1,13 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.Input.Keys;
 import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.utils.Base64Coder;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Settings;
-import io.anuke.arc.core.Timers;
 import io.anuke.arc.function.Consumer;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.TextField;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.serialization.Base64Coder;
 
 import java.util.Random;
 
@@ -44,7 +42,7 @@ public abstract class Platform {
 
             TextField to = dialog.content().addField(field.getText(), t-> {}).pad(15).width(250f).get();
             to.setMaxLength(maxLength);
-            to.keyDown(Keys.ENTER, () -> dialog.content().find("okb").fireClick());
+            to.keyDown(KeyCode.ENTER, () -> dialog.content().find("okb").fireClick());
 
             use[0] = to;
 
@@ -81,7 +79,7 @@ public abstract class Platform {
             byte[] result = new byte[8];
             new Random().nextBytes(result);
             uuid = new String(Base64Coder.encode(result));
-            Core.settings.putString("uuid", uuid);
+            Core.settings.put("uuid", uuid);
             Core.settings.save();
             return uuid;
         }

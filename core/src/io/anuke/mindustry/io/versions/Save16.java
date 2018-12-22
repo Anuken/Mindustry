@@ -1,6 +1,6 @@
 package io.anuke.mindustry.io.versions;
 
-import io.anuke.arc.utils.TimeUtils;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Version;
@@ -56,7 +56,7 @@ public class Save16 extends SaveFileVersion{
     public void write(DataOutputStream stream) throws IOException{
         //--META--
         stream.writeInt(version); //version id
-        stream.writeLong(TimeUtils.millis()); //last saved
+        stream.writeLong(Time.millis()); //last saved
         stream.writeLong(headless ? 0 : control.saves.getTotalPlaytime()); //playtime
         stream.writeInt(Version.build); //build
         stream.writeInt(world.getSector() == null ? invalidSector : world.getSector().pos()); //sector ID

@@ -1,11 +1,18 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.ObjectSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.BaseEntity;
+import io.anuke.arc.entities.trait.HealthTrait;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.GridPoint2;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.TargetTrait;
@@ -20,13 +27,6 @@ import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.mindustry.world.modules.PowerModule;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Timers;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.BaseEntity;
-import io.anuke.arc.entities.trait.HealthTrait;
-import io.anuke.arc.util.Mathf;
-import io.anuke.arc.util.Timer;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -42,7 +42,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public static int sleepingEntities = 0;
 
     public Tile tile;
-    public Timer timer;
+    public Interval timer;
     public float health;
     public float timeScale = 1f, timeScaleDuration;
 
@@ -78,7 +78,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
         health = tile.block().health;
 
-        timer = new Timer(tile.block().timers);
+        timer = new Interval(tile.block().timers);
 
         if(added){
             add();

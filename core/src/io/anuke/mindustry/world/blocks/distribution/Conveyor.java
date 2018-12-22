@@ -1,8 +1,8 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.LongArray;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.LongArray;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Layer;
@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.util.*;
 
@@ -68,7 +68,7 @@ public class Conveyor extends Block{
 
         for(int i = 0; i < regions.length; i++){
             for(int j = 0; j < 4; j++){
-                regions[i][j] = Draw.region(name + "-" + i + "-" + j);
+                regions[i][j] = Core.atlas.find(name + "-" + i + "-" + j);
             }
         }
     }
@@ -139,7 +139,7 @@ public class Conveyor extends Block{
     @Override
     public TextureRegion[] getIcon(){
         if(icon == null){
-            icon = new TextureRegion[]{Draw.region(name + "-0-0")};
+            icon = new TextureRegion[]{Core.atlas.find(name + "-0-0")};
         }
         return super.getIcon();
     }

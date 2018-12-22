@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.utils.Scaling;
+import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.scene.ui.Image;
@@ -39,7 +39,7 @@ public class LocalPlayerDialog extends FloatingDialog{
 
             stack.add(new Image("button"));
 
-            Image img = new Image(Draw.region("icon-chat"));
+            Image img = new Image(Core.atlas.find("icon-chat"));
             img.setScaling(Scaling.fill);
 
             stack.add(img);

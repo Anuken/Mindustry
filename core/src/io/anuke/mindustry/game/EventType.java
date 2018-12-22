@@ -43,14 +43,6 @@ public class EventType{
 
     }
 
-    /**
-     * Called after the WorldLoadEvent is, and all logic has been loaded.
-     * It is safe to intialize graphics here.
-     */
-    public static class WorldLoadGraphicsEvent implements Event{
-
-    }
-
     /**Called from the logic thread. Do not access graphics here!*/
     public static class TileChangeEvent implements Event{
         public final Tile tile;

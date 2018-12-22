@@ -19,13 +19,13 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumePowerExact;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Graphics;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.util.Geometry;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -135,14 +135,14 @@ public class MechPad extends Block{
     @Override
     public void load(){
         super.load();
-        openRegion = Draw.region(name + "-open");
+        openRegion = Core.atlas.find(name + "-open");
     }
 
     @Override
     public void draw(Tile tile){
         MechFactoryEntity entity = tile.entity();
 
-        Draw.rect(Draw.region(name), tile.drawx(), tile.drawy(), entity.open ? 180f : 0f);
+        Draw.rect(Core.atlas.find(name), tile.drawx(), tile.drawy(), entity.open ? 180f : 0f);
 
         if(entity.player != null){
             TextureRegion region = mech.iconRegion;

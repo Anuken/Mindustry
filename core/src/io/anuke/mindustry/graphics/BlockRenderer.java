@@ -1,20 +1,20 @@
 package io.anuke.mindustry.graphics;
 
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.IntSet;
-import io.anuke.arc.utils.Sort;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.IntSet;
+import io.anuke.arc.util.Sort;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Events;
-import io.anuke.arc.core.Graphics;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.Graphics;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Surface;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.arc.core.Core.camera;

@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ai;
 
 import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.utils.IntArray;
-import io.anuke.arc.utils.Queue;
-import io.anuke.arc.utils.TimeUtils;
+import io.anuke.arc.util.IntArray;
+import io.anuke.arc.util.Queue;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -11,8 +11,8 @@ import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.core.Events;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Events;
+import io.anuke.arc.Timers;
 import io.anuke.arc.util.Geometry;
 import io.anuke.arc.util.Structs;
 
@@ -20,7 +20,7 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 public class Pathfinder{
-    private long maxUpdate = TimeUtils.millisToNanos(4);
+    private long maxUpdate = Time.millisToNanos(4);
     private PathData[] paths;
     private IntArray blocked = new IntArray();
 
@@ -105,7 +105,7 @@ public class Pathfinder{
             //increment search, clear frontier
             path.search++;
             path.frontier.clear();
-            path.lastSearchTime = TimeUtils.millis();
+            path.lastSearchTime = Time.millis();
 
             //add all targets to the frontier
             for(Tile other : world.indexer.getEnemy(team, BlockFlag.target)){
@@ -144,9 +144,9 @@ public class Pathfinder{
     private void updateFrontier(Team team, long nsToRun){
         PathData path = paths[team.ordinal()];
 
-        long start = TimeUtils.nanoTime();
+        long start = Time.nanoTime();
 
-        while(path.frontier.size > 0 && (nsToRun < 0 || TimeUtils.timeSinceNanos(start) <= nsToRun)){
+        while(path.frontier.size > 0 && (nsToRun < 0 || Time.timeSinceNanos(start) <= nsToRun)){
             Tile tile = path.frontier.removeLast();
             float cost = path.weights[tile.x][tile.y];
 

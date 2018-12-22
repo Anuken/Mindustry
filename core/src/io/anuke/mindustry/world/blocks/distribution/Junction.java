@@ -1,12 +1,12 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.utils.NumberUtils;
+import io.anuke.arc.util.NumberUtils;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 import io.anuke.arc.util.Bits;
 
 import static io.anuke.mindustry.Vars.content;

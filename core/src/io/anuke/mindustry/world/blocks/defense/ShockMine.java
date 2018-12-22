@@ -8,7 +8,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Fill;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 public class ShockMine extends Block{
     protected int timerDamage = timers ++;

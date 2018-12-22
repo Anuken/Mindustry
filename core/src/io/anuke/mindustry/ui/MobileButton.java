@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ui;
 
-import io.anuke.arc.utils.Align;
+import io.anuke.arc.util.Align;
 import io.anuke.arc.scene.ui.ImageButton;
 
 public class MobileButton extends ImageButton{

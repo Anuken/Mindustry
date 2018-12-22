@@ -3,7 +3,7 @@ package io.anuke.mindustry.type;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.Content;
-import io.anuke.arc.core.Effects.Effect;
+import io.anuke.arc.entities.Effects.Effect;
 
 public class AmmoType extends Content {
     /**The item used. Always null if liquid isn't.*/

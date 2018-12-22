@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.consumers;
 
-import io.anuke.arc.utils.ObjectMap;
-import io.anuke.arc.utils.ObjectSet;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;

@@ -2,7 +2,7 @@ package io.anuke.mindustry.world;
 
 import io.anuke.arc.math.GridPoint2;
 import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.TargetTrait;

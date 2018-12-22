@@ -2,9 +2,9 @@ package io.anuke.mindustry.maps.generation;
 
 import io.anuke.arc.math.GridPoint2;
 import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.IntArray;
-import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.IntArray;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.OreBlocks;
@@ -24,7 +24,7 @@ import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.arc.noise.RidgedPerlin;
 import io.anuke.arc.noise.Simplex;
 import io.anuke.arc.util.Geometry;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.SeedRandom;
 import io.anuke.arc.util.Structs;
 

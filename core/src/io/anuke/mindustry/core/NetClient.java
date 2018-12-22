@@ -1,14 +1,21 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.utils.Base64Coder;
-import io.anuke.arc.utils.IntSet;
-import io.anuke.arc.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.PacketPriority;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.annotations.Annotations.Variant;
+import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.io.ReusableByteArrayInputStream;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -25,16 +32,6 @@ import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Settings;
-import io.anuke.arc.core.Timers;
-import io.anuke.arc.entities.Entities;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.io.ReusableByteArrayInputStream;
-import io.anuke.arc.modules.Module;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Mathf;
-import io.anuke.arc.util.Timer;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -43,12 +40,12 @@ import java.util.zip.InflaterInputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class NetClient extends Module{
+public class NetClient implements ApplicationListener{
     private final static float dataTimeout = 60 * 18;
     private final static float playerSyncTime = 2;
     public final static float viewScale = 2f;
 
-    private Timer timer = new Timer(5);
+    private Interval timer = new Interval(5);
     /**Whether the client is currently connecting.*/
     private boolean connecting = false;
     /**If true, no message will be shown on disconnect.*/
@@ -422,13 +419,13 @@ public class NetClient extends Module{
                 requests[i] = player.getPlaceQueue().get(i);
             }
 
-            Call.onClientShapshot(lastSent++, TimeUtils.millis(), player.x, player.y,
+            Call.onClientShapshot(lastSent++, Time.millis(), player.x, player.y,
                 player.pointerX, player.pointerY, player.rotation, player.baseRotation,
                 player.getVelocity().x, player.getVelocity().y,
                 player.getMineTile(),
                 player.isBoosting, player.isShooting, requests,
                 Core.camera.position.x, Core.camera.position.y,
-                Core.camera.viewportWidth * Core.camera.zoom * viewScale, Core.camera.viewportHeight * Core.camera.zoom * viewScale);
+                Core.camera.width * viewScale, Core.camera.height * viewScale);
         }
 
         if(timer.get(1, 60)){
@@ -443,7 +440,7 @@ public class NetClient extends Module{
             byte[] bytes = new byte[8];
             new Random().nextBytes(bytes);
             String result = new String(Base64Coder.encode(bytes));
-            Core.settings.putString("usid-" + ip, result);
+            Core.settings.put("usid-" + ip, result);
             Core.settings.save();
             return result;
         }

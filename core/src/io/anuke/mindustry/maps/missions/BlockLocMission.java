@@ -2,12 +2,12 @@ package io.anuke.mindustry.maps.missions;
 
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.util.Angles;
 import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.players;
 import static io.anuke.mindustry.Vars.tilesize;

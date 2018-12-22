@@ -2,7 +2,7 @@ package io.anuke.mindustry.entities.units;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.utils.ObjectSet;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.traits.TypeTrait;
@@ -78,12 +78,12 @@ public class UnitType extends UnlockableContent{
 
     @Override
     public void load(){
-        iconRegion = Draw.region("unit-icon-" + name);
-        region = Draw.region(name);
+        iconRegion = Core.atlas.find("unit-icon-" + name);
+        region = Core.atlas.find(name);
 
         if(!isFlying){
-            legRegion = Draw.region(name + "-leg");
-            baseRegion = Draw.region(name + "-base");
+            legRegion = Core.atlas.find(name + "-leg");
+            baseRegion = Core.atlas.find(name + "-base");
         }
     }
 

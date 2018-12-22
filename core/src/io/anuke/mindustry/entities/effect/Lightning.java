@@ -2,8 +2,8 @@ package io.anuke.mindustry.entities.effect;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Rectangle;
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.IntSet;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.IntSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.bullets.TurretBullets;
@@ -21,7 +21,6 @@ import io.anuke.arc.entities.trait.PosTrait;
 import io.anuke.arc.entities.trait.TimeTrait;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
-import io.anuke.arc.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;

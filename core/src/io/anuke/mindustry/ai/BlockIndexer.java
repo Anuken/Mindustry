@@ -1,7 +1,12 @@
 package io.anuke.mindustry.ai;
 
-import io.anuke.arc.math.Vector2;
-import io.anuke.arc.utils.*;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Bits;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -11,12 +16,6 @@ import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.core.Events;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.util.EnumSet;
-import io.anuke.arc.util.Geometry;
-import io.anuke.arc.util.Mathf;
-import io.anuke.arc.util.ThreadArray;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -47,7 +46,7 @@ public class BlockIndexer{
     /**Empty set used for returning.*/
     private ObjectSet<Tile> emptySet = new ObjectSet<>();
     /**Array used for returning and reusing.*/
-    private Array<Tile> returnArray = new ThreadArray<>();
+    private Array<Tile> returnArray = new Array<>();
 
     public BlockIndexer(){
         Events.on(TileChangeEvent.class, event -> {

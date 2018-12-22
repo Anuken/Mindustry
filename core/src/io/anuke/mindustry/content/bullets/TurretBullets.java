@@ -18,11 +18,11 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.Angles;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
@@ -367,9 +367,9 @@ public class TurretBullets extends BulletList implements ContentList{
                     return;
                 }
 
-                float baseDst = data.from.distanceTo(data.to);
-                float dst1 = b.distanceTo(data.from);
-                float dst2 = b.distanceTo(data.to);
+                float baseDst = data.from.dst(data.to);
+                float dst1 = b.dst(data.from);
+                float dst2 = b.dst(data.to);
 
                 boolean intersect = false;
 

@@ -1,7 +1,7 @@
 package io.anuke.mindustry.maps;
 
-import io.anuke.arc.utils.IntIntMap;
-import io.anuke.arc.utils.ObjectMap;
+import io.anuke.arc.util.IntIntMap;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.util.Bundles;
 
 public class MapMeta{

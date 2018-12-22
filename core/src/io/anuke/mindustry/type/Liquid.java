@@ -45,7 +45,7 @@ public class Liquid extends UnlockableContent{
 
     @Override
     public void load(){
-        iconRegion = Draw.region("liquid-icon-" + name);
+        iconRegion = Core.atlas.find("liquid-icon-" + name);
     }
 
     @Override

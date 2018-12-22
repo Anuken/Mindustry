@@ -6,11 +6,11 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Graphics;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.input.InputProcessor;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.scene.event.InputListener;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.utils.Time;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Player;
@@ -29,7 +29,7 @@ import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
 
-public abstract class InputHandler implements InputListener{
+public abstract class InputHandler implements InputProcessor{
     /**Used for dropping items.*/
     final static float playerSelectRange = mobile ? 17f : 11f;
     /**Maximum line length.*/
@@ -69,47 +69,45 @@ public abstract class InputHandler implements InputListener{
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
 
-        threads.run(() -> {
-            if(player == null || tile.entity == null) return;
+        if(player == null || tile.entity == null) return;
 
-            player.isTransferring = true;
+        player.isTransferring = true;
 
-            Item item = player.inventory.getItem().item;
-            int amount = player.inventory.getItem().amount;
-            int accepted = tile.block().acceptStack(item, amount, tile, player);
-            player.inventory.getItem().amount -= accepted;
+        Item item = player.inventory.getItem().item;
+        int amount = player.inventory.getItem().amount;
+        int accepted = tile.block().acceptStack(item, amount, tile, player);
+        player.inventory.getItem().amount -= accepted;
 
-            int sent = Mathf.clamp(accepted / 4, 1, 8);
-            int removed = accepted / sent;
-            int[] remaining = {accepted, accepted};
-            Block block = tile.block();
+        int sent = Mathf.clamp(accepted / 4, 1, 8);
+        int removed = accepted / sent;
+        int[] remaining = {accepted, accepted};
+        Block block = tile.block();
 
-            for(int i = 0; i < sent; i++){
-                boolean end = i == sent - 1;
-                Time.run(i * 3, () -> {
-                    tile.block().getStackOffset(item, tile, stackTrns);
+        for(int i = 0; i < sent; i++){
+            boolean end = i == sent - 1;
+            Time.run(i * 3, () -> {
+                tile.block().getStackOffset(item, tile, stackTrns);
 
-                    ItemTransfer.create(item,
-                            player.x + Mathf.trnsx(player.rotation + 180f, backTrns), player.y + Mathf.trnsy(player.rotation + 180f, backTrns),
-                            new Vector2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
-                                if(tile.block() != block || tile.entity == null || tile.entity.items == null) return;
+                ItemTransfer.create(item,
+                        player.x + Mathf.trnsx(player.rotation + 180f, backTrns), player.y + Mathf.trnsy(player.rotation + 180f, backTrns),
+                        new Vector2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
+                            if(tile.block() != block || tile.entity == null || tile.entity.items == null) return;
 
-                                tile.block().handleStack(item, removed, tile, player);
-                                remaining[1] -= removed;
+                            tile.block().handleStack(item, removed, tile, player);
+                            remaining[1] -= removed;
 
-                                if(end && remaining[1] > 0){
-                                    tile.block().handleStack(item, remaining[1], tile, player);
-                                }
-                            });
+                            if(end && remaining[1] > 0){
+                                tile.block().handleStack(item, remaining[1], tile, player);
+                            }
+                        });
 
-                    remaining[0] -= removed;
+                remaining[0] -= removed;
 
-                    if(end){
-                        player.isTransferring = false;
-                    }
-                });
-            }
-        });
+                if(end){
+                    player.isTransferring = false;
+                }
+            });
+        }
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
@@ -246,7 +244,7 @@ public abstract class InputHandler implements InputListener{
                 && tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
                 && !tile.floor().playerUnmineable
                 && player.inventory.canAcceptItem(tile.floor().drops.item)
-                && tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance;
+                && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= Player.mineDistance;
     }
 
     /**Returns the tile at the specified MOUSE coordinates.*/
@@ -283,7 +281,7 @@ public abstract class InputHandler implements InputListener{
     }
 
     public void remove(){
-        Inputs.removeProcessor(this);
+        Core.input.removeProcessor(this);
         frag.remove();
     }
 
@@ -334,7 +332,7 @@ public abstract class InputHandler implements InputListener{
 
     public boolean validPlace(int x, int y, Block type, int rotation){
         for(Tile tile : state.teams.get(player.getTeam()).cores){
-            if(tile.distanceTo(x * tilesize, y * tilesize) < coreBuildRange){
+            if(tile.dst(x * tilesize, y * tilesize) < coreBuildRange){
                 return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
                 Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
             }

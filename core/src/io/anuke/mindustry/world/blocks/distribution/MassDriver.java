@@ -2,8 +2,8 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.utils.ObjectSet;
-import io.anuke.arc.utils.Pool.Poolable;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.util.Pool.Poolable;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.bullets.TurretBullets;
@@ -21,13 +21,13 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.core.Effects;
-import io.anuke.arc.core.Effects.Effect;
-import io.anuke.arc.core.Timers;
+import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.Timers;
 import io.anuke.arc.graphics.Draw;
 import io.anuke.arc.graphics.Lines;
 import io.anuke.arc.util.Angles;
-import io.anuke.arc.util.Mathf;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Pooling;
 
 import java.io.DataInput;
@@ -119,7 +119,7 @@ public class MassDriver extends Block{
     public void load(){
         super.load();
 
-        turretRegion = Draw.region(name + "-turret");
+        turretRegion = Core.atlas.find(name + "-turret");
     }
 
     @Override
@@ -228,7 +228,7 @@ public class MassDriver extends Block{
         if(entity.link == other.pos()){
             Call.linkMassDriver(null, tile, -1);
             return false;
-        }else if(other.block() instanceof MassDriver && other.distanceTo(tile) <= range){
+        }else if(other.block() instanceof MassDriver && other.dst(tile) <= range){
             Call.linkMassDriver(null, tile, other.pos());
             return false;
         }
@@ -259,7 +259,7 @@ public class MassDriver extends Block{
         if(entity == null || entity.link == -1) return false;
         Tile link = world.tile(entity.link);
 
-        return link != null && link.block() instanceof MassDriver && tile.distanceTo(link) <= range;
+        return link != null && link.block() instanceof MassDriver && tile.dst(link) <= range;
     }
 
     public static class DriverBulletData implements Poolable{

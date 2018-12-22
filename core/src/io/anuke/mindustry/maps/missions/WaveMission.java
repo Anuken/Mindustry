@@ -1,6 +1,6 @@
 package io.anuke.mindustry.maps.missions;
 
-import io.anuke.arc.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;

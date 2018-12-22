@@ -1,8 +1,8 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.utils.Array;
-import io.anuke.arc.utils.JsonReader;
-import io.anuke.arc.utils.JsonValue;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.JsonReader;
+import io.anuke.arc.util.JsonValue;
 import io.anuke.mindustry.net.Net;
 import io.anuke.arc.function.Consumer;
 
