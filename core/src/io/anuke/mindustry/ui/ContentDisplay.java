@@ -13,7 +13,7 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatCategory;
 import io.anuke.mindustry.world.meta.StatValue;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Bundles;
 import io.anuke.arc.util.Strings;

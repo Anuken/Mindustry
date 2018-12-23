@@ -11,13 +11,13 @@ import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
-import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.util.Angles;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Translator;
+import io.anuke.arc.util.Vector2;
 
 public class Weapon extends Content{
     public final String name;
@@ -49,7 +49,7 @@ public class Weapon extends Content{
     /**whether to shoot the weapons in different arms one after another, rather than all at once*/
     protected boolean roundrobin = false;
     /**translator for vector calulations*/
-    protected Translator tr = new Translator();
+    protected Vector2 tr = new Vector2();
 
     public TextureRegion equipRegion, region;
 

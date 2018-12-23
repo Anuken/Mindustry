@@ -12,8 +12,8 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.Timers;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.util.*;
 
 import java.io.DataInput;
@@ -29,8 +29,8 @@ public class Conveyor extends Block{
     private static ItemPos drawpos = new ItemPos();
     private static ItemPos pos1 = new ItemPos();
     private static ItemPos pos2 = new ItemPos();
-    private final Translator tr1 = new Translator();
-    private final Translator tr2 = new Translator();
+    private final Vector2 tr1 = new Vector2();
+    private final Vector2 tr2 = new Vector2();
 
     private TextureRegion[][] regions = new TextureRegion[7][4];
 
@@ -294,7 +294,7 @@ public class Conveyor extends Block{
     }
 
     @Override
-    public void getStackOffset(Item item, Tile tile, Translator trns){
+    public void getStackOffset(Item item, Tile tile, Vector2 trns){
         trns.trns(tile.getRotation() * 90 + 180f, tilesize / 2f);
     }
 

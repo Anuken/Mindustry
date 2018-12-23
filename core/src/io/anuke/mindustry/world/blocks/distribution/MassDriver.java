@@ -21,11 +21,11 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.Timers;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.util.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Pooling;
@@ -80,7 +80,7 @@ public class MassDriver extends Block{
         entity.reload = 1f;
         entity.power.amount = 0f;
 
-        DriverBulletData data = Pooling.obtain(DriverBulletData.class, DriverBulletData::new);
+        DriverBulletData data = Pools.obtain(DriverBulletData.class, DriverBulletData::new);
         data.from = entity;
         data.to = other;
         int totalUsed = 0;

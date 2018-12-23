@@ -1,15 +1,15 @@
 package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.Vector2;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.Graphics;
-import io.anuke.arc.Timers;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Physics;
 

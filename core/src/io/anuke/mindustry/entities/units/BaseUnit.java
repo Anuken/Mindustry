@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.Vars;
@@ -24,10 +24,10 @@ import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.units.CommandCenter.CommandCenterEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.Effects;
-import io.anuke.arc.Timers;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.util.*;
 
 import java.io.DataInput;

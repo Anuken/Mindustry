@@ -1,15 +1,22 @@
 package io.anuke.mindustry.editor;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.function.Consumer;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
-import io.anuke.arc.graphics.g2d.Batch;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Vector2;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Disposable;
-import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.Stack;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.utils.UIUtils;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.core.Platform;
@@ -21,22 +28,6 @@ import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.Inputs;
-import io.anuke.arc.Timers;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.input.Input;
-import io.anuke.arc.scene.actions.Actions;
-import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Stack;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.scene.utils.UIUtils;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Strings;
 
 import java.io.DataInputStream;
 import java.io.InputStream;
@@ -190,7 +181,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 return;
             }
 
-            Vector2 v = pane.stageToLocalCoordinates(Graphics.mouse());
+            Vector2 v = pane.stageToLocalCoordinates(Core.input.mouse());
 
             if(v.x >= 0 && v.y >= 0 && v.x <= pane.getWidth() && v.y <= pane.getHeight()){
                 Core.scene.setScrollFocus(pane);
@@ -223,8 +214,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     @Override
-    protected void drawBackground(Batch batch, float parentAlpha, float x, float y){
-        drawDefaultBackground(batch, parentAlpha, x, y);
+    protected void drawBackground(float x, float y){
+        drawDefaultBackground(x, y);
     }
 
     private void save(){
@@ -475,35 +466,35 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private void doInput(){
         //tool select
         for(int i = 0; i < EditorTool.values().length; i++){
-            if(Core.input.keyTap(Input.valueOf("NUM_" + (i + 1)))){
+            if(Core.input.keyTap(KeyCode.valueOf("NUM_" + (i + 1)))){
                 view.setTool(EditorTool.values()[i]);
                 break;
             }
         }
 
-        if(Core.input.keyTap(Input.R)){
+        if(Core.input.keyTap(KeyCode.R)){
             editor.setDrawRotation((editor.getDrawRotation() + 1) % 4);
         }
 
-        if(Core.input.keyTap(Input.E)){
+        if(Core.input.keyTap(KeyCode.E)){
             editor.setDrawRotation(Mathf.mod((editor.getDrawRotation() + 1), 4));
         }
 
         //ctrl keys (undo, redo, save)
         if(UIUtils.ctrl()){
-            if(Core.input.keyTap(Input.Z)){
+            if(Core.input.keyTap(KeyCode.Z)){
                 view.undo();
             }
 
-            if(Core.input.keyTap(Input.Y)){
+            if(Core.input.keyTap(KeyCode.Y)){
                 view.redo();
             }
 
-            if(Core.input.keyTap(Input.S)){
+            if(Core.input.keyTap(KeyCode.S)){
                 save();
             }
 
-            if(Core.input.keyTap(Input.G)){
+            if(Core.input.keyTap(KeyCode.G)){
                 view.setGrid(!view.isGrid());
             }
         }

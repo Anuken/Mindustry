@@ -125,11 +125,11 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public float getMouseX(){
-        return Core.input.getX();
+        return Core.input.mouseX();
     }
 
     public float getMouseY(){
-        return Core.input.getY();
+        return Core.input.mouseY();
     }
 
     public void resetCursor(){
@@ -240,7 +240,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     boolean canMine(Tile tile){
-        return !ui.hasMouse()
+        return !Core.scene.hasMouse()
                 && tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
                 && !tile.floor().playerUnmineable
                 && player.inventory.canAcceptItem(tile.floor().drops.item)
@@ -253,7 +253,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     int tileX(float cursorX){
-        Vector2 vec = Graphics.world(cursorX, 0);
+        Vector2 vec = Core.input.mouseWorld(cursorX, 0);
         if(selectedBlock()){
             vec.sub(recipe.result.offset(), recipe.result.offset());
         }
@@ -261,7 +261,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     int tileY(float cursorY){
-        Vector2 vec = Graphics.world(0, cursorY);
+        Vector2 vec = Core.input.mouseWorld(0, cursorY);
         if(selectedBlock()){
             vec.sub(recipe.result.offset(), recipe.result.offset());
         }
@@ -277,7 +277,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public float mouseAngle(float x, float y){
-        return Graphics.world(getMouseX(), getMouseY()).sub(x, y).angle();
+        return Core.input.mouseWorld(getMouseX(), getMouseY()).sub(x, y).angle();
     }
 
     public void remove(){
@@ -286,7 +286,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public boolean canShoot(){
-        return recipe == null && !ui.hasMouse() && !onConfigurable() && !isDroppingItem();
+        return recipe == null && !Core.scene.hasMouse() && !onConfigurable() && !isDroppingItem();
     }
 
     public boolean onConfigurable(){

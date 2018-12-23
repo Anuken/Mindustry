@@ -7,7 +7,7 @@ import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Bundles;
 

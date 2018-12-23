@@ -8,8 +8,8 @@ import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterE
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.arc.Graphics;
-import io.anuke.arc.Timers;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
 
 public class FusionReactor extends PowerGenerator{

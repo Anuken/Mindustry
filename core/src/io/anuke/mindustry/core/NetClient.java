@@ -165,21 +165,19 @@ public class NetClient implements ApplicationListener{
         netClient.disconnectQuietly();
         state.set(State.menu);
 
-        threads.runGraphics(() -> {
-            if(!reason.quiet){
-                if(reason.extraText() != null){
-                    ui.showText(reason.toString(), reason.extraText());
-                }else{
-                    ui.showText("$text.disconnect", reason.toString());
-                }
+        if(!reason.quiet){
+            if(reason.extraText() != null){
+                ui.showText(reason.toString(), reason.extraText());
+            }else{
+                ui.showText("$text.disconnect", reason.toString());
             }
-            ui.loadfrag.hide();
-        });
+        }
+        ui.loadfrag.hide();
     }
 
     @Remote(variants = Variant.both)
     public static void onInfoMessage(String message){
-        threads.runGraphics(() -> ui.showText("", message));
+        ui.showText("", message);
     }
 
     @Remote(variants = Variant.both)
@@ -190,15 +188,13 @@ public class NetClient implements ApplicationListener{
         ui.chatfrag.clearMessages();
         Net.setClientLoaded(false);
 
-        threads.runGraphics(() -> {
-            ui.loadfrag.show("$text.connecting.data");
+        ui.loadfrag.show("$text.connecting.data");
 
-            ui.loadfrag.setButton(() -> {
-                ui.loadfrag.hide();
-                netClient.connecting = false;
-                netClient.quiet = true;
-                Net.disconnect();
-            });
+        ui.loadfrag.setButton(() -> {
+            ui.loadfrag.hide();
+            netClient.connecting = false;
+            netClient.quiet = true;
+            Net.disconnect();
         });
     }
 

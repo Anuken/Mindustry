@@ -4,11 +4,11 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
+import io.anuke.arc.Core;
+import io.anuke.arc.util.EmptyLogger;
 import io.anuke.kryonet.KryoClient;
 import io.anuke.kryonet.KryoServer;
 import io.anuke.mindustry.net.Net;
-import io.anuke.arc.core.Settings;
-import io.anuke.arc.util.EmptyLogger;
 
 public class ServerLauncher extends HeadlessApplication{
 
@@ -37,8 +37,13 @@ public class ServerLauncher extends HeadlessApplication{
         for(Thread thread : Thread.getAllStackTraces().keySet()){
             if(thread.getName().equals("HeadlessApplication")){
                 thread.setUncaughtExceptionHandler((t, throwable) -> {
-                    CrashHandler.handle(throwable);
-                    System.exit(-1);
+                    try{
+                        CrashHandler.handle(throwable);
+                        System.exit(-1);
+                    }catch(Throwable crashCrash){
+                        crashCrash.printStackTrace();
+                        System.exit(-1);
+                    }
                 });
                 break;
             }

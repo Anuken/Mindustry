@@ -76,7 +76,7 @@ public class PlacementFragment extends Fragment{
             }
             return true;
         }else if(Core.input.keyDown("select")){ //mouse eyedropper select
-            Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
+            Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
             if(tile != null){
                 tile = tile.target();
@@ -257,8 +257,8 @@ public class PlacementFragment extends Fragment{
         Vector2 v = topTable.stageToLocalCoordinates(Graphics.mouse());
 
         //setup hovering tile
-        if(!ui.hasMouse() && topTable.hit(v.x, v.y, false) == null){
-            Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
+        if(!Core.scene.hasMouse() && topTable.hit(v.x, v.y, false) == null){
+            Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             if(tile != null){
                 hoverTile = tile.target();
             }else{

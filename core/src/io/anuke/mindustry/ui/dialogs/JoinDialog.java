@@ -11,7 +11,7 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.arc.Settings;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.scene.style.Drawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Cell;

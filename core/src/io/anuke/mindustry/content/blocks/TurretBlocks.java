@@ -1,5 +1,6 @@
 package io.anuke.mindustry.content.blocks;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.AmmoTypes;
@@ -8,7 +9,7 @@ import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.util.Angles;
 import io.anuke.arc.math.Mathf;
 
@@ -73,11 +74,11 @@ public class TurretBlocks extends BlockList implements ContentList{
             health = 360;
 
             drawer = (tile, entity) -> {
-                Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+                Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y).rot(entity.rotation - 90);
 
                 Draw.color(entity.liquids.current().color);
                 Draw.alpha(entity.liquids.total() / liquidCapacity);
-                Draw.rect(name + "-liquid", tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+                Draw.rect(name + "-liquid", tile.drawx() + tr2.x, tile.drawy() + tr2.y).rot(entity.rotation - 90).color(entity.liquids.current().color);
                 Draw.color();
             };
         }};

@@ -75,7 +75,7 @@ public class Floor extends Block{
         super.load();
 
         if(blend){
-            edgeRegion = Draw.hasRegion(name + "edge") ? Core.atlas.find(name + "edge") : Core.atlas.find(edge + "edge");
+            edgeRegion = Core.atlas.has(name + "edge") ? Core.atlas.find(name + "edge") : Core.atlas.find(edge + "edge");
             edgeRegions = new TextureRegion[8];
             offsets = new Vector2[8];
 
@@ -186,7 +186,7 @@ public class Floor extends Block{
 
             TextureRegion region = floor.edgeRegions[i];
 
-            Draw.crect(region, tile.worldx() + floor.offsets[i].x, tile.worldy() + floor.offsets[i].y, region.getRegionWidth(), region.getRegionHeight());
+            Draw.crect(region, tile.worldx() + floor.offsets[i].x, tile.worldy() + floor.offsets[i].y, region.getWidth(), region.getHeight());
         }
     }
 

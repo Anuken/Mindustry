@@ -5,9 +5,7 @@ import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
 
-/**
- * Class for various team-based utilities.
- */
+/**Class for various team-based utilities.*/
 public class Teams{
     private TeamData[] map = new TeamData[Team.all.length];
 

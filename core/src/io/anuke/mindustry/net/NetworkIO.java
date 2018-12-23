@@ -15,7 +15,7 @@ import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.arc.Core;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.entities.Entities;
 import io.anuke.arc.util.Bits;
 

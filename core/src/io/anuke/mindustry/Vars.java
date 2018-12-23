@@ -23,7 +23,7 @@ import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.EffectEntity;
 import io.anuke.arc.entities.trait.DrawTrait;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Translator;
+import io.anuke.arc.util.Vector2;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -122,7 +122,7 @@ public class Vars{
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<BaseUnit>[] unitGroups;
 
-    public static final Translator[] tmptr = new Translator[]{new Translator(), new Translator(), new Translator(), new Translator()};
+    public static final Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
 
     public static void init(){
         Serialization.init();

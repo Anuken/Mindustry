@@ -14,11 +14,11 @@ import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
-import io.anuke.arc.Effects;
-import io.anuke.arc.Timers;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Translator;
+import io.anuke.arc.util.Vector2;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -29,7 +29,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 public class NuclearReactor extends PowerGenerator{
     protected final int timerFuel = timers++;
 
-    protected final Translator tr = new Translator();
+    protected final Vector2 tr = new Vector2();
 
     protected Color coolColor = new Color(1, 1, 1, 0f);
     protected Color hotColor = Color.valueOf("ff9575a3");

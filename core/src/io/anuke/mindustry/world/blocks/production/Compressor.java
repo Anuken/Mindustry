@@ -4,7 +4,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
 
 public class Compressor extends PowerCrafter{

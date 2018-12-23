@@ -1,8 +1,11 @@
 package io.anuke.mindustry.ai;
 
-import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.util.IntArray;
-import io.anuke.arc.util.Queue;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.collection.Queue;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.GridPoint2;
+import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -11,10 +14,6 @@ import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.Events;
-import io.anuke.arc.Timers;
-import io.anuke.arc.util.Geometry;
-import io.anuke.arc.util.Structs;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;

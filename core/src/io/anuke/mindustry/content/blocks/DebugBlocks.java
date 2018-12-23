@@ -17,7 +17,7 @@ import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.blocks.distribution.Sorter;
 import io.anuke.mindustry.world.blocks.power.PowerNode;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.ui.ButtonGroup;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;

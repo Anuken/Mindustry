@@ -1,15 +1,15 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.util.IntArray;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.function.IntPositionConsumer;
+import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.arc.function.IntPositionConsumer;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Bits;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.ui;
@@ -24,8 +24,8 @@ public enum EditorTool{
             byte link = editor.getMap().read(x, y, DataPosition.link);
 
             if(link != 0){
-                x -= (Bits.getLeftByte(link) - 8);
-                y -= (Bits.getRightByte(link) - 8);
+                x -= (Pack.leftByte(link) - 8);
+                y -= (Pack.rightByte(link) - 8);
                 bf = editor.getMap().read(x, y, DataPosition.floor);
                 bw = editor.getMap().read(x, y, DataPosition.wall);
             }
@@ -101,7 +101,7 @@ public enum EditorTool{
             byte bw = data.read(x, y, DataPosition.wall);
             be = data.read(x, y, DataPosition.elevation);
             boolean synth = editor.getDrawBlock().synthetic();
-            byte brt = Bits.packByte((byte) editor.getDrawRotation(), (byte) editor.getDrawTeam().ordinal());
+            byte brt = Pack.byteByte((byte) editor.getDrawRotation(), (byte) editor.getDrawTeam().ordinal());
 
             dest = floor ? bf : bw;
             byte draw = editor.getDrawBlock().id;

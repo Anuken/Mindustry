@@ -12,11 +12,11 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.arc.Timers;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.util.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Translator;
+import io.anuke.arc.util.Vector2;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -26,7 +26,7 @@ import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
 public abstract class GroundUnit extends BaseUnit{
-    protected static Translator vec = new Translator();
+    protected static Vector2 vec = new Vector2();
 
     protected float walkTime;
     protected float stuckTime;

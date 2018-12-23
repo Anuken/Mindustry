@@ -7,7 +7,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.arc.Core;
 import io.anuke.arc.Graphics;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.Fill;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.ui.layout.Unit;
@@ -30,8 +30,8 @@ public class BackgroundFragment extends Fragment{
             boolean portrait = Core.graphics.getWidth() < Core.graphics.getHeight();
             float logoscl = (int) Unit.dp.scl(7) * (portrait ? 5f / 7f : 1f);
             TextureRegion logo = Core.skin.getRegion("logotext");
-            float logow = logo.getRegionWidth() * logoscl;
-            float logoh = logo.getRegionHeight() * logoscl;
+            float logow = logo.getWidth() * logoscl;
+            float logoh = logo.getHeight() * logoscl;
 
             Draw.color();
             Core.batch.draw(logo, (int) (w / 2 - logow / 2), (int) (h - logoh + 15 - Unit.dp.scl(portrait ? 30f : 0)), logow, logoh);

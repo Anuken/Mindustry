@@ -4,8 +4,8 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.Core;
-import io.anuke.arc.Timers;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.Shader;
 import io.anuke.arc.scene.ui.layout.Unit;
 

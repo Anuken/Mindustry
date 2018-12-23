@@ -15,7 +15,7 @@ import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
-import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;

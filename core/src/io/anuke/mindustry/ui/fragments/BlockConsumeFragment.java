@@ -30,8 +30,8 @@ public class BlockConsumeFragment extends Fragment{
         table.setTransform(true);
 
         parent.addChild(new Element(){{update(() -> {
-            if(!ui.hasMouse()){
-                Tile tile = world.tileWorld(Graphics.mouseWorld().x, Graphics.mouseWorld().y);
+            if(!Core.scene.hasMouse()){
+                Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
                 if(tile == null) return;
                 tile = tile.target();
 

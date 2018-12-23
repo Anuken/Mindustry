@@ -6,8 +6,8 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.Graphics;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Mathf;
 
 public class PhaseWeaver extends PowerSmelter{

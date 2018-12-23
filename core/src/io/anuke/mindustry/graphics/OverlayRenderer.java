@@ -2,7 +2,7 @@ package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.MathUtils;
-import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.Vector2;
 import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.content.blocks.Blocks;
@@ -16,10 +16,10 @@ import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.arc.Core;
 import io.anuke.arc.Graphics;
 import io.anuke.arc.Settings;
-import io.anuke.arc.Timers;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.Fill;
-import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Tmp;
 
@@ -101,8 +101,8 @@ public class OverlayRenderer{
             Draw.reset();
 
             //draw selected block bars and info
-            if(input.recipe == null && !ui.hasMouse()){
-                Vector2 vec = Graphics.world(input.getMouseX(), input.getMouseY());
+            if(input.recipe == null && !Core.scene.hasMouse()){
+                Vector2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
                 Tile tile = world.tileWorld(vec.x, vec.y);
 
                 if(tile != null && tile.block() != Blocks.air && tile.target().getTeam() == players[0].getTeam()){
@@ -181,7 +181,7 @@ public class OverlayRenderer{
             }
 
             if(input.isDroppingItem()){
-                Vector2 v = Graphics.world(input.getMouseX(), input.getMouseY());
+                Vector2 v = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
                 float size = 8;
                 Draw.rect(player.inventory.getItem().item.region, v.x, v.y, size, size);
                 Draw.color(Palette.accent);

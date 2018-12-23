@@ -1,6 +1,9 @@
 package io.anuke.mindustry.editor;
 
 import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
@@ -10,10 +13,9 @@ import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Bits;
-import io.anuke.arc.math.Mathf;
+
 import static io.anuke.mindustry.Vars.content;
+
 public class MapEditor{
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15};
 
@@ -103,7 +105,7 @@ public class MapEditor{
 
         byte writeID = drawBlock.id;
         byte partID = Blocks.blockpart.id;
-        byte rotationTeam = Bits.packByte(drawBlock.rotate ? (byte) rotation : 0, drawBlock.synthetic() ? (byte) drawTeam.ordinal() : 0);
+        byte rotationTeam = Pack.byteByte(drawBlock.rotate ? (byte)rotation : 0, drawBlock.synthetic() ? (byte)drawTeam.ordinal() : 0);
 
         boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
 
@@ -126,13 +128,13 @@ public class MapEditor{
                             if(i == 1){
                                 map.write(worldx, worldy, DataPosition.wall, partID);
                                 map.write(worldx, worldy, DataPosition.rotationTeam, rotationTeam);
-                                map.write(worldx, worldy, DataPosition.link, Bits.packByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8)));
+                                map.write(worldx, worldy, DataPosition.link, Pack.byteByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8)));
                             }else{
                                 byte link = map.read(worldx, worldy, DataPosition.link);
                                 byte block = map.read(worldx, worldy, DataPosition.wall);
 
                                 if(link != 0){
-                                    removeLinked(worldx - (Bits.getLeftByte(link) - 8), worldy - (Bits.getRightByte(link) - 8));
+                                    removeLinked(worldx - (Pack.leftByte(link) - 8), worldy - (Pack.rightByte(link) - 8));
                                 }else if(content.block(block).isMultiblock()){
                                     removeLinked(worldx, worldy);
                                 }
@@ -170,7 +172,7 @@ public class MapEditor{
                             if(content.block(map.read(wx, wy, DataPosition.wall)).isMultiblock()){
                                 removeLinked(wx, wy);
                             }else if(link != 0){
-                                removeLinked(wx - (Bits.getLeftByte(link) - 8), wy - (Bits.getRightByte(link) - 8));
+                                removeLinked(wx - (Pack.leftByte(link) - 8), wy - (Pack.rightByte(link) - 8));
                             }
                         }
 

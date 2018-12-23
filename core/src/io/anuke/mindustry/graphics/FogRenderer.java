@@ -16,7 +16,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.Events;
 import io.anuke.arc.Graphics;
 import io.anuke.arc.entities.EntityDraw;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.Fill;
 
 import java.nio.ByteBuffer;

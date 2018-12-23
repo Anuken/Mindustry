@@ -1,9 +1,20 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Vector2;
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.function.BiConsumer;
+import io.anuke.arc.graphics.Blending;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.TileEntity;
@@ -22,14 +33,6 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.Effects;
-import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.Timers;
-import io.anuke.arc.function.BiConsumer;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Lines;
-import io.anuke.arc.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -64,21 +67,18 @@ public abstract class Turret extends Block{
     protected float xRand = 0f;
     protected boolean targetAir = true;
 
-    protected Translator tr = new Translator();
-    protected Translator tr2 = new Translator();
+    protected Vector2 tr = new Vector2();
+    protected Vector2 tr2 = new Vector2();
 
     protected TextureRegion baseRegion;
     protected TextureRegion heatRegion;
     protected TextureRegion baseTopRegion;
 
-    protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+    protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) ->
+        Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y).rot(entity.rotation - 90);
     protected BiConsumer<Tile, TurretEntity> heatDrawer = (tile, entity) -> {
         if(entity.heat <= 0.00001f) return;
-        Graphics.setAdditiveBlending();
-        Draw.color(heatColor);
-        Draw.alpha(entity.heat);
-        Draw.rect(heatRegion, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-        Graphics.setNormalBlending();
+        Draw.rect(heatRegion, tile.drawx() + tr2.x, tile.drawy() + tr2.y).rot(entity.rotation - 90).color(heatColor, entity.heat).blend(Blending.additive);
     };
 
     public Turret(String name){

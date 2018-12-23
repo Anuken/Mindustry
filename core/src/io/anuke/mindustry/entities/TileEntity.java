@@ -10,6 +10,7 @@ import io.anuke.arc.entities.impl.BaseEntity;
 import io.anuke.arc.entities.trait.HealthTrait;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.GridPoint2;
+import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Time;
@@ -258,7 +259,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     @Override
     public Vector2 getVelocity(){
-        return Vector2.Zero;
+        return Vector2.ZERO;
     }
 
     @Override

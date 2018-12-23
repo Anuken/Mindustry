@@ -23,7 +23,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             burnDuration = 46f;
             useFlux = true;
 
-            consumes.items(new ItemStack[]{new ItemStack(Items.copper, 1), new ItemStack(Items.lead, 2)});
+            consumes.items(new ItemStack(Items.copper, 1), new ItemStack(Items.lead, 2));
             consumes.item(Items.coal).optional(true);
         }};
 
@@ -37,7 +37,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             useFlux = true;
             fluxNeeded = 2;
 
-            consumes.items(new ItemStack[]{new ItemStack(Items.copper, 1), new ItemStack(Items.lead, 2)});
+            consumes.items(new ItemStack(Items.copper, 1), new ItemStack(Items.lead, 2));
             consumes.power(0.1f);
         }};
 
@@ -51,7 +51,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");
 
-            consumes.items(new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2)});
+            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2));
             consumes.power(0.05f);
         }};
 
@@ -80,7 +80,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             powerCapacity = 50f;
             size = 2;
 
-            consumes.items(new ItemStack[]{new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10)});
+            consumes.items(new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10));
             consumes.power(0.5f);
         }};
 
@@ -95,7 +95,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             fluxNeeded = 3;
 
             consumes.power(0.4f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 3)});
+            consumes.items(new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 3));
         }};
 
         cryofluidmixer = new LiquidMixer("cryofluidmixer"){{
@@ -133,7 +133,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             size = 2;
 
             consumes.power(0.02f);
-            consumes.items(new ItemStack[]{new ItemStack(Items.coal, 1), new ItemStack(Items.lead, 2), new ItemStack(Items.sand, 2)});
+            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.lead, 2), new ItemStack(Items.sand, 2));
         }};
 
         melter = new PowerCrafter("melter"){{

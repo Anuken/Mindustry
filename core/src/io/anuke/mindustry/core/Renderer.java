@@ -1,16 +1,30 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.EntityDraw;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.EffectEntity;
+import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.arc.entities.trait.Entity;
 import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.PixmapIO;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.SpriteBatch;
-import io.anuke.arc.math.Rectangle;
-import io.anuke.arc.math.Vector2;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.utils.Cursors;
 import io.anuke.arc.util.BufferUtils;
 import io.anuke.arc.util.ScreenUtils;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -23,28 +37,7 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
-import io.anuke.arc.Effects;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.entities.EntityDraw;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.EffectEntity;
-import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.entities.trait.Entity;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Lines;
-import io.anuke.arc.graphics.Surface;
-import io.anuke.arc.modules.RendererModule;
-import io.anuke.arc.scene.utils.Cursors;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Pooling;
-import io.anuke.arc.util.Translator;
-
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.arc.core.Core.batch;
-import static io.anuke.arc.core.Core.camera;
 
 public class Renderer extends RendererModule{
     public final Surface effectSurface;
@@ -55,7 +48,7 @@ public class Renderer extends RendererModule{
 
     private int targetscale = baseCameraScale;
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
-    private Vector2 avgPosition = new Translator();
+    private Vector2 avgPosition = new Vector2();
 
     public Renderer(){
         Core.batch = new SpriteBatch(4096);
@@ -75,7 +68,7 @@ public class Renderer extends RendererModule{
                 if(view.overlaps(pos)){
 
                     if(!(effect instanceof GroundEffect)){
-                        EffectEntity entity = Pooling.obtain(EffectEntity.class, EffectEntity::new);
+                        EffectEntity entity = Pools.obtain(EffectEntity.class, EffectEntity::new);
                         entity.effect = effect;
                         entity.color = color;
                         entity.rotation = rotation;
@@ -87,7 +80,7 @@ public class Renderer extends RendererModule{
                         }
                         threads.runGraphics(() -> effectGroup.add(entity));
                     }else{
-                        GroundEffectEntity entity = Pooling.obtain(GroundEffectEntity.class, GroundEffectEntity::new);
+                        GroundEffectEntity entity = Pools.obtain(GroundEffectEntity.class, GroundEffectEntity::new);
                         entity.effect = effect;
                         entity.color = color;
                         entity.rotation = rotation;

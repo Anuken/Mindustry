@@ -4,7 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.util.I18NBundle;
 import io.anuke.mindustry.Vars;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Log;
 
 import java.util.Locale;

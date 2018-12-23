@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.effect;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.util.IntSet;
 import io.anuke.annotations.Annotations.Loc;
@@ -19,8 +19,8 @@ import io.anuke.arc.entities.impl.TimedEntity;
 import io.anuke.arc.entities.trait.DrawTrait;
 import io.anuke.arc.entities.trait.PosTrait;
 import io.anuke.arc.entities.trait.TimeTrait;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -54,7 +54,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     @Remote(called = Loc.server)
     public static void createLighting(int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
 
-        Lightning l = Pooling.obtain(Lightning.class, Lightning::new);
+        Lightning l = Pools.obtain(Lightning.class, Lightning::new);
         Float dmg = damage;
 
         l.x = x;
@@ -67,7 +67,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
 
         for (int i = 0; i < length/2; i++) {
             Bullet.create(TurretBullets.damageLightning, l, team, x, y, 0f, 1f, 1f, dmg);
-            l.lines.add(new Translator(x + Mathf.range(3f), y + Mathf.range(3f)));
+            l.lines.add(new Vector2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
             rect.setSize(hitRange).setCenter(x, y);
             entities.clear();
@@ -119,7 +119,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     @Override
     public void removed(){
         super.removed();
-        Pooling.free(this);
+        Pools.free(this);
     }
 
     @Override

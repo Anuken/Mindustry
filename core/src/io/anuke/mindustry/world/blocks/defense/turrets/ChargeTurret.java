@@ -4,9 +4,9 @@ import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;

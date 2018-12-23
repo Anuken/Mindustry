@@ -188,7 +188,7 @@ public class Control implements ApplicationListener{
         }
 
         inputs[index] = input;
-        Core.input.addInputProcessor(input);
+        Core.input.addProcessor(input);
     }
 
     public void removePlayer(){

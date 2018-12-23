@@ -194,12 +194,6 @@ project(":core"){
 project(":server"){
     apply plugin: "java"
 
-    configurations{
-        if(findProject(":android") != null){
-            compile.exclude module: android
-        }
-    }
-
     dependencies{
 
         compile project(":core")
@@ -248,7 +242,7 @@ project(":kryonet"){
     dependencies{
         compile project(":core")
         compile "org.lz4:lz4-java:1.4.1"
-        compile 'com.github.Anuken:kryonet:53b10247b1'
+        compile 'com.github.Anuken:kryonet:38ca8d51b5763ebe463ed973a63b64390ff51416'
         compile 'com.github.Anuken:WaifUPnP:05eb46bc577fd7674596946ba288c96c0cedd893'
     }
 }

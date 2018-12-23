@@ -16,8 +16,8 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.Effects;
-import io.anuke.arc.Timers;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.TimedEntity;
 import io.anuke.arc.util.Structs;
@@ -51,7 +51,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
         Fire fire = map.get(tile.pos());
 
         if(fire == null){
-            fire = Pooling.obtain(Fire.class, Fire::new);
+            fire = Pools.obtain(Fire.class, Fire::new);
             fire.tile = tile;
             fire.lifetime = baseLifetime;
             fire.set(tile.worldx(), tile.worldy());

@@ -1,6 +1,10 @@
 package io.anuke.mindustry.ai;
 
+import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.GridBits;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.Squad;
@@ -9,10 +13,6 @@ import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Waves;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.Events;
-import io.anuke.arc.util.GridBits;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Structs;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -115,8 +115,8 @@ public class WaveSpawner{
                     FlyerSpawn spawn = flySpawns.get(flyCount);
 
                     float margin = 40f; //how far away from the edge flying units spawn
-                    spawnX = world.width() * tilesize / 2f + Mathf.sqrwavex(spawn.angle) * (world.width() / 2f * tilesize + margin);
-                    spawnY = world.height() * tilesize / 2f + Mathf.sqrwavey(spawn.angle) * (world.height() / 2f * tilesize + margin);
+                    spawnX = world.width() * tilesize / 2f + sqrwavex(spawn.angle) * (world.width() / 2f * tilesize + margin);
+                    spawnY = world.height() * tilesize / 2f + sqrwavey(spawn.angle) * (world.height() / 2f * tilesize + margin);
                     spread = margin / 1.5f;
 
                     flyCount++;
@@ -223,7 +223,7 @@ public class WaveSpawner{
         int shellWidth = quadWidth() * 2 + quadHeight() * 2 * 6;
         shellWidth = Math.min(quadWidth() * quadHeight() / 4, shellWidth);
 
-        Mathf.traverseSpiral(quadWidth(), quadHeight(), Mathf.random(shellWidth), (x, y) -> {
+        traverseSpiral(quadWidth(), quadHeight(), Mathf.random(shellWidth), (x, y) -> {
             if(getQuad(x, y)){
                 spawn.x = x;
                 spawn.y = y;
@@ -256,4 +256,57 @@ public class WaveSpawner{
         //quadrant spawn coordinates
         int x, y;
     }
+
+    //utility methods
+
+    float sqrwavex(float degrees){
+        degrees = Mathf.mod(degrees, 360f);
+        if(degrees < 45){
+            return 1;
+        }else if(degrees < 135){
+            return 1f - (degrees - 45f) / 90f;
+        }else if(degrees < 225){
+            return -1f;
+        }else if(degrees < 315){
+            return (degrees - 225) / 90f;
+        }else{
+            return 1f;
+        }
+    }
+
+   float sqrwavey(float degrees){
+        return sqrwavex(degrees + 90f);
+    }
+
+    void traverseSpiral(int width, int height, int offset, SpiralTraverser con){
+        int directionIdx = 0;
+        int curRow = 0, curCol = 0;
+        for(int i = 0; i < height * width; i++){
+
+            if(i >= offset && con.accept(curCol, curRow)) break;
+
+            int same = 1, row = curRow, col = curCol;
+            if(row > height - 1 - row){
+                row = height - 1 - row;
+                same = 0;
+            }
+            if(col >= width - 1 - col){
+                col = width - 1 - col;
+                same = 0;
+            }
+            row -= same;
+
+            if(row == col){
+                directionIdx = (directionIdx + 1) % 4;
+            }
+            curRow += directions[directionIdx][0];
+            curCol += directions[directionIdx][1];
+        }
+    }
+
+    interface SpiralTraverser{
+        boolean accept(int x, int y);
+    }
+
+    private static int[][] directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
 }

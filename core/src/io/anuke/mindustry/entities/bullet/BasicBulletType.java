@@ -6,9 +6,9 @@ import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.arc.Effects;
-import io.anuke.arc.Timers;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.util.Angles;
 import io.anuke.arc.math.Mathf;
 

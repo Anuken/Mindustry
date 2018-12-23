@@ -6,7 +6,7 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.world;

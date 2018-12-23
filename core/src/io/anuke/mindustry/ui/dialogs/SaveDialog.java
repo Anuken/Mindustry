@@ -2,7 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.util.Bundles;
 

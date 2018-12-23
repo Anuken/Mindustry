@@ -13,12 +13,12 @@ import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.arc.Settings;
-import io.anuke.arc.Timers;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.util.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Translator;
+import io.anuke.arc.util.Vector2;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -29,8 +29,8 @@ public class PowerNode extends PowerBlock{
     //last distribution block placed
     private static int lastPlaced = -1;
 
-    protected Translator t1 = new Translator();
-    protected Translator t2 = new Translator();
+    protected Vector2 t1 = new Vector2();
+    protected Vector2 t2 = new Vector2();
 
     protected float laserRange = 6;
     protected int maxNodes = 3;

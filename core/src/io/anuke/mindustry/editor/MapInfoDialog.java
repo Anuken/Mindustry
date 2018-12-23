@@ -1,11 +1,11 @@
 package io.anuke.mindustry.editor;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
-import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.arc.Settings;
 import io.anuke.arc.scene.ui.TextArea;
 import io.anuke.arc.scene.ui.TextField;
+import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 public class MapInfoDialog extends FloatingDialog{
     private final MapEditor editor;
@@ -55,7 +55,7 @@ public class MapInfoDialog extends FloatingDialog{
 
         author = content().addField(tags.get("author", Core.settings.getString("mapAuthor", "")), text -> {
             tags.put("author", text);
-            Core.settings.putString("mapAuthor", text);
+            Core.settings.put("mapAuthor", text);
             Core.settings.save();
         }).size(400, 55f).get();
         author.setMessageText("$text.unknown");

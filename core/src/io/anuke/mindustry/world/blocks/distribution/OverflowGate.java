@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.distribution;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.math.Mathf;
 
 public class OverflowGate extends Router{

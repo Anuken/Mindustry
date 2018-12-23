@@ -1,9 +1,9 @@
 package io.anuke.mindustry.entities.bullet;
 
-import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 
 public abstract class FlakBulletType extends BasicBulletType{
     protected static Rectangle rect = new Rectangle();

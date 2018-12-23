@@ -9,7 +9,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.arc.Graphics;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.event.InputEvent;

@@ -5,7 +5,7 @@ import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.TimedEntity;
 import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.groundEffectGroup;

@@ -1,16 +1,16 @@
 package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 
 import java.io.DataInput;
 import java.io.DataOutput;

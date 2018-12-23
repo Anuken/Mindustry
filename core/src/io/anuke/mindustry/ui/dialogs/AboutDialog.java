@@ -10,7 +10,7 @@ import io.anuke.mindustry.io.Contributors.Contributor;
 import io.anuke.mindustry.ui.Links;
 import io.anuke.mindustry.ui.Links.LinkEntry;
 import io.anuke.arc.Core;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.layout.Cell;
 import io.anuke.arc.scene.ui.layout.Table;

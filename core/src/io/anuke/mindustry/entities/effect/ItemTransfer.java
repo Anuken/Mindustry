@@ -5,15 +5,15 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.TimedEntity;
 import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.entities.trait.PosTrait;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Fill;
-import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.math.Vector2;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Pooling;
+import io.anuke.arc.math.geom.Position;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
@@ -28,7 +28,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     private Vector2 tovec = new Vector2();
     private Item item;
     private float seed;
-    private PosTrait to;
+    private Position to;
     private Runnable done;
 
     public ItemTransfer(){
@@ -57,8 +57,8 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
         tile.entity.items.add(item, amount);
     }
 
-    public static void create(Item item, float fromx, float fromy, PosTrait to, Runnable done){
-        ItemTransfer tr = Pooling.obtain(ItemTransfer.class, ItemTransfer::new);
+    public static void create(Item item, float fromx, float fromy, Position to, Runnable done){
+        ItemTransfer tr = Pools.obtain(ItemTransfer.class, ItemTransfer::new);
         tr.item = item;
         tr.from.set(fromx, fromy);
         tr.to = to;
@@ -88,7 +88,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
         if(done != null){
             threads.run(done);
         }
-        Pooling.free(this);
+        Pools.free(this);
     }
 
     @Override
@@ -108,8 +108,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     public void draw(){
         float length = fslope() * 6f;
         float angle = current.set(x, y).sub(from).angle();
-        Draw.color(Palette.accent);
-        Lines.stroke(fslope() * 2f);
+        Lines.stroke(fslope() * 2f, Palette.accent);
 
         Lines.circle(x, y, fslope() * 2f);
         Lines.lineAngleCenter(x, y, angle, length);

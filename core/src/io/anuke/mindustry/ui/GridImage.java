@@ -2,7 +2,7 @@ package io.anuke.mindustry.ui;
 
 import io.anuke.arc.graphics.g2d.Batch;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.Element;
 
 public class GridImage extends Element{

@@ -13,7 +13,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.arc.Inputs;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.Label;

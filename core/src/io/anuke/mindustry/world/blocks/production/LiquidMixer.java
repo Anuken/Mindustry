@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 
 public class LiquidMixer extends LiquidBlock{
     protected Liquid outputLiquid;

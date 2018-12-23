@@ -5,7 +5,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
 import io.anuke.arc.Settings;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.util.Bundles;
 import io.anuke.arc.util.Strings;

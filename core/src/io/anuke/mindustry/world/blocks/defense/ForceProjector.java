@@ -14,14 +14,14 @@ import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.Graphics;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.entities.impl.BaseEntity;
 import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.Fill;
 import io.anuke.arc.math.Mathf;
 

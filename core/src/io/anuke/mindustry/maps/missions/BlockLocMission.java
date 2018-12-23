@@ -2,9 +2,9 @@ package io.anuke.mindustry.maps.missions;
 
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
-import io.anuke.arc.Timers;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.util.Angles;
 import io.anuke.arc.util.Bundles;
 import io.anuke.arc.math.Mathf;

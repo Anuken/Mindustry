@@ -10,7 +10,7 @@ import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.BulletEntity;
 import io.anuke.arc.entities.trait.Entity;
@@ -55,7 +55,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     }
 
     public static Bullet create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Object data){
-        Bullet bullet = Pooling.obtain(Bullet.class, Bullet::new);
+        Bullet bullet = Pools.obtain(Bullet.class, Bullet::new);
         bullet.type = type;
         bullet.owner = owner;
         bullet.data = data;
@@ -259,7 +259,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
     @Override
     public void removed(){
-        Pooling.free(this);
+        Pools.free(this);
     }
 
     @Override

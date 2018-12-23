@@ -5,9 +5,9 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.Hue;
-import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -105,7 +105,6 @@ public class Block extends BaseBlock {
     public boolean canOverdrive = true;
 
     protected Array<Tile> tempTiles = new Array<>();
-    protected Color tempColor = new Color();
     protected TextureRegion[] blockIcon;
     protected TextureRegion[] icon;
     protected TextureRegion[] compactIcon;
@@ -378,8 +377,6 @@ public class Block extends BaseBlock {
         float explosiveness = baseExplosiveness;
         float flammability = 0f;
         float power = 0f;
-        int units = 1;
-        tempColor.set(Palette.darkFlame);
 
         if(hasItems){
             float scaling = inventoryScaling(tile);
@@ -387,11 +384,6 @@ public class Block extends BaseBlock {
                 int amount = tile.entity.items.get(item);
                 explosiveness += item.explosiveness * amount * scaling;
                 flammability += item.flammability * amount * scaling;
-
-                if(item.flammability * amount > 0.5){
-                    units++;
-                    Hue.addu(tempColor, item.flameColor);
-                }
             }
         }
 
@@ -403,8 +395,6 @@ public class Block extends BaseBlock {
         if(hasPower){
             power += tile.entity.power.amount;
         }
-
-        tempColor.mul(1f / units);
 
         if(hasLiquids){
 
@@ -422,7 +412,7 @@ public class Block extends BaseBlock {
             });
         }
 
-        Damage.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size / 2f, tempColor);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size / 2f, Palette.darkFlame);
         if(!tile.floor().solid && !tile.floor().isLiquid){
             RubbleDecal.create(tile.drawx(), tile.drawy(), size);
         }
@@ -505,8 +495,8 @@ public class Block extends BaseBlock {
     /** Crops a regionto 8x8 */
     protected TextureRegion iconRegion(TextureRegion src){
         TextureRegion region = new TextureRegion(src);
-        region.setRegionWidth(8);
-        region.setRegionHeight(8);
+        region.setWidth(8);
+        region.setHeight(8);
         return region;
     }
 
@@ -531,7 +521,7 @@ public class Block extends BaseBlock {
 
     /** Offset for placing and drawing multiblocks. */
     public float offset(){
-        return ((size + 1) % 2) * tilesize / 2;
+        return ((size + 1) % 2) * tilesize / 2f;
     }
 
     public boolean isMultiblock(){

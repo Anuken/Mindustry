@@ -2,7 +2,7 @@ package io.anuke.mindustry.world;
 
 import io.anuke.arc.util.NumberUtils;
 import io.anuke.mindustry.type.Item;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Bits;
 import static io.anuke.mindustry.Vars.*;
 

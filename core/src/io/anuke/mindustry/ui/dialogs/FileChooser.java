@@ -7,7 +7,7 @@ import io.anuke.arc.util.Align;
 import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.scene.event.Touchable;
@@ -178,7 +178,7 @@ public class FileChooser extends FloatingDialog{
         //if is mac, don't display extra info since you can only ever go to downloads
         navigation.setText(OS.isMac ? directory.name() : directory.toString());
 
-        GlyphLayout layout = Pooling.obtain(GlyphLayout.class, GlyphLayout::new);
+        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
 
         layout.setText(Core.font, navigation.getText());
 
@@ -188,7 +188,7 @@ public class FileChooser extends FloatingDialog{
             navigation.setCursorPosition(navigation.getText().length());
         }
 
-        Pooling.free(layout);
+        Pools.free(layout);
 
         files.clearChildren();
         files.top().left();

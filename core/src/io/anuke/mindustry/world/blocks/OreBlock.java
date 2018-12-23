@@ -1,12 +1,11 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.MathUtils;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
 
 public class OreBlock extends Floor{
@@ -46,7 +45,7 @@ public class OreBlock extends Floor{
 
     @Override
     public void drawNonLayer(Tile tile){
-        MathUtils.random.setSeed(tile.pos());
+        Mathf.random.setSeed(tile.pos());
 
         base.drawEdges(tile, true);
     }

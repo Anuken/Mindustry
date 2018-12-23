@@ -1,19 +1,18 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.util.IntArray;
-import io.anuke.arc.util.IntMap;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.SaveMeta;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.arc.Events;
-import io.anuke.arc.Timers;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.ThreadArray;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -23,7 +22,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Saves{
     private int nextSlot;
-    private Array<SaveSlot> saves = new ThreadArray<>();
+    private Array<SaveSlot> saves = new Array<>();
     private IntMap<SaveSlot> saveMap = new IntMap<>();
     private SaveSlot current;
     private boolean saving;
@@ -35,11 +34,9 @@ public class Saves{
     public Saves(){
         Events.on(StateChangeEvent.class, event -> {
             if(event.to == State.menu){
-                threads.run(() -> {
-                    totalPlaytime = 0;
-                    lastTimestamp = 0;
-                    current = null;
-                });
+                totalPlaytime = 0;
+                lastTimestamp = 0;
+                current = null;
             }
         });
     }
@@ -68,7 +65,7 @@ public class Saves{
         SaveSlot current = this.current;
 
         if(current != null && !state.is(State.menu)
-            && !(state.isPaused() && ui.hasDialog())){
+            && !(state.isPaused() && Core.scene.hasDialog())){
             if(lastTimestamp != 0){
                 totalPlaytime += Time.timeSinceMillis(lastTimestamp);
             }
@@ -145,7 +142,7 @@ public class Saves{
         IntArray result = new IntArray(saves.size);
         for(int i = 0; i < saves.size; i++) result.add(saves.get(i).index);
 
-        Core.settings.putObject("save-slots", result);
+        Core.settings.put("save-slots", result);
         Core.settings.save();
     }
 
@@ -204,7 +201,7 @@ public class Saves{
         }
 
         public void setName(String name){
-            Core.settings.putString("save-" + index + "-name", name);
+            Core.settings.put("save-" + index + "-name", name);
             Core.settings.save();
         }
 
@@ -229,7 +226,7 @@ public class Saves{
         }
 
         public void setAutosave(boolean save){
-            Core.settings.putBool("save-" + index + "-autosave", save);
+            Core.settings.put("save-" + index + "-autosave", save);
             Core.settings.save();
         }
 

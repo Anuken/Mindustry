@@ -1,7 +1,7 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.util.Bundles;
 
 public enum Team{
     none(Color.valueOf("4d4e58")),

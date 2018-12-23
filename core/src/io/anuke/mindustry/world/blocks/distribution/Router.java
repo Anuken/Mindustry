@@ -8,7 +8,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 
 public class Router extends Block{
     protected float speed = 8f;

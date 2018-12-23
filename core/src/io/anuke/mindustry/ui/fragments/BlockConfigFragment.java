@@ -74,7 +74,7 @@ public class BlockConfigFragment extends Fragment{
     }
 
     public boolean hasConfigMouse(){
-        Element e = Core.scene.hit(Core.input.getX(), Core.graphics.getHeight() - Core.input.getY(), true);
+        Element e = Core.scene.hit(Core.input.mouseX(), Core.graphics.getHeight() - Core.input.mouseY(), true);
         return e != null && (e == table || e.isDescendantOf(table));
     }
 

@@ -14,7 +14,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.Graphics;
-import io.anuke.arc.Timers;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.function.BooleanProvider;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;

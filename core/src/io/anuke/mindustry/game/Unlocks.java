@@ -1,5 +1,6 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
@@ -12,7 +13,7 @@ public class Unlocks{
     private ObjectMap<ContentType, ObjectSet<String>> unlocked = new ObjectMap<>();
     private boolean dirty;
 
-    static{
+    public Unlocks(){
         Core.settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
     }
 

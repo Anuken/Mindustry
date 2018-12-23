@@ -10,14 +10,14 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.Timers;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.util.*;
 
 import static io.anuke.mindustry.Vars.world;
 
 public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
-    protected static Translator vec = new Translator();
+    protected static Vector2 vec = new Vector2();
     protected static float wobblyness = 0.6f;
 
     protected Trail trail = new Trail(8);

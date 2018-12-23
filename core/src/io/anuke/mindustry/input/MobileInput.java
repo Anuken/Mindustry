@@ -6,7 +6,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.input.GestureDetector;
 import io.anuke.arc.input.GestureDetector.GestureListener;
 import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.Vector2;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.collection.Array;
@@ -28,8 +28,8 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.*;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.math.Mathf;
 
@@ -176,7 +176,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             for(TextureRegion region : regions){
                 Draw.rect(region, tile.worldx() + offset, tile.worldy() + offset,
-                        region.getRegionWidth() * request.scale, region.getRegionHeight() * request.scale,
+                        region.getWidth() * request.scale, region.getHeight() * request.scale,
                         request.recipe.result.rotate ? request.rotation * 90 : 0);
             }
         }else{
@@ -321,8 +321,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //Draw lines
         if(lineMode){
-            int tileX = tileX(Core.input.getX());
-            int tileY = tileY(Core.input.getY());
+            int tileX = tileX(Core.input.mouseX());
+            int tileY = tileY(Core.input.mouseY());
 
             //draw placing
             if(mode == placing && recipe != null){
@@ -344,7 +344,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                         for(TextureRegion region : regions){
                             Draw.rect(region, x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(),
-                                    region.getRegionWidth() * lineScale, region.getRegionHeight() * lineScale, recipe.result.rotate ? result.rotation * 90 : 0);
+                                    region.getWidth() * lineScale, region.getHeight() * lineScale, recipe.result.rotate ? result.rotation * 90 : 0);
                         }
                     }else{
                         Draw.color(Palette.removeBack);
@@ -415,7 +415,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         //get tile on cursor
         Tile cursor = tileAt(screenX, screenY);
 
-        float worldx = Graphics.world(screenX, screenY).x, worldy = Graphics.world(screenX, screenY).y;
+        float worldx = Core.input.mouseWorld(screenX, screenY).x, worldy = Core.input.mouseWorld(screenX, screenY).y;
 
         //ignore off-screen taps
         if(cursor == null || ui.hasMouse(screenX, screenY)) return false;
@@ -492,7 +492,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             if(tile == null) return false;
 
-            tryDropItems(tile.target(), Graphics.world(screenX, screenY).x, Graphics.world(screenX, screenY).y);
+            tryDropItems(tile.target(), Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
         }
         return false;
     }
@@ -526,7 +526,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     public boolean tap(float x, float y, int count, int button){
         if(state.is(State.menu) || lineMode) return false;
 
-        float worldx = Graphics.world(x, y).x, worldy = Graphics.world(x, y).y;
+        float worldx = Core.input.mouseWorld(x, y).x, worldy = Core.input.mouseWorld(x, y).y;
 
         //get tile on cursor
         Tile cursor = tileAt(x, y);
@@ -554,7 +554,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     consumed = true;
                     player.dropCarry(); //drop off unit
                 }else{
-                    Unit unit = Units.getClosest(player.getTeam(), Graphics.world(x, y).x, Graphics.world(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
+                    Unit unit = Units.getClosest(player.getTeam(), Core.input.mouseWorld(x, y).x, Core.input.mouseWorld(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
 
                     if(unit != null){
                         consumed = true;
@@ -714,7 +714,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean touchDown(float x, float y, int pointer, int button){
-        canPan = !ui.hasMouse();
+        canPan = !Core.scene.hasMouse();
         return false;
     }
 

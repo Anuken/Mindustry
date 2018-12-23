@@ -2,7 +2,7 @@ package io.anuke.mindustry.entities.effect;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.IntMap;
 import io.anuke.arc.util.Pool.Poolable;
 import io.anuke.annotations.Annotations.Loc;
@@ -19,12 +19,12 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.Effects;
-import io.anuke.arc.Timers;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.SolidEntity;
 import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.Fill;
 import io.anuke.arc.graphics.Hue;
 import io.anuke.arc.util.Angles;
@@ -97,7 +97,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
         if(p == null){
             if(Net.client()) return; //not clientside.
 
-            Puddle puddle = Pooling.obtain(Puddle.class, Puddle::new);
+            Puddle puddle = Pools.obtain(Puddle.class, Puddle::new);
             puddle.tile = tile;
             puddle.liquid = liquid;
             puddle.amount = amount;

@@ -6,9 +6,9 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.power.ItemGenerator.ItemGeneratorEntity;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.arc.Effects;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
 
 public abstract class LiquidGenerator extends PowerGenerator{

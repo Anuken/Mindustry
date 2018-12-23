@@ -1,11 +1,12 @@
 package io.anuke.mindustry.world.blocks;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 
 public class LiquidBlock extends Block{
     protected TextureRegion liquidRegion, bottomRegion, topRegion;

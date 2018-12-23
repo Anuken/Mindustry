@@ -1,8 +1,13 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
@@ -16,7 +21,6 @@ import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.CursorType;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.BarType;
@@ -24,11 +28,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.arc.Effects;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;

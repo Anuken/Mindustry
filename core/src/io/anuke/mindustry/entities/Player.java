@@ -326,7 +326,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 Draw.rect(mech.legRegion,
                 x + Angles.trnsx(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
                 y + Angles.trnsy(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
-                mech.legRegion.getRegionWidth() * i, mech.legRegion.getRegionHeight() - Mathf.clamp(ft * i, 0, 2), baseRotation - 90 + boostAng * i);
+                mech.legRegion.getWidth() * i, mech.legRegion.getHeight() - Mathf.clamp(ft * i, 0, 2), baseRotation - 90 + boostAng * i);
             }
 
             Draw.rect(mech.baseRegion, x, y, baseRotation - 90);
@@ -344,10 +344,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         for(int i : Mathf.signs){
             float tra = rotation - 90, trY = -mech.weapon.getRecoil(this, i > 0) + mech.weaponOffsetY;
-            float w = i > 0 ? -mech.weapon.equipRegion.getRegionWidth() : mech.weapon.equipRegion.getRegionWidth();
+            float w = i > 0 ? -mech.weapon.equipRegion.getWidth() : mech.weapon.equipRegion.getWidth();
             Draw.rect(mech.weapon.equipRegion,
             x + Angles.trnsx(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY),
-            y + Angles.trnsy(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY), w, mech.weapon.equipRegion.getRegionHeight(), rotation - 90);
+            y + Angles.trnsy(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY), w, mech.weapon.equipRegion.getHeight(), rotation - 90);
         }
 
         float backTrns = 4f, itemSize = 5f;
@@ -403,7 +403,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     public void drawName(){
-        GlyphLayout layout = Pooling.obtain(GlyphLayout.class, GlyphLayout::new);
+        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
 
         boolean ints = Core.font.usesIntegerPositions();
         Core.font.setUseIntegerPositions(false);
@@ -424,7 +424,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         Draw.reset();
-        Pooling.free(layout);
+        Pools.free(layout);
         Draw.tscl(1f);
         Core.font.setUseIntegerPositions(ints);
     }
@@ -613,7 +613,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             movement.x += xa * speed;
         }
 
-        Vector2 vec = Graphics.world(control.input(playerIndex).getMouseX(), control.input(playerIndex).getMouseY());
+        Vector2 vec = Core.input.mouseWorld(control.input(playerIndex).getMouseX(), control.input(playerIndex).getMouseY());
         pointerX = vec.x;
         pointerY = vec.y;
         updateShooting();
@@ -767,7 +767,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 }
 
             }else if(isShooting()){
-                Vector2 vec = Graphics.world(control.input(playerIndex).getMouseX(),
+                Vector2 vec = Core.input.mouseWorld(control.input(playerIndex).getMouseX(),
                 control.input(playerIndex).getMouseY());
                 pointerX = vec.x;
                 pointerY = vec.y;

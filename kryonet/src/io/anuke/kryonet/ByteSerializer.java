@@ -34,7 +34,7 @@ public class ByteSerializer implements Serialization{
         if(id == -2){
             return FrameworkSerializer.read(byteBuffer);
         }else{
-            Packet packet = Pooling.obtain((Class<Packet>) Registrator.getByID(id).type, (Supplier<Packet>) Registrator.getByID(id).constructor);
+            Packet packet = Pools.obtain((Class<Packet>) Registrator.getByID(id).type, (Supplier<Packet>) Registrator.getByID(id).constructor);
             packet.read(byteBuffer);
             return packet;
         }

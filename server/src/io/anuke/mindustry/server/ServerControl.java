@@ -6,6 +6,17 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
+import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.util.CommandHandler;
+import io.anuke.arc.util.CommandHandler.Command;
+import io.anuke.arc.util.CommandHandler.Response;
+import io.anuke.arc.util.CommandHandler.ResponseType;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
@@ -23,24 +34,16 @@ import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.*;
-import io.anuke.arc.modules.Module;
-import io.anuke.arc.util.CommandHandler;
-import io.anuke.arc.util.CommandHandler.Command;
-import io.anuke.arc.util.CommandHandler.Response;
-import io.anuke.arc.util.CommandHandler.ResponseType;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Strings;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
-import static io.anuke.mindustry.Vars.*;
 import static io.anuke.arc.util.Log.*;
+import static io.anuke.mindustry.Vars.*;
 
-public class ServerControl extends Module{
+public class ServerControl implements ApplicationListener{
     private static final int roundExtraTime = 12;
     //in bytes: 512 kb is max
     private static final int maxLogLength = 1024 * 512;
@@ -55,7 +58,7 @@ public class ServerControl extends Module{
 
 
     public ServerControl(String[] args){
-        Core.settings.defaultList(
+        Core.settings.defaults(
             "shufflemode", "normal",
             "bans", "",
             "admins", "",
@@ -99,7 +102,6 @@ public class ServerControl extends Module{
         Time.setDeltaProvider(() -> Gdx.graphics.getDeltaTime() * 60f);
         Effects.setScreenShakeProvider((a, b) -> {});
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
-        Sounds.setHeadless(true);
 
         registerCommands();
 
@@ -136,7 +138,7 @@ public class ServerControl extends Module{
             world.sectors.save();
             gameOvers = 0;
             inExtraRound = true;
-            Core.settings.putInt("sector_x", world.getSector().x + 1);
+            Core.settings.put("sector_x", world.getSector().x + 1);
             Core.settings.save();
 
             Call.onInfoMessage("[accent]Sector conquered![]\n" + roundExtraTime + " seconds until deployment in next sector.");

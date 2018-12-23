@@ -7,7 +7,7 @@ import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Bundles;
 

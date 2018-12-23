@@ -1,15 +1,14 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.arc.graphics.Color;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.traits.Saveable;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
-import io.anuke.arc.Timers;
-import io.anuke.arc.util.Pooling;
-import io.anuke.arc.util.ThreadArray;
-import io.anuke.arc.util.Tmp;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -21,9 +20,9 @@ import static io.anuke.mindustry.Vars.content;
  */
 public class StatusController implements Saveable{
     private static final StatusEntry globalResult = new StatusEntry();
-    private static final Array<StatusEntry> removals = new ThreadArray<>();
+    private static final Array<StatusEntry> removals = new Array<>();
 
-    private Array<StatusEntry> statuses = new ThreadArray<>();
+    private Array<StatusEntry> statuses = new Array<>();
 
     private float speedMultiplier;
     private float damageMultiplier;
@@ -57,7 +56,7 @@ public class StatusController implements Saveable{
         }
 
         //otherwise, no opposites found, add direct effect
-        StatusEntry entry = Pooling.obtain(StatusEntry.class, StatusEntry::new);
+        StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
         entry.set(effect, newTime);
         statuses.add(entry);
     }
@@ -91,7 +90,7 @@ public class StatusController implements Saveable{
             entry.time = Math.max(entry.time - Time.delta(), 0);
 
             if(entry.time <= 0){
-                Pooling.free(entry);
+                Pools.free(entry);
                 removals.add(entry);
             }else{
                 speedMultiplier *= entry.effect.speedMultiplier;
@@ -137,7 +136,7 @@ public class StatusController implements Saveable{
     @Override
     public void readSave(DataInput stream) throws IOException{
         for(StatusEntry effect : statuses){
-            Pooling.free(effect);
+            Pools.free(effect);
         }
 
         statuses.clear();
@@ -146,7 +145,7 @@ public class StatusController implements Saveable{
         for(int i = 0; i < amount; i++){
             byte id = stream.readByte();
             float time = stream.readShort() / 2f;
-            StatusEntry entry = Pooling.obtain(StatusEntry.class, StatusEntry::new);
+            StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
             entry.set(content.getByID(ContentType.status, id), time);
             statuses.add(entry);
         }

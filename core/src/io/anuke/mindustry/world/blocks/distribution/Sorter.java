@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.SelectionTrait;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.math.Mathf;
 

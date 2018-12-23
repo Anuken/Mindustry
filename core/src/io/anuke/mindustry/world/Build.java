@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world;
 
 import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.math.Rectangle;
+import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.Vector2;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Units;

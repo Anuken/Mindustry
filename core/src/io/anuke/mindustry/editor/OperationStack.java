@@ -22,7 +22,7 @@ public class OperationStack{
         stack.add(action);
 
         if(stack.size > maxSize){
-            stack.removeIndex(0);
+            stack.removeAt(0);
         }
     }
 

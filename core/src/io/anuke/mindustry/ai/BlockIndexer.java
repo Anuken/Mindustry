@@ -6,7 +6,6 @@ import io.anuke.arc.function.Predicate;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Bits;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;

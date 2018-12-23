@@ -162,7 +162,7 @@ public class KryoClient implements ClientProvider{
             client.sendUDP(object);
         }
 
-        Pooling.free(object);
+        Pools.free(object);
     }
 
     @Override

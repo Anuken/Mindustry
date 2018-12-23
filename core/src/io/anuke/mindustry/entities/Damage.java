@@ -1,11 +1,17 @@
 package io.anuke.mindustry.entities;
 
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.Rectangle;
-import io.anuke.arc.math.Vector2;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.ExplosionFx;
-import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
@@ -13,14 +19,6 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.Effects;
-import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.Timers;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Physics;
-import io.anuke.arc.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -28,7 +26,7 @@ import static io.anuke.mindustry.Vars.*;
 public class Damage{
     private static Rectangle rect = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
-    private static Translator tr = new Translator();
+    private static Vector2 tr = new Vector2();
 
     /**Creates a dynamic explosion based on specified parameters.*/
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
@@ -47,7 +45,7 @@ public class Damage{
         for(int i = 0; i < waves; i++){
             int f = i;
             Time.run(i * 2f, () -> {
-                threads.run(() -> Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f));
+                Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
                 Effects.effect(ExplosionFx.blockExplosionSmoke, x + Mathf.range(radius), y + Mathf.range(radius));
             });
         }
@@ -119,7 +117,7 @@ public class Damage{
             other.width += expand * 2;
             other.height += expand * 2;
 
-            Vector2 vec = Physics.raycastRect(x, y, x2, y2, other);
+            Vector2 vec = Geometry.raycastRect(x, y, x2, y2, other);
 
             if(vec != null){
                 Effects.effect(effect, vec.x, vec.y);
@@ -180,7 +178,7 @@ public class Damage{
         int trad = (int) (radius / tilesize);
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
-                Tile tile = world.tile(Mathf.scl2(x, tilesize) + dx, Mathf.scl2(y, tilesize) + dy);
+                Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
                 if(tile != null && tile.entity != null && (team == null || state.teams.areEnemies(team, tile.getTeam())) && Vector2.dst(dx, dy, 0, 0) <= trad){
                     float amount = calculateDamage(x, y, tile.worldx(), tile.worldy(), radius, damage);
                     tile.entity.damage(amount);

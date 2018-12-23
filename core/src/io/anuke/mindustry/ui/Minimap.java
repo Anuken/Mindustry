@@ -5,7 +5,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.arc.Core;
 import io.anuke.arc.Graphics;
-import io.anuke.arc.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.event.InputEvent;
 import io.anuke.arc.scene.event.InputListener;
@@ -32,7 +32,7 @@ public class Minimap extends Container<Element>{
                 if(showFog){
                     renderer.fog.getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
-                    r.setRegion(renderer.minimap.getRegion());
+                    r.set(renderer.minimap.getRegion());
                     float pad = renderer.fog.getPadding();
 
                     float px = r.getU() * world.width() + pad;

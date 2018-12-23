@@ -2,8 +2,8 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.graphics.CapStyle;
-import io.anuke.arc.graphics.Draw;
-import io.anuke.arc.graphics.Lines;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.util.Geometry;
 import io.anuke.arc.math.Mathf;
 
