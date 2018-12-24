@@ -339,7 +339,7 @@ public class WorldGenerator{
 
         if(detailed && spawnpoints != null){
             for(GridPoint2 p : spawnpoints){
-                float dst = Vector2.dst2(p.x, p.y, localX, localY);
+                float dst = Mathf.dst2(p.x, p.y, localX, localY);
                 minDst = Math.min(minDst, dst);
 
                 if(dst < lerpDst){

@@ -1,8 +1,17 @@
 package io.anuke.mindustry.entities.bullet;
 
-import io.anuke.arc.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.BulletEntity;
+import io.anuke.arc.entities.trait.Entity;
+import io.anuke.arc.entities.trait.SolidTrait;
+import io.anuke.arc.entities.trait.VelocityTrait;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.traits.AbsorbTrait;
@@ -10,15 +19,6 @@ import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.BulletEntity;
-import io.anuke.arc.entities.trait.Entity;
-import io.anuke.arc.entities.trait.SolidTrait;
-import io.anuke.arc.entities.trait.VelocityTrait;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Pooling;
-import io.anuke.arc.util.Timer;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -28,7 +28,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait, AbsorbTrait{
     private static Vector2 vector = new Vector2();
-    public Timer timer = new Timer(3);
+    public Interval timer = new Interval(3);
     private float lifeScl;
     private Team team;
     private Object data;
@@ -62,7 +62,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
         bullet.velocity.set(0, type.speed).setAngle(angle).scl(velocityScl);
         if(type.keepVelocity){
-            bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait) owner).getVelocity() : Vector2.Zero);
+            bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait) owner).getVelocity() : Vector2.ZERO);
         }
 
         bullet.team = team;

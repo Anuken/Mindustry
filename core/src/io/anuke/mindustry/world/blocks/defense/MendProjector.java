@@ -76,7 +76,7 @@ public class MendProjector extends Block{
 
             for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
                 for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(Vector2.dst(x, y, tile.x, tile.y) > realRange) continue;
+                    if(Mathf.dst(x, y, tile.x, tile.y) > realRange) continue;
 
                     Tile other = world.tile(x, y);
 

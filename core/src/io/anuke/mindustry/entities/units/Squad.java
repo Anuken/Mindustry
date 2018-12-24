@@ -1,9 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
-import io.anuke.arc.math.Vector2;
-import io.anuke.arc.util.Vector2;
-
-import static io.anuke.mindustry.Vars.threads;
+import io.anuke.arc.Core;
+import io.anuke.arc.math.geom.Vector2;
 
 /**
  * Used to group entities together, for formations and such.
@@ -16,9 +14,9 @@ public class Squad{
     private long lastUpdated;
 
     protected void update(){
-        if(threads.getFrameID() != lastUpdated){
+        if(Core.graphics.getFrameId() != lastUpdated){
             direction.setZero();
-            lastUpdated = threads.getFrameID();
+            lastUpdated = Core.graphics.getFrameId();
         }
     }
 }

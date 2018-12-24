@@ -359,7 +359,7 @@ public class NetServer implements ApplicationListener{
             player.y = prevy;
             newx = x;
             newy = y;
-        }else if(Vector2.dst(x, y, newx, newy) > correctDist){
+        }else if(Mathf.dst(x, y, newx, newy) > correctDist){
             Call.onPositionSet(player.con.id, newx, newy); //teleport and correct position when necessary
         }
 

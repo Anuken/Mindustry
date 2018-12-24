@@ -1,16 +1,17 @@
 package io.anuke.mindustry.entities.bullet;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.util.Angles;
-import io.anuke.arc.math.Mathf;
 
 /**
  * A BulletType for most ammo-based bullets shot from turrets and units.
@@ -56,9 +57,9 @@ public class BasicBulletType extends BulletType{
         float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, bulletWidth, height, b.angle() - 90);
+        Draw.rect(backRegion, b.x, b.y, bulletWidth, height).rot(b.angle() - 90);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, bulletWidth, height, b.angle() - 90);
+        Draw.rect(frontRegion, b.x, b.y, bulletWidth, height).rot(b.angle() - 90);
         Draw.color();
     }
 

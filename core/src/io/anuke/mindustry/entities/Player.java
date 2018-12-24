@@ -3,24 +3,20 @@ package io.anuke.mindustry.entities;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
-import io.anuke.arc.Graphics;
+import io.anuke.arc.collection.Bits;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.GlyphLayout;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Bits;
-import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Timer;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
@@ -292,7 +288,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         float x = snappedX(), y = snappedY();
         float scl = mech.flying ? 1f : boostHeat / 2f;
 
-        Draw.rect(mech.iconRegion, x + offsetX * scl, y + offsetY * scl, rotation - 90);
+        Draw.rect(mech.iconRegion, x + offsetX * scl, y + offsetY * scl).rot(rotation - 90);
     }
 
     @Override
@@ -326,10 +322,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 Draw.rect(mech.legRegion,
                 x + Angles.trnsx(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
                 y + Angles.trnsy(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
-                mech.legRegion.getWidth() * i, mech.legRegion.getHeight() - Mathf.clamp(ft * i, 0, 2), baseRotation - 90 + boostAng * i);
+                mech.legRegion.getWidth() * i, mech.legRegion.getHeight() - Mathf.clamp(ft * i, 0, 2)).rot(baseRotation - 90 + boostAng * i);
             }
 
-            Draw.rect(mech.baseRegion, x, y, baseRotation - 90);
+            Draw.rect(mech.baseRegion, x, y).rot(baseRotation - 90);
         }
 
         if(floor.isLiquid){
@@ -338,7 +334,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             Draw.tint(Color.WHITE);
         }
 
-        Draw.rect(mech.region, x, y, rotation - 90);
+        Draw.rect(mech.region, x, y).rot(rotation - 90);
 
         mech.draw(this);
 
@@ -347,7 +343,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             float w = i > 0 ? -mech.weapon.equipRegion.getWidth() : mech.weapon.equipRegion.getWidth();
             Draw.rect(mech.weapon.equipRegion,
             x + Angles.trnsx(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY),
-            y + Angles.trnsy(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY), w, mech.weapon.equipRegion.getHeight(), rotation - 90);
+            y + Angles.trnsy(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY), w, mech.weapon.equipRegion.getHeight()).rot(rotation - 90);
         }
 
         float backTrns = 4f, itemSize = 5f;
@@ -361,7 +357,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 Draw.rect(stack.item.region,
                 x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
                 y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
-                itemSize, itemSize, rotation);
+                itemSize, itemSize).rot(rotation);
             }
         }
 
@@ -374,7 +370,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
         Draw.alpha(hitTime / hitDuration);
-        Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
+        Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f)).rot(rotation - 90);
         Draw.color();
     }
 
@@ -388,7 +384,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             float wobblyness = 0.6f;
             if(!state.isPaused()) trail.update(x + Angles.trnsx(rotation + 180f, 5f) + Mathf.range(wobblyness),
             y + Angles.trnsy(rotation + 180f, 5f) + Mathf.range(wobblyness));
-            trail.draw(Hue.mix(mech.trailColor, mech.trailColorTo, mech.flying ? 0f : boostHeat, Tmp.c1), 5f * (isFlying() ? 1f : boostHeat));
+            trail.draw(Tmp.c1.set(mech.trailColor).lerp(mech.trailColorTo, mech.flying ? 0f : boostHeat), 5f * (isFlying() ? 1f : boostHeat));
         }else{
             trail.clear();
         }
@@ -403,17 +399,17 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     public void drawName(){
+        BitmapFont font = Core.scene.skin.getFont("default-font");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
 
-        boolean ints = Core.font.usesIntegerPositions();
-        Core.font.setUseIntegerPositions(false);
-        Draw.tscl(0.25f / io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f));
-        layout.setText(Core.font, name);
-        Draw.color(0f, 0f, 0f, 0.3f);
-        Draw.rect("blank", x, y + 8 - layout.height / 2, layout.width + 2, layout.height + 3);
-        Draw.color();
-        Draw.tcolor(color);
-        Draw.text(name, x, y + 8);
+        boolean ints = font.usesIntegerPositions();
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(0.25f / io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f));
+        layout.setText(font, name);
+        Fill.rect().center(x, y + 8 - layout.height / 2, layout.width + 2, layout.height + 3).color(0f, 0f, 0f, 0.3f);
+        font.setColor(color);
+
+        font.draw(name, x, y + 8, 0, Align.center, false);
 
         if(isAdmin){
             float s = 3f;
@@ -425,8 +421,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         Draw.reset();
         Pools.free(layout);
-        Draw.tscl(1f);
-        Core.font.setUseIntegerPositions(ints);
+        font.getData().setScale(1f);
+        font.setUseIntegerPositions(ints);
     }
 
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
@@ -438,9 +434,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 Block block = world.tile(request.x, request.y).target().block();
 
                 //draw removal request
-                Lines.stroke(2f);
-
-                Draw.color(Palette.removeBack);
+                Lines.stroke(2f, Palette.removeBack);
 
                 float rad = Mathf.absin(Time.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
 
@@ -457,9 +451,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 rad);
             }else{
                 //draw place request
-                Lines.stroke(2f);
-
-                Draw.color(Palette.accentBack);
+                Lines.stroke(2f, Palette.accentBack);
 
                 float rad = Mathf.absin(Time.time(), 7f, 1f) - 2f + request.recipe.result.size * tilesize / 2f;
 
@@ -566,7 +558,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     protected void updateMech(){
         Tile tile = world.tileWorld(x, y);
 
-        isBoosting = Core.input.keyDown("dash") && !mech.flying;
+        isBoosting = Core.input.keyDown(Binding.dash) && !mech.flying;
 
         //if player is in solid block
         if(tile != null && tile.solid()){
@@ -586,7 +578,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }
 
         //drop from carrier on key press
-        if(!ui.chatfrag.chatOpen() && Core.input.keyTap("drop_unit")){
+        if(!ui.chatfrag.chatOpen() && Core.input.keyTap(Binding.drop_unit)){
             if(!mech.flying){
                 if(getCarrier() != null){
                     Call.dropSelf(this);
@@ -604,10 +596,8 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         movement.setZero();
 
-        String section = control.input(playerIndex).section;
-
-        float xa = Core.input.axis(section, "move_x");
-        float ya = Core.input.axis(section, "move_y");
+        float xa = Core.input.axis(Binding.move_x);
+        float ya = Core.input.axis(Binding.move_y);
         if(!Core.input.keyDown(Binding.gridMode)){
             movement.y += ya * speed;
             movement.x += xa * speed;
@@ -879,7 +869,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
         TypeIO.writeStringData(buffer, name); //TODO writing strings is very inefficient
-        buffer.writeByte(Bits.toByte(isAdmin) | (Bits.toByte(dead) << 1) | (Bits.toByte(isBoosting) << 2));
+        buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? -1 : mining.pos());

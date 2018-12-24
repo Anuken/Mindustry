@@ -57,7 +57,7 @@ public class MapView extends Element implements GestureListener{
 
         for(int i = 0; i < MapEditor.brushSizes.length; i++){
             float size = MapEditor.brushSizes[i];
-            brushPolygons[i] = Geometry.pixelCircle(size, (index, x, y) -> Vector2.dst(x, y, index, index) <= index - 0.5f);
+            brushPolygons[i] = Geometry.pixelCircle(size, (index, x, y) -> Mathf.dst(x, y, index, index) <= index - 0.5f);
         }
 
         Core.input.addProcessor(0, new GestureDetector(20, 0.5f, 2, 0.15f, this));

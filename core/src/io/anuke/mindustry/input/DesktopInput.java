@@ -235,7 +235,7 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
 
-            if(mode == placing){ //touch up while placing, place everything in selection
+            if(mode == placing && recipe != null){ //touch up while placing, place everything in selection
                 NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, true, maxLength);
 
                 for(int i = 0; i <= result.getLength(); i += recipe.result.size){

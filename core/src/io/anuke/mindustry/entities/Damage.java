@@ -179,7 +179,7 @@ public class Damage{
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
-                if(tile != null && tile.entity != null && (team == null || state.teams.areEnemies(team, tile.getTeam())) && Vector2.dst(dx, dy, 0, 0) <= trad){
+                if(tile != null && tile.entity != null && (team == null || state.teams.areEnemies(team, tile.getTeam())) && Mathf.dst(dx, dy, 0, 0) <= trad){
                     float amount = calculateDamage(x, y, tile.worldx(), tile.worldy(), radius, damage);
                     tile.entity.damage(amount);
                 }
@@ -189,7 +189,7 @@ public class Damage{
     }
 
     private static float calculateDamage(float x, float y, float tx, float ty, float radius, float damage){
-        float dist = Vector2.dst(x, y, tx, ty);
+        float dist = Mathf.dst(x, y, tx, ty);
         float falloff = 0.4f;
         float scaled = Mathf.lerp(1f - dist / radius, 1f, falloff);
         return damage * scaled;

@@ -1,6 +1,11 @@
 package io.anuke.mindustry.entities.units.types;
 
-import io.anuke.arc.util.Queue;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Queue;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -20,11 +25,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.Events;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.util.Geometry;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Structs;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -63,7 +63,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             if(core == null) return;
 
             if((entity.progress() < 1f || entity.progress() > 0f) && entity.tile.block() instanceof BuildBlock){ //building is valid
-                if(!isBuilding() && distanceTo(target) < placeDistance * 0.9f){ //within distance, begin placing
+                if(!isBuilding() && dst(target) < placeDistance * 0.9f){ //within distance, begin placing
                     if(isBreaking){
                         getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y));
                     }else{
@@ -158,7 +158,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                 if(target instanceof Tile){
                     moveTo(type.range / 1.5f);
 
-                    if(distanceTo(target) < type.range && mineTile != target){
+                    if(dst(target) < type.range && mineTile != target){
                         setMineTile((Tile) target);
                     }
 
@@ -196,7 +196,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
             TileEntity tile = (TileEntity) target;
 
-            if(distanceTo(target) < type.range){
+            if(dst(target) < type.range){
                 if(tile.tile.block().acceptStack(inventory.getItem().item, inventory.getItem().amount, tile.tile, Drone.this) == inventory.getItem().amount){
                     Call.transferItemTo(inventory.getItem().item, inventory.getItem().amount, x, y, tile.tile);
                     inventory.clearItem();

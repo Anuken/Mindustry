@@ -4,6 +4,8 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.Graphics;
+import io.anuke.arc.Graphics.Cursor;
+import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
@@ -20,7 +22,6 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.BarType;
@@ -88,8 +89,8 @@ public class BuildBlock extends Block{
     }
 
     @Override
-    public CursorType getCursor(Tile tile){
-        return CursorType.hand;
+    public Cursor getCursor(Tile tile){
+        return SystemCursor.hand;
     }
 
     @Override
@@ -129,7 +130,7 @@ public class BuildBlock extends Block{
         if(entity.previous == null) return;
 
         for(TextureRegion region : entity.previous.getBlockIcon()){
-            Draw.rect(region, tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.getRotation() * 90 : 0);
+            Draw.rect(region, tile.drawx(), tile.drawy()).rot(entity.previous.rotate ? tile.getRotation() * 90 : 0);
         }
     }
 
@@ -149,9 +150,8 @@ public class BuildBlock extends Block{
             Shaders.blockbuild.progress = entity.progress;
             Shaders.blockbuild.apply();
 
-            Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.getRotation() * 90 : 0);
-
-            Graphics.flush();
+            Draw.rect(region, tile.drawx(), tile.drawy()).rot(target.rotate ? tile.getRotation() * 90 : 0);
+            Draw.flush();
         }
     }
 

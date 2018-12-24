@@ -5,9 +5,9 @@ import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
@@ -165,7 +165,7 @@ public class Units{
             if(e.isDead() || !predicate.test(e))
                 return;
 
-            float dist = Vector2.dst(e.x, e.y, x, y);
+            float dist = Mathf.dst(e.x, e.y, x, y);
             if(dist < range){
                 if(result == null || dist < cdist){
                     result = e;
@@ -188,7 +188,7 @@ public class Units{
             if(!predicate.test(e))
                 return;
 
-            float dist = Vector2.dst(e.x, e.y, x, y);
+            float dist = Mathf.dst(e.x, e.y, x, y);
             if(dist < range){
                 if(result == null || dist < cdist){
                     result = e;

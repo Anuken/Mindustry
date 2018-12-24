@@ -1,8 +1,13 @@
 package io.anuke.mindustry.entities.units;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.traits.TypeTrait;
@@ -12,12 +17,6 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.arc.function.Supplier;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Strings;
 
 public class UnitType extends UnlockableContent{
     protected final Supplier<? extends BaseUnit> constructor;

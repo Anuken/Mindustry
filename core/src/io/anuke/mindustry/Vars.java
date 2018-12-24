@@ -2,8 +2,14 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.Application.ApplicationType;
 import io.anuke.arc.Core;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.EffectEntity;
+import io.anuke.arc.entities.trait.DrawTrait;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -17,13 +23,6 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
-import io.anuke.arc.Settings;
-import io.anuke.arc.entities.Entities;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.EffectEntity;
-import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Vector2;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -100,7 +99,6 @@ public class Vars{
 
     public static ContentLoader content;
     public static GameState state;
-    public static ThreadHandler threads;
 
     public static Control control;
     public static Logic logic;
@@ -167,13 +165,14 @@ public class Vars{
         }
 
         state = new GameState();
-        threads = new ThreadHandler();
 
         mobile = Core.app.getType() == ApplicationType.Android || Core.app.getType() == ApplicationType.iOS || testMobile;
         ios = Core.app.getType() == ApplicationType.iOS;
         android = Core.app.getType() == ApplicationType.Android;
 
-        dataDirectory = Core.settings.getDataDirectory(appName);
+        Core.settings.setAppName(appName);
+
+        dataDirectory = Core.settings.getDataDirectory();
         screenshotDirectory = dataDirectory.child("screenshots/");
         customMapDirectory = dataDirectory.child("maps/");
         saveDirectory = dataDirectory.child("saves/");

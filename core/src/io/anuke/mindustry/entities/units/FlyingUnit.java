@@ -1,6 +1,11 @@
 package io.anuke.mindustry.entities.units;
 
-import io.anuke.arc.math.Vector2;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.CarriableTrait;
@@ -10,9 +15,6 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.util.*;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -75,8 +77,8 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             }else{
                 attack(150f);
 
-                if((Mathf.angNear(angleTo(target), rotation, 15f) || !getWeapon().getAmmo().bullet.keepVelocity) //bombers don't care about rotation
-                && distanceTo(target) < Math.max(getWeapon().getAmmo().getRange(), type.range)){
+                if((Angles.near(angleTo(target), rotation, 15f) || !getWeapon().getAmmo().bullet.keepVelocity) //bombers don't care about rotation
+                && dst(target) < Math.max(getWeapon().getAmmo().getRange(), type.range)){
                     AmmoType ammo = getWeapon().getAmmo();
 
                     Vector2 to = Predict.intercept(FlyingUnit.this, target, ammo.bullet.speed);
@@ -162,7 +164,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     public void draw(){
         Draw.alpha(hitTime / hitDuration);
 
-        Draw.rect(type.name, x, y, rotation - 90);
+        Draw.rect(type.name, x, y).rot(rotation - 90);
 
         drawItems();
 
@@ -235,7 +237,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
         vec.set(target.getX() - x, target.getY() - y);
 
-        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((distanceTo(target) - circleLength) / 100f, -1f, 1f);
+        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((dst(target) - circleLength) / 100f, -1f, 1f);
 
         vec.setLength(type.speed * Time.delta() * length);
         if(length < 0) vec.rotate(180f);

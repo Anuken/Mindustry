@@ -3,10 +3,10 @@ package io.anuke.mindustry.input;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
-import io.anuke.arc.Graphics;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.input.InputProcessor;
+import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -39,7 +39,6 @@ public abstract class InputHandler implements InputProcessor{
     final static float backTrns = 3f;
 
     public final Player player;
-    public final String section;
     public final OverlayFragment frag = new OverlayFragment(this);
 
     public Recipe recipe;
@@ -48,7 +47,6 @@ public abstract class InputHandler implements InputProcessor{
 
     public InputHandler(Player player){
         this.player = player;
-        this.section = "player_" + (player.playerIndex + 1);
     }
 
     //methods to override
@@ -89,7 +87,7 @@ public abstract class InputHandler implements InputProcessor{
                 tile.block().getStackOffset(item, tile, stackTrns);
 
                 ItemTransfer.create(item,
-                        player.x + Mathf.trnsx(player.rotation + 180f, backTrns), player.y + Mathf.trnsy(player.rotation + 180f, backTrns),
+                        player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
                         new Vector2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
                             if(tile.block() != block || tile.entity == null || tile.entity.items == null) return;
 
@@ -226,7 +224,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     boolean canTapPlayer(float x, float y){
-        return Vector2.dst(x, y, player.x, player.y) <= playerSelectRange && player.inventory.hasItem();
+        return Mathf.dst(x, y, player.x, player.y) <= playerSelectRange && player.inventory.hasItem();
     }
 
     /**Tries to begin mining a tile, returns true if successful.*/
@@ -334,7 +332,7 @@ public abstract class InputHandler implements InputProcessor{
         for(Tile tile : state.teams.get(player.getTeam()).cores){
             if(tile.dst(x * tilesize, y * tilesize) < coreBuildRange){
                 return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
-                Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
+                Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
             }
         }
 
@@ -342,7 +340,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public boolean validBreak(int x, int y){
-        return Build.validBreak(player.getTeam(), x, y) && Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
+        return Build.validBreak(player.getTeam(), x, y) && Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
     }
 
     public void placeBlock(int x, int y, Recipe recipe, int rotation){

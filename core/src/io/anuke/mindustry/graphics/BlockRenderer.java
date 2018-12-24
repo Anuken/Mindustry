@@ -48,8 +48,8 @@ public class BlockRenderer{
             threads.runGraphics(() -> {
                 int avgx = Mathf.scl(camera.position.x, tilesize);
                 int avgy = Mathf.scl(camera.position.y, tilesize);
-                int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
-                int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
+                int rangex = (int) (camera.width  / tilesize / 2) + 2;
+                int rangey = (int) (camera.height  / tilesize / 2) + 2;
 
                 if(Math.abs(avgx - event.tile.x) <= rangex && Math.abs(avgy - event.tile.y) <= rangey){
                     lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
@@ -79,8 +79,8 @@ public class BlockRenderer{
         int avgx = Mathf.scl(camera.position.x, tilesize);
         int avgy = Mathf.scl(camera.position.y, tilesize);
 
-        int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
-        int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
+        int rangex = (int) (camera.width  / tilesize / 2) + 2;
+        int rangey = (int) (camera.height  / tilesize / 2) + 2;
 
         if(avgx == lastCamX && avgy == lastCamY && lastRangeX == rangex && lastRangeY == rangey){
             return;

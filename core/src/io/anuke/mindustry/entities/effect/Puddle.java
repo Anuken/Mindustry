@@ -1,12 +1,23 @@
 package io.anuke.mindustry.entities.effect;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.util.IntMap;
-import io.anuke.arc.util.Pool.Poolable;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.SolidEntity;
+import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.pooling.Pool.Poolable;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.bullets.TurretBullets;
@@ -19,18 +30,6 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.SolidEntity;
-import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Fill;
-import io.anuke.arc.graphics.Hue;
-import io.anuke.arc.util.Angles;
-import io.anuke.arc.util.Geometry;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Pooling;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -183,7 +182,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
 
             if(amount >= maxLiquid / 1.5f && generation < maxGeneration){
                 float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Time.delta();
-                for(GridPoint2 point : Geometry.d4){
+                for(Point2 point : Geometry.d4){
                     Tile other = world.tile(tile.x + point.x, tile.y + point.y);
                     if(other != null && other.block() == Blocks.air && !other.hasCliffs()){
                         deposit(other, tile, liquid, deposited, generation + 1);
@@ -232,7 +231,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
         float smag = onLiquid ? 0.8f : 0f;
         float sscl = 20f;
 
-        Draw.color(Hue.shift(tmp.set(liquid.color), 2, -0.05f));
+        Draw.color(tmp.set(liquid.color).shiftValue(-0.05f));
         Fill.circle(x + Mathf.sin(Time.time() + seeds * 532, sscl, smag), y + Mathf.sin(Time.time() + seeds * 53, sscl, smag), f * 8f);
         Angles.randLenVectors(id, 3, f * 6f, (ex, ey) -> {
             Fill.circle(x + ex + Mathf.sin(Time.time() + seeds * 532, sscl, smag),

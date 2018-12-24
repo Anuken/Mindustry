@@ -3,15 +3,16 @@ package io.anuke.mindustry.core;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
-import io.anuke.arc.Graphics;
+import io.anuke.arc.Graphics.Cursor;
+import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Colors;
 import io.anuke.arc.graphics.g2d.BitmapFont;
-import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.Scene;
 import io.anuke.arc.scene.Skin;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.ui.Dialog;
@@ -27,7 +28,6 @@ import io.anuke.arc.freetype.*;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 
@@ -67,7 +67,19 @@ public class UI implements ApplicationListener{
     public SectorsDialog sectors;
     public MissionDialog missions;
 
+    public Cursor drillCursor, unloadCursor;
+
     public UI(){
+        Skin skin = new Skin(Core.atlas);
+        generateFonts();
+        skin.load(Core.files.internal("ui/uiskin.json"));
+
+        for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
+            font.setUseIntegerPositions(true);
+        }
+
+        Core.scene = new Scene(skin);
+
         Dialog.setShowAction(() -> sequence(
             alpha(0f),
             originCenter(),
@@ -88,12 +100,24 @@ public class UI implements ApplicationListener{
 
         TooltipManager.getInstance().animations = false;
 
-        Core.settings.setErrorHandler(() -> Time.run(1f, () -> showError("[crimson]Failed to access local storage.\nSettings will not be saved.")));
-
-        Dialog.closePadR = -1;
-        Dialog.closePadT = 5;
+        Core.settings.setErrorHandler(e -> Time.run(1f, () -> showError("Failed to access local storage.\nSettings will not be saved.")));
 
         Colors.put("accent", Palette.accent);
+
+        loadCursors();
+    }
+
+    void loadCursors(){
+        int cursorScaling = 3;
+        Color outlineColor = Color.valueOf("444444");
+
+        drillCursor = Core.graphics.newCursor("drill", cursorScaling, outlineColor);
+        unloadCursor = Core.graphics.newCursor("unload", cursorScaling, outlineColor);
+        SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScaling, outlineColor));
+        SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScaling, outlineColor));
+        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScaling, outlineColor));
+
+        Core.graphics.restoreCursor();
     }
     
     void generateFonts(){
@@ -111,41 +135,12 @@ public class UI implements ApplicationListener{
     }
 
     @Override
-    protected void loadSkin(){
-        skin = new Skin(Core.atlas);
-        generateFonts();
-        skin.load(Core.files.internal("ui/uiskin.json"));
-
-        for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
-            font.setUseIntegerPositions(true);
-            //font.getData().setScale(Vars.fontScale);
-        }
-    }
-
-    @Override
     public void update(){
         if(disableUI) return;
 
-        if(Graphics.drawing()) Graphics.end();
-
-        act();
-
-        Graphics.begin();
-
-        for(int i = 0; i < players.length; i++){
-            InputHandler input = control.input(i);
-
-            if(input.isCursorVisible()){
-                Draw.color();
-
-                float scl = Unit.dp.scl(3f);
-
-                Draw.rect("controller-cursor", input.getMouseX(), Core.graphics.getHeight() - input.getMouseY(), 16 * scl, 16 * scl);
-            }
-        }
-
-        Graphics.end();
-        Draw.color();
+        Core.scene.act();
+        Core.scene.draw();
+        Core.graphics.batch().flush();
     }
 
     @Override
@@ -186,14 +181,12 @@ public class UI implements ApplicationListener{
 
     @Override
     public void resize(int width, int height){
-        super.resize(width, height);
-
+        Core.scene.resize(width, height);
         Events.fire(new ResizeEvent());
     }
 
     @Override
     public void dispose(){
-        super.dispose();
         generator.dispose();
     }
 

@@ -42,7 +42,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         public void update(){
             TileEntity core = getClosestEnemyCore();
-            float dst = core == null ? 0 : distanceTo(core);
+            float dst = core == null ? 0 : dst(core);
 
             if(core != null && dst < getWeapon().getAmmo().getRange() / 1.1f){
                 target = core;
@@ -57,7 +57,7 @@ public abstract class GroundUnit extends BaseUnit{
         public void update(){
             TileEntity target = getClosestCore();
             if(target != null){
-                if(distanceTo(target) > 400f){
+                if(dst(target) > 400f){
                     moveAwayFromCore();
                 }else{
                     patrol();
@@ -188,7 +188,7 @@ public abstract class GroundUnit extends BaseUnit{
         }
 
         if(!Units.invalidateTarget(target, this)){
-            if(distanceTo(target) < getWeapon().getAmmo().getRange()){
+            if(dst(target) < getWeapon().getAmmo().getRange()){
                 rotate(angleTo(target));
 
                 if(Mathf.angNear(angleTo(target), rotation, 13f)){
@@ -292,7 +292,7 @@ public abstract class GroundUnit extends BaseUnit{
         Tile targetTile = world.pathfinder.getTargetTile(enemy, tile);
         TileEntity core = getClosestCore();
 
-        if(tile == targetTile || core == null || distanceTo(core) < 90f) return;
+        if(tile == targetTile || core == null || dst(core) < 90f) return;
 
         float angle = angleTo(targetTile);
 

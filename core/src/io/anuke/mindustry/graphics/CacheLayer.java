@@ -80,7 +80,7 @@ public enum CacheLayer{
         Graphics.shader(shader);
         Graphics.begin();
         Draw.rect(renderer.effectSurface.texture(), Core.camera.position.x, Core.camera.position.y,
-                Core.camera.viewportWidth * Core.camera.zoom, -Core.camera.viewportHeight * Core.camera.zoom);
+                Core.camera.width , -Core.camera.height );
         Graphics.end();
         Graphics.shader();
         renderer.blocks.beginFloor();

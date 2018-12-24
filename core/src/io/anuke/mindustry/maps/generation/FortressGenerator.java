@@ -198,7 +198,7 @@ public class FortressGenerator{
         for(IntPositionConsumer i : passes){
             for(int x = 0; x < gen.width; x++){
                 for(int y = 0; y < gen.height; y++){
-                    if(Vector2.dst(x, y, enemyX, enemyY) > coreDst){
+                    if(Mathf.dst(x, y, enemyX, enemyY) > coreDst){
                         continue;
                     }
 

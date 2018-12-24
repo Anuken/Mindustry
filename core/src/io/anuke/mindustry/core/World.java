@@ -7,7 +7,7 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.GridPoint2;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
@@ -338,7 +338,7 @@ public class World implements ApplicationListener{
     /**
      * Raycast, but with world coordinates.
      */
-    public GridPoint2 raycastWorld(float x, float y, float x2, float y2){
+    public Point2 raycastWorld(float x, float y, float x2, float y2){
         return raycast(Math.round(x / tilesize), Math.round(y / tilesize),
                 Math.round(x2 / tilesize), Math.round(y2 / tilesize));
     }
@@ -348,7 +348,7 @@ public class World implements ApplicationListener{
      *
      * @return null if no collisions found, block position otherwise.
      */
-    public GridPoint2 raycast(int x0f, int y0f, int x1, int y1){
+    public Point2 raycast(int x0f, int y0f, int x1, int y1){
         int x0 = x0f;
         int y0 = y0f;
         int dx = Math.abs(x1 - x0);

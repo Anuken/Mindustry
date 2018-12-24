@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.Graphics;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.entities.Effects;
@@ -12,6 +11,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
@@ -129,9 +129,7 @@ public abstract class Turret extends Block{
     @Override
     public void draw(Tile tile){
         Draw.rect(baseRegion, tile.drawx(), tile.drawy());
-        Draw.color(tile.getTeam().color, Color.WHITE, 0.45f);
-        Draw.rect(baseTopRegion, tile.drawx(), tile.drawy());
-        Draw.color();
+        Draw.rect(baseTopRegion, tile.drawx(), tile.drawy()).color(tile.getTeam().color, Color.WHITE, 0.45f);
     }
 
     @Override
@@ -145,8 +143,6 @@ public abstract class Turret extends Block{
         if(heatRegion != Core.atlas.find("error")){
             heatDrawer.accept(tile, entity);
         }
-
-        Draw.color();
     }
 
     @Override
@@ -174,8 +170,7 @@ public abstract class Turret extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Draw.color(Palette.placing);
-        Lines.stroke(1f);
+        Lines.stroke(1f, Palette.placing);
         Lines.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range);
     }
 
@@ -296,7 +291,7 @@ public abstract class Turret extends Block{
 
         AmmoType type = peekAmmo(tile);
 
-        tr.trns(entity.rotation, size * tilesize / 2, Mathf.range(xRand));
+        tr.trns(entity.rotation, size * tilesize / 2f, Mathf.range(xRand));
 
         for(int i = 0; i < shots; i++){
             bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i-shots/2) * spread);
@@ -344,7 +339,7 @@ public abstract class Turret extends Block{
     }
 
     public static class TurretEntity extends TileEntity{
-        public Array<AmmoEntry> ammo = new ThreadArray<>();
+        public Array<AmmoEntry> ammo = new Array<>();
         public int totalAmmo;
         public float reload;
         public float rotation = 90;

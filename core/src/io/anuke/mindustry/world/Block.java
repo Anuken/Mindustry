@@ -1,6 +1,8 @@
 package io.anuke.mindustry.world;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.Graphics.Cursor;
+import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.collection.IntArray;
@@ -24,7 +26,6 @@ import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -282,8 +283,8 @@ public class Block extends BaseBlock {
     }
 
     /** Returns whether or not a hand cursor should be shown over this block. */
-    public CursorType getCursor(Tile tile){
-        return configurable ? CursorType.hand : CursorType.normal;
+    public Cursor getCursor(Tile tile){
+        return configurable ? SystemCursor.hand : SystemCursor.arrow;
     }
 
     /**

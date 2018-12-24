@@ -9,8 +9,7 @@ import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.BaseEntity;
 import io.anuke.arc.entities.trait.HealthTrait;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.GridPoint2;
-import io.anuke.arc.math.geom.Position;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Time;
@@ -170,8 +169,8 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public void removeFromProximity(){
         tile.block().onProximityRemoved(tile);
 
-        GridPoint2[] nearby = Edges.getEdges(tile.block().size);
-        for(GridPoint2 point : nearby){
+        Point2[] nearby = Edges.getEdges(tile.block().size);
+        for(Point2 point : nearby){
             Tile other = world.tile(tile.x + point.x, tile.y + point.y);
             //remove this tile from all nearby tile's proximities
             if(other != null){
@@ -188,8 +187,8 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         tmpTiles.clear();
         proximity.clear();
 
-        GridPoint2[] nearby = Edges.getEdges(tile.block().size);
-        for(GridPoint2 point : nearby){
+        Point2[] nearby = Edges.getEdges(tile.block().size);
+        for(Point2 point : nearby){
             Tile other = world.tile(tile.x + point.x, tile.y + point.y);
 
             if(other == null) continue;

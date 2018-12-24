@@ -225,12 +225,12 @@ public class PowerNode extends PowerBlock{
         if(link.block() instanceof PowerNode){
             TileEntity oe = link.entity();
 
-            return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
+            return Mathf.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
                     ((PowerNode) link.block()).laserRange * tilesize)
                     + (link.block().size - 1) * tilesize / 2f + (tile.block().size - 1) * tilesize / 2f &&
                     (!checkMaxNodes || (oe.power.links.size < ((PowerNode) link.block()).maxNodes || oe.power.links.contains(tile.pos())));
         }else{
-            return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
+            return Mathf.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
                     <= laserRange * tilesize + (link.block().size - 1) * tilesize;
         }
     }

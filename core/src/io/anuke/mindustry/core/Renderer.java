@@ -1,5 +1,6 @@
 package io.anuke.mindustry.core;
 
+import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Graphics;
 import io.anuke.arc.entities.Effects;
@@ -16,11 +17,9 @@ import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.PixmapIO;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.SpriteBatch;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.scene.utils.Cursors;
 import io.anuke.arc.util.BufferUtils;
 import io.anuke.arc.util.ScreenUtils;
 import io.anuke.arc.util.Time;
@@ -37,31 +36,30 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
+
+import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
 
-public class Renderer extends RendererModule{
-    public final Surface effectSurface;
+public class Renderer implements ApplicationListener{
     public final BlockRenderer blocks = new BlockRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
     public final FogRenderer fog = new FogRenderer();
 
+    private Color clearColor;
     private int targetscale = baseCameraScale;
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
     private Vector2 avgPosition = new Vector2();
 
     public Renderer(){
-        Core.batch = new SpriteBatch(4096);
-
         Lines.setCircleVertices(14);
 
         Shaders.init();
 
-        Core.cameraScale = baseCameraScale;
         Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
             if(effect == Fx.none) return;
             if(Core.settings.getBool("effects")){
-                Rectangle view = rect.setSize(camera.viewportWidth, camera.viewportHeight)
+                Rectangle view = rect.setSize(camera.width, camera.height)
                         .setCenter(camera.position.x, camera.position.y);
                 Rectangle pos = rect2.setSize(effect.size).setCenter(x, y);
 
@@ -78,7 +76,7 @@ public class Renderer extends RendererModule{
                         if(data instanceof Entity){
                             entity.setParent((Entity) data);
                         }
-                        threads.runGraphics(() -> effectGroup.add(entity));
+                        effectGroup.add(entity);
                     }else{
                         GroundEffectEntity entity = Pools.obtain(GroundEffectEntity.class, GroundEffectEntity::new);
                         entity.effect = effect;
@@ -90,30 +88,13 @@ public class Renderer extends RendererModule{
                         if(data instanceof Entity){
                             entity.setParent((Entity) data);
                         }
-                        threads.runGraphics(() -> groundEffectGroup.add(entity));
+                        groundEffectGroup.add(entity);
                     }
                 }
             }
         });
 
-        Cursors.cursorScaling = 3;
-        Cursors.outlineColor = Color.valueOf("444444");
-
-        Cursors.arrow = Cursors.loadCursor("cursor");
-        Cursors.hand = Cursors.loadCursor("hand");
-        Cursors.ibeam = Cursors.loadCursor("ibar");
-        Cursors.restoreCursor();
-        Cursors.loadCustom("drill");
-        Cursors.loadCustom("unload");
-
         clearColor = new Color(0f, 0f, 0f, 1f);
-
-        effectSurface = Graphics.createSurface(Core.cameraScale);
-        pixelSurface = Graphics.createSurface(Core.cameraScale);
-    }
-
-    @Override
-    public void init(){
     }
 
     @Override
@@ -185,9 +166,9 @@ public class Renderer extends RendererModule{
     @Override
     public void draw(){
         camera.update();
-        if(Float.isNaN(Core.camera.position.x) || Float.isNaN(Core.camera.position.y)){
-            Core.camera.position.x = players[0].x;
-            Core.camera.position.y = players[0].y;
+        if(Float.isNaN(camera.position.x) || Float.isNaN(camera.position.y)){
+            camera.position.x = players[0].x;
+            camera.position.y = players[0].y;
         }
 
         Graphics.clear(clearColor);
@@ -377,24 +358,24 @@ public class Renderer extends RendererModule{
     }
 
     public void takeMapScreenshot(){
-        float vpW = Core.camera.viewportWidth, vpH = Core.camera.viewportHeight;
+        float vpW = camera.width, vpH = camera.height;
         int w = world.width()*tilesize, h =  world.height()*tilesize;
         int pw = pixelSurface.width(), ph = pixelSurface.height();
         showFog = false;
         disableUI = true;
         pixelSurface.setSize(w, h, true);
         Graphics.getEffectSurface().setSize(w, h, true);
-        Core.camera.viewportWidth = w;
-        Core.camera.viewportHeight = h;
-        Core.camera.position.x = w/2f + tilesize/2f;
-        Core.camera.position.y = h/2f + tilesize/2f;
+        camera.width = w;
+        camera.height = h;
+        camera.position.x = w/2f + tilesize/2f;
+        camera.position.y = h/2f + tilesize/2f;
 
         draw();
 
         showFog = true;
         disableUI = false;
-        Core.camera.viewportWidth = vpW;
-        Core.camera.viewportHeight = vpH;
+        camera.width = vpW;
+        camera.height = vpH;
 
         pixelSurface.getBuffer().begin();
         byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);

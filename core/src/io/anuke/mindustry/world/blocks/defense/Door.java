@@ -6,7 +6,6 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Effects.Effect;

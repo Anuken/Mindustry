@@ -20,7 +20,6 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.effectGroup;
-import static io.anuke.mindustry.Vars.threads;
 
 public class ItemTransfer extends TimedEntity implements DrawTrait{
     private Vector2 from = new Vector2();
@@ -86,7 +85,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     @Override
     public void removed(){
         if(done != null){
-            threads.run(done);
+            done.run();
         }
         Pools.free(this);
     }

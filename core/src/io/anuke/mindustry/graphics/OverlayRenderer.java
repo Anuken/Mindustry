@@ -53,7 +53,7 @@ public class OverlayRenderer{
 
         for(Player player : playerGroup.all()){
             if(Core.settings.getBool("indicators") && player != players[0] && player.getTeam() == players[0].getTeam()){
-                if(!rect.setSize(Core.camera.viewportWidth * Core.camera.zoom * 0.9f, Core.camera.viewportHeight * Core.camera.zoom * 0.9f)
+                if(!rect.setSize(Core.camera.width  * 0.9f, Core.camera.height  * 0.9f)
                 .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
 
                     Tmp.v1.set(player.x, player.y).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
@@ -87,7 +87,7 @@ public class OverlayRenderer{
             if(buildFadeTime > 0.005f){
                 for(Team enemy : state.teams.enemiesOf(player.getTeam())){
                     for(Tile core : state.teams.get(enemy).cores){
-                        float dst = Vector2.dst(player.x, player.y, core.drawx(), core.drawy());
+                        float dst = Mathf.dst(player.x, player.y, core.drawx(), core.drawy());
                         if(dst < state.mode.enemyCoreBuildRadius * 1.5f){
                             Draw.color(Color.DARK_GRAY);
                             Lines.poly(core.drawx(), core.drawy() - 2, 200, state.mode.enemyCoreBuildRadius);

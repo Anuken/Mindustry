@@ -23,7 +23,7 @@ public class Trail{
     }
 
     public void update(float curx, float cury){
-        if(Vector2.dst(curx, cury, lastX, lastY) >= maxJump){
+        if(Mathf.dst(curx, cury, lastX, lastY) >= maxJump){
             points.clear();
         }
 

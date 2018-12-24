@@ -636,7 +636,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     panY = (screenY - Core.graphics.getHeight()) + edgePan;
                 }
 
-                vector.set(panX, panY).scl((Core.camera.viewportWidth * Core.camera.zoom) / Core.graphics.getWidth());
+                vector.set(panX, panY).scl((Core.camera.width ) / Core.graphics.getWidth());
                 vector.limit(maxPanSpeed);
 
                 //pan view
@@ -667,7 +667,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             return false;
         }
 
-        float dx = deltaX * Core.camera.zoom / Core.cameraScale, dy = deltaY * Core.camera.zoom / Core.cameraScale;
+        float dx = deltaX  / Core.cameraScale, dy = deltaY  / Core.cameraScale;
 
         if(selecting){ //pan all requests
             for(PlaceRequest req : selection){

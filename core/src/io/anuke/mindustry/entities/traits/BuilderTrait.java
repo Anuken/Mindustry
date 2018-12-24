@@ -1,9 +1,18 @@
 package io.anuke.mindustry.entities.traits;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.util.Queue;
+import io.anuke.arc.collection.Queue;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.trait.Entity;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
@@ -21,16 +30,6 @@ import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.Events;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.entities.trait.Entity;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Fill;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.Shapes;
-import io.anuke.arc.util.Angles;
-import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -322,7 +321,7 @@ public interface BuilderTrait extends Entity{
         tmptr[3].set(tile.drawx() + sz, tile.drawy() + sz);
 
         Arrays.sort(tmptr, (a, b) -> -Float.compare(Angles.angleDist(Angles.angle(unit.x, unit.y, a.x, a.y), ang),
-                Angles.angleDist(Angles.angle(unit.x, unit.y, b.x, b.y), ang)));
+            Angles.angleDist(Angles.angle(unit.x, unit.y, b.x, b.y), ang)));
 
         float x1 = tmptr[0].x, y1 = tmptr[0].y,
                 x3 = tmptr[1].x, y3 = tmptr[1].y;
@@ -354,10 +353,11 @@ public interface BuilderTrait extends Entity{
         float ey = tile.worldy() + Mathf.sin(Time.time() + 48, swingScl + 2f, swingMag);
 
         Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
+        //TODO better laser drawing functions
         Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey);
 
         if(unit instanceof Player && ((Player) unit).isLocal){
-            Draw.color(Palette.accent);
+            Lines.stroke(1f, Palette.accent);
             Lines.poly(tile.worldx(), tile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Time.time());
         }
 

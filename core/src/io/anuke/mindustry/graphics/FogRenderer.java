@@ -94,8 +94,8 @@ public class FogRenderer implements Disposable{
     public void draw(){
         if(buffer == null) return;
 
-        float vw = Core.camera.viewportWidth * Core.camera.zoom;
-        float vh = Core.camera.viewportHeight * Core.camera.zoom;
+        float vw = Core.camera.width ;
+        float vh = Core.camera.height ;
 
         float px = Core.camera.position.x - vw / 2f;
         float py = Core.camera.position.y - vh / 2f;

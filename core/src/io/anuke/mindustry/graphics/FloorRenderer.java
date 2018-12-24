@@ -46,8 +46,8 @@ public class FloorRenderer{
 
         OrthographicCamera camera = Core.camera;
 
-        int crangex = (int) (camera.viewportWidth * camera.zoom / (chunksize * tilesize)) + 1;
-        int crangey = (int) (camera.viewportHeight * camera.zoom / (chunksize * tilesize)) + 1;
+        int crangex = (int) (camera.width  / (chunksize * tilesize)) + 1;
+        int crangey = (int) (camera.height  / (chunksize * tilesize)) + 1;
 
         int camx = Mathf.scl(camera.position.x, chunksize * tilesize);
         int camy = Mathf.scl(camera.position.y, chunksize * tilesize);
@@ -123,8 +123,8 @@ public class FloorRenderer{
 
         OrthographicCamera camera = Core.camera;
 
-        int crangex = (int) (camera.viewportWidth * camera.zoom / (chunksize * tilesize)) + 1;
-        int crangey = (int) (camera.viewportHeight * camera.zoom / (chunksize * tilesize)) + 1;
+        int crangex = (int) (camera.width  / (chunksize * tilesize)) + 1;
+        int crangey = (int) (camera.height  / (chunksize * tilesize)) + 1;
 
         layer.begin();
 

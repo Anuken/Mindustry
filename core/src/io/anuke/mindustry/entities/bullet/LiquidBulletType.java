@@ -1,18 +1,18 @@
 package io.anuke.mindustry.entities.bullet;
 
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Fill;
-import io.anuke.arc.util.Geometry;
-import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -60,7 +60,7 @@ public class LiquidBulletType extends BulletType{
         if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){
             float intensity = 400f;
             Fire.extinguish(world.tileWorld(hitx, hity), intensity);
-            for(GridPoint2 p : Geometry.d4){
+            for(Point2 p : Geometry.d4){
                 Fire.extinguish(world.tileWorld(hitx + p.x * tilesize, hity + p.y * tilesize), intensity);
             }
         }

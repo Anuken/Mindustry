@@ -4,7 +4,7 @@ import io.anuke.arc.Events;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.GridPoint2;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -62,7 +62,7 @@ public class Pathfinder{
 
         Tile target = null;
         float tl = 0f;
-        for(GridPoint2 point : Geometry.d8){
+        for(Point2 point : Geometry.d8){
             int dx = tile.x + point.x, dy = tile.y + point.y;
 
             Tile other = world.tile(dx, dy);
@@ -150,7 +150,7 @@ public class Pathfinder{
             float cost = path.weights[tile.x][tile.y];
 
             if(cost < Float.MAX_VALUE){
-                for(GridPoint2 point : Geometry.d4){
+                for(Point2 point : Geometry.d4){
 
                     int dx = tile.x + point.x, dy = tile.y + point.y;
                     Tile other = world.tile(dx, dy);
