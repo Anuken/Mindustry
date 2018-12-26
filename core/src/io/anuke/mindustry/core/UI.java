@@ -5,6 +5,8 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.Graphics.Cursor;
 import io.anuke.arc.Graphics.Cursor.SystemCursor;
+import io.anuke.arc.freetype.FreeTypeFontGenerator;
+import io.anuke.arc.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Colors;
@@ -24,7 +26,6 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
-import io.anuke.arc.freetype.*;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Palette;
@@ -32,17 +33,18 @@ import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 
 import static io.anuke.arc.scene.actions.Actions.*;
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.disableUI;
 
 public class UI implements ApplicationListener{
     private FreeTypeFontGenerator generator;
 
-    public final MenuFragment menufrag = new MenuFragment();
-    public final HudFragment hudfrag = new HudFragment();
-    public final ChatFragment chatfrag = new ChatFragment();
-    public final PlayerListFragment listfrag = new PlayerListFragment();
-    public final BackgroundFragment backfrag = new BackgroundFragment();
-    public final LoadingFragment loadfrag = new LoadingFragment();
+    public MenuFragment menufrag;
+    public HudFragment hudfrag;
+    public ChatFragment chatfrag;
+    public PlayerListFragment listfrag;
+    public BackgroundFragment backfrag;
+    public LoadingFragment loadfrag;
 
     public AboutDialog about;
     public RestartDialog restart;
@@ -71,7 +73,7 @@ public class UI implements ApplicationListener{
 
     public UI(){
         Skin skin = new Skin(Core.atlas);
-        generateFonts();
+        generateFonts(skin);
         skin.load(Core.files.internal("ui/uiskin.json"));
 
         for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
@@ -120,7 +122,7 @@ public class UI implements ApplicationListener{
         Core.graphics.restoreCursor();
     }
     
-    void generateFonts(){
+    void generateFonts(Skin skin){
         generator = new FreeTypeFontGenerator(Core.files.internal("fonts/pixel.ttf"));
         FreeTypeFontParameter param = new FreeTypeFontParameter();
         param.size = (int)(14*2 * Math.max(Unit.dp.scl(1f), 0.5f));
@@ -145,6 +147,13 @@ public class UI implements ApplicationListener{
 
     @Override
     public void init(){
+        menufrag = new MenuFragment();
+        hudfrag = new HudFragment();
+        chatfrag = new ChatFragment();
+        listfrag = new PlayerListFragment();
+        backfrag = new BackgroundFragment();
+        loadfrag = new LoadingFragment();
+
         editor = new MapEditorDialog();
         controls = new ControlsDialog();
         restart = new RestartDialog();

@@ -2,7 +2,6 @@ package io.anuke.mindustry.maps;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.GridMap;
-import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.Mechs;
@@ -30,7 +29,7 @@ public class SectorPresets{
 
         //command center mission
         add(new SectorPreset(0, 1,
-            Structs.array(
+            Array.ofRecursive(
                 Missions.blockRecipe(UnitBlocks.daggerFactory),
                 new UnitMission(UnitTypes.dagger),
                 Missions.blockRecipe(UnitBlocks.commandCenter),
@@ -42,7 +41,7 @@ public class SectorPresets{
 
         //pad mission
         add(new SectorPreset(0, -2,
-            Structs.array(
+        Array.ofRecursive(
                 Missions.blockRecipe(mobile ? UpgradeBlocks.alphaPad : UpgradeBlocks.dartPad),
                 new MechMission(mobile ? Mechs.alpha : Mechs.dart),
                 new WaveMission(15)
@@ -51,7 +50,7 @@ public class SectorPresets{
 
         //oil mission
         add(new SectorPreset(-2, 0,
-            Structs.array(
+            Array.ofRecursive(
                 Missions.blockRecipe(ProductionBlocks.cultivator),
                 Missions.blockRecipe(ProductionBlocks.waterExtractor),
                 new ContentMission(Items.biomatter),

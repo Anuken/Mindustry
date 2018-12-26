@@ -1,6 +1,6 @@
 package io.anuke.mindustry;
 
-import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.ApplicationCore;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.util.Log;
@@ -11,10 +11,10 @@ import io.anuke.mindustry.io.BundleLoader;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Mindustry implements ApplicationListener{
-    private long lastFrameTime;
+public class Mindustry extends ApplicationCore{
 
-    public Mindustry(){
+    @Override
+    public void setup(){
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;
             return Float.isNaN(result) || Float.isInfinite(result) ? 1f : Math.min(result, 60f / 10f);
@@ -28,26 +28,28 @@ public class Mindustry implements ApplicationListener{
         BundleLoader.load();
         content.load();
 
-        Core.app.addListener(logic = new Logic());
-        Core.app.addListener(world = new World());
-        Core.app.addListener(control = new Control());
-        Core.app.addListener(renderer = new Renderer());
-        Core.app.addListener(ui = new UI());
-        Core.app.addListener(netServer = new NetServer());
-        Core.app.addListener(netClient = new NetClient());
+        add(logic = new Logic());
+        add(world = new World());
+        add(control = new Control());
+        add(renderer = new Renderer());
+        add(ui = new UI());
+        add(netServer = new NetServer());
+        add(netClient = new NetClient());
     }
 
     @Override
     public void init(){
+        super.init();
+
         Log.info("Time to load [total]: {0}", Time.elapsed());
         Events.fire(new GameLoadEvent());
     }
 
     @Override
     public void update(){
-        lastFrameTime = Time.millis();
+        long lastFrameTime = Time.millis();
 
-        //TODO ??render it all??
+        super.update();
 
         int fpsCap = Core.settings.getInt("fpscap", 125);
 

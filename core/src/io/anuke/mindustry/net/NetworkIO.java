@@ -93,28 +93,6 @@ public class NetworkIO{
                 }
             }
 
-            //write visibility, length-run encoded
-            for(int i = 0; i < world.width() * world.height(); i++){
-                Tile tile = world.tile(i % world.width(), i / world.width());;
-                boolean discovered = tile.discovered();
-
-                int consecutives = 0;
-
-                for(int j = i + 1; j < world.width() * world.height() && consecutives < 32767*2-1; j++){
-                    Tile nextTile = world.tile(j % world.width(), j / world.width());;
-
-                    if(nextTile.discovered() != discovered){
-                        break;
-                    }
-
-                    consecutives++;
-                }
-
-                stream.writeBoolean(discovered);
-                stream.writeShort(consecutives);
-                i += consecutives;
-            }
-
             stream.write(Team.all.length);
 
             //write team data
@@ -245,18 +223,6 @@ public class NetworkIO{
                 }
 
                 tiles[x][y] = tile;
-            }
-
-            for(int i = 0; i < width * height; i++){
-                boolean discovered = stream.readBoolean();
-                int consecutives = stream.readUnsignedShort();
-                if(discovered){
-                    for(int j = i + 1; j < i + 1 + consecutives; j++){
-                        int newx = j % width, newy = j / width;
-                        tiles[newx][newy].setVisibility((byte) 1);
-                    }
-                }
-                i += consecutives;
             }
 
             state.teams = new Teams();

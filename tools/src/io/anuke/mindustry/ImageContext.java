@@ -1,17 +1,18 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData.Region;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.ObjectMap;
-import io.anuke.mindustry.core.ContentLoader;
-import io.anuke.arc.core.Core;
-import io.anuke.arc.core.Timers;
-import io.anuke.arc.util.Atlas;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.graphics.g2d.TextureAtlas;
+import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
+import io.anuke.arc.graphics.g2d.TextureAtlas.TextureAtlasData;
+import io.anuke.arc.graphics.g2d.TextureAtlas.TextureAtlasData.Region;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Log.LogHandler;
 import io.anuke.arc.util.Log.NoopLogHandler;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.core.ContentLoader;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -31,7 +32,7 @@ public class ImageContext {
         TextureAtlasData data = new TextureAtlasData(new FileHandle(spritesFolder + "/sprites.atlas"),
                 new FileHandle(spritesFolder), false);
 
-        ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
+        ObjectMap<String, AtlasRegion> regionCache = new ObjectMap<>();
 
         for(Region region : data.getRegions()){
             int x = region.left, y = region.top, width = region.width, height = region.height;
@@ -43,30 +44,30 @@ public class ImageContext {
                 }
 
                 @Override
-                public int getRegionX(){
+                public int getX(){
                     return x;
                 }
 
                 @Override
-                public int getRegionY(){
+                public int getY(){
                     return y;
                 }
 
                 @Override
-                public int getRegionWidth(){
+                public int getWidth(){
                     return width;
                 }
 
                 @Override
-                public int getRegionHeight(){
+                public int getHeight(){
                     return height;
                 }
             });
         }
 
-        Core.atlas = new Atlas(){
+        Core.atlas = new TextureAtlas(){
             @Override
-            public TextureRegion getRegion(String name){
+            public AtlasRegion find(String name){
                 if(!regionCache.containsKey(name)){
                     GenRegion region = new GenRegion();
                     region.name = name;
@@ -78,12 +79,10 @@ public class ImageContext {
             }
 
             @Override
-            public boolean hasRegion(String s) {
+            public boolean has(String s) {
                 return regionCache.containsKey(s);
             }
         };
-
-        Core.atlas.setErrorRegion("error");
 
         image = ImageIO.read(new File(spritesFolder + "/sprites.png"));
     }
@@ -99,7 +98,7 @@ public class ImageContext {
     }
 
     public Image get(String name){
-        return get(Core.atlas.getRegion(name));
+        return get(Core.atlas.find(name));
     }
 
     public Image get(TextureRegion region){

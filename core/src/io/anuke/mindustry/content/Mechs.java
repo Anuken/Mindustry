@@ -2,7 +2,7 @@ package io.anuke.mindustry.content;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.entities.Effects;
-import io.anuke.arc.Graphics;
+import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
@@ -202,14 +202,14 @@ public class Mechs implements ContentList{
             public void draw(Player player){
                 if(player.shootHeat <= 0.01f) return;
 
-                float alpha = Core.batch.getColor().a;
+                float alpha = Core.graphics.batch().getColor().a;
                 Shaders.build.progress = player.shootHeat;
                 Shaders.build.region = armorRegion;
                 Shaders.build.time = Time.time() / 10f;
                 Shaders.build.color.set(Palette.accent).a = player.shootHeat;
                 Draw.shader(Shaders.build);
                 Draw.alpha(1f);
-                Draw.rect(armorRegion, player.snappedX(), player.snappedY(), player.rotation);
+                Draw.rect(armorRegion, player.snappedX(), player.snappedY()).rot(player.rotation);
                 Draw.shader(Shaders.mix);
                 Draw.color(1f, 1f, 1f, alpha);
             }
@@ -268,13 +268,11 @@ public class Mechs implements ContentList{
             public void draw(Player player){
                 float scl = scld(player);
                 if(scl < 0.01f) return;
-                float alpha = Core.batch.getColor().a;
+                float alpha = Core.graphics.batch().getColor().a;
                 Draw.shader();
-                Graphics.setAdditiveBlending();
                 Draw.color(Palette.lancerLaser);
                 Draw.alpha(scl/2f);
-                Draw.rect(shield, player.snappedX() + Mathf.range(scl/2f), player.snappedY() + Mathf.range(scl/2f), player.rotation - 90);
-                Graphics.setNormalBlending();
+                Draw.rect(shield, player.snappedX() + Mathf.range(scl/2f), player.snappedY() + Mathf.range(scl/2f)).rot(player.rotation - 90).blend(Blending.additive);
                 Draw.shader(Shaders.mix);
                 Draw.color();
                 Draw.alpha(alpha);

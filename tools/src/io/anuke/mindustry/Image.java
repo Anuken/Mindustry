@@ -1,13 +1,13 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.util.Structs;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.awt.Graphics2D;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -110,10 +110,10 @@ public class Image {
                 x, y,
                 x + region.getWidth(),
                 y + region.getHeight(),
-                (flipx ? region.getRegionX() + region.getWidth() : region.getRegionX()) + ofx,
-                (flipy ? region.getRegionY() + region.getHeight() : region.getRegionY()) + ofy,
-                (flipx ? region.getRegionX() : region.getRegionX() + region.getWidth()) + ofx,
-                (flipy ? region.getRegionY() : region.getRegionY() + region.getHeight()) + ofy,
+                (flipx ? region.getX() + region.getWidth() : region.getX()) + ofx,
+                (flipy ? region.getY() + region.getHeight() : region.getY()) + ofy,
+                (flipx ? region.getX() : region.getX() + region.getWidth()) + ofx,
+                (flipy ? region.getY() : region.getY() + region.getHeight()) + ofy,
                 null);
     }
 

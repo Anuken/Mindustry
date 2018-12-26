@@ -129,7 +129,7 @@ public class RemoteWriteGenerator{
         method.beginControlFlow("if(" + getCheckString(methodEntry.where) + ")");
 
         //add statement to create packet from pool
-        method.addStatement("$1N packet = $2N.obtain($1N.class, $1N::new)", "io.anuke.mindustry.net.Packets.InvokePacket", "io.anuke.arc.util.Pooling");
+        method.addStatement("$1N packet = $2N.obtain($1N.class, $1N::new)", "io.anuke.mindustry.net.Packets.InvokePacket", "io.anuke.arc.util.pooling.Pools");
         //assign buffer
         method.addStatement("packet.writeBuffer = TEMP_BUFFER");
         //assign priority

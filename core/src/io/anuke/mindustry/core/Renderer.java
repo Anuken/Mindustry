@@ -10,6 +10,7 @@ import io.anuke.arc.entities.trait.DrawTrait;
 import io.anuke.arc.entities.trait.Entity;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
+import io.anuke.arc.graphics.Camera;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
@@ -37,7 +38,6 @@ public class Renderer implements ApplicationListener{
     public final BlockRenderer blocks = new BlockRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
-    public final FogRenderer fog = new FogRenderer();
 
     private Color clearColor;
     private int targetscale = baseCameraScale;
@@ -45,6 +45,7 @@ public class Renderer implements ApplicationListener{
     private Vector2 avgPosition = new Vector2();
 
     public Renderer(){
+        camera = new Camera();
         Lines.setCircleVertices(14);
 
         Shaders.init();
@@ -283,11 +284,6 @@ public class Renderer implements ApplicationListener{
     @Override
     public void resize(int width, int height){
         camera.resize(width, height);
-    }
-
-    @Override
-    public void dispose(){
-        fog.dispose();
     }
 
     public Vector2 averagePosition(){

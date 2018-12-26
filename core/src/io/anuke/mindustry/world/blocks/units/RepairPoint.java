@@ -15,6 +15,7 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -71,11 +72,10 @@ public class RepairPoint extends Block{
             float ang = entity.angleTo(entity.target);
             float len = 5f;
 
-            //TODO new laser drawing system
             Draw.color(Color.valueOf("e8ffd7"));
-            //Shapes.laser("laser", "laser-end",
-            //        tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
-            //        entity.target.x, entity.target.y, entity.strength);
+            Shapes.laser("laser", "laser-end",
+                    tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
+                    entity.target.x, entity.target.y, entity.strength);
             Draw.color();
         }
     }

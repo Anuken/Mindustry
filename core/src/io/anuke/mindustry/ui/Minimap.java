@@ -1,22 +1,18 @@
 package io.anuke.mindustry.ui;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Texture.TextureFilter;
 import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.event.InputEvent;
 import io.anuke.arc.scene.event.InputListener;
 import io.anuke.arc.scene.ui.layout.Container;
-import io.anuke.mindustry.graphics.Shaders;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.renderer;
 
 public class Minimap extends Container<Element>{
 
     public Minimap(){
         super(new Element(){
-            TextureRegion r = new TextureRegion();
 
             @Override
             public void draw(){
@@ -26,30 +22,6 @@ public class Minimap extends Container<Element>{
 
                 if(renderer.minimap.getTexture() != null){
                     renderer.minimap.drawEntities(x, y, width, height);
-                }
-
-                if(showFog){
-                    renderer.fog.getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
-
-                    r.set(renderer.minimap.getRegion());
-                    float pad = renderer.fog.getPadding();
-
-                    float px = r.getU() * world.width() + pad;
-                    float py = r.getV() * world.height() + pad;
-                    float px2 = r.getU2() * world.width() + pad;
-                    float py2 = r.getV2() * world.height() + pad;
-
-                    r.setTexture(renderer.fog.getTexture());
-                    r.setU(px / (world.width() + pad*2f));
-                    r.setV(1f - py / (world.height() + pad*2f));
-                    r.setU2(px2 / (world.width() + pad*2f));
-                    r.setV2(1f - py2 / (world.height() + pad*2f));
-
-                    Draw.shader(Shaders.fog);
-                    Draw.rect().tex(r).set(x, y, width, height);
-                    Draw.shader();
-
-                    renderer.fog.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
                 }
             }
         });

@@ -8,7 +8,7 @@ import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.TimedEntity;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pool.Poolable;

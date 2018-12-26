@@ -99,14 +99,11 @@ public class Reconstructor extends Block{
         ReconstructorEntity entity = tile.entity();
         ReconstructorEntity oe = other.entity();
 
-        //called in main thread to prevent issues
-        threads.run(() -> {
-            unlink(entity);
-            unlink(oe);
+        unlink(entity);
+        unlink(oe);
 
-            entity.link = other.pos();
-            oe.link = tile.pos();
-        });
+        entity.link = other.pos();
+        oe.link = tile.pos();
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)

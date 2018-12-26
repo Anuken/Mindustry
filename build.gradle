@@ -88,13 +88,13 @@ project(":desktop"){
 
     dependencies{
         compile project(":core")
-        compile project(":kryonet")
+        compile project(":net")
         if(new File(projectDir.parent, '../debug').exists() && System.properties["release"] == null) compile project(":debug")
 
-        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+
+        compile project(":Arc:backends:backend-lwjgl3")
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.0'
     }
 }
@@ -145,7 +145,7 @@ project(":ios"){
 
     dependencies{
         compile project(":core")
-        implementation project(":kryonet")
+        implementation project(":net")
 
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
@@ -170,20 +170,11 @@ project(":core"){
 
         if(new File(projectDir.parent, '../Arc').exists() && comp){
             compile project(":Arc:arc-core")
-            //compile project(":Arc:extensions:freetype")
+            compile project(":Arc:extensions:freetype")
         }else{
             //TODO compile arc from jitpack
             //compile 'com.github.Anuken.Arc:arc:-SNAPSHOT'
         }
-
-       // if(new File(projectDir.parent, '../GDXGifRecorder').exists() && comp){
-       //     compile project(":GDXGifRecorder")
-       // }
-
-
-        //compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        //compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
-        //compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
@@ -196,7 +187,7 @@ project(":server"){
     dependencies{
 
         compile project(":core")
-        compile project(":kryonet")
+        compile project(":net")
         compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
@@ -235,7 +226,7 @@ project(":annotations"){
     }
 }
 
-project(":kryonet"){
+project(":net"){
     apply plugin: "java"
 
     dependencies{

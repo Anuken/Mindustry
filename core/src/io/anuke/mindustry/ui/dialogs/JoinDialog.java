@@ -232,7 +232,7 @@ public class JoinDialog extends FloatingDialog{
                 pad = 6;
             }
 
-            Cell<TextButton> cell = ((Table) pane.getParent()).getCell(button);
+            Cell cell = ((Table) pane.getParent()).getCell(button);
 
             if(!Mathf.isEqual(cell.getMinWidth(), pw)){
                 cell.width(pw);

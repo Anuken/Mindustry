@@ -57,11 +57,12 @@ public class Control implements ApplicationListener{
         unlocks = new Unlocks();
 
         Core.input.setCatch(KeyCode.BACK, true);
+        Core.keybinds.setDefaults(Binding.values());
 
         Effects.setShakeFalloff(10000f);
 
         content.initialize(Content::init);
-        Core.atlas = new TextureAtlas("sprites.atlas");
+        Core.atlas = new TextureAtlas("sprites/sprites.atlas");
         content.initialize(Content::load);
 
         unlocks.load();

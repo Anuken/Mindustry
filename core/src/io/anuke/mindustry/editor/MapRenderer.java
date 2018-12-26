@@ -1,21 +1,20 @@
 package io.anuke.mindustry.editor;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.collection.IntSet.IntSetIterator;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Disposable;
-import io.anuke.arc.util.IntSet;
-import io.anuke.arc.util.IntSet.IntSetIterator;
+import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.graphics.IndexedRenderer;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.world.Block;
-import io.anuke.arc.Core;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.IndexedRenderer;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Bits;
-import io.anuke.arc.math.geom.Geometry;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -56,7 +55,7 @@ public class MapRenderer implements Disposable{
 
 
     public void draw(float tx, float ty, float tw, float th){
-        Graphics.end();
+        Draw.flush();
 
         IntSetIterator it = updates.iterator();
         while(it.hasNext){
@@ -79,15 +78,12 @@ public class MapRenderer implements Disposable{
                     mesh = chunks[x][y];
                 }
 
-                mesh.getTransformMatrix().setToTranslation(tx, ty, 0).scl(tw / (width * tilesize),
-                        th / (height * tilesize), 1f);
-                mesh.setProjectionMatrix(Core.batch.getProjectionMatrix());
+                mesh.getTransformMatrix().setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize));
+                mesh.setProjectionMatrix(Core.graphics.batch().getProjection());
 
                 mesh.render(Core.atlas.getTextures().first());
             }
         }
-
-        Graphics.begin();
     }
 
     public void updatePoint(int x, int y){

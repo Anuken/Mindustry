@@ -58,7 +58,7 @@ public class TurretBlocks extends BlockList implements ContentList{
                 ammoUseEffect = ShootFx.shellEjectSmall;
                 health = 160;
 
-                drawer = (tile, entity) -> Draw.rect(entity.target != null ? shootRegion : region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+                drawer = (tile, entity) -> Draw.rect(entity.target != null ? shootRegion : region, tile.drawx() + tr2.x, tile.drawy() + tr2.y).rot(entity.rotation - 90);
             }
         };
 
@@ -157,19 +157,24 @@ public class TurretBlocks extends BlockList implements ContentList{
                 ammoUseEffect = ShootFx.shellEjectBig;
 
                 drawer = (tile, entity) -> {
-                    Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-                    float offsetx = (int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 3f);
-                    float offsety = -(int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 2f);
+                    Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y).rot(entity.rotation - 90);
+                    float offsetx = (int) (abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 3f);
+                    float offsety = -(int) (abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 2f);
 
                     for(int i : Mathf.signs){
                         float rot = entity.rotation + 90 * i;
                         Draw.rect(panels[i == -1 ? 0 : 1],
                                 tile.drawx() + tr2.x + Angles.trnsx(rot, offsetx, offsety),
-                                tile.drawy() + tr2.y + Angles.trnsy(rot, -offsetx, offsety), entity.rotation - 90);
+                                tile.drawy() + tr2.y + Angles.trnsy(rot, -offsetx, offsety)).rot(entity.rotation - 90);
                     }
                 };
 
                 health = 360;
+            }
+
+            /** Converts a value range from 0-1 to a value range 0-1-0. */
+            float abscurve(float f){
+                return 1f - Math.abs(f - 0.5f) * 2f;
             }
         };
 

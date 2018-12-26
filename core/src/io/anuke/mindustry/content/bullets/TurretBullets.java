@@ -1,6 +1,14 @@
 package io.anuke.mindustry.content.bullets;
 
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.CapStyle;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BlockFx;
@@ -15,14 +23,10 @@ import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.*;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
@@ -342,10 +346,10 @@ public class TurretBullets extends BulletList implements ContentList{
                 float w = 11f, h = 13f;
 
                 Draw.color(Palette.bulletYellowBack);
-                Draw.rect("shell-back", b.x, b.y, w, h, b.angle() + 90);
+                Draw.rect("shell-back", b.x, b.y, w, h).rot(b.angle() + 90);
 
                 Draw.color(Palette.bulletYellow);
-                Draw.rect("shell", b.x, b.y, w, h, b.angle() + 90);
+                Draw.rect("shell", b.x, b.y, w, h).rot(b.angle() + 90);
 
                 Draw.reset();
             }
@@ -379,7 +383,7 @@ public class TurretBullets extends BulletList implements ContentList{
                     float baseAngle = data.to.angleTo(data.from);
 
                     //if angles are nearby, then yes, it did
-                    if(Mathf.angNear(angleTo, baseAngle, 2f)){
+                    if(Angles.near(angleTo, baseAngle, 2f)){
                         intersect = true;
                         //snap bullet position back; this is used for low-FPS situations
                         b.set(data.to.x + Angles.trnsx(baseAngle, hitDst), data.to.y + Angles.trnsy(baseAngle, hitDst));

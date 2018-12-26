@@ -37,11 +37,11 @@ public class Shaders{
         build = new UnitBuild();
         mix = new MixShader();
         fog = new FogShader();
-        fullMix = new Shader("fullmix", "default");
+        fullMix = new LoadShader("fullmix", "default");
         menu = new MenuShader();
     }
 
-    public static class MenuShader extends Shader{
+    public static class MenuShader extends LoadShader{
         float time = 0f;
 
         public MenuShader(){
@@ -60,13 +60,13 @@ public class Shaders{
         }
     }
 
-    public static class FogShader extends Shader{
+    public static class FogShader extends LoadShader{
         public FogShader(){
             super("fog", "default");
         }
     }
 
-    public static class MixShader extends Shader{
+    public static class MixShader extends LoadShader{
         public Color color = new Color(Color.WHITE);
 
         public MixShader(){
@@ -93,7 +93,7 @@ public class Shaders{
         }
     }
 
-    public static class UnitBuild extends Shader{
+    public static class UnitBuild extends LoadShader{
         public float progress, time;
         public Color color = new Color();
         public TextureRegion region;
@@ -113,8 +113,9 @@ public class Shaders{
         }
     }
 
-    public static class Outline extends Shader{
+    public static class Outline extends LoadShader{
         public Color color = new Color();
+        public TextureRegion region = new TextureRegion();
 
         public Outline(){
             super("outline", "default");
@@ -127,9 +128,10 @@ public class Shaders{
         }
     }
 
-    public static class BlockBuild extends Shader{
+    public static class BlockBuild extends LoadShader{
         public Color color = new Color();
         public float progress;
+        public TextureRegion region = new TextureRegion();
 
         public BlockBuild(){
             super("blockbuild", "default");
@@ -146,8 +148,9 @@ public class Shaders{
         }
     }
 
-    public static class BlockPreview extends Shader{
+    public static class BlockPreview extends LoadShader{
         public Color color = new Color();
+        public TextureRegion region = new TextureRegion();
 
         public BlockPreview(){
             super("blockpreview", "default");
@@ -162,7 +165,7 @@ public class Shaders{
         }
     }
 
-    public static class Shield extends Shader{
+    public static class Shield extends LoadShader{
 
         public Shield(){
             super("shield", "default");
@@ -180,7 +183,7 @@ public class Shaders{
         }
     }
 
-    public static class SurfaceShader extends Shader{
+    public static class SurfaceShader extends LoadShader{
 
         public SurfaceShader(String frag){
             super(frag, "default");
@@ -194,6 +197,12 @@ public class Shaders{
             setUniformf("screensize", Core.camera.width,
             Core.camera.height );
             setUniformf("time", Time.time());
+        }
+    }
+    
+    public static class LoadShader extends Shader{
+        public LoadShader(String frag, String vert){
+            super(Core.files.internal("shaders/" + vert + ".vertex"), Core.files.internal("shaders/" + frag + ".fragment"));
         }
     }
 }

@@ -42,8 +42,6 @@ public class Tile implements Position, TargetTrait{
     private byte team;
     /** Tile elevation. -1 means slope.*/
     private byte elevation;
-    /** Fog visibility status: 3 states, but saved as a single bit. 0 = unexplored, 1 = visited, 2 = currently visible (saved as 1)*/
-    private byte visibility;
 
     public Tile(int x, int y){
         this.x = (short) x;
@@ -65,10 +63,6 @@ public class Tile implements Position, TargetTrait{
         this.setElevation(elevation);
         changed();
         this.team = team;
-    }
-
-    public boolean discovered(){
-        return visibility > 0;
     }
 
     /**Returns this tile's position as a {@link Pos}.*/
@@ -169,14 +163,6 @@ public class Tile implements Position, TargetTrait{
 
     public void setFloor(Floor type){
         this.floor = type;
-    }
-
-    public byte getVisibility(){
-        return visibility;
-    }
-
-    public void setVisibility(byte visibility){
-        this.visibility = visibility;
     }
 
     public byte getRotation(){

@@ -22,6 +22,7 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
@@ -353,8 +354,8 @@ public interface BuilderTrait extends Entity{
         float ey = tile.worldy() + Mathf.sin(Time.time() + 48, swingScl + 2f, swingMag);
 
         Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
-        //TODO better laser drawing functions
-        //Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey);
+
+        Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey);
 
         if(unit instanceof Player && ((Player) unit).isLocal){
             Lines.stroke(1f, Palette.accent);

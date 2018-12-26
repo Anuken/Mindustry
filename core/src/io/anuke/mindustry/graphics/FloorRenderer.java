@@ -2,19 +2,22 @@ package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
-import io.anuke.arc.Graphics;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.collection.IntSet.IntSetIterator;
 import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.graphics.Camera;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.GL20;
+import io.anuke.arc.graphics.g2d.CacheBatch;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.SpriteBatch;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -33,7 +36,7 @@ public class FloorRenderer{
     private IntArray drawnLayers = new IntArray();
 
     public FloorRenderer(){
-        Events.on(WorldLoadGraphicsEvent.class, event -> clearTiles());
+        Events.on(WorldLoadEvent.class, event -> clearTiles());
     }
 
     public void drawFloor(){
@@ -41,13 +44,13 @@ public class FloorRenderer{
             return;
         }
 
-        OrthographicCamera camera = Core.camera;
+        Camera camera = Core.camera;
 
         int crangex = (int) (camera.width  / (chunksize * tilesize)) + 1;
         int crangey = (int) (camera.height  / (chunksize * tilesize)) + 1;
 
-        int camx = Mathf.scl(camera.position.x, chunksize * tilesize);
-        int camy = Mathf.scl(camera.position.y, chunksize * tilesize);
+        int camx = (int)(camera.position.x / (chunksize * tilesize));
+        int camy = (int)(camera.position.y / (chunksize * tilesize));
 
         int layers = CacheLayer.values().length;
 
@@ -81,7 +84,7 @@ public class FloorRenderer{
 
         drawnLayers.sort();
 
-        Graphics.end();
+        Draw.flush();
         beginDraw();
 
         for(int i = 0; i < drawnLayers.size; i++){
@@ -91,7 +94,6 @@ public class FloorRenderer{
         }
 
         endDraw();
-        Graphics.begin();
     }
 
     public void beginDraw(){
@@ -99,7 +101,7 @@ public class FloorRenderer{
             return;
         }
 
-        cbatch.setProjectionMatrix(Core.camera.combined);
+        cbatch.setProjection(Core.camera.projection());
         cbatch.beginDraw();
 
         Core.gl.glEnable(GL20.GL_BLEND);
@@ -118,7 +120,7 @@ public class FloorRenderer{
             return;
         }
 
-        OrthographicCamera camera = Core.camera;
+        Camera camera = Core.camera;
 
         int crangex = (int) (camera.width  / (chunksize * tilesize)) + 1;
         int crangey = (int) (camera.height  / (chunksize * tilesize)) + 1;
@@ -127,8 +129,8 @@ public class FloorRenderer{
 
         for(int x = -crangex; x <= crangex; x++){
             for(int y = -crangey; y <= crangey; y++){
-                int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
-                int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
+                int worldx = (int)(camera.position.x / (chunksize * tilesize)) + x;
+                int worldy = (int)(camera.position.y / (chunksize * tilesize)) + y;
 
                 if(!Structs.inBounds(worldx, worldy, cache)){
                     continue;
@@ -145,7 +147,7 @@ public class FloorRenderer{
 
     private void fillChunk(float x, float y){
         Draw.color(Color.BLACK);
-        Fill.crect(x, y, chunksize * tilesize, chunksize * tilesize);
+        Fill.rect().set(x, y, chunksize * tilesize, chunksize * tilesize);
         Draw.color();
     }
 
@@ -172,11 +174,8 @@ public class FloorRenderer{
     }
 
     private void cacheChunkLayer(int cx, int cy, Chunk chunk, CacheLayer layer){
-
-        Graphics.useBatch(cbatch);
-        cbatch.begin();
-
-        Sector sector = world.getSector();
+        SpriteBatch current = Core.graphics.batch();
+        Core.graphics.useBatch(cbatch);
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
@@ -196,10 +195,8 @@ public class FloorRenderer{
                 }
             }
         }
-
-        cbatch.end();
-        Graphics.popBatch();
-        chunk.caches[layer.ordinal()] = cbatch.getLastCache();
+        Core.graphics.useBatch(current);
+        chunk.caches[layer.ordinal()] = cbatch.flushCache();
     }
 
     public void clearTiles(){

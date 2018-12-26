@@ -1,4 +1,4 @@
-include 'desktop', 'core', 'kryonet', 'server', 'ios', 'annotations', 'tools', 'tests'
+include 'desktop', 'core', 'net', 'server', 'ios', 'annotations', 'tools', 'tests'
 
 def use = { String name, String path ->
     include(name)
@@ -25,9 +25,8 @@ if(System.properties["release"] == null || System.properties["release"] == "fals
         use(':Arc:arc-core', '../Arc/arc-core')
         use(':Arc:extensions', '../Arc/extensions')
         use(':Arc:extensions:freetype', '../Arc/extensions/freetype')
-    }
-    if (new File(settingsDir, '../GDXGifRecorder').exists()) {
-        use(':GDXGifRecorder', '../GDXGifRecorder')
+        use(':Arc:backends', '../Arc/backends')
+        use(':Arc:backends:backend-lwjgl3', '../Arc/backends/backend-lwjgl3')
     }
     if (new File(settingsDir, '../debug').exists()) {
         use(':debug', '../debug')

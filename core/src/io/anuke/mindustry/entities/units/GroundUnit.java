@@ -1,7 +1,11 @@
 package io.anuke.mindustry.entities.units;
 
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.TileEntity;
@@ -12,11 +16,6 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -155,7 +154,7 @@ public abstract class GroundUnit extends BaseUnit{
             Draw.rect(type.legRegion,
                     x + Angles.trnsx(baseRotation, ft * i),
                     y + Angles.trnsy(baseRotation, ft * i),
-                    12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
+                    12f * i, 12f - Mathf.clamp(ft * i, 0, 2)).rot(baseRotation - 90);
         }
 
         if(floor.isLiquid){
@@ -164,16 +163,16 @@ public abstract class GroundUnit extends BaseUnit{
             Draw.tint(Color.WHITE);
         }
 
-        Draw.rect(type.baseRegion, x, y, baseRotation - 90);
+        Draw.rect(type.baseRegion, x, y).rot(baseRotation - 90);
 
-        Draw.rect(type.region, x, y, rotation - 90);
+        Draw.rect(type.region, x, y).rot(rotation - 90);
 
         for(int i : Mathf.signs){
             float tra = rotation - 90, trY = -weapon.getRecoil(this, i > 0) + type.weaponOffsetY;
             float w = i > 0 ? -12 : 12;
             Draw.rect(weapon.equipRegion,
                     x + Angles.trnsx(tra, type.weaponOffsetX * i, trY),
-                    y + Angles.trnsy(tra, type.weaponOffsetX * i, trY), w, 12, rotation - 90);
+                    y + Angles.trnsy(tra, type.weaponOffsetX * i, trY), w, 12).rot(rotation - 90);
         }
 
         drawItems();
@@ -191,7 +190,7 @@ public abstract class GroundUnit extends BaseUnit{
             if(dst(target) < getWeapon().getAmmo().getRange()){
                 rotate(angleTo(target));
 
-                if(Mathf.angNear(angleTo(target), rotation, 13f)){
+                if(Angles.near(angleTo(target), rotation, 13f)){
                     AmmoType ammo = getWeapon().getAmmo();
 
                     Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.bullet.speed);

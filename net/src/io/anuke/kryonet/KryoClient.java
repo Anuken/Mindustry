@@ -1,8 +1,10 @@
 package io.anuke.kryonet;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.kryonet.*;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.ClientProvider;
@@ -10,8 +12,6 @@ import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.util.Pooling;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 
@@ -23,7 +23,8 @@ import java.net.NetworkInterface;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedSelectorException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.netClient;
+import static io.anuke.mindustry.Vars.port;
 
 public class KryoClient implements ClientProvider{
     final Client client;
@@ -50,7 +51,7 @@ public class KryoClient implements ClientProvider{
                         return;
                     }
                 }
-                Gdx.app.postRunnable(() -> lastCallback.accept(host));
+                Core.app.post(() -> lastCallback.accept(host));
                 foundAddresses.add(datagramPacket.getAddress());
             }
 
@@ -194,9 +195,9 @@ public class KryoClient implements ClientProvider{
                     ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
                     Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
 
-                    Gdx.app.postRunnable(() -> valid.accept(host));
+                    Core.app.post(() -> valid.accept(host));
                 }catch(Exception e){
-                    Gdx.app.postRunnable(() -> invalid.accept(e));
+                    Core.app.post(() -> invalid.accept(e));
                 }
             }
         });
@@ -209,7 +210,7 @@ public class KryoClient implements ClientProvider{
                 foundAddresses.clear();
                 lastCallback = callback;
                 client.discoverHosts(port, 3000);
-                Gdx.app.postRunnable(done);
+                Core.app.post(done);
             }
         });
     }
@@ -231,9 +232,9 @@ public class KryoClient implements ClientProvider{
 
     private void handleException(Exception e){
         if(e instanceof KryoNetException){
-            Gdx.app.postRunnable(() -> Net.showError(new IOException("mismatch")));
+            Core.app.post(() -> Net.showError(new IOException("mismatch")));
         }else{
-            Gdx.app.postRunnable(() -> Net.showError(e));
+            Core.app.post(() -> Net.showError(e));
         }
     }
 

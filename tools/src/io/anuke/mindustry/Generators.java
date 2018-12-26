@@ -1,7 +1,9 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
@@ -10,9 +12,8 @@ import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Hue;
-import static io.anuke.mindustry.Vars.*;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class Generators {
 
@@ -50,7 +51,7 @@ public class Generators {
                         for (int y = 0; y < base.height(); y++) {
                             Color result = top.getColor(x, y);
                             if(result.a > 0.01f){
-                                Hue.mix(result, color, 0.45f, result);
+                                result.lerp(color, 0.45f);
                                 base.draw(x, y, result);
                             }
                         }
@@ -144,7 +145,7 @@ public class Generators {
             for(Block block : content.blocks()){
                 if(!(block instanceof Floor)) continue;
                 Floor floor = (Floor)block;
-                if(floor.getIcon().length > 0 && !Draw.hasRegion(floor.name + "-cliff-side")){
+                if(floor.getIcon().length > 0 && !Core.atlas.has(floor.name + "-cliff-side")){
                     Image floori = context.get(floor.getIcon()[0]);
                     Color color = floori.getColor(0, 0).mul(1.3f, 1.3f, 1.3f, 1f);
 

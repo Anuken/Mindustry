@@ -1,7 +1,7 @@
 package io.anuke.kryonet;
 
-import com.esotericsoftware.minlog.Log;
-import com.esotericsoftware.minlog.Log.Logger;
+import com.esotericsoftware.kryonet.util.Log;
+import com.esotericsoftware.kryonet.util.Log.Logger;
 import io.anuke.arc.util.ColorCodes;
 
 import java.io.PrintWriter;

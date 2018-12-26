@@ -263,14 +263,14 @@ public class BlockFx extends FxList implements ContentList{
             Draw.reset();
         });
         ripple = new GroundEffect(false, 30, e -> {
-            Draw.color(Hue.shift(Tmp.c1.set(e.color), 2, 0.1f));
+            Draw.color(Tmp.c1.set(e.color).shiftValue(0.1f));
             Lines.stroke(e.fout() + 0.4f);
             Lines.circle(e.x, e.y, 2f + e.fin() * 4f);
             Draw.reset();
         });
 
         bubble = new Effect(20, e -> {
-            Draw.color(Hue.shift(Tmp.c1.set(e.color), 2, 0.1f));
+            Draw.color(Tmp.c1.set(e.color).shiftValue(0.1f));
             Lines.stroke(e.fout() + 0.2f);
             Angles.randLenVectors(e.id, 2, 8f, (x, y) -> {
                 Lines.circle(e.x + x, e.y + y, 1f + e.fin() * 3f);

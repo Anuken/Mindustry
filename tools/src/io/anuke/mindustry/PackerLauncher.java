@@ -1,7 +1,7 @@
 package io.anuke.mindustry;
 
-import io.anuke.arc.core.Timers;
 import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Time;
 
 import java.io.IOException;
 

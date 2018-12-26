@@ -1,10 +1,10 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.OrderedMap;
-import com.badlogic.gdx.utils.PropertiesUtils;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.OrderedMap;
 import io.anuke.arc.function.BiFunction;
 import io.anuke.arc.util.Log;
+import io.anuke.arc.util.io.PropertiesUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
