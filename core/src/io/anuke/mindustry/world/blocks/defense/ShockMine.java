@@ -1,14 +1,14 @@
 package io.anuke.mindustry.world.blocks.defense;
 
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Fill;
-import io.anuke.arc.math.Mathf;
 
 public class ShockMine extends Block{
     protected int timerDamage = timers ++;
@@ -34,7 +34,7 @@ public class ShockMine extends Block{
         super.draw(tile);
         Draw.color(tile.getTeam().color);
         Draw.alpha(0.22f);
-        Fill.rect(tile.drawx(), tile.drawy(), 2f, 2f);
+        Fill.rect().center(tile.drawx(), tile.drawy(), 2f, 2f);
         Draw.color();
     }
 

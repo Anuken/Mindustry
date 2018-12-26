@@ -15,7 +15,7 @@ public class BundleLoader{
 
     public static void load(){
         Core.settings.defaults("locale", "default");
-        Core.settings.load(Vars.appName, headless ? "io.anuke.mindustry.server" : "io.anuke.mindustry");
+        Core.settings.load();
         loadBundle();
     }
 
@@ -37,7 +37,6 @@ public class BundleLoader{
     }
 
     private static void loadBundle(){
-        I18NBundle.setExceptionOnMissingKey(false);
         try{
             //try loading external bundle
             FileHandle handle = Core.files.local("bundle");

@@ -1,7 +1,7 @@
 package io.anuke.mindustry.maps.missions;
 
+import io.anuke.arc.Core;
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.arc.util.Bundles;
 
 public class ContentMission extends Mission {
     private final UnlockableContent content;

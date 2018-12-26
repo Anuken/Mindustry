@@ -8,7 +8,6 @@ import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Hue;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
@@ -463,11 +462,11 @@ public class Block extends BaseBlock {
     /** Returns the icon used for displaying this block in the place menu */
     public TextureRegion[] getIcon(){
         if(icon == null){
-            if(Draw.hasRegion(name + "-icon")){
+            if(Core.atlas.has(name + "-icon")){
                 icon = new TextureRegion[]{Core.atlas.find(name + "-icon")};
-            }else if(Draw.hasRegion(name)){
+            }else if(Core.atlas.has(name)){
                 icon = new TextureRegion[]{Core.atlas.find(name)};
-            }else if(Draw.hasRegion(name + "1")){
+            }else if(Core.atlas.has(name + "1")){
                 icon = new TextureRegion[]{Core.atlas.find(name + "1")};
             }else{
                 icon = new TextureRegion[]{};
@@ -510,7 +509,7 @@ public class Block extends BaseBlock {
     }
 
     public void draw(Tile tile){
-        Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
+        Draw.rect(region, tile.drawx(), tile.drawy()).rot(rotate ? tile.getRotation() * 90 : 0);
     }
 
     public void drawNonLayer(Tile tile){

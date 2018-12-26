@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Angles;
+import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;

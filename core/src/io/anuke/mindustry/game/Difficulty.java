@@ -1,6 +1,6 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.arc.util.Bundles;
+import io.anuke.arc.Core;
 
 public enum Difficulty{
     training(3f, 3f),

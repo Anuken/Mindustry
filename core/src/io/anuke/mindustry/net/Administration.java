@@ -1,10 +1,10 @@
 package io.anuke.mindustry.net;
 
+import io.anuke.annotations.Annotations.Serialize;
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.annotations.Annotations.Serialize;
-import io.anuke.arc.Settings;
 
 import static io.anuke.mindustry.Vars.headless;
 
@@ -15,7 +15,7 @@ public class Administration{
     private Array<String> bannedIPs = new Array<>();
 
     public Administration(){
-        Core.settings.defaultList(
+        Core.settings.defaults(
             "strict", true
         );
 
@@ -23,7 +23,7 @@ public class Administration{
     }
 
     public void setStrict(boolean on){
-        Core.settings.putBool("strict", on);
+        Core.settings.put("strict", on);
         Core.settings.save();
     }
 
@@ -36,7 +36,7 @@ public class Administration{
     }
 
     public void setCustomClients(boolean allowed){
-        Core.settings.putBool("allow-custom", allowed);
+        Core.settings.put("allow-custom", allowed);
         Core.settings.save();
     }
 

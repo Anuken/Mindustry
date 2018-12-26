@@ -1,8 +1,15 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.content.fx.Fx;
@@ -22,13 +29,6 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.util.EnumSet;
-import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -152,10 +152,10 @@ public class CoreBlock extends StorageBlock{
             Shaders.build.color.set(Palette.accent);
             Shaders.build.time = -entity.time / 10f;
 
-            Graphics.shader(Shaders.build, false);
+            Draw.shader(Shaders.build, false);
             Shaders.build.apply();
             Draw.rect(region, tile.drawx(), tile.drawy());
-            Graphics.shader();
+            Draw.shader();
 
             Draw.color(Palette.accent);
 

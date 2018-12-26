@@ -1,15 +1,14 @@
 package io.anuke.mindustry.ui;
 
-import io.anuke.arc.graphics.Texture.TextureFilter;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.arc.Core;
-import io.anuke.arc.Graphics;
+import io.anuke.arc.graphics.Texture.TextureFilter;
 import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.event.InputEvent;
 import io.anuke.arc.scene.event.InputListener;
 import io.anuke.arc.scene.ui.layout.Container;
+import io.anuke.mindustry.graphics.Shaders;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -23,7 +22,7 @@ public class Minimap extends Container<Element>{
             public void draw(){
                 if(renderer.minimap.getRegion() == null) return;
 
-                Draw.crect(renderer.minimap.getRegion(), x, y, width, height);
+                Draw.rect().tex(renderer.minimap.getRegion()).set(x, y, width, height);
 
                 if(renderer.minimap.getTexture() != null){
                     renderer.minimap.drawEntities(x, y, width, height);
@@ -46,9 +45,9 @@ public class Minimap extends Container<Element>{
                     r.setU2(px2 / (world.width() + pad*2f));
                     r.setV2(1f - py2 / (world.height() + pad*2f));
 
-                    Graphics.shader(Shaders.fog);
-                    Draw.crect(r, x, y, width, height);
-                    Graphics.shader();
+                    Draw.shader(Shaders.fog);
+                    Draw.rect().tex(r).set(x, y, width, height);
+                    Draw.shader();
 
                     renderer.fog.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
                 }
@@ -61,15 +60,16 @@ public class Minimap extends Container<Element>{
         margin(5f);
 
         addListener(new InputListener(){
-            public boolean scrolled(InputEvent event, float x, float y, int amount){
-                renderer.minimap.zoomBy(amount);
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, float amountx, float amounty){
+                renderer.minimap.zoomBy(amounty);
                 return true;
             }
         });
 
         update(() -> {
 
-            Element e = Core.scene.hit(Graphics.mouse().x, Graphics.mouse().y, true);
+            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
             if(e != null && e.isDescendantOf(this)){
                 Core.scene.setScrollFocus(this);
             }else if(Core.scene.getScrollFocus() == this){

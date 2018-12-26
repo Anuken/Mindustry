@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world;
 
+import io.anuke.arc.collection.IntMap;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.util.IntMap;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.OreBlocks;

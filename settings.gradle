@@ -1,5 +1,10 @@
 include 'desktop', 'core', 'kryonet', 'server', 'ios', 'annotations', 'tools', 'tests'
 
+def use = { String name, String path ->
+    include(name)
+    project(name).projectDir = new File(settingsDir, path)
+}
+
 Properties properties = new Properties()
 
 if(new File(settingsDir, 'local.properties').exists()){
@@ -16,23 +21,16 @@ if(new File(settingsDir, 'local.properties').exists()){
 
 if(System.properties["release"] == null || System.properties["release"] == "false"){
     if (new File(settingsDir, '../Arc').exists()) {
-        //ARC ARC ARC ARC ARC
-        include ':Arc'
-        project(':Arc').projectDir = new File(settingsDir, '../Arc')
-        include ':Arc:core'
-        project(':Arc:core').projectDir = new File(settingsDir, '../Arc/core')
-        include ':Arc:extensions'
-        project(':Arc:extensions').projectDir = new File(settingsDir, '../Arc/extensions')
-        include ':Arc:extensions:freetype'
-        project(':Arc:extensions:freetype').projectDir = new File(settingsDir, '../Arc/extensions/freetype')
+        use(':Arc', '../Arc')
+        use(':Arc:arc-core', '../Arc/arc-core')
+        use(':Arc:extensions', '../Arc/extensions')
+        use(':Arc:extensions:freetype', '../Arc/extensions/freetype')
     }
     if (new File(settingsDir, '../GDXGifRecorder').exists()) {
-        include ':GDXGifRecorder'
-        project(':GDXGifRecorder').projectDir = new File(settingsDir, '../GDXGifRecorder')
+        use(':GDXGifRecorder', '../GDXGifRecorder')
     }
     if (new File(settingsDir, '../debug').exists()) {
-        include ':debug'
-        project(':debug').projectDir = new File(settingsDir, '../debug')
+        use(':debug', '../debug')
     }
 }else{
     println("Not including local repositories.")

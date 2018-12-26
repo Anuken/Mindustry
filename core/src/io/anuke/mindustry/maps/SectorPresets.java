@@ -1,6 +1,8 @@
 package io.anuke.mindustry.maps;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.GridMap;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.Mechs;
@@ -12,8 +14,6 @@ import io.anuke.mindustry.content.blocks.UpgradeBlocks;
 import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.maps.missions.*;
 import io.anuke.mindustry.type.Item;
-import io.anuke.arc.util.GridMap;
-import io.anuke.arc.util.Structs;
 
 import static io.anuke.mindustry.Vars.mobile;
 

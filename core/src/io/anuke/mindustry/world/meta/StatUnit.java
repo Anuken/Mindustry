@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.meta;
 
-import io.anuke.arc.util.Bundles;
+import io.anuke.arc.Core;
 
 import java.util.Locale;
 

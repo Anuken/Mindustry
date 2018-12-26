@@ -1,12 +1,17 @@
 package io.anuke.mindustry.maps;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.Array.ArrayIterable;
+import io.anuke.arc.collection.GridMap;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.graphics.Texture;
-import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.util.Array.ArrayIterable;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.async.AsyncExecutor;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
@@ -27,7 +32,6 @@ import io.anuke.mindustry.type.Recipe.RecipeVisibility;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.defense.Wall;
-import io.anuke.arc.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -71,7 +75,7 @@ public class Sectors{
             playSector(sector);
 
             if(!headless){
-                threads.runGraphics(() -> ui.showError("$text.sector.corrupted"));
+                ui.showError("$text.sector.corrupted");
             }
         }
     }
@@ -82,7 +86,7 @@ public class Sectors{
     }
 
     public Sector get(int position){
-        return grid.get(Bits.getLeftShort(position), Bits.getRightShort(position));
+        return grid.get(Pack.leftShort(position), Pack.rightShort(position));
     }
 
     public Iterable<Sector> getSectors(){
@@ -111,7 +115,7 @@ public class Sectors{
         Sector sector = get(x, y);
         sector.complete = true;
 
-        for(GridPoint2 g : Geometry.d4){
+        for(Point2 g : Geometry.d4){
             createSector(x + g.x, y + g.y);
         }
     }
@@ -130,7 +134,7 @@ public class Sectors{
         grid.put(sector.x, sector.y, sector);
 
         if(sector.texture == null){
-            threads.runGraphics(() -> createTexture(sector));
+            createTexture(sector);
         }
 
         if(sector.missions.size == 0){
@@ -148,7 +152,7 @@ public class Sectors{
 
         grid.put(sector.x, sector.y, sector);
 
-        threads.runGraphics(() -> createTexture(sector));
+        createTexture(sector);
 
         save();
     }
@@ -245,14 +249,14 @@ public class Sectors{
 
         Generation gen = new Generation(sector, null, sectorSize, sectorSize, null);
 
-        Array<GridPoint2> points = new Array<>();
+        Array<Point2> points = new Array<>();
         for(Mission mission : sector.missions){
             points.addAll(mission.getSpawnPoints(gen));
         }
 
         GenResult result = new GenResult();
 
-        for(GridPoint2 point : new ArrayIterable<>(points)){
+        for(Point2 point : new ArrayIterable<>(points)){
             world.generator.generateTile(result, sector.x, sector.y, point.x, point.y, true, null, null);
             if(((Floor)result.floor).isLiquid || result.wall.solid){
                 sector.missions.clear();

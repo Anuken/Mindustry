@@ -1,8 +1,14 @@
 package io.anuke.mindustry.type;
 
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
@@ -11,13 +17,6 @@ import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.util.Angles;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Vector2;
 
 public class Weapon extends Content{
     public final String name;

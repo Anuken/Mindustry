@@ -1,8 +1,14 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import io.anuke.arc.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -12,15 +18,9 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.Settings;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.util.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Vector2;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class PowerNode extends PowerBlock{
     public static final float thicknessScl = 0.7f;
@@ -131,9 +131,9 @@ public class PowerNode extends PowerBlock{
 
         if(linkValid(tile, other)){
             if(linked(tile, other)){
-                threads.run(() -> Call.unlinkPowerNodes(null, tile, result));
+                Call.unlinkPowerNodes(null, tile, result);
             }else if(entity.power.links.size < maxNodes){
-                threads.run(() -> Call.linkPowerNodes(null, tile, result));
+                Call.linkPowerNodes(null, tile, result);
             }
             return false;
         }

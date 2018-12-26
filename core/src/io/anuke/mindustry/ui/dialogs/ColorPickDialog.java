@@ -1,8 +1,8 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Input.Keys;
-import io.anuke.arc.graphics.Color;
 import io.anuke.arc.function.Consumer;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -38,7 +38,7 @@ public class ColorPickDialog extends Dialog{
         }
 
         keyDown(key -> {
-            if(key == Keys.ESCAPE || key == Keys.BACK)
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK)
                 hide();
         });
 

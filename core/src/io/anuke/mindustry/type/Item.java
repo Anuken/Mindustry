@@ -1,17 +1,16 @@
 package io.anuke.mindustry.type;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.collection.Array;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Strings;
 
 public class Item extends UnlockableContent implements Comparable<Item>{
     public final String name;

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.production;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -24,7 +25,7 @@ public class Pulverizer extends GenericCrafter{
         GenericCrafterEntity entity = tile.entity();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
-        Draw.rect(rotatorRegion, tile.drawx(), tile.drawy(), entity.totalProgress * 2f);
+        Draw.rect(rotatorRegion, tile.drawx(), tile.drawy()).rot(entity.totalProgress * 2f);
     }
 
     @Override

@@ -1,23 +1,23 @@
 package io.anuke.mindustry.graphics;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.util.IntSet;
-import io.anuke.arc.util.Sort;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.collection.Sort;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.glutils.FrameBuffer;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
-import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Surface;
-import io.anuke.arc.math.Mathf;
 
-import static io.anuke.mindustry.Vars.*;
-import static io.anuke.arc.core.Core.camera;
+import static io.anuke.arc.Core.camera;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
@@ -31,7 +31,7 @@ public class BlockRenderer{
     private Layer lastLayer;
     private int requestidx = 0;
     private int iterateidx = 0;
-    private Surface shadows = Graphics.createSurface().setSize(2, 2);
+    private FrameBuffer shadows = new FrameBuffer(1, 1);
 
     public BlockRenderer(){
         floorRenderer = new FloorRenderer();
@@ -40,30 +40,28 @@ public class BlockRenderer{
             requests.set(i, new BlockRequest());
         }
 
-        Events.on(WorldLoadGraphicsEvent.class, event -> {
+        Events.on(WorldLoadEvent.class, event -> {
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
         });
 
         Events.on(TileChangeEvent.class, event -> {
-            threads.runGraphics(() -> {
-                int avgx = Mathf.scl(camera.position.x, tilesize);
-                int avgy = Mathf.scl(camera.position.y, tilesize);
-                int rangex = (int) (camera.width  / tilesize / 2) + 2;
-                int rangey = (int) (camera.height  / tilesize / 2) + 2;
+            int avgx = (int)(camera.position.x / tilesize);
+            int avgy = (int)(camera.position. y/ tilesize);
+            int rangex = (int) (camera.width  / tilesize / 2) + 2;
+            int rangey = (int) (camera.height  / tilesize / 2) + 2;
 
-                if(Math.abs(avgx - event.tile.x) <= rangex && Math.abs(avgy - event.tile.y) <= rangey){
-                    lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
-                }
-            });
+            if(Math.abs(avgx - event.tile.x) <= rangex && Math.abs(avgy - event.tile.y) <= rangey){
+                lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
+            }
         });
     }
 
     public void drawShadows(){
         Draw.color(0, 0, 0, 0.15f);
-        Draw.rect(shadows.texture(),
-            Core.camera.position.x - Core.camera.position.x % tilesize,
-            Core.camera.position.y - Core.camera.position.y % tilesize,
-            shadows.width(), -shadows.height());
+        Draw.rect().tex(shadows.getTexture()).center(
+            camera.position.x - camera.position.x % tilesize,
+            camera.position.y - camera.position.y % tilesize,
+            shadows.getWidth(), -shadows.getHeight());
         Draw.color();
     }
 
@@ -76,8 +74,8 @@ public class BlockRenderer{
         iterateidx = 0;
         lastLayer = null;
 
-        int avgx = Mathf.scl(camera.position.x, tilesize);
-        int avgy = Mathf.scl(camera.position.y, tilesize);
+        int avgx = (int)(camera.position.x / tilesize);
+        int avgy = (int)(camera.position.y / tilesize);
 
         int rangex = (int) (camera.width  / tilesize / 2) + 2;
         int rangey = (int) (camera.height  / tilesize / 2) + 2;
@@ -91,12 +89,16 @@ public class BlockRenderer{
         teamChecks.clear();
         requestidx = 0;
 
-        Graphics.end();
-        if(shadows.width() != shadowW || shadows.height() != shadowH){
-            shadows.setSize(shadowW, shadowH);
+        Draw.flush();
+        Core.graphics.batch().getProjection()
+        .setOrtho(Mathf.round(camera.position.x, tilesize)-shadowW/2f, Mathf.round(camera.position.y, tilesize)-shadowH/2f,
+        shadowW, shadowH);
+
+        if(shadows.getWidth() != shadowW || shadows.getHeight() != shadowH){
+            shadows.resize(shadowW, shadowH);
         }
-        Core.batch.getProjectionMatrix().setToOrtho2D(Mathf.round(Core.camera.position.x, tilesize)-shadowW/2f, Mathf.round(Core.camera.position.y, tilesize)-shadowH/2f, shadowW, shadowH);
-        Graphics.surface(shadows);
+
+        shadows.begin();
 
         int minx = Math.max(avgx - rangex - expandr, 0);
         int miny = Math.max(avgy - rangey - expandr, 0);
@@ -136,10 +138,10 @@ public class BlockRenderer{
             }
         }
 
-        Graphics.surface();
-        Graphics.end();
-        Core.batch.setProjectionMatrix(camera.combined);
-        Graphics.begin();
+        shadows.end();
+
+        Draw.flush();
+        Draw.projection(camera.projection());
 
         Sort.instance().sort(requests.items, 0, requestidx);
 

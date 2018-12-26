@@ -1,21 +1,14 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.math.Vector2;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.IntSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.ui.ItemImage;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.function.BooleanProvider;
+import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.HandCursorListener;
@@ -23,8 +16,16 @@ import io.anuke.arc.scene.event.InputEvent;
 import io.anuke.arc.scene.event.InputListener;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.ui.ItemImage;
+import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -75,7 +76,7 @@ public class BlockInventoryFragment extends Fragment{
             table.clear();
             table.update(null);
         }));
-        table.setTouchable(Touchable.disabled);
+        table.touchable(Touchable.disabled);
         tile = null;
     }
 
@@ -87,7 +88,7 @@ public class BlockInventoryFragment extends Fragment{
 
         table.clearChildren();
         table.background("inventory");
-        table.setTouchable(Touchable.enabled);
+        table.touchable(Touchable.enabled);
         table.update(() -> {
             if(state.is(State.menu) || tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.total() == 0){
                 hide();
@@ -144,7 +145,7 @@ public class BlockInventoryFragment extends Fragment{
 
                 image.addListener(new InputListener(){
                     @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                         if(!canPick.get() || !tile.entity.items.has(item)) return false;
                         int amount = Math.min(1, player.inventory.itemCapacityUsed(item));
                         Call.requestItem(player, tile, item, amount);
@@ -155,7 +156,7 @@ public class BlockInventoryFragment extends Fragment{
                     }
 
                     @Override
-                    public void touchUp(InputEvent event, float x, float y, int pointer, int button){
+                    public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
                         holding = false;
                         lastItem = null;
                     }
@@ -190,7 +191,7 @@ public class BlockInventoryFragment extends Fragment{
     }
 
     private void updateTablePosition(){
-        Vector2 v = Graphics.screen(tile.drawx() + tile.block().size * tilesize / 2f, tile.drawy() + tile.block().size * tilesize / 2f);
+        Vector2 v = Core.input.mouseScreen(tile.drawx() + tile.block().size * tilesize / 2f, tile.drawy() + tile.block().size * tilesize / 2f);
         table.pack();
         table.setPosition(v.x, v.y, Align.topLeft);
     }

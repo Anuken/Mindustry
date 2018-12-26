@@ -1,8 +1,8 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.arc.Core;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.maps.Sector;
-import io.anuke.arc.util.Bundles;
 
 public class MissionDialog extends FloatingDialog{
 

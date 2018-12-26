@@ -1,12 +1,11 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.util.IntSet;
+import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.util.Queue;
+import io.anuke.arc.collection.Queue;
 import io.anuke.mindustry.world.Tile;
-
-import static io.anuke.mindustry.Vars.threads;
 
 public class PowerGraph{
     private final static Queue<Tile> queue = new Queue<>();
@@ -31,11 +30,11 @@ public class PowerGraph{
     }
 
     public void update(){
-        if(threads.getFrameID() == lastFrameUpdated || consumers.size == 0 || producers.size == 0){
+        if(Core.graphics.getFrameId() == lastFrameUpdated || consumers.size == 0 || producers.size == 0){
             return;
         }
 
-        lastFrameUpdated = threads.getFrameID();
+        lastFrameUpdated = Core.graphics.getFrameId();
 
         boolean charge = false;
 

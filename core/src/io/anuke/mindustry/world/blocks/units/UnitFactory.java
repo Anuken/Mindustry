@@ -1,8 +1,14 @@
 package io.anuke.mindustry.world.blocks.units;
 
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
@@ -23,12 +29,6 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.util.EnumSet;
-import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -125,10 +125,10 @@ public class UnitFactory extends Block{
         Shaders.build.color.a = entity.speedScl;
         Shaders.build.time = -entity.time / 10f;
 
-        Graphics.shader(Shaders.build, false);
+        Draw.shader(Shaders.build, false);
         Shaders.build.apply();
         Draw.rect(region, tile.drawx(), tile.drawy());
-        Graphics.shader();
+        Draw.shader();
 
         Draw.color(Palette.accent);
         Draw.alpha(entity.speedScl);

@@ -1,14 +1,10 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.Input.Keys;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.util.Align;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.net.Net;
 import io.anuke.arc.function.Consumer;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.event.InputEvent;
 import io.anuke.arc.scene.event.InputListener;
@@ -18,11 +14,11 @@ import io.anuke.arc.scene.ui.SettingsDialog;
 import io.anuke.arc.scene.ui.SettingsDialog.SettingsTable.Setting;
 import io.anuke.arc.scene.ui.Slider;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.math.Mathf;
-
-import java.util.HashMap;
-import java.util.Map;
+import io.anuke.arc.util.Align;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.net.Net;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -36,7 +32,7 @@ public class SettingsMenuDialog extends SettingsDialog{
     private boolean wasPaused;
 
     public SettingsMenuDialog(){
-        setStyle(Core.skin.get("dialog", WindowStyle.class));
+        setStyle(Core.scene.skin.get("dialog", WindowStyle.class));
 
         hidden(() -> {
             if(!state.is(State.menu)){
@@ -96,7 +92,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         ScrollPane pane = new ScrollPane(prefs);
         pane.addCaptureListener(new InputListener(){
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                 Element actor = pane.hit(x, y, true);
                 if(actor instanceof Slider){
                     pane.setFlickScroll(false);
@@ -107,7 +103,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
 
             @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button){
+            public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
                 pane.setFlickScroll(true);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -125,7 +121,8 @@ public class SettingsMenuDialog extends SettingsDialog{
     }
 
     void addSettings(){
-        sound.volumePrefs();
+        //TODO add when sound works again
+        //sound.volumePrefs();
 
         game.screenshakePref();
         game.checkPref("effects", true);
@@ -162,14 +159,14 @@ public class SettingsMenuDialog extends SettingsDialog{
                     dialog.content().row();
                     dialog.content().addButton("$text.settings.clearall", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clearall.confirm", () -> {
-                            Map<String, Object> map = new HashMap<>();
-                            for(String value : Core.settings.prefs().get().keySet()){
+                            ObjectMap<String, Object> map = new ObjectMap<>();
+                            for(String value : Core.settings.keys()){
                                 if(value.contains("usid") || value.contains("uuid")){
-                                    map.put(value, Core.settings.prefs().getString(value));
+                                    map.put(value, Core.settings.getString(value));
                                 }
                             }
-                            Core.settings.prefs().clear();
-                            Core.settings.prefs().put(map);
+                            Core.settings.clear();
+                            Core.settings.putAll(map);
                             Core.settings.save();
 
                             for(FileHandle file : dataDirectory.list()){
@@ -218,7 +215,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     private void visible(int index){
         prefs.clearChildren();
-        Table table = Mathf.select(index, game, graphics, sound);
+        Table table = new Table[]{game, graphics, sound}[index];
         prefs.add(table);
     }
 
@@ -227,7 +224,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         buttons().addImageTextButton("$text.menu", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 
         keyDown(key -> {
-            if(key == Keys.ESCAPE || key == Keys.BACK)
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK)
                 hide();
         });
     }

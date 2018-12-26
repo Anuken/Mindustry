@@ -1,25 +1,12 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.util.Scaling;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.EventType.StateChangeEvent;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.Packets.AdminAction;
-import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.ui.IntFormat;
-import io.anuke.mindustry.ui.Minimap;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.arc.*;
-import io.anuke.arc.graphics.Hue;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
@@ -31,8 +18,21 @@ import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Scaling;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.EventType.StateChangeEvent;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.input.Binding;
+import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.Packets.AdminAction;
+import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.ui.IntFormat;
+import io.anuke.mindustry.ui.Minimap;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -75,10 +75,10 @@ public class HudFragment extends Fragment{
                         }
                     }).update(i -> {
                         if(Net.active()){
-                            i.getStyle().imageUp = Core.skin.getDrawable("icon-players");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-players");
                         }else{
                             i.setDisabled(Net.active());
-                            i.getStyle().imageUp = Core.skin.getDrawable(state.is(State.paused) ? "icon-play" : "icon-pause");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable(state.is(State.paused) ? "icon-play" : "icon-pause");
                         }
                     }).get();
 
@@ -94,9 +94,9 @@ public class HudFragment extends Fragment{
                         }
                     }).update(i -> {
                         if(Net.active() && mobile){
-                            i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-chat");
                         }else{
-                            i.getStyle().imageUp = Core.skin.getDrawable("icon-unlocks");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-unlocks");
                         }
                     }).get();
 
@@ -109,7 +109,7 @@ public class HudFragment extends Fragment{
             }
 
             cont.update(() -> {
-                if(!Core.input.keyDown("gridMode") && Core.input.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
+                if(!Core.input.keyDown(Binding.gridMode) && Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.chatOpen()){
                     toggleMenus();
                 }
             });
@@ -198,7 +198,7 @@ public class HudFragment extends Fragment{
                 return coreAttackOpacity > 0;
             });
             t.table("button", top -> top.add("$text.coreattack").pad(2)
-                .update(label -> label.setColor(Hue.mix(Color.ORANGE, Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)))));
+                .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f))));
         });
 
         //'saving' indicator
@@ -207,7 +207,7 @@ public class HudFragment extends Fragment{
             t.add("$text.saveload");
         });
 
-        blockfrag.build(Core.scene.getRoot());
+        blockfrag.build(Core.scene.root);
     }
 
     public void showToast(String text){
@@ -345,7 +345,7 @@ public class HudFragment extends Fragment{
         Interpolation in = Interpolation.pow3Out;
 
         if(flip != null){
-            flip.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
+            flip.getStyle().imageUp = Core.scene.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
         }
 
         if(shown){
@@ -368,7 +368,7 @@ public class HudFragment extends Fragment{
         IntFormat enemiesf = new IntFormat("text.wave.enemies");
 
         table.clearChildren();
-        table.setTouchable(Touchable.enabled);
+        table.touchable(Touchable.enabled);
 
         table.labelWrap(() ->
             world.getSector() == null ?
@@ -403,8 +403,8 @@ public class HudFragment extends Fragment{
             boolean vis = state.mode.disableWaveTimer && ((Net.server() || players[0].isAdmin) || !Net.active());
             boolean paused = state.is(State.paused) || !vis;
 
-            l.getStyle().imageUp = Core.skin.getDrawable(vis ? "icon-play" : "clear");
-            l.setTouchable(!paused ? Touchable.enabled : Touchable.disabled);
+            l.getStyle().imageUp = Core.scene.skin.getDrawable(vis ? "icon-play" : "clear");
+            l.touchable(!paused ? Touchable.enabled : Touchable.disabled);
         }).visible(() -> state.mode.disableWaveTimer && ((Net.server() || players[0].isAdmin) || !Net.active()) && unitGroups[Team.red.ordinal()].size() == 0);
     }
 }

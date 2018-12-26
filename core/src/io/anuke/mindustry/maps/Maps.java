@@ -9,7 +9,6 @@ import io.anuke.arc.collection.ObjectMap;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.arc.function.Supplier;
 import io.anuke.arc.util.Log;
-import io.anuke.arc.util.ThreadArray;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -26,9 +25,9 @@ public class Maps implements Disposable{
     /**Maps map names to the real maps.*/
     private ObjectMap<String, Map> maps = new ObjectMap<>();
     /**All maps stored in an ordered array.*/
-    private Array<Map> allMaps = new ThreadArray<>();
+    private Array<Map> allMaps = new Array<>();
     /**Temporary array used for returning things.*/
-    private Array<Map> returnArray = new ThreadArray<>();
+    private Array<Map> returnArray = new Array<>();
 
     /**Returns a list of all maps, including custom ones.*/
     public Array<Map> all(){

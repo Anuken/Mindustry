@@ -1,14 +1,12 @@
 package io.anuke.mindustry.input;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.KeyBinds;
+import io.anuke.arc.Graphics.Cursor;
+import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.input.InputDevice.DeviceType;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -20,7 +18,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.input.CursorType.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
@@ -29,7 +26,7 @@ public class DesktopInput extends InputHandler{
     private float controlx, controly;
     private boolean controlling;
     /**Current cursor type.*/
-    private CursorType cursorType = normal;
+    private Cursor cursorType = SystemCursor.arrow;
 
     /**Position where the player started dragging a line.*/
     private int selectX, selectY;
@@ -52,7 +49,7 @@ public class DesktopInput extends InputHandler{
 
             for(TextureRegion region : regions){
                 Draw.rect(region, x * tilesize + block.offset(), y * tilesize + block.offset(),
-                        region.getWidth() * selectScale, region.getHeight() * selectScale, block.rotate ? rotation * 90 : 0);
+                        region.getWidth() * selectScale, region.getHeight() * selectScale).rot(block.rotate ? rotation * 90 : 0);
             }
         }else{
             Draw.color(Palette.removeBack);
@@ -82,8 +79,8 @@ public class DesktopInput extends InputHandler{
 
                 if(i + recipe.result.size > result.getLength() && recipe.result.rotate){
                     Draw.color(!validPlace(x, y, recipe.result, result.rotation) ? Palette.remove : Palette.placeRotate);
-                    Draw.grect("place-arrow", x * tilesize + recipe.result.offset(),
-                            y * tilesize + recipe.result.offset(), result.rotation * 90 - 90);
+                    Draw.rect("place-arrow", x * tilesize + recipe.result.offset(),
+                            y * tilesize + recipe.result.offset()).origin(x * tilesize + recipe.result.offset()/2f, 0f).rot(result.rotation * 90 - 90);
                 }
 
                 drawPlace(x, y, recipe.result, result.rotation);
@@ -114,8 +111,8 @@ public class DesktopInput extends InputHandler{
         }else if(isPlacing()){
             if(recipe.result.rotate){
                 Draw.color(!validPlace(cursorX, cursorY, recipe.result, rotation) ? Palette.remove : Palette.placeRotate);
-                Draw.grect("place-arrow", cursorX * tilesize + recipe.result.offset(),
-                        cursorY * tilesize + recipe.result.offset(), rotation * 90 - 90);
+                Draw.rect("place-arrow", cursorX * tilesize + recipe.result.offset(),
+                        cursorY * tilesize + recipe.result.offset()).origin(cursorX * tilesize + recipe.result.offset()/2f, 0).rot(rotation * 90 - 90);
             }
             drawPlace(cursorX, cursorY, recipe.result, rotation);
             recipe.result.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, recipe.result, rotation));
@@ -157,7 +154,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(isPlacing()){
-            cursorType = hand;
+            cursorType = SystemCursor.hand;
             selectScale = Mathf.lerpDelta(selectScale, 1f, 0.2f);
         }else{
             selectScale = 0f;
@@ -168,30 +165,30 @@ public class DesktopInput extends InputHandler{
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
         if(player.isDead()){
-            cursorType = normal;
+            cursorType = SystemCursor.arrow;
         }else if(cursor != null){
             cursor = cursor.target();
 
             cursorType = cursor.block().getCursor(cursor);
 
             if(isPlacing()){
-                cursorType = hand;
+                cursorType = SystemCursor.hand;
             }
 
             if(!isPlacing() && canMine(cursor)){
-                cursorType = drill;
+                cursorType = ui.drillCursor;
             }
 
             if(canTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y)){
-                cursorType = unload;
+                cursorType = ui.unloadCursor;
             }
         }
 
         if(!Core.scene.hasMouse()){
-            cursorType.set();
+            Core.graphics.cursor(cursorType);
         }
 
-        cursorType = normal;
+        cursorType = SystemCursor.arrow;
     }
 
     void pollInput(){

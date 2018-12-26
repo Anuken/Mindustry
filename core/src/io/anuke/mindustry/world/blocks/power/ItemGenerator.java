@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.fx.BlockFx;

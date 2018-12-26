@@ -1,8 +1,15 @@
 package io.anuke.mindustry.world.blocks.units;
 
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
@@ -15,19 +22,13 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 //TODO re-implement properly
 public class Reconstructor extends Block{
@@ -117,10 +118,8 @@ public class Reconstructor extends Block{
         ReconstructorEntity oe = other.entity();
 
         //called in main thread to prevent issues
-        threads.run(() -> {
-            unlink(entity);
-            unlink(oe);
-        });
+        unlink(entity);
+        unlink(oe);
     }
 
     @Override
@@ -206,10 +205,10 @@ public class Reconstructor extends Block{
             Shaders.build.color.set(Palette.accent);
             Shaders.build.time = -entity.time / 10f;
 
-            Graphics.shader(Shaders.build, false);
+            Draw.shader(Shaders.build, false);
             Shaders.build.apply();
             Draw.rect(region, tile.drawx(), tile.drawy());
-            Graphics.shader();
+            Draw.shader();
 
             Draw.color(Palette.accent);
 

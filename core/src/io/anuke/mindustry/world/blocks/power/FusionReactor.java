@@ -1,16 +1,18 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Mathf;
 
 public class FusionReactor extends PowerGenerator{
     protected int plasmas = 4;
@@ -78,19 +80,15 @@ public class FusionReactor extends PowerGenerator{
 
         Draw.rect(name + "-bottom", tile.drawx(), tile.drawy());
 
-        Graphics.setAdditiveBlending();
-
         for(int i = 0; i < plasmas; i++){
             float r = 29f + Mathf.absin(Time.time(), 2f + i * 1f, 5f - i * 0.5f);
 
             Draw.color(plasma1, plasma2, (float) i / plasmas);
             Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * entity.warmup);
-            Draw.rect(name + "-plasma-" + i, tile.drawx(), tile.drawy(), r, r, Time.time() * (12 + i * 6f) * entity.warmup);
+            Draw.rect(name + "-plasma-" + i, tile.drawx(), tile.drawy(), r, r).rot(Time.time() * (12 + i * 6f) * entity.warmup).blend(Blending.additive);
         }
 
         Draw.color();
-
-        Graphics.setNormalBlending();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
 

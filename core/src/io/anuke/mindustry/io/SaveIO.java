@@ -1,9 +1,9 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.util.IntArray;
-import io.anuke.arc.util.IntMap;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.files.FileHandle;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save16;
 

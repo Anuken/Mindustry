@@ -1,9 +1,9 @@
 package io.anuke.mindustry.maps.missions;
 
+import io.anuke.arc.Core;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.arc.util.Bundles;
 
 public class UnitMission extends Mission{
     private final UnitType type;

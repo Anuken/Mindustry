@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.storage;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
@@ -18,7 +19,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.threads;
 
 public class SortedUnloader extends Block implements SelectionTrait{
     protected float speed = 1f;

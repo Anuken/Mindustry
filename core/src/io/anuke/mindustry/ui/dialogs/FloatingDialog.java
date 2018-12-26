@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.Input.Keys;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
@@ -66,7 +66,7 @@ public class FloatingDialog extends Dialog{
         buttons().addImageTextButton("$text.back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 
         keyDown(key -> {
-            if(key == Keys.ESCAPE || key == Keys.BACK) {
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK) {
                 Core.app.post(this::hide);
             }
         });

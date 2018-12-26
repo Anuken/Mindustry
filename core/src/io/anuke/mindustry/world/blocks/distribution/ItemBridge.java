@@ -1,12 +1,19 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.util.IntArray;
-import io.anuke.arc.util.IntSet;
-import io.anuke.arc.util.IntSet.IntSetIterator;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.collection.IntSet.IntSetIterator;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.CapStyle;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -18,12 +25,6 @@ import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.CapStyle;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.util.Geometry;
-import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -215,8 +216,8 @@ public class ItemBridge extends Block{
         Draw.color(Color.WHITE, Color.BLACK, Mathf.absin(Time.time(), 6f, 0.07f));
         Draw.alpha(Math.max(entity.uptime, 0.25f));
 
-        Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);
-        Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
+        Draw.rect(endRegion, tile.drawx(), tile.drawy()).rot(i * 90 + 90);
+        Draw.rect(endRegion, other.drawx(), other.drawy()).rot(i * 90 + 270);
 
         Lines.stroke(8f);
         Lines.line(bridgeRegion,
@@ -236,8 +237,7 @@ public class ItemBridge extends Block{
             Draw.alpha(Mathf.absin(a / (float) arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime);
             Draw.rect(arrowRegion,
                     tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 4f + time % 4f),
-                    tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f),
-                    i * 90f);
+                    tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f)).rot(i * 90f);
         }
         Draw.reset();
     }

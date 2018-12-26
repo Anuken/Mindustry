@@ -1,17 +1,15 @@
 package io.anuke.mindustry.maps.missions;
 
-import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.world.Block;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.util.Angles;
-import io.anuke.arc.util.Bundles;
+import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.world.Block;
 
-import static io.anuke.mindustry.Vars.players;
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class BlockLocMission extends Mission{
     private final Block block;
@@ -44,18 +42,18 @@ public class BlockLocMission extends Mission{
 
         if(block.rotate){
             Draw.colorl(0.4f);
-            Draw.rect("icon-arrow", x * tilesize + block.offset(), y * tilesize + block.offset() - 1f, rotation*90);
+            Draw.rect("icon-arrow", x * tilesize + block.offset(), y * tilesize + block.offset() - 1f).rot(rotation*90);
             Draw.colorl(0.6f);
-            Draw.rect("icon-arrow", x * tilesize + block.offset(), y * tilesize + block.offset(), rotation*90);
+            Draw.rect("icon-arrow", x * tilesize + block.offset(), y * tilesize + block.offset()).rot(rotation*90);
         }
 
         float rot = players[0].angleTo(x * tilesize + block.offset(), y * tilesize + block.offset());
         float len = 12f;
 
         Draw.color(Palette.accentBack);
-        Draw.rect("icon-arrow", players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len), rot);
+        Draw.rect("icon-arrow", players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len)).rot(rot);
         Draw.color(Palette.accent);
-        Draw.rect("icon-arrow", players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len) + 1f, rot);
+        Draw.rect("icon-arrow", players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len) + 1f).rot(rot);
 
         Draw.reset();
     }

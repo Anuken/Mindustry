@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.Vector2;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.TileEntity;
@@ -14,9 +14,9 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.util.Angles;
+import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Vector2;
+import io.anuke.arc.math.geom.Vector2;
 
 import java.io.DataInput;
 import java.io.DataOutput;

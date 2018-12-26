@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;

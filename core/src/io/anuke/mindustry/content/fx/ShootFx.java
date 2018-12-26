@@ -6,10 +6,10 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Fill;
+import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.Shapes;
-import io.anuke.arc.util.Angles;
+import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 
 public class ShootFx extends FxList implements ContentList{

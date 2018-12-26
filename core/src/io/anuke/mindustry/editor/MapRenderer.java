@@ -2,7 +2,7 @@ package io.anuke.mindustry.editor;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.IntSet;
 import io.anuke.arc.util.IntSet.IntSetIterator;
@@ -15,7 +15,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.IndexedRenderer;
 import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Bits;
-import io.anuke.arc.util.Geometry;
+import io.anuke.arc.math.geom.Geometry;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -111,8 +111,8 @@ public class MapRenderer implements Disposable{
         byte bw = editor.getMap().read(wx, wy, DataPosition.wall);
         byte btr = editor.getMap().read(wx, wy, DataPosition.rotationTeam);
         byte elev = editor.getMap().read(wx, wy, DataPosition.elevation);
-        byte rotation = Bits.getLeftByte(btr);
-        Team team = Team.all[Bits.getRightByte(btr)];
+        byte rotation = Pack.leftByte(btr);
+        Team team = Team.all[Pack.rightByte(btr)];
 
         Block floor = content.block(bf);
         Block wall = content.block(bw);
@@ -159,7 +159,7 @@ public class MapRenderer implements Disposable{
     }
 
     private boolean checkElevation(byte elev, int x, int y){
-        for(GridPoint2 p : Geometry.d4){
+        for(Point2 p : Geometry.d4){
             int wx = x + p.x, wy = y + p.y;
             if(!Structs.inBounds(wx, wy, editor.getMap().width(), editor.getMap().height())){
                 return true;

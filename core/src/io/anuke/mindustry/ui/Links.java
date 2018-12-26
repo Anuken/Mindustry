@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.util.Bundles;
 
 public class Links{
     private static LinkEntry[] links;

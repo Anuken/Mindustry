@@ -2,27 +2,20 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
-import io.anuke.arc.Graphics;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.EntityDraw;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.impl.EffectEntity;
 import io.anuke.arc.entities.trait.DrawTrait;
 import io.anuke.arc.entities.trait.Entity;
-import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Pixmap;
-import io.anuke.arc.graphics.PixmapIO;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.BufferUtils;
-import io.anuke.arc.util.ScreenUtils;
-import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
@@ -35,9 +28,9 @@ import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
 
-import static io.anuke.arc.Core.*;
+import static io.anuke.arc.Core.camera;
+import static io.anuke.arc.Core.graphics;
 import static io.anuke.mindustry.Vars.*;
 
 public class Renderer implements ApplicationListener{
@@ -102,68 +95,47 @@ public class Renderer implements ApplicationListener{
         //TODO hack, find source of this bug
         Color.WHITE.set(1f, 1f, 1f, 1f);
 
-        if(Core.cameraScale != targetscale){
-            float targetzoom = (float) Core.cameraScale / targetscale;
-            camera.zoom = Mathf.lerpDelta(camera.zoom, targetzoom, 0.2f);
-
-            if(Mathf.in(camera.zoom, targetzoom, 0.005f)){
-                camera.zoom = 1f;
-                Graphics.setCameraScale(targetscale);
-                for(Player player : players){
-                    control.input(player.playerIndex).resetCursor();
-                }
-            }
-        }else{
-            camera.zoom = Mathf.lerpDelta(camera.zoom, 1f, 0.2f);
-        }
-
         if(state.is(State.menu)){
-            Graphics.clear(Color.BLACK);
+            graphics.clear(Color.BLACK);
         }else{
             Vector2 position = averagePosition();
 
             if(players[0].isDead()){
                 TileEntity core = players[0].getClosestCore();
                 if(core != null && players[0].spawner == Unit.noSpawner){
-                    smoothCamera(core.x, core.y, 0.08f);
+                    camera.position.lerpDelta(core.x, core.y, 0.08f);
                 }else{
-                    smoothCamera(position.x + 0.0001f, position.y + 0.0001f, 0.08f);
+                    camera.position.lerpDelta(position, 0.08f);
                 }
             }else if(!mobile){
-                setCamera(position.x + 0.0001f, position.y + 0.0001f);
+                camera.position.set(position);
             }
+
             camera.position.x = Mathf.clamp(camera.position.x, -tilesize / 2f, world.width() * tilesize - tilesize / 2f);
             camera.position.y = Mathf.clamp(camera.position.y, -tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
             float prex = camera.position.x, prey = camera.position.y;
-            updateShake(0.75f);
+            //TODO update screenshake
+            //updateShake(0.75f);
 
             float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
             float lastx = camera.position.x, lasty = camera.position.y;
 
             if(snapCamera){
-                camera.position.set((int) camera.position.x, (int) camera.position.y, 0);
-            }
-
-            if(Core.graphics.getHeight() / Core.cameraScale % 2 == 1){
-                camera.position.add(0, -0.5f, 0);
-            }
-
-            if(Core.graphics.getWidth() / Core.cameraScale % 2 == 1){
-                camera.position.add(-0.5f, 0, 0);
+                camera.position.set((int) camera.position.x, (int) camera.position.y);
             }
 
             draw();
 
-            camera.position.set(lastx - deltax, lasty - deltay, 0);
+            camera.position.set(lastx - deltax, lasty - deltay);
         }
 
         if(!ui.chatfrag.chatOpen()){
-            renderer.record(); //this only does something if CoreGifRecorder is on the class path, which it usually isn't
+            //TODO does not work
+            //ScreenRecorder.record(); //this only does something if CoreGifRecorder is on the class path, which it usually isn't
         }
     }
 
-    @Override
     public void draw(){
         camera.update();
         if(Float.isNaN(camera.position.x) || Float.isNaN(camera.position.y)){
@@ -171,13 +143,9 @@ public class Renderer implements ApplicationListener{
             camera.position.y = players[0].y;
         }
 
-        Graphics.clear(clearColor);
+        graphics.clear(clearColor);
 
-        batch.setProjectionMatrix(camera.combined);
-
-        Graphics.surface(pixelSurface, false);
-
-        Graphics.clear(clearColor);
+        graphics.batch().setProjection(camera.projection());
 
         blocks.drawFloor();
 
@@ -189,26 +157,14 @@ public class Renderer implements ApplicationListener{
         blocks.drawShadows();
         for(Team team : Team.all){
             if(blocks.isTeamShown(team)){
-                boolean outline = team != players[0].getTeam() && team != Team.none;
-
-                if(outline){
-                    Shaders.outline.color.set(team.color);
-                    Shaders.outline.color.a = 0.8f;
-                    Graphics.beginShaders(Shaders.outline);
-                }
-
                 blocks.drawTeamBlocks(Layer.block, team);
-
-                if(outline){
-                    Graphics.endShaders();
-                }
             }
         }
         blocks.skipLayer(Layer.block);
 
-        Graphics.shader(Shaders.blockbuild, false);
+        Draw.shader(Shaders.blockbuild, false);
         blocks.drawBlocks(Layer.placement);
-        Graphics.shader();
+        Draw.shader();
 
         blocks.drawBlocks(Layer.overlay);
 
@@ -227,37 +183,47 @@ public class Renderer implements ApplicationListener{
         overlays.drawBottom();
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
+        //TODO shield
+        /*
         Graphics.beginShaders(Shaders.shield);
         EntityDraw.draw(shieldGroup);
         EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
         Draw.color(Palette.accent);
         Graphics.endShaders();
         Draw.color();
+        */
 
         overlays.drawTop();
 
+        //TODO fog
+        /*
         if(showFog){
             Graphics.surface();
         }else{
             Graphics.flushSurface();
-        }
+        }*/
 
-        batch.end();
+        //batch.end();
 
         if(showFog){
-            fog.draw();
+       //     fog.draw();
         }
 
-        Graphics.beginCam();
+        //TODO this isn't necessary anymore
+        //Graphics.beginCam();
+
         EntityDraw.setClip(false);
         drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
         EntityDraw.setClip(true);
-        Graphics.end();
+        //Graphics.end();
+
         Draw.color();
+        Draw.flush();
     }
 
     private void drawFlyerShadows(){
-        Graphics.surface(effectSurface, true, false);
+        //TODO fix flyer shadows
+        //Graphics.surface(effectSurface, true, false);
 
         float trnsX = -12, trnsY = -13;
 
@@ -271,9 +237,9 @@ public class Renderer implements ApplicationListener{
             drawAndInterpolate(playerGroup, unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
         }
 
-        Draw.color(0, 0, 0, 0.15f);
-        Graphics.flushSurface();
-        Draw.color();
+        //Draw.color(0, 0, 0, 0.15f);
+        //Graphics.flushSurface();
+       // Draw.color();
     }
 
     private void drawAllTeams(boolean flying){
@@ -289,13 +255,13 @@ public class Renderer implements ApplicationListener{
             Shaders.outline.color.set(team.color);
             Shaders.mix.color.set(Color.WHITE);
 
-            Graphics.beginShaders(Shaders.outline);
-            Graphics.shader(Shaders.mix, true);
+            //Graphics.beginShaders(Shaders.outline);
+            //Draw.shader(Shaders.mix, true);
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
-            Graphics.shader();
+            //Draw.shader();
             blocks.drawTeamBlocks(Layer.turret, team);
-            Graphics.endShaders();
+            //Graphics.endShaders();
 
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
@@ -316,13 +282,7 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void resize(int width, int height){
-        float lastX = camera.position.x, lastY = camera.position.y;
-        super.resize(width, height);
-        for(Player player : players){
-            control.input(player.playerIndex).resetCursor();
-        }
-        camera.update();
-        camera.position.set(lastX, lastY, 0f);
+        camera.resize(width, height);
     }
 
     @Override
@@ -342,10 +302,6 @@ public class Renderer implements ApplicationListener{
     public void setCameraScale(int amount){
         targetscale = amount;
         clampScale();
-        //scale up all surfaces in preparation for the zoom
-        for(Surface surface : Graphics.getSurfaces()){
-            surface.setScale(targetscale);
-        }
     }
 
     public void scaleCamera(int amount){
@@ -358,6 +314,8 @@ public class Renderer implements ApplicationListener{
     }
 
     public void takeMapScreenshot(){
+        //TODO fix/implement
+        /*
         float vpW = camera.width, vpH = camera.height;
         int w = world.width()*tilesize, h =  world.height()*tilesize;
         int pw = pixelSurface.width(), ph = pixelSurface.height();
@@ -394,7 +352,7 @@ public class Renderer implements ApplicationListener{
         pixelSurface.setSize(pw, ph, false);
         Graphics.getEffectSurface().setSize(pw, ph, false);
 
-        ui.showInfoFade(Core.bundle.format("text.screenshot", file.toString()));
+        ui.showInfoFade(Core.bundle.format("text.screenshot", file.toString()));*/
     }
 
 }

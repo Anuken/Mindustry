@@ -1,10 +1,18 @@
 package io.anuke.mindustry.entities.effect;
 
-import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.util.IntMap;
-import io.anuke.arc.util.Pool.Poolable;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.TimedEntity;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.pooling.Pool.Poolable;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
@@ -16,14 +24,6 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.TimedEntity;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Geometry;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Pooling;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -131,11 +131,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
         }
 
         if(flammability > 1f && Mathf.chance(spreadChance * Time.delta() * Mathf.clamp(flammability / 5f, 0.3f, 2f))){
-            GridPoint2 p = Mathf.select(Geometry.d4);
+            Point2 p = Geometry.d4[Mathf.random(3)];
             Tile other = world.tile(tile.x + p.x, tile.y + p.y);
             create(other);
 
-            if(Mathf.chance(fireballChance * Time.delta() * Mathf.clamp(flammability / 10.0))){
+            if(Mathf.chance(fireballChance * Time.delta() * Mathf.clamp(flammability / 10f))){
                 Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f));
             }
         }

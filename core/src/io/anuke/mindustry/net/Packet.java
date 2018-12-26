@@ -1,6 +1,6 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.arc.util.Pool.Poolable;
+import io.anuke.arc.util.pooling.Pool.Poolable;
 
 import java.nio.ByteBuffer;
 

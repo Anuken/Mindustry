@@ -1,11 +1,11 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Input.Keys;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.net.Net;
+import io.anuke.arc.Core;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.style.Drawable;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Bundles;
+import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.net.Net;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -22,7 +22,7 @@ public class PausedDialog extends FloatingDialog{
         shown(this::rebuild);
 
         keyDown(key -> {
-            if(key == Keys.ESCAPE || key == Keys.BACK) {
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK) {
                 hide();
             }
         });
@@ -111,7 +111,7 @@ public class PausedDialog extends FloatingDialog{
                 control.saves.getCurrent().save();
             }catch(Throwable e){
                 e.printStackTrace();
-                threads.runGraphics(() -> ui.showError("[accent]" + Core.bundle.get("text.savefail")));
+               ui.showError("[accent]" + Core.bundle.get("text.savefail"));
             }
             state.set(State.menu);
         });

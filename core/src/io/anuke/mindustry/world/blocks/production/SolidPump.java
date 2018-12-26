@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.production;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.Fx;
@@ -50,7 +51,7 @@ public class SolidPump extends Pump{
         Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
         Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
         Draw.color();
-        Draw.rect(name + "-rotator", tile.drawx(), tile.drawy(), entity.pumpTime * rotateSpeed);
+        Draw.rect(name + "-rotator", tile.drawx(), tile.drawy()).rot(entity.pumpTime * rotateSpeed);
         Draw.rect(name + "-top", tile.drawx(), tile.drawy());
     }
 

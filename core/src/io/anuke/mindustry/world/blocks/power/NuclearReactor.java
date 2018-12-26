@@ -1,7 +1,13 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.ExplosionFx;
@@ -14,11 +20,6 @@ import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Vector2;
 
 import java.io.DataInput;
 import java.io.DataOutput;

@@ -1,7 +1,10 @@
 package io.anuke.mindustry.ui;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.OrderedMap;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.util.OrderedMap;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
@@ -13,10 +16,6 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatCategory;
 import io.anuke.mindustry.world.meta.StatValue;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.Strings;
 
 public class ContentDisplay{
 

@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -19,7 +20,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.threads;
 
 public class Sorter extends Block implements SelectionTrait{
     private static Item lastItem;

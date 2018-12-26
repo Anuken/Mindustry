@@ -1,10 +1,10 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.scene.ui.TextButton;
-import io.anuke.arc.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -26,7 +26,7 @@ public class SaveDialog extends LoadDialog{
                 ui.showTextInput("$text.save", "$text.save.newslot", "", text -> {
                     ui.loadGraphics("$text.saving", () -> {
                         control.saves.addSave(text);
-                        threads.runGraphics(() -> threads.run(() -> threads.runGraphics(this::setup)));
+                        Core.app.post(() -> Core.app.post(this::setup));
                     });
                 })
         ).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);

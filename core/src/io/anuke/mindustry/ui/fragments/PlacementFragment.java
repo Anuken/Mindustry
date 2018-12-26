@@ -1,13 +1,24 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.math.Vector2;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.ButtonGroup;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.ImageButton;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.type.ItemStack;
@@ -16,18 +27,6 @@ import io.anuke.mindustry.ui.ImageStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.arc.Events;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.Inputs;
-import io.anuke.arc.input.Input;
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.actions.Actions;
-import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.ui.ButtonGroup;
-import io.anuke.arc.scene.ui.Image;
-import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -42,20 +41,20 @@ public class PlacementFragment extends Fragment{
     boolean lastGround;
 
     //TODO make this configurable
-    final Input[] inputGrid = {
-        Input.NUM_1, Input.NUM_2, Input.NUM_3, Input.NUM_4,
-        Input.Q, Input.W, Input.E, Input.R,
-        Input.A, Input.S, Input.D, Input.F,
-        Input.Z, Input.X, Input.C, Input.V
+    final KeyCode[] inputGrid = {
+        KeyCode.NUM_1, KeyCode.NUM_2, KeyCode.NUM_3, KeyCode.NUM_4,
+        KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R,
+        KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
+        KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V
     }, inputCatGrid = {
-        Input.NUM_1, Input.NUM_2,
-        Input.Q, Input.W,
-        Input.A, Input.S,
-        Input.Z, Input.X, Input.C, Input.V
+        KeyCode.NUM_1, KeyCode.NUM_2,
+        KeyCode.Q, KeyCode.W,
+        KeyCode.A, KeyCode.S,
+        KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V
     };
 
     public PlacementFragment(){
-        Events.on(WorldLoadGraphicsEvent.class, event -> {
+        Events.on(WorldLoadEvent.class, event -> {
             currentCategory = Category.turret;
             Group group = toggler.getParent();
             toggler.remove();
@@ -64,10 +63,10 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean gridUpdate(InputHandler input){
-        if(!Core.input.keyDown("gridMode") || ui.chatfrag.chatOpen()) return false;
-        if(Core.input.keyDown("gridModeShift")){ //select category
+        if(!Core.input.keyDown(Binding.gridMode) || ui.chatfrag.chatOpen()) return false;
+        if(Core.input.keyDown(Binding.gridModeShift)){ //select category
             int i = 0;
-            for(Input key : inputCatGrid){
+            for(KeyCode key : inputCatGrid){
                 if(Core.input.keyDown(key)){
                     input.recipe = Recipe.getByCategory(Category.values()[i]).first();
                     currentCategory = input.recipe.category;
@@ -75,7 +74,7 @@ public class PlacementFragment extends Fragment{
                 i++;
             }
             return true;
-        }else if(Core.input.keyDown("select")){ //mouse eyedropper select
+        }else if(Core.input.keyDown(Binding.select)){ //mouse eyedropper select
             Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
             if(tile != null){
@@ -90,7 +89,7 @@ public class PlacementFragment extends Fragment{
         }else{ //select block
             int i = 0;
             Array<Recipe> recipes = Recipe.getByCategory(currentCategory);
-            for(Input key : inputGrid){
+            for(KeyCode key : inputGrid){
                 if(Core.input.keyDown(key))
                     input.recipe = (i < recipes.size && control.unlocks.isUnlocked(recipes.get(i))) ? recipes.get(i) : null;
                 i++;
@@ -254,7 +253,7 @@ public class PlacementFragment extends Fragment{
     Block getSelected(){
         Block toDisplay = null;
 
-        Vector2 v = topTable.stageToLocalCoordinates(Graphics.mouse());
+        Vector2 v = topTable.stageToLocalCoordinates(Core.input.mouse());
 
         //setup hovering tile
         if(!Core.scene.hasMouse() && topTable.hit(v.x, v.y, false) == null){

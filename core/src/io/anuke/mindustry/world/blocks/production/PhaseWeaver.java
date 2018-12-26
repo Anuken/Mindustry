@@ -1,14 +1,14 @@
 package io.anuke.mindustry.world.blocks.production;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.math.Mathf;
 
 public class PhaseWeaver extends PowerSmelter{
     protected TextureRegion bottomRegion;
@@ -48,10 +48,10 @@ public class PhaseWeaver extends PowerSmelter{
         Shaders.build.color.a = entity.heat;
         Shaders.build.time = -entity.time / 10f;
 
-        Graphics.shader(Shaders.build, false);
+        Draw.shader(Shaders.build, false);
         Shaders.build.apply();
-        Draw.rect(weaveRegion, tile.drawx(), tile.drawy(), entity.time);
-        Graphics.shader();
+        Draw.rect(weaveRegion, tile.drawx(), tile.drawy()).rot(entity.time);
+        Draw.shader();
 
         Draw.color(Palette.accent);
         Draw.alpha(entity.heat);

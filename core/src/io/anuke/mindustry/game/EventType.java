@@ -11,6 +11,7 @@ public class EventType{
 
     }
 
+    /**Called when the game is first loaded.*/
     public static class GameLoadEvent implements Event{
 
     }
@@ -35,10 +36,7 @@ public class EventType{
         }
     }
 
-    /**
-     * This event is called from the logic thread.
-     * DO NOT INITIALIZE GRAPHICS HERE.
-     */
+    /**Called when a game begins and the world is loaded.*/
     public static class WorldLoadEvent implements Event{
 
     }

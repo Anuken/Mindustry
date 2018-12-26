@@ -1,8 +1,12 @@
 package io.anuke.mindustry.world;
 
-import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.math.Vector2;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.math.geom.Position;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.TargetTrait;
@@ -13,15 +17,11 @@ import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.mindustry.world.modules.PowerModule;
-import io.anuke.arc.entities.trait.PosTrait;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.util.Bits;
-import io.anuke.arc.util.Geometry;
 
 import static io.anuke.mindustry.Vars.*;
 
 
-public class Tile implements PosTrait, TargetTrait{
+public class Tile implements Position, TargetTrait{
     /**
      * The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
      * This is relative to the block it is linked to; negate coords to find the link.
@@ -254,7 +254,7 @@ public class Tile implements PosTrait, TargetTrait{
     /** Sets this to a linked tile, which sets the block to a blockpart. dx and dy can only be -8-7. */
     public void setLinked(byte dx, byte dy){
         setBlock(Blocks.blockpart);
-        link = Bits.packByte((byte) (dx + 8), (byte) (dy + 8));
+        link = Pack.byteByte((byte)(dx + 8), (byte)(dy + 8));
     }
 
     /**
@@ -305,14 +305,14 @@ public class Tile implements PosTrait, TargetTrait{
         if(link == 0){
             return null;
         }else{
-            byte dx = Bits.getLeftByte(link);
-            byte dy = Bits.getRightByte(link);
+            byte dx = Pack.leftByte(link);
+            byte dy = Pack.rightByte(link);
             return world.tile(x - (dx - 8), y - (dy - 8));
         }
     }
 
     public void allNearby(Consumer<Tile> cons){
-        for(GridPoint2 point : Edges.getEdges(block().size)){
+        for(Point2 point : Edges.getEdges(block().size)){
             Tile tile = world.tile(x + point.x, y + point.y);
             if(tile != null){
                 cons.accept(tile.target());
@@ -321,7 +321,7 @@ public class Tile implements PosTrait, TargetTrait{
     }
 
     public void allInside(Consumer<Tile> cons){
-        for(GridPoint2 point : Edges.getInsideEdges(block().size)){
+        for(Point2 point : Edges.getInsideEdges(block().size)){
             Tile tile = world.tile(x + point.x, y + point.y);
             if(tile != null){
                 cons.accept(tile);
@@ -334,7 +334,7 @@ public class Tile implements PosTrait, TargetTrait{
         return link == null ? this : link;
     }
 
-    public Tile getNearby(GridPoint2 relative){
+    public Tile getNearby(Point2 relative){
         return world.tile(x + relative.x, y + relative.y);
     }
 
@@ -357,7 +357,7 @@ public class Tile implements PosTrait, TargetTrait{
 
         //check for occlusion
         for(int i = 0; i < 8; i++){
-            GridPoint2 point = Geometry.d8[i];
+            Point2 point = Geometry.d8[i];
             Tile tile = world.tile(x + point.x, y + point.y);
             if(tile != null && tile.solid()){
                 occluded = true;
@@ -415,7 +415,7 @@ public class Tile implements PosTrait, TargetTrait{
             }
         }else if(!(block instanceof BlockPart) && !world.isGenerating()){
             //since the entity won't update proximity for us, update proximity for all nearby tiles manually
-            for(GridPoint2 p : Geometry.d4){
+            for(Point2 p : Geometry.d4){
                 Tile tile = world.tile(x + p.x, y + p.y);
                 if(tile != null){
                     tile = tile.target();
@@ -436,7 +436,7 @@ public class Tile implements PosTrait, TargetTrait{
 
     @Override
     public Vector2 getVelocity(){
-        return Vector2.Zero;
+        return Vector2.ZERO;
     }
 
     @Override
@@ -463,6 +463,6 @@ public class Tile implements PosTrait, TargetTrait{
         Block floor = floor();
 
         return floor.name() + ":" + block.name() + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
-        (link != 0 ? " link=[" + (Bits.getLeftByte(link) - 8) + ", " + (Bits.getRightByte(link) - 8) + "]" : "");
+        (link != 0 ? " link=[" + (Pack.leftByte(link) - 8) + ", " + (Pack.rightByte(link) - 8) + "]" : "");
     }
 }

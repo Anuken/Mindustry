@@ -1,10 +1,14 @@
 package io.anuke.mindustry.maps.generation;
 
-import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.math.Vector2;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.util.IntIntMap;
-import io.anuke.arc.util.Predicate;
+import io.anuke.arc.collection.IntIntMap;
+import io.anuke.arc.function.BiFunction;
+import io.anuke.arc.function.IntPositionConsumer;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.function.TriFunction;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.blocks.*;
@@ -29,11 +33,6 @@ import io.anuke.mindustry.world.blocks.power.SolarGenerator;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.storage.StorageBlock;
 import io.anuke.mindustry.world.blocks.units.UnitFactory;
-import io.anuke.arc.function.BiFunction;
-import io.anuke.arc.function.IntPositionConsumer;
-import io.anuke.arc.function.TriFunction;
-import io.anuke.arc.util.Geometry;
-import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -83,11 +82,11 @@ public class FortressGenerator{
         }
 
         TriFunction<Tile, Block, Predicate<Tile>, Boolean> checker = (current, block, pred) -> {
-            for(GridPoint2 point : Edges.getEdges(block.size)){
+            for(Point2 point : Edges.getEdges(block.size)){
                 Tile tile = gen.tile(current.x + point.x, current.y + point.y);
                 if(tile != null){
                     tile = tile.target();
-                    if(tile.getTeamID() == team.ordinal() && pred.evaluate(tile)){
+                    if(tile.getTeamID() == team.ordinal() && pred.test(tile)){
                         return true;
                     }
                 }
@@ -160,7 +159,7 @@ public class FortressGenerator{
             (x, y) -> {
                 if(!gen.canPlace(x, y, wall)) return;
 
-                for(GridPoint2 point : Geometry.d8){
+                for(Point2 point : Geometry.d8){
                     Tile tile = gen.tile(x + point.x, y + point.y);
                     if(tile != null){
                         tile = tile.target();
@@ -211,7 +210,7 @@ public class FortressGenerator{
     Array<Block> find(Predicate<Block> pred){
         Array<Block> out = new Array<>();
         for(Block block : content.blocks()){
-            if(pred.evaluate(block) && Recipe.getByResult(block) != null){
+            if(pred.test(block) && Recipe.getByResult(block) != null){
                 out.add(block);
             }
         }

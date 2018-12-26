@@ -1,8 +1,15 @@
 package io.anuke.mindustry.world.blocks.units;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
@@ -11,13 +18,6 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.Shapes;
-import io.anuke.arc.util.Angles;
-import io.anuke.arc.util.EnumSet;
-import io.anuke.arc.math.Mathf;
 
 public class RepairPoint extends Block{
     private static Rectangle rect = new Rectangle();
@@ -59,7 +59,7 @@ public class RepairPoint extends Block{
     public void drawLayer(Tile tile){
         RepairPointEntity entity = tile.entity();
 
-        Draw.rect(topRegion, tile.drawx(), tile.drawy(), entity.rotation - 90);
+        Draw.rect(topRegion, tile.drawx(), tile.drawy()).rot(entity.rotation - 90);
     }
 
     @Override
@@ -71,10 +71,11 @@ public class RepairPoint extends Block{
             float ang = entity.angleTo(entity.target);
             float len = 5f;
 
+            //TODO new laser drawing system
             Draw.color(Color.valueOf("e8ffd7"));
-            Shapes.laser("laser", "laser-end",
-                    tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
-                    entity.target.x, entity.target.y, entity.strength);
+            //Shapes.laser("laser", "laser-end",
+            //        tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
+            //        entity.target.x, entity.target.y, entity.strength);
             Draw.color();
         }
     }

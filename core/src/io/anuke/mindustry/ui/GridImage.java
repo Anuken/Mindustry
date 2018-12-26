@@ -1,8 +1,6 @@
 package io.anuke.mindustry.ui;
 
-import io.anuke.arc.graphics.g2d.Batch;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.scene.Element;
 
 public class GridImage extends Element{
@@ -13,9 +11,8 @@ public class GridImage extends Element{
         this.imageHeight = h;
     }
 
-    public void draw(Batch batch, float alpha){
-        TextureRegion blank = Core.atlas.find("white");
-
+    @Override
+    public void draw(){
         float xspace = (getWidth() / imageWidth);
         float yspace = (getHeight() / imageHeight);
         float s = 1f;
@@ -26,11 +23,11 @@ public class GridImage extends Element{
         int jumpy = (int) (Math.max(minspace, yspace) / yspace);
 
         for(int x = 0; x <= imageWidth; x += jumpx){
-            batch.draw(blank, (int) (getX() + xspace * x - s), getY() - s, 2, getHeight() + (x == imageWidth ? 1 : 0));
+            Fill.rect().set((int) (getX() + xspace * x - s), getY() - s, 2, getHeight() + (x == imageWidth ? 1 : 0));
         }
 
         for(int y = 0; y <= imageHeight; y += jumpy){
-            batch.draw(blank, getX() - s, (int) (getY() + y * yspace - s), getWidth(), 2);
+            Fill.rect().set(getX() - s, (int) (getY() + y * yspace - s), getWidth(), 2);
         }
     }
 

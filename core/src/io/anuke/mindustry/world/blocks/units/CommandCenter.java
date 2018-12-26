@@ -1,10 +1,18 @@
 package io.anuke.mindustry.world.blocks.units;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.collection.ObjectSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.scene.ui.ButtonGroup;
+import io.anuke.arc.scene.ui.ImageButton;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -16,13 +24,6 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.scene.ui.ButtonGroup;
-import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.EnumSet;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -84,7 +85,7 @@ public class CommandCenter extends Block{
         Table buttons = new Table();
 
         for(UnitCommand cmd : UnitCommand.values()){
-            buttons.addImageButton("command-" + cmd.name(), "clear-toggle", 8*3, () -> threads.run(() -> Call.onCommandCenterSet(players[0], tile, cmd)))
+            buttons.addImageButton("command-" + cmd.name(), "clear-toggle", 8*3, () -> Call.onCommandCenterSet(players[0], tile, cmd))
             .size(38f).checked(entity.command == cmd).group(group);
         }
         table.add(buttons);

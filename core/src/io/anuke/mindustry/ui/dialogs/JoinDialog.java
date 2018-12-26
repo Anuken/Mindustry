@@ -1,24 +1,23 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.MathUtils;
-import io.anuke.arc.collection.Array;
 import io.anuke.annotations.Annotations.Serialize;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.scene.style.Drawable;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.Cell;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.utils.UIUtils;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
-import io.anuke.arc.Settings;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.scene.style.Drawable;
-import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Cell;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.utils.UIUtils;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -48,7 +47,7 @@ public class JoinDialog extends FloatingDialog{
         add.content().add("$text.joingame.ip").padRight(5f).left();
 
         TextField field = add.content().addField(Core.settings.getString("ip"), text -> {
-            Core.settings.putString("ip", text);
+            Core.settings.put("ip", text);
             Core.settings.save();
         }).size(320f, 54f).get();
 
@@ -145,7 +144,7 @@ public class JoinDialog extends FloatingDialog{
 
     void refreshServer(Server server){
         server.content.clear();
-        server.content.label(() -> Core.bundle.get("text.server.refreshing") + Strings.animated(4, 11, "."));
+        server.content.label(() -> Core.bundle.get("text.server.refreshing") + Strings.animated(Time.time(), 4, 11, "."));
 
         Net.pingHost(server.ip, server.port, host -> {
             String versionString;
@@ -213,7 +212,7 @@ public class JoinDialog extends FloatingDialog{
             ImageButton button = t.addImageButton("white", "clear-full", 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
-                    Core.settings.putInt("color-0", Color.rgba8888(color));
+                    Core.settings.put("color-0", Color.rgba8888(color));
                     Core.settings.save();
                 });
             }).size(54f).get();
@@ -235,7 +234,7 @@ public class JoinDialog extends FloatingDialog{
 
             Cell<TextButton> cell = ((Table) pane.getParent()).getCell(button);
 
-            if(!MathUtils.isEqual(cell.getMinWidth(), pw)){
+            if(!Mathf.isEqual(cell.getMinWidth(), pw)){
                 cell.width(pw);
                 cell.padLeft(pad);
                 pane.getParent().invalidateHierarchy();
@@ -248,7 +247,7 @@ public class JoinDialog extends FloatingDialog{
 
         local.clear();
         local.background((Drawable)null);
-        local.table("button", t -> t.label(() -> "[accent]" + Core.bundle.get("text.hosts.discovering") + Strings.animated(4, 10f, ".")).pad(10f)).growX();
+        local.table("button", t -> t.label(() -> "[accent]" + Core.bundle.get("text.hosts.discovering") + Strings.animated(Time.time(), 4, 10f, ".")).pad(10f)).growX();
         Net.discoverServers(this::addLocalHost, this::finishLocalHosts);
     }
 

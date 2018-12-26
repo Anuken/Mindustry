@@ -1,10 +1,15 @@
 package io.anuke.mindustry.maps.generation;
 
-import io.anuke.arc.math.GridPoint2;
-import io.anuke.arc.math.Vector2;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.util.IntArray;
+import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.RandomXS128;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.noise.RidgedPerlin;
+import io.anuke.arc.util.noise.Simplex;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.OreBlocks;
@@ -21,12 +26,6 @@ import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.arc.noise.RidgedPerlin;
-import io.anuke.arc.noise.Simplex;
-import io.anuke.arc.util.Geometry;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.SeedRandom;
-import io.anuke.arc.util.Structs;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -39,13 +38,13 @@ public class WorldGenerator{
     private Simplex sim2 = new Simplex(baseSeed + 1);
     private Simplex sim3 = new Simplex(baseSeed + 2);
     private RidgedPerlin rid = new RidgedPerlin(baseSeed + 4, 1);
-    private SeedRandom random = new SeedRandom(baseSeed + 3);
+    private RandomXS128 random = new RandomXS128(baseSeed + 3);
 
     private GenResult result = new GenResult();
     private ObjectMap<Block, Block> decoration;
 
     public WorldGenerator(){
-        decoration = Structs.map(
+        decoration = ObjectMap.of(
             Blocks.grass, Blocks.shrub,
             Blocks.stone, Blocks.rock,
             Blocks.ice, Blocks.icerock,
@@ -149,15 +148,15 @@ public class WorldGenerator{
             int sy = (short)Mathf.range(Short.MAX_VALUE/2);
             int width = 380;
             int height = 380;
-            Array<GridPoint2> spawns = new Array<>();
+            Array<Point2> spawns = new Array<>();
             Array<Item> ores = Item.getAllOres();
 
             if(state.mode.isPvp){
                 int scaling = 10;
-                spawns.add(new GridPoint2(width/scaling, height/scaling));
-                spawns.add(new GridPoint2(width - 1 - width/scaling, height - 1 - height/scaling));
+                spawns.add(new Point2(width/scaling, height/scaling));
+                spawns.add(new Point2(width - 1 - width/scaling, height - 1 - height/scaling));
             }else{
-                spawns.add(new GridPoint2(width/2, height/2));
+                spawns.add(new Point2(width/2, height/2));
             }
 
             Tile[][] tiles = world.createTiles(width, height);
@@ -179,7 +178,7 @@ public class WorldGenerator{
 
                     byte elevation = tile.getElevation();
 
-                    for(GridPoint2 point : Geometry.d4){
+                    for(Point2 point : Geometry.d4){
                         if(!Structs.inBounds(x + point.x, y + point.y, width, height)) continue;
                         if(tiles[x + point.x][y + point.y].getElevation() < elevation){
 
@@ -220,7 +219,7 @@ public class WorldGenerator{
                 ores.addAll(baseOres);
             }else{
                 for(Item item : usedOres){
-                    ores.add(baseOres.select(entry -> entry.item == item).iterator().next());
+                    ores.add(baseOres.find(entry -> entry.item == item));
                 }
             }
 
@@ -249,9 +248,9 @@ public class WorldGenerator{
 
     public void generateMap(Tile[][] tiles, Sector sector){
         int width = tiles.length, height = tiles[0].length;
-        SeedRandom rnd = new SeedRandom(sector.getSeed());
+        RandomXS128 rnd = new RandomXS128(sector.getSeed());
         Generation gena = new Generation(sector, tiles, tiles.length, tiles[0].length, rnd);
-        Array<GridPoint2> spawnpoints = sector.currentMission().getSpawnPoints(gena);
+        Array<Point2> spawnpoints = sector.currentMission().getSpawnPoints(gena);
         Array<Item> ores = world.sectors.getOres(sector.x, sector.y);
 
         for(int x = 0; x < width; x++){
@@ -268,7 +267,7 @@ public class WorldGenerator{
 
                 byte elevation = tile.getElevation();
 
-                for(GridPoint2 point : Geometry.d4){
+                for(Point2 point : Geometry.d4){
                     if(!Structs.inBounds(x + point.x, y + point.y, width, height)) continue;
                     if(tiles[x + point.x][y + point.y].getElevation() < elevation){
 
@@ -317,7 +316,7 @@ public class WorldGenerator{
      * @param spawnpoints list of player spawnpoints, can be null
      * @return the GenResult passed in with its values modified
      */
-    public GenResult generateTile(GenResult result, int sectorX, int sectorY, int localX, int localY, boolean detailed, Array<GridPoint2> spawnpoints, Array<Item> ores){
+    public GenResult generateTile(GenResult result, int sectorX, int sectorY, int localX, int localY, boolean detailed, Array<Point2> spawnpoints, Array<Item> ores){
         int x = sectorX * sectorSize + localX + Short.MAX_VALUE;
         int y = sectorY * sectorSize + localY + Short.MAX_VALUE;
 
@@ -338,7 +337,7 @@ public class WorldGenerator{
         float minDst = Float.MAX_VALUE;
 
         if(detailed && spawnpoints != null){
-            for(GridPoint2 p : spawnpoints){
+            for(Point2 p : spawnpoints){
                 float dst = Mathf.dst2(p.x, p.y, localX, localY);
                 minDst = Math.min(minDst, dst);
 

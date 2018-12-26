@@ -1,8 +1,6 @@
 package io.anuke.mindustry.maps.missions;
 
-import io.anuke.arc.util.Bundles;
-
-import static io.anuke.mindustry.Vars.threads;
+import io.anuke.arc.Core;
 
 /**A mission which simply runs a single action and is completed instantly.*/
 public class ActionMission extends Mission{
@@ -17,7 +15,7 @@ public class ActionMission extends Mission{
 
     @Override
     public void onComplete(){
-        threads.run(runner);
+        runner.run();
     }
 
     @Override

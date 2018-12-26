@@ -1,9 +1,9 @@
 package io.anuke.mindustry.maps.missions;
 
+import io.anuke.arc.Core;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.type.Mech;
-import io.anuke.arc.util.Bundles;
 
 public class MechMission extends Mission{
     private final Mech mech;

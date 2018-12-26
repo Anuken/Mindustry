@@ -3,11 +3,9 @@ package io.anuke.mindustry.graphics;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.Core;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Shader;
+import io.anuke.arc.graphics.glutils.Shader;
 import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Time;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -54,11 +52,11 @@ public class Shaders{
         public void apply(){
             time = time % 158;
 
-            shader.setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
-            shader.setUniformi("u_time", (int)(time += Core.graphics.getDeltaTime() * 60f));
-            shader.setUniformf("u_uv", Draw.getBlankRegion().getU(), Draw.getBlankRegion().getV());
-            shader.setUniformf("u_scl", Unit.dp.scl(1f));
-            shader.setUniformf("u_uv2", Draw.getBlankRegion().getU2(), Draw.getBlankRegion().getV2());
+            setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
+            setUniformi("u_time", (int)(time += Core.graphics.getDeltaTime() * 60f));
+            setUniformf("u_uv", Core.atlas.white().getU(), Core.atlas.white().getV());
+            setUniformf("u_scl", Unit.dp.scl(1f));
+            setUniformf("u_uv2", Core.atlas.white().getU2(), Core.atlas.white().getV2());
         }
     }
 
@@ -78,7 +76,7 @@ public class Shaders{
         @Override
         public void apply(){
             super.apply();
-            shader.setUniformf("u_color", color);
+            setUniformf("u_color", color);
         }
     }
 
@@ -91,7 +89,7 @@ public class Shaders{
         @Override
         public void apply(){
             super.apply();
-            shader.setUniformf("u_center", world.width() * tilesize / 2f, world.height() * tilesize / 2f);
+            setUniformf("u_center", world.width() * tilesize / 2f, world.height() * tilesize / 2f);
         }
     }
 
@@ -106,12 +104,12 @@ public class Shaders{
 
         @Override
         public void apply(){
-            shader.setUniformf("u_time", time);
-            shader.setUniformf("u_color", color);
-            shader.setUniformf("u_progress", progress);
-            shader.setUniformf("u_uv", region.getU(), region.getV());
-            shader.setUniformf("u_uv2", region.getU2(), region.getV2());
-            shader.setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+            setUniformf("u_time", time);
+            setUniformf("u_color", color);
+            setUniformf("u_progress", progress);
+            setUniformf("u_uv", region.getU(), region.getV());
+            setUniformf("u_uv2", region.getU2(), region.getV2());
+            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
         }
     }
 
@@ -124,8 +122,8 @@ public class Shaders{
 
         @Override
         public void apply(){
-            shader.setUniformf("u_color", color);
-            shader.setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+            setUniformf("u_color", color);
+            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
         }
     }
 
@@ -139,12 +137,12 @@ public class Shaders{
 
         @Override
         public void apply(){
-            shader.setUniformf("u_progress", progress);
-            shader.setUniformf("u_color", color);
-            shader.setUniformf("u_uv", region.getU(), region.getV());
-            shader.setUniformf("u_uv2", region.getU2(), region.getV2());
-            shader.setUniformf("u_time", Time.time());
-            shader.setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+            setUniformf("u_progress", progress);
+            setUniformf("u_color", color);
+            setUniformf("u_uv", region.getU(), region.getV());
+            setUniformf("u_uv2", region.getU2(), region.getV2());
+            setUniformf("u_time", Time.time());
+            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
         }
     }
 
@@ -157,10 +155,10 @@ public class Shaders{
 
         @Override
         public void apply(){
-            shader.setUniformf("u_color", color);
-            shader.setUniformf("u_uv", region.getU(), region.getV());
-            shader.setUniformf("u_uv2", region.getU2(), region.getV2());
-            shader.setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+            setUniformf("u_color", color);
+            setUniformf("u_uv", region.getU(), region.getV());
+            setUniformf("u_uv2", region.getU2(), region.getV2());
+            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
         }
     }
 
@@ -172,12 +170,12 @@ public class Shaders{
 
         @Override
         public void apply(){
-            shader.setUniformf("u_dp", Unit.dp.scl(1f));
-            shader.setUniformf("u_time", Time.time() / Unit.dp.scl(1f));
-            shader.setUniformf("u_offset",
+            setUniformf("u_dp", Unit.dp.scl(1f));
+            setUniformf("u_time", Time.time() / Unit.dp.scl(1f));
+            setUniformf("u_offset",
                     Core.camera.position.x - Core.camera.width / 2 ,
                     Core.camera.position.y - Core.camera.height / 2 );
-            shader.setUniformf("u_texsize", Core.camera.width ,
+            setUniformf("u_texsize", Core.camera.width ,
             Core.camera.height );
         }
     }
@@ -190,12 +188,12 @@ public class Shaders{
 
         @Override
         public void apply(){
-            shader.setUniformf("camerapos",
+            setUniformf("camerapos",
                     Core.camera.position.x - Core.camera.width / 2 ,
                     Core.camera.position.y - Core.camera.height / 2 );
-            shader.setUniformf("screensize", Core.camera.width,
+            setUniformf("screensize", Core.camera.width,
             Core.camera.height );
-            shader.setUniformf("time", Time.time());
+            setUniformf("time", Time.time());
         }
     }
 }

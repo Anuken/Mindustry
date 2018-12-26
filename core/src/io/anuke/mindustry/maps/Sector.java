@@ -1,13 +1,13 @@
 package io.anuke.mindustry.maps;
 
-import io.anuke.arc.graphics.Texture;
-import io.anuke.arc.collection.Array;
 import io.anuke.annotations.Annotations.Serialize;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.maps.missions.*;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.arc.util.Bits;
 
 import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.headless;
@@ -56,7 +56,7 @@ public class Sector{
     }
 
     public int getSeed(){
-        return Bits.packInt(x, y);
+        return pos();
     }
 
     public SaveSlot getSave(){
@@ -68,6 +68,6 @@ public class Sector{
     }
 
     public int pos(){
-        return Bits.packInt(x, y);
+        return Pack.shortInt(x, y);
     }
 }

@@ -1,23 +1,23 @@
 package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.entities.EntityDraw;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.GL20;
 import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.util.Disposable;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
-import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.Events;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.entities.EntityDraw;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Fill;
 
 import java.nio.ByteBuffer;
 
@@ -33,7 +33,7 @@ public class FogRenderer implements Disposable{
     private boolean dirty;
 
     public FogRenderer(){
-        Events.on(WorldLoadGraphicsEvent.class, event -> {
+        Events.on(WorldLoadEvent.class, event -> {
             dispose();
 
             shadowPadding = -1;
@@ -43,7 +43,7 @@ public class FogRenderer implements Disposable{
 
             //clear buffer to black
             buffer.begin();
-            Graphics.clear(0, 0, 0, 1f);
+            Core.graphics.clear(0, 0, 0, 1f);
             buffer.end();
 
             for(int x = 0; x < world.width(); x++){
@@ -59,11 +59,11 @@ public class FogRenderer implements Disposable{
             dirty = true;
         });
 
-        Events.on(TileChangeEvent.class, event -> threads.runGraphics(() -> {
+        Events.on(TileChangeEvent.class, event -> {
             if(event.tile.getTeam() == players[0].getTeam() && event.tile.block().synthetic() && event.tile.block().viewRange > 0){
                 changeQueue.add(event.tile);
             }
-        }));
+        });
     }
 
     public void writeFog(){
@@ -146,11 +146,11 @@ public class FogRenderer implements Disposable{
 
         Graphics.endClip();
 
-        region.setTexture(buffer.getColorBufferTexture());
+        region.setTexture(buffer.getTexture());
         region.setRegion(u, v2, u2, v);
 
         Core.batch.setProjectionMatrix(Core.camera.combined);
-        Graphics.shader(Shaders.fog);
+        Draw.shader(Shaders.fog);
         renderer.pixelSurface.getBuffer().begin();
         Graphics.begin();
 
@@ -158,7 +158,7 @@ public class FogRenderer implements Disposable{
 
         Graphics.end();
         renderer.pixelSurface.getBuffer().end();
-        Graphics.shader();
+        Draw.shader();
 
         Graphics.setScreen();
         Core.batch.draw(renderer.pixelSurface.texture(), 0, Core.graphics.getHeight(), Core.graphics.getWidth(), -Core.graphics.getHeight());
@@ -166,7 +166,7 @@ public class FogRenderer implements Disposable{
     }
 
     public Texture getTexture(){
-        return buffer.getColorBufferTexture();
+        return buffer.getTexture();
     }
 
     @Override

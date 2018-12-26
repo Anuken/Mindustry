@@ -354,7 +354,7 @@ public interface BuilderTrait extends Entity{
 
         Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
         //TODO better laser drawing functions
-        Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey);
+        //Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey);
 
         if(unit instanceof Player && ((Player) unit).isLocal){
             Lines.stroke(1f, Palette.accent);

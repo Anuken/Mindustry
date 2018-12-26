@@ -6,9 +6,9 @@ import io.anuke.arc.graphics.g2d.Batch;
 import io.anuke.arc.input.GestureDetector;
 import io.anuke.arc.input.GestureDetector.GestureListener;
 import io.anuke.arc.math.Bresenham2;
-import io.anuke.arc.math.GridPoint2;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.math.Vector2;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.graphics.Palette;
@@ -24,7 +24,7 @@ import io.anuke.arc.scene.event.InputListener;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Geometry;
+import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Tmp;
 
@@ -61,7 +61,7 @@ public class MapView extends Element implements GestureListener{
         }
 
         Core.input.addProcessor(0, new GestureDetector(20, 0.5f, 2, 0.15f, this));
-        setTouchable(Touchable.enabled);
+        touchable(Touchable.enabled);
 
         addListener(new InputListener(){
 
@@ -95,7 +95,7 @@ public class MapView extends Element implements GestureListener{
 
                 updated = false;
 
-                GridPoint2 p = project(x, y);
+                Point2 p = project(x, y);
                 lastx = p.x;
                 lasty = p.y;
                 startx = p.x;
@@ -119,12 +119,12 @@ public class MapView extends Element implements GestureListener{
 
                 drawing = false;
 
-                GridPoint2 p = project(x, y);
+                Point2 p = project(x, y);
 
                 if(tool == EditorTool.line){
                     ui.editor.resetSaved();
-                    Array<GridPoint2> points = br.line(startx, starty, p.x, p.y);
-                    for(GridPoint2 point : points){
+                    Array<Point2> points = br.line(startx, starty, p.x, p.y);
+                    for(Point2 point : points){
                         editor.draw(point.x, point.y);
                     }
                     updated = true;
@@ -149,12 +149,12 @@ public class MapView extends Element implements GestureListener{
                 mousex = x;
                 mousey = y;
 
-                GridPoint2 p = project(x, y);
+                Point2 p = project(x, y);
 
                 if(drawing && tool.draggable){
                     ui.editor.resetSaved();
-                    Array<GridPoint2> points = br.line(lastx, lasty, p.x, p.y);
-                    for(GridPoint2 point : points){
+                    Array<Point2> points = br.line(lastx, lasty, p.x, p.y);
+                    for(Point2 point : points){
                         tool.touched(editor, point.x, point.y);
                     }
                     updated = true;
@@ -231,7 +231,7 @@ public class MapView extends Element implements GestureListener{
         zoom = Mathf.clamp(zoom, 0.2f, 12f);
     }
 
-    private GridPoint2 project(float x, float y){
+    private Point2 project(float x, float y){
         float ratio = 1f / ((float) editor.getMap().width() / editor.getMap().height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
@@ -307,13 +307,13 @@ public class MapView extends Element implements GestureListener{
             }
 
             if(tool.edit && (!mobile || drawing)){
-                GridPoint2 p = project(mousex, mousey);
+                Point2 p = project(mousex, mousey);
                 Vector2 v = unproject(p.x, p.y).add(x, y);
                 Lines.poly(brushPolygons[index], v.x, v.y, scaling);
             }
         }else{
             if((tool.edit || tool == EditorTool.line) && (!mobile || drawing)){
-                GridPoint2 p = project(mousex, mousey);
+                Point2 p = project(mousex, mousey);
                 Vector2 v = unproject(p.x, p.y).add(x, y);
                 float offset = (editor.getDrawBlock().size % 2 == 0 ? scaling / 2f : 0f);
                 Lines.square(

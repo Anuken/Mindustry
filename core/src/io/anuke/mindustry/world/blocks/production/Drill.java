@@ -1,9 +1,16 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.util.ObjectIntMap;
+import io.anuke.arc.collection.ObjectIntMap;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.graphics.Blending;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
@@ -16,14 +23,9 @@ import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
+
 public class Drill extends Block{
     protected final static float hardnessDrillMultiplier = 50f;
     protected final int timerDump = timers++;
@@ -93,15 +95,13 @@ public class Drill extends Block{
         Draw.rect(region, tile.drawx(), tile.drawy());
 
         if(drawRim){
-            Graphics.setAdditiveBlending();
             Draw.color(heatColor);
             Draw.alpha(entity.warmup * ts * (1f - s + Mathf.absin(Time.time(), 3f, s)));
-            Draw.rect(rimRegion, tile.drawx(), tile.drawy());
+            Draw.rect(rimRegion, tile.drawx(), tile.drawy()).blend(Blending.additive);
             Draw.color();
-            Graphics.setNormalBlending();
         }
 
-        Draw.rect(rotatorRegion, tile.drawx(), tile.drawy(), entity.drillTime * rotateSpeed);
+        Draw.rect(rotatorRegion, tile.drawx(), tile.drawy()).rot(entity.drillTime * rotateSpeed);
 
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
 
@@ -125,7 +125,7 @@ public class Drill extends Block{
             Array<Item> list = new Array<>();
 
             for(Item item : content.items()){
-                if(tier >= item.hardness && Draw.hasRegion(item.name + "1")){
+                if(tier >= item.hardness && Core.atlas.has(item.name + "1")){
                     list.add(item);
                 }
             }

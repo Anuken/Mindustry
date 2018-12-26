@@ -2,15 +2,14 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.io.Changelogs;
-import io.anuke.mindustry.io.Changelogs.VersionInfo;
-import io.anuke.mindustry.game.Version;
-import io.anuke.arc.Settings;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.OS;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.io.Changelogs;
+import io.anuke.mindustry.io.Changelogs.VersionInfo;
 
 import static io.anuke.mindustry.Vars.ios;
 
@@ -79,7 +78,7 @@ public class ChangelogDialog extends FloatingDialog{
 
             int lastid = Core.settings.getInt("lastBuild");
             if(lastid != 0 && versions.peek().build > lastid){
-                Core.settings.putInt("lastBuild", versions.peek().build);
+                Core.settings.put("lastBuild", versions.peek().build);
                 Core.settings.save();
                 show();
             }

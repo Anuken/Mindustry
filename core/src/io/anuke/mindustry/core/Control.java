@@ -8,6 +8,7 @@ import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureAtlas;
 import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
@@ -349,7 +350,7 @@ public class Control implements ApplicationListener{
                 }
             }
 
-            if(!mobile && Core.input.keyTap(Binding.screenshot) && !ui.chatfrag.chatOpen()){
+            if(!mobile && Core.input.keyTap(Binding.screenshot) && !(scene.getKeyboardFocus() instanceof TextField) && !ui.chatfrag.chatOpen()){
                 renderer.takeMapScreenshot();
             }
 

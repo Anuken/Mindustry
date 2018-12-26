@@ -8,12 +8,10 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.game.Saves.SaveSlot;
-import io.anuke.arc.Core;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Bundles;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Strings;
 
@@ -183,7 +181,7 @@ public class LoadDialog extends FloatingDialog{
                 Log.err(e);
                 state.set(State.menu);
                 logic.reset();
-                threads.runGraphics(() -> ui.showError("$text.save.corrupted"));
+                ui.showError("$text.save.corrupted");
             }
         });
     }

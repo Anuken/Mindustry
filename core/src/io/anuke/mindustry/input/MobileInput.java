@@ -1,16 +1,23 @@
 package io.anuke.mindustry.input;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.input.GestureDetector;
 import io.anuke.arc.input.GestureDetector.GestureListener;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.math.Vector2;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.core.GameState.State;
@@ -27,11 +34,6 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.*;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
@@ -176,8 +178,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             for(TextureRegion region : regions){
                 Draw.rect(region, tile.worldx() + offset, tile.worldy() + offset,
-                        region.getWidth() * request.scale, region.getHeight() * request.scale,
-                        request.recipe.result.rotate ? request.rotation * 90 : 0);
+                        region.getWidth() * request.scale, region.getHeight() * request.scale)
+                .rot(request.recipe.result.rotate ? request.rotation * 90 : 0);
             }
         }else{
             float rad = (tile.block().size * tilesize / 2f - 1) * request.scale;
@@ -198,7 +200,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             dialog.content().add("$text." + type).growX().wrap();
             dialog.content().row();
             dialog.content().addCheck("$text.showagain", false, checked -> {
-                Core.settings.putBool(type, checked);
+                Core.settings.put(type, checked);
                 Core.settings.save();
             }).growX().left().get().left();
             dialog.show();
@@ -277,7 +279,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         Lines.stroke(1f);
 
         Shaders.mix.color.set(Palette.accent);
-        Graphics.shader(Shaders.mix);
+        Draw.shader(Shaders.mix);
 
         //draw removals
         for(PlaceRequest request : removals){
@@ -315,7 +317,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        Graphics.shader();
+        Draw.shader();
 
         Draw.color(Palette.accent);
 
@@ -334,8 +336,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 //go through each cell and draw the block to place if valid
                 for(int i = 0; i <= result.getLength(); i += recipe.result.size){
-                    int x = lineStartX + i * Mathf.sign(tileX - lineStartX) * Mathf.bool(result.isX());
-                    int y = lineStartY + i * Mathf.sign(tileY - lineStartY) * Mathf.bool(!result.isX());
+                    int x = lineStartX + i * Mathf.sign(tileX - lineStartX) * Mathf.num(result.isX());
+                    int y = lineStartY + i * Mathf.sign(tileY - lineStartY) * Mathf.num(!result.isX());
 
                     if(!checkOverlapPlacement(x, y, recipe.result) && validPlace(x, y, recipe.result, result.rotation)){
                         Draw.color();
@@ -344,7 +346,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                         for(TextureRegion region : regions){
                             Draw.rect(region, x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(),
-                                    region.getWidth() * lineScale, region.getHeight() * lineScale, recipe.result.rotate ? result.rotation * 90 : 0);
+                                    region.getWidth() * lineScale, region.getHeight() * lineScale)
+                            .rot(recipe.result.rotate ? result.rotation * 90 : 0);
                         }
                     }else{
                         Draw.color(Palette.removeBack);
@@ -409,7 +412,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     //region input events
 
     @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button){
+    public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button){
         if(state.is(State.menu) || player.isDead()) return false;
 
         //get tile on cursor
@@ -418,7 +421,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         float worldx = Core.input.mouseWorld(screenX, screenY).x, worldy = Core.input.mouseWorld(screenX, screenY).y;
 
         //ignore off-screen taps
-        if(cursor == null || ui.hasMouse(screenX, screenY)) return false;
+        if(cursor == null || Core.scene.hasMouse(screenX, screenY)) return false;
 
         //only begin selecting if the tapped block is a request
         selecting = hasRequest(cursor) && isPlacing() && mode == placing;
@@ -432,7 +435,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button){
+    public boolean touchUp(int screenX, int screenY, int pointer, KeyCode button){
 
         //place down a line if in line mode
         if(lineMode){
@@ -448,8 +451,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 //place blocks on line
                 for(int i = 0; i <= result.getLength(); i += recipe.result.size){
-                    int x = lineStartX + i * Mathf.sign(tileX - lineStartX) * Mathf.bool(result.isX());
-                    int y = lineStartY + i * Mathf.sign(tileY - lineStartY) * Mathf.bool(!result.isX());
+                    int x = lineStartX + i * Mathf.sign(tileX - lineStartX) * Mathf.num(result.isX());
+                    int y = lineStartY + i * Mathf.sign(tileY - lineStartY) * Mathf.num(!result.isX());
 
                     if(!checkOverlapPlacement(x, y, recipe.result) && validPlace(x, y, recipe.result, result.rotation)){
                         PlaceRequest request = new PlaceRequest(x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(), recipe, result.rotation);
@@ -505,7 +508,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         Tile cursor = tileAt(x, y);
 
         //ignore off-screen taps
-        if(cursor == null || ui.hasMouse(x, y)) return false;
+        if(cursor == null || Core.scene.hasMouse(x, y)) return false;
 
         //remove request if it's there
         //long pressing enables line mode otherwise
@@ -523,7 +526,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    public boolean tap(float x, float y, int count, int button){
+    public boolean tap(float x, float y, int count, KeyCode button){
         if(state.is(State.menu) || lineMode) return false;
 
         float worldx = Core.input.mouseWorld(x, y).x, worldy = Core.input.mouseWorld(x, y).y;
@@ -532,7 +535,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         Tile cursor = tileAt(x, y);
 
         //ignore off-screen taps
-        if(cursor == null || ui.hasMouse(x, y)) return false;
+        if(cursor == null || Core.scene.hasMouse(x, y)) return false;
 
         checkTargets(worldx, worldy);
 
@@ -616,7 +619,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             //When in line mode, pan when near screen edges automatically
             if(Core.input.isTouched(0) && lineMode){
-                float screenX = Graphics.mouse().x, screenY = Graphics.mouse().y;
+                float screenX = Core.input.mouseX(), screenY = Core.input.mouseY();
 
                 float panX = 0, panY = 0;
 
@@ -652,7 +655,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             PlaceRequest request = removals.get(i);
 
             if(request.scale <= 0.0001f){
-                removals.removeIndex(i);
+                removals.removeAt(i);
                 i--;
             }
         }
@@ -667,30 +670,18 @@ public class MobileInput extends InputHandler implements GestureListener{
             return false;
         }
 
-        float dx = deltaX  / Core.cameraScale, dy = deltaY  / Core.cameraScale;
-
         if(selecting){ //pan all requests
             for(PlaceRequest req : selection){
                 if(req.remove) continue; //don't shift removal requests
-                req.x += dx;
-                req.y -= dy;
+                req.x += deltaX;
+                req.y -= deltaY;
             }
         }else{
             //pan player
-            Core.camera.position.x -= dx;
-            Core.camera.position.y += dy;
+            Core.camera.position.x -= deltaX;
+            Core.camera.position.y += deltaY;
         }
 
-        return false;
-    }
-
-    @Override
-    public boolean panStop(float x, float y, int pointer, int button){
-        return false;
-    }
-
-    @Override
-    public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2){
         return false;
     }
 
@@ -713,13 +704,13 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    public boolean touchDown(float x, float y, int pointer, int button){
+    public boolean touchDown(float x, float y, int pointer, KeyCode button){
         canPan = !Core.scene.hasMouse();
         return false;
     }
 
     @Override
-    public boolean fling(float velocityX, float velocityY, int button){
+    public boolean fling(float velocityX, float velocityY, KeyCode button){
         return false;
     }
 

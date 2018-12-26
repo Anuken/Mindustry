@@ -1,16 +1,16 @@
 package io.anuke.mindustry.graphics;
 
+import io.anuke.arc.collection.FloatArray;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.Vector2;
-import io.anuke.arc.util.FloatArray;
-import io.anuke.arc.util.Time;
 import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Fill;
+import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 
 /**
  * Class that renders a colored trail.
+ * TODO remove / recode
  */
 public class Trail{
     private final static float maxJump = 15f;

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.production;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
@@ -43,7 +44,7 @@ public class Fracker extends SolidPump{
         Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
         Draw.color();
 
-        Draw.rect(rotatorRegion, tile.drawx(), tile.drawy(), entity.pumpTime);
+        Draw.rect(rotatorRegion, tile.drawx(), tile.drawy()).rot(entity.pumpTime);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
     }
 

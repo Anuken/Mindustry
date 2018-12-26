@@ -14,8 +14,8 @@ public class LoadingFragment extends Fragment{
     @Override
     public void build(Group parent){
         parent.fill("loadDim", t -> {
-            t.setVisible(false);
-            t.setTouchable(Touchable.enabled);
+            t.visible(false);
+            t.touchable(Touchable.enabled);
             t.add().height(70f).row();
 
             t.addImage("white").growX().height(3f).pad(4f).growX().get().setColor(Palette.accent);
@@ -31,8 +31,8 @@ public class LoadingFragment extends Fragment{
     }
 
     public void setButton(Runnable listener){
-        button.setVisible(true);
-        button.getListeners().removeIndex(button.getListeners().size - 1);
+        button.visible(true);
+        button.getListeners().removeAt(button.getListeners().size - 1);
         button.clicked(listener);
     }
 
@@ -42,12 +42,12 @@ public class LoadingFragment extends Fragment{
 
     public void show(String text){
         table.<Label>find("namelabel").setText(text);
-        table.setVisible(true);
+        table.visible(true);
         table.toFront();
     }
 
     public void hide(){
-        table.setVisible(false);
-        button.setVisible(false);
+        table.visible(false);
+        button.visible(false);
     }
 }

@@ -1,7 +1,7 @@
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
-import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Point2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
@@ -220,13 +220,13 @@ public class ApplicationTests{
 
     @Test
     void edges(){
-        GridPoint2[] edges = Edges.getEdges(1);
-        assertEquals(edges[0], new GridPoint2(1, 0));
-        assertEquals(edges[1], new GridPoint2(0, 1));
-        assertEquals(edges[2], new GridPoint2(-1, 0));
-        assertEquals(edges[3], new GridPoint2(0, -1));
+        Point2[] edges = Edges.getEdges(1);
+        assertEquals(edges[0], new Point2(1, 0));
+        assertEquals(edges[1], new Point2(0, 1));
+        assertEquals(edges[2], new Point2(-1, 0));
+        assertEquals(edges[3], new Point2(0, -1));
 
-        GridPoint2[] edges2 = Edges.getEdges(2);
+        Point2[] edges2 = Edges.getEdges(2);
         assertEquals(8, edges2.length);
     }
 

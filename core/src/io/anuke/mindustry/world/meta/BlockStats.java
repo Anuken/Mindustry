@@ -1,14 +1,14 @@
 package io.anuke.mindustry.world.meta;
 
-import io.anuke.arc.util.ObjectMap.Entry;
-import io.anuke.arc.util.OrderedMap;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.ObjectMap.Entry;
+import io.anuke.arc.collection.OrderedMap;
+import io.anuke.arc.util.Log;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.values.*;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.Log;
 
 import java.util.Locale;
 

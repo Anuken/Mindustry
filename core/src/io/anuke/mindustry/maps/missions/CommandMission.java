@@ -1,9 +1,9 @@
 package io.anuke.mindustry.maps.missions;
 
+import io.anuke.arc.Core;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitCommand;
-import io.anuke.arc.util.Bundles;
 
 public class CommandMission extends Mission{
     private final UnitCommand command;

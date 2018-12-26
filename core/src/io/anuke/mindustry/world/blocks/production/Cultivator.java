@@ -1,7 +1,13 @@
 package io.anuke.mindustry.world.blocks.production;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.RandomXS128;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
@@ -9,11 +15,6 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.SeedRandom;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -27,7 +28,7 @@ public class Cultivator extends Drill{
 
     protected Item result;
 
-    protected SeedRandom random = new SeedRandom(0);
+    protected RandomXS128 random = new RandomXS128(0);
     protected float recurrence = 6f;
 
     public Cultivator(String name){

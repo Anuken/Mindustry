@@ -2,20 +2,19 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Scaling;
-import io.anuke.mindustry.game.Difficulty;
-import io.anuke.mindustry.game.GameMode;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.ui.BorderImage;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.ButtonGroup;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Scaling;
+import io.anuke.mindustry.game.Difficulty;
+import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.ui.BorderImage;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -76,7 +75,7 @@ public class CustomGameDialog extends FloatingDialog{
         sdif.addButton("", () -> {})
         .update(t -> {
             t.setText(state.difficulty.toString());
-            t.setTouchable(Touchable.disabled);
+            t.touchable(Touchable.disabled);
         }).width(180f);
 
         sdif.addImageButton("icon-arrow-right", 10 * 3, () -> {

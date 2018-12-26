@@ -1,10 +1,11 @@
 package io.anuke.mindustry.world;
 
 import io.anuke.arc.util.NumberUtils;
-import io.anuke.mindustry.type.Item;
+import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Bits;
-import static io.anuke.mindustry.Vars.*;
+import io.anuke.mindustry.type.Item;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class ItemBuffer{
     private final float speed;
@@ -23,7 +24,7 @@ public class ItemBuffer{
 
     public void accept(Item item, short data){
         //if(!accepts()) return;
-        buffer[index++] = Bits.packLong(NumberUtils.floatToIntBits(Time.time()), Bits.packInt((short) item.id, data));
+        buffer[index++] = Pack.longInt(NumberUtils.floatToIntBits(Time.time()), Pack.shortInt((short) item.id, data));
     }
 
     public void accept(Item item){
@@ -33,10 +34,10 @@ public class ItemBuffer{
     public Item poll(){
         if(index > 0){
             long l = buffer[0];
-            float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
+            float time = NumberUtils.intBitsToFloat(Pack.leftInt(l));
 
             if(Time.time() >= time + speed || Time.time() < time){
-                return content.item(Bits.getLeftShort(Bits.getRightInt(l)));
+                return content.item(Pack.leftShort(Pack.rightInt(l)));
             }
         }
         return null;
@@ -45,10 +46,10 @@ public class ItemBuffer{
     public short pollData(){
         if(index > 0){
             long l = buffer[0];
-            float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
+            float time = NumberUtils.intBitsToFloat(Pack.leftInt(l));
 
             if(Time.time() >= time + speed || Time.time() < time){
-                return Bits.getRightShort(Bits.getRightInt(l));
+                return Pack.rightShort(Pack.rightInt(l));
             }
         }
         return -1;

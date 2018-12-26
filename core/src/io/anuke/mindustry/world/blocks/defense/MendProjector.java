@@ -1,20 +1,20 @@
 package io.anuke.mindustry.world.blocks.defense;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Vector2;
-import io.anuke.arc.util.IntSet;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Hue;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -68,7 +68,7 @@ public class MendProjector extends Block{
         if(entity.charge >= reload){
             float realRange = range + entity.phaseHeat * phaseRangeBoost;
 
-            Effects.effect(BlockFx.healWaveMend, Hue.mix(color, phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
+            Effects.effect(BlockFx.healWaveMend, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
             entity.charge = 0f;
 
             int tileRange = (int)(realRange / tilesize);
@@ -85,7 +85,7 @@ public class MendProjector extends Block{
 
                     if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
                         other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat*phaseBoost)/100f);
-                        Effects.effect(BlockFx.healBlockFull, Hue.mix(color, phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
+                        Effects.effect(BlockFx.healBlockFull, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
                         healed.add(other.pos());
                     }
                 }
@@ -112,10 +112,8 @@ public class MendProjector extends Block{
 
         Draw.color(color, phase, entity.phaseHeat);
         Draw.alpha(entity.heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
-        Graphics.setAdditiveBlending();
-        Draw.rect(topRegion, tile.drawx(), tile.drawy());
+        Draw.rect(topRegion, tile.drawx(), tile.drawy()).blend(Blending.additive);
 
-        Graphics.setNormalBlending();
         Draw.alpha(1f);
         Lines.stroke((2f  * f + 0.2f)* entity.heat);
         Lines.circle(tile.drawx(), tile.drawy(), (1f-f) * 9f);

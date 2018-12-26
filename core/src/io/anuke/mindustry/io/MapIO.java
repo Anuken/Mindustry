@@ -1,11 +1,13 @@
 package io.anuke.mindustry.io;
 
+import io.anuke.arc.collection.IntIntMap;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.ObjectMap.Entry;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
-import io.anuke.arc.util.IntIntMap;
-import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.util.ObjectMap.Entry;
+import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.game.Team;
@@ -19,8 +21,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper.LegacyBlock;
-import io.anuke.arc.util.Bits;
-import io.anuke.arc.util.Structs;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -90,14 +90,14 @@ public class MapIO{
 
                             if(Structs.inBounds(worldx, worldy, pixmap.getWidth(), pixmap.getHeight())){
                                 data.write(worldx, worldy, DataPosition.wall, Blocks.blockpart.id);
-                                data.write(worldx, worldy, DataPosition.rotationTeam, Bits.packByte((byte)0, (byte)Team.blue.ordinal()));
-                                data.write(worldx, worldy, DataPosition.link, Bits.packByte((byte) (dx - 1 + 8), (byte) (dy - 1 + 8)));
+                                data.write(worldx, worldy, DataPosition.rotationTeam, Pack.byteByte((byte)0, (byte)Team.blue.ordinal()));
+                                data.write(worldx, worldy, DataPosition.link, Pack.byteByte((byte) (dx - 1 + 8), (byte) (dy - 1 + 8)));
                             }
                         }
                     }
 
                     data.write(x, y, DataPosition.wall, StorageBlocks.core.id);
-                    data.write(x, y, DataPosition.rotationTeam, Bits.packByte((byte)0, (byte)Team.blue.ordinal()));
+                    data.write(x, y, DataPosition.rotationTeam, Pack.byteByte((byte)0, (byte)Team.blue.ordinal()));
                 }
             }
         }

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.IntIntMap;
 import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.function.BiPredicate;
 import io.anuke.arc.function.Predicate;
@@ -11,7 +10,6 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.type.Liquid;
@@ -20,12 +18,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 public class Floor extends Block{
-    //TODO implement proper bitmasking
-    protected static IntIntMap bitmask = Structs.mapInt(2, 1, 8, 2, 10, 3, 11, 4, 16, 5, 18, 6, 22, 7, 24, 8,
-            26, 9, 27, 10, 30, 11, 31, 12, 64, 13, 66, 14, 72, 15, 74, 16, 75, 17, 80, 18,
-            82, 19, 86, 20, 88, 21, 90, 22, 91, 23, 94, 24, 95, 25, 104, 26, 106, 27, 107, 28,
-            120, 29, 122, 30, 123, 31, 126, 32, 127, 33, 208, 34, 210, 35, 214, 36, 216, 37,
-            218, 38, 219, 39, 222, 40, 223, 41, 248, 42, 250, 43, 251, 44, 254, 45, 255, 46, 0, 47);
     /** number of different variant regions to use */
     public int variants;
     /** edge fallback, used mainly for ores */
@@ -149,13 +141,13 @@ public class Floor extends Block{
                     boolean above = (tile.getCliffs() & (1 << ((i + 1) % 4) * 2)) != 0, below = (tile.getCliffs() & (1 << (Mathf.mod(i - 1, 4)) * 2)) != 0;
 
                     if(above && below){
-                        Draw.rect(cliffRegions[0], tile.worldx(), tile.worldy(), i * 90);
+                        Draw.rect(cliffRegions[0], tile.worldx(), tile.worldy()).rot(i * 90);
                     }else if(above){
-                        Draw.rect(cliffRegions[1], tile.worldx(), tile.worldy(), i * 90);
+                        Draw.rect(cliffRegions[1], tile.worldx(), tile.worldy()).rot(i * 90);
                     }else if(below){
-                        Draw.rect(cliffRegions[2], tile.worldx(), tile.worldy(), i * 90);
+                        Draw.rect(cliffRegions[2], tile.worldx(), tile.worldy()).rot(i * 90);
                     }else{
-                        Draw.rect(cliffRegions[3], tile.worldx(), tile.worldy(), i * 90);
+                        Draw.rect(cliffRegions[3], tile.worldx(), tile.worldy()).rot(i * 90);
                     }
                 }
             }
@@ -186,7 +178,7 @@ public class Floor extends Block{
 
             TextureRegion region = floor.edgeRegions[i];
 
-            Draw.crect(region, tile.worldx() + floor.offsets[i].x, tile.worldy() + floor.offsets[i].y, region.getWidth(), region.getHeight());
+            Draw.rect().tex(region).set(tile.worldx() + floor.offsets[i].x, tile.worldy() + floor.offsets[i].y, region.getWidth(), region.getHeight());
         }
     }
 

@@ -1,20 +1,19 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.Vector2;
-import io.anuke.arc.util.Align;
 import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Align;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.Consume;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.scene.Element;
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -86,7 +85,7 @@ public class BlockConsumeFragment extends Fragment{
                 rebuild(block, entity);
             }
 
-            Vector2 v = Graphics.screen(tile.drawx() - tile.block().size * tilesize / 2f + 0.25f, tile.drawy() + tile.block().size * tilesize / 2f);
+            Vector2 v = Core.input.mouseScreen(tile.drawx() - tile.block().size * tilesize / 2f + 0.25f, tile.drawy() + tile.block().size * tilesize / 2f);
             table.pack();
             table.setPosition(v.x, v.y, Align.topRight);
         });

@@ -1,6 +1,10 @@
 package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.trait.Entity;
+import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.entities.traits.SaveTrait;
@@ -13,10 +17,6 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
-import io.anuke.arc.entities.Entities;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.trait.Entity;
-import io.anuke.arc.util.Bits;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -59,7 +59,7 @@ public abstract class SaveFileVersion{
             if(tile.block() instanceof BlockPart){
                 stream.writeByte(tile.link);
             }else if(tile.entity != null){
-                stream.writeByte(Bits.packByte(tile.getTeamID(), tile.getRotation())); //team + rotation
+                stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
                 stream.writeShort((short) tile.entity.health); //health
 
                 if(tile.entity.items != null) tile.entity.items.write(stream);
@@ -139,8 +139,8 @@ public abstract class SaveFileVersion{
                 byte tr = stream.readByte();
                 short health = stream.readShort();
 
-                byte team = Bits.getLeftByte(tr);
-                byte rotation = Bits.getRightByte(tr);
+                byte team = Pack.leftByte(tr);
+                byte rotation = Pack.rightByte(tr);
 
                 Team t = Team.all[team];
 

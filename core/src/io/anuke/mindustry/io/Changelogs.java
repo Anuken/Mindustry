@@ -1,10 +1,10 @@
 package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.util.JsonReader;
-import io.anuke.arc.util.JsonValue;
-import io.anuke.mindustry.net.Net;
 import io.anuke.arc.function.Consumer;
+import io.anuke.arc.util.serialization.JsonReader;
+import io.anuke.arc.util.serialization.JsonValue;
+import io.anuke.mindustry.net.Net;
 
 import static io.anuke.mindustry.Vars.releasesURL;
 

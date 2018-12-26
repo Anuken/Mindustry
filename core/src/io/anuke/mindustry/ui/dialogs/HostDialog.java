@@ -1,14 +1,13 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.scene.ui.ImageButton;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.net.Net;
-import io.anuke.arc.Settings;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.Strings;
 
 import java.io.IOException;
 
@@ -37,7 +36,7 @@ public class HostDialog extends FloatingDialog{
             ImageButton button = t.addImageButton("white", "clear-full", 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
-                    Core.settings.putInt("color-0", Color.rgba8888(color));
+                    Core.settings.put("color-0", Color.rgba8888(color));
                     Core.settings.save();
                 });
             }).size(54f).get();

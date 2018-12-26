@@ -1,7 +1,16 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.utils.UIUtils;
+import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Scaling;
+import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.io.MapIO;
@@ -9,15 +18,6 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.ui.Image;
-import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.scene.ui.TextButton;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.utils.UIUtils;
-import io.anuke.arc.util.Bundles;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Strings;
 
 import java.io.DataInputStream;
 

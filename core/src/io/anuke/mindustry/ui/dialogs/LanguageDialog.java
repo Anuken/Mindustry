@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Settings;
+import io.anuke.arc.Core;
 import io.anuke.arc.scene.ui.ButtonGroup;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.TextButton;
@@ -33,7 +33,7 @@ public class LanguageDialog extends FloatingDialog{
             TextButton button = new TextButton(loc.getDisplayName(loc), "toggle");
             button.clicked(() -> {
                 if(getLocale().equals(loc)) return;
-                Core.settings.putString("locale", loc.toString());
+                Core.settings.put("locale", loc.toString());
                 Core.settings.save();
                 Log.info("Setting locale: {0}", loc.toString());
                 ui.showInfo("$text.language.restart");
@@ -67,7 +67,7 @@ public class LanguageDialog extends FloatingDialog{
         //check exact locale
         for(Locale l : locales){
             if(l.equals(Locale.getDefault())){
-                Core.settings.putString("locale", l.toString());
+                Core.settings.put("locale", l.toString());
                 return;
             }
         }
@@ -75,11 +75,11 @@ public class LanguageDialog extends FloatingDialog{
         //find by language
         for(Locale l : locales){
             if(l.getLanguage().equals(Locale.getDefault().getLanguage())){
-                Core.settings.putString("locale", l.toString());
+                Core.settings.put("locale", l.toString());
                 return;
             }
         }
 
-        Core.settings.putString("locale", new Locale("en").toString());
+        Core.settings.put("locale", new Locale("en").toString());
     }
 }

@@ -1,26 +1,23 @@
 package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.Graphics;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.collection.IntSet.IntSetIterator;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.GL20;
-import io.anuke.arc.graphics.OrthographicCamera;
-import io.anuke.arc.util.IntArray;
-import io.anuke.arc.util.IntSet;
-import io.anuke.arc.util.IntSet.IntSetIterator;
-import io.anuke.arc.collection.ObjectSet;
-import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.arc.Events;
-import io.anuke.arc.Graphics;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.CacheBatch;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.Fill;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Structs;
 
 import java.util.Arrays;
 

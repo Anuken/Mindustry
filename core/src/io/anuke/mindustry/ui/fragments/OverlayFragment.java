@@ -12,11 +12,8 @@ public class OverlayFragment extends Fragment{
     public final BlockConsumeFragment consume;
 
     private Group group = new Group();
-    private InputHandler input;
 
     public OverlayFragment(InputHandler input){
-        this.input = input;
-
         inv = new BlockInventoryFragment(input);
         config = new BlockConfigFragment(input);
         consume = new BlockConsumeFragment();

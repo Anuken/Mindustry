@@ -1,22 +1,22 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.graphics.g2d.GlyphLayout;
-import io.anuke.arc.util.Align;
 import io.anuke.arc.collection.Array;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.Platform;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
+import io.anuke.arc.graphics.g2d.GlyphLayout;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.UIUtils;
+import io.anuke.arc.util.Align;
 import io.anuke.arc.util.OS;
-import io.anuke.arc.util.Pooling;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.pooling.Pools;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.Platform;
 
 import java.util.Arrays;
 
@@ -73,7 +73,7 @@ public class FileChooser extends FloatingDialog{
         cancel.clicked(this::hide);
 
         navigation = new TextField("");
-        navigation.setTouchable(Touchable.disabled);
+        navigation.touchable(Touchable.disabled);
 
         files = new Table();
         files.marginRight(10);
@@ -180,7 +180,7 @@ public class FileChooser extends FloatingDialog{
 
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
 
-        layout.setText(Core.font, navigation.getText());
+        layout.setText(Core.scene.skin.getFont("default-font"), navigation.getText());
 
         if(layout.width < navigation.getWidth()){
             navigation.setCursorPosition(0);

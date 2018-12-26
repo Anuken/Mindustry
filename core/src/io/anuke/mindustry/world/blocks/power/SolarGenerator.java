@@ -4,7 +4,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.arc.util.Time;
-import io.anuke.arc.util.EnumSet;
+import io.anuke.arc.collection.EnumSet;
 
 public class SolarGenerator extends PowerGenerator{
     /**
