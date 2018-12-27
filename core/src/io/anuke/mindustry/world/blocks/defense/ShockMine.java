@@ -34,7 +34,7 @@ public class ShockMine extends Block{
         super.draw(tile);
         Draw.color(tile.getTeam().color);
         Draw.alpha(0.22f);
-        Fill.rect().center(tile.drawx(), tile.drawy(), 2f, 2f);
+        Fill.rect(tile.drawx(), tile.drawy(), 2f, 2f);
         Draw.color();
     }
 

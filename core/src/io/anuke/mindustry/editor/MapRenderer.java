@@ -79,7 +79,7 @@ public class MapRenderer implements Disposable{
                 }
 
                 mesh.getTransformMatrix().setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize));
-                mesh.setProjectionMatrix(Core.graphics.batch().getProjection());
+                mesh.setProjectionMatrix(Draw.proj());
 
                 mesh.render(Core.atlas.getTextures().first());
             }

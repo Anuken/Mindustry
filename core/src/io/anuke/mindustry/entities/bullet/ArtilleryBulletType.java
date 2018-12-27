@@ -34,9 +34,9 @@ public class ArtilleryBulletType extends BasicBulletType{
         float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, bulletWidth * scale, height * scale).rot(b.angle() - 90);
+        Draw.rect(backRegion, b.x, b.y, bulletWidth * scale, height * scale, b.angle() - 90);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, bulletWidth * scale, height * scale).rot(b.angle() - 90);
+        Draw.rect(frontRegion, b.x, b.y, bulletWidth * scale, height * scale, b.angle() - 90);
         Draw.color();
     }
 }

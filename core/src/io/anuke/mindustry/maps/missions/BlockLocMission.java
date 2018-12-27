@@ -42,18 +42,18 @@ public class BlockLocMission extends Mission{
 
         if(block.rotate){
             Draw.colorl(0.4f);
-            Draw.rect("icon-arrow", x * tilesize + block.offset(), y * tilesize + block.offset() - 1f).rot(rotation*90);
+            Draw.rect(Core.atlas.find("icon-arrow"), x * tilesize + block.offset(), y * tilesize + block.offset() - 1f, rotation*90);
             Draw.colorl(0.6f);
-            Draw.rect("icon-arrow", x * tilesize + block.offset(), y * tilesize + block.offset()).rot(rotation*90);
+            Draw.rect(Core.atlas.find("icon-arrow"), x * tilesize + block.offset(), y * tilesize + block.offset(), rotation*90);
         }
 
         float rot = players[0].angleTo(x * tilesize + block.offset(), y * tilesize + block.offset());
         float len = 12f;
 
         Draw.color(Palette.accentBack);
-        Draw.rect("icon-arrow", players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len)).rot(rot);
+        Draw.rect(Core.atlas.find("icon-arrow"), players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len), rot);
         Draw.color(Palette.accent);
-        Draw.rect("icon-arrow", players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len) + 1f).rot(rot);
+        Draw.rect(Core.atlas.find("icon-arrow"), players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len) + 1f, rot);
 
         Draw.reset();
     }

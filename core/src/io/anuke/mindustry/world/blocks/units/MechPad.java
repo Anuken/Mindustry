@@ -111,7 +111,7 @@ public class MechPad extends Block{
         Draw.color(Palette.accent);
         for(int i = 0; i < 4; i ++){
             float length = tilesize * size/2f + 3 + Mathf.absin(Time.time(), 5f, 2f);
-            Draw.rect("transfer-arrow", tile.drawx() + Geometry.d4[i].x * length, tile.drawy() + Geometry.d4[i].y * length).rot((i+2) * 90);
+            Draw.rect("transfer-arrow", tile.drawx() + Geometry.d4[i].x * length, tile.drawy() + Geometry.d4[i].y * length, (i+2) * 90);
         }
         Draw.color();
     }
@@ -142,7 +142,7 @@ public class MechPad extends Block{
     public void draw(Tile tile){
         MechFactoryEntity entity = tile.entity();
 
-        Draw.rect(Core.atlas.find(name), tile.drawx(), tile.drawy()).rot(entity.open ? 180f : 0f);
+        Draw.rect(Core.atlas.find(name), tile.drawx(), tile.drawy(), entity.open ? 180f : 0f);
 
         if(entity.player != null){
             TextureRegion region = mech.iconRegion;

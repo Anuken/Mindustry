@@ -45,7 +45,7 @@ public class Conduit extends LiquidBlock{
         if(entity.blendshadowrot == -1){
             super.drawShadow(tile);
         }else{
-            Draw.rect("shadow-corner", tile.drawx(), tile.drawy()).rot((tile.getRotation() + 3 + entity.blendshadowrot) * 90);
+            Draw.rect(Core.atlas.find("shadow-corner"), tile.drawx(), tile.drawy(), (tile.getRotation() + 3 + entity.blendshadowrot) * 90);
         }
     }
 
@@ -88,14 +88,14 @@ public class Conduit extends LiquidBlock{
         int rotation = tile.getRotation() * 90;
 
         Draw.colorl(0.34f);
-        Draw.rect(botRegions[entity.blendbits], tile.drawx(), tile.drawy()).rot(rotation);
+        Draw.rect(botRegions[entity.blendbits], tile.drawx(), tile.drawy(), rotation);
 
         Draw.color(mod.current().color);
         Draw.alpha(entity.smoothLiquid);
-        Draw.rect(botRegions[entity.blendbits], tile.drawx(), tile.drawy()).rot(rotation);
+        Draw.rect(botRegions[entity.blendbits], tile.drawx(), tile.drawy(), rotation);
         Draw.color();
 
-        Draw.rect(topRegions[entity.blendbits], tile.drawx(), tile.drawy()).rot(rotation);
+        Draw.rect(topRegions[entity.blendbits], tile.drawx(), tile.drawy(), rotation);
     }
 
     @Override

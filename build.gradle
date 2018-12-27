@@ -89,6 +89,7 @@ project(":desktop"){
     dependencies{
         compile project(":core")
         compile project(":net")
+        
         if(new File(projectDir.parent, '../debug').exists() && System.properties["release"] == null) compile project(":debug")
 
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
@@ -145,11 +146,12 @@ project(":ios"){
 
     dependencies{
         compile project(":core")
-        implementation project(":net")
+        compile project(":net")
 
+        compile project(":Arc:backends:backend-robovm")
+        
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
-        compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
     }
@@ -185,11 +187,9 @@ project(":server"){
     apply plugin: "java"
 
     dependencies{
-
         compile project(":core")
         compile project(":net")
-        compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile project(":Arc:backends:backend-headless")
     }
 }
 
@@ -200,8 +200,7 @@ project(":tests"){
         testImplementation project(":core")
         testImplementation('org.junit.jupiter:junit-jupiter-api:5.1.0')
         testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.1.0')
-        testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-        testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile project(":Arc:backends:backend-headless")
     }
 
     test{

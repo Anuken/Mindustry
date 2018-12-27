@@ -115,7 +115,9 @@ public class OverdriveProjector extends Block{
 
         Draw.color(color, phase, entity.phaseHeat);
         Draw.alpha(entity.heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
-        Draw.rect(topRegion, tile.drawx(), tile.drawy()).blend(Blending.additive);
+        Draw.blend(Blending.additive);
+        Draw.rect(topRegion, tile.drawx(), tile.drawy());
+        Draw.blend();
         Draw.alpha(1f);
         Lines.stroke((2f  * f + 0.2f)* entity.heat);
         Lines.circle(tile.drawx(), tile.drawy(), (1f-f) * 9f);

@@ -26,6 +26,6 @@ public class RubbleDecal extends Decal{
             return;
         }
 
-        Draw.rect(region, x, y).rot(Mathf.randomSeed(id, 0, 4) * 90);
+        Draw.rect(region, x, y, Mathf.randomSeed(id, 0, 4) * 90);
     }
 }

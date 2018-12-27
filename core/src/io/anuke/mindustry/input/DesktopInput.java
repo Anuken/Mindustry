@@ -49,7 +49,7 @@ public class DesktopInput extends InputHandler{
 
             for(TextureRegion region : regions){
                 Draw.rect(region, x * tilesize + block.offset(), y * tilesize + block.offset(),
-                        region.getWidth() * selectScale, region.getHeight() * selectScale).rot(block.rotate ? rotation * 90 : 0);
+                        region.getWidth() * selectScale, region.getHeight() * selectScale, block.rotate ? rotation * 90 : 0);
             }
         }else{
             Draw.color(Palette.removeBack);
@@ -79,8 +79,10 @@ public class DesktopInput extends InputHandler{
 
                 if(i + recipe.result.size > result.getLength() && recipe.result.rotate){
                     Draw.color(!validPlace(x, y, recipe.result, result.rotation) ? Palette.remove : Palette.placeRotate);
-                    Draw.rect("place-arrow", x * tilesize + recipe.result.offset(),
-                            y * tilesize + recipe.result.offset()).origin(x * tilesize + recipe.result.offset()/2f, 0f).rot(result.rotation * 90 - 90);
+                    Draw.rect(Core.atlas.find("place-arrow"), x * tilesize + recipe.result.offset(),
+                            y * tilesize + recipe.result.offset(),
+                    Core.atlas.find("place-arrow").getWidth() * Draw.scl, Core.atlas.find("place-arrow").getHeight() * Draw.scl,
+                    x * tilesize + recipe.result.offset()/2f, 0f, result.rotation * 90 - 90);
                 }
 
                 drawPlace(x, y, recipe.result, result.rotation);
@@ -111,8 +113,11 @@ public class DesktopInput extends InputHandler{
         }else if(isPlacing()){
             if(recipe.result.rotate){
                 Draw.color(!validPlace(cursorX, cursorY, recipe.result, rotation) ? Palette.remove : Palette.placeRotate);
-                Draw.rect("place-arrow", cursorX * tilesize + recipe.result.offset(),
-                        cursorY * tilesize + recipe.result.offset()).origin(cursorX * tilesize + recipe.result.offset()/2f, 0).rot(rotation * 90 - 90);
+                Draw.rect(Core.atlas.find("place-arrow"), cursorX * tilesize + recipe.result.offset(),
+                        cursorY * tilesize + recipe.result.offset(),
+                Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+                Core.atlas.find("place-arrow").getHeight() * Draw.scl,
+                cursorX * tilesize + recipe.result.offset()/2f, 0, rotation * 90 - 90);
             }
             drawPlace(cursorX, cursorY, recipe.result, rotation);
             recipe.result.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, recipe.result, rotation));

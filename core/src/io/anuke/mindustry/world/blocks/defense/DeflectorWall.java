@@ -36,7 +36,9 @@ public class DeflectorWall extends Wall{
 
         Draw.color(Color.WHITE);
         Draw.alpha(entity.hit * 0.5f);
-        Draw.rect("blank", tile.drawx(), tile.drawy(), tilesize * size, tilesize * size).blend(Blending.additive);
+        Draw.blend(Blending.additive);
+        Draw.rect("blank", tile.drawx(), tile.drawy(), tilesize * size, tilesize * size);
+        Draw.blend();
         Draw.reset();
 
         entity.hit = Mathf.clamp(entity.hit - Time.delta() / hitTime);

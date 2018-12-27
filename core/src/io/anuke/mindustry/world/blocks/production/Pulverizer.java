@@ -25,7 +25,7 @@ public class Pulverizer extends GenericCrafter{
         GenericCrafterEntity entity = tile.entity();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
-        Draw.rect(rotatorRegion, tile.drawx(), tile.drawy()).rot(entity.totalProgress * 2f);
+        Draw.rect(rotatorRegion, tile.drawx(), tile.drawy(), entity.totalProgress * 2f);
     }
 
     @Override

@@ -91,7 +91,7 @@ public class Conveyor extends Block{
         if(entity.blendshadowrot == -1){
             super.drawShadow(tile);
         }else{
-            Draw.rect("shadow-corner", tile.drawx(), tile.drawy()).rot((tile.getRotation() + 3 + entity.blendshadowrot) * 90);
+            Draw.rect(Core.atlas.find("shadow-corner"), tile.drawx(), tile.drawy(), (tile.getRotation() + 3 + entity.blendshadowrot) * 90);
         }
     }
 
@@ -102,7 +102,7 @@ public class Conveyor extends Block{
 
         int frame = entity.clogHeat <= 0.5f ? (int) (((Time.time() * speed * 8f * entity.timeScale)) % 4) : 0;
         Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], tile.drawx(), tile.drawy(),
-            tilesize * entity.blendsclx, tilesize * entity.blendscly).rot( rotation*90);
+            tilesize * entity.blendsclx, tilesize * entity.blendscly,  rotation*90);
     }
 
     @Override

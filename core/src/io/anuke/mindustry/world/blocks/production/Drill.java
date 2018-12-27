@@ -97,11 +97,13 @@ public class Drill extends Block{
         if(drawRim){
             Draw.color(heatColor);
             Draw.alpha(entity.warmup * ts * (1f - s + Mathf.absin(Time.time(), 3f, s)));
-            Draw.rect(rimRegion, tile.drawx(), tile.drawy()).blend(Blending.additive);
+            Draw.blend(Blending.additive);
+            Draw.rect(rimRegion, tile.drawx(), tile.drawy());
+            Draw.blend();
             Draw.color();
         }
 
-        Draw.rect(rotatorRegion, tile.drawx(), tile.drawy()).rot(entity.drillTime * rotateSpeed);
+        Draw.rect(rotatorRegion, tile.drawx(), tile.drawy(), entity.drillTime * rotateSpeed);
 
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
 

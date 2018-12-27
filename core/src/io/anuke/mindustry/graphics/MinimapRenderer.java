@@ -8,6 +8,7 @@ import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.graphics.Pixmaps;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.g2d.ScissorStack;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
@@ -81,7 +82,7 @@ public class MinimapRenderer implements Disposable{
         for(Unit unit : units){
             float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
             Draw.color(unit.getTeam().color);
-            Draw.rect().tex(Core.atlas.white()).set(x + rx, y + ry, w / (sz * 2), h / (sz * 2));
+            Fill.crect(x + rx, y + ry, w / (sz * 2), h / (sz * 2));
         }
 
         Draw.color();

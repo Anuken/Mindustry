@@ -509,7 +509,7 @@ public class Block extends BaseBlock {
     }
 
     public void draw(Tile tile){
-        Draw.rect(region, tile.drawx(), tile.drawy()).rot(rotate ? tile.getRotation() * 90 : 0);
+        Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
     }
 
     public void drawNonLayer(Tile tile){

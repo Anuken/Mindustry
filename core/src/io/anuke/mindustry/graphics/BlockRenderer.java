@@ -1,6 +1,5 @@
 package io.anuke.mindustry.graphics;
 
-import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntSet;
@@ -58,7 +57,7 @@ public class BlockRenderer{
 
     public void drawShadows(){
         Draw.color(0, 0, 0, 0.15f);
-        Draw.rect().tex(shadows.getTexture()).center(
+        Draw.rect(Draw.wrap(shadows.getTexture()),
             camera.position.x - camera.position.x % tilesize,
             camera.position.y - camera.position.y % tilesize,
             shadows.getWidth(), -shadows.getHeight());
@@ -90,7 +89,7 @@ public class BlockRenderer{
         requestidx = 0;
 
         Draw.flush();
-        Core.graphics.batch().getProjection()
+        Draw.proj()
         .setOrtho(Mathf.round(camera.position.x, tilesize)-shadowW/2f, Mathf.round(camera.position.y, tilesize)-shadowH/2f,
         shadowW, shadowH);
 
@@ -141,7 +140,7 @@ public class BlockRenderer{
         shadows.end();
 
         Draw.flush();
-        Draw.projection(camera.projection());
+        Draw.proj(camera.projection());
 
         Sort.instance().sort(requests.items, 0, requestidx);
 

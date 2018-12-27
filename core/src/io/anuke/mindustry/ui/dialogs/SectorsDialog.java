@@ -202,13 +202,13 @@ public class SectorsDialog extends FloatingDialog{
 
                     if(sector == null || sector.texture == null){
                         Draw.reset();
-                        Draw.rect("empty-sector", drawX, drawY, sectorSize, sectorSize);
+                        Draw.rect(("empty-sector"), drawX, drawY, sectorSize, sectorSize);
 
                         int i = 0;
                         for(Point2 point : Geometry.d4){
                             Sector other = world.sectors.get(sectorX + point.x, sectorY + point.y);
                             if(other != null){
-                                Draw.rect("sector-edge", drawX, drawY, sectorSize, sectorSize).rot(i*90);
+                                Draw.rect(("sector-edge"), drawX, drawY, sectorSize, sectorSize, i*90);
                             }
 
                             i ++;
@@ -217,7 +217,7 @@ public class SectorsDialog extends FloatingDialog{
                     }
 
                     Draw.colorl(!sector.complete ? 0.3f : 1f);
-                    Draw.rect().tex(sector.texture).center(drawX, drawY, sectorSize, sectorSize);
+                    Draw.rect(Draw.wrap(sector.texture), drawX, drawY, sectorSize, sectorSize);
 
                     if(sector.missions.size == 0) continue;
 
@@ -250,16 +250,16 @@ public class SectorsDialog extends FloatingDialog{
                     }
 
                     Draw.color(selectColor);
-                    Draw.rect("sector-select", drawX, drawY, sectorSize, sectorSize);
+                    Draw.rect(("sector-select"), drawX, drawY, sectorSize, sectorSize);
 
                     Draw.color(backColor);
                     Draw.alpha(0.75f * backColor.a);
-                    Draw.rect("icon-mission-background", drawX, drawY, Unit.dp.scl(18f * 5), Unit.dp.scl(18f * 5));
+                    Draw.rect(("icon-mission-background"), drawX, drawY, Unit.dp.scl(18f * 5), Unit.dp.scl(18f * 5));
 
                     float size = Unit.dp.scl(10f * 5);
 
                     Draw.color(iconColor);
-                    Draw.rect(region, drawX, drawY, size, size);
+                    Draw.rect((region), drawX, drawY, size, size);
                 }
             }
 

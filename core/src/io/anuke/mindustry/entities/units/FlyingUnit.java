@@ -164,7 +164,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     public void draw(){
         Draw.alpha(hitTime / hitDuration);
 
-        Draw.rect(type.name, x, y).rot(rotation - 90);
+        Draw.rect(type.name, x, y, rotation - 90);
 
         drawItems();
 

@@ -158,7 +158,7 @@ public class ChatFragment extends Table{
         Draw.color(shadowColor);
 
         if(chatOpen){
-            Fill.rect().set(offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+            Fill.crect(offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
         }
 
         super.draw();
@@ -185,7 +185,7 @@ public class ChatFragment extends Table{
                 Draw.color(0, 0, 0, shadowColor.a * (fadetime - i));
             }
 
-            Fill.rect().set(offsetx, theight - layout.height - 2, textWidth + Unit.dp.scl(4f), layout.height + textspacing);
+            Fill.crect(offsetx, theight - layout.height - 2, textWidth + Unit.dp.scl(4f), layout.height + textspacing);
             Draw.color(shadowColor);
 
             font.getCache().draw();

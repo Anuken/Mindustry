@@ -141,13 +141,13 @@ public class Floor extends Block{
                     boolean above = (tile.getCliffs() & (1 << ((i + 1) % 4) * 2)) != 0, below = (tile.getCliffs() & (1 << (Mathf.mod(i - 1, 4)) * 2)) != 0;
 
                     if(above && below){
-                        Draw.rect(cliffRegions[0], tile.worldx(), tile.worldy()).rot(i * 90);
+                        Draw.rect(cliffRegions[0], tile.worldx(), tile.worldy(), i * 90);
                     }else if(above){
-                        Draw.rect(cliffRegions[1], tile.worldx(), tile.worldy()).rot(i * 90);
+                        Draw.rect(cliffRegions[1], tile.worldx(), tile.worldy(), i * 90);
                     }else if(below){
-                        Draw.rect(cliffRegions[2], tile.worldx(), tile.worldy()).rot(i * 90);
+                        Draw.rect(cliffRegions[2], tile.worldx(), tile.worldy(), i * 90);
                     }else{
-                        Draw.rect(cliffRegions[3], tile.worldx(), tile.worldy()).rot(i * 90);
+                        Draw.rect(cliffRegions[3], tile.worldx(), tile.worldy(), i * 90);
                     }
                 }
             }
@@ -178,7 +178,7 @@ public class Floor extends Block{
 
             TextureRegion region = floor.edgeRegions[i];
 
-            Draw.rect().tex(region).set(tile.worldx() + floor.offsets[i].x, tile.worldy() + floor.offsets[i].y, region.getWidth(), region.getHeight());
+            Draw.rect(region, tile.worldx() + floor.offsets[i].x, tile.worldy() + floor.offsets[i].y, region.getWidth(), region.getHeight());
         }
     }
 

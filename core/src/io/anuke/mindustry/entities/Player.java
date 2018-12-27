@@ -288,7 +288,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         float x = snappedX(), y = snappedY();
         float scl = mech.flying ? 1f : boostHeat / 2f;
 
-        Draw.rect(mech.iconRegion, x + offsetX * scl, y + offsetY * scl).rot(rotation - 90);
+        Draw.rect(mech.iconRegion, x + offsetX * scl, y + offsetY * scl, rotation - 90);
     }
 
     @Override
@@ -322,10 +322,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 Draw.rect(mech.legRegion,
                 x + Angles.trnsx(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
                 y + Angles.trnsy(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
-                mech.legRegion.getWidth() * i, mech.legRegion.getHeight() - Mathf.clamp(ft * i, 0, 2)).rot(baseRotation - 90 + boostAng * i);
+                mech.legRegion.getWidth() * i, mech.legRegion.getHeight() - Mathf.clamp(ft * i, 0, 2), baseRotation - 90 + boostAng * i);
             }
 
-            Draw.rect(mech.baseRegion, x, y).rot(baseRotation - 90);
+            Draw.rect(mech.baseRegion, x, y, baseRotation - 90);
         }
 
         if(floor.isLiquid){
@@ -334,7 +334,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             Draw.tint(Color.WHITE);
         }
 
-        Draw.rect(mech.region, x, y).rot(rotation - 90);
+        Draw.rect(mech.region, x, y, rotation - 90);
 
         mech.draw(this);
 
@@ -343,7 +343,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             float w = i > 0 ? -mech.weapon.equipRegion.getWidth() : mech.weapon.equipRegion.getWidth();
             Draw.rect(mech.weapon.equipRegion,
             x + Angles.trnsx(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY),
-            y + Angles.trnsy(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY), w, mech.weapon.equipRegion.getHeight()).rot(rotation - 90);
+            y + Angles.trnsy(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY), w, mech.weapon.equipRegion.getHeight(), rotation - 90);
         }
 
         float backTrns = 4f, itemSize = 5f;
@@ -357,7 +357,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 Draw.rect(stack.item.region,
                 x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
                 y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
-                itemSize, itemSize).rot(rotation);
+                itemSize, itemSize, rotation);
             }
         }
 
@@ -370,7 +370,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
         Draw.alpha(hitTime / hitDuration);
-        Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f)).rot(rotation - 90);
+        Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.color();
     }
 
@@ -406,7 +406,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         font.setUseIntegerPositions(false);
         font.getData().setScale(0.25f / io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f));
         layout.setText(font, name);
-        Fill.rect().center(x, y + 8 - layout.height / 2, layout.width + 2, layout.height + 3).color(0f, 0f, 0f, 0.3f);
+        Draw.color(0f, 0f, 0f, 0.3f);
+        Fill.rect(x, y + 8 - layout.height / 2, layout.width + 2, layout.height + 3);
+        Draw.color();
         font.setColor(color);
 
         font.draw(name, x, y + 8, 0, Align.center, false);
@@ -414,9 +416,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         if(isAdmin){
             float s = 3f;
             Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
-            Draw.rect("icon-admin-small", x + layout.width / 2f + 2 + 1, y + 6.5f, s, s);
+            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + 6.5f, s, s);
             Draw.color(color);
-            Draw.rect("icon-admin-small", x + layout.width / 2f + 2 + 1, y + 7f, s, s);
+            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + 7f, s, s);
         }
 
         Draw.reset();

@@ -191,8 +191,7 @@ public class MassDriver extends Block{
 
         Draw.rect(turretRegion,
                 tile.drawx() + Angles.trnsx(entity.rotation + 180f, entity.reload * knockback),
-                tile.drawy() + Angles.trnsy(entity.rotation + 180f, entity.reload * knockback))
-        .rot(entity.rotation - 90);
+                tile.drawy() + Angles.trnsy(entity.rotation + 180f, entity.reload * knockback), entity.rotation - 90);
     }
 
     @Override

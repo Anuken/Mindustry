@@ -11,6 +11,7 @@ import io.anuke.arc.function.Consumer;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Colors;
 import io.anuke.arc.graphics.g2d.BitmapFont;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.scene.Group;
@@ -81,6 +82,7 @@ public class UI implements ApplicationListener{
         }
 
         Core.scene = new Scene(skin);
+        Core.input.addProcessor(Core.scene);
 
         Dialog.setShowAction(() -> sequence(
             alpha(0f),
@@ -142,7 +144,7 @@ public class UI implements ApplicationListener{
 
         Core.scene.act();
         Core.scene.draw();
-        Core.graphics.batch().flush();
+        Draw.flush();
     }
 
     @Override

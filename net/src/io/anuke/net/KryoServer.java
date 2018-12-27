@@ -1,4 +1,4 @@
-package io.anuke.kryonet;
+package io.anuke.net;
 
 import com.dosse.upnp.UPnP;
 import com.esotericsoftware.kryonet.Connection;

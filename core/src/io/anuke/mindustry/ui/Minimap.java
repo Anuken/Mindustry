@@ -18,7 +18,7 @@ public class Minimap extends Container<Element>{
             public void draw(){
                 if(renderer.minimap.getRegion() == null) return;
 
-                Draw.rect().tex(renderer.minimap.getRegion()).set(x, y, width, height);
+                Draw.rect(renderer.minimap.getRegion(), x + width/2f, y + height/2f, width, height);
 
                 if(renderer.minimap.getTexture() != null){
                     renderer.minimap.drawEntities(x, y, width, height);

@@ -50,7 +50,6 @@ public class Control implements ApplicationListener{
     private boolean hiscore = false;
     private boolean wasPaused = false;
     private InputHandler[] inputs = {};
-    private Throwable error;
 
     public Control(){
         saves = new Saves();
@@ -206,10 +205,6 @@ public class Control implements ApplicationListener{
         System.arraycopy(oldi, 0, inputs, 0, inputs.length);
     }
 
-    public void setError(Throwable error){
-        this.error = error;
-    }
-
     public InputHandler input(int index){
         return inputs[index];
     }
@@ -308,9 +303,6 @@ public class Control implements ApplicationListener{
 
     @Override
     public void update(){
-        if(error != null){
-            throw new RuntimeException(error);
-        }
 
         saves.update();
 

@@ -60,7 +60,7 @@ public class RepairPoint extends Block{
     public void drawLayer(Tile tile){
         RepairPointEntity entity = tile.entity();
 
-        Draw.rect(topRegion, tile.drawx(), tile.drawy()).rot(entity.rotation - 90);
+        Draw.rect(topRegion, tile.drawx(), tile.drawy(), entity.rotation - 90);
     }
 
     @Override

@@ -129,7 +129,7 @@ public class BuildBlock extends Block{
         if(entity.previous == null) return;
 
         for(TextureRegion region : entity.previous.getBlockIcon()){
-            Draw.rect(region, tile.drawx(), tile.drawy()).rot(entity.previous.rotate ? tile.getRotation() * 90 : 0);
+            Draw.rect(region, tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.getRotation() * 90 : 0);
         }
     }
 
@@ -149,7 +149,7 @@ public class BuildBlock extends Block{
             Shaders.blockbuild.progress = entity.progress;
             Shaders.blockbuild.apply();
 
-            Draw.rect(region, tile.drawx(), tile.drawy()).rot(target.rotate ? tile.getRotation() * 90 : 0);
+            Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.getRotation() * 90 : 0);
             Draw.flush();
         }
     }

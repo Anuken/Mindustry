@@ -1,7 +1,9 @@
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.headless.HeadlessApplication;
-import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
-import com.badlogic.gdx.math.Point2;
+import io.anuke.arc.ApplicationCore;
+import io.anuke.arc.backends.headless.HeadlessApplication;
+import io.anuke.arc.backends.headless.HeadlessApplicationConfiguration;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
@@ -24,15 +26,9 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.core.Timers;
-import io.anuke.arc.modules.ModuleCore;
-import io.anuke.arc.util.EmptyLogger;
-import io.anuke.arc.util.Log;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 import static io.anuke.mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,9 +42,9 @@ public class ApplicationTests{
             Throwable[] exceptionThrown = {null};
             Log.setUseColors(false);
 
-            ModuleCore core = new ModuleCore(){
+            ApplicationCore core = new ApplicationCore(){
                 @Override
-                public void init(){
+                public void setup(){
                     Vars.init();
 
                     headless = true;
@@ -57,26 +53,21 @@ public class ApplicationTests{
                     content.load();
                     content.initialize(Content::init);
 
-                    module(logic = new Logic());
-                    module(world = new World());
-                    module(netServer = new NetServer());
+                    add(logic = new Logic());
+                    add(world = new World());
+                    add(netServer = new NetServer());
                 }
 
                 @Override
-                public void postInit(){
-                    super.postInit();
+                public void init(){
+                    super.init();
                     begins[0] = true;
                 }
             };
 
             HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-            config.preferencesDirectory = "test_files/";
 
-            new File("tests_files/").delete();
-
-            new HeadlessApplication(core, config){{
-                Gdx.app.setApplicationLogger(new EmptyLogger());
-            }};
+            new HeadlessApplication(core, config);
 
             for(Thread thread : Thread.getAllStackTraces().keySet()){
                 if(thread.getName().equals("HeadlessApplication")){

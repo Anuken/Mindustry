@@ -39,10 +39,10 @@ public class ExtendingItemBridge extends ItemBridge{
                 tile.worldx() + ex,
                 tile.worldy() + ey, CapStyle.none, 0f);
 
-        Draw.rect(endRegion, tile.drawx(), tile.drawy()).rot(i * 90 + 90);
+        Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);
         Draw.rect(endRegion,
                 tile.worldx() + ex + Geometry.d4[i].x * tilesize / 2f,
-                tile.worldy() + ey + Geometry.d4[i].y * tilesize / 2f).rot(i * 90 + 270);
+                tile.worldy() + ey + Geometry.d4[i].y * tilesize / 2f, i * 90 + 270);
 
         int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y));
 
@@ -54,8 +54,7 @@ public class ExtendingItemBridge extends ItemBridge{
             Draw.alpha(Mathf.absin(a / (float) arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime);
             Draw.rect(arrowRegion,
                     tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 6f + 2) * entity.uptime,
-                    tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * entity.uptime)
-            .rot(i * 90f);
+                    tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * entity.uptime, i * 90f);
         }
         Draw.reset();
     }

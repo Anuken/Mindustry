@@ -7,7 +7,6 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 
 import static io.anuke.mindustry.Vars.state;
@@ -18,12 +17,10 @@ public class BackgroundFragment extends Fragment{
     public void build(Group parent){
         Core.scene.table().addRect((a, b, w, h) -> {
             Draw.colorl(0.1f);
-            Fill.rect().set(0, 0, w, h);
-            Draw.color(Palette.accent);
+            Fill.rect(0, 0, w, h);
             Draw.shader(Shaders.menu);
-            Fill.rect().set(0, 0, w, h);
+            Fill.rect(0, 0, w, h);
             Draw.shader();
-            Draw.color();
 
             boolean portrait = Core.graphics.getWidth() < Core.graphics.getHeight();
             float logoscl = (int) Unit.dp.scl(7) * (portrait ? 5f / 7f : 1f);
@@ -32,7 +29,7 @@ public class BackgroundFragment extends Fragment{
             float logoh = logo.getHeight() * logoscl;
 
             Draw.color();
-            Draw.rect().tex(logo).set((int) (w / 2 - logow / 2), (int) (h - logoh + 15 - Unit.dp.scl(portrait ? 30f : 0)), logow, logoh);
+            Draw.rect(logo, (int) (w / 2 - logow / 2), (int) (h - logoh + 15 - Unit.dp.scl(portrait ? 30f : 0)), logow, logoh);
         }).visible(() -> state.is(State.menu)).grow();
     }
 }

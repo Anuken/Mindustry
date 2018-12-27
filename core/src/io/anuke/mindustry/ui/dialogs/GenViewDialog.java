@@ -99,7 +99,7 @@ public class GenViewDialog extends FloatingDialog{
                     float drawX = x + width/2f+ wx * padSectorSize - tx * padSectorSize - panX % padSectorSize;
                     float drawY = y + height/2f + wy * padSectorSize - ty * padSectorSize - panY % padSectorSize;
 
-                    Draw.rect().tex(map.get(wx, wy)).set(drawX, drawY, padSectorSize, padSectorSize);
+                    Draw.rect(Draw.wrap(map.get(wx, wy)), drawX + padSectorSize/2f, drawY + padSectorSize/2f, padSectorSize, padSectorSize);
                 }
             }
         }

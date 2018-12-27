@@ -26,14 +26,13 @@ public class Shapes{
 
         TextureRegion region = Core.atlas.find(edge);
 
-        Draw.rect(edge, x, y, region.getWidth() * Draw.scl, region.getHeight() * scale * Draw.scl).rot(rotation + 180);
+        Draw.rect(Core.atlas.find(edge), x, y, region.getWidth() * Draw.scl, region.getHeight() * scale * Draw.scl, rotation + 180);
 
-        Draw.rect(edge, x2, y2, region.getWidth() * Draw.scl, region.getHeight() * scale * Draw.scl).rot(rotation);
+        Draw.rect(Core.atlas.find(edge), x2, y2, region.getWidth() * Draw.scl, region.getHeight() * scale * Draw.scl, rotation);
     }
 
     public static void tri(float x, float y, float width, float length, float rotation){
         float oy = 17f / 63f * length;
-        Core.graphics.batch().draw().tex(Core.atlas.find("shape-3")).pos(x - width / 2f, y - oy)
-            .origin(width / 2f, oy).size(width, length).rot(rotation - 90);
+        Draw.rect(Core.atlas.find("shape-3"), x, y - oy + length/2f, width, length, width / 2f, oy, rotation - 90);
     }
 }

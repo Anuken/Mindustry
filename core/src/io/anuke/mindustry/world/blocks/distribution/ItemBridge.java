@@ -216,8 +216,8 @@ public class ItemBridge extends Block{
         Draw.color(Color.WHITE, Color.BLACK, Mathf.absin(Time.time(), 6f, 0.07f));
         Draw.alpha(Math.max(entity.uptime, 0.25f));
 
-        Draw.rect(endRegion, tile.drawx(), tile.drawy()).rot(i * 90 + 90);
-        Draw.rect(endRegion, other.drawx(), other.drawy()).rot(i * 90 + 270);
+        Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);
+        Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
 
         Lines.stroke(8f);
         Lines.line(bridgeRegion,
@@ -237,7 +237,7 @@ public class ItemBridge extends Block{
             Draw.alpha(Mathf.absin(a / (float) arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime);
             Draw.rect(arrowRegion,
                     tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 4f + time % 4f),
-                    tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f)).rot(i * 90f);
+                    tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);
         }
         Draw.reset();
     }

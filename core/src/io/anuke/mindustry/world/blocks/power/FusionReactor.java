@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.Graphics;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -85,7 +84,9 @@ public class FusionReactor extends PowerGenerator{
 
             Draw.color(plasma1, plasma2, (float) i / plasmas);
             Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * entity.warmup);
-            Draw.rect(name + "-plasma-" + i, tile.drawx(), tile.drawy(), r, r).rot(Time.time() * (12 + i * 6f) * entity.warmup).blend(Blending.additive);
+            Draw.blend(Blending.additive);
+            Draw.rect(name + "-plasma-" + i, tile.drawx(), tile.drawy(), r, r, Time.time() * (12 + i * 6f) * entity.warmup);
+            Draw.blend();
         }
 
         Draw.color();

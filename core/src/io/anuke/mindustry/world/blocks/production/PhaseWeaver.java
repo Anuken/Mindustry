@@ -50,7 +50,7 @@ public class PhaseWeaver extends PowerSmelter{
 
         Draw.shader(Shaders.build, false);
         Shaders.build.apply();
-        Draw.rect(weaveRegion, tile.drawx(), tile.drawy()).rot(entity.time);
+        Draw.rect(weaveRegion, tile.drawx(), tile.drawy(), entity.time);
         Draw.shader();
 
         Draw.color(Palette.accent);

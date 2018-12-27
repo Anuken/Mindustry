@@ -142,7 +142,7 @@ public class Saves{
         IntArray result = new IntArray(saves.size);
         for(int i = 0; i < saves.size; i++) result.add(saves.get(i).index);
 
-        Core.settings.put("save-slots", result);
+        Core.settings.putObject("save-slots", result);
         Core.settings.save();
     }
 

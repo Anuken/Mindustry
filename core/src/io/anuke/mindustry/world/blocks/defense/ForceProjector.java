@@ -175,7 +175,9 @@ public class ForceProjector extends Block {
 
         if(entity.buildup <= 0f) return;
         Draw.alpha(entity.buildup / breakage * 0.75f);
-        Draw.rect(topRegion, tile.drawx(), tile.drawy()).blend(Blending.additive);
+        Draw.blend(Blending.additive);
+        Draw.rect(topRegion, tile.drawx(), tile.drawy());
+        Draw.blend();
         Draw.reset();
     }
 

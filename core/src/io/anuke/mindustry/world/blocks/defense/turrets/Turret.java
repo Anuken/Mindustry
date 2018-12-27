@@ -75,10 +75,14 @@ public abstract class Turret extends Block{
     protected TextureRegion baseTopRegion;
 
     protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) ->
-        Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y).rot(entity.rotation - 90);
+        Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
     protected BiConsumer<Tile, TurretEntity> heatDrawer = (tile, entity) -> {
         if(entity.heat <= 0.00001f) return;
-        Draw.rect(heatRegion, tile.drawx() + tr2.x, tile.drawy() + tr2.y).rot(entity.rotation - 90).color(heatColor, entity.heat).blend(Blending.additive);
+        Draw.color(heatColor, entity.heat);
+        Draw.blend(Blending.additive);
+        Draw.rect(heatRegion, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+        Draw.blend();
+        Draw.color();
     };
 
     public Turret(String name){
@@ -129,7 +133,8 @@ public abstract class Turret extends Block{
     @Override
     public void draw(Tile tile){
         Draw.rect(baseRegion, tile.drawx(), tile.drawy());
-        Draw.rect(baseTopRegion, tile.drawx(), tile.drawy()).color(tile.getTeam().color, Color.WHITE, 0.45f);
+        Draw.color(tile.getTeam().color, Color.WHITE, 0.45f);
+        Draw.rect(baseTopRegion, tile.drawx(), tile.drawy());
     }
 
     @Override

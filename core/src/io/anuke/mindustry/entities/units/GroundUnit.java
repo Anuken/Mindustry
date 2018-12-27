@@ -154,7 +154,7 @@ public abstract class GroundUnit extends BaseUnit{
             Draw.rect(type.legRegion,
                     x + Angles.trnsx(baseRotation, ft * i),
                     y + Angles.trnsy(baseRotation, ft * i),
-                    12f * i, 12f - Mathf.clamp(ft * i, 0, 2)).rot(baseRotation - 90);
+                    12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
         }
 
         if(floor.isLiquid){
@@ -163,16 +163,16 @@ public abstract class GroundUnit extends BaseUnit{
             Draw.tint(Color.WHITE);
         }
 
-        Draw.rect(type.baseRegion, x, y).rot(baseRotation - 90);
+        Draw.rect(type.baseRegion, x, y, baseRotation - 90);
 
-        Draw.rect(type.region, x, y).rot(rotation - 90);
+        Draw.rect(type.region, x, y, rotation - 90);
 
         for(int i : Mathf.signs){
             float tra = rotation - 90, trY = -weapon.getRecoil(this, i > 0) + type.weaponOffsetY;
             float w = i > 0 ? -12 : 12;
             Draw.rect(weapon.equipRegion,
                     x + Angles.trnsx(tra, type.weaponOffsetX * i, trY),
-                    y + Angles.trnsy(tra, type.weaponOffsetX * i, trY), w, 12).rot(rotation - 90);
+                    y + Angles.trnsy(tra, type.weaponOffsetX * i, trY), w, 12, rotation - 90);
         }
 
         drawItems();

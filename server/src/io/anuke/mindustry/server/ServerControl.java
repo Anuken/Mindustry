@@ -1,22 +1,17 @@
 package io.anuke.mindustry.server;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.entities.Effects;
-import io.anuke.arc.util.CommandHandler;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.CommandHandler.Command;
 import io.anuke.arc.util.CommandHandler.Response;
 import io.anuke.arc.util.CommandHandler.ResponseType;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Timer.Task;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
@@ -36,6 +31,7 @@ import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
 
 import java.io.IOException;
+import java.lang.StringBuilder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -49,7 +45,7 @@ public class ServerControl implements ApplicationListener{
     private static final int maxLogLength = 1024 * 512;
 
     private final CommandHandler handler = new CommandHandler("");
-    private final FileHandle logFolder = Gdx.files.local("logs/");
+    private final FileHandle logFolder = Core.files.local("logs/");
 
     private FileHandle currentLogFile;
     private int gameOvers;
@@ -99,13 +95,13 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        Time.setDeltaProvider(() -> Gdx.graphics.getDeltaTime() * 60f);
+        Time.setDeltaProvider(() -> Core.graphics.getDeltaTime() * 60f);
         Effects.setScreenShakeProvider((a, b) -> {});
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
 
         registerCommands();
 
-        Gdx.app.postRunnable(() -> {
+        Core.app.post(() -> {
             String[] commands = {};
 
             if(args.length > 0){
@@ -176,7 +172,7 @@ public class ServerControl implements ApplicationListener{
                 }else{
                     Call.onInfoMessage("[SCARLET]Sector has been lost.[]\nRe-deploying in " + roundExtraTime + " seconds.");
                     if(gameOvers >= 2){
-                        Core.settings.putInt("sector_y", Core.settings.getInt("sector_y") < 0 ? Core.settings.getInt("sector_y") + 1 : Core.settings.getInt("sector_y") - 1);
+                        Core.settings.put("sector_y", Core.settings.getInt("sector_y") < 0 ? Core.settings.getInt("sector_y") + 1 : Core.settings.getInt("sector_y") - 1);
                         Core.settings.save();
                         gameOvers = 0;
                     }
@@ -211,7 +207,7 @@ public class ServerControl implements ApplicationListener{
         handler.register("exit", "Exit the server application.", arg -> {
             info("Shutting down server.");
             Net.dispose();
-            Gdx.app.exit();
+            Core.app.exit();
         });
 
         handler.register("stop", "Stop hosting the server.", arg -> {
@@ -282,7 +278,7 @@ public class ServerControl implements ApplicationListener{
                     return;
                 }
                 info("&lyPort set to {0}.", port);
-                Core.settings.putInt("port", port);
+                Core.settings.put("port", port);
                 Core.settings.save();
             }
         });
@@ -308,7 +304,7 @@ public class ServerControl implements ApplicationListener{
                 }
 
                 info("  &ly{0} FPS.", (int) (60f / Time.delta()));
-                info("  &ly{0} MB used.", Gdx.app.getJavaHeap() / 1024 / 1024);
+                info("  &ly{0} MB used.", Core.app.getJavaHeap() / 1024 / 1024);
 
                 if(playerGroup.size() > 0){
                     info("  &lyPlayers: {0}", playerGroup.size());
@@ -343,8 +339,8 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("setsector", "<x> <y>", "Sets the next sector to be played. Does not affect current game.", arg -> {
             try{
-                Core.settings.putInt("sector_x", Integer.parseInt(arg[0]));
-                Core.settings.putInt("sector_y", Integer.parseInt(arg[1]));
+                Core.settings.put("sector_x", Integer.parseInt(arg[0]));
+                Core.settings.put("sector_y", Integer.parseInt(arg[1]));
                 Core.settings.save();
                 info("Sector position set.");
             }catch(NumberFormatException e){
@@ -380,14 +376,14 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
             boolean value = arg[0].equalsIgnoreCase("on");
-            Core.settings.putBool("crashreport", value);
+            Core.settings.put("crashreport", value);
             Core.settings.save();
             info("Crash reporting is now {0}.", value ? "on" : "off");
         });
 
         handler.register("logging", "<on/off>", "Disables or enables server logs", arg -> {
             boolean value = arg[0].equalsIgnoreCase("on");
-            Core.settings.putBool("logging", value);
+            Core.settings.put("logging", value);
             Core.settings.save();
             info("Logging is now {0}.", value ? "on" : "off");
         });
@@ -421,7 +417,7 @@ public class ServerControl implements ApplicationListener{
                 err("Invalid shuffle mode.");
                 return;
             }
-            Core.settings.putBool("shuffle", arg[0].equals("on"));
+            Core.settings.put("shuffle", arg[0].equals("on"));
             Core.settings.save();
             info("Shuffle mode set to '{0}'.", arg[0]);
         });
@@ -587,7 +583,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            threads.run(() -> {
+            Core.app.post(() -> {
                 SaveIO.loadFromSlot(slot);
                 info("Save loaded.");
                 host();
@@ -604,7 +600,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            threads.run(() -> {
+            Core.app.post(() -> {
                 int slot = Strings.parseInt(arg[0]);
                 SaveIO.saveToSlot(slot);
                 info("Saved to slot {0}.", slot);
@@ -677,7 +673,7 @@ public class ServerControl implements ApplicationListener{
         while(scan.hasNext()){
             String line = scan.nextLine();
 
-            Gdx.app.postRunnable(() -> {
+            Core.app.post(() -> {
                 Response response = handler.handleMessage(line);
 
                 if(response.type == ResponseType.unknownCommand){

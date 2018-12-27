@@ -7,11 +7,9 @@ import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.collection.IntSet.IntSetIterator;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.Camera;
-import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.GL20;
 import io.anuke.arc.graphics.g2d.CacheBatch;
 import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.g2d.SpriteBatch;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Log;
@@ -145,12 +143,6 @@ public class FloorRenderer{
         layer.end();
     }
 
-    private void fillChunk(float x, float y){
-        Draw.color(Color.BLACK);
-        Fill.rect().set(x, y, chunksize * tilesize, chunksize * tilesize);
-        Draw.color();
-    }
-
     private void cacheChunk(int cx, int cy){
         Chunk chunk = cache[cx][cy];
 
@@ -174,8 +166,10 @@ public class FloorRenderer{
     }
 
     private void cacheChunkLayer(int cx, int cy, Chunk chunk, CacheLayer layer){
-        SpriteBatch current = Core.graphics.batch();
-        Core.graphics.useBatch(cbatch);
+        SpriteBatch current = Core.batch;
+        Core.batch = cbatch;
+
+        cbatch.beginCache();
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
@@ -195,8 +189,8 @@ public class FloorRenderer{
                 }
             }
         }
-        Core.graphics.useBatch(current);
-        chunk.caches[layer.ordinal()] = cbatch.flushCache();
+        Core.batch = current;
+        chunk.caches[layer.ordinal()] = cbatch.endCache();
     }
 
     public void clearTiles(){

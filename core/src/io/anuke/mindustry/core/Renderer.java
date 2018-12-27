@@ -14,6 +14,7 @@ import io.anuke.arc.graphics.Camera;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.SpriteBatch;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
@@ -30,7 +31,7 @@ import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 
-import static io.anuke.arc.Core.camera;
+import static io.anuke.arc.Core.*;
 import static io.anuke.arc.Core.graphics;
 import static io.anuke.mindustry.Vars.*;
 
@@ -45,6 +46,7 @@ public class Renderer implements ApplicationListener{
     private Vector2 avgPosition = new Vector2();
 
     public Renderer(){
+        batch = new SpriteBatch(4096);
         camera = new Camera();
         Lines.setCircleVertices(14);
 
@@ -146,7 +148,7 @@ public class Renderer implements ApplicationListener{
 
         graphics.clear(clearColor);
 
-        graphics.batch().setProjection(camera.projection());
+        Draw.proj(camera.projection());
 
         blocks.drawFloor();
 

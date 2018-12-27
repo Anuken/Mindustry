@@ -216,7 +216,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
                 Draw.rect(stack.item.region,
                     x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
                     y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
-                    itemSize, itemSize).rot(rotation);
+                    itemSize, itemSize, rotation);
             }
         }
     }

@@ -346,10 +346,10 @@ public class TurretBullets extends BulletList implements ContentList{
                 float w = 11f, h = 13f;
 
                 Draw.color(Palette.bulletYellowBack);
-                Draw.rect("shell-back", b.x, b.y, w, h).rot(b.angle() + 90);
+                Draw.rect("shell-back", b.x, b.y, w, h, b.angle() + 90);
 
                 Draw.color(Palette.bulletYellow);
-                Draw.rect("shell", b.x, b.y, w, h).rot(b.angle() + 90);
+                Draw.rect("shell", b.x, b.y, w, h, b.angle() + 90);
 
                 Draw.reset();
             }
