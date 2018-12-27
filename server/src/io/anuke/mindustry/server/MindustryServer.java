@@ -20,6 +20,7 @@ public class MindustryServer implements ApplicationListener{
 
     @Override
     public void init(){
+        Core.settings.setDataDirectory(Core.files.local("config"));
         Vars.init();
 
         headless = true;

@@ -3,6 +3,7 @@ package io.anuke.mindustry.graphics;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.VertexAttributes.Usage;
+import io.anuke.arc.graphics.g2d.BatchShader;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.graphics.glutils.Shader;
 import io.anuke.arc.math.Mathf;
@@ -63,7 +64,7 @@ public class IndexedRenderer implements Disposable{
 
         texture.bind();
 
-        program.setUniformMatrix("u_projTrans", combined);
+        program.setUniformMatrix4("u_projTrans", BatchShader.copyTransform(combined));
         program.setUniformi("u_texture", 0);
 
         mesh.render(program, GL20.GL_TRIANGLES, 0, vertices.length / 5);

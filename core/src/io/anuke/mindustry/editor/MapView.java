@@ -324,6 +324,8 @@ public class MapView extends Element implements GestureListener{
         Lines.stroke(Unit.dp.scl(3f));
         Lines.rect(x, y, width, height);
         Draw.reset();
+
+        ScissorStack.popScissors();
     }
 
     private boolean active(){
@@ -337,7 +339,7 @@ public class MapView extends Element implements GestureListener{
     public boolean pan(float x, float y, float deltaX, float deltaY){
         if(!active()) return false;
         offsetx += deltaX / zoom;
-        offsety -= deltaY / zoom;
+        offsety += deltaY / zoom;
         return false;
     }
 

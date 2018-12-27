@@ -17,9 +17,9 @@ public class BackgroundFragment extends Fragment{
     public void build(Group parent){
         Core.scene.table().addRect((a, b, w, h) -> {
             Draw.colorl(0.1f);
-            Fill.rect(0, 0, w, h);
+            Fill.crect(0, 0, w, h);
             Draw.shader(Shaders.menu);
-            Fill.rect(0, 0, w, h);
+            Fill.crect(0, 0, w, h);
             Draw.shader();
 
             boolean portrait = Core.graphics.getWidth() < Core.graphics.getHeight();
@@ -29,7 +29,7 @@ public class BackgroundFragment extends Fragment{
             float logoh = logo.getHeight() * logoscl;
 
             Draw.color();
-            Draw.rect(logo, (int) (w / 2 - logow / 2), (int) (h - logoh + 15 - Unit.dp.scl(portrait ? 30f : 0)), logow, logoh);
+            Draw.rect(logo, (int) (w / 2), (int) (h - logoh + 15 - Unit.dp.scl(portrait ? 30f : 0)) + logoh/2, logow, logoh);
         }).visible(() -> state.is(State.menu)).grow();
     }
 }

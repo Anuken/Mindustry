@@ -2,12 +2,11 @@ package io.anuke.mindustry.server;
 
 
 import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Core;
 import io.anuke.arc.backends.headless.HeadlessApplication;
 import io.anuke.arc.backends.headless.HeadlessApplicationConfiguration;
+import io.anuke.mindustry.net.Net;
 import io.anuke.net.KryoClient;
 import io.anuke.net.KryoServer;
-import io.anuke.mindustry.net.Net;
 
 public class ServerLauncher extends HeadlessApplication{
 
@@ -22,8 +21,6 @@ public class ServerLauncher extends HeadlessApplication{
             Net.setServerProvider(new KryoServer());
 
             HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-            Core.settings.setDataDirectory(Core.files.local("config"));
-
             new ServerLauncher(new MindustryServer(args), config);
         }catch(Throwable t){
             CrashHandler.handle(t);
