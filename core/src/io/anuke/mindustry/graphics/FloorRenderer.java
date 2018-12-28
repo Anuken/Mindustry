@@ -16,7 +16,6 @@ import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
-import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
@@ -147,8 +146,6 @@ public class FloorRenderer{
         Chunk chunk = cache[cx][cy];
 
         ObjectSet<CacheLayer> used = new ObjectSet<>();
-
-        Sector sector = world.getSector();
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){

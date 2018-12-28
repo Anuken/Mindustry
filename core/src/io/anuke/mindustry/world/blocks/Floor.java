@@ -178,7 +178,7 @@ public class Floor extends Block{
 
             TextureRegion region = floor.edgeRegions[i];
 
-            Draw.rect(region, tile.worldx() + floor.offsets[i].x, tile.worldy() + floor.offsets[i].y, region.getWidth(), region.getHeight());
+            Draw.rect(region, tile.worldx() + floor.offsets[i].x + region.getWidth()/2f, tile.worldy() + floor.offsets[i].y + region.getHeight()/2f, region.getWidth(), region.getHeight());
         }
     }
 

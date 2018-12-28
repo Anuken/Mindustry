@@ -22,7 +22,7 @@ public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 6;
 
-    private FloorRenderer floorRenderer;
+    public final FloorRenderer floor;
 
     private Array<BlockRequest> requests = new Array<>(true, initialRequests, BlockRequest.class);
     private IntSet teamChecks = new IntSet();
@@ -33,7 +33,7 @@ public class BlockRenderer{
     private FrameBuffer shadows = new FrameBuffer(1, 1);
 
     public BlockRenderer(){
-        floorRenderer = new FloorRenderer();
+        floor = new FloorRenderer();
 
         for(int i = 0; i < requests.size; i++){
             requests.set(i, new BlockRequest());
@@ -163,12 +163,6 @@ public class BlockRenderer{
             }
 
             BlockRequest req = requests.get(iterateidx);
-
-            if(req.layer != lastLayer){
-                if(lastLayer != null) layerEnds(lastLayer);
-                layerBegins(req.layer);
-            }
-
             Block block = req.tile.block();
 
             if(req.layer == Layer.block){
@@ -215,24 +209,6 @@ public class BlockRenderer{
                 break;
             }
         }
-    }
-
-    public void beginFloor(){
-        floorRenderer.beginDraw();
-    }
-
-    public void endFloor(){
-        floorRenderer.endDraw();
-    }
-
-    public void drawFloor(){
-        floorRenderer.drawFloor();
-    }
-
-    private void layerBegins(Layer layer){
-    }
-
-    private void layerEnds(Layer layer){
     }
 
     private void addRequest(Tile tile, Layer layer){

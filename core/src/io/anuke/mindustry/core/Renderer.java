@@ -18,10 +18,13 @@ import io.anuke.arc.graphics.g2d.SpriteBatch;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.ScreenRecorder;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
@@ -39,7 +42,8 @@ public class Renderer implements ApplicationListener{
     public final OverlayRenderer overlays = new OverlayRenderer();
 
     private Color clearColor;
-    private int targetscale = baseCameraScale;
+    private float targetscale = baseCameraScale;
+    private float camerascale = baseCameraScale;
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
     private Vector2 avgPosition = new Vector2();
     private float shakeIntensity, shaketime;
@@ -99,15 +103,12 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void update(){
-        camera.position.set(players[0].x, players[0].y);
-        graphics.clear(Color.PURPLE);
-        Draw.proj(camera.projection());
-        players[0].drawAll();
-        Draw.flush();
-
-        /*
         //TODO hack, find source of this bug
         Color.WHITE.set(1f, 1f, 1f, 1f);
+
+        camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
+        camera.width = graphics.getWidth() / camerascale;
+        camera.height = graphics.getHeight() / camerascale;
 
         if(state.is(State.menu)){
             graphics.clear(Color.BLACK);
@@ -122,32 +123,20 @@ public class Renderer implements ApplicationListener{
                     camera.position.lerpDelta(position, 0.08f);
                 }
             }else if(!mobile){
-                camera.position.set(position);
+                camera.position.lerpDelta(position, 0.08f);
             }
 
             camera.position.x = Mathf.clamp(camera.position.x, -tilesize / 2f, world.width() * tilesize - tilesize / 2f);
             camera.position.y = Mathf.clamp(camera.position.y, -tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
-            float prex = camera.position.x, prey = camera.position.y;
-            //TODO update screenshake
             updateShake(0.75f);
 
-            float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
-            float lastx = camera.position.x, lasty = camera.position.y;
-
-            if(snapCamera){
-                camera.position.set((int) camera.position.x, (int) camera.position.y);
-            }
-
             draw();
-
-            camera.position.set(lastx - deltax, lasty - deltay);
         }
 
         if(!ui.chatfrag.chatOpen()){
-            //TODO does not work
-            //ScreenRecorder.record(); //this only does something if CoreGifRecorder is on the class path, which it usually isn't
-        }*/
+            ScreenRecorder.record(); //this only does something if CoreGifRecorder is on the class path, which it usually isn't
+        }
     }
 
     void updateShake(float scale){
@@ -174,7 +163,7 @@ public class Renderer implements ApplicationListener{
 
         Draw.proj(camera.projection());
 
-        blocks.drawFloor();
+        blocks.floor.drawFloor();
 
         drawAndInterpolate(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
         drawAndInterpolate(puddleGroup);
@@ -222,20 +211,6 @@ public class Renderer implements ApplicationListener{
 
         overlays.drawTop();
 
-        //TODO fog
-        /*
-        if(showFog){
-            Graphics.surface();
-        }else{
-            Graphics.flushSurface();
-        }*/
-
-        //batch.end();
-
-        if(showFog){
-       //     fog.draw();
-        }
-
         //TODO this isn't necessary anymore
         //Graphics.beginCam();
 
@@ -253,6 +228,7 @@ public class Renderer implements ApplicationListener{
         //Graphics.surface(effectSurface, true, false);
 
         float trnsX = -12, trnsY = -13;
+        Draw.color(0, 0, 0, 0.15f);
 
         for(EntityGroup<? extends BaseUnit> group : unitGroups){
             if(!group.isEmpty()){
@@ -266,7 +242,7 @@ public class Renderer implements ApplicationListener{
 
         //Draw.color(0, 0, 0, 0.15f);
         //Graphics.flushSurface();
-       // Draw.color();
+        Draw.color();
     }
 
     private void drawAllTeams(boolean flying){
@@ -307,11 +283,6 @@ public class Renderer implements ApplicationListener{
         EntityDraw.drawWith(group, toDraw, drawer);
     }
 
-    @Override
-    public void resize(int width, int height){
-        camera.resize(width, height);
-    }
-
     public Vector2 averagePosition(){
         avgPosition.setZero();
 
@@ -321,13 +292,9 @@ public class Renderer implements ApplicationListener{
         return avgPosition;
     }
 
-    public void setCameraScale(int amount){
-        targetscale = amount;
+    public void scaleCamera(float amount){
+        targetscale += amount;
         clampScale();
-    }
-
-    public void scaleCamera(int amount){
-        setCameraScale(targetscale + amount);
     }
 
     public void clampScale(){
