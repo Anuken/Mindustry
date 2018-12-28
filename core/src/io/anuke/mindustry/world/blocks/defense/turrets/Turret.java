@@ -135,6 +135,7 @@ public abstract class Turret extends Block{
         Draw.rect(baseRegion, tile.drawx(), tile.drawy());
         Draw.color(tile.getTeam().color, Color.WHITE, 0.45f);
         Draw.rect(baseTopRegion, tile.drawx(), tile.drawy());
+        Draw.color();
     }
 
     @Override
@@ -177,6 +178,7 @@ public abstract class Turret extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Lines.stroke(1f, Palette.placing);
         Lines.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range);
+        Draw.color();
     }
 
     @Override

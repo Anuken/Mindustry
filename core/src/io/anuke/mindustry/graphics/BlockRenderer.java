@@ -1,9 +1,11 @@
 package io.anuke.mindustry.graphics;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.collection.Sort;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.Mathf;
@@ -27,7 +29,6 @@ public class BlockRenderer{
     private Array<BlockRequest> requests = new Array<>(true, initialRequests, BlockRequest.class);
     private IntSet teamChecks = new IntSet();
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
-    private Layer lastLayer;
     private int requestidx = 0;
     private int iterateidx = 0;
     private FrameBuffer shadows = new FrameBuffer(1, 1);
@@ -71,7 +72,6 @@ public class BlockRenderer{
     /**Process all blocks to draw, simultaneously updating the block shadow framebuffer.*/
     public void processBlocks(){
         iterateidx = 0;
-        lastLayer = null;
 
         int avgx = (int)(camera.position.x / tilesize);
         int avgy = (int)(camera.position.y / tilesize);
@@ -89,8 +89,7 @@ public class BlockRenderer{
         requestidx = 0;
 
         Draw.flush();
-        Draw.proj()
-        .setOrtho(Mathf.round(camera.position.x, tilesize)-shadowW/2f, Mathf.round(camera.position.y, tilesize)-shadowH/2f,
+        Draw.proj().setOrtho(Mathf.round(camera.position.x, tilesize)-shadowW/2f, Mathf.round(camera.position.y, tilesize)-shadowH/2f,
         shadowW, shadowH);
 
         if(shadows.getWidth() != shadowW || shadows.getHeight() != shadowH){
@@ -98,6 +97,7 @@ public class BlockRenderer{
         }
 
         shadows.begin();
+        Core.graphics.clear(Color.CLEAR);
 
         int minx = Math.max(avgx - rangex - expandr, 0);
         int miny = Math.max(avgy - rangey - expandr, 0);
@@ -137,9 +137,9 @@ public class BlockRenderer{
             }
         }
 
+        Draw.flush();
         shadows.end();
 
-        Draw.flush();
         Draw.proj(camera.projection());
 
         Sort.instance().sort(requests.items, 0, requestidx);
@@ -172,8 +172,6 @@ public class BlockRenderer{
             }else if(req.layer == block.layer2){
                 block.drawLayer2(req.tile);
             }
-
-            lastLayer = req.layer;
         }
     }
 
