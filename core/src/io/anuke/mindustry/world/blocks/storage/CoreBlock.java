@@ -26,7 +26,6 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.maps.TutorialSector;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
@@ -115,13 +114,6 @@ public class CoreBlock extends StorageBlock{
     @Override
     public void placed(Tile tile){
         state.teams.get(tile.getTeam()).cores.add(tile);
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-
-        bars.remove(BarType.inventory);
     }
 
     @Override

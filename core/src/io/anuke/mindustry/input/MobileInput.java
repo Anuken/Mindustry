@@ -679,8 +679,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }else{
             //pan player
-            Core.camera.position.x += deltaX;
-            Core.camera.position.y += deltaY;
+            Core.camera.position.x -= deltaX;
+            Core.camera.position.y -= deltaY;
         }
 
         return false;

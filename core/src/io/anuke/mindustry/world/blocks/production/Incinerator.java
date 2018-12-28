@@ -11,7 +11,6 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -27,12 +26,6 @@ public class Incinerator extends Block{
         solid = true;
 
         consumes.power(0.05f);
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-        bars.remove(BarType.liquid);
     }
 
     @Override

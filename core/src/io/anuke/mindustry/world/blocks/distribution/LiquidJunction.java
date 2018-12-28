@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks.distribution;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.meta.BlockStat;
@@ -14,12 +13,6 @@ public class LiquidJunction extends LiquidBlock{
     public LiquidJunction(String name){
         super(name);
         hasLiquids = true;
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-        bars.remove(BarType.liquid);
     }
 
     @Override

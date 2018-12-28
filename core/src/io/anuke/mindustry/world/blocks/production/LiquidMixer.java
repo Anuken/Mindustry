@@ -2,11 +2,9 @@ package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.modules.LiquidModule;
@@ -38,15 +36,6 @@ public class LiquidMixer extends LiquidBlock{
 
         stats.add(BlockStat.liquidOutput, outputLiquid);
         stats.add(BlockStat.liquidOutputSpeed, 60f * consumes.get(ConsumeLiquid.class).used(), StatUnit.liquidSecond);
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-
-        bars.remove(BarType.liquid);
-        bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.get(consumes.liquid()) / liquidCapacity));
-        bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.get(outputLiquid) / liquidCapacity));
     }
 
     @Override

@@ -79,8 +79,6 @@ public class Block extends BaseBlock {
     public boolean instantTransfer = false;
     /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
     public BlockGroup group = BlockGroup.none;
-    /** list of displayed block status bars. Defaults to health bar. */
-    public BlockBars bars = new BlockBars();
     /** List of block stats. */
     public BlockStats stats = new BlockStats(this);
     /** List of block flags. Used for AI indexing. */
@@ -252,7 +250,6 @@ public class Block extends BaseBlock {
         }
 
         setStats();
-        setBars();
 
         consumes.checkRequired(this);
     }
@@ -331,12 +328,6 @@ public class Block extends BaseBlock {
         if(hasPower) stats.add(BlockStat.powerCapacity, powerCapacity, StatUnit.powerUnits);
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
-    }
-
-    public void setBars(){
-        if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
-        if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
-        if(hasItems) bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.total() / itemCapacity));
     }
 
     public String name(){

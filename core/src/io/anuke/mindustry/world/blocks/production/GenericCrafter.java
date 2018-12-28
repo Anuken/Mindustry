@@ -6,11 +6,9 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeItem;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.arc.entities.Effects;
@@ -37,14 +35,6 @@ public class GenericCrafter extends Block{
         update = true;
         solid = true;
         health = 60;
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-
-        if(consumes.has(ConsumeItem.class)) bars.replace(new BlockBar(BarType.inventory, true,
-                tile -> (float) tile.entity.items.get(consumes.item()) / itemCapacity));
     }
 
     @Override

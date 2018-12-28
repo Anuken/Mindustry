@@ -7,10 +7,8 @@ import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.arc.entities.Effects;
@@ -68,16 +66,6 @@ public class PowerSmelter extends PowerBlock{
     public void load(){
         super.load();
         topRegion = Core.atlas.find(name + "-top");
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-        bars.remove(BarType.inventory);
-
-        for(ItemStack item : consumes.items()){
-            bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.get(item.item) / itemCapacity));
-        }
     }
 
     @Override

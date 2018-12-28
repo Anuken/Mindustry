@@ -14,9 +14,7 @@ import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
@@ -63,13 +61,6 @@ public class NuclearReactor extends PowerGenerator{
 
         topRegion = Core.atlas.find(name + "-center");
         lightsRegion = Core.atlas.find(name + "-lights");
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-        bars.replace(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.get(consumes.item()) / itemCapacity));
-        bars.add(new BlockBar(BarType.heat, true, tile -> tile.<NuclearReactorEntity>entity().heat));
     }
 
     @Override

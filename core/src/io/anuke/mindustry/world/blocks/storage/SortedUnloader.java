@@ -42,9 +42,6 @@ public class SortedUnloader extends Block implements SelectionTrait{
     }
 
     @Override
-    public void setBars(){}
-
-    @Override
     public void playerPlaced(Tile tile){
         Core.app.post(() -> Call.setSortedUnloaderItem(null, tile, lastItem));
     }

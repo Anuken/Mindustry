@@ -23,10 +23,8 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.modules.ItemModule;
 
 import java.io.DataInput;
@@ -101,11 +99,6 @@ public class BuildBlock extends Block{
             player.clearBuilding();
             player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.getRotation(), entity.recipe));
         }
-    }
-
-    @Override
-    public void setBars(){
-        bars.replace(new BlockBar(BarType.health, true, tile -> tile.<BuildEntity>entity().progress));
     }
 
     @Override

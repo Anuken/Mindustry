@@ -10,7 +10,6 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
@@ -45,12 +44,6 @@ public class DebugBlocks extends BlockList implements ContentList{
             }
 
             @Override
-            public void setBars(){
-                super.setBars();
-                bars.remove(BarType.power);
-            }
-
-            @Override
             public void init(){
                 super.init();
                 stats.remove(BlockStat.powerCapacity);
@@ -81,12 +74,6 @@ public class DebugBlocks extends BlockList implements ContentList{
             @Override
             public boolean outputsItems(){
                 return true;
-            }
-
-            @Override
-            public void setBars(){
-                super.setBars();
-                bars.remove(BarType.inventory);
             }
 
             @Override

@@ -91,10 +91,6 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void setBars(){
-    }
-
-    @Override
     public void playerPlaced(Tile tile){
         Tile before = world.tile(lastPlaced);
         if(linkValid(tile, before) && before.block() instanceof PowerNode){

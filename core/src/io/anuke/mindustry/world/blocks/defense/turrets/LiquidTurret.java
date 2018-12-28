@@ -5,9 +5,7 @@ import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
 import io.anuke.arc.entities.Effects;
@@ -56,13 +54,6 @@ public abstract class LiquidTurret extends Turret{
         }
 
         super.findTarget(tile);
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-        bars.remove(BarType.inventory);
-        bars.replace(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
     }
 
     @Override
