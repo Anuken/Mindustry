@@ -24,7 +24,7 @@ public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 6;
 
-    public final FloorRenderer floor;
+    public final FloorRenderer floor = new FloorRenderer();
 
     private Array<BlockRequest> requests = new Array<>(true, initialRequests, BlockRequest.class);
     private IntSet teamChecks = new IntSet();
@@ -34,7 +34,6 @@ public class BlockRenderer{
     private FrameBuffer shadows = new FrameBuffer(1, 1);
 
     public BlockRenderer(){
-        floor = new FloorRenderer();
 
         for(int i = 0; i < requests.size; i++){
             requests.set(i, new BlockRequest());

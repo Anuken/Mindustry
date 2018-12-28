@@ -148,7 +148,6 @@ public class HudFragment extends Fragment{
         });
 
         //minimap
-        //TODO screws everything up, somehow
         //parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> !state.is(State.menu) && Core.settings.getBool("minimap")));
 
         //paused table

@@ -48,7 +48,6 @@ public class MobileInput extends InputHandler implements GestureListener{
     //gesture data
     private Vector2 vector = new Vector2();
     private boolean canPan;
-    private boolean zoomed = false;
     /** Set of completed guides. */
     private ObjectSet<String> guides = new ObjectSet<>();
 
@@ -663,6 +662,9 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
         if(!canPan) return false;
+        float scale = Core.camera.width / Core.graphics.getWidth();
+        deltaX *= scale;
+        deltaY *= scale;
 
         //can't pan in line mode with one finger or while dropping items!
         if((lineMode && !Core.input.isTouched(1)) || droppingItem){
@@ -673,11 +675,11 @@ public class MobileInput extends InputHandler implements GestureListener{
             for(PlaceRequest req : selection){
                 if(req.remove) continue; //don't shift removal requests
                 req.x += deltaX;
-                req.y -= deltaY;
+                req.y += deltaY;
             }
         }else{
             //pan player
-            Core.camera.position.x -= deltaX;
+            Core.camera.position.x += deltaX;
             Core.camera.position.y += deltaY;
         }
 
@@ -686,20 +688,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean zoom(float initialDistance, float distance){
-
-        if(Math.abs(distance - initialDistance) > io.anuke.arc.scene.ui.layout.Unit.dp.scl(100f) && !zoomed){
-            int amount = (distance > initialDistance ? 1 : -1);
-            renderer.scaleCamera(Math.round(io.anuke.arc.scene.ui.layout.Unit.dp.scl(amount)));
-            zoomed = true;
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public void pinchStop(){
-        zoomed = false;
+        float amount = (distance > initialDistance ? 0.1f : -0.1f) * Time.delta();
+        renderer.scaleCamera(io.anuke.arc.scene.ui.layout.Unit.dp.scl(amount));
+        return true;
     }
 
     @Override

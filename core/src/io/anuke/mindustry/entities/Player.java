@@ -14,7 +14,10 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.fx.UnitFx;
@@ -23,7 +26,6 @@ import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
@@ -73,7 +75,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     private Queue<BuildRequest> placeQueue = new Queue<>();
     private Tile mining;
     private CarriableTrait carrying;
-    private Trail trail = new Trail(12);
     private Vector2 movement = new Vector2();
     private boolean moved;
 
@@ -373,15 +374,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         if(dead) return;
 
         drawBuilding(this);
-
-        if(mech.flying || boostHeat > 0.001f){
-            float wobblyness = 0.6f;
-            if(!state.isPaused()) trail.update(x + Angles.trnsx(rotation + 180f, 5f) + Mathf.range(wobblyness),
-            y + Angles.trnsy(rotation + 180f, 5f) + Mathf.range(wobblyness));
-            trail.draw(Tmp.c1.set(mech.trailColor).lerp(mech.trailColorTo, mech.flying ? 0f : boostHeat), 5f * (isFlying() ? 1f : boostHeat));
-        }else{
-            trail.clear();
-        }
     }
 
     public void drawName(){
@@ -772,7 +764,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         inventory.clear();
         placeQueue.clear();
         dead = true;
-        trail.clear();
         target = null;
         moveTarget = null;
         carrier = null;

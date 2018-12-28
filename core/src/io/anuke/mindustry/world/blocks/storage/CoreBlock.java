@@ -152,8 +152,7 @@ public class CoreBlock extends StorageBlock{
             Shaders.build.color.set(Palette.accent);
             Shaders.build.time = -entity.time / 10f;
 
-            Draw.shader(Shaders.build, false);
-            Shaders.build.apply();
+            Draw.shader(Shaders.build, true);
             Draw.rect(region, tile.drawx(), tile.drawy());
             Draw.shader();
 

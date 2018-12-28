@@ -17,7 +17,6 @@ import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.ItemType;
@@ -333,7 +332,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
     @Override
     public void drawOver(){
-        trail.draw(Palette.lightTrail, 3f);
         drawBuilding(this);
     }
 

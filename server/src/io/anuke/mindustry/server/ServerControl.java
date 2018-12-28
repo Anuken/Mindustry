@@ -105,7 +105,7 @@ public class ServerControl implements ApplicationListener{
             String[] commands = {};
 
             if(args.length > 0){
-                commands = String.join(" ", args).split(",");
+                commands = Strings.join(" ", args).split(",");
                 info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
             }
 

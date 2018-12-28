@@ -299,7 +299,7 @@ public class Renderer implements ApplicationListener{
 
     public void clampScale(){
         float s = io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f);
-        targetscale = Mathf.clamp(targetscale, Math.round(s * 2), Math.round(s * 5));
+        targetscale = Mathf.clamp(targetscale, Math.round(s * 1), Math.round(s * 6));
     }
 
     public void takeMapScreenshot(){

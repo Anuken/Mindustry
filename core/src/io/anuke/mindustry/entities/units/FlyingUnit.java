@@ -10,7 +10,6 @@ import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.CarriableTrait;
 import io.anuke.mindustry.entities.traits.CarryTrait;
-import io.anuke.mindustry.graphics.Trail;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
@@ -20,9 +19,7 @@ import static io.anuke.mindustry.Vars.world;
 
 public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     protected static Vector2 vec = new Vector2();
-    protected static float wobblyness = 0.6f;
 
-    protected Trail trail = new Trail(8);
     protected CarriableTrait carrying;
     protected final UnitState
 
@@ -155,9 +152,6 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             updateRotation();
             wobble();
         }
-
-        trail.update(x + Angles.trnsx(rotation + 180f, 6f) + Mathf.range(wobblyness),
-        y + Angles.trnsy(rotation + 180f, 6f) + Mathf.range(wobblyness));
     }
 
     @Override
@@ -169,11 +163,6 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
         drawItems();
 
         Draw.alpha(1f);
-    }
-
-    @Override
-    public void drawOver(){
-        trail.draw(type.trailColor, 5f);
     }
 
     @Override
