@@ -209,7 +209,7 @@ public class Mechs implements ContentList{
                 Shaders.build.color.set(Palette.accent).a = player.shootHeat;
                 Draw.shader(Shaders.build);
                 Draw.alpha(1f);
-                Draw.rect(armorRegion, player.snappedX(), player.snappedY(), player.rotation);
+                Draw.rect(armorRegion, player.x, player.y, player.rotation);
                 Draw.shader(Shaders.mix);
                 Draw.color(1f, 1f, 1f, alpha);
             }
@@ -273,7 +273,7 @@ public class Mechs implements ContentList{
                 Draw.color(Palette.lancerLaser);
                 Draw.alpha(scl/2f);
                 Draw.blend(Blending.additive);
-                Draw.rect(shield, player.snappedX() + Mathf.range(scl/2f), player.snappedY() + Mathf.range(scl/2f), player.rotation - 90);
+                Draw.rect(shield, player.x + Mathf.range(scl/2f), player.y + Mathf.range(scl/2f), player.rotation - 90);
                 Draw.blend();
                 Draw.shader(Shaders.mix);
                 Draw.color();

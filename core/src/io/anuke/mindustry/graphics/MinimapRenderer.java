@@ -67,6 +67,8 @@ public class MinimapRenderer implements Disposable{
     }
 
     public void drawEntities(float x, float y, float w, float h){
+        updateUnitArray();
+
         int sz = baseSize * zoom;
         float dx = (Core.camera.position.x / tilesize);
         float dy = (Core.camera.position.y / tilesize);

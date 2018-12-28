@@ -56,7 +56,6 @@ public class Control implements ApplicationListener{
         unlocks = new Unlocks();
 
         Core.input.setCatch(KeyCode.BACK, true);
-        Core.keybinds.setDefaults(Binding.values());
 
         Effects.setShakeFalloff(10000f);
 
@@ -279,7 +278,7 @@ public class Control implements ApplicationListener{
         if(!Core.settings.getBool("4.0-warning-2", false)){
 
             Time.run(5f, () -> {
-                FloatingDialog dialog = new FloatingDialog("[accent]WARNING![]");
+                FloatingDialog dialog = new FloatingDialog("WARNING!");
                 dialog.buttons().addButton("$text.ok", () -> {
                     dialog.hide();
                     Core.settings.put("4.0-warning-2", true);
@@ -291,13 +290,6 @@ public class Control implements ApplicationListener{
                         "\n\n[accent]Saves and maps may be corrupted without warning between updates.").wrap().width(400f);
                 dialog.show();
             });
-        }
-    }
-
-    /** Called from main logic thread.*/
-    public void runUpdateLogic(){
-        if(!state.is(State.menu)){
-            renderer.minimap.updateUnitArray();
         }
     }
 

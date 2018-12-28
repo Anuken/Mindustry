@@ -103,7 +103,10 @@ public class UI implements ApplicationListener{
 
         TooltipManager.getInstance().animations = false;
 
-        Core.settings.setErrorHandler(e -> Time.run(1f, () -> showError("Failed to access local storage.\nSettings will not be saved.")));
+        Core.settings.setErrorHandler(e -> {
+            e.printStackTrace();
+            Core.app.post(() -> showError("Failed to access local storage.\nSettings will not be saved."));
+        });
 
         Colors.put("accent", Palette.accent);
 

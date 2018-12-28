@@ -399,7 +399,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 tools.row();
 
                 tools.table("underline", t -> t.add("$text.editor.teams"))
-                        .colspan(3).height(40).width(size * 3f).padBottom(3);
+                        .colspan(3).height(40).width(size * 3f + 3f).padBottom(3);
 
                 tools.row();
 
@@ -437,7 +437,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 mid.row();
 
                 mid.table("underline", t -> t.add("$text.editor.elevation"))
-                    .colspan(3).height(40).width(size * 3f);
+                    .colspan(3).height(40).width(size * 3f + 3f);
 
                 mid.row();
 
@@ -450,8 +450,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     .size(size).get().setAlignment(Align.center, Align.center);
 
                     t.addImageButton("icon-arrow-right", "clear-partial", 16 * 2f, () -> editor.setDrawElevation(editor.getDrawElevation() + 1))
-                    .disabled(b -> editor.getDrawElevation() >= 63).size(size);
-                }).colspan(3).height(size).width(size * 3f);
+                    .disabled(b -> editor.getDrawElevation() >= 63).size(size).name("aaaaa");
+                }).colspan(3).height(size).width(size * 3f + 3f);
 
             }).margin(0).left().growY();
 

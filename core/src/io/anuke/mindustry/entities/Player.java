@@ -3,7 +3,6 @@ package io.anuke.mindustry.entities;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.Bits;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.EntityGroup;
@@ -285,7 +284,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void drawShadow(float offsetX, float offsetY){
-        float x = snappedX(), y = snappedY();
         float scl = mech.flying ? 1f : boostHeat / 2f;
 
         Draw.rect(mech.iconRegion, x + offsetX * scl, y + offsetY * scl, rotation - 90);
@@ -294,8 +292,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     @Override
     public void draw(){
         if(dead) return;
-
-        float x = snappedX(), y = snappedY();
 
         if(!movement.isZero() && moved && !state.isPaused()){
             walktime += movement.len() / 0.7f * getFloorOn().speedMultiplier;
@@ -366,8 +362,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void drawStats(){
-        float x = snappedX(), y = snappedY();
-
         Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
         Draw.alpha(hitTime / hitDuration);
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
@@ -388,14 +382,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         }else{
             trail.clear();
         }
-    }
-
-    public float snappedX(){
-        return snapCamera && isLocal ? (int) (x + 0.0001f) : x;
-    }
-
-    public float snappedY(){
-        return snapCamera && isLocal ? (int) (y + 0.0001f) : y;
     }
 
     public void drawName(){

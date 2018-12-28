@@ -6,6 +6,7 @@ import io.anuke.arc.util.I18NBundle;
 import io.anuke.mindustry.Vars;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Log;
+import io.anuke.mindustry.input.Binding;
 
 import java.util.Locale;
 
@@ -15,6 +16,7 @@ public class BundleLoader{
 
     public static void load(){
         Core.settings.defaults("locale", "default");
+        Core.keybinds.setDefaults(Binding.values());
         Core.settings.load();
         loadBundle();
     }

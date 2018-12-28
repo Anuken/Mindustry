@@ -4,12 +4,11 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.entities.Entities;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.EntityQuery;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.*;
@@ -171,10 +170,6 @@ public class Logic implements ApplicationListener{
 
     @Override
     public void update(){
-
-        if(Vars.control != null){
-            control.runUpdateLogic();
-        }
 
         if(!state.is(State.menu)){
 

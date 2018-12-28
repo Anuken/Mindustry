@@ -14,7 +14,7 @@ import io.anuke.arc.util.Disposable;
 public class IndexedRenderer implements Disposable{
     private final static int vsize = 5;
 
-    private Shader program = createDefaultShader();
+    private Shader program = BatchShader.create();
     private Mesh mesh;
     private float[] tmpVerts = new float[vsize * 6];
     private float[] vertices;
@@ -26,33 +26,6 @@ public class IndexedRenderer implements Disposable{
 
     public IndexedRenderer(int sprites){
         resize(sprites);
-    }
-
-    static public Shader createDefaultShader(){
-        String vertexShader = "attribute vec4 " + Shader.POSITION_ATTRIBUTE + ";\n" //
-                + "attribute vec2 " + Shader.TEXCOORD_ATTRIBUTE + "0;\n" //
-                + "uniform mat4 u_projTrans;\n" //
-                + "varying vec2 v_texCoords;\n" //
-                + "\n" //
-                + "void main()\n" //
-                + "{\n" //
-                + "   v_texCoords = " + Shader.TEXCOORD_ATTRIBUTE + "0;\n" //
-                + "   gl_Position =  u_projTrans * " + Shader.POSITION_ATTRIBUTE + ";\n" //
-                + "}\n";
-        String fragmentShader = "#ifdef GL_ES\n" //
-                + "#define LOWP lowp\n" //
-                + "precision mediump float;\n" //
-                + "#else\n" //
-                + "#define LOWP \n" //
-                + "#endif\n" //
-                + "varying vec2 v_texCoords;\n" //
-                + "uniform sampler2D u_texture;\n" //
-                + "void main()\n"//
-                + "{\n" //
-                + "  gl_FragColor = texture2D(u_texture, v_texCoords);\n" //
-                + "}";
-
-        return new Shader(vertexShader, fragmentShader);
     }
 
     public void render(Texture texture){

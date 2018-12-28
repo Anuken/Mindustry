@@ -18,11 +18,10 @@ import io.anuke.arc.graphics.g2d.SpriteBatch;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
@@ -32,7 +31,6 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 
 import static io.anuke.arc.Core.*;
-import static io.anuke.arc.Core.graphics;
 import static io.anuke.mindustry.Vars.*;
 
 public class Renderer implements ApplicationListener{
@@ -44,6 +42,7 @@ public class Renderer implements ApplicationListener{
     private int targetscale = baseCameraScale;
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
     private Vector2 avgPosition = new Vector2();
+    private float shakeIntensity, shaketime;
 
     public Renderer(){
         batch = new SpriteBatch(4096);
@@ -51,6 +50,11 @@ public class Renderer implements ApplicationListener{
         Lines.setCircleVertices(14);
 
         Shaders.init();
+
+        Effects.setScreenShakeProvider((intensity, duration) -> {
+            shakeIntensity = Math.max(intensity, shakeIntensity);
+            shaketime = Math.max(shaketime, duration);
+        });
 
         Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
             if(effect == Fx.none) return;
@@ -95,6 +99,13 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void update(){
+        camera.position.set(players[0].x, players[0].y);
+        graphics.clear(Color.PURPLE);
+        Draw.proj(camera.projection());
+        players[0].drawAll();
+        Draw.flush();
+
+        /*
         //TODO hack, find source of this bug
         Color.WHITE.set(1f, 1f, 1f, 1f);
 
@@ -119,7 +130,7 @@ public class Renderer implements ApplicationListener{
 
             float prex = camera.position.x, prey = camera.position.y;
             //TODO update screenshake
-            //updateShake(0.75f);
+            updateShake(0.75f);
 
             float deltax = camera.position.x - prex, deltay = camera.position.y - prey;
             float lastx = camera.position.x, lasty = camera.position.y;
@@ -136,11 +147,24 @@ public class Renderer implements ApplicationListener{
         if(!ui.chatfrag.chatOpen()){
             //TODO does not work
             //ScreenRecorder.record(); //this only does something if CoreGifRecorder is on the class path, which it usually isn't
+        }*/
+    }
+
+    void updateShake(float scale){
+        if(shaketime > 0){
+            float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * scale;
+            camera.position.add(Mathf.range(intensity), Mathf.range(intensity));
+            shakeIntensity -= 0.25f * Time.delta();
+            shaketime -= Time.delta();
+            shakeIntensity = Mathf.clamp(shakeIntensity, 0f, 100f);
+        }else{
+            shakeIntensity = 0f;
         }
     }
 
     public void draw(){
         camera.update();
+
         if(Float.isNaN(camera.position.x) || Float.isNaN(camera.position.y)){
             camera.position.x = players[0].x;
             camera.position.y = players[0].y;
@@ -259,10 +283,10 @@ public class Renderer implements ApplicationListener{
             Shaders.mix.color.set(Color.WHITE);
 
             //Graphics.beginShaders(Shaders.outline);
-            //Draw.shader(Shaders.mix, true);
+            Draw.shader(Shaders.mix, true);
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
-            //Draw.shader();
+            Draw.shader();
             blocks.drawTeamBlocks(Layer.turret, team);
             //Graphics.endShaders();
 
