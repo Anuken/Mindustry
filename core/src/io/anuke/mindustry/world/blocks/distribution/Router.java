@@ -1,14 +1,13 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.ucore.core.Timers;
+import io.anuke.arc.util.Time;
 
 public class Router extends Block{
     protected float speed = 8f;
@@ -23,13 +22,6 @@ public class Router extends Block{
     }
 
     @Override
-    public void setBars(){
-        super.setBars();
-
-        bars.remove(BarType.inventory);
-    }
-
-    @Override
     public void update(Tile tile){
         SplitterEntity entity = tile.entity();
 
@@ -38,7 +30,7 @@ public class Router extends Block{
         }
 
         if(entity.lastItem != null){
-            entity.time += 1f/speed * Timers.delta();
+            entity.time += 1f/speed * Time.delta();
             Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
 
             if(target != null && (entity.time >= 1f || !(target.block() instanceof Router))){

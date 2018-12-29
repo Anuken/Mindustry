@@ -1,8 +1,11 @@
 package io.anuke.mindustry.entities.units.types;
 
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Player;
@@ -15,14 +18,13 @@ import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.AmmoType;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.headless;
+import static io.anuke.mindustry.Vars.players;
 
 public class AlphaDrone extends FlyingUnit {
     static final float followDistance = 80f;
@@ -44,7 +46,7 @@ public class AlphaDrone extends FlyingUnit {
             }
 
             target = last;
-            if(distanceTo(leader) < followDistance){
+            if(dst(leader) < followDistance){
                 targetClosest();
             }else{
                 target = null;
@@ -53,7 +55,7 @@ public class AlphaDrone extends FlyingUnit {
             if(target != null){
                 attack(50f);
 
-                if((Mathf.angNear(angleTo(target), rotation, 15f) && distanceTo(target) < getWeapon().getAmmo().getRange())){
+                if((Angles.near(angleTo(target), rotation, 15f) && dst(target) < getWeapon().getAmmo().getRange())){
                     AmmoType ammo = getWeapon().getAmmo();
 
                     Vector2 to = Predict.intercept(AlphaDrone.this, target, ammo.bullet.speed);
@@ -61,7 +63,7 @@ public class AlphaDrone extends FlyingUnit {
                 }
             }
 
-            if(!leader.isShooting && distanceTo(leader) < 7f){
+            if(!leader.isShooting && dst(leader) < 7f){
                 Call.onAlphaDroneFade(AlphaDrone.this);
             }
         }
@@ -72,7 +74,7 @@ public class AlphaDrone extends FlyingUnit {
         if(drone == null) return;
         Effects.effect(UnitFx.pickup, drone);
         //must run afterwards so the unit's group is not null when sending the removal packet
-        threads.runDelay(drone::remove);
+        Core.app.post(drone::remove);
     }
 
     @Override

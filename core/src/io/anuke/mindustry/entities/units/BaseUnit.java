@@ -1,9 +1,19 @@
 package io.anuke.mindustry.entities.units;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Timer;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.Damage;
@@ -24,11 +34,6 @@ import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.units.CommandCenter.CommandCenterEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -46,7 +51,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static final int timerShootRight = timerIndex++;
 
     protected UnitType type;
-    protected Timer timer = new Timer(5);
+    protected Interval timer = new Interval(5);
     protected StateMachine state = new StateMachine();
     protected TargetTrait target;
 
@@ -77,7 +82,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         Effects.shake(2f, 2f, unit);
 
         //must run afterwards so the unit's group is not null when sending the removal packet
-        threads.runDelay(unit::remove);
+        Core.app.post(unit::remove);
     }
 
     @Override
@@ -222,7 +227,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public Timer getTimer(){
+    public Interval getTimer(){
         return timer;
     }
 
@@ -282,7 +287,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public void update(){
-        hitTime -= Timers.delta();
+        hitTime -= Time.delta();
 
         if(isDead()){
             updateRespawning();

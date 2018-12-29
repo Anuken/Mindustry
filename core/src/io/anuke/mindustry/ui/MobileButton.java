@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui;
 
-import com.badlogic.gdx.utils.Align;
-import io.anuke.ucore.scene.ui.ImageButton;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.scene.ui.ImageButton;
 
 public class MobileButton extends ImageButton{
 

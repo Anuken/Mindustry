@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.ucore.scene.ui.Dialog;
+import io.anuke.arc.scene.ui.Dialog;
 
 import static io.anuke.mindustry.Vars.discordURL;
 import static io.anuke.mindustry.Vars.ui;
@@ -40,12 +40,12 @@ public class DiscordDialog extends Dialog{
 
         buttons().addButton("$text.back", this::hide);
         buttons().addButton("$text.copylink", () -> {
-            Gdx.app.getClipboard().setContents(discordURL);
+            Core.app.getClipboard().setContents(discordURL);
         });
         buttons().addButton("$text.openlink", () -> {
-            if(!Gdx.net.openURI(discordURL)){
+            if(!Core.net.openURI(discordURL)){
                 ui.showError("$text.linkfail");
-                Gdx.app.getClipboard().setContents(discordURL);
+                Core.app.getClipboard().setContents(discordURL);
             }
         });
     }

@@ -1,8 +1,14 @@
 package io.anuke.mindustry.world.blocks;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics.Cursor;
+import io.anuke.arc.Graphics.Cursor.SystemCursor;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
@@ -15,20 +21,11 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.input.CursorType;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -60,20 +57,20 @@ public class BuildBlock extends Block{
         tile.setRotation(rotation);
         world.setBlock(tile, block, team);
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
-        threads.runDelay(() -> tile.block().placed(tile));
+        Core.app.post(() -> tile.block().placed(tile));
 
         //last builder was this local client player, call placed()
         if(!headless && builderID == players[0].id){
             //this is run delayed, since if this is called on the server, all clients need to recieve the onBuildFinish()
             //event first before they can recieve the placed() event modification results
-            threads.runDelay(() -> tile.block().playerPlaced(tile));
+            Core.app.post(() -> tile.block().playerPlaced(tile));
         }
     }
 
     @Override
     public String getDisplayName(Tile tile){
         BuildEntity entity = tile.entity();
-        return Bundles.format("block.constructing", entity.recipe == null ? entity.previous.formalName : entity.recipe.result.formalName);
+        return Core.bundle.format("block.constructing", entity.recipe == null ? entity.previous.formalName : entity.recipe.result.formalName);
     }
 
     @Override
@@ -89,8 +86,8 @@ public class BuildBlock extends Block{
     }
 
     @Override
-    public CursorType getCursor(Tile tile){
-        return CursorType.hand;
+    public Cursor getCursor(Tile tile){
+        return SystemCursor.hand;
     }
 
     @Override
@@ -102,11 +99,6 @@ public class BuildBlock extends Block{
             player.clearBuilding();
             player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.getRotation(), entity.recipe));
         }
-    }
-
-    @Override
-    public void setBars(){
-        bars.replace(new BlockBar(BarType.health, true, tile -> tile.<BuildEntity>entity().progress));
     }
 
     @Override
@@ -151,8 +143,7 @@ public class BuildBlock extends Block{
             Shaders.blockbuild.apply();
 
             Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.getRotation() * 90 : 0);
-
-            Graphics.flush();
+            Draw.flush();
         }
     }
 

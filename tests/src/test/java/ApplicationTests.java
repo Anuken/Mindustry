@@ -1,7 +1,9 @@
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.headless.HeadlessApplication;
-import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
-import com.badlogic.gdx.math.GridPoint2;
+import io.anuke.arc.ApplicationCore;
+import io.anuke.arc.backends.headless.HeadlessApplication;
+import io.anuke.arc.backends.headless.HeadlessApplicationConfiguration;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
@@ -24,15 +26,9 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.modules.ModuleCore;
-import io.anuke.ucore.util.EmptyLogger;
-import io.anuke.ucore.util.Log;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 import static io.anuke.mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,9 +42,9 @@ public class ApplicationTests{
             Throwable[] exceptionThrown = {null};
             Log.setUseColors(false);
 
-            ModuleCore core = new ModuleCore(){
+            ApplicationCore core = new ApplicationCore(){
                 @Override
-                public void init(){
+                public void setup(){
                     Vars.init();
 
                     headless = true;
@@ -57,26 +53,21 @@ public class ApplicationTests{
                     content.load();
                     content.initialize(Content::init);
 
-                    module(logic = new Logic());
-                    module(world = new World());
-                    module(netServer = new NetServer());
+                    add(logic = new Logic());
+                    add(world = new World());
+                    add(netServer = new NetServer());
                 }
 
                 @Override
-                public void postInit(){
-                    super.postInit();
+                public void init(){
+                    super.init();
                     begins[0] = true;
                 }
             };
 
             HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-            config.preferencesDirectory = "test_files/";
 
-            new File("tests_files/").delete();
-
-            new HeadlessApplication(core, config){{
-                Gdx.app.setApplicationLogger(new EmptyLogger());
-            }};
+            new HeadlessApplication(core, config);
 
             for(Thread thread : Thread.getAllStackTraces().keySet()){
                 if(thread.getName().equals("HeadlessApplication")){
@@ -98,7 +89,7 @@ public class ApplicationTests{
 
     @BeforeEach
     void resetWorld(){
-        Timers.setDeltaProvider(() ->  1f);
+        Time.setDeltaProvider(() ->  1f);
         logic.reset();
         state.set(State.menu);
     }
@@ -179,11 +170,11 @@ public class ApplicationTests{
     @Test
     void timers(){
         boolean[] ran = {false};
-        Timers.run(1.9999f, () -> ran[0] = true);
+        Time.run(1.9999f, () -> ran[0] = true);
 
-        Timers.update();
+        Time.update();
         assertFalse(ran[0]);
-        Timers.update();
+        Time.update();
         assertTrue(ran[0]);
     }
 
@@ -220,13 +211,13 @@ public class ApplicationTests{
 
     @Test
     void edges(){
-        GridPoint2[] edges = Edges.getEdges(1);
-        assertEquals(edges[0], new GridPoint2(1, 0));
-        assertEquals(edges[1], new GridPoint2(0, 1));
-        assertEquals(edges[2], new GridPoint2(-1, 0));
-        assertEquals(edges[3], new GridPoint2(0, -1));
+        Point2[] edges = Edges.getEdges(1);
+        assertEquals(edges[0], new Point2(1, 0));
+        assertEquals(edges[1], new Point2(0, 1));
+        assertEquals(edges[2], new Point2(-1, 0));
+        assertEquals(edges[3], new Point2(0, -1));
 
-        GridPoint2[] edges2 = Edges.getEdges(2);
+        Point2[] edges2 = Edges.getEdges(2);
         assertEquals(8, edges2.length);
     }
 
@@ -243,7 +234,7 @@ public class ApplicationTests{
         d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
         d2.addBuildRequest(new BuildRequest(1, 1, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
 
-        Timers.setDeltaProvider(() -> 9999999f);
+        Time.setDeltaProvider(() -> 9999999f);
         d1.updateBuilding(d1);
         d2.updateBuilding(d2);
 
@@ -265,14 +256,14 @@ public class ApplicationTests{
         d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
         d2.addBuildRequest(new BuildRequest(1, 1));
 
-        Timers.setDeltaProvider(() -> 3f);
+        Time.setDeltaProvider(() -> 3f);
         d1.updateBuilding(d1);
-        Timers.setDeltaProvider(() -> 1f);
+        Time.setDeltaProvider(() -> 1f);
         d2.updateBuilding(d2);
 
         assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
 
-        Timers.setDeltaProvider(() -> 9999f);
+        Time.setDeltaProvider(() -> 9999f);
 
         d1.updateBuilding(d1);
         d2.updateBuilding(d2);

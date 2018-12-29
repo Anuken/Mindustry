@@ -1,24 +1,22 @@
 package io.anuke.mindustry.entities.units;
 
-import com.badlogic.gdx.math.Vector2;
-import io.anuke.ucore.util.Translator;
-
-import static io.anuke.mindustry.Vars.threads;
+import io.anuke.arc.Core;
+import io.anuke.arc.math.geom.Vector2;
 
 /**
  * Used to group entities together, for formations and such.
  * Usually, squads are used by units spawned in the same wave.
  */
 public class Squad{
-    public Vector2 direction = new Translator();
+    public Vector2 direction = new Vector2();
     public int units;
 
     private long lastUpdated;
 
     protected void update(){
-        if(threads.getFrameID() != lastUpdated){
+        if(Core.graphics.getFrameId() != lastUpdated){
             direction.setZero();
-            lastUpdated = threads.getFrameID();
+            lastUpdated = Core.graphics.getFrameId();
         }
     }
 }

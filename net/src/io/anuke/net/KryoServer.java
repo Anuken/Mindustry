@@ -1,6 +1,5 @@
-package io.anuke.kryonet;
+package io.anuke.net;
 
-import com.badlogic.gdx.utils.Array;
 import com.dosse.upnp.UPnP;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.FrameworkMessage;
@@ -8,6 +7,10 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.util.InputStreamSender;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.SendMode;
@@ -16,8 +19,6 @@ import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import io.anuke.mindustry.net.Packets.StreamBegin;
 import io.anuke.mindustry.net.Packets.StreamChunk;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Log;
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 
@@ -26,8 +27,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedSelectorException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
-
-import static io.anuke.mindustry.Vars.threads;
 
 public class KryoServer implements ServerProvider{
     final Server server;
@@ -65,7 +64,7 @@ public class KryoServer implements ServerProvider{
                 Log.info("&bRecieved connection: {0}", c.addressTCP);
 
                 connections.add(kn);
-                threads.runDelay(() -> Net.handleServerReceived(kn.id, c));
+                Core.app.post(() -> Net.handleServerReceived(kn.id, c));
             }
 
             @Override
@@ -76,7 +75,7 @@ public class KryoServer implements ServerProvider{
                 Disconnect c = new Disconnect();
                 c.id = k.id;
 
-                threads.runDelay(() -> {
+                Core.app.post(() -> {
                     Net.handleServerReceived(k.id, c);
                     connections.remove(k);
                 });
@@ -87,7 +86,7 @@ public class KryoServer implements ServerProvider{
                 KryoConnection k = getByKryoID(connection.getID());
                 if(object instanceof FrameworkMessage || k == null) return;
 
-                threads.runDelay(() -> {
+                Core.app.post(() -> {
                     try{
                         Net.handleServerReceived(k.id, object);
                     }catch(ValidateException e){
@@ -254,7 +253,7 @@ public class KryoServer implements ServerProvider{
     }
 
     private void handleException(Throwable e){
-        Timers.run(0f, () -> {
+        Time.run(0f, () -> {
             throw new RuntimeException(e);
         });
     }

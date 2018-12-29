@@ -1,30 +1,24 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Align;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.event.InputEvent;
+import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.SettingsDialog;
+import io.anuke.arc.scene.ui.SettingsDialog.SettingsTable.Setting;
+import io.anuke.arc.scene.ui.Slider;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.event.InputEvent;
-import io.anuke.ucore.scene.event.InputListener;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.SettingsDialog;
-import io.anuke.ucore.scene.ui.SettingsDialog.SettingsTable.Setting;
-import io.anuke.ucore.scene.ui.Slider;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -38,7 +32,7 @@ public class SettingsMenuDialog extends SettingsDialog{
     private boolean wasPaused;
 
     public SettingsMenuDialog(){
-        setStyle(Core.skin.get("dialog", WindowStyle.class));
+        setStyle(Core.scene.skin.get("dialog", WindowStyle.class));
 
         hidden(() -> {
             if(!state.is(State.menu)){
@@ -98,7 +92,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         ScrollPane pane = new ScrollPane(prefs);
         pane.addCaptureListener(new InputListener(){
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                 Element actor = pane.hit(x, y, true);
                 if(actor instanceof Slider){
                     pane.setFlickScroll(false);
@@ -109,7 +103,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
 
             @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button){
+            public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
                 pane.setFlickScroll(true);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -127,14 +121,15 @@ public class SettingsMenuDialog extends SettingsDialog{
     }
 
     void addSettings(){
-        sound.volumePrefs();
+        //TODO add when sound works again
+        //sound.volumePrefs();
 
         game.screenshakePref();
         game.checkPref("effects", true);
         if(mobile){
             game.checkPref("autotarget", true);
         }
-        game.sliderPref("saveinterval", 120, 10, 5 * 120, i -> Bundles.format("setting.seconds", i));
+        game.sliderPref("saveinterval", 120, 10, 5 * 120, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
             game.checkPref("crashreport", true);
@@ -164,21 +159,21 @@ public class SettingsMenuDialog extends SettingsDialog{
                     dialog.content().row();
                     dialog.content().addButton("$text.settings.clearall", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clearall.confirm", () -> {
-                            Map<String, Object> map = new HashMap<>();
-                            for(String value : Settings.prefs().get().keySet()){
+                            ObjectMap<String, Object> map = new ObjectMap<>();
+                            for(String value : Core.settings.keys()){
                                 if(value.contains("usid") || value.contains("uuid")){
-                                    map.put(value, Settings.prefs().getString(value));
+                                    map.put(value, Core.settings.getString(value));
                                 }
                             }
-                            Settings.prefs().clear();
-                            Settings.prefs().put(map);
-                            Settings.save();
+                            Core.settings.clear();
+                            Core.settings.putAll(map);
+                            Core.settings.save();
 
                             for(FileHandle file : dataDirectory.list()){
                                 file.deleteDirectory();
                             }
 
-                            Gdx.app.exit();
+                            Core.app.exit();
                         });
                     });
                     dialog.content().row();
@@ -189,21 +184,21 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Bundles.get("setting.fpscap.none") : Bundles.format("setting.fpscap.text", s)));
+        graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
 
         if(!mobile){
-            graphics.checkPref("vsync", true, b -> Gdx.graphics.setVSync(b));
+            graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
                 if(b){
-                    Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+                    Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
                 }else{
-                    Gdx.graphics.setWindowedMode(600, 480);
+                    Core.graphics.setWindowedMode(600, 480);
                 }
             });
 
-            Gdx.graphics.setVSync(Settings.getBool("vsync"));
-            if(Settings.getBool("fullscreen")){
-                Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+            Core.graphics.setVSync(Core.settings.getBool("vsync"));
+            if(Core.settings.getBool("fullscreen")){
+                Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
             }
         }
 
@@ -220,7 +215,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     private void visible(int index){
         prefs.clearChildren();
-        Table table = Mathf.select(index, game, graphics, sound);
+        Table table = new Table[]{game, graphics, sound}[index];
         prefs.add(table);
     }
 
@@ -229,7 +224,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         buttons().addImageTextButton("$text.menu", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 
         keyDown(key -> {
-            if(key == Keys.ESCAPE || key == Keys.BACK)
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK)
                 hide();
         });
     }

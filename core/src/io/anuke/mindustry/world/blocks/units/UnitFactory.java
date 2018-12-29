@@ -1,8 +1,14 @@
 package io.anuke.mindustry.world.blocks.units;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
@@ -14,21 +20,13 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeItems;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -81,7 +79,7 @@ public class UnitFactory extends Block{
     public void load(){
         super.load();
 
-        topRegion = Draw.region(name + "-top");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
@@ -97,18 +95,10 @@ public class UnitFactory extends Block{
     }
 
     @Override
-    public void setBars(){
-        super.setBars();
-
-        bars.add(new BlockBar(BarType.production, true, tile -> tile.<UnitFactoryEntity>entity().buildTime / produceTime));
-        bars.remove(BarType.inventory);
-    }
-
-    @Override
     public TextureRegion[] getIcon(){
         return new TextureRegion[]{
-            Draw.region(name),
-            Draw.region(name + "-top")
+            Core.atlas.find(name),
+            Core.atlas.find(name + "-top")
         };
     }
 
@@ -125,10 +115,10 @@ public class UnitFactory extends Block{
         Shaders.build.color.a = entity.speedScl;
         Shaders.build.time = -entity.time / 10f;
 
-        Graphics.shader(Shaders.build, false);
+        Draw.shader(Shaders.build, false);
         Shaders.build.apply();
         Draw.rect(region, tile.drawx(), tile.drawy());
-        Graphics.shader();
+        Draw.shader();
 
         Draw.color(Palette.accent);
         Draw.alpha(entity.speedScl);

@@ -1,11 +1,11 @@
 package io.anuke.mindustry.ui;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.ucore.function.Supplier;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.layout.Stack;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.function.Supplier;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.layout.Stack;
+import io.anuke.arc.scene.ui.layout.Table;
 
 public class ItemImage extends Stack{
 

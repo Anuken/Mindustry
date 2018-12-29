@@ -1,14 +1,14 @@
 package io.anuke.mindustry.world.consumers;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.scene.ui.layout.Table;
 import static io.anuke.mindustry.Vars.*;
 
 public class ConsumeItemFilter extends Consume{

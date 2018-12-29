@@ -1,20 +1,18 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
+import io.anuke.arc.Core;
+import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Align;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -46,7 +44,7 @@ public class BlockConfigFragment extends Fragment{
         configTile = tile;
         configBlock = tile.block();
 
-        table.setVisible(true);
+        table.visible(true);
         table.clear();
         tile.block().buildTable(tile, table);
         table.pack();
@@ -66,7 +64,7 @@ public class BlockConfigFragment extends Fragment{
             }
 
             table.setOrigin(Align.center);
-            Vector2 pos = Graphics.screen(tile.drawx(), tile.drawy() - tile.block().size * tilesize / 2f - 1);
+            Vector2 pos = Core.input.mouseScreen(tile.drawx(), tile.drawy() - tile.block().size * tilesize / 2f - 1);
             table.setPosition(pos.x, pos.y, Align.top);
             if(configTile == null || configTile.block() == Blocks.air || configTile.block() != configBlock){
                 hideConfig();
@@ -75,7 +73,7 @@ public class BlockConfigFragment extends Fragment{
     }
 
     public boolean hasConfigMouse(){
-        Element e = Core.scene.hit(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), true);
+        Element e = Core.scene.hit(Core.input.mouseX(), Core.graphics.getHeight() - Core.input.mouseY(), true);
         return e != null && (e == table || e.isDescendantOf(table));
     }
 

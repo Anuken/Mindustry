@@ -1,8 +1,9 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 
-public class GenRegion extends TextureRegion {
+public class GenRegion extends AtlasRegion{
     public String name;
     public boolean invalid;
     public ImageContext context;

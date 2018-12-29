@@ -1,13 +1,13 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.ucore.util.Structs;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.util.Structs;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.awt.Graphics2D;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ public class Image {
     private Color color = new Color();
 
     public Image(BufferedImage atlas, TextureRegion region){
-        this(atlas, region.getRegionWidth(), region.getRegionHeight());
+        this(atlas, region.getWidth(), region.getHeight());
 
         draw(region);
     }
@@ -69,12 +69,12 @@ public class Image {
 
     /**Draws a region at the center.*/
     public void drawCenter(TextureRegion region){
-        draw(region, (width() - region.getRegionWidth())/2, (height() - region.getRegionHeight())/2, false, false);
+        draw(region, (width() - region.getWidth())/2, (height() - region.getHeight())/2, false, false);
     }
 
     /**Draws a region at the center.*/
     public void drawCenter(TextureRegion region, boolean flipx, boolean flipy){
-        draw(region, (width() - region.getRegionWidth())/2, (height() - region.getRegionHeight())/2, flipx, flipy);
+        draw(region, (width() - region.getWidth())/2, (height() - region.getHeight())/2, flipx, flipy);
     }
 
     /**Draws an image at the top left corner.*/
@@ -108,12 +108,12 @@ public class Image {
 
         graphics.drawImage(atlas,
                 x, y,
-                x + region.getRegionWidth(),
-                y + region.getRegionHeight(),
-                (flipx ? region.getRegionX() + region.getRegionWidth() : region.getRegionX()) + ofx,
-                (flipy ? region.getRegionY() + region.getRegionHeight() : region.getRegionY()) + ofy,
-                (flipx ? region.getRegionX() : region.getRegionX() + region.getRegionWidth()) + ofx,
-                (flipy ? region.getRegionY() : region.getRegionY() + region.getRegionHeight()) + ofy,
+                x + region.getWidth(),
+                y + region.getHeight(),
+                (flipx ? region.getX() + region.getWidth() : region.getX()) + ofx,
+                (flipy ? region.getY() + region.getHeight() : region.getY()) + ofy,
+                (flipx ? region.getX() : region.getX() + region.getWidth()) + ofx,
+                (flipy ? region.getY() : region.getY() + region.getHeight()) + ofy,
                 null);
     }
 

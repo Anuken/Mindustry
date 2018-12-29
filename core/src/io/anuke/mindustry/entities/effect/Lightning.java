@@ -1,11 +1,24 @@
 package io.anuke.mindustry.entities.effect;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.TimedEntity;
+import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.arc.entities.trait.TimeTrait;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.RandomXS128;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Position;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
@@ -14,14 +27,6 @@ import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.TimedEntity;
-import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.entities.trait.PosTrait;
-import io.anuke.ucore.entities.trait.TimeTrait;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -31,7 +36,7 @@ import static io.anuke.mindustry.Vars.bulletGroup;
 public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, TimeTrait{
     public static final float lifetime = 10f;
 
-    private static final SeedRandom random = new SeedRandom();
+    private static final RandomXS128 random = new RandomXS128();
     private static final Rectangle rect = new Rectangle();
     private static final Array<Unit> entities = new Array<>();
     private static final IntSet hit = new IntSet();
@@ -39,7 +44,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     private static final float hitRange = 30f;
     private static int lastSeed = 0;
 
-    private Array<PosTrait> lines = new Array<>();
+    private Array<Position> lines = new Array<>();
     private Color color = Palette.lancerLaser;
 
     /**For pooling use only. Do not call directly!*/
@@ -55,7 +60,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     @Remote(called = Loc.server)
     public static void createLighting(int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
 
-        Lightning l = Pooling.obtain(Lightning.class, Lightning::new);
+        Lightning l = Pools.obtain(Lightning.class, Lightning::new);
         Float dmg = damage;
 
         l.x = x;
@@ -68,7 +73,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
 
         for (int i = 0; i < length/2; i++) {
             Bullet.create(TurretBullets.damageLightning, l, team, x, y, 0f, 1f, 1f, dmg);
-            l.lines.add(new Translator(x + Mathf.range(3f), y + Mathf.range(3f)));
+            l.lines.add(new Vector2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
             rect.setSize(hitRange).setCenter(x, y);
             entities.clear();
@@ -120,15 +125,17 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     @Override
     public void removed(){
         super.removed();
-        Pooling.free(this);
+        Pools.free(this);
     }
 
     @Override
     public void draw(){
         float lx = x, ly = y;
         Draw.color(color, Color.WHITE, fin());
+        //TODO this is really, really bad rendering
+        /*
         for(int i = 0; i < lines.size; i++){
-            PosTrait v = lines.get(i);
+            Position v = lines.get(i);
 
             float f = (float) i / lines.size;
 
@@ -143,11 +150,10 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
             Lines.line(lx, ly, v.getX(), v.getY());
 
             Lines.stroke(3f * fout() * (1f - f));
-           // Lines.lineAngleCenter(lx, ly, Angles.angle(lx, ly, v.getX(), v.getY()) + 90f, 20f);
 
             lx = v.getX();
             ly = v.getY();
-        }
+        }*/
         Draw.color();
     }
 

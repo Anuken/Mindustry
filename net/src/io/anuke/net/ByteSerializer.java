@@ -1,11 +1,11 @@
-package io.anuke.kryonet;
+package io.anuke.net;
 
 import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.serialization.Serialization;
+import io.anuke.arc.function.Supplier;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.net.Packet;
 import io.anuke.mindustry.net.Registrator;
-import io.anuke.ucore.function.Supplier;
-import io.anuke.ucore.util.Pooling;
 
 import java.nio.ByteBuffer;
 
@@ -34,7 +34,7 @@ public class ByteSerializer implements Serialization{
         if(id == -2){
             return FrameworkSerializer.read(byteBuffer);
         }else{
-            Packet packet = Pooling.obtain((Class<Packet>) Registrator.getByID(id).type, (Supplier<Packet>) Registrator.getByID(id).constructor);
+            Packet packet = Pools.obtain((Class<Packet>) Registrator.getByID(id).type, (Supplier<Packet>) Registrator.getByID(id).constructor);
             packet.read(byteBuffer);
             return packet;
         }

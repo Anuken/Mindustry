@@ -1,7 +1,17 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureAtlas;
+import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.scene.ui.TextField;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -11,7 +21,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.game.Unlocks;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.input.DefaultKeybinds;
+import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.MobileInput;
@@ -20,16 +30,10 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.ucore.core.*;
-import io.anuke.ucore.entities.EntityQuery;
-import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Atlas;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.Timer;
 
 import java.io.IOException;
 
+import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
 
 /**
@@ -38,36 +42,31 @@ import static io.anuke.mindustry.Vars.*;
  * Should <i>not</i> handle any logic-critical state.
  * This class is not created in the headless server.
  */
-public class Control extends Module{
+public class Control implements ApplicationListener{
     public final Saves saves;
     public final Unlocks unlocks;
 
-    private Timer timerRPC = new Timer(), timerUnlock = new Timer();
+    private Interval timerRPC = new Interval(), timerUnlock = new Interval();
     private boolean hiscore = false;
     private boolean wasPaused = false;
     private InputHandler[] inputs = {};
-    private Throwable error;
 
     public Control(){
         saves = new Saves();
         unlocks = new Unlocks();
 
-        Inputs.useControllers(true);
-
-        Gdx.input.setCatchBackKey(true);
+        Core.input.setCatch(KeyCode.BACK, true);
 
         Effects.setShakeFalloff(10000f);
 
         content.initialize(Content::init);
-        Core.atlas = new Atlas("sprites.atlas");
-        Core.atlas.setErrorRegion("error");
+        Core.atlas = new TextureAtlas("sprites/sprites.atlas");
         content.initialize(Content::load);
 
         unlocks.load();
 
-        DefaultKeybinds.load();
-
-        Settings.defaultList(
+        Core.settings.setAppName(appName);
+        Core.settings.defaults(
             "ip", "localhost",
             "color-0", Color.rgba8888(playerColors[8]),
             "color-1", Color.rgba8888(playerColors[11]),
@@ -77,15 +76,13 @@ public class Control extends Module{
             "lastBuild", 0
         );
 
-        KeyBinds.load();
-
         addPlayer(0);
 
         saves.load();
 
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
-                Timers.runTask(5f, Platform.instance::updateRPC);
+                Time.runTask(5f, Platform.instance::updateRPC);
             }
         });
 
@@ -97,9 +94,9 @@ public class Control extends Module{
             state.set(State.playing);
         });
 
-        Events.on(WorldLoadGraphicsEvent.class, event -> {
+        Events.on(WorldLoadEvent.class, event -> {
             if(mobile){
-                Gdx.app.postRunnable(() -> Core.camera.position.set(players[0].x, players[0].y, 0));
+                Core.app.post(() -> Core.camera.position.set(players[0]));
             }
         });
 
@@ -115,11 +112,11 @@ public class Control extends Module{
 
         Events.on(WaveEvent.class, event -> {
 
-            int last = Settings.getInt("hiscore" + world.getMap().name, 0);
+            int last = Core.settings.getInt("hiscore" + world.getMap().name, 0);
 
             if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer && world.getSector() == null){
-                Settings.putInt("hiscore" + world.getMap().name, state.wave);
-                Settings.save();
+                Core.settings.put("hiscore" + world.getMap().name, state.wave);
+                Core.settings.save();
                 hiscore = true;
             }
 
@@ -131,12 +128,9 @@ public class Control extends Module{
             if(world.getSector() != null && world.getSector().hasSave()){
                 world.getSector().getSave().delete();
             }
-
-            threads.runGraphics(() -> {
-                Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
-                //the restart dialog can show info for any number of scenarios
-                Call.onGameOver(event.winner);
-            });
+            Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+            //the restart dialog can show info for any number of scenarios
+            Call.onGameOver(event.winner);
         });
 
         //autohost for pvp sectors
@@ -146,13 +140,11 @@ public class Control extends Module{
                     Net.host(port);
                     players[0].isAdmin = true;
                 }catch(IOException e){
-                    ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
-                    threads.runDelay(() -> state.set(State.menu));
+                    ui.showError(Core.bundle.format("text.server.error", Strings.parseException(e, false)));
+                    Core.app.post(() -> state.set(State.menu));
                 }
             }
         });
-
-        Events.on(WorldLoadEvent.class, event -> threads.runGraphics(() -> Events.fire(new WorldLoadGraphicsEvent())));
     }
 
     public void addPlayer(int index){
@@ -171,9 +163,9 @@ public class Control extends Module{
         Player setTo = (index == 0 ? null : players[0]);
 
         Player player = new Player();
-        player.name = Settings.getString("name");
+        player.name = Core.settings.getString("name");
         player.mech = mobile ? Mechs.starterMobile : Mechs.starterDesktop;
-        player.color.set(Settings.getInt("color-" + index));
+        player.color.set(Core.settings.getInt("color-" + index));
         player.isLocal = true;
         player.playerIndex = index;
         player.isMobile = mobile;
@@ -196,7 +188,7 @@ public class Control extends Module{
         }
 
         inputs[index] = input;
-        Inputs.addProcessor(input);
+        Core.input.addProcessor(input);
     }
 
     public void removePlayer(){
@@ -210,10 +202,6 @@ public class Control extends Module{
         InputHandler[] oldi = inputs;
         inputs = new InputHandler[inputs.length - 1];
         System.arraycopy(oldi, 0, inputs, 0, inputs.length);
-    }
-
-    public void setError(Throwable error){
-        this.error = error;
     }
 
     public InputHandler input(int index){
@@ -248,7 +236,7 @@ public class Control extends Module{
             Recipe recipe = content.recipes().get(i);
             if(!recipe.isHidden() && recipe.requirements != null){
                 for(ItemStack stack : recipe.requirements){
-                    if(!entity.items.has(stack.item, Math.min((int) (stack.amount * unlockResourceScaling), 2000))) continue outer;
+                    if(!entity.items.has(stack.item, Math.min((int) (stack.amount), 2000))) continue outer;
                 }
 
                 if(unlocks.unlockContent(recipe)){
@@ -287,14 +275,14 @@ public class Control extends Module{
 
         Platform.instance.updateRPC();
 
-        if(!Settings.getBool("4.0-warning-2", false)){
+        if(!Core.settings.getBool("4.0-warning-2", false)){
 
-            Timers.run(5f, () -> {
-                FloatingDialog dialog = new FloatingDialog("[accent]WARNING![]");
+            Time.run(5f, () -> {
+                FloatingDialog dialog = new FloatingDialog("WARNING!");
                 dialog.buttons().addButton("$text.ok", () -> {
                     dialog.hide();
-                    Settings.putBool("4.0-warning-2", true);
-                    Settings.save();
+                    Core.settings.put("4.0-warning-2", true);
+                    Core.settings.save();
                 }).size(100f, 60f);
                 dialog.content().add("Reminder: The beta version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
                         "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
@@ -305,18 +293,8 @@ public class Control extends Module{
         }
     }
 
-    /** Called from main logic thread.*/
-    public void runUpdateLogic(){
-        if(!state.is(State.menu)){
-            renderer.minimap.updateUnitArray();
-        }
-    }
-
     @Override
     public void update(){
-        if(error != null){
-            throw new RuntimeException(error);
-        }
 
         saves.update();
 
@@ -344,26 +322,26 @@ public class Control extends Module{
                 }
             }
 
-            if(Inputs.keyTap("pause") && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            if(Core.input.keyTap(Binding.pause) && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
             }
 
-            if(Inputs.keyTap("menu") && !ui.restart.isShown()){
+            if(Core.input.keyTap(Binding.menu) && !ui.restart.isShown()){
                 if(ui.chatfrag.chatOpen()){
                     ui.chatfrag.hide();
-                }else if(!ui.paused.isShown() && !ui.hasDialog()){
+                }else if(!ui.paused.isShown() && !scene.hasDialog()){
                     ui.paused.show();
                     state.set(State.paused);
                 }
             }
 
-            if(!mobile && Inputs.keyTap("screenshot") && !ui.chatfrag.chatOpen()){
+            if(!mobile && Core.input.keyTap(Binding.screenshot) && !(scene.getKeyboardFocus() instanceof TextField) && !ui.chatfrag.chatOpen()){
                 renderer.takeMapScreenshot();
             }
 
         }else{
             if(!state.isPaused()){
-                Timers.update();
+                Time.update();
             }
         }
     }

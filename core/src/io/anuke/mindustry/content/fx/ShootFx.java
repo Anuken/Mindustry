@@ -1,16 +1,17 @@
 package io.anuke.mindustry.content.fx;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
-import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shapes;
 
 public class ShootFx extends FxList implements ContentList{
     public static Effect shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke, shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium, shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot;
@@ -108,8 +109,7 @@ public class ShootFx extends FxList implements ContentList{
 
             float len = (2f + e.finpow() * 6f) * i;
             float lr = rot + e.fin() * 30f * i;
-            Draw.rect("white",
-                    e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
+            Fill.rect(e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
                     e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
                     1f, 2f, rot + e.fin() * 50f * i);
 
@@ -122,7 +122,7 @@ public class ShootFx extends FxList implements ContentList{
             for(int i : Mathf.signs){
                 float len = (2f + e.finpow() * 10f) * i;
                 float lr = rot + e.fin() * 20f * i;
-                Draw.rect("casing",
+                Draw.rect(Core.atlas.find("casing"),
                         e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
                         e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
                         2f, 3f, rot);
@@ -145,11 +145,11 @@ public class ShootFx extends FxList implements ContentList{
             for(int i : Mathf.signs){
                 float len = (4f + e.finpow() * 8f) * i;
                 float lr = rot + Mathf.randomSeedRange(e.id + i + 6, 20f * e.fin()) * i;
-                Draw.rect("casing",
+                Draw.rect(Core.atlas.find("casing"),
                         e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
                         e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
                         2.5f, 4f,
-                        rot + e.fin() * 30f * i + Mathf.randomSeedRange(e.id + i + 9, 40f * e.fin()));
+                rot + e.fin() * 30f * i + Mathf.randomSeedRange(e.id + i + 9, 40f * e.fin()));
             }
 
             Draw.color(Color.LIGHT_GRAY);

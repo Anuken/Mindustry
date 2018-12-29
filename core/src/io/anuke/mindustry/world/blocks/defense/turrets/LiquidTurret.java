@@ -1,16 +1,14 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
-import io.anuke.ucore.core.Effects;
+import io.anuke.arc.entities.Effects;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -56,13 +54,6 @@ public abstract class LiquidTurret extends Turret{
         }
 
         super.findTarget(tile);
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-        bars.remove(BarType.inventory);
-        bars.replace(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
     }
 
     @Override

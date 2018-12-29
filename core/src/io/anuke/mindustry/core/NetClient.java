@@ -1,14 +1,21 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Base64Coder;
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.PacketPriority;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.annotations.Annotations.Variant;
+import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.io.ReusableByteArrayInputStream;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
@@ -25,16 +32,6 @@ import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.io.ReusableByteArrayInputStream;
-import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timer;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -43,12 +40,12 @@ import java.util.zip.InflaterInputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class NetClient extends Module{
+public class NetClient implements ApplicationListener{
     private final static float dataTimeout = 60 * 18;
     private final static float playerSyncTime = 2;
     public final static float viewScale = 2f;
 
-    private Timer timer = new Timer(5);
+    private Interval timer = new Interval(5);
     /**Whether the client is currently connecting.*/
     private boolean connecting = false;
     /**If true, no message will be shown on disconnect.*/
@@ -114,7 +111,7 @@ public class NetClient extends Module{
         Net.handleClient(Disconnect.class, packet -> {
             if(quiet) return;
 
-            Timers.runTask(3f, ui.loadfrag::hide);
+            Time.runTask(3f, ui.loadfrag::hide);
 
             state.set(State.menu);
 
@@ -168,21 +165,19 @@ public class NetClient extends Module{
         netClient.disconnectQuietly();
         state.set(State.menu);
 
-        threads.runGraphics(() -> {
-            if(!reason.quiet){
-                if(reason.extraText() != null){
-                    ui.showText(reason.toString(), reason.extraText());
-                }else{
-                    ui.showText("$text.disconnect", reason.toString());
-                }
+        if(!reason.quiet){
+            if(reason.extraText() != null){
+                ui.showText(reason.toString(), reason.extraText());
+            }else{
+                ui.showText("$text.disconnect", reason.toString());
             }
-            ui.loadfrag.hide();
-        });
+        }
+        ui.loadfrag.hide();
     }
 
     @Remote(variants = Variant.both)
     public static void onInfoMessage(String message){
-        threads.runGraphics(() -> ui.showText("", message));
+        ui.showText("", message);
     }
 
     @Remote(variants = Variant.both)
@@ -193,15 +188,13 @@ public class NetClient extends Module{
         ui.chatfrag.clearMessages();
         Net.setClientLoaded(false);
 
-        threads.runGraphics(() -> {
-            ui.loadfrag.show("$text.connecting.data");
+        ui.loadfrag.show("$text.connecting.data");
 
-            ui.loadfrag.setButton(() -> {
-                ui.loadfrag.hide();
-                netClient.connecting = false;
-                netClient.quiet = true;
-                Net.disconnect();
-            });
+        ui.loadfrag.setButton(() -> {
+            ui.loadfrag.hide();
+            netClient.connecting = false;
+            netClient.quiet = true;
+            Net.disconnect();
         });
     }
 
@@ -347,7 +340,7 @@ public class NetClient extends Module{
         }else if(!connecting){
             Net.disconnect();
         }else{ //...must be connecting
-            timeoutTime += Timers.delta();
+            timeoutTime += Time.delta();
             if(timeoutTime > dataTimeout){
                 Log.err("Failed to load data!");
                 ui.loadfrag.hide();
@@ -369,8 +362,8 @@ public class NetClient extends Module{
         ui.loadfrag.hide();
         ui.join.hide();
         Net.setClientLoaded(true);
-        Gdx.app.postRunnable(Call::connectConfirm);
-        Timers.runTask(40f, Platform.instance::updateRPC);
+        Core.app.post(Call::connectConfirm);
+        Time.runTask(40f, Platform.instance::updateRPC);
     }
 
     private void reset(){
@@ -422,13 +415,13 @@ public class NetClient extends Module{
                 requests[i] = player.getPlaceQueue().get(i);
             }
 
-            Call.onClientShapshot(lastSent++, TimeUtils.millis(), player.x, player.y,
+            Call.onClientShapshot(lastSent++, Time.millis(), player.x, player.y,
                 player.pointerX, player.pointerY, player.rotation, player.baseRotation,
                 player.getVelocity().x, player.getVelocity().y,
                 player.getMineTile(),
                 player.isBoosting, player.isShooting, requests,
                 Core.camera.position.x, Core.camera.position.y,
-                Core.camera.viewportWidth * Core.camera.zoom * viewScale, Core.camera.viewportHeight * Core.camera.zoom * viewScale);
+                Core.camera.width * viewScale, Core.camera.height * viewScale);
         }
 
         if(timer.get(1, 60)){
@@ -437,14 +430,14 @@ public class NetClient extends Module{
     }
 
     String getUsid(String ip){
-        if(Settings.getString("usid-" + ip, null) != null){
-            return Settings.getString("usid-" + ip, null);
+        if(Core.settings.getString("usid-" + ip, null) != null){
+            return Core.settings.getString("usid-" + ip, null);
         }else{
             byte[] bytes = new byte[8];
             new Random().nextBytes(bytes);
             String result = new String(Base64Coder.encode(bytes));
-            Settings.putString("usid-" + ip, result);
-            Settings.save();
+            Core.settings.put("usid-" + ip, result);
+            Core.settings.save();
             return result;
         }
     }

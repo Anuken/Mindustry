@@ -1,25 +1,24 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Net.HttpRequest;
-import com.badlogic.gdx.Net.HttpResponse;
-import com.badlogic.gdx.Net.HttpResponseListener;
-import com.badlogic.gdx.net.HttpRequestBuilder;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.Core;
+import io.anuke.arc.Net.HttpRequest;
+import io.anuke.arc.Net.HttpResponse;
+import io.anuke.arc.Net.HttpResponseListener;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.function.BiConsumer;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.net.HttpRequestBuilder;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.net.Packets.StreamBegin;
 import io.anuke.mindustry.net.Packets.StreamChunk;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.BiConsumer;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Pooling;
 
 import java.io.IOException;
 
@@ -60,20 +59,20 @@ public class Net{
             String type = t.getClass().toString().toLowerCase();
 
             if(error.equals("mismatch")){
-                error = Bundles.get("text.error.mismatch");
+                error = Core.bundle.get("text.error.mismatch");
             }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address"))){
-                error = Bundles.get("text.error.invalidaddress");
+                error = Core.bundle.get("text.error.invalidaddress");
             }else if(error.contains("connection refused") || error.contains("route to host") || type.contains("unknownhost")){
-                error = Bundles.get("text.error.unreachable");
+                error = Core.bundle.get("text.error.unreachable");
             }else if(type.contains("timeout")){
-                error = Bundles.get("text.error.timedout");
+                error = Core.bundle.get("text.error.timedout");
             }else if(error.equals("alreadyconnected")){
-                error = Bundles.get("text.error.alreadyconnected");
+                error = Core.bundle.get("text.error.alreadyconnected");
             }else if(!error.isEmpty()){
-                error = Bundles.get("text.error.any");
+                error = Core.bundle.get("text.error.any");
             }
 
-            ui.showText("", Bundles.format("text.connectfail", error));
+            ui.showText("", Core.bundle.format("text.connectfail", error));
             ui.loadfrag.hide();
 
             if(Net.client()){
@@ -126,7 +125,7 @@ public class Net{
         active = true;
         server = true;
 
-        Timers.runTask(60f, Platform.instance::updateRPC);
+        Time.runTask(60f, Platform.instance::updateRPC);
     }
 
     /**
@@ -262,12 +261,12 @@ public class Net{
             if(clientLoaded || ((object instanceof Packet) && ((Packet) object).isImportant())){
                 if(clientListeners.get(object.getClass()) != null)
                     clientListeners.get(object.getClass()).accept(object);
-                Pooling.free(object);
+                Pools.free(object);
             }else if(!((object instanceof Packet) && ((Packet) object).isUnimportant())){
                 packetQueue.add(object);
                 Log.info("Queuing packet {0}", object);
             }else{
-                Pooling.free(object);
+                Pools.free(object);
             }
         }else{
             Log.err("Unhandled packet type: '{0}'!", object);
@@ -282,7 +281,7 @@ public class Net{
         if(serverListeners.get(object.getClass()) != null){
             if(serverListeners.get(object.getClass()) != null)
                 serverListeners.get(object.getClass()).accept(connection, object);
-            Pooling.free(object);
+            Pools.free(object);
         }else{
             Log.err("Unhandled packet type: '{0}'!", object.getClass());
         }
@@ -347,7 +346,7 @@ public class Net{
         HttpRequest req = new HttpRequestBuilder().newRequest()
         .method(method).url(url).content(body).build();
 
-        Gdx.net.sendHttpRequest(req, new HttpResponseListener(){
+        Core.net.sendHttpRequest(req, new HttpResponseListener(){
             @Override
             public void handleHttpResponse(HttpResponse httpResponse){
                 listener.accept(httpResponse.getResultAsString());

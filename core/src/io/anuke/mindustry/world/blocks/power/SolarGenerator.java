@@ -3,8 +3,8 @@ package io.anuke.mindustry.world.blocks.power;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.EnumSet;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.collection.EnumSet;
 
 public class SolarGenerator extends PowerGenerator{
     /**
@@ -26,7 +26,7 @@ public class SolarGenerator extends PowerGenerator{
 
     @Override
     public void update(Tile tile){
-        addPower(tile, generation * Timers.delta());
+        addPower(tile, generation * Time.delta());
 
         tile.entity.power.graph.update();
     }

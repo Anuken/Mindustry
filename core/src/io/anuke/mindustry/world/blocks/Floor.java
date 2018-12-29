@@ -1,31 +1,23 @@
 package io.anuke.mindustry.world.blocks;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.IntIntMap;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.function.BiPredicate;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.function.BiPredicate;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Structs;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
 
 public class Floor extends Block{
-    //TODO implement proper bitmasking
-    protected static IntIntMap bitmask = Structs.mapInt(2, 1, 8, 2, 10, 3, 11, 4, 16, 5, 18, 6, 22, 7, 24, 8,
-            26, 9, 27, 10, 30, 11, 31, 12, 64, 13, 66, 14, 72, 15, 74, 16, 75, 17, 80, 18,
-            82, 19, 86, 20, 88, 21, 90, 22, 91, 23, 94, 24, 95, 25, 104, 26, 106, 27, 107, 28,
-            120, 29, 122, 30, 123, 31, 126, 32, 127, 33, 208, 34, 210, 35, 214, 36, 216, 37,
-            218, 38, 219, 39, 222, 40, 223, 41, 248, 42, 250, 43, 251, 44, 254, 45, 255, 46, 0, 47);
     /** number of different variant regions to use */
     public int variants;
     /** edge fallback, used mainly for ores */
@@ -75,7 +67,7 @@ public class Floor extends Block{
         super.load();
 
         if(blend){
-            edgeRegion = Draw.hasRegion(name + "edge") ? Draw.region(name + "edge") : Draw.region(edge + "edge");
+            edgeRegion = Core.atlas.has(name + "edge") ? Core.atlas.find(name + "edge") : Core.atlas.find(edge + "edge");
             edgeRegions = new TextureRegion[8];
             offsets = new Vector2[8];
 
@@ -93,17 +85,17 @@ public class Floor extends Block{
                 float ry = Mathf.clamp(dy * 8, 0, 8 - h);
 
                 result.setTexture(edgeRegion.getTexture());
-                result.setRegion(edgeRegion.getRegionX() + x, edgeRegion.getRegionY() + y + h, w, -h);
+                result.set(edgeRegion.getX() + x, edgeRegion.getY() + y + h, w, -h);
 
                 edgeRegions[i] = result;
                 offsets[i] = new Vector2(-4 + rx, -4 + ry);
             }
 
             cliffRegions = new TextureRegion[4];
-            cliffRegions[0] = Draw.region(name + "-cliff-edge-2");
-            cliffRegions[1] = Draw.region(name + "-cliff-edge");
-            cliffRegions[2] = Draw.region(name + "-cliff-edge-1");
-            cliffRegions[3] = Draw.region(name + "-cliff-side");
+            cliffRegions[0] = Core.atlas.find(name + "-cliff-edge-2");
+            cliffRegions[1] = Core.atlas.find(name + "-cliff-edge");
+            cliffRegions[2] = Core.atlas.find(name + "-cliff-edge-1");
+            cliffRegions[3] = Core.atlas.find(name + "-cliff-side");
         }
 
         //load variant regions for drawing
@@ -111,11 +103,11 @@ public class Floor extends Block{
             variantRegions = new TextureRegion[variants];
 
             for(int i = 0; i < variants; i++){
-                variantRegions[i] = Draw.region(name + (i + 1));
+                variantRegions[i] = Core.atlas.find(name + (i + 1));
             }
         }else{
             variantRegions = new TextureRegion[1];
-            variantRegions[0] = Draw.region(name);
+            variantRegions[0] = Core.atlas.find(name);
         }
     }
 
@@ -130,14 +122,14 @@ public class Floor extends Block{
 
     @Override
     public void drawNonLayer(Tile tile){
-        MathUtils.random.setSeed(tile.pos());
+        Mathf.random.setSeed(tile.pos());
 
         drawEdges(tile, true);
     }
 
     @Override
     public void draw(Tile tile){
-        MathUtils.random.setSeed(tile.pos());
+        Mathf.random.setSeed(tile.pos());
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
 
@@ -186,7 +178,7 @@ public class Floor extends Block{
 
             TextureRegion region = floor.edgeRegions[i];
 
-            Draw.crect(region, tile.worldx() + floor.offsets[i].x, tile.worldy() + floor.offsets[i].y, region.getRegionWidth(), region.getRegionHeight());
+            Draw.rect(region, tile.worldx() + floor.offsets[i].x + region.getWidth()/2f, tile.worldy() + floor.offsets[i].y + region.getHeight()/2f, region.getWidth(), region.getHeight());
         }
     }
 

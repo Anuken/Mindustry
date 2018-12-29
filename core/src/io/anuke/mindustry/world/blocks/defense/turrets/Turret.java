@@ -1,9 +1,20 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.function.BiConsumer;
+import io.anuke.arc.graphics.Blending;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.TileEntity;
@@ -22,14 +33,6 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.BiConsumer;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -64,21 +67,22 @@ public abstract class Turret extends Block{
     protected float xRand = 0f;
     protected boolean targetAir = true;
 
-    protected Translator tr = new Translator();
-    protected Translator tr2 = new Translator();
+    protected Vector2 tr = new Vector2();
+    protected Vector2 tr2 = new Vector2();
 
     protected TextureRegion baseRegion;
     protected TextureRegion heatRegion;
     protected TextureRegion baseTopRegion;
 
-    protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+    protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) ->
+        Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
     protected BiConsumer<Tile, TurretEntity> heatDrawer = (tile, entity) -> {
         if(entity.heat <= 0.00001f) return;
-        Graphics.setAdditiveBlending();
-        Draw.color(heatColor);
-        Draw.alpha(entity.heat);
+        Draw.color(heatColor, entity.heat);
+        Draw.blend(Blending.additive);
         Draw.rect(heatRegion, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-        Graphics.setNormalBlending();
+        Draw.blend();
+        Draw.color();
     };
 
     public Turret(String name){
@@ -106,9 +110,9 @@ public abstract class Turret extends Block{
     public void load(){
         super.load();
 
-        baseRegion = Draw.region("block-" + size);
-        baseTopRegion = Draw.region("block-" + size + "-top");
-        heatRegion = Draw.region(name + "-heat");
+        baseRegion = Core.atlas.find("block-" + size);
+        baseTopRegion = Core.atlas.find("block-" + size + "-top");
+        heatRegion = Core.atlas.find(name + "-heat");
     }
 
     @Override
@@ -142,17 +146,15 @@ public abstract class Turret extends Block{
 
         drawer.accept(tile, entity);
 
-        if(heatRegion != Draw.region("error")){
+        if(heatRegion != Core.atlas.find("error")){
             heatDrawer.accept(tile, entity);
         }
-
-        Draw.color();
     }
 
     @Override
     public TextureRegion[] getBlockIcon(){
         if(blockIcon == null){
-            blockIcon = new TextureRegion[]{Draw.region("block-icon-" + name)};
+            blockIcon = new TextureRegion[]{Core.atlas.find("block-icon-" + name)};
         }
         return blockIcon;
     }
@@ -160,7 +162,7 @@ public abstract class Turret extends Block{
     @Override
     public TextureRegion[] getCompactIcon(){
         if(compactIcon == null){
-            compactIcon = new TextureRegion[]{iconRegion(Draw.region("block-icon-" + name))};
+            compactIcon = new TextureRegion[]{iconRegion(Core.atlas.find("block-icon-" + name))};
         }
         return compactIcon;
     }
@@ -174,9 +176,9 @@ public abstract class Turret extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Draw.color(Palette.placing);
-        Lines.stroke(1f);
+        Lines.stroke(1f, Palette.placing);
         Lines.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range);
+        Draw.color();
     }
 
     @Override
@@ -254,7 +256,7 @@ public abstract class Turret extends Block{
         entry.amount -= ammoPerShot;
         if(entry.amount == 0) entity.ammo.pop();
         entity.totalAmmo -= ammoPerShot;
-        Timers.run(reload / 2f, () -> ejectEffects(tile));
+        Time.run(reload / 2f, () -> ejectEffects(tile));
         return entry.type;
     }
 
@@ -296,7 +298,7 @@ public abstract class Turret extends Block{
 
         AmmoType type = peekAmmo(tile);
 
-        tr.trns(entity.rotation, size * tilesize / 2, Mathf.range(xRand));
+        tr.trns(entity.rotation, size * tilesize / 2f, Mathf.range(xRand));
 
         for(int i = 0; i < shots; i++){
             bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i-shots/2) * spread);
@@ -344,7 +346,7 @@ public abstract class Turret extends Block{
     }
 
     public static class TurretEntity extends TileEntity{
-        public Array<AmmoEntry> ammo = new ThreadArray<>();
+        public Array<AmmoEntry> ammo = new Array<>();
         public int totalAmmo;
         public float reload;
         public float rotation = 90;

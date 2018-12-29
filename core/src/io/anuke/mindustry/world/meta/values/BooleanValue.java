@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.meta.values;
 
 import io.anuke.mindustry.world.meta.StatValue;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Table;
 
 public class BooleanValue implements StatValue{
     private final boolean value;

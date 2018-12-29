@@ -1,6 +1,6 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 
 public class Palette{
     public static final Color

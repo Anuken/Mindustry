@@ -1,7 +1,11 @@
 package io.anuke.mindustry.entities.units;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.TileEntity;
@@ -12,11 +16,6 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -26,7 +25,7 @@ import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
 public abstract class GroundUnit extends BaseUnit{
-    protected static Translator vec = new Translator();
+    protected static Vector2 vec = new Vector2();
 
     protected float walkTime;
     protected float stuckTime;
@@ -42,7 +41,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         public void update(){
             TileEntity core = getClosestEnemyCore();
-            float dst = core == null ? 0 : distanceTo(core);
+            float dst = core == null ? 0 : dst(core);
 
             if(core != null && dst < getWeapon().getAmmo().getRange() / 1.1f){
                 target = core;
@@ -57,7 +56,7 @@ public abstract class GroundUnit extends BaseUnit{
         public void update(){
             TileEntity target = getClosestCore();
             if(target != null){
-                if(distanceTo(target) > 400f){
+                if(dst(target) > 400f){
                     moveAwayFromCore();
                 }else{
                     patrol();
@@ -119,14 +118,14 @@ public abstract class GroundUnit extends BaseUnit{
     public void update(){
         super.update();
 
-        stuckTime = !vec.set(x, y).sub(lastPosition()).isZero(0.0001f) ? 0f : stuckTime + Timers.delta();
+        stuckTime = !vec.set(x, y).sub(lastPosition()).isZero(0.0001f) ? 0f : stuckTime + Time.delta();
 
         if(!velocity.isZero()){
             baseRotation = Mathf.slerpDelta(baseRotation, velocity.angle(), 0.05f);
         }
 
         if(stuckTime < 1f){
-            walkTime += Timers.delta();
+            walkTime += Time.delta();
         }
     }
 
@@ -188,10 +187,10 @@ public abstract class GroundUnit extends BaseUnit{
         }
 
         if(!Units.invalidateTarget(target, this)){
-            if(distanceTo(target) < getWeapon().getAmmo().getRange()){
+            if(dst(target) < getWeapon().getAmmo().getRange()){
                 rotate(angleTo(target));
 
-                if(Mathf.angNear(angleTo(target), rotation, 13f)){
+                if(Angles.near(angleTo(target), rotation, 13f)){
                     AmmoType ammo = getWeapon().getAmmo();
 
                     Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.bullet.speed);
@@ -238,12 +237,12 @@ public abstract class GroundUnit extends BaseUnit{
     }
 
     protected void patrol(){
-        vec.trns(baseRotation, type.speed * Timers.delta());
+        vec.trns(baseRotation, type.speed * Time.delta());
         velocity.add(vec.x, vec.y);
         vec.trns(baseRotation, type.hitsizeTile);
         Tile tile = world.tileWorld(x + vec.x, y + vec.y);
         if((tile == null || tile.solid() || tile.floor().drownTime > 0) || stuckTime > 10f){
-            baseRotation += Mathf.sign(id % 2 - 0.5f) * Timers.delta() * 3f;
+            baseRotation += Mathf.sign(id % 2 - 0.5f) * Time.delta() * 3f;
         }
 
         rotation = Mathf.slerpDelta(rotation, velocity.angle(), type.rotatespeed);
@@ -258,7 +257,7 @@ public abstract class GroundUnit extends BaseUnit{
             vec.rotate((circleLength - vec.len()) / circleLength * 180f);
         }
 
-        vec.setLength(type.speed * Timers.delta());
+        vec.setLength(type.speed * Time.delta());
 
         velocity.add(vec);
     }
@@ -272,7 +271,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         float angle = angleTo(targetTile);
 
-        velocity.add(vec.trns(angleTo(targetTile), type.speed*Timers.delta()));
+        velocity.add(vec.trns(angleTo(targetTile), type.speed*Time.delta()));
         rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
     }
 
@@ -292,11 +291,11 @@ public abstract class GroundUnit extends BaseUnit{
         Tile targetTile = world.pathfinder.getTargetTile(enemy, tile);
         TileEntity core = getClosestCore();
 
-        if(tile == targetTile || core == null || distanceTo(core) < 90f) return;
+        if(tile == targetTile || core == null || dst(core) < 90f) return;
 
         float angle = angleTo(targetTile);
 
-        velocity.add(vec.trns(angleTo(targetTile), type.speed*Timers.delta()));
+        velocity.add(vec.trns(angleTo(targetTile), type.speed*Time.delta()));
         rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
     }
 }

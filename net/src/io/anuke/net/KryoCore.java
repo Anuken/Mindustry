@@ -1,8 +1,8 @@
-package io.anuke.kryonet;
+package io.anuke.net;
 
-import com.esotericsoftware.minlog.Log;
-import com.esotericsoftware.minlog.Log.Logger;
-import io.anuke.ucore.util.ColorCodes;
+import com.esotericsoftware.kryonet.util.Log;
+import com.esotericsoftware.kryonet.util.Log.Logger;
+import io.anuke.arc.util.ColorCodes;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -55,7 +55,7 @@ public class KryoCore{
                 if(headless)
                     builder.append(ColorCodes.RESET);
 
-                io.anuke.ucore.util.Log.info("&b" + builder.toString());
+                io.anuke.arc.util.Log.info("&b" + builder.toString());
             }
         });
     }

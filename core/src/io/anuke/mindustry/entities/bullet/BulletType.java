@@ -1,15 +1,15 @@
 package io.anuke.mindustry.entities.bullet;
 
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.entities.impl.BaseBulletType;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.entities.impl.BaseBulletType;
-import io.anuke.ucore.util.Translator;
 
 public abstract class BulletType extends Content implements BaseBulletType<Bullet>{
     public float lifetime;
@@ -45,7 +45,7 @@ public abstract class BulletType extends Content implements BaseBulletType<Bulle
     /**Whether velocity is inherited from the shooter.*/
     public boolean keepVelocity = true;
 
-    protected Translator vector = new Translator();
+    protected Vector2 vector = new Vector2();
 
     public BulletType(float speed, float damage){
         this.speed = speed;

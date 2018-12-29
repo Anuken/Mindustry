@@ -1,8 +1,11 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectMap.Entry;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.ObjectMap.Entry;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.GameMode;
@@ -14,10 +17,6 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.util.Bits;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -66,7 +65,7 @@ public class NetworkIO{
                 if(tile.block() instanceof BlockPart){
                     stream.writeByte(tile.link);
                 }else if(tile.entity != null){
-                    stream.writeByte(Bits.packByte(tile.getTeamID(), tile.getRotation())); //team + rotation
+                    stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
                     stream.writeShort((short) tile.entity.health); //health
 
                     if(tile.entity.items != null) tile.entity.items.write(stream);
@@ -92,28 +91,6 @@ public class NetworkIO{
                     stream.writeByte(consecutives);
                     i += consecutives;
                 }
-            }
-
-            //write visibility, length-run encoded
-            for(int i = 0; i < world.width() * world.height(); i++){
-                Tile tile = world.tile(i % world.width(), i / world.width());;
-                boolean discovered = tile.discovered();
-
-                int consecutives = 0;
-
-                for(int j = i + 1; j < world.width() * world.height() && consecutives < 32767*2-1; j++){
-                    Tile nextTile = world.tile(j % world.width(), j / world.width());;
-
-                    if(nextTile.discovered() != discovered){
-                        break;
-                    }
-
-                    consecutives++;
-                }
-
-                stream.writeBoolean(discovered);
-                stream.writeShort(consecutives);
-                i += consecutives;
             }
 
             stream.write(Team.all.length);
@@ -151,7 +128,7 @@ public class NetworkIO{
         Player player = players[0];
 
         try(DataInputStream stream = new DataInputStream(is)){
-            Timers.clear();
+            Time.clear();
 
             //general state
             byte mode = stream.readByte();
@@ -160,7 +137,7 @@ public class NetworkIO{
             int missions = stream.readInt();
 
             if(sector != invalidSector){
-                world.sectors.createSector(Bits.getLeftShort(sector), Bits.getRightShort(sector));
+                world.sectors.createSector(Pack.leftShort(sector), Pack.rightShort(sector));
                 world.setSector(world.sectors.get(sector));
                 world.getSector().completedMissions = missions;
             }else{
@@ -186,7 +163,7 @@ public class NetworkIO{
             Entities.clear();
             int id = stream.readInt();
             player.resetNoAdd();
-            player.read(stream, TimeUtils.millis());
+            player.read(stream, Time.millis());
             player.resetID(id);
             player.add();
 
@@ -218,8 +195,8 @@ public class NetworkIO{
                     byte tr = stream.readByte();
                     short health = stream.readShort();
 
-                    byte team = Bits.getLeftByte(tr);
-                    byte rotation = Bits.getRightByte(tr);
+                    byte team = Pack.leftByte(tr);
+                    byte rotation = Pack.rightByte(tr);
 
                     tile.setTeam(Team.all[team]);
                     tile.entity.health = health;
@@ -248,18 +225,6 @@ public class NetworkIO{
                 tiles[x][y] = tile;
             }
 
-            for(int i = 0; i < width * height; i++){
-                boolean discovered = stream.readBoolean();
-                int consecutives = stream.readUnsignedShort();
-                if(discovered){
-                    for(int j = i + 1; j < i + 1 + consecutives; j++){
-                        int newx = j % width, newy = j / width;
-                        tiles[newx][newy].setVisibility((byte) 1);
-                    }
-                }
-                i += consecutives;
-            }
-
             state.teams = new Teams();
 
             byte teams = stream.readByte();
@@ -281,7 +246,7 @@ public class NetworkIO{
                 }
 
                 if(team == players[0].getTeam() && cores > 0){
-                    Core.camera.position.set(state.teams.get(team).cores.first().drawx(), state.teams.get(team).cores.first().drawy(), 0);
+                    Core.camera.position.set(state.teams.get(team).cores.first().drawx(), state.teams.get(team).cores.first().drawy());
                 }
             }
 

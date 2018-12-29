@@ -1,69 +1,66 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.Sort;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.collection.Sort;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.glutils.FrameBuffer;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
-import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Surface;
-import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.core.Core.camera;
+import static io.anuke.arc.Core.camera;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 6;
 
-    private FloorRenderer floorRenderer;
+    public final FloorRenderer floor = new FloorRenderer();
 
     private Array<BlockRequest> requests = new Array<>(true, initialRequests, BlockRequest.class);
     private IntSet teamChecks = new IntSet();
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
-    private Layer lastLayer;
     private int requestidx = 0;
     private int iterateidx = 0;
-    private Surface shadows = Graphics.createSurface().setSize(2, 2);
+    private FrameBuffer shadows = new FrameBuffer(1, 1);
 
     public BlockRenderer(){
-        floorRenderer = new FloorRenderer();
 
         for(int i = 0; i < requests.size; i++){
             requests.set(i, new BlockRequest());
         }
 
-        Events.on(WorldLoadGraphicsEvent.class, event -> {
+        Events.on(WorldLoadEvent.class, event -> {
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
         });
 
         Events.on(TileChangeEvent.class, event -> {
-            threads.runGraphics(() -> {
-                int avgx = Mathf.scl(camera.position.x, tilesize);
-                int avgy = Mathf.scl(camera.position.y, tilesize);
-                int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
-                int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
+            int avgx = (int)(camera.position.x / tilesize);
+            int avgy = (int)(camera.position. y/ tilesize);
+            int rangex = (int) (camera.width  / tilesize / 2) + 2;
+            int rangey = (int) (camera.height  / tilesize / 2) + 2;
 
-                if(Math.abs(avgx - event.tile.x) <= rangex && Math.abs(avgy - event.tile.y) <= rangey){
-                    lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
-                }
-            });
+            if(Math.abs(avgx - event.tile.x) <= rangex && Math.abs(avgy - event.tile.y) <= rangey){
+                lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
+            }
         });
     }
 
     public void drawShadows(){
         Draw.color(0, 0, 0, 0.15f);
-        Draw.rect(shadows.texture(),
-            Core.camera.position.x - Core.camera.position.x % tilesize,
-            Core.camera.position.y - Core.camera.position.y % tilesize,
-            shadows.width(), -shadows.height());
+        Draw.rect(Draw.wrap(shadows.getTexture()),
+            camera.position.x - camera.position.x % tilesize,
+            camera.position.y - camera.position.y % tilesize,
+            shadows.getWidth(), -shadows.getHeight());
         Draw.color();
     }
 
@@ -74,13 +71,12 @@ public class BlockRenderer{
     /**Process all blocks to draw, simultaneously updating the block shadow framebuffer.*/
     public void processBlocks(){
         iterateidx = 0;
-        lastLayer = null;
 
-        int avgx = Mathf.scl(camera.position.x, tilesize);
-        int avgy = Mathf.scl(camera.position.y, tilesize);
+        int avgx = (int)(camera.position.x / tilesize);
+        int avgy = (int)(camera.position.y / tilesize);
 
-        int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2) + 2;
-        int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2) + 2;
+        int rangex = (int) (camera.width  / tilesize / 2) + 2;
+        int rangey = (int) (camera.height  / tilesize / 2) + 2;
 
         if(avgx == lastCamX && avgy == lastCamY && lastRangeX == rangex && lastRangeY == rangey){
             return;
@@ -91,12 +87,16 @@ public class BlockRenderer{
         teamChecks.clear();
         requestidx = 0;
 
-        Graphics.end();
-        if(shadows.width() != shadowW || shadows.height() != shadowH){
-            shadows.setSize(shadowW, shadowH);
+        Draw.flush();
+        Draw.proj().setOrtho(Mathf.round(camera.position.x, tilesize)-shadowW/2f, Mathf.round(camera.position.y, tilesize)-shadowH/2f,
+        shadowW, shadowH);
+
+        if(shadows.getWidth() != shadowW || shadows.getHeight() != shadowH){
+            shadows.resize(shadowW, shadowH);
         }
-        Core.batch.getProjectionMatrix().setToOrtho2D(Mathf.round(Core.camera.position.x, tilesize)-shadowW/2f, Mathf.round(Core.camera.position.y, tilesize)-shadowH/2f, shadowW, shadowH);
-        Graphics.surface(shadows);
+
+        shadows.begin();
+        Core.graphics.clear(Color.CLEAR);
 
         int minx = Math.max(avgx - rangex - expandr, 0);
         int miny = Math.max(avgy - rangey - expandr, 0);
@@ -136,10 +136,10 @@ public class BlockRenderer{
             }
         }
 
-        Graphics.surface();
-        Graphics.end();
-        Core.batch.setProjectionMatrix(camera.combined);
-        Graphics.begin();
+        Draw.flush();
+        shadows.end();
+
+        Draw.proj(camera.projection());
 
         Sort.instance().sort(requests.items, 0, requestidx);
 
@@ -162,12 +162,6 @@ public class BlockRenderer{
             }
 
             BlockRequest req = requests.get(iterateidx);
-
-            if(req.layer != lastLayer){
-                if(lastLayer != null) layerEnds(lastLayer);
-                layerBegins(req.layer);
-            }
-
             Block block = req.tile.block();
 
             if(req.layer == Layer.block){
@@ -177,8 +171,6 @@ public class BlockRenderer{
             }else if(req.layer == block.layer2){
                 block.drawLayer2(req.tile);
             }
-
-            lastLayer = req.layer;
         }
     }
 
@@ -214,24 +206,6 @@ public class BlockRenderer{
                 break;
             }
         }
-    }
-
-    public void beginFloor(){
-        floorRenderer.beginDraw();
-    }
-
-    public void endFloor(){
-        floorRenderer.endDraw();
-    }
-
-    public void drawFloor(){
-        floorRenderer.drawFloor();
-    }
-
-    private void layerBegins(Layer layer){
-    }
-
-    private void layerEnds(Layer layer){
     }
 
     private void addRequest(Tile tile, Layer layer){

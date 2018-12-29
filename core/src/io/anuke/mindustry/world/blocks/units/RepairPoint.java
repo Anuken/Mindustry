@@ -1,23 +1,24 @@
 package io.anuke.mindustry.world.blocks.units;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.Mathf;
 
 public class RepairPoint extends Block{
     private static Rectangle rect = new Rectangle();
@@ -45,7 +46,7 @@ public class RepairPoint extends Block{
     public void load(){
         super.load();
 
-        topRegion = Draw.region(name + "-turret");
+        topRegion = Core.atlas.find(name + "-turret");
     }
 
     @Override
@@ -83,19 +84,19 @@ public class RepairPoint extends Block{
     public void update(Tile tile){
         RepairPointEntity entity = tile.entity();
 
-        if(entity.target != null && (entity.target.isDead() || entity.target.distanceTo(tile) > repairRadius ||
+        if(entity.target != null && (entity.target.isDead() || entity.target.dst(tile) > repairRadius ||
                 entity.target.health >= entity.target.maxHealth())){
             entity.target = null;
         }else if(entity.target != null){
-            entity.target.health += repairSpeed * Timers.delta() * entity.strength;
+            entity.target.health += repairSpeed * Time.delta() * entity.strength;
             entity.target.clampHealth();
             entity.rotation = Mathf.slerpDelta(entity.rotation, entity.angleTo(entity.target), 0.5f);
         }
 
         if(entity.target != null && entity.cons.valid()){
-            entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.08f * Timers.delta());
+            entity.strength = Mathf.lerpDelta(entity.strength, 1f, 0.08f * Time.delta());
         }else{
-            entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.07f * Timers.delta());
+            entity.strength = Mathf.lerpDelta(entity.strength, 0f, 0.07f * Time.delta());
         }
 
         if(entity.timer.get(timerTarget, 20)){

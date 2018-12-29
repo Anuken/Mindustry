@@ -1,17 +1,16 @@
 package io.anuke.mindustry.content.fx;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Tmp;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -264,14 +263,14 @@ public class BlockFx extends FxList implements ContentList{
             Draw.reset();
         });
         ripple = new GroundEffect(false, 30, e -> {
-            Draw.color(Hue.shift(Tmp.c1.set(e.color), 2, 0.1f));
+            Draw.color(Tmp.c1.set(e.color).shiftValue(0.1f));
             Lines.stroke(e.fout() + 0.4f);
             Lines.circle(e.x, e.y, 2f + e.fin() * 4f);
             Draw.reset();
         });
 
         bubble = new Effect(20, e -> {
-            Draw.color(Hue.shift(Tmp.c1.set(e.color), 2, 0.1f));
+            Draw.color(Tmp.c1.set(e.color).shiftValue(0.1f));
             Lines.stroke(e.fout() + 0.2f);
             Angles.randLenVectors(e.id, 2, 8f, (x, y) -> {
                 Lines.circle(e.x + x, e.y + y, 1f + e.fin() * 3f);
