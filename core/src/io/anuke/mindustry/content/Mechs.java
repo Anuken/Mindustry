@@ -14,17 +14,11 @@ import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.Lightning;
-import io.anuke.mindustry.entities.units.BaseUnit;
-import io.anuke.mindustry.entities.units.types.AlphaDrone;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.maps.TutorialSector;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Mech;
-
-import static io.anuke.mindustry.Vars.unitGroups;
 
 public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
@@ -36,8 +30,6 @@ public class Mechs implements ContentList{
     public void load(){
 
         alpha = new Mech("alpha-mech", false){
-            int maxDrones = 3;
-            float buildTime = 20f;
 
             {
                 drillPower = 1;
@@ -53,28 +45,6 @@ public class Mechs implements ContentList{
             @Override
             public void updateAlt(Player player){
 
-                if(player.isShooting && getDrones(player) < maxDrones && !TutorialSector.supressDrone()){
-                    player.timer.get(Player.timerAbility, buildTime);
-
-                    if(player.timer.getTime(Player.timerAbility) > buildTime/2f){
-                        if(!Net.client()){
-                            AlphaDrone drone = (AlphaDrone) UnitTypes.alphaDrone.create(player.getTeam());
-                            drone.leader = player;
-                            drone.set(player.x, player.y);
-                            drone.add();
-
-                            Effects.effect(UnitFx.unitLand, player);
-                        }
-                    }
-                }
-            }
-
-            int getDrones(Player player){
-                int sum = 0;
-                for(BaseUnit unit : unitGroups[player.getTeam().ordinal()].all()){
-                    if(unit instanceof AlphaDrone && ((AlphaDrone) unit).leader == player) sum ++;
-                }
-                return sum;
             }
         };
 

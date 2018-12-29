@@ -9,6 +9,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -32,6 +33,7 @@ public class BlockRenderer{
     private int requestidx = 0;
     private int iterateidx = 0;
     private FrameBuffer shadows = new FrameBuffer(1, 1);
+    private FrameBuffer shadowWrite = new FrameBuffer(1, 1);
 
     public BlockRenderer(){
 
@@ -57,10 +59,10 @@ public class BlockRenderer{
 
     public void drawShadows(){
         Draw.color(0, 0, 0, 0.15f);
-        Draw.rect(Draw.wrap(shadows.getTexture()),
+        Draw.rect(Draw.wrap(shadowWrite.getTexture()),
             camera.position.x - camera.position.x % tilesize,
             camera.position.y - camera.position.y % tilesize,
-            shadows.getWidth(), -shadows.getHeight());
+            shadowWrite.getWidth()*Draw.scl, -shadowWrite.getHeight()*Draw.scl);
         Draw.color();
     }
 
@@ -87,13 +89,15 @@ public class BlockRenderer{
         teamChecks.clear();
         requestidx = 0;
 
-        //TODO fix shadows
         Draw.flush();
-        Draw.proj().setOrtho(Mathf.round(camera.position.x, tilesize)-shadowW/2f, Mathf.round(camera.position.y, tilesize)-shadowH/2f,
-        shadowW, shadowH);
+        Draw.proj().setOrtho(
+            Mathf.round(Core.camera.position.x, tilesize)-shadowW/2f*Draw.scl,
+            Mathf.round(Core.camera.position.y, tilesize)-shadowH/2f*Draw.scl,
+            shadowW*Draw.scl, shadowH*Draw.scl);
 
         if(shadows.getWidth() != shadowW || shadows.getHeight() != shadowH){
             shadows.resize(shadowW, shadowH);
+            shadowWrite.resize(shadowW, shadowH);
         }
 
         shadows.begin();
@@ -137,9 +141,23 @@ public class BlockRenderer{
             }
         }
 
-        //TODO proper shadows
         Draw.flush();
         shadows.end();
+
+        Tmp.tr1.set(shadows.getTexture());
+        Shaders.outline.color.set(Color.BLACK);
+        Shaders.outline.region = Tmp.tr1;
+
+        Draw.shader(Shaders.outline);
+        shadowWrite.begin();
+        Core.graphics.clear(Color.CLEAR);
+        Draw.rect(Draw.wrap(shadows.getTexture()),
+            Mathf.round(Core.camera.position.x, tilesize),
+            Mathf.round(Core.camera.position.y, tilesize),
+            shadows.getTexture().getWidth() * Draw.scl,
+            -shadows.getTexture().getHeight() * Draw.scl);
+        Draw.shader();
+        shadowWrite.end();
 
         Draw.proj(camera.projection());
 
