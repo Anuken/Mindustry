@@ -49,7 +49,8 @@ public class DesktopInput extends InputHandler{
 
             for(TextureRegion region : regions){
                 Draw.rect(region, x * tilesize + block.offset(), y * tilesize + block.offset(),
-                        region.getWidth() * selectScale, region.getHeight() * selectScale, block.rotate ? rotation * 90 : 0);
+                        region.getWidth() * selectScale * Draw.scl,
+                        region.getHeight() * selectScale * Draw.scl, block.rotate ? rotation * 90 : 0);
             }
         }else{
             Draw.color(Palette.removeBack);

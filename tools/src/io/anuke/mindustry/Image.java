@@ -14,25 +14,24 @@ import java.util.ArrayList;
 public class Image {
     private static ArrayList<Image> toDispose = new ArrayList<>();
 
-    private BufferedImage atlas;
-
     private BufferedImage image;
     private Graphics2D graphics;
     private Color color = new Color();
 
-    public Image(BufferedImage atlas, TextureRegion region){
-        this(atlas, region.getWidth(), region.getHeight());
-
-        draw(region);
+    public Image(TextureRegion region){
+        this(ImageContext.buf(region));
     }
 
-    public Image(BufferedImage atlas, int width, int height){
-        this.atlas = atlas;
-
-        this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    public Image(BufferedImage src){
+        this.image = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
         this.graphics = image.createGraphics();
+        this.graphics.drawImage(src, 0, 0, null);
 
         toDispose.add(this);
+    }
+
+    public Image(int width, int height){
+        this(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
     }
 
     public int width(){
@@ -106,14 +105,14 @@ public class Image {
             y = 0;
         }
 
-        graphics.drawImage(atlas,
+        graphics.drawImage(ImageContext.get(region).image,
                 x, y,
                 x + region.getWidth(),
                 y + region.getHeight(),
-                (flipx ? region.getX() + region.getWidth() : region.getX()) + ofx,
-                (flipy ? region.getY() + region.getHeight() : region.getY()) + ofy,
-                (flipx ? region.getX() : region.getX() + region.getWidth()) + ofx,
-                (flipy ? region.getY() : region.getY() + region.getHeight()) + ofy,
+                (flipx ?  region.getWidth() : 0) + ofx,
+                (flipy ? region.getHeight() : 0) + ofy,
+                (flipx ? 0 : region.getWidth()) + ofx,
+                (flipy ? 0 : region.getHeight()) + ofy,
                 null);
     }
 

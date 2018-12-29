@@ -27,15 +27,6 @@ public class Rock extends Block{
     }
 
     @Override
-    public void drawShadow(Tile tile){
-        if(shadowRegions != null){
-            Draw.rect(shadowRegions[(Mathf.randomSeed(tile.pos(), 0, variants - 1))], tile.worldx(), tile.worldy());
-        }else if(shadowRegion != null){
-            Draw.rect(shadowRegion, tile.drawx(), tile.drawy());
-        }
-    }
-
-    @Override
     public void load(){
         super.load();
 

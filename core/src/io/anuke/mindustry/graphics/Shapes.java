@@ -11,11 +11,11 @@ import io.anuke.arc.math.Mathf;
 public class Shapes{
 
     public static void laser(String line, String edge, float x, float y, float x2, float y2, float scale){
-        laser(line, edge, x, y, x2, y2, Mathf.atan2(x2 - x, y2 - y), scale);
+        laser(line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), scale);
     }
 
     public static void laser(String line, String edge, float x, float y, float x2, float y2){
-        laser(line, edge, x, y, x2, y2, Mathf.atan2(x2 - x, y2 - y), 1f);
+        laser(line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), 1f);
     }
 
     public static void laser(String line, String edge, float x, float y, float x2, float y2, float rotation, float scale){

@@ -21,8 +21,7 @@ import io.anuke.mindustry.world.blocks.Floor;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class FloorRenderer{
     private final static int chunksize = 64;
@@ -194,7 +193,7 @@ public class FloorRenderer{
         if(cbatch != null) cbatch.dispose();
 
         int chunksx = Mathf.ceil((float) (world.width()) / chunksize),
-            chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
+        chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
         cache = new Chunk[chunksx][chunksy];
         cbatch = new CacheBatch(world.width() * world.height() * 4 * 4);
 

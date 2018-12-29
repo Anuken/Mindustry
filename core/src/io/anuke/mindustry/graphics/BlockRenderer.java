@@ -82,11 +82,12 @@ public class BlockRenderer{
             return;
         }
 
-        int shadowW = rangex * tilesize*2, shadowH = rangey * tilesize*2;
+        int shadowW = (int)(rangex * tilesize*2/Draw.scl), shadowH = (int)(rangey * tilesize*2/Draw.scl);
 
         teamChecks.clear();
         requestidx = 0;
 
+        //TODO fix shadows
         Draw.flush();
         Draw.proj().setOrtho(Mathf.round(camera.position.x, tilesize)-shadowW/2f, Mathf.round(camera.position.y, tilesize)-shadowH/2f,
         shadowW, shadowH);
@@ -136,6 +137,7 @@ public class BlockRenderer{
             }
         }
 
+        //TODO proper shadows
         Draw.flush();
         shadows.end();
 
@@ -147,10 +149,6 @@ public class BlockRenderer{
         lastCamY = avgy;
         lastRangeX = rangex;
         lastRangeY = rangey;
-    }
-
-    public int getRequests(){
-        return requestidx;
     }
 
     public void drawBlocks(Layer stopAt){

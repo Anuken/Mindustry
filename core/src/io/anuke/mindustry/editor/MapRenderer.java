@@ -121,12 +121,12 @@ public class MapRenderer implements Disposable{
             if(wall.rotate){
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
                         wx * tilesize + wall.offset(), wy * tilesize + wall.offset(),
-                        region.getWidth(), region.getHeight(), rotation * 90 - 90);
+                        region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, rotation * 90 - 90);
             }else{
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
-                        wx * tilesize + wall.offset() + (tilesize - region.getWidth())/2f,
-                        wy * tilesize + wall.offset() + (tilesize - region.getHeight())/2f,
-                        region.getWidth(), region.getHeight());
+                        wx * tilesize + wall.offset() + (tilesize - region.getWidth() * Draw.scl)/2f,
+                        wy * tilesize + wall.offset() + (tilesize - region.getHeight() * Draw.scl)/2f,
+                        region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
             }
         }else{
             region = floor.getEditorIcon();
@@ -150,7 +150,7 @@ public class MapRenderer implements Disposable{
 
         mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize, region,
                 wx * tilesize - (wall.size/3) * tilesize, wy * tilesize - (wall.size/3) * tilesize,
-                region.getWidth(), region.getHeight());
+                region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
         mesh.setColor(Color.WHITE);
     }
 

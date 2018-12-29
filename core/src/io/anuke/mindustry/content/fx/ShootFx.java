@@ -177,7 +177,7 @@ public class ShootFx extends FxList implements ContentList{
             Draw.color(Palette.lancerLaser);
 
             Angles.randLenVectors(e.id, 7, 80f, e.rotation, 0f, (x, y) -> {
-                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), e.fout() * 9f);
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 9f);
             });
 
             Draw.reset();
@@ -187,7 +187,7 @@ public class ShootFx extends FxList implements ContentList{
             Draw.color(Palette.lancerLaser);
 
             Angles.randLenVectors(e.id, 2, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {
-                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), e.fslope() * 3f + 1f);
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3f + 1f);
             });
 
             Draw.reset();
@@ -205,7 +205,7 @@ public class ShootFx extends FxList implements ContentList{
             Draw.color(Palette.lancerLaser);
 
             Angles.randLenVectors(e.id, 2, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {
-                Shapes.tri(e.x + x, e.y + y, e.fslope() * 3f + 1, e.fslope() * 3f + 1, Mathf.atan2(x, y));
+                Shapes.tri(e.x + x, e.y + y, e.fslope() * 3f + 1, e.fslope() * 3f + 1, Mathf.angle(x, y));
             });
 
             Draw.reset();
@@ -216,7 +216,7 @@ public class ShootFx extends FxList implements ContentList{
             Lines.stroke(e.fout() * 1.2f + 0.5f);
 
             Angles.randLenVectors(e.id, 7, 25f * e.finpow(), e.rotation, 50f, (x, y) -> {
-                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), e.fin() * 5f + 2f);
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 5f + 2f);
             });
 
             Draw.reset();

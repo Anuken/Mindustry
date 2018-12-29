@@ -133,8 +133,6 @@ public abstract class Turret extends Block{
     @Override
     public void draw(Tile tile){
         Draw.rect(baseRegion, tile.drawx(), tile.drawy());
-        Draw.color(tile.getTeam().color, Color.WHITE, 0.45f);
-        Draw.rect(baseTopRegion, tile.drawx(), tile.drawy());
         Draw.color();
     }
 

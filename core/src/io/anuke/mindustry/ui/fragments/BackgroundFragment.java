@@ -23,13 +23,13 @@ public class BackgroundFragment extends Fragment{
             Draw.shader();
 
             boolean portrait = Core.graphics.getWidth() < Core.graphics.getHeight();
-            float logoscl = (int) Unit.dp.scl(7) * (portrait ? 5f / 7f : 1f);
+            float logoscl = (int) Unit.dp.scl(1) * (portrait ? 5f / 7f : 1f);
             TextureRegion logo = Core.atlas.find("logotext");
             float logow = logo.getWidth() * logoscl;
             float logoh = logo.getHeight() * logoscl;
 
             Draw.color();
-            Draw.rect(logo, (int) (w / 2), (int) (h - logoh + 15 - Unit.dp.scl(portrait ? 30f : 0)) + logoh/2, logow, logoh);
+            Draw.rect(logo, (int) (w / 2), (int) (h - 10 - logoh - Unit.dp.scl(portrait ? 30f : 0)) + logoh/2, logow, logoh);
         }).visible(() -> state.is(State.menu)).grow();
     }
 }

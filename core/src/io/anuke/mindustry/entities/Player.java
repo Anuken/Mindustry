@@ -319,7 +319,9 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 Draw.rect(mech.legRegion,
                 x + Angles.trnsx(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
                 y + Angles.trnsy(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
-                mech.legRegion.getWidth() * i, mech.legRegion.getHeight() - Mathf.clamp(ft * i, 0, 2), baseRotation - 90 + boostAng * i);
+                mech.legRegion.getWidth() * i * Draw.scl,
+                (mech.legRegion.getHeight() - Mathf.clamp(ft * i, 0, 2)) * Draw.scl,
+                baseRotation - 90 + boostAng * i);
             }
 
             Draw.rect(mech.baseRegion, x, y, baseRotation - 90);
@@ -340,7 +342,10 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             float w = i > 0 ? -mech.weapon.equipRegion.getWidth() : mech.weapon.equipRegion.getWidth();
             Draw.rect(mech.weapon.equipRegion,
             x + Angles.trnsx(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY),
-            y + Angles.trnsy(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY), w, mech.weapon.equipRegion.getHeight(), rotation - 90);
+            y + Angles.trnsy(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY),
+            w * Draw.scl,
+            mech.weapon.equipRegion.getHeight() * Draw.scl,
+            rotation - 90);
         }
 
         float backTrns = 4f, itemSize = 5f;

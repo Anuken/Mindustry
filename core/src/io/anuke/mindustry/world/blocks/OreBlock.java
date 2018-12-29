@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
@@ -18,8 +17,6 @@ public class OreBlock extends Floor{
         this.base = base;
         this.variants = 3;
         this.minimapColor = ore.color;
-        this.blends = block -> (block instanceof OreBlock && ((OreBlock) block).base != base) || (!(block instanceof OreBlock) && block != base);
-        this.tileBlends = (tile, other) -> tile.getElevation() < other.getElevation();
         this.edge = base.name;
     }
 
@@ -50,8 +47,4 @@ public class OreBlock extends Floor{
         base.drawEdges(tile, true);
     }
 
-    @Override
-    public boolean blendOverride(Block block){
-        return block == base;
-    }
 }

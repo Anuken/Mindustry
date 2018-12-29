@@ -39,7 +39,7 @@ public class Edges{
                 edges[i][idx++] = new Point2(top, bot + j + 1);
             }
 
-            Arrays.sort(edges[i], (e1, e2) -> Float.compare(Mathf.atan2(e1.x, e1.y), Mathf.atan2(e2.x, e2.y)));
+            Arrays.sort(edges[i], (e1, e2) -> Float.compare(Mathf.angle(e1.x, e1.y), Mathf.angle(e2.x, e2.y)));
 
             edgeInside[i] = new Point2[edges[i].length];
 

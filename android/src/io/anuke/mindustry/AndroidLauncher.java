@@ -49,6 +49,8 @@ public class AndroidLauncher extends AndroidApplication{
         super.onCreate(savedInstanceState);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.useImmersiveMode = true;
+        config.numSamples = 2;
+        config.depth = 0;
         Platform.instance = new Platform(){
 
             @Override

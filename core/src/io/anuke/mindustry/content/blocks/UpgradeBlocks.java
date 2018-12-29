@@ -37,28 +37,24 @@ public class UpgradeBlocks extends BlockList{
             mech = Mechs.dart;
             size = 2;
             powerCapacity = 50f;
-            shadow = "shadow-rounded-2";
         }};
 
         javelinPad = new MechPad("javelin-ship-pad"){{
             mech = Mechs.javelin;
             size = 2;
             powerCapacity = 80f;
-            shadow = "shadow-rounded-2";
         }};
 
         tridentPad = new MechPad("trident-ship-pad"){{
             mech = Mechs.trident;
             size = 2;
             powerCapacity = 100f;
-            shadow = "shadow-rounded-2";
         }};
 
         glaivePad = new MechPad("glaive-ship-pad"){{
             mech = Mechs.glaive;
             size = 3;
             powerCapacity = 120f;
-            shadow = "shadow-round-3";
         }};
     }
 }

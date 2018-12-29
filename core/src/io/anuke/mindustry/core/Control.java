@@ -6,6 +6,7 @@ import io.anuke.arc.Events;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureAtlas;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.ui.TextField;
@@ -61,7 +62,12 @@ public class Control implements ApplicationListener{
 
         content.initialize(Content::init);
         Core.atlas = new TextureAtlas("sprites/sprites.atlas");
+        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
         content.initialize(Content::load);
+
+        if(Core.atlas.getTextures().size != 1){
+            throw new IllegalStateException("Atlas must be exactly one texture.");
+        }
 
         unlocks.load();
 
@@ -284,7 +290,7 @@ public class Control implements ApplicationListener{
                     Core.settings.put("4.0-warning-2", true);
                     Core.settings.save();
                 }).size(100f, 60f);
-                dialog.content().add("Reminder: The beta version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
+                dialog.content().add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
                         "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
                         "All current art and UI is temporary, and will be re-drawn before release. " +
                         "\n\n[accent]Saves and maps may be corrupted without warning between updates.").wrap().width(400f);

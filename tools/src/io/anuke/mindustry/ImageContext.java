@@ -12,70 +12,73 @@ import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Log.LogHandler;
 import io.anuke.arc.util.Log.NoopLogHandler;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.Core;
 import io.anuke.mindustry.core.ContentLoader;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class ImageContext {
-    private BufferedImage image;
+    static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
+    static ObjectMap<TextureRegion, BufferedImage> imageCache = new ObjectMap<>();
 
-    public void load() throws IOException{
+    static void load() throws IOException{
         Log.setLogger(new NoopLogHandler());
         Vars.content = new ContentLoader();
         Vars.content.load();
         Log.setLogger(new LogHandler());
 
-        String spritesFolder = new File("../../../assets/sprites").getAbsolutePath();
-        TextureAtlasData data = new TextureAtlasData(new FileHandle(spritesFolder + "/sprites.atlas"),
-                new FileHandle(spritesFolder), false);
+        Files.walk(Paths.get("../../../assets-raw/sprites_out")).forEach(path -> {
+            try{
+                if(Files.isDirectory(path)) return;
 
-        ObjectMap<String, AtlasRegion> regionCache = new ObjectMap<>();
+                String fname = path.getFileName().toString();
+                fname = fname.substring(0, fname.length() - 4);
 
-        for(Region region : data.getRegions()){
-            int x = region.left, y = region.top, width = region.width, height = region.height;
+                BufferedImage image = ImageIO.read(path.toFile());
+                GenRegion region = new GenRegion(fname){
 
-            regionCache.put(region.name, new GenRegion(){
-                {
-                    name = region.name;
-                    context = ImageContext.this;
-                }
+                    @Override
+                    public int getX(){
+                        return 0;
+                    }
 
-                @Override
-                public int getX(){
-                    return x;
-                }
+                    @Override
+                    public int getY(){
+                        return 0;
+                    }
 
-                @Override
-                public int getY(){
-                    return y;
-                }
+                    @Override
+                    public int getWidth(){
+                        return image.getWidth();
+                    }
 
-                @Override
-                public int getWidth(){
-                    return width;
-                }
+                    @Override
+                    public int getHeight(){
+                        return image.getHeight();
+                    }
+                };
 
-                @Override
-                public int getHeight(){
-                    return height;
-                }
-            });
-        }
+                regionCache.put(fname, region);
+                imageCache.put(region, image);
+
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+        });
 
         Core.atlas = new TextureAtlas(){
             @Override
             public AtlasRegion find(String name){
                 if(!regionCache.containsKey(name)){
-                    GenRegion region = new GenRegion();
-                    region.name = name;
-                    region.context = ImageContext.this;
+                    GenRegion region = new GenRegion(name);
                     region.invalid = true;
                     return region;
                 }
-                return regionCache.get(name);
+                return (AtlasRegion)regionCache.get(name);
             }
 
             @Override
@@ -83,31 +86,33 @@ public class ImageContext {
                 return regionCache.containsKey(s);
             }
         };
-
-        image = ImageIO.read(new File(spritesFolder + "/sprites.png"));
     }
 
-    public void generate(String name, Runnable run){
+    static void generate(String name, Runnable run){
         Time.mark();
         run.run();
         Log.info("&ly[Generator]&lc Time to generate &lm{0}&lc: &lg{1}&lcms", name, Time.elapsed());
     }
 
-    public Image create(int width, int height){
-        return new Image(image, width, height);
+    static BufferedImage buf(TextureRegion region){
+        return imageCache.get(region);
     }
 
-    public Image get(String name){
+    static Image create(int width, int height){
+        return new Image(width, height);
+    }
+
+    static Image get(String name){
         return get(Core.atlas.find(name));
     }
 
-    public Image get(TextureRegion region){
+    static Image get(TextureRegion region){
         GenRegion.validate(region);
 
-        return new Image(image, region);
+        return new Image(imageCache.get(region));
     }
 
-    public void err(String message, Object... args){
+    static void err(String message, Object... args){
         Log.err(message, args);
         System.exit(-1);
     }

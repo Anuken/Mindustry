@@ -17,6 +17,8 @@ import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
+import static io.anuke.mindustry.Vars.tilesize;
+
 public class Floor extends Block{
     /** number of different variant regions to use */
     public int variants;
@@ -76,19 +78,23 @@ public class Floor extends Block{
 
                 TextureRegion result = new TextureRegion();
 
-                int sx = -dx * 8 + 2, sy = -dy * 8 + 2;
-                int x = Mathf.clamp(sx, 0, 12);
-                int y = Mathf.clamp(sy, 0, 12);
-                int w = Mathf.clamp(sx + 8, 0, 12) - x, h = Mathf.clamp(sy + 8, 0, 12) - y;
+                int padSize = (int)(tilesize/Draw.scl/2);
+                int texSize = (int)(tilesize/Draw.scl);
+                int totSize = padSize + texSize;
 
-                float rx = Mathf.clamp(dx * 8, 0, 8 - w);
-                float ry = Mathf.clamp(dy * 8, 0, 8 - h);
+                int sx = -dx * texSize + padSize/2, sy = -dy * texSize + padSize/2;
+                int x = Mathf.clamp(sx, 0, totSize);
+                int y = Mathf.clamp(sy, 0, totSize);
+                int w = Mathf.clamp(sx + texSize, 0, totSize) - x, h = Mathf.clamp(sy + texSize, 0, totSize) - y;
+
+                float rx = Mathf.clamp(dx * texSize, 0, texSize - w);
+                float ry = Mathf.clamp(dy * texSize, 0, texSize - h);
 
                 result.setTexture(edgeRegion.getTexture());
                 result.set(edgeRegion.getX() + x, edgeRegion.getY() + y + h, w, -h);
 
                 edgeRegions[i] = result;
-                offsets[i] = new Vector2(-4 + rx, -4 + ry);
+                offsets[i] = new Vector2(-padSize + rx, -padSize + ry);
             }
 
             cliffRegions = new TextureRegion[4];
@@ -172,13 +178,20 @@ public class Floor extends Block{
             if(other == null) continue;
 
             Floor floor = other.floor();
+            Floor cur = this;
+            if(floor instanceof OreBlock) floor = ((OreBlock) floor).base;
+            if(cur instanceof OreBlock) cur = ((OreBlock) cur).base;
 
-            if(floor.edgeRegions == null || (floor.id <= this.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!blends.test(floor) && !tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > this.cacheLayer.ordinal() && !sameLayer) ||
-                    (sameLayer && floor.cacheLayer == this.cacheLayer)) continue;
+            if(floor.edgeRegions == null || (floor.id <= cur.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!cur.blends.test(floor) && !cur.tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > cur.cacheLayer.ordinal() && !sameLayer) ||
+                    (sameLayer && floor.cacheLayer == cur.cacheLayer)) continue;
 
             TextureRegion region = floor.edgeRegions[i];
 
-            Draw.rect(region, tile.worldx() + floor.offsets[i].x + region.getWidth()/2f, tile.worldy() + floor.offsets[i].y + region.getHeight()/2f, region.getWidth(), region.getHeight());
+            Draw.rect(region,
+                tile.worldx() + floor.offsets[i].x * Draw.scl + Draw.scl * region.getWidth()/2f,
+                tile.worldy() + floor.offsets[i].y * Draw.scl + Draw.scl * region.getHeight()/2f,
+                region.getWidth() * Draw.scl,
+                region.getHeight() * Draw.scl);
         }
     }
 

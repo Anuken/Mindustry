@@ -170,7 +170,9 @@ public class Renderer implements ApplicationListener{
         drawAndInterpolate(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
 
         blocks.processBlocks();
+
         blocks.drawShadows();
+
         for(Team team : Team.all){
             if(blocks.isTeamShown(team)){
                 blocks.drawTeamBlocks(Layer.block, team);
@@ -201,23 +203,21 @@ public class Renderer implements ApplicationListener{
 
         //TODO shield
         /*
-        Graphics.beginShaders(Shaders.shield);
-        EntityDraw.draw(shieldGroup);
-        EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
-        Draw.color(Palette.accent);
-        Graphics.endShaders();
-        Draw.color();
+        if(shieldGroup.size() > 0){
+            Graphics.beginShaders(Shaders.shield);
+            EntityDraw.draw(shieldGroup);
+            EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
+            Draw.color(Palette.accent);
+            Graphics.endShaders();
+            Draw.color();
+        }
         */
 
         overlays.drawTop();
 
-        //TODO this isn't necessary anymore
-        //Graphics.beginCam();
-
         EntityDraw.setClip(false);
         drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
         EntityDraw.setClip(true);
-        //Graphics.end();
 
         Draw.color();
         Draw.flush();
@@ -308,7 +308,6 @@ public class Renderer implements ApplicationListener{
         float vpW = camera.width, vpH = camera.height;
         int w = world.width()*tilesize, h =  world.height()*tilesize;
         int pw = pixelSurface.width(), ph = pixelSurface.height();
-        showFog = false;
         disableUI = true;
         pixelSurface.setSize(w, h, true);
         Graphics.getEffectSurface().setSize(w, h, true);
@@ -319,7 +318,6 @@ public class Renderer implements ApplicationListener{
 
         draw();
 
-        showFog = true;
         disableUI = false;
         camera.width = vpW;
         camera.height = vpH;

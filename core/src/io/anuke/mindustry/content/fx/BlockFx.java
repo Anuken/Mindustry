@@ -235,7 +235,7 @@ public class BlockFx extends FxList implements ContentList{
             Lines.stroke(e.fout() * 2f);
 
             Angles.randLenVectors(e.id, 30, 4f + 40f * e.fin(), (x, y) -> {
-                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), e.fin() * 4f + 1f);
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 4f + 1f);
             });
 
             Draw.reset();
@@ -246,7 +246,7 @@ public class BlockFx extends FxList implements ContentList{
             Lines.circle(e.x, e.y, 7f + e.fout() * 8f);
 
             Angles.randLenVectors(e.id, 20, 6f + 20f * e.fout(), (x, y) -> {
-                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), e.fin() * 4f + 1f);
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 4f + 1f);
             });
 
             Draw.reset();
@@ -257,7 +257,7 @@ public class BlockFx extends FxList implements ContentList{
             Lines.circle(e.x, e.y, 7f + e.fin() * 8f);
 
             Angles.randLenVectors(e.id, 20, 4f + 20f * e.fin(), (x, y) -> {
-                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), e.fslope() * 4f + 1f);
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 4f + 1f);
             });
 
             Draw.reset();

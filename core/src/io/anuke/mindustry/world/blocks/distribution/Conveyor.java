@@ -28,7 +28,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Conveyor extends Block{
-    private static final float itemSpace = 0.135f * 2.2f;
+    private static final float itemSpace = 0.135f * 2.5f;
     private static final float offsetScl = 128f * 3f;
     private static final float minmove = 1f / (Short.MAX_VALUE - 2);
     private static ItemPos drawpos = new ItemPos();
@@ -72,23 +72,6 @@ public class Conveyor extends Block{
             for(int j = 0; j < 4; j++){
                 regions[i][j] = Core.atlas.find(name + "-" + i + "-" + j);
             }
-        }
-    }
-
-    @Override
-    public void drawShadow(Tile tile){
-        //fixes build block crash
-        if(!(tile.entity instanceof ConveyorEntity)){
-            super.drawShadow(tile);
-            return;
-        }
-
-        ConveyorEntity entity = tile.entity();
-
-        if(entity.blendshadowrot == -1){
-            super.drawShadow(tile);
-        }else{
-            Draw.rect(Core.atlas.find("shadow-corner"), tile.drawx(), tile.drawy(), (tile.getRotation() + 3 + entity.blendshadowrot) * 90);
         }
     }
 
@@ -163,8 +146,8 @@ public class Conveyor extends Block{
                 tr2.trns(rotation * 90, -tilesize / 2f, pos.x * tilesize / 2f);
 
                 Draw.rect(pos.item.region,
-                        (int) (tile.x * tilesize + tr1.x * pos.y + tr2.x),
-                        (int) (tile.y * tilesize + tr1.y * pos.y + tr2.y), itemSize, itemSize);
+                        (tile.x * tilesize + tr1.x * pos.y + tr2.x),
+                        (tile.y * tilesize + tr1.y * pos.y + tr2.y), itemSize, itemSize);
             }
 
         }catch(IndexOutOfBoundsException e){

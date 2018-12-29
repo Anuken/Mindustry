@@ -160,9 +160,7 @@ public class Blocks extends BlockList implements ContentList{
             minimapColor = Color.valueOf("549d5b");
         }};
 
-        shrub = new Rock("shrub"){{
-            shadow = "shrubshadow";
-        }};
+        shrub = new Rock("shrub");
 
         rock = new Rock("rock"){{
             variants = 2;

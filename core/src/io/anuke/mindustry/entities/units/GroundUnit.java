@@ -104,7 +104,7 @@ public abstract class GroundUnit extends BaseUnit{
     @Override
     public void move(float x, float y){
         if(Mathf.dst(x, y) > 0.01f){
-            baseRotation = Mathf.slerpDelta(baseRotation, Mathf.atan2(x, y), type.baseRotateSpeed);
+            baseRotation = Mathf.slerpDelta(baseRotation, Mathf.angle(x, y), type.baseRotateSpeed);
         }
         super.move(x, y);
     }

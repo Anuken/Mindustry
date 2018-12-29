@@ -54,7 +54,7 @@ public class ExplosionFx extends FxList implements ContentList{
             Lines.stroke(1.5f * e.fout());
 
             Angles.randLenVectors(e.id + 1, 8, 1f + 23f * e.finpow(), (x, y) -> {
-                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), 1f + e.fout() * 3f);
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
             });
 
             Draw.reset();
@@ -77,7 +77,7 @@ public class ExplosionFx extends FxList implements ContentList{
             Lines.stroke(1.7f * e.fout());
 
             Angles.randLenVectors(e.id + 1, 9, 1f + 23f * e.finpow(), (x, y) -> {
-                Lines.lineAngle(e.x + x, e.y + y, Mathf.atan2(x, y), 1f + e.fout() * 3f);
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
             });
 
             Draw.reset();

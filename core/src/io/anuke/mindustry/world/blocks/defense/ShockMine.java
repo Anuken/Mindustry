@@ -24,7 +24,6 @@ public class ShockMine extends Block{
         update = false;
         destructible = true;
         solid = false;
-        shadow = "shadow-shock-mine";
         targetable = false;
         layer = Layer.overlay;
     }
