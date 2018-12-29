@@ -309,7 +309,7 @@ public class BlockFx extends FxList implements ContentList{
         healBlockFull = new Effect(20, e -> {
             Draw.color(e.color);
             Draw.alpha(e.fout());
-            Fill.square(e.x, e.y, e.rotation * tilesize);
+            Fill.square(e.x, e.y, e.rotation * tilesize / 2f);
             Draw.color();
         });
 

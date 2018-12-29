@@ -116,6 +116,7 @@ public class Shaders{
     public static class Outline extends LoadShader{
         public Color color = new Color();
         public TextureRegion region = new TextureRegion();
+        public float scl;
 
         public Outline(){
             super("outline", "default");
@@ -124,6 +125,7 @@ public class Shaders{
         @Override
         public void apply(){
             setUniformf("u_color", color);
+            setUniformf("u_scl", scl);
             setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
         }
     }

@@ -3,12 +3,10 @@ package io.anuke.mindustry.graphics;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.collection.Sort;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
-import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -18,8 +16,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.arc.Core.camera;
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
@@ -28,12 +25,10 @@ public class BlockRenderer{
     public final FloorRenderer floor = new FloorRenderer();
 
     private Array<BlockRequest> requests = new Array<>(true, initialRequests, BlockRequest.class);
-    private IntSet teamChecks = new IntSet();
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private int requestidx = 0;
     private int iterateidx = 0;
     private FrameBuffer shadows = new FrameBuffer(1, 1);
-    private FrameBuffer shadowWrite = new FrameBuffer(1, 1);
 
     public BlockRenderer(){
 
@@ -58,16 +53,30 @@ public class BlockRenderer{
     }
 
     public void drawShadows(){
-        Draw.color(0, 0, 0, 0.15f);
-        Draw.rect(Draw.wrap(shadowWrite.getTexture()),
-            camera.position.x - camera.position.x % tilesize,
-            camera.position.y - camera.position.y % tilesize,
-            shadowWrite.getWidth()*Draw.scl, -shadowWrite.getHeight()*Draw.scl);
-        Draw.color();
-    }
+        if(shadows.getWidth() != Core.graphics.getWidth() || shadows.getHeight() != Core.graphics.getHeight()){
+            shadows.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+        }
 
-    public boolean isTeamShown(Team team){
-        return teamChecks.contains(team.ordinal());
+        Tmp.tr1.set(shadows.getTexture());
+        Shaders.outline.color.set(0, 0, 0, 0.15f);
+        Shaders.outline.scl = renderer.cameraScale()/3f;
+        Shaders.outline.region = Tmp.tr1;
+
+        Draw.flush();
+        shadows.begin();
+        Core.graphics.clear(Color.CLEAR);
+        Draw.color(Color.BLACK);
+        drawBlocks(Layer.shadow);
+        Draw.color();
+        Draw.flush();
+        shadows.end();
+
+        Draw.shader(Shaders.outline);
+        Draw.rect(Draw.wrap(shadows.getTexture()),
+            camera.position.x,
+            camera.position.y,
+            camera.width, -camera.height);
+        Draw.shader();
     }
 
     /**Process all blocks to draw, simultaneously updating the block shadow framebuffer.*/
@@ -84,24 +93,7 @@ public class BlockRenderer{
             return;
         }
 
-        int shadowW = (int)(rangex * tilesize*2/Draw.scl), shadowH = (int)(rangey * tilesize*2/Draw.scl);
-
-        teamChecks.clear();
         requestidx = 0;
-
-        Draw.flush();
-        Draw.proj().setOrtho(
-            Mathf.round(Core.camera.position.x, tilesize)-shadowW/2f*Draw.scl,
-            Mathf.round(Core.camera.position.y, tilesize)-shadowH/2f*Draw.scl,
-            shadowW*Draw.scl, shadowH*Draw.scl);
-
-        if(shadows.getWidth() != shadowW || shadows.getHeight() != shadowH){
-            shadows.resize(shadowW, shadowH);
-            shadowWrite.resize(shadowW, shadowH);
-        }
-
-        shadows.begin();
-        Core.graphics.clear(Color.CLEAR);
 
         int minx = Math.max(avgx - rangex - expandr, 0);
         int miny = Math.max(avgy - rangey - expandr, 0);
@@ -123,8 +115,8 @@ public class BlockRenderer{
 
                     if(block != Blocks.air){
                         if(!expanded){
+                            addRequest(tile, Layer.shadow);
                             addRequest(tile, Layer.block);
-                            teamChecks.add(team.ordinal());
                         }
 
                         if(block.expanded || !expanded){
@@ -140,24 +132,6 @@ public class BlockRenderer{
                 }
             }
         }
-
-        Draw.flush();
-        shadows.end();
-
-        Tmp.tr1.set(shadows.getTexture());
-        Shaders.outline.color.set(Color.BLACK);
-        Shaders.outline.region = Tmp.tr1;
-
-        Draw.shader(Shaders.outline);
-        shadowWrite.begin();
-        Core.graphics.clear(Color.CLEAR);
-        Draw.rect(Draw.wrap(shadows.getTexture()),
-            Mathf.round(Core.camera.position.x, tilesize),
-            Mathf.round(Core.camera.position.y, tilesize),
-            shadows.getTexture().getWidth() * Draw.scl,
-            -shadows.getTexture().getHeight() * Draw.scl);
-        Draw.shader();
-        shadowWrite.end();
 
         Draw.proj(camera.projection());
 
@@ -180,7 +154,9 @@ public class BlockRenderer{
             BlockRequest req = requests.get(iterateidx);
             Block block = req.tile.block();
 
-            if(req.layer == Layer.block){
+            if(req.layer == Layer.shadow){
+                block.drawShadow(req.tile);
+            }else  if(req.layer == Layer.block){
                 block.draw(req.tile);
             }else if(req.layer == block.layer){
                 block.drawLayer(req.tile);

@@ -277,6 +277,10 @@ public class Renderer implements ApplicationListener{
         EntityDraw.drawWith(group, toDraw, drawer);
     }
 
+    public float cameraScale(){
+        return camerascale;
+    }
+
     public Vector2 averagePosition(){
         avgPosition.setZero();
 

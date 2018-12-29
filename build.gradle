@@ -34,7 +34,13 @@ allprojects{
 
         getArcHash = {
             //get latest commit hash from gtihub since JITPack's '-snapshot' version doesn't work correctly
-            if(arcHash == null) arcHash = new JsonSlurper().parseText(new URL("https://api.github.com/repos/Anuken/Arc/commits/master").text)["sha"]
+            if(arcHash == null){
+                try{
+                    arcHash = new JsonSlurper().parse(new URL("https://api.github.com/repos/Anuken/Arc/commits/master"))["sha"]
+                }catch(e){ //github can get angry sometimes
+                    arcHash = "-SNAPSHOT";
+                }
+            } 
             return arcHash
         }
 
@@ -190,7 +196,7 @@ project(":core"){
         build.finalizedBy(finish)
 
         //forces JITPack to compile arc and its submodules
-        if(localArc()) compile "com.github.anuken:arc:${getArcHash()}"
+        if(!localArc()) compile "com.github.anuken:arc:${getArcHash()}"
 
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
