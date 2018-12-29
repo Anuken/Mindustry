@@ -8,9 +8,11 @@ buildscript{
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
     }
+
     dependencies{
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.5'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.9"
+        classpath files('tools/filters.jar')
     }
 }
 
@@ -40,7 +42,7 @@ allprojects{
                 }catch(e){ //github can get angry sometimes
                     arcHash = "-SNAPSHOT";
                 }
-            } 
+            }
             return arcHash
         }
 
@@ -87,7 +89,6 @@ allprojects{
             }catch(Exception ignored){}
 
             if(pfile.exists()){
-
                 props.load(new FileInputStream(pfile))
 
                 String buildid = getBuildVersion()
@@ -196,7 +197,7 @@ project(":core"){
         build.finalizedBy(finish)
 
         //forces JITPack to compile arc and its submodules
-        if(!localArc()) compile "com.github.anuken:arc:${getArcHash()}"
+        if(!localArc()) compile "com.github.Anuken.Arc:${getArcHash()}"
 
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 
 import javax.imageio.ImageIO
-import java.awt.image.BufferedImage
+import java.awt.image.BufferedImage 
 
 def outFolder = "../core/assets-raw/sprites_out/"
 def genFolder = "../core/assets-raw/sprites_out/generated/"
@@ -123,7 +123,7 @@ task scaleSprites(){
 
 task pack(){
     dependsOn 'cleanSprites', 'scaleSprites'
-    finalizedBy 'cleanup'
+    //finalizedBy 'cleanup'
 
     doLast{
 
