@@ -12,6 +12,11 @@ buildscript{
     }
 }
 
+//make sure snapshot Arc does not get cached
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 allprojects{
     apply plugin: "idea"
 
@@ -25,6 +30,17 @@ allprojects{
         gdxVersion = '1.9.9'
         roboVMVersion = '2.3.0'
         uCoreVersion = 'bf399460a6a3656b0ed7cfe398a72befe2b66b42'
+        
+        arcModule = { String name ->
+            def comp = System.properties["release"] == null || System.properties["release"] == "false"
+            
+            if(new File(projectDir.parent, '../Arc').exists() && comp){
+                return project(":Arc:$name")
+            }else{
+                if(name.contains(':')) name = name.split(':').last()
+                return "com.github.Anuken.Arc:$name:-SNAPSHOT"
+            }
+        }
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -95,7 +111,7 @@ project(":desktop"){
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
-        compile project(":Arc:backends:backend-lwjgl3")
+        compile arcModule("backends:backend-lwjgl3")
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.0'
     }
 }
@@ -148,7 +164,7 @@ project(":ios"){
         compile project(":core")
         compile project(":net")
 
-        compile project(":Arc:backends:backend-robovm")
+        compile arcModule("backends:backend-robovm")
         
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
@@ -166,17 +182,9 @@ project(":core"){
 
     dependencies{
         build.finalizedBy(finish)
-
-        def comp = System.properties["release"] == null || System.properties["release"] == "false"
-        if(!comp) println("Note: Compiling release build.")
-
-        if(new File(projectDir.parent, '../Arc').exists() && comp){
-            compile project(":Arc:arc-core")
-            compile project(":Arc:extensions:freetype")
-        }else{
-            //TODO compile arc from jitpack
-            //compile 'com.github.Anuken.Arc:arc:-SNAPSHOT'
-        }
+        
+        compile arcModule("arc-core")
+        compile arcModule("extensions:freetype")
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
@@ -189,7 +197,7 @@ project(":server"){
     dependencies{
         compile project(":core")
         compile project(":net")
-        compile project(":Arc:backends:backend-headless")
+        compile arcModule("backends:backend-headless")
     }
 }
 
@@ -200,7 +208,7 @@ project(":tests"){
         testImplementation project(":core")
         testImplementation('org.junit.jupiter:junit-jupiter-api:5.1.0')
         testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.1.0')
-        compile project(":Arc:backends:backend-headless")
+        compile arcModule("backends:backend-headless")
     }
 
     test{

@@ -140,7 +140,6 @@ public class BuildBlock extends Block{
         for(TextureRegion region : target.getBlockIcon()){
             Shaders.blockbuild.region = region;
             Shaders.blockbuild.progress = entity.progress;
-            Shaders.blockbuild.apply();
 
             Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.getRotation() * 90 : 0);
             Draw.flush();

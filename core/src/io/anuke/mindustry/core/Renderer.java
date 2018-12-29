@@ -172,15 +172,9 @@ public class Renderer implements ApplicationListener{
         blocks.processBlocks();
 
         blocks.drawShadows();
+        blocks.drawBlocks(Layer.block);
 
-        for(Team team : Team.all){
-            if(blocks.isTeamShown(team)){
-                blocks.drawTeamBlocks(Layer.block, team);
-            }
-        }
-        blocks.skipLayer(Layer.block);
-
-        Draw.shader(Shaders.blockbuild, false);
+        Draw.shader(Shaders.blockbuild, true);
         blocks.drawBlocks(Layer.placement);
         Draw.shader();
 
