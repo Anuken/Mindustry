@@ -286,7 +286,7 @@ public class ApplicationTests{
     }
 
     void depositTest(Block block, Item item){
-        BaseUnit unit = UnitTypes.alphaDrone.create(Team.none);
+        BaseUnit unit = UnitTypes.spirit.create(Team.none);
         Tile tile = new Tile(0, 0, Blocks.air.id, block.id);
         int capacity = tile.block().itemCapacity;
 
