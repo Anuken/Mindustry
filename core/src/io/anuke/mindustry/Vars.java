@@ -8,8 +8,6 @@ import io.anuke.arc.entities.impl.EffectEntity;
 import io.anuke.arc.entities.trait.DrawTrait;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -29,29 +27,39 @@ import java.util.Locale;
 
 @SuppressWarnings("unchecked")
 public class Vars{
+    /**main application name, capitalized*/
     public static final String appName = "Mindustry";
+    /**URL for discord invite.*/
     public static final String discordURL = "https://discord.gg/mindustry";
+    /**URL for Github API for releases*/
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
+    /**URL for Github API for contributors*/
     public static final String contributorsURL = "https://api.github.com/repos/Anuken/Mindustry/contributors";
+    /**URL for sending crash reports to*/
     public static final String crashReportURL = "http://mindustry.us.to/report";
-    //time between waves in frames (on normal mode)
+    /**time between waves in ticks (on normal mode)*/
     public static final float wavespace = 60 * 60 * 1.5f;
-
+    /**maximum distance between mine and core that supports automatic transferring*/
     public static final float mineTransferRange = 220f;
-    //set ridiculously high for now
+    /**maximum distance from core that the player can be before it is no longer used for building*/
     public static final float coreBuildRange = 999999f;
-    //team of the player by default
+    /**team of the player by default*/
     public static final Team defaultTeam = Team.blue;
-    //team of the enemy in waves
+    /**team of the enemy in waves/sectors*/
     public static final Team waveTeam = Team.red;
-    public static final float unlockResourceScaling = 1f;
+    /**max chat message length*/
     public static final int maxTextLength = 150;
+    /**max player name length in bytes*/
     public static final int maxNameLength = 40;
+    /**displayed item size when ingame, TODO remove.*/
     public static final float itemSize = 5f;
+    /**size of tiles in units*/
     public static final int tilesize = 8;
+    /**size of sectors in tiles*/
     public static final int sectorSize = 256;
+    /**specific number indicating 'invalid' sector*/
     public static final int invalidSector = Integer.MAX_VALUE;
-    public static Locale[] locales;
+    /**all choosable player colors in join/host dialog*/
     public static final Color[] playerColors = {
         Color.valueOf("82759a"),
         Color.valueOf("c0c1c5"),
@@ -70,31 +78,35 @@ public class Vars{
         Color.valueOf("4b5ef1"),
         Color.valueOf("2cabfe"),
     };
-    //server port
+    /**default server port*/
     public static final int port = 6567;
+    /**if true, UI is not drawn*/
     public static boolean disableUI;
+    /**if true, game is set up in mobile mode, even on desktop. used for debugging*/
     public static boolean testMobile;
-    //shorthand for whether or not this is running on android or ios
+    /**whether the game is running on a mobile device*/
     public static boolean mobile;
+    /**whether the game is running on an iOS device*/
     public static boolean ios;
+    /**whether the game is running on an Android device*/
     public static boolean android;
-    //main data directory
+    /**whether the game is running on a headless server*/
+    public static boolean headless;
+    /**application data directory, equivalent to {@link io.anuke.arc.Settings#getDataDirectory()}*/
     public static FileHandle dataDirectory;
-    //subdirectory for screenshots
+    /**data subdirectory used for screenshots*/
     public static FileHandle screenshotDirectory;
-    //directory for user-created map data
+    /**data subdirectory used for custom mmaps*/
     public static FileHandle customMapDirectory;
-    //save file directory
+    /**data subdirectory used for saves*/
     public static FileHandle saveDirectory;
-    public static String mapExtension = "mmap";
-    public static String saveExtension = "msav";
-    //camera zoom displayed on startup
-    public static int baseCameraScale;
-    public static boolean showBlockDebug = false;
-    public static boolean showFog = true;
-    public static boolean headless = false;
-    public static float controllerMin = 0.25f;
-    public static float baseControllerSpeed = 11f;
+    /**map file extension*/
+    public static final String mapExtension = "mmap";
+    /**save file extension*/
+    public static final String saveExtension = "msav";
+
+    /**list of all locales that can be switched to*/
+    public static Locale[] locales;
 
     public static ContentLoader content;
     public static GameState state;
@@ -107,8 +119,6 @@ public class Vars{
     public static NetServer netServer;
     public static NetClient netClient;
 
-    public static Player[] players = {};
-
     public static EntityGroup<Player> playerGroup;
     public static EntityGroup<TileEntity> tileGroup;
     public static EntityGroup<Bullet> bulletGroup;
@@ -119,7 +129,8 @@ public class Vars{
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<BaseUnit>[] unitGroups;
 
-    public static final Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
+    /**all local players, currently only has one player. may be used for local co-op in the future*/
+    public static Player[] players = {};
 
     public static void init(){
         Serialization.init();
@@ -175,6 +186,5 @@ public class Vars{
         screenshotDirectory = dataDirectory.child("screenshots/");
         customMapDirectory = dataDirectory.child("maps/");
         saveDirectory = dataDirectory.child("saves/");
-        baseCameraScale = Math.round(Unit.dp.scl(4));
     }
 }

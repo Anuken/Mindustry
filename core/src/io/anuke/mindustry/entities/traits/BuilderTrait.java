@@ -12,6 +12,7 @@ import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
@@ -44,6 +45,7 @@ import static io.anuke.mindustry.Vars.*;
  */
 public interface BuilderTrait extends Entity{
     //these are not instance variables!
+    Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
     float placeDistance = 150f;
     float mineDistance = 70f;
     Array<BuildRequest> removal = new Array<>();

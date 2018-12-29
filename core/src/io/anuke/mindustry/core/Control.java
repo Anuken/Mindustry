@@ -236,7 +236,7 @@ public class Control implements ApplicationListener{
             Recipe recipe = content.recipes().get(i);
             if(!recipe.isHidden() && recipe.requirements != null){
                 for(ItemStack stack : recipe.requirements){
-                    if(!entity.items.has(stack.item, Math.min((int) (stack.amount * unlockResourceScaling), 2000))) continue outer;
+                    if(!entity.items.has(stack.item, Math.min((int) (stack.amount), 2000))) continue outer;
                 }
 
                 if(unlocks.unlockContent(recipe)){

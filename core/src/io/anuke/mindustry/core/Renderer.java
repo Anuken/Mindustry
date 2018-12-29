@@ -42,8 +42,8 @@ public class Renderer implements ApplicationListener{
     public final OverlayRenderer overlays = new OverlayRenderer();
 
     private Color clearColor;
-    private float targetscale = baseCameraScale;
-    private float camerascale = baseCameraScale;
+    private float targetscale = io.anuke.arc.scene.ui.layout.Unit.dp.scl(4);
+    private float camerascale = targetscale;
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
     private Vector2 avgPosition = new Vector2();
     private float shakeIntensity, shaketime;
