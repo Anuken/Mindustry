@@ -197,7 +197,7 @@ project(":core"){
         build.finalizedBy(finish)
 
         //forces JITPack to compile arc and its submodules
-        if(!localArc()) compile "com.github.Anuken.Arc:${getArcHash()}"
+        if(!localArc()) compile "com.github.Anuken:Arc:${getArcHash()}"
 
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
