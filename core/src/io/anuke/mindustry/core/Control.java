@@ -66,7 +66,8 @@ public class Control implements ApplicationListener{
         content.initialize(Content::load);
 
         if(Core.atlas.getTextures().size != 1){
-            throw new IllegalStateException("Atlas must be exactly one texture.");
+            throw new IllegalStateException("Atlas must be exactly one texture. " +
+            "If more textures are used, the map editor will not display them correctly.");
         }
 
         unlocks.load();

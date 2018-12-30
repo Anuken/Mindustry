@@ -1,12 +1,10 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.Input.TextInput;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.TextField;
-import io.anuke.arc.util.Time;
 import io.anuke.arc.util.serialization.Base64Coder;
 
 import java.util.Random;
@@ -26,6 +24,17 @@ public abstract class Platform {
         if(!mobile) return; //this is mobile only, desktop doesn't need dialogs
 
         field.tapped(() -> {
+            TextInput input = new TextInput();
+            input.text = field.getText();
+            input.maxLength = maxLength;
+            input.accepted = text -> {
+                field.clearText();
+                field.appendText(text);
+                field.change();
+                Core.input.setOnscreenKeyboardVisible(false);
+            };
+            Core.input.getTextInput(input);
+            /*
             Dialog dialog = new Dialog("", "dialog");
             dialog.setFillParent(true);
             dialog.content().top();
@@ -59,7 +68,7 @@ public abstract class Platform {
                 to.setCursorPosition(to.getText().length());
                 Core.scene.setKeyboardFocus(to);
                 Core.input.setOnscreenKeyboardVisible(true);
-            });
+            });*/
         });
     }
     /**Update discord RPC.*/

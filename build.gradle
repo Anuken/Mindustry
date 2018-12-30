@@ -10,7 +10,6 @@ buildscript{
     dependencies{
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.5'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.9"
-        classpath files('tools/filters.jar')
     }
 }
 
@@ -37,7 +36,7 @@ allprojects{
             if(arcHash == null){
                 try{
                     arcHash = 'git ls-remote https://github.com/Anuken/Arc.git'.execute().text.split("\t")[0]//new JsonSlurper().parse(new URL("https://api.github.com/repos/Anuken/Arc/commits/master"))["sha"]
-                }catch(e){ //github can get angry sometimes
+                }catch(e){
                     e.printStackTrace()
                     arcHash = "-SNAPSHOT";
                 }
