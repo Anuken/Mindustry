@@ -45,13 +45,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.zip.DeflaterOutputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
-    public final static int maxSnapshotSize = 2047;
+    public final static int maxSnapshotSize = 430;
 
     public final static boolean debugSnapshots = false;
     public final static float maxSnapshotDelay = 200;
@@ -224,45 +223,6 @@ public class NetServer implements ApplicationListener{
             if(player == null) return;
             RemoteReadServer.readPacket(packet.writeBuffer, packet.type, player);
         });
-    }
-
-    /** Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.*/
-    private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID, int uncompressedLength){
-        if(bytes.length < maxSnapshotSize){
-            scheduleSnapshot(() -> Call.onSnapshot(userid, bytes, snapshotID, (short) 0, bytes.length, uncompressedLength));
-        }else{
-            int remaining = bytes.length;
-            int offset = 0;
-            int chunkid = 0;
-            while(remaining > 0){
-                int used = Math.min(remaining, maxSnapshotSize);
-                byte[] toSend;
-                //re-use sent byte arrays when possible
-                if(used == maxSnapshotSize && !debugSnapshots){
-                    toSend = reusableSnapArray;
-                    System.arraycopy(bytes, offset, toSend, 0, Math.min(offset + maxSnapshotSize, bytes.length) - offset);
-                }else{
-                    toSend = Arrays.copyOfRange(bytes, offset, Math.min(offset + maxSnapshotSize, bytes.length));
-                }
-
-                short fchunk = (short)chunkid;
-                scheduleSnapshot(() -> Call.onSnapshot(userid, toSend, snapshotID, fchunk, bytes.length, uncompressedLength));
-
-                remaining -= used;
-                offset += used;
-                chunkid++;
-            }
-        }
-    }
-
-    private static void scheduleSnapshot(Runnable r){
-        if(debugSnapshots){
-            if(!Mathf.chance(snapshotDropchance)){
-                Time.run(maxSnapshotDelay / 1000f * 60f, r);
-            }
-        }else{
-            r.run();
-        }
     }
 
     public void sendWorldData(Player player, int clientID){
@@ -481,35 +441,24 @@ public class NetServer implements ApplicationListener{
         admins.save();
     }
 
-    public void writeSnapshot(Player player, DataOutputStream dataStream) throws IOException{
-        viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
-
-        //write wave datas
-        dataStream.writeFloat(state.wavetime);
-        dataStream.writeInt(state.wave);
-        dataStream.writeInt(state.enemies());
-
+    public void writeSnapshot(Player player) throws IOException{
+        syncStream.reset();
         ObjectSet<Tile> cores = state.teams.get(player.getTeam()).cores;
 
         dataStream.writeByte(cores.size);
 
-        //write all core inventory data
         for(Tile tile : cores){
             dataStream.writeInt(tile.pos());
             tile.entity.items.write(dataStream);
         }
 
-        //write timestamp
-        dataStream.writeLong(Time.millis());
+        dataStream.close();
+        byte[] stateBytes = syncStream.toByteArray();
 
-        int totalGroups = 0;
+        //write basic state data.
+        Call.onStateSnapshot(player.con.id, state.wavetime, state.wave, state.enemies, (short)stateBytes.length, Net.compressSnapshot(stateBytes));
 
-        for(EntityGroup<?> group : Entities.getAllGroups()){
-            if(!group.isEmpty() && (group.all().get(0) instanceof SyncTrait)) totalGroups++;
-        }
-
-        //write total amount of serializable groups
-        dataStream.writeByte(totalGroups);
+        viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 
         //check for syncable groups
         for(EntityGroup<?> group : Entities.getAllGroups()){
@@ -537,15 +486,32 @@ public class NetServer implements ApplicationListener{
                 }
             }
 
-            //write group ID + group size
-            dataStream.writeByte(group.getID());
-            dataStream.writeShort(returnArray.size);
+            syncStream.reset();
+
+            int sent = 0;
 
             for(Entity entity : returnArray){
                 //write all entities now
                 dataStream.writeInt(entity.getID()); //write id
                 dataStream.writeByte(((SyncTrait) entity).getTypeID()); //write type ID
                 ((SyncTrait) entity).write(dataStream); //write entity
+
+                sent ++;
+
+                if(syncStream.position() > maxSnapshotSize){
+                    dataStream.close();
+                    byte[] syncBytes = syncStream.toByteArray();
+                    Call.onEntitySnapshot(player.con.id, (byte)group.getID(), (short)sent, (short)syncBytes.length, Net.compressSnapshot(syncBytes));
+                    sent = 0;
+                    syncStream.reset();
+                }
+            }
+
+            if(sent > 0){
+                dataStream.close();
+
+                byte[] syncBytes = syncStream.toByteArray();
+                Call.onEntitySnapshot(player.con.id, (byte)group.getID(), (short)sent, (short)syncBytes.length, Net.compressSnapshot(syncBytes));
             }
         }
     }
@@ -619,21 +585,7 @@ public class NetServer implements ApplicationListener{
 
                 if(!player.timer.get(Player.timerSync, serverSyncTime) || !connection.hasConnected) continue;
 
-                //reset stream to begin writing
-                Time.mark();
-                syncStream.reset();
-
-                writeSnapshot(player, dataStream);
-
-                dataStream.close();
-
-                byte[] bytes = syncStream.toByteArray();
-                int uncompressed = bytes.length;
-                bytes = Net.compressSnapshot(bytes);
-                int snapid = connection.lastSentSnapshotID ++;
-
-                if(debugSnapshots) Log.info("Sent snapshot: {0} bytes.", bytes.length);
-                sendSplitSnapshot(connection.id, bytes, snapid, uncompressed);
+                writeSnapshot(player);
             }
 
         }catch(IOException e){

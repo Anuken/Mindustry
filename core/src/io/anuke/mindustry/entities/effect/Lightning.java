@@ -108,7 +108,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     public void write(DataOutput data){}
 
     @Override
-    public void read(DataInput data, long time){}
+    public void read(DataInput data){}
 
     @Override
     public float lifetime(){

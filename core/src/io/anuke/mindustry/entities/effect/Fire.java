@@ -177,7 +177,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     }
 
     @Override
-    public void read(DataInput data, long time) throws IOException{
+    public void read(DataInput data) throws IOException{
         x = data.readFloat();
         y = data.readFloat();
     }

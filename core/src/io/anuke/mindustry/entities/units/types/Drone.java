@@ -362,8 +362,8 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     }
 
     @Override
-    public void read(DataInput data, long time) throws IOException{
-        super.read(data, time);
+    public void read(DataInput data) throws IOException{
+        super.read(data);
         int mined = data.readInt();
         int repairing = data.readInt();
 

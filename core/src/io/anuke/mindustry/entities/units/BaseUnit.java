@@ -13,7 +13,6 @@ import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Timer;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.Damage;
@@ -398,12 +397,12 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public void read(DataInput data, long time) throws IOException{
+    public void read(DataInput data) throws IOException{
         float lastx = x, lasty = y, lastrot = rotation;
         super.readSave(data);
         this.type = content.getByID(ContentType.unit, data.readByte());
 
-        interpolator.read(lastx, lasty, x, y, time, rotation);
+        interpolator.read(lastx, lasty, x, y, rotation);
         rotation = lastrot;
     }
 

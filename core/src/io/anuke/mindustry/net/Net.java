@@ -21,6 +21,8 @@ import io.anuke.mindustry.net.Packets.StreamChunk;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
 
 import java.io.IOException;
+import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -58,7 +60,9 @@ public class Net{
             String error = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
             String type = t.getClass().toString().toLowerCase();
 
-            if(error.equals("mismatch")){
+            if(e instanceof BufferUnderflowException || e instanceof BufferOverflowException){
+                error = Core.bundle.get("text.error.io");
+            }else if(error.equals("mismatch")){
                 error = Core.bundle.get("text.error.mismatch");
             }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address"))){
                 error = Core.bundle.get("text.error.invalidaddress");

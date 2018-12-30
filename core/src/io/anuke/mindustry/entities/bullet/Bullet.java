@@ -158,7 +158,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     }
 
     @Override
-    public void read(DataInput data, long time) throws IOException{
+    public void read(DataInput data) throws IOException{
         x = data.readFloat();
         y = data.readFloat();
         velocity.x = data.readFloat();

@@ -15,7 +15,7 @@ public class Interpolator{
     public Vector2 pos = new Vector2();
     public float[] values = {};
 
-    public void read(float cx, float cy, float x, float y, long sent, float... target1ds){
+    public void read(float cx, float cy, float x, float y, float... target1ds){
         if(lastUpdated != 0) updateSpacing = Time.timeSinceMillis(lastUpdated);
 
         lastUpdated = Time.millis();

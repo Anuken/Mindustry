@@ -111,13 +111,6 @@ public class NetworkIO{
                 }
             }
 
-            //now write a snapshot.
-            player.con.viewX = world.width() * tilesize/2f;
-            player.con.viewY = world.height() * tilesize/2f;
-            player.con.viewWidth = world.width() * tilesize;
-            player.con.viewHeight = world.height() * tilesize;
-            netServer.writeSnapshot(player, stream);
-
         }catch(IOException e){
             throw new RuntimeException(e);
         }
@@ -163,7 +156,7 @@ public class NetworkIO{
             Entities.clear();
             int id = stream.readInt();
             player.resetNoAdd();
-            player.read(stream, Time.millis());
+            player.read(stream);
             player.resetID(id);
             player.add();
 
@@ -251,9 +244,6 @@ public class NetworkIO{
             }
 
             world.endMapLoad();
-
-            //read raw snapshot
-            netClient.readSnapshot(stream);
 
         }catch(IOException e){
             throw new RuntimeException(e);

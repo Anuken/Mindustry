@@ -219,8 +219,8 @@ public abstract class GroundUnit extends BaseUnit{
     }
 
     @Override
-    public void read(DataInput data, long time) throws IOException{
-        super.read(data, time);
+    public void read(DataInput data) throws IOException{
+        super.read(data);
         weapon = content.getByID(ContentType.weapon, data.readByte());
     }
 

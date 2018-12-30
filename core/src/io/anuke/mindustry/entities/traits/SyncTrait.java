@@ -66,5 +66,5 @@ public interface SyncTrait extends Entity, TypeTrait{
     //Read and write sync data, usually position
     void write(DataOutput data) throws IOException;
 
-    void read(DataInput data, long time) throws IOException;
+    void read(DataInput data) throws IOException;
 }

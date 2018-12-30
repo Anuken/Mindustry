@@ -99,8 +99,8 @@ public class AlphaDrone extends FlyingUnit {
     }
 
     @Override
-    public void read(DataInput stream, long time) throws IOException {
-        super.read(stream, time);
+    public void read(DataInput stream) throws IOException {
+        super.read(stream);
         leader = Vars.playerGroup.getByID(stream.readInt());
     }
 

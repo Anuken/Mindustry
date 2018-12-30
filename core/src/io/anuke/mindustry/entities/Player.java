@@ -864,7 +864,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
-    public void read(DataInput buffer, long time) throws IOException{
+    public void read(DataInput buffer) throws IOException{
         float lastx = x, lasty = y, lastrot = rotation;
         super.readSave(buffer);
         name = TypeIO.readStringData(buffer);
@@ -880,7 +880,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         readBuilding(buffer, !isLocal);
 
-        interpolator.read(lastx, lasty, x, y, time, rotation, baseRotation);
+        interpolator.read(lastx, lasty, x, y, rotation, baseRotation);
         rotation = lastrot;
 
         if(isLocal){

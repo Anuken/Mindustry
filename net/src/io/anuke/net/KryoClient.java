@@ -20,6 +20,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedSelectorException;
 
@@ -157,10 +159,15 @@ public class KryoClient implements ClientProvider{
 
     @Override
     public void send(Object object, SendMode mode){
-        if(mode == SendMode.tcp){
-            client.sendTCP(object);
-        }else{
-            client.sendUDP(object);
+        try{
+            if(mode == SendMode.tcp){
+                client.sendTCP(object);
+            }else{
+                client.sendUDP(object);
+            }
+            //sending things can cause an under/overflow, catch it and disconnect instead of crashing
+        }catch(BufferOverflowException | BufferUnderflowException e){
+            Net.showError(e);
         }
 
         Pools.free(object);

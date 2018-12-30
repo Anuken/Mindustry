@@ -11,10 +11,9 @@ import io.anuke.arc.entities.Entities;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.io.ReusableByteArrayInputStream;
-import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.io.ReusableByteArrayInputStream;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
@@ -54,16 +53,6 @@ public class NetClient implements ApplicationListener{
     private float timeoutTime = 0f;
     /**Last sent client snapshot ID.*/
     private int lastSent;
-
-    /**Last snapshot ID recieved.*/
-    private int lastSnapshotBaseID = -1;
-
-    /**Current snapshot that is being built from chinks.*/
-    private byte[] currentSnapshot;
-    /**Counter of how many chunks have been recieved.*/
-    private int recievedChunkCounter;
-    /**ID of snapshot that is currently being constructed.*/
-    private int currentSnapshotID = -1;
 
     /**List of entities that were removed, and need not be added while syncing.*/
     private IntSet removed = new IntSet();
@@ -210,96 +199,10 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void onSnapshot(byte[] chunk, int snapshotID, short chunkID, int totalLength, int uncompressedLength){
-        int totalChunks = Mathf.ceil((float) totalLength / NetServer.maxSnapshotSize);
-
-        if(NetServer.debugSnapshots)
-            Log.info("Recieved snapshot: len {0} ID {1} chunkID {2} / "+totalChunks+" totalLength {3} bclient-base {4}", chunk.length, snapshotID, chunkID, totalLength, netClient.lastSnapshotBaseID);
-
-        //skip snapshot IDs that have already been recieved OR snapshots that are too far in front
-        if(snapshotID < netClient.lastSnapshotBaseID){
-            if(NetServer.debugSnapshots) Log.info("//SKIP SNAPSHOT");
-            return;
-        }
-
+    public static void onEntitySnapshot(byte groupID, short amount, short dataLen, byte[] data){
         try{
-            byte[] snapshot;
-
-            //total length exceeds that needed to hold one snapshot, therefore, it is split into chunks
-            if(totalLength > NetServer.maxSnapshotSize){
-                //total amount of chunks to recieve
-
-                //reset status when a new snapshot sending begins
-                if(netClient.currentSnapshotID != snapshotID || netClient.currentSnapshot == null){
-                    netClient.currentSnapshotID = snapshotID;
-                    netClient.currentSnapshot = new byte[totalLength];
-                    netClient.recievedChunkCounter = 0;
-                }
-
-                netClient.recievedChunkCounter++; //update recieved status
-                //copy the recieved bytes into the holding array
-                System.arraycopy(chunk, 0, netClient.currentSnapshot, chunkID * NetServer.maxSnapshotSize,
-                        Math.min(NetServer.maxSnapshotSize, totalLength - chunkID * NetServer.maxSnapshotSize));
-
-                //when all chunks have been recieved, begin
-                if(netClient.recievedChunkCounter >= totalChunks && netClient.currentSnapshot != null){
-                    snapshot = netClient.currentSnapshot;
-                }else{
-                    return;
-                }
-            }else{
-                snapshot = chunk;
-            }
-
-            if(NetServer.debugSnapshots)
-                Log.info("Finished recieving snapshot ID {0} length {1}", snapshotID, chunk.length);
-
-            byte[] result = Net.decompressSnapshot(snapshot, uncompressedLength);
-            int length = result.length;
-
-            netClient.lastSnapshotBaseID = snapshotID;
-
-            //set stream bytes to begin snapshot reading
-            netClient.byteStream.setBytes(result, 0, length);
-
-            //get data input for reading from the stream
+            netClient.byteStream.setBytes(Net.decompressSnapshot(data, dataLen));
             DataInputStream input = netClient.dataStream;
-
-            netClient.readSnapshot(input);
-
-            //confirm that snapshot has been recieved
-            netClient.lastSnapshotBaseID = snapshotID;
-        }catch(Exception e){
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void readSnapshot(DataInputStream input) throws IOException{
-
-        //read wave info
-        state.wavetime = input.readFloat();
-        state.wave = input.readInt();
-        state.enemies = input.readInt();
-
-        byte cores = input.readByte();
-        for(int i = 0; i < cores; i++){
-            int pos = input.readInt();
-            Tile tile = world.tile(pos);
-            if(tile != null && tile.entity != null){
-                tile.entity.items.read(input);
-            }else{
-                new ItemModule().read(input);
-            }
-        }
-
-        long timestamp = input.readLong();
-
-        byte totalGroups = input.readByte();
-        //for each group...
-        for(int i = 0; i < totalGroups; i++){
-            //read group info
-            byte groupID = input.readByte();
-            short amount = input.readShort();
 
             EntityGroup group = Entities.getGroup(groupID);
 
@@ -321,13 +224,41 @@ public class NetClient implements ApplicationListener{
                 }
 
                 //read the entity
-                entity.read(input, timestamp);
+                entity.read(input);
 
                 if(add){
                     entity.add();
                     netClient.addRemovedEntity(entity.getID());
                 }
             }
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
+    public static void onStateSnapshot(float waveTime, int wave, int enemies, short coreDataLen, byte[] coreData){
+        try{
+            state.wavetime = waveTime;
+            state.wave = wave;
+            state.enemies = enemies;
+
+            netClient.byteStream.setBytes(Net.decompressSnapshot(coreData, coreDataLen));
+            DataInputStream input = netClient.dataStream;
+
+            byte cores = input.readByte();
+            for(int i = 0; i < cores; i++){
+                int pos = input.readInt();
+                Tile tile = world.tile(pos);
+                if(tile != null && tile.entity != null){
+                    tile.entity.items.read(input);
+                }else{
+                    new ItemModule().read(input);
+                }
+            }
+
+        }catch(IOException e){
+            throw new RuntimeException(e);
         }
     }
 
@@ -373,9 +304,6 @@ public class NetClient implements ApplicationListener{
         connecting = true;
         quiet = false;
         lastSent = 0;
-        currentSnapshot = null;
-        currentSnapshotID = -1;
-        lastSnapshotBaseID = -1;
 
         Entities.clear();
         ui.chatfrag.clearMessages();
@@ -409,9 +337,11 @@ public class NetClient implements ApplicationListener{
             Player player = players[0];
 
             BuildRequest[] requests;
+            //limit to 10 to prevent buffer overflows
+            int usedRequests = Math.min(player.getPlaceQueue().size, 10);
 
-            requests = new BuildRequest[player.getPlaceQueue().size];
-            for(int i = 0; i < requests.length; i++){
+            requests = new BuildRequest[usedRequests];
+            for(int i = 0; i < usedRequests; i++){
                 requests[i] = player.getPlaceQueue().get(i);
             }
 

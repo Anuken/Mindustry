@@ -301,7 +301,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
     }
 
     @Override
-    public void read(DataInput data, long time) throws IOException{
+    public void read(DataInput data) throws IOException{
         x = data.readFloat();
         y = data.readFloat();
         liquid = content.liquid(data.readByte());
