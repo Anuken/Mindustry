@@ -23,7 +23,7 @@ public class BackgroundFragment extends Fragment{
             Draw.shader();
 
             boolean portrait = Core.graphics.getWidth() < Core.graphics.getHeight();
-            float logoscl = (int) Unit.dp.scl(1) * (portrait ? 0.5f : 0.75f);
+            float logoscl = (int) Unit.dp.scl(1);
             TextureRegion logo = Core.atlas.find("logotext");
             float logow = logo.getWidth() * logoscl;
             float logoh = logo.getHeight() * logoscl;
