@@ -1,11 +1,16 @@
 package io.anuke.mindustry.input;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.input.InputProcessor;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Player;
@@ -21,28 +26,19 @@ import io.anuke.mindustry.ui.fragments.OverlayFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
 
 import static io.anuke.mindustry.Vars.*;
 
-public abstract class InputHandler extends InputAdapter{
+public abstract class InputHandler implements InputProcessor{
     /**Used for dropping items.*/
     final static float playerSelectRange = mobile ? 17f : 11f;
     /**Maximum line length.*/
     final static int maxLength = 100;
-    final static Translator stackTrns = new Translator();
+    final static Vector2 stackTrns = new Vector2();
     /**Distance on the back from where items originate.*/
     final static float backTrns = 3f;
 
     public final Player player;
-    public final String section;
     public final OverlayFragment frag = new OverlayFragment(this);
 
     public Recipe recipe;
@@ -51,7 +47,6 @@ public abstract class InputHandler extends InputAdapter{
 
     public InputHandler(Player player){
         this.player = player;
-        this.section = "player_" + (player.playerIndex + 1);
     }
 
     //methods to override
@@ -72,47 +67,45 @@ public abstract class InputHandler extends InputAdapter{
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
 
-        threads.run(() -> {
-            if(player == null || tile.entity == null) return;
+        if(player == null || tile.entity == null) return;
 
-            player.isTransferring = true;
+        player.isTransferring = true;
 
-            Item item = player.inventory.getItem().item;
-            int amount = player.inventory.getItem().amount;
-            int accepted = tile.block().acceptStack(item, amount, tile, player);
-            player.inventory.getItem().amount -= accepted;
+        Item item = player.inventory.getItem().item;
+        int amount = player.inventory.getItem().amount;
+        int accepted = tile.block().acceptStack(item, amount, tile, player);
+        player.inventory.getItem().amount -= accepted;
 
-            int sent = Mathf.clamp(accepted / 4, 1, 8);
-            int removed = accepted / sent;
-            int[] remaining = {accepted, accepted};
-            Block block = tile.block();
+        int sent = Mathf.clamp(accepted / 4, 1, 8);
+        int removed = accepted / sent;
+        int[] remaining = {accepted, accepted};
+        Block block = tile.block();
 
-            for(int i = 0; i < sent; i++){
-                boolean end = i == sent - 1;
-                Timers.run(i * 3, () -> {
-                    tile.block().getStackOffset(item, tile, stackTrns);
+        for(int i = 0; i < sent; i++){
+            boolean end = i == sent - 1;
+            Time.run(i * 3, () -> {
+                tile.block().getStackOffset(item, tile, stackTrns);
 
-                    ItemTransfer.create(item,
-                            player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
-                            new Translator(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
-                                if(tile.block() != block || tile.entity == null || tile.entity.items == null) return;
+                ItemTransfer.create(item,
+                        player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
+                        new Vector2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
+                            if(tile.block() != block || tile.entity == null || tile.entity.items == null) return;
 
-                                tile.block().handleStack(item, removed, tile, player);
-                                remaining[1] -= removed;
+                            tile.block().handleStack(item, removed, tile, player);
+                            remaining[1] -= removed;
 
-                                if(end && remaining[1] > 0){
-                                    tile.block().handleStack(item, remaining[1], tile, player);
-                                }
-                            });
+                            if(end && remaining[1] > 0){
+                                tile.block().handleStack(item, remaining[1], tile, player);
+                            }
+                        });
 
-                    remaining[0] -= removed;
+                remaining[0] -= removed;
 
-                    if(end){
-                        player.isTransferring = false;
-                    }
-                });
-            }
-        });
+                if(end){
+                    player.isTransferring = false;
+                }
+            });
+        }
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
@@ -130,11 +123,11 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     public float getMouseX(){
-        return Gdx.input.getX();
+        return Core.input.mouseX();
     }
 
     public float getMouseY(){
-        return Gdx.input.getY();
+        return Core.input.mouseY();
     }
 
     public void resetCursor(){
@@ -231,7 +224,7 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     boolean canTapPlayer(float x, float y){
-        return Vector2.dst(x, y, player.x, player.y) <= playerSelectRange && player.inventory.hasItem();
+        return Mathf.dst(x, y, player.x, player.y) <= playerSelectRange && player.inventory.hasItem();
     }
 
     /**Tries to begin mining a tile, returns true if successful.*/
@@ -245,11 +238,11 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     boolean canMine(Tile tile){
-        return !ui.hasMouse()
+        return !Core.scene.hasMouse()
                 && tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
                 && !tile.floor().playerUnmineable
                 && player.inventory.canAcceptItem(tile.floor().drops.item)
-                && tile.block() == Blocks.air && player.distanceTo(tile.worldx(), tile.worldy()) <= Player.mineDistance;
+                && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= Player.mineDistance;
     }
 
     /**Returns the tile at the specified MOUSE coordinates.*/
@@ -258,7 +251,7 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     int tileX(float cursorX){
-        Vector2 vec = Graphics.world(cursorX, 0);
+        Vector2 vec = Core.input.mouseWorld(cursorX, 0);
         if(selectedBlock()){
             vec.sub(recipe.result.offset(), recipe.result.offset());
         }
@@ -266,7 +259,7 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     int tileY(float cursorY){
-        Vector2 vec = Graphics.world(0, cursorY);
+        Vector2 vec = Core.input.mouseWorld(0, cursorY);
         if(selectedBlock()){
             vec.sub(recipe.result.offset(), recipe.result.offset());
         }
@@ -282,16 +275,16 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     public float mouseAngle(float x, float y){
-        return Graphics.world(getMouseX(), getMouseY()).sub(x, y).angle();
+        return Core.input.mouseWorld(getMouseX(), getMouseY()).sub(x, y).angle();
     }
 
     public void remove(){
-        Inputs.removeProcessor(this);
+        Core.input.removeProcessor(this);
         frag.remove();
     }
 
     public boolean canShoot(){
-        return recipe == null && !ui.hasMouse() && !onConfigurable() && !isDroppingItem();
+        return recipe == null && !Core.scene.hasMouse() && !onConfigurable() && !isDroppingItem();
     }
 
     public boolean onConfigurable(){
@@ -337,9 +330,9 @@ public abstract class InputHandler extends InputAdapter{
 
     public boolean validPlace(int x, int y, Block type, int rotation){
         for(Tile tile : state.teams.get(player.getTeam()).cores){
-            if(tile.distanceTo(x * tilesize, y * tilesize) < coreBuildRange){
+            if(tile.dst(x * tilesize, y * tilesize) < coreBuildRange){
                 return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
-                Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
+                Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
             }
         }
 
@@ -347,7 +340,7 @@ public abstract class InputHandler extends InputAdapter{
     }
 
     public boolean validBreak(int x, int y){
-        return Build.validBreak(player.getTeam(), x, y) && Vector2.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
+        return Build.validBreak(player.getTeam(), x, y) && Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
     }
 
     public void placeBlock(int x, int y, Recipe recipe, int rotation){

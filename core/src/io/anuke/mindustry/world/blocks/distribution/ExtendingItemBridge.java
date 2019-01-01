@@ -1,11 +1,11 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
+import io.anuke.arc.graphics.g2d.CapStyle;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.graphics.CapStyle;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -54,8 +54,7 @@ public class ExtendingItemBridge extends ItemBridge{
             Draw.alpha(Mathf.absin(a / (float) arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime);
             Draw.rect(arrowRegion,
                     tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 6f + 2) * entity.uptime,
-                    tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * entity.uptime,
-                    i * 90f);
+                    tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * entity.uptime, i * 90f);
         }
         Draw.reset();
     }

@@ -1,23 +1,22 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.graphics.g2d.GlyphLayout;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.utils.UIUtils;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.OS;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.*;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.scene.utils.UIUtils;
-import io.anuke.ucore.util.OS;
-import io.anuke.ucore.util.Pooling;
 
 import java.util.Arrays;
 
@@ -27,8 +26,8 @@ public class FileChooser extends FloatingDialog{
     public static Predicate<FileHandle> jpegFilter = file -> file.extension().equalsIgnoreCase("png") || file.extension().equalsIgnoreCase("jpg") || file.extension().equalsIgnoreCase("jpeg");
     public static Predicate<FileHandle> defaultFilter = file -> true;
     private Table files;
-    private FileHandle homeDirectory = Gdx.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" :
-            Gdx.files.getExternalStoragePath());
+    private FileHandle homeDirectory = Core.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" :
+            Core.files.getExternalStoragePath());
     private FileHandle directory = homeDirectory;
     private ScrollPane pane;
     private TextField navigation, filefield;
@@ -74,7 +73,7 @@ public class FileChooser extends FloatingDialog{
         cancel.clicked(this::hide);
 
         navigation = new TextField("");
-        navigation.setTouchable(Touchable.disabled);
+        navigation.touchable(Touchable.disabled);
 
         files = new Table();
         files.marginRight(10);
@@ -82,7 +81,7 @@ public class FileChooser extends FloatingDialog{
 
         pane = new ScrollPane(files){
             public float getPrefHeight(){
-                return Gdx.graphics.getHeight();
+                return Core.graphics.getHeight();
             }
         };
         pane.setOverscroll(false, false);
@@ -142,7 +141,7 @@ public class FileChooser extends FloatingDialog{
         content.add(icontable).expandX().fillX();
         content.row();
 
-        content.center().add(pane).width(UIUtils.portrait() ? Gdx.graphics.getWidth() / Unit.dp.scl(1) : Gdx.graphics.getWidth() / Unit.dp.scl(2)).colspan(3).grow();
+        content.center().add(pane).width(UIUtils.portrait() ? Core.graphics.getWidth() / Unit.dp.scl(1) : Core.graphics.getWidth() / Unit.dp.scl(2)).colspan(3).grow();
         content.row();
 
         if(!open){
@@ -179,9 +178,9 @@ public class FileChooser extends FloatingDialog{
         //if is mac, don't display extra info since you can only ever go to downloads
         navigation.setText(OS.isMac ? directory.name() : directory.toString());
 
-        GlyphLayout layout = Pooling.obtain(GlyphLayout.class, GlyphLayout::new);
+        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
 
-        layout.setText(Core.font, navigation.getText());
+        layout.setText(Core.scene.skin.getFont("default-font"), navigation.getText());
 
         if(layout.width < navigation.getWidth()){
             navigation.setCursorPosition(0);
@@ -189,7 +188,7 @@ public class FileChooser extends FloatingDialog{
             navigation.setCursorPosition(navigation.getText().length());
         }
 
-        Pooling.free(layout);
+        Pools.free(layout);
 
         files.clearChildren();
         files.top().left();
@@ -264,7 +263,7 @@ public class FileChooser extends FloatingDialog{
 
     @Override
     public Dialog show(){
-        Timers.runTask(2f, () -> {
+        Time.runTask(2f, () -> {
             content().clear();
             setupWidgets();
             super.show();

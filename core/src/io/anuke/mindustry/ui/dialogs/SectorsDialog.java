@@ -1,27 +1,24 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.event.InputEvent;
+import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.layout.Cell;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.maps.Sector;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.event.InputEvent;
-import io.anuke.ucore.scene.event.InputListener;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.layout.Cell;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -54,7 +51,7 @@ public class SectorsDialog extends FloatingDialog{
         });
 
         Group container = new Group();
-        container.setTouchable(Touchable.childrenOnly);
+        container.touchable(Touchable.childrenOnly);
         container.addChild(table);
 
         margin(0);
@@ -84,16 +81,16 @@ public class SectorsDialog extends FloatingDialog{
         table.background("button").margin(5);
 
         table.defaults().pad(3);
-        table.add(Bundles.format("text.sector", sector.x + ", " + sector.y));
+        table.add(Core.bundle.format("text.sector", sector.x + ", " + sector.y));
         table.row();
 
         if(selected.completedMissions < selected.missions.size && !selected.complete){
-            table.labelWrap(Bundles.format("text.mission", selected.getDominantMission().menuDisplayString())).growX();
+            table.labelWrap(Core.bundle.format("text.mission", selected.getDominantMission().menuDisplayString())).growX();
             table.row();
         }
 
         if(selected.hasSave()){
-            table.labelWrap(Bundles.format("text.sector.time", selected.getSave().getPlayTime())).growX();
+            table.labelWrap(Core.bundle.format("text.sector.time", selected.getSave().getPlayTime())).growX();
             table.row();
         }
 
@@ -118,7 +115,7 @@ public class SectorsDialog extends FloatingDialog{
         }).pad(-5).growX().padTop(0);
 
         table.pack();
-        table.act(Gdx.graphics.getDeltaTime());
+        table.act(Core.graphics.getDeltaTime());
     }
 
     public Sector getSelected(){
@@ -133,7 +130,7 @@ public class SectorsDialog extends FloatingDialog{
         SectorView(){
             addListener(new InputListener(){
                 @Override
-                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                     if(pointer != 0) return false;
                     //Cursors.setHand();
                     lastX = x;
@@ -152,9 +149,9 @@ public class SectorsDialog extends FloatingDialog{
                 }
 
                 @Override
-                public void touchUp(InputEvent event, float x, float y, int pointer, int button){
+                public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
                     if(pointer != 0) return;
-                    Cursors.restoreCursor();
+                    //Cursors.restoreCursor();
                 }
             });
 
@@ -183,7 +180,7 @@ public class SectorsDialog extends FloatingDialog{
 
         @Override
         public void draw(){
-            Draw.alpha(alpha);
+            Draw.alpha(parentAlpha);
 
             int shownSectorsX = (int)(width/sectorSize);
             int shownSectorsY = (int)(height/sectorSize);
@@ -191,7 +188,7 @@ public class SectorsDialog extends FloatingDialog{
             int offsetX = (int)(panX / sectorSize);
             int offsetY = (int)(panY / sectorSize);
 
-            Vector2 mouse = Graphics.mouse();
+            Vector2 mouse = Core.input.mouse();
 
             for(int x = -shownSectorsX; x <= shownSectorsX; x++){
                 for(int y = -shownSectorsY; y <= shownSectorsY; y++){
@@ -205,13 +202,13 @@ public class SectorsDialog extends FloatingDialog{
 
                     if(sector == null || sector.texture == null){
                         Draw.reset();
-                        Draw.rect("empty-sector", drawX, drawY, sectorSize, sectorSize);
+                        Draw.rect(("empty-sector"), drawX, drawY, sectorSize, sectorSize);
 
                         int i = 0;
-                        for(GridPoint2 point : Geometry.d4){
+                        for(Point2 point : Geometry.d4){
                             Sector other = world.sectors.get(sectorX + point.x, sectorY + point.y);
                             if(other != null){
-                                Draw.rect("sector-edge", drawX, drawY, sectorSize, sectorSize, i*90);
+                                Draw.rect(("sector-edge"), drawX, drawY, sectorSize, sectorSize, i*90);
                             }
 
                             i ++;
@@ -220,7 +217,7 @@ public class SectorsDialog extends FloatingDialog{
                     }
 
                     Draw.colorl(!sector.complete ? 0.3f : 1f);
-                    Draw.rect(sector.texture, drawX, drawY, sectorSize, sectorSize);
+                    Draw.rect(Draw.wrap(sector.texture), drawX, drawY, sectorSize, sectorSize);
 
                     if(sector.missions.size == 0) continue;
 
@@ -236,8 +233,8 @@ public class SectorsDialog extends FloatingDialog{
 
                     if(sector == selected){
                         selectColor = Palette.accent;
-                    }else if(Mathf.inRect(mouse.x, mouse.y, drawX - sectorSize / 2f, drawY - sectorSize / 2f,
-                        drawX + sectorSize / 2f, drawY + sectorSize / 2f)){
+                    }else if(mouse.x > drawX - sectorSize / 2f && mouse.y > drawY - sectorSize / 2f
+                        && mouse.x < drawX + sectorSize / 2f && mouse.y < drawY + sectorSize / 2f){
                         if(clicked){
                             selectSector(sector);
                         }
@@ -253,16 +250,16 @@ public class SectorsDialog extends FloatingDialog{
                     }
 
                     Draw.color(selectColor);
-                    Draw.rect("sector-select", drawX, drawY, sectorSize, sectorSize);
+                    Draw.rect(("sector-select"), drawX, drawY, sectorSize, sectorSize);
 
                     Draw.color(backColor);
                     Draw.alpha(0.75f * backColor.a);
-                    Draw.rect("icon-mission-background", drawX, drawY, Unit.dp.scl(18f * 5), Unit.dp.scl(18f * 5));
+                    Draw.rect(("icon-mission-background"), drawX, drawY, Unit.dp.scl(18f * 5), Unit.dp.scl(18f * 5));
 
                     float size = Unit.dp.scl(10f * 5);
 
                     Draw.color(iconColor);
-                    Draw.rect(region, drawX, drawY, size, size);
+                    Draw.rect((region), drawX, drawY, size, size);
                 }
             }
 

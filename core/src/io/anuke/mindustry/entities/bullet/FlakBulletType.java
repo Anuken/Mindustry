@@ -1,9 +1,9 @@
 package io.anuke.mindustry.entities.bullet;
 
-import com.badlogic.gdx.math.Rectangle;
+import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.ucore.core.Timers;
+import io.anuke.arc.util.Time;
 
 public abstract class FlakBulletType extends BasicBulletType{
     protected static Rectangle rect = new Rectangle();
@@ -27,9 +27,9 @@ public abstract class FlakBulletType extends BasicBulletType{
             Units.getNearbyEnemies(b.getTeam(), rect.setSize(explodeRange*2f).setCenter(b.x, b.y), unit -> {
                 if(b.getData() instanceof Float) return;
 
-                if(unit.distanceTo(b) < explodeRange){
+                if(unit.dst(b) < explodeRange){
                     b.setData(0);
-                    Timers.run(5f, () -> {
+                    Time.run(5f, () -> {
                         if(b.getData() instanceof Integer){
                             b.time(b.lifetime());
                         }

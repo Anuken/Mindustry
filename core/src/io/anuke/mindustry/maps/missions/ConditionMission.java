@@ -1,6 +1,6 @@
 package io.anuke.mindustry.maps.missions;
 
-import io.anuke.ucore.function.BooleanProvider;
+import io.anuke.arc.function.BooleanProvider;
 
 public class ConditionMission extends Mission{
     private final BooleanProvider complete;

@@ -1,24 +1,23 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -29,7 +28,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 public class NuclearReactor extends PowerGenerator{
     protected final int timerFuel = timers++;
 
-    protected final Translator tr = new Translator();
+    protected final Vector2 tr = new Vector2();
 
     protected Color coolColor = new Color(1, 1, 1, 0f);
     protected Color hotColor = Color.valueOf("ff9575a3");
@@ -60,15 +59,8 @@ public class NuclearReactor extends PowerGenerator{
     public void load(){
         super.load();
 
-        topRegion = Draw.region(name + "-center");
-        lightsRegion = Draw.region(name + "-lights");
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-        bars.replace(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.get(consumes.item()) / itemCapacity));
-        bars.add(new BlockBar(BarType.heat, true, tile -> tile.<NuclearReactorEntity>entity().heat));
+        topRegion = Core.atlas.find(name + "-center");
+        lightsRegion = Core.atlas.find(name + "-lights");
     }
 
     @Override
@@ -140,21 +132,21 @@ public class NuclearReactor extends PowerGenerator{
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
         Effects.effect(ExplosionFx.nuclearShockwave, tile.worldx(), tile.worldy());
         for(int i = 0; i < 6; i++){
-            Timers.run(Mathf.random(40), () -> Effects.effect(BlockFx.nuclearcloud, tile.worldx(), tile.worldy()));
+            Time.run(Mathf.random(40), () -> Effects.effect(BlockFx.nuclearcloud, tile.worldx(), tile.worldy()));
         }
 
         Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
 
 
         for(int i = 0; i < 20; i++){
-            Timers.run(Mathf.random(50), () -> {
+            Time.run(Mathf.random(50), () -> {
                 tr.rnd(Mathf.random(40f));
                 Effects.effect(ExplosionFx.explosion, tr.x + tile.worldx(), tr.y + tile.worldy());
             });
         }
 
         for(int i = 0; i < 70; i++){
-            Timers.run(Mathf.random(80), () -> {
+            Time.run(Mathf.random(80), () -> {
                 tr.rnd(Mathf.random(120f));
                 Effects.effect(BlockFx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
             });
@@ -182,7 +174,7 @@ public class NuclearReactor extends PowerGenerator{
 
         if(entity.heat > flashThreshold){
             float flash = 1f + ((entity.heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
-            entity.flash += flash * Timers.delta();
+            entity.flash += flash * Time.delta();
             Draw.color(Color.RED, Color.YELLOW, Mathf.absin(entity.flash, 9f, 1f));
             Draw.alpha(0.6f);
             Draw.rect(lightsRegion, tile.drawx(), tile.drawy());

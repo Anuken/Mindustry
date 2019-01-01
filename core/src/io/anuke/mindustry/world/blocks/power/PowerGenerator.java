@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.util.EnumSet;
+import io.anuke.arc.collection.EnumSet;
 
 public class PowerGenerator extends PowerDistributor{
 

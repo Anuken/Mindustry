@@ -6,6 +6,7 @@ buildscript{
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
     }
+
     dependencies{
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.5'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.9"
@@ -24,7 +25,34 @@ allprojects{
         appName = 'Mindustry'
         gdxVersion = '1.9.9'
         roboVMVersion = '2.3.0'
-        uCoreVersion = '7ffeb2a9c754f4d31ca13e02dd857876b0707dc5'
+        arcHash = null
+
+        localArc = {
+            return (System.properties["release"] == null || System.properties["release"] == "false") && new File(projectDir.parent, '../Arc').exists()
+        }
+
+        getArcHash = {
+            //get latest commit hash from gtihub since JITPack's '-snapshot' version doesn't work correctly
+            if(arcHash == null){
+                try{
+                    arcHash = 'git ls-remote https://github.com/Anuken/Arc.git'.execute().text.split("\t")[0]//new JsonSlurper().parse(new URL("https://api.github.com/repos/Anuken/Arc/commits/master"))["sha"]
+                }catch(e){
+                    e.printStackTrace()
+                    arcHash = "-SNAPSHOT";
+                }
+            }
+            return arcHash
+        }
+
+        arcModule = { String name ->
+            if(localArc()){
+                return project(":Arc:$name")
+            }else{
+                //skip to last submodule
+                if(name.contains(':')) name = name.split(':').last()
+                return "com.github.Anuken.Arc:$name:${getArcHash()}"
+            }
+        }
 
         getVersionString = {
             String buildVersion = getBuildVersion()
@@ -59,7 +87,6 @@ allprojects{
             }catch(Exception ignored){}
 
             if(pfile.exists()){
-
                 props.load(new FileInputStream(pfile))
 
                 String buildid = getBuildVersion()
@@ -88,13 +115,14 @@ project(":desktop"){
 
     dependencies{
         compile project(":core")
-        compile project(":kryonet")
+        compile project(":net")
+        
         if(new File(projectDir.parent, '../debug').exists() && System.properties["release"] == null) compile project(":debug")
 
-        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+
+        compile arcModule("backends:backend-lwjgl3")
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.0'
     }
 }
@@ -145,11 +173,12 @@ project(":ios"){
 
     dependencies{
         compile project(":core")
-        implementation project(":kryonet")
+        compile project(":net")
 
+        compile arcModule("backends:backend-robovm")
+        
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
-        compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
     }
@@ -165,22 +194,8 @@ project(":core"){
     dependencies{
         build.finalizedBy(finish)
 
-        def comp = System.properties["release"] == null || System.properties["release"] == "false"
-        if(!comp) println("Note: Compiling release build.")
-
-        if(new File(projectDir.parent, '../uCore').exists() && comp){
-            compile project(":uCore")
-        }else{
-            compile "com.github.anuken:ucore:$uCoreVersion"
-        }
-
-        if(new File(projectDir.parent, '../GDXGifRecorder').exists() && comp){
-            compile project(":GDXGifRecorder")
-        }
-
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        compile arcModule("arc-core")
+        compile arcModule("extensions:freetype")
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
@@ -190,18 +205,10 @@ project(":core"){
 project(":server"){
     apply plugin: "java"
 
-    configurations{
-        if(findProject(":android") != null){
-            compile.exclude module: android
-        }
-    }
-
     dependencies{
-
         compile project(":core")
-        compile project(":kryonet")
-        compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile project(":net")
+        compile arcModule("backends:backend-headless")
     }
 }
 
@@ -212,8 +219,7 @@ project(":tests"){
         testImplementation project(":core")
         testImplementation('org.junit.jupiter:junit-jupiter-api:5.1.0')
         testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.1.0')
-        testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-        testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile arcModule("backends:backend-headless")
     }
 
     test{
@@ -238,13 +244,13 @@ project(":annotations"){
     }
 }
 
-project(":kryonet"){
+project(":net"){
     apply plugin: "java"
 
     dependencies{
         compile project(":core")
         compile "org.lz4:lz4-java:1.4.1"
-        compile 'com.github.Anuken:kryonet:53b10247b1'
+        compile 'com.github.Anuken:kryonet:38ca8d51b5763ebe463ed973a63b64390ff51416'
         compile 'com.github.Anuken:WaifUPnP:05eb46bc577fd7674596946ba288c96c0cedd893'
     }
 }

@@ -1,9 +1,9 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.Events.Event;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Events.Event;
 
 public class EventType{
 
@@ -11,6 +11,7 @@ public class EventType{
 
     }
 
+    /**Called when the game is first loaded.*/
     public static class GameLoadEvent implements Event{
 
     }
@@ -35,19 +36,8 @@ public class EventType{
         }
     }
 
-    /**
-     * This event is called from the logic thread.
-     * DO NOT INITIALIZE GRAPHICS HERE.
-     */
+    /**Called when a game begins and the world is loaded.*/
     public static class WorldLoadEvent implements Event{
-
-    }
-
-    /**
-     * Called after the WorldLoadEvent is, and all logic has been loaded.
-     * It is safe to intialize graphics here.
-     */
-    public static class WorldLoadGraphicsEvent implements Event{
 
     }
 

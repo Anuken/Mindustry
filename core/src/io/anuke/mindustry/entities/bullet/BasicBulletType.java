@@ -1,16 +1,17 @@
 package io.anuke.mindustry.entities.bullet;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
 
 /**
  * A BulletType for most ammo-based bullets shot from turrets and units.
@@ -47,8 +48,8 @@ public class BasicBulletType extends BulletType{
 
     @Override
     public void load(){
-        backRegion = Draw.region(bulletSprite + "-back");
-        frontRegion = Draw.region(bulletSprite);
+        backRegion = Core.atlas.find(bulletSprite + "-back");
+        frontRegion = Core.atlas.find(bulletSprite);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class BasicBulletType extends BulletType{
         if(homingPower > 0.0001f){
             TargetTrait target = Units.getClosestTarget(b.getTeam(), b.x, b.y, homingRange);
             if(target != null){
-                b.getVelocity().setAngle(Angles.moveToward(b.getVelocity().angle(), b.angleTo(target), homingPower * Timers.delta()));
+                b.getVelocity().setAngle(Angles.moveToward(b.getVelocity().angle(), b.angleTo(target), homingPower * Time.delta()));
             }
         }
     }

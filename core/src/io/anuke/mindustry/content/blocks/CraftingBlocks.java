@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content.blocks;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
@@ -122,7 +122,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             size = 2;
 
             consumes.power(0.02f);
-            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.lead, 2), new ItemStack(Items.sand, 2));
+            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.lead, 1), new ItemStack(Items.sand, 1));
         }};
 
         melter = new PowerCrafter("melter"){{

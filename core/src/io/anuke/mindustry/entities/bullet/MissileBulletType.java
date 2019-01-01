@@ -1,11 +1,11 @@
 package io.anuke.mindustry.entities.bullet;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.math.Mathf;
 
 public class MissileBulletType extends BasicBulletType{
     protected Color trailColor = Palette.missileYellowBack;
@@ -21,7 +21,7 @@ public class MissileBulletType extends BasicBulletType{
     public void update(Bullet b){
         super.update(b);
 
-        if(Mathf.chance(Timers.delta() * 0.2)){
+        if(Mathf.chance(Time.delta() * 0.2)){
             Effects.effect(BulletFx.missileTrail, trailColor, b.x, b.y, 2f);
         }
     }

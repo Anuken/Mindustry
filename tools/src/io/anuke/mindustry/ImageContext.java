@@ -1,114 +1,118 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData.Region;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.graphics.g2d.TextureAtlas;
+import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
+import io.anuke.arc.graphics.g2d.TextureAtlas.TextureAtlasData;
+import io.anuke.arc.graphics.g2d.TextureAtlas.TextureAtlasData.Region;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Log.LogHandler;
+import io.anuke.arc.util.Log.NoopLogHandler;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.Core;
 import io.anuke.mindustry.core.ContentLoader;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Atlas;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Log.LogHandler;
-import io.anuke.ucore.util.Log.NoopLogHandler;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class ImageContext {
-    private BufferedImage image;
+    static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
+    static ObjectMap<TextureRegion, BufferedImage> imageCache = new ObjectMap<>();
 
-    public void load() throws IOException{
+    static void load() throws IOException{
         Log.setLogger(new NoopLogHandler());
         Vars.content = new ContentLoader();
         Vars.content.load();
         Log.setLogger(new LogHandler());
 
-        String spritesFolder = new File("../../../assets/sprites").getAbsolutePath();
-        TextureAtlasData data = new TextureAtlasData(new FileHandle(spritesFolder + "/sprites.atlas"),
-                new FileHandle(spritesFolder), false);
+        Files.walk(Paths.get("../../../assets-raw/sprites_out")).forEach(path -> {
+            try{
+                if(Files.isDirectory(path)) return;
 
-        ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
+                String fname = path.getFileName().toString();
+                fname = fname.substring(0, fname.length() - 4);
 
-        for(Region region : data.getRegions()){
-            int x = region.left, y = region.top, width = region.width, height = region.height;
+                BufferedImage image = ImageIO.read(path.toFile());
+                GenRegion region = new GenRegion(fname){
 
-            regionCache.put(region.name, new GenRegion(){
-                {
-                    name = region.name;
-                    context = ImageContext.this;
-                }
+                    @Override
+                    public int getX(){
+                        return 0;
+                    }
 
-                @Override
-                public int getRegionX(){
-                    return x;
-                }
+                    @Override
+                    public int getY(){
+                        return 0;
+                    }
 
-                @Override
-                public int getRegionY(){
-                    return y;
-                }
+                    @Override
+                    public int getWidth(){
+                        return image.getWidth();
+                    }
 
-                @Override
-                public int getRegionWidth(){
-                    return width;
-                }
+                    @Override
+                    public int getHeight(){
+                        return image.getHeight();
+                    }
+                };
 
-                @Override
-                public int getRegionHeight(){
-                    return height;
-                }
-            });
-        }
+                regionCache.put(fname, region);
+                imageCache.put(region, image);
 
-        Core.atlas = new Atlas(){
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+        });
+
+        Core.atlas = new TextureAtlas(){
             @Override
-            public TextureRegion getRegion(String name){
+            public AtlasRegion find(String name){
                 if(!regionCache.containsKey(name)){
-                    GenRegion region = new GenRegion();
-                    region.name = name;
-                    region.context = ImageContext.this;
+                    GenRegion region = new GenRegion(name);
                     region.invalid = true;
                     return region;
                 }
-                return regionCache.get(name);
+                return (AtlasRegion)regionCache.get(name);
             }
 
             @Override
-            public boolean hasRegion(String s) {
+            public boolean has(String s) {
                 return regionCache.containsKey(s);
             }
         };
-
-        Core.atlas.setErrorRegion("error");
-
-        image = ImageIO.read(new File(spritesFolder + "/sprites.png"));
     }
 
-    public void generate(String name, Runnable run){
-        Timers.mark();
+    static void generate(String name, Runnable run){
+        Time.mark();
         run.run();
-        Log.info("&ly[Generator]&lc Time to generate &lm{0}&lc: &lg{1}&lcms", name, Timers.elapsed());
+        Log.info("&ly[Generator]&lc Time to generate &lm{0}&lc: &lg{1}&lcms", name, Time.elapsed());
     }
 
-    public Image create(int width, int height){
-        return new Image(image, width, height);
+    static BufferedImage buf(TextureRegion region){
+        return imageCache.get(region);
     }
 
-    public Image get(String name){
-        return get(Core.atlas.getRegion(name));
+    static Image create(int width, int height){
+        return new Image(width, height);
     }
 
-    public Image get(TextureRegion region){
+    static Image get(String name){
+        return get(Core.atlas.find(name));
+    }
+
+    static Image get(TextureRegion region){
         GenRegion.validate(region);
 
-        return new Image(image, region);
+        return new Image(imageCache.get(region));
     }
 
-    public void err(String message, Object... args){
+    static void err(String message, Object... args){
         Log.err(message, args);
         System.exit(-1);
     }

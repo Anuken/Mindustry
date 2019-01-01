@@ -4,7 +4,7 @@ import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.ui.LiquidDisplay;
 import io.anuke.mindustry.world.meta.ContentStatValue;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Table;
 
 public class LiquidValue implements ContentStatValue{
     private final Liquid liquid;

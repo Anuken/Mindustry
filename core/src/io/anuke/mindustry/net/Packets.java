@@ -1,9 +1,9 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.Base64Coder;
+import io.anuke.arc.Core;
+import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.io.TypeIO;
-import io.anuke.ucore.util.Bundles;
 
 import java.nio.ByteBuffer;
 
@@ -28,11 +28,11 @@ public class Packets{
 
         @Override
         public String toString(){
-            return Bundles.get("text.server.kicked." + name());
+            return Core.bundle.get("text.server.kicked." + name());
         }
 
         public String extraText(){
-            return Bundles.getOrNull("text.server.kicked." + name() + ".text");
+            return Core.bundle.getOrNull("text.server.kicked." + name() + ".text");
         }
     }
 

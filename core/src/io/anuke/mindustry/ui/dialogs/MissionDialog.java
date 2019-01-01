@@ -1,8 +1,8 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.arc.Core;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.maps.Sector;
-import io.anuke.ucore.util.Bundles;
 
 public class MissionDialog extends FloatingDialog{
 
@@ -23,7 +23,7 @@ public class MissionDialog extends FloatingDialog{
 
         buttons().addButton("$text.continue", this::hide).size(190f, 64f);
 
-        content().add(Bundles.format("text.mission.complete.body", sector.x, sector.y)).pad(10);
+        content().add(Core.bundle.format("text.mission.complete.body", sector.x, sector.y)).pad(10);
         show();
     }
 }

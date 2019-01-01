@@ -1,6 +1,6 @@
 package io.anuke.mindustry.maps.missions;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;

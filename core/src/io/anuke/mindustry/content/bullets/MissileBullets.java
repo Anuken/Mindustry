@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content.bullets;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
@@ -8,8 +8,8 @@ import io.anuke.mindustry.entities.bullet.MissileBulletType;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.math.Mathf;
 
 public class MissileBullets extends BulletList implements ContentList{
     public static BulletType explosive, incindiary, surge, javelin, swarm;
@@ -92,7 +92,7 @@ public class MissileBullets extends BulletList implements ContentList{
             @Override
             public void update(Bullet b){
                 super.update(b);
-                b.getVelocity().rotate(Mathf.sin(Timers.time() + b.id * 4422, 8f, 2f));
+                b.getVelocity().rotate(Mathf.sin(Time.time() + b.id * 4422, 8f, 2f));
             }
         };
 
@@ -117,7 +117,7 @@ public class MissileBullets extends BulletList implements ContentList{
             @Override
             public void update(Bullet b){
                 super.update(b);
-                b.getVelocity().rotate(Mathf.sin(Timers.time() + b.id * 4422, 8f, 2f));
+                b.getVelocity().rotate(Mathf.sin(Time.time() + b.id * 4422, 8f, 2f));
             }
         };
     }

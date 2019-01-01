@@ -19,7 +19,7 @@
   </resources>
   <forceLinkClasses>
     <pattern>net.jpountz.lz4.**</pattern>
-    <pattern>io.anuke.ucore.scene.**</pattern>
+    <pattern>io.anuke.arc.scene.**</pattern>
     <pattern>io.anuke.mindustry.gen.Call</pattern>
     <pattern>io.anuke.mindustry.net.**</pattern>
     <pattern>com.android.okhttp.HttpHandler</pattern>

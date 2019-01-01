@@ -1,15 +1,14 @@
 package io.anuke.mindustry.type;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
 
 public class Mech extends UnlockableContent{
     public final String name;
@@ -44,11 +43,11 @@ public class Mech extends UnlockableContent{
     public Mech(String name, boolean flying){
         this.flying = flying;
         this.name = name;
-        this.description = Bundles.get("mech." + name + ".description");
+        this.description = Core.bundle.get("mech." + name + ".description");
     }
 
     public String localizedName(){
-        return Bundles.get("mech." + name + ".name");
+        return Core.bundle.get("mech." + name + ".name");
     }
 
     public void updateAlt(Player player){}
@@ -94,12 +93,12 @@ public class Mech extends UnlockableContent{
     @Override
     public void load(){
         if(!flying){
-            legRegion = Draw.region(name + "-leg");
-            baseRegion = Draw.region(name + "-base");
+            legRegion = Core.atlas.find(name + "-leg");
+            baseRegion = Core.atlas.find(name + "-base");
         }
 
-        region = Draw.region(name);
-        iconRegion = Draw.region("mech-icon-" + name);
+        region = Core.atlas.find(name);
+        iconRegion = Core.atlas.find("mech-icon-" + name);
     }
 
     @Override

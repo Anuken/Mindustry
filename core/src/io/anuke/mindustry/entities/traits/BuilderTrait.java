@@ -1,9 +1,19 @@
 package io.anuke.mindustry.entities.traits;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Queue;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.Queue;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.trait.Entity;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.BlockFx;
@@ -13,6 +23,7 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Recipe;
@@ -21,16 +32,6 @@ import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.graphics.Shapes;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -44,6 +45,7 @@ import static io.anuke.mindustry.Vars.*;
  */
 public interface BuilderTrait extends Entity{
     //these are not instance variables!
+    Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
     float placeDistance = 150f;
     float mineDistance = 70f;
     Array<BuildRequest> removal = new Array<>();
@@ -202,7 +204,7 @@ public interface BuilderTrait extends Entity{
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(unit.distanceTo(tile) > placeDistance){
+        if(unit.dst(tile) > placeDistance){
             return;
         }
 
@@ -232,7 +234,7 @@ public interface BuilderTrait extends Entity{
             return;
         }
 
-        if(unit.distanceTo(tile) <= placeDistance){
+        if(unit.dst(tile) <= placeDistance){
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
         }
 
@@ -240,9 +242,9 @@ public interface BuilderTrait extends Entity{
         if(!Net.client()){
             //deconstructing is 2x as fast
             if(current.breaking){
-                entity.deconstruct(unit, core, 2f / entity.buildCost * Timers.delta() * getBuildPower(tile));
+                entity.deconstruct(unit, core, 2f / entity.buildCost * Time.delta() * getBuildPower(tile));
             }else{
-                entity.construct(unit, core, 1f / entity.buildCost * Timers.delta() * getBuildPower(tile));
+                entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile));
             }
 
             current.progress = entity.progress();
@@ -251,7 +253,7 @@ public interface BuilderTrait extends Entity{
         }
 
         if(!current.initialized){
-            Gdx.app.postRunnable(() -> Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking)));
+            Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking)));
             current.initialized = true;
         }
     }
@@ -261,16 +263,16 @@ public interface BuilderTrait extends Entity{
         Tile tile = getMineTile();
         TileEntity core = unit.getClosestCore();
 
-        if(core == null || tile.block() != Blocks.air || unit.distanceTo(tile.worldx(), tile.worldy()) > mineDistance
+        if(core == null || tile.block() != Blocks.air || unit.dst(tile.worldx(), tile.worldy()) > mineDistance
                 || tile.floor().drops == null || !unit.inventory.canAcceptItem(tile.floor().drops.item) || !canMine(tile.floor().drops.item)){
             setMineTile(null);
         }else{
             Item item = tile.floor().drops.item;
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.worldx(), tile.worldy()), 0.4f);
 
-            if(Mathf.chance(Timers.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
+            if(Mathf.chance(Time.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){
 
-                if(unit.distanceTo(core) < mineTransferRange && core.tile.block().acceptStack(item, 1, core.tile, unit) == 1){
+                if(unit.dst(core) < mineTransferRange && core.tile.block().acceptStack(item, 1, core.tile, unit) == 1){
                     Call.transferItemTo(item, 1,
                         tile.worldx() + Mathf.range(tilesize / 2f),
                         tile.worldy() + Mathf.range(tilesize / 2f), core.tile);
@@ -282,7 +284,7 @@ public interface BuilderTrait extends Entity{
                 }
             }
 
-            if(Mathf.chance(0.06 * Timers.delta())){
+            if(Mathf.chance(0.06 * Time.delta())){
                 Effects.effect(BlockFx.pulverizeSmall,
                         tile.worldx() + Mathf.range(tilesize / 2f),
                         tile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
@@ -304,12 +306,12 @@ public interface BuilderTrait extends Entity{
 
         Tile tile = world.tile(request.x, request.y);
 
-        if(unit.distanceTo(tile) > placeDistance){
+        if(unit.dst(tile) > placeDistance){
             return;
         }
 
         Draw.color(Palette.accent);
-        float focusLen = 3.8f + Mathf.absin(Timers.time(), 1.1f, 0.6f);
+        float focusLen = 3.8f + Mathf.absin(Time.time(), 1.1f, 0.6f);
         float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
         float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
 
@@ -322,7 +324,7 @@ public interface BuilderTrait extends Entity{
         tmptr[3].set(tile.drawx() + sz, tile.drawy() + sz);
 
         Arrays.sort(tmptr, (a, b) -> -Float.compare(Angles.angleDist(Angles.angle(unit.x, unit.y, a.x, a.y), ang),
-                Angles.angleDist(Angles.angle(unit.x, unit.y, b.x, b.y), ang)));
+            Angles.angleDist(Angles.angle(unit.x, unit.y, b.x, b.y), ang)));
 
         float x1 = tmptr[0].x, y1 = tmptr[0].y,
                 x3 = tmptr[1].x, y3 = tmptr[1].y;
@@ -332,7 +334,7 @@ public interface BuilderTrait extends Entity{
         Lines.line(px, py, x1, y1);
         Lines.line(px, py, x3, y3);
 
-        Fill.circle(px, py, 1.6f + Mathf.absin(Timers.time(), 0.8f, 1.5f));
+        Fill.circle(px, py, 1.6f + Mathf.absin(Time.time(), 0.8f, 1.5f));
 
         Draw.color();
     }
@@ -343,22 +345,23 @@ public interface BuilderTrait extends Entity{
 
         if(tile == null) return;
 
-        float focusLen = 4f + Mathf.absin(Timers.time(), 1.1f, 0.5f);
+        float focusLen = 4f + Mathf.absin(Time.time(), 1.1f, 0.5f);
         float swingScl = 12f, swingMag = tilesize / 8f;
         float flashScl = 0.3f;
 
         float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
         float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
 
-        float ex = tile.worldx() + Mathf.sin(Timers.time() + 48, swingScl, swingMag);
-        float ey = tile.worldy() + Mathf.sin(Timers.time() + 48, swingScl + 2f, swingMag);
+        float ex = tile.worldx() + Mathf.sin(Time.time() + 48, swingScl, swingMag);
+        float ey = tile.worldy() + Mathf.sin(Time.time() + 48, swingScl + 2f, swingMag);
 
-        Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f - flashScl + Mathf.absin(Timers.time(), 0.5f, flashScl));
+        Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
+
         Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey);
 
         if(unit instanceof Player && ((Player) unit).isLocal){
-            Draw.color(Palette.accent);
-            Lines.poly(tile.worldx(), tile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Timers.time());
+            Lines.stroke(1f, Palette.accent);
+            Lines.poly(tile.worldx(), tile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Time.time());
         }
 
         Draw.color();

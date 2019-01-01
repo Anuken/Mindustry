@@ -1,10 +1,10 @@
 package io.anuke.mindustry.maps.missions;
 
+import io.anuke.arc.Core;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.state;
 
@@ -32,11 +32,11 @@ public class ItemMission extends Mission{
     public String displayString(){
         TileEntity core = Vars.players[0].getClosestCore();
         if(core == null) return "imminent doom";
-        return Bundles.format("text.mission.resource", item.localizedName(), core.items.get(item), amount);
+        return Core.bundle.format("text.mission.resource", item.localizedName(), core.items.get(item), amount);
     }
 
     @Override
     public String menuDisplayString(){
-        return Bundles.format("text.mission.resource.menu", item.localizedName(), amount);
+        return Core.bundle.format("text.mission.resource.menu", item.localizedName(), amount);
     }
 }

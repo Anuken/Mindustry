@@ -1,21 +1,21 @@
 package io.anuke.mindustry.maps.generation;
 
+import io.anuke.arc.math.RandomXS128;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.Drill;
-import io.anuke.ucore.util.Structs;
-import io.anuke.ucore.util.SeedRandom;
+import io.anuke.arc.util.Structs;
 
 public class Generation{
     public final Sector sector;
     public final Tile[][] tiles;
     public final int width, height;
-    public final SeedRandom random;
+    public final RandomXS128 random;
 
-    public Generation(Sector sector, Tile[][] tiles, int width, int height, SeedRandom random){
+    public Generation(Sector sector, Tile[][] tiles, int width, int height, RandomXS128 random){
         this.sector = sector;
         this.tiles = tiles;
         this.width = width;

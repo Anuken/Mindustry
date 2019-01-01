@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content.blocks;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;

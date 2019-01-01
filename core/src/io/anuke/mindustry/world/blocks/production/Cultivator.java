@@ -1,7 +1,13 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.RandomXS128;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.content.fx.Fx;
@@ -9,11 +15,6 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.SeedRandom;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -27,7 +28,7 @@ public class Cultivator extends Drill{
 
     protected Item result;
 
-    protected SeedRandom random = new SeedRandom(0);
+    protected RandomXS128 random = new RandomXS128(0);
     protected float recurrence = 6f;
 
     public Cultivator(String name){
@@ -50,8 +51,8 @@ public class Cultivator extends Drill{
     public void load(){
         super.load();
 
-        middleRegion = Draw.region(name + "-middle");
-        topRegion = Draw.region(name + "-top");
+        middleRegion = Core.atlas.find(name + "-middle");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
@@ -78,7 +79,7 @@ public class Cultivator extends Drill{
         for(int i = 0; i < 12; i++){
             float offset = random.nextFloat() * 999999f;
             float x = random.range(4f), y = random.range(4f);
-            float life = 1f - (((Timers.time() + offset) / 50f) % recurrence);
+            float life = 1f - (((Time.time() + offset) / 50f) % recurrence);
 
             if(life > 0){
                 Lines.stroke(entity.warmup * (life * 1f + 0.2f));
@@ -92,7 +93,7 @@ public class Cultivator extends Drill{
 
     @Override
     public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-top"),};
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top"),};
     }
 
     @Override
