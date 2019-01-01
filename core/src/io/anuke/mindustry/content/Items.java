@@ -7,7 +7,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
 public class Items implements ContentList{
-    public static Item stone, copper, lead, densealloy, coal, titanium, thorium, silicon, plastanium, phasefabric, surgealloy,
+    public static Item scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium, phasefabric, surgealloy,
             biomatter, sand, blastCompound, pyratite;
 
     @Override
@@ -27,9 +27,9 @@ public class Items implements ContentList{
             genOre = true;
         }};
 
-        densealloy = new Item("dense-alloy", Color.valueOf("b2c6d2")){{
+        graphite = new Item("graphite", Color.valueOf("b2c6d2")){{
             type = ItemType.material;
-            cost = 1.2f;
+            cost = 1.3f;
         }};
 
         coal = new Item("coal", Color.valueOf("272727")){{
@@ -55,8 +55,8 @@ public class Items implements ContentList{
             genOre = true;
         }};
 
-        stone = new Item("stone", Color.valueOf("777777")){{
-            hardness = 3;
+        scrap = new Item("scrap", Color.valueOf("777777")){{
+
         }};
 
         silicon = new Item("silicon", Color.valueOf("53565c")){{
