@@ -365,6 +365,10 @@ public class Tile implements Position, TargetTrait{
             cost += 1;
         }
 
+        if(target().synthetic()){
+            cost += target().block().health / 10f;
+        }
+
         if(floor.isLiquid){
             cost += 100f;
         }
