@@ -1,11 +1,17 @@
 package io.anuke.mindustry.server;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
+import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.CommandHandler.Command;
+import io.anuke.arc.util.CommandHandler.Response;
+import io.anuke.arc.util.CommandHandler.ResponseType;
+import io.anuke.arc.util.Timer.Task;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
@@ -23,30 +29,23 @@ import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.*;
-import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.CommandHandler;
-import io.anuke.ucore.util.CommandHandler.Command;
-import io.anuke.ucore.util.CommandHandler.Response;
-import io.anuke.ucore.util.CommandHandler.ResponseType;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Strings;
 
 import java.io.IOException;
+import java.lang.StringBuilder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
+import static io.anuke.arc.util.Log.*;
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.util.Log.*;
 
-public class ServerControl extends Module{
+public class ServerControl implements ApplicationListener{
     private static final int roundExtraTime = 12;
     //in bytes: 512 kb is max
     private static final int maxLogLength = 1024 * 512;
 
     private final CommandHandler handler = new CommandHandler("");
-    private final FileHandle logFolder = Gdx.files.local("logs/");
+    private final FileHandle logFolder = Core.files.local("logs/");
 
     private FileHandle currentLogFile;
     private int gameOvers;
@@ -55,7 +54,7 @@ public class ServerControl extends Module{
 
 
     public ServerControl(String[] args){
-        Settings.defaultList(
+        Core.settings.defaults(
             "shufflemode", "normal",
             "bans", "",
             "admins", "",
@@ -90,24 +89,23 @@ public class ServerControl extends Module{
                 String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", args);
                 System.out.println(result);
 
-                if(Settings.getBool("logging")){
+                if(Core.settings.getBool("logging")){
                     logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", false, args));
                 }
             }
         });
 
-        Timers.setDeltaProvider(() -> Gdx.graphics.getDeltaTime() * 60f);
+        Time.setDeltaProvider(() -> Core.graphics.getDeltaTime() * 60f);
         Effects.setScreenShakeProvider((a, b) -> {});
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
-        Sounds.setHeadless(true);
 
         registerCommands();
 
-        Gdx.app.postRunnable(() -> {
+        Core.app.post(() -> {
             String[] commands = {};
 
             if(args.length > 0){
-                commands = String.join(" ", args).split(",");
+                commands = Strings.join(" ", args).split(",");
                 info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
             }
 
@@ -136,8 +134,8 @@ public class ServerControl extends Module{
             world.sectors.save();
             gameOvers = 0;
             inExtraRound = true;
-            Settings.putInt("sector_x", world.getSector().x + 1);
-            Settings.save();
+            Core.settings.put("sector_x", world.getSector().x + 1);
+            Core.settings.save();
 
             Call.onInfoMessage("[accent]Sector conquered![]\n" + roundExtraTime + " seconds until deployment in next sector.");
 
@@ -148,7 +146,7 @@ public class ServerControl extends Module{
             if(inExtraRound) return;
             info("Game over!");
 
-            if(Settings.getBool("shuffle")){
+            if(Core.settings.getBool("shuffle")){
                 if(world.getSector() == null){
                     if(world.maps.all().size > 0){
                         Array<Map> maps = world.maps.customMaps().size == 0 ? world.maps.defaultMaps() : world.maps.customMaps();
@@ -174,13 +172,13 @@ public class ServerControl extends Module{
                 }else{
                     Call.onInfoMessage("[SCARLET]Sector has been lost.[]\nRe-deploying in " + roundExtraTime + " seconds.");
                     if(gameOvers >= 2){
-                        Settings.putInt("sector_y", Settings.getInt("sector_y") < 0 ? Settings.getInt("sector_y") + 1 : Settings.getInt("sector_y") - 1);
-                        Settings.save();
+                        Core.settings.put("sector_y", Core.settings.getInt("sector_y") < 0 ? Core.settings.getInt("sector_y") + 1 : Core.settings.getInt("sector_y") - 1);
+                        Core.settings.save();
                         gameOvers = 0;
                     }
                     gameOvers ++;
                     playSectorMap();
-                    info("Re-trying sector map: {0} {1}",  Settings.getInt("sector_x"), Settings.getInt("sector_y"));
+                    info("Re-trying sector map: {0} {1}",  Core.settings.getInt("sector_x"), Core.settings.getInt("sector_y"));
                 }
             }else{
                 netServer.kickAll(KickReason.gameover);
@@ -209,7 +207,7 @@ public class ServerControl extends Module{
         handler.register("exit", "Exit the server application.", arg -> {
             info("Shutting down server.");
             Net.dispose();
-            Gdx.app.exit();
+            Core.app.exit();
         });
 
         handler.register("stop", "Stop hosting the server.", arg -> {
@@ -261,7 +259,7 @@ public class ServerControl extends Module{
                 logic.play();
 
             }else{
-                info("&fiNo map specified. Loading sector {0}, {1}.", Settings.getInt("sector_x"), Settings.getInt("sector_y"));
+                info("&fiNo map specified. Loading sector {0}, {1}.", Core.settings.getInt("sector_x"), Core.settings.getInt("sector_y"));
                 playSectorMap(false);
             }
 
@@ -272,7 +270,7 @@ public class ServerControl extends Module{
 
         handler.register("port", "[port]", "Sets or displays the port for hosting the server.", arg -> {
             if(arg.length == 0){
-                info("&lyPort: &lc{0}", Settings.getInt("port"));
+                info("&lyPort: &lc{0}", Core.settings.getInt("port"));
             }else{
                 int port = Strings.parseInt(arg[0]);
                 if(port < 0 || port > 65535){
@@ -280,8 +278,8 @@ public class ServerControl extends Module{
                     return;
                 }
                 info("&lyPort set to {0}.", port);
-                Settings.putInt("port", port);
-                Settings.save();
+                Core.settings.put("port", port);
+                Core.settings.save();
             }
         });
 
@@ -305,8 +303,8 @@ public class ServerControl extends Module{
                     info("&ly  {0} seconds until next wave.", (int) (state.wavetime / 60));
                 }
 
-                info("  &ly{0} FPS.", (int) (60f / Timers.delta()));
-                info("  &ly{0} MB used.", Gdx.app.getJavaHeap() / 1024 / 1024);
+                info("  &ly{0} FPS.", (int) (60f / Time.delta()));
+                info("  &ly{0} MB used.", Core.app.getJavaHeap() / 1024 / 1024);
 
                 if(playerGroup.size() > 0){
                     info("  &lyPlayers: {0}", playerGroup.size());
@@ -341,9 +339,9 @@ public class ServerControl extends Module{
 
         handler.register("setsector", "<x> <y>", "Sets the next sector to be played. Does not affect current game.", arg -> {
             try{
-                Settings.putInt("sector_x", Integer.parseInt(arg[0]));
-                Settings.putInt("sector_y", Integer.parseInt(arg[1]));
-                Settings.save();
+                Core.settings.put("sector_x", Integer.parseInt(arg[0]));
+                Core.settings.put("sector_y", Integer.parseInt(arg[1]));
+                Core.settings.save();
                 info("Sector position set.");
             }catch(NumberFormatException e){
                 err("Invalid coordinates.");
@@ -378,15 +376,15 @@ public class ServerControl extends Module{
 
         handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
             boolean value = arg[0].equalsIgnoreCase("on");
-            Settings.putBool("crashreport", value);
-            Settings.save();
+            Core.settings.put("crashreport", value);
+            Core.settings.save();
             info("Crash reporting is now {0}.", value ? "on" : "off");
         });
 
         handler.register("logging", "<on/off>", "Disables or enables server logs", arg -> {
             boolean value = arg[0].equalsIgnoreCase("on");
-            Settings.putBool("logging", value);
-            Settings.save();
+            Core.settings.put("logging", value);
+            Core.settings.save();
             info("Logging is now {0}.", value ? "on" : "off");
         });
 
@@ -419,8 +417,8 @@ public class ServerControl extends Module{
                 err("Invalid shuffle mode.");
                 return;
             }
-            Settings.putBool("shuffle", arg[0].equals("on"));
-            Settings.save();
+            Core.settings.put("shuffle", arg[0].equals("on"));
+            Core.settings.save();
             info("Shuffle mode set to '{0}'.", arg[0]);
         });
 
@@ -585,7 +583,7 @@ public class ServerControl extends Module{
                 return;
             }
 
-            threads.run(() -> {
+            Core.app.post(() -> {
                 SaveIO.loadFromSlot(slot);
                 info("Save loaded.");
                 host();
@@ -602,7 +600,7 @@ public class ServerControl extends Module{
                 return;
             }
 
-            threads.run(() -> {
+            Core.app.post(() -> {
                 int slot = Strings.parseInt(arg[0]);
                 SaveIO.saveToSlot(slot);
                 info("Saved to slot {0}.", slot);
@@ -675,7 +673,7 @@ public class ServerControl extends Module{
         while(scan.hasNext()){
             String line = scan.nextLine();
 
-            Gdx.app.postRunnable(() -> {
+            Core.app.post(() -> {
                 Response response = handler.handleMessage(line);
 
                 if(response.type == ResponseType.unknownCommand){
@@ -712,7 +710,7 @@ public class ServerControl extends Module{
     }
 
     private void playSectorMap(boolean wait){
-        int x = Settings.getInt("sector_x"), y = Settings.getInt("sector_y");
+        int x = Core.settings.getInt("sector_x"), y = Core.settings.getInt("sector_y");
         if(world.sectors.get(x, y) == null){
             world.sectors.createSector(x, y);
         }
@@ -758,8 +756,8 @@ public class ServerControl extends Module{
 
     private void host(){
         try{
-            Net.host(Settings.getInt("port"));
-            info("&lcOpened a server on port {0}.", Settings.getInt("port"));
+            Net.host(Core.settings.getInt("port"));
+            info("&lcOpened a server on port {0}.", Core.settings.getInt("port"));
         }catch(IOException e){
             err(e);
             state.set(State.menu);

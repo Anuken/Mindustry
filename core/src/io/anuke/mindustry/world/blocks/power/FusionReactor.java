@@ -1,16 +1,17 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Blending;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
 
 public class FusionReactor extends PowerGenerator{
     protected int plasmas = 4;
@@ -46,9 +47,9 @@ public class FusionReactor extends PowerGenerator{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.01f);
         }
 
-        float powerAdded = Math.min(powerCapacity - entity.power.amount, maxPowerProduced * Mathf.pow(entity.warmup, 4f) * Timers.delta());
+        float powerAdded = Math.min(powerCapacity - entity.power.amount, maxPowerProduced * Mathf.pow(entity.warmup, 4f) * Time.delta());
         entity.power.amount += powerAdded;
-        entity.totalProgress += entity.warmup * Timers.delta();
+        entity.totalProgress += entity.warmup * Time.delta();
 
         tile.entity.power.graph.update();
     }
@@ -78,19 +79,17 @@ public class FusionReactor extends PowerGenerator{
 
         Draw.rect(name + "-bottom", tile.drawx(), tile.drawy());
 
-        Graphics.setAdditiveBlending();
-
         for(int i = 0; i < plasmas; i++){
-            float r = 29f + Mathf.absin(Timers.time(), 2f + i * 1f, 5f - i * 0.5f);
+            float r = 29f + Mathf.absin(Time.time(), 2f + i * 1f, 5f - i * 0.5f);
 
             Draw.color(plasma1, plasma2, (float) i / plasmas);
-            Draw.alpha((0.3f + Mathf.absin(Timers.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * entity.warmup);
-            Draw.rect(name + "-plasma-" + i, tile.drawx(), tile.drawy(), r, r, Timers.time() * (12 + i * 6f) * entity.warmup);
+            Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * entity.warmup);
+            Draw.blend(Blending.additive);
+            Draw.rect(name + "-plasma-" + i, tile.drawx(), tile.drawy(), r, r, Time.time() * (12 + i * 6f) * entity.warmup);
+            Draw.blend();
         }
 
         Draw.color();
-
-        Graphics.setNormalBlending();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
 
@@ -104,7 +103,7 @@ public class FusionReactor extends PowerGenerator{
 
     @Override
     public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Draw.region(name + "-bottom"), Draw.region(name), Draw.region(name + "-top")};
+        return new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name), Core.atlas.find(name + "-top")};
     }
 
     @Override

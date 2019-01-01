@@ -1,8 +1,14 @@
 package io.anuke.mindustry.type;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
@@ -11,13 +17,6 @@ import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
 
 public class Weapon extends Content{
     public final String name;
@@ -49,7 +48,7 @@ public class Weapon extends Content{
     /**whether to shoot the weapons in different arms one after another, rather than all at once*/
     protected boolean roundrobin = false;
     /**translator for vector calulations*/
-    protected Translator tr = new Translator();
+    protected Vector2 tr = new Vector2();
 
     public TextureRegion equipRegion, region;
 
@@ -101,8 +100,8 @@ public class Weapon extends Content{
 
     @Override
     public void load(){
-        equipRegion = Draw.region(name + "-equip");
-        region = Draw.region(name);
+        equipRegion = Core.atlas.find(name + "-equip");
+        region = Core.atlas.find(name);
     }
 
     @Override

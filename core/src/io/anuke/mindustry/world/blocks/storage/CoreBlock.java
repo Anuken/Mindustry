@@ -1,8 +1,15 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.content.fx.Fx;
@@ -19,16 +26,8 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.maps.TutorialSector;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -118,25 +117,18 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public void setBars(){
-        super.setBars();
-
-        bars.remove(BarType.inventory);
-    }
-
-    @Override
     public void load(){
         super.load();
 
-        openRegion = Draw.region(name + "-open");
-        topRegion = Draw.region(name + "-top");
+        openRegion = Core.atlas.find(name + "-open");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
     public void draw(Tile tile){
         CoreEntity entity = tile.entity();
 
-        Draw.rect(entity.solid ? Draw.region(name) : openRegion, tile.drawx(), tile.drawy());
+        Draw.rect(entity.solid ? Core.atlas.find(name) : openRegion, tile.drawx(), tile.drawy());
 
         Draw.alpha(entity.heat);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
@@ -152,10 +144,9 @@ public class CoreBlock extends StorageBlock{
             Shaders.build.color.set(Palette.accent);
             Shaders.build.time = -entity.time / 10f;
 
-            Graphics.shader(Shaders.build, false);
-            Shaders.build.apply();
+            Draw.shader(Shaders.build, true);
             Draw.rect(region, tile.drawx(), tile.drawy());
-            Graphics.shader();
+            Draw.shader();
 
             Draw.color(Palette.accent);
 
@@ -202,7 +193,7 @@ public class CoreBlock extends StorageBlock{
                 Call.onUnitRespawn(tile, entity.currentUnit);
             }
         }else if(!netServer.isWaitingForPlayers()){
-            entity.warmup += Timers.delta();
+            entity.warmup += Time.delta();
 
             if(entity.solid && entity.warmup > 60f && unitGroups[tile.getTeamID()].getByID(entity.droneID) == null && !Net.client()){
 

@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -10,16 +11,15 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.SelectionTrait;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.threads;
 
 public class Sorter extends Block implements SelectionTrait{
     private static Item lastItem;
@@ -40,7 +40,7 @@ public class Sorter extends Block implements SelectionTrait{
 
     @Override
     public void playerPlaced(Tile tile){
-        threads.runDelay(() -> Call.setSorterItem(null, tile, lastItem));
+        Core.app.post(() -> Call.setSorterItem(null, tile, lastItem));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)

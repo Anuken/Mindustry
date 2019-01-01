@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.arc.Core;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Sector;
-import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -28,7 +28,7 @@ public class RestartDialog extends FloatingDialog{
         buttons().margin(10);
 
         if(state.mode.isPvp){
-            content().add(Bundles.format("text.gameover.pvp",winner.localized())).pad(6);
+            content().add(Core.bundle.format("text.gameover.pvp",winner.localized())).pad(6);
             buttons().addButton("$text.menu", () -> {
                 hide();
                 state.set(State.menu);
@@ -39,7 +39,7 @@ public class RestartDialog extends FloatingDialog{
                 content().add("$text.highscore").pad(6);
                 content().row();
             }
-            content().add(Bundles.format("text.wave.lasted", state.wave)).pad(12);
+            content().add(Core.bundle.format("text.wave.lasted", state.wave)).pad(12);
 
             buttons().addButton("$text.menu", () -> {
                 hide();

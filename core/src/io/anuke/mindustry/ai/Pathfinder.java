@@ -1,9 +1,12 @@
 package io.anuke.mindustry.ai;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.Queue;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.collection.Queue;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -11,16 +14,12 @@ import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Structs;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 public class Pathfinder{
-    private long maxUpdate = TimeUtils.millisToNanos(4);
+    private long maxUpdate = Time.millisToNanos(4);
     private PathData[] paths;
     private IntArray blocked = new IntArray();
 
@@ -63,7 +62,7 @@ public class Pathfinder{
 
         Tile target = null;
         float tl = 0f;
-        for(GridPoint2 point : Geometry.d8){
+        for(Point2 point : Geometry.d8){
             int dx = tile.x + point.x, dy = tile.y + point.y;
 
             Tile other = world.tile(dx, dy);
@@ -105,7 +104,7 @@ public class Pathfinder{
             //increment search, clear frontier
             path.search++;
             path.frontier.clear();
-            path.lastSearchTime = TimeUtils.millis();
+            path.lastSearchTime = Time.millis();
 
             //add all targets to the frontier
             for(Tile other : world.indexer.getEnemy(team, BlockFlag.target)){
@@ -144,14 +143,14 @@ public class Pathfinder{
     private void updateFrontier(Team team, long nsToRun){
         PathData path = paths[team.ordinal()];
 
-        long start = TimeUtils.nanoTime();
+        long start = Time.nanoTime();
 
-        while(path.frontier.size > 0 && (nsToRun < 0 || TimeUtils.timeSinceNanos(start) <= nsToRun)){
+        while(path.frontier.size > 0 && (nsToRun < 0 || Time.timeSinceNanos(start) <= nsToRun)){
             Tile tile = path.frontier.removeLast();
             float cost = path.weights[tile.x][tile.y];
 
             if(cost < Float.MAX_VALUE){
-                for(GridPoint2 point : Geometry.d4){
+                for(Point2 point : Geometry.d4){
 
                     int dx = tile.x + point.x, dy = tile.y + point.y;
                     Tile other = world.tile(dx, dy);
@@ -168,7 +167,7 @@ public class Pathfinder{
     }
 
     private void clear(){
-        Timers.mark();
+        Time.mark();
 
         paths = new PathData[Team.all.length];
         blocked.clear();

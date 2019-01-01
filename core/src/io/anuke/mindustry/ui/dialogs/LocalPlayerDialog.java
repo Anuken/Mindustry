@@ -1,11 +1,11 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.utils.Scaling;
+import io.anuke.arc.Core;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.layout.Stack;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.layout.Stack;
-import io.anuke.ucore.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.players;
@@ -39,7 +39,7 @@ public class LocalPlayerDialog extends FloatingDialog{
 
             stack.add(new Image("button"));
 
-            Image img = new Image(Draw.region("icon-chat"));
+            Image img = new Image(Core.atlas.find("icon-chat"));
             img.setScaling(Scaling.fill);
 
             stack.add(img);

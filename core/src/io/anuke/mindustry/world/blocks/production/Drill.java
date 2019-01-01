@@ -1,9 +1,16 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectIntMap;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectIntMap;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.graphics.Blending;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.entities.TileEntity;
@@ -16,14 +23,9 @@ import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
+
 public class Drill extends Block{
     protected final static float hardnessDrillMultiplier = 50f;
     protected final int timerDump = timers++;
@@ -78,9 +80,9 @@ public class Drill extends Block{
     @Override
     public void load(){
         super.load();
-        rimRegion = Draw.region(name + "-rim");
-        rotatorRegion = Draw.region(name + "-rotator");
-        topRegion = Draw.region(name + "-top");
+        rimRegion = Core.atlas.find(name + "-rim");
+        rotatorRegion = Core.atlas.find(name + "-rotator");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
@@ -93,12 +95,12 @@ public class Drill extends Block{
         Draw.rect(region, tile.drawx(), tile.drawy());
 
         if(drawRim){
-            Graphics.setAdditiveBlending();
             Draw.color(heatColor);
-            Draw.alpha(entity.warmup * ts * (1f - s + Mathf.absin(Timers.time(), 3f, s)));
+            Draw.alpha(entity.warmup * ts * (1f - s + Mathf.absin(Time.time(), 3f, s)));
+            Draw.blend(Blending.additive);
             Draw.rect(rimRegion, tile.drawx(), tile.drawy());
+            Draw.blend();
             Draw.color();
-            Graphics.setNormalBlending();
         }
 
         Draw.rect(rotatorRegion, tile.drawx(), tile.drawy(), entity.drillTime * rotateSpeed);
@@ -114,7 +116,7 @@ public class Drill extends Block{
 
     @Override
     public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-rotator"), Draw.region(name + "-top")};
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
     }
 
     @Override
@@ -125,7 +127,7 @@ public class Drill extends Block{
             Array<Item> list = new Array<>();
 
             for(Item item : content.items()){
-                if(tier >= item.hardness && Draw.hasRegion(item.name + "1")){
+                if(tier >= item.hardness && Core.atlas.has(item.name + "1")){
                     list.add(item);
                 }
             }
@@ -193,7 +195,7 @@ public class Drill extends Block{
             entity.progress += entity.delta()
             * entity.dominantItems * speed * entity.warmup;
 
-            if(Mathf.chance(Timers.delta() * updateEffectChance * entity.warmup))
+            if(Mathf.chance(Time.delta() * updateEffectChance * entity.warmup))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, warmupSpeed);

@@ -1,8 +1,8 @@
 package io.anuke.mindustry.maps.missions;
 
-import com.badlogic.gdx.math.Bresenham2;
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.math.geom.Bresenham2;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.mindustry.world.Block;
 
 public class LineBlockMission extends Mission{
@@ -10,8 +10,8 @@ public class LineBlockMission extends Mission{
     private int completeIndex;
 
     public LineBlockMission(Block block, int x1, int y1, int x2, int y2, int rotation){
-        Array<GridPoint2> points = new Bresenham2().line(x1, y1, x2, y2);
-        for(GridPoint2 point : points){
+        Array<Point2> points = new Bresenham2().line(x1, y1, x2, y2);
+        for(Point2 point : points){
             this.points.add(new BlockLocMission(block, point.x, point.y, rotation));
         }
     }

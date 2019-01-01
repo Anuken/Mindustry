@@ -1,16 +1,15 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.OS;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.io.Changelogs;
 import io.anuke.mindustry.io.Changelogs.VersionInfo;
-import io.anuke.mindustry.game.Version;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.OS;
 
 import static io.anuke.mindustry.Vars.ios;
 
@@ -28,10 +27,10 @@ public class ChangelogDialog extends FloatingDialog{
         if(!ios && !OS.isMac){
             Changelogs.getChangelog(result -> {
                 versions = result;
-                Gdx.app.postRunnable(this::setup);
+                Core.app.post(this::setup);
             }, t -> {
                 Log.err(t);
-                Gdx.app.postRunnable(this::setup);
+                Core.app.post(this::setup);
             });
         }
     }
@@ -77,10 +76,10 @@ public class ChangelogDialog extends FloatingDialog{
                 table.add(in).width(vw).pad(8).row();
             }
 
-            int lastid = Settings.getInt("lastBuild");
+            int lastid = Core.settings.getInt("lastBuild");
             if(lastid != 0 && versions.peek().build > lastid){
-                Settings.putInt("lastBuild", versions.peek().build);
-                Settings.save();
+                Core.settings.put("lastBuild", versions.peek().build);
+                Core.settings.save();
                 show();
             }
         }

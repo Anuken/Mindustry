@@ -1,13 +1,11 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.type.AmmoEntry;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 
@@ -89,12 +87,6 @@ public class ItemTurret extends CooledTurret{
         TurretEntity entity = tile.entity();
 
         return ammoMap != null && ammoMap.get(item) != null && entity.totalAmmo + ammoMap.get(item).quantityMultiplier <= maxAmmo;
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-        bars.replace(new BlockBar(BarType.inventory, true, tile -> (float) tile.<TurretEntity>entity().totalAmmo / maxAmmo));
     }
 
     @Override

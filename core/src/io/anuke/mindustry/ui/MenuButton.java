@@ -1,8 +1,8 @@
 package io.anuke.mindustry.ui;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Align;
-import io.anuke.ucore.scene.ui.TextButton;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.scene.ui.TextButton;
 
 public class MenuButton extends TextButton{
 

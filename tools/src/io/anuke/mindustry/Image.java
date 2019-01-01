@@ -1,38 +1,37 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.ucore.util.Structs;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.util.Structs;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.awt.Graphics2D;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class Image {
     private static ArrayList<Image> toDispose = new ArrayList<>();
 
-    private BufferedImage atlas;
-
     private BufferedImage image;
     private Graphics2D graphics;
     private Color color = new Color();
 
-    public Image(BufferedImage atlas, TextureRegion region){
-        this(atlas, region.getRegionWidth(), region.getRegionHeight());
-
-        draw(region);
+    public Image(TextureRegion region){
+        this(ImageContext.buf(region));
     }
 
-    public Image(BufferedImage atlas, int width, int height){
-        this.atlas = atlas;
-
-        this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    public Image(BufferedImage src){
+        this.image = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
         this.graphics = image.createGraphics();
+        this.graphics.drawImage(src, 0, 0, null);
 
         toDispose.add(this);
+    }
+
+    public Image(int width, int height){
+        this(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
     }
 
     public int width(){
@@ -69,12 +68,12 @@ public class Image {
 
     /**Draws a region at the center.*/
     public void drawCenter(TextureRegion region){
-        draw(region, (width() - region.getRegionWidth())/2, (height() - region.getRegionHeight())/2, false, false);
+        draw(region, (width() - region.getWidth())/2, (height() - region.getHeight())/2, false, false);
     }
 
     /**Draws a region at the center.*/
     public void drawCenter(TextureRegion region, boolean flipx, boolean flipy){
-        draw(region, (width() - region.getRegionWidth())/2, (height() - region.getRegionHeight())/2, flipx, flipy);
+        draw(region, (width() - region.getWidth())/2, (height() - region.getHeight())/2, flipx, flipy);
     }
 
     /**Draws an image at the top left corner.*/
@@ -106,14 +105,14 @@ public class Image {
             y = 0;
         }
 
-        graphics.drawImage(atlas,
+        graphics.drawImage(ImageContext.get(region).image,
                 x, y,
-                x + region.getRegionWidth(),
-                y + region.getRegionHeight(),
-                (flipx ? region.getRegionX() + region.getRegionWidth() : region.getRegionX()) + ofx,
-                (flipy ? region.getRegionY() + region.getRegionHeight() : region.getRegionY()) + ofy,
-                (flipx ? region.getRegionX() : region.getRegionX() + region.getRegionWidth()) + ofx,
-                (flipy ? region.getRegionY() : region.getRegionY() + region.getRegionHeight()) + ofy,
+                x + region.getWidth(),
+                y + region.getHeight(),
+                (flipx ?  region.getWidth() : 0) + ofx,
+                (flipy ? region.getHeight() : 0) + ofy,
+                (flipx ? 0 : region.getWidth()) + ofx,
+                (flipy ? 0 : region.getHeight()) + ofy,
                 null);
     }
 

@@ -1,8 +1,17 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
 import io.anuke.mindustry.ai.WaveSpawner;
@@ -18,15 +27,10 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityQuery;
-import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class World extends Module{
+public class World implements ApplicationListener{
     public final Maps maps = new Maps();
     public final Sectors sectors = new Sectors();
     public final WorldGenerator generator = new WorldGenerator();
@@ -38,7 +42,7 @@ public class World extends Module{
     private Sector currentSector;
     private Tile[][] tiles;
 
-    private Array<Tile> tempTiles = new ThreadArray<>();
+    private Array<Tile> tempTiles = new Array<>();
     private boolean generating, invalidMap;
 
     public World(){
@@ -121,11 +125,11 @@ public class World extends Module{
     }
 
     public Tile tileWorld(float x, float y){
-        return tile(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize));
+        return tile(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
     public int toTile(float coord){
-        return Mathf.scl2(coord, tilesize);
+        return Math.round(coord / tilesize);
     }
 
     public Tile[][] getTiles(){
@@ -209,8 +213,8 @@ public class World extends Module{
         currentSector = sector;
         state.difficulty = sectors.getDifficulty(sector);
         state.mode = sector.currentMission().getMode();
-        Timers.mark();
-        Timers.mark();
+        Time.mark();
+        Time.mark();
 
         logic.reset();
 
@@ -247,7 +251,7 @@ public class World extends Module{
             Log.err(e);
             if(!headless){
                 ui.showError("$text.map.invalid");
-                threads.runDelay(() -> state.set(State.menu));
+                Core.app.post(() -> state.set(State.menu));
                 invalidMap = true;
             }
             generating = false;
@@ -277,13 +281,13 @@ public class World extends Module{
             invalidMap = false;
         }
 
-        if(invalidMap) threads.runDelay(() -> state.set(State.menu));
+        if(invalidMap) Core.app.post(() -> state.set(State.menu));
 
     }
 
     public void notifyChanged(Tile tile){
         if(!generating){
-            threads.runDelay(() -> Events.fire(new TileChangeEvent(tile)));
+            Core.app.post(() -> Events.fire(new TileChangeEvent(tile)));
         }
     }
 
@@ -334,9 +338,9 @@ public class World extends Module{
     /**
      * Raycast, but with world coordinates.
      */
-    public GridPoint2 raycastWorld(float x, float y, float x2, float y2){
-        return raycast(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize),
-                Mathf.scl2(x2, tilesize), Mathf.scl2(y2, tilesize));
+    public Point2 raycastWorld(float x, float y, float x2, float y2){
+        return raycast(Math.round(x / tilesize), Math.round(y / tilesize),
+                Math.round(x2 / tilesize), Math.round(y2 / tilesize));
     }
 
     /**
@@ -344,7 +348,7 @@ public class World extends Module{
      *
      * @return null if no collisions found, block position otherwise.
      */
-    public GridPoint2 raycast(int x0f, int y0f, int x1, int y1){
+    public Point2 raycast(int x0f, int y0f, int x1, int y1){
         int x0 = x0f;
         int y0 = y0f;
         int dx = Math.abs(x1 - x0);

@@ -1,13 +1,13 @@
 package io.anuke.mindustry.world.blocks;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.type.Item;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.function.Supplier;
-import io.anuke.ucore.scene.style.TextureRegionDrawable;
-import io.anuke.ucore.scene.ui.ButtonGroup;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Supplier;
+import io.anuke.arc.scene.style.TextureRegionDrawable;
+import io.anuke.arc.scene.ui.ButtonGroup;
+import io.anuke.arc.scene.ui.ImageButton;
+import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.control;

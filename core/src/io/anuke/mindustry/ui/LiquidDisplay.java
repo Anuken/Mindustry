@@ -1,8 +1,8 @@
 package io.anuke.mindustry.ui;
 
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.layout.Table;
 
 /**An ItemDisplay, but for liquids.*/
 public class LiquidDisplay extends Table{

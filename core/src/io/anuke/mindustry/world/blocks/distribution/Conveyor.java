@@ -1,8 +1,16 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.LongArray;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.LongArray;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.graphics.Layer;
@@ -12,9 +20,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -23,14 +28,14 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Conveyor extends Block{
-    private static final float itemSpace = 0.135f * 2.2f;
+    private static final float itemSpace = 0.135f * 2.5f;
     private static final float offsetScl = 128f * 3f;
     private static final float minmove = 1f / (Short.MAX_VALUE - 2);
     private static ItemPos drawpos = new ItemPos();
     private static ItemPos pos1 = new ItemPos();
     private static ItemPos pos2 = new ItemPos();
-    private final Translator tr1 = new Translator();
-    private final Translator tr2 = new Translator();
+    private final Vector2 tr1 = new Vector2();
+    private final Vector2 tr2 = new Vector2();
 
     private TextureRegion[][] regions = new TextureRegion[7][4];
 
@@ -54,9 +59,6 @@ public class Conveyor extends Block{
     }
 
     @Override
-    public void setBars(){}
-
-    @Override
     public void setStats(){
         super.setStats();
         stats.add(BlockStat.itemSpeed, speed * 60, StatUnit.pixelsSecond);
@@ -68,25 +70,8 @@ public class Conveyor extends Block{
 
         for(int i = 0; i < regions.length; i++){
             for(int j = 0; j < 4; j++){
-                regions[i][j] = Draw.region(name + "-" + i + "-" + j);
+                regions[i][j] = Core.atlas.find(name + "-" + i + "-" + j);
             }
-        }
-    }
-
-    @Override
-    public void drawShadow(Tile tile){
-        //fixes build block crash
-        if(!(tile.entity instanceof ConveyorEntity)){
-            super.drawShadow(tile);
-            return;
-        }
-
-        ConveyorEntity entity = tile.entity();
-
-        if(entity.blendshadowrot == -1){
-            super.drawShadow(tile);
-        }else{
-            Draw.rect("shadow-corner", tile.drawx(), tile.drawy(), (tile.getRotation() + 3 + entity.blendshadowrot) * 90);
         }
     }
 
@@ -95,9 +80,9 @@ public class Conveyor extends Block{
         ConveyorEntity entity = tile.entity();
         byte rotation = tile.getRotation();
 
-        int frame = entity.clogHeat <= 0.5f ? (int) (((Timers.time() * speed * 8f * entity.timeScale)) % 4) : 0;
+        int frame = entity.clogHeat <= 0.5f ? (int) (((Time.time() * speed * 8f * entity.timeScale)) % 4) : 0;
         Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], tile.drawx(), tile.drawy(),
-            tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation*90);
+            tilesize * entity.blendsclx, tilesize * entity.blendscly,  rotation*90);
     }
 
     @Override
@@ -139,7 +124,7 @@ public class Conveyor extends Block{
     @Override
     public TextureRegion[] getIcon(){
         if(icon == null){
-            icon = new TextureRegion[]{Draw.region(name + "-0-0")};
+            icon = new TextureRegion[]{Core.atlas.find(name + "-0-0")};
         }
         return super.getIcon();
     }
@@ -161,8 +146,8 @@ public class Conveyor extends Block{
                 tr2.trns(rotation * 90, -tilesize / 2f, pos.x * tilesize / 2f);
 
                 Draw.rect(pos.item.region,
-                        (int) (tile.x * tilesize + tr1.x * pos.y + tr2.x),
-                        (int) (tile.y * tilesize + tr1.y * pos.y + tr2.y), itemSize, itemSize);
+                        (tile.x * tilesize + tr1.x * pos.y + tr2.x),
+                        (tile.y * tilesize + tr1.y * pos.y + tr2.y), itemSize, itemSize);
             }
 
         }catch(IndexOutOfBoundsException e){
@@ -219,7 +204,7 @@ public class Conveyor extends Block{
 
             if(maxmove > minmove){
                 pos.y += maxmove;
-                if(Mathf.in(pos.x, 0, 0.1f)){
+                if(Mathf.isEqual(pos.x, 0, 0.1f)){
                     pos.x = 0f;
                 }
                 pos.x = Mathf.lerpDelta(pos.x, 0, 0.1f);
@@ -294,7 +279,7 @@ public class Conveyor extends Block{
     }
 
     @Override
-    public void getStackOffset(Item item, Tile tile, Translator trns){
+    public void getStackOffset(Item item, Tile tile, Vector2 trns){
         trns.trns(tile.getRotation() * 90 + 180f, tilesize / 2f);
     }
 
@@ -425,11 +410,11 @@ public class Conveyor extends Block{
             shorts[1] = (short) (x * Short.MAX_VALUE);
             shorts[2] = (short) ((y - 1f) * Short.MAX_VALUE);
             shorts[3] = seed;
-            return Bits.packLong(shorts);
+            return Pack.longShorts(shorts);
         }
 
         static int toInt(long value){
-            short[] values = Bits.getShorts(value, writeShort);
+            short[] values = Pack.shorts(value, writeShort);
 
             short itemid = values[0];
             float x = values[1] / (float) Short.MAX_VALUE;
@@ -442,11 +427,11 @@ public class Conveyor extends Block{
             bytes[2] = (byte) (y * 255 - 128);
             bytes[3] = seed;
 
-            return Bits.packInt(bytes);
+            return Pack.intBytes(bytes);
         }
 
         static long toLong(int value){
-            byte[] values = Bits.getBytes(value, writeByte);
+            byte[] values = Pack.bytes(value, writeByte);
 
             byte itemid = values[0];
             float x = values[1] / 127f;
@@ -458,11 +443,11 @@ public class Conveyor extends Block{
             shorts[1] = (short) (x * Short.MAX_VALUE);
             shorts[2] = (short) ((y - 1f) * Short.MAX_VALUE);
             shorts[3] = seed;
-            return Bits.packLong(shorts);
+            return Pack.longShorts(shorts);
         }
 
         ItemPos set(long lvalue, short[] values){
-            Bits.getShorts(lvalue, values);
+            Pack.shorts(lvalue, values);
 
             if(values[0] >= content.items().size || values[0] < 0)
                 item = null;

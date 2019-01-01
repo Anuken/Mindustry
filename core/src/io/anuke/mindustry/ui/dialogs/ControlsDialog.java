@@ -1,15 +1,16 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.utils.Align;
+import io.anuke.arc.Core;
+import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.KeybindDialog;
+import io.anuke.arc.util.Align;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.KeybindDialog;
 
 public class ControlsDialog extends KeybindDialog{
 
     public ControlsDialog(){
-        setDialog();
+        setStyle(Core.scene.skin.get("dialog", WindowStyle.class));
 
         setFillParent(true);
         title().setAlignment(Align.center);
@@ -23,7 +24,7 @@ public class ControlsDialog extends KeybindDialog{
         buttons().addImageTextButton("$text.back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 
         keyDown(key -> {
-            if(key == Keys.ESCAPE || key == Keys.BACK)
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK)
                 hide();
         });
     }

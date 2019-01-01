@@ -13,8 +13,9 @@ logs/
 /desktop/gifexport/
 /core/lib/
 /core/assets-raw/sprites/generated/
+/core/assets-raw/sprites_out/
 /annotations/build/
-/kryonet/build/
+/net/build/
 /tools/build/
 /tests/build/
 /server/build/

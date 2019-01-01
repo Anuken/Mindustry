@@ -1,23 +1,23 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.async.AsyncExecutor;
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics.Cursor.SystemCursor;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.GridMap;
+import io.anuke.arc.graphics.Pixmap;
+import io.anuke.arc.graphics.Pixmap.Format;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.event.InputEvent;
+import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.util.async.AsyncExecutor;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.ColorMapper;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.event.InputEvent;
-import io.anuke.ucore.scene.event.InputListener;
-import io.anuke.ucore.scene.utils.Cursors;
-import io.anuke.ucore.util.GridMap;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.sectorSize;
 import static io.anuke.mindustry.Vars.world;
@@ -37,13 +37,13 @@ public class GenViewDialog extends FloatingDialog{
         float panX, panY;
         float lastX, lastY;
         int viewsize = 3;
-        AsyncExecutor async = new AsyncExecutor(Mathf.sqr(viewsize*2));
+        AsyncExecutor async = new AsyncExecutor(viewsize*2 * viewsize*2);
 
         {
             addListener(new InputListener(){
                 @Override
-                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
-                    Cursors.setHand();
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                    Core.graphics.cursor(SystemCursor.hand);
                     lastX = x;
                     lastY = y;
                     return true;
@@ -59,8 +59,8 @@ public class GenViewDialog extends FloatingDialog{
                 }
 
                 @Override
-                public void touchUp(InputEvent event, float x, float y, int pointer, int button){
-                    Cursors.restoreCursor();
+                public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
+                    Core.graphics.restoreCursor();
                 }
             });
         }
@@ -89,7 +89,7 @@ public class GenViewDialog extends FloatingDialog{
                                     pixmap.drawPixel(i, sectorSize - 1 - j, ColorMapper.colorFor(result.floor, result.wall, Team.none, result.elevation, (byte)0));
                                 }
                             }
-                            Gdx.app.postRunnable(() -> map.put(wx, wy, new Texture(pixmap)));
+                            Core.app.post(() -> map.put(wx, wy, new Texture(pixmap)));
                             return pixmap;
                         });
 
@@ -99,7 +99,7 @@ public class GenViewDialog extends FloatingDialog{
                     float drawX = x + width/2f+ wx * padSectorSize - tx * padSectorSize - panX % padSectorSize;
                     float drawY = y + height/2f + wy * padSectorSize - ty * padSectorSize - panY % padSectorSize;
 
-                    Draw.rect(map.get(wx, wy), drawX, drawY, padSectorSize, padSectorSize);
+                    Draw.rect(Draw.wrap(map.get(wx, wy)), drawX + padSectorSize/2f, drawY + padSectorSize/2f, padSectorSize, padSectorSize);
                 }
             }
         }

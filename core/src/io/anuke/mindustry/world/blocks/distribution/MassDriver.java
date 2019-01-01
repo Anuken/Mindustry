@@ -1,11 +1,20 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.Pool.Poolable;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.pooling.Pool.Poolable;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
@@ -21,14 +30,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Pooling;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -62,9 +63,7 @@ public class MassDriver extends Block{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void linkMassDriver(Player player, Tile tile, int position){
         MassDriverEntity entity = tile.entity();
-
-        //called in main thread to prevent issues
-        threads.run(() -> entity.link = position);
+        entity.link = position;
     }
 
     @Remote(called = Loc.server)
@@ -80,7 +79,7 @@ public class MassDriver extends Block{
         entity.reload = 1f;
         entity.power.amount = 0f;
 
-        DriverBulletData data = Pooling.obtain(DriverBulletData.class, DriverBulletData::new);
+        DriverBulletData data = Pools.obtain(DriverBulletData.class, DriverBulletData::new);
         data.from = entity;
         data.to = other;
         int totalUsed = 0;
@@ -119,7 +118,7 @@ public class MassDriver extends Block{
     public void load(){
         super.load();
 
-        turretRegion = Draw.region(name + "-turret");
+        turretRegion = Core.atlas.find(name + "-turret");
     }
 
     @Override
@@ -176,8 +175,8 @@ public class MassDriver extends Block{
 
                 entity.rotation = Mathf.slerpDelta(entity.rotation, target, rotateSpeed);
 
-                if(Mathf.angNear(entity.rotation, target, 1f) &&
-                        Mathf.angNear(other.rotation, target + 180f, 1f)){
+                if(Angles.near(entity.rotation, target, 1f) &&
+                Angles.near(other.rotation, target + 180f, 1f)){
                     Call.onMassDriverFire(tile, link);
                 }
             }
@@ -192,13 +191,12 @@ public class MassDriver extends Block{
 
         Draw.rect(turretRegion,
                 tile.drawx() + Angles.trnsx(entity.rotation + 180f, entity.reload * knockback),
-                tile.drawy() + Angles.trnsy(entity.rotation + 180f, entity.reload * knockback),
-                entity.rotation - 90);
+                tile.drawy() + Angles.trnsy(entity.rotation + 180f, entity.reload * knockback), entity.rotation - 90);
     }
 
     @Override
     public void drawConfigure(Tile tile){
-        float sin = Mathf.absin(Timers.time(), 6f, 1f);
+        float sin = Mathf.absin(Time.time(), 6f, 1f);
 
         Draw.color(Palette.accent);
         Lines.stroke(1f);
@@ -228,7 +226,7 @@ public class MassDriver extends Block{
         if(entity.link == other.pos()){
             Call.linkMassDriver(null, tile, -1);
             return false;
-        }else if(other.block() instanceof MassDriver && other.distanceTo(tile) <= range){
+        }else if(other.block() instanceof MassDriver && other.dst(tile) <= range){
             Call.linkMassDriver(null, tile, other.pos());
             return false;
         }
@@ -259,7 +257,7 @@ public class MassDriver extends Block{
         if(entity == null || entity.link == -1) return false;
         Tile link = world.tile(entity.link);
 
-        return link != null && link.block() instanceof MassDriver && tile.distanceTo(link) <= range;
+        return link != null && link.block() instanceof MassDriver && tile.dst(link) <= range;
     }
 
     public static class DriverBulletData implements Poolable{

@@ -1,29 +1,28 @@
 package io.anuke.mindustry.world.blocks.defense;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.entities.impl.BaseEntity;
+import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.arc.graphics.Blending;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.AbsorbTrait;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.mindustry.world.meta.BlockBar;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityQuery;
-import io.anuke.ucore.entities.impl.BaseEntity;
-import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -60,7 +59,7 @@ public class ForceProjector extends Block {
     @Override
     public void load(){
         super.load();
-        topRegion = Draw.region(name + "-top");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
@@ -68,13 +67,6 @@ public class ForceProjector extends Block {
         super.setStats();
 
         stats.add(BlockStat.powerDamage, powerDamage, StatUnit.powerUnits);
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-
-        bars.add(new BlockBar(BarType.heat, true, tile -> tile.<ForceEntity>entity().buildup / breakage));
     }
 
     @Override
@@ -95,7 +87,7 @@ public class ForceProjector extends Block {
 
         entity.radscl = Mathf.lerpDelta(entity.radscl, entity.broken ? 0f : 1f, 0.05f);
 
-        if(Mathf.chance(Timers.delta() * entity.buildup / breakage * 0.1f)){
+        if(Mathf.chance(Time.delta() * entity.buildup / breakage * 0.1f)){
             Effects.effect(BlockFx.reactorsmoke, tile.drawx() + Mathf.range(tilesize/2f), tile.drawy() + Mathf.range(tilesize/2f));
         }
 
@@ -117,7 +109,7 @@ public class ForceProjector extends Block {
                 scale *= (cooldownLiquid * (1f+(entity.liquids.current().heatCapacity-0.4f)*0.9f));
             }
 
-            entity.buildup -= Timers.delta()*scale;
+            entity.buildup -= Time.delta()*scale;
         }
 
         if(entity.broken && entity.buildup <= 0 && entity.warmup >= 0.9f){
@@ -131,7 +123,7 @@ public class ForceProjector extends Block {
         }
 
         if(entity.hit > 0f){
-            entity.hit -= 1f/5f * Timers.delta();
+            entity.hit -= 1f/5f * Time.delta();
         }
 
         float realRadius = realRadius(entity);
@@ -174,11 +166,9 @@ public class ForceProjector extends Block {
 
         if(entity.buildup <= 0f) return;
         Draw.alpha(entity.buildup / breakage * 0.75f);
-
-        Graphics.setAdditiveBlending();
+        Draw.blend(Blending.additive);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
-        Graphics.setNormalBlending();
-
+        Draw.blend();
         Draw.reset();
     }
 

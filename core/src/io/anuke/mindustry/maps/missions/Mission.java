@@ -1,17 +1,18 @@
 package io.anuke.mindustry.maps.missions;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.Sector;
 import io.anuke.mindustry.maps.generation.Generation;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.headless;
+import static io.anuke.mindustry.Vars.ui;
 
 public abstract class Mission{
     private String extraMessage;
@@ -76,12 +77,12 @@ public abstract class Mission{
     }
 
     public void onBegin(){
-        Timers.runTask(60f, this::showMessage);
+        Time.runTask(60f, this::showMessage);
     }
 
     public void onComplete(){
         if(showComplete && !headless){
-            threads.runGraphics(() -> ui.hudfrag.showToast("[LIGHT_GRAY]"+menuDisplayString() + ":\n" + Bundles.get("text.mission.complete")));
+            ui.hudfrag.showToast("[LIGHT_GRAY]"+menuDisplayString() + ":\n" + Core.bundle.get("text.mission.complete"));
         }
     }
 
@@ -93,7 +94,7 @@ public abstract class Mission{
         return new Array<>();
     }
 
-    public Array<GridPoint2> getSpawnPoints(Generation gen){
+    public Array<Point2> getSpawnPoints(Generation gen){
         return Array.with();
     }
 

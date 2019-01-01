@@ -1,13 +1,13 @@
 package io.anuke.mindustry.entities.effect;
 
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.entities.Effects.EffectRenderer;
+import io.anuke.arc.entities.impl.EffectEntity;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.impl.EffectEntity;
-import io.anuke.ucore.core.Effects.EffectRenderer;
-import io.anuke.ucore.util.Mathf;
 
 /**
  * A ground effect contains an effect that is rendered on the ground layer as opposed to the top layer.
@@ -20,7 +20,7 @@ public class GroundEffectEntity extends EffectEntity{
         GroundEffect effect = (GroundEffect) this.effect;
 
         if(effect.isStatic){
-            time += Timers.delta();
+            time += Time.delta();
 
             time = Mathf.clamp(time, 0, effect.staticLife);
 

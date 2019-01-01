@@ -1,11 +1,11 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Color;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.scene.ui.Dialog;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.scene.ui.Dialog;
+import io.anuke.arc.scene.ui.ImageButton;
+import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.playerColors;
 import static io.anuke.mindustry.Vars.players;
@@ -38,7 +38,7 @@ public class ColorPickDialog extends Dialog{
         }
 
         keyDown(key -> {
-            if(key == Keys.ESCAPE || key == Keys.BACK)
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK)
                 hide();
         });
 
