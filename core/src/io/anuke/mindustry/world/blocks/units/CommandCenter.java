@@ -86,7 +86,7 @@ public class CommandCenter extends Block{
 
         for(UnitCommand cmd : UnitCommand.values()){
             buttons.addImageButton("command-" + cmd.name(), "clear-toggle", 8*3, () -> Call.onCommandCenterSet(players[0], tile, cmd))
-            .size(38f).checked(entity.command == cmd).group(group);
+            .size(38f).group(group).update(b -> b.setChecked(entity.command == cmd));
         }
         table.add(buttons);
         table.row();
