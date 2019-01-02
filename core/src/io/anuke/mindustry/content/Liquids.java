@@ -6,7 +6,7 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Liquid;
 
 public class Liquids implements ContentList{
-    public static Liquid water, lava, oil, cryofluid;
+    public static Liquid water, slag, oil, cryofluid;
 
     @Override
     public void load(){
@@ -24,34 +24,28 @@ public class Liquids implements ContentList{
             }
         };
 
-        lava = new Liquid("lava", Color.valueOf("e37341")){
-            {
-                temperature = 1f;
-                viscosity = 0.8f;
-                tier = 2;
-                effect = StatusEffects.melting;
-            }
-        };
+        slag = new Liquid("slag", Color.valueOf("e37341")){{
+            temperature = 1f;
+            viscosity = 0.8f;
+            tier = 2;
+            effect = StatusEffects.melting;
+        }};
 
-        oil = new Liquid("oil", Color.valueOf("313131")){
-            {
-                viscosity = 0.7f;
-                flammability = 0.6f;
-                explosiveness = 0.6f;
-                heatCapacity = 0.7f;
-                tier = 1;
-                effect = StatusEffects.tarred;
-            }
-        };
+        oil = new Liquid("oil", Color.valueOf("313131")){{
+            viscosity = 0.7f;
+            flammability = 0.6f;
+            explosiveness = 0.6f;
+            heatCapacity = 0.7f;
+            tier = 1;
+            effect = StatusEffects.tarred;
+        }};
 
-        cryofluid = new Liquid("cryofluid", Color.SKY){
-            {
-                heatCapacity = 0.9f;
-                temperature = 0.25f;
-                tier = 1;
-                effect = StatusEffects.freezing;
-            }
-        };
+        cryofluid = new Liquid("cryofluid", Color.SKY){{
+            heatCapacity = 0.9f;
+            temperature = 0.25f;
+            tier = 1;
+            effect = StatusEffects.freezing;
+        }};
     }
 
     @Override

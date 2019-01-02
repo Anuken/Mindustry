@@ -27,11 +27,11 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.copperWall, new ItemStack(Items.copper, 12)).setAlwaysUnlocked(true);
         new Recipe(defense, DefenseBlocks.copperWallLarge, new ItemStack(Items.copper, 12 * 4)).setAlwaysUnlocked(true);
 
-        new Recipe(defense, DefenseBlocks.denseAlloyWall, new ItemStack(Items.densealloy, 12));
-        new Recipe(defense, DefenseBlocks.denseAlloyWallLarge, new ItemStack(Items.densealloy, 12 * 4));
+        new Recipe(defense, DefenseBlocks.denseAlloyWall, new ItemStack(Items.titanium, 12));
+        new Recipe(defense, DefenseBlocks.denseAlloyWallLarge, new ItemStack(Items.titanium, 12 * 4));
 
-        new Recipe(defense, DefenseBlocks.door, new ItemStack(Items.densealloy, 12), new ItemStack(Items.silicon, 8));
-        new Recipe(defense, DefenseBlocks.doorLarge, new ItemStack(Items.densealloy, 12 * 4), new ItemStack(Items.silicon, 8 * 4));
+        new Recipe(defense, DefenseBlocks.door, new ItemStack(Items.titanium, 12), new ItemStack(Items.silicon, 8));
+        new Recipe(defense, DefenseBlocks.doorLarge, new ItemStack(Items.titanium, 12 * 4), new ItemStack(Items.silicon, 8 * 4));
 
         new Recipe(defense, DefenseBlocks.thoriumWall, new ItemStack(Items.thorium, 12));
         new Recipe(defense, DefenseBlocks.thoriumWallLarge, new ItemStack(Items.thorium, 12 * 4));
@@ -42,19 +42,19 @@ public class Recipes implements ContentList{
         new Recipe(defense, DefenseBlocks.surgeWall, new ItemStack(Items.surgealloy, 12));
         new Recipe(defense, DefenseBlocks.surgeWallLarge, new ItemStack(Items.surgealloy, 12 * 4));
 
-        new Recipe(effect, StorageBlocks.container, new ItemStack(Items.densealloy, 200));
-        new Recipe(effect, StorageBlocks.vault, new ItemStack(Items.densealloy, 500), new ItemStack(Items.thorium, 250));
+        new Recipe(effect, StorageBlocks.container, new ItemStack(Items.titanium, 200));
+        new Recipe(effect, StorageBlocks.vault, new ItemStack(Items.titanium, 500), new ItemStack(Items.thorium, 250));
 
         new Recipe(effect, StorageBlocks.core,
-            new ItemStack(Items.copper, 2000), new ItemStack(Items.densealloy, 2000),
+            new ItemStack(Items.copper, 2000), new ItemStack(Items.titanium, 2000),
             new ItemStack(Items.silicon, 1750), new ItemStack(Items.thorium, 1000),
             new ItemStack(Items.surgealloy, 500), new ItemStack(Items.phasefabric, 750)
         );
 
         //projectors
-        new Recipe(effect, DefenseBlocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 50), new ItemStack(Items.silicon, 180));
-        new Recipe(effect, DefenseBlocks.overdriveProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
-        new Recipe(effect, DefenseBlocks.forceProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
+        new Recipe(effect, DefenseBlocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.titanium, 150), new ItemStack(Items.titanium, 50), new ItemStack(Items.silicon, 180));
+        new Recipe(effect, DefenseBlocks.overdriveProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.titanium, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
+        new Recipe(effect, DefenseBlocks.forceProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.titanium, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
 
         new Recipe(effect, DefenseBlocks.shockMine, new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 25))
                 .setDependencies(Items.blastCompound);

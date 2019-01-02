@@ -90,20 +90,6 @@ public class Blocks extends BlockList implements ContentList{
             minimapColor = Color.valueOf("506eb4");
         }};
 
-        lava = new Floor("lava"){{
-            drownTime = 100f;
-            liquidColor = Color.valueOf("ed5334");
-            speedMultiplier = 0.2f;
-            damageTaken = 0.5f;
-            status = StatusEffects.melting;
-            statusIntensity = 0.8f;
-            variants = 0;
-            liquidDrop = Liquids.lava;
-            isLiquid = true;
-            cacheLayer = CacheLayer.lava;
-            minimapColor = Color.valueOf("ed5334");
-        }};
-
         tar = new Floor("tar"){{
             drownTime = 150f;
             liquidColor = Color.valueOf("292929");
@@ -119,14 +105,12 @@ public class Blocks extends BlockList implements ContentList{
 
         stone = new Floor("stone"){{
             hasOres = true;
-            drops = new ItemStack(Items.stone, 1);
             blends = block -> block != this && !(block instanceof OreBlock);
             minimapColor = Color.valueOf("323232");
             playerUnmineable = true;
         }};
 
         blackstone = new Floor("blackstone"){{
-            drops = new ItemStack(Items.stone, 1);
             minimapColor = Color.valueOf("252525");
             playerUnmineable = true;
             hasOres = true;

@@ -656,7 +656,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             PlaceRequest request = removals.get(i);
 
             if(request.scale <= 0.0001f){
-                removals.removeAt(i);
+                removals.remove(i);
                 i--;
             }
         }
