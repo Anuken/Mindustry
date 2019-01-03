@@ -32,7 +32,7 @@ public class LoadingFragment extends Fragment{
 
     public void setButton(Runnable listener){
         button.visible(true);
-        button.getListeners().removeAt(button.getListeners().size - 1);
+        button.getListeners().remove(button.getListeners().size - 1);
         button.clicked(listener);
     }
 

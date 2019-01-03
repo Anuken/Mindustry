@@ -9,13 +9,13 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public class FusionReactor extends PowerGenerator{
     protected int plasmas = 4;
-    protected float maxPowerProduced = 2f;
     protected float warmupSpeed = 0.001f;
 
     protected Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
@@ -25,33 +25,27 @@ public class FusionReactor extends PowerGenerator{
         super(name);
         hasPower = true;
         hasLiquids = true;
-        powerCapacity = 100f;
+        powerProduction = 2.0f;
         liquidCapacity = 30f;
         hasItems = true;
-    }
-
-    @Override
-    public void setStats(){
-        super.setStats();
-
-        stats.add(BlockStat.basePowerGeneration, maxPowerProduced * 60f, StatUnit.powerSecond);
     }
 
     @Override
     public void update(Tile tile){
         FusionReactorEntity entity = tile.entity();
 
+        float increaseOrDecrease = 1.0f;
         if(entity.cons.valid()){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.01f);
+            increaseOrDecrease = -1.0f;
         }
 
-        float powerAdded = Math.min(powerCapacity - entity.power.amount, maxPowerProduced * Mathf.pow(entity.warmup, 4f) * Time.delta());
-        entity.power.amount += powerAdded;
-        entity.totalProgress += entity.warmup * Time.delta();
+        float efficiencyAdded = Mathf.pow(entity.warmup, 4f) * Time.delta();
+        entity.productionEfficiency = Mathf.clamp(entity.productionEfficiency + efficiencyAdded * increaseOrDecrease);
 
-        tile.entity.power.graph.update();
+        super.update(tile);
     }
 
     @Override
@@ -95,7 +89,7 @@ public class FusionReactor extends PowerGenerator{
 
         Draw.rect(name + "-top", tile.drawx(), tile.drawy());
 
-        Draw.color(ind1, ind2, entity.warmup + Mathf.absin(entity.totalProgress, 3f, entity.warmup * 0.5f));
+        Draw.color(ind1, ind2, entity.warmup + Mathf.absin(entity.productionEfficiency, 3f, entity.warmup * 0.5f));
         Draw.rect(name + "-light", tile.drawx(), tile.drawy());
 
         Draw.color();
@@ -122,7 +116,19 @@ public class FusionReactor extends PowerGenerator{
         //TODO catastrophic failure
     }
 
-    public static class FusionReactorEntity extends GenericCrafterEntity{
+    public static class FusionReactorEntity extends GeneratorEntity{
+        public float warmup;
 
+        @Override
+        public void write(DataOutput stream) throws IOException{
+            super.write(stream);
+            stream.writeFloat(warmup);
+        }
+
+        @Override
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
+            warmup = stream.readFloat();
+        }
     }
 }

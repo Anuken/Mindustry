@@ -1,11 +1,12 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Liquid;
 
-public class DecayGenerator extends ItemGenerator{
+public class DecayGenerator extends ItemLiquidGenerator{
 
     public DecayGenerator(String name){
-        super(name);
+        super(InputType.ItemsOnly, name);
         hasItems = true;
         hasLiquids = false;
     }

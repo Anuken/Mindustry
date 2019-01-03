@@ -9,52 +9,53 @@ public class UpgradeBlocks extends BlockList{
 
     @Override
     public void load(){
+
         alphaPad = new MechPad("alpha-mech-pad"){{
             mech = Mechs.alpha;
             size = 2;
-            powerCapacity = 50f;
+            consumes.powerBuffered(50f);
         }};
 
         deltaPad = new MechPad("delta-mech-pad"){{
             mech = Mechs.delta;
             size = 2;
-            powerCapacity = 70f;
+            consumes.powerBuffered(70f);
         }};
 
         tauPad = new MechPad("tau-mech-pad"){{
             mech = Mechs.tau;
             size = 2;
-            powerCapacity = 100f;
+            consumes.powerBuffered(100f);
         }};
 
         omegaPad = new MechPad("omega-mech-pad"){{
             mech = Mechs.omega;
             size = 3;
-            powerCapacity = 120f;
+            consumes.powerBuffered(120f);
         }};
 
         dartPad = new MechPad("dart-ship-pad"){{
             mech = Mechs.dart;
             size = 2;
-            powerCapacity = 50f;
+            consumes.powerBuffered(50f);
         }};
 
         javelinPad = new MechPad("javelin-ship-pad"){{
             mech = Mechs.javelin;
             size = 2;
-            powerCapacity = 80f;
+            consumes.powerBuffered(80f);
         }};
 
         tridentPad = new MechPad("trident-ship-pad"){{
             mech = Mechs.trident;
             size = 2;
-            powerCapacity = 100f;
+            consumes.powerBuffered(100f);
         }};
 
         glaivePad = new MechPad("glaive-ship-pad"){{
             mech = Mechs.glaive;
             size = 3;
-            powerCapacity = 120f;
+            consumes.powerBuffered(120f);
         }};
     }
 }

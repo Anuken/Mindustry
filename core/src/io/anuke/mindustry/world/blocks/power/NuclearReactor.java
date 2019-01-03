@@ -33,7 +33,6 @@ public class NuclearReactor extends PowerGenerator{
     protected Color coolColor = new Color(1, 1, 1, 0f);
     protected Color hotColor = Color.valueOf("ff9575a3");
     protected int fuelUseTime = 120; //time to consume 1 fuel
-    protected float powerMultiplier = 0.45f; //power per frame, depends on full capacity
     protected float heating = 0.013f; //heating per frame
     protected float coolantPower = 0.015f; //how much heat decreases per coolant unit
     protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
@@ -48,7 +47,6 @@ public class NuclearReactor extends PowerGenerator{
         super(name);
         itemCapacity = 30;
         liquidCapacity = 50;
-        powerCapacity = 80f;
         hasItems = true;
         hasLiquids = true;
 
@@ -67,7 +65,10 @@ public class NuclearReactor extends PowerGenerator{
     public void setStats(){
         super.setStats();
         stats.add(BlockStat.inputLiquid, new LiquidFilterValue(liquid -> liquid.temperature <= 0.5f));
-        stats.add(BlockStat.basePowerGeneration, powerMultiplier * 60f * 0.5f, StatUnit.powerSecond);
+
+        stats.remove(BlockStat.basePowerGeneration);
+        // Display the power which will be produced at 50% efficiency
+        stats.add(BlockStat.basePowerGeneration, powerProduction * 60f * 0.5f, StatUnit.powerSecond);
     }
 
     @Override
@@ -76,11 +77,11 @@ public class NuclearReactor extends PowerGenerator{
 
         int fuel = entity.items.get(consumes.item());
         float fullness = (float) fuel / itemCapacity;
+        entity.productionEfficiency = fullness / 2.0f; // Currently, efficiency of 0.5 = 100%
 
         if(fuel > 0){
             entity.heat += fullness * heating * Math.min(entity.delta(), 4f);
-            entity.power.amount += powerMultiplier * fullness * entity.delta();
-            entity.power.amount = Mathf.clamp(entity.power.amount, 0f, powerCapacity);
+
             if(entity.timer.get(timerFuel, fuelUseTime)){
                 entity.items.remove(consumes.item(), 1);
             }
@@ -115,7 +116,7 @@ public class NuclearReactor extends PowerGenerator{
         if(entity.heat >= 0.999f){
             entity.kill();
         }else{
-            tile.entity.power.graph.update();
+            super.update(tile);
         }
     }
 

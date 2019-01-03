@@ -46,7 +46,6 @@ public class CraftingBlocks extends BlockList implements ContentList{
             craftEffect = BlockFx.smeltsmoke;
             result = Items.silicon;
             craftTime = 40f;
-            powerCapacity = 20f;
             size = 2;
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");
@@ -61,7 +60,6 @@ public class CraftingBlocks extends BlockList implements ContentList{
             craftTime = 60f;
             output = Items.plastanium;
             itemCapacity = 30;
-            powerCapacity = 40f;
             size = 2;
             health = 320;
             hasPower = hasLiquids = true;
@@ -77,7 +75,6 @@ public class CraftingBlocks extends BlockList implements ContentList{
             craftEffect = BlockFx.smeltsmoke;
             result = Items.phasefabric;
             craftTime = 120f;
-            powerCapacity = 50f;
             size = 2;
 
             consumes.items(new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10));
@@ -88,7 +85,6 @@ public class CraftingBlocks extends BlockList implements ContentList{
             craftEffect = BlockFx.smeltsmoke;
             result = Items.surgealloy;
             craftTime = 75f;
-            powerCapacity = 60f;
             size = 2;
 
             useFlux = true;

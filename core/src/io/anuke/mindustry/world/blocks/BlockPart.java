@@ -59,22 +59,6 @@ public class BlockPart extends Block{
         block.handleLiquid(tile.getLinked(), source, liquid, amount);
     }
 
-    @Override
-    public float addPower(Tile tile, float amount){
-        Block block = linked(tile);
-        if(block.hasPower){
-            return block.addPower(tile.getLinked(), amount);
-        }else{
-            return amount;
-        }
-    }
-
-    @Override
-    public boolean acceptPower(Tile tile, Tile from, float amount){
-        Block block = linked(tile);
-        return block.hasPower && block.acceptPower(tile.getLinked(), from, amount);
-    }
-
     private Block linked(Tile tile){
         return tile.getLinked().block();
     }

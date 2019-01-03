@@ -26,18 +26,21 @@ public abstract class BaseBlock extends MappableContent{
     public boolean outputsLiquid = false;
     public boolean singleLiquid = true;
     public boolean consumesPower = true;
-    public boolean outputsPower;
+    public boolean outputsPower = false;
 
     public int itemCapacity;
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
-    public float powerCapacity = 10f;
 
     public Consumers consumes = new Consumers();
     public Producers produces = new Producers();
 
     public boolean shouldConsume(Tile tile){
         return true;
+    }
+
+    public float getPowerProduction(Tile tile){
+        return 0f;
     }
 
     /**Returns the amount of items this block can accept.*/
@@ -96,19 +99,6 @@ public abstract class BaseBlock extends MappableContent{
 
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         tile.entity.liquids.add(liquid, amount);
-    }
-
-    public boolean acceptPower(Tile tile, Tile source, float amount){
-        return true;
-    }
-
-    /**Returns how much power is accepted.*/
-    public float addPower(Tile tile, float amount){
-        float canAccept = Math.min(powerCapacity - tile.entity.power.amount, amount);
-
-        tile.entity.power.amount += canAccept;
-
-        return canAccept;
     }
 
     public void tryDumpLiquid(Tile tile, Liquid liquid){

@@ -28,6 +28,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -179,6 +180,14 @@ public class Block extends BaseBlock {
         return out;
     }
 
+    protected float getProgressIncrease(TileEntity entity, float baseTime){
+        float progressIncrease = 1f / baseTime * entity.delta();
+        if(hasPower){
+            progressIncrease *= entity.power.satisfaction; // Reduced increase in case of low power
+        }
+        return progressIncrease;
+    }
+
     public boolean isLayer(Tile tile){
         return true;
     }
@@ -321,7 +330,7 @@ public class Block extends BaseBlock {
 
         consumes.forEach(cons -> cons.display(stats));
 
-        if(hasPower) stats.add(BlockStat.powerCapacity, powerCapacity, StatUnit.powerUnits);
+        // Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
     }
@@ -379,8 +388,8 @@ public class Block extends BaseBlock {
             explosiveness += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
         }
 
-        if(hasPower){
-            power += tile.entity.power.amount;
+        if(consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
+            power += tile.entity.power.satisfaction * consumes.get(ConsumePower.class).powerCapacity;
         }
 
         if(hasLiquids){

@@ -35,7 +35,7 @@ public class DistributionBlocks extends BlockList implements ContentList{
         phaseConveyor = new ItemBridge("phase-conveyor"){{
             range = 12;
             hasPower = true;
-            consumes.power(0.03f);
+            consumes.power(0.03f, 1.0f);
         }};
 
         sorter = new Sorter("sorter");
