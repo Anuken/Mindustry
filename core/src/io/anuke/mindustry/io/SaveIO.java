@@ -13,6 +13,7 @@ import java.util.zip.InflaterInputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
+//TODO load backup meta if possible
 public class SaveIO{
     public static final IntArray breakingVersions = IntArray.with(47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 63);
     public static final IntMap<SaveFileVersion> versions = new IntMap<>();
@@ -65,9 +66,7 @@ public class SaveIO{
     public static boolean isSaveValid(DataInputStream stream){
 
         try{
-            int version = stream.readInt();
-            SaveFileVersion ver = versions.get(version);
-            ver.getData(stream);
+            getData(stream);
             return true;
         }catch(Exception e){
             e.printStackTrace();
