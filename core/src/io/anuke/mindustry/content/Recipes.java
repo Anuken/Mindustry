@@ -106,7 +106,7 @@ public class Recipes implements ContentList{
         new Recipe(crafting, CraftingBlocks.cryofluidmixer, new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 80), new ItemStack(Items.thorium, 90));
 
         new Recipe(crafting, CraftingBlocks.melter, new ItemStack(Items.copper, 60), new ItemStack(Items.lead, 70), new ItemStack(Items.densealloy, 90));
-        new Recipe(crafting, CraftingBlocks.incinerator, new ItemStack(Items.densealloy, 10), new ItemStack(Items.lead, 30));
+        new Recipe(crafting, CraftingBlocks.incinerator, new ItemStack(Items.graphite, 10), new ItemStack(Items.lead, 30));
 
         //processing
         new Recipe(crafting, CraftingBlocks.biomatterCompressor, new ItemStack(Items.lead, 70), new ItemStack(Items.silicon, 60));
@@ -114,9 +114,9 @@ public class Recipes implements ContentList{
 
         //POWER
         new Recipe(power, PowerBlocks.powerNode, new ItemStack(Items.copper, 2), new ItemStack(Items.lead, 6));
-        new Recipe(power, PowerBlocks.powerNodeLarge, new ItemStack(Items.densealloy, 10), new ItemStack(Items.lead, 20), new ItemStack(Items.silicon, 6));
+        new Recipe(power, PowerBlocks.powerNodeLarge, new ItemStack(Items.titanium, 10), new ItemStack(Items.lead, 20), new ItemStack(Items.silicon, 6));
         new Recipe(power, PowerBlocks.battery, new ItemStack(Items.copper, 8), new ItemStack(Items.lead, 30), new ItemStack(Items.silicon, 4));
-        new Recipe(power, PowerBlocks.batteryLarge, new ItemStack(Items.densealloy, 40), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 30));
+        new Recipe(power, PowerBlocks.batteryLarge, new ItemStack(Items.titanium, 40), new ItemStack(Items.lead, 80), new ItemStack(Items.silicon, 30));
 
         //generators - combustion
         new Recipe(power, PowerBlocks.combustionGenerator, new ItemStack(Items.copper, 50), new ItemStack(Items.lead, 30));
