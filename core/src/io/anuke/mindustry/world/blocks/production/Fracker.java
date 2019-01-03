@@ -18,7 +18,6 @@ public class Fracker extends SolidPump{
     public Fracker(String name){
         super(name);
         hasItems = true;
-        itemCapacity = 20;
         singleLiquid = false;
 
         consumes.require(ConsumeItem.class);

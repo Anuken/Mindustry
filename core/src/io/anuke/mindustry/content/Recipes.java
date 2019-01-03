@@ -82,7 +82,7 @@ public class Recipes implements ContentList{
         new Recipe(distribution, DistributionBlocks.junction, new ItemStack(Items.copper, 2)).setAlwaysUnlocked(true);
         new Recipe(distribution, DistributionBlocks.router, new ItemStack(Items.copper, 6)).setAlwaysUnlocked(true);
 
-        //advanced densealloy transporat
+        //more advanced transport
         new Recipe(distribution, DistributionBlocks.distributor, new ItemStack(Items.densealloy, 8), new ItemStack(Items.copper, 8));
         new Recipe(distribution, DistributionBlocks.sorter, new ItemStack(Items.densealloy, 4), new ItemStack(Items.copper, 4));
         new Recipe(distribution, DistributionBlocks.overflowGate, new ItemStack(Items.densealloy, 4), new ItemStack(Items.copper, 8));
@@ -114,7 +114,6 @@ public class Recipes implements ContentList{
         //processing
         new Recipe(crafting, CraftingBlocks.biomatterCompressor, new ItemStack(Items.lead, 70), new ItemStack(Items.silicon, 60));
         new Recipe(crafting, CraftingBlocks.separator, new ItemStack(Items.copper, 60), new ItemStack(Items.densealloy, 50));
-        new Recipe(crafting, CraftingBlocks.centrifuge, new ItemStack(Items.copper, 130), new ItemStack(Items.densealloy, 130), new ItemStack(Items.silicon, 60), new ItemStack(Items.titanium, 50));
 
         //POWER
         new Recipe(power, PowerBlocks.powerNode, new ItemStack(Items.copper, 2), new ItemStack(Items.lead, 6))
@@ -175,7 +174,9 @@ public class Recipes implements ContentList{
         new Recipe(units, UnitBlocks.revenantFactory, new ItemStack(Items.plastanium, 300), new ItemStack(Items.titanium, 400), new ItemStack(Items.lead, 300), new ItemStack(Items.silicon, 400), new ItemStack(Items.surgealloy, 100));
 
         new Recipe(units, UnitBlocks.repairPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.copper, 30), new ItemStack(Items.silicon, 30));
-        new Recipe(units, UnitBlocks.commandCenter, new ItemStack(Items.lead, 100), new ItemStack(Items.densealloy, 100), new ItemStack(Items.silicon, 200));
+
+        //removed for testing MOBA-style unit production
+        //new Recipe(units, UnitBlocks.commandCenter, new ItemStack(Items.lead, 100), new ItemStack(Items.densealloy, 100), new ItemStack(Items.silicon, 200));
 
         //LIQUIDS
         new Recipe(liquid, LiquidBlocks.conduit, new ItemStack(Items.lead, 1));

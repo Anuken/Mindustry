@@ -52,7 +52,6 @@ public class ForceProjector extends Block {
         hasLiquids = true;
         powerCapacity = 60f;
         hasItems = true;
-        itemCapacity = 10;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).optional(true).update(false);
     }
 

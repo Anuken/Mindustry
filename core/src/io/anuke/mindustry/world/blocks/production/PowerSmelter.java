@@ -52,7 +52,6 @@ public class PowerSmelter extends PowerBlock{
         hasItems = true;
         update = true;
         solid = true;
-        itemCapacity = 20;
     }
 
     @Override

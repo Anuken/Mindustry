@@ -44,7 +44,6 @@ public class MendProjector extends Block{
         update = true;
         hasPower = true;
         hasItems = true;
-        itemCapacity = 10;
     }
 
     @Override

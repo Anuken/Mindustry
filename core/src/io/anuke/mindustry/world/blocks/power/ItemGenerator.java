@@ -33,7 +33,6 @@ public abstract class ItemGenerator extends PowerGenerator{
 
     public ItemGenerator(String name){
         super(name);
-        itemCapacity = 20;
         hasItems = true;
 
         consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false).optional(true);
