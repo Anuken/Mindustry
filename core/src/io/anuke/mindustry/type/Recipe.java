@@ -37,7 +37,6 @@ public class Recipe extends UnlockableContent{
     public boolean alwaysUnlocked;
 
     private UnlockableContent[] dependencies;
-    private Block[] blockDependencies;
 
     public Recipe(Category category, Block result, ItemStack... requirements){
         this.result = result;
@@ -149,28 +148,6 @@ public class Recipe extends UnlockableContent{
                 }
             }
         }
-    }
-
-    @Override
-    public UnlockableContent[] getDependencies(){
-        if(blockDependencies != null && dependencies == null){
-            dependencies = new UnlockableContent[blockDependencies.length];
-            for(int i = 0; i < dependencies.length; i++){
-                dependencies[i] = Recipe.getByResult(blockDependencies[i]);
-            }
-            return dependencies;
-        }
-        return dependencies;
-    }
-
-    public Recipe setDependencies(UnlockableContent... dependencies){
-        this.dependencies = dependencies;
-        return this;
-    }
-
-    public Recipe setDependencies(Block... dependencies){
-        this.blockDependencies = dependencies;
-        return this;
     }
 
     public enum RecipeVisibility{

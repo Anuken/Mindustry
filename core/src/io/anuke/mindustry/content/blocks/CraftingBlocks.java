@@ -10,14 +10,14 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.production.*;
 
 public class CraftingBlocks extends BlockList implements ContentList{
-    public static Block arcsmelter, siliconsmelter, plastaniumCompressor, phaseWeaver, alloySmelter,
+    public static Block siliconSmelter, plastaniumCompressor, phaseWeaver, surgeSmelter,
             pyratiteMixer, blastMixer,
             cryofluidmixer, melter, separator, biomatterCompressor, pulverizer, incinerator;
 
     @Override
     public void load(){
 
-        siliconsmelter = new PowerSmelter("silicon-smelter"){{
+        siliconSmelter = new PowerSmelter("silicon-smelter"){{
             health = 90;
             craftEffect = BlockFx.smeltsmoke;
             result = Items.silicon;
@@ -59,12 +59,12 @@ public class CraftingBlocks extends BlockList implements ContentList{
             consumes.power(0.5f);
         }};
 
-        alloySmelter = new PowerSmelter("alloy-smelter"){{
+        surgeSmelter = new PowerSmelter("surge-smelter"){{
             craftEffect = BlockFx.smeltsmoke;
             result = Items.surgealloy;
             craftTime = 75f;
             powerCapacity = 60f;
-            size = 2;
+            size = 3;
 
             useFlux = true;
             fluxNeeded = 3;
