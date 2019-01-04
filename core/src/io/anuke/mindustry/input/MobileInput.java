@@ -691,7 +691,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean zoom(float initialDistance, float distance){
-        float amount = (distance > initialDistance ? 0.1f : -0.1f) * Time.delta();
+        float amount = (distance > initialDistance ? 0.1f : -0.1f);
         renderer.scaleCamera(io.anuke.arc.scene.ui.layout.Unit.dp.scl(amount));
         return true;
     }
