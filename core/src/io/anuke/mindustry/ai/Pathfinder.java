@@ -109,7 +109,7 @@ public class Pathfinder{
             //add all targets to the frontier
             for(Tile other : world.indexer.getEnemy(team, BlockFlag.target)){
                 path.weights[other.x][other.y] = 0;
-                path.searches[other.x][other.y] = path.search;
+                path.searches[other.x][other.y] = (short)path.search;
                 path.frontier.addFirst(other);
             }
         }
@@ -117,6 +117,8 @@ public class Pathfinder{
 
     private void createFor(Team team){
         PathData path = new PathData();
+        path.weights = new float[world.width()][world.height()];
+        path.searches = new short[world.width()][world.height()];
         path.search++;
         path.frontier.ensureCapacity((world.width() + world.height()) * 3);
 
@@ -130,7 +132,7 @@ public class Pathfinder{
                         && tile.block().flags.contains(BlockFlag.target)){
                     path.frontier.addFirst(tile);
                     path.weights[x][y] = 0;
-                    path.searches[x][y] = path.search;
+                    path.searches[x][y] = (short)path.search;
                 }else{
                     path.weights[x][y] = Float.MAX_VALUE;
                 }
@@ -159,7 +161,7 @@ public class Pathfinder{
                             && passable(other, team)){
                         path.frontier.addFirst(world.tile(dx, dy));
                         path.weights[dx][dy] = cost + other.cost;
-                        path.searches[dx][dy] = path.search;
+                        path.searches[dx][dy] = (short)path.search;
                     }
                 }
             }
@@ -186,14 +188,9 @@ public class Pathfinder{
 
     class PathData{
         float[][] weights;
-        int[][] searches;
+        short[][] searches;
         int search = 0;
         long lastSearchTime;
         Queue<Tile> frontier = new Queue<>();
-
-        PathData(){
-            weights = new float[world.width()][world.height()];
-            searches = new int[world.width()][world.height()];
-        }
     }
 }

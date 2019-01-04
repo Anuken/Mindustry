@@ -11,6 +11,7 @@ import io.anuke.arc.graphics.GL20;
 import io.anuke.arc.graphics.g2d.CacheBatch;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.SpriteBatch;
+import io.anuke.arc.graphics.g2d.SpriteCache;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
@@ -30,6 +31,7 @@ public class FloorRenderer{
     private CacheBatch cbatch;
     private IntSet drawnLayerSet = new IntSet();
     private IntArray drawnLayers = new IntArray();
+    private ObjectSet<CacheLayer> used = new ObjectSet<>();
 
     public FloorRenderer(){
         Events.on(WorldLoadEvent.class, event -> clearTiles());
@@ -142,9 +144,8 @@ public class FloorRenderer{
     }
 
     private void cacheChunk(int cx, int cy){
+        used.clear();
         Chunk chunk = cache[cx][cy];
-
-        ObjectSet<CacheLayer> used = new ObjectSet<>();
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
@@ -195,7 +196,8 @@ public class FloorRenderer{
         int chunksx = Mathf.ceil((float) (world.width()) / chunksize),
         chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
         cache = new Chunk[chunksx][chunksy];
-        cbatch = new CacheBatch(world.width() * world.height());
+        SpriteCache sprites = new SpriteCache(world.width() * world.height(), (world.width() / chunksize) * (world.height() / chunksize) * 2, false);
+        cbatch = new CacheBatch(sprites);
 
         Time.mark();
 

@@ -141,8 +141,8 @@ public class WorldGenerator{
 
             int sx = (short)Mathf.range(Short.MAX_VALUE/2);
             int sy = (short)Mathf.range(Short.MAX_VALUE/2);
-            int width = 380;
-            int height = 380;
+            int width = 512;
+            int height = 512;
             Array<Point2> spawns = new Array<>();
             Array<Item> ores = Item.getAllOres();
 
