@@ -1,14 +1,14 @@
 package io.anuke.mindustry.content;
 
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.StatusController.StatusEntry;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Mathf;
 
 public class StatusEffects implements ContentList{
     public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded, shocked;
@@ -38,7 +38,7 @@ public class StatusEffects implements ContentList{
             public void update(Unit unit, float time){
                 unit.damagePeriodic(0.04f);
 
-                if(Mathf.chance(Timers.delta() * 0.2f)){
+                if(Mathf.chance(Time.delta() * 0.2f)){
                     Effects.effect(EnvironmentFx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
@@ -54,7 +54,7 @@ public class StatusEffects implements ContentList{
             @Override
             public void update(Unit unit, float time){
 
-                if(Mathf.chance(Timers.delta() * 0.15f)){
+                if(Mathf.chance(Time.delta() * 0.15f)){
                     Effects.effect(EnvironmentFx.freezing, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
@@ -79,7 +79,7 @@ public class StatusEffects implements ContentList{
 
             @Override
             public void update(Unit unit, float time){
-                if(Mathf.chance(Timers.delta() * 0.15f)){
+                if(Mathf.chance(Time.delta() * 0.15f)){
                     Effects.effect(EnvironmentFx.wet, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
@@ -105,7 +105,7 @@ public class StatusEffects implements ContentList{
             public void update(Unit unit, float time){
                 unit.damagePeriodic(0.3f);
 
-                if(Mathf.chance(Timers.delta() * 0.2f)){
+                if(Mathf.chance(Time.delta() * 0.2f)){
                     Effects.effect(EnvironmentFx.melting, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
@@ -118,7 +118,7 @@ public class StatusEffects implements ContentList{
 
             @Override
             public void update(Unit unit, float time){
-                if(Mathf.chance(Timers.delta() * 0.15f)){
+                if(Mathf.chance(Time.delta() * 0.15f)){
                     Effects.effect(EnvironmentFx.oily, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
@@ -143,9 +143,9 @@ public class StatusEffects implements ContentList{
             @Override
             public void update(Unit unit, float time){
                 //idle regen boosted
-                unit.health += 0.01f * Timers.delta();
+                unit.health += 0.01f * Time.delta();
 
-                if(Mathf.chance(Timers.delta() * 0.25f)){
+                if(Mathf.chance(Time.delta() * 0.25f)){
                     Effects.effect(EnvironmentFx.overdriven, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f), 0f, unit);
                 }
             }

@@ -1,38 +1,38 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Scaling;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.ImageButton;
+import io.anuke.arc.scene.ui.Label;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.layout.Stack;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Scaling;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.Minimap;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.ucore.core.*;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.Label;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Stack;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -75,10 +75,10 @@ public class HudFragment extends Fragment{
                         }
                     }).update(i -> {
                         if(Net.active()){
-                            i.getStyle().imageUp = Core.skin.getDrawable("icon-players");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-players");
                         }else{
                             i.setDisabled(Net.active());
-                            i.getStyle().imageUp = Core.skin.getDrawable(state.is(State.paused) ? "icon-play" : "icon-pause");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable(state.is(State.paused) ? "icon-play" : "icon-pause");
                         }
                     }).get();
 
@@ -94,9 +94,9 @@ public class HudFragment extends Fragment{
                         }
                     }).update(i -> {
                         if(Net.active() && mobile){
-                            i.getStyle().imageUp = Core.skin.getDrawable("icon-chat");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-chat");
                         }else{
-                            i.getStyle().imageUp = Core.skin.getDrawable("icon-unlocks");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-unlocks");
                         }
                     }).get();
 
@@ -109,7 +109,7 @@ public class HudFragment extends Fragment{
             }
 
             cont.update(() -> {
-                if(Inputs.keyTap("toggle_menus") && !ui.chatfrag.chatOpen()){
+                if(!Core.input.keyDown(Binding.gridMode) && Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.chatOpen()){
                     toggleMenus();
                 }
             });
@@ -134,12 +134,12 @@ public class HudFragment extends Fragment{
                 IntFormat fps = new IntFormat("text.fps");
                 IntFormat tps = new IntFormat("text.tps");
                 IntFormat ping = new IntFormat("text.ping");
-                t.label(() -> fps.get(Gdx.graphics.getFramesPerSecond())).padRight(10);
+                t.label(() -> fps.get(Core.graphics.getFramesPerSecond())).padRight(10);
                 t.row();
                 if(Net.hasClient()){
                     t.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
                 }
-            }).size(-1).visible(() -> Settings.getBool("fps")).update(t -> t.setTranslation(0, (!waves.isVisible() ? wavetable.getHeight() : Math.min(wavetable.getTranslation().y, wavetable.getHeight())) )).get();
+            }).size(-1).visible(() -> Core.settings.getBool("fps")).update(t -> t.setTranslation(0, (!waves.isVisible() ? wavetable.getHeight() : Math.min(wavetable.getTranslation().y, wavetable.getHeight())))).get();
 
             //make wave box appear below rest of menu
             if(mobile){
@@ -148,8 +148,7 @@ public class HudFragment extends Fragment{
         });
 
         //minimap
-        parent.fill(t -> t.top().right().add(new Minimap())
-            .visible(() -> !state.is(State.menu) && Settings.getBool("minimap")));
+        //parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> !state.is(State.menu) && Core.settings.getBool("minimap")));
 
         //paused table
         parent.fill(t -> {
@@ -193,12 +192,12 @@ public class HudFragment extends Fragment{
                     coreAttackOpacity = Mathf.lerpDelta(coreAttackOpacity, 0f, 0.1f);
                 }
 
-                coreAttackTime -= Timers.delta();
+                coreAttackTime -= Time.delta();
 
                 return coreAttackOpacity > 0;
             });
             t.table("button", top -> top.add("$text.coreattack").pad(2)
-            .update(label -> label.setColor(Hue.mix(Color.ORANGE, Color.SCARLET, Mathf.absin(Timers.time(), 2f, 1f)))));
+                .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f))));
         });
 
         //'saving' indicator
@@ -207,7 +206,7 @@ public class HudFragment extends Fragment{
             t.add("$text.saveload");
         });
 
-        blockfrag.build(Core.scene.getRoot());
+        blockfrag.build(Core.scene.root);
     }
 
     public void showToast(String text){
@@ -218,7 +217,7 @@ public class HudFragment extends Fragment{
             }
         });
         table.margin(12);
-        table.addImage("icon-check").size(16*2).pad(3);
+        table.addImage("icon-check").size(16 * 2).pad(3);
         table.add(text).wrap().width(280f).get().setAlignment(Align.center, Align.center);
         table.pack();
 
@@ -231,7 +230,7 @@ public class HudFragment extends Fragment{
         Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.removeActor())));
     }
 
-    /**Show unlock notification for a new recipe.*/
+    /** Show unlock notification for a new recipe. */
     public void showUnlock(Recipe recipe){
 
         //if there's currently no unlock notification...
@@ -268,11 +267,11 @@ public class HudFragment extends Fragment{
             container.top().add(table);
             container.setTranslation(0, table.getPrefHeight());
             container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(4f),
-                    //nesting actions() calls is necessary so the right prefHeight() is used
-                    Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.run(() -> {
-                        lastUnlockTable = null;
-                        lastUnlockLayout = null;
-                    }), Actions.removeActor())));
+            //nesting actions() calls is necessary so the right prefHeight() is used
+            Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.run(() -> {
+                lastUnlockTable = null;
+                lastUnlockLayout = null;
+            }), Actions.removeActor())));
 
             lastUnlockTable = container;
             lastUnlockLayout = in;
@@ -345,7 +344,7 @@ public class HudFragment extends Fragment{
         Interpolation in = Interpolation.pow3Out;
 
         if(flip != null){
-            flip.getStyle().imageUp = Core.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
+            flip.getStyle().imageUp = Core.scene.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
         }
 
         if(shown){
@@ -368,7 +367,7 @@ public class HudFragment extends Fragment{
         IntFormat enemiesf = new IntFormat("text.wave.enemies");
 
         table.clearChildren();
-        table.setTouchable(Touchable.enabled);
+        table.touchable(Touchable.enabled);
 
         table.labelWrap(() ->
             world.getSector() == null ?
@@ -378,9 +377,9 @@ public class HudFragment extends Fragment{
                     enemiesf.get(state.enemies())) :
                 wavef.get(state.wave) + "\n" +
                     (!state.mode.disableWaveTimer ?
-                    Bundles.format("text.wave.waiting", (int)(state.wavetime/60)) :
-                    Bundles.get("text.waiting"))) :
-            Bundles.format("text.mission.display", world.getSector().currentMission().displayString())).growX().pad(8f);
+                    Core.bundle.format("text.wave.waiting", (int)(state.wavetime/60)) :
+                    Core.bundle.get("text.waiting"))) :
+            Core.bundle.format("text.mission.display", world.getSector().currentMission().displayString())).growX().pad(8f);
 
         table.clicked(() -> {
             if(world.getSector() != null && world.getSector().currentMission().hasMessage()){
@@ -403,8 +402,8 @@ public class HudFragment extends Fragment{
             boolean vis = state.mode.disableWaveTimer && ((Net.server() || players[0].isAdmin) || !Net.active());
             boolean paused = state.is(State.paused) || !vis;
 
-            l.getStyle().imageUp = Core.skin.getDrawable(vis ? "icon-play" : "clear");
-            l.setTouchable(!paused ? Touchable.enabled : Touchable.disabled);
+            l.getStyle().imageUp = Core.scene.skin.getDrawable(vis ? "icon-play" : "clear");
+            l.touchable(!paused ? Touchable.enabled : Touchable.disabled);
         }).visible(() -> state.mode.disableWaveTimer && ((Net.server() || players[0].isAdmin) || !Net.active()) && unitGroups[Team.red.ordinal()].size() == 0);
     }
 }

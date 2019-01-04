@@ -1,9 +1,18 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics.Cursor;
+import io.anuke.arc.Graphics.Cursor.SystemCursor;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -16,19 +25,11 @@ import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.*;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -79,16 +80,12 @@ public class Block extends BaseBlock {
     public boolean instantTransfer = false;
     /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
     public BlockGroup group = BlockGroup.none;
-    /** list of displayed block status bars. Defaults to health bar. */
-    public BlockBars bars = new BlockBars();
     /** List of block stats. */
     public BlockStats stats = new BlockStats(this);
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags;
     /** Whether to automatically set the entity to 'sleeping' when created. */
     public boolean autoSleep;
-    /** Name of shadow region to load. Null to indicate normal shadow. */
-    public String shadow = null;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
@@ -105,19 +102,17 @@ public class Block extends BaseBlock {
     public boolean canOverdrive = true;
 
     protected Array<Tile> tempTiles = new Array<>();
-    protected Color tempColor = new Color();
     protected TextureRegion[] blockIcon;
     protected TextureRegion[] icon;
     protected TextureRegion[] compactIcon;
     protected TextureRegion editorIcon;
 
-    public TextureRegion shadowRegion;
     public TextureRegion region;
 
     public Block(String name){
         this.name = name;
-        this.formalName = Bundles.get("block." + name + ".name", name);
-        this.fullDescription = Bundles.getOrNull("block." + name + ".description");
+        this.formalName = Core.bundle.get("block." + name + ".name", name);
+        this.fullDescription = Core.bundle.getOrNull("block." + name + ".description");
         this.solid = false;
     }
 
@@ -183,6 +178,14 @@ public class Block extends BaseBlock {
             if(link != null && link.entity != null && link.entity.power != null) out.add(link);
         }
         return out;
+    }
+
+    protected float getProgressIncrease(TileEntity entity, float baseTime){
+        float progressIncrease = 1f / baseTime * entity.delta();
+        if(hasPower){
+            progressIncrease *= entity.power.satisfaction; // Reduced increase in case of low power
+        }
+        return progressIncrease;
     }
 
     public boolean isLayer(Tile tile){
@@ -253,15 +256,13 @@ public class Block extends BaseBlock {
         }
 
         setStats();
-        setBars();
 
         consumes.checkRequired(this);
     }
 
     @Override
     public void load(){
-        shadowRegion = Draw.region(shadow == null ? "shadow-" + size : shadow);
-        region = Draw.region(name);
+        region = Core.atlas.find(name);
     }
 
     /**Called when the world is resized.
@@ -283,8 +284,8 @@ public class Block extends BaseBlock {
     }
 
     /** Returns whether or not a hand cursor should be shown over this block. */
-    public CursorType getCursor(Tile tile){
-        return configurable ? CursorType.hand : CursorType.normal;
+    public Cursor getCursor(Tile tile){
+        return configurable ? SystemCursor.hand : SystemCursor.arrow;
     }
 
     /**
@@ -319,8 +320,7 @@ public class Block extends BaseBlock {
     public void drawConfigure(Tile tile){
         Draw.color(Palette.accent);
         Lines.stroke(1f);
-        Lines.square(tile.drawx(), tile.drawy(),
-                tile.block().size * tilesize / 2f + 1f);
+        Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1f);
         Draw.reset();
     }
 
@@ -330,15 +330,9 @@ public class Block extends BaseBlock {
 
         consumes.forEach(cons -> cons.display(stats));
 
-        if(hasPower) stats.add(BlockStat.powerCapacity, powerCapacity, StatUnit.powerUnits);
+        // Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
-    }
-
-    public void setBars(){
-        if(hasPower) bars.add(new BlockBar(BarType.power, true, tile -> tile.entity.power.amount / powerCapacity));
-        if(hasLiquids) bars.add(new BlockBar(BarType.liquid, true, tile -> tile.entity.liquids.total() / liquidCapacity));
-        if(hasItems) bars.add(new BlockBar(BarType.inventory, true, tile -> (float) tile.entity.items.total() / itemCapacity));
     }
 
     public String name(){
@@ -379,8 +373,6 @@ public class Block extends BaseBlock {
         float explosiveness = baseExplosiveness;
         float flammability = 0f;
         float power = 0f;
-        int units = 1;
-        tempColor.set(Palette.darkFlame);
 
         if(hasItems){
             float scaling = inventoryScaling(tile);
@@ -388,11 +380,6 @@ public class Block extends BaseBlock {
                 int amount = tile.entity.items.get(item);
                 explosiveness += item.explosiveness * amount * scaling;
                 flammability += item.flammability * amount * scaling;
-
-                if(item.flammability * amount > 0.5){
-                    units++;
-                    Hue.addu(tempColor, item.flameColor);
-                }
             }
         }
 
@@ -401,11 +388,9 @@ public class Block extends BaseBlock {
             explosiveness += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
         }
 
-        if(hasPower){
-            power += tile.entity.power.amount;
+        if(consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
+            power += tile.entity.power.satisfaction * consumes.get(ConsumePower.class).powerCapacity;
         }
-
-        tempColor.mul(1f / units);
 
         if(hasLiquids){
 
@@ -413,7 +398,7 @@ public class Block extends BaseBlock {
                 float splash = Mathf.clamp(amount / 4f, 0f, 10f);
 
                 for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
-                    Timers.run(i / 2f, () -> {
+                    Time.run(i / 2f, () -> {
                         Tile other = world.tile(tile.x + Mathf.range(size / 2), tile.y + Mathf.range(size / 2));
                         if(other != null){
                             Puddle.deposit(other, liquid, splash);
@@ -423,7 +408,7 @@ public class Block extends BaseBlock {
             });
         }
 
-        Damage.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size / 2f, tempColor);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size / 2f, Palette.darkFlame);
         if(!tile.floor().solid && !tile.floor().isLiquid){
             RubbleDecal.create(tile.drawx(), tile.drawy(), size);
         }
@@ -465,7 +450,7 @@ public class Block extends BaseBlock {
 
     public TextureRegion getEditorIcon(){
         if(editorIcon == null){
-            editorIcon = Draw.region("block-icon-" + name, Draw.region("clear"));
+            editorIcon = Core.atlas.find("block-icon-" + name, Core.atlas.find("clear"));
         }
         return editorIcon;
     }
@@ -473,12 +458,12 @@ public class Block extends BaseBlock {
     /** Returns the icon used for displaying this block in the place menu */
     public TextureRegion[] getIcon(){
         if(icon == null){
-            if(Draw.hasRegion(name + "-icon")){
-                icon = new TextureRegion[]{Draw.region(name + "-icon")};
-            }else if(Draw.hasRegion(name)){
-                icon = new TextureRegion[]{Draw.region(name)};
-            }else if(Draw.hasRegion(name + "1")){
-                icon = new TextureRegion[]{Draw.region(name + "1")};
+            if(Core.atlas.has(name + "-icon")){
+                icon = new TextureRegion[]{Core.atlas.find(name + "-icon")};
+            }else if(Core.atlas.has(name)){
+                icon = new TextureRegion[]{Core.atlas.find(name)};
+            }else if(Core.atlas.has(name + "1")){
+                icon = new TextureRegion[]{Core.atlas.find(name + "1")};
             }else{
                 icon = new TextureRegion[]{};
             }
@@ -506,8 +491,8 @@ public class Block extends BaseBlock {
     /** Crops a regionto 8x8 */
     protected TextureRegion iconRegion(TextureRegion src){
         TextureRegion region = new TextureRegion(src);
-        region.setRegionWidth(8);
-        region.setRegionHeight(8);
+        region.setWidth((int)(8 / Draw.scl));
+        region.setHeight((int)(8 / Draw.scl));
         return region;
     }
 
@@ -527,12 +512,12 @@ public class Block extends BaseBlock {
     }
 
     public void drawShadow(Tile tile){
-        Draw.rect(shadowRegion, tile.drawx(), tile.drawy());
+        draw(tile);
     }
 
     /** Offset for placing and drawing multiblocks. */
     public float offset(){
-        return ((size + 1) % 2) * tilesize / 2;
+        return ((size + 1) % 2) * tilesize / 2f;
     }
 
     public boolean isMultiblock(){

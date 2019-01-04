@@ -1,16 +1,17 @@
 package io.anuke.mindustry.maps.missions;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.FortressGenerator;
 import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.util.Bundles;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.defaultTeam;
+import static io.anuke.mindustry.Vars.state;
 
 public class BattleMission extends MissionWithStartingCore{
     final int spacing = 30;
@@ -43,12 +44,12 @@ public class BattleMission extends MissionWithStartingCore{
 
     @Override
     public String displayString(){
-        return Bundles.get("text.mission.battle");
+        return Core.bundle.get("text.mission.battle");
     }
 
     @Override
-    public Array<GridPoint2> getSpawnPoints(Generation gen){
-        return Array.with(new GridPoint2(50, 50), new GridPoint2(gen.width - 1 - spacing, gen.height - 1 - spacing));
+    public Array<Point2> getSpawnPoints(Generation gen){
+        return Array.with(new Point2(50, 50), new Point2(gen.width - 1 - spacing, gen.height - 1 - spacing));
     }
 
     @Override

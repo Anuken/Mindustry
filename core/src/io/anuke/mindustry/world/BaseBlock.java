@@ -1,6 +1,10 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.TileEntity;
@@ -13,10 +17,6 @@ import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
 import io.anuke.mindustry.world.meta.Producers;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
 
 public abstract class BaseBlock extends MappableContent{
     public boolean hasItems;
@@ -26,18 +26,21 @@ public abstract class BaseBlock extends MappableContent{
     public boolean outputsLiquid = false;
     public boolean singleLiquid = true;
     public boolean consumesPower = true;
-    public boolean outputsPower;
+    public boolean outputsPower = false;
 
     public int itemCapacity;
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
-    public float powerCapacity = 10f;
 
     public Consumers consumes = new Consumers();
     public Producers produces = new Producers();
 
     public boolean shouldConsume(Tile tile){
         return true;
+    }
+
+    public float getPowerProduction(Tile tile){
+        return 0f;
     }
 
     /**Returns the amount of items this block can accept.*/
@@ -71,7 +74,7 @@ public abstract class BaseBlock extends MappableContent{
     }
 
     /**Returns offset for stack placement.*/
-    public void getStackOffset(Item item, Tile tile, Translator trns){
+    public void getStackOffset(Item item, Tile tile, Vector2 trns){
 
     }
 
@@ -96,19 +99,6 @@ public abstract class BaseBlock extends MappableContent{
 
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         tile.entity.liquids.add(liquid, amount);
-    }
-
-    public boolean acceptPower(Tile tile, Tile source, float amount){
-        return true;
-    }
-
-    /**Returns how much power is accepted.*/
-    public float addPower(Tile tile, float amount){
-        float canAccept = Math.min(powerCapacity - tile.entity.power.amount, amount);
-
-        tile.entity.power.amount += canAccept;
-
-        return canAccept;
     }
 
     public void tryDumpLiquid(Tile tile, Liquid liquid){
@@ -164,15 +154,15 @@ public abstract class BaseBlock extends MappableContent{
                     Liquid other = next.entity.liquids.current();
                     if((other.flammability > 0.3f && liquid.temperature > 0.7f) ||
                             (liquid.flammability > 0.3f && other.temperature > 0.7f)){
-                        tile.entity.damage(1 * Timers.delta());
-                        next.entity.damage(1 * Timers.delta());
-                        if(Mathf.chance(0.1 * Timers.delta())){
+                        tile.entity.damage(1 * Time.delta());
+                        next.entity.damage(1 * Time.delta());
+                        if(Mathf.chance(0.1 * Time.delta())){
                             Effects.effect(EnvironmentFx.fire, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
                         }
                     }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) ||
                             (other.temperature > 0.7f && liquid.temperature < 0.55f)){
-                        tile.entity.liquids.remove(liquid, Math.min(tile.entity.liquids.get(liquid), 0.7f * Timers.delta()));
-                        if(Mathf.chance(0.2f * Timers.delta())){
+                        tile.entity.liquids.remove(liquid, Math.min(tile.entity.liquids.get(liquid), 0.7f * Time.delta()));
+                        if(Mathf.chance(0.2f * Time.delta())){
                             Effects.effect(EnvironmentFx.steam, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
                         }
                     }

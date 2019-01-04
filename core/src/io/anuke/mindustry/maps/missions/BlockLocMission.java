@@ -1,17 +1,15 @@
 package io.anuke.mindustry.maps.missions;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
 
-import static io.anuke.mindustry.Vars.players;
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class BlockLocMission extends Mission{
     private final Block block;
@@ -36,26 +34,26 @@ public class BlockLocMission extends Mission{
         Lines.stroke(2f);
 
         Draw.color(Palette.accentBack);
-        Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1f, block.size * tilesize/2f + 1f+ Mathf.absin(Timers.time(), 6f, 2f));
+        Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1f, block.size * tilesize/2f + 1f+ Mathf.absin(Time.time(), 6f, 2f));
 
         Draw.color(Palette.accent);
-        Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset(), block.size * tilesize/2f + 1f+ Mathf.absin(Timers.time(), 6f, 2f));
+        Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset(), block.size * tilesize/2f + 1f+ Mathf.absin(Time.time(), 6f, 2f));
 
 
         if(block.rotate){
             Draw.colorl(0.4f);
-            Draw.rect("icon-arrow", x * tilesize + block.offset(), y * tilesize + block.offset() - 1f, rotation*90);
+            Draw.rect(Core.atlas.find("icon-arrow"), x * tilesize + block.offset(), y * tilesize + block.offset() - 1f, rotation*90);
             Draw.colorl(0.6f);
-            Draw.rect("icon-arrow", x * tilesize + block.offset(), y * tilesize + block.offset(), rotation*90);
+            Draw.rect(Core.atlas.find("icon-arrow"), x * tilesize + block.offset(), y * tilesize + block.offset(), rotation*90);
         }
 
         float rot = players[0].angleTo(x * tilesize + block.offset(), y * tilesize + block.offset());
         float len = 12f;
 
         Draw.color(Palette.accentBack);
-        Draw.rect("icon-arrow", players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len), rot);
+        Draw.rect(Core.atlas.find("icon-arrow"), players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len), rot);
         Draw.color(Palette.accent);
-        Draw.rect("icon-arrow", players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len) + 1f, rot);
+        Draw.rect(Core.atlas.find("icon-arrow"), players[0].x + Angles.trnsx(rot, len), players[0].y + Angles.trnsy(rot, len) + 1f, rot);
 
         Draw.reset();
     }
@@ -67,6 +65,6 @@ public class BlockLocMission extends Mission{
 
     @Override
     public String displayString(){
-        return Bundles.format("text.mission.block", block.formalName);
+        return Core.bundle.format("text.mission.block", block.formalName);
     }
 }

@@ -1,7 +1,10 @@
 package io.anuke.mindustry.ai;
 
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.*;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -11,12 +14,6 @@ import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadArray;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -47,7 +44,7 @@ public class BlockIndexer{
     /**Empty set used for returning.*/
     private ObjectSet<Tile> emptySet = new ObjectSet<>();
     /**Array used for returning and reusing.*/
-    private Array<Tile> returnArray = new ThreadArray<>();
+    private Array<Tile> returnArray = new Array<>();
 
     public BlockIndexer(){
         Events.on(TileChangeEvent.class, event -> {
@@ -176,7 +173,7 @@ public class BlockIndexer{
 
                         TileEntity e = other.entity;
 
-                        float ndst = Vector2.dst(x, y, e.x, e.y);
+                        float ndst = Mathf.dst(x, y, e.x, e.y);
                         if(ndst < range && (closest == null || ndst < dst)){
                             dst = ndst;
                             closest = e;

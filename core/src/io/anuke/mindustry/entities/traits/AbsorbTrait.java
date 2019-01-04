@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.ucore.entities.trait.DamageTrait;
-import io.anuke.ucore.entities.trait.Entity;
+import io.anuke.arc.entities.trait.DamageTrait;
+import io.anuke.arc.entities.trait.Entity;
 
 public interface AbsorbTrait extends Entity, TeamTrait, DamageTrait{
     void absorb();

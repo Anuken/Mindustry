@@ -1,9 +1,20 @@
 package io.anuke.mindustry.entities;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.impl.DestructibleEntity;
+import io.anuke.arc.entities.trait.DamageTrait;
+import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.arc.entities.trait.SolidTrait;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.blocks.Blocks;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
@@ -15,16 +26,6 @@ import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.impl.DestructibleEntity;
-import io.anuke.ucore.entities.trait.DamageTrait;
-import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.entities.trait.SolidTrait;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -194,7 +195,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         Units.getNearby(queryRect, t -> {
             if(t == this || t.getCarrier() == this || getCarrier() == t || t.isFlying() != isFlying()) return;
-            float dst = distanceTo(t);
+            float dst = dst(t);
             moveVector.set(x, y).sub(t.getX(), t.getY()).setLength(1f * (1f - (dst / queryRect.getWidth())));
             applyImpulse(moveVector.x, moveVector.y);
         });
@@ -235,11 +236,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         status.update(this);
 
-        velocity.limit(getMaxVelocity()).scl(1f + (status.getSpeedMultiplier()-1f) * Timers.delta());
+        velocity.limit(getMaxVelocity()).scl(1f + (status.getSpeedMultiplier()-1f) * Time.delta());
 
         if(isFlying()){
-            x += velocity.x * Timers.delta();
-            y += velocity.y * Timers.delta();
+            x += velocity.x * Time.delta();
+            y += velocity.y * Time.delta();
         }else{
             boolean onLiquid = floor.isLiquid;
 
@@ -255,7 +256,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 }
             }
 
-            if(onLiquid && velocity.len() > 0.4f && Mathf.chance((velocity.len() * floor.speedMultiplier) * 0.06f * Timers.delta())){
+            if(onLiquid && velocity.len() > 0.4f && Mathf.chance((velocity.len() * floor.speedMultiplier) * 0.06f * Time.delta())){
                 Effects.effect(floor.walkEffect, floor.liquidColor, x, y);
             }
 
@@ -268,8 +269,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             }
 
             if(onLiquid && floor.drownTime > 0){
-                drownTime += Timers.delta() * 1f / floor.drownTime;
-                if(Mathf.chance(Timers.delta() * 0.05f)){
+                drownTime += Time.delta() * 1f / floor.drownTime;
+                if(Mathf.chance(Time.delta() * 0.05f)){
                     Effects.effect(floor.drownUpdateEffect, floor.liquidColor, x, y);
                 }
             }else{
@@ -283,12 +284,12 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             }
 
             float px = x, py = y;
-            move(velocity.x * floor.speedMultiplier * Timers.delta(), velocity.y * floor.speedMultiplier * Timers.delta());
+            move(velocity.x * floor.speedMultiplier * Time.delta(), velocity.y * floor.speedMultiplier * Time.delta());
             if(Math.abs(px - x) <= 0.0001f) velocity.x = 0f;
             if(Math.abs(py - y) <= 0.0001f) velocity.y = 0f;
         }
 
-        velocity.scl(Mathf.clamp(1f - getDrag() * (isFlying() ? 1f : floor.dragMultiplier) * Timers.delta()));
+        velocity.scl(Mathf.clamp(1f - getDrag() * (isFlying() ? 1f : floor.dragMultiplier) * Time.delta()));
     }
 
     public void applyEffect(StatusEffect effect, float intensity){
@@ -297,7 +298,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void damagePeriodic(float amount){
-        damage(amount * Timers.delta(), hitTime <= -20 + hitDuration);
+        damage(amount * Time.delta(), hitTime <= -20 + hitDuration);
     }
 
     public void damage(float amount, boolean withEffect){
@@ -317,14 +318,14 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void drawStats(){
-        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Timers.time(), healthf()*5f, 1f - healthf()));
+        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf()*5f, 1f - healthf()));
         Draw.alpha(hitTime);
         Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
         Draw.color();
     }
 
     public TextureRegion getPowerCellRegion(){
-        return Draw.region("power-cell");
+        return Core.atlas.find("power-cell");
     }
 
     public void drawAll(){

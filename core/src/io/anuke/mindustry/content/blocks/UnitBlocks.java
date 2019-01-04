@@ -45,7 +45,6 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 3600;
             size = 3;
             consumes.power(0.2f);
-            shadow = "shadow-round-3";
             consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 30), new ItemStack(Items.plastanium, 20));
         }};
 
@@ -54,7 +53,6 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 8000;
             size = 4;
             consumes.power(0.3f);
-            shadow = "shadow-round-4";
             consumes.items(new ItemStack(Items.silicon, 80), new ItemStack(Items.titanium, 80), new ItemStack(Items.plastanium, 50));
         }};
 
@@ -71,7 +69,6 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 3400;
             size = 3;
             consumes.power(0.15f);
-            shadow = "shadow-round-3";
             consumes.items(new ItemStack(Items.silicon, 20), new ItemStack(Items.thorium, 30));
         }};
 
@@ -80,12 +77,10 @@ public class UnitBlocks extends BlockList implements ContentList{
             produceTime = 5000;
             size = 3;
             consumes.power(0.2f);
-            shadow = "shadow-round-3";
             consumes.items(new ItemStack(Items.silicon, 40), new ItemStack(Items.thorium, 50));
         }};
 
         repairPoint = new RepairPoint("repair-point"){{
-            shadow = "shadow-round-1";
             repairSpeed = 0.1f;
         }};
 

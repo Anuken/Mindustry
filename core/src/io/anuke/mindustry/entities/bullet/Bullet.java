@@ -1,8 +1,17 @@
 package io.anuke.mindustry.entities.bullet;
 
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.BulletEntity;
+import io.anuke.arc.entities.trait.Entity;
+import io.anuke.arc.entities.trait.SolidTrait;
+import io.anuke.arc.entities.trait.VelocityTrait;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.traits.AbsorbTrait;
@@ -10,15 +19,6 @@ import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TeamTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.BulletEntity;
-import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.entities.trait.SolidTrait;
-import io.anuke.ucore.entities.trait.VelocityTrait;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Pooling;
-import io.anuke.ucore.util.Timer;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -28,7 +28,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncTrait, AbsorbTrait{
     private static Vector2 vector = new Vector2();
-    public Timer timer = new Timer(3);
+    public Interval timer = new Interval(3);
     private float lifeScl;
     private Team team;
     private Object data;
@@ -55,21 +55,21 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     }
 
     public static Bullet create(BulletType type, Entity owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Object data){
-        Bullet bullet = Pooling.obtain(Bullet.class, Bullet::new);
+        Bullet bullet = Pools.obtain(Bullet.class, Bullet::new);
         bullet.type = type;
         bullet.owner = owner;
         bullet.data = data;
 
         bullet.velocity.set(0, type.speed).setAngle(angle).scl(velocityScl);
         if(type.keepVelocity){
-            bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait) owner).getVelocity() : Vector2.Zero);
+            bullet.velocity.add(owner instanceof VelocityTrait ? ((VelocityTrait) owner).getVelocity() : Vector2.ZERO);
         }
 
         bullet.team = team;
         bullet.type = type;
         bullet.lifeScl = lifetimeScl;
 
-        bullet.set(x - bullet.velocity.x * Timers.delta(), y - bullet.velocity.y * Timers.delta());
+        bullet.set(x - bullet.velocity.x * Time.delta(), y - bullet.velocity.y * Time.delta());
         bullet.add();
 
         return bullet;
@@ -158,7 +158,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
     }
 
     @Override
-    public void read(DataInput data, long time) throws IOException{
+    public void read(DataInput data) throws IOException{
         x = data.readFloat();
         y = data.readFloat();
         velocity.x = data.readFloat();
@@ -236,7 +236,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
     @Override
     protected void updateLife(){
-        time += Timers.delta() * 1f/(lifeScl);
+        time += Time.delta() * 1f/(lifeScl);
         time = Mathf.clamp(time, 0, type.lifetime());
 
         if(time >= type.lifetime){
@@ -259,7 +259,7 @@ public class Bullet extends BulletEntity<BulletType> implements TeamTrait, SyncT
 
     @Override
     public void removed(){
-        Pooling.free(this);
+        Pools.free(this);
     }
 
     @Override

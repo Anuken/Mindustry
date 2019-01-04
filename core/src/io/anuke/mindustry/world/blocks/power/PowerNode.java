@@ -1,8 +1,14 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -12,15 +18,9 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class PowerNode extends PowerBlock{
     public static final float thicknessScl = 0.7f;
@@ -29,8 +29,8 @@ public class PowerNode extends PowerBlock{
     //last distribution block placed
     private static int lastPlaced = -1;
 
-    protected Translator t1 = new Translator();
-    protected Translator t2 = new Translator();
+    protected Vector2 t1 = new Vector2();
+    protected Vector2 t2 = new Vector2();
 
     protected float laserRange = 6;
     protected int maxNodes = 3;
@@ -39,7 +39,6 @@ public class PowerNode extends PowerBlock{
         super(name);
         expanded = true;
         layer = Layer.power;
-        powerCapacity = 5f;
         configurable = true;
         consumesPower = false;
         outputsPower = false;
@@ -91,10 +90,6 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void setBars(){
-    }
-
-    @Override
     public void playerPlaced(Tile tile){
         Tile before = world.tile(lastPlaced);
         if(linkValid(tile, before) && before.block() instanceof PowerNode){
@@ -131,9 +126,9 @@ public class PowerNode extends PowerBlock{
 
         if(linkValid(tile, other)){
             if(linked(tile, other)){
-                threads.run(() -> Call.unlinkPowerNodes(null, tile, result));
+                Call.unlinkPowerNodes(null, tile, result);
             }else if(entity.power.links.size < maxNodes){
-                threads.run(() -> Call.linkPowerNodes(null, tile, result));
+                Call.linkPowerNodes(null, tile, result);
             }
             return false;
         }
@@ -159,7 +154,7 @@ public class PowerNode extends PowerBlock{
 
         Lines.stroke(1f);
         Lines.circle(tile.drawx(), tile.drawy(),
-                tile.block().size * tilesize / 2f + 1f + Mathf.absin(Timers.time(), 4f, 1f));
+                tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time(), 4f, 1f));
 
         Lines.poly(tile.drawx(), tile.drawy(), 50, laserRange*tilesize);
 
@@ -173,7 +168,7 @@ public class PowerNode extends PowerBlock{
                     Draw.color(linked ? Palette.place : Palette.breakInvalid);
 
                     Lines.circle(link.drawx(), link.drawy(),
-                            link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Timers.time(), 4f, 1f)));
+                            link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
 
                     if((entity.power.links.size >= maxNodes || (link.block() instanceof PowerNode && link.entity.power.links.size >= ((PowerNode) link.block()).maxNodes)) && !linked){
                         Draw.color();
@@ -196,7 +191,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void drawLayer(Tile tile){
-        if(!Settings.getBool("lasers")) return;
+        if(!Core.settings.getBool("lasers")) return;
 
         TileEntity entity = tile.entity();
 
@@ -225,12 +220,12 @@ public class PowerNode extends PowerBlock{
         if(link.block() instanceof PowerNode){
             TileEntity oe = link.entity();
 
-            return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
+            return Mathf.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
                     ((PowerNode) link.block()).laserRange * tilesize)
                     + (link.block().size - 1) * tilesize / 2f + (tile.block().size - 1) * tilesize / 2f &&
                     (!checkMaxNodes || (oe.power.links.size < ((PowerNode) link.block()).maxNodes || oe.power.links.contains(tile.pos())));
         }else{
-            return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
+            return Mathf.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
                     <= laserRange * tilesize + (link.block().size - 1) * tilesize;
         }
     }
@@ -242,15 +237,15 @@ public class PowerNode extends PowerBlock{
         float angle1 = Angles.angle(x1, y1, x2, y2);
         float angle2 = angle1 + 180f;
 
-        t1.trns(angle1, tile.block().size * tilesize / 2f - 1f);
-        t2.trns(angle2, target.block().size * tilesize / 2f - 1f);
+        t1.trns(angle1, tile.block().size * tilesize / 2f - 1.5f);
+        t2.trns(angle2, target.block().size * tilesize / 2f - 1.5f);
 
         x1 += t1.x;
         y1 += t1.y;
         x2 += t2.x;
         y2 += t2.y;
 
-        Draw.color(Palette.powerLight, Palette.power, Mathf.absin(Timers.time(), 8f, 1f));
+        Draw.color(Palette.powerLight, Palette.power, Mathf.absin(Time.time(), 8f, 1f));
         Lines.stroke(2f);
         Lines.line(x1, y1, x2, y2);
     }

@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.ucore.entities.trait.SolidTrait;
+import io.anuke.arc.entities.trait.SolidTrait;
 
 public interface CarriableTrait extends TeamTrait, TargetTrait, SolidTrait{
 

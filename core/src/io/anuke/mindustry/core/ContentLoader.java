@@ -1,8 +1,10 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.util.Log;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.content.bullets.*;
@@ -24,9 +26,6 @@ import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.ThreadArray;
 
 /**
  * Loads all game content.
@@ -114,7 +113,7 @@ public class ContentLoader{
         registerTypes();
 
         for(ContentType type : ContentType.values()){
-            contentMap[type.ordinal()] = new ThreadArray<>();
+            contentMap[type.ordinal()] = new Array<>();
             contentNameMap[type.ordinal()] =  new ObjectMap<>();
         }
 

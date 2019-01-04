@@ -1,20 +1,21 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Blending;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public class FusionReactor extends PowerGenerator{
     protected int plasmas = 4;
-    protected float maxPowerProduced = 2f;
     protected float warmupSpeed = 0.001f;
 
     protected Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
@@ -24,33 +25,27 @@ public class FusionReactor extends PowerGenerator{
         super(name);
         hasPower = true;
         hasLiquids = true;
-        powerCapacity = 100f;
+        powerProduction = 2.0f;
         liquidCapacity = 30f;
         hasItems = true;
-    }
-
-    @Override
-    public void setStats(){
-        super.setStats();
-
-        stats.add(BlockStat.basePowerGeneration, maxPowerProduced * 60f, StatUnit.powerSecond);
     }
 
     @Override
     public void update(Tile tile){
         FusionReactorEntity entity = tile.entity();
 
+        float increaseOrDecrease = 1.0f;
         if(entity.cons.valid()){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.01f);
+            increaseOrDecrease = -1.0f;
         }
 
-        float powerAdded = Math.min(powerCapacity - entity.power.amount, maxPowerProduced * Mathf.pow(entity.warmup, 4f) * Timers.delta());
-        entity.power.amount += powerAdded;
-        entity.totalProgress += entity.warmup * Timers.delta();
+        float efficiencyAdded = Mathf.pow(entity.warmup, 4f) * Time.delta();
+        entity.productionEfficiency = Mathf.clamp(entity.productionEfficiency + efficiencyAdded * increaseOrDecrease);
 
-        tile.entity.power.graph.update();
+        super.update(tile);
     }
 
     @Override
@@ -78,25 +73,23 @@ public class FusionReactor extends PowerGenerator{
 
         Draw.rect(name + "-bottom", tile.drawx(), tile.drawy());
 
-        Graphics.setAdditiveBlending();
-
         for(int i = 0; i < plasmas; i++){
-            float r = 29f + Mathf.absin(Timers.time(), 2f + i * 1f, 5f - i * 0.5f);
+            float r = 29f + Mathf.absin(Time.time(), 2f + i * 1f, 5f - i * 0.5f);
 
             Draw.color(plasma1, plasma2, (float) i / plasmas);
-            Draw.alpha((0.3f + Mathf.absin(Timers.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * entity.warmup);
-            Draw.rect(name + "-plasma-" + i, tile.drawx(), tile.drawy(), r, r, Timers.time() * (12 + i * 6f) * entity.warmup);
+            Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * entity.warmup);
+            Draw.blend(Blending.additive);
+            Draw.rect(name + "-plasma-" + i, tile.drawx(), tile.drawy(), r, r, Time.time() * (12 + i * 6f) * entity.warmup);
+            Draw.blend();
         }
 
         Draw.color();
-
-        Graphics.setNormalBlending();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
 
         Draw.rect(name + "-top", tile.drawx(), tile.drawy());
 
-        Draw.color(ind1, ind2, entity.warmup + Mathf.absin(entity.totalProgress, 3f, entity.warmup * 0.5f));
+        Draw.color(ind1, ind2, entity.warmup + Mathf.absin(entity.productionEfficiency, 3f, entity.warmup * 0.5f));
         Draw.rect(name + "-light", tile.drawx(), tile.drawy());
 
         Draw.color();
@@ -104,7 +97,7 @@ public class FusionReactor extends PowerGenerator{
 
     @Override
     public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Draw.region(name + "-bottom"), Draw.region(name), Draw.region(name + "-top")};
+        return new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name), Core.atlas.find(name + "-top")};
     }
 
     @Override
@@ -123,7 +116,19 @@ public class FusionReactor extends PowerGenerator{
         //TODO catastrophic failure
     }
 
-    public static class FusionReactorEntity extends GenericCrafterEntity{
+    public static class FusionReactorEntity extends GeneratorEntity{
+        public float warmup;
 
+        @Override
+        public void write(DataOutput stream) throws IOException{
+            super.write(stream);
+            stream.writeFloat(warmup);
+        }
+
+        @Override
+        public void read(DataInput stream) throws IOException{
+            super.read(stream);
+            warmup = stream.readFloat();
+        }
     }
 }

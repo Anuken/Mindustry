@@ -1,13 +1,12 @@
 package io.anuke.mindustry.ui;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.layout.Unit;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.layout.Unit;
 
 public class BorderImage extends Image{
     private float thickness = 3f;
@@ -31,8 +30,8 @@ public class BorderImage extends Image{
     }
 
     @Override
-    public void draw(Batch batch, float alpha){
-        super.draw(batch, alpha);
+    public void draw(){
+        super.draw();
 
         float scaleX = getScaleX();
         float scaleY = getScaleY();

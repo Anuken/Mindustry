@@ -1,17 +1,17 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.ucore.scene.event.HandCursorListener;
-import io.anuke.ucore.scene.ui.Image;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.Tooltip;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.utils.UIUtils;
+import io.anuke.arc.scene.event.HandCursorListener;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.Tooltip;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.utils.UIUtils;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.control;

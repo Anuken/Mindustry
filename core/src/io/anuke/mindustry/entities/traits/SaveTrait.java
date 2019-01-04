@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.ucore.entities.trait.Entity;
+import io.anuke.arc.entities.trait.Entity;
 
 /**
  * Marks an entity as serializable.

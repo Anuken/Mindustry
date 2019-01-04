@@ -1,8 +1,8 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.ObjectIntMap;
+import io.anuke.arc.collection.ObjectIntMap;
+import io.anuke.arc.function.Supplier;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.ucore.function.Supplier;
 
 public class Registrator{
     private static ClassEntry[] classes = {

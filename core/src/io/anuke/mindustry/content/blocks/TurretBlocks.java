@@ -1,16 +1,17 @@
 package io.anuke.mindustry.content.blocks;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.AmmoTypes;
 import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
 
 public class TurretBlocks extends BlockList implements ContentList{
     public static Block duo, /*scatter,*/
@@ -46,7 +47,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             @Override
             public void load(){
                 super.load();
-                shootRegion = Draw.region(name + "-shoot");
+                shootRegion = Core.atlas.find(name + "-shoot");
             }
 
             {
@@ -91,8 +92,8 @@ public class TurretBlocks extends BlockList implements ContentList{
             recoil = 2f;
             reload = 100f;
             cooldown = 0.03f;
-            powerUsed = 20f;
-            powerCapacity = 60f;
+            powerUsed = 1 / 3f;
+            consumes.powerBuffered(60f);
             shootShake = 2f;
             shootEffect = ShootFx.lancerLaserShoot;
             smokeEffect = ShootFx.lancerLaserShootSmoke;
@@ -110,8 +111,8 @@ public class TurretBlocks extends BlockList implements ContentList{
             shootShake = 1f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUsed = 10f;
-            powerCapacity = 30f;
+            powerUsed = 1f / 3f;
+            consumes.powerBuffered(30f);
             range = 150f;
             shootEffect = ShootFx.lightningShoot;
             heatColor = Color.RED;
@@ -137,8 +138,8 @@ public class TurretBlocks extends BlockList implements ContentList{
             @Override
             public void load() {
                 super.load();
-                panels[0] = Draw.region(name + "-panel-left");
-                panels[1] = Draw.region(name + "-panel-right");
+                panels[0] = Core.atlas.find(name + "-panel-left");
+                panels[1] = Core.atlas.find(name + "-panel-right");
             }
 
             {
@@ -157,8 +158,8 @@ public class TurretBlocks extends BlockList implements ContentList{
 
                 drawer = (tile, entity) -> {
                     Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-                    float offsetx = (int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 3f);
-                    float offsety = -(int) (Mathf.abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 2f);
+                    float offsetx = (int) (abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 3f);
+                    float offsety = -(int) (abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 2f);
 
                     for(int i : Mathf.signs){
                         float rot = entity.rotation + 90 * i;
@@ -169,6 +170,11 @@ public class TurretBlocks extends BlockList implements ContentList{
                 };
 
                 health = 360;
+            }
+
+            /** Converts a value range from 0-1 to a value range 0-1-0. */
+            float abscurve(float f){
+                return 1f - Math.abs(f - 0.5f) * 2f;
             }
         };
 
@@ -243,8 +249,8 @@ public class TurretBlocks extends BlockList implements ContentList{
             recoil = 4f;
             size = 4;
             shootShake = 2f;
-            powerUsed = 60f;
-            powerCapacity = 120f;
+            powerUsed = 0.5f;
+            consumes.powerBuffered(120f);
             range = 160f;
             reload = 200f;
             firingMoveFract = 0.1f;

@@ -1,22 +1,22 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.io.Contributors;
 import io.anuke.mindustry.io.Contributors.Contributor;
 import io.anuke.mindustry.ui.Links;
 import io.anuke.mindustry.ui.Links.LinkEntry;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.layout.Cell;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.scene.utils.UIUtils;
-import io.anuke.ucore.util.OS;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.Core;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.layout.Cell;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.utils.UIUtils;
+import io.anuke.arc.util.OS;
+import io.anuke.arc.util.Strings;
 
 import static io.anuke.mindustry.Vars.ios;
 import static io.anuke.mindustry.Vars.ui;
@@ -69,16 +69,16 @@ public class AboutDialog extends FloatingDialog{
             }).padLeft(8);
 
             table.addImageButton("icon-link", 14 * 3, () -> {
-                if(!Gdx.net.openURI(link.link)){
+                if(!Core.net.openURI(link.link)){
                     ui.showError("$text.linkfail");
-                    Gdx.app.getClipboard().setContents(link.link);
+                    Core.app.getClipboard().setContents(link.link);
                 }
             }).size(h - 5, h);
 
             in.add(table).size(w, h).padTop(5).row();
         }
 
-        shown(() -> Timers.run(1f, () -> Core.scene.setScrollFocus(pane)));
+        shown(() -> Time.run(1f, () -> Core.scene.setScrollFocus(pane)));
 
         content().add(pane).growX();
 

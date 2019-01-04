@@ -1,8 +1,15 @@
 package io.anuke.mindustry.world.blocks.units;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.Player;
@@ -15,25 +22,20 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 //TODO re-implement properly
 public class Reconstructor extends Block{
     protected float departTime = 30f;
     protected float arriveTime = 40f;
-    protected float powerPerTeleport = 5f;
+    /** Stores the percentage of buffered power to be used upon teleporting. */
+    protected float powerPerTeleport = 0.5f;
     protected Effect arriveEffect = Fx.spawn;
     protected TextureRegion openRegion;
 
@@ -43,13 +45,14 @@ public class Reconstructor extends Block{
         solidifes = true;
         hasPower = true;
         configurable = true;
+        consumes.powerBuffered(30f);
     }
 
     protected static boolean checkValidTap(Tile tile, ReconstructorEntity entity, Player player){
         return validLink(tile, entity.link) &&
                 Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
                 Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f &&
-                entity.current == null && entity.power.amount >= ((Reconstructor) tile.block()).powerPerTeleport;
+                entity.current == null && entity.power.satisfaction >= ((Reconstructor) tile.block()).powerPerTeleport;
     }
 
     protected static boolean validLink(Tile tile, int position){
@@ -74,13 +77,13 @@ public class Reconstructor extends Block{
     public static void reconstructPlayer(Player player, Tile tile){
         ReconstructorEntity entity = tile.entity();
 
-        if(!checkValidTap(tile, entity, player) || entity.power.amount < ((Reconstructor) tile.block()).powerPerTeleport)
+        if(!checkValidTap(tile, entity, player) || entity.power.satisfaction < ((Reconstructor) tile.block()).powerPerTeleport)
             return;
 
         entity.departing = true;
         entity.current = player;
         entity.solid = false;
-        entity.power.amount -= ((Reconstructor) tile.block()).powerPerTeleport;
+        entity.power.satisfaction -= Math.min(entity.power.satisfaction, ((Reconstructor) tile.block()).powerPerTeleport);
         entity.updateTime = 1f;
         entity.set(tile.drawx(), tile.drawy());
         player.rotation = 90f;
@@ -98,14 +101,11 @@ public class Reconstructor extends Block{
         ReconstructorEntity entity = tile.entity();
         ReconstructorEntity oe = other.entity();
 
-        //called in main thread to prevent issues
-        threads.run(() -> {
-            unlink(entity);
-            unlink(oe);
+        unlink(entity);
+        unlink(oe);
 
-            entity.link = other.pos();
-            oe.link = tile.pos();
-        });
+        entity.link = other.pos();
+        oe.link = tile.pos();
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
@@ -117,16 +117,14 @@ public class Reconstructor extends Block{
         ReconstructorEntity oe = other.entity();
 
         //called in main thread to prevent issues
-        threads.run(() -> {
-            unlink(entity);
-            unlink(oe);
-        });
+        unlink(entity);
+        unlink(oe);
     }
 
     @Override
     public void load(){
         super.load();
-        openRegion = Draw.region(name + "-open");
+        openRegion = Core.atlas.find(name + "-open");
     }
 
     @Override
@@ -206,10 +204,10 @@ public class Reconstructor extends Block{
             Shaders.build.color.set(Palette.accent);
             Shaders.build.time = -entity.time / 10f;
 
-            Graphics.shader(Shaders.build, false);
+            Draw.shader(Shaders.build, false);
             Shaders.build.apply();
             Draw.rect(region, tile.drawx(), tile.drawy());
-            Graphics.shader();
+            Draw.shader();
 
             Draw.color(Palette.accent);
 
@@ -230,7 +228,7 @@ public class Reconstructor extends Block{
         boolean stayOpen = false;
 
         if(entity.current != null){
-            entity.time += Timers.delta();
+            entity.time += Time.delta();
 
             entity.solid = true;
 
@@ -243,16 +241,16 @@ public class Reconstructor extends Block{
 
                 ReconstructorEntity other = world.tile(entity.link).entity();
 
-                entity.updateTime -= Timers.delta() / departTime;
+                entity.updateTime -= Time.delta() / departTime;
                 if(entity.updateTime <= 0f){
                     //no power? death.
-                    if(other.power.amount < powerPerTeleport){
+                    if(other.power.satisfaction < powerPerTeleport){
                         entity.current.setDead(true);
                         //entity.current.setRespawning(false);
                         entity.current = null;
                         return;
                     }
-                    other.power.amount -= powerPerTeleport;
+                    other.power.satisfaction -= Math.min(other.power.satisfaction, powerPerTeleport);
                     other.current = entity.current;
                     other.departing = false;
                     other.current.set(other.x, other.y);
@@ -260,7 +258,7 @@ public class Reconstructor extends Block{
                     entity.current = null;
                 }
             }else{ //else, arriving
-                entity.updateTime -= Timers.delta() / arriveTime;
+                entity.updateTime -= Time.delta() / arriveTime;
 
                 if(entity.updateTime <= 0f){
                     entity.solid = false;
@@ -276,8 +274,8 @@ public class Reconstructor extends Block{
 
             if(validLink(tile, entity.link)){
                 Tile other = world.tile(entity.link);
-                if(other.entity.power.amount >= powerPerTeleport && Units.anyEntities(tile, 4f, unit -> unit.getTeam() == entity.getTeam() && unit instanceof Player) &&
-                        entity.power.amount >= powerPerTeleport){
+                if(other.entity.power.satisfaction >= powerPerTeleport && Units.anyEntities(tile, 4f, unit -> unit.getTeam() == entity.getTeam() && unit instanceof Player) &&
+                        entity.power.satisfaction >= powerPerTeleport){
                     entity.solid = false;
                     stayOpen = true;
                 }

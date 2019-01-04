@@ -1,18 +1,17 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
-import com.badlogic.gdx.files.FileHandle;
-import io.anuke.kryonet.KryoClient;
-import io.anuke.kryonet.KryoServer;
+import io.anuke.arc.Core;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Strings;
+import io.anuke.net.KryoClient;
+import io.anuke.net.KryoServer;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Strings;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.uikit.*;
@@ -39,7 +38,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
 
             @Override
             public void shareFile(FileHandle file){
-                FileHandle to = Gdx.files.absolute(getDocumentsDirectory()).child(file.name());
+                FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
                 file.copyTo(to);
 
                 NSURL url = new NSURL(to.file());
@@ -47,7 +46,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
                 p.getPopoverPresentationController().setSourceView(UIApplication.getSharedApplication().getKeyWindow().getRootViewController().getView());
 
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
-                .presentViewController(p, true, () -> io.anuke.ucore.util.Log.info("Success! Presented {0}", to));
+                .presentViewController(p, true, () -> io.anuke.arc.util.Log.info("Success! Presented {0}", to));
             }
 
             @Override
@@ -91,9 +90,9 @@ public class IOSLauncher extends IOSApplication.Delegate {
 
     void openURL(NSURL url){
 
-        Gdx.app.postRunnable(() -> {
-            FileHandle file = Gdx.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
-            Gdx.files.absolute(url.getPath()).copyTo(file);
+        Core.app.post(() -> {
+            FileHandle file = Core.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
+            Core.files.absolute(url.getPath()).copyTo(file);
 
             if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
 
@@ -102,14 +101,14 @@ public class IOSLauncher extends IOSApplication.Delegate {
                         SaveSlot slot = control.saves.importSave(file);
                         ui.load.runLoadSave(slot);
                     }catch (IOException e){
-                        ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
+                        ui.showError(Core.bundle.format("text.save.import.fail", Strings.parseException(e, false)));
                     }
                 }else{
                     ui.showError("$text.save.import.invalid");
                 }
 
             }else if(file.extension().equalsIgnoreCase(mapExtension)){ //open map
-                Gdx.app.postRunnable(() -> {
+                Core.app.post(() -> {
                     if (!ui.editor.isShown()) {
                         ui.editor.show();
                     }

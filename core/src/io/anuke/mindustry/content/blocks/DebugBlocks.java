@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content.blocks;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.mindustry.content.Liquids;
@@ -10,17 +10,16 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.blocks.distribution.Sorter;
 import io.anuke.mindustry.world.blocks.power.PowerNode;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.ButtonGroup;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.scene.ui.ButtonGroup;
+import io.anuke.arc.scene.ui.ImageButton;
+import io.anuke.arc.scene.ui.layout.Table;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -40,36 +39,26 @@ public class DebugBlocks extends BlockList implements ContentList{
     public void load(){
         powerVoid = new PowerBlock("powervoid"){
             {
-                powerCapacity = Float.MAX_VALUE;
-                shadow = "shadow-round-1";
-            }
-
-            @Override
-            public void setBars(){
-                super.setBars();
-                bars.remove(BarType.power);
+                consumes.power(Float.MAX_VALUE);
             }
 
             @Override
             public void init(){
                 super.init();
-                stats.remove(BlockStat.powerCapacity);
+                stats.remove(BlockStat.powerUse);
             }
         };
 
         powerInfinite = new PowerNode("powerinfinite"){
             {
-                powerCapacity = 10000f;
                 maxNodes = 100;
                 outputsPower = true;
                 consumesPower = false;
-                shadow = "shadow-round-1";
             }
 
             @Override
-            public void update(Tile tile){
-                super.update(tile);
-                tile.entity.power.amount = powerCapacity;
+            public float getPowerProduction(Tile tile){
+                return 10000f;
             }
         };
 
@@ -81,12 +70,6 @@ public class DebugBlocks extends BlockList implements ContentList{
             @Override
             public boolean outputsItems(){
                 return true;
-            }
-
-            @Override
-            public void setBars(){
-                super.setBars();
-                bars.remove(BarType.inventory);
             }
 
             @Override

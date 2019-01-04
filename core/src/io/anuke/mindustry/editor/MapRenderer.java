@@ -1,21 +1,20 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.IntSet.IntSetIterator;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.collection.IntSet.IntSetIterator;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.util.Disposable;
+import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.graphics.IndexedRenderer;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.world.Block;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.IndexedRenderer;
-import io.anuke.ucore.util.Structs;
-import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Geometry;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -56,7 +55,7 @@ public class MapRenderer implements Disposable{
 
 
     public void draw(float tx, float ty, float tw, float th){
-        Graphics.end();
+        Draw.flush();
 
         IntSetIterator it = updates.iterator();
         while(it.hasNext){
@@ -79,15 +78,12 @@ public class MapRenderer implements Disposable{
                     mesh = chunks[x][y];
                 }
 
-                mesh.getTransformMatrix().setToTranslation(tx, ty, 0).scl(tw / (width * tilesize),
-                        th / (height * tilesize), 1f);
-                mesh.setProjectionMatrix(Core.batch.getProjectionMatrix());
+                mesh.getTransformMatrix().setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize));
+                mesh.setProjectionMatrix(Draw.proj());
 
                 mesh.render(Core.atlas.getTextures().first());
             }
         }
-
-        Graphics.begin();
     }
 
     public void updatePoint(int x, int y){
@@ -111,8 +107,8 @@ public class MapRenderer implements Disposable{
         byte bw = editor.getMap().read(wx, wy, DataPosition.wall);
         byte btr = editor.getMap().read(wx, wy, DataPosition.rotationTeam);
         byte elev = editor.getMap().read(wx, wy, DataPosition.elevation);
-        byte rotation = Bits.getLeftByte(btr);
-        Team team = Team.all[Bits.getRightByte(btr)];
+        byte rotation = Pack.leftByte(btr);
+        Team team = Team.all[Pack.rightByte(btr)];
 
         Block floor = content.block(bf);
         Block wall = content.block(bw);
@@ -125,12 +121,12 @@ public class MapRenderer implements Disposable{
             if(wall.rotate){
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
                         wx * tilesize + wall.offset(), wy * tilesize + wall.offset(),
-                        region.getRegionWidth(), region.getRegionHeight(), rotation * 90 - 90);
+                        region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, rotation * 90 - 90);
             }else{
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
-                        wx * tilesize + wall.offset() + (tilesize - region.getRegionWidth())/2f,
-                        wy * tilesize + wall.offset() + (tilesize - region.getRegionHeight())/2f,
-                        region.getRegionWidth(), region.getRegionHeight());
+                        wx * tilesize + wall.offset() + (tilesize - region.getWidth() * Draw.scl)/2f,
+                        wy * tilesize + wall.offset() + (tilesize - region.getHeight() * Draw.scl)/2f,
+                        region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
             }
         }else{
             region = floor.getEditorIcon();
@@ -142,24 +138,24 @@ public class MapRenderer implements Disposable{
 
         if(wall.update || wall.destructible){
             mesh.setColor(team.color);
-            region = Draw.region("block-border");
+            region = Core.atlas.find("block-border");
         }else if(elev > 0 && check){
             mesh.setColor(tmpColor.fromHsv((360f * elev / 127f * 4f) % 360f, 0.5f + (elev / 4f) % 0.5f, 1f));
-            region = Draw.region("block-elevation");
+            region = Core.atlas.find("block-elevation");
         }else if(elev == -1){
-            region = Draw.region("block-slope");
+            region = Core.atlas.find("block-slope");
         }else{
-            region = Draw.region("clear");
+            region = Core.atlas.find("clear");
         }
 
         mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize, region,
                 wx * tilesize - (wall.size/3) * tilesize, wy * tilesize - (wall.size/3) * tilesize,
-                region.getRegionWidth(), region.getRegionHeight());
+                region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
         mesh.setColor(Color.WHITE);
     }
 
     private boolean checkElevation(byte elev, int x, int y){
-        for(GridPoint2 p : Geometry.d4){
+        for(Point2 p : Geometry.d4){
             int wx = x + p.x, wy = y + p.y;
             if(!Structs.inBounds(wx, wy, editor.getMap().width(), editor.getMap().height())){
                 return true;

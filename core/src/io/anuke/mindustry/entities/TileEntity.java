@@ -1,11 +1,18 @@
 package io.anuke.mindustry.entities;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.EntityGroup;
+import io.anuke.arc.entities.impl.BaseEntity;
+import io.anuke.arc.entities.trait.HealthTrait;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.fx.Fx;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.TargetTrait;
@@ -20,13 +27,6 @@ import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
 import io.anuke.mindustry.world.modules.PowerModule;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.BaseEntity;
-import io.anuke.ucore.entities.trait.HealthTrait;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Timer;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -42,7 +42,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public static int sleepingEntities = 0;
 
     public Tile tile;
-    public Timer timer;
+    public Interval timer;
     public float health;
     public float timeScale = 1f, timeScaleDuration;
 
@@ -78,7 +78,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
         health = tile.block().health;
 
-        timer = new Timer(tile.block().timers);
+        timer = new Interval(tile.block().timers);
 
         if(shouldAdd){
             add();
@@ -89,12 +89,12 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     /**Scaled delta.*/
     public float delta(){
-        return Timers.delta() * timeScale;
+        return Time.delta() * timeScale;
     }
 
     /**Call when nothing is happening to the entity. This increments the internal sleep timer.*/
     public void sleep(){
-        sleepTime += Timers.delta();
+        sleepTime += Time.delta();
         if(!sleeping && sleepTime >= timeToSleep){
             remove();
             sleeping = true;
@@ -169,8 +169,8 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public void removeFromProximity(){
         tile.block().onProximityRemoved(tile);
 
-        GridPoint2[] nearby = Edges.getEdges(tile.block().size);
-        for(GridPoint2 point : nearby){
+        Point2[] nearby = Edges.getEdges(tile.block().size);
+        for(Point2 point : nearby){
             Tile other = world.tile(tile.x + point.x, tile.y + point.y);
             //remove this tile from all nearby tile's proximities
             if(other != null){
@@ -187,8 +187,8 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         tmpTiles.clear();
         proximity.clear();
 
-        GridPoint2[] nearby = Edges.getEdges(tile.block().size);
-        for(GridPoint2 point : nearby){
+        Point2[] nearby = Edges.getEdges(tile.block().size);
+        for(Point2 point : nearby){
             Tile other = world.tile(tile.x + point.x, tile.y + point.y);
 
             if(other == null) continue;
@@ -258,19 +258,19 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     @Override
     public Vector2 getVelocity(){
-        return Vector2.Zero;
+        return Vector2.ZERO;
     }
 
     @Override
     public void update(){
         //TODO better smoke effect, this one is awful
         if(health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
-                Mathf.chance(0.009f * Timers.delta() * (1f - health / tile.block().health))){
+                Mathf.chance(0.009f * Time.delta() * (1f - health / tile.block().health))){
 
             Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
         }
 
-        timeScaleDuration -= Timers.delta();
+        timeScaleDuration -= Time.delta();
         if(timeScaleDuration <= 0f || !tile.block().canOverdrive){
             timeScale = 1f;
         }

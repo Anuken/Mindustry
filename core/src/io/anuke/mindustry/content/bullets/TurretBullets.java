@@ -1,6 +1,14 @@
 package io.anuke.mindustry.content.bullets;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.CapStyle;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BlockFx;
@@ -15,14 +23,10 @@ import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.*;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
@@ -105,18 +109,18 @@ public class TurretBullets extends BulletList implements ContentList{
 
             @Override
             public void update(Bullet b){
-                if(Mathf.chance(0.04 * Timers.delta())){
+                if(Mathf.chance(0.04 * Time.delta())){
                     Tile tile = world.tileWorld(b.x, b.y);
                     if(tile != null){
                         Fire.create(tile);
                     }
                 }
 
-                if(Mathf.chance(0.1 * Timers.delta())){
+                if(Mathf.chance(0.1 * Time.delta())){
                     Effects.effect(EnvironmentFx.fireballsmoke, b.x, b.y);
                 }
 
-                if(Mathf.chance(0.1 * Timers.delta())){
+                if(Mathf.chance(0.1 * Time.delta())){
                     Effects.effect(EnvironmentFx.ballfire, b.x, b.y);
                 }
             }
@@ -213,10 +217,10 @@ public class TurretBullets extends BulletList implements ContentList{
 
                 Lines.lineAngle(b.x, b.y, b.angle(), baseLen);
                 for(int s = 0; s < colors.length; s++){
-                    Draw.color(tmpColor.set(colors[s]).mul(1f + Mathf.absin(Timers.time(), 1f, 0.1f)));
+                    Draw.color(tmpColor.set(colors[s]).mul(1f + Mathf.absin(Time.time(), 1f, 0.1f)));
                     for(int i = 0; i < tscales.length; i++){
                         vector.trns(b.angle() + 180f, (lenscales[i] - 1f) * 35f);
-                        Lines.stroke((9f + Mathf.absin(Timers.time(), 0.8f, 1.5f)) * b.fout() * strokes[s] * tscales[i]);
+                        Lines.stroke((9f + Mathf.absin(Time.time(), 0.8f, 1.5f)) * b.fout() * strokes[s] * tscales[i]);
                         Lines.lineAngle(b.x + vector.x, b.y + vector.y, b.angle(), baseLen * lenscales[i], CapStyle.none);
                     }
                 }
@@ -367,9 +371,9 @@ public class TurretBullets extends BulletList implements ContentList{
                     return;
                 }
 
-                float baseDst = data.from.distanceTo(data.to);
-                float dst1 = b.distanceTo(data.from);
-                float dst2 = b.distanceTo(data.to);
+                float baseDst = data.from.dst(data.to);
+                float dst1 = b.dst(data.from);
+                float dst2 = b.dst(data.to);
 
                 boolean intersect = false;
 
@@ -379,7 +383,7 @@ public class TurretBullets extends BulletList implements ContentList{
                     float baseAngle = data.to.angleTo(data.from);
 
                     //if angles are nearby, then yes, it did
-                    if(Mathf.angNear(angleTo, baseAngle, 2f)){
+                    if(Angles.near(angleTo, baseAngle, 2f)){
                         intersect = true;
                         //snap bullet position back; this is used for low-FPS situations
                         b.set(data.to.x + Angles.trnsx(baseAngle, hitDst), data.to.y + Angles.trnsy(baseAngle, hitDst));

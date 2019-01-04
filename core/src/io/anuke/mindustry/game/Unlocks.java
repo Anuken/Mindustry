@@ -1,19 +1,20 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Settings;
+import io.anuke.arc.Events;
+import io.anuke.arc.Settings;
 
 /**Stores player unlocks. Clientside only.*/
 public class Unlocks{
     private ObjectMap<ContentType, ObjectSet<String>> unlocked = new ObjectMap<>();
     private boolean dirty;
 
-    static{
-        Settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
+    public Unlocks(){
+        Core.settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
     }
 
     /** Returns whether or not this piece of content is unlocked yet.*/
@@ -65,13 +66,14 @@ public class Unlocks{
         save();
     }
 
+    @SuppressWarnings("unchecked")
     public void load(){
-        unlocked = Settings.getObject("unlockset", ObjectMap.class, ObjectMap::new);
+        unlocked = Core.settings.getObject("unlockset", ObjectMap.class, ObjectMap::new);
     }
 
     public void save(){
-        Settings.putObject("unlockset", unlocked);
-        Settings.save();
+        Core.settings.putObject("unlockset", unlocked);
+        Core.settings.save();
     }
 
 }

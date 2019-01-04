@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
+import io.anuke.arc.Core;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
@@ -8,10 +8,10 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.MobileButton;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.scene.Group;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.Events;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -50,7 +50,7 @@ public class MenuFragment extends Fragment{
 
     private void buildMobile(){
         container.clear();
-        container.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
         float size = 120f;
         float isize = 14f * 4;
@@ -66,7 +66,7 @@ public class MenuFragment extends Fragment{
             unlocks = new MobileButton("icon-unlocks", isize, "$text.unlocks", ui.unlocks::show),
             donate = new MobileButton("icon-donate", isize, "$text.donate", Platform.instance::openDonations);
 
-        if(Gdx.graphics.getWidth() > Gdx.graphics.getHeight()){
+        if(Core.graphics.getWidth() > Core.graphics.getHeight()){
             container.add(play);
             container.add(join);
             container.add(load);
@@ -134,7 +134,7 @@ public class MenuFragment extends Fragment{
 
             out.row();
 
-            out.add(new MenuButton("icon-exit", "$text.quit", Gdx.app::exit)).width(bw).colspan(2);
+            out.add(new MenuButton("icon-exit", "$text.quit", Core.app::exit)).width(bw).colspan(2);
         });
     }
 

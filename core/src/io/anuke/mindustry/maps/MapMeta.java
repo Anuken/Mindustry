@@ -1,8 +1,8 @@
 package io.anuke.mindustry.maps;
 
-import com.badlogic.gdx.utils.IntIntMap;
-import com.badlogic.gdx.utils.ObjectMap;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.IntIntMap;
+import io.anuke.arc.collection.ObjectMap;
 
 public class MapMeta{
     public final int version;
@@ -31,7 +31,7 @@ public class MapMeta{
     }
 
     public String tag(String name){
-        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Bundles.get("text.unknown");
+        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Core.bundle.get("text.unknown");
     }
 
     public boolean hasOreGen(){

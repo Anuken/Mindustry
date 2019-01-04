@@ -1,10 +1,10 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.PropertiesUtils;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.io.PropertiesUtils;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ public class Version{
 
     public static void init(){
         try{
-            FileHandle file = Gdx.files.internal("version.properties");
+            FileHandle file = Core.files.internal("version.properties");
 
             ObjectMap<String, String> map = new ObjectMap<>();
             PropertiesUtils.load(map, file.reader());

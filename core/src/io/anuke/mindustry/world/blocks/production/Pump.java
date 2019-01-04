@@ -1,7 +1,8 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
@@ -10,7 +11,7 @@ import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.graphics.Draw;
+import io.anuke.arc.graphics.g2d.Draw;
 
 public class Pump extends LiquidBlock{
     protected final Array<Tile> drawTiles = new Array<>();
@@ -35,7 +36,7 @@ public class Pump extends LiquidBlock{
     public void load(){
         super.load();
 
-        liquidRegion = Draw.region("pump-liquid");
+        liquidRegion = Core.atlas.find("pump-liquid");
     }
 
     @Override
@@ -56,7 +57,7 @@ public class Pump extends LiquidBlock{
 
     @Override
     public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Draw.region(name)};
+        return new TextureRegion[]{Core.atlas.find(name)};
     }
 
     @Override
@@ -95,6 +96,9 @@ public class Pump extends LiquidBlock{
 
         if(tile.entity.cons.valid() && liquidDrop != null){
             float maxPump = Math.min(liquidCapacity - tile.entity.liquids.total(), tiles * pumpAmount * tile.entity.delta());
+            if(hasPower){
+                maxPump *= tile.entity.power.satisfaction; // Produce slower if not at full power
+            }
             tile.entity.liquids.add(liquidDrop, maxPump);
         }
 

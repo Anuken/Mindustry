@@ -1,7 +1,6 @@
 package io.anuke.mindustry.content;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.entities.units.types.*;
 import io.anuke.mindustry.game.ContentList;
@@ -10,32 +9,11 @@ import io.anuke.mindustry.type.ContentType;
 public class UnitTypes implements ContentList{
     public static UnitType
         spirit, phantom,
-        alphaDrone,
         wraith, ghoul, revenant,
         dagger, titan, fortress;
 
     @Override
     public void load(){
-        alphaDrone = new UnitType("alpha-drone", AlphaDrone.class, AlphaDrone::new){
-            {
-                isFlying = true;
-                drag = 0.005f;
-                speed = 0.6f;
-                maxVelocity = 1.7f;
-                range = 40f;
-                health = 45;
-                hitsize = 4f;
-                mass = 0.1f;
-                weapon = Weapons.droneBlaster;
-                trailColor = Color.valueOf("ffd37f");
-            }
-
-            @Override
-            public boolean isHidden() {
-                return true;
-            }
-        };
-
         spirit = new UnitType("spirit", Spirit.class, Spirit::new){{
             weapon = Weapons.healBlasterDrone;
             isFlying = true;

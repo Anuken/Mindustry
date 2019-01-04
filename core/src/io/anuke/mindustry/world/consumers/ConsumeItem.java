@@ -7,7 +7,7 @@ import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Table;
 
 public class ConsumeItem extends Consume{
     private final Item item;

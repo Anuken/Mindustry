@@ -45,6 +45,7 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
             Set<TypeElement> elements = ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(Serialize.class));
 
             TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
+            classBuilder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
             MethodSpec.Builder method = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
             for(TypeElement elem : elements){
@@ -52,7 +53,7 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
 
                 TypeSpec.Builder serializer = TypeSpec.anonymousClassBuilder("")
                 .addSuperinterface(ParameterizedTypeName.get(
-                ClassName.bestGuess("io.anuke.ucore.io.TypeSerializer"), type));
+                ClassName.bestGuess("io.anuke.arc.Settings.TypeSerializer"), type));
 
                 MethodSpec.Builder writeMethod = MethodSpec.methodBuilder("write")
                 .returns(void.class)
@@ -83,8 +84,8 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                         writeMethod.addStatement("stream.write" + capName + "(object." + name + ")");
                         readMethod.addStatement("object." + name + "= stream.read" + capName + "()");
                     }else{
-                        writeMethod.addStatement("io.anuke.ucore.core.Settings.getSerializer(" + typeName+ ".class).write(stream, object." + name + ")");
-                        readMethod.addStatement("object." + name + " = (" +typeName+")io.anuke.ucore.core.Settings.getSerializer(" + typeName+ ".class).read(stream)");
+                        writeMethod.addStatement("io.anuke.arc.Core.settings.getSerializer(" + typeName+ ".class).write(stream, object." + name + ")");
+                        readMethod.addStatement("object." + name + " = (" +typeName+")io.anuke.arc.Core.settings.getSerializer(" + typeName+ ".class).read(stream)");
                     }
                 }
 
@@ -93,7 +94,7 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                 serializer.addMethod(writeMethod.build());
                 serializer.addMethod(readMethod.build());
 
-                method.addStatement("io.anuke.ucore.core.Settings.setSerializer($N, $L)",  Utils.elementUtils.getBinaryName(elem).toString().replace('$', '.') + ".class", serializer.build());
+                method.addStatement("io.anuke.arc.Core.settings.setSerializer($N, $L)",  Utils.elementUtils.getBinaryName(elem).toString().replace('$', '.') + ".class", serializer.build());
             }
 
             classBuilder.addMethod(method.build());

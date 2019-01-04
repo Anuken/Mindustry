@@ -1,6 +1,6 @@
 package io.anuke.mindustry.maps;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.blocks.CraftingBlocks;
 import io.anuke.mindustry.content.blocks.ProductionBlocks;
@@ -62,7 +62,7 @@ public class TutorialSector{
             new BlockMission(ProductionBlocks.mechanicalDrill).setMessage("$tutorial.generatordrill"),
             new BlockMission(PowerBlocks.powerNode).setMessage("$tutorial.node"),
             //TODO fix positions
-            new ConditionMission(Bundles.get("text.mission.linknode"), () -> world.tile(54, 52).entity != null && world.tile(54, 52).entity.power != null && world.tile(54, 52).entity.power.amount >= 0.01f)
+            new ConditionMission(Core.bundle.get("text.mission.linknode"), () -> world.tile(54, 52).entity != null && world.tile(54, 52).entity.power != null && world.tile(54, 52).entity.power.amount >= 0.01f)
                 .setMessage("$tutorial.nodelink"),
 
             new ItemMission(Items.silicon, 70).setMessage("$tutorial.silicon"),
