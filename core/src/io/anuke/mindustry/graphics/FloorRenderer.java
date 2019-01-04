@@ -181,7 +181,7 @@ public class FloorRenderer{
                 if(floor.cacheLayer == layer){
                     floor.draw(tile);
                 }else if(floor.cacheLayer.ordinal() < layer.ordinal()){
-                    floor.drawNonLayer(tile);
+                    //floor.drawNonLayer(tile);
                 }
             }
         }
@@ -195,7 +195,7 @@ public class FloorRenderer{
         int chunksx = Mathf.ceil((float) (world.width()) / chunksize),
         chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
         cache = new Chunk[chunksx][chunksy];
-        cbatch = new CacheBatch(world.width() * world.height() * 4 * 4);
+        cbatch = new CacheBatch(world.width() * world.height());
 
         Time.mark();
 

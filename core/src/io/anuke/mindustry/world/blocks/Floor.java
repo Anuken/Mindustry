@@ -139,6 +139,7 @@ public class Floor extends Block{
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
 
+        /*
         if(tile.hasCliffs() && cliffRegions != null){
             for(int i = 0; i < 4; i++){
                 if((tile.getCliffs() & (1 << i * 2)) != 0){
@@ -160,7 +161,7 @@ public class Floor extends Block{
         }
         Draw.reset();
 
-        drawEdges(tile, false);
+        drawEdges(tile, false);*/
     }
 
     public boolean blendOverride(Block block){
