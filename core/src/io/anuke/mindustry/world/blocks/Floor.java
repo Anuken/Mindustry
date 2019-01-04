@@ -127,13 +127,6 @@ public class Floor extends Block{
     }
 
     @Override
-    public void drawNonLayer(Tile tile){
-        Mathf.random.setSeed(tile.pos());
-
-        drawEdges(tile, true);
-    }
-
-    @Override
     public void draw(Tile tile){
         Mathf.random.setSeed(tile.pos());
 
@@ -166,34 +159,6 @@ public class Floor extends Block{
 
     public boolean blendOverride(Block block){
         return false;
-    }
-
-    protected void drawEdges(Tile tile, boolean sameLayer){
-        if(!blend || tile.getCliffs() > 0) return;
-
-        for(int i = 0; i < 8; i++){
-            int dx = Geometry.d8[i].x, dy = Geometry.d8[i].y;
-
-            Tile other = tile.getNearby(dx, dy);
-
-            if(other == null) continue;
-
-            Floor floor = other.floor();
-            Floor cur = this;
-            if(floor instanceof OreBlock) floor = ((OreBlock) floor).base;
-            if(cur instanceof OreBlock) cur = ((OreBlock) cur).base;
-
-            if(floor.edgeRegions == null || (floor.id <= cur.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!cur.blends.test(floor) && !cur.tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > cur.cacheLayer.ordinal() && !sameLayer) ||
-                    (sameLayer && floor.cacheLayer == cur.cacheLayer)) continue;
-
-            TextureRegion region = floor.edgeRegions[i];
-
-            Draw.rect(region,
-                tile.worldx() + floor.offsets[i].x * Draw.scl + Draw.scl * region.getWidth()/2f,
-                tile.worldy() + floor.offsets[i].y * Draw.scl + Draw.scl * region.getHeight()/2f,
-                region.getWidth() * Draw.scl,
-                region.getHeight() * Draw.scl);
-        }
     }
 
 }

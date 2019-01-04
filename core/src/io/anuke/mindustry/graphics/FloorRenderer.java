@@ -113,6 +113,10 @@ public class FloorRenderer{
         cbatch.endDraw();
     }
 
+    public void updateFloor(Tile tile){
+        //TODO: implement
+    }
+
     public void drawLayer(CacheLayer layer){
         if(cache == null){
             return;
@@ -181,8 +185,6 @@ public class FloorRenderer{
 
                 if(floor.cacheLayer == layer){
                     floor.draw(tile);
-                }else if(floor.cacheLayer.ordinal() < layer.ordinal()){
-                    //floor.drawNonLayer(tile);
                 }
             }
         }

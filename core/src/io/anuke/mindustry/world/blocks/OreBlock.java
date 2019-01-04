@@ -36,15 +36,6 @@ public class OreBlock extends Floor{
     @Override
     public void draw(Tile tile){
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
-
-        //drawEdges(tile, false);
-    }
-
-    @Override
-    public void drawNonLayer(Tile tile){
-        Mathf.random.setSeed(tile.pos());
-
-        base.drawEdges(tile, true);
     }
 
 }
