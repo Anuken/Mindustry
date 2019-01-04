@@ -29,6 +29,7 @@ public class Save16 extends SaveFileVersion{
         byte mode = stream.readByte();
         String mapname = stream.readUTF();
         Map map = world.maps.getByName(mapname);
+        if(map == null) map = new Map("unknown", 1, 1);
         world.setMap(map);
 
         int wave = stream.readInt();

@@ -146,9 +146,9 @@ public class MenuFragment extends Fragment{
         dialog.addCloseButton();
         dialog.content().defaults().height(66f).width(w).padRight(5f);
 
-        dialog.content().add(new MenuButton("icon-play-2", "$text.sectors", () -> {
+        dialog.content().add(new MenuButton("icon-play-2", "$text.map.random", () -> {
             dialog.hide();
-            ui.showInfo("aaaaaaaaaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
+            world.generator.playRandomMap();
         })).width(bw).colspan(2);
         dialog.content().row();
 

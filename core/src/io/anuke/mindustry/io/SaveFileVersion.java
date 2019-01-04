@@ -13,7 +13,6 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.MappableContent;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
@@ -92,7 +91,6 @@ public abstract class SaveFileVersion{
         short width = stream.readShort();
         short height = stream.readShort();
 
-        world.setMap(new Map("unknown", width, height));
         world.beginMapLoad();
 
         Tile[][] tiles = world.createTiles(width, height);
