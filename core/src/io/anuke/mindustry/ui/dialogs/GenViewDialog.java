@@ -15,7 +15,7 @@ import io.anuke.arc.scene.event.InputListener;
 import io.anuke.arc.util.async.AsyncExecutor;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.generation.WorldGenerator.GenResult;
+import io.anuke.mindustry.maps.WorldGenerator.GenResult;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.ColorMapper;
 

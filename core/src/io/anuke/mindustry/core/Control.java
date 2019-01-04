@@ -121,7 +121,7 @@ public class Control implements ApplicationListener{
 
             int last = Core.settings.getInt("hiscore" + world.getMap().name, 0);
 
-            if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer && world.getSector() == null){
+            if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer){
                 Core.settings.put("hiscore" + world.getMap().name, state.wave);
                 Core.settings.save();
                 hiscore = true;
@@ -131,10 +131,6 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(GameOverEvent.class, event -> {
-            //delete saves for game-over sectors
-            if(world.getSector() != null && world.getSector().hasSave()){
-                world.getSector().getSave().delete();
-            }
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);

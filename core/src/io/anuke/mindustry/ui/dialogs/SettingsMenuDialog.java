@@ -143,13 +143,6 @@ public class SettingsMenuDialog extends SettingsDialog{
                     dialog.setFillParent(false);
                     dialog.content().defaults().size(230f, 60f).pad(3);
                     dialog.addCloseButton();
-                    dialog.content().addButton("$text.settings.clearsectors", () -> {
-                        ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
-                            world.sectors.clear();
-                            dialog.hide();
-                        });
-                    });
-                    dialog.content().row();
                     dialog.content().addButton("$text.settings.clearunlocks", () -> {
                         ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
                             control.unlocks.reset();

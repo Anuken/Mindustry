@@ -31,7 +31,6 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
-import io.anuke.mindustry.ui.Minimap;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;
@@ -370,7 +369,6 @@ public class HudFragment extends Fragment{
         table.touchable(Touchable.enabled);
 
         table.labelWrap(() ->
-            world.getSector() == null ?
                 (state.enemies() > 0 && state.mode.disableWaveTimer ?
                 wavef.get(state.wave) + "\n" + (state.enemies() == 1 ?
                     enemyf.get(state.enemies()) :
@@ -378,17 +376,11 @@ public class HudFragment extends Fragment{
                 wavef.get(state.wave) + "\n" +
                     (!state.mode.disableWaveTimer ?
                     Core.bundle.format("text.wave.waiting", (int)(state.wavetime/60)) :
-                    Core.bundle.get("text.waiting"))) :
-            Core.bundle.format("text.mission.display", world.getSector().currentMission().displayString())).growX().pad(8f);
+                    Core.bundle.get("text.waiting")))
+        ).growX().pad(8f);
 
-        table.clicked(() -> {
-            if(world.getSector() != null && world.getSector().currentMission().hasMessage()){
-                world.getSector().currentMission().showMessage();
-            }
-        });
-
-        table.setDisabled(() -> !(world.getSector() != null && world.getSector().currentMission().hasMessage()));
-        table.visible(() -> !((world.getSector() == null && state.mode.disableWaves) || !state.mode.showMission || (world.getSector() != null && world.getSector().complete)));
+        table.setDisabled(true);
+        table.visible(() -> !(state.mode.disableWaves || !state.mode.showMission));
     }
 
     private void addPlayButton(Table table){

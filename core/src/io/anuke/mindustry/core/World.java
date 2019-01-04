@@ -4,13 +4,11 @@ import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
@@ -21,8 +19,9 @@ import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.maps.*;
-import io.anuke.mindustry.maps.generation.WorldGenerator;
+import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.maps.Maps;
+import io.anuke.mindustry.maps.WorldGenerator;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
@@ -32,14 +31,12 @@ import static io.anuke.mindustry.Vars.*;
 
 public class World implements ApplicationListener{
     public final Maps maps = new Maps();
-    public final Sectors sectors = new Sectors();
     public final WorldGenerator generator = new WorldGenerator();
     public final BlockIndexer indexer = new BlockIndexer();
     public final WaveSpawner spawner = new WaveSpawner();
     public final Pathfinder pathfinder = new Pathfinder();
 
     private Map currentMap;
-    private Sector currentSector;
     private Tile[][] tiles;
 
     private Array<Tile> tempTiles = new Array<>();
@@ -47,11 +44,6 @@ public class World implements ApplicationListener{
 
     public World(){
         maps.load();
-    }
-
-    @Override
-    public void init(){
-        sectors.load();
     }
 
     @Override
@@ -86,14 +78,6 @@ public class World implements ApplicationListener{
 
     public Map getMap(){
         return currentMap;
-    }
-
-    public Sector getSector(){
-        return currentSector;
-    }
-
-    public void setSector(Sector currentSector){
-        this.currentSector = currentSector;
     }
 
     public void setMap(Map map){
@@ -208,34 +192,7 @@ public class World implements ApplicationListener{
         return generating;
     }
 
-    /**Loads up a sector map. This does not call play(), but calls reset().*/
-    public void loadSector(Sector sector){
-        currentSector = sector;
-        state.difficulty = sectors.getDifficulty(sector);
-        state.mode = sector.currentMission().getMode();
-        Time.mark();
-        Time.mark();
-
-        logic.reset();
-
-        beginMapLoad();
-
-        int width = sectorSize, height = sectorSize;
-
-        Tile[][] tiles = createTiles(width, height);
-
-        Map map = new Map("Sector " + sector.x + ", " + sector.y, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
-        setMap(map);
-
-        EntityQuery.resizeTree(0, 0, width * tilesize, height * tilesize);
-
-        generator.generateMap(tiles, sector);
-
-        endMapLoad();
-    }
-
     public void loadMap(Map map){
-        currentSector = null;
         beginMapLoad();
         this.currentMap = map;
 

@@ -148,7 +148,7 @@ public class MenuFragment extends Fragment{
 
         dialog.content().add(new MenuButton("icon-play-2", "$text.sectors", () -> {
             dialog.hide();
-            ui.sectors.show();
+            ui.showInfo("aaaaaaaaaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
         })).width(bw).colspan(2);
         dialog.content().row();
 

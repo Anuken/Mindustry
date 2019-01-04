@@ -31,10 +31,6 @@ public class PausedDialog extends FloatingDialog{
     void rebuild(){
         missionTable.clear();
         missionTable.background((Drawable) null);
-        if(world.getSector() != null){
-            missionTable.background("underline");
-            missionTable.add(Core.bundle.format("text.sector", world.getSector().x + ", " + world.getSector().y));
-        }
     }
 
     void setup(){
@@ -58,7 +54,7 @@ public class PausedDialog extends FloatingDialog{
             content().addButton("$text.settings", ui.settings::show);
 
             content().row();
-            content().addButton("$text.savegame", save::show).disabled(s -> world.getSector() != null);
+            content().addButton("$text.savegame", save::show);
             content().addButton("$text.loadgame", load::show).disabled(b -> Net.active());
 
             content().row();
@@ -79,11 +75,9 @@ public class PausedDialog extends FloatingDialog{
             content().defaults().size(120f).pad(5);
             float isize = 14f * 4;
 
-            content().addRowImageTextButton("$text.back", "icon-play-2", isize, () -> {
-                hide();
-            });
+            content().addRowImageTextButton("$text.back", "icon-play-2", isize, this::hide);
             content().addRowImageTextButton("$text.settings", "icon-tools", isize, ui.settings::show);
-            content().addRowImageTextButton("$text.save", "icon-save", isize, save::show).disabled(b -> world.getSector() != null);
+            content().addRowImageTextButton("$text.save", "icon-save", isize, save::show);
 
             content().row();
 

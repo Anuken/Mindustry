@@ -92,12 +92,7 @@ public abstract class SaveFileVersion{
         short width = stream.readShort();
         short height = stream.readShort();
 
-        if(world.getSector() != null){
-            world.setMap(new Map("Sector " + world.getSector().x + ", " + world.getSector().y, width, height));
-        }else if(world.getMap() == null){
-            world.setMap(new Map("unknown", width, height));
-        }
-
+        world.setMap(new Map("unknown", width, height));
         world.beginMapLoad();
 
         Tile[][] tiles = world.createTiles(width, height);
