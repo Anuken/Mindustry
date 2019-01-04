@@ -25,7 +25,8 @@ public class Incinerator extends Block{
         update = true;
         solid = true;
 
-        consumes.power(0.05f);
+        // Incinerator has no speed which could be adjusted, so it will only operate fully powered for now
+        consumes.power(0.05f, 1.0f);
     }
 
     @Override

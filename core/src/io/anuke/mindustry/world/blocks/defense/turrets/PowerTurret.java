@@ -6,6 +6,7 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
 public abstract class PowerTurret extends CooledTurret{
+    /** The percentage of power which will be used per shot. */
     protected float powerUsed = 0.5f;
     protected AmmoType shootType;
 
@@ -23,13 +24,15 @@ public abstract class PowerTurret extends CooledTurret{
 
     @Override
     public boolean hasAmmo(Tile tile){
-        return tile.entity.power.amount >= powerUsed;
+        // Allow shooting as long as the turret is at least at 50% power
+        return tile.entity.power.satisfaction >= powerUsed;
     }
 
     @Override
     public AmmoType useAmmo(Tile tile){
         if(tile.isEnemyCheat()) return shootType;
-        tile.entity.power.amount -= powerUsed;
+        // Make sure that power can not go negative in case of threading issues or similar
+        tile.entity.power.satisfaction -= Math.min(powerUsed, tile.entity.power.satisfaction);
         return shootType;
     }
 

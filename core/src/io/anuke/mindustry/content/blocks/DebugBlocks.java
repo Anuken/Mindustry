@@ -39,28 +39,26 @@ public class DebugBlocks extends BlockList implements ContentList{
     public void load(){
         powerVoid = new PowerBlock("powervoid"){
             {
-                powerCapacity = Float.MAX_VALUE;
+                consumes.power(Float.MAX_VALUE);
             }
 
             @Override
             public void init(){
                 super.init();
-                stats.remove(BlockStat.powerCapacity);
+                stats.remove(BlockStat.powerUse);
             }
         };
 
         powerInfinite = new PowerNode("powerinfinite"){
             {
-                powerCapacity = 10000f;
                 maxNodes = 100;
                 outputsPower = true;
                 consumesPower = false;
             }
 
             @Override
-            public void update(Tile tile){
-                super.update(tile);
-                tile.entity.power.amount = powerCapacity;
+            public float getPowerProduction(Tile tile){
+                return 10000f;
             }
         };
 

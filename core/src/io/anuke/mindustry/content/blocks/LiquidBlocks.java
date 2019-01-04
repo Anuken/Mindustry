@@ -20,7 +20,6 @@ public class LiquidBlocks extends BlockList implements ContentList{
             pumpAmount = 0.2f;
             consumes.power(0.015f);
             liquidCapacity = 30f;
-            powerCapacity = 20f;
             hasPower = true;
             size = 2;
             tier = 1;
@@ -31,7 +30,6 @@ public class LiquidBlocks extends BlockList implements ContentList{
             consumes.power(0.03f);
             liquidCapacity = 40f;
             hasPower = true;
-            powerCapacity = 20f;
             size = 2;
             tier = 2;
         }};
@@ -66,7 +64,7 @@ public class LiquidBlocks extends BlockList implements ContentList{
         phaseConduit = new LiquidBridge("phase-conduit"){{
             range = 12;
             hasPower = true;
-            consumes.power(0.03f);
+            consumes.power(0.03f, 1.0f);
         }};
     }
 }

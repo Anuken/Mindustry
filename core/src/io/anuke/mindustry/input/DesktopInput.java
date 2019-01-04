@@ -67,6 +67,7 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void drawOutlined(){
+        Lines.stroke(1f);
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());
 

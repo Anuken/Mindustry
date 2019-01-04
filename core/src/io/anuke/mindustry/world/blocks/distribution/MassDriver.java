@@ -28,6 +28,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
@@ -48,6 +49,7 @@ public class MassDriver extends Block{
     protected Effect smokeEffect = ShootFx.shootBigSmoke2;
     protected Effect recieveEffect = BlockFx.mineBig;
     protected float shake = 3f;
+    protected final static float powerPercentageUsed = 1.0f;
     protected TextureRegion turretRegion;
 
     public MassDriver(String name){
@@ -58,6 +60,8 @@ public class MassDriver extends Block{
         hasItems = true;
         layer = Layer.turret;
         hasPower = true;
+        consumes.powerBuffered(30f);
+        consumes.require(ConsumePower.class);
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
@@ -77,7 +81,8 @@ public class MassDriver extends Block{
         MassDriverEntity other = target.entity();
 
         entity.reload = 1f;
-        entity.power.amount = 0f;
+
+        entity.power.satisfaction -= Math.min(entity.power.satisfaction, powerPercentageUsed);
 
         DriverBulletData data = Pools.obtain(DriverBulletData.class, DriverBulletData::new);
         data.from = entity;
@@ -125,7 +130,7 @@ public class MassDriver extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.powerShot, powerCapacity, StatUnit.powerUnits);
+        stats.add(BlockStat.powerShot, consumes.get(ConsumePower.class).powerCapacity * powerPercentageUsed, StatUnit.powerUnits);
     }
 
     @Override
@@ -164,8 +169,8 @@ public class MassDriver extends Block{
 
                 entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(waiter), rotateSpeed);
             }else if(tile.entity.items.total() >= minDistribute &&
-                    linkValid(tile) && //only fire when at least at half-capacity and power
-                    tile.entity.power.amount >= powerCapacity * 0.8f &&
+                    linkValid(tile) && //only fire when at 100% power capacity
+                    tile.entity.power.satisfaction >= powerPercentageUsed &&
                     link.block().itemCapacity - link.entity.items.total() >= minDistribute && entity.reload <= 0.0001f){
 
                 MassDriverEntity other = link.entity();

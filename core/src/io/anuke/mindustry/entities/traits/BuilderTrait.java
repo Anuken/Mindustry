@@ -310,7 +310,7 @@ public interface BuilderTrait extends Entity{
             return;
         }
 
-        Draw.color(Palette.accent);
+        Lines.stroke(1f, Palette.accent);
         float focusLen = 3.8f + Mathf.absin(Time.time(), 1.1f, 0.6f);
         float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
         float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
