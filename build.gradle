@@ -251,7 +251,7 @@ project(":net"){
     dependencies{
         compile project(":core")
         compile "org.lz4:lz4-java:1.4.1"
-        compile 'com.github.Anuken:kryonet:38ca8d51b5763ebe463ed973a63b64390ff51416'
+        compile 'com.github.Anuken:kryonet:a64d2280880e80566ca1bdaffa55de43e51cad38'
         compile 'com.github.Anuken:WaifUPnP:05eb46bc577fd7674596946ba288c96c0cedd893'
     }
 }
