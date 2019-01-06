@@ -46,6 +46,7 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
 
             TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
             classBuilder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
+            classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
             MethodSpec.Builder method = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
             for(TypeElement elem : elements){
