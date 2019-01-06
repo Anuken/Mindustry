@@ -28,7 +28,7 @@ public class RemoteReadGenerator{
     /**
      * Generates a class for reading remote invoke packets.
      *
-     * @param entries List of methods to use/
+     * @param entries List of methods to use.
      * @param className Simple target class name.
      * @param packageName Full target package name.
      * @param needsPlayer Whether this read method requires a reference to the player sender.
@@ -37,6 +37,7 @@ public class RemoteReadGenerator{
             throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException, IOException{
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
+        classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
 
         //create main method builder
         MethodSpec.Builder readMethod = MethodSpec.methodBuilder("readPacket")
