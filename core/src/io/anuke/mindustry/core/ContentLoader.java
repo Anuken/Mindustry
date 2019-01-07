@@ -67,10 +67,6 @@ public class ContentLoader{
         new TurretBullets(),
         new WeaponBullets(),
 
-
-        //ammotypes
-        new AmmoTypes(),
-
         //weapons
         new Weapons(),
 

@@ -48,7 +48,7 @@ public class Units{
 
     /**See {@link #invalidateTarget(TargetTrait, Team, float, float, float)}*/
     public static boolean invalidateTarget(TargetTrait target, Unit targeter){
-        return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.getWeapon().getAmmo().getRange());
+        return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.getWeapon().getAmmo().range());
     }
 
     /**Returns whether there are any entities on this tile.*/

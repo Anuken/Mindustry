@@ -184,7 +184,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void targetClosest(){
-        target = Units.getClosestTarget(team, x, y, Math.max(getWeapon().getAmmo().getRange(), type.range), u -> type.targetAir || !u.isFlying());
+        target = Units.getClosestTarget(team, x, y, Math.max(getWeapon().getAmmo().range(), type.range), u -> type.targetAir || !u.isFlying());
     }
 
     public TileEntity getClosestEnemyCore(){

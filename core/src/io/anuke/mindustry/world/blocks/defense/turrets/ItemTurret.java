@@ -1,26 +1,30 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import io.anuke.arc.collection.ObjectMap;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.type.AmmoEntry;
-import io.anuke.mindustry.type.AmmoType;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public class ItemTurret extends CooledTurret{
     protected int maxAmmo = 50;
-    protected AmmoType[] ammoTypes;
-    protected ObjectMap<Item, AmmoType> ammoMap = new ObjectMap<>();
+    protected ObjectMap<Item, BulletType> ammo = new ObjectMap<>();
 
     public ItemTurret(String name){
         super(name);
         hasItems = true;
     }
 
-    public AmmoType[] getAmmoTypes(){
-        return ammoTypes;
+    /**Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...]*/
+    protected void ammo(Object... objects){
+        ammo = ObjectMap.of(objects);
     }
 
     @Override
@@ -28,19 +32,18 @@ public class ItemTurret extends CooledTurret{
         super.setStats();
 
         stats.remove(BlockStat.itemCapacity);
-
-        stats.add(BlockStat.inputItems, new ItemFilterValue(item -> ammoMap.containsKey(item)));
+        stats.add(BlockStat.inputItems, new ItemFilterValue(item -> ammo.containsKey(item)));
     }
 
     @Override
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
         TurretEntity entity = tile.entity();
 
-        AmmoType type = ammoMap.get(item);
+        BulletType type = ammo.get(item);
 
         if(type == null) return 0;
 
-        return Math.min((int) ((maxAmmo - entity.totalAmmo) / ammoMap.get(item).quantityMultiplier), amount);
+        return Math.min((int) ((maxAmmo - entity.totalAmmo) / ammo.get(item).ammoMultiplier), amount);
     }
 
     @Override
@@ -61,47 +64,67 @@ public class ItemTurret extends CooledTurret{
         TurretEntity entity = tile.entity();
         if(entity == null) return;
 
-        AmmoType type = ammoMap.get(item);
-        entity.totalAmmo += type.quantityMultiplier;
+        BulletType type = ammo.get(item);
+        entity.totalAmmo += type.ammoMultiplier;
         entity.items.add(item, 1);
 
         //find ammo entry by type
         for(int i = 0; i < entity.ammo.size; i++){
-            AmmoEntry entry = entity.ammo.get(i);
+            ItemEntry entry = (ItemEntry)entity.ammo.get(i);
 
             //if found, put it to the right
-            if(entry.type == type){
-                entry.amount += type.quantityMultiplier;
+            if(entry.item == item){
+                entry.amount += type.ammoMultiplier;
                 entity.ammo.swap(i, entity.ammo.size - 1);
                 return;
             }
         }
 
         //must not be found
-        AmmoEntry entry = new AmmoEntry(type, (int) type.quantityMultiplier);
-        entity.ammo.add(entry);
+        entity.ammo.add(new ItemEntry(item, (int) type.ammoMultiplier));
     }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         TurretEntity entity = tile.entity();
 
-        return ammoMap != null && ammoMap.get(item) != null && entity.totalAmmo + ammoMap.get(item).quantityMultiplier <= maxAmmo;
+        return ammo != null && ammo.get(item) != null && entity.totalAmmo + ammo.get(item).ammoMultiplier <= maxAmmo;
     }
 
-    @Override
-    public void init(){
-        super.init();
-
-        if(ammoTypes != null){
-            for(AmmoType type : ammoTypes){
-                if(type.item == null) continue;
-                if(ammoMap.containsKey(type.item)){
-                    throw new RuntimeException("Turret \"" + name + "\" has two conflicting ammo entries on item type " + type.item + "!");
-                }else{
-                    ammoMap.put(type.item, type);
-                }
+    public class ItemTurretEntity extends TurretEntity{
+        @Override
+        public void write(DataOutput stream) throws IOException{
+            stream.writeByte(ammo.size);
+            for(AmmoEntry entry : ammo){
+                ItemEntry i = (ItemEntry)entry;
+                stream.writeByte(i.item.id);
+                stream.writeShort(i.amount);
             }
+        }
+
+        @Override
+        public void read(DataInput stream) throws IOException{
+            byte amount = stream.readByte();
+            for(int i = 0; i < amount; i++){
+                Item item = Vars.content.item(stream.readByte());
+                short a = stream.readShort();
+                totalAmmo += a;
+                ammo.add(new ItemEntry(item, a));
+            }
+        }
+    }
+
+    class ItemEntry extends AmmoEntry{
+        protected Item item;
+
+        ItemEntry(Item item, int amount){
+            this.item = item;
+            this.amount = amount;
+        }
+
+        @Override
+        public BulletType type(){
+            return ammo.get(item);
         }
     }
 }

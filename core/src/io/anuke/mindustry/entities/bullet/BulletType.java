@@ -4,7 +4,7 @@ import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.fx.BulletFx;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
@@ -21,9 +21,17 @@ public abstract class BulletType extends Content{
     public Effect hitEffect, despawnEffect;
 
     /**Effect created when shooting.*/
-    public Effect shootEffect = Fx.none;
+    public Effect shootEffect = ShootFx.shootSmall;
     /**Extra smoke effect created when shooting.*/
-    public Effect smokeEffect = Fx.none;
+    public Effect smokeEffect = ShootFx.shootSmallSmoke;
+    /**Extra inaccuracy when firing.*/
+    public float inaccuracy = 0f;
+    /**How many bullets get created per ammo item/liquid.*/
+    public float ammoMultiplier = 1f;
+    /**Multiplied by turret reload speed to get final shoot speed.*/
+    public float reloadMultiplier = 1f;
+    /**Recoil from shooter entities.*/
+    public float recoil;
 
     public float splashDamage = 0f;
     /**Knockback in velocity.*/
@@ -55,6 +63,11 @@ public abstract class BulletType extends Content{
         lifetime = 40f;
         hitEffect = BulletFx.hitBulletSmall;
         despawnEffect = BulletFx.hitBulletSmall;
+    }
+
+    /**Returns maximum distance the bullet this bullet type has can travel.*/
+    public float range(){
+        return speed * lifetime;
     }
 
     public boolean collides(Bullet bullet, Tile tile){

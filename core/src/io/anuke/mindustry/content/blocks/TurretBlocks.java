@@ -1,17 +1,14 @@
 package io.anuke.mindustry.content.blocks;
 
-import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.content.AmmoTypes;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.Liquids;
+import io.anuke.mindustry.content.bullets.*;
 import io.anuke.mindustry.content.fx.ShootFx;
-import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
 
 public class TurretBlocks extends BlockList implements ContentList{
     public static Block duo, /*scatter,*/
@@ -20,7 +17,12 @@ public class TurretBlocks extends BlockList implements ContentList{
     @Override
     public void load(){
         duo = new DoubleTurret("duo"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.bulletCopper, AmmoTypes.bulletDense, AmmoTypes.bulletPyratite, AmmoTypes.bulletSilicon};
+            ammo(
+                Items.copper, StandardBullets.copper,
+                Items.densealloy, StandardBullets.dense,
+                Items.pyratite, StandardBullets.tracer,
+                Items.silicon, StandardBullets.homing
+            );
             reload = 25f;
             restitution = 0.03f;
             range = 90f;
@@ -32,7 +34,11 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         hail = new ArtilleryTurret("hail"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.artilleryDense, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary};
+            ammo(
+                Items.densealloy, ArtilleryBullets.dense,
+                Items.silicon, ArtilleryBullets.homing,
+                Items.pyratite, ArtilleryBullets.incendiary
+            );
             reload = 60f;
             recoil = 2f;
             range = 230f;
@@ -41,29 +47,22 @@ public class TurretBlocks extends BlockList implements ContentList{
             health = 120;
         }};
 
-        scorch = new LiquidTurret("scorch"){
-            protected TextureRegion shootRegion;
-
-            @Override
-            public void load(){
-                super.load();
-                shootRegion = Core.atlas.find(name + "-shoot");
-            }
-
-            {
-                ammoTypes = new AmmoType[]{AmmoTypes.basicFlame};
-                recoil = 0f;
-                reload = 4f;
-                shootCone = 50f;
-                ammoUseEffect = ShootFx.shellEjectSmall;
-                health = 160;
-
-                drawer = (tile, entity) -> Draw.rect(entity.target != null ? shootRegion : region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-            }
-        };
+        scorch = new LiquidTurret("scorch"){{
+            ammo(Liquids.oil, TurretBullets.basicFlame);
+            recoil = 0f;
+            reload = 4f;
+            shootCone = 50f;
+            ammoUseEffect = ShootFx.shellEjectSmall;
+            health = 160;
+        }};
 
         wave = new LiquidTurret("wave"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.water, AmmoTypes.lava, AmmoTypes.cryofluid, AmmoTypes.oil};
+            ammo(
+                Liquids.water, TurretBullets.waterShot,
+                Liquids.lava, TurretBullets.lavaShot,
+                Liquids.cryofluid, TurretBullets.cryoShot,
+                Liquids.oil, TurretBullets.oilShot
+            );
             size = 2;
             recoil = 0f;
             reload = 4f;
@@ -88,7 +87,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             chargeTime = 60f;
             chargeMaxDelay = 30f;
             chargeEffects = 7;
-            shootType = AmmoTypes.lancerLaser;
+            shootType = TurretBullets.lancerLaser;
             recoil = 2f;
             reload = 100f;
             cooldown = 0.03f;
@@ -106,7 +105,7 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         arc = new PowerTurret("arc"){{
-            shootType = AmmoTypes.arc;
+            shootType = TurretBullets.arc;
             reload = 85f;
             shootShake = 1f;
             shootCone = 40f;
@@ -121,7 +120,11 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         swarmer = new BurstTurret("swarmer"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.missileExplosive, AmmoTypes.missileIncindiary, AmmoTypes.missileSurge};
+            ammo(
+                Items.blastCompound, MissileBullets.explosive,
+                Items.pyratite, MissileBullets.incindiary,
+                Items.surgealloy, MissileBullets.surge
+            );
             reload = 50f;
             shots = 4;
             burstSpacing = 5;
@@ -132,54 +135,37 @@ public class TurretBlocks extends BlockList implements ContentList{
             health = 380;
         }};
 
-        salvo = new BurstTurret("salvo"){
-            TextureRegion[] panels = new TextureRegion[2];
+        salvo = new BurstTurret("salvo"){{
+            ammo(
+                Items.copper, StandardBullets.copper,
+                Items.densealloy, StandardBullets.dense,
+                Items.pyratite, StandardBullets.tracer,
+                Items.silicon, StandardBullets.homing,
+                Items.thorium, StandardBullets.thorium
+            );
 
-            @Override
-            public void load() {
-                super.load();
-                panels[0] = Core.atlas.find(name + "-panel-left");
-                panels[1] = Core.atlas.find(name + "-panel-right");
-            }
-
-            {
-                size = 2;
-                range = 120f;
-                ammoTypes = new AmmoType[]{AmmoTypes.bulletCopper, AmmoTypes.bulletDense, AmmoTypes.bulletPyratite, AmmoTypes.bulletThorium, AmmoTypes.bulletSilicon};
-                reload = 35f;
-                restitution = 0.03f;
-                ammoEjectBack = 3f;
-                cooldown = 0.03f;
-                recoil = 3f;
-                shootShake = 2f;
-                burstSpacing = 4;
-                shots = 3;
-                ammoUseEffect = ShootFx.shellEjectBig;
-
-                drawer = (tile, entity) -> {
-                    Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-                    float offsetx = (int) (abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 3f);
-                    float offsety = -(int) (abscurve(Mathf.curve(entity.reload / reload, 0.3f, 0.2f)) * 2f);
-
-                    for(int i : Mathf.signs){
-                        float rot = entity.rotation + 90 * i;
-                        Draw.rect(panels[i == -1 ? 0 : 1],
-                                tile.drawx() + tr2.x + Angles.trnsx(rot, offsetx, offsety),
-                                tile.drawy() + tr2.y + Angles.trnsy(rot, -offsetx, offsety), entity.rotation - 90);
-                    }
-                };
-
-                health = 360;
-            }
-
-            /** Converts a value range from 0-1 to a value range 0-1-0. */
-            float abscurve(float f){
-                return 1f - Math.abs(f - 0.5f) * 2f;
-            }
-        };
+            size = 2;
+            range = 120f;
+            reload = 35f;
+            restitution = 0.03f;
+            ammoEjectBack = 3f;
+            cooldown = 0.03f;
+            recoil = 3f;
+            shootShake = 2f;
+            burstSpacing = 4;
+            shots = 3;
+            ammoUseEffect = ShootFx.shellEjectBig;
+            health = 360;
+        }};
 
         ripple = new ArtilleryTurret("ripple"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.artilleryDense, AmmoTypes.artilleryHoming, AmmoTypes.artilleryIncindiary, AmmoTypes.artilleryExplosive, AmmoTypes.artilleryPlastic};
+            ammo(
+                Items.densealloy, ArtilleryBullets.dense,
+                Items.silicon, ArtilleryBullets.homing,
+                Items.pyratite, ArtilleryBullets.incendiary,
+                Items.blastCompound, ArtilleryBullets.explosive,
+                Items.plastanium, ArtilleryBullets.plastic
+            );
             size = 3;
             shots = 4;
             inaccuracy = 12f;
@@ -197,7 +183,11 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         cyclone = new ItemTurret("cyclone"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.flakExplosive, AmmoTypes.flakPlastic, AmmoTypes.flakSurge};
+            ammo(
+                Items.blastCompound, FlakBullets.explosive,
+                Items.plastanium, FlakBullets.plastic,
+                Items.surgealloy, FlakBullets.surge
+            );
             xRand = 4f;
             reload = 8f;
             range = 145f;
@@ -211,7 +201,7 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         fuse = new ItemTurret("fuse"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.fuseShotgun};
+            ammo(Items.densealloy, TurretBullets.fuseShot);
             reload = 50f;
             shootShake = 4f;
             range = 80f;
@@ -223,7 +213,11 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         spectre = new DoubleTurret("spectre"){{
-            ammoTypes = new AmmoType[]{AmmoTypes.bulletDenseBig, AmmoTypes.bulletPyratiteBig, AmmoTypes.bulletThoriumBig};
+            ammo(
+                Items.densealloy, StandardBullets.denseBig,
+                Items.pyratite, StandardBullets.tracerBig,
+                Items.thorium, StandardBullets.thoriumBig
+            );
             reload = 6f;
             coolantMultiplier = 0.5f;
             maxCoolantUsed = 1.5f;
@@ -243,7 +237,7 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         meltdown = new LaserTurret("meltdown"){{
-            shootType = AmmoTypes.meltdownLaser;
+            shootType = TurretBullets.meltdownLaser;
             shootEffect = ShootFx.shootBigSmoke2;
             shootCone = 40f;
             recoil = 4f;

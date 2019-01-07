@@ -292,16 +292,6 @@ public class TypeIO{
         return content.liquid(buffer.get());
     }
 
-    @WriteClass(AmmoType.class)
-    public static void writeAmmo(ByteBuffer buffer, AmmoType type){
-        buffer.put(type.id);
-    }
-
-    @ReadClass(AmmoType.class)
-    public static AmmoType readAmmo(ByteBuffer buffer){
-        return content.getByID(ContentType.weapon, buffer.get());
-    }
-
     @WriteClass(BulletType.class)
     public static void writeBulletType(ByteBuffer buffer, BulletType type){
         buffer.put(type.id);

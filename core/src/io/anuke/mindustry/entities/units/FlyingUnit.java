@@ -8,10 +8,10 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.CarriableTrait;
 import io.anuke.mindustry.entities.traits.CarryTrait;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
@@ -74,11 +74,11 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
             }else{
                 attack(150f);
 
-                if((Angles.near(angleTo(target), rotation, 15f) || !getWeapon().getAmmo().bullet.keepVelocity) //bombers don't care about rotation
-                && dst(target) < Math.max(getWeapon().getAmmo().getRange(), type.range)){
-                    AmmoType ammo = getWeapon().getAmmo();
+                if((Angles.near(angleTo(target), rotation, 15f) || !getWeapon().getAmmo().keepVelocity) //bombers don't care about rotation
+                && dst(target) < Math.max(getWeapon().getAmmo().range(), type.range)){
+                    BulletType ammo = getWeapon().getAmmo();
 
-                    Vector2 to = Predict.intercept(FlyingUnit.this, target, ammo.bullet.speed);
+                    Vector2 to = Predict.intercept(FlyingUnit.this, target, ammo.speed);
 
                     getWeapon().update(FlyingUnit.this, to.x, to.y);
                 }

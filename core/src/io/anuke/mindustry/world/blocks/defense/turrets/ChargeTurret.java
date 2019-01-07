@@ -1,13 +1,13 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.type.AmmoType;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.util.Time;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -24,7 +24,7 @@ public class ChargeTurret extends PowerTurret{
     }
 
     @Override
-    public void shoot(Tile tile, AmmoType ammo){
+    public void shoot(Tile tile, BulletType ammo){
         LaserTurretEntity entity = tile.entity();
 
         useAmmo(tile);
@@ -47,7 +47,7 @@ public class ChargeTurret extends PowerTurret{
             tr.trns(entity.rotation, size * tilesize / 2);
             entity.recoil = recoil;
             entity.heat = 1f;
-            bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy));
+            bullet(tile, ammo, entity.rotation + Mathf.range(inaccuracy));
             effects(tile);
             entity.shooting = false;
         });

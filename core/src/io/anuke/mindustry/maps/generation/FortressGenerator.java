@@ -13,7 +13,6 @@ import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
@@ -74,12 +73,14 @@ public class FortressGenerator{
         float placeChance = difficultyScl*0.75f+0.25f;
 
         IntIntMap ammoPerType = new IntIntMap();
+        //todo implement
+        /*
         for(Block turret : turrets){
             if(!(turret instanceof ItemTurret)) continue;
             ItemTurret t = (ItemTurret)turret;
             int size = t.getAmmoTypes().length;
             ammoPerType.put(t.id, Mathf.clamp((int)(size* difficultyScl) + gen.random.range(1), 0, size - 1));
-        }
+        }*/
 
         TriFunction<Tile, Block, Predicate<Tile>, Boolean> checker = (current, block, pred) -> {
             for(Point2 point : Edges.getEdges(block.size)){
@@ -181,11 +182,12 @@ public class FortressGenerator{
 
                 if(block instanceof PowerTurret){
                     tile.entity.power.satisfaction = 1.0f;
-                }else if(block instanceof ItemTurret){
+                    //todo implement
+                /*}else if(block instanceof ItemTurret){
                     ItemTurret turret = (ItemTurret)block;
                     AmmoType[] type = turret.getAmmoTypes();
                     int index = ammoPerType.get(block.id, 0);
-                    block.handleStack(type[index].item, block.acceptStack(type[index].item, 1000, tile, null), tile, null);
+                    block.handleStack(type[index].item, block.acceptStack(type[index].item, 1000, tile, null), tile, null);*/
                 }else if(block instanceof NuclearReactor){
                     tile.entity.items.add(Items.thorium, 30);
                 }else if(block instanceof LiquidTurret){

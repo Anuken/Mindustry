@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import io.anuke.mindustry.type.AmmoType;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -8,7 +8,7 @@ import io.anuke.mindustry.world.meta.StatUnit;
 public abstract class PowerTurret extends CooledTurret{
     /** The percentage of power which will be used per shot. */
     protected float powerUsed = 0.5f;
-    protected AmmoType shootType;
+    protected BulletType shootType;
 
     public PowerTurret(String name){
         super(name);
@@ -29,7 +29,7 @@ public abstract class PowerTurret extends CooledTurret{
     }
 
     @Override
-    public AmmoType useAmmo(Tile tile){
+    public BulletType useAmmo(Tile tile){
         if(tile.isEnemyCheat()) return shootType;
         // Make sure that power can not go negative in case of threading issues or similar
         tile.entity.power.satisfaction -= Math.min(powerUsed, tile.entity.power.satisfaction);
@@ -37,7 +37,7 @@ public abstract class PowerTurret extends CooledTurret{
     }
 
     @Override
-    public AmmoType peekAmmo(Tile tile){
+    public BulletType peekAmmo(Tile tile){
         return shootType;
     }
 }
