@@ -46,17 +46,6 @@ public class Blocks implements ContentList{
     @Override
     public void load(){
         //region environment blocks
-        
-        //create ores for every floor and item combination necessary
-        for(Item item : content.items()){
-            if(!item.genOre) continue;
-
-            for(Block block : content.blocks()){
-                if(block instanceof Floor && ((Floor) block).hasOres){
-                    new OreBlock(item, (Floor) block);
-                }
-            }
-        }
 
         air = new Floor("air"){
             {
@@ -1186,6 +1175,21 @@ public class Blocks implements ContentList{
             consumes.powerBuffered(120f);
         }};
         
+        //endregion
+
+        //region ores
+
+        //create ores for every floor and item combination necessary
+        for(Item item : content.items()){
+            if(!item.genOre) continue;
+
+            for(Block block : content.blocks()){
+                if(block instanceof Floor && ((Floor) block).hasOres){
+                    new OreBlock(item, (Floor) block);
+                }
+            }
+        }
+
         //endregion
     }
 }

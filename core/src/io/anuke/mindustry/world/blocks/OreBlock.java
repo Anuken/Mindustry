@@ -55,8 +55,7 @@ public class OreBlock extends Floor{
 
     public static Block get(Block floor, Item item){
         if(!oreBlockMap.containsKey(item)) throw new IllegalArgumentException("Item '" + item + "' is not an ore!");
-        if(!oreBlockMap.get(item).containsKey(floor))
-            throw new IllegalArgumentException("Block '" + floor.name + "' does not support ores!");
+        if(!oreBlockMap.get(item).containsKey(floor)) throw new IllegalArgumentException("Block '" + floor.name + "' does not support ores!");
         return oreBlockMap.get(item).get(floor);
     }
 }

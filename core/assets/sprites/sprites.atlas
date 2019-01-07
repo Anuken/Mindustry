@@ -2944,28 +2944,28 @@ incinerator
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-icon-itemsource
+block-icon-item-source
   rotate: false
   xy: 483, 425
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-itemsource
+item-source
   rotate: false
   xy: 483, 425
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-icon-itemvoid
+block-icon-item-void
   rotate: false
   xy: 415, 357
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-itemvoid
+item-void
   rotate: false
   xy: 415, 357
   size: 32, 32
@@ -3042,25 +3042,25 @@ block-icon-liquid-router
   orig: 32, 32
   offset: 0, 0
   index: -1
+block-icon-liquid-source
+  rotate: false
+  xy: 483, 357
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+liquid-source
+  rotate: false
+  xy: 483, 357
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
 block-icon-liquid-tank
   rotate: false
   xy: 261, 1243
   size: 96, 96
   orig: 96, 96
-  offset: 0, 0
-  index: -1
-block-icon-liquidsource
-  rotate: false
-  xy: 483, 357
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-liquidsource
-  rotate: false
-  xy: 483, 357
-  size: 32, 32
-  orig: 32, 32
   offset: 0, 0
   index: -1
 block-icon-mass-driver
@@ -3308,14 +3308,28 @@ block-icon-power-node-large
   orig: 64, 64
   offset: 0, 0
   index: -1
-block-icon-powerinfinite
+block-icon-power-source
   rotate: false
   xy: 229, 310
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-icon-powervoid
+power-source
+  rotate: false
+  xy: 229, 310
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+block-icon-power-void
+  rotate: false
+  xy: 229, 276
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+power-void
   rotate: false
   xy: 229, 276
   size: 32, 32
