@@ -3,7 +3,7 @@ package io.anuke.mindustry.content.blocks;
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.production.Cultivator;
@@ -35,8 +35,8 @@ public class ProductionBlocks extends BlockList implements ContentList{
             size = 2;
             hasPower = true;
             tier = 4;
-            updateEffect = BlockFx.pulverizeMedium;
-            drillEffect = BlockFx.mineBig;
+            updateEffect = Fx.pulverizeMedium;
+            drillEffect = Fx.mineBig;
 
             consumes.power(0.11f);
         }};
@@ -47,9 +47,9 @@ public class ProductionBlocks extends BlockList implements ContentList{
             drawRim = true;
             hasPower = true;
             tier = 5;
-            updateEffect = BlockFx.pulverizeRed;
+            updateEffect = Fx.pulverizeRed;
             updateEffectChance = 0.03f;
-            drillEffect = BlockFx.mineHuge;
+            drillEffect = Fx.mineHuge;
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
 
@@ -65,9 +65,9 @@ public class ProductionBlocks extends BlockList implements ContentList{
             tier = 5;
             rotateSpeed = 9f;
             drawRim = true;
-            updateEffect = BlockFx.pulverizeRedder;
+            updateEffect = Fx.pulverizeRedder;
             updateEffectChance = 0.04f;
-            drillEffect = BlockFx.mineHuge;
+            drillEffect = Fx.mineHuge;
             warmupSpeed = 0.005f;
 
             consumes.power(0.7f);
@@ -85,7 +85,7 @@ public class ProductionBlocks extends BlockList implements ContentList{
 
         oilExtractor = new Fracker("oil-extractor"){{
             result = Liquids.oil;
-            updateEffect = BlockFx.pulverize;
+            updateEffect = Fx.pulverize;
             liquidCapacity = 50f;
             updateEffectChance = 0.05f;
             pumpAmount = 0.09f;

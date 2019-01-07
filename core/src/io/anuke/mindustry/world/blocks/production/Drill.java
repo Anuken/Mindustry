@@ -12,7 +12,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Item;
@@ -48,11 +48,11 @@ public class Drill extends Block{
     /**Whether to draw the item this drill is mining.*/
     protected boolean drawMineItem = false;
     /**Effect played when an item is produced. This is colored.*/
-    protected Effect drillEffect = BlockFx.mine;
+    protected Effect drillEffect = Fx.mine;
     /**Speed the drill bit rotates at.*/
     protected float rotateSpeed = 2f;
     /**Effect randomly played while drilling.*/
-    protected Effect updateEffect = BlockFx.pulverizeSmall;
+    protected Effect updateEffect = Fx.pulverizeSmall;
     /**Chance the update effect will appear.*/
     protected float updateEffectChance = 0.02f;
 

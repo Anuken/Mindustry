@@ -20,7 +20,7 @@ import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.fx.UnitFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
@@ -502,7 +502,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 if(mech.shake > 1f){
                     Effects.shake(mech.shake, mech.shake, this);
                 }
-                Effects.effect(UnitFx.unitLand, tile.floor().minimapColor, x, y, tile.floor().isLiquid ? 1f : 0.5f);
+                Effects.effect(Fx.unitLand, tile.floor().minimapColor, x, y, tile.floor().isLiquid ? 1f : 0.5f);
             }
             mech.onLand(this);
             achievedFlight = false;

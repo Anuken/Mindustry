@@ -5,7 +5,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.content.fx.ShootFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
@@ -27,7 +27,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             restitution = 0.03f;
             range = 90f;
             shootCone = 15f;
-            ammoUseEffect = ShootFx.shellEjectSmall;
+            ammoUseEffect = Fx.shellEjectSmall;
             health = 80;
             inaccuracy = 2f;
             rotatespeed = 10f;
@@ -52,7 +52,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             recoil = 0f;
             reload = 4f;
             shootCone = 50f;
-            ammoUseEffect = ShootFx.shellEjectSmall;
+            ammoUseEffect = Fx.shellEjectSmall;
             health = 160;
         }};
 
@@ -68,7 +68,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             reload = 4f;
             inaccuracy = 5f;
             shootCone = 50f;
-            shootEffect = ShootFx.shootLiquid;
+            shootEffect = Fx.shootLiquid;
             range = 90f;
             health = 360;
 
@@ -94,10 +94,10 @@ public class TurretBlocks extends BlockList implements ContentList{
             powerUsed = 1 / 3f;
             consumes.powerBuffered(60f);
             shootShake = 2f;
-            shootEffect = ShootFx.lancerLaserShoot;
-            smokeEffect = ShootFx.lancerLaserShootSmoke;
-            chargeEffect = ShootFx.lancerLaserCharge;
-            chargeBeginEffect = ShootFx.lancerLaserChargeBegin;
+            shootEffect = Fx.lancerLaserShoot;
+            smokeEffect = Fx.lancerLaserShootSmoke;
+            chargeEffect = Fx.lancerLaserCharge;
+            chargeBeginEffect = Fx.lancerLaserChargeBegin;
             heatColor = Color.RED;
             size = 2;
             health = 320;
@@ -113,7 +113,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             powerUsed = 1f / 3f;
             consumes.powerBuffered(30f);
             range = 150f;
-            shootEffect = ShootFx.lightningShoot;
+            shootEffect = Fx.lightningShoot;
             heatColor = Color.RED;
             recoil = 1f;
             size = 1;
@@ -154,7 +154,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             shootShake = 2f;
             burstSpacing = 4;
             shots = 3;
-            ammoUseEffect = ShootFx.shellEjectBig;
+            ammoUseEffect = Fx.shellEjectBig;
             health = 360;
         }};
 
@@ -171,7 +171,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             inaccuracy = 12f;
             reload = 60f;
             ammoEjectBack = 5f;
-            ammoUseEffect = ShootFx.shellEjectBig;
+            ammoUseEffect = Fx.shellEjectBig;
             cooldown = 0.03f;
             velocityInaccuracy = 0.2f;
             restitution = 0.02f;
@@ -222,7 +222,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             coolantMultiplier = 0.5f;
             maxCoolantUsed = 1.5f;
             restitution = 0.1f;
-            ammoUseEffect = ShootFx.shellEjectBig;
+            ammoUseEffect = Fx.shellEjectBig;
             range = 200f;
             inaccuracy = 3f;
             recoil = 3f;
@@ -238,7 +238,7 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         meltdown = new LaserTurret("meltdown"){{
             shootType = Bullets.meltdownLaser;
-            shootEffect = ShootFx.shootBigSmoke2;
+            shootEffect = Fx.shootBigSmoke2;
             shootCone = 40f;
             recoil = 4f;
             size = 4;

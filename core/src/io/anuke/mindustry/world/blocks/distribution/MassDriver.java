@@ -16,10 +16,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pool.Poolable;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Bullets;
-import io.anuke.mindustry.content.Bullets;
-import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.content.fx.EnvironmentFx;
-import io.anuke.mindustry.content.fx.ShootFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
@@ -46,9 +43,9 @@ public class MassDriver extends Block{
     protected int minDistribute = 10;
     protected float knockback = 4f;
     protected float reloadTime = 100f;
-    protected Effect shootEffect = ShootFx.shootBig2;
-    protected Effect smokeEffect = ShootFx.shootBigSmoke2;
-    protected Effect recieveEffect = BlockFx.mineBig;
+    protected Effect shootEffect = Fx.shootBig2;
+    protected Effect smokeEffect = Fx.shootBigSmoke2;
+    protected Effect recieveEffect = Fx.mineBig;
     protected float shake = 3f;
     protected final static float powerPercentageUsed = 1.0f;
     protected TextureRegion turretRegion;
@@ -309,7 +306,7 @@ public class MassDriver extends Block{
                 int amountDropped = Mathf.random(0, data.items[i]);
                 if(amountDropped > 0){
                     float angle = Mathf.range(180f);
-                    Effects.effect(EnvironmentFx.dropItem, Color.WHITE, bullet.x, bullet.y, angle, content.item(i));
+                    Effects.effect(Fx.dropItem, Color.WHITE, bullet.x, bullet.y, angle, content.item(i));
                 }
             }
 

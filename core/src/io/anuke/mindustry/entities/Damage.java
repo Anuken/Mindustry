@@ -11,7 +11,7 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Bullets;
-import io.anuke.mindustry.content.fx.ExplosionFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
@@ -46,21 +46,21 @@ public class Damage{
             int f = i;
             Time.run(i * 2f, () -> {
                 Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
-                Effects.effect(ExplosionFx.blockExplosionSmoke, x + Mathf.range(radius), y + Mathf.range(radius));
+                Effects.effect(Fx.blockExplosionSmoke, x + Mathf.range(radius), y + Mathf.range(radius));
             });
         }
 
         if(explosiveness > 15f){
-            Effects.effect(ExplosionFx.shockwave, x, y);
+            Effects.effect(Fx.shockwave, x, y);
         }
 
         if(explosiveness > 30f){
-            Effects.effect(ExplosionFx.bigShockwave, x, y);
+            Effects.effect(Fx.bigShockwave, x, y);
         }
 
         float shake = Math.min(explosiveness / 4f + 3f, 9f);
         Effects.shake(shake, shake, x, y);
-        Effects.effect(ExplosionFx.blockExplosion, x, y);
+        Effects.effect(Fx.blockExplosion, x, y);
     }
 
     public static void createIncend(float x, float y, float range, int amount){

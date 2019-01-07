@@ -21,7 +21,7 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.ScreenRecorder;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;

@@ -4,7 +4,7 @@ import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.world.Tile;

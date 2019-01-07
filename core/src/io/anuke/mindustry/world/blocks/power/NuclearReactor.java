@@ -9,8 +9,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.content.fx.ExplosionFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
@@ -106,7 +105,7 @@ public class NuclearReactor extends PowerGenerator{
         if(entity.heat > smokeThreshold){
             float smoke = 1.0f + (entity.heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
             if(Mathf.chance(smoke / 20.0 * entity.delta())){
-                Effects.effect(BlockFx.reactorsmoke, tile.worldx() + Mathf.range(size * tilesize / 2f),
+                Effects.effect(Fx.reactorsmoke, tile.worldx() + Mathf.range(size * tilesize / 2f),
                         tile.worldy() + Mathf.random(size * tilesize / 2f));
             }
         }
@@ -131,9 +130,9 @@ public class NuclearReactor extends PowerGenerator{
         if(fuel < 5 && entity.heat < 0.5f) return;
 
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
-        Effects.effect(ExplosionFx.nuclearShockwave, tile.worldx(), tile.worldy());
+        Effects.effect(Fx.nuclearShockwave, tile.worldx(), tile.worldy());
         for(int i = 0; i < 6; i++){
-            Time.run(Mathf.random(40), () -> Effects.effect(BlockFx.nuclearcloud, tile.worldx(), tile.worldy()));
+            Time.run(Mathf.random(40), () -> Effects.effect(Fx.nuclearcloud, tile.worldx(), tile.worldy()));
         }
 
         Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
@@ -142,14 +141,14 @@ public class NuclearReactor extends PowerGenerator{
         for(int i = 0; i < 20; i++){
             Time.run(Mathf.random(50), () -> {
                 tr.rnd(Mathf.random(40f));
-                Effects.effect(ExplosionFx.explosion, tr.x + tile.worldx(), tr.y + tile.worldy());
+                Effects.effect(Fx.explosion, tr.x + tile.worldx(), tr.y + tile.worldy());
             });
         }
 
         for(int i = 0; i < 70; i++){
             Time.run(Mathf.random(80), () -> {
                 tr.rnd(Mathf.random(120f));
-                Effects.effect(BlockFx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
+                Effects.effect(Fx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
             });
         }
     }

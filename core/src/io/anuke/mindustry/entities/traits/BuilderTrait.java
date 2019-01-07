@@ -16,7 +16,7 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
@@ -285,7 +285,7 @@ public interface BuilderTrait extends Entity{
             }
 
             if(Mathf.chance(0.06 * Time.delta())){
-                Effects.effect(BlockFx.pulverizeSmall,
+                Effects.effect(Fx.pulverizeSmall,
                         tile.worldx() + Mathf.range(tilesize / 2f),
                         tile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
             }

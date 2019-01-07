@@ -7,7 +7,6 @@ import io.anuke.arc.function.Consumer;
 import io.anuke.arc.util.Log;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
-import io.anuke.mindustry.content.fx.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
@@ -41,13 +40,7 @@ public class ContentLoader{
     private ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
         //effects
-        new BlockFx(),
-        new BulletFx(),
-        new EnvironmentFx(),
-        new ExplosionFx(),
         new Fx(),
-        new ShootFx(),
-        new UnitFx(),
 
         //items
         new Items(),

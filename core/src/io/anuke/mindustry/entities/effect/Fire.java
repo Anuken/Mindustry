@@ -15,7 +15,7 @@ import io.anuke.arc.util.pooling.Pool.Poolable;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.content.fx.EnvironmentFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.SaveTrait;
@@ -93,11 +93,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     @Override
     public void update(){
         if(Mathf.chance(0.1 * Time.delta())){
-            Effects.effect(EnvironmentFx.fire, x + Mathf.range(4f), y + Mathf.range(4f));
+            Effects.effect(Fx.fire, x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
         if(Mathf.chance(0.05 * Time.delta())){
-            Effects.effect(EnvironmentFx.smoke, x + Mathf.range(4f), y + Mathf.range(4f));
+            Effects.effect(Fx.fireSmoke, x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
         if(Net.client()){

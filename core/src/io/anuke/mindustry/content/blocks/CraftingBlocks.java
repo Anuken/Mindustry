@@ -3,7 +3,7 @@ package io.anuke.mindustry.content.blocks;
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
@@ -29,7 +29,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
 
         arcsmelter = new PowerSmelter("arc-smelter"){{
             health = 90;
-            craftEffect = BlockFx.smeltsmoke;
+            craftEffect = Fx.smeltsmoke;
             result = Items.densealloy;
             craftTime = 30f;
             size = 2;
@@ -43,7 +43,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
 
         siliconsmelter = new PowerSmelter("silicon-smelter"){{
             health = 90;
-            craftEffect = BlockFx.smeltsmoke;
+            craftEffect = Fx.smeltsmoke;
             result = Items.silicon;
             craftTime = 40f;
             size = 2;
@@ -63,8 +63,8 @@ public class CraftingBlocks extends BlockList implements ContentList{
             size = 2;
             health = 320;
             hasPower = hasLiquids = true;
-            craftEffect = BlockFx.formsmoke;
-            updateEffect = BlockFx.plasticburn;
+            craftEffect = Fx.formsmoke;
+            updateEffect = Fx.plasticburn;
 
             consumes.liquid(Liquids.oil, 0.25f);
             consumes.power(0.3f);
@@ -72,7 +72,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
         }};
 
         phaseWeaver = new PhaseWeaver("phase-weaver"){{
-            craftEffect = BlockFx.smeltsmoke;
+            craftEffect = Fx.smeltsmoke;
             result = Items.phasefabric;
             craftTime = 120f;
             size = 2;
@@ -82,7 +82,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
         }};
 
         alloySmelter = new PowerSmelter("alloy-smelter"){{
-            craftEffect = BlockFx.smeltsmoke;
+            craftEffect = Fx.smeltsmoke;
             result = Items.surgealloy;
             craftTime = 75f;
             size = 2;
@@ -207,9 +207,9 @@ public class CraftingBlocks extends BlockList implements ContentList{
             itemCapacity = 40;
             output = Items.sand;
             health = 80;
-            craftEffect = BlockFx.pulverize;
+            craftEffect = Fx.pulverize;
             craftTime = 40f;
-            updateEffect = BlockFx.pulverizeSmall;
+            updateEffect = Fx.pulverizeSmall;
             hasItems = hasPower = true;
 
             consumes.item(Items.stone, 1);
@@ -222,7 +222,7 @@ public class CraftingBlocks extends BlockList implements ContentList{
             output = Items.stone;
             itemCapacity = 20;
             health = 80;
-            craftEffect = BlockFx.purifystone;
+            craftEffect = Fx.purifystone;
             hasLiquids = hasItems = true;
 
             consumes.liquid(Liquids.lava, 1f);

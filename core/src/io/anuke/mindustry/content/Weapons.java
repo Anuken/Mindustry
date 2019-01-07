@@ -1,7 +1,5 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
@@ -17,7 +15,7 @@ public class Weapons implements ContentList{
             length = 1.5f;
             reload = 14f;
             roundrobin = true;
-            ejectEffect = ShootFx.shellEjectSmall;
+            ejectEffect = Fx.shellEjectSmall;
             ammo = Bullets.standardMechSmall;
         }};
 
@@ -25,7 +23,7 @@ public class Weapons implements ContentList{
             length = 1.5f;
             reload = 15f;
             roundrobin = true;
-            ejectEffect = ShootFx.shellEjectSmall;
+            ejectEffect = Fx.shellEjectSmall;
             ammo = Bullets.standardCopper;
         }};
 
@@ -33,7 +31,7 @@ public class Weapons implements ContentList{
             length = 1.5f;
             reload = 10f;
             roundrobin = true;
-            ejectEffect = ShootFx.shellEjectSmall;
+            ejectEffect = Fx.shellEjectSmall;
             ammo = Bullets.standardGlaive;
         }};
 
@@ -42,7 +40,7 @@ public class Weapons implements ContentList{
             reload = 25f;
             width = 1f;
             roundrobin = true;
-            ejectEffect = ShootFx.shellEjectSmall;
+            ejectEffect = Fx.shellEjectSmall;
             ammo = Bullets.standardCopper;
         }};
 
@@ -84,7 +82,7 @@ public class Weapons implements ContentList{
             length = 1.5f;
             reload = 28f;
             roundrobin = true;
-            ejectEffect = ShootFx.shellEjectSmall;
+            ejectEffect = Fx.shellEjectSmall;
             ammo = Bullets.standardCopper;
         }};
 
@@ -107,7 +105,7 @@ public class Weapons implements ContentList{
             inaccuracy = 3f;
             recoil = 3f;
             velocityRnd = 0.1f;
-            ejectEffect = ShootFx.shellEjectMedium;
+            ejectEffect = Fx.shellEjectMedium;
             ammo = Bullets.artilleryDense;
         }};
 
@@ -126,7 +124,7 @@ public class Weapons implements ContentList{
             roundrobin = true;
             recoil = 5f;
             shake = 2f;
-            ejectEffect = ShootFx.shellEjectMedium;
+            ejectEffect = Fx.shellEjectMedium;
             ammo = Bullets.artilleryUnit;
         }};
 

@@ -3,8 +3,7 @@ package io.anuke.mindustry.entities.bullet;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.content.fx.BulletFx;
-import io.anuke.mindustry.content.fx.ShootFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
@@ -21,9 +20,9 @@ public abstract class BulletType extends Content{
     public Effect hitEffect, despawnEffect;
 
     /**Effect created when shooting.*/
-    public Effect shootEffect = ShootFx.shootSmall;
+    public Effect shootEffect = Fx.shootSmall;
     /**Extra smoke effect created when shooting.*/
-    public Effect smokeEffect = ShootFx.shootSmallSmoke;
+    public Effect smokeEffect = Fx.shootSmallSmoke;
     /**Extra inaccuracy when firing.*/
     public float inaccuracy = 0f;
     /**How many bullets get created per ammo item/liquid.*/
@@ -61,8 +60,8 @@ public abstract class BulletType extends Content{
         this.speed = speed;
         this.damage = damage;
         lifetime = 40f;
-        hitEffect = BulletFx.hitBulletSmall;
-        despawnEffect = BulletFx.hitBulletSmall;
+        hitEffect = Fx.hitBulletSmall;
+        despawnEffect = Fx.hitBulletSmall;
     }
 
     /**Returns maximum distance the bullet this bullet type has can travel.*/

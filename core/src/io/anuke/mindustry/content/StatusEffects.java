@@ -3,7 +3,6 @@ package io.anuke.mindustry.content;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.StatusController.StatusEntry;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.ContentList;
@@ -27,7 +26,7 @@ public class StatusEffects implements ContentList{
             public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
                 if(to == tarred){
                     unit.damage(1f);
-                    Effects.effect(EnvironmentFx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+                    Effects.effect(Fx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                     return result.set(this, Math.min(time + newTime, baseDuration + tarred.baseDuration));
                 }
 
@@ -39,7 +38,7 @@ public class StatusEffects implements ContentList{
                 unit.damagePeriodic(0.04f);
 
                 if(Mathf.chance(Time.delta() * 0.2f)){
-                    Effects.effect(EnvironmentFx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+                    Effects.effect(Fx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
         };
@@ -55,7 +54,7 @@ public class StatusEffects implements ContentList{
             public void update(Unit unit, float time){
 
                 if(Mathf.chance(Time.delta() * 0.15f)){
-                    Effects.effect(EnvironmentFx.freezing, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+                    Effects.effect(Fx.freezing, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
         };
@@ -80,7 +79,7 @@ public class StatusEffects implements ContentList{
             @Override
             public void update(Unit unit, float time){
                 if(Mathf.chance(Time.delta() * 0.15f)){
-                    Effects.effect(EnvironmentFx.wet, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+                    Effects.effect(Fx.wet, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
         };
@@ -106,7 +105,7 @@ public class StatusEffects implements ContentList{
                 unit.damagePeriodic(0.3f);
 
                 if(Mathf.chance(Time.delta() * 0.2f)){
-                    Effects.effect(EnvironmentFx.melting, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+                    Effects.effect(Fx.melting, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
         };
@@ -119,7 +118,7 @@ public class StatusEffects implements ContentList{
             @Override
             public void update(Unit unit, float time){
                 if(Mathf.chance(Time.delta() * 0.15f)){
-                    Effects.effect(EnvironmentFx.oily, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+                    Effects.effect(Fx.oily, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
                 }
             }
 
@@ -146,7 +145,7 @@ public class StatusEffects implements ContentList{
                 unit.health += 0.01f * Time.delta();
 
                 if(Mathf.chance(Time.delta() * 0.25f)){
-                    Effects.effect(EnvironmentFx.overdriven, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f), 0f, unit);
+                    Effects.effect(Fx.overdriven, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f), 0f, unit);
                 }
             }
         };

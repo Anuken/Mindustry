@@ -5,9 +5,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.content.fx.BulletFx;
-import io.anuke.mindustry.content.fx.EnvironmentFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 
@@ -19,8 +17,8 @@ public class MassDriverBolt extends BulletType{
         super(5.3f, 50);
         collidesTiles = false;
         lifetime = 200f;
-        despawnEffect = BlockFx.smeltsmoke;
-        hitEffect = BulletFx.hitBulletBig;
+        despawnEffect = Fx.smeltsmoke;
+        hitEffect = Fx.hitBulletBig;
         drag = 0.005f;
     }
 
@@ -96,7 +94,7 @@ public class MassDriverBolt extends BulletType{
             int amountDropped = Mathf.random(0, data.items[i]);
             if(amountDropped > 0){
                 float angle = b.rot() + Mathf.range(100f);
-                Effects.effect(EnvironmentFx.dropItem, Color.WHITE, b.x, b.y, angle, content.item(i));
+                Effects.effect(Fx.dropItem, Color.WHITE, b.x, b.y, angle, content.item(i));
             }
         }
     }

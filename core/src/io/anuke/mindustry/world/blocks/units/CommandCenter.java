@@ -13,7 +13,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.ButtonGroup;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
@@ -35,7 +35,7 @@ public class CommandCenter extends Block{
     protected TextureRegion[] commandRegions = new TextureRegion[UnitCommand.values().length];
     protected Color topColor = Palette.command;
     protected Color bottomColor = Color.valueOf("5e5e5e");
-    protected Effect effect = BlockFx.commandSend;
+    protected Effect effect = Fx.commandSend;
 
     public CommandCenter(String name){
         super(name);

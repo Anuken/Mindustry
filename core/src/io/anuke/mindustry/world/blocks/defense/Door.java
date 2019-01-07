@@ -8,7 +8,7 @@ import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
@@ -21,8 +21,8 @@ import java.io.IOException;
 public class Door extends Wall{
     protected final Rectangle rect = new Rectangle();
 
-    protected Effect openfx = BlockFx.dooropen;
-    protected Effect closefx = BlockFx.doorclose;
+    protected Effect openfx = Fx.dooropen;
+    protected Effect closefx = Fx.doorclose;
 
     protected TextureRegion openRegion;
 

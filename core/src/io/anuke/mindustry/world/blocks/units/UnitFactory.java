@@ -10,7 +10,7 @@ import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
@@ -64,7 +64,7 @@ public class UnitFactory extends Block{
         entity.buildTime = 0f;
 
         Effects.shake(2f, 3f, entity);
-        Effects.effect(BlockFx.producesmoke, tile.drawx(), tile.drawy());
+        Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
 
         if(!Net.client()){
             BaseUnit unit = factory.type.create(tile.getTeam());

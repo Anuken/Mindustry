@@ -14,7 +14,7 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.fx.ExplosionFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
@@ -77,7 +77,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         unit.onSuperDeath();
 
         ScorchDecal.create(unit.x, unit.y);
-        Effects.effect(ExplosionFx.explosion, unit);
+        Effects.effect(Fx.explosion, unit);
         Effects.shake(2f, 2f, unit);
 
         //must run afterwards so the unit's group is not null when sending the removal packet

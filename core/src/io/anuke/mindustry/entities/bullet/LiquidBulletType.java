@@ -7,8 +7,7 @@ import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
-import io.anuke.mindustry.content.fx.BulletFx;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.type.Liquid;
@@ -28,7 +27,7 @@ public class LiquidBulletType extends BulletType{
         status = liquid.effect;
         statusIntensity = 0.5f;
         despawnEffect = Fx.none;
-        hitEffect = BulletFx.hitLiquid;
+        hitEffect = Fx.hitLiquid;
         drag = 0.01f;
         knockback = 0.5f;
     }

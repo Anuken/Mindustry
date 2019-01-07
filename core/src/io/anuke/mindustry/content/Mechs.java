@@ -9,8 +9,6 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.fx.BulletFx;
-import io.anuke.mindustry.content.fx.UnitFx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.Lightning;
@@ -68,7 +66,7 @@ public class Mechs implements ContentList{
             public void onLand(Player player){
                 if(player.timer.get(Player.timerAbility, cooldown)){
                     Effects.shake(1f, 1f, player);
-                    Effects.effect(UnitFx.landShock, player);
+                    Effects.effect(Fx.landShock, player);
                     for(int i = 0; i < 8; i++){
                         Time.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), Palette.lancerLaser, 17f, player.x, player.y, Mathf.random(360f), 14));
                     }
@@ -109,7 +107,7 @@ public class Mechs implements ContentList{
                     Units.getNearby(player.getTeam(), rect, unit -> {
                         if(unit.dst(player) <= healRange){
                             if(unit.health < unit.maxHealth()){
-                                Effects.effect(UnitFx.heal, unit);
+                                Effects.effect(Fx.heal, unit);
                                 wasHealed = true;
                             }
                             unit.healBy(healAmount);
@@ -117,7 +115,7 @@ public class Mechs implements ContentList{
                     });
 
                     if(wasHealed){
-                        Effects.effect(UnitFx.healWave, player);
+                        Effects.effect(Fx.healWave, player);
                     }
                 }
             }
@@ -228,7 +226,7 @@ public class Mechs implements ContentList{
             public void updateAlt(Player player){
                 float scl = scld(player);
                 if(Mathf.chance(Time.delta() * (0.15*scl))){
-                    Effects.effect(BulletFx.hitLancer, Palette.lancerLaser, player.x, player.y);
+                    Effects.effect(Fx.hitLancer, Palette.lancerLaser, player.x, player.y);
                     Lightning.create(player.getTeam(), Palette.lancerLaser, 10f,
                     player.x + player.velocity().x, player.y + player.velocity().y, player.rotation, 14);
                 }

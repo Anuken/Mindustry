@@ -1,10 +1,9 @@
 package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.power.*;
 
 public class PowerBlocks extends BlockList implements ContentList{
@@ -21,7 +20,7 @@ public class PowerBlocks extends BlockList implements ContentList{
         thermalGenerator = new LiquidHeatGenerator("thermal-generator"){{
             maxLiquidGenerate = 2f;
             powerProduction = 2f;
-            generateEffect = BlockFx.redgeneratespark;
+            generateEffect = Fx.redgeneratespark;
             size = 2;
         }};
 

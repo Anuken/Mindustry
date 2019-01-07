@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content.blocks;
 
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.defense.*;
@@ -64,8 +64,8 @@ public class DefenseBlocks extends BlockList implements ContentList{
         }};
 
         doorLarge = new Door("door-large"){{
-            openfx = BlockFx.dooropenlarge;
-            closefx = BlockFx.doorcloselarge;
+            openfx = Fx.dooropenlarge;
+            closefx = Fx.doorcloselarge;
             health = 100 * 4 * wallHealthMultiplier;
             size = 2;
         }};

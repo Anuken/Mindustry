@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.production;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;

@@ -11,7 +11,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -70,7 +70,7 @@ public class OverdriveProjector extends Block{
             float realRange = range + entity.phaseHeat * phaseRangeBoost;
             float realBoost = (speedBoost + entity.phaseHeat*speedBoostPhase) * entity.power.satisfaction;
 
-            Effects.effect(BlockFx.overdriveWave, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
+            Effects.effect(Fx.overdriveWave, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
             entity.charge = 0f;
 
             int tileRange = (int)(realRange / tilesize);
@@ -88,7 +88,7 @@ public class OverdriveProjector extends Block{
                     if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null){
                         other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
                         other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
-                        Effects.effect(BlockFx.overdriveBlockFull, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
+                        Effects.effect(Fx.overdriveBlockFull, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
                         healed.add(other.pos());
                     }
                 }

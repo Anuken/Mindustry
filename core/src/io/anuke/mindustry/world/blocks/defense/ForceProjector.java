@@ -13,8 +13,7 @@ import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.content.fx.BulletFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.AbsorbTrait;
 import io.anuke.mindustry.graphics.Palette;
@@ -94,7 +93,7 @@ public class ForceProjector extends Block {
         entity.radscl = Mathf.lerpDelta(entity.radscl, entity.broken ? 0f : 1f, 0.05f);
 
         if(Mathf.chance(Time.delta() * entity.buildup / breakage * 0.1f)){
-            Effects.effect(BlockFx.reactorsmoke, tile.drawx() + Mathf.range(tilesize/2f), tile.drawy() + Mathf.range(tilesize/2f));
+            Effects.effect(Fx.reactorsmoke, tile.drawx() + Mathf.range(tilesize/2f), tile.drawy() + Mathf.range(tilesize/2f));
         }
 
         // Use Cases:
@@ -137,7 +136,7 @@ public class ForceProjector extends Block {
         if(entity.buildup >= breakage && !entity.broken){
             entity.broken = true;
             entity.buildup = breakage;
-            Effects.effect(BlockFx.shieldBreak, tile.drawx(), tile.drawy(), radius);
+            Effects.effect(Fx.shieldBreak, tile.drawx(), tile.drawy(), radius);
         }
 
         if(entity.hit > 0f){
@@ -151,7 +150,7 @@ public class ForceProjector extends Block {
                 AbsorbTrait trait = (AbsorbTrait)bullet;
                 if(trait.canBeAbsorbed() && trait.getTeam() != tile.getTeam() && isInsideHexagon(trait.getX(), trait.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
                     trait.absorb();
-                    Effects.effect(BulletFx.absorb, trait);
+                    Effects.effect(Fx.absorb, trait);
                     float relativeDamagePowerDraw = trait.getShieldDamage() * powerDamage / consumePower.powerCapacity;
                     entity.hit = 1f;
 
