@@ -6,6 +6,7 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
 public abstract class PowerTurret extends CooledTurret{
+    //TODO recode this class, satisfaction must be 100%!
     /** The percentage of power which will be used per shot. */
     protected float powerUsed = 0.5f;
     protected BulletType shootType;

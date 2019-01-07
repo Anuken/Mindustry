@@ -10,6 +10,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Palette;
 
@@ -33,6 +34,9 @@ public class BasicBulletType extends BulletType{
 
     public float homingPower = 0f;
     public float homingRange = 50f;
+
+    public int lightining;
+    public int lightningLength = 5;
 
     public TextureRegion backRegion;
     public TextureRegion frontRegion;
@@ -101,6 +105,10 @@ public class BasicBulletType extends BulletType{
         super.despawned(b);
         if(fragBullet != null || splashDamageRadius > 0){
             hit(b);
+        }
+
+        for (int i = 0; i < lightining; i++) {
+            Lightning.create(b.getTeam(), Palette.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
 }

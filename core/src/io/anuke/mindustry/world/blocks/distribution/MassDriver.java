@@ -15,7 +15,8 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pool.Poolable;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.content.bullets.TurretBullets;
+import io.anuke.mindustry.content.Bullets;
+import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.content.fx.ShootFx;
@@ -98,7 +99,7 @@ public class MassDriver extends Block{
         float angle = tile.angleTo(target);
 
         other.isRecieving = true;
-        Bullet.create(TurretBullets.driverBolt, entity, entity.getTeam(),
+        Bullet.create(Bullets.driverBolt, entity, entity.getTeam(),
                 tile.drawx() + Angles.trnsx(angle, driver.translation), tile.drawy() + Angles.trnsy(angle, driver.translation),
                 angle, 1f, 1f, data);
 

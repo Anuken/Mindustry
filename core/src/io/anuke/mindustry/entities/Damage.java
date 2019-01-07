@@ -10,7 +10,7 @@ import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.bullets.TurretBullets;
+import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.content.fx.ExplosionFx;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
@@ -37,7 +37,7 @@ public class Damage{
         }
 
         for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
-            Time.run(i / 2f, () -> Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f)));
+            Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, x, y, Mathf.random(360f)));
         }
 
         int waves = Mathf.clamp((int) (explosiveness / 4), 0, 30);

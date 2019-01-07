@@ -13,8 +13,8 @@ import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pool.Poolable;
 import io.anuke.arc.util.pooling.Pools;
+import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.content.bullets.TurretBullets;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.TileEntity;
@@ -136,7 +136,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
             create(other);
 
             if(Mathf.chance(fireballChance * Time.delta() * Mathf.clamp(flammability / 10f))){
-                Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f));
+                Call.createBullet(Bullets.fireball, x, y, Mathf.random(360f));
             }
         }
 

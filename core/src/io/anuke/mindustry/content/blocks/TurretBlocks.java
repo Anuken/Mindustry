@@ -2,26 +2,26 @@ package io.anuke.mindustry.content.blocks;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.content.bullets.*;
 import io.anuke.mindustry.content.fx.ShootFx;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
 
 public class TurretBlocks extends BlockList implements ContentList{
-    public static Block duo, /*scatter,*/
-            scorch, hail, wave, lancer, arc, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown;
+    public static Block duo, scorch, hail, wave, lancer, arc, swarmer, salvo,
+            fuse, ripple, cyclone, spectre, meltdown;
 
     @Override
     public void load(){
         duo = new DoubleTurret("duo"){{
             ammo(
-                Items.copper, StandardBullets.copper,
-                Items.densealloy, StandardBullets.dense,
-                Items.pyratite, StandardBullets.tracer,
-                Items.silicon, StandardBullets.homing
+                Items.copper, Bullets.standardCopper,
+                Items.densealloy, Bullets.standardDense,
+                Items.pyratite, Bullets.standardIncendiary,
+                Items.silicon, Bullets.standardHoming
             );
             reload = 25f;
             restitution = 0.03f;
@@ -35,9 +35,9 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         hail = new ArtilleryTurret("hail"){{
             ammo(
-                Items.densealloy, ArtilleryBullets.dense,
-                Items.silicon, ArtilleryBullets.homing,
-                Items.pyratite, ArtilleryBullets.incendiary
+                Items.densealloy, Bullets.artilleryDense,
+                Items.silicon, Bullets.artilleryHoming,
+                Items.pyratite, Bullets.artlleryIncendiary
             );
             reload = 60f;
             recoil = 2f;
@@ -48,7 +48,7 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         scorch = new LiquidTurret("scorch"){{
-            ammo(Liquids.oil, TurretBullets.basicFlame);
+            ammo(Liquids.oil, Bullets.basicFlame);
             recoil = 0f;
             reload = 4f;
             shootCone = 50f;
@@ -58,10 +58,10 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         wave = new LiquidTurret("wave"){{
             ammo(
-                Liquids.water, TurretBullets.waterShot,
-                Liquids.lava, TurretBullets.lavaShot,
-                Liquids.cryofluid, TurretBullets.cryoShot,
-                Liquids.oil, TurretBullets.oilShot
+                Liquids.water, Bullets.waterShot,
+                Liquids.lava, Bullets.lavaShot,
+                Liquids.cryofluid, Bullets.cryoShot,
+                Liquids.oil, Bullets.oilShot
             );
             size = 2;
             recoil = 0f;
@@ -87,7 +87,7 @@ public class TurretBlocks extends BlockList implements ContentList{
             chargeTime = 60f;
             chargeMaxDelay = 30f;
             chargeEffects = 7;
-            shootType = TurretBullets.lancerLaser;
+            shootType = Bullets.lancerLaser;
             recoil = 2f;
             reload = 100f;
             cooldown = 0.03f;
@@ -105,7 +105,7 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         arc = new PowerTurret("arc"){{
-            shootType = TurretBullets.arc;
+            shootType = Bullets.arc;
             reload = 85f;
             shootShake = 1f;
             shootCone = 40f;
@@ -121,9 +121,9 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         swarmer = new BurstTurret("swarmer"){{
             ammo(
-                Items.blastCompound, MissileBullets.explosive,
-                Items.pyratite, MissileBullets.incindiary,
-                Items.surgealloy, MissileBullets.surge
+                Items.blastCompound, Bullets.missileExplosive,
+                Items.pyratite, Bullets.missileIncendiary,
+                Items.surgealloy, Bullets.missileSurge
             );
             reload = 50f;
             shots = 4;
@@ -137,11 +137,11 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         salvo = new BurstTurret("salvo"){{
             ammo(
-                Items.copper, StandardBullets.copper,
-                Items.densealloy, StandardBullets.dense,
-                Items.pyratite, StandardBullets.tracer,
-                Items.silicon, StandardBullets.homing,
-                Items.thorium, StandardBullets.thorium
+                Items.copper, Bullets.standardCopper,
+                Items.densealloy, Bullets.standardDense,
+                Items.pyratite, Bullets.standardIncendiary,
+                Items.silicon, Bullets.standardHoming,
+                Items.thorium, Bullets.standardThorium
             );
 
             size = 2;
@@ -160,11 +160,11 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         ripple = new ArtilleryTurret("ripple"){{
             ammo(
-                Items.densealloy, ArtilleryBullets.dense,
-                Items.silicon, ArtilleryBullets.homing,
-                Items.pyratite, ArtilleryBullets.incendiary,
-                Items.blastCompound, ArtilleryBullets.explosive,
-                Items.plastanium, ArtilleryBullets.plastic
+                Items.densealloy, Bullets.artilleryDense,
+                Items.silicon, Bullets.artilleryHoming,
+                Items.pyratite, Bullets.artlleryIncendiary,
+                Items.blastCompound, Bullets.artilleryExplosive,
+                Items.plastanium, Bullets.arilleryPlastic
             );
             size = 3;
             shots = 4;
@@ -184,9 +184,9 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         cyclone = new ItemTurret("cyclone"){{
             ammo(
-                Items.blastCompound, FlakBullets.explosive,
-                Items.plastanium, FlakBullets.plastic,
-                Items.surgealloy, FlakBullets.surge
+                Items.blastCompound, Bullets.flakExplosive,
+                Items.plastanium, Bullets.flakPlastic,
+                Items.surgealloy, Bullets.flakSurge
             );
             xRand = 4f;
             reload = 8f;
@@ -201,7 +201,7 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         fuse = new ItemTurret("fuse"){{
-            ammo(Items.densealloy, TurretBullets.fuseShot);
+            ammo(Items.densealloy, Bullets.fuseShot);
             reload = 50f;
             shootShake = 4f;
             range = 80f;
@@ -214,9 +214,9 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         spectre = new DoubleTurret("spectre"){{
             ammo(
-                Items.densealloy, StandardBullets.denseBig,
-                Items.pyratite, StandardBullets.tracerBig,
-                Items.thorium, StandardBullets.thoriumBig
+                Items.densealloy, Bullets.standardDenseBig,
+                Items.pyratite, Bullets.standardIncendiaryBig,
+                Items.thorium, Bullets.standardThoriumBig
             );
             reload = 6f;
             coolantMultiplier = 0.5f;
@@ -237,7 +237,7 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         meltdown = new LaserTurret("meltdown"){{
-            shootType = TurretBullets.meltdownLaser;
+            shootType = Bullets.meltdownLaser;
             shootEffect = ShootFx.shootBigSmoke2;
             shootCone = 40f;
             recoil = 4f;

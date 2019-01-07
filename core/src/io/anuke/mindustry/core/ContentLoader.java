@@ -7,7 +7,6 @@ import io.anuke.arc.function.Consumer;
 import io.anuke.arc.util.Log;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.blocks.*;
-import io.anuke.mindustry.content.bullets.*;
 import io.anuke.mindustry.content.fx.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.bullet.Bullet;
@@ -60,12 +59,7 @@ public class ContentLoader{
         new Liquids(),
 
         //bullets
-        new ArtilleryBullets(),
-        new FlakBullets(),
-        new MissileBullets(),
-        new StandardBullets(),
-        new TurretBullets(),
-        new WeaponBullets(),
+        new Bullets(),
 
         //weapons
         new Weapons(),
@@ -275,7 +269,5 @@ public class ContentLoader{
         TypeTrait.registerType(Lightning.class, Lightning::new);
     }
 
-    private class ImpendingDoomException extends RuntimeException{
-        public ImpendingDoomException(String s){ super(s); }
-    }
+    private class ImpendingDoomException extends RuntimeException{ ImpendingDoomException(String s){ super(s); }}
 }

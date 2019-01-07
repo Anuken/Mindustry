@@ -20,7 +20,7 @@ import io.anuke.arc.util.pooling.Pool.Poolable;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.bullets.TurretBullets;
+import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.content.fx.BlockFx;
 import io.anuke.mindustry.content.fx.EnvironmentFx;
 import io.anuke.mindustry.entities.Units;
@@ -130,7 +130,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
                 (liquid.flammability > 0.3f && dest.temperature > 0.7f)){ //flammable liquid + hot liquid
             Fire.create(tile);
             if(Mathf.chance(0.006 * amount)){
-                Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f));
+                Call.createBullet(Bullets.fireball, x, y, Mathf.random(360f));
             }
         }else if(dest.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot puddle
             if(Mathf.chance(0.5f * amount)){

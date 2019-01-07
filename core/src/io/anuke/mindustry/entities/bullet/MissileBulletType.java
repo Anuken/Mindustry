@@ -10,6 +10,9 @@ import io.anuke.arc.math.Mathf;
 public class MissileBulletType extends BasicBulletType{
     protected Color trailColor = Palette.missileYellowBack;
 
+    protected float weaveScale = 0f;
+    protected float weaveMag = -1f;
+
     public MissileBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage, bulletSprite);
         backColor = Palette.missileYellowBack;
@@ -23,6 +26,10 @@ public class MissileBulletType extends BasicBulletType{
 
         if(Mathf.chance(Time.delta() * 0.2)){
             Effects.effect(BulletFx.missileTrail, trailColor, b.x, b.y, 2f);
+        }
+
+        if(weaveMag > 0){
+            b.velocity().rotate(Mathf.sin(Time.time() + b.id * 4422, weaveScale, weaveMag));
         }
     }
 }
