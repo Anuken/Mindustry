@@ -8,12 +8,10 @@ import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shapes;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -24,7 +22,7 @@ public class Fx implements ContentList{
     none, placeBlock, breakBlock, smoke, spawn, tapBlock, select,
     vtolHover, unitDrop, unitPickup, unitLand, pickup, healWave, heal, landShock, reactorsmoke, nuclearsmoke, nuclearcloud,
     redgeneratespark, generatespark, fuelburn, plasticburn, pulverize, pulverizeRed, pulverizeRedder, pulverizeSmall, pulverizeMedium,
-    producesmoke, smeltsmoke, formsmoke, blastsmoke, lava, doorclose, dooropenlarge, doorcloselarge, purify, purifyoil, purifystone, generate,
+    producesmoke, smeltsmoke, formsmoke, blastsmoke, lava, doorclose, dooropen, dooropenlarge, doorcloselarge, purify, purifyoil, purifystone, generate,
     mine, mineBig, mineHuge, smelt, teleportActivate, teleport, teleportOut, ripple, bubble, commandSend,
     healBlock, healBlockFull, healWaveMend, overdriveWave, overdriveBlockFull, shieldBreak, hitBulletSmall, hitFuse,
     hitBulletBig, hitFlameSmall, hitLiquid, hitLaser, hitLancer, hitMeltdown, despawn, flakExplosion, blastExplosion,
@@ -805,10 +803,5 @@ public class Fx implements ContentList{
 
             Draw.reset();
         });
-    }
-
-    @Override
-    public ContentType type(){
-        return ContentType.effect;
     }
 }

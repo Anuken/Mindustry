@@ -5,9 +5,9 @@ import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Logic;
 import io.anuke.mindustry.core.NetServer;
@@ -142,12 +142,12 @@ public class ApplicationTests{
         createMap();
         int bx = 4;
         int by = 4;
-        world.setBlock(world.tile(bx, by), StorageBlocks.core, Team.blue);
+        world.setBlock(world.tile(bx, by), Blocks.core, Team.blue);
         assertEquals(world.tile(bx, by).getTeam(), Team.blue);
         for(int x = bx-1; x <= bx + 1; x++){
             for(int y = by-1; y <= by + 1; y++){
                 if(x == bx && by == y){
-                    assertEquals(world.tile(x, y).block(), StorageBlocks.core);
+                    assertEquals(world.tile(x, y).block(), Blocks.core);
                 }else{
                     assertTrue(world.tile(x, y).block() == Blocks.blockpart && world.tile(x, y).getLinked() == world.tile(bx, by));
                 }
@@ -204,9 +204,9 @@ public class ApplicationTests{
 
     @Test
     void inventoryDeposit(){
-        depositTest(CraftingBlocks.smelter, Items.copper);
-        depositTest(StorageBlocks.vault, Items.copper);
-        depositTest(PowerBlocks.thoriumReactor, Items.thorium);
+        depositTest(Blocks.smelter, Items.copper);
+        depositTest(Blocks.vault, Items.copper);
+        depositTest(Blocks.thoriumReactor, Items.thorium);
     }
 
     @Test
@@ -231,14 +231,14 @@ public class ApplicationTests{
         d1.set(10f, 20f);
         d2.set(10f, 20f);
 
-        d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
-        d2.addBuildRequest(new BuildRequest(1, 1, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
+        d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(Blocks.copperWallLarge)));
+        d2.addBuildRequest(new BuildRequest(1, 1, 0, Recipe.getByResult(Blocks.copperWallLarge)));
 
         Time.setDeltaProvider(() -> 9999999f);
         d1.updateBuilding(d1);
         d2.updateBuilding(d2);
 
-        assertEquals(DefenseBlocks.copperWallLarge, world.tile(0, 0).block());
+        assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
         assertEquals(Blocks.blockpart, world.tile(1, 1).block());
     }
@@ -253,7 +253,7 @@ public class ApplicationTests{
         d1.set(10f, 20f);
         d2.set(10f, 20f);
 
-        d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
+        d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(Blocks.copperWallLarge)));
         d2.addBuildRequest(new BuildRequest(1, 1));
 
         Time.setDeltaProvider(() -> 3f);
@@ -277,7 +277,7 @@ public class ApplicationTests{
         createMap();
 
         Tile core = world.tile(5, 5);
-        world.setBlock(core, StorageBlocks.core, Team.blue);
+        world.setBlock(core, Blocks.core, Team.blue);
         for(Item item : content.items()){
             core.entity.items.set(item, 3000);
         }

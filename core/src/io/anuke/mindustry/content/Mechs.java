@@ -15,7 +15,6 @@ import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Mech;
 
 public class Mechs implements ContentList{
@@ -290,10 +289,5 @@ public class Mechs implements ContentList{
 
         starterDesktop = alpha;
         starterMobile = dart;
-    }
-
-    @Override
-    public ContentType type(){
-        return ContentType.mech;
     }
 }

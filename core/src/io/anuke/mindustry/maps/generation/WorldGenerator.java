@@ -11,9 +11,7 @@ import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.noise.RidgedPerlin;
 import io.anuke.arc.util.noise.Simplex;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.blocks.OreBlocks;
-import io.anuke.mindustry.content.blocks.StorageBlocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapTileData;
@@ -191,10 +189,10 @@ public class WorldGenerator{
                 }
             }
 
-            world.setBlock(tiles[spawns.get(0).x][spawns.get(0).y], StorageBlocks.core, Team.blue);
+            world.setBlock(tiles[spawns.get(0).x][spawns.get(0).y], Blocks.core, Team.blue);
 
             if(state.mode.isPvp){
-                world.setBlock(tiles[spawns.get(1).x][spawns.get(1).y], StorageBlocks.core, Team.red);
+                world.setBlock(tiles[spawns.get(1).x][spawns.get(1).y], Blocks.core, Team.red);
             }
 
             world.endMapLoad();
@@ -237,7 +235,7 @@ public class WorldGenerator{
                         if(entry.noise.octaveNoise2D(1, 0.7, 1f / (4 + i * 2), x, y) / 4f +
                         Math.abs(0.5f - entry.noise.octaveNoise2D(2, 0.7, 1f / (50 + i * 2), x, y)) > 0.48f &&
                         Math.abs(0.5f - entry.noise.octaveNoise2D(1, 1, 1f / (55 + i * 4), x, y)) > 0.22f){
-                            tile.setFloor((Floor) OreBlocks.get(tile.floor(), entry.item));
+                            tile.setFloor((Floor) OreBlock.get(tile.floor(), entry.item));
                             break;
                         }
                     }
@@ -393,7 +391,7 @@ public class WorldGenerator{
                 Item entry = ores.get(i);
                 if(Math.abs(0.5f - sim.octaveNoise2D(2, 0.7, 1f / (50 + i * 2), offsetX, offsetY)) > 0.23f &&
                 Math.abs(0.5f - sim2.octaveNoise2D(1, 1, 1f / (40 + i * 4), offsetX, offsetY)) > 0.32f){
-                    floor = OreBlocks.get(floor, entry);
+                    floor = OreBlock.get(floor, entry);
                     break;
                 }
             }

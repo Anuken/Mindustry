@@ -17,7 +17,6 @@ import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shapes;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 
@@ -643,10 +642,5 @@ public class Bullets implements ContentList{
                 }
             }
         };
-    }
-
-    @Override
-    public ContentType type(){
-        return ContentType.bullet;
     }
 }

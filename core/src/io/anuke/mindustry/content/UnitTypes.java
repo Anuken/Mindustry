@@ -4,7 +4,6 @@ import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.entities.units.types.*;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.type.ContentType;
 
 public class UnitTypes implements ContentList{
     public static UnitType
@@ -105,10 +104,5 @@ public class UnitTypes implements ContentList{
             minePower = 1.1f;
             toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium);
         }};
-    }
-
-    @Override
-    public ContentType type(){
-        return ContentType.unit;
     }
 }

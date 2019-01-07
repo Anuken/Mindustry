@@ -6,7 +6,7 @@ import io.anuke.arc.collection.ObjectMap.Entry;
 import io.anuke.arc.entities.Entities;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;

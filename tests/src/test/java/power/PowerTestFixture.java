@@ -3,7 +3,7 @@ package power;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.ContentLoader;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;

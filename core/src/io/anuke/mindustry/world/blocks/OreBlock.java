@@ -1,13 +1,17 @@
 package io.anuke.mindustry.world.blocks;
 
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Mathf;
 
 public class OreBlock extends Floor{
+    private static final ObjectMap<Item, ObjectMap<Block, Block>> oreBlockMap = new ObjectMap<>();
+
     public Floor base;
 
     public OreBlock(Item ore, Floor base){
@@ -18,6 +22,8 @@ public class OreBlock extends Floor{
         this.variants = 3;
         this.minimapColor = ore.color;
         this.edge = base.name;
+
+        oreBlockMap.getOr(ore, ObjectMap::new).put(base, this);
     }
 
     @Override
@@ -47,4 +53,10 @@ public class OreBlock extends Floor{
         base.drawEdges(tile, true);
     }
 
+    public static Block get(Block floor, Item item){
+        if(!oreBlockMap.containsKey(item)) throw new IllegalArgumentException("Item '" + item + "' is not an ore!");
+        if(!oreBlockMap.get(item).containsKey(floor))
+            throw new IllegalArgumentException("Block '" + floor.name + "' does not support ores!");
+        return oreBlockMap.get(item).get(floor);
+    }
 }

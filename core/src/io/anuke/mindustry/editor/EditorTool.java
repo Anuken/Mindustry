@@ -4,7 +4,7 @@ import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.function.IntPositionConsumer;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;

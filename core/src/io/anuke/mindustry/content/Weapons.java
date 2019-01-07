@@ -1,7 +1,6 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
 
 public class Weapons implements ContentList{
@@ -179,10 +178,5 @@ public class Weapons implements ContentList{
             recoil = 2f;
             ammo = Bullets.healBullet;
         }};
-    }
-
-    @Override
-    public ContentType type(){
-        return ContentType.weapon;
     }
 }

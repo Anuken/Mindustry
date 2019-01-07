@@ -2,12 +2,11 @@ package io.anuke.mindustry.world;
 
 import io.anuke.arc.collection.IntMap;
 import io.anuke.arc.graphics.Color;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.blocks.OreBlocks;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.OreBlock;
 
 public class LegacyColorMapper implements ContentList{
     private static IntMap<LegacyBlock> blockMap = new IntMap<>();
@@ -39,15 +38,10 @@ public class LegacyColorMapper implements ContentList{
         map("6e501e", Blocks.dirt, 0);
         map("ed5334", Blocks.lava, 0);
         map("292929", Blocks.tar, 0);
-        map("c3a490", OreBlocks.get(Blocks.stone, Items.copper), 0);
-        map("161616", OreBlocks.get(Blocks.stone, Items.coal), 0);
-        map("6277bc", OreBlocks.get(Blocks.stone, Items.titanium), 0);
-        map("83bc58", OreBlocks.get(Blocks.stone, Items.thorium), 0);
-    }
-
-    @Override
-    public ContentType type(){
-        return ContentType.block;
+        map("c3a490", OreBlock.get(Blocks.stone, Items.copper), 0);
+        map("161616", OreBlock.get(Blocks.stone, Items.coal), 0);
+        map("6277bc", OreBlock.get(Blocks.stone, Items.titanium), 0);
+        map("83bc58", OreBlock.get(Blocks.stone, Items.thorium), 0);
     }
     
     private void map(String color, Block block, int elevation){

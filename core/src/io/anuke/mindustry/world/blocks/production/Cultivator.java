@@ -9,7 +9,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.RandomXS128;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;

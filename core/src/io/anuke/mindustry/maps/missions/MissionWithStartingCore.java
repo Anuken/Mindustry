@@ -2,7 +2,7 @@ package io.anuke.mindustry.maps.missions;
 
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.collection.Array;
-import io.anuke.mindustry.content.blocks.StorageBlocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.generation.Generation;
 import io.anuke.mindustry.world.Tile;
@@ -39,7 +39,7 @@ public abstract class MissionWithStartingCore extends Mission{
         }
 
         Tile startingCoreTile = gen.tiles[spawnPoints.first().x][spawnPoints.first().y];
-        startingCoreTile.setBlock(StorageBlocks.core);
+        startingCoreTile.setBlock(Blocks.core);
         startingCoreTile.setTeam(team);
         state.teams.get(team).cores.add(startingCoreTile);
 

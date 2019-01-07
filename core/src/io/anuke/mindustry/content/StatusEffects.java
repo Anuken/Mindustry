@@ -6,7 +6,6 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.StatusController.StatusEntry;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
 
 public class StatusEffects implements ContentList{
@@ -167,10 +166,5 @@ public class StatusEffects implements ContentList{
         wet.setOpposites(burning);
         freezing.setOpposites(burning, melting);
         burning.setOpposites(wet, freezing);
-    }
-
-    @Override
-    public ContentType type(){
-        return ContentType.status;
     }
 }

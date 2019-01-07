@@ -2,14 +2,7 @@ package io.anuke.mindustry.maps;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.GridMap;
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.content.blocks.CraftingBlocks;
-import io.anuke.mindustry.content.blocks.ProductionBlocks;
-import io.anuke.mindustry.content.blocks.UnitBlocks;
-import io.anuke.mindustry.content.blocks.UpgradeBlocks;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.maps.missions.*;
 import io.anuke.mindustry.type.Item;
@@ -30,9 +23,9 @@ public class SectorPresets{
         //command center mission
         add(new SectorPreset(0, 1,
             Array.ofRecursive(
-                Missions.blockRecipe(UnitBlocks.daggerFactory),
+                Missions.blockRecipe(Blocks.daggerFactory),
                 new UnitMission(UnitTypes.dagger),
-                Missions.blockRecipe(UnitBlocks.commandCenter),
+                Missions.blockRecipe(Blocks.commandCenter),
                 new CommandMission(UnitCommand.retreat),
                 new CommandMission(UnitCommand.attack),
                 new BattleMission()
@@ -42,7 +35,7 @@ public class SectorPresets{
         //pad mission
         add(new SectorPreset(0, -2,
         Array.ofRecursive(
-                Missions.blockRecipe(mobile ? UpgradeBlocks.alphaPad : UpgradeBlocks.dartPad),
+                Missions.blockRecipe(mobile ? Blocks.alphaPad : Blocks.dartPad),
                 new MechMission(mobile ? Mechs.alpha : Mechs.dart),
                 new WaveMission(15)
             ),
@@ -51,10 +44,10 @@ public class SectorPresets{
         //oil mission
         add(new SectorPreset(-2, 0,
             Array.ofRecursive(
-                Missions.blockRecipe(ProductionBlocks.cultivator),
-                Missions.blockRecipe(ProductionBlocks.waterExtractor),
+                Missions.blockRecipe(Blocks.cultivator),
+                Missions.blockRecipe(Blocks.waterExtractor),
                 new ContentMission(Items.biomatter),
-                Missions.blockRecipe(CraftingBlocks.biomatterCompressor),
+                Missions.blockRecipe(Blocks.biomatterCompressor),
                 new ContentMission(Liquids.oil),
                 new BattleMission()
             ),

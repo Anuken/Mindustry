@@ -9,9 +9,9 @@ import io.anuke.arc.function.TriFunction;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
@@ -54,7 +54,7 @@ public class FortressGenerator{
     }
 
     void gen(){
-        gen.setBlock(enemyX, enemyY, StorageBlocks.core, team);
+        gen.setBlock(enemyX, enemyY, Blocks.core, team);
         gen.random.nextBoolean();
 
         float difficultyScl = Mathf.clamp(gen.sector.difficulty / 20f + gen.random.range(0.25f), 0f, 0.9999f);
@@ -109,25 +109,25 @@ public class FortressGenerator{
 
         Array<IntPositionConsumer> passes = Array.with(
             //initial seeding solar panels
-            placer.get(PowerBlocks.largeSolarPanel, 0.001f),
+            placer.get(Blocks.largeSolarPanel, 0.001f),
 
             //extra seeding
-            seeder.get(PowerBlocks.solarPanel, tile -> tile.block() == PowerBlocks.largeSolarPanel && gen.random.chance(0.3)),
+            seeder.get(Blocks.solarPanel, tile -> tile.block() == Blocks.largeSolarPanel && gen.random.chance(0.3)),
 
             //coal gens
-            seeder.get(PowerBlocks.combustionGenerator, tile -> tile.block() instanceof SolarGenerator && gen.random.chance(0.2)),
+            seeder.get(Blocks.combustionGenerator, tile -> tile.block() instanceof SolarGenerator && gen.random.chance(0.2)),
 
             //water extractors
-            seeder.get(ProductionBlocks.waterExtractor, tile -> tile.block() instanceof NuclearReactor && gen.random.chance(0.5)),
+            seeder.get(Blocks.waterExtractor, tile -> tile.block() instanceof NuclearReactor && gen.random.chance(0.5)),
 
             //mend projectors
-            seeder.get(DefenseBlocks.mendProjector, tile -> tile.block() instanceof PowerGenerator && gen.random.chance(0.04)),
+            seeder.get(Blocks.mendProjector, tile -> tile.block() instanceof PowerGenerator && gen.random.chance(0.04)),
 
             //power turrets
             seeder.get(powerTurret, tile -> tile.block() instanceof PowerGenerator && gen.random.chance(0.04)),
 
             //repair point
-            seeder.get(UnitBlocks.repairPoint, tile -> tile.block() instanceof PowerGenerator && gen.random.chance(0.1)),
+            seeder.get(Blocks.repairPoint, tile -> tile.block() instanceof PowerGenerator && gen.random.chance(0.1)),
 
             //turrets1
             seeder.get(turret1, tile -> tile.block() instanceof PowerBlock && gen.random.chance(0.22 - turret1.size*0.02)),
@@ -136,22 +136,22 @@ public class FortressGenerator{
             seeder.get(turret2, tile -> tile.block() instanceof PowerBlock && gen.random.chance(0.12 - turret2.size*0.02)),
 
             //shields
-            seeder.get(DefenseBlocks.forceProjector, tile -> (tile.block() instanceof CoreBlock || tile.block() instanceof UnitFactory) && gen.random.chance(0.2 * dscl2)),
+            seeder.get(Blocks.forceProjector, tile -> (tile.block() instanceof CoreBlock || tile.block() instanceof UnitFactory) && gen.random.chance(0.2 * dscl2)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.daggerFactory, tile -> (tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector) && gen.random.chance(0.3 * dscl2)),
+            seeder.get(Blocks.daggerFactory, tile -> (tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector) && gen.random.chance(0.3 * dscl2)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.wraithFactory, tile -> (tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector) && gen.random.chance(0.3 * dscl2)),
+            seeder.get(Blocks.wraithFactory, tile -> (tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector) && gen.random.chance(0.3 * dscl2)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.titanFactory, tile -> (tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector) && gen.random.chance(0.23 * dscl2)),
+            seeder.get(Blocks.titanFactory, tile -> (tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector) && gen.random.chance(0.23 * dscl2)),
 
             //unit pads (assorted)
-            seeder.get(UnitBlocks.ghoulFactory, tile -> (tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector) && gen.random.chance(0.23 * dscl2)),
+            seeder.get(Blocks.ghoulFactory, tile -> (tile.block() instanceof MendProjector || tile.block() instanceof ForceProjector) && gen.random.chance(0.23 * dscl2)),
 
             //vaults
-            seeder.get(StorageBlocks.vault, tile -> (tile.block() instanceof CoreBlock || tile.block() instanceof ForceProjector) && gen.random.chance(0.4)),
+            seeder.get(Blocks.vault, tile -> (tile.block() instanceof CoreBlock || tile.block() instanceof ForceProjector) && gen.random.chance(0.4)),
 
             //big turrets
             seeder.get(bigTurret, tile -> tile.block() instanceof StorageBlock && gen.random.chance(0.65)),
@@ -173,7 +173,7 @@ public class FortressGenerator{
             },
 
             //mines
-            placer.get(DefenseBlocks.shockMine, 0.02f * difficultyScl),
+            placer.get(Blocks.shockMine, 0.02f * difficultyScl),
 
             //fill up turrets w/ ammo
             (x, y) -> {
