@@ -73,7 +73,7 @@ public class StandardBullets extends BulletList implements ContentList{
                 bulletWidth = 11f;
                 bulletHeight = 14f;
                 lifetime = 40f;
-                despawneffect = BulletFx.hitBulletSmall;
+                despawnEffect = BulletFx.hitBulletSmall;
             }
         };
 

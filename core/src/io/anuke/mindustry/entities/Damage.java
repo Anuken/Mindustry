@@ -110,7 +110,7 @@ public class Damage{
         rect.height += expand * 2;
 
         Consumer<Unit> cons = e -> {
-            e.getHitbox(hitrect);
+            e.hitbox(hitrect);
             Rectangle other = hitrect;
             other.y -= expand;
             other.x -= expand;
@@ -134,7 +134,7 @@ public class Damage{
         Consumer<Unit> cons = entity -> {
             if(!predicate.test(entity)) return;
 
-            entity.getHitbox(hitrect);
+            entity.hitbox(hitrect);
             if(!hitrect.overlaps(rect)){
                 return;
             }
@@ -165,7 +165,7 @@ public class Damage{
             entity.damage(amount);
             //TODO better velocity displacement
             float dst = tr.set(entity.x - x, entity.y - y).len();
-            entity.getVelocity().add(tr.setLength((1f - dst / radius) * 2f));
+            entity.velocity().add(tr.setLength((1f - dst / radius) * 2f));
         };
 
         rect.setSize(radius * 2).setCenter(x, y);

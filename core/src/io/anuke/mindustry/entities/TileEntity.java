@@ -257,7 +257,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     }
 
     @Override
-    public Vector2 getVelocity(){
+    public Vector2 velocity(){
         return Vector2.ZERO;
     }
 

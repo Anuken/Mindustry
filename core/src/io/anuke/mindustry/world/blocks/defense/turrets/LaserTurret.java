@@ -33,8 +33,8 @@ public class LaserTurret extends PowerTurret{
         LaserTurretEntity entity = tile.entity();
 
         if(entity.bulletLife > 0 && entity.bullet != null){
-            tr.trns(entity.rotation, size * tilesize / 2, 0f);
-            entity.bullet.setRotation(entity.rotation);
+            tr.trns(entity.rotation, size * tilesize / 2f, 0f);
+            entity.bullet.rot(entity.rotation);
             entity.bullet.set(tile.drawx() + tr.x, tile.drawy() + tr.y);
             entity.bullet.time(0f);
             entity.heat = 1f;

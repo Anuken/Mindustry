@@ -21,7 +21,7 @@ public class FlakBullets extends BulletList implements ContentList{
                 splashDamageRadius = 40f;
                 fragBullet = ArtilleryBullets.plasticFrag;
                 fragBullets = 4;
-                hiteffect = BulletFx.plasticExplosion;
+                hitEffect = BulletFx.plasticExplosion;
                 frontColor = Palette.plastaniumFront;
                 backColor = Palette.plastaniumBack;
             }

@@ -71,7 +71,7 @@ public class UnitFactory extends Block{
             unit.setSpawner(tile);
             unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
             unit.add();
-            unit.getVelocity().y = factory.launchVelocity;
+            unit.velocity().y = factory.launchVelocity;
         }
     }
 

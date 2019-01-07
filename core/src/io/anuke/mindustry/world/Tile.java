@@ -421,7 +421,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     @Override
-    public Vector2 getVelocity(){
+    public Vector2 velocity(){
         return Vector2.ZERO;
     }
 

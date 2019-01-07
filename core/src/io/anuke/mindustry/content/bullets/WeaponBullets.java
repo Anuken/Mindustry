@@ -35,7 +35,7 @@ public class WeaponBullets extends BulletList{
             {
                 bulletWidth = 9f;
                 bulletHeight = 13f;
-                hiteffect = BulletFx.flakExplosion;
+                hitEffect = BulletFx.flakExplosion;
             }
         };
 
@@ -43,7 +43,7 @@ public class WeaponBullets extends BulletList{
             {
                 bulletWidth = 8f;
                 bulletHeight = 12f;
-                hiteffect = BulletFx.flakExplosion;
+                hitEffect = BulletFx.flakExplosion;
                 backColor = Palette.lightOrange;
                 frontColor = Palette.lightishOrange;
             }
@@ -67,7 +67,7 @@ public class WeaponBullets extends BulletList{
             {
                 bulletWidth = 8f;
                 bulletHeight = 12f;
-                hiteffect = BlockFx.pulverize;
+                hitEffect = BlockFx.pulverize;
                 backColor = new Color(0x4f4f4fff);
                 frontColor = Color.GRAY;
             }
@@ -91,7 +91,7 @@ public class WeaponBullets extends BulletList{
                 lifetime = 40f;
                 drag = 0.025f;
                 fragBullets = 5;
-                hiteffect = BulletFx.flakExplosion;
+                hitEffect = BulletFx.flakExplosion;
                 fragBullet = tungstenShotgun;
             }
         };

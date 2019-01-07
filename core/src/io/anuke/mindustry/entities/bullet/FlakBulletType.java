@@ -13,7 +13,7 @@ public abstract class FlakBulletType extends BasicBulletType{
         super(speed, damage, "shell");
         splashDamage = 15f;
         splashDamageRadius = 34f;
-        hiteffect = BulletFx.flakExplosionBig;
+        hitEffect = BulletFx.flakExplosionBig;
         bulletWidth = 8f;
         bulletHeight = 10f;
     }

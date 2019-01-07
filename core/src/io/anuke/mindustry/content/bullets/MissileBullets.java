@@ -26,8 +26,8 @@ public class MissileBullets extends BulletList implements ContentList{
                 splashDamageRadius = 30f;
                 splashDamage = 30f;
                 lifetime = 150f;
-                hiteffect = BulletFx.blastExplosion;
-                despawneffect = BulletFx.blastExplosion;
+                hitEffect = BulletFx.blastExplosion;
+                despawnEffect = BulletFx.blastExplosion;
             }
         };
 
@@ -43,7 +43,7 @@ public class MissileBullets extends BulletList implements ContentList{
                 splashDamageRadius = 10f;
                 splashDamage = 10f;
                 lifetime = 160f;
-                hiteffect = BulletFx.blastExplosion;
+                hitEffect = BulletFx.blastExplosion;
                 incendSpread = 10f;
                 incendAmount = 3;
             }
@@ -58,8 +58,8 @@ public class MissileBullets extends BulletList implements ContentList{
                 splashDamageRadius = 30f;
                 splashDamage = 22f;
                 lifetime = 150f;
-                hiteffect = BulletFx.blastExplosion;
-                despawneffect = BulletFx.blastExplosion;
+                hitEffect = BulletFx.blastExplosion;
+                despawnEffect = BulletFx.blastExplosion;
             }
 
             @Override
@@ -83,8 +83,8 @@ public class MissileBullets extends BulletList implements ContentList{
                 splashDamage = 1f;
                 lifetime = 90f;
                 trailColor = Color.valueOf("b6c6fd");
-                hiteffect = BulletFx.blastExplosion;
-                despawneffect = BulletFx.blastExplosion;
+                hitEffect = BulletFx.blastExplosion;
+                despawnEffect = BulletFx.blastExplosion;
                 backColor = Palette.bulletYellowBack;
                 frontColor = Palette.bulletYellow;
             }
@@ -92,7 +92,7 @@ public class MissileBullets extends BulletList implements ContentList{
             @Override
             public void update(Bullet b){
                 super.update(b);
-                b.getVelocity().rotate(Mathf.sin(Time.time() + b.id * 4422, 8f, 2f));
+                b.velocity().rotate(Mathf.sin(Time.time() + b.id * 4422, 8f, 2f));
             }
         };
 
@@ -110,14 +110,14 @@ public class MissileBullets extends BulletList implements ContentList{
                 trailColor = Color.GRAY;
                 backColor = Palette.bulletYellowBack;
                 frontColor = Palette.bulletYellow;
-                hiteffect = BulletFx.blastExplosion;
-                despawneffect = BulletFx.blastExplosion;
+                hitEffect = BulletFx.blastExplosion;
+                despawnEffect = BulletFx.blastExplosion;
             }
 
             @Override
             public void update(Bullet b){
                 super.update(b);
-                b.getVelocity().rotate(Mathf.sin(Time.time() + b.id * 4422, 8f, 2f));
+                b.velocity().rotate(Mathf.sin(Time.time() + b.id * 4422, 8f, 2f));
             }
         };
     }

@@ -16,7 +16,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
 
         dense = new ArtilleryBulletType(3f, 0, "shell"){
             {
-                hiteffect = BulletFx.flakExplosion;
+                hitEffect = BulletFx.flakExplosion;
                 knockback = 0.8f;
                 lifetime = 50f;
                 bulletWidth = bulletHeight = 11f;
@@ -34,13 +34,13 @@ public class ArtilleryBullets extends BulletList implements ContentList{
                 lifetime = 15f;
                 backColor = Palette.plastaniumBack;
                 frontColor = Palette.plastaniumFront;
-                despawneffect = Fx.none;
+                despawnEffect = Fx.none;
             }
         };
 
         plastic = new ArtilleryBulletType(3.3f, 0, "shell"){
             {
-                hiteffect = BulletFx.plasticExplosion;
+                hitEffect = BulletFx.plasticExplosion;
                 knockback = 1f;
                 lifetime = 55f;
                 bulletWidth = bulletHeight = 13f;
@@ -56,7 +56,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
 
         homing = new ArtilleryBulletType(3f, 0, "shell"){
             {
-                hiteffect = BulletFx.flakExplosion;
+                hitEffect = BulletFx.flakExplosion;
                 knockback = 0.8f;
                 lifetime = 45f;
                 bulletWidth = bulletHeight = 11f;
@@ -70,7 +70,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
 
         incindiary = new ArtilleryBulletType(3f, 0, "shell"){
             {
-                hiteffect = BulletFx.blastExplosion;
+                hitEffect = BulletFx.blastExplosion;
                 knockback = 0.8f;
                 lifetime = 60f;
                 bulletWidth = bulletHeight = 13f;
@@ -87,7 +87,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
 
         explosive = new ArtilleryBulletType(2f, 0, "shell"){
             {
-                hiteffect = BulletFx.blastExplosion;
+                hitEffect = BulletFx.blastExplosion;
                 knockback = 0.8f;
                 lifetime = 70f;
                 bulletWidth = bulletHeight = 14f;
@@ -101,7 +101,7 @@ public class ArtilleryBullets extends BulletList implements ContentList{
 
         unit = new ArtilleryBulletType(2f, 0, "shell"){
             {
-                hiteffect = BulletFx.blastExplosion;
+                hitEffect = BulletFx.blastExplosion;
                 knockback = 0.8f;
                 lifetime = 90f;
                 bulletWidth = bulletHeight = 14f;

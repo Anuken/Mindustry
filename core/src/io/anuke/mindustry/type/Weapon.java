@@ -85,7 +85,7 @@ public class Weapon extends Content{
 
         weapon.tr.trns(rotation + 180f, ammo.recoil);
 
-        shooter.getVelocity().add(weapon.tr);
+        shooter.velocity().add(weapon.tr);
 
         weapon.tr.trns(rotation, 3f);
 

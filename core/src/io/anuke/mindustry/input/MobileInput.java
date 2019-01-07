@@ -559,7 +559,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     consumed = true;
                     player.dropCarry(); //drop off unit
                 }else{
-                    Unit unit = Units.getClosest(player.getTeam(), Core.input.mouseWorld(x, y).x, Core.input.mouseWorld(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
+                    Unit unit = Units.getClosest(player.getTeam(), Core.input.mouseWorld(x, y).x, Core.input.mouseWorld(x, y).y, 4f, u -> !u.isFlying() && u.mass() <= player.mech.carryWeight);
 
                     if(unit != null){
                         consumed = true;

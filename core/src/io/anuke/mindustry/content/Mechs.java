@@ -160,7 +160,7 @@ public class Mechs implements ContentList{
             @Override
             public void updateAlt(Player player){
                 float scl = 1f - player.shootHeat/2f;
-                player.getVelocity().scl(scl);
+                player.velocity().scl(scl);
             }
 
             @Override
@@ -230,7 +230,7 @@ public class Mechs implements ContentList{
                 if(Mathf.chance(Time.delta() * (0.15*scl))){
                     Effects.effect(BulletFx.hitLancer, Palette.lancerLaser, player.x, player.y);
                     Lightning.create(player.getTeam(), Palette.lancerLaser, 10f,
-                    player.x + player.getVelocity().x, player.y + player.getVelocity().y, player.rotation, 14);
+                    player.x + player.velocity().x, player.y + player.velocity().y, player.rotation, 14);
                 }
             }
 
@@ -251,7 +251,7 @@ public class Mechs implements ContentList{
             }
 
             float scld(Player player){
-                return Mathf.clamp((player.getVelocity().len() - minV) / (maxV - minV));
+                return Mathf.clamp((player.velocity().len() - minV) / (maxV - minV));
             }
         };
 
@@ -271,7 +271,7 @@ public class Mechs implements ContentList{
 
             @Override
             public boolean canShoot(Player player){
-                return player.getVelocity().len() > 1.2f;
+                return player.velocity().len() > 1.2f;
             }
         };
 

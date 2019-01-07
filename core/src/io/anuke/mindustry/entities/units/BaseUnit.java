@@ -85,7 +85,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public float getDrag(){
+    public float drag(){
         return type.drag;
     }
 
@@ -275,7 +275,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public float getMass(){
+    public float mass(){
         return type.mass;
     }
 
@@ -326,7 +326,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public float getMaxVelocity(){
+    public float maxVelocity(){
         return type.maxVelocity;
     }
 
@@ -357,12 +357,12 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public void getHitbox(Rectangle rectangle){
+    public void hitbox(Rectangle rectangle){
         rectangle.setSize(type.hitsize).setCenter(x, y);
     }
 
     @Override
-    public void getHitboxTile(Rectangle rectangle){
+    public void hitboxTile(Rectangle rectangle){
         rectangle.setSize(type.hitsizeTile).setCenter(x, y);
     }
 

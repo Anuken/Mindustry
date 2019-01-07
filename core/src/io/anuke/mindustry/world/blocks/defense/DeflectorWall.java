@@ -49,13 +49,13 @@ public class DeflectorWall extends Wall{
         super.handleBulletHit(entity, bullet);
 
         //doesn't reflect powerful bullets
-        if(bullet.getDamage() > maxDamageDeflect) return;
+        if(bullet.damage() > maxDamageDeflect) return;
 
         float penX = Math.abs(entity.x - bullet.x), penY = Math.abs(entity.y - bullet.y);
 
-        bullet.getHitbox(rect2);
+        bullet.hitbox(rect2);
 
-        Vector2 position = Geometry.raycastRect(bullet.x, bullet.y, bullet.x + bullet.getVelocity().x, bullet.y + bullet.getVelocity().y,
+        Vector2 position = Geometry.raycastRect(bullet.x, bullet.y, bullet.x + bullet.velocity().x, bullet.y + bullet.velocity().y,
                 rect.setCenter(entity.x, entity.y).setSize(size * tilesize + rect2.width + rect2.height));
 
         if(position != null){
@@ -63,9 +63,9 @@ public class DeflectorWall extends Wall{
         }
 
         if(penX > penY){
-            bullet.getVelocity().x *= -1;
+            bullet.velocity().x *= -1;
         }else{
-            bullet.getVelocity().y *= -1;
+            bullet.velocity().y *= -1;
         }
 
         bullet.updateVelocity();

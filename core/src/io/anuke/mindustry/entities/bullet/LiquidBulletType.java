@@ -25,8 +25,8 @@ public class LiquidBulletType extends BulletType{
         this.liquid = liquid;
 
         lifetime = 70f;
-        despawneffect = Fx.none;
-        hiteffect = BulletFx.hitLiquid;
+        despawnEffect = Fx.none;
+        hitEffect = BulletFx.hitLiquid;
         drag = 0.01f;
         knockback = 0.5f;
     }
@@ -54,7 +54,7 @@ public class LiquidBulletType extends BulletType{
 
     @Override
     public void hit(Bullet b, float hitx, float hity){
-        Effects.effect(hiteffect, liquid.color, hitx, hity);
+        Effects.effect(hitEffect, liquid.color, hitx, hity);
         Puddle.deposit(world.tileWorld(hitx, hity), liquid, 5f);
 
         if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){

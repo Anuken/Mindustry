@@ -156,12 +156,12 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
     }
 
     @Override
-    public void getHitbox(Rectangle rectangle){
+    public void hitbox(Rectangle rectangle){
         rectangle.setCenter(x, y).setSize(tilesize);
     }
 
     @Override
-    public void getHitboxTile(Rectangle rectangle){
+    public void hitboxTile(Rectangle rectangle){
         rectangle.setCenter(x, y).setSize(0f);
     }
 
@@ -203,12 +203,12 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             Units.getNearby(rect.setSize(Mathf.clamp(amount / (maxLiquid / 1.5f)) * 10f).setCenter(x, y), unit -> {
                 if(unit.isFlying()) return;
 
-                unit.getHitbox(rect2);
+                unit.hitbox(rect2);
                 if(!rect.overlaps(rect2)) return;
 
                 unit.applyEffect(liquid.effect, 0.5f);
 
-                if(unit.getVelocity().len() > 0.1){
+                if(unit.velocity().len() > 0.1){
                     Effects.effect(BlockFx.ripple, liquid.color, unit.x, unit.y);
                 }
             });

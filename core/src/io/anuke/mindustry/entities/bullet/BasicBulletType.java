@@ -57,9 +57,9 @@ public class BasicBulletType extends BulletType{
         float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, bulletWidth, height, b.angle() - 90);
+        Draw.rect(backRegion, b.x, b.y, bulletWidth, height, b.rot() - 90);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, bulletWidth, height, b.angle() - 90);
+        Draw.rect(frontRegion, b.x, b.y, bulletWidth, height, b.rot() - 90);
         Draw.color();
     }
 
@@ -70,7 +70,7 @@ public class BasicBulletType extends BulletType{
         if(homingPower > 0.0001f){
             TargetTrait target = Units.getClosestTarget(b.getTeam(), b.x, b.y, homingRange);
             if(target != null){
-                b.getVelocity().setAngle(Angles.moveToward(b.getVelocity().angle(), b.angleTo(target), homingPower * Time.delta()));
+                b.velocity().setAngle(Angles.moveToward(b.velocity().angle(), b.angleTo(target), homingPower * Time.delta()));
             }
         }
     }

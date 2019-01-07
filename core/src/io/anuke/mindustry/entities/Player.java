@@ -100,17 +100,17 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
-    public void getHitbox(Rectangle rectangle){
+    public void hitbox(Rectangle rectangle){
         rectangle.setSize(mech.hitsize).setCenter(x, y);
     }
 
     @Override
-    public void getHitboxTile(Rectangle rectangle){
+    public void hitboxTile(Rectangle rectangle){
         rectangle.setSize(mech.hitsize * 2f / 3f).setCenter(x, y);
     }
 
     @Override
-    public float getDrag(){
+    public float drag(){
         return mech.drag;
     }
 
@@ -208,7 +208,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
-    public float getMass(){
+    public float mass(){
         return mech.mass;
     }
 
@@ -241,7 +241,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
-    public float getMaxVelocity(){
+    public float maxVelocity(){
         return mech.maxSpeed;
     }
 
@@ -571,7 +571,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             }else if(getCarry() != null){
                 dropCarry();
             }else{
-                Unit unit = Units.getClosest(team, x, y, 8f, u -> !u.isFlying() && u.getMass() <= mech.carryWeight);
+                Unit unit = Units.getClosest(team, x, y, 8f, u -> !u.isFlying() && u.mass() <= mech.carryWeight);
 
                 if(unit != null){
                     carry(unit);
@@ -675,7 +675,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         float expansion = 3f;
 
-        getHitbox(rect);
+        hitbox(rect);
         rect.x -= expansion;
         rect.y -= expansion;
         rect.width += expansion * 2f;
@@ -732,7 +732,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                     }
 
                     Vector2 intercept =
-                    Predict.intercept(x, y, target.getX(), target.getY(), target.getVelocity().x - velocity.x, target.getVelocity().y - velocity.y, getWeapon().getAmmo().bullet.speed);
+                    Predict.intercept(x, y, target.getX(), target.getY(), target.velocity().x - velocity.x, target.velocity().y - velocity.y, getWeapon().getAmmo().bullet.speed);
 
                     pointerX = intercept.x;
                     pointerY = intercept.y;
