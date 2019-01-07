@@ -84,13 +84,13 @@ public class TurretBlocks extends BlockList implements ContentList{
         }};
 
         lancer = new ChargeTurret("lancer"){{
-            range = 90f;
-            chargeTime = 60f;
+            range = 170f;
+            chargeTime = 50f;
             chargeMaxDelay = 30f;
             chargeEffects = 7;
             shootType = AmmoTypes.lancerLaser;
             recoil = 2f;
-            reload = 100f;
+            reload = 120f;
             cooldown = 0.03f;
             powerUsed = 1 / 3f;
             consumes.powerBuffered(60f);
@@ -107,13 +107,13 @@ public class TurretBlocks extends BlockList implements ContentList{
 
         arc = new PowerTurret("arc"){{
             shootType = AmmoTypes.arc;
-            reload = 85f;
-            shootShake = 1f;
+            reload = 20f;
+            shootShake = 0f;
             shootCone = 40f;
             rotatespeed = 8f;
             powerUsed = 1f / 3f;
             consumes.powerBuffered(30f);
-            range = 150f;
+            range = 50f;
             shootEffect = ShootFx.lightningShoot;
             heatColor = Color.RED;
             recoil = 1f;

@@ -2,7 +2,6 @@ package io.anuke.mindustry.maps;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.blocks.CraftingBlocks;
 import io.anuke.mindustry.content.blocks.ProductionBlocks;
 import io.anuke.mindustry.content.blocks.StorageBlocks;
 import io.anuke.mindustry.content.blocks.UnitBlocks;
@@ -97,7 +96,7 @@ public class TutorialSector{
             new ItemMission(Items.copper, 100),
             new ItemMission(Items.lead, 50),
 
-            new BlockMission(CraftingBlocks.smelter),
+//            new BlockMission(CraftingBlocks.smelter),
             new ItemMission(Items.densealloy, 10),
             new WaveMission(5)
         );

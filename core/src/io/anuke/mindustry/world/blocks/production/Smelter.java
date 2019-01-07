@@ -40,7 +40,6 @@ public class Smelter extends Block{
         update = true;
         hasItems = true;
         solid = true;
-        itemCapacity = 20;
 
         consumes.require(ConsumeItems.class);
         consumes.require(ConsumeItem.class);

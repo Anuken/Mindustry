@@ -68,7 +68,6 @@ public class Drill extends Block{
         update = true;
         solid = true;
         layer = Layer.overlay;
-        itemCapacity = 5;
         group = BlockGroup.drills;
         hasLiquids = true;
         liquidCapacity = 5f;

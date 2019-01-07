@@ -31,7 +31,6 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
-import io.anuke.mindustry.ui.Minimap;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;

@@ -142,11 +142,11 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        lancerLaser = new BulletType(0.001f, 140){
+        lancerLaser = new BulletType(0.001f, 60){
             Color[] colors = {Palette.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Palette.lancerLaser, Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
             float[] lenscales = {1f, 1.1f, 1.13f, 1.14f};
-            float length = 100f;
+            float length = 170f;
 
             {
                 hiteffect = BulletFx.hitLancer;
@@ -315,7 +315,7 @@ public class TurretBullets extends BulletList implements ContentList{
             }
         };
 
-        arc = new BulletType(0.001f, 26){
+        arc = new BulletType(0.001f, 8){
             {
                 lifetime = 1;
                 despawneffect = Fx.none;

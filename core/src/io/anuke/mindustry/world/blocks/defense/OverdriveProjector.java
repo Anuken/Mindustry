@@ -45,7 +45,6 @@ public class OverdriveProjector extends Block{
         hasPower = true;
         hasItems = true;
         canOverdrive = false;
-        itemCapacity = 10;
     }
 
     @Override
