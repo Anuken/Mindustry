@@ -513,7 +513,6 @@ public class Bullets implements ContentList{
 
         fuseShot = new BulletType(0.01f, 70){
             int rays = 3;
-            float raySpace = 2f;
             float rayLength = 80f;
             {
                 hitEffect = Fx.hitFuse;

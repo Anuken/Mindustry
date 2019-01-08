@@ -29,7 +29,7 @@ public class Liquid extends UnlockableContent{
     public StatusEffect effect = StatusEffects.none;
     /**Pump tier. Controls which pumps can use this liquid.*/
     public int tier;
-    /**Displayed icon.*/
+    /**Displayed icon. TODO fix it by removing autogen, draw icons manually*/
     public TextureRegion iconRegion;
 
     public Liquid(String name, Color color){
@@ -44,7 +44,7 @@ public class Liquid extends UnlockableContent{
 
     @Override
     public void load(){
-        iconRegion = Core.atlas.find("liquid-icon-" + name);
+        iconRegion = Core.atlas.find("liquid-" + name);
     }
 
     @Override

@@ -72,7 +72,7 @@ public class Recipes implements ContentList{
 
         //DISTRIBUTION
         new Recipe(distribution, Blocks.conveyor, new ItemStack(Items.copper, 1)).setAlwaysUnlocked(true);
-        new Recipe(distribution, Blocks.titaniumconveyor, new ItemStack(Items.copper, 2), new ItemStack(Items.titanium, 1));
+        new Recipe(distribution, Blocks.titaniumConveyor, new ItemStack(Items.copper, 2), new ItemStack(Items.titanium, 1));
         new Recipe(distribution, Blocks.phaseConveyor, new ItemStack(Items.phasefabric, 10), new ItemStack(Items.silicon, 15), new ItemStack(Items.lead, 20), new ItemStack(Items.graphite, 20));
 
         //starter transport
@@ -101,7 +101,7 @@ public class Recipes implements ContentList{
         new Recipe(crafting, Blocks.pulverizer, new ItemStack(Items.copper, 60), new ItemStack(Items.lead, 50));
         new Recipe(crafting, Blocks.pyratiteMixer, new ItemStack(Items.copper, 100), new ItemStack(Items.lead, 50));
         new Recipe(crafting, Blocks.blastMixer, new ItemStack(Items.lead, 60), new ItemStack(Items.titanium, 40));
-        new Recipe(crafting, Blocks.cryofluidmixer, new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 80), new ItemStack(Items.thorium, 90));
+        new Recipe(crafting, Blocks.cryofluidMixer, new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 80), new ItemStack(Items.thorium, 90));
 
         new Recipe(crafting, Blocks.melter, new ItemStack(Items.copper, 60), new ItemStack(Items.lead, 70), new ItemStack(Items.graphite, 90));
         new Recipe(crafting, Blocks.incinerator, new ItemStack(Items.graphite, 10), new ItemStack(Items.lead, 30));
@@ -175,7 +175,7 @@ public class Recipes implements ContentList{
         new Recipe(liquid, Blocks.phaseConduit, new ItemStack(Items.phasefabric, 10), new ItemStack(Items.silicon, 15), new ItemStack(Items.lead, 20), new ItemStack(Items.titanium, 20));
 
         new Recipe(liquid, Blocks.liquidRouter, new ItemStack(Items.titanium, 4), new ItemStack(Items.lead, 4));
-        new Recipe(liquid, Blocks.liquidtank, new ItemStack(Items.titanium, 50), new ItemStack(Items.lead, 50));
+        new Recipe(liquid, Blocks.liquidTank, new ItemStack(Items.titanium, 50), new ItemStack(Items.lead, 50));
         new Recipe(liquid, Blocks.liquidJunction, new ItemStack(Items.titanium, 4), new ItemStack(Items.lead, 4));
         new Recipe(liquid, Blocks.bridgeConduit, new ItemStack(Items.titanium, 8), new ItemStack(Items.lead, 8));
 

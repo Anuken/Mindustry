@@ -2,12 +2,10 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -102,21 +100,6 @@ public class Generators {
                 }
 
                 image.save("unit-icon-" + type.name);
-            }
-        });
-
-        ImageContext.generate("liquid-icons", () -> {
-            for(Liquid liquid : content.liquids()){
-                Image image = ImageContext.get("liquid-icon");
-                for (int x = 0; x < image.width(); x++) {
-                    for (int y = 0; y < image.height(); y++) {
-                        Color color = image.getColor(x, y);
-                        color.mul(liquid.color);
-                        image.draw(x, y, color);
-                    }
-                }
-
-                image.save("liquid-icon-" + liquid.name);
             }
         });
 

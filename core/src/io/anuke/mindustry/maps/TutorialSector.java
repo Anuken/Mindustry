@@ -95,7 +95,7 @@ public class TutorialSector{
             new ItemMission(Items.lead, 50),
 
 //            new BlockMission(CraftingBlocks.smelter),
-            new BlockMission(Blocks.smelter),
+            //new BlockMission(Blocks.smelter),
             new WaveMission(5)
         );
     }

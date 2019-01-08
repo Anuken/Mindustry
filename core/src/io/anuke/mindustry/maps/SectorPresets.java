@@ -25,7 +25,7 @@ public class SectorPresets{
             Array.ofRecursive(
                 Missions.blockRecipe(Blocks.daggerFactory),
                 new UnitMission(UnitTypes.dagger),
-                Missions.blockRecipe(Blocks.commandCenter),
+                //Missions.blockRecipe(Blocks.commandCenter),
                 new CommandMission(UnitCommand.retreat),
                 new CommandMission(UnitCommand.attack),
                 new BattleMission()

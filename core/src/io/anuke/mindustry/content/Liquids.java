@@ -10,18 +10,11 @@ public class Liquids implements ContentList{
     @Override
     public void load(){
 
-        water = new Liquid("water", Color.valueOf("486acd")){
-            {
-                heatCapacity = 0.4f;
-                tier = 0;
-                effect = StatusEffects.wet;
-            }
-
-            @Override
-            public boolean alwaysUnlocked() {
-                return true;
-            }
-        };
+        water = new Liquid("water", Color.valueOf("486acd")){{
+            heatCapacity = 0.4f;
+            tier = 0;
+            effect = StatusEffects.wet;
+        }};
 
         slag = new Liquid("slag", Color.valueOf("e37341")){{
             temperature = 1f;

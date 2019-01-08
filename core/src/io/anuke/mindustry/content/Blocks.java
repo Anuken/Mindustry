@@ -33,7 +33,7 @@ public class Blocks implements ContentList{
     grass, shrub, rock, icerock, blackrock,
 
     //crafting
-    smelter, siliconSmelter, plastaniumCompressor, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidmixer,
+    siliconSmelter, plastaniumCompressor, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, centrifuge, biomatterCompressor, pulverizer, incinerator,
 
     //sandbox
@@ -44,10 +44,10 @@ public class Blocks implements ContentList{
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, overdriveProjector, forceProjector, shockMine,
 
     //transport
-    conveyor, titaniumconveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
+    conveyor, titaniumConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
 
     //liquids
-    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidtank, liquidJunction, bridgeConduit, phaseConduit,
+    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
     //power
     combustionGenerator, thermalGenerator, turbineGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
@@ -264,7 +264,7 @@ public class Blocks implements ContentList{
             consumes.items(new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 3));
         }};
 
-        cryofluidmixer = new LiquidMixer("cryofluidmixer"){{
+        cryofluidMixer = new LiquidMixer("cryofluidmixer"){{
             outputLiquid = Liquids.cryofluid;
             liquidPerItem = 50f;
             size = 2;
@@ -460,7 +460,7 @@ public class Blocks implements ContentList{
             speed = 0.03f;
         }};
 
-        titaniumconveyor = new Conveyor("titanium-conveyor"){{
+        titaniumConveyor = new Conveyor("titanium-conveyor"){{
             health = 65;
             speed = 0.07f;
         }};
@@ -538,7 +538,7 @@ public class Blocks implements ContentList{
             liquidCapacity = 20f;
         }};
 
-        liquidtank = new LiquidTank("liquid-tank"){{
+        liquidTank = new LiquidTank("liquid-tank"){{
             size = 3;
             liquidCapacity = 1500f;
             health = 500;
@@ -1113,7 +1113,6 @@ public class Blocks implements ContentList{
         }};
         
         //endregion
-
         //region ores
 
         //create ores for every floor and item combination necessary
