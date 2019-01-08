@@ -103,7 +103,7 @@ task scaleSprites(){
 
 task pack(){
     dependsOn 'cleanSprites', 'scaleSprites'
-    //finalizedBy 'cleanup'
+    finalizedBy 'cleanup'
 
     doLast{
 
@@ -142,7 +142,7 @@ task cleanSprites(){
 }
 
 task genSprites(dependsOn: classes, type: JavaExec) {
-    main = "io.anuke.mindustry.PackerLauncher"
+    main = "io.anuke.mindustry.ImagePacker"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = genFolder

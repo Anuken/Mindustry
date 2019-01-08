@@ -2,17 +2,13 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.g2d.TextureAtlas;
 import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
-import io.anuke.arc.graphics.g2d.TextureAtlas.TextureAtlasData;
-import io.anuke.arc.graphics.g2d.TextureAtlas.TextureAtlasData.Region;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Log.LogHandler;
 import io.anuke.arc.util.Log.NoopLogHandler;
 import io.anuke.arc.util.Time;
-import io.anuke.arc.Core;
 import io.anuke.mindustry.core.ContentLoader;
 
 import javax.imageio.ImageIO;
@@ -21,11 +17,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class ImageContext {
+public class ImagePacker{
     static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
     static ObjectMap<TextureRegion, BufferedImage> imageCache = new ObjectMap<>();
 
-    static void load() throws IOException{
+    public static void main(String[] args) throws IOException{
+        Vars.headless = true;
+
         Log.setLogger(new NoopLogHandler());
         Vars.content = new ContentLoader();
         Vars.content.load();
@@ -86,6 +84,12 @@ public class ImageContext {
                 return regionCache.containsKey(s);
             }
         };
+
+        Time.mark();
+        Generators.generate();
+        Log.info("&ly[Generator]&lc Total time to generate: &lg{0}&lcms", Time.elapsed());
+        Log.info("&ly[Generator]&lc Total images created: &lg{0}", Image.total());
+        Image.dispose();
     }
 
     static void generate(String name, Runnable run){
@@ -115,5 +119,20 @@ public class ImageContext {
     static void err(String message, Object... args){
         Log.err(message, args);
         System.exit(-1);
+    }
+
+    static class GenRegion extends AtlasRegion{
+        String name;
+        boolean invalid;
+
+        GenRegion(String name){
+            this.name = name;
+        }
+
+        static void validate(TextureRegion region){
+            if(((GenRegion)region).invalid){
+                ImagePacker.err("Region does not exist: {0}", ((GenRegion)region).name);
+            }
+        }
     }
 }

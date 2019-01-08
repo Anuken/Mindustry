@@ -3,11 +3,12 @@ package io.anuke.mindustry;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.util.Structs;
+import io.anuke.mindustry.ImagePacker.GenRegion;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.awt.Graphics2D;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -19,7 +20,7 @@ public class Image {
     private Color color = new Color();
 
     public Image(TextureRegion region){
-        this(ImageContext.buf(region));
+        this(ImagePacker.buf(region));
     }
 
     public Image(BufferedImage src){
@@ -105,7 +106,7 @@ public class Image {
             y = 0;
         }
 
-        graphics.drawImage(ImageContext.get(region).image,
+        graphics.drawImage(ImagePacker.get(region).image,
                 x, y,
                 x + region.getWidth(),
                 y + region.getHeight(),
