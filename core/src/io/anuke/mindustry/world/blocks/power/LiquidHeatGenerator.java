@@ -5,6 +5,7 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
+//TODO remove, as this is no longer a thing
 public class LiquidHeatGenerator extends ItemLiquidGenerator{
 
     public LiquidHeatGenerator(String name){
@@ -17,7 +18,7 @@ public class LiquidHeatGenerator extends ItemLiquidGenerator{
 
         stats.remove(BlockStat.basePowerGeneration);
         // Right now, Lava is the only thing that can be used.
-        stats.add(BlockStat.basePowerGeneration, powerProduction * getLiquidEfficiency(Liquids.lava) / maxLiquidGenerate * 60f, StatUnit.powerSecond);
+        stats.add(BlockStat.basePowerGeneration, powerProduction * getLiquidEfficiency(Liquids.slag) / maxLiquidGenerate * 60f, StatUnit.powerSecond);
     }
 
     @Override

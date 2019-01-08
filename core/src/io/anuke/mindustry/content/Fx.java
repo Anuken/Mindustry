@@ -476,7 +476,7 @@ public class Fx implements ContentList{
         });
 
         melting = new Effect(40f, e -> {
-            Draw.color(Liquids.lava.color, Color.WHITE, e.fout() / 5f + Mathf.randomSeedRange(e.id, 0.12f));
+            Draw.color(Liquids.slag.color, Color.WHITE, e.fout() / 5f + Mathf.randomSeedRange(e.id, 0.12f));
 
             Angles.randLenVectors(e.id, 2, 1f + e.fin() * 3f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, .2f + e.fout() * 1.2f);

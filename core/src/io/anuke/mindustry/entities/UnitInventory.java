@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.traits.Saveable;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -13,7 +12,7 @@ import static io.anuke.mindustry.Vars.content;
 
 public class UnitInventory implements Saveable{
     private final Unit unit;
-    private ItemStack item = new ItemStack(Items.stone, 0);
+    private ItemStack item = new ItemStack(content.item(0), 0);
 
     public UnitInventory(Unit unit){
         this.unit = unit;

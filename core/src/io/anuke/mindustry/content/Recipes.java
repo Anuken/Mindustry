@@ -25,8 +25,8 @@ public class Recipes implements ContentList{
         new Recipe(defense, Blocks.copperWall, new ItemStack(Items.copper, 12)).setAlwaysUnlocked(true);
         new Recipe(defense, Blocks.copperWallLarge, new ItemStack(Items.copper, 12 * 4)).setAlwaysUnlocked(true);
 
-        new Recipe(defense, Blocks.denseAlloyWall, new ItemStack(Items.titanium, 12));
-        new Recipe(defense, Blocks.denseAlloyWallLarge, new ItemStack(Items.titanium, 12 * 4));
+        new Recipe(defense, Blocks.titaniumWall, new ItemStack(Items.titanium, 12));
+        new Recipe(defense, Blocks.titaniumWallLarge, new ItemStack(Items.titanium, 12 * 4));
 
         new Recipe(defense, Blocks.door, new ItemStack(Items.titanium, 12), new ItemStack(Items.silicon, 8));
         new Recipe(defense, Blocks.doorLarge, new ItemStack(Items.titanium, 12 * 4), new ItemStack(Items.silicon, 8 * 4));

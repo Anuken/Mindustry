@@ -28,24 +28,50 @@ import static io.anuke.mindustry.Vars.content;
 public class Blocks implements ContentList{
     public static Block
 
-    air, blockpart, spawn, space, metalfloor, deepwater, water, lava, tar, stone,
-    blackstone, dirt, sand, ice, snow, grass, shrub, rock, icerock, blackrock, smelter, siliconSmelter,
-    plastaniumCompressor, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidmixer, melter, separator,
-    centrifuge, biomatterCompressor, pulverizer, incinerator, powerVoid, powerSource, itemSource, liquidSource,
-    itemVoid, copperWall, copperWallLarge, graphiteWall, graphiteWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
-    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, overdriveProjector, forceProjector, shockMine, conveyor,
-    titaniumconveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver, mechanicalPump,
-    rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidtank, liquidJunction, bridgeConduit, phaseConduit,
+    //environment
+    air, blockpart, spawn, space, metalfloor, deepwater, water, lava, tar, stone, blackstone, dirt, sand, ice, snow,
+    grass, shrub, rock, icerock, blackrock,
+
+    //crafting
+    smelter, siliconSmelter, plastaniumCompressor, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidmixer,
+    melter, separator, centrifuge, biomatterCompressor, pulverizer, incinerator,
+
+    //sandbox
+    powerVoid, powerSource, itemSource, liquidSource, itemVoid,
+
+    //defense
+    copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
+    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, overdriveProjector, forceProjector, shockMine,
+
+    //transport
+    conveyor, titaniumconveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
+
+    //liquids
+    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidtank, liquidJunction, bridgeConduit, phaseConduit,
+
+    //power
     combustionGenerator, thermalGenerator, turbineGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
-    fusionReactor, battery, batteryLarge, powerNode, powerNodeLarge, mechanicalDrill, pneumaticDrill, laserDrill, blastDrill,
-    plasmaDrill, waterExtractor, oilExtractor, cultivator, core, vault, container, unloader, duo, scorch, hail, wave, lancer,
-    arc, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, spiritFactory, phantomFactory, wraithFactory, ghoulFactory,
-    revenantFactory, daggerFactory, titanFactory, fortressFactory, reconstructor, repairPoint, commandCenter, alphaPad, deltaPad,
-    tauPad, omegaPad, dartPad, javelinPad, tridentPad, glaivePad;
+    fusionReactor, battery, batteryLarge, powerNode, powerNodeLarge,
+
+    //production
+    mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, plasmaDrill, waterExtractor, oilExtractor, cultivator,
+
+    //storage
+    core, vault, container, unloader,
+
+    //turrets
+    duo, scorch, hail, wave, lancer, arc, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
+
+    //units
+    spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, titanFactory,
+    fortressFactory, reconstructor, repairPoint, commandCenter,
+
+    //upgrades
+    alphaPad, deltaPad, tauPad, omegaPad, dartPad, javelinPad, tridentPad, glaivePad;
 
     @Override
     public void load(){
-        //region environment blocks
+        //region environment
 
         air = new Floor("air"){
             {
@@ -354,11 +380,11 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
-        graphiteWall = new Wall("dense-alloy-wall"){{
+        titaniumWall = new Wall("titanium-wall"){{
             health = 110 * wallHealthMultiplier;
         }};
 
-        graphiteWallLarge = new Wall("dense-alloy-wall-large"){{
+        titaniumWallLarge = new Wall("titanium-wall-large"){{
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
         }};

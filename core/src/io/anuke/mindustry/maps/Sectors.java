@@ -217,13 +217,13 @@ public class Sectors{
 
         //set starter items
         if(sector.difficulty > 12){ //now with titanium
-            sector.startingItems = Array.with(new ItemStack(Items.copper, 1900), new ItemStack(Items.lead, 500), new ItemStack(Items.densealloy, 470), new ItemStack(Items.silicon, 460), new ItemStack(Items.titanium, 230));
+            sector.startingItems = Array.with(new ItemStack(Items.copper, 1900), new ItemStack(Items.lead, 500), new ItemStack(Items.graphite, 470), new ItemStack(Items.silicon, 460), new ItemStack(Items.titanium, 230));
         }else if(sector.difficulty > 8){ //just more resources
-            sector.startingItems = Array.with(new ItemStack(Items.copper, 1500), new ItemStack(Items.lead, 400), new ItemStack(Items.densealloy, 340), new ItemStack(Items.silicon, 250));
+            sector.startingItems = Array.with(new ItemStack(Items.copper, 1500), new ItemStack(Items.lead, 400), new ItemStack(Items.graphite, 340), new ItemStack(Items.silicon, 250));
         }else if(sector.difficulty > 5){ //now with silicon
-            sector.startingItems = Array.with(new ItemStack(Items.copper, 950), new ItemStack(Items.lead, 300), new ItemStack(Items.densealloy, 190), new ItemStack(Items.silicon, 140));
+            sector.startingItems = Array.with(new ItemStack(Items.copper, 950), new ItemStack(Items.lead, 300), new ItemStack(Items.graphite, 190), new ItemStack(Items.silicon, 140));
         }else if(sector.difficulty > 3){ //now with carbide
-            sector.startingItems = Array.with(new ItemStack(Items.copper, 700), new ItemStack(Items.lead, 200), new ItemStack(Items.densealloy, 130));
+            sector.startingItems = Array.with(new ItemStack(Items.copper, 700), new ItemStack(Items.lead, 200), new ItemStack(Items.graphite, 130));
         }else if(sector.difficulty > 2){ //more starter items for faster start
             sector.startingItems = Array.with(new ItemStack(Items.copper, 400), new ItemStack(Items.lead, 100));
         }else{ //empty default
