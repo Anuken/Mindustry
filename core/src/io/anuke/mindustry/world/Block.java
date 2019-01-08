@@ -352,7 +352,7 @@ public class Block extends BaseBlock {
     }
 
     public void handleBulletHit(TileEntity entity, Bullet bullet){
-        entity.damage(bullet.getDamage());
+        entity.damage(bullet.damage());
     }
 
     public void update(Tile tile){

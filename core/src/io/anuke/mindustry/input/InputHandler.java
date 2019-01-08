@@ -11,8 +11,8 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.fx.EnvironmentFx;
+import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
@@ -57,7 +57,7 @@ public abstract class InputHandler implements InputProcessor{
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        Effects.effect(EnvironmentFx.dropItem, Color.WHITE, player.x, player.y, angle, player.inventory.getItem().item);
+        Effects.effect(Fx.dropItem, Color.WHITE, player.x, player.y, angle, player.inventory.getItem().item);
         player.inventory.clearItem();
     }
 

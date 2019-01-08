@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -32,7 +32,7 @@ public class Smelter extends Block{
 
     protected float craftTime = 20f;
     protected float burnDuration = 50f;
-    protected Effect craftEffect = BlockFx.smelt, burnEffect = BlockFx.fuelburn;
+    protected Effect craftEffect = Fx.smelt, burnEffect = Fx.fuelburn;
     protected Color flameColor = Color.valueOf("ffb879");
 
     public Smelter(String name){

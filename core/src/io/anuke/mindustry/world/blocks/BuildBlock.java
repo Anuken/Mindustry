@@ -9,8 +9,7 @@ import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.content.fx.ExplosionFx;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
@@ -103,7 +102,7 @@ public class BuildBlock extends Block{
 
     @Override
     public void onDestroyed(Tile tile){
-        Effects.effect(ExplosionFx.blockExplosionSmoke, tile);
+        Effects.effect(Fx.blockExplosionSmoke, tile);
 
         if(!tile.floor().solid && !tile.floor().isLiquid){
             RubbleDecal.create(tile.drawx(), tile.drawy(), size);

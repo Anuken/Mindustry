@@ -7,7 +7,7 @@ import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Pack;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
@@ -425,7 +425,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     @Override
-    public Vector2 getVelocity(){
+    public Vector2 velocity(){
         return Vector2.ZERO;
     }
 

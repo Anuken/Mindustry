@@ -11,7 +11,6 @@ public enum ContentType {
     weapon,
     status,
     unit,
-    ammo,
     weather,
     effect
 }

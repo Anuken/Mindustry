@@ -7,7 +7,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
@@ -15,7 +15,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 public class Incinerator extends Block{
-    protected Effect effect = BlockFx.fuelburn;
+    protected Effect effect = Fx.fuelburn;
     protected Color flameColor = Color.valueOf("ffad9d");
 
     public Incinerator(String name){

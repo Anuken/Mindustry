@@ -1,16 +1,15 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -33,8 +32,8 @@ public class LaserTurret extends PowerTurret{
         LaserTurretEntity entity = tile.entity();
 
         if(entity.bulletLife > 0 && entity.bullet != null){
-            tr.trns(entity.rotation, size * tilesize / 2, 0f);
-            entity.bullet.setRotation(entity.rotation);
+            tr.trns(entity.rotation, size * tilesize / 2f, 0f);
+            entity.bullet.rot(entity.rotation);
             entity.bullet.set(tile.drawx() + tr.x, tile.drawy() + tr.y);
             entity.bullet.time(0f);
             entity.heat = 1f;
@@ -55,7 +54,7 @@ public class LaserTurret extends PowerTurret{
         }
 
         if(entity.reload >= reload && entity.cons.valid()){
-            AmmoType type = peekAmmo(tile);
+            BulletType type = peekAmmo(tile);
 
             shoot(tile, type);
 

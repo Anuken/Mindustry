@@ -1,10 +1,8 @@
 package io.anuke.mindustry.maps;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.blocks.ProductionBlocks;
-import io.anuke.mindustry.content.blocks.StorageBlocks;
-import io.anuke.mindustry.content.blocks.UnitBlocks;
 import io.anuke.mindustry.maps.missions.BlockMission;
 import io.anuke.mindustry.maps.missions.ItemMission;
 import io.anuke.mindustry.maps.missions.Mission;
@@ -91,13 +89,13 @@ public class TutorialSector{
             //intentionally unlocalized
             new ItemMission(Items.copper, 50).setMessage("An updated tutorial will return next build.\nFor now, you'll have to deal with... this."),
 
-            new BlockMission(ProductionBlocks.mechanicalDrill),
+            new BlockMission(Blocks.mechanicalDrill),
 
             new ItemMission(Items.copper, 100),
             new ItemMission(Items.lead, 50),
 
 //            new BlockMission(CraftingBlocks.smelter),
-            new ItemMission(Items.densealloy, 10),
+            new BlockMission(Blocks.smelter),
             new WaveMission(5)
         );
     }
@@ -108,9 +106,9 @@ public class TutorialSector{
 
     private static void generateBase(){
         int x = sectorSize - 50, y = sectorSize - 50;
-        world.setBlock(world.tile(x, y), StorageBlocks.core, waveTeam);
-        world.setBlock(world.tile(x - 1, y + 2), UnitBlocks.daggerFactory, waveTeam);
-        world.setBlock(world.tile(x - 1, y - 3), UnitBlocks.daggerFactory, waveTeam);
+        world.setBlock(world.tile(x, y), Blocks.core, waveTeam);
+        world.setBlock(world.tile(x - 1, y + 2), Blocks.daggerFactory, waveTeam);
+        world.setBlock(world.tile(x - 1, y - 3), Blocks.daggerFactory, waveTeam);
 
         //since placed() is not called here, add core manually
         state.teams.get(waveTeam).cores.add(world.tile(x, y));

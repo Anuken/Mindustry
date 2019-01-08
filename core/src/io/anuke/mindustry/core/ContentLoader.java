@@ -6,9 +6,6 @@ import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.util.Log;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.content.blocks.*;
-import io.anuke.mindustry.content.bullets.*;
-import io.anuke.mindustry.content.fx.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
@@ -42,13 +39,7 @@ public class ContentLoader{
     private ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
         //effects
-        new BlockFx(),
-        new BulletFx(),
-        new EnvironmentFx(),
-        new ExplosionFx(),
         new Fx(),
-        new ShootFx(),
-        new UnitFx(),
 
         //items
         new Items(),
@@ -60,16 +51,7 @@ public class ContentLoader{
         new Liquids(),
 
         //bullets
-        new ArtilleryBullets(),
-        new FlakBullets(),
-        new MissileBullets(),
-        new StandardBullets(),
-        new TurretBullets(),
-        new WeaponBullets(),
-
-
-        //ammotypes
-        new AmmoTypes(),
+        new Bullets(),
 
         //weapons
         new Weapons(),
@@ -82,18 +64,6 @@ public class ContentLoader{
 
         //blocks
         new Blocks(),
-        new DefenseBlocks(),
-        new DistributionBlocks(),
-        new ProductionBlocks(),
-        new TurretBlocks(),
-        new DebugBlocks(),
-        new LiquidBlocks(),
-        new StorageBlocks(),
-        new UnitBlocks(),
-        new PowerBlocks(),
-        new CraftingBlocks(),
-        new UpgradeBlocks(),
-        new OreBlocks(),
 
         //not really a content class, but this makes initialization easier
         new ColorMapper(),
@@ -279,7 +249,5 @@ public class ContentLoader{
         TypeTrait.registerType(Lightning.class, Lightning::new);
     }
 
-    private class ImpendingDoomException extends RuntimeException{
-        public ImpendingDoomException(String s){ super(s); }
-    }
+    private class ImpendingDoomException extends RuntimeException{ ImpendingDoomException(String s){ super(s); }}
 }

@@ -5,8 +5,7 @@ import io.anuke.arc.entities.Entities;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.trait.Entity;
 import io.anuke.arc.util.Pack;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.blocks.StorageBlocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Content;
@@ -134,7 +133,7 @@ public abstract class SaveFileVersion{
                 tile.entity.readConfig(stream);
                 tile.entity.read(stream);
 
-                if(tile.block() == StorageBlocks.core){
+                if(tile.block() == Blocks.core){
                     state.teams.get(t).cores.add(tile);
                 }
             }else if(wallid == 0){

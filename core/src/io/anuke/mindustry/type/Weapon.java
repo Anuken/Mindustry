@@ -10,9 +10,10 @@ import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.gen.Call;
@@ -24,7 +25,7 @@ public class Weapon extends Content{
     /**minimum cursor distance from player, fixes 'cross-eyed' shooting.*/
     protected static float minPlayerDist = 20f;
     /**ammo type map. set with setAmmo()*/
-    protected AmmoType ammo;
+    protected BulletType ammo;
     /**shell ejection effect*/
     protected Effect ejectEffect = Fx.none;
     /**weapon reload in frames*/
@@ -47,7 +48,7 @@ public class Weapon extends Content{
     protected float velocityRnd = 0f;
     /**whether to shoot the weapons in different arms one after another, rather than all at once*/
     protected boolean roundrobin = false;
-    /**translator for vector calulations*/
+    /**vector for vector calulations*/
     protected Vector2 tr = new Vector2();
 
     public TextureRegion equipRegion, region;
@@ -81,11 +82,11 @@ public class Weapon extends Content{
         Weapon weapon = shooter.getWeapon();
 
         Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> weapon.bullet(shooter, x, y, f + Mathf.range(weapon.inaccuracy)));
-        AmmoType ammo = weapon.ammo;
+        BulletType ammo = weapon.ammo;
 
         weapon.tr.trns(rotation + 180f, ammo.recoil);
 
-        shooter.getVelocity().add(weapon.tr);
+        shooter.velocity().add(weapon.tr);
 
         weapon.tr.trns(rotation, 3f);
 
@@ -109,7 +110,7 @@ public class Weapon extends Content{
         return ContentType.weapon;
     }
 
-    public AmmoType getAmmo(){
+    public BulletType getAmmo(){
         return ammo;
     }
 
@@ -165,7 +166,7 @@ public class Weapon extends Content{
         if(owner == null) return;
 
         tr.trns(angle, 3f);
-        Bullet.create(ammo.bullet,
+        Bullet.create(ammo,
                 owner, owner.getTeam(), x + tr.x, y + tr.y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd));
     }
 }

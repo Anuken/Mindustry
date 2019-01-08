@@ -10,7 +10,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -42,8 +42,8 @@ public class PowerSmelter extends PowerBlock{
 
     protected float craftTime = 20f; //time to craft one item, so max 3 items per second by default
     protected float burnEffectChance = 0.01f;
-    protected Effect craftEffect = BlockFx.smelt,
-            burnEffect = BlockFx.fuelburn;
+    protected Effect craftEffect = Fx.smelt,
+            burnEffect = Fx.fuelburn;
     protected Color flameColor = Color.valueOf("ffc999");
 
     protected TextureRegion topRegion;

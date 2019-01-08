@@ -18,14 +18,14 @@ public interface TargetTrait extends Position, VelocityTrait{
         if(this instanceof SolidTrait){
             return ((SolidTrait) this).getDeltaX();
         }
-        return getVelocity().x;
+        return velocity().x;
     }
 
     default float getTargetVelocityY(){
         if(this instanceof SolidTrait){
             return ((SolidTrait) this).getDeltaY();
         }
-        return getVelocity().y;
+        return velocity().y;
     }
 
     /**

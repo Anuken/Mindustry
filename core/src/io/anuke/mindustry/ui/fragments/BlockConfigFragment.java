@@ -8,7 +8,7 @@ import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.world.Block;

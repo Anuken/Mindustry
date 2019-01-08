@@ -18,7 +18,7 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.blocks.StorageBlocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
@@ -521,7 +521,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         for(Block block : Vars.content.blocks()){
             TextureRegion[] regions = block.getCompactIcon();
             if((block.synthetic() && (Recipe.getByResult(block) == null || !control.unlocks.isUnlocked(Recipe.getByResult(block))))
-                    && block != StorageBlocks.core){
+                    && block != Blocks.core){
                 continue;
             }
 

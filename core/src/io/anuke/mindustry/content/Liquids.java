@@ -2,7 +2,6 @@ package io.anuke.mindustry.content;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Liquid;
 
 public class Liquids implements ContentList{
@@ -46,10 +45,5 @@ public class Liquids implements ContentList{
             tier = 1;
             effect = StatusEffects.freezing;
         }};
-    }
-
-    @Override
-    public ContentType type(){
-        return ContentType.liquid;
     }
 }

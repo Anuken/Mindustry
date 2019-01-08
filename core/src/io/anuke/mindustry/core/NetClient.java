@@ -347,7 +347,7 @@ public class NetClient implements ApplicationListener{
 
             Call.onClientShapshot(lastSent++, Time.millis(), player.x, player.y,
                 player.pointerX, player.pointerY, player.rotation, player.baseRotation,
-                player.getVelocity().x, player.getVelocity().y,
+                player.velocity().x, player.velocity().y,
                 player.getMineTile(),
                 player.isBoosting, player.isShooting, requests,
                 Core.camera.position.x, Core.camera.position.y,

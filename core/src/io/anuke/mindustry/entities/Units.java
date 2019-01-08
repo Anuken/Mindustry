@@ -48,7 +48,7 @@ public class Units{
 
     /**See {@link #invalidateTarget(TargetTrait, Team, float, float, float)}*/
     public static boolean invalidateTarget(TargetTrait target, Unit targeter){
-        return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.getWeapon().getAmmo().getRange());
+        return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.getWeapon().getAmmo().range());
     }
 
     /**Returns whether there are any entities on this tile.*/
@@ -67,7 +67,7 @@ public class Units{
         Units.getNearby(rect, unit -> {
             if(boolResult) return;
             if(!unit.isFlying()){
-                unit.getHitbox(hitrect);
+                unit.hitbox(hitrect);
 
                 if(hitrect.overlaps(rect)){
                     boolResult = true;
@@ -89,7 +89,7 @@ public class Units{
         Units.getNearby(rect, unit -> {
             if(value[0] || !pred.test(unit) || unit.isDead()) return;
             if(!unit.isFlying()){
-                unit.getHitbox(hitrect);
+                unit.hitbox(hitrect);
 
                 if(hitrect.overlaps(rect)){
                     value[0] = true;

@@ -5,7 +5,6 @@ import io.anuke.arc.collection.ObjectIntMap;
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.type.ContentType;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -48,10 +47,5 @@ public class ColorMapper implements ContentList{
             blockMap.put(color, block);
             colorMap.put(block, color);
         }
-    }
-
-    @Override
-    public ContentType type(){
-        return ContentType.block;
     }
 }

@@ -2,7 +2,6 @@ package io.anuke.mindustry.content;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
@@ -100,10 +99,5 @@ public class Items implements ContentList{
             flammability = 0.7f;
             explosiveness = 0.2f;
         }};
-    }
-
-    @Override
-    public ContentType type(){
-        return ContentType.item;
     }
 }

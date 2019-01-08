@@ -11,7 +11,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
@@ -33,9 +33,9 @@ public class Floor extends Block{
     /** How many ticks it takes to drown on this. */
     public float drownTime = 0f;
     /** Effect when walking on this floor. */
-    public Effect walkEffect = BlockFx.ripple;
+    public Effect walkEffect = Fx.ripple;
     /** Effect displayed when drowning on this floor. */
-    public Effect drownUpdateEffect = BlockFx.bubble;
+    public Effect drownUpdateEffect = Fx.bubble;
     /** Status effect applied when walking on. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */

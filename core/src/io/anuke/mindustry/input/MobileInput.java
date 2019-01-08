@@ -18,8 +18,8 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -559,7 +559,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     consumed = true;
                     player.dropCarry(); //drop off unit
                 }else{
-                    Unit unit = Units.getClosest(player.getTeam(), Core.input.mouseWorld(x, y).x, Core.input.mouseWorld(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
+                    Unit unit = Units.getClosest(player.getTeam(), Core.input.mouseWorld(x, y).x, Core.input.mouseWorld(x, y).y, 4f, u -> !u.isFlying() && u.mass() <= player.mech.carryWeight);
 
                     if(unit != null){
                         consumed = true;

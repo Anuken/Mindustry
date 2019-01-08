@@ -19,7 +19,7 @@ import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.content.bullets.TurretBullets;
+import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
@@ -72,7 +72,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
         hit.clear();
 
         for (int i = 0; i < length/2; i++) {
-            Bullet.create(TurretBullets.damageLightning, l, team, x, y, 0f, 1f, 1f, dmg);
+            Bullet.create(Bullets.damageLightning, l, team, x, y, 0f, 1f, 1f, dmg);
             l.lines.add(new Vector2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
             rect.setSize(hitRange).setCenter(x, y);

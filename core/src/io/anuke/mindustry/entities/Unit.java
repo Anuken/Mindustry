@@ -15,7 +15,7 @@ import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams.TeamData;
@@ -124,7 +124,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     @Override
-    public Vector2 getVelocity(){
+    public Vector2 velocity(){
         return velocity;
     }
 
@@ -190,7 +190,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void avoidOthers(float scaling){
-        getHitbox(queryRect);
+        hitbox(queryRect);
         queryRect.setSize(queryRect.getWidth() * scaling);
 
         Units.getNearby(queryRect, t -> {
@@ -228,7 +228,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         if(isCarried()){ //carried units do not take into account velocity normally
             set(carrier.getX(), carrier.getY());
-            velocity.set(carrier.getVelocity());
+            velocity.set(carrier.velocity());
             return;
         }
 
@@ -236,7 +236,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         status.update(this);
 
-        velocity.limit(getMaxVelocity()).scl(1f + (status.getSpeedMultiplier()-1f) * Time.delta());
+        velocity.limit(maxVelocity()).scl(1f + (status.getSpeedMultiplier()-1f) * Time.delta());
 
         if(isFlying()){
             x += velocity.x * Time.delta();
@@ -289,7 +289,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             if(Math.abs(py - y) <= 0.0001f) velocity.y = 0f;
         }
 
-        velocity.scl(Mathf.clamp(1f - getDrag() * (isFlying() ? 1f : floor.dragMultiplier) * Time.delta()));
+        velocity.scl(Mathf.clamp(1f - drag() * (isFlying() ? 1f : floor.dragMultiplier) * Time.delta()));
     }
 
     public void applyEffect(StatusEffect effect, float intensity){
@@ -355,7 +355,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public abstract float getArmor();
 
-    public abstract float getMass();
+    public abstract float mass();
 
     public abstract boolean isFlying();
 
