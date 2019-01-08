@@ -12,18 +12,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Image {
+class Image {
     private static ArrayList<Image> toDispose = new ArrayList<>();
 
     private BufferedImage image;
     private Graphics2D graphics;
     private Color color = new Color();
 
-    public Image(TextureRegion region){
+    Image(TextureRegion region){
         this(ImagePacker.buf(region));
     }
 
-    public Image(BufferedImage src){
+    Image(BufferedImage src){
         this.image = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
         this.graphics = image.createGraphics();
         this.graphics.drawImage(src, 0, 0, null);
@@ -31,19 +31,19 @@ public class Image {
         toDispose.add(this);
     }
 
-    public Image(int width, int height){
+    Image(int width, int height){
         this(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
     }
 
-    public int width(){
+    int width(){
         return image.getWidth();
     }
 
-    public int height(){
+    int height(){
         return image.getHeight();
     }
 
-    public boolean isEmpty(int x, int y){
+    boolean isEmpty(int x, int y){
         if(!Structs.inBounds(x, y, width(), height())){
             return true;
         }
@@ -51,47 +51,47 @@ public class Image {
         return color.a <= 0.001f;
     }
 
-    public Color getColor(int x, int y){
+    Color getColor(int x, int y){
         int i = image.getRGB(x, y);
         Color.argb8888ToColor(color, i);
         return color;
     }
 
-    public void draw(int x, int y, Color color){
+    void draw(int x, int y, Color color){
         graphics.setColor(new java.awt.Color(color.r, color.g, color.b, color.a));
         graphics.fillRect(x, y, 1, 1);
     }
 
     /**Draws a region at the top left corner.*/
-    public void draw(TextureRegion region){
+    void draw(TextureRegion region){
         draw(region, 0, 0, false, false);
     }
 
     /**Draws a region at the center.*/
-    public void drawCenter(TextureRegion region){
+    void drawCenter(TextureRegion region){
         draw(region, (width() - region.getWidth())/2, (height() - region.getHeight())/2, false, false);
     }
 
     /**Draws a region at the center.*/
-    public void drawCenter(TextureRegion region, boolean flipx, boolean flipy){
+    void drawCenter(TextureRegion region, boolean flipx, boolean flipy){
         draw(region, (width() - region.getWidth())/2, (height() - region.getHeight())/2, flipx, flipy);
     }
 
     /**Draws an image at the top left corner.*/
-    public void draw(Image image){
+    void draw(Image image){
         draw(image, 0, 0);
     }
 
     /**Draws an image at the coordinates specified.*/
-    public void draw(Image image, int x, int y){
+    void draw(Image image, int x, int y){
         graphics.drawImage(image.image, x, y, null);
     }
 
-    public void draw(TextureRegion region, boolean flipx, boolean flipy){
+    void draw(TextureRegion region, boolean flipx, boolean flipy){
         draw(region, 0, 0, flipx, flipy);
     }
 
-    public void draw(TextureRegion region, int x, int y, boolean flipx, boolean flipy){
+    void draw(TextureRegion region, int x, int y, boolean flipx, boolean flipy){
         GenRegion.validate(region);
 
         int ofx = 0, ofy = 0;
@@ -118,7 +118,7 @@ public class Image {
     }
 
     /** @param name Name of texture file name to create, without any extensions.*/
-    public void save(String name){
+    void save(String name){
         try {
             ImageIO.write(image, "png", new File(name + ".png"));
         }catch (IOException e){
@@ -126,11 +126,11 @@ public class Image {
         }
     }
 
-    public static int total(){
+    static int total(){
         return toDispose.size();
     }
 
-    public static void dispose(){
+    static void dispose(){
         for(Image image : toDispose){
             image.graphics.dispose();
         }
