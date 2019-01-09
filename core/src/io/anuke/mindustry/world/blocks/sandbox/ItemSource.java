@@ -1,15 +1,16 @@
 package io.anuke.mindustry.world.blocks.sandbox;
 
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.distribution.Sorter.SorterEntity;
+import io.anuke.mindustry.world.blocks.distribution.Sorter;
 
-public class ItemSource extends Block{
+public class ItemSource extends Sorter{
 
     public ItemSource(String name){
         super(name);
         hasItems = true;
+        update = true;
+        solid = true;
     }
 
     @Override

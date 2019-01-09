@@ -36,7 +36,7 @@ public class LegacyColorMapper implements ContentList{
         map("c4e3e7", Blocks.ice, 0);
         map("f7feff", Blocks.snow, 1);
         map("6e501e", Blocks.dirt, 0);
-        map("ed5334", Blocks.lava, 0);
+        map("ed5334", Blocks.blackstone, 0);
         map("292929", Blocks.tar, 0);
         map("c3a490", OreBlock.get(Blocks.stone, Items.copper), 0);
         map("161616", OreBlock.get(Blocks.stone, Items.coal), 0);

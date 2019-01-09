@@ -18,7 +18,6 @@ public class GlobalData{
 
     public GlobalData(){
         Core.settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
-        Core.settings.setSerializer(Item.class, (stream, t) -> stream.writeUTF(t.name), stream -> Vars.content.getByName(ContentType.item, stream.readUTF()));
     }
 
     public void addItem(Item item, int amount){
@@ -32,7 +31,8 @@ public class GlobalData{
 
     /** Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(UnlockableContent content){
-        return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.getContentName());
+        return true;
+        //return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.getContentName());
     }
 
     /**
@@ -73,12 +73,16 @@ public class GlobalData{
     @SuppressWarnings("unchecked")
     public void load(){
         unlocked = Core.settings.getObject("unlocks", ObjectMap.class, ObjectMap::new);
-        items = Core.settings.getObject("items", ObjectIntMap.class, ObjectIntMap::new);
+        for(Item item : Vars.content.items()){
+            items.put(item, Core.settings.getInt("item-" + item.name, 0));
+        }
     }
 
     public void save(){
         Core.settings.putObject("unlocks", unlocked);
-        Core.settings.putObject("items", items);
+        for(Item item : Vars.content.items()){
+            Core.settings.put("item-" + item.name, items.get(item, 0));
+        }
         Core.settings.save();
     }
 

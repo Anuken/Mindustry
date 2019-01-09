@@ -185,6 +185,7 @@ public class WorldGenerator{
             }
 
             world.setBlock(tiles[spawns.get(0).x][spawns.get(0).y], Blocks.core, Team.blue);
+            world.setBlock(tiles[spawns.get(0).x][spawns.get(0).y - 3], Blocks.launchPad, Team.blue);
 
             if(state.mode.isPvp){
                 world.setBlock(tiles[spawns.get(1).x][spawns.get(1).y], Blocks.core, Team.red);
@@ -310,8 +311,6 @@ public class WorldGenerator{
             if(iceridge > 0.25 && minDst > lerpDst/1.5f){
                 elevation ++;
             }
-        }else if(minDst > lerpDst/1.5f){
-            floor = Blocks.lava;
         }else{
             floor = Blocks.blackstone;
         }

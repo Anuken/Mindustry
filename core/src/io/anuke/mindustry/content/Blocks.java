@@ -30,7 +30,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, blockpart, spawn, space, metalfloor, deepwater, water, lava, tar, stone, blackstone, dirt, sand, ice, snow,
+    air, blockpart, spawn, space, metalfloor, deepwater, water, tar, stone, blackstone, dirt, sand, ice, snow,
     grass, shrub, rock, icerock, blackrock,
 
     //crafting

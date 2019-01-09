@@ -8,6 +8,7 @@ import io.anuke.arc.entities.impl.EffectEntity;
 import io.anuke.arc.entities.trait.DrawTrait;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -149,7 +150,7 @@ public class Vars{
             }
         }
 
-        Arrays.sort(locales, (l1, l2) -> l1.getDisplayName(l1).compareTo(l2.getDisplayName(l2)));
+        Arrays.sort(locales, Structs.comparing(l -> l.getDisplayName(l), String.CASE_INSENSITIVE_ORDER));
         Version.init();
 
         content = new ContentLoader();

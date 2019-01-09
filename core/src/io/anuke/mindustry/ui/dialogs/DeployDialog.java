@@ -4,6 +4,7 @@ import io.anuke.arc.collection.ObjectIntMap;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemType;
 
 public class DeployDialog extends FloatingDialog{
 
@@ -24,18 +25,18 @@ public class DeployDialog extends FloatingDialog{
 
             ObjectIntMap<Item> items = Vars.data.items();
             for(Item item : Vars.content.items()){
-                if(Vars.data.isUnlocked(item)){
-                    add(items.get(item, 0) + "");
-                    addImage(item.region).size(8*3).pad(3);
-                    add(item.localizedName());
+                if(item.type == ItemType.material && Vars.data.isUnlocked(item)){
+                    add(items.get(item, 0) + "").left();
+                    addImage(item.region).size(8*4).pad(4);
+                    add("[LIGHT_GRAY]" + item.localizedName()).left();
                     row();
                 }
             }
         }}, new Table(){{
-            addButton("$text.play", () -> {
+            addButton("Wasteland", () -> {
                 hide();
                 Vars.world.generator.playRandomMap();
-            }).margin(15);
+            }).size(190f, 60f);
         }}).grow();
     }
 }

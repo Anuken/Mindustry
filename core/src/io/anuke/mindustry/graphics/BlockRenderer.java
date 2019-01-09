@@ -21,7 +21,8 @@ import static io.anuke.mindustry.Vars.*;
 public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 6;
-    private final static boolean disableShadows = true;
+    private final static boolean disableShadows = false;
+    private final static Color shadowColor = new Color(0, 0, 0, 0.15f);
 
     public final FloorRenderer floor = new FloorRenderer();
 
@@ -29,7 +30,7 @@ public class BlockRenderer{
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private int requestidx = 0;
     private int iterateidx = 0;
-    private FrameBuffer shadows = new FrameBuffer(1, 1);
+    private FrameBuffer shadows = new FrameBuffer(2, 2);
 
     public BlockRenderer(){
 
@@ -61,14 +62,14 @@ public class BlockRenderer{
         }
 
         Tmp.tr1.set(shadows.getTexture());
-        Shaders.outline.color.set(0, 0, 0, 0.15f);
+        Shaders.outline.color.set(shadowColor);
         Shaders.outline.scl = renderer.cameraScale()/3f;
         Shaders.outline.region = Tmp.tr1;
 
         Draw.flush();
         shadows.begin();
         Core.graphics.clear(Color.CLEAR);
-        Draw.color(Color.BLACK);
+        Draw.color(shadowColor);
         drawBlocks(Layer.shadow);
         Draw.color();
         Draw.flush();
@@ -89,8 +90,8 @@ public class BlockRenderer{
         int avgx = (int)(camera.position.x / tilesize);
         int avgy = (int)(camera.position.y / tilesize);
 
-        int rangex = (int) (camera.width  / tilesize / 2) + 2;
-        int rangey = (int) (camera.height  / tilesize / 2) + 2;
+        int rangex = (int) (camera.width / tilesize / 2) + 3;
+        int rangey = (int) (camera.height / tilesize / 2) + 3;
 
         if(avgx == lastCamX && avgy == lastCamY && lastRangeX == rangex && lastRangeY == rangey){
             return;
@@ -192,7 +193,6 @@ public class BlockRenderer{
     }
 
     public void skipLayer(Layer stopAt){
-
         for(; iterateidx < requestidx; iterateidx++){
             if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
                 break;
