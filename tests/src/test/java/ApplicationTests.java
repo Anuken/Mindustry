@@ -102,12 +102,6 @@ public class ApplicationTests{
     }
 
     @Test
-    void loadSector(){
-        world.sectors.createSector(0, 0);
-        world.sectors.playSector(world.sectors.get(0, 0));
-    }
-
-    @Test
     void playMap(){
         assertTrue(world.maps.all().size > 0);
 

@@ -23,7 +23,6 @@ import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.maps.TutorialSector;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;

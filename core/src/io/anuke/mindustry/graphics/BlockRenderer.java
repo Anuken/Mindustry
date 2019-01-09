@@ -21,6 +21,7 @@ import static io.anuke.mindustry.Vars.*;
 public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 6;
+    private final static boolean disableShadows = true;
 
     public final FloorRenderer floor = new FloorRenderer();
 
@@ -53,6 +54,8 @@ public class BlockRenderer{
     }
 
     public void drawShadows(){
+        if(disableShadows) return;
+
         if(shadows.getWidth() != Core.graphics.getWidth() || shadows.getHeight() != Core.graphics.getHeight()){
             shadows.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         }
@@ -107,7 +110,6 @@ public class BlockRenderer{
 
                 if(tile != null){
                     Block block = tile.block();
-                    Team team = tile.getTeam();
 
                     if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
                         tile.block().drawShadow(tile);
@@ -132,8 +134,6 @@ public class BlockRenderer{
                 }
             }
         }
-
-        Draw.proj(camera.projection());
 
         Sort.instance().sort(requests.items, 0, requestidx);
 

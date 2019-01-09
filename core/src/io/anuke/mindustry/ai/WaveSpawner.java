@@ -177,12 +177,7 @@ public class WaveSpawner{
         flySpawns.clear();
         groundSpawns.clear();
         quadrants = new GridBits(quadWidth(), quadHeight());
-
-        if(world.getSector() == null){
-            groups = Waves.getSpawns();
-        }else{
-            groups = world.getSector().spawns;
-        }
+        groups = Waves.getSpawns();
 
         dynamicSpawn = true;
 

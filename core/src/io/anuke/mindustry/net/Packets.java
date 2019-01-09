@@ -14,7 +14,7 @@ public class Packets{
 
     public enum KickReason{
         kick, clientOutdated, serverOutdated, banned, gameover(true), recentKick,
-        nameInUse, idInUse, nameEmpty, customClient, sectorComplete, serverClose;
+        nameInUse, idInUse, nameEmpty, customClient, serverClose;
 
         public final boolean quiet;
 

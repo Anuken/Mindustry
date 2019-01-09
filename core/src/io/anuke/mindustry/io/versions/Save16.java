@@ -24,15 +24,13 @@ public class Save16 extends SaveFileVersion{
         stream.readLong(); //time
         stream.readLong(); //total playtime
         stream.readInt(); //build
-        int sector = stream.readInt(); //sector ID
 
         //general state
         byte mode = stream.readByte();
         String mapname = stream.readUTF();
         Map map = world.maps.getByName(mapname);
+        if(map == null) map = new Map("unknown", 1, 1);
         world.setMap(map);
-
-        world.setSector(world.sectors.get(sector));
 
         int wave = stream.readInt();
         byte difficulty = stream.readByte();
@@ -59,7 +57,6 @@ public class Save16 extends SaveFileVersion{
         stream.writeLong(Time.millis()); //last saved
         stream.writeLong(headless ? 0 : control.saves.getTotalPlaytime()); //playtime
         stream.writeInt(Version.build); //build
-        stream.writeInt(world.getSector() == null ? invalidSector : world.getSector().pos()); //sector ID
 
         //--GENERAL STATE--
         stream.writeByte(state.mode.ordinal()); //gamemode

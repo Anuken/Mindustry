@@ -12,7 +12,6 @@ import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.MappableContent;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
@@ -90,12 +89,6 @@ public abstract class SaveFileVersion{
     public void readMap(DataInputStream stream) throws IOException{
         short width = stream.readShort();
         short height = stream.readShort();
-
-        if(world.getSector() != null){
-            world.setMap(new Map("Sector " + world.getSector().x + ", " + world.getSector().y, width, height));
-        }else if(world.getMap() == null){
-            world.setMap(new Map("unknown", width, height));
-        }
 
         world.beginMapLoad();
 

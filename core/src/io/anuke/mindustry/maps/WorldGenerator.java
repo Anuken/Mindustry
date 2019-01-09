@@ -1,4 +1,4 @@
-package io.anuke.mindustry.maps.generation;
+package io.anuke.mindustry.maps;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntArray;
@@ -13,11 +13,7 @@ import io.anuke.arc.util.noise.Simplex;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
-import io.anuke.mindustry.maps.Sector;
-import io.anuke.mindustry.maps.missions.Mission;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
@@ -139,13 +135,12 @@ public class WorldGenerator{
 
     public void playRandomMap(){
         ui.loadLogic(() -> {
-            world.setSector(null);
             logic.reset();
 
             int sx = (short)Mathf.range(Short.MAX_VALUE/2);
             int sy = (short)Mathf.range(Short.MAX_VALUE/2);
-            int width = 380;
-            int height = 380;
+            int width = 512;
+            int height = 512;
             Array<Point2> spawns = new Array<>();
             Array<Item> ores = Item.getAllOres();
 
@@ -242,57 +237,6 @@ public class WorldGenerator{
                 }
             }
         }
-    }
-
-    public void generateMap(Tile[][] tiles, Sector sector){
-        int width = tiles.length, height = tiles[0].length;
-        RandomXS128 rnd = new RandomXS128(sector.getSeed());
-        Generation gena = new Generation(sector, tiles, tiles.length, tiles[0].length, rnd);
-        Array<Point2> spawnpoints = sector.currentMission().getSpawnPoints(gena);
-        Array<Item> ores = world.sectors.getOres(sector.x, sector.y);
-
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                GenResult result = generateTile(this.result, sector.x, sector.y, x, y, true, spawnpoints, ores);
-                Tile tile = new Tile(x, y, result.floor.id, result.wall.id, (byte)0, (byte)0, result.elevation);
-                tiles[x][y] = tile;
-            }
-        }
-
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                Tile tile = tiles[x][y];
-
-                byte elevation = tile.getElevation();
-
-                for(Point2 point : Geometry.d4){
-                    if(!Structs.inBounds(x + point.x, y + point.y, width, height)) continue;
-                    if(tiles[x + point.x][y + point.y].getElevation() < elevation){
-
-                        if(sim2.octaveNoise2D(1, 1, 1.0 / 8, x, y) > 0.8){
-                            tile.setElevation(-1);
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-
-        for(int x = 0; x < tiles.length; x++){
-            for(int y = 0; y < tiles[0].length; y++){
-                Tile tile = tiles[x][y];
-
-                tile.updateOcclusion();
-            }
-        }
-
-        Generation gen = new Generation(sector, tiles, tiles.length, tiles[0].length, random);
-
-        for(Mission mission : sector.missions){
-            mission.generate(gen);
-        }
-
-        prepareTiles(tiles);
     }
 
     public GenResult generateTile(int sectorX, int sectorY, int localX, int localY){
