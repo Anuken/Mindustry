@@ -19,6 +19,7 @@ import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.blocks.production.*;
 import io.anuke.mindustry.world.blocks.sandbox.*;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
+import io.anuke.mindustry.world.blocks.storage.LaunchPad;
 import io.anuke.mindustry.world.blocks.storage.SortedUnloader;
 import io.anuke.mindustry.world.blocks.storage.Vault;
 import io.anuke.mindustry.world.blocks.units.*;
@@ -57,7 +58,7 @@ public class Blocks implements ContentList{
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, plasmaDrill, waterExtractor, oilExtractor, cultivator,
 
     //storage
-    core, vault, container, unloader,
+    core, vault, container, unloader, launchPad,
 
     //turrets
     duo, scorch, hail, wave, lancer, arc, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
@@ -725,7 +726,7 @@ public class Blocks implements ContentList{
 
         core = new CoreBlock("core"){{
             health = 1100;
-            itemCapacity = 3000;
+            itemCapacity = 2000;
         }};
 
         vault = new Vault("vault"){{
@@ -740,6 +741,13 @@ public class Blocks implements ContentList{
 
         unloader = new SortedUnloader("unloader"){{
             speed = 7f;
+        }};
+
+        launchPad = new LaunchPad("launch-pad"){{
+            size = 3;
+            itemCapacity = 100;
+            launchTime = 60f * 6;
+            consumes.power(0.1f);
         }};
         
         //endregion

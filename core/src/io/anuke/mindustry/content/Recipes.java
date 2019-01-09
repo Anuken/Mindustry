@@ -42,6 +42,7 @@ public class Recipes implements ContentList{
 
         new Recipe(effect, Blocks.container, new ItemStack(Items.titanium, 200));
         new Recipe(effect, Blocks.vault, new ItemStack(Items.titanium, 500), new ItemStack(Items.thorium, 250));
+        new Recipe(effect, Blocks.launchPad, new ItemStack(Items.copper, 500));
 
         //removed; no longer fits gameplay
         /*new Recipe(effect, Blocks.core,

@@ -14,10 +14,16 @@ import io.anuke.mindustry.type.Item;
 public class GlobalData{
     private ObjectMap<ContentType, ObjectSet<String>> unlocked = new ObjectMap<>();
     private ObjectIntMap<Item> items = new ObjectIntMap<>();
+    private boolean modified;
 
     public GlobalData(){
         Core.settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
         Core.settings.setSerializer(Item.class, (stream, t) -> stream.writeUTF(t.name), stream -> Vars.content.getByName(ContentType.item, stream.readUTF()));
+    }
+
+    public void addItem(Item item, int amount){
+        modified = true;
+        items.getAndIncrement(item, 0, amount);
     }
 
     public ObjectIntMap<Item> items(){
@@ -43,6 +49,7 @@ public class GlobalData{
 
         //fire unlock event so other classes can use it
         if(ret){
+            modified = true;
             content.onUnlock();
             Events.fire(new UnlockEvent(content));
             save();
@@ -54,6 +61,13 @@ public class GlobalData{
     /** Clears all unlocked content. Automatically saves.*/
     public void reset(){
         save();
+    }
+
+    public void checkSave(){
+        if(modified){
+            save();
+            modified = false;
+        }
     }
 
     @SuppressWarnings("unchecked")

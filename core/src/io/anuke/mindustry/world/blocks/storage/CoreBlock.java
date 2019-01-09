@@ -9,22 +9,19 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
-import io.anuke.mindustry.entities.units.BaseUnit;
-import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
@@ -78,6 +75,11 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        return item.type == ItemType.material && super.acceptItem(item, tile, source);
+    }
+
+    @Override
     public int getMaximumAccepted(Tile tile, Item item){
         return itemCapacity * state.teams.get(tile.getTeam()).cores.size;
     }
@@ -124,7 +126,7 @@ public class CoreBlock extends StorageBlock{
     public void draw(Tile tile){
         CoreEntity entity = tile.entity();
 
-        Draw.rect(entity.solid ? Core.atlas.find(name) : openRegion, tile.drawx(), tile.drawy());
+        Draw.rect(entity.solid ? region : openRegion, tile.drawx(), tile.drawy());
 
         Draw.alpha(entity.heat);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());

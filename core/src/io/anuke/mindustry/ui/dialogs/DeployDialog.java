@@ -14,7 +14,10 @@ public class DeployDialog extends FloatingDialog{
     }
 
     void setup(){
+        buttons().clear();
         content().clear();
+
+        addCloseButton();
 
         content().stack(new Table(){{
             top().left().margin(10);
@@ -29,7 +32,10 @@ public class DeployDialog extends FloatingDialog{
                 }
             }
         }}, new Table(){{
-            addButton("$text.play", () -> Vars.world.generator.playRandomMap()).margin(15);
+            addButton("$text.play", () -> {
+                hide();
+                Vars.world.generator.playRandomMap();
+            }).margin(15);
         }}).grow();
     }
 }

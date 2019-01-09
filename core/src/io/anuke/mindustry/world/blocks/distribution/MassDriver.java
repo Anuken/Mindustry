@@ -59,7 +59,6 @@ public class MassDriver extends Block{
         layer = Layer.turret;
         hasPower = true;
         consumes.powerBuffered(30f);
-        consumes.require(ConsumePower.class);
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)

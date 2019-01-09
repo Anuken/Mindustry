@@ -25,16 +25,14 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
     idle = new UnitState(){
         public void update(){
-            if(!isCommanded()){
-                retarget(() -> {
-                    targetClosest();
-                    targetClosestEnemyFlag(BlockFlag.target);
+            retarget(() -> {
+                targetClosest();
+                targetClosestEnemyFlag(BlockFlag.target);
 
-                    if(target != null){
-                        setState(attack);
-                    }
-                });
-            }
+                if(target != null){
+                    setState(attack);
+                }
+            });
 
             target = getClosestCore();
             if(target != null){
@@ -58,7 +56,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
                 retarget(() -> {
                     targetClosest();
 
-                    if(target == null && isCommanded() && getCommand() == UnitCommand.patrol){
+                    if(target == null){
                         setState(patrol);
                         return;
                     }
@@ -67,7 +65,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
                     if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
                     if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
 
-                    if(target == null && !isCommanded()){
+                    if(target == null){
                         setState(idle);
                     }
                 });
@@ -108,7 +106,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
         }
 
         public void update(){
-            if(health >= maxHealth() && !isCommanded()){
+            if(health >= maxHealth()){
                 state.set(attack);
             }else if(!targetHasFlag(BlockFlag.repair)){
                 retarget(() -> {
@@ -167,7 +165,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
     @Override
     public void behavior(){
-        if(health <= health * type.retreatPercent && !isCommanded() &&
+        if(health <= health * type.retreatPercent &&
          Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
         }

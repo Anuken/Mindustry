@@ -70,7 +70,7 @@ public abstract class GroundUnit extends BaseUnit{
         }
 
         public void update(){
-            if(health >= maxHealth() && !isCommanded()){
+            if(health >= maxHealth()){
                 state.set(attack);
             }
 
@@ -182,7 +182,7 @@ public abstract class GroundUnit extends BaseUnit{
 
     @Override
     public void behavior(){
-        if(health <= health * type.retreatPercent && !isCommanded()){
+        if(health <= health * type.retreatPercent){
             setState(retreat);
         }
 

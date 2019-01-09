@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 
 import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class Generators {
 
@@ -143,7 +144,7 @@ public class Generators {
                     Image image = ImagePacker.get(base.name + (i+1));
                     Image shadow = ImagePacker.get(item.name + (i+1));
 
-                    int offset = 3;
+                    int offset = image.width()/tilesize;
 
                     for (int x = 0; x < image.width(); x++) {
                         for (int y = offset; y < image.height(); y++) {

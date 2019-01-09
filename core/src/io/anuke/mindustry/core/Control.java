@@ -46,7 +46,7 @@ import static io.anuke.mindustry.Vars.*;
 public class Control implements ApplicationListener{
     public final Saves saves;
 
-    private Interval timerRPC = new Interval();
+    private Interval timer = new Interval(2);
     private boolean hiscore = false;
     private boolean wasPaused = false;
     private InputHandler[] inputs = {};
@@ -309,8 +309,13 @@ public class Control implements ApplicationListener{
                 input.update();
             }
 
+            //autosave global data every second if it's modified
+            if(timer.get(1, 60)){
+                data.checkSave();
+            }
+
             //auto-update rpc every 5 seconds
-            if(timerRPC.get(60 * 5)){
+            if(timer.get(60 * 5)){
                 Platform.instance.updateRPC();
             }
 
