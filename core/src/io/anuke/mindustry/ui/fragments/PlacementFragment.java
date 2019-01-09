@@ -80,7 +80,7 @@ public class PlacementFragment extends Fragment{
             if(tile != null){
                 tile = tile.target();
                 Recipe tryRecipe = Recipe.getByResult(tile.block());
-                if(tryRecipe != null && control.unlocks.isUnlocked(tryRecipe)){
+                if(tryRecipe != null && data.isUnlocked(tryRecipe)){
                     input.recipe = tryRecipe;
                     currentCategory = input.recipe.category;
                     return true;
@@ -91,7 +91,7 @@ public class PlacementFragment extends Fragment{
             Array<Recipe> recipes = Recipe.getByCategory(currentCategory);
             for(KeyCode key : inputGrid){
                 if(Core.input.keyDown(key))
-                    input.recipe = (i < recipes.size && control.unlocks.isUnlocked(recipes.get(i))) ? recipes.get(i) : null;
+                    input.recipe = (i < recipes.size && data.isUnlocked(recipes.get(i))) ? recipes.get(i) : null;
                 i++;
             }
         }
@@ -126,13 +126,13 @@ public class PlacementFragment extends Fragment{
                         boolean[] unlocked = {false};
 
                         ImageButton button = blockTable.addImageButton("icon-locked", "select", 8 * 4, () -> {
-                            if(control.unlocks.isUnlocked(recipe)){
+                            if(data.isUnlocked(recipe)){
                                 input.recipe = input.recipe == recipe ? null : recipe;
                             }
                         }).size(46f).group(group).get();
 
                         button.update(() -> { //color unplacable things gray
-                            boolean ulock = control.unlocks.isUnlocked(recipe);
+                            boolean ulock = data.isUnlocked(recipe);
                             TileEntity core = players[0].getClosestCore();
                             Color color = core != null && (core.items.has(recipe.requirements) || state.mode.infiniteResources) ? Color.WHITE : ulock ? Color.GRAY : Color.WHITE;
                             button.forEach(elem -> elem.setColor(color));
@@ -176,10 +176,10 @@ public class PlacementFragment extends Fragment{
                                 header.left();
                                 header.add(new ImageStack(lastDisplay.getCompactIcon())).size(8 * 4);
                                 header.labelWrap(() ->
-                                !control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay)) ? Core.bundle.get("text.blocks.unknown") : lastDisplay.formalName)
+                                !data.isUnlocked(Recipe.getByResult(lastDisplay)) ? Core.bundle.get("text.blocks.unknown") : lastDisplay.formalName)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
-                                if(control.unlocks.isUnlocked(Recipe.getByResult(lastDisplay))){
+                                if(data.isUnlocked(Recipe.getByResult(lastDisplay))){
                                     header.addButton("?", "clear-partial", () -> ui.content.show(Recipe.getByResult(lastDisplay)))
                                     .size(8 * 5).padTop(-5).padRight(-5).right().grow();
                                 }

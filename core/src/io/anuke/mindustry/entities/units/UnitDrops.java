@@ -29,7 +29,7 @@ public class UnitDrops{
         for(int i = 0; i < 3; i++){
             for(Item item : dropTable){
                 //only drop unlocked items
-                if(!Vars.headless && !Vars.control.unlocks.isUnlocked(item)){
+                if(!Vars.headless && !Vars.data.isUnlocked(item)){
                     continue;
                 }
 

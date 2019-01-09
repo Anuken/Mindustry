@@ -143,7 +143,7 @@ public class Recipe extends UnlockableContent{
                     ContentStatValue stat = (ContentStatValue) value;
                     UnlockableContent[] content = stat.getValueContent();
                     for(UnlockableContent c : content){
-                        control.unlocks.unlockContent(c);
+                        data.unlockContent(c);
                     }
                 }
             }

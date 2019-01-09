@@ -50,7 +50,7 @@ public class Logic implements ApplicationListener{
     /**Handles the event of content being used by either the player or some block.*/
     public void handleContent(UnlockableContent content){
         if(!headless){
-            control.unlocks.unlockContent(content);
+            data.unlockContent(content);
         }
     }
 

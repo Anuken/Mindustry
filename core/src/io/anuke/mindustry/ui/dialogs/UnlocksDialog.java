@@ -13,8 +13,7 @@ import io.anuke.arc.scene.ui.Tooltip;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.utils.UIUtils;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.*;
 
 public class UnlocksDialog extends FloatingDialog{
 
@@ -59,11 +58,11 @@ public class UnlocksDialog extends FloatingDialog{
 
                     if(unlock.isHidden()) continue;
 
-                    Image image = control.unlocks.isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked");
+                    Image image = data.isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked");
                     image.addListener(new HandCursorListener());
                     list.add(image).size(size).pad(3);
 
-                    if(control.unlocks.isUnlocked(unlock)){
+                    if(data.isUnlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));
                         image.addListener(new Tooltip<>(new Table("button"){{
                             add(unlock.localizedName());

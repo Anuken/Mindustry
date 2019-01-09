@@ -31,7 +31,6 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.units.CommandCenter.CommandCenterEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
 import java.io.DataInput;
@@ -98,17 +97,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         this.type = type;
         this.team = team;
-    }
-
-    public boolean isCommanded(){
-        return !isWave && world.indexer.getAllied(team, BlockFlag.comandCenter).size != 0 && world.indexer.getAllied(team, BlockFlag.comandCenter).first().entity instanceof CommandCenterEntity;
-    }
-
-    public UnitCommand getCommand(){
-        if(isCommanded()){
-            return world.indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
-        }
-        return null;
     }
 
     public UnitType getType(){
@@ -350,10 +338,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         state.set(getStartState());
 
         health(maxHealth());
-
-        if(isCommanded()){
-            onCommand(getCommand());
-        }
     }
 
     @Override

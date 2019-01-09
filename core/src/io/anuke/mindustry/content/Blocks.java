@@ -64,7 +64,7 @@ public class Blocks implements ContentList{
 
     //units
     spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, titanFactory,
-    fortressFactory, reconstructor, repairPoint, commandCenter,
+    fortressFactory, reconstructor, repairPoint,
 
     //upgrades
     alphaPad, deltaPad, tauPad, omegaPad, dartPad, javelinPad, tridentPad, glaivePad;
@@ -1054,10 +1054,6 @@ public class Blocks implements ContentList{
         }};
 
         reconstructor = new Reconstructor("reconstructor"){{
-            size = 2;
-        }};
-
-        commandCenter = new CommandCenter("command-center"){{
             size = 2;
         }};
         

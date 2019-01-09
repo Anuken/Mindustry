@@ -16,6 +16,7 @@ import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.game.GlobalData;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Serialization;
@@ -110,6 +111,7 @@ public class Vars{
 
     public static ContentLoader content;
     public static GameState state;
+    public static GlobalData data;
 
     public static Control control;
     public static Logic logic;
@@ -175,6 +177,7 @@ public class Vars{
         }
 
         state = new GameState();
+        data = new GlobalData();
 
         mobile = Core.app.getType() == ApplicationType.Android || Core.app.getType() == ApplicationType.iOS || testMobile;
         ios = Core.app.getType() == ApplicationType.iOS;

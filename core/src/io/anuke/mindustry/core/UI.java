@@ -66,6 +66,7 @@ public class UI implements ApplicationListener{
     public LocalPlayerDialog localplayers;
     public UnlocksDialog unlocks;
     public ContentInfoDialog content;
+    public DeployDialog deploy;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -175,6 +176,7 @@ public class UI implements ApplicationListener{
         maps = new MapsDialog();
         localplayers = new LocalPlayerDialog();
         content = new ContentInfoDialog();
+        deploy = new DeployDialog();
 
         Group group = Core.scene.root;
 

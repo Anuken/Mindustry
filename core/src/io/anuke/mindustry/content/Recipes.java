@@ -43,11 +43,12 @@ public class Recipes implements ContentList{
         new Recipe(effect, Blocks.container, new ItemStack(Items.titanium, 200));
         new Recipe(effect, Blocks.vault, new ItemStack(Items.titanium, 500), new ItemStack(Items.thorium, 250));
 
-        new Recipe(effect, Blocks.core,
+        //removed; no longer fits gameplay
+        /*new Recipe(effect, Blocks.core,
             new ItemStack(Items.copper, 2000), new ItemStack(Items.titanium, 2000),
             new ItemStack(Items.silicon, 1750), new ItemStack(Items.thorium, 1000),
             new ItemStack(Items.surgealloy, 500), new ItemStack(Items.phasefabric, 750)
-        );
+        );*/
 
         //projectors
         new Recipe(effect, Blocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.titanium, 150), new ItemStack(Items.titanium, 50), new ItemStack(Items.silicon, 180));

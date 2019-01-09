@@ -98,7 +98,7 @@ task scaleSprites4x(){
 
 task scaleSprites(){
     finalizedBy 'genSprites'
-    dependsOn 'scaleSprites4x'
+    //dependsOn 'scaleSprites4x'
 }
 
 task pack(){

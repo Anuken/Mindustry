@@ -19,8 +19,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.*;
 
 public class LiquidSource extends Block{
 
@@ -63,7 +62,7 @@ public class LiquidSource extends Block{
         Table cont = new Table();
 
         for(int i = 0; i < items.size; i++){
-            if(!control.unlocks.isUnlocked(items.get(i))) continue;
+            if(!data.isUnlocked(items.get(i))) continue;
 
             final int f = i;
             ImageButton button = cont.addImageButton("liquid-icon-" + items.get(i).name, "clear-toggle", 24,

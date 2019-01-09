@@ -20,7 +20,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves;
-import io.anuke.mindustry.game.Unlocks;
+import io.anuke.mindustry.game.GlobalData;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.input.DesktopInput;
@@ -45,16 +45,15 @@ import static io.anuke.mindustry.Vars.*;
  */
 public class Control implements ApplicationListener{
     public final Saves saves;
-    public final Unlocks unlocks;
 
-    private Interval timerRPC = new Interval(), timerUnlock = new Interval();
+    private Interval timerRPC = new Interval();
     private boolean hiscore = false;
     private boolean wasPaused = false;
     private InputHandler[] inputs = {};
 
     public Control(){
         saves = new Saves();
-        unlocks = new Unlocks();
+        data = new GlobalData();
 
         Core.input.setCatch(KeyCode.BACK, true);
 
@@ -70,7 +69,7 @@ public class Control implements ApplicationListener{
             "If more textures are used, the map editor will not display them correctly.");
         }
 
-        unlocks.load();
+        data.load();
 
         Core.settings.setAppName(appName);
         Core.settings.defaults(
@@ -228,10 +227,10 @@ public class Control implements ApplicationListener{
 
         if(entity == null) return;
 
-        entity.items.forEach((item, amount) -> unlocks.unlockContent(item));
+        entity.items.forEach((item, amount) -> data.unlockContent(item));
 
         if(players[0].inventory.hasItem()){
-            unlocks.unlockContent(players[0].inventory.getItem().item);
+            data.unlockContent(players[0].inventory.getItem().item);
         }
 
         outer:
@@ -242,7 +241,7 @@ public class Control implements ApplicationListener{
                     if(!entity.items.has(stack.item, Math.min((int) (stack.amount), 2000))) continue outer;
                 }
 
-                if(unlocks.unlockContent(recipe)){
+                if(data.unlockContent(recipe)){
                     ui.hudfrag.showUnlock(recipe);
                 }
             }
@@ -313,16 +312,6 @@ public class Control implements ApplicationListener{
             //auto-update rpc every 5 seconds
             if(timerRPC.get(60 * 5)){
                 Platform.instance.updateRPC();
-            }
-
-            //check unlocks every 2 seconds
-            if(!state.mode.infiniteResources && timerUnlock.get(120)){
-                checkUnlockableBlocks();
-
-                //save if the unlocks changed
-                if(unlocks.isDirty()){
-                    unlocks.save();
-                }
             }
 
             if(Core.input.keyTap(Binding.pause) && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){

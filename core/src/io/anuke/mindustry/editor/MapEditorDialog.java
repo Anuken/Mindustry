@@ -520,7 +520,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         for(Block block : Vars.content.blocks()){
             TextureRegion[] regions = block.getCompactIcon();
-            if((block.synthetic() && (Recipe.getByResult(block) == null || !control.unlocks.isUnlocked(Recipe.getByResult(block))))
+            if((block.synthetic() && (Recipe.getByResult(block) == null || !data.isUnlocked(Recipe.getByResult(block))))
                     && block != Blocks.core){
                 continue;
             }

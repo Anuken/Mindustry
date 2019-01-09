@@ -1,17 +1,16 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.MobileButton;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.arc.Events;
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Strings;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -139,6 +138,9 @@ public class MenuFragment extends Fragment{
     }
 
     private void showPlaySelect(){
+        ui.deploy.show();
+
+        /*
         float w = 220f;
         float bw = w * 2f + 10f;
 
@@ -169,6 +171,6 @@ public class MenuFragment extends Fragment{
             dialog.hide();
         })).width(bw).colspan(2);
 
-        dialog.show();
+        dialog.show();*/
     }
 }

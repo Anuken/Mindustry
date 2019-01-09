@@ -1,33 +1,32 @@
 package io.anuke.mindustry.game;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.ObjectIntMap;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectSet;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.arc.Events;
-import io.anuke.arc.Settings;
+import io.anuke.mindustry.type.Item;
 
 /**Stores player unlocks. Clientside only.*/
-public class Unlocks{
+public class GlobalData{
     private ObjectMap<ContentType, ObjectSet<String>> unlocked = new ObjectMap<>();
-    private boolean dirty;
+    private ObjectIntMap<Item> items = new ObjectIntMap<>();
 
-    public Unlocks(){
+    public GlobalData(){
         Core.settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
+        Core.settings.setSerializer(Item.class, (stream, t) -> stream.writeUTF(t.name), stream -> Vars.content.getByName(ContentType.item, stream.readUTF()));
+    }
+
+    public ObjectIntMap<Item> items(){
+        return items;
     }
 
     /** Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(UnlockableContent content){
-        if(content.alwaysUnlocked()) return true;
-
-        if(!unlocked.containsKey(content.getContentType())){
-            unlocked.put(content.getContentType(), new ObjectSet<>());
-        }
-
-        ObjectSet<String> set = unlocked.get(content.getContentType());
-
-        return set.contains(content.getContentName());
+        return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.getContentName());
     }
 
     /**
@@ -40,25 +39,16 @@ public class Unlocks{
     public boolean unlockContent(UnlockableContent content){
         if(!content.canBeUnlocked() || content.alwaysUnlocked()) return false;
 
-        if(!unlocked.containsKey(content.getContentType())){
-            unlocked.put(content.getContentType(), new ObjectSet<>());
-        }
-
-        boolean ret = unlocked.get(content.getContentType()).add(content.getContentName());
+        boolean ret = unlocked.getOr(content.getContentType(), ObjectSet::new).add(content.getContentName());
 
         //fire unlock event so other classes can use it
         if(ret){
             content.onUnlock();
             Events.fire(new UnlockEvent(content));
-            dirty = true;
+            save();
         }
 
         return ret;
-    }
-
-    /** Returns whether unlockables have changed since the last save.*/
-    public boolean isDirty(){
-        return dirty;
     }
 
     /** Clears all unlocked content. Automatically saves.*/
@@ -68,11 +58,13 @@ public class Unlocks{
 
     @SuppressWarnings("unchecked")
     public void load(){
-        unlocked = Core.settings.getObject("unlockset", ObjectMap.class, ObjectMap::new);
+        unlocked = Core.settings.getObject("unlocks", ObjectMap.class, ObjectMap::new);
+        items = Core.settings.getObject("items", ObjectIntMap.class, ObjectIntMap::new);
     }
 
     public void save(){
-        Core.settings.putObject("unlockset", unlocked);
+        Core.settings.putObject("unlocks", unlocked);
+        Core.settings.putObject("items", items);
         Core.settings.save();
     }
 
