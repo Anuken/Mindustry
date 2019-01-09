@@ -18,7 +18,7 @@ public class AdminsDialog extends FloatingDialog{
     }
 
     private void setup(){
-        content().clear();
+        cont.clear();
 
         float w = 400f, h = 80f;
 
@@ -53,6 +53,6 @@ public class AdminsDialog extends FloatingDialog{
             table.row();
         }
 
-        content().add(pane);
+        cont.add(pane);
     }
 }

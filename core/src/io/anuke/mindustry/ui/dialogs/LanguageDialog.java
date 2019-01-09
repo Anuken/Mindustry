@@ -41,7 +41,7 @@ public class LanguageDialog extends FloatingDialog{
             langs.add(button).group(group).update(t -> t.setChecked(loc.equals(getLocale()))).size(400f, 50f).pad(2).row();
         }
 
-        content().add(pane);
+        cont.add(pane);
     }
 
     public Locale getLocale(){

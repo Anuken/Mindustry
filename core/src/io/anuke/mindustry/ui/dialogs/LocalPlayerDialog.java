@@ -22,15 +22,15 @@ public class LocalPlayerDialog extends FloatingDialog{
     private void rebuild(){
         float size = 140f;
 
-        content().clear();
+        cont.clear();
 
         if(players.length > 1){
-            content().addImageButton("icon-cancel", 14 * 2, () -> {
+            cont.addImageButton("icon-cancel", 14 * 2, () -> {
                 control.removePlayer();
                 rebuild();
             }).size(50f, size).pad(5).bottom();
         }else{
-            content().add().size(50f, size);
+            cont.add().size(50f, size);
         }
 
         for(Player player : players){
@@ -48,11 +48,11 @@ public class LocalPlayerDialog extends FloatingDialog{
             table.row();
             table.add(stack).size(size);
 
-            content().add(table).pad(5);
+            cont.add(table).pad(5);
         }
 
         if(players.length < 4){
-            content().addImageButton("icon-add", 14 * 2, () -> {
+            cont.addImageButton("icon-add", 14 * 2, () -> {
                 control.addPlayer(players.length);
                 rebuild();
             }).size(50f, size).pad(5).bottom();

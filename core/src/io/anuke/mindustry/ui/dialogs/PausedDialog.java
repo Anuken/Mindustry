@@ -40,30 +40,30 @@ public class PausedDialog extends FloatingDialog{
             }
         });
 
-        content().table(t -> missionTable = t).colspan(mobile ? 3 : 2);
-        content().row();
+        cont.table(t -> missionTable = t).colspan(mobile ? 3 : 2);
+        cont.row();
 
         if(!mobile){
             float dw = 210f;
-            content().defaults().width(dw).height(50).pad(5f);
+            cont.defaults().width(dw).height(50).pad(5f);
 
-            content().addButton("$back", this::hide).colspan(2).width(dw*2 + 20f);
+            cont.addButton("$back", this::hide).colspan(2).width(dw*2 + 20f);
 
-            content().row();
-            content().addButton("$unlocks", ui.unlocks::show);
-            content().addButton("$settings", ui.settings::show);
+            cont.row();
+            cont.addButton("$unlocks", ui.unlocks::show);
+            cont.addButton("$settings", ui.settings::show);
 
-            content().row();
-            content().addButton("$savegame", save::show);
-            content().addButton("$loadgame", load::show).disabled(b -> Net.active());
+            cont.row();
+            cont.addButton("$savegame", save::show);
+            cont.addButton("$loadgame", load::show).disabled(b -> Net.active());
 
-            content().row();
+            cont.row();
 
-            content().addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw*2 + 20f);
+            cont.addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw*2 + 20f);
 
-            content().row();
+            cont.row();
 
-            content().addButton("$quit", () -> {
+            cont.addButton("$quit", () -> {
                 ui.showConfirm("$confirm", "$quit.confirm", () -> {
                     if(Net.client()) netClient.disconnectQuietly();
                     runExitSave();
@@ -72,18 +72,18 @@ public class PausedDialog extends FloatingDialog{
             }).colspan(2).width(dw + 10f);
 
         }else{
-            content().defaults().size(120f).pad(5);
+            cont.defaults().size(120f).pad(5);
             float isize = 14f * 4;
 
-            content().addRowImageTextButton("$back", "icon-play-2", isize, this::hide);
-            content().addRowImageTextButton("$settings", "icon-tools", isize, ui.settings::show);
-            content().addRowImageTextButton("$save", "icon-save", isize, save::show);
+            cont.addRowImageTextButton("$back", "icon-play-2", isize, this::hide);
+            cont.addRowImageTextButton("$settings", "icon-tools", isize, ui.settings::show);
+            cont.addRowImageTextButton("$save", "icon-save", isize, save::show);
 
-            content().row();
+            cont.row();
 
-            content().addRowImageTextButton("$load", "icon-load", isize, load::show).disabled(b -> Net.active());
-            content().addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
-            content().addRowImageTextButton("$quit", "icon-quit", isize, () -> {
+            cont.addRowImageTextButton("$load", "icon-load", isize, load::show).disabled(b -> Net.active());
+            cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
+            cont.addRowImageTextButton("$quit", "icon-quit", isize, () -> {
                 ui.showConfirm("$confirm", "$quit.confirm", () -> {
                     if(Net.client()) netClient.disconnectQuietly();
                     runExitSave();

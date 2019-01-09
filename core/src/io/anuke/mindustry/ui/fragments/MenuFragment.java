@@ -146,27 +146,27 @@ public class MenuFragment extends Fragment{
 
         FloatingDialog dialog = new FloatingDialog("$play");
         dialog.addCloseButton();
-        dialog.content().defaults().height(66f).width(w).padRight(5f);
+        dialog.cont.defaults().height(66f).width(w).padRight(5f);
 
-        dialog.content().add(new MenuButton("icon-play-2", "$map.random", () -> {
+        dialog.cont.add(new MenuButton("icon-play-2", "$map.random", () -> {
             dialog.hide();
             world.generator.playRandomMap();
         })).width(bw).colspan(2);
-        dialog.content().row();
+        dialog.cont.row();
 
-        dialog.content().add(new MenuButton("icon-add", "$joingame", () -> {
+        dialog.cont.add(new MenuButton("icon-add", "$joingame", () -> {
             ui.join.show();
             dialog.hide();
         }));
 
-        dialog.content().add(new MenuButton("icon-editor", "$customgame", () -> {
+        dialog.cont.add(new MenuButton("icon-editor", "$customgame", () -> {
             dialog.hide();
             ui.levels.show();
         }));
 
-        dialog.content().row();
+        dialog.cont.row();
 
-        dialog.content().add(new MenuButton("icon-load", "$loadgame", () -> {
+        dialog.cont.add(new MenuButton("icon-load", "$loadgame", () -> {
             ui.load.show();
             dialog.hide();
         })).width(bw).colspan(2);

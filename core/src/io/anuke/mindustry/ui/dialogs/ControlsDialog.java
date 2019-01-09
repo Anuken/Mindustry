@@ -13,15 +13,15 @@ public class ControlsDialog extends KeybindDialog{
         setStyle(Core.scene.skin.get("dialog", WindowStyle.class));
 
         setFillParent(true);
-        title().setAlignment(Align.center);
-        getTitleTable().row();
-        getTitleTable().add(new Image("white"))
+        title.setAlignment(Align.center);
+        titleTable.row();
+        titleTable.add(new Image("white"))
                 .growX().height(3f).pad(4f).get().setColor(Palette.accent);
     }
 
     @Override
     public void addCloseButton(){
-        buttons().addImageTextButton("$back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+        buttons.addImageTextButton("$back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK)

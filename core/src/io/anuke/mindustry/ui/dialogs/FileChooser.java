@@ -45,7 +45,7 @@ public class FileChooser extends FloatingDialog{
     }
 
     private void setupWidgets(){
-        content().margin(-10);
+        cont.margin(-10);
 
         Table content = new Table();
 
@@ -151,7 +151,7 @@ public class FileChooser extends FloatingDialog{
 
         content.add(buttons).growX();
 
-        content().add(content);
+        cont.add(content);
     }
 
     private void updateFileFieldStatus(){
@@ -264,7 +264,7 @@ public class FileChooser extends FloatingDialog{
     @Override
     public Dialog show(){
         Time.runTask(2f, () -> {
-            content().clear();
+            cont.clear();
             setupWidgets();
             super.show();
             Core.scene.setScrollFocus(pane);

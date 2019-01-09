@@ -27,13 +27,13 @@ public class UnlocksDialog extends FloatingDialog{
     }
 
     void rebuild(){
-        content().clear();
+        cont.clear();
 
         Table table = new Table();
         table.margin(20);
         ScrollPane pane = new ScrollPane(table);
 
-        Array<Content>[] allContent = content.getContentMap();
+        Array<Content>[] allContent = Vars.content.getContentMap();
 
         for(int j = 0; j < allContent.length; j ++){
             ContentType type = ContentType.values()[j];
@@ -77,6 +77,6 @@ public class UnlocksDialog extends FloatingDialog{
             table.row();
         }
 
-        content().add(pane);
+        cont.add(pane);
     }
 }

@@ -9,6 +9,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 
 /**Stores player unlocks. Clientside only.*/
 public class GlobalData{
@@ -23,6 +24,22 @@ public class GlobalData{
     public void addItem(Item item, int amount){
         modified = true;
         items.getAndIncrement(item, 0, amount);
+    }
+
+    public boolean hasItems(ItemStack[] stacks){
+        for(ItemStack stack : stacks){
+            if(items.get(stack.item, 0) < stack.amount){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void removeItems(ItemStack[] stacks){
+        for(ItemStack stack : stacks){
+            items.getAndIncrement(stack.item, 0, -stack.amount);
+        }
+        modified = true;
     }
 
     public ObjectIntMap<Item> items(){

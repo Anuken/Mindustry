@@ -35,28 +35,28 @@ public class JoinDialog extends FloatingDialog{
 
         loadServers();
 
-        buttons().add().width(60f);
-        buttons().add().growX();
+        buttons.add().width(60f);
+        buttons.add().growX();
 
         addCloseButton();
 
-        buttons().add().growX();
-        buttons().addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f);
+        buttons.add().growX();
+        buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f);
 
         add = new FloatingDialog("$joingame.title");
-        add.content().add("$joingame.ip").padRight(5f).left();
+        add.cont.add("$joingame.ip").padRight(5f).left();
 
-        TextField field = add.content().addField(Core.settings.getString("ip"), text -> {
+        TextField field = add.cont.addField(Core.settings.getString("ip"), text -> {
             Core.settings.put("ip", text);
             Core.settings.save();
         }).size(320f, 54f).get();
 
         Platform.instance.addDialog(field, 100);
 
-        add.content().row();
-        add.buttons().defaults().size(140f, 60f).pad(4f);
-        add.buttons().addButton("$cancel", add::hide);
-        add.buttons().addButton("$ok", () -> {
+        add.cont.row();
+        add.buttons.defaults().size(140f, 60f).pad(4f);
+        add.buttons.addButton("$cancel", add::hide);
+        add.buttons.addButton("$ok", () -> {
             if(renaming == null){
                 Server server = new Server();
                 server.setIP(Core.settings.getString("ip"));
@@ -74,7 +74,7 @@ public class JoinDialog extends FloatingDialog{
         }).disabled(b -> Core.settings.getString("ip").isEmpty() || Net.active());
 
         add.shown(() -> {
-            add.getTitleLabel().setText(renaming != null ? "$server.edit" : "$server.add");
+            add.title.setText(renaming != null ? "$server.edit" : "$server.add");
             if(renaming != null){
                 field.setText(renaming.displayIP());
             }
@@ -200,8 +200,8 @@ public class JoinDialog extends FloatingDialog{
         setupRemote();
         refreshRemote();
 
-        content().clear();
-        content().table(t -> {
+        cont.clear();
+        cont.table(t -> {
             t.add("$name").padRight(10);
             t.addField(Core.settings.getString("name"), text -> {
                 player.name = text;
@@ -218,10 +218,10 @@ public class JoinDialog extends FloatingDialog{
             }).size(54f).get();
             button.update(() -> button.getStyle().imageUpColor = player.color);
         }).width(w).height(70f).pad(4);
-        content().row();
-        content().add(pane).width(w + 38).pad(0);
-        content().row();
-        content().addCenteredImageTextButton("$server.add", "icon-add", 14 * 3, () -> {
+        cont.row();
+        cont.add(pane).width(w + 38).pad(0);
+        cont.row();
+        cont.addCenteredImageTextButton("$server.add", "icon-add", 14 * 3, () -> {
             renaming = null;
             add.show();
         }).marginLeft(6).width(w).height(80f).update(button -> {

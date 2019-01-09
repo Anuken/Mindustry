@@ -40,7 +40,7 @@ public class LoadDialog extends FloatingDialog{
     }
 
     protected void setup(){
-        content().clear();
+        cont.clear();
 
         slots = new Table();
         pane = new ScrollPane(slots);
@@ -132,7 +132,7 @@ public class LoadDialog extends FloatingDialog{
             slots.row();
         }
 
-        content().add(pane);
+        cont.add(pane);
 
         addSetup();
     }

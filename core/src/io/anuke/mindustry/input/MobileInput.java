@@ -197,10 +197,10 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(!guides.contains(type) && !Core.settings.getBool(type, false)){
             FloatingDialog dialog = new FloatingDialog("$" + type + ".title");
             dialog.addCloseButton();
-            dialog.content().left();
-            dialog.content().add("$" + type).growX().wrap();
-            dialog.content().row();
-            dialog.content().addCheck("$showagain", false, checked -> {
+            dialog.cont.left();
+            dialog.cont.add("$" + type).growX().wrap();
+            dialog.cont.row();
+            dialog.cont.addCheck("$showagain", false, checked -> {
                 Core.settings.put(type, checked);
                 Core.settings.save();
             }).growX().left().get().left();

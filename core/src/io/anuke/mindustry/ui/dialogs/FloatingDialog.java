@@ -20,9 +20,9 @@ public class FloatingDialog extends Dialog{
     public FloatingDialog(String title){
         super(title, "dialog");
         setFillParent(true);
-        title().setAlignment(Align.center);
-        getTitleTable().row();
-        getTitleTable().addImage("white", Palette.accent)
+        this.title.setAlignment(Align.center);
+        titleTable.row();
+        titleTable.addImage("white", Palette.accent)
                 .growX().height(3f).pad(4f);
 
         hidden(() -> {
@@ -63,7 +63,7 @@ public class FloatingDialog extends Dialog{
 
     @Override
     public void addCloseButton(){
-        buttons().addImageTextButton("$back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+        buttons.addImageTextButton("$back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK) {

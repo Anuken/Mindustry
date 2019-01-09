@@ -9,7 +9,6 @@ import io.anuke.mindustry.io.Contributors;
 import io.anuke.mindustry.io.Contributors.Contributor;
 import io.anuke.mindustry.ui.Links;
 import io.anuke.mindustry.ui.Links.LinkEntry;
-import io.anuke.arc.Core;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.layout.Cell;
@@ -35,8 +34,8 @@ public class AboutDialog extends FloatingDialog{
     }
 
     void setup(){
-        content().clear();
-        buttons().clear();
+        cont.clear();
+        buttons.clear();
 
         float h = UIUtils.portrait() ? 90f : 80f;
         float w = UIUtils.portrait() ? 330f : 600f;
@@ -80,18 +79,18 @@ public class AboutDialog extends FloatingDialog{
 
         shown(() -> Time.run(1f, () -> Core.scene.setScrollFocus(pane)));
 
-        content().add(pane).growX();
+        cont.add(pane).growX();
 
         addCloseButton();
 
-        buttons().addButton("$credits", this::showCredits).size(200f, 64f);
+        buttons.addButton("$credits", this::showCredits).size(200f, 64f);
 
         if(!ios && !OS.isMac){
-            buttons().addButton("$changelog.title", ui.changelog::show).size(200f, 64f);
+            buttons.addButton("$changelog.title", ui.changelog::show).size(200f, 64f);
         }
 
         if(UIUtils.portrait()){
-            for(Cell<?> cell : buttons().getCells()){
+            for(Cell<?> cell : buttons.getCells()){
                 cell.width(140f);
             }
         }
@@ -101,14 +100,14 @@ public class AboutDialog extends FloatingDialog{
     public void showCredits(){
         FloatingDialog dialog = new FloatingDialog("$credits");
         dialog.addCloseButton();
-        dialog.content().add("$credits.text");
-        dialog.content().row();
+        dialog.cont.add("$credits.text");
+        dialog.cont.row();
         if(!contributors.isEmpty()){
-            dialog.content().addImage("blank").color(Palette.accent).fillX().height(3f).pad(3f);
-            dialog.content().row();
-            dialog.content().add("$contributors");
-            dialog.content().row();
-            dialog.content().pane(new Table(){{
+            dialog.cont.addImage("blank").color(Palette.accent).fillX().height(3f).pad(3f);
+            dialog.cont.row();
+            dialog.cont.add("$contributors");
+            dialog.cont.row();
+            dialog.cont.pane(new Table(){{
                 int i = 0;
                 left();
                 for(Contributor c : contributors){

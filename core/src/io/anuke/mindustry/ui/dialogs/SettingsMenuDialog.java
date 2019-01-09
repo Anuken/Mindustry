@@ -8,11 +8,8 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.event.InputEvent;
 import io.anuke.arc.scene.event.InputListener;
-import io.anuke.arc.scene.ui.Image;
-import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.scene.ui.SettingsDialog;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.SettingsDialog.SettingsTable.Setting;
-import io.anuke.arc.scene.ui.Slider;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.Vars;
@@ -49,14 +46,14 @@ public class SettingsMenuDialog extends SettingsDialog{
         });
 
         setFillParent(true);
-        title().setAlignment(Align.center);
-        getTitleTable().row();
-        getTitleTable().add(new Image("white"))
+        title.setAlignment(Align.center);
+        titleTable.row();
+        titleTable.add(new Image("white"))
                 .growX().height(3f).pad(4f).get().setColor(Palette.accent);
 
-        content().clearChildren();
-        content().remove();
-        buttons().remove();
+        cont.clearChildren();
+        cont.remove();
+        buttons.remove();
 
         menu = new Table();
 
@@ -113,7 +110,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         row();
         add(pane).grow().top();
         row();
-        add(buttons()).fillX();
+        add(buttons).fillX();
 
         hidden(this::back);
 
@@ -141,16 +138,16 @@ public class SettingsMenuDialog extends SettingsDialog{
                 table.addButton("$settings.cleardata", () -> {
                     FloatingDialog dialog = new FloatingDialog("$settings.cleardata");
                     dialog.setFillParent(false);
-                    dialog.content().defaults().size(230f, 60f).pad(3);
+                    dialog.cont.defaults().size(230f, 60f).pad(3);
                     dialog.addCloseButton();
-                    dialog.content().addButton("$settings.clearunlocks", () -> {
+                    dialog.cont.addButton("$settings.clearunlocks", () -> {
                         ui.showConfirm("$confirm", "$settings.clear.confirm", () -> {
                             data.reset();
                             dialog.hide();
                         });
                     });
-                    dialog.content().row();
-                    dialog.content().addButton("$settings.clearall", () -> {
+                    dialog.cont.row();
+                    dialog.cont.addButton("$settings.clearall", () -> {
                         ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
                             ObjectMap<String, Object> map = new ObjectMap<>();
                             for(String value : Core.settings.keys()){
@@ -169,7 +166,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                             Core.app.exit();
                         });
                     });
-                    dialog.content().row();
+                    dialog.cont.row();
                     dialog.show();
                 }).size(220f, 60f).pad(6).left();
                 table.add();
@@ -214,7 +211,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     @Override
     public void addCloseButton(){
-        buttons().addImageTextButton("$menu", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+        buttons.addImageTextButton("$menu", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK)

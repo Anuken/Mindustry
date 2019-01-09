@@ -22,8 +22,8 @@ public class MapSaveDialog extends FloatingDialog{
         Platform.instance.addDialog(field);
 
         shown(() -> {
-            content().clear();
-            content().label(() -> {
+            cont.clear();
+            cont.label(() -> {
                 Map map = world.maps.getByName(field.getText());
                 if(map != null){
                     if(map.custom){
@@ -34,13 +34,13 @@ public class MapSaveDialog extends FloatingDialog{
                 }
                 return "";
             }).colspan(2);
-            content().row();
-            content().add("$editor.mapname").padRight(14f);
-            content().add(field).size(220f, 48f);
+            cont.row();
+            cont.add("$editor.mapname").padRight(14f);
+            cont.add(field).size(220f, 48f);
         });
 
-        buttons().defaults().size(200f, 50f).pad(2f);
-        buttons().addButton("$cancel", this::hide);
+        buttons.defaults().size(200f, 50f).pad(2f);
+        buttons.addButton("$cancel", this::hide);
 
         TextButton button = new TextButton("$save");
         button.clicked(() -> {
@@ -50,7 +50,7 @@ public class MapSaveDialog extends FloatingDialog{
             }
         });
         button.setDisabled(this::invalid);
-        buttons().add(button);
+        buttons.add(button);
     }
 
     public void save(){

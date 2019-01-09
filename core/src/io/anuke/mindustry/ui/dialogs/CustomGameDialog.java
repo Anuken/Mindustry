@@ -29,7 +29,7 @@ public class CustomGameDialog extends FloatingDialog{
     }
 
     void setup(){
-        content().clear();
+        cont.clear();
 
         Table maps = new Table();
         maps.marginRight(14);
@@ -56,8 +56,8 @@ public class CustomGameDialog extends FloatingDialog{
         selmode.add(modes);
         selmode.addButton("?", this::displayGameModeHelp).width(50f).fillY().padLeft(18f);
 
-        content().add(selmode);
-        content().row();
+        cont.add(selmode);
+        cont.row();
 
         Difficulty[] ds = Difficulty.values();
 
@@ -82,8 +82,8 @@ public class CustomGameDialog extends FloatingDialog{
             state.difficulty = (ds[Mathf.mod(state.difficulty.ordinal() + 1, ds.length)]);
         }).width(s);
 
-        content().add(sdif);
-        content().row();
+        cont.add(sdif);
+        cont.row();
 
         float images = 146f;
 
@@ -129,7 +129,7 @@ public class CustomGameDialog extends FloatingDialog{
             maps.add("$maps.none").pad(50);
         }
 
-        content().add(pane).uniformX();
+        cont.add(pane).uniformX();
     }
 
     private void displayGameModeHelp(){
@@ -146,8 +146,8 @@ public class CustomGameDialog extends FloatingDialog{
             table.row();
         }
 
-        d.content().add(pane);
-        d.buttons().addButton("$ok", d::hide).size(110, 50).pad(10f);
+        d.cont.add(pane);
+        d.buttons.addButton("$ok", d::hide).size(110, 50).pad(10f);
         d.show();
     }
 

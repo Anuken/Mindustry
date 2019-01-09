@@ -28,7 +28,7 @@ public class GenViewDialog extends FloatingDialog{
     public GenViewDialog(){
         super("generate view");
 
-        content().add(new GenView()).grow();
+        cont.add(new GenView()).grow();
     }
 
     public class GenView extends Element{

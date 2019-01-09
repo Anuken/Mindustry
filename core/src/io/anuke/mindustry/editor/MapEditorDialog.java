@@ -63,7 +63,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         float isize = 16 * 2f;
         float swidth = 180f;
 
-        menu.content().table(t -> {
+        menu.cont.table(t -> {
             t.defaults().size(swidth, 60f).padBottom(5).padRight(5).padLeft(5);
 
             t.addImageTextButton("$editor.savemap", "icon-floppy-16", isize, this::save).size(swidth * 2f + 10, 60f).colspan(2);
@@ -140,9 +140,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
             t.row();
         });
 
-        menu.content().row();
+        menu.cont.row();
 
-        menu.content().addImageTextButton("$quit", "icon-back", isize, () -> {
+        menu.cont.addImageTextButton("$quit", "icon-back", isize, () -> {
             tryExit();
             menu.hide();
         }).padTop(-5).size(swidth * 2f + 10, 60f);
@@ -249,7 +249,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         float h = 90f;
 
-        dialog.content().defaults().size(360f, h).padBottom(5).padRight(5).padLeft(5);
+        dialog.cont.defaults().size(360f, h).padBottom(5).padRight(5).padLeft(5);
 
         for(int i = 0; i < arguments.length; i += 4){
             String name = (String) arguments[i];
@@ -257,7 +257,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             String iconname = (String) arguments[i + 2];
             Runnable listenable = (Runnable) arguments[i + 3];
 
-            TextButton button = dialog.content().addButton(name, () -> {
+            TextButton button = dialog.cont.addButton(name, () -> {
                 listenable.run();
                 dialog.hide();
                 menu.hide();
@@ -273,7 +273,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             button.row();
 
-            dialog.content().row();
+            dialog.cont.row();
         }
 
         dialog.addCloseButton();
@@ -316,7 +316,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     public void updateSelectedBlock(){
         Block block = editor.getDrawBlock();
-        for(int j = 0; j < content.blocks().size; j++){
+        for(int j = 0; j < Vars.content.blocks().size; j++){
             if(block.id == j && j < blockgroup.getButtons().size){
                 blockgroup.getButtons().get(j).setChecked(true);
                 break;

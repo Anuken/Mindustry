@@ -225,19 +225,19 @@ public class UI implements ApplicationListener{
             }));
     }
 
-    public void showTextInput(String title, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){
-        new Dialog(title, "dialog"){{
-            content().margin(30).add(text).padRight(6f);
-            TextField field = content().addField(def, t -> {
+    public void showTextInput(String titleText, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){
+        new Dialog(titleText, "dialog"){{
+            cont.margin(30).add(text).padRight(6f);
+            TextField field = cont.addField(def, t -> {
             }).size(170f, 50f).get();
             field.setTextFieldFilter((f, c) -> field.getText().length() < 12 && filter.acceptChar(f, c));
             Platform.instance.addDialog(field);
-            buttons().defaults().size(120, 54).pad(4);
-            buttons().addButton("$ok", () -> {
+            buttons.defaults().size(120, 54).pad(4);
+            buttons.addButton("$ok", () -> {
                 confirmed.accept(field.getText());
                 hide();
             }).disabled(b -> field.getText().isEmpty());
-            buttons().addButton("$cancel", this::hide);
+            buttons.addButton("$cancel", this::hide);
         }}.show();
     }
 
@@ -255,17 +255,17 @@ public class UI implements ApplicationListener{
 
     public void showInfo(String info){
         new Dialog("", "dialog"){{
-            getCell(content()).growX();
-            content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons().addButton("$ok", this::hide).size(90, 50).pad(4);
+            getCell(cont).growX();
+            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
     }
 
     public void showInfo(String info, Runnable clicked){
         new Dialog("", "dialog"){{
-            getCell(content()).growX();
-            content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons().addButton("$ok", () -> {
+            getCell(cont).growX();
+            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", () -> {
                 clicked.run();
                 hide();
             }).size(90, 50).pad(4);
@@ -274,25 +274,25 @@ public class UI implements ApplicationListener{
 
     public void showError(String text){
         new Dialog("$error.title", "dialog"){{
-            content().margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons().addButton("$ok", this::hide).size(90, 50).pad(4);
+            cont.margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
     }
 
-    public void showText(String title, String text){
-        new Dialog(title, "dialog"){{
-            content().margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons().addButton("$ok", this::hide).size(90, 50).pad(4);
+    public void showText(String titleText, String text){
+        new Dialog(titleText, "dialog"){{
+            cont.margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
     }
 
     public void showConfirm(String title, String text, Runnable confirmed){
         FloatingDialog dialog = new FloatingDialog(title);
-        dialog.content().add(text).width(400f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
-        dialog.buttons().defaults().size(200f, 54f).pad(2f);
+        dialog.cont.add(text).width(400f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+        dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons().addButton("$cancel", dialog::hide);
-        dialog.buttons().addButton("$ok", () -> {
+        dialog.buttons.addButton("$cancel", dialog::hide);
+        dialog.buttons.addButton("$ok", () -> {
             dialog.hide();
             confirmed.run();
         });

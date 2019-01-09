@@ -24,7 +24,7 @@ public class HostDialog extends FloatingDialog{
 
         addCloseButton();
 
-        content().table(t -> {
+        cont.table(t -> {
             t.add("$name").padRight(10);
             t.addField(Core.settings.getString("name"), text -> {
                 player.name = text;
@@ -43,11 +43,11 @@ public class HostDialog extends FloatingDialog{
             button.update(() -> button.getStyle().imageUpColor = player.color);
         }).width(w).height(70f).pad(4).colspan(3);
 
-        content().row();
+        cont.row();
 
-        content().add().width(65f);
+        cont.add().width(65f);
 
-        content().addButton("$host", () -> {
+        cont.addButton("$host", () -> {
             if(Core.settings.getString("name").trim().isEmpty()){
                 ui.showInfo("$noname");
                 return;
@@ -66,6 +66,6 @@ public class HostDialog extends FloatingDialog{
             });
         }).width(w).height(70f);
 
-        content().addButton("?", () -> ui.showInfo("$host.info")).size(65f, 70f).padLeft(6f);
+        cont.addButton("?", () -> ui.showInfo("$host.info")).size(65f, 70f).padLeft(6f);
     }
 }

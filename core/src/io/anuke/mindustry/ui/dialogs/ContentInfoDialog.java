@@ -13,7 +13,7 @@ public class ContentInfoDialog extends FloatingDialog{
     }
 
     public void show(UnlockableContent content){
-        content().clear();
+        cont.clear();
 
         Table table = new Table();
         table.margin(10);
@@ -21,7 +21,7 @@ public class ContentInfoDialog extends FloatingDialog{
         content.displayInfo(table);
 
         ScrollPane pane = new ScrollPane(table);
-        content().add(pane);
+        cont.add(pane);
 
         show();
     }

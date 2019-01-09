@@ -22,7 +22,7 @@ public class ChangelogDialog extends FloatingDialog{
 
         addCloseButton();
 
-        content().add("$changelog.loading");
+        cont.add("$changelog.loading");
 
         if(!ios && !OS.isMac){
             Changelogs.getChangelog(result -> {
@@ -39,8 +39,8 @@ public class ChangelogDialog extends FloatingDialog{
         Table table = new Table();
         ScrollPane pane = new ScrollPane(table);
 
-        content().clear();
-        content().add(pane).grow();
+        cont.clear();
+        cont.add(pane).grow();
 
         if(versions == null){
             table.add("$changelog.error");

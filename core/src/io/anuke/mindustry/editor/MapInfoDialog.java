@@ -28,42 +28,42 @@ public class MapInfoDialog extends FloatingDialog{
     }
 
     private void setup(){
-        content().clear();
+        cont.clear();
 
         ObjectMap<String, String> tags = editor.getTags();
 
-        content().add("$editor.name").padRight(8).left();
+        cont.add("$editor.name").padRight(8).left();
 
-        content().defaults().padTop(15);
+        cont.defaults().padTop(15);
 
-        name = content().addField(tags.get("name", ""), text -> {
+        name = cont.addField(tags.get("name", ""), text -> {
             tags.put("name", text);
         }).size(400, 55f).get();
         name.setMessageText("$unknown");
 
-        content().row();
+        cont.row();
 
-        content().add("$editor.description").padRight(8).left();
+        cont.add("$editor.description").padRight(8).left();
 
-        description = content().addArea(tags.get("description", ""), "textarea", text -> {
+        description = cont.addArea(tags.get("description", ""), "textarea", text -> {
             tags.put("description", text);
         }).size(400f, 140f).get();
 
-        content().row();
+        cont.row();
 
-        content().add("$editor.author").padRight(8).left();
+        cont.add("$editor.author").padRight(8).left();
 
-        author = content().addField(tags.get("author", Core.settings.getString("mapAuthor", "")), text -> {
+        author = cont.addField(tags.get("author", Core.settings.getString("mapAuthor", "")), text -> {
             tags.put("author", text);
             Core.settings.put("mapAuthor", text);
             Core.settings.save();
         }).size(400, 55f).get();
         author.setMessageText("$unknown");
 
-        content().row();
+        cont.row();
 
-        content().add().padRight(8).left();
-        content().addCheck("$editor.oregen", enabled -> {
+        cont.add().padRight(8).left();
+        cont.addCheck("$editor.oregen", enabled -> {
             tags.put("oregen", enabled ? "1" : "0");
         }).update(c -> c.setChecked(!tags.get("oregen", "0").equals("0"))).left();
 

@@ -16,7 +16,6 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves;
@@ -28,8 +27,6 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.MobileInput;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import java.io.IOException;
@@ -254,12 +251,12 @@ public class Control implements ApplicationListener{
 
             Time.run(5f, () -> {
                 FloatingDialog dialog = new FloatingDialog("WARNING!");
-                dialog.buttons().addButton("$ok", () -> {
+                dialog.buttons.addButton("$ok", () -> {
                     dialog.hide();
                     Core.settings.put("4.0-warning-2", true);
                     Core.settings.save();
                 }).size(100f, 60f);
-                dialog.content().add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
+                dialog.cont.add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
                         "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
                         "All current art and UI is temporary, and will be re-drawn before release. " +
                         "\n\n[accent]Saves and maps may be corrupted without warning between updates.").wrap().width(400f);

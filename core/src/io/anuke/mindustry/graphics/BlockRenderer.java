@@ -22,7 +22,7 @@ public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 6;
     private final static boolean disableShadows = false;
-    private final static Color shadowColor = new Color(0, 0, 0, 0.15f);
+    private final static Color shadowColor = new Color(0, 0, 0, 0.19f);
 
     public final FloorRenderer floor = new FloorRenderer();
 

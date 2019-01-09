@@ -21,26 +21,26 @@ public class RestartDialog extends FloatingDialog{
     }
 
     void rebuild(){
-        buttons().clear();
-        content().clear();
+        buttons.clear();
+        cont.clear();
 
-        buttons().margin(10);
+        buttons.margin(10);
 
         if(state.mode.isPvp){
-            content().add(Core.bundle.format("gameover.pvp",winner.localized())).pad(6);
-            buttons().addButton("$menu", () -> {
+            cont.add(Core.bundle.format("gameover.pvp",winner.localized())).pad(6);
+            buttons.addButton("$menu", () -> {
                 hide();
                 state.set(State.menu);
                 logic.reset();
             }).size(130f, 60f);
         }else{
             if(control.isHighScore()){
-                content().add("$highscore").pad(6);
-                content().row();
+                cont.add("$highscore").pad(6);
+                cont.row();
             }
-            content().add(Core.bundle.format("wave.lasted", state.wave)).pad(12);
+            cont.add(Core.bundle.format("wave.lasted", state.wave)).pad(12);
 
-            buttons().addButton("$menu", () -> {
+            buttons.addButton("$menu", () -> {
                 hide();
                 state.set(State.menu);
                 logic.reset();

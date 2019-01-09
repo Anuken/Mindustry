@@ -16,10 +16,7 @@ import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.MappableContent;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper;
@@ -38,39 +35,21 @@ public class ContentLoader{
     private MappableContent[][] temporaryMapper;
     private ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
-        //effects
         new Fx(),
-
-        //items
         new Items(),
-
-        //status effects
         new StatusEffects(),
-
-        //liquids
         new Liquids(),
-
-        //bullets
         new Bullets(),
-
-        //weapons
         new Weapons(),
-
-        //mechs
         new Mechs(),
-
-        //units
         new UnitTypes(),
-
-        //blocks
         new Blocks(),
+        new Recipes(),
+        new Zones(),
 
-        //not really a content class, but this makes initialization easier
+        //these are not really content classes, but this makes initialization easier
         new ColorMapper(),
         new LegacyColorMapper(),
-
-        //recipes
-        new Recipes(),
     };
 
     /**Creates all content types.*/
@@ -235,6 +214,10 @@ public class ContentLoader{
 
     public BulletType bullet(int id){
         return (BulletType) getByID(ContentType.bullet, id);
+    }
+
+    public Array<Zone> zones(){
+        return getBy(ContentType.zone);
     }
 
     /**

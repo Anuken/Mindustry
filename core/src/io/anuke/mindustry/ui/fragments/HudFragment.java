@@ -329,9 +329,9 @@ public class HudFragment extends Fragment{
         new FloatingDialog("$mission.info"){{
             shouldPause = true;
             setFillParent(false);
-            getCell(content()).growX();
-            content().margin(15).add(str).width(400f).wrap().get().setAlignment(Align.left, Align.left);
-            buttons().addButton("$continue", this::hide).size(140, 60).pad(4);
+            getCell(cont).growX();
+            cont.margin(15).add(str).width(400f).wrap().get().setAlignment(Align.left, Align.left);
+            buttons.addButton("$continue", this::hide).size(140, 60).pad(4);
         }}.show();
     }
 

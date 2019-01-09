@@ -30,7 +30,7 @@ public class MapsDialog extends FloatingDialog{
         super("$maps");
 
         addCloseButton();
-        buttons().addImageTextButton("$editor.importmap", "icon-add", 14 * 2, () -> {
+        buttons.addImageTextButton("$editor.importmap", "icon-add", 14 * 2, () -> {
             Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
                 try{
                     DataInputStream stream = new DataInputStream(file.read());
@@ -68,7 +68,7 @@ public class MapsDialog extends FloatingDialog{
     }
 
     void setup(){
-        content().clear();
+        cont.clear();
 
         Table maps = new Table();
         maps.marginRight(24);
@@ -104,7 +104,7 @@ public class MapsDialog extends FloatingDialog{
             maps.add("$maps.none");
         }
 
-        content().add(pane).uniformX();
+        cont.add(pane).uniformX();
     }
 
     void showMapInfo(Map map){
@@ -112,7 +112,7 @@ public class MapsDialog extends FloatingDialog{
         dialog.addCloseButton();
 
         float mapsize = UIUtils.portrait() ? 160f : 300f;
-        Table table = dialog.content();
+        Table table = dialog.cont;
 
         table.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize);
 

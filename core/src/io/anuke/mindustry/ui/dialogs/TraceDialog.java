@@ -9,7 +9,7 @@ public class TraceDialog extends FloatingDialog{
     }
 /*
     public void show(Player player, SessionInfo info){
-        content().clear();
+        cont.clear();
 
         Table table = new Table("clear");
         table.margin(14);
@@ -48,7 +48,7 @@ public class TraceDialog extends FloatingDialog{
         table.add(Core.bundle.format("trace.lastblockplaced", info.lastBlockPlaced.formalName));
         table.row();
 
-        content().add(table);
+        cont.add(table);
 
         show();
     }*/

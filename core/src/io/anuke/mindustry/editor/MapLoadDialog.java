@@ -30,13 +30,13 @@ public class MapLoadDialog extends FloatingDialog{
             }
         });
 
-        buttons().defaults().size(200f, 50f);
-        buttons().addButton("$cancel", this::hide);
-        buttons().add(button);
+        buttons.defaults().size(200f, 50f);
+        buttons.addButton("$cancel", this::hide);
+        buttons.add(button);
     }
 
     public void rebuild(){
-        content().clear();
+        cont.clear();
         if(world.maps.all().size > 0){
             selected = world.maps.all().first();
         }
@@ -69,11 +69,11 @@ public class MapLoadDialog extends FloatingDialog{
         if(world.maps.all().size == 0){
             table.add("$maps.none").center();
         }else{
-            content().add("$editor.loadmap");
+            cont.add("$editor.loadmap");
         }
 
-        content().row();
-        content().add(pane);
+        cont.row();
+        cont.add(pane);
     }
 
 }
