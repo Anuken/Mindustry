@@ -9,7 +9,6 @@ import io.anuke.arc.function.Consumer;
 import io.anuke.arc.util.OS;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.serialization.Base64Coder;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.GameMode;
@@ -29,11 +28,13 @@ public class DesktopPlatform extends Platform{
     public DesktopPlatform(String[] args){
         this.args = args;
 
-        Vars.testMobile = Array.with(args).contains("-testMobile", false);
+        testMobile = Array.with(args).contains("-testMobile");
 
         if(useDiscord){
             DiscordEventHandlers handlers = new DiscordEventHandlers();
             DiscordRPC.INSTANCE.Discord_Initialize(applicationId, handlers, true, "");
+
+            Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC.INSTANCE::Discord_Shutdown));
         }
     }
 
@@ -82,11 +83,6 @@ public class DesktopPlatform extends Platform{
         presence.largeImageKey = "logo";
 
         DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
-    }
-
-    @Override
-    public void onGameExit(){
-        if(useDiscord) DiscordRPC.INSTANCE.Discord_Shutdown();
     }
 
     @Override

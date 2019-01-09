@@ -222,35 +222,8 @@ public class Control implements ApplicationListener{
         return hiscore;
     }
 
-    private void checkUnlockableBlocks(){
-        TileEntity entity = players[0].getClosestCore();
-
-        if(entity == null) return;
-
-        entity.items.forEach((item, amount) -> data.unlockContent(item));
-
-        if(players[0].inventory.hasItem()){
-            data.unlockContent(players[0].inventory.getItem().item);
-        }
-
-        outer:
-        for(int i = 0; i < content.recipes().size; i ++){
-            Recipe recipe = content.recipes().get(i);
-            if(!recipe.isHidden() && recipe.requirements != null){
-                for(ItemStack stack : recipe.requirements){
-                    if(!entity.items.has(stack.item, Math.min((int) (stack.amount), 2000))) continue outer;
-                }
-
-                if(data.unlockContent(recipe)){
-                    ui.hudfrag.showUnlock(recipe);
-                }
-            }
-        }
-    }
-
     @Override
     public void dispose(){
-        Platform.instance.onGameExit();
         content.dispose();
         Net.dispose();
         ui.editor.dispose();
