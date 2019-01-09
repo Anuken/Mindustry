@@ -197,7 +197,7 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
         if(other instanceof Unit){
             Unit unit = (Unit) other;
             unit.velocity().add(Tmp.v3.set(other.getX(), other.getY()).sub(x, y).setLength(type.knockback / unit.mass()));
-            unit.applyEffect(type.status, type.statusIntensity);
+            unit.applyEffect(type.status, type.statusDuration);
         }
     }
 

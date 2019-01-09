@@ -39,7 +39,7 @@ public class Floor extends Block{
     /** Status effect applied when walking on. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */
-    public float statusIntensity = 0.6f;
+    public float statusDuration = 60f;
     /** Color of this floor's liquid. Used for tinting sprites. */
     public Color liquidColor;
     /** liquids that drop from this block, used for pumps */

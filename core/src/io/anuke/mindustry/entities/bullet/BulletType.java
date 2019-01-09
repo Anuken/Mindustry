@@ -40,7 +40,7 @@ public abstract class BulletType extends Content{
     /**Status effect applied on hit.*/
     public StatusEffect status = StatusEffects.none;
     /**Intensity of applied status effect in terms of duration.*/
-    public float statusIntensity = 0.5f;
+    public float statusDuration = 60 * 1f;
     /**What fraction of armor is pierced, 0-1*/
     public float armorPierce = 0f;
     /**Whether to sync this bullet to clients.*/

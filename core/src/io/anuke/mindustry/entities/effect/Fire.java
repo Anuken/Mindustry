@@ -151,7 +151,9 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
             if(damage){
                 entity.damage(0.4f);
             }
-            Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f, unit -> !unit.isFlying(), unit -> unit.applyEffect(StatusEffects.burning, 0.8f));
+            Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f,
+                    unit -> !unit.isFlying(),
+                    unit -> unit.applyEffect(StatusEffects.burning, 60 * 5));
         }
     }
 

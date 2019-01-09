@@ -28,24 +28,21 @@ public class StatusController implements Saveable{
     private float damageMultiplier;
     private float armorMultiplier;
 
-    public void handleApply(Unit unit, StatusEffect effect, float intensity){
+    public void handleApply(Unit unit, StatusEffect effect, float duration){
         if(effect == StatusEffects.none) return; //don't apply empty effects
-
-        float newTime = effect.baseDuration * intensity;
 
         if(statuses.size > 0){
             //check for opposite effects
             for(StatusEntry entry : statuses){
                 //extend effect
                 if(entry.effect == effect){
-                    entry.time = Math.max(entry.time, newTime);
+                    entry.time = Math.max(entry.time, duration);
                     return;
-                }else if(entry.effect.isOpposite(effect)){ //find opposite
-                    entry.effect.getTransition(unit, effect, entry.time, newTime, globalResult);
+                }else if(entry.effect.reactsWith(effect)){ //find opposite
+                    entry.effect.getTransition(unit, effect, entry.time, duration, globalResult);
                     entry.time = globalResult.time;
 
                     if(globalResult.effect != entry.effect){
-                        entry.effect.onTransition(unit, globalResult.effect);
                         entry.effect = globalResult.effect;
                     }
 
@@ -57,7 +54,7 @@ public class StatusController implements Saveable{
 
         //otherwise, no opposites found, add direct effect
         StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
-        entry.set(effect, newTime);
+        entry.set(effect, duration);
         statuses.add(entry);
     }
 

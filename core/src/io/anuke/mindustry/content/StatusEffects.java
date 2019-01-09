@@ -2,169 +2,80 @@ package io.anuke.mindustry.content;
 
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.StatusController.StatusEntry;
-import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.StatusEffect;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded, shocked;
+    public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded, shocked, corroded;
 
     @Override
     public void load(){
 
-        none = new StatusEffect(0);
+        none = new StatusEffect();
 
-        burning = new StatusEffect(4 * 60f){
-            {
-                oppositeScale = 0.5f;
-            }
+        burning = new StatusEffect(){{
+            damage = 0.04f;
+            effect = Fx.burning;
 
-            @Override
-            public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
-                if(to == tarred){
-                    unit.damage(1f);
-                    Effects.effect(Fx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
-                    return result.set(this, Math.min(time + newTime, baseDuration + tarred.baseDuration));
-                }
+            opposite(() -> wet, () -> freezing);
+            trans(() -> tarred, ((unit, time, newTime, result) -> {
+                unit.damage(1f);
+                Effects.effect(Fx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+                result.set(this, Math.min(time + newTime, 300f));
+            }));
+        }};
 
-                return super.getTransition(unit, to, time, newTime, result);
-            }
+        freezing = new StatusEffect(){{
+            speedMultiplier = 0.6f;
+            armorMultiplier = 0.8f;
+            effect = Fx.freezing;
 
-            @Override
-            public void update(Unit unit, float time){
-                unit.damagePeriodic(0.04f);
+            opposite(() -> melting, () -> burning);
+        }};
 
-                if(Mathf.chance(Time.delta() * 0.2f)){
-                    Effects.effect(Fx.burning, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
-                }
-            }
-        };
+        wet = new StatusEffect(){{
+            speedMultiplier = 0.9f;
+            effect = Fx.wet;
 
-        freezing = new StatusEffect(5 * 60f){
-            {
-                oppositeScale = 0.4f;
-                speedMultiplier = 0.6f;
-                armorMultiplier = 0.8f;
-            }
+            trans(() -> shocked, ((unit, time, newTime, result) -> unit.damage(15f)));
+            opposite(() -> burning, () -> shocked);
+        }};
 
-            @Override
-            public void update(Unit unit, float time){
+        melting = new StatusEffect(){{
+            speedMultiplier = 0.8f;
+            armorMultiplier = 0.8f;
+            damage = 0.3f;
+            effect = Fx.melting;
 
-                if(Mathf.chance(Time.delta() * 0.15f)){
-                    Effects.effect(Fx.freezing, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
-                }
-            }
-        };
+            trans(() -> tarred, ((unit, time, newTime, result) -> result.set(this, Math.min(time + newTime / 2f, 140f))));
+            opposite(() -> wet, () -> freezing);
+        }};
 
-        wet = new StatusEffect(3 * 60f){
-            {
-                oppositeScale = 0.5f;
-                speedMultiplier = 0.9f;
-            }
+        tarred = new StatusEffect(){{
+            speedMultiplier = 0.6f;
+            effect = Fx.oily;
 
-            @Override
-            public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
-                if(to == shocked){
-                    //get shocked when wet
-                    unit.damage(15f);
-                    return result.set(this, time);
-                }
+            trans(() -> melting, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
+            trans(() -> burning, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
+        }};
 
-                return super.getTransition(unit, to, time, newTime, result);
-            }
+        overdrive = new StatusEffect(){{
+            armorMultiplier = 0.95f;
+            speedMultiplier = 1.15f;
+            damageMultiplier = 1.4f;
+            damage = -0.01f;
+            effect = Fx.overdriven;
+        }};
 
-            @Override
-            public void update(Unit unit, float time){
-                if(Mathf.chance(Time.delta() * 0.15f)){
-                    Effects.effect(Fx.wet, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
-                }
-            }
-        };
+        shielded = new StatusEffect(){{
+            armorMultiplier = 3f;
+        }};
 
-        melting = new StatusEffect(5 * 60f){
-            {
-                oppositeScale = 0.2f;
-                speedMultiplier = 0.8f;
-                armorMultiplier = 0.8f;
-            }
+        shocked = new StatusEffect();
 
-            @Override
-            public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
-                if(to == tarred){
-                    return result.set(this, Math.min(time + newTime / 2f, baseDuration));
-                }
-
-                return super.getTransition(unit, to, time, newTime, result);
-            }
-
-            @Override
-            public void update(Unit unit, float time){
-                unit.damagePeriodic(0.3f);
-
-                if(Mathf.chance(Time.delta() * 0.2f)){
-                    Effects.effect(Fx.melting, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
-                }
-            }
-        };
-
-        tarred = new StatusEffect(4 * 60f){
-            {
-                speedMultiplier = 0.6f;
-            }
-
-            @Override
-            public void update(Unit unit, float time){
-                if(Mathf.chance(Time.delta() * 0.15f)){
-                    Effects.effect(Fx.oily, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
-                }
-            }
-
-            @Override
-            public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
-                if(to == melting || to == burning){
-                    return result.set(to, newTime + time);
-                }
-
-                return result.set(to, newTime);
-            }
-        };
-
-        overdrive = new StatusEffect(60f*15){
-            {
-                armorMultiplier = 0.95f;
-                speedMultiplier = 1.15f;
-                damageMultiplier = 1.4f;
-            }
-
-            @Override
-            public void update(Unit unit, float time){
-                //idle regen boosted
-                unit.health += 0.01f * Time.delta();
-
-                if(Mathf.chance(Time.delta() * 0.25f)){
-                    Effects.effect(Fx.overdriven, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f), 0f, unit);
-                }
-            }
-        };
-
-        shielded = new StatusEffect(6f){
-            {
-                armorMultiplier = 3f;
-            }
-        };
-
-        shocked = new StatusEffect(1f){
-            {
-                armorMultiplier = 3f;
-            }
-        };
-
-        wet.setOpposites(shocked);
-        melting.setOpposites(wet, freezing);
-        wet.setOpposites(burning);
-        freezing.setOpposites(burning, melting);
-        burning.setOpposites(wet, freezing);
+        //no effects, just small amounts of damage.
+        corroded = new StatusEffect(){{
+            damage = 0.1f;
+        }};
     }
 }

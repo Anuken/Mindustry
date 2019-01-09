@@ -261,7 +261,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             }
 
             if(onLiquid){
-                status.handleApply(this, floor.status, floor.statusIntensity);
+                status.handleApply(this, floor.status, floor.statusDuration);
 
                 if(floor.damageTaken > 0f){
                     damagePeriodic(floor.damageTaken);
@@ -292,9 +292,9 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         velocity.scl(Mathf.clamp(1f - drag() * (isFlying() ? 1f : floor.dragMultiplier) * Time.delta()));
     }
 
-    public void applyEffect(StatusEffect effect, float intensity){
+    public void applyEffect(StatusEffect effect, float duration){
         if(dead || Net.client()) return; //effects are synced and thus not applied through clients
-        status.handleApply(this, effect, intensity);
+        status.handleApply(this, effect, duration);
     }
 
     public void damagePeriodic(float amount){

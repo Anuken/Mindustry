@@ -205,7 +205,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
                 unit.hitbox(rect2);
                 if(!rect.overlaps(rect2)) return;
 
-                unit.applyEffect(liquid.effect, 0.5f);
+                unit.applyEffect(liquid.effect, 60 * 2);
 
                 if(unit.velocity().len() > 0.1){
                     Effects.effect(Fx.ripple, liquid.color, unit.x, unit.y);

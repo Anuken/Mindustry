@@ -123,7 +123,7 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             status = StatusEffects.wet;
-            statusIntensity = 1f;
+            statusDuration = 120f;
             drownTime = 140f;
             cacheLayer = CacheLayer.water;
             minimapColor = Color.valueOf("465a96");
@@ -134,7 +134,7 @@ public class Blocks implements ContentList{
             speedMultiplier = 0.5f;
             variants = 0;
             status = StatusEffects.wet;
-            statusIntensity = 0.9f;
+            statusDuration = 90f;
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
@@ -145,7 +145,7 @@ public class Blocks implements ContentList{
             drownTime = 150f;
             liquidColor = Color.valueOf("292929");
             status = StatusEffects.tarred;
-            statusIntensity = 1f;
+            statusDuration = 240f;
             speedMultiplier = 0.19f;
             variants = 0;
             liquidDrop = Liquids.oil;

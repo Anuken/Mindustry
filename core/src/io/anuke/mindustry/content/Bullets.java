@@ -321,15 +321,13 @@ public class Bullets implements ContentList{
             incendChance = 0.3f;
         }};
 
-        damageLightning = new BulletType(0.0001f, 0f){
-            {
-                lifetime = Lightning.lifetime;
-                hitEffect = Fx.hitLancer;
-                despawnEffect = Fx.none;
-                status = StatusEffects.shocked;
-                statusIntensity = 1f;
-            }
-        };
+        damageLightning = new BulletType(0.0001f, 0f){{
+            lifetime = Lightning.lifetime;
+            hitEffect = Fx.hitLancer;
+            despawnEffect = Fx.none;
+            status = StatusEffects.shocked;
+            statusDuration = 10f;
+        }};
 
         healBullet = new BulletType(5.2f, 13){
             float healPercent = 3f;
