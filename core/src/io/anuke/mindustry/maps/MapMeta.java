@@ -31,7 +31,7 @@ public class MapMeta{
     }
 
     public String tag(String name){
-        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Core.bundle.get("text.unknown");
+        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Core.bundle.get("unknown");
     }
 
     public boolean hasOreGen(){

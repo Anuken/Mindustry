@@ -337,7 +337,7 @@ public class Renderer implements ApplicationListener{
         pixelSurface.setSize(pw, ph, false);
         Graphics.getEffectSurface().setSize(pw, ph, false);
 
-        ui.showInfoFade(Core.bundle.format("text.screenshot", file.toString()));*/
+        ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));*/
     }
 
 }

@@ -20,12 +20,12 @@ public class LoadingFragment extends Fragment{
 
             t.addImage("white").growX().height(3f).pad(4f).growX().get().setColor(Palette.accent);
             t.row();
-            t.add("$text.loading").name("namelabel").pad(10f);
+            t.add("$loading").name("namelabel").pad(10f);
             t.row();
             t.addImage("white").growX().height(3f).pad(4f).growX().get().setColor(Palette.accent);
             t.row();
 
-            button = t.addButton("$text.cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
+            button = t.addButton("$cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
             table = t;
         });
     }
@@ -37,7 +37,7 @@ public class LoadingFragment extends Fragment{
     }
 
     public void show(){
-        show("$text.loading");
+        show("$loading");
     }
 
     public void show(String text){

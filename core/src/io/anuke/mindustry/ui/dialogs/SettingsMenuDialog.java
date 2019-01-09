@@ -62,7 +62,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         Consumer<SettingsTable> s = table -> {
             table.row();
-            table.addImageTextButton("$text.back", "icon-arrow-left", 10 * 3, this::back).size(240f, 60f).colspan(2).padTop(15f);
+            table.addImageTextButton("$back", "icon-arrow-left", 10 * 3, this::back).size(240f, 60f).colspan(2).padTop(15f);
         };
 
         game = new SettingsTable(s);
@@ -74,17 +74,17 @@ public class SettingsMenuDialog extends SettingsDialog{
         prefs.margin(14f);
 
         menu.defaults().size(300f, 60f).pad(3f);
-        menu.addButton("$text.settings.game", () -> visible(0));
+        menu.addButton("$settings.game", () -> visible(0));
         menu.row();
-        menu.addButton("$text.settings.graphics", () -> visible(1));
+        menu.addButton("$settings.graphics", () -> visible(1));
         menu.row();
-        menu.addButton("$text.settings.sound", () -> visible(2));
+        menu.addButton("$settings.sound", () -> visible(2));
         if(!Vars.mobile){
             menu.row();
-            menu.addButton("$text.settings.controls", ui.controls::show);
+            menu.addButton("$settings.controls", ui.controls::show);
         }
         menu.row();
-        menu.addButton("$text.settings.language", ui.language::show);
+        menu.addButton("$settings.language", ui.language::show);
 
         prefs.clearChildren();
         prefs.add(menu);
@@ -138,20 +138,20 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.pref(new Setting(){
             @Override
             public void add(SettingsTable table){
-                table.addButton("$text.settings.cleardata", () -> {
-                    FloatingDialog dialog = new FloatingDialog("$text.settings.cleardata");
+                table.addButton("$settings.cleardata", () -> {
+                    FloatingDialog dialog = new FloatingDialog("$settings.cleardata");
                     dialog.setFillParent(false);
                     dialog.content().defaults().size(230f, 60f).pad(3);
                     dialog.addCloseButton();
-                    dialog.content().addButton("$text.settings.clearunlocks", () -> {
-                        ui.showConfirm("$text.confirm", "$text.settings.clear.confirm", () -> {
+                    dialog.content().addButton("$settings.clearunlocks", () -> {
+                        ui.showConfirm("$confirm", "$settings.clear.confirm", () -> {
                             data.reset();
                             dialog.hide();
                         });
                     });
                     dialog.content().row();
-                    dialog.content().addButton("$text.settings.clearall", () -> {
-                        ui.showConfirm("$text.confirm", "$text.settings.clearall.confirm", () -> {
+                    dialog.content().addButton("$settings.clearall", () -> {
+                        ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
                             ObjectMap<String, Object> map = new ObjectMap<>();
                             for(String value : Core.settings.keys()){
                                 if(value.contains("usid") || value.contains("uuid")){
@@ -214,7 +214,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     @Override
     public void addCloseButton(){
-        buttons().addImageTextButton("$text.menu", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+        buttons().addImageTextButton("$menu", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK)

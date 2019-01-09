@@ -63,7 +63,7 @@ public class FloatingDialog extends Dialog{
 
     @Override
     public void addCloseButton(){
-        buttons().addImageTextButton("$text.back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+        buttons().addImageTextButton("$back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK) {

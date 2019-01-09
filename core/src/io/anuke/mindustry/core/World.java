@@ -207,7 +207,7 @@ public class World implements ApplicationListener{
         } catch(Exception e){
             Log.err(e);
             if(!headless){
-                ui.showError("$text.map.invalid");
+                ui.showError("$map.invalid");
                 Core.app.post(() -> state.set(State.menu));
                 invalidMap = true;
             }
@@ -221,7 +221,7 @@ public class World implements ApplicationListener{
 
         if(!headless){
             if(state.teams.get(players[0].getTeam()).cores.size == 0){
-                ui.showError("$text.map.nospawn");
+                ui.showError("$map.nospawn");
                 invalidMap = true;
             }else if(state.mode.isPvp){
                 invalidMap = true;
@@ -231,7 +231,7 @@ public class World implements ApplicationListener{
                     }
                 }
                 if(invalidMap){
-                    ui.showError("$text.map.nospawn.pvp");
+                    ui.showError("$map.nospawn.pvp");
                 }
             }
         }else{

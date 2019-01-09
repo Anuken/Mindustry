@@ -12,6 +12,6 @@ public class BooleanValue implements StatValue{
 
     @Override
     public void display(Table table){
-        table.add(!value ? "$text.no" : "$text.yes");
+        table.add(!value ? "$no" : "$yes");
     }
 }

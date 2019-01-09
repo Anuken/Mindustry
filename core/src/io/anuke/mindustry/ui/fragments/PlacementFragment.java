@@ -176,7 +176,7 @@ public class PlacementFragment extends Fragment{
                                 header.left();
                                 header.add(new ImageStack(lastDisplay.getCompactIcon())).size(8 * 4);
                                 header.labelWrap(() ->
-                                !data.isUnlocked(Recipe.getByResult(lastDisplay)) ? Core.bundle.get("text.blocks.unknown") : lastDisplay.formalName)
+                                !data.isUnlocked(Recipe.getByResult(lastDisplay)) ? Core.bundle.get("blocks.unknown") : lastDisplay.formalName)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(data.isUnlocked(Recipe.getByResult(lastDisplay))){

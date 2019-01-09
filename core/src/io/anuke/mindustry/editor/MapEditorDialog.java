@@ -57,7 +57,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         infoDialog = new MapInfoDialog(editor);
 
-        menu = new FloatingDialog("$text.menu");
+        menu = new FloatingDialog("$menu");
         menu.addCloseButton();
 
         float isize = 16 * 2f;
@@ -66,27 +66,27 @@ public class MapEditorDialog extends Dialog implements Disposable{
         menu.content().table(t -> {
             t.defaults().size(swidth, 60f).padBottom(5).padRight(5).padLeft(5);
 
-            t.addImageTextButton("$text.editor.savemap", "icon-floppy-16", isize, this::save).size(swidth * 2f + 10, 60f).colspan(2);
+            t.addImageTextButton("$editor.savemap", "icon-floppy-16", isize, this::save).size(swidth * 2f + 10, 60f).colspan(2);
 
             t.row();
 
-            t.addImageTextButton("$text.editor.mapinfo", "icon-pencil", isize, () -> {
+            t.addImageTextButton("$editor.mapinfo", "icon-pencil", isize, () -> {
                 infoDialog.show();
                 menu.hide();
             });
 
-            t.addImageTextButton("$text.editor.resize", "icon-resize", isize, () -> {
+            t.addImageTextButton("$editor.resize", "icon-resize", isize, () -> {
                 resizeDialog.show();
                 menu.hide();
             });
 
             t.row();
 
-            t.addImageTextButton("$text.editor.import", "icon-load-map", isize, () ->
-                    createDialog("$text.editor.import",
-                            "$text.editor.importmap", "$text.editor.importmap.description", "icon-load-map", (Runnable) loadDialog::show,
-                            "$text.editor.importfile", "$text.editor.importfile.description", "icon-file", (Runnable) () ->
-                                Platform.instance.showFileChooser("$text.loadimage", "Map Files", file -> ui.loadGraphics(() -> {
+            t.addImageTextButton("$editor.import", "icon-load-map", isize, () ->
+                    createDialog("$editor.import",
+                            "$editor.importmap", "$editor.importmap.description", "icon-load-map", (Runnable) loadDialog::show,
+                            "$editor.importfile", "$editor.importfile.description", "icon-file", (Runnable) () ->
+                                Platform.instance.showFileChooser("$loadimage", "Map Files", file -> ui.loadGraphics(() -> {
                                     try{
                                         DataInputStream stream = new DataInputStream(file.read());
 
@@ -96,13 +96,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                         editor.beginEdit(data, meta.tags, false);
                                         view.clearStack();
                                     }catch(Exception e){
-                                        ui.showError(Core.bundle.format("text.editor.errorimageload", Strings.parseException(e, false)));
+                                        ui.showError(Core.bundle.format("editor.errorimageload", Strings.parseException(e, false)));
                                         Log.err(e);
                                     }
                                 }), true, mapExtension),
 
-						"$text.editor.importimage", "$text.editor.importimage.description", "icon-file-image", (Runnable)() ->
-                            Platform.instance.showFileChooser("$text.loadimage", "Image Files", file ->
+						"$editor.importimage", "$editor.importimage.description", "icon-file-image", (Runnable)() ->
+                            Platform.instance.showFileChooser("$loadimage", "Image Files", file ->
                                 ui.loadGraphics(() -> {
                                     try{
                                         MapTileData data = MapIO.readLegacyPixmap(new Pixmap(file));
@@ -110,15 +110,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                         editor.beginEdit(data, editor.getTags(), false);
                                         view.clearStack();
                                     }catch (Exception e){
-                                        ui.showError(Core.bundle.format("text.editor.errorimageload", Strings.parseException(e, false)));
+                                        ui.showError(Core.bundle.format("editor.errorimageload", Strings.parseException(e, false)));
                                         Log.err(e);
                                     }
                                 }), true, "png")
                     ));
 
-            t.addImageTextButton("$text.editor.export", "icon-save-map", isize, () -> createDialog("$text.editor.export",
-                    "$text.editor.exportfile", "$text.editor.exportfile.description", "icon-file", (Runnable) () ->
-                        Platform.instance.showFileChooser("$text.saveimage", "Map Files", file -> {
+            t.addImageTextButton("$editor.export", "icon-save-map", isize, () -> createDialog("$editor.export",
+                    "$editor.exportfile", "$editor.exportfile.description", "icon-file", (Runnable) () ->
+                        Platform.instance.showFileChooser("$saveimage", "Map Files", file -> {
                             file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
                             FileHandle result = file;
                             ui.loadGraphics(() -> {
@@ -129,7 +129,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                     }
                                     MapIO.writeMap(result.write(false), editor.getTags(), editor.getMap());
                                 }catch(Exception e){
-                                    ui.showError(Core.bundle.format("text.editor.errorimagesave", Strings.parseException(e, false)));
+                                    ui.showError(Core.bundle.format("editor.errorimagesave", Strings.parseException(e, false)));
                                     Log.err(e);
                                 }
                             });
@@ -142,7 +142,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         menu.content().row();
 
-        menu.content().addImageTextButton("$text.quit", "icon-back", isize, () -> {
+        menu.content().addImageTextButton("$quit", "icon-back", isize, () -> {
             tryExit();
             menu.hide();
         }).padTop(-5).size(swidth * 2f + 10, 60f);
@@ -165,7 +165,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     editor.beginEdit(data, meta.tags, false);
                     view.clearStack();
                 }catch(Exception e){
-                    ui.showError(Core.bundle.format("text.editor.errormapload", Strings.parseException(e, false)));
+                    ui.showError(Core.bundle.format("editor.errormapload", Strings.parseException(e, false)));
                     Log.err(e);
                 }
             }));
@@ -222,14 +222,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
         String name = editor.getTags().get("name", "");
 
         if(name.isEmpty()){
-            ui.showError("$text.editor.save.noname");
+            ui.showError("$editor.save.noname");
         }else{
             Map map = world.maps.getByName(name);
             if(map != null && !map.custom){
-                ui.showError("$text.editor.save.overwrite");
+                ui.showError("$editor.save.overwrite");
             }else{
                 world.maps.saveMap(name, editor.getMap(), editor.getTags());
-                ui.showInfoFade("$text.editor.saved");
+                ui.showInfoFade("$editor.saved");
             }
         }
 
@@ -301,7 +301,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 show();
             }catch(Exception e){
                 Log.err(e);
-                ui.showError(Core.bundle.format("text.editor.errorimageload", Strings.parseException(e, false)));
+                ui.showError(Core.bundle.format("editor.errorimageload", Strings.parseException(e, false)));
             }
         });
     }
@@ -398,7 +398,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.row();
 
-                tools.table("underline", t -> t.add("$text.editor.teams"))
+                tools.table("underline", t -> t.add("$editor.teams"))
                         .colspan(3).height(40).width(size * 3f + 3f).padBottom(3);
 
                 tools.row();
@@ -429,14 +429,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     slider.moved(f -> editor.setBrushSize(MapEditor.brushSizes[(int) (float) f]));
 
                     t.top();
-                    t.add("$text.editor.brush");
+                    t.add("$editor.brush");
                     t.row();
                     t.add(slider).width(size * 3f - 20).padTop(4f);
                 }).padTop(5).growX().growY().top();
 
                 mid.row();
 
-                mid.table("underline", t -> t.add("$text.editor.elevation"))
+                mid.table("underline", t -> t.add("$editor.elevation"))
                     .colspan(3).height(40).width(size * 3f + 3f);
 
                 mid.row();
@@ -446,7 +446,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     t.addImageButton("icon-arrow-left", "clear-partial", 16 * 2f, () -> editor.setDrawElevation(editor.getDrawElevation() - 1))
                     .disabled(b -> editor.getDrawElevation() <= -1).size(size);
 
-                    t.label(() -> editor.getDrawElevation() == -1 ? "$text.editor.slope" : (editor.getDrawElevation() + ""))
+                    t.label(() -> editor.getDrawElevation() == -1 ? "$editor.slope" : (editor.getDrawElevation() + ""))
                     .size(size).get().setAlignment(Align.center, Align.center);
 
                     t.addImageButton("icon-arrow-right", "clear-partial", 16 * 2f, () -> editor.setDrawElevation(editor.getDrawElevation() + 1))
@@ -502,7 +502,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     private void tryExit(){
         if(!saved){
-            ui.showConfirm("$text.confirm", "$text.editor.unsaved", this::hide);
+            ui.showConfirm("$confirm", "$editor.unsaved", this::hide);
         }else{
             hide();
         }

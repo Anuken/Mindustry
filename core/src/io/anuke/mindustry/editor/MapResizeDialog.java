@@ -13,7 +13,7 @@ public class MapResizeDialog extends FloatingDialog{
     int width, height;
 
     public MapResizeDialog(MapEditor editor, BiConsumer<Integer, Integer> cons){
-        super("$text.editor.resizemap");
+        super("$editor.resizemap");
         shown(() -> {
             content().clear();
             MapTileData data = editor.getMap();
@@ -29,7 +29,7 @@ public class MapResizeDialog extends FloatingDialog{
                     if(validMapSizes[i] == curr) idx = i;
                 }
 
-                table.add(w ? "$text.width" : "$text.height").padRight(8f);
+                table.add(w ? "$width" : "$height").padRight(8f);
                 ButtonGroup<TextButton> group = new ButtonGroup<>();
                 for(int i = 0; i < validMapSizes.length; i++){
                     int size = validMapSizes[i];
@@ -53,8 +53,8 @@ public class MapResizeDialog extends FloatingDialog{
         });
 
         buttons().defaults().size(200f, 50f);
-        buttons().addButton("$text.cancel", this::hide);
-        buttons().addButton("$text.editor.resize", () -> {
+        buttons().addButton("$cancel", this::hide);
+        buttons().addButton("$editor.resize", () -> {
             cons.accept(width, height);
             hide();
         });

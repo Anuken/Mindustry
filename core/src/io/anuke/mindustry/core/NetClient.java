@@ -70,7 +70,7 @@ public class NetClient implements ApplicationListener{
             reset();
 
             ui.loadfrag.hide();
-            ui.loadfrag.show("$text.connecting.data");
+            ui.loadfrag.show("$connecting.data");
 
             ui.loadfrag.setButton(() -> {
                 ui.loadfrag.hide();
@@ -88,7 +88,7 @@ public class NetClient implements ApplicationListener{
             c.uuid = Platform.instance.getUUID();
 
             if(c.uuid == null){
-                ui.showError("$text.invalidid");
+                ui.showError("$invalidid");
                 ui.loadfrag.hide();
                 disconnectQuietly();
                 return;
@@ -104,7 +104,7 @@ public class NetClient implements ApplicationListener{
 
             state.set(State.menu);
 
-            ui.showError("$text.disconnect");
+            ui.showError("$disconnect");
             connecting = false;
 
             Platform.instance.updateRPC();
@@ -158,7 +158,7 @@ public class NetClient implements ApplicationListener{
             if(reason.extraText() != null){
                 ui.showText(reason.toString(), reason.extraText());
             }else{
-                ui.showText("$text.disconnect", reason.toString());
+                ui.showText("$disconnect", reason.toString());
             }
         }
         ui.loadfrag.hide();
@@ -177,7 +177,7 @@ public class NetClient implements ApplicationListener{
         ui.chatfrag.clearMessages();
         Net.setClientLoaded(false);
 
-        ui.loadfrag.show("$text.connecting.data");
+        ui.loadfrag.show("$connecting.data");
 
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
@@ -276,7 +276,7 @@ public class NetClient implements ApplicationListener{
                 Log.err("Failed to load data!");
                 ui.loadfrag.hide();
                 quiet = true;
-                ui.showError("$text.disconnect.data");
+                ui.showError("$disconnect.data");
                 Net.disconnect();
                 timeoutTime = 0f;
             }

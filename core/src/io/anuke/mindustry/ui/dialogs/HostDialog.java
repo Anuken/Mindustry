@@ -18,14 +18,14 @@ public class HostDialog extends FloatingDialog{
     float w = 300;
 
     public HostDialog(){
-        super("$text.hostserver");
+        super("$hostserver");
 
         Player player = players[0];
 
         addCloseButton();
 
         content().table(t -> {
-            t.add("$text.name").padRight(10);
+            t.add("$name").padRight(10);
             t.addField(Core.settings.getString("name"), text -> {
                 player.name = text;
                 Core.settings.put("name", text);
@@ -47,25 +47,25 @@ public class HostDialog extends FloatingDialog{
 
         content().add().width(65f);
 
-        content().addButton("$text.host", () -> {
+        content().addButton("$host", () -> {
             if(Core.settings.getString("name").trim().isEmpty()){
-                ui.showInfo("$text.noname");
+                ui.showInfo("$noname");
                 return;
             }
 
-            ui.loadfrag.show("$text.hosting");
+            ui.loadfrag.show("$hosting");
             Time.runTask(5f, () -> {
                 try{
                     Net.host(Vars.port);
                     player.isAdmin = true;
                 }catch(IOException e){
-                    ui.showError(Core.bundle.format("text.server.error", Strings.parseException(e, false)));
+                    ui.showError(Core.bundle.format("server.error", Strings.parseException(e, false)));
                 }
                 ui.loadfrag.hide();
                 hide();
             });
         }).width(w).height(70f);
 
-        content().addButton("?", () -> ui.showInfo("$text.host.info")).size(65f, 70f).padLeft(6f);
+        content().addButton("?", () -> ui.showInfo("$host.info")).size(65f, 70f).padLeft(6f);
     }
 }

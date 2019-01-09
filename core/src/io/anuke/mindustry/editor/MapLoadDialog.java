@@ -16,12 +16,12 @@ public class MapLoadDialog extends FloatingDialog{
     private Map selected = null;
 
     public MapLoadDialog(Consumer<Map> loader){
-        super("$text.editor.loadmap");
+        super("$editor.loadmap");
 
         shown(this::rebuild);
         rebuild();
 
-        TextButton button = new TextButton("$text.load");
+        TextButton button = new TextButton("$load");
         button.setDisabled(() -> selected == null);
         button.clicked(() -> {
             if(selected != null){
@@ -31,7 +31,7 @@ public class MapLoadDialog extends FloatingDialog{
         });
 
         buttons().defaults().size(200f, 50f);
-        buttons().addButton("$text.cancel", this::hide);
+        buttons().addButton("$cancel", this::hide);
         buttons().add(button);
     }
 
@@ -67,9 +67,9 @@ public class MapLoadDialog extends FloatingDialog{
         }
 
         if(world.maps.all().size == 0){
-            table.add("$text.maps.none").center();
+            table.add("$maps.none").center();
         }else{
-            content().add("$text.editor.loadmap");
+            content().add("$editor.loadmap");
         }
 
         content().row();

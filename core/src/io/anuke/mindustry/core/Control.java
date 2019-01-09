@@ -142,7 +142,7 @@ public class Control implements ApplicationListener{
                     Net.host(port);
                     players[0].isAdmin = true;
                 }catch(IOException e){
-                    ui.showError(Core.bundle.format("text.server.error", Strings.parseException(e, false)));
+                    ui.showError(Core.bundle.format("server.error", Strings.parseException(e, false)));
                     Core.app.post(() -> state.set(State.menu));
                 }
             }
@@ -254,7 +254,7 @@ public class Control implements ApplicationListener{
 
             Time.run(5f, () -> {
                 FloatingDialog dialog = new FloatingDialog("WARNING!");
-                dialog.buttons().addButton("$text.ok", () -> {
+                dialog.buttons().addButton("$ok", () -> {
                     dialog.hide();
                     Core.settings.put("4.0-warning-2", true);
                     Core.settings.save();

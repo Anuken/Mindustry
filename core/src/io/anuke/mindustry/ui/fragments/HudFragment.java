@@ -130,9 +130,9 @@ public class HudFragment extends Fragment{
 
             //fps display
             infolabel = cont.table(t -> {
-                IntFormat fps = new IntFormat("text.fps");
-                IntFormat tps = new IntFormat("text.tps");
-                IntFormat ping = new IntFormat("text.ping");
+                IntFormat fps = new IntFormat("fps");
+                IntFormat tps = new IntFormat("tps");
+                IntFormat ping = new IntFormat("ping");
                 t.label(() -> fps.get(Core.graphics.getFramesPerSecond())).padRight(10);
                 t.row();
                 if(Net.hasClient()){
@@ -152,12 +152,12 @@ public class HudFragment extends Fragment{
         //paused table
         parent.fill(t -> {
             t.top().visible(() -> state.is(State.paused) && !Net.active());
-            t.table("button", top -> top.add("$text.paused").pad(6f));
+            t.table("button", top -> top.add("$paused").pad(6f));
         });
 
         parent.fill(t -> {
             t.visible(() -> netServer.isWaitingForPlayers() && !state.is(State.menu));
-            t.table("button", c -> c.add("$text.waiting.players"));
+            t.table("button", c -> c.add("$waiting.players"));
         });
 
         //'core is under attack' table
@@ -195,14 +195,14 @@ public class HudFragment extends Fragment{
 
                 return coreAttackOpacity > 0;
             });
-            t.table("button", top -> top.add("$text.coreattack").pad(2)
+            t.table("button", top -> top.add("$coreattack").pad(2)
                 .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f))));
         });
 
         //'saving' indicator
         parent.fill(t -> {
             t.bottom().visible(() -> !state.is(State.menu) && control.saves.isSaving());
-            t.add("$text.saveload");
+            t.add("$saveload");
         });
 
         blockfrag.build(Core.scene.root);
@@ -258,7 +258,7 @@ public class HudFragment extends Fragment{
 
             //add to table
             table.add(in).padRight(8);
-            table.add("$text.unlocked");
+            table.add("$unlocked");
             table.pack();
 
             //create container table which will align and move
@@ -292,7 +292,7 @@ public class HudFragment extends Fragment{
 
             //correct plurals if needed
             if(esize == 1){
-                ((Label) lastUnlockLayout.getParent().find(e -> e instanceof Label)).setText("$text.unlocked.plural");
+                ((Label) lastUnlockLayout.getParent().find(e -> e instanceof Label)).setText("$unlocked.plural");
             }
 
             lastUnlockLayout.clearChildren();
@@ -326,12 +326,12 @@ public class HudFragment extends Fragment{
     }
 
     public void showTextDialog(String str){
-        new FloatingDialog("$text.mission.info"){{
+        new FloatingDialog("$mission.info"){{
             shouldPause = true;
             setFillParent(false);
             getCell(content()).growX();
             content().margin(15).add(str).width(400f).wrap().get().setAlignment(Align.left, Align.left);
-            buttons().addButton("$text.continue", this::hide).size(140, 60).pad(4);
+            buttons().addButton("$continue", this::hide).size(140, 60).pad(4);
         }}.show();
     }
 
@@ -361,9 +361,9 @@ public class HudFragment extends Fragment{
 
     private void addWaveTable(TextButton table){
 
-        IntFormat wavef = new IntFormat("text.wave");
-        IntFormat enemyf = new IntFormat("text.wave.enemy");
-        IntFormat enemiesf = new IntFormat("text.wave.enemies");
+        IntFormat wavef = new IntFormat("wave");
+        IntFormat enemyf = new IntFormat("wave.enemy");
+        IntFormat enemiesf = new IntFormat("wave.enemies");
 
         table.clearChildren();
         table.touchable(Touchable.enabled);
@@ -375,8 +375,8 @@ public class HudFragment extends Fragment{
                     enemiesf.get(state.enemies())) :
                 wavef.get(state.wave) + "\n" +
                     (!state.mode.disableWaveTimer ?
-                    Core.bundle.format("text.wave.waiting", (int)(state.wavetime/60)) :
-                    Core.bundle.get("text.waiting")))
+                    Core.bundle.format("wave.waiting", (int)(state.wavetime/60)) :
+                    Core.bundle.get("waiting")))
         ).growX().pad(8f);
 
         table.setDisabled(true);

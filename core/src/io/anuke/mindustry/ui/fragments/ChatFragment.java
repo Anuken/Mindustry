@@ -124,7 +124,7 @@ public class ChatFragment extends Table{
                 TextField to = dialog.content().addField("", t-> {}).pad(15).width(250f).get();
                 to.setMaxLength(maxTextLength);
                 to.keyDown(KeyCode.ENTER, () -> dialog.content().find("okb").fireClick());
-                dialog.content().addButton("$text.ok", () -> {
+                dialog.content().addButton("$ok", () -> {
                     chatfield.clearText();
                     chatfield.appendText(to.getText());
                     chatfield.change();

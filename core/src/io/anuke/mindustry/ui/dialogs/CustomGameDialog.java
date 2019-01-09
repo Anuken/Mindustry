@@ -21,7 +21,7 @@ import static io.anuke.mindustry.Vars.*;
 public class CustomGameDialog extends FloatingDialog{
 
     public CustomGameDialog(){
-        super("$text.customgame");
+        super("$customgame");
         addCloseButton();
         shown(this::setup);
 
@@ -40,7 +40,7 @@ public class CustomGameDialog extends FloatingDialog{
 
         Table selmode = new Table();
         ButtonGroup<TextButton> group = new ButtonGroup<>();
-        selmode.add("$text.level.mode").padRight(15f);
+        selmode.add("$level.mode").padRight(15f);
         int i = 0;
 
         Table modes = new Table();
@@ -102,7 +102,7 @@ public class CustomGameDialog extends FloatingDialog{
             image.row();
             image.add("[accent]" + map.getDisplayName()).pad(3f).growX().wrap().get().setAlignment(Align.center, Align.center);
             image.row();
-            image.label((() -> Core.bundle.format("text.level.highscore", Core.settings.getInt("hiscore" + map.name, 0)))).pad(3f);
+            image.label((() -> Core.bundle.format("level.highscore", Core.settings.getInt("hiscore" + map.name, 0)))).pad(3f);
 
             BorderImage border = new BorderImage(map.texture, 3f);
             border.setScaling(Scaling.fit);
@@ -123,10 +123,10 @@ public class CustomGameDialog extends FloatingDialog{
             world.generator.playRandomMap();
         }).growY().get();
         gen.row();
-        gen.add("$text.map.random");
+        gen.add("$map.random");
 
         if(world.maps.all().size == 0){
-            maps.add("$text.maps.none").pad(50);
+            maps.add("$maps.none").pad(50);
         }
 
         content().add(pane).uniformX();
@@ -147,7 +147,7 @@ public class CustomGameDialog extends FloatingDialog{
         }
 
         d.content().add(pane);
-        d.buttons().addButton("$text.ok", d::hide).size(110, 50).pad(10f);
+        d.buttons().addButton("$ok", d::hide).size(110, 50).pad(10f);
         d.show();
     }
 

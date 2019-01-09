@@ -9,7 +9,7 @@ import io.anuke.mindustry.type.ItemType;
 public class DeployDialog extends FloatingDialog{
 
     public DeployDialog(){
-        super("$text.play");
+        super("$play");
 
         shown(this::setup);
     }

@@ -26,7 +26,7 @@ public class AboutDialog extends FloatingDialog{
     private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "trello");
 
     public AboutDialog(){
-        super("$text.about.button");
+        super("$about.button");
 
         Contributors.getContributors(out -> contributors = out, Throwable::printStackTrace);
 
@@ -70,7 +70,7 @@ public class AboutDialog extends FloatingDialog{
 
             table.addImageButton("icon-link", 14 * 3, () -> {
                 if(!Core.net.openURI(link.link)){
-                    ui.showError("$text.linkfail");
+                    ui.showError("$linkfail");
                     Core.app.getClipboard().setContents(link.link);
                 }
             }).size(h - 5, h);
@@ -84,10 +84,10 @@ public class AboutDialog extends FloatingDialog{
 
         addCloseButton();
 
-        buttons().addButton("$text.credits", this::showCredits).size(200f, 64f);
+        buttons().addButton("$credits", this::showCredits).size(200f, 64f);
 
         if(!ios && !OS.isMac){
-            buttons().addButton("$text.changelog.title", ui.changelog::show).size(200f, 64f);
+            buttons().addButton("$changelog.title", ui.changelog::show).size(200f, 64f);
         }
 
         if(UIUtils.portrait()){
@@ -99,14 +99,14 @@ public class AboutDialog extends FloatingDialog{
     }
 
     public void showCredits(){
-        FloatingDialog dialog = new FloatingDialog("$text.credits");
+        FloatingDialog dialog = new FloatingDialog("$credits");
         dialog.addCloseButton();
-        dialog.content().add("$text.credits.text");
+        dialog.content().add("$credits.text");
         dialog.content().row();
         if(!contributors.isEmpty()){
             dialog.content().addImage("blank").color(Palette.accent).fillX().height(3f).pad(3f);
             dialog.content().row();
-            dialog.content().add("$text.contributors");
+            dialog.content().add("$contributors");
             dialog.content().row();
             dialog.content().pane(new Table(){{
                 int i = 0;

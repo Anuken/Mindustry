@@ -56,14 +56,14 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-            play = new MobileButton("icon-play-2", isize, "$text.play", this::showPlaySelect),
-            maps = new MobileButton("icon-map", isize, "$text.maps", ui.maps::show),
-            load = new MobileButton("icon-load", isize, "$text.load", ui.load::show),
-            join = new MobileButton("icon-add", isize, "$text.joingame", ui.join::show),
-            editor = new MobileButton("icon-editor", isize, "$text.editor", () -> ui.loadGraphics(ui.editor::show)),
-            tools = new MobileButton("icon-tools", isize, "$text.settings", ui.settings::show),
-            unlocks = new MobileButton("icon-unlocks", isize, "$text.unlocks", ui.unlocks::show),
-            donate = new MobileButton("icon-donate", isize, "$text.donate", Platform.instance::openDonations);
+            play = new MobileButton("icon-play-2", isize, "$play", this::showPlaySelect),
+            maps = new MobileButton("icon-map", isize, "$maps", ui.maps::show),
+            load = new MobileButton("icon-load", isize, "$load", ui.load::show),
+            join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
+            editor = new MobileButton("icon-editor", isize, "$editor", () -> ui.loadGraphics(ui.editor::show)),
+            tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),
+            unlocks = new MobileButton("icon-unlocks", isize, "$unlocks", ui.unlocks::show),
+            donate = new MobileButton("icon-donate", isize, "$donate", Platform.instance::openDonations);
 
         if(Core.graphics.getWidth() > Core.graphics.getHeight()){
             container.add(play);
@@ -111,29 +111,29 @@ public class MenuFragment extends Fragment{
             out.margin(16);
             out.defaults().size(w, 66f).padTop(5).padRight(5);
 
-            out.add(new MenuButton("icon-play-2", "$text.play", MenuFragment.this::showPlaySelect)).width(bw).colspan(2);
+            out.add(new MenuButton("icon-play-2", "$play", MenuFragment.this::showPlaySelect)).width(bw).colspan(2);
 
             out.row();
 
-            out.add(new MenuButton("icon-editor", "$text.editor", () -> ui.loadGraphics(ui.editor::show)));
+            out.add(new MenuButton("icon-editor", "$editor", () -> ui.loadGraphics(ui.editor::show)));
 
-            out.add(new MenuButton("icon-map", "$text.maps", ui.maps::show));
-
-            out.row();
-
-            out.add(new MenuButton("icon-info", "$text.about.button", ui.about::show));
-
-            out.add(new MenuButton("icon-tools", "$text.settings", ui.settings::show));
+            out.add(new MenuButton("icon-map", "$maps", ui.maps::show));
 
             out.row();
 
-            out.add(new MenuButton("icon-menu", "$text.changelog.title", ui.changelog::show));
+            out.add(new MenuButton("icon-info", "$about.button", ui.about::show));
 
-            out.add(new MenuButton("icon-unlocks", "$text.unlocks", ui.unlocks::show));
+            out.add(new MenuButton("icon-tools", "$settings", ui.settings::show));
 
             out.row();
 
-            out.add(new MenuButton("icon-exit", "$text.quit", Core.app::exit)).width(bw).colspan(2);
+            out.add(new MenuButton("icon-menu", "$changelog.title", ui.changelog::show));
+
+            out.add(new MenuButton("icon-unlocks", "$unlocks", ui.unlocks::show));
+
+            out.row();
+
+            out.add(new MenuButton("icon-exit", "$quit", Core.app::exit)).width(bw).colspan(2);
         });
     }
 
@@ -144,29 +144,29 @@ public class MenuFragment extends Fragment{
         float w = 220f;
         float bw = w * 2f + 10f;
 
-        FloatingDialog dialog = new FloatingDialog("$text.play");
+        FloatingDialog dialog = new FloatingDialog("$play");
         dialog.addCloseButton();
         dialog.content().defaults().height(66f).width(w).padRight(5f);
 
-        dialog.content().add(new MenuButton("icon-play-2", "$text.map.random", () -> {
+        dialog.content().add(new MenuButton("icon-play-2", "$map.random", () -> {
             dialog.hide();
             world.generator.playRandomMap();
         })).width(bw).colspan(2);
         dialog.content().row();
 
-        dialog.content().add(new MenuButton("icon-add", "$text.joingame", () -> {
+        dialog.content().add(new MenuButton("icon-add", "$joingame", () -> {
             ui.join.show();
             dialog.hide();
         }));
 
-        dialog.content().add(new MenuButton("icon-editor", "$text.customgame", () -> {
+        dialog.content().add(new MenuButton("icon-editor", "$customgame", () -> {
             dialog.hide();
             ui.levels.show();
         }));
 
         dialog.content().row();
 
-        dialog.content().add(new MenuButton("icon-load", "$text.loadgame", () -> {
+        dialog.content().add(new MenuButton("icon-load", "$loadgame", () -> {
             ui.load.show();
             dialog.hide();
         })).width(bw).colspan(2);

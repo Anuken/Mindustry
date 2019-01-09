@@ -15,7 +15,7 @@ public class MapSaveDialog extends FloatingDialog{
     private Consumer<String> listener;
 
     public MapSaveDialog(Consumer<String> cons){
-        super("$text.editor.savemap");
+        super("$editor.savemap");
         field = new TextField();
         listener = cons;
 
@@ -27,22 +27,22 @@ public class MapSaveDialog extends FloatingDialog{
                 Map map = world.maps.getByName(field.getText());
                 if(map != null){
                     if(map.custom){
-                        return "$text.editor.overwrite";
+                        return "$editor.overwrite";
                     }else{
-                        return "$text.editor.failoverwrite";
+                        return "$editor.failoverwrite";
                     }
                 }
                 return "";
             }).colspan(2);
             content().row();
-            content().add("$text.editor.mapname").padRight(14f);
+            content().add("$editor.mapname").padRight(14f);
             content().add(field).size(220f, 48f);
         });
 
         buttons().defaults().size(200f, 50f).pad(2f);
-        buttons().addButton("$text.cancel", this::hide);
+        buttons().addButton("$cancel", this::hide);
 
-        TextButton button = new TextButton("$text.save");
+        TextButton button = new TextButton("$save");
         button.clicked(() -> {
             if(!invalid()){
                 cons.accept(field.getText());
@@ -57,7 +57,7 @@ public class MapSaveDialog extends FloatingDialog{
         if(!invalid()){
             listener.accept(field.getText());
         }else{
-            ui.showError("$text.editor.failoverwrite");
+            ui.showError("$editor.failoverwrite");
         }
     }
 

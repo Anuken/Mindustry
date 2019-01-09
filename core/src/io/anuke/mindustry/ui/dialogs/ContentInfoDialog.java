@@ -7,7 +7,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 public class ContentInfoDialog extends FloatingDialog{
 
     public ContentInfoDialog(){
-        super("$text.info.title");
+        super("$info.title");
 
         addCloseButton();
     }

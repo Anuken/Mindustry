@@ -18,7 +18,7 @@ import static io.anuke.mindustry.Vars.*;
 public class UnlocksDialog extends FloatingDialog{
 
     public UnlocksDialog(){
-        super("$text.unlocks");
+        super("$unlocks");
 
         shouldPause = true;
         addCloseButton();

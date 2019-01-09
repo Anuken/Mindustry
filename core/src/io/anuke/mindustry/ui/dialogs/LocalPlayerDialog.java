@@ -13,7 +13,7 @@ import static io.anuke.mindustry.Vars.players;
 public class LocalPlayerDialog extends FloatingDialog{
 
     public LocalPlayerDialog(){
-        super("$text.addplayers");
+        super("$addplayers");
 
         addCloseButton();
         shown(this::rebuild);

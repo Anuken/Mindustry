@@ -15,7 +15,7 @@ public class PausedDialog extends FloatingDialog{
     private Table missionTable;
 
     public PausedDialog(){
-        super("$text.menu");
+        super("$menu");
         shouldPause = true;
         setup();
 
@@ -47,24 +47,24 @@ public class PausedDialog extends FloatingDialog{
             float dw = 210f;
             content().defaults().width(dw).height(50).pad(5f);
 
-            content().addButton("$text.back", this::hide).colspan(2).width(dw*2 + 20f);
+            content().addButton("$back", this::hide).colspan(2).width(dw*2 + 20f);
 
             content().row();
-            content().addButton("$text.unlocks", ui.unlocks::show);
-            content().addButton("$text.settings", ui.settings::show);
+            content().addButton("$unlocks", ui.unlocks::show);
+            content().addButton("$settings", ui.settings::show);
 
             content().row();
-            content().addButton("$text.savegame", save::show);
-            content().addButton("$text.loadgame", load::show).disabled(b -> Net.active());
-
-            content().row();
-
-            content().addButton("$text.hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw*2 + 20f);
+            content().addButton("$savegame", save::show);
+            content().addButton("$loadgame", load::show).disabled(b -> Net.active());
 
             content().row();
 
-            content().addButton("$text.quit", () -> {
-                ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
+            content().addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw*2 + 20f);
+
+            content().row();
+
+            content().addButton("$quit", () -> {
+                ui.showConfirm("$confirm", "$quit.confirm", () -> {
                     if(Net.client()) netClient.disconnectQuietly();
                     runExitSave();
                     hide();
@@ -75,16 +75,16 @@ public class PausedDialog extends FloatingDialog{
             content().defaults().size(120f).pad(5);
             float isize = 14f * 4;
 
-            content().addRowImageTextButton("$text.back", "icon-play-2", isize, this::hide);
-            content().addRowImageTextButton("$text.settings", "icon-tools", isize, ui.settings::show);
-            content().addRowImageTextButton("$text.save", "icon-save", isize, save::show);
+            content().addRowImageTextButton("$back", "icon-play-2", isize, this::hide);
+            content().addRowImageTextButton("$settings", "icon-tools", isize, ui.settings::show);
+            content().addRowImageTextButton("$save", "icon-save", isize, save::show);
 
             content().row();
 
-            content().addRowImageTextButton("$text.load", "icon-load", isize, load::show).disabled(b -> Net.active());
-            content().addRowImageTextButton("$text.hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
-            content().addRowImageTextButton("$text.quit", "icon-quit", isize, () -> {
-                ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
+            content().addRowImageTextButton("$load", "icon-load", isize, load::show).disabled(b -> Net.active());
+            content().addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
+            content().addRowImageTextButton("$quit", "icon-quit", isize, () -> {
+                ui.showConfirm("$confirm", "$quit.confirm", () -> {
                     if(Net.client()) netClient.disconnectQuietly();
                     runExitSave();
                     hide();
@@ -100,12 +100,12 @@ public class PausedDialog extends FloatingDialog{
             return;
         }
 
-        ui.loadLogic("$text.saveload", () -> {
+        ui.loadLogic("$saveload", () -> {
             try{
                 control.saves.getCurrent().save();
             }catch(Throwable e){
                 e.printStackTrace();
-               ui.showError("[accent]" + Core.bundle.get("text.savefail"));
+               ui.showError("[accent]" + Core.bundle.get("savefail"));
             }
             state.set(State.menu);
         });

@@ -10,7 +10,7 @@ public class RestartDialog extends FloatingDialog{
     private Team winner;
 
     public RestartDialog(){
-        super("$text.gameover");
+        super("$gameover");
         setFillParent(false);
         shown(this::rebuild);
     }
@@ -27,20 +27,20 @@ public class RestartDialog extends FloatingDialog{
         buttons().margin(10);
 
         if(state.mode.isPvp){
-            content().add(Core.bundle.format("text.gameover.pvp",winner.localized())).pad(6);
-            buttons().addButton("$text.menu", () -> {
+            content().add(Core.bundle.format("gameover.pvp",winner.localized())).pad(6);
+            buttons().addButton("$menu", () -> {
                 hide();
                 state.set(State.menu);
                 logic.reset();
             }).size(130f, 60f);
         }else{
             if(control.isHighScore()){
-                content().add("$text.highscore").pad(6);
+                content().add("$highscore").pad(6);
                 content().row();
             }
-            content().add(Core.bundle.format("text.wave.lasted", state.wave)).pad(12);
+            content().add(Core.bundle.format("wave.lasted", state.wave)).pad(12);
 
-            buttons().addButton("$text.menu", () -> {
+            buttons().addButton("$menu", () -> {
                 hide();
                 state.set(State.menu);
                 logic.reset();
