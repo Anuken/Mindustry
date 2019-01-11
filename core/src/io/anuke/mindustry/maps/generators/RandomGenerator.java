@@ -9,9 +9,8 @@ public abstract class RandomGenerator extends Generator{
     protected Block floor;
     protected Block block;
 
-    public RandomGenerator(int width, int height, Block floor){
+    public RandomGenerator(int width, int height){
         super(width, height);
-        this.floor = floor;
     }
 
     @Override

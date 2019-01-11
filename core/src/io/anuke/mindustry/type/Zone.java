@@ -8,11 +8,12 @@ import io.anuke.mindustry.maps.generators.Generator;
 
 public class Zone extends UnlockableContent{
     public final String name;
+    public final Generator generator;
     public ItemStack[] deployCost = {};
-    public Generator generator;
 
-    public Zone(String name){
+    public Zone(String name, Generator generator){
         this.name = name;
+        this.generator = generator;
     }
 
     @Override

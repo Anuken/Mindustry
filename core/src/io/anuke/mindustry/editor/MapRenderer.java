@@ -99,7 +99,6 @@ public class MapRenderer implements Disposable{
     private void render(int wx, int wy){
         int x = wx / chunksize, y = wy / chunksize;
         IndexedRenderer mesh = chunks[x][y];
-        //TileDataMarker data = editor.getMap().readAt(wx, wy);
         byte bf = editor.getMap().read(wx, wy, DataPosition.floor);
         byte bw = editor.getMap().read(wx, wy, DataPosition.wall);
         byte btr = editor.getMap().read(wx, wy, DataPosition.rotationTeam);
