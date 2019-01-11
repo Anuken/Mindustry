@@ -173,7 +173,7 @@ public class LoadDialog extends FloatingDialog{
         hide();
         ui.paused.hide();
 
-        ui.loadLogic(() -> {
+        ui.loadAnd(() -> {
             try{
                 slot.load();
                 state.set(State.playing);

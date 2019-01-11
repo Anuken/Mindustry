@@ -118,12 +118,13 @@ public class CustomGameDialog extends FloatingDialog{
             i++;
         }
 
+        /*
         ImageButton gen = maps.addImageButton("icon-editor", "clear", 16*4, () -> {
             hide();
             world.generator.playRandomMap();
         }).growY().get();
         gen.row();
-        gen.add("$map.random");
+        gen.add("$map.random");*/
 
         if(world.maps.all().size == 0){
             maps.add("$maps.none").pad(50);

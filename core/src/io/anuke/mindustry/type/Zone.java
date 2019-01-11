@@ -4,10 +4,12 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.maps.generators.Generator;
 
 public class Zone extends UnlockableContent{
     public final String name;
     public ItemStack[] deployCost = {};
+    public Generator generator;
 
     public Zone(String name){
         this.name = name;

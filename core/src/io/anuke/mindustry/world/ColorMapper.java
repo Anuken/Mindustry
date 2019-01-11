@@ -17,24 +17,12 @@ public class ColorMapper implements ContentList{
         return colorMap.get(block, 0);
     }
 
-    public static int colorFor(Block floor, Block wall, Team team, int elevation, byte cliffs){
+    public static int colorFor(Block floor, Block wall, Team team){
         if(wall.synthetic()){
             return team.intColor;
         }
         int color = getBlockColor(wall);
         if(color == 0) color = ColorMapper.getBlockColor(floor);
-        if(elevation > 0){
-            if(tmpColors.get() == null) tmpColors.set(new Color());
-            Color tmpColor = tmpColors.get();
-            tmpColor.set(color);
-            float maxMult = 1f/Math.max(Math.max(tmpColor.r, tmpColor.g), tmpColor.b) ;
-            float mul = Math.min(0.7f + elevation / 5f, maxMult);
-            if((cliffs & ((1 << 6))) != 0){
-                mul -= 0.35f;
-            }
-            tmpColor.mul(mul, mul, mul, 1f);
-            color = Color.rgba8888(tmpColor);
-        }
         return color;
     }
 

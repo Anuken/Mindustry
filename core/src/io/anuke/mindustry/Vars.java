@@ -57,10 +57,6 @@ public class Vars{
     public static final float itemSize = 5f;
     /**size of tiles in units*/
     public static final int tilesize = 8;
-    /**size of sectors in tiles*/
-    public static final int sectorSize = 256;
-    /**specific number indicating 'invalid' sector*/
-    public static final int invalidSector = Integer.MAX_VALUE;
     /**all choosable player colors in join/host dialog*/
     public static final Color[] playerColors = {
         Color.valueOf("82759a"),

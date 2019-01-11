@@ -249,11 +249,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 if(tile.block() != Blocks.air){
                     onLiquid = false;
                 }
-
-                //on slope
-                if(tile.getElevation() == -1){
-                    velocity.scl(0.7f);
-                }
             }
 
             if(onLiquid && velocity.len() > 0.4f && Mathf.chance((velocity.len() * floor.speedMultiplier) * 0.06f * Time.delta())){

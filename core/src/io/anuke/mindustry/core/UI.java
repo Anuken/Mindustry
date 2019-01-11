@@ -200,29 +200,16 @@ public class UI implements ApplicationListener{
         generator.dispose();
     }
 
-    public void loadGraphics(Runnable call){
-        loadGraphics("$loading", call);
+    public void loadAnd(Runnable call){
+        loadAnd("$loading", call);
     }
 
-    public void loadGraphics(String text, Runnable call){
+    public void loadAnd(String text, Runnable call){
         loadfrag.show(text);
         Time.runTask(7f, () -> {
             call.run();
             loadfrag.hide();
         });
-    }
-
-    public void loadLogic(Runnable call){
-        loadLogic("$loading", call);
-    }
-
-    public void loadLogic(String text, Runnable call){
-        loadfrag.show(text);
-        Time.runTask(7f, () ->
-            Core.app.post(() -> {
-                call.run();
-                loadfrag.hide();
-            }));
     }
 
     public void showTextInput(String titleText, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){

@@ -183,7 +183,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
                 float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Time.delta();
                 for(Point2 point : Geometry.d4){
                     Tile other = world.tile(tile.x + point.x, tile.y + point.y);
-                    if(other != null && other.block() == Blocks.air && !other.hasCliffs()){
+                    if(other != null && other.block() == Blocks.air){
                         deposit(other, tile, liquid, deposited, generation + 1);
                         amount -= deposited / 2f; //tweak to speed up/slow down puddle propagation
                     }

@@ -53,7 +53,7 @@ public class MapIO{
                 byte elev = y >= data.height() - 1 ? 0 : data.read(x, y + 1, DataPosition.elevation);
                 Block floor = content.block(marker.floor);
                 Block wall = content.block(marker.wall);
-                int color = ColorMapper.colorFor(floor, wall, Team.all[marker.team], marker.elevation + 1, elev > marker.elevation ? (byte)(1 << 6) : (byte)0);
+                int color = ColorMapper.colorFor(floor, wall, Team.all[marker.team]);
                 pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, color);
             }
         }

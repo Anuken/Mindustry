@@ -60,7 +60,7 @@ public class MenuFragment extends Fragment{
             maps = new MobileButton("icon-map", isize, "$maps", ui.maps::show),
             load = new MobileButton("icon-load", isize, "$load", ui.load::show),
             join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
-            editor = new MobileButton("icon-editor", isize, "$editor", () -> ui.loadGraphics(ui.editor::show)),
+            editor = new MobileButton("icon-editor", isize, "$editor", () -> ui.loadAnd(ui.editor::show)),
             tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),
             unlocks = new MobileButton("icon-unlocks", isize, "$unlocks", ui.unlocks::show),
             donate = new MobileButton("icon-donate", isize, "$donate", Platform.instance::openDonations);
@@ -115,7 +115,7 @@ public class MenuFragment extends Fragment{
 
             out.row();
 
-            out.add(new MenuButton("icon-editor", "$editor", () -> ui.loadGraphics(ui.editor::show)));
+            out.add(new MenuButton("icon-editor", "$editor", () -> ui.loadAnd(ui.editor::show)));
 
             out.add(new MenuButton("icon-map", "$maps", ui.maps::show));
 

@@ -8,7 +8,7 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.type.Zone;
 
-import static io.anuke.mindustry.Vars.data;
+import static io.anuke.mindustry.Vars.*;
 
 public class DeployDialog extends FloatingDialog{
 
@@ -45,7 +45,7 @@ public class DeployDialog extends FloatingDialog{
                         t.addButton(zone.localizedName(), () -> {
                             data.removeItems(zone.deployCost);
                             hide();
-                            Vars.world.generator.playRandomMap();
+                            world.playGenerator(zone.generator);
                         }).size(150f).disabled(b -> !data.hasItems(zone.deployCost));
                         t.row();
                         t.table(req -> {

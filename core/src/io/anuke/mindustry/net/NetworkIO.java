@@ -58,7 +58,6 @@ public class NetworkIO{
 
                 stream.writeByte(tile.getFloorID());
                 stream.writeByte(tile.getBlockID());
-                stream.writeByte(tile.getElevation());
 
                 if(tile.block() instanceof BlockPart){
                     stream.writeByte(tile.link);
@@ -79,7 +78,7 @@ public class NetworkIO{
                     for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                         Tile nextTile = world.tile(j % world.width(), j / world.width());
 
-                        if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getElevation() != tile.getElevation()){
+                        if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air){
                             break;
                         }
 
@@ -165,10 +164,8 @@ public class NetworkIO{
                 int x = i % width, y = i / width;
                 byte floorid = stream.readByte();
                 byte wallid = stream.readByte();
-                byte elevation = stream.readByte();
 
                 Tile tile = new Tile(x, y, floorid, wallid);
-                tile.setElevation(elevation);
 
                 if(wallid == Blocks.blockpart.id){
                     tile.link = stream.readByte();
@@ -196,7 +193,6 @@ public class NetworkIO{
                     for(int j = i + 1; j < i + 1 + consecutives; j++){
                         int newx = j % width, newy = j / width;
                         Tile newTile = new Tile(newx, newy, floorid, wallid);
-                        newTile.setElevation(elevation);
                         tiles[newx][newy] = newTile;
                     }
 

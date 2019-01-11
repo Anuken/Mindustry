@@ -86,7 +86,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     createDialog("$editor.import",
                             "$editor.importmap", "$editor.importmap.description", "icon-load-map", (Runnable) loadDialog::show,
                             "$editor.importfile", "$editor.importfile.description", "icon-file", (Runnable) () ->
-                                Platform.instance.showFileChooser("$loadimage", "Map Files", file -> ui.loadGraphics(() -> {
+                                Platform.instance.showFileChooser("$loadimage", "Map Files", file -> ui.loadAnd(() -> {
                                     try{
                                         DataInputStream stream = new DataInputStream(file.read());
 
@@ -103,7 +103,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
 						"$editor.importimage", "$editor.importimage.description", "icon-file-image", (Runnable)() ->
                             Platform.instance.showFileChooser("$loadimage", "Image Files", file ->
-                                ui.loadGraphics(() -> {
+                                ui.loadAnd(() -> {
                                     try{
                                         MapTileData data = MapIO.readLegacyPixmap(new Pixmap(file));
 
@@ -121,7 +121,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         Platform.instance.showFileChooser("$saveimage", "Map Files", file -> {
                             file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
                             FileHandle result = file;
-                            ui.loadGraphics(() -> {
+                            ui.loadAnd(() -> {
 
                                 try{
                                     if(!editor.getTags().containsKey("name")){
@@ -149,7 +149,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         resizeDialog = new MapResizeDialog(editor, (x, y) -> {
             if(!(editor.getMap().width() == x && editor.getMap().height() == y)){
-                ui.loadGraphics(() -> {
+                ui.loadAnd(() -> {
                     editor.resize(x, y);
                     view.clearStack();
                 });
@@ -157,7 +157,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
 
         loadDialog = new MapLoadDialog(map ->
-            ui.loadGraphics(() -> {
+            ui.loadAnd(() -> {
                 try(DataInputStream stream = new DataInputStream(map.stream.get())){
                     MapMeta meta = MapIO.readMapMeta(stream);
                     MapTileData data = MapIO.readTileData(stream, meta, false);
@@ -291,7 +291,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     public void beginEditMap(InputStream is){
-        ui.loadGraphics(() -> {
+        ui.loadAnd(() -> {
             try{
                 shownWithMap = true;
                 DataInputStream stream = new DataInputStream(is);
@@ -432,26 +432,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     t.add("$editor.brush");
                     t.row();
                     t.add(slider).width(size * 3f - 20).padTop(4f);
-                }).padTop(5).growX().growY().top();
-
-                mid.row();
-
-                mid.table("underline", t -> t.add("$editor.elevation"))
-                    .colspan(3).height(40).width(size * 3f + 3f);
-
-                mid.row();
-
-                mid.table("underline", t -> {
-                    t.margin(0);
-                    t.addImageButton("icon-arrow-left", "clear-partial", 16 * 2f, () -> editor.setDrawElevation(editor.getDrawElevation() - 1))
-                    .disabled(b -> editor.getDrawElevation() <= -1).size(size);
-
-                    t.label(() -> editor.getDrawElevation() == -1 ? "$editor.slope" : (editor.getDrawElevation() + ""))
-                    .size(size).get().setAlignment(Align.center, Align.center);
-
-                    t.addImageButton("icon-arrow-right", "clear-partial", 16 * 2f, () -> editor.setDrawElevation(editor.getDrawElevation() + 1))
-                    .disabled(b -> editor.getDrawElevation() >= 63).size(size).name("aaaaa");
-                }).colspan(3).height(size).width(size * 3f + 3f);
+                }).padTop(5).growX().top();
 
             }).margin(0).left().growY();
 

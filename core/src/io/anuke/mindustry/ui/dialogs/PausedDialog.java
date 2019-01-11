@@ -100,7 +100,7 @@ public class PausedDialog extends FloatingDialog{
             return;
         }
 
-        ui.loadLogic("$saveload", () -> {
+        ui.loadAnd("$saveload", () -> {
             try{
                 control.saves.getCurrent().save();
             }catch(Throwable e){

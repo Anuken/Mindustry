@@ -4,8 +4,8 @@ import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.entities.EntityQuery;
-import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
@@ -20,18 +20,18 @@ import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.maps.MapTileData;
+import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.maps.Maps;
-import io.anuke.mindustry.maps.WorldGenerator;
+import io.anuke.mindustry.maps.generators.Generator;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.OreBlock;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class World implements ApplicationListener{
     public final Maps maps = new Maps();
-    public final WorldGenerator generator = new WorldGenerator();
     public final BlockIndexer indexer = new BlockIndexer();
     public final WaveSpawner spawner = new WaveSpawner();
     public final Pathfinder pathfinder = new Pathfinder();
@@ -172,10 +172,6 @@ public class World implements ApplicationListener{
                 Tile tile = tiles[x][y];
                 tile.updateOcclusion();
 
-                if(tile.floor() instanceof OreBlock && tile.hasCliffs()){
-                    tile.setFloor(((OreBlock) tile.floor()).base);
-                }
-
                 if(tile.entity != null){
                     tile.entity.updateProximity();
                 }
@@ -192,6 +188,24 @@ public class World implements ApplicationListener{
         return generating;
     }
 
+    public void playGenerator(Generator generator){
+        ui.loadAnd(() -> {
+            logic.reset();
+            loadGenerator(generator);
+            logic.play();
+        });
+    }
+
+    public void loadGenerator(Generator generator){
+        beginMapLoad();
+
+        createTiles(generator.width, generator.height);
+        generator.generate(tiles);
+        prepareTiles(tiles);
+
+        endMapLoad();
+    }
+
     public void loadMap(Map map){
         beginMapLoad();
         this.currentMap = map;
@@ -200,11 +214,9 @@ public class World implements ApplicationListener{
 
         createTiles(width, height);
 
-        EntityQuery.resizeTree(0, 0, width * tilesize, height * tilesize);
-
         try{
-            generator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), Mathf.random(99999));
-        } catch(Exception e){
+            loadTileData(tiles, MapIO.readTileData(map, true));
+        }catch(Exception e){
             Log.err(e);
             if(!headless){
                 ui.showError("$map.invalid");
@@ -366,6 +378,79 @@ public class World implements ApplicationListener{
             if(e2 < dx){
                 err = err + dx;
                 y0 = y0 + sy;
+            }
+        }
+    }
+
+    /**Loads raw map tile data into a Tile[][] array, setting up multiblocks, cliffs and ores. */
+    void loadTileData(Tile[][] tiles, MapTileData data){
+        data.position(0, 0);
+        TileDataMarker marker = data.newDataMarker();
+
+        for(int y = 0; y < data.height(); y++){
+            for(int x = 0; x < data.width(); x++){
+                data.read(marker);
+
+                tiles[x][y] = new Tile(x, y, marker.floor, marker.wall == Blocks.blockpart.id ? 0 : marker.wall, marker.rotation, marker.team);
+            }
+        }
+
+        prepareTiles(tiles);
+    }
+
+    /**'Prepares' a tile array by:<br>
+     * - setting up multiblocks<br>
+     * - updating occlusion<br>
+     * Usually used before placing structures on a tile array.*/
+    void prepareTiles(Tile[][] tiles){
+
+        //find multiblocks
+        IntArray multiblocks = new IntArray();
+
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
+
+                if(tile.block().isMultiblock()){
+                    multiblocks.add(tile.pos());
+                }
+            }
+        }
+
+        //place multiblocks now
+        for(int i = 0; i < multiblocks.size; i++){
+            int pos = multiblocks.get(i);
+
+            int x = Pos.x(pos);
+            int y = Pos.y(pos);
+
+            Block result = tiles[x][y].block();
+            Team team = tiles[x][y].getTeam();
+
+            int offsetx = -(result.size - 1) / 2;
+            int offsety = -(result.size - 1) / 2;
+
+            for(int dx = 0; dx < result.size; dx++){
+                for(int dy = 0; dy < result.size; dy++){
+                    int worldx = dx + offsetx + x;
+                    int worldy = dy + offsety + y;
+                    if(!(worldx == x && worldy == y)){
+                        Tile toplace = world.tile(worldx, worldy);
+                        if(toplace != null){
+                            toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));
+                            toplace.setTeam(team);
+                        }
+                    }
+                }
+            }
+        }
+
+        //update cliffs, occlusion data
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
+
+                tile.updateOcclusion();
             }
         }
     }

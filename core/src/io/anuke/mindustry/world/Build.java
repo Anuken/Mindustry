@@ -149,8 +149,8 @@ public class Build{
             for(int dx = 0; dx < type.size; dx++){
                 for(int dy = 0; dy < type.size; dy++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace)
-                            || other.hasCliffs() || !other.floor().placeableOn ||
+                    if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) ||
+                            !other.floor().placeableOn ||
                             (other.floor().isLiquid && !type.floating)){
                         return false;
                     }
@@ -161,7 +161,7 @@ public class Build{
             return (tile.getTeam() == Team.none || tile.getTeam() == team)
                     && contactsGround(tile.x, tile.y, type)
                     && (!tile.floor().isLiquid || type.floating)
-                    && tile.floor().placeableOn && !tile.hasCliffs()
+                    && tile.floor().placeableOn
                     && ((type.canReplace(tile.block())
                     && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
                     && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
