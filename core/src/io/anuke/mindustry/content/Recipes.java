@@ -1,7 +1,6 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.type.Recipe.RecipeVisibility;
@@ -13,11 +12,11 @@ public class Recipes implements ContentList{
     @Override
     public void load(){
         //DEBUG
-        new Recipe(distribution, Blocks.itemSource).setMode(GameMode.sandbox).setHidden(true).setAlwaysUnlocked(true);
-        new Recipe(distribution, Blocks.itemVoid).setMode(GameMode.sandbox).setHidden(true).setAlwaysUnlocked(true);
-        new Recipe(liquid, Blocks.liquidSource).setMode(GameMode.sandbox).setHidden(true).setAlwaysUnlocked(true);
-        new Recipe(power, Blocks.powerVoid).setMode(GameMode.sandbox).setHidden(true).setAlwaysUnlocked(true);
-        new Recipe(power, Blocks.powerSource).setMode(GameMode.sandbox).setHidden(true).setAlwaysUnlocked(true);
+        new Recipe(distribution, Blocks.itemSource).setVisible(RecipeVisibility.sandboxOnly).setHidden(true).setAlwaysUnlocked(true);
+        new Recipe(distribution, Blocks.itemVoid).setVisible(RecipeVisibility.sandboxOnly).setHidden(true).setAlwaysUnlocked(true);
+        new Recipe(liquid, Blocks.liquidSource).setVisible(RecipeVisibility.sandboxOnly).setHidden(true).setAlwaysUnlocked(true);
+        new Recipe(power, Blocks.powerVoid).setVisible(RecipeVisibility.sandboxOnly).setHidden(true).setAlwaysUnlocked(true);
+        new Recipe(power, Blocks.powerSource).setVisible(RecipeVisibility.sandboxOnly).setHidden(true).setAlwaysUnlocked(true);
 
         //DEFENSE
 

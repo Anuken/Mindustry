@@ -16,8 +16,6 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.game.EventType.SectorCompleteEvent;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
@@ -139,7 +137,7 @@ public class ServerControl implements ApplicationListener{
                         while(map == previous) map = maps.random();
                     }
 
-                    Call.onInfoMessage((state.mode.isPvp
+                    Call.onInfoMessage((state.rules.pvp
                     ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
                     + "\nNext selected map:[accent] "+map.name+"[]"
                     + (map.meta.author() != null ? " by[accent] " + map.meta.author() + "[]" : "") + "."+
@@ -188,7 +186,7 @@ public class ServerControl implements ApplicationListener{
             info("Stopped server.");
         });
 
-        handler.register("host", "[mapname] [mode]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "[mapname]", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
@@ -212,18 +210,7 @@ public class ServerControl implements ApplicationListener{
 
 
                 info("Loading map...");
-
-                if(arg.length > 1){
-                    GameMode mode;
-                    try{
-                        mode = GameMode.valueOf(arg[1]);
-                    }catch(IllegalArgumentException e){
-                        err("No gamemode '{0}' found.", arg[1]);
-                        return;
-                    }
-
-                    state.mode = mode;
-                }
+                err("TODO select gamemode");
 
                 logic.reset();
                 world.loadMap(result);
@@ -231,7 +218,7 @@ public class ServerControl implements ApplicationListener{
 
             }else{
                 //TODO
-                info("TODO play generated map");
+                err("TODO play generated map");
             }
 
             info("Map loaded.");
@@ -266,9 +253,9 @@ public class ServerControl implements ApplicationListener{
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
-                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1} &lb/&ly {2} &lb/&ly {3}", Strings.capitalize(world.getMap().name), state.wave, Strings.capitalize(state.difficulty.name()), Strings.capitalize(state.mode.name()));
+                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1} &lb/&ly {2} &lb/&ly {3}", Strings.capitalize(world.getMap().name), state.wave);
 
-                if(state.mode.disableWaveTimer){
+                if(!state.rules.waves){
                     info("&ly  {0} enemies.", unitGroups[Team.red.ordinal()].size());
                 }else{
                     info("&ly  {0} seconds until next wave.", (int) (state.wavetime / 60));
@@ -301,7 +288,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
             try{
-                state.difficulty = Difficulty.valueOf(arg[0]);
+                state.rules.waveSpacing = Difficulty.valueOf(arg[0]).waveTime;
                 info("Difficulty set to '{0}'.", arg[0]);
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);

@@ -330,10 +330,8 @@ public abstract class InputHandler implements InputProcessor{
 
     public boolean validPlace(int x, int y, Block type, int rotation){
         for(Tile tile : state.teams.get(player.getTeam()).cores){
-            if(tile.dst(x * tilesize, y * tilesize) < coreBuildRange){
-                return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
-                Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
-            }
+            return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
+            Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
         }
 
         return false;

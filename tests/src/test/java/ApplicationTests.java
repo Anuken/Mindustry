@@ -198,7 +198,7 @@ public class ApplicationTests{
 
     @Test
     void inventoryDeposit(){
-        depositTest(Blocks.smelter, Items.copper);
+        depositTest(Blocks.surgeSmelter, Items.copper);
         depositTest(Blocks.vault, Items.copper);
         depositTest(Blocks.thoriumReactor, Items.thorium);
     }

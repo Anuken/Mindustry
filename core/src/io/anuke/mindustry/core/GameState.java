@@ -1,11 +1,10 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.mindustry.game.Difficulty;
+import io.anuke.arc.Events;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
-import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.net.Net;
-import io.anuke.arc.Events;
 
 import static io.anuke.mindustry.Vars.unitGroups;
 import static io.anuke.mindustry.Vars.waveTeam;
@@ -13,14 +12,12 @@ import static io.anuke.mindustry.Vars.waveTeam;
 public class GameState{
     /**Current wave number, can be anything in non-wave modes.*/
     public int wave = 1;
-    /**Wave countdown in ticks.*/
+    /**Wave time in ticks.*/
     public float wavetime;
     /**Whether the game is in game over state.*/
     public boolean gameOver = false;
-    /**The current game mode.*/
-    public GameMode mode = GameMode.waves;
-    /**The current difficulty for wave modes.*/
-    public Difficulty difficulty = Difficulty.normal;
+    /**The current game rules.*/
+    public Rules rules = new Rules();
     /**Team data. Gets reset every new game.*/
     public Teams teams = new Teams();
     /**Number of enemies in the game; only used clientside in servers.*/

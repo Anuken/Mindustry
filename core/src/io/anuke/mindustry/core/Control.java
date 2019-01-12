@@ -113,18 +113,7 @@ public class Control implements ApplicationListener{
             saves.resetSave();
         });
 
-        Events.on(WaveEvent.class, event -> {
-
-            int last = Core.settings.getInt("hiscore" + world.getMap().name, 0);
-
-            if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer){
-                Core.settings.put("hiscore" + world.getMap().name, state.wave);
-                Core.settings.save();
-                hiscore = true;
-            }
-
-            Platform.instance.updateRPC();
-        });
+        //todo high scores for custom maps, as well as other statistics
 
         Events.on(GameOverEvent.class, event -> {
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
@@ -134,7 +123,7 @@ public class Control implements ApplicationListener{
 
         //autohost for pvp sectors
         Events.on(WorldLoadEvent.class, event -> {
-            if(state.mode.isPvp && !Net.active()){
+            if(state.rules.pvp && !Net.active()){
                 try{
                     Net.host(port);
                     players[0].isAdmin = true;

@@ -235,7 +235,7 @@ public class World implements ApplicationListener{
             if(state.teams.get(players[0].getTeam()).cores.size == 0){
                 ui.showError("$map.nospawn");
                 invalidMap = true;
-            }else if(state.mode.isPvp){
+            }else if(state.rules.pvp){ //pvp maps need two cores to  be valid
                 invalidMap = true;
                 for(Team team : Team.all){
                     if(state.teams.get(team).cores.size != 0 && team != players[0].getTeam()){

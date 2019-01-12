@@ -1,7 +1,6 @@
 package io.anuke.mindustry.io;
 
 import io.anuke.mindustry.game.Difficulty;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.maps.Map;
 
 import static io.anuke.mindustry.Vars.world;
@@ -11,7 +10,6 @@ public class SaveMeta{
     public int build;
     public long timestamp;
     public long timePlayed;
-    public GameMode mode;
     public Map map;
     public int wave;
     public Difficulty difficulty;
@@ -21,7 +19,6 @@ public class SaveMeta{
         this.build = build;
         this.timestamp = timestamp;
         this.timePlayed = timePlayed;
-        this.mode = GameMode.values()[mode];
         this.map = world.maps.getByName(map);
         this.wave = wave;
         this.difficulty = difficulty;

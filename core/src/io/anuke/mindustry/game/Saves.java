@@ -215,10 +215,6 @@ public class Saves{
             return meta.difficulty;
         }
 
-        public GameMode getMode(){
-            return meta.mode;
-        }
-
         public boolean isAutosave(){
             return Core.settings.getBool("save-" + index + "-autosave", true);
         }

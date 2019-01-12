@@ -185,7 +185,7 @@ public class CoreBlock extends StorageBlock{
             }
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += entity.delta();
-            entity.progress += 1f / state.mode.respawnTime * entity.delta();
+            entity.progress += 1f / state.rules.respawnTime * entity.delta();
 
             if(entity.progress >= 1f){
                 Call.onUnitRespawn(tile, entity.currentUnit);

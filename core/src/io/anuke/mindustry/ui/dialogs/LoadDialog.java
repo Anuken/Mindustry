@@ -112,9 +112,7 @@ public class LoadDialog extends FloatingDialog{
 
             button.defaults().padBottom(3);
             button.row();
-            button.add(Core.bundle.format("save.map", color + (slot.getMap() == null ? "Unknown" : slot.getMap().meta.name())));
-            button.row();
-            button.add(Core.bundle.get("level.mode") + " " + color + slot.getMode());
+            button.add(Core.bundle.format("save.map", color + (slot.getMap() == null ? Core.bundle.get("unknown") : slot.getMap().meta.name())));
             button.row();
             button.add(Core.bundle.format("save.wave", color + slot.getWave()));
             button.row();

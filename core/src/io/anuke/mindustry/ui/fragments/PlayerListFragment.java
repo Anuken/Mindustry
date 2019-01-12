@@ -1,13 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.util.Interval;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetConnection;
-import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.scene.Group;
@@ -15,7 +8,13 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Timer;
+import io.anuke.arc.util.Interval;
+import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetConnection;
+import io.anuke.mindustry.net.Packets.AdminAction;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -137,7 +136,7 @@ public class PlayerListFragment extends Fragment{
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
             content.row();
-            content.addImage("blank").height(3f).color(state.mode.isPvp ? player.getTeam().color : Palette.accent).growX();
+            content.addImage("blank").height(3f).color(state.rules.pvp ? player.getTeam().color : Palette.accent).growX();
             content.row();
         });
 

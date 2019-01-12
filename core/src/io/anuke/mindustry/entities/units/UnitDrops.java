@@ -12,7 +12,7 @@ public class UnitDrops{
 
     public static void dropItems(BaseUnit unit){
         //items only dropped in waves for enemy team
-        if(unit.getTeam() != Vars.waveTeam || Vars.state.mode.disableWaves){
+        if(unit.getTeam() != Vars.waveTeam || !Vars.state.rules.unitDrops){
             return;
         }
 

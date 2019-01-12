@@ -26,7 +26,7 @@ public class RestartDialog extends FloatingDialog{
 
         buttons.margin(10);
 
-        if(state.mode.isPvp){
+        if(state.rules.pvp){
             cont.add(Core.bundle.format("gameover.pvp",winner.localized())).pad(6);
             buttons.addButton("$menu", () -> {
                 hide();

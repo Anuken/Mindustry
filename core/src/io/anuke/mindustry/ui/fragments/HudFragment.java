@@ -369,18 +369,18 @@ public class HudFragment extends Fragment{
         table.touchable(Touchable.enabled);
 
         table.labelWrap(() ->
-                (state.enemies() > 0 && state.mode.disableWaveTimer ?
+                (state.enemies() > 0 && !state.rules.waveTimer ?
                 wavef.get(state.wave) + "\n" + (state.enemies() == 1 ?
                     enemyf.get(state.enemies()) :
                     enemiesf.get(state.enemies())) :
                 wavef.get(state.wave) + "\n" +
-                    (!state.mode.disableWaveTimer ?
+                    (state.rules.waveTimer ?
                     Core.bundle.format("wave.waiting", (int)(state.wavetime/60)) :
                     Core.bundle.get("waiting")))
         ).growX().pad(8f);
 
         table.setDisabled(true);
-        table.visible(() -> !(state.mode.disableWaves || !state.mode.showMission));
+        table.visible(() -> state.rules.waves);
     }
 
     private void addPlayButton(Table table){
@@ -391,11 +391,11 @@ public class HudFragment extends Fragment{
                 state.wavetime = 0f;
             }
         }).growY().fillX().right().width(40f).update(l -> {
-            boolean vis = state.mode.disableWaveTimer && ((Net.server() || players[0].isAdmin) || !Net.active());
+            boolean vis = !state.rules.waveTimer && ((Net.server() || players[0].isAdmin) || !Net.active());
             boolean paused = state.is(State.paused) || !vis;
 
             l.getStyle().imageUp = Core.scene.skin.getDrawable(vis ? "icon-play" : "clear");
             l.touchable(!paused ? Touchable.enabled : Touchable.disabled);
-        }).visible(() -> state.mode.disableWaveTimer && ((Net.server() || players[0].isAdmin) || !Net.active()) && unitGroups[Team.red.ordinal()].size() == 0);
+        }).visible(() -> !state.rules.waveTimer && ((Net.server() || players[0].isAdmin) || !Net.active()) && unitGroups[Team.red.ordinal()].size() == 0);
     }
 }

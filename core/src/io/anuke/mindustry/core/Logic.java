@@ -11,6 +11,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.game.UnlockableContent;
@@ -56,16 +57,17 @@ public class Logic implements ApplicationListener{
 
     public void play(){
         state.set(State.playing);
-        state.wavetime = wavespace * state.difficulty.timeScaling * 2;
+        state.wavetime = 0;
 
         Events.fire(new PlayEvent());
     }
 
     public void reset(){
         state.wave = 1;
-        state.wavetime = wavespace * state.difficulty.timeScaling;
+        state.wavetime = 0;
         state.gameOver = false;
         state.teams = new Teams();
+        state.rules = new Rules();
 
         Time.clear();
         Entities.clear();
@@ -77,16 +79,16 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         world.spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = wavespace * state.difficulty.timeScaling;
+        state.wavetime = 0;
 
         Events.fire(new WaveEvent());
     }
 
     private void checkGameOver(){
-        if(!state.mode.isPvp && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
+        if(!state.rules.pvp && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
             state.gameOver = true;
             Events.fire(new GameOverEvent(waveTeam));
-        }else if(state.mode.isPvp){
+        }else if(state.rules.pvp){
             Team alive = null;
 
             for(Team team : Team.all){
@@ -119,16 +121,17 @@ public class Logic implements ApplicationListener{
             if(!state.isPaused()){
                 Time.update();
 
-                if(!state.mode.disableWaveTimer && !state.mode.disableWaves && !state.gameOver){
-                    state.wavetime -= Time.delta();
+                if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
+                    state.wavetime += Time.delta();
                 }
 
-                if(!Net.client() && state.wavetime <= 0 && !state.mode.disableWaves){
+                if(!Net.client() && state.wavetime >= state.rules.waveSpacing && state.rules.waves){
                     runWave();
                 }
 
-                if(!Entities.defaultGroup().isEmpty())
-                    throw new RuntimeException("Do not add anything to the default group!");
+                if(!Entities.defaultGroup().isEmpty()){
+                    throw new IllegalArgumentException("Do not add anything to the default group!");
+                }
 
                 if(!headless){
                     Entities.update(effectGroup);

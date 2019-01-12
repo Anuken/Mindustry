@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntIntMap;
 import io.anuke.arc.collection.ObjectMap;
 
+//todo: specify preferred game rules here; can be overriden
 public class MapMeta{
     public final int version;
     public final ObjectMap<String, String> tags;

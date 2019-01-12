@@ -193,7 +193,8 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(state.mode.isPvp){
+            //playing in pvp mode automatically assigns players to teams
+            if(state.rules.pvp){
                 //find team with minimum amount of players and auto-assign player to that.
                 Team min = Structs.findMin(Team.all, team -> {
                     if(state.teams.isActive(team)){
@@ -382,7 +383,7 @@ public class NetServer implements ApplicationListener{
     }
 
     public boolean isWaitingForPlayers(){
-        if(state.mode.isPvp){
+        if(state.rules.pvp){
             int used = 0;
             for(Team t : Team.all){
                 if(playerGroup.count(p -> p.getTeam() == t) > 0){

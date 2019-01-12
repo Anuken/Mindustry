@@ -39,12 +39,8 @@ public class Vars{
     public static final String contributorsURL = "https://api.github.com/repos/Anuken/Mindustry/contributors";
     /**URL for sending crash reports to*/
     public static final String crashReportURL = "http://mindustry.us.to/report";
-    /**time between waves in ticks (on normal mode)*/
-    public static final float wavespace = 60 * 60 * 1.5f;
     /**maximum distance between mine and core that supports automatic transferring*/
     public static final float mineTransferRange = 220f;
-    /**maximum distance from core that the player can be before it is no longer used for building*/
-    public static final float coreBuildRange = 999999f;
     /**team of the player by default*/
     public static final Team defaultTeam = Team.blue;
     /**team of the enemy in waves/sectors*/

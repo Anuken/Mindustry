@@ -11,7 +11,6 @@ import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 
@@ -51,22 +50,18 @@ public class DesktopPlatform extends Platform{
         DiscordRichPresence presence = new DiscordRichPresence();
 
         if(!state.is(State.menu)){
-            presence.state = Strings.capitalize(state.mode.name());
+            presence.state = state.rules.waves ? "Survival" : "Attack";
             if(world.getMap() == null){
                 presence.details = "Unknown Map";
-            }else if(state.mode.disableWaves){
+            }else if(!state.rules.waves){
                 presence.details = Strings.capitalize(world.getMap().name);
             }else{
                 presence.details = Strings.capitalize(world.getMap().name) + " | Wave " + state.wave;
                 presence.largeImageText = "Wave " + state.wave;
             }
 
-            if(state.mode != GameMode.attack){
-                presence.state = Strings.capitalize(state.mode.name());
-            }else{
-                presence.state = unitGroups[players[0].getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
-                (unitGroups[players[0].getTeam().ordinal()].size() + " Units Active");
-            }
+            presence.state = unitGroups[players[0].getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
+            (unitGroups[players[0].getTeam().ordinal()].size() + " Units Active");
 
             if(Net.active()){
                 presence.partyMax = 16;

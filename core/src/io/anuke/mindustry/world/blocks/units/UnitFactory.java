@@ -154,8 +154,8 @@ public class UnitFactory extends Block{
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
             }
             //check if grace period had passed
-        }else if(entity.warmup > produceTime*gracePeriodMultiplier * Vars.state.difficulty.spawnerScaling){
-            float speedMultiplier = Math.min(0.1f + (entity.warmup - produceTime * gracePeriodMultiplier * Vars.state.difficulty.spawnerScaling) / speedupTime, maxSpeedup);
+        }else if(entity.warmup > produceTime*gracePeriodMultiplier){
+            float speedMultiplier = Math.min(0.1f + (entity.warmup - produceTime * gracePeriodMultiplier) / speedupTime, maxSpeedup);
             //otherwise, it's an enemy, cheat by not requiring resources
             entity.buildTime += entity.delta() * speedMultiplier;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);

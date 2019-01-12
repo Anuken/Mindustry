@@ -21,6 +21,7 @@ public class BasicGenerator extends RandomGenerator{
 
     @Override
     public void generate(Tile[][] tiles){
+        //todo use set seed
         int seed = Mathf.random(99999999);
         sim.setSeed(seed);
         sim2.setSeed(seed + 1);
@@ -41,6 +42,18 @@ public class BasicGenerator extends RandomGenerator{
                     break;
                 }
             }
+        }
+
+        //rock outcrops
+        double rocks = sim.octaveNoise2D(3, 0.7, 1f / 70f, x, y);
+        double edgeDist = Math.min(x, Math.min(y, Math.min(Math.abs(x - (width - 1)), Math.abs(y - (height - 1)))));
+        double transition = 8;
+        if(edgeDist < transition){
+            rocks += (transition - edgeDist) / transition / 1.5;
+        }
+
+        if(rocks > 0.64){
+            block = Blocks.rocksSmall;
         }
     }
 }

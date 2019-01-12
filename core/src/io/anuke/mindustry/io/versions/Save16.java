@@ -1,9 +1,8 @@
 package io.anuke.mindustry.io.versions;
 
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.game.Difficulty;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.maps.Map;
 
@@ -26,18 +25,15 @@ public class Save16 extends SaveFileVersion{
         stream.readInt(); //build
 
         //general state
-        byte mode = stream.readByte();
+        state.rules = Serialization.readRules(stream);
         String mapname = stream.readUTF();
         Map map = world.maps.getByName(mapname);
         if(map == null) map = new Map("unknown", 1, 1);
         world.setMap(map);
 
         int wave = stream.readInt();
-        byte difficulty = stream.readByte();
         float wavetime = stream.readFloat();
 
-        state.difficulty = Difficulty.values()[difficulty];
-        state.mode = GameMode.values()[mode];
         state.wave = wave;
         state.wavetime = wavetime;
 
@@ -59,11 +55,10 @@ public class Save16 extends SaveFileVersion{
         stream.writeInt(Version.build); //build
 
         //--GENERAL STATE--
-        stream.writeByte(state.mode.ordinal()); //gamemode
-        stream.writeUTF(world.getMap().name); //map ID
+        Serialization.writeRules(stream, state.rules);
+        stream.writeUTF(world.getMap().name); //map name
 
         stream.writeInt(state.wave); //wave
-        stream.writeByte(state.difficulty.ordinal()); //difficulty ordinal
         stream.writeFloat(state.wavetime); //wave countdown
 
         writeContentHeader(stream);

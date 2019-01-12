@@ -109,7 +109,7 @@ public class Build{
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
         Recipe recipe = Recipe.getByResult(type);
 
-        if(recipe == null || (recipe.mode != null && recipe.mode != state.mode)){
+        if(recipe == null || (!recipe.visibility.usable())){
             return false;
         }
 
@@ -121,7 +121,7 @@ public class Build{
         //check for enemy cores
         for(Team enemy : state.teams.enemiesOf(team)){
             for(Tile core : state.teams.get(enemy).cores){
-                if(Mathf.dst(x*tilesize + type.offset(), y*tilesize + type.offset(), core.drawx(), core.drawy()) < state.mode.enemyCoreBuildRadius + type.size*tilesize/2f){
+                if(Mathf.dst(x*tilesize + type.offset(), y*tilesize + type.offset(), core.drawx(), core.drawy()) < state.rules.enemyCoreBuildRadius + type.size*tilesize/2f){
                     return false;
                 }
             }

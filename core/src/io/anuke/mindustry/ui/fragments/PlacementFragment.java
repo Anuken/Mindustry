@@ -134,7 +134,7 @@ public class PlacementFragment extends Fragment{
                         button.update(() -> { //color unplacable things gray
                             boolean ulock = data.isUnlocked(recipe);
                             TileEntity core = players[0].getClosestCore();
-                            Color color = core != null && (core.items.has(recipe.requirements) || state.mode.infiniteResources) ? Color.WHITE : ulock ? Color.GRAY : Color.WHITE;
+                            Color color = core != null && (core.items.has(recipe.requirements) || state.rules.infiniteResources) ? Color.WHITE : ulock ? Color.GRAY : Color.WHITE;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.recipe == recipe);
 
@@ -196,7 +196,7 @@ public class PlacementFragment extends Fragment{
                                         line.add(stack.item.localizedName()).color(Color.LIGHT_GRAY).padLeft(2).left();
                                         line.labelWrap(() -> {
                                             TileEntity core = players[0].getClosestCore();
-                                            if(core == null || state.mode.infiniteResources) return "*/*";
+                                            if(core == null || state.rules.infiniteResources) return "*/*";
 
                                             int amount = core.items.get(stack.item);
                                             String color = (amount < stack.amount / 2f ? "[red]" : amount < stack.amount ? "[accent]" : "[white]");

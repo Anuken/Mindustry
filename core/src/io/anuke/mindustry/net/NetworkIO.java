@@ -8,11 +8,11 @@ import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.world.Tile;
@@ -30,7 +30,7 @@ public class NetworkIO{
 
         try(DataOutputStream stream = new DataOutputStream(os)){
             //--GENERAL STATE--
-            stream.writeByte(state.mode.ordinal()); //gamemode
+            Serialization.writeRules(stream, state.rules);
             stream.writeUTF(world.getMap().name); //map name
 
             //write tags
@@ -121,7 +121,7 @@ public class NetworkIO{
             Time.clear();
 
             //general state
-            byte mode = stream.readByte();
+            state.rules = Serialization.readRules(stream);
             String map = stream.readUTF();
 
             ObjectMap<String, String> tags = new ObjectMap<>();
@@ -138,7 +138,6 @@ public class NetworkIO{
 
             state.wave = wave;
             state.wavetime = wavetime;
-            state.mode = GameMode.values()[mode];
 
             Entities.clear();
             int id = stream.readInt();
@@ -256,7 +255,6 @@ public class NetworkIO{
         buffer.putInt(Version.build);
         buffer.put((byte)Version.type.getBytes(StandardCharsets.UTF_8).length);
         buffer.put(Version.type.getBytes(StandardCharsets.UTF_8));
-        buffer.put((byte)state.mode.ordinal());
         return buffer;
     }
 
@@ -279,8 +277,7 @@ public class NetworkIO{
         byte[] tb = new byte[tlength];
         buffer.get(tb);
         String vertype = new String(tb, StandardCharsets.UTF_8);
-        GameMode mode = GameMode.values()[buffer.get()];
 
-        return new Host(host, hostAddress, map, wave, players, version, vertype, mode);
+        return new Host(host, hostAddress, map, wave, players, version, vertype);
     }
 }
