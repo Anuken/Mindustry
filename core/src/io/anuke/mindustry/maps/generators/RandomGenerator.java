@@ -1,9 +1,9 @@
 package io.anuke.mindustry.maps.generators;
 
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
 
 public abstract class RandomGenerator extends Generator{
     protected Block floor;
@@ -20,10 +20,11 @@ public abstract class RandomGenerator extends Generator{
                 floor = Blocks.air;
                 block = Blocks.air;
                 generate(x, y);
-                tiles[x][y].setFloor((Floor) floor);
-                tiles[x][y].setBlock(block);
+                tiles[x][y] = new Tile(x, y, floor.id, block.id);
             }
         }
+
+        tiles[width/2][height/2].setBlock(Blocks.core, Team.blue);
     }
 
     /**Sets {@link #floor} and {@link #block} to the correct values as output.
