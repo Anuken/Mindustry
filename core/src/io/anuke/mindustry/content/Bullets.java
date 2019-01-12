@@ -242,7 +242,7 @@ public class Bullets implements ContentList{
             bulletHeight = 9f;
             shootEffect = Fx.shootSmall;
             smokeEffect = Fx.shootSmallSmoke;
-            ammoMultiplier = 5;
+            ammoMultiplier = 2;
         }};
 
         standardDense = new BasicBulletType(3.5f, 18, "bullet"){{

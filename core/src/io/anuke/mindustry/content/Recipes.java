@@ -43,13 +43,6 @@ public class Recipes implements ContentList{
         new Recipe(effect, Blocks.vault, new ItemStack(Items.titanium, 500), new ItemStack(Items.thorium, 250));
         new Recipe(effect, Blocks.launchPad, new ItemStack(Items.copper, 500));
 
-        //removed; no longer fits gameplay
-        /*new Recipe(effect, Blocks.core,
-            new ItemStack(Items.copper, 2000), new ItemStack(Items.titanium, 2000),
-            new ItemStack(Items.silicon, 1750), new ItemStack(Items.thorium, 1000),
-            new ItemStack(Items.surgealloy, 500), new ItemStack(Items.phasefabric, 750)
-        );*/
-
         //projectors
         new Recipe(effect, Blocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.titanium, 150), new ItemStack(Items.titanium, 50), new ItemStack(Items.silicon, 180));
         new Recipe(effect, Blocks.overdriveProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.titanium, 150), new ItemStack(Items.titanium, 150), new ItemStack(Items.silicon, 250));
@@ -131,7 +124,7 @@ public class Recipes implements ContentList{
         new Recipe(power, Blocks.rtgGenerator, new ItemStack(Items.lead, 200), new ItemStack(Items.silicon, 150), new ItemStack(Items.phasefabric, 50), new ItemStack(Items.plastanium, 150), new ItemStack(Items.thorium, 100));
 
         //DRILLS, PRODUCERS
-        new Recipe(production, Blocks.mechanicalDrill, new ItemStack(Items.copper, 45)).setAlwaysUnlocked(true);
+        new Recipe(production, Blocks.mechanicalDrill, new ItemStack(Items.copper, 20)).setAlwaysUnlocked(true);
         new Recipe(production, Blocks.pneumaticDrill, new ItemStack(Items.copper, 60), new ItemStack(Items.graphite, 50));
         new Recipe(production, Blocks.laserDrill, new ItemStack(Items.copper, 70), new ItemStack(Items.graphite, 90), new ItemStack(Items.silicon, 60), new ItemStack(Items.titanium, 50));
         new Recipe(production, Blocks.blastDrill, new ItemStack(Items.copper, 130), new ItemStack(Items.silicon, 120), new ItemStack(Items.titanium, 100), new ItemStack(Items.thorium, 60));

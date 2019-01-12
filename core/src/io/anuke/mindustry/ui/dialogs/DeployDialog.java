@@ -45,7 +45,7 @@ public class DeployDialog extends FloatingDialog{
                         t.addButton(zone.localizedName(), () -> {
                             data.removeItems(zone.deployCost);
                             hide();
-                            world.playGenerator(zone.generator);
+                            world.playZone(zone);
                         }).size(150f).disabled(b -> !data.hasItems(zone.deployCost));
                         t.row();
                         t.table(req -> {

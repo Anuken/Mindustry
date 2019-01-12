@@ -1,8 +1,10 @@
 package io.anuke.mindustry.type;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.generators.Generator;
 
@@ -10,6 +12,8 @@ public class Zone extends UnlockableContent{
     public final String name;
     public final Generator generator;
     public ItemStack[] deployCost = {};
+    public ItemStack[] startingItems = {};
+    public Supplier<Rules> rules = Rules::new;
 
     public Zone(String name, Generator generator){
         this.name = name;

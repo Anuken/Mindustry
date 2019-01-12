@@ -12,7 +12,7 @@ import static io.anuke.mindustry.Vars.waveTeam;
 public class GameState{
     /**Current wave number, can be anything in non-wave modes.*/
     public int wave = 1;
-    /**Wave time in ticks.*/
+    /**Wave countdown in ticks.*/
     public float wavetime;
     /**Whether the game is in game over state.*/
     public boolean gameOver = false;

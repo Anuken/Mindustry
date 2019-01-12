@@ -57,14 +57,14 @@ public class Logic implements ApplicationListener{
 
     public void play(){
         state.set(State.playing);
-        state.wavetime = 0;
+        state.wavetime = state.rules.waveSpacing * 2; //grace period of 2x wave time before game starts
 
         Events.fire(new PlayEvent());
     }
 
     public void reset(){
         state.wave = 1;
-        state.wavetime = 0;
+        state.wavetime = state.rules.waveSpacing;
         state.gameOver = false;
         state.teams = new Teams();
         state.rules = new Rules();
@@ -79,7 +79,7 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         world.spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = 0;
+        state.wavetime = state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
     }
@@ -122,10 +122,10 @@ public class Logic implements ApplicationListener{
                 Time.update();
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
-                    state.wavetime += Time.delta();
+                    state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
                 }
 
-                if(!Net.client() && state.wavetime >= state.rules.waveSpacing && state.rules.waves){
+                if(!Net.client() && state.wavetime <= 0 && state.rules.waves){
                     runWave();
                 }
 

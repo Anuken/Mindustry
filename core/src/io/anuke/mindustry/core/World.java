@@ -24,6 +24,8 @@ import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.maps.Maps;
 import io.anuke.mindustry.maps.generators.Generator;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
@@ -188,10 +190,16 @@ public class World implements ApplicationListener{
         return generating;
     }
 
-    public void playGenerator(Generator generator){
+    public void playZone(Zone zone){
         ui.loadAnd(() -> {
             logic.reset();
-            loadGenerator(generator);
+            state.rules = zone.rules.get();
+            loadGenerator(zone.generator);
+            for(Tile core : state.teams.get(defaultTeam).cores){
+                for(ItemStack stack : zone.startingItems){
+                    core.entity.items.add(stack.item, stack.amount);
+                }
+            }
             logic.play();
         });
     }

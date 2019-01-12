@@ -25,6 +25,7 @@ public abstract class RandomGenerator extends Generator{
         }
 
         tiles[width/2][height/2].setBlock(Blocks.core, Team.blue);
+        tiles[width/2][height/2 - 6].setBlock(Blocks.launchPad, Team.blue);
     }
 
     /**Sets {@link #floor} and {@link #block} to the correct values as output.
