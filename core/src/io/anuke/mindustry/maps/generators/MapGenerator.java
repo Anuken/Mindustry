@@ -34,5 +34,6 @@ public class MapGenerator extends Generator{
         }
 
         world.prepareTiles(tiles);
+        world.setMap(map);
     }
 }
