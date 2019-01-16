@@ -12,8 +12,5 @@ public abstract class Generator{
 
     public Generator(){}
 
-    /**Initialize special variables like maps.*/
-    public void init(){}
-
     public abstract void generate(Tile[][] tiles);
 }
