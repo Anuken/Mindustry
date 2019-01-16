@@ -194,7 +194,7 @@ public class MapIO{
         }
     }
 
-    public static Map readMap(DataInputStream stream) throws IOException{
+    public static Map readMap(String useName, DataInputStream stream) throws IOException{
         ObjectMap<String, String> tags = new ObjectMap<>();
         IntIntMap map = new IntIntMap();
 
@@ -218,6 +218,10 @@ public class MapIO{
             map.put(id, block.id);
         }
 
+        return new Map(useName);
+    }
+
+    public static Tile[][] readTiles(DataInputStream stream) throws IOException{
         int width = stream.readShort();
         int height = stream.readShort();
 
@@ -270,6 +274,8 @@ public class MapIO{
 
             tiles[x][y] = tile;
         }
+
+        return tiles;
     }
 
     public static void writeMapMeta(DataOutputStream stream, MapMeta meta) throws IOException{
