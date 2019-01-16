@@ -2,8 +2,7 @@ package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
@@ -26,7 +25,7 @@ public class GenericCrafter extends Block{
 
     protected Item output;
     protected float craftTime = 80;
-    protected Effect craftEffect = BlockFx.purify;
+    protected Effect craftEffect = Fx.purify;
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.04f;
 

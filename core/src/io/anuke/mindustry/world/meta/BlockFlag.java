@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.meta;
 
+//TODO fix flagging system, currently doesn't really work
 public enum BlockFlag{
     /**General important target for all types of units.*/
     target(0),
@@ -14,9 +15,7 @@ public enum BlockFlag{
     /**Producer or storage unit of volatile materials.*/
     explosive(Float.MAX_VALUE),
     /**Repair point.*/
-    repair(Float.MAX_VALUE),
-    /**Special flag for command center blocks.*/
-    comandCenter(Float.MAX_VALUE);
+    repair(Float.MAX_VALUE);
 
     public final static BlockFlag[] all = values();
 

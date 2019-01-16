@@ -66,8 +66,7 @@ public class UI implements ApplicationListener{
     public LocalPlayerDialog localplayers;
     public UnlocksDialog unlocks;
     public ContentInfoDialog content;
-    public SectorsDialog sectors;
-    public MissionDialog missions;
+    public DeployDialog deploy;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -177,8 +176,7 @@ public class UI implements ApplicationListener{
         maps = new MapsDialog();
         localplayers = new LocalPlayerDialog();
         content = new ContentInfoDialog();
-        sectors = new SectorsDialog();
-        missions = new MissionDialog();
+        deploy = new DeployDialog();
 
         Group group = Core.scene.root;
 
@@ -202,11 +200,11 @@ public class UI implements ApplicationListener{
         generator.dispose();
     }
 
-    public void loadGraphics(Runnable call){
-        loadGraphics("$text.loading", call);
+    public void loadAnd(Runnable call){
+        loadAnd("$loading", call);
     }
 
-    public void loadGraphics(String text, Runnable call){
+    public void loadAnd(String text, Runnable call){
         loadfrag.show(text);
         Time.runTask(7f, () -> {
             call.run();
@@ -214,32 +212,19 @@ public class UI implements ApplicationListener{
         });
     }
 
-    public void loadLogic(Runnable call){
-        loadLogic("$text.loading", call);
-    }
-
-    public void loadLogic(String text, Runnable call){
-        loadfrag.show(text);
-        Time.runTask(7f, () ->
-            Core.app.post(() -> {
-                call.run();
-                loadfrag.hide();
-            }));
-    }
-
-    public void showTextInput(String title, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){
-        new Dialog(title, "dialog"){{
-            content().margin(30).add(text).padRight(6f);
-            TextField field = content().addField(def, t -> {
+    public void showTextInput(String titleText, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){
+        new Dialog(titleText, "dialog"){{
+            cont.margin(30).add(text).padRight(6f);
+            TextField field = cont.addField(def, t -> {
             }).size(170f, 50f).get();
             field.setTextFieldFilter((f, c) -> field.getText().length() < 12 && filter.acceptChar(f, c));
             Platform.instance.addDialog(field);
-            buttons().defaults().size(120, 54).pad(4);
-            buttons().addButton("$text.ok", () -> {
+            buttons.defaults().size(120, 54).pad(4);
+            buttons.addButton("$ok", () -> {
                 confirmed.accept(field.getText());
                 hide();
             }).disabled(b -> field.getText().isEmpty());
-            buttons().addButton("$text.cancel", this::hide);
+            buttons.addButton("$cancel", this::hide);
         }}.show();
     }
 
@@ -257,17 +242,17 @@ public class UI implements ApplicationListener{
 
     public void showInfo(String info){
         new Dialog("", "dialog"){{
-            getCell(content()).growX();
-            content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
+            getCell(cont).growX();
+            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
     }
 
     public void showInfo(String info, Runnable clicked){
         new Dialog("", "dialog"){{
-            getCell(content()).growX();
-            content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons().addButton("$text.ok", () -> {
+            getCell(cont).growX();
+            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", () -> {
                 clicked.run();
                 hide();
             }).size(90, 50).pad(4);
@@ -275,26 +260,26 @@ public class UI implements ApplicationListener{
     }
 
     public void showError(String text){
-        new Dialog("$text.error.title", "dialog"){{
-            content().margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
+        new Dialog("$error.title", "dialog"){{
+            cont.margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
     }
 
-    public void showText(String title, String text){
-        new Dialog(title, "dialog"){{
-            content().margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
+    public void showText(String titleText, String text){
+        new Dialog(titleText, "dialog"){{
+            cont.margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
     }
 
     public void showConfirm(String title, String text, Runnable confirmed){
         FloatingDialog dialog = new FloatingDialog(title);
-        dialog.content().add(text).width(400f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
-        dialog.buttons().defaults().size(200f, 54f).pad(2f);
+        dialog.cont.add(text).width(400f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+        dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons().addButton("$text.cancel", dialog::hide);
-        dialog.buttons().addButton("$text.ok", () -> {
+        dialog.buttons.addButton("$cancel", dialog::hide);
+        dialog.buttons.addButton("$ok", () -> {
             dialog.hide();
             confirmed.run();
         });

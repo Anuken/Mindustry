@@ -19,10 +19,9 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pool.Poolable;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.bullets.TurretBullets;
-import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.content.fx.EnvironmentFx;
+import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.Bullets;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
@@ -85,7 +84,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             Puddle p = map.get(tile.pos());
 
             if(generation == 0 && p != null && p.lastRipple <= Time.time() - 40f){
-                Effects.effect(BlockFx.ripple, tile.floor().liquidDrop.color,
+                Effects.effect(Fx.ripple, tile.floor().liquidDrop.color,
                         (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
                 p.lastRipple = Time.time();
             }
@@ -108,7 +107,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             p.accepting = Math.max(amount, p.accepting);
 
             if(generation == 0  && p.lastRipple <= Time.time() - 40f && p.amount >= maxLiquid / 2f){
-                Effects.effect(BlockFx.ripple, p.liquid.color, (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
+                Effects.effect(Fx.ripple, p.liquid.color, (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
                 p.lastRipple = Time.time();
             }
         }else{
@@ -130,16 +129,16 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
                 (liquid.flammability > 0.3f && dest.temperature > 0.7f)){ //flammable liquid + hot liquid
             Fire.create(tile);
             if(Mathf.chance(0.006 * amount)){
-                Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f));
+                Call.createBullet(Bullets.fireball, x, y, Mathf.random(360f));
             }
         }else if(dest.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot puddle
             if(Mathf.chance(0.5f * amount)){
-                Effects.effect(EnvironmentFx.steam, x, y);
+                Effects.effect(Fx.steam, x, y);
             }
             return -0.1f * amount;
         }else if(liquid.temperature > 0.7f && dest.temperature < 0.55f){ //hot liquid poured onto cold puddle
             if(Mathf.chance(0.8f * amount)){
-                Effects.effect(EnvironmentFx.steam, x, y);
+                Effects.effect(Fx.steam, x, y);
             }
             return -0.4f * amount;
         }
@@ -156,12 +155,12 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
     }
 
     @Override
-    public void getHitbox(Rectangle rectangle){
+    public void hitbox(Rectangle rectangle){
         rectangle.setCenter(x, y).setSize(tilesize);
     }
 
     @Override
-    public void getHitboxTile(Rectangle rectangle){
+    public void hitboxTile(Rectangle rectangle){
         rectangle.setCenter(x, y).setSize(0f);
     }
 
@@ -184,7 +183,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
                 float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Time.delta();
                 for(Point2 point : Geometry.d4){
                     Tile other = world.tile(tile.x + point.x, tile.y + point.y);
-                    if(other != null && other.block() == Blocks.air && !other.hasCliffs()){
+                    if(other != null && other.block() == Blocks.air){
                         deposit(other, tile, liquid, deposited, generation + 1);
                         amount -= deposited / 2f; //tweak to speed up/slow down puddle propagation
                     }
@@ -203,13 +202,13 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
             Units.getNearby(rect.setSize(Mathf.clamp(amount / (maxLiquid / 1.5f)) * 10f).setCenter(x, y), unit -> {
                 if(unit.isFlying()) return;
 
-                unit.getHitbox(rect2);
+                unit.hitbox(rect2);
                 if(!rect.overlaps(rect2)) return;
 
-                unit.applyEffect(liquid.effect, 0.5f);
+                unit.applyEffect(liquid.effect, 60 * 2);
 
-                if(unit.getVelocity().len() > 0.1){
-                    Effects.effect(BlockFx.ripple, liquid.color, unit.x, unit.y);
+                if(unit.velocity().len() > 0.1){
+                    Effects.effect(Fx.ripple, liquid.color, unit.x, unit.y);
                 }
             });
 

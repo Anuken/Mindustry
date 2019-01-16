@@ -20,7 +20,7 @@ import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.fx.UnitFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
@@ -100,17 +100,17 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
-    public void getHitbox(Rectangle rectangle){
+    public void hitbox(Rectangle rectangle){
         rectangle.setSize(mech.hitsize).setCenter(x, y);
     }
 
     @Override
-    public void getHitboxTile(Rectangle rectangle){
+    public void hitboxTile(Rectangle rectangle){
         rectangle.setSize(mech.hitsize * 2f / 3f).setCenter(x, y);
     }
 
     @Override
-    public float getDrag(){
+    public float drag(){
         return mech.drag;
     }
 
@@ -208,7 +208,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
-    public float getMass(){
+    public float mass(){
         return mech.mass;
     }
 
@@ -241,7 +241,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
-    public float getMaxVelocity(){
+    public float maxVelocity(){
         return mech.maxSpeed;
     }
 
@@ -502,7 +502,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 if(mech.shake > 1f){
                     Effects.shake(mech.shake, mech.shake, this);
                 }
-                Effects.effect(UnitFx.unitLand, tile.floor().minimapColor, x, y, tile.floor().isLiquid ? 1f : 0.5f);
+                Effects.effect(Fx.unitLand, tile.floor().minimapColor, x, y, tile.floor().isLiquid ? 1f : 0.5f);
             }
             mech.onLand(this);
             achievedFlight = false;
@@ -525,7 +525,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             return;
         }else{
             //unlock mech when used
-            control.unlocks.unlockContent(mech);
+            data.unlockContent(mech);
         }
 
         if(mobile){
@@ -571,7 +571,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             }else if(getCarry() != null){
                 dropCarry();
             }else{
-                Unit unit = Units.getClosest(team, x, y, 8f, u -> !u.isFlying() && u.getMass() <= mech.carryWeight);
+                Unit unit = Units.getClosest(team, x, y, 8f, u -> !u.isFlying() && u.mass() <= mech.carryWeight);
 
                 if(unit != null){
                     carry(unit);
@@ -629,7 +629,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     protected void updateFlying(){
         if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
-        mech.canHeal && dst(target) < getWeapon().getAmmo().getRange())){
+        mech.canHeal && dst(target) < getWeapon().getAmmo().range())){
             target = null;
         }
 
@@ -675,7 +675,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         float expansion = 3f;
 
-        getHitbox(rect);
+        hitbox(rect);
         rect.x -= expansion;
         rect.y -= expansion;
         rect.width += expansion * 2f;
@@ -709,11 +709,11 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 if(target == null){
                     isShooting = false;
                     if(Core.settings.getBool("autotarget")){
-                        target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().getRange());
+                        target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().range());
 
                         if(mech.canHeal && target == null){
                             target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));
-                            if(target != null && dst(target) > getWeapon().getAmmo().getRange()){
+                            if(target != null && dst(target) > getWeapon().getAmmo().range()){
                                 target = null;
                             }else if(target != null){
                                 target = ((Tile) target).entity;
@@ -725,14 +725,14 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                         }
                     }
                 }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
-                mech.canHeal && dst(target) < getWeapon().getAmmo().getRange())){
+                mech.canHeal && dst(target) < getWeapon().getAmmo().range())){
                     //rotate toward and shoot the target
                     if(mech.turnCursor){
                         rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
                     }
 
                     Vector2 intercept =
-                    Predict.intercept(x, y, target.getX(), target.getY(), target.getVelocity().x - velocity.x, target.getVelocity().y - velocity.y, getWeapon().getAmmo().bullet.speed);
+                    Predict.intercept(x, y, target.getX(), target.getY(), target.velocity().x - velocity.x, target.velocity().y - velocity.y, getWeapon().getAmmo().speed);
 
                     pointerX = intercept.x;
                     pointerY = intercept.y;

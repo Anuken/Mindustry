@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.bullet;
 
 import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.mindustry.content.fx.BulletFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.arc.util.Time;
 
@@ -13,7 +13,7 @@ public abstract class FlakBulletType extends BasicBulletType{
         super(speed, damage, "shell");
         splashDamage = 15f;
         splashDamageRadius = 34f;
-        hiteffect = BulletFx.flakExplosionBig;
+        hitEffect = Fx.flakExplosionBig;
         bulletWidth = 8f;
         bulletHeight = 10f;
     }

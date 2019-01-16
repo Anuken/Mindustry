@@ -8,8 +8,7 @@ import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.blocks.StorageBlocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
@@ -54,7 +53,7 @@ public class MapIO{
                 byte elev = y >= data.height() - 1 ? 0 : data.read(x, y + 1, DataPosition.elevation);
                 Block floor = content.block(marker.floor);
                 Block wall = content.block(marker.wall);
-                int color = ColorMapper.colorFor(floor, wall, Team.all[marker.team], marker.elevation + 1, elev > marker.elevation ? (byte)(1 << 6) : (byte)0);
+                int color = ColorMapper.colorFor(floor, wall, Team.all[marker.team]);
                 pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, color);
             }
         }
@@ -96,7 +95,7 @@ public class MapIO{
                         }
                     }
 
-                    data.write(x, y, DataPosition.wall, StorageBlocks.core.id);
+                    data.write(x, y, DataPosition.wall, Blocks.core.id);
                     data.write(x, y, DataPosition.rotationTeam, Pack.byteByte((byte)0, (byte)Team.blue.ordinal()));
                 }
             }

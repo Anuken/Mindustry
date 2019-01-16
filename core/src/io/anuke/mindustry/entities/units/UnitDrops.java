@@ -12,7 +12,7 @@ public class UnitDrops{
 
     public static void dropItems(BaseUnit unit){
         //items only dropped in waves for enemy team
-        if(unit.getTeam() != Vars.waveTeam || Vars.state.mode.disableWaves){
+        if(unit.getTeam() != Vars.waveTeam || !Vars.state.rules.unitDrops){
             return;
         }
 
@@ -23,13 +23,13 @@ public class UnitDrops{
         }
 
         if(dropTable == null){
-            dropTable = new Item[]{Items.densealloy, Items.silicon, Items.lead, Items.copper};
+            dropTable = new Item[]{Items.titanium, Items.silicon, Items.lead, Items.copper};
         }
 
         for(int i = 0; i < 3; i++){
             for(Item item : dropTable){
                 //only drop unlocked items
-                if(!Vars.headless && !Vars.control.unlocks.isUnlocked(item)){
+                if(!Vars.headless && !Vars.data.isUnlocked(item)){
                     continue;
                 }
 

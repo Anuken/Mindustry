@@ -21,8 +21,8 @@ void main() {
 	float spacing = SPACE * u_scl;
 
 	gl_FragColor = mix(c * v_color, u_color,
-	        (1.0-step(0.1, texture2D(u_texture, v_texCoord.xy).a)) *
-	        step(0.1,
+	        (1.0-step(0.001, texture2D(u_texture, v_texCoord.xy).a)) *
+	        step(0.001,
 	                //cardinals
 	                texture2D(u_texture, v_texCoord.xy + vec2(0, spacing) * v).a +
 	                texture2D(u_texture, v_texCoord.xy + vec2(0, -spacing) * v).a +

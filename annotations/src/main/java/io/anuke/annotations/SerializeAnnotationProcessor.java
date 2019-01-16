@@ -12,6 +12,7 @@ import javax.lang.model.util.ElementFilter;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
@@ -60,14 +61,12 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                 .returns(void.class)
                 .addParameter(DataOutput.class, "stream")
                 .addParameter(type, "object")
-                .addAnnotation(Override.class)
                 .addException(IOException.class)
                 .addModifiers(Modifier.PUBLIC);
 
                 MethodSpec.Builder readMethod = MethodSpec.methodBuilder("read")
                 .returns(type)
                 .addParameter(DataInput.class, "stream")
-                .addAnnotation(Override.class)
                 .addException(IOException.class)
                 .addModifiers(Modifier.PUBLIC);
 
@@ -96,6 +95,17 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                 serializer.addMethod(readMethod.build());
 
                 method.addStatement("io.anuke.arc.Core.settings.setSerializer($N, $L)",  Utils.elementUtils.getBinaryName(elem).toString().replace('$', '.') + ".class", serializer.build());
+
+                String sname = type.toString().substring(type.toString().lastIndexOf('.') + 1);
+
+                name(writeMethod, "write" + sname);
+                name(readMethod, "read" + sname);
+
+                writeMethod.addModifiers(Modifier.STATIC);
+                readMethod.addModifiers(Modifier.STATIC);
+
+                classBuilder.addMethod(writeMethod.build());
+                classBuilder.addMethod(readMethod.build());
             }
 
             classBuilder.addMethod(method.build());
@@ -106,6 +116,16 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
             return true;
         }catch(Exception e){
             e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    static void name(MethodSpec.Builder builder, String name){
+        try{
+            Field field = builder.getClass().getDeclaredField("name");
+            field.setAccessible(true);
+            field.set(builder, name);
+        }catch(Exception e){
             throw new RuntimeException(e);
         }
     }

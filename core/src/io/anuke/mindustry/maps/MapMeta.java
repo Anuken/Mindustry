@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntIntMap;
 import io.anuke.arc.collection.ObjectMap;
 
+//todo: specify preferred game rules here; can be overriden
 public class MapMeta{
     public final int version;
     public final ObjectMap<String, String> tags;
@@ -31,7 +32,7 @@ public class MapMeta{
     }
 
     public String tag(String name){
-        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Core.bundle.get("text.unknown");
+        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Core.bundle.get("unknown");
     }
 
     public boolean hasOreGen(){

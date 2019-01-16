@@ -9,7 +9,6 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.Block;
@@ -31,13 +30,8 @@ public class Recipe extends UnlockableContent{
     public final float cost;
 
     public RecipeVisibility visibility = RecipeVisibility.all;
-    //the only gamemode in which the recipe shows up
-    public GameMode mode;
     public boolean hidden;
     public boolean alwaysUnlocked;
-
-    private UnlockableContent[] dependencies;
-    private Block[] blockDependencies;
 
     public Recipe(Category category, Block result, ItemStack... requirements){
         this.result = result;
@@ -60,7 +54,7 @@ public class Recipe extends UnlockableContent{
     public static Array<Recipe> getByCategory(Category category){
         returnArray.clear();
         for(Recipe recipe : content.recipes()){
-            if(recipe.category == category && recipe.visibility.shown() && (recipe.mode == state.mode || recipe.mode == null)){
+            if(recipe.category == category && recipe.visibility.shown()){
                 returnArray.add(recipe);
             }
         }
@@ -73,11 +67,6 @@ public class Recipe extends UnlockableContent{
 
     public Recipe setVisible(RecipeVisibility visibility){
         this.visibility = visibility;
-        return this;
-    }
-
-    public Recipe setMode(GameMode mode){
-        this.mode = mode;
         return this;
     }
 
@@ -144,39 +133,23 @@ public class Recipe extends UnlockableContent{
                     ContentStatValue stat = (ContentStatValue) value;
                     UnlockableContent[] content = stat.getValueContent();
                     for(UnlockableContent c : content){
-                        control.unlocks.unlockContent(c);
+                        data.unlockContent(c);
                     }
                 }
             }
         }
     }
 
-    @Override
-    public UnlockableContent[] getDependencies(){
-        if(blockDependencies != null && dependencies == null){
-            dependencies = new UnlockableContent[blockDependencies.length];
-            for(int i = 0; i < dependencies.length; i++){
-                dependencies[i] = Recipe.getByResult(blockDependencies[i]);
-            }
-            return dependencies;
-        }
-        return dependencies;
-    }
-
-    public Recipe setDependencies(UnlockableContent... dependencies){
-        this.dependencies = dependencies;
-        return this;
-    }
-
-    public Recipe setDependencies(Block... dependencies){
-        this.blockDependencies = dependencies;
-        return this;
-    }
-
     public enum RecipeVisibility{
         mobileOnly(true, false),
         desktopOnly(false, true),
-        all(true, true);
+        all(true, true),
+        sandboxOnly(true, true){
+            @Override
+            public boolean usable(){
+                return state.rules.infiniteResources;
+            }
+        };
 
         public final boolean mobile, desktop;
 
@@ -185,8 +158,12 @@ public class Recipe extends UnlockableContent{
             this.desktop = desktop;
         }
 
+        public boolean usable(){
+            return true;
+        }
+
         public boolean shown(){
-            return (Vars.mobile && mobile) || (!Vars.mobile && desktop);
+            return usable() && ((Vars.mobile && mobile) || (!Vars.mobile && desktop));
         }
     }
 }

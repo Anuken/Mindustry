@@ -5,7 +5,7 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;

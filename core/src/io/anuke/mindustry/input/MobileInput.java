@@ -18,8 +18,8 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -195,12 +195,12 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     void showGuide(String type){
         if(!guides.contains(type) && !Core.settings.getBool(type, false)){
-            FloatingDialog dialog = new FloatingDialog("$text." + type + ".title");
+            FloatingDialog dialog = new FloatingDialog("$" + type + ".title");
             dialog.addCloseButton();
-            dialog.content().left();
-            dialog.content().add("$text." + type).growX().wrap();
-            dialog.content().row();
-            dialog.content().addCheck("$text.showagain", false, checked -> {
+            dialog.cont.left();
+            dialog.cont.add("$" + type).growX().wrap();
+            dialog.cont.row();
+            dialog.cont.addCheck("$showagain", false, checked -> {
                 Core.settings.put(type, checked);
                 Core.settings.save();
             }).growX().left().get().left();
@@ -559,7 +559,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     consumed = true;
                     player.dropCarry(); //drop off unit
                 }else{
-                    Unit unit = Units.getClosest(player.getTeam(), Core.input.mouseWorld(x, y).x, Core.input.mouseWorld(x, y).y, 4f, u -> !u.isFlying() && u.getMass() <= player.mech.carryWeight);
+                    Unit unit = Units.getClosest(player.getTeam(), Core.input.mouseWorld(x, y).x, Core.input.mouseWorld(x, y).y, 4f, u -> !u.isFlying() && u.mass() <= player.mech.carryWeight);
 
                     if(unit != null){
                         consumed = true;

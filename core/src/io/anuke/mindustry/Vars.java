@@ -8,6 +8,7 @@ import io.anuke.arc.entities.impl.EffectEntity;
 import io.anuke.arc.entities.trait.DrawTrait;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -16,6 +17,7 @@ import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.game.GlobalData;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Serialization;
@@ -37,12 +39,8 @@ public class Vars{
     public static final String contributorsURL = "https://api.github.com/repos/Anuken/Mindustry/contributors";
     /**URL for sending crash reports to*/
     public static final String crashReportURL = "http://mindustry.us.to/report";
-    /**time between waves in ticks (on normal mode)*/
-    public static final float wavespace = 60 * 60 * 1.5f;
     /**maximum distance between mine and core that supports automatic transferring*/
     public static final float mineTransferRange = 220f;
-    /**maximum distance from core that the player can be before it is no longer used for building*/
-    public static final float coreBuildRange = 999999f;
     /**team of the player by default*/
     public static final Team defaultTeam = Team.blue;
     /**team of the enemy in waves/sectors*/
@@ -55,10 +53,6 @@ public class Vars{
     public static final float itemSize = 5f;
     /**size of tiles in units*/
     public static final int tilesize = 8;
-    /**size of sectors in tiles*/
-    public static final int sectorSize = 256;
-    /**specific number indicating 'invalid' sector*/
-    public static final int invalidSector = Integer.MAX_VALUE;
     /**all choosable player colors in join/host dialog*/
     public static final Color[] playerColors = {
         Color.valueOf("82759a"),
@@ -110,6 +104,7 @@ public class Vars{
 
     public static ContentLoader content;
     public static GameState state;
+    public static GlobalData data;
 
     public static Control control;
     public static Logic logic;
@@ -147,7 +142,7 @@ public class Vars{
             }
         }
 
-        Arrays.sort(locales, (l1, l2) -> l1.getDisplayName(l1).compareTo(l2.getDisplayName(l2)));
+        Arrays.sort(locales, Structs.comparing(l -> l.getDisplayName(l), String.CASE_INSENSITIVE_ORDER));
         Version.init();
 
         content = new ContentLoader();
@@ -175,6 +170,7 @@ public class Vars{
         }
 
         state = new GameState();
+        data = new GlobalData();
 
         mobile = Core.app.getType() == ApplicationType.Android || Core.app.getType() == ApplicationType.iOS || testMobile;
         ios = Core.app.getType() == ApplicationType.iOS;

@@ -6,7 +6,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.fx.EnvironmentFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.Puddle;
@@ -28,7 +28,7 @@ public abstract class BaseBlock extends MappableContent{
     public boolean consumesPower = true;
     public boolean outputsPower = false;
 
-    public int itemCapacity;
+    public int itemCapacity = 10;
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
 
@@ -157,13 +157,13 @@ public abstract class BaseBlock extends MappableContent{
                         tile.entity.damage(1 * Time.delta());
                         next.entity.damage(1 * Time.delta());
                         if(Mathf.chance(0.1 * Time.delta())){
-                            Effects.effect(EnvironmentFx.fire, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
+                            Effects.effect(Fx.fire, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
                         }
                     }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) ||
                             (other.temperature > 0.7f && liquid.temperature < 0.55f)){
                         tile.entity.liquids.remove(liquid, Math.min(tile.entity.liquids.get(liquid), 0.7f * Time.delta()));
                         if(Mathf.chance(0.2f * Time.delta())){
-                            Effects.effect(EnvironmentFx.steam, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
+                            Effects.effect(Fx.steam, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
                         }
                     }
                 }

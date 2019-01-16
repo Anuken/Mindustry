@@ -9,8 +9,7 @@ import io.anuke.arc.scene.ui.ButtonGroup;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.*;
 
 public interface SelectionTrait{
 
@@ -26,7 +25,7 @@ public interface SelectionTrait{
         int i = 0;
 
         for(Item item : items){
-            if(!control.unlocks.isUnlocked(item)) continue;
+            if(!data.isUnlocked(item)) continue;
 
             ImageButton button = cont.addImageButton("white", "clear-toggle", 24, () -> {}).group(group).get();
             button.changed(() -> consumer.accept(button.isChecked() ? item : null));

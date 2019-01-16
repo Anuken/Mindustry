@@ -21,7 +21,7 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.ScreenRecorder;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
@@ -337,7 +337,7 @@ public class Renderer implements ApplicationListener{
         pixelSurface.setSize(pw, ph, false);
         Graphics.getEffectSurface().setSize(pw, ph, false);
 
-        ui.showInfoFade(Core.bundle.format("text.screenshot", file.toString()));*/
+        ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));*/
     }
 
 }

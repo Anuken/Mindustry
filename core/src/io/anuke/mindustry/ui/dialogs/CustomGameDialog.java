@@ -12,16 +12,17 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.game.Difficulty;
-import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.game.RulePreset;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class CustomGameDialog extends FloatingDialog{
+    Difficulty difficulty = Difficulty.normal;
 
     public CustomGameDialog(){
-        super("$text.customgame");
+        super("$customgame");
         addCloseButton();
         shown(this::setup);
 
@@ -29,7 +30,7 @@ public class CustomGameDialog extends FloatingDialog{
     }
 
     void setup(){
-        content().clear();
+        cont.clear();
 
         Table maps = new Table();
         maps.marginRight(14);
@@ -40,24 +41,24 @@ public class CustomGameDialog extends FloatingDialog{
 
         Table selmode = new Table();
         ButtonGroup<TextButton> group = new ButtonGroup<>();
-        selmode.add("$text.level.mode").padRight(15f);
+        selmode.add("$level.mode").padRight(15f);
         int i = 0;
 
         Table modes = new Table();
         modes.marginBottom(5);
 
-        for(GameMode mode : GameMode.values()){
-            if(mode.hidden) continue;
+        for(RulePreset mode : RulePreset.values()){
 
-            modes.addButton("$mode." + mode.name() + ".name", "toggle", () -> state.mode = mode)
-                .update(b -> b.setChecked(state.mode == mode)).group(group).size(140f, 54f);
+            //todo fix presets
+            modes.addButton(mode.toString(), "toggle", () -> state.rules = mode.get())/*
+                .update(b -> b.setChecked(state.rules == mode))*/.group(group).size(140f, 54f);
             if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);
         selmode.addButton("?", this::displayGameModeHelp).width(50f).fillY().padLeft(18f);
 
-        content().add(selmode);
-        content().row();
+        cont.add(selmode);
+        cont.row();
 
         Difficulty[] ds = Difficulty.values();
 
@@ -66,24 +67,25 @@ public class CustomGameDialog extends FloatingDialog{
         Table sdif = new Table();
 
         sdif.add("$setting.difficulty.name").padRight(15f);
-
         sdif.defaults().height(s + 4);
         sdif.addImageButton("icon-arrow-left", 10 * 3, () -> {
-            state.difficulty = (ds[Mathf.mod(state.difficulty.ordinal() - 1, ds.length)]);
+            difficulty = (ds[Mathf.mod(difficulty.ordinal() - 1, ds.length)]);
+            state.wavetime = difficulty.waveTime;
         }).width(s);
 
         sdif.addButton("", () -> {})
         .update(t -> {
-            t.setText(state.difficulty.toString());
+            t.setText(difficulty.toString());
             t.touchable(Touchable.disabled);
         }).width(180f);
 
         sdif.addImageButton("icon-arrow-right", 10 * 3, () -> {
-            state.difficulty = (ds[Mathf.mod(state.difficulty.ordinal() + 1, ds.length)]);
+            difficulty = (ds[Mathf.mod(difficulty.ordinal() + 1, ds.length)]);
+            state.wavetime = difficulty.waveTime;
         }).width(s);
 
-        content().add(sdif);
-        content().row();
+        cont.add(sdif);
+        cont.row();
 
         float images = 146f;
 
@@ -102,7 +104,7 @@ public class CustomGameDialog extends FloatingDialog{
             image.row();
             image.add("[accent]" + map.getDisplayName()).pad(3f).growX().wrap().get().setAlignment(Align.center, Align.center);
             image.row();
-            image.label((() -> Core.bundle.format("text.level.highscore", Core.settings.getInt("hiscore" + map.name, 0)))).pad(3f);
+            image.label((() -> Core.bundle.format("level.highscore", Core.settings.getInt("hiscore" + map.name, 0)))).pad(3f);
 
             BorderImage border = new BorderImage(map.texture, 3f);
             border.setScaling(Scaling.fit);
@@ -118,18 +120,19 @@ public class CustomGameDialog extends FloatingDialog{
             i++;
         }
 
+        /*
         ImageButton gen = maps.addImageButton("icon-editor", "clear", 16*4, () -> {
             hide();
             world.generator.playRandomMap();
         }).growY().get();
         gen.row();
-        gen.add("$text.map.random");
+        gen.add("$map.random");*/
 
         if(world.maps.all().size == 0){
-            maps.add("$text.maps.none").pad(50);
+            maps.add("$maps.none").pad(50);
         }
 
-        content().add(pane).uniformX();
+        cont.add(pane).uniformX();
     }
 
     private void displayGameModeHelp(){
@@ -140,14 +143,13 @@ public class CustomGameDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(table);
         pane.setFadeScrollBars(false);
         table.row();
-        for(GameMode mode : GameMode.values()){
-            if(mode.hidden) continue;
+        for(RulePreset mode : RulePreset.values()){
             table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(400f);
             table.row();
         }
 
-        d.content().add(pane);
-        d.buttons().addButton("$text.ok", d::hide).size(110, 50).pad(10f);
+        d.cont.add(pane);
+        d.buttons.addButton("$ok", d::hide).size(110, 50).pad(10f);
         d.show();
     }
 

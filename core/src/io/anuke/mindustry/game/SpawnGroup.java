@@ -101,7 +101,7 @@ public class SpawnGroup{
         }
 
         if(effect != null){
-            unit.applyEffect(effect, 10000f);
+            unit.applyEffect(effect, 999999f);
         }
 
         if(items != null){

@@ -9,10 +9,8 @@ import io.anuke.arc.function.Consumer;
 import io.anuke.arc.util.OS;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.serialization.Base64Coder;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 
@@ -29,11 +27,13 @@ public class DesktopPlatform extends Platform{
     public DesktopPlatform(String[] args){
         this.args = args;
 
-        Vars.testMobile = Array.with(args).contains("-testMobile", false);
+        testMobile = Array.with(args).contains("-testMobile");
 
         if(useDiscord){
             DiscordEventHandlers handlers = new DiscordEventHandlers();
             DiscordRPC.INSTANCE.Discord_Initialize(applicationId, handlers, true, "");
+
+            Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC.INSTANCE::Discord_Shutdown));
         }
     }
 
@@ -50,22 +50,18 @@ public class DesktopPlatform extends Platform{
         DiscordRichPresence presence = new DiscordRichPresence();
 
         if(!state.is(State.menu)){
-            presence.state = Strings.capitalize(state.mode.name());
+            presence.state = state.rules.waves ? "Survival" : "Attack";
             if(world.getMap() == null){
                 presence.details = "Unknown Map";
-            }else if(state.mode.disableWaves){
+            }else if(!state.rules.waves){
                 presence.details = Strings.capitalize(world.getMap().name);
             }else{
                 presence.details = Strings.capitalize(world.getMap().name) + " | Wave " + state.wave;
                 presence.largeImageText = "Wave " + state.wave;
             }
 
-            if(state.mode != GameMode.attack){
-                presence.state = Strings.capitalize(state.mode.name());
-            }else{
-                presence.state = unitGroups[players[0].getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
-                (unitGroups[players[0].getTeam().ordinal()].size() + " Units Active");
-            }
+            presence.state = unitGroups[players[0].getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
+            (unitGroups[players[0].getTeam().ordinal()].size() + " Units Active");
 
             if(Net.active()){
                 presence.partyMax = 16;
@@ -82,11 +78,6 @@ public class DesktopPlatform extends Platform{
         presence.largeImageKey = "logo";
 
         DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
-    }
-
-    @Override
-    public void onGameExit(){
-        if(useDiscord) DiscordRPC.INSTANCE.Discord_Shutdown();
     }
 
     @Override

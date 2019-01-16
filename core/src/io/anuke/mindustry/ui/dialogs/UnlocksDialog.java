@@ -13,13 +13,12 @@ import io.anuke.arc.scene.ui.Tooltip;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.utils.UIUtils;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.*;
 
 public class UnlocksDialog extends FloatingDialog{
 
     public UnlocksDialog(){
-        super("$text.unlocks");
+        super("$unlocks");
 
         shouldPause = true;
         addCloseButton();
@@ -28,13 +27,13 @@ public class UnlocksDialog extends FloatingDialog{
     }
 
     void rebuild(){
-        content().clear();
+        cont.clear();
 
         Table table = new Table();
         table.margin(20);
         ScrollPane pane = new ScrollPane(table);
 
-        Array<Content>[] allContent = content.getContentMap();
+        Array<Content>[] allContent = Vars.content.getContentMap();
 
         for(int j = 0; j < allContent.length; j ++){
             ContentType type = ContentType.values()[j];
@@ -59,11 +58,11 @@ public class UnlocksDialog extends FloatingDialog{
 
                     if(unlock.isHidden()) continue;
 
-                    Image image = control.unlocks.isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked");
+                    Image image = data.isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked");
                     image.addListener(new HandCursorListener());
                     list.add(image).size(size).pad(3);
 
-                    if(control.unlocks.isUnlocked(unlock)){
+                    if(data.isUnlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));
                         image.addListener(new Tooltip<>(new Table("button"){{
                             add(unlock.localizedName());
@@ -78,6 +77,6 @@ public class UnlocksDialog extends FloatingDialog{
             table.row();
         }
 
-        content().add(pane);
+        cont.add(pane);
     }
 }

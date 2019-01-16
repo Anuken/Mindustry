@@ -5,7 +5,7 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.GridBits;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Structs;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.Squad;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -177,12 +177,7 @@ public class WaveSpawner{
         flySpawns.clear();
         groundSpawns.clear();
         quadrants = new GridBits(quadWidth(), quadHeight());
-
-        if(world.getSector() == null){
-            groups = Waves.getSpawns();
-        }else{
-            groups = world.getSector().spawns;
-        }
+        groups = Waves.getSpawns();
 
         dynamicSpawn = true;
 

@@ -14,7 +14,7 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.fx.ExplosionFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
@@ -31,7 +31,6 @@ import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.units.CommandCenter.CommandCenterEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
 import java.io.DataInput;
@@ -77,7 +76,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         unit.onSuperDeath();
 
         ScorchDecal.create(unit.x, unit.y);
-        Effects.effect(ExplosionFx.explosion, unit);
+        Effects.effect(Fx.explosion, unit);
         Effects.shake(2f, 2f, unit);
 
         //must run afterwards so the unit's group is not null when sending the removal packet
@@ -85,7 +84,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public float getDrag(){
+    public float drag(){
         return type.drag;
     }
 
@@ -98,17 +97,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         this.type = type;
         this.team = team;
-    }
-
-    public boolean isCommanded(){
-        return !isWave && world.indexer.getAllied(team, BlockFlag.comandCenter).size != 0 && world.indexer.getAllied(team, BlockFlag.comandCenter).first().entity instanceof CommandCenterEntity;
-    }
-
-    public UnitCommand getCommand(){
-        if(isCommanded()){
-            return world.indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
-        }
-        return null;
     }
 
     public UnitType getType(){
@@ -184,7 +172,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void targetClosest(){
-        target = Units.getClosestTarget(team, x, y, Math.max(getWeapon().getAmmo().getRange(), type.range), u -> type.targetAir || !u.isFlying());
+        target = Units.getClosestTarget(team, x, y, Math.max(getWeapon().getAmmo().range(), type.range), u -> type.targetAir || !u.isFlying());
     }
 
     public TileEntity getClosestEnemyCore(){
@@ -275,7 +263,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public float getMass(){
+    public float mass(){
         return type.mass;
     }
 
@@ -326,7 +314,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public float getMaxVelocity(){
+    public float maxVelocity(){
         return type.maxVelocity;
     }
 
@@ -350,19 +338,15 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         state.set(getStartState());
 
         health(maxHealth());
-
-        if(isCommanded()){
-            onCommand(getCommand());
-        }
     }
 
     @Override
-    public void getHitbox(Rectangle rectangle){
+    public void hitbox(Rectangle rectangle){
         rectangle.setSize(type.hitsize).setCenter(x, y);
     }
 
     @Override
-    public void getHitboxTile(Rectangle rectangle){
+    public void hitboxTile(Rectangle rectangle){
         rectangle.setSize(type.hitsizeTile).setCenter(x, y);
     }
 

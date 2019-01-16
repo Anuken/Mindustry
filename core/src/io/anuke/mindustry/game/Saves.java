@@ -125,7 +125,6 @@ public class Saves{
         saveMap.put(slot.index, slot);
         slot.meta = SaveIO.getData(slot.index);
         current = slot;
-        slot.meta.sector = invalidSector;
         saveSlots();
         return slot;
     }
@@ -176,7 +175,7 @@ public class Saves{
         }
 
         public boolean isHidden(){
-            return meta.sector != invalidSector;
+            return false;
         }
 
         public String getPlayTime(){
@@ -214,10 +213,6 @@ public class Saves{
 
         public Difficulty getDifficulty(){
             return meta.difficulty;
-        }
-
-        public GameMode getMode(){
-            return meta.mode;
         }
 
         public boolean isAutosave(){

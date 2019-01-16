@@ -24,7 +24,7 @@ public class LoadDialog extends FloatingDialog{
     Table slots;
 
     public LoadDialog(){
-        this("$text.loadgame");
+        this("$loadgame");
     }
 
     public LoadDialog(String title){
@@ -40,7 +40,7 @@ public class LoadDialog extends FloatingDialog{
     }
 
     protected void setup(){
-        content().clear();
+        cont.clear();
 
         slots = new Table();
         pane = new ScrollPane(slots);
@@ -71,14 +71,14 @@ public class LoadDialog extends FloatingDialog{
                 }).checked(slot.isAutosave()).right();
 
                 t.addImageButton("icon-trash", "empty", 14 * 3, () -> {
-                    ui.showConfirm("$text.confirm", "$text.save.delete.confirm", () -> {
+                    ui.showConfirm("$confirm", "$save.delete.confirm", () -> {
                         slot.delete();
                         setup();
                     });
                 }).size(14 * 3).right();
 
                 t.addImageButton("icon-pencil-small", "empty", 14 * 3, () -> {
-                    ui.showTextInput("$text.save.rename", "$text.save.rename.text", slot.getName(), text -> {
+                    ui.showTextInput("$save.rename", "$save.rename.text", slot.getName(), text -> {
                         slot.setName(text);
                         setup();
                     });
@@ -86,12 +86,12 @@ public class LoadDialog extends FloatingDialog{
 
                 t.addImageButton("icon-save", "empty", 14 * 3, () -> {
                     if(!ios){
-                        Platform.instance.showFileChooser(Core.bundle.get("text.save.export"), "Mindustry Save", file -> {
+                        Platform.instance.showFileChooser(Core.bundle.get("save.export"), "Mindustry Save", file -> {
                             try{
                                 slot.exportFile(file);
                                 setup();
                             }catch(IOException e){
-                                ui.showError(Core.bundle.format("text.save.export.fail", Strings.parseException(e, false)));
+                                ui.showError(Core.bundle.format("save.export.fail", Strings.parseException(e, false)));
                             }
                         }, false, saveExtension);
                     }else{
@@ -100,7 +100,7 @@ public class LoadDialog extends FloatingDialog{
                             slot.exportFile(file);
                             Platform.instance.shareFile(file);
                         }catch(Exception e){
-                            ui.showError(Core.bundle.format("text.save.export.fail", Strings.parseException(e, false)));
+                            ui.showError(Core.bundle.format("save.export.fail", Strings.parseException(e, false)));
                         }
                     }
                 }).size(14 * 3).right();
@@ -112,19 +112,17 @@ public class LoadDialog extends FloatingDialog{
 
             button.defaults().padBottom(3);
             button.row();
-            button.add(Core.bundle.format("text.save.map", color + (slot.getMap() == null ? "Unknown" : slot.getMap().meta.name())));
+            button.add(Core.bundle.format("save.map", color + (slot.getMap() == null ? Core.bundle.get("unknown") : slot.getMap().meta.name())));
             button.row();
-            button.add(Core.bundle.get("text.level.mode") + " " + color + slot.getMode());
+            button.add(Core.bundle.format("save.wave", color + slot.getWave()));
             button.row();
-            button.add(Core.bundle.format("text.save.wave", color + slot.getWave()));
+            button.add(Core.bundle.format("save.difficulty", color + slot.getDifficulty()));
             button.row();
-            button.add(Core.bundle.format("text.save.difficulty", color + slot.getDifficulty()));
+            button.label(() -> Core.bundle.format("save.autosave", color + Core.bundle.get(slot.isAutosave() ? "on" : "off")));
             button.row();
-            button.label(() -> Core.bundle.format("text.save.autosave", color + Core.bundle.get(slot.isAutosave() ? "text.on" : "text.off")));
+            button.label(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
             button.row();
-            button.label(() -> Core.bundle.format("text.save.playtime", color + slot.getPlayTime()));
-            button.row();
-            button.add(Core.bundle.format("text.save.date", color + slot.getDate())).colspan(2).padTop(5).right();
+            button.add(Core.bundle.format("save.date", color + slot.getDate())).colspan(2).padTop(5).right();
             button.row();
             modifyButton(button, slot);
 
@@ -132,7 +130,7 @@ public class LoadDialog extends FloatingDialog{
             slots.row();
         }
 
-        content().add(pane);
+        cont.add(pane);
 
         addSetup();
     }
@@ -144,7 +142,7 @@ public class LoadDialog extends FloatingDialog{
         if(!valids){
 
             slots.row();
-            slots.addButton("$text.save.none", () -> {
+            slots.addButton("$save.none", () -> {
             }).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
         }
 
@@ -152,18 +150,18 @@ public class LoadDialog extends FloatingDialog{
 
         if(ios) return;
 
-        slots.addImageTextButton("$text.save.import", "icon-add", 14 * 3, () -> {
-            Platform.instance.showFileChooser(Core.bundle.get("text.save.import"), "Mindustry Save", file -> {
+        slots.addImageTextButton("$save.import", "icon-add", 14 * 3, () -> {
+            Platform.instance.showFileChooser(Core.bundle.get("save.import"), "Mindustry Save", file -> {
                 if(SaveIO.isSaveValid(file)){
                     try{
                         control.saves.importSave(file);
                         setup();
                     }catch(IOException e){
                         e.printStackTrace();
-                        ui.showError(Core.bundle.format("text.save.import.fail", Strings.parseException(e, false)));
+                        ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, false)));
                     }
                 }else{
-                    ui.showError("$text.save.import.invalid");
+                    ui.showError("$save.import.invalid");
                 }
             }, true, saveExtension);
         }).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
@@ -173,7 +171,7 @@ public class LoadDialog extends FloatingDialog{
         hide();
         ui.paused.hide();
 
-        ui.loadLogic(() -> {
+        ui.loadAnd(() -> {
             try{
                 slot.load();
                 state.set(State.playing);
@@ -181,7 +179,7 @@ public class LoadDialog extends FloatingDialog{
                 Log.err(e);
                 state.set(State.menu);
                 logic.reset();
-                ui.showError("$text.save.corrupted");
+                ui.showError("$save.corrupted");
             }
         });
     }
@@ -191,7 +189,7 @@ public class LoadDialog extends FloatingDialog{
             if(!button.childrenPressed()){
                 int build = slot.getBuild();
                 if(SaveIO.breakingVersions.contains(build)){
-                    ui.showInfo("$text.save.old");
+                    ui.showInfo("$save.old");
                     slot.delete();
                 }else{
                     runLoadSave(slot);

@@ -10,7 +10,7 @@ import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
@@ -48,7 +48,6 @@ public class UnitFactory extends Block{
         hasPower = true;
         hasItems = true;
         solid = false;
-        itemCapacity = 10;
         flags = EnumSet.of(BlockFlag.producer, BlockFlag.target);
 
         consumes.require(ConsumeItems.class);
@@ -64,14 +63,14 @@ public class UnitFactory extends Block{
         entity.buildTime = 0f;
 
         Effects.shake(2f, 3f, entity);
-        Effects.effect(BlockFx.producesmoke, tile.drawx(), tile.drawy());
+        Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
 
         if(!Net.client()){
             BaseUnit unit = factory.type.create(tile.getTeam());
             unit.setSpawner(tile);
             unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
             unit.add();
-            unit.getVelocity().y = factory.launchVelocity;
+            unit.velocity().y = factory.launchVelocity;
         }
     }
 
@@ -155,8 +154,8 @@ public class UnitFactory extends Block{
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
             }
             //check if grace period had passed
-        }else if(entity.warmup > produceTime*gracePeriodMultiplier * Vars.state.difficulty.spawnerScaling){
-            float speedMultiplier = Math.min(0.1f + (entity.warmup - produceTime * gracePeriodMultiplier * Vars.state.difficulty.spawnerScaling) / speedupTime, maxSpeedup);
+        }else if(entity.warmup > produceTime*gracePeriodMultiplier){
+            float speedMultiplier = Math.min(0.1f + (entity.warmup - produceTime * gracePeriodMultiplier) / speedupTime, maxSpeedup);
             //otherwise, it's an enemy, cheat by not requiring resources
             entity.buildTime += entity.delta() * speedMultiplier;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);

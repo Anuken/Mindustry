@@ -1,13 +1,13 @@
 package io.anuke.mindustry.entities.bullet;
 
-import io.anuke.mindustry.content.fx.BulletFx;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.mindustry.content.Fx;
 
 //TODO scale velocity depending on fslope()
 public class ArtilleryBulletType extends BasicBulletType{
-    protected Effect trailEffect = BulletFx.artilleryTrail;
+    protected Effect trailEffect = Fx.artilleryTrail;
 
     public ArtilleryBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage, bulletSprite);
@@ -34,9 +34,9 @@ public class ArtilleryBulletType extends BasicBulletType{
         float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, bulletWidth * scale, height * scale, b.angle() - 90);
+        Draw.rect(backRegion, b.x, b.y, bulletWidth * scale, height * scale, b.rot() - 90);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, bulletWidth * scale, height * scale, b.angle() - 90);
+        Draw.rect(frontRegion, b.x, b.y, bulletWidth * scale, height * scale, b.rot() - 90);
         Draw.color();
     }
 }

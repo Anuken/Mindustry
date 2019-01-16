@@ -4,7 +4,6 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.entities.Entities;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.EntityQuery;
@@ -12,13 +11,11 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
 
@@ -53,36 +50,24 @@ public class Logic implements ApplicationListener{
 
     /**Handles the event of content being used by either the player or some block.*/
     public void handleContent(UnlockableContent content){
-        if(world.getSector() != null){
-            world.getSector().currentMission().onContentUsed(content);
-        }
-
         if(!headless){
-            control.unlocks.unlockContent(content);
+            data.unlockContent(content);
         }
     }
 
     public void play(){
         state.set(State.playing);
-        state.wavetime = wavespace * state.difficulty.timeScaling * 2;
-
-        for(Tile tile : state.teams.get(defaultTeam).cores){
-            if(world.getSector() != null){
-                Array<ItemStack> items = world.getSector().startingItems;
-                for(ItemStack stack : items){
-                    tile.entity.items.add(stack.item, stack.amount);
-                }
-            }
-        }
+        state.wavetime = state.rules.waveSpacing * 2; //grace period of 2x wave time before game starts
 
         Events.fire(new PlayEvent());
     }
 
     public void reset(){
         state.wave = 1;
-        state.wavetime = wavespace * state.difficulty.timeScaling;
+        state.wavetime = state.rules.waveSpacing;
         state.gameOver = false;
         state.teams = new Teams();
+        state.rules = new Rules();
 
         Time.clear();
         Entities.clear();
@@ -94,16 +79,16 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         world.spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = wavespace * state.difficulty.timeScaling;
+        state.wavetime = state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
     }
 
     private void checkGameOver(){
-        if(!state.mode.isPvp && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
+        if(!state.rules.pvp && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
             state.gameOver = true;
             Events.fire(new GameOverEvent(waveTeam));
-        }else if(state.mode.isPvp){
+        }else if(state.rules.pvp){
             Team alive = null;
 
             for(Team team : Team.all){
@@ -122,50 +107,10 @@ public class Logic implements ApplicationListener{
         }
     }
 
-    private void updateSectors(){
-        if(world.getSector() == null || state.gameOver) return;
-
-        world.getSector().currentMission().update();
-
-        //check unlocked sectors
-        while(!world.getSector().complete && world.getSector().currentMission().isComplete()){
-            Call.onMissionFinish(world.getSector().completedMissions);
-        }
-
-        //check if all assigned missions are complete
-        if(!world.getSector().complete && world.getSector().completedMissions >= world.getSector().missions.size){
-            Call.onSectorComplete();
-        }
-    }
-
     @Remote(called = Loc.both)
     public static void onGameOver(Team winner){
         ui.restart.show(winner);
         netClient.setQuiet();
-    }
-
-    @Remote(called = Loc.server)
-    public static void onMissionFinish(int index){
-        world.getSector().missions.get(index).onComplete();
-        world.getSector().completedMissions = index + 1;
-
-        state.mode = world.getSector().currentMission().getMode();
-        world.getSector().currentMission().onBegin();
-        world.sectors.save();
-    }
-
-    @Remote(called = Loc.server)
-    public static void onSectorComplete(){
-        state.mode = GameMode.victory;
-
-        world.sectors.completeSector(world.getSector().x, world.getSector().y);
-        world.sectors.save();
-
-        if(!headless && !Net.client()){
-            ui.missions.show(world.getSector());
-        }
-
-        Events.fire(new SectorCompleteEvent());
     }
 
     @Override
@@ -176,16 +121,17 @@ public class Logic implements ApplicationListener{
             if(!state.isPaused()){
                 Time.update();
 
-                if(!state.mode.disableWaveTimer && !state.mode.disableWaves && !state.gameOver){
-                    state.wavetime -= Time.delta();
+                if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
+                    state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
                 }
 
-                if(!Net.client() && state.wavetime <= 0 && !state.mode.disableWaves){
+                if(!Net.client() && state.wavetime <= 0 && state.rules.waves){
                     runWave();
                 }
 
-                if(!Entities.defaultGroup().isEmpty())
-                    throw new RuntimeException("Do not add anything to the default group!");
+                if(!Entities.defaultGroup().isEmpty()){
+                    throw new IllegalArgumentException("Do not add anything to the default group!");
+                }
 
                 if(!headless){
                     Entities.update(effectGroup);
@@ -221,7 +167,6 @@ public class Logic implements ApplicationListener{
             }
 
             if(!Net.client() && !world.isInvalidMap()){
-                updateSectors();
                 checkGameOver();
             }
         }

@@ -190,7 +190,7 @@ project(":core"){
 
     dependencies{
         compileJava.dependsOn(cleanGen)
-        build.finalizedBy(copyGen)
+        compileJava.finalizedBy(copyGen)
 
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")

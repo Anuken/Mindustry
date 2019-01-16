@@ -27,11 +27,11 @@ public class MapsDialog extends FloatingDialog{
     private FloatingDialog dialog;
 
     public MapsDialog(){
-        super("$text.maps");
+        super("$maps");
 
         addCloseButton();
-        buttons().addImageTextButton("$text.editor.importmap", "icon-add", 14 * 2, () -> {
-            Platform.instance.showFileChooser("$text.editor.importmap", "Map File", file -> {
+        buttons.addImageTextButton("$editor.importmap", "icon-add", 14 * 2, () -> {
+            Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
                 try{
                     DataInputStream stream = new DataInputStream(file.read());
                     MapMeta meta = MapIO.readMapMeta(stream);
@@ -41,9 +41,9 @@ public class MapsDialog extends FloatingDialog{
                     String name = meta.tags.get("name", file.nameWithoutExtension());
 
                     if(world.maps.getByName(name) != null && !world.maps.getByName(name).custom){
-                        ui.showError(Core.bundle.format("text.editor.import.exists", name));
+                        ui.showError(Core.bundle.format("editor.import.exists", name));
                     }else if(world.maps.getByName(name) != null){
-                        ui.showConfirm("$text.confirm", "$text.editor.overwrite.confirm", () -> {
+                        ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
                             world.maps.saveMap(name, data, meta.tags);
                             setup();
                         });
@@ -53,7 +53,7 @@ public class MapsDialog extends FloatingDialog{
                     }
 
                 }catch(Exception e){
-                    ui.showError(Core.bundle.format("text.editor.errorimageload", Strings.parseException(e, false)));
+                    ui.showError(Core.bundle.format("editor.errorimageload", Strings.parseException(e, false)));
                     Log.err(e);
                 }
             }, true, mapExtension);
@@ -68,7 +68,7 @@ public class MapsDialog extends FloatingDialog{
     }
 
     void setup(){
-        content().clear();
+        cont.clear();
 
         Table maps = new Table();
         maps.marginRight(24);
@@ -95,24 +95,24 @@ public class MapsDialog extends FloatingDialog{
             button.row();
             button.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize - 20f);
             button.row();
-            button.add(map.custom ? "$text.custom" : "$text.builtin").color(Color.GRAY).padTop(3);
+            button.add(map.custom ? "$custom" : "$builtin").color(Color.GRAY).padTop(3);
 
             i++;
         }
 
         if(world.maps.all().size == 0){
-            maps.add("$text.maps.none");
+            maps.add("$maps.none");
         }
 
-        content().add(pane).uniformX();
+        cont.add(pane).uniformX();
     }
 
     void showMapInfo(Map map){
-        dialog = new FloatingDialog("$text.editor.mapinfo");
+        dialog = new FloatingDialog("$editor.mapinfo");
         dialog.addCloseButton();
 
         float mapsize = UIUtils.portrait() ? 160f : 300f;
-        Table table = dialog.content();
+        Table table = dialog.cont;
 
         table.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize);
 
@@ -127,38 +127,38 @@ public class MapsDialog extends FloatingDialog{
             t.top();
             t.defaults().padTop(10).left();
 
-            t.add("$text.editor.name").padRight(10).color(Color.GRAY).padTop(0);
+            t.add("$editor.name").padRight(10).color(Color.GRAY).padTop(0);
             t.row();
             t.add(map.meta.tags.get("name", map.name)).growX().wrap().padTop(2);
             t.row();
-            t.add("$text.editor.author").padRight(10).color(Color.GRAY);
+            t.add("$editor.author").padRight(10).color(Color.GRAY);
             t.row();
             t.add(map.meta.author()).growX().wrap().padTop(2);
             t.row();
-            t.add("$text.editor.description").padRight(10).color(Color.GRAY).top();
+            t.add("$editor.description").padRight(10).color(Color.GRAY).top();
             t.row();
             t.add(map.meta.description()).growX().wrap().padTop(2);
             t.row();
-            t.add("$text.editor.oregen.info").padRight(10).color(Color.GRAY);
+            t.add("$editor.oregen.info").padRight(10).color(Color.GRAY);
             t.row();
-            t.add(map.meta.hasOreGen() ? "$text.on" : "$text.off").padTop(2);
+            t.add(map.meta.hasOreGen() ? "$on" : "$off").padTop(2);
         }).height(mapsize).width(mapsize);
 
         table.row();
 
-        table.addImageTextButton("$text.editor.openin", "icon-load-map", 16 * 2, () -> {
+        table.addImageTextButton("$editor.openin", "icon-load-map", 16 * 2, () -> {
             try{
                 Vars.ui.editor.beginEditMap(map.stream.get());
                 dialog.hide();
                 hide();
             }catch(Exception e){
                 e.printStackTrace();
-                ui.showError("$text.error.mapnotfound");
+                ui.showError("$error.mapnotfound");
             }
         }).fillX().height(54f).marginLeft(10);
 
-        table.addImageTextButton("$text.delete", "icon-trash-16", 16 * 2, () -> {
-            ui.showConfirm("$text.confirm", Core.bundle.format("text.map.delete", map.name), () -> {
+        table.addImageTextButton("$delete", "icon-trash-16", 16 * 2, () -> {
+            ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name), () -> {
                 world.maps.removeMap(map);
                 dialog.hide();
                 setup();

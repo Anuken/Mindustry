@@ -8,7 +8,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -21,6 +21,8 @@ import static io.anuke.mindustry.Vars.*;
 public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 6;
+    private final static boolean disableShadows = false;
+    private final static Color shadowColor = new Color(0, 0, 0, 0.19f);
 
     public final FloorRenderer floor = new FloorRenderer();
 
@@ -28,7 +30,7 @@ public class BlockRenderer{
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private int requestidx = 0;
     private int iterateidx = 0;
-    private FrameBuffer shadows = new FrameBuffer(1, 1);
+    private FrameBuffer shadows = new FrameBuffer(2, 2);
 
     public BlockRenderer(){
 
@@ -53,19 +55,21 @@ public class BlockRenderer{
     }
 
     public void drawShadows(){
+        if(disableShadows) return;
+
         if(shadows.getWidth() != Core.graphics.getWidth() || shadows.getHeight() != Core.graphics.getHeight()){
             shadows.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         }
 
         Tmp.tr1.set(shadows.getTexture());
-        Shaders.outline.color.set(0, 0, 0, 0.15f);
+        Shaders.outline.color.set(shadowColor);
         Shaders.outline.scl = renderer.cameraScale()/3f;
         Shaders.outline.region = Tmp.tr1;
 
         Draw.flush();
         shadows.begin();
         Core.graphics.clear(Color.CLEAR);
-        Draw.color(Color.BLACK);
+        Draw.color(shadowColor);
         drawBlocks(Layer.shadow);
         Draw.color();
         Draw.flush();
@@ -86,8 +90,8 @@ public class BlockRenderer{
         int avgx = (int)(camera.position.x / tilesize);
         int avgy = (int)(camera.position.y / tilesize);
 
-        int rangex = (int) (camera.width  / tilesize / 2) + 2;
-        int rangey = (int) (camera.height  / tilesize / 2) + 2;
+        int rangex = (int) (camera.width / tilesize / 2) + 3;
+        int rangey = (int) (camera.height / tilesize / 2) + 3;
 
         if(avgx == lastCamX && avgy == lastCamY && lastRangeX == rangex && lastRangeY == rangey){
             return;
@@ -107,7 +111,6 @@ public class BlockRenderer{
 
                 if(tile != null){
                     Block block = tile.block();
-                    Team team = tile.getTeam();
 
                     if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
                         tile.block().drawShadow(tile);
@@ -132,8 +135,6 @@ public class BlockRenderer{
                 }
             }
         }
-
-        Draw.proj(camera.projection());
 
         Sort.instance().sort(requests.items, 0, requestidx);
 
@@ -192,7 +193,6 @@ public class BlockRenderer{
     }
 
     public void skipLayer(Layer stopAt){
-
         for(; iterateidx < requestidx; iterateidx++){
             if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
                 break;

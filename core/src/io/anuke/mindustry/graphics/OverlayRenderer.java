@@ -9,7 +9,7 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.input.InputHandler;
@@ -25,10 +25,6 @@ public class OverlayRenderer{
     public void drawBottom(){
         for(Player player : players){
             InputHandler input = control.input(player.playerIndex);
-
-            if(world.getSector() != null){
-                world.getSector().currentMission().drawOverlay();
-            }
 
             if(!input.isDrawing() || player.isDead()) continue;
 
@@ -80,11 +76,11 @@ public class OverlayRenderer{
                 for(Team enemy : state.teams.enemiesOf(player.getTeam())){
                     for(Tile core : state.teams.get(enemy).cores){
                         float dst = Mathf.dst(player.x, player.y, core.drawx(), core.drawy());
-                        if(dst < state.mode.enemyCoreBuildRadius * 1.5f){
+                        if(dst < state.rules.enemyCoreBuildRadius * 1.5f){
                             Draw.color(Color.DARK_GRAY);
-                            Lines.poly(core.drawx(), core.drawy() - 2, 200, state.mode.enemyCoreBuildRadius);
+                            Lines.poly(core.drawx(), core.drawy() - 2, 200, state.rules.enemyCoreBuildRadius);
                             Draw.color(Palette.accent, enemy.color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
-                            Lines.poly(core.drawx(), core.drawy(), 200, state.mode.enemyCoreBuildRadius);
+                            Lines.poly(core.drawx(), core.drawy(), 200, state.rules.enemyCoreBuildRadius);
                         }
                     }
                 }

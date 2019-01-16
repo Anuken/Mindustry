@@ -20,7 +20,7 @@ public class ColorPickDialog extends Dialog{
 
     private void build(){
         Table table = new Table();
-        content().add(table);
+        cont.add(table);
 
         for(int i = 0; i < playerColors.length; i++){
             Color color = playerColors[i];

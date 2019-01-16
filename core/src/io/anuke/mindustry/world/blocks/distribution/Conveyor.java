@@ -28,7 +28,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Conveyor extends Block{
-    private static final float itemSpace = 0.135f * 2.5f;
+    private static final float itemSpace = 0.135f * 3f;
     private static final float offsetScl = 128f * 3f;
     private static final float minmove = 1f / (Short.MAX_VALUE - 2);
     private static ItemPos drawpos = new ItemPos();
@@ -177,7 +177,7 @@ public class Conveyor extends Block{
         }
 
         if(entity.convey.size * itemSpace < 0.9f){
-            unit.getVelocity().add((tx * speed + centerx) * entity.delta(), (ty * speed + centery) * entity.delta());
+            unit.velocity().add((tx * speed + centerx) * entity.delta(), (ty * speed + centery) * entity.delta());
         }
     }
 

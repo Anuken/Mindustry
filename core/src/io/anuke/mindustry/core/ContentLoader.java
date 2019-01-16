@@ -6,9 +6,6 @@ import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.util.Log;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.content.blocks.*;
-import io.anuke.mindustry.content.bullets.*;
-import io.anuke.mindustry.content.fx.*;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
@@ -19,10 +16,7 @@ import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.MappableContent;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper;
@@ -41,66 +35,21 @@ public class ContentLoader{
     private MappableContent[][] temporaryMapper;
     private ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
-        //effects
-        new BlockFx(),
-        new BulletFx(),
-        new EnvironmentFx(),
-        new ExplosionFx(),
         new Fx(),
-        new ShootFx(),
-        new UnitFx(),
-
-        //items
         new Items(),
-
-        //status effects
         new StatusEffects(),
-
-        //liquids
         new Liquids(),
-
-        //bullets
-        new ArtilleryBullets(),
-        new FlakBullets(),
-        new MissileBullets(),
-        new StandardBullets(),
-        new TurretBullets(),
-        new WeaponBullets(),
-
-
-        //ammotypes
-        new AmmoTypes(),
-
-        //weapons
+        new Bullets(),
         new Weapons(),
-
-        //mechs
         new Mechs(),
-
-        //units
         new UnitTypes(),
-
-        //blocks
         new Blocks(),
-        new DefenseBlocks(),
-        new DistributionBlocks(),
-        new ProductionBlocks(),
-        new TurretBlocks(),
-        new DebugBlocks(),
-        new LiquidBlocks(),
-        new StorageBlocks(),
-        new UnitBlocks(),
-        new PowerBlocks(),
-        new CraftingBlocks(),
-        new UpgradeBlocks(),
-        new OreBlocks(),
+        new Recipes(),
+        new Zones(),
 
-        //not really a content class, but this makes initialization easier
+        //these are not really content classes, but this makes initialization easier
         new ColorMapper(),
         new LegacyColorMapper(),
-
-        //recipes
-        new Recipes(),
     };
 
     /**Creates all content types.*/
@@ -267,6 +216,10 @@ public class ContentLoader{
         return (BulletType) getByID(ContentType.bullet, id);
     }
 
+    public Array<Zone> zones(){
+        return getBy(ContentType.zone);
+    }
+
     /**
      * Registers sync IDs for all types of sync entities.
      * Do not register units here!
@@ -279,7 +232,5 @@ public class ContentLoader{
         TypeTrait.registerType(Lightning.class, Lightning::new);
     }
 
-    private class ImpendingDoomException extends RuntimeException{
-        public ImpendingDoomException(String s){ super(s); }
-    }
+    private class ImpendingDoomException extends RuntimeException{ ImpendingDoomException(String s){ super(s); }}
 }

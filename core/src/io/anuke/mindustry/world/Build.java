@@ -6,7 +6,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.BlockBuildBeginEvent;
 import io.anuke.mindustry.game.Team;
@@ -109,7 +109,7 @@ public class Build{
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
         Recipe recipe = Recipe.getByResult(type);
 
-        if(recipe == null || (recipe.mode != null && recipe.mode != state.mode)){
+        if(recipe == null || (!recipe.visibility.usable())){
             return false;
         }
 
@@ -121,7 +121,7 @@ public class Build{
         //check for enemy cores
         for(Team enemy : state.teams.enemiesOf(team)){
             for(Tile core : state.teams.get(enemy).cores){
-                if(Mathf.dst(x*tilesize + type.offset(), y*tilesize + type.offset(), core.drawx(), core.drawy()) < state.mode.enemyCoreBuildRadius + type.size*tilesize/2f){
+                if(Mathf.dst(x*tilesize + type.offset(), y*tilesize + type.offset(), core.drawx(), core.drawy()) < state.rules.enemyCoreBuildRadius + type.size*tilesize/2f){
                     return false;
                 }
             }
@@ -149,8 +149,8 @@ public class Build{
             for(int dx = 0; dx < type.size; dx++){
                 for(int dy = 0; dy < type.size; dy++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace)
-                            || other.hasCliffs() || !other.floor().placeableOn ||
+                    if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) ||
+                            !other.floor().placeableOn ||
                             (other.floor().isLiquid && !type.floating)){
                         return false;
                     }
@@ -161,7 +161,7 @@ public class Build{
             return (tile.getTeam() == Team.none || tile.getTeam() == team)
                     && contactsGround(tile.x, tile.y, type)
                     && (!tile.floor().isLiquid || type.floating)
-                    && tile.floor().placeableOn && !tile.hasCliffs()
+                    && tile.floor().placeableOn
                     && ((type.canReplace(tile.block())
                     && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
                     && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);

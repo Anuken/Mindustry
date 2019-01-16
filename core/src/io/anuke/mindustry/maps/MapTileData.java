@@ -4,7 +4,7 @@ import io.anuke.arc.collection.IntIntMap;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.world.Block;
 
 import java.nio.ByteBuffer;

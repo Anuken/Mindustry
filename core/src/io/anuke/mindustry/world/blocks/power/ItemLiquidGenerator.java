@@ -7,7 +7,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
@@ -32,8 +32,8 @@ public class ItemLiquidGenerator extends PowerGenerator{
     /** Maximum liquid used per frame. */
     protected float maxLiquidGenerate = 0.4f;
 
-    protected Effects.Effect generateEffect = BlockFx.generatespark;
-    protected Effects.Effect explodeEffect = BlockFx.generatespark;
+    protected Effects.Effect generateEffect = Fx.generatespark;
+    protected Effects.Effect explodeEffect = Fx.generatespark;
     protected Color heatColor = Color.valueOf("ff9b59");
     protected TextureRegion topRegion;
 

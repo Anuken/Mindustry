@@ -352,7 +352,7 @@ public class Block extends BaseBlock {
     }
 
     public void handleBulletHit(TileEntity entity, Bullet bullet){
-        entity.damage(bullet.getDamage());
+        entity.damage(bullet.damage());
     }
 
     public void update(Tile tile){
@@ -506,9 +506,6 @@ public class Block extends BaseBlock {
 
     public void draw(Tile tile){
         Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
-    }
-
-    public void drawNonLayer(Tile tile){
     }
 
     public void drawShadow(Tile tile){

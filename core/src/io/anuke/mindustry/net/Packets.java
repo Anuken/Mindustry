@@ -14,7 +14,7 @@ public class Packets{
 
     public enum KickReason{
         kick, clientOutdated, serverOutdated, banned, gameover(true), recentKick,
-        nameInUse, idInUse, nameEmpty, customClient, sectorComplete, serverClose;
+        nameInUse, idInUse, nameEmpty, customClient, serverClose;
 
         public final boolean quiet;
 
@@ -28,11 +28,11 @@ public class Packets{
 
         @Override
         public String toString(){
-            return Core.bundle.get("text.server.kicked." + name());
+            return Core.bundle.get("server.kicked." + name());
         }
 
         public String extraText(){
-            return Core.bundle.getOrNull("text.server.kicked." + name() + ".text");
+            return Core.bundle.getOrNull("server.kicked." + name() + ".text");
         }
     }
 

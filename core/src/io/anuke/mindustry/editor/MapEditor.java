@@ -5,7 +5,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.MapTileData;

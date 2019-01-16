@@ -10,12 +10,11 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Palette;
 
-/**
- * A BulletType for most ammo-based bullets shot from turrets and units.
- */
+/**An extended BulletType for most ammo-based bullets shot from turrets and units.*/
 public class BasicBulletType extends BulletType{
     public Color backColor = Palette.bulletYellowBack, frontColor = Palette.bulletYellow;
     public float bulletWidth = 5f, bulletHeight = 7f;
@@ -35,6 +34,9 @@ public class BasicBulletType extends BulletType{
 
     public float homingPower = 0f;
     public float homingRange = 50f;
+
+    public int lightining;
+    public int lightningLength = 5;
 
     public TextureRegion backRegion;
     public TextureRegion frontRegion;
@@ -57,9 +59,9 @@ public class BasicBulletType extends BulletType{
         float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, bulletWidth, height, b.angle() - 90);
+        Draw.rect(backRegion, b.x, b.y, bulletWidth, height, b.rot() - 90);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, bulletWidth, height, b.angle() - 90);
+        Draw.rect(frontRegion, b.x, b.y, bulletWidth, height, b.rot() - 90);
         Draw.color();
     }
 
@@ -70,7 +72,7 @@ public class BasicBulletType extends BulletType{
         if(homingPower > 0.0001f){
             TargetTrait target = Units.getClosestTarget(b.getTeam(), b.x, b.y, homingRange);
             if(target != null){
-                b.getVelocity().setAngle(Angles.moveToward(b.getVelocity().angle(), b.angleTo(target), homingPower * Time.delta()));
+                b.velocity().setAngle(Angles.moveToward(b.velocity().angle(), b.angleTo(target), homingPower * Time.delta()));
             }
         }
     }
@@ -103,6 +105,10 @@ public class BasicBulletType extends BulletType{
         super.despawned(b);
         if(fragBullet != null || splashDamageRadius > 0){
             hit(b);
+        }
+
+        for (int i = 0; i < lightining; i++) {
+            Lightning.create(b.getTeam(), Palette.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
 }

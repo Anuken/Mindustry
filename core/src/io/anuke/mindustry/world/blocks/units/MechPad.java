@@ -12,7 +12,7 @@ import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
@@ -24,7 +24,6 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
 
 import java.io.DataInput;
 import java.io.DataOutput;

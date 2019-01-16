@@ -11,6 +11,6 @@ public interface AbsorbTrait extends Entity, TeamTrait, DamageTrait{
     }
 
     default float getShieldDamage(){
-        return getDamage();
+        return damage();
     }
 }

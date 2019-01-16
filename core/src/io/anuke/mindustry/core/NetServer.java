@@ -22,7 +22,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.io.ByteBufferOutput;
 import io.anuke.arc.util.io.CountableByteArrayOutputStream;
 import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
@@ -193,7 +193,8 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(state.mode.isPvp){
+            //playing in pvp mode automatically assigns players to teams
+            if(state.rules.pvp){
                 //find team with minimum amount of players and auto-assign player to that.
                 Team min = Structs.findMin(Team.all, team -> {
                     if(state.teams.isActive(team)){
@@ -329,7 +330,7 @@ public class NetServer implements ApplicationListener{
 
         //set interpolator target to *new* position so it moves toward it
         player.getInterpolator().read(player.x, player.y, newx, newy, sent, rotation, baseRotation);
-        player.getVelocity().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
+        player.velocity().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
 
         connection.lastRecievedClientSnapshot = snapshotID;
         connection.lastRecievedClientTime = Time.millis();
@@ -382,7 +383,7 @@ public class NetServer implements ApplicationListener{
     }
 
     public boolean isWaitingForPlayers(){
-        if(state.mode.isPvp){
+        if(state.rules.pvp){
             int used = 0;
             for(Team t : Team.all){
                 if(playerGroup.count(p -> p.getTeam() == t) > 0){
@@ -398,7 +399,7 @@ public class NetServer implements ApplicationListener{
 
         if(!headless && !closing && Net.server() && state.is(State.menu)){
             closing = true;
-            ui.loadfrag.show("$text.server.closing");
+            ui.loadfrag.show("$server.closing");
             Time.runTask(5f, () -> {
                 Net.closeServer();
                 ui.loadfrag.hide();

@@ -7,7 +7,7 @@ import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Pack;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
@@ -32,16 +32,12 @@ public class Tile implements Position, TargetTrait{
     /** Tile entity, usually null. */
     public TileEntity entity;
     public short x, y;
-    /** Position of cliffs around the tile, packed into bits 0-8. */
-    private byte cliffs;
     private Block wall;
     private Floor floor;
     /** Rotation, 0-3. Also used to store offload location, in which case it can be any number. */
     private byte rotation;
     /** Team ordinal. */
     private byte team;
-    /** Tile elevation. -1 means slope.*/
-    private byte elevation;
 
     public Tile(int x, int y){
         this.x = (short) x;
@@ -55,12 +51,11 @@ public class Tile implements Position, TargetTrait{
         changed();
     }
 
-    public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team, byte elevation){
+    public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team){
         this(x, y);
         this.floor = (Floor) content.block(floor);
         this.wall = content.block(wall);
         this.rotation = rotation;
-        this.setElevation(elevation);
         changed();
         this.team = team;
     }
@@ -181,26 +176,6 @@ public class Tile implements Position, TargetTrait{
         this.rotation = dump;
     }
 
-    public byte getElevation(){
-        return elevation;
-    }
-
-    public void setElevation(int elevation){
-        this.elevation = (byte)elevation;
-    }
-
-    public byte getCliffs(){
-        return cliffs;
-    }
-
-    public void setCliffs(byte cliffs){
-        this.cliffs = cliffs;
-    }
-
-    public boolean hasCliffs(){
-        return getCliffs() != 0;
-    }
-
     public boolean passable(){
         Block block = block();
         Block floor = floor();
@@ -216,7 +191,7 @@ public class Tile implements Position, TargetTrait{
     public boolean solid(){
         Block block = block();
         Block floor = floor();
-        return block.solid || getCliffs() != 0 || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
+        return block.solid || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
         || (isLinked() && getLinked().block().isSolidFor(getLinked()));
     }
 
@@ -230,7 +205,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean isEnemyCheat(){
-        return getTeam() == waveTeam && !state.mode.isPvp;
+        return getTeam() == waveTeam && !state.rules.pvp;
     }
 
     public boolean isLinked(){
@@ -338,7 +313,6 @@ public class Tile implements Position, TargetTrait{
 
     public void updateOcclusion(){
         cost = 1;
-        cliffs = 0;
         boolean occluded = false;
 
         //check for occlusion
@@ -351,18 +325,12 @@ public class Tile implements Position, TargetTrait{
             }
         }
 
-        //check for bitmasking cliffs
-        for(int i = 0; i < 4; i++){
-            Tile tc = getNearby(i);
-
-            //check for cardinal direction elevation changes and bitmask that
-            if(tc != null && ((tc.elevation < elevation && tc.elevation != -1))){
-                cliffs |= (1 << (i * 2));
-            }
-        }
-
         if(occluded){
             cost += 1;
+        }
+
+        if(target().synthetic()){
+            cost += target().block().health / 10f;
         }
 
         if(floor.isLiquid){
@@ -421,7 +389,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     @Override
-    public Vector2 getVelocity(){
+    public Vector2 velocity(){
         return Vector2.ZERO;
     }
 
@@ -432,6 +400,7 @@ public class Tile implements Position, TargetTrait{
 
     @Override
     public void setX(float x){
+        throw new IllegalArgumentException("Tile position cannot change.");
     }
 
     @Override
@@ -441,6 +410,7 @@ public class Tile implements Position, TargetTrait{
 
     @Override
     public void setY(float y){
+        throw new IllegalArgumentException("Tile position cannot change.");
     }
 
     @Override

@@ -57,6 +57,6 @@ public enum BlockStat{
     }
 
     public String localized(){
-        return Core.bundle.get("text.blocks." + name().toLowerCase(Locale.ROOT));
+        return Core.bundle.get("blocks." + name().toLowerCase(Locale.ROOT));
     }
 }

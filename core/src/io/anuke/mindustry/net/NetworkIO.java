@@ -6,13 +6,13 @@ import io.anuke.arc.collection.ObjectMap.Entry;
 import io.anuke.arc.entities.Entities;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.world.Tile;
@@ -30,10 +30,8 @@ public class NetworkIO{
 
         try(DataOutputStream stream = new DataOutputStream(os)){
             //--GENERAL STATE--
-            stream.writeByte(state.mode.ordinal()); //gamemode
+            Serialization.writeRules(stream, state.rules);
             stream.writeUTF(world.getMap().name); //map name
-            stream.writeInt(world.getSector() == null ? invalidSector : world.getSector().pos()); //sector ID
-            stream.writeInt(world.getSector() == null ? 0 : world.getSector().completedMissions);
 
             //write tags
             ObjectMap<String, String> tags = world.getMap().meta.tags;
@@ -60,7 +58,6 @@ public class NetworkIO{
 
                 stream.writeByte(tile.getFloorID());
                 stream.writeByte(tile.getBlockID());
-                stream.writeByte(tile.getElevation());
 
                 if(tile.block() instanceof BlockPart){
                     stream.writeByte(tile.link);
@@ -81,7 +78,7 @@ public class NetworkIO{
                     for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                         Tile nextTile = world.tile(j % world.width(), j / world.width());
 
-                        if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getElevation() != tile.getElevation()){
+                        if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air){
                             break;
                         }
 
@@ -124,18 +121,8 @@ public class NetworkIO{
             Time.clear();
 
             //general state
-            byte mode = stream.readByte();
+            state.rules = Serialization.readRules(stream);
             String map = stream.readUTF();
-            int sector = stream.readInt();
-            int missions = stream.readInt();
-
-            if(sector != invalidSector){
-                world.sectors.createSector(Pack.leftShort(sector), Pack.rightShort(sector));
-                world.setSector(world.sectors.get(sector));
-                world.getSector().completedMissions = missions;
-            }else{
-                world.setSector(null);
-            }
 
             ObjectMap<String, String> tags = new ObjectMap<>();
 
@@ -151,7 +138,6 @@ public class NetworkIO{
 
             state.wave = wave;
             state.wavetime = wavetime;
-            state.mode = GameMode.values()[mode];
 
             Entities.clear();
             int id = stream.readInt();
@@ -177,10 +163,8 @@ public class NetworkIO{
                 int x = i % width, y = i / width;
                 byte floorid = stream.readByte();
                 byte wallid = stream.readByte();
-                byte elevation = stream.readByte();
 
                 Tile tile = new Tile(x, y, floorid, wallid);
-                tile.setElevation(elevation);
 
                 if(wallid == Blocks.blockpart.id){
                     tile.link = stream.readByte();
@@ -208,7 +192,6 @@ public class NetworkIO{
                     for(int j = i + 1; j < i + 1 + consecutives; j++){
                         int newx = j % width, newy = j / width;
                         Tile newTile = new Tile(newx, newy, floorid, wallid);
-                        newTile.setElevation(elevation);
                         tiles[newx][newy] = newTile;
                     }
 
@@ -272,7 +255,6 @@ public class NetworkIO{
         buffer.putInt(Version.build);
         buffer.put((byte)Version.type.getBytes(StandardCharsets.UTF_8).length);
         buffer.put(Version.type.getBytes(StandardCharsets.UTF_8));
-        buffer.put((byte)state.mode.ordinal());
         return buffer;
     }
 
@@ -295,8 +277,7 @@ public class NetworkIO{
         byte[] tb = new byte[tlength];
         buffer.get(tb);
         String vertype = new String(tb, StandardCharsets.UTF_8);
-        GameMode mode = GameMode.values()[buffer.get()];
 
-        return new Host(host, hostAddress, map, wave, players, version, vertype, mode);
+        return new Host(host, hostAddress, map, wave, players, version, vertype);
     }
 }

@@ -11,7 +11,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
@@ -33,13 +33,13 @@ public class Floor extends Block{
     /** How many ticks it takes to drown on this. */
     public float drownTime = 0f;
     /** Effect when walking on this floor. */
-    public Effect walkEffect = BlockFx.ripple;
+    public Effect walkEffect = Fx.ripple;
     /** Effect displayed when drowning on this floor. */
-    public Effect drownUpdateEffect = BlockFx.bubble;
+    public Effect drownUpdateEffect = Fx.bubble;
     /** Status effect applied when walking on. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */
-    public float statusIntensity = 0.6f;
+    public float statusDuration = 60f;
     /** Color of this floor's liquid. Used for tinting sprites. */
     public Color liquidColor;
     /** liquids that drop from this block, used for pumps */
@@ -127,18 +127,12 @@ public class Floor extends Block{
     }
 
     @Override
-    public void drawNonLayer(Tile tile){
-        Mathf.random.setSeed(tile.pos());
-
-        drawEdges(tile, true);
-    }
-
-    @Override
     public void draw(Tile tile){
         Mathf.random.setSeed(tile.pos());
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
 
+        /*
         if(tile.hasCliffs() && cliffRegions != null){
             for(int i = 0; i < 4; i++){
                 if((tile.getCliffs() & (1 << i * 2)) != 0){
@@ -160,39 +154,11 @@ public class Floor extends Block{
         }
         Draw.reset();
 
-        drawEdges(tile, false);
+        drawEdges(tile, false);*/
     }
 
     public boolean blendOverride(Block block){
         return false;
-    }
-
-    protected void drawEdges(Tile tile, boolean sameLayer){
-        if(!blend || tile.getCliffs() > 0) return;
-
-        for(int i = 0; i < 8; i++){
-            int dx = Geometry.d8[i].x, dy = Geometry.d8[i].y;
-
-            Tile other = tile.getNearby(dx, dy);
-
-            if(other == null) continue;
-
-            Floor floor = other.floor();
-            Floor cur = this;
-            if(floor instanceof OreBlock) floor = ((OreBlock) floor).base;
-            if(cur instanceof OreBlock) cur = ((OreBlock) cur).base;
-
-            if(floor.edgeRegions == null || (floor.id <= cur.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!cur.blends.test(floor) && !cur.tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > cur.cacheLayer.ordinal() && !sameLayer) ||
-                    (sameLayer && floor.cacheLayer == cur.cacheLayer)) continue;
-
-            TextureRegion region = floor.edgeRegions[i];
-
-            Draw.rect(region,
-                tile.worldx() + floor.offsets[i].x * Draw.scl + Draw.scl * region.getWidth()/2f,
-                tile.worldy() + floor.offsets[i].y * Draw.scl + Draw.scl * region.getHeight()/2f,
-                region.getWidth() * Draw.scl,
-                region.getHeight() * Draw.scl);
-        }
     }
 
 }

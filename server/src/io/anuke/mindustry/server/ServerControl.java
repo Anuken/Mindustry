@@ -16,8 +16,6 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.game.EventType.SectorCompleteEvent;
-import io.anuke.mindustry.game.GameMode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
@@ -48,7 +46,6 @@ public class ServerControl implements ApplicationListener{
     private final FileHandle logFolder = Core.files.local("logs/");
 
     private FileHandle currentLogFile;
-    private int gameOvers;
     private boolean inExtraRound;
     private Task lastTask;
 
@@ -58,8 +55,6 @@ public class ServerControl implements ApplicationListener{
             "shufflemode", "normal",
             "bans", "",
             "admins", "",
-            "sector_x", 2,
-            "sector_y", 1,
             "shuffle", true,
             "crashreport", false,
             "port", port,
@@ -128,57 +123,31 @@ public class ServerControl implements ApplicationListener{
             warn("&lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly.");
         }
 
-        Events.on(SectorCompleteEvent.class, event -> {
-            info("Sector complete.");
-            world.sectors.completeSector(world.getSector().x, world.getSector().y);
-            world.sectors.save();
-            gameOvers = 0;
-            inExtraRound = true;
-            Core.settings.put("sector_x", world.getSector().x + 1);
-            Core.settings.save();
-
-            Call.onInfoMessage("[accent]Sector conquered![]\n" + roundExtraTime + " seconds until deployment in next sector.");
-
-            playSectorMap();
-        });
-
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
             info("Game over!");
 
             if(Core.settings.getBool("shuffle")){
-                if(world.getSector() == null){
-                    if(world.maps.all().size > 0){
-                        Array<Map> maps = world.maps.customMaps().size == 0 ? world.maps.defaultMaps() : world.maps.customMaps();
+                if(world.maps.all().size > 0){
+                    Array<Map> maps = world.maps.customMaps().size == 0 ? world.maps.defaultMaps() : world.maps.customMaps();
 
-                        Map previous = world.getMap();
-                        Map map = previous;
-                        if(maps.size > 1){
-                            while(map == previous) map = maps.random();
-                        }
-
-                        Call.onInfoMessage((state.mode.isPvp
-                        ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
-                        + "\nNext selected map:[accent] "+map.name+"[]"
-                        + (map.meta.author() != null ? " by[accent] " + map.meta.author() + "[]" : "") + "."+
-                        "\nNew game begins in " + roundExtraTime + " seconds.");
-
-                        info("Selected next map to be {0}.", map.name);
-
-                        Map fmap = map;
-
-                        play(true, () -> world.loadMap(fmap));
+                    Map previous = world.getMap();
+                    Map map = previous;
+                    if(maps.size > 1){
+                        while(map == previous) map = maps.random();
                     }
-                }else{
-                    Call.onInfoMessage("[SCARLET]Sector has been lost.[]\nRe-deploying in " + roundExtraTime + " seconds.");
-                    if(gameOvers >= 2){
-                        Core.settings.put("sector_y", Core.settings.getInt("sector_y") < 0 ? Core.settings.getInt("sector_y") + 1 : Core.settings.getInt("sector_y") - 1);
-                        Core.settings.save();
-                        gameOvers = 0;
-                    }
-                    gameOvers ++;
-                    playSectorMap();
-                    info("Re-trying sector map: {0} {1}",  Core.settings.getInt("sector_x"), Core.settings.getInt("sector_y"));
+
+                    Call.onInfoMessage((state.rules.pvp
+                    ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
+                    + "\nNext selected map:[accent] "+map.name+"[]"
+                    + (map.meta.author() != null ? " by[accent] " + map.meta.author() + "[]" : "") + "."+
+                    "\nNew game begins in " + roundExtraTime + " seconds.");
+
+                    info("Selected next map to be {0}.", map.name);
+
+                    Map fmap = map;
+
+                    play(true, () -> world.loadMap(fmap));
                 }
             }else{
                 netServer.kickAll(KickReason.gameover);
@@ -217,7 +186,7 @@ public class ServerControl implements ApplicationListener{
             info("Stopped server.");
         });
 
-        handler.register("host", "[mapname] [mode]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "[mapname]", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
@@ -241,26 +210,15 @@ public class ServerControl implements ApplicationListener{
 
 
                 info("Loading map...");
-
-                if(arg.length > 1){
-                    GameMode mode;
-                    try{
-                        mode = GameMode.valueOf(arg[1]);
-                    }catch(IllegalArgumentException e){
-                        err("No gamemode '{0}' found.", arg[1]);
-                        return;
-                    }
-
-                    state.mode = mode;
-                }
+                err("TODO select gamemode");
 
                 logic.reset();
                 world.loadMap(result);
                 logic.play();
 
             }else{
-                info("&fiNo map specified. Loading sector {0}, {1}.", Core.settings.getInt("sector_x"), Core.settings.getInt("sector_y"));
-                playSectorMap(false);
+                //TODO
+                err("TODO play generated map");
             }
 
             info("Map loaded.");
@@ -295,9 +253,9 @@ public class ServerControl implements ApplicationListener{
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
-                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1} &lb/&ly {2} &lb/&ly {3}", Strings.capitalize(world.getMap().name), state.wave, Strings.capitalize(state.difficulty.name()), Strings.capitalize(state.mode.name()));
+                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1} &lb/&ly {2} &lb/&ly {3}", Strings.capitalize(world.getMap().name), state.wave);
 
-                if(state.mode.disableWaveTimer){
+                if(!state.rules.waves){
                     info("&ly  {0} enemies.", unitGroups[Team.red.ordinal()].size());
                 }else{
                     info("&ly  {0} seconds until next wave.", (int) (state.wavetime / 60));
@@ -330,21 +288,10 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
             try{
-                state.difficulty = Difficulty.valueOf(arg[0]);
+                state.rules.waveSpacing = Difficulty.valueOf(arg[0]).waveTime;
                 info("Difficulty set to '{0}'.", arg[0]);
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
-            }
-        });
-
-        handler.register("setsector", "<x> <y>", "Sets the next sector to be played. Does not affect current game.", arg -> {
-            try{
-                Core.settings.put("sector_x", Integer.parseInt(arg[0]));
-                Core.settings.put("sector_y", Integer.parseInt(arg[1]));
-                Core.settings.save();
-                info("Sector position set.");
-            }catch(NumberFormatException e){
-                err("Invalid coordinates.");
             }
         });
 
@@ -703,21 +650,6 @@ public class ServerControl implements ApplicationListener{
                 System.out.print("> ");
             });
         }
-    }
-
-    private void playSectorMap(){
-        playSectorMap(true);
-    }
-
-    private void playSectorMap(boolean wait){
-        int x = Core.settings.getInt("sector_x"), y = Core.settings.getInt("sector_y");
-        if(world.sectors.get(x, y) == null){
-            world.sectors.createSector(x, y);
-        }
-
-        world.sectors.get(x, y).completedMissions = 0;
-
-        play(wait, () -> world.loadSector(world.sectors.get(x, y)));
     }
 
     private void play(boolean wait, Runnable run){

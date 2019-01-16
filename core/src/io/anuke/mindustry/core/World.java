@@ -4,42 +4,41 @@ import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.entities.EntityQuery;
-import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
 import io.anuke.mindustry.ai.WaveSpawner;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.maps.*;
-import io.anuke.mindustry.maps.generation.WorldGenerator;
+import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.maps.MapTileData;
+import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
+import io.anuke.mindustry.maps.Maps;
+import io.anuke.mindustry.maps.generators.Generator;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.OreBlock;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class World implements ApplicationListener{
     public final Maps maps = new Maps();
-    public final Sectors sectors = new Sectors();
-    public final WorldGenerator generator = new WorldGenerator();
     public final BlockIndexer indexer = new BlockIndexer();
     public final WaveSpawner spawner = new WaveSpawner();
     public final Pathfinder pathfinder = new Pathfinder();
 
     private Map currentMap;
-    private Sector currentSector;
     private Tile[][] tiles;
 
     private Array<Tile> tempTiles = new Array<>();
@@ -47,11 +46,6 @@ public class World implements ApplicationListener{
 
     public World(){
         maps.load();
-    }
-
-    @Override
-    public void init(){
-        sectors.load();
     }
 
     @Override
@@ -86,14 +80,6 @@ public class World implements ApplicationListener{
 
     public Map getMap(){
         return currentMap;
-    }
-
-    public Sector getSector(){
-        return currentSector;
-    }
-
-    public void setSector(Sector currentSector){
-        this.currentSector = currentSector;
     }
 
     public void setMap(Map map){
@@ -188,10 +174,6 @@ public class World implements ApplicationListener{
                 Tile tile = tiles[x][y];
                 tile.updateOcclusion();
 
-                if(tile.floor() instanceof OreBlock && tile.hasCliffs()){
-                    tile.setFloor(((OreBlock) tile.floor()).base);
-                }
-
                 if(tile.entity != null){
                     tile.entity.updateProximity();
                 }
@@ -208,34 +190,31 @@ public class World implements ApplicationListener{
         return generating;
     }
 
-    /**Loads up a sector map. This does not call play(), but calls reset().*/
-    public void loadSector(Sector sector){
-        currentSector = sector;
-        state.difficulty = sectors.getDifficulty(sector);
-        state.mode = sector.currentMission().getMode();
-        Time.mark();
-        Time.mark();
+    public void playZone(Zone zone){
+        ui.loadAnd(() -> {
+            logic.reset();
+            state.rules = zone.rules.get();
+            loadGenerator(zone.generator);
+            for(Tile core : state.teams.get(defaultTeam).cores){
+                for(ItemStack stack : zone.startingItems){
+                    core.entity.items.add(stack.item, stack.amount);
+                }
+            }
+            logic.play();
+        });
+    }
 
-        logic.reset();
-
+    public void loadGenerator(Generator generator){
         beginMapLoad();
 
-        int width = sectorSize, height = sectorSize;
-
-        Tile[][] tiles = createTiles(width, height);
-
-        Map map = new Map("Sector " + sector.x + ", " + sector.y, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
-        setMap(map);
-
-        EntityQuery.resizeTree(0, 0, width * tilesize, height * tilesize);
-
-        generator.generateMap(tiles, sector);
+        createTiles(generator.width, generator.height);
+        generator.generate(tiles);
+        prepareTiles(tiles);
 
         endMapLoad();
     }
 
     public void loadMap(Map map){
-        currentSector = null;
         beginMapLoad();
         this.currentMap = map;
 
@@ -243,14 +222,12 @@ public class World implements ApplicationListener{
 
         createTiles(width, height);
 
-        EntityQuery.resizeTree(0, 0, width * tilesize, height * tilesize);
-
         try{
-            generator.loadTileData(tiles, MapIO.readTileData(map, true), map.meta.hasOreGen(), Mathf.random(99999));
-        } catch(Exception e){
+            loadTileData(tiles, MapIO.readTileData(map, true));
+        }catch(Exception e){
             Log.err(e);
             if(!headless){
-                ui.showError("$text.map.invalid");
+                ui.showError("$map.invalid");
                 Core.app.post(() -> state.set(State.menu));
                 invalidMap = true;
             }
@@ -264,9 +241,9 @@ public class World implements ApplicationListener{
 
         if(!headless){
             if(state.teams.get(players[0].getTeam()).cores.size == 0){
-                ui.showError("$text.map.nospawn");
+                ui.showError("$map.nospawn");
                 invalidMap = true;
-            }else if(state.mode.isPvp){
+            }else if(state.rules.pvp){ //pvp maps need two cores to  be valid
                 invalidMap = true;
                 for(Team team : Team.all){
                     if(state.teams.get(team).cores.size != 0 && team != players[0].getTeam()){
@@ -274,7 +251,7 @@ public class World implements ApplicationListener{
                     }
                 }
                 if(invalidMap){
-                    ui.showError("$text.map.nospawn.pvp");
+                    ui.showError("$map.nospawn.pvp");
                 }
             }
         }else{
@@ -409,6 +386,79 @@ public class World implements ApplicationListener{
             if(e2 < dx){
                 err = err + dx;
                 y0 = y0 + sy;
+            }
+        }
+    }
+
+    /**Loads raw map tile data into a Tile[][] array, setting up multiblocks, cliffs and ores. */
+    void loadTileData(Tile[][] tiles, MapTileData data){
+        data.position(0, 0);
+        TileDataMarker marker = data.newDataMarker();
+
+        for(int y = 0; y < data.height(); y++){
+            for(int x = 0; x < data.width(); x++){
+                data.read(marker);
+
+                tiles[x][y] = new Tile(x, y, marker.floor, marker.wall == Blocks.blockpart.id ? 0 : marker.wall, marker.rotation, marker.team);
+            }
+        }
+
+        prepareTiles(tiles);
+    }
+
+    /**'Prepares' a tile array by:<br>
+     * - setting up multiblocks<br>
+     * - updating occlusion<br>
+     * Usually used before placing structures on a tile array.*/
+    void prepareTiles(Tile[][] tiles){
+
+        //find multiblocks
+        IntArray multiblocks = new IntArray();
+
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
+
+                if(tile.block().isMultiblock()){
+                    multiblocks.add(tile.pos());
+                }
+            }
+        }
+
+        //place multiblocks now
+        for(int i = 0; i < multiblocks.size; i++){
+            int pos = multiblocks.get(i);
+
+            int x = Pos.x(pos);
+            int y = Pos.y(pos);
+
+            Block result = tiles[x][y].block();
+            Team team = tiles[x][y].getTeam();
+
+            int offsetx = -(result.size - 1) / 2;
+            int offsety = -(result.size - 1) / 2;
+
+            for(int dx = 0; dx < result.size; dx++){
+                for(int dy = 0; dy < result.size; dy++){
+                    int worldx = dx + offsetx + x;
+                    int worldy = dy + offsety + y;
+                    if(!(worldx == x && worldy == y)){
+                        Tile toplace = world.tile(worldx, worldy);
+                        if(toplace != null){
+                            toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));
+                            toplace.setTeam(team);
+                        }
+                    }
+                }
+            }
+        }
+
+        //update cliffs, occlusion data
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
+
+                tile.updateOcclusion();
             }
         }
     }

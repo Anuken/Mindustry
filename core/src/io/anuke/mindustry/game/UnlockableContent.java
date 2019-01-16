@@ -3,7 +3,7 @@ package io.anuke.mindustry.game;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 
-import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.data;
 
 /**Base interface for an unlockable content type.*/
 public abstract class UnlockableContent extends MappableContent{
@@ -41,7 +41,7 @@ public abstract class UnlockableContent extends MappableContent{
             return true;
         }else{
             for(UnlockableContent cont : depend){
-                if(!control.unlocks.isUnlocked(cont)){
+                if(!data.isUnlocked(cont)){
                     return false;
                 }
             }

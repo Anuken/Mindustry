@@ -10,8 +10,8 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.type.AmmoType;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
@@ -43,11 +43,11 @@ public abstract class GroundUnit extends BaseUnit{
             TileEntity core = getClosestEnemyCore();
             float dst = core == null ? 0 : dst(core);
 
-            if(core != null && dst < getWeapon().getAmmo().getRange() / 1.1f){
+            if(core != null && dst < getWeapon().getAmmo().range() / 1.1f){
                 target = core;
             }
 
-            if(dst > getWeapon().getAmmo().getRange() * 0.5f){
+            if(dst > getWeapon().getAmmo().range() * 0.5f){
                 moveToCore();
             }
         }
@@ -70,7 +70,7 @@ public abstract class GroundUnit extends BaseUnit{
         }
 
         public void update(){
-            if(health >= maxHealth() && !isCommanded()){
+            if(health >= maxHealth()){
                 state.set(attack);
             }
 
@@ -182,18 +182,18 @@ public abstract class GroundUnit extends BaseUnit{
 
     @Override
     public void behavior(){
-        if(health <= health * type.retreatPercent && !isCommanded()){
+        if(health <= health * type.retreatPercent){
             setState(retreat);
         }
 
         if(!Units.invalidateTarget(target, this)){
-            if(dst(target) < getWeapon().getAmmo().getRange()){
+            if(dst(target) < getWeapon().getAmmo().range()){
                 rotate(angleTo(target));
 
                 if(Angles.near(angleTo(target), rotation, 13f)){
-                    AmmoType ammo = getWeapon().getAmmo();
+                    BulletType ammo = getWeapon().getAmmo();
 
-                    Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.bullet.speed);
+                    Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.speed);
 
                     getWeapon().update(GroundUnit.this, to.x, to.y);
                 }

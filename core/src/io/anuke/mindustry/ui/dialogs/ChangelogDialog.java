@@ -18,11 +18,11 @@ public class ChangelogDialog extends FloatingDialog{
     private Array<VersionInfo> versions;
 
     public ChangelogDialog(){
-        super("$text.changelog.title");
+        super("$changelog.title");
 
         addCloseButton();
 
-        content().add("$text.changelog.loading");
+        cont.add("$changelog.loading");
 
         if(!ios && !OS.isMac){
             Changelogs.getChangelog(result -> {
@@ -39,19 +39,19 @@ public class ChangelogDialog extends FloatingDialog{
         Table table = new Table();
         ScrollPane pane = new ScrollPane(table);
 
-        content().clear();
-        content().add(pane).grow();
+        cont.clear();
+        cont.add(pane).grow();
 
         if(versions == null){
-            table.add("$text.changelog.error");
+            table.add("$changelog.error");
             if(Vars.android){
                 table.row();
-                table.add("$text.changelog.error.android").padTop(8);
+                table.add("$changelog.error.android").padTop(8);
             }
 
             if(ios){
                 table.row();
-                table.add("$text.changelog.error.ios").padTop(8);
+                table.add("$changelog.error.ios").padTop(8);
             }
         }else{
             for(VersionInfo info : versions){
@@ -65,10 +65,10 @@ public class ChangelogDialog extends FloatingDialog{
                 in.add("[accent]" + info.name + "[LIGHT_GRAY]  | " + info.date);
                 if(info.build == Version.build){
                     in.row();
-                    in.add("$text.changelog.current");
+                    in.add("$changelog.current");
                 }else if(info == versions.first()){
                     in.row();
-                    in.add("$text.changelog.latest");
+                    in.add("$changelog.latest");
                 }
                 in.row();
                 in.labelWrap("[lightgray]" + desc).width(vw - 20).padTop(12);

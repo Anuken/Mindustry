@@ -15,11 +15,11 @@ public class DiscordDialog extends Dialog{
 
         float h = 70f;
 
-        content().margin(12f);
+        cont.margin(12f);
 
         Color color = Color.valueOf("7289da");
 
-        content().table(t -> {
+        cont.table(t -> {
             t.background("button").margin(0);
 
             t.table(img -> {
@@ -33,18 +33,18 @@ public class DiscordDialog extends Dialog{
                 i.addImage("icon-discord").size(14 * 3);
             }).size(h).left();
 
-            t.add("$text.discord").color(Palette.accent).growX().padLeft(10f);
+            t.add("$discord").color(Palette.accent).growX().padLeft(10f);
         }).size(470f, h).pad(10f);
 
-        buttons().defaults().size(170f, 50);
+        buttons.defaults().size(170f, 50);
 
-        buttons().addButton("$text.back", this::hide);
-        buttons().addButton("$text.copylink", () -> {
+        buttons.addButton("$back", this::hide);
+        buttons.addButton("$copylink", () -> {
             Core.app.getClipboard().setContents(discordURL);
         });
-        buttons().addButton("$text.openlink", () -> {
+        buttons.addButton("$openlink", () -> {
             if(!Core.net.openURI(discordURL)){
-                ui.showError("$text.linkfail");
+                ui.showError("$linkfail");
                 Core.app.getClipboard().setContents(discordURL);
             }
         });

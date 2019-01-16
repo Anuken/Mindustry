@@ -2,24 +2,23 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 
 import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class Generators {
 
-    public static void generate(ImageContext context){
+    public static void generate(){
 
-        ImageContext.generate("block-icons", () -> {
+        ImagePacker.generate("block-icons", () -> {
             for(Block block : content.blocks()){
                 TextureRegion[] regions = block.getBlockIcon();
 
@@ -29,19 +28,19 @@ public class Generators {
 
                 if(block.turretIcon){
 
-                    Image image = ImageContext.get(block.name);
+                    Image image = ImagePacker.get(block.name);
 
-                    Image read = ImageContext.create(image.width(), image.height());
+                    Image read = ImagePacker.create(image.width(), image.height());
                     read.draw(image);
 
-                    Image base = ImageContext.get("block-" + block.size);
+                    Image base = ImagePacker.get("block-" + block.size);
 
                     base.draw(image);
 
                     base.save("block-icon-" + block.name);
                 }else {
 
-                    Image image = ImageContext.get(regions[0]);
+                    Image image = ImagePacker.get(regions[0]);
 
                     for (TextureRegion region : regions) {
                         image.draw(region);
@@ -52,13 +51,13 @@ public class Generators {
             }
         });
 
-        ImageContext.generate("mech-icons", () -> {
+        ImagePacker.generate("mech-icons", () -> {
             for(Mech mech : content.<Mech>getBy(ContentType.mech)){
 
                 mech.load();
                 mech.weapon.load();
 
-                Image image = ImageContext.get(mech.region);
+                Image image = ImagePacker.get(mech.region);
 
                 if(!mech.flying){
                     image.drawCenter(mech.baseRegion);
@@ -77,13 +76,13 @@ public class Generators {
             }
         });
 
-        ImageContext.generate("unit-icons", () -> {
+        ImagePacker.generate("unit-icons", () -> {
             for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
 
                 type.load();
                 type.weapon.load();
 
-                Image image = ImageContext.get(type.region);
+                Image image = ImagePacker.get(type.region);
 
                 if(!type.isFlying){
                     image.draw(type.baseRegion);
@@ -105,32 +104,17 @@ public class Generators {
             }
         });
 
-        ImageContext.generate("liquid-icons", () -> {
-            for(Liquid liquid : content.liquids()){
-                Image image = ImageContext.get("liquid-icon");
-                for (int x = 0; x < image.width(); x++) {
-                    for (int y = 0; y < image.height(); y++) {
-                        Color color = image.getColor(x, y);
-                        color.mul(liquid.color);
-                        image.draw(x, y, color);
-                    }
-                }
-
-                image.save("liquid-icon-" + liquid.name);
-            }
-        });
-
-        ImageContext.generate("block-edges", () -> {
+        ImagePacker.generate("block-edges", () -> {
             for(Block block : content.blocks()){
                 if(!(block instanceof Floor)) continue;
                 Floor floor = (Floor)block;
                 if(floor.getIcon().length > 0 && !Core.atlas.has(floor.name + "-cliff-side")){
-                    Image floori = ImageContext.get(floor.getIcon()[0]);
+                    Image floori = ImagePacker.get(floor.getIcon()[0]);
                     Color color = floori.getColor(0, 0).mul(1.3f, 1.3f, 1.3f, 1f);
 
                     String[] names = {"cliff-edge-2", "cliff-edge", "cliff-edge-1", "cliff-side"};
                     for(String str : names){
-                        Image image = ImageContext.get("generic-" + str);
+                        Image image = ImagePacker.get("generic-" + str);
 
                         for(int x = 0; x < image.width(); x++){
                             for(int y = 0; y < image.height(); y++){
@@ -147,7 +131,7 @@ public class Generators {
             }
         });
 
-        ImageContext.generate("ore-icons", () -> {
+        ImagePacker.generate("ore-icons", () -> {
             for(Block block : content.blocks()){
                 if(!(block instanceof OreBlock)) continue;
 
@@ -157,10 +141,10 @@ public class Generators {
 
                 for (int i = 0; i < 3; i++) {
                     //get base image to draw on
-                    Image image = ImageContext.get(base.name + (i+1));
-                    Image shadow = ImageContext.get(item.name + (i+1));
+                    Image image = ImagePacker.get(base.name + (i+1));
+                    Image shadow = ImagePacker.get(item.name + (i+1));
 
-                    int offset = 3;
+                    int offset = image.width()/tilesize;
 
                     for (int x = 0; x < image.width(); x++) {
                         for (int y = offset; y < image.height(); y++) {
@@ -174,7 +158,7 @@ public class Generators {
                         }
                     }
 
-                    image.draw(ImageContext.get(item.name + (i+1)));
+                    image.draw(ImagePacker.get(item.name + (i+1)));
                     image.save("ore-" + item.name + "-" + base.name + (i+1));
                 }
 

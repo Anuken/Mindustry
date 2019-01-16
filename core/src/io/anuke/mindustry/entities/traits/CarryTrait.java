@@ -2,7 +2,7 @@ package io.anuke.mindustry.entities.traits;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.mindustry.content.fx.UnitFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.arc.entities.Effects;
@@ -26,7 +26,7 @@ public interface CarryTrait extends TeamTrait, SolidTrait, TargetTrait{
 
         if(trait.getCarry() != null){ //already carrying something, drop it
             //drop current
-            Effects.effect(UnitFx.unitDrop, trait.getCarry());
+            Effects.effect(Fx.unitDrop, trait.getCarry());
             trait.getCarry().setCarrier(null);
             trait.setCarry(null);
 
@@ -37,7 +37,7 @@ public interface CarryTrait extends TeamTrait, SolidTrait, TargetTrait{
             trait.setCarry(unit);
             unit.setCarrier(trait);
 
-            Effects.effect(UnitFx.unitPickup, trait);
+            Effects.effect(Fx.unitPickup, trait);
         }
     }
 
