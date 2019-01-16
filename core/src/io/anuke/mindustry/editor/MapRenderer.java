@@ -10,7 +10,6 @@ import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.IndexedRenderer;
-import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.world.Block;
 
 import static io.anuke.mindustry.Vars.content;

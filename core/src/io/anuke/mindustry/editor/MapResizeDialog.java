@@ -1,6 +1,5 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.arc.function.BiConsumer;
 import io.anuke.arc.scene.ui.ButtonGroup;

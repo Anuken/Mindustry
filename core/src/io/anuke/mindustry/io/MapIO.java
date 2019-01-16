@@ -11,22 +11,20 @@ import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.maps.MapMeta;
-import io.anuke.mindustry.maps.MapTileData;
-import io.anuke.mindustry.maps.MapTileData.DataPosition;
-import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper.LegacyBlock;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.BlockPart;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.*;
 
 /**
  * Reads and writes map files.
@@ -148,12 +146,59 @@ public class MapIO{
         }
     }
 
-    public static MapMeta readMapMeta(DataInputStream stream) throws IOException{
+    public static void writeMap(Map map, Tile[][] tiles, DataOutputStream stream) throws IOException{
+        stream.writeInt(version);
+        stream.writeByte((byte) map.tags.size);
+
+        for(Entry<String, String> entry : map.tags.entries()){
+            stream.writeUTF(entry.key);
+            stream.writeUTF(entry.value);
+        }
+
+        stream.writeShort(content.blocks().size);
+        for(Block block : content.blocks()){
+            stream.writeShort(block.id);
+            stream.writeUTF(block.name);
+        }
+
+        stream.writeShort(tiles.length);
+        stream.writeShort(tiles[0].length);
+
+        for(int i = 0; i < tiles.length * tiles[0].length; i++){
+            Tile tile = world.tile(i % world.width(), i / world.width());
+
+            stream.writeByte(tile.getFloorID());
+            stream.writeByte(tile.getBlockID());
+
+            if(tile.block() instanceof BlockPart){
+                stream.writeByte(tile.link);
+            }else if(tile.entity != null){
+                stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
+                stream.writeShort((short) tile.entity.health); //health
+            }else if(tile.block() == Blocks.air){
+                int consecutives = 0;
+
+                for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
+                    Tile nextTile = world.tile(j % world.width(), j / world.width());
+
+                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air){
+                        break;
+                    }
+
+                    consecutives++;
+                }
+
+                stream.writeByte(consecutives);
+                i += consecutives;
+            }
+        }
+    }
+
+    public static Map readMap(DataInputStream stream) throws IOException{
         ObjectMap<String, String> tags = new ObjectMap<>();
         IntIntMap map = new IntIntMap();
 
         int version = stream.readInt();
-
         byte tagAmount = stream.readByte();
 
         for(int i = 0; i < tagAmount; i++){
@@ -168,7 +213,6 @@ public class MapIO{
             String name = stream.readUTF();
             Block block = content.getByName(ContentType.block, name);
             if(block == null){
-                //Log.info("Map load info: No block with name {0} found.", name);
                 block = Blocks.air;
             }
             map.put(id, block.id);
@@ -177,7 +221,55 @@ public class MapIO{
         int width = stream.readShort();
         int height = stream.readShort();
 
-        return new MapMeta(version, tags, width, height, map);
+        Tile[][] tiles = new Tile[width][height];
+
+        for(int i = 0; i < width * height; i++){
+            int x = i % width, y = i / width;
+            byte floorid = stream.readByte();
+            byte wallid = stream.readByte();
+
+            Tile tile = new Tile(x, y, floorid, wallid);
+
+            if(wallid == Blocks.blockpart.id){
+                tile.link = stream.readByte();
+            }else if(tile.entity != null){
+                byte tr = stream.readByte();
+                short health = stream.readShort();
+
+                byte team = Pack.leftByte(tr);
+                byte rotation = Pack.rightByte(tr);
+
+                Team t = Team.all[team];
+
+                tile.setTeam(Team.all[team]);
+                tile.entity.health = health;
+                tile.setRotation(rotation);
+
+                if(tile.entity.items != null) tile.entity.items.read(stream);
+                if(tile.entity.power != null) tile.entity.power.read(stream);
+                if(tile.entity.liquids != null) tile.entity.liquids.read(stream);
+                if(tile.entity.cons != null) tile.entity.cons.read(stream);
+
+                tile.entity.readConfig(stream);
+                tile.entity.read(stream);
+
+                if(tile.block() == Blocks.core){
+                    state.teams.get(t).cores.add(tile);
+                }
+            }else if(wallid == 0){
+                int consecutives = stream.readUnsignedByte();
+
+                for(int j = i + 1; j < i + 1 + consecutives; j++){
+                    int newx = j % width, newy = j / width;
+                    Tile newTile = new Tile(newx, newy, floorid, wallid);
+                    tiles[newx][newy] = newTile;
+                }
+
+                i += consecutives;
+            }
+
+            tiles[x][y] = tile;
+        }
     }
 
     public static void writeMapMeta(DataOutputStream stream, MapMeta meta) throws IOException{

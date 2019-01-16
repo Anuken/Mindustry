@@ -8,9 +8,6 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.MapTileData;
-import io.anuke.mindustry.maps.MapTileData.DataPosition;
-import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
 

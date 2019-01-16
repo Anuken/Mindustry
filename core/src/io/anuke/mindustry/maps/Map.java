@@ -1,8 +1,9 @@
 package io.anuke.mindustry.maps;
 
-import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.function.Supplier;
+import io.anuke.arc.graphics.Texture;
 
 import java.io.InputStream;
 
@@ -12,25 +13,45 @@ public class Map{
     /** Whether this is a custom map.*/
     public final boolean custom;
     /** Metadata. Author description, display name, etc.*/
-    public final MapMeta meta;
+    public final ObjectMap<String, String> tags;
     /** Supplies a new input stream with the data of this map.*/
     public final Supplier<InputStream> stream;
     /** Preview texture.*/
     public Texture texture;
 
-    public Map(String name, MapMeta meta, boolean custom, Supplier<InputStream> streamSupplier){
+    public Map(String name, ObjectMap<String, String> tags, boolean custom, Supplier<InputStream> streamSupplier){
         this.name = name;
         this.custom = custom;
-        this.meta = meta;
+        this.tags = tags;
         this.stream = streamSupplier;
     }
 
-    public Map(String unknownName, int width, int height){
-        this(unknownName, new MapMeta(0, new ObjectMap<>(), width, height, null), true, () -> null);
+    public Map(String name){
+        this(name, new ObjectMap<>(), true, () -> null);
     }
 
     public String getDisplayName(){
-        return meta.tags.get("name", name);
+        return tags.get("name", name);
+    }
+
+    public String author(){
+        return tag("author");
+    }
+
+    public String description(){
+        return tag("description");
+    }
+
+    public String name(){
+        return tag("name");
+    }
+
+    public String tag(String name){
+        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Core.bundle.get("unknown");
+    }
+
+    public boolean hasOreGen(){
+        return !tags.get("oregen", "0").equals("0");
     }
 
     @Override
@@ -38,7 +59,7 @@ public class Map{
         return "Map{" +
                 "name='" + name + '\'' +
                 ", custom=" + custom +
-                ", meta=" + meta +
+                ", tags=" + tags +
                 '}';
     }
 }

@@ -20,8 +20,6 @@ import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.maps.MapTileData;
-import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.maps.Maps;
 import io.anuke.mindustry.maps.generators.Generator;
 import io.anuke.mindustry.type.ItemStack;

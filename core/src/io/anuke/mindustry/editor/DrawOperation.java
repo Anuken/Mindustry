@@ -3,8 +3,6 @@ package io.anuke.mindustry.editor;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.util.Pack;
-import io.anuke.mindustry.maps.MapTileData;
-import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 
 public class DrawOperation{
     /**

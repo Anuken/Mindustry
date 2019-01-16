@@ -3,8 +3,6 @@ package io.anuke.mindustry.maps.generators;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.maps.MapTileData;
-import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.world;

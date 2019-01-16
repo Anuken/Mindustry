@@ -15,8 +15,6 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.maps.MapMeta;
-import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.ui.BorderImage;
 
 import java.io.DataInputStream;
