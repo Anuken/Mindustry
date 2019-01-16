@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.function.BiPredicate;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -10,8 +9,8 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
@@ -52,11 +51,9 @@ public class Floor extends Block{
     public boolean playerUnmineable = false;
     protected TextureRegion edgeRegion;
     protected TextureRegion[] edgeRegions;
-    protected TextureRegion[] cliffRegions;
     protected TextureRegion[] variantRegions;
     protected Vector2[] offsets;
     protected Predicate<Floor> blends = block -> block != this && !block.blendOverride(this);
-    protected BiPredicate<Tile, Tile> tileBlends = (tile, other) -> false;
     protected boolean blend = true;
 
     public Floor(String name){
@@ -96,12 +93,6 @@ public class Floor extends Block{
                 edgeRegions[i] = result;
                 offsets[i] = new Vector2(-padSize + rx, -padSize + ry);
             }
-
-            cliffRegions = new TextureRegion[4];
-            cliffRegions[0] = Core.atlas.find(name + "-cliff-edge-2");
-            cliffRegions[1] = Core.atlas.find(name + "-cliff-edge");
-            cliffRegions[2] = Core.atlas.find(name + "-cliff-edge-1");
-            cliffRegions[3] = Core.atlas.find(name + "-cliff-side");
         }
 
         //load variant regions for drawing
@@ -115,6 +106,8 @@ public class Floor extends Block{
             variantRegions = new TextureRegion[1];
             variantRegions[0] = Core.atlas.find(name);
         }
+
+        region = variantRegions[0];
     }
 
     @Override

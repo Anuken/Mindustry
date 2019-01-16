@@ -21,6 +21,11 @@ public class Zone extends UnlockableContent{
     }
 
     @Override
+    public void init(){
+        generator.init();
+    }
+
+    @Override
     public boolean isHidden(){
         return true;
     }

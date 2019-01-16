@@ -46,7 +46,7 @@ public class DeployDialog extends FloatingDialog{
                             data.removeItems(zone.deployCost);
                             hide();
                             world.playZone(zone);
-                        }).size(150f).disabled(b -> !data.hasItems(zone.deployCost));
+                        }).size(150f)/*.disabled(b -> !data.hasItems(zone.deployCost))*/;
                         t.row();
                         t.table(req -> {
                             req.left();

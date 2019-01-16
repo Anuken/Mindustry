@@ -18,7 +18,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
     /**List of all built-in maps.*/
-    private static final String[] defaultMapNames = {"sandbox"};
+    private static final String[] defaultMapNames = {};
     /**Tile format version.*/
     private static final int version = 0;
 
@@ -57,9 +57,28 @@ public class Maps implements Disposable{
         return maps.get(name.toLowerCase());
     }
 
+    /**Loads a map from the map folder and returns it. Should only be used for zone maps.
+     * Does not add this map to the map list.*/
+    public Map loadInternalMap(String name){
+        FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
+
+        try(DataInputStream ds = new DataInputStream(file.read())) {
+            MapMeta meta = MapIO.readMapMeta(ds);
+            Map map = new Map(name, meta, false, file::read);
+
+            if (!headless){
+                map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta, true)));
+            }
+
+            return map;
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
     /**Load all maps. Should be called at application start.*/
     public void load(){
-        try {
+        try{
             for (String name : defaultMapNames) {
                 FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
                 loadMap(file.nameWithoutExtension(), file::read, false);

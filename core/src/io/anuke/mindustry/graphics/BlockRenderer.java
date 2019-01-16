@@ -83,7 +83,7 @@ public class BlockRenderer{
         Draw.shader();
     }
 
-    /**Process all blocks to draw, simultaneously updating the block shadow framebuffer.*/
+    /**Process all blocks to draw.*/
     public void processBlocks(){
         iterateidx = 0;
 
@@ -108,28 +108,25 @@ public class BlockRenderer{
             for(int y = miny; y <= maxy; y++){
                 boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
                 Tile tile = world.rawTile(x, y);
+                Block block = tile.block();
 
-                if(tile != null){
-                    Block block = tile.block();
+                if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
+                    tile.block().drawShadow(tile);
+                }
 
-                    if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
-                        tile.block().drawShadow(tile);
+                if(block != Blocks.air){
+                    if(!expanded){
+                        addRequest(tile, Layer.shadow);
+                        addRequest(tile, Layer.block);
                     }
 
-                    if(block != Blocks.air){
-                        if(!expanded){
-                            addRequest(tile, Layer.shadow);
-                            addRequest(tile, Layer.block);
+                    if(block.expanded || !expanded){
+                        if(block.layer != null && block.isLayer(tile)){
+                            addRequest(tile, block.layer);
                         }
 
-                        if(block.expanded || !expanded){
-                            if(block.layer != null && block.isLayer(tile)){
-                                addRequest(tile, block.layer);
-                            }
-
-                            if(block.layer2 != null && block.isLayer2(tile)){
-                                addRequest(tile, block.layer2);
-                            }
+                        if(block.layer2 != null && block.isLayer2(tile)){
+                            addRequest(tile, block.layer2);
                         }
                     }
                 }

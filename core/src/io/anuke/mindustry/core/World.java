@@ -254,12 +254,9 @@ public class World implements ApplicationListener{
                     ui.showError("$map.nospawn.pvp");
                 }
             }
-        }else{
-            invalidMap = false;
         }
 
         if(invalidMap) Core.app.post(() -> state.set(State.menu));
-
     }
 
     public void notifyChanged(Tile tile){
@@ -410,7 +407,7 @@ public class World implements ApplicationListener{
      * - setting up multiblocks<br>
      * - updating occlusion<br>
      * Usually used before placing structures on a tile array.*/
-    void prepareTiles(Tile[][] tiles){
+    public void prepareTiles(Tile[][] tiles){
 
         //find multiblocks
         IntArray multiblocks = new IntArray();
