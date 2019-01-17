@@ -14,7 +14,7 @@ public class Zones implements ContentList{
     @Override
     public void load(){
 
-        groundZero = new Zone("groundZero", new MapGenerator("groundZero")){{
+        groundZero = new Zone("groundZero", new MapGenerator("groundZero", 1)){{
             deployCost = ItemStack.with(Items.copper, 100);
             startingItems = ItemStack.with(Items.copper, 50);
             alwaysUnlocked = true;
