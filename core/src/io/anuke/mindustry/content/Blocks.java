@@ -31,7 +31,7 @@ public class Blocks implements ContentList{
 
     //environment
     air, blockpart, spawn, space, metalfloor, deepwater, water, tar, stone, blackstone, dirt, sand, ice, snow,
-    grass, shrub, rock, icerock, blackrock, rocksSmall, rocksMedium,
+    grass, shrub, rock, icerock, blackrock, rocks,
 
     //crafting
     siliconSmelter, plastaniumCompressor, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -210,16 +210,10 @@ public class Blocks implements ContentList{
             variants = 1;
         }};
 
-        rocksSmall = new Rock("rocks-small"){{
+        rocks = new Rock("rocks"){{
            variants = 2;
            breakable = alwaysReplace = false;
            solid = true;
-        }};
-
-        rocksMedium = new Rock("rocks-medium"){{
-            variants = 2;
-            breakable = alwaysReplace = false;
-            solid = true;
         }};
         
         //endregion

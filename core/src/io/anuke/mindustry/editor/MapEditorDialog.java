@@ -18,14 +18,12 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.maps.MapTileData;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 
@@ -501,14 +499,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         for(Block block : Vars.content.blocks()){
             TextureRegion[] regions = block.getCompactIcon();
-            if((block.synthetic() && (Recipe.getByResult(block) == null || !data.isUnlocked(Recipe.getByResult(block))))
-                    && block != Blocks.core){
-                continue;
-            }
-
-            if(Recipe.getByResult(block) != null && !Recipe.getByResult(block).visibility.shown()){
-                continue;
-            }
 
             if(regions.length == 0 || regions[0] == Core.atlas.find("jjfgj")) continue;
 

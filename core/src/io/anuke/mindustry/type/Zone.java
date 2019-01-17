@@ -14,10 +14,16 @@ public class Zone extends UnlockableContent{
     public ItemStack[] deployCost = {};
     public ItemStack[] startingItems = {};
     public Supplier<Rules> rules = Rules::new;
+    public boolean alwaysUnlocked;
 
     public Zone(String name, Generator generator){
         this.name = name;
         this.generator = generator;
+    }
+
+    @Override
+    public boolean alwaysUnlocked(){
+        return alwaysUnlocked;
     }
 
     @Override

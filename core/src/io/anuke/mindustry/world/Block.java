@@ -314,7 +314,7 @@ public class Block extends BaseBlock {
     }
 
     public boolean synthetic(){
-        return update || destructible || solid;
+        return update || destructible;
     }
 
     public void drawConfigure(Tile tile){

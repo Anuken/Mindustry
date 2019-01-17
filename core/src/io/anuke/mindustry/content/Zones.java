@@ -12,9 +12,10 @@ public class Zones implements ContentList{
     @Override
     public void load(){
 
-        wasteland = new Zone("wasteland", new BasicGenerator(256, 256, Items.lead, Items.copper)){{
+        wasteland = new Zone("wasteland", new BasicGenerator(256, 256, Items.copper)){{
             deployCost = ItemStack.with(Items.copper, 100);
             startingItems = ItemStack.with(Items.copper, 50);
+            alwaysUnlocked = true;
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;

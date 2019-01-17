@@ -53,7 +53,7 @@ public class BasicGenerator extends RandomGenerator{
         }
 
         if(rocks > 0.64){
-            block = Blocks.rocksSmall;
+            block = Blocks.rocks;
         }
     }
 }

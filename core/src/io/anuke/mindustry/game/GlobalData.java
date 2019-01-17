@@ -6,6 +6,7 @@ import io.anuke.arc.collection.ObjectIntMap;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
@@ -48,8 +49,8 @@ public class GlobalData{
 
     /** Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(UnlockableContent content){
-        return true;
-        //return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.getContentName());
+        //return true;
+        return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.getContentName());
     }
 
     /**
@@ -92,6 +93,11 @@ public class GlobalData{
         unlocked = Core.settings.getObject("unlocks", ObjectMap.class, ObjectMap::new);
         for(Item item : Vars.content.items()){
             items.put(item, Core.settings.getInt("item-" + item.name, 0));
+        }
+
+        //set up default values
+        if(!Core.settings.has("item-" + Items.copper)){
+            addItem(Items.copper, 1000);
         }
     }
 

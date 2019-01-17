@@ -76,7 +76,7 @@ public class HudFragment extends Fragment{
                         if(Net.active()){
                             i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-players");
                         }else{
-                            i.setDisabled(Net.active());
+                            i.setDisabled(false);
                             i.getStyle().imageUp = Core.scene.skin.getDrawable(state.is(State.paused) ? "icon-play" : "icon-pause");
                         }
                     }).get();
@@ -131,7 +131,6 @@ public class HudFragment extends Fragment{
             //fps display
             infolabel = cont.table(t -> {
                 IntFormat fps = new IntFormat("fps");
-                IntFormat tps = new IntFormat("tps");
                 IntFormat ping = new IntFormat("ping");
                 t.label(() -> fps.get(Core.graphics.getFramesPerSecond())).padRight(10);
                 t.row();
@@ -364,20 +363,32 @@ public class HudFragment extends Fragment{
         IntFormat wavef = new IntFormat("wave");
         IntFormat enemyf = new IntFormat("wave.enemy");
         IntFormat enemiesf = new IntFormat("wave.enemies");
+        IntFormat waitingf = new IntFormat("wave.waiting");
 
         table.clearChildren();
         table.touchable(Touchable.enabled);
 
-        table.labelWrap(() ->
-                (state.enemies() > 0 && !state.rules.waveTimer ?
-                wavef.get(state.wave) + "\n" + (state.enemies() == 1 ?
-                    enemyf.get(state.enemies()) :
-                    enemiesf.get(state.enemies())) :
-                wavef.get(state.wave) + "\n" +
-                    (state.rules.waveTimer ?
-                    Core.bundle.format("wave.waiting", (int)(state.wavetime/60)) :
-                    Core.bundle.get("waiting")))
-        ).growX().pad(8f);
+        StringBuilder builder = new StringBuilder();
+
+        table.labelWrap(() -> {
+            builder.setLength(0);
+            builder.append(wavef.get(state.wave));
+            builder.append("\n");
+
+            if(state.enemies() > 0 && !state.rules.waveTimer){
+                if(state.enemies() == 1){
+                    builder.append(enemyf.get(state.enemies()));
+                }else{
+                    builder.append(enemiesf.get(state.enemies()));
+                }
+            }else if(state.rules.waveTimer){
+                builder.append(waitingf.get((int)(state.wavetime/60)));
+            }else{
+                builder.append(Core.bundle.get("waiting"));
+            }
+
+            return builder;
+        }).growX().pad(8f);
 
         table.setDisabled(true);
         table.visible(() -> state.rules.waves);
