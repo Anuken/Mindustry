@@ -42,11 +42,11 @@ public class Save16 extends SaveFileVersion{
 
         state.wave = wave;
         state.wavetime = wavetime;
+        state.stats = Serialization.readStats(stream);
 
         content.setTemporaryMapper(readContentHeader(stream));
 
         readEntities(stream);
-
         readMap(stream);
     }
 
@@ -64,6 +64,8 @@ public class Save16 extends SaveFileVersion{
 
         stream.writeInt(state.wave); //wave
         stream.writeFloat(state.wavetime); //wave countdown
+
+        Serialization.writeStats(stream, state.stats);
 
         writeContentHeader(stream);
 

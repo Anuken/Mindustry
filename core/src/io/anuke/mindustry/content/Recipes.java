@@ -51,8 +51,8 @@ public class Recipes implements ContentList{
         new Recipe(effect, Blocks.shockMine, new ItemStack(Items.lead, 50), new ItemStack(Items.silicon, 25));
 
         //TURRETS
-        new Recipe(turret, Blocks.duo, new ItemStack(Items.copper, 40)).setAlwaysUnlocked(true);
-        new Recipe(turret, Blocks.arc, new ItemStack(Items.copper, 50), new ItemStack(Items.lead, 40));
+        new Recipe(turret, Blocks.duo, new ItemStack(Items.copper, 60)).setAlwaysUnlocked(true);
+        new Recipe(turret, Blocks.arc, new ItemStack(Items.copper, 70), new ItemStack(Items.lead, 60));
         new Recipe(turret, Blocks.hail, new ItemStack(Items.copper, 60), new ItemStack(Items.graphite, 35));
         new Recipe(turret, Blocks.lancer, new ItemStack(Items.copper, 50), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 90));
         new Recipe(turret, Blocks.wave, new ItemStack(Items.titanium, 70), new ItemStack(Items.lead, 150));

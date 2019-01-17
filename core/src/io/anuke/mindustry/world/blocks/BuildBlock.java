@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
+import io.anuke.arc.Events;
 import io.anuke.arc.Graphics.Cursor;
 import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.entities.Effects;
@@ -15,6 +16,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
+import io.anuke.mindustry.game.EventType.BlockBuildEndEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
@@ -46,8 +48,10 @@ public class BuildBlock extends Block{
 
     @Remote(called = Loc.server)
     public static void onDeconstructFinish(Tile tile, Block block){
+        Team team = tile.getTeam();
         Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
         world.removeBlock(tile);
+        Events.fire(new BlockBuildEndEvent(tile, team, true));
     }
 
     @Remote(called = Loc.server)
@@ -64,6 +68,7 @@ public class BuildBlock extends Block{
             //event first before they can recieve the placed() event modification results
             Core.app.post(() -> tile.block().playerPlaced(tile));
         }
+        Core.app.post(() -> Events.fire(new BlockBuildEndEvent(tile, team, false)));
     }
 
     @Override

@@ -126,7 +126,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(mobile){
             game.checkPref("autotarget", true);
         }
-        game.sliderPref("saveinterval", 120, 10, 5 * 120, i -> Core.bundle.format("setting.seconds", i));
+        game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
             game.checkPref("crashreport", true);

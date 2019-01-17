@@ -10,11 +10,8 @@ import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Teams;
-import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
@@ -68,6 +65,7 @@ public class Logic implements ApplicationListener{
         state.gameOver = false;
         state.teams = new Teams();
         state.rules = new Rules();
+        state.stats = new Stats();
 
         Time.clear();
         Entities.clear();

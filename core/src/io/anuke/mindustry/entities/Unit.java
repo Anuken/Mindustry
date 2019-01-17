@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.Events;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.impl.DestructibleEntity;
 import io.anuke.arc.entities.trait.DamageTrait;
@@ -17,6 +18,7 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.game.EventType.UnitDestroyEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.net.Interpolator;
@@ -121,6 +123,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         inventory.clear();
         drownTime = 0f;
         status.clear();
+        Events.fire(new UnitDestroyEvent(this));
     }
 
     @Override

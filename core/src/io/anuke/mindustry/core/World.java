@@ -26,6 +26,7 @@ import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.maps.Maps;
 import io.anuke.mindustry.maps.generators.Generator;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
@@ -195,7 +196,11 @@ public class World implements ApplicationListener{
     }
 
     public boolean isZone(){
-        return state.rules.zone != -1;
+        return getZone() != null;
+    }
+
+    public Zone getZone(){
+        return content.getByID(ContentType.zone, state.rules.zone);
     }
 
     public void playZone(Zone zone){

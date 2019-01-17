@@ -28,6 +28,7 @@ public class GlobalData{
     public void addItem(Item item, int amount){
         modified = true;
         items.getAndIncrement(item, 0, amount);
+        state.stats.itemsDelivered.getAndIncrement(item, 0, amount);
     }
 
     public boolean hasItems(ItemStack[] stacks){

@@ -28,13 +28,8 @@ public class Zones implements ContentList{
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
-                        begin = 5;
-                        unitScaling = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
                         begin = 10;
-                        unitScaling = 1;
+                        unitScaling = 2;
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
@@ -49,6 +44,11 @@ public class Zones implements ContentList{
 
                     new SpawnGroup(UnitTypes.dagger){{
                         begin = 25;
+                        unitScaling = 1;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 30;
                         unitScaling = 1;
                     }}
                 );

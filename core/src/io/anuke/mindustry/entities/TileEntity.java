@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.entities.Effects;
@@ -16,6 +17,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.game.EventType.BlockDestroyEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.world.Block;
@@ -244,6 +246,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             dead = true;
             Block block = tile.block();
 
+            Events.fire(new BlockDestroyEvent(tile));
             block.onDestroyed(tile);
             world.removeBlock(tile);
             block.afterDestroyed(tile, this);

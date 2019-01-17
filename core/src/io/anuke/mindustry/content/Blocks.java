@@ -725,8 +725,8 @@ public class Blocks implements ContentList{
 
         core = new CoreBlock("core"){{
             health = 1100;
-            itemCapacity = 2000;
-            launchThreshold = 1000;
+            itemCapacity = 1000;
+            launchThreshold = 500;
             launchTime = 60f * 10;
             launchChunkSize = 100;
         }};
@@ -763,12 +763,12 @@ public class Blocks implements ContentList{
                 Items.pyratite, Bullets.standardIncendiary,
                 Items.silicon, Bullets.standardHoming
             );
-            reload = 25f;
+            reload = 20f;
             restitution = 0.03f;
             range = 90f;
             shootCone = 15f;
             ammoUseEffect = Fx.shellEjectSmall;
-            health = 80;
+            health = 110;
             inaccuracy = 2f;
             rotatespeed = 10f;
         }};

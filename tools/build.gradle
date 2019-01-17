@@ -162,7 +162,7 @@ task scaleSprites(){
 
 task pack(){
     dependsOn 'cleanSprites', 'scaleSprites'
-    finalizedBy 'cleanup'
+    //finalizedBy 'cleanup'
 
     doLast{
 
@@ -189,8 +189,7 @@ task cleanup(){
 }
 
 task cleanSprites(){
-    finalizedBy 'cleanup'
-    
+
     doLast{
         delete{
             delete "../core/assets-raw/sprites_out/"

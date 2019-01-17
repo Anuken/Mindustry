@@ -38,10 +38,6 @@ public class Palette{
 
     stoneGray = Color.valueOf("8f8f8f"),
 
-    portalLight = Color.valueOf("9054ea"),
-    portal = Color.valueOf("6344d7"),
-    portalDark = Color.valueOf("3f3dac"),
-
     heal = Color.valueOf("98ffa9"),
     bar = Color.SLATE,
     accent = Color.valueOf("ffd37f"),

@@ -47,7 +47,7 @@ public class UI implements ApplicationListener{
     public LoadingFragment loadfrag;
 
     public AboutDialog about;
-    public RestartDialog restart;
+    public GameOverDialog restart;
     public CustomGameDialog levels;
     public MapsDialog maps;
     public LoadDialog load;
@@ -158,7 +158,7 @@ public class UI implements ApplicationListener{
 
         editor = new MapEditorDialog();
         controls = new ControlsDialog();
-        restart = new RestartDialog();
+        restart = new GameOverDialog();
         join = new JoinDialog();
         discord = new DiscordDialog();
         load = new LoadDialog();

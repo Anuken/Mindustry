@@ -31,12 +31,16 @@ public class ScorchDecal extends Decal{
 
     @Override
     public void drawDecal(){
-
         for(int i = 0; i < 5; i++){
             TextureRegion region = regions[Mathf.randomSeed(id - i, 0, scorches - 1)];
             float rotation = Mathf.randomSeed(id + i, 0, 360);
             float space = 1.5f + Mathf.randomSeed(id + i + 1, 0, 20) / 10f;
-            Draw.rect(region, x + Angles.trnsx(rotation, space), y + Angles.trnsy(rotation, space) + region.getHeight()/2f, region.getWidth()/2f, 0, rotation - 90);
+            Draw.rect(region,
+            x + Angles.trnsx(rotation, space),
+            y + Angles.trnsy(rotation, space) + region.getHeight()/2f*Draw.scl,
+            region.getWidth() * Draw.scl,
+            region.getHeight() * Draw.scl,
+            region.getWidth()/2f*Draw.scl, 0, rotation - 90);
         }
     }
 }

@@ -2,6 +2,7 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.Events.Event;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.world.Tile;
 
@@ -81,6 +82,18 @@ public class EventType{
         }
     }
 
+    public static class BlockBuildEndEvent implements Event{
+        public final Tile tile;
+        public final Team team;
+        public final boolean breaking;
+
+        public BlockBuildEndEvent(Tile tile, Team team, boolean breaking){
+            this.tile = tile;
+            this.team = team;
+            this.breaking = breaking;
+        }
+    }
+
     /**Called when a player or drone begins building something.
      * This does not necessarily happen when a new BuildBlock is created.*/
     public static class BuildSelectEvent implements Event{
@@ -94,6 +107,22 @@ public class EventType{
             this.team = team;
             this.builder = builder;
             this.breaking = breaking;
+        }
+    }
+
+    public static class BlockDestroyEvent implements Event{
+        public final Tile tile;
+
+        public BlockDestroyEvent(Tile tile){
+            this.tile = tile;
+        }
+    }
+
+    public static class UnitDestroyEvent implements Event{
+        public final Unit unit;
+
+        public UnitDestroyEvent(Unit unit){
+            this.unit = unit;
         }
     }
 

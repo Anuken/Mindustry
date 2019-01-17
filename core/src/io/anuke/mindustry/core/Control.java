@@ -116,15 +116,16 @@ public class Control implements ApplicationListener{
         //todo high scores for custom maps, as well as other statistics
 
         Events.on(GameOverEvent.class, event -> {
+            state.stats.wavesLasted = state.wave;
+            Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+            //the restart dialog can show info for any number of scenarios
+            Call.onGameOver(event.winner);
             if(state.rules.zone != -1){
                 //remove zone save on game over
                 if(saves.getZoneSlot() != null){
                     saves.getZoneSlot().delete();
                 }
             }
-            Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
-            //the restart dialog can show info for any number of scenarios
-            Call.onGameOver(event.winner);
         });
 
         //autohost for pvp sectors
@@ -141,6 +142,28 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
+
+        Events.on(BlockBuildEndEvent.class, e -> {
+            if(e.team == players[0].getTeam()){
+                if(e.breaking){
+                    state.stats.buildingsDeconstructed++;
+                }else{
+                    state.stats.buildingsBuilt ++;
+                }
+            }
+        });
+
+        Events.on(BlockDestroyEvent.class, e -> {
+            if(e.tile.getTeam() == players[0].getTeam()){
+                state.stats.buildingsDestroyed ++;
+            }
+        });
+
+        Events.on(UnitDestroyEvent.class, e -> {
+            if(e.unit.getTeam() != players[0].getTeam()){
+                state.stats.enemyUnitsDestroyed ++;
+            }
+        });
     }
 
     public void addPlayer(int index){

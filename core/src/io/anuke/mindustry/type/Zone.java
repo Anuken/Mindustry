@@ -8,6 +8,8 @@ import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.generators.Generator;
 
+import static io.anuke.mindustry.Vars.state;
+
 public class Zone extends UnlockableContent{
     public final String name;
     public final Generator generator;
@@ -15,10 +17,16 @@ public class Zone extends UnlockableContent{
     public ItemStack[] startingItems = {};
     public Supplier<Rules> rules = Rules::new;
     public boolean alwaysUnlocked;
+    public int conditionWave = Integer.MAX_VALUE;
 
     public Zone(String name, Generator generator){
         this.name = name;
         this.generator = generator;
+    }
+
+    /**Whether this zone has met its condition; if true, the player can leave.*/
+    public boolean metCondition(){
+        return state.wave > conditionWave;
     }
 
     @Override
