@@ -8,10 +8,8 @@ import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.Difficulty;
-import io.anuke.mindustry.game.MappableContent;
-import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
@@ -33,11 +31,11 @@ public abstract class SaveFileVersion{
         long time = stream.readLong();
         long playtime = stream.readLong();
         int build = stream.readInt();
-        byte mode = stream.readByte();
+
+        Rules rules = Serialization.readRules(stream);
         String map = stream.readUTF();
         int wave = stream.readInt();
-        byte difficulty = stream.readByte();
-        return new SaveMeta(version, time, playtime, build, mode, map, wave, Difficulty.values()[difficulty]);
+        return new SaveMeta(version, time, playtime, build, map, wave, rules);
     }
 
     public void writeMap(DataOutputStream stream) throws IOException{

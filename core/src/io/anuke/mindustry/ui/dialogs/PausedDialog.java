@@ -2,8 +2,6 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.scene.style.Drawable;
-import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 
@@ -12,12 +10,10 @@ import static io.anuke.mindustry.Vars.*;
 public class PausedDialog extends FloatingDialog{
     private SaveDialog save = new SaveDialog();
     private LoadDialog load = new LoadDialog();
-    private Table missionTable;
 
     public PausedDialog(){
         super("$menu");
         shouldPause = true;
-        setup();
 
         shown(this::rebuild);
 
@@ -29,19 +25,13 @@ public class PausedDialog extends FloatingDialog{
     }
 
     void rebuild(){
-        missionTable.clear();
-        missionTable.background((Drawable) null);
-    }
+        cont.clear();
 
-    void setup(){
         update(() -> {
             if(state.is(State.menu) && isShown()){
                 hide();
             }
         });
-
-        cont.table(t -> missionTable = t).colspan(mobile ? 3 : 2);
-        cont.row();
 
         if(!mobile){
             float dw = 210f;
@@ -53,9 +43,11 @@ public class PausedDialog extends FloatingDialog{
             cont.addButton("$unlocks", ui.unlocks::show);
             cont.addButton("$settings", ui.settings::show);
 
-            cont.row();
-            cont.addButton("$savegame", save::show);
-            cont.addButton("$loadgame", load::show).disabled(b -> Net.active());
+            if(!world.isZone()){
+                cont.row();
+                cont.addButton("$savegame", save::show);
+                cont.addButton("$loadgame", load::show).disabled(b -> Net.active());
+            }
 
             cont.row();
 
@@ -77,11 +69,15 @@ public class PausedDialog extends FloatingDialog{
 
             cont.addRowImageTextButton("$back", "icon-play-2", isize, this::hide);
             cont.addRowImageTextButton("$settings", "icon-tools", isize, ui.settings::show);
-            cont.addRowImageTextButton("$save", "icon-save", isize, save::show);
 
-            cont.row();
+            if(!world.isZone()){
+                cont.addRowImageTextButton("$save", "icon-save", isize, save::show);
 
-            cont.addRowImageTextButton("$load", "icon-load", isize, load::show).disabled(b -> Net.active());
+                cont.row();
+
+                cont.addRowImageTextButton("$load", "icon-load", isize, load::show).disabled(b -> Net.active());
+            }
+
             cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
             cont.addRowImageTextButton("$quit", "icon-quit", isize, () -> {
                 ui.showConfirm("$confirm", "$quit.confirm", () -> {

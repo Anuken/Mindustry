@@ -116,6 +116,12 @@ public class Control implements ApplicationListener{
         //todo high scores for custom maps, as well as other statistics
 
         Events.on(GameOverEvent.class, event -> {
+            if(state.rules.zone != -1){
+                //remove zone save on game over
+                if(saves.getZoneSlot() != null){
+                    saves.getZoneSlot().delete();
+                }
+            }
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);

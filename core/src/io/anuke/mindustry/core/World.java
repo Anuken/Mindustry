@@ -192,6 +192,10 @@ public class World implements ApplicationListener{
         return generating;
     }
 
+    public boolean isZone(){
+        return state.rules.zone != -1;
+    }
+
     public void playZone(Zone zone){
         ui.loadAnd(() -> {
             logic.reset();
@@ -202,6 +206,8 @@ public class World implements ApplicationListener{
                     core.entity.items.add(stack.item, stack.amount);
                 }
             }
+            state.rules.zone = zone.id;
+            control.saves.zoneSave();
             logic.play();
         });
     }

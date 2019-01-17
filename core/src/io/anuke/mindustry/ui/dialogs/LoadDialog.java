@@ -116,8 +116,6 @@ public class LoadDialog extends FloatingDialog{
             button.row();
             button.add(Core.bundle.format("save.wave", color + slot.getWave()));
             button.row();
-            button.add(Core.bundle.format("save.difficulty", color + slot.getDifficulty()));
-            button.row();
             button.label(() -> Core.bundle.format("save.autosave", color + Core.bundle.get(slot.isAutosave() ? "on" : "off")));
             button.row();
             button.label(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));

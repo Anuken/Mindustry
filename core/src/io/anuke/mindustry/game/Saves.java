@@ -13,6 +13,8 @@ import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.SaveMeta;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.Zone;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -105,6 +107,16 @@ public class Saves{
         return saving;
     }
 
+    public void zoneSave(){
+        SaveSlot slot = new SaveSlot(-1);
+        slot.setName("zone");
+        saves.remove(s -> s.index == -1);
+        saves.add(slot);
+        saveMap.put(slot.index, slot);
+        slot.save();
+        saveSlots();
+    }
+
     public SaveSlot addSave(String name){
         SaveSlot slot = new SaveSlot(nextSlot);
         nextSlot++;
@@ -127,6 +139,11 @@ public class Saves{
         current = slot;
         saveSlots();
         return slot;
+    }
+
+    public SaveSlot getZoneSlot(){
+        SaveSlot slot = getByID(-1);
+        return slot == null || slot.getZone() == null ? null : slot;
     }
 
     public SaveSlot getByID(int id){
@@ -203,16 +220,16 @@ public class Saves{
             Core.settings.save();
         }
 
+        public Zone getZone(){
+            return content.getByID(ContentType.zone, meta.rules.zone);
+        }
+
         public int getBuild(){
             return meta.build;
         }
 
         public int getWave(){
             return meta.wave;
-        }
-
-        public Difficulty getDifficulty(){
-            return meta.difficulty;
         }
 
         public boolean isAutosave(){

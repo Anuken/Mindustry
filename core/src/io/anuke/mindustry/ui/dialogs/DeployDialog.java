@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectIntMap;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.Vars;
@@ -39,24 +40,30 @@ public class DeployDialog extends FloatingDialog{
 
         }}, new Table(){{
 
-            for(Zone zone : Vars.content.zones()){
-                if(data.isUnlocked(zone)){
-                    table(t -> {
-                        t.addButton(zone.localizedName(), () -> {
-                            data.removeItems(zone.deployCost);
-                            hide();
-                            world.playZone(zone);
-                        }).size(150f)/*.disabled(b -> !data.hasItems(zone.deployCost))*/;
-                        t.row();
-                        t.table(req -> {
-                            req.left();
-                            for(ItemStack stack : zone.deployCost){
-                                req.addImage(stack.item.region).size(8*3);
-                                req.add(stack.amount + "").left();
-                            }
-                        }).pad(3).growX();
-                    }).pad(3);
+            if(control.saves.getZoneSlot() == null){
+
+                for(Zone zone : Vars.content.zones()){
+                    if(data.isUnlocked(zone)){
+                        table(t -> {
+                            t.addButton(zone.localizedName(), () -> {
+                                data.removeItems(zone.deployCost);
+                                hide();
+                                world.playZone(zone);
+                            }).size(150f).disabled(b -> !data.hasItems(zone.deployCost));
+                            t.row();
+                            t.table(req -> {
+                                req.left();
+                                for(ItemStack stack : zone.deployCost){
+                                    req.addImage(stack.item.region).size(8 * 3);
+                                    req.add(stack.amount + "").left();
+                                }
+                            }).pad(3).growX();
+                        }).pad(3);
+                    }
                 }
+            }else{
+                addButton(Core.bundle.format("resume", control.saves.getZoneSlot().getZone().localizedName()), () -> control.saves.getZoneSlot().load())
+                .size(200f);
             }
         }}).grow();
     }

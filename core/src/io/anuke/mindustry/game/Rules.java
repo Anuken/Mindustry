@@ -24,4 +24,6 @@ public class Rules{
     public float respawnTime = 60 * 4;
     /**Time between waves in ticks.*/
     public float waveSpacing = 60 * 60;
+    /**Zone ID, -1 for invalid zone.*/
+    public byte zone = -1;
 }
