@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectIntMap;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.ItemType;
@@ -62,8 +63,13 @@ public class DeployDialog extends FloatingDialog{
                     }
                 }
             }else{
-                addButton(Core.bundle.format("resume", control.saves.getZoneSlot().getZone().localizedName()), () -> control.saves.getZoneSlot().load())
-                .size(200f);
+                addButton(Core.bundle.format("resume", control.saves.getZoneSlot().getZone().localizedName()), () -> {
+                    hide();
+                    ui.loadAnd(() -> {
+                        control.saves.getZoneSlot().load();
+                        state.set(State.playing);
+                    });
+                }).size(200f);
             }
         }}).grow();
     }
