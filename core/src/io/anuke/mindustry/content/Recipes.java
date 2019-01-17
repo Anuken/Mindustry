@@ -21,8 +21,8 @@ public class Recipes implements ContentList{
         //DEFENSE
 
         //walls
-        new Recipe(defense, Blocks.copperWall, new ItemStack(Items.copper, 12)).setAlwaysUnlocked(true);
-        new Recipe(defense, Blocks.copperWallLarge, new ItemStack(Items.copper, 12 * 4)).setAlwaysUnlocked(true);
+        new Recipe(defense, Blocks.copperWall, new ItemStack(Items.copper, 12));
+        new Recipe(defense, Blocks.copperWallLarge, new ItemStack(Items.copper, 12 * 4));
 
         new Recipe(defense, Blocks.titaniumWall, new ItemStack(Items.titanium, 12));
         new Recipe(defense, Blocks.titaniumWallLarge, new ItemStack(Items.titanium, 12 * 4));
@@ -70,8 +70,8 @@ public class Recipes implements ContentList{
         new Recipe(distribution, Blocks.phaseConveyor, new ItemStack(Items.phasefabric, 10), new ItemStack(Items.silicon, 15), new ItemStack(Items.lead, 20), new ItemStack(Items.graphite, 20));
 
         //starter transport
-        new Recipe(distribution, Blocks.junction, new ItemStack(Items.copper, 2)).setAlwaysUnlocked(true);
-        new Recipe(distribution, Blocks.router, new ItemStack(Items.copper, 6)).setAlwaysUnlocked(true);
+        new Recipe(distribution, Blocks.junction, new ItemStack(Items.copper, 2));
+        new Recipe(distribution, Blocks.router, new ItemStack(Items.copper, 6));
 
         //more advanced transport
         new Recipe(distribution, Blocks.distributor, new ItemStack(Items.titanium, 8), new ItemStack(Items.copper, 8));

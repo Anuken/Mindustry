@@ -105,13 +105,9 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
 
     @Override
     public void draw(){
-        float length = fslope() * 6f;
-        float angle = current.set(x, y).sub(from).angle();
         Lines.stroke(fslope() * 2f, Palette.accent);
 
         Lines.circle(x, y, fslope() * 2f);
-        Lines.lineAngleCenter(x, y, angle, length);
-        Lines.lineAngle(x, y, angle, fout() * 6f);
 
         Draw.color(item.color);
         Fill.circle(x, y, fslope() * 1.5f);
