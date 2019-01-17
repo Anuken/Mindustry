@@ -2,17 +2,17 @@ package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.maps.generators.BasicGenerator;
+import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Zone;
 
 public class Zones implements ContentList{
-    public Zone wasteland;
+    public Zone groundZero;
 
     @Override
     public void load(){
 
-        wasteland = new Zone("wasteland", new BasicGenerator(256, 256, Items.copper)){{
+        groundZero = new Zone("groundZero", new MapGenerator("groundZero")){{
             deployCost = ItemStack.with(Items.copper, 100);
             startingItems = ItemStack.with(Items.copper, 50);
             alwaysUnlocked = true;

@@ -10,9 +10,15 @@ import io.anuke.mindustry.world.Tile;
 import static io.anuke.mindustry.Vars.world;
 
 public class MapGenerator extends Generator{
-    private final Map map;
+    private Map map;
+    private String mapName;
 
     public MapGenerator(String mapName){
+        this.mapName = mapName;
+    }
+
+    @Override
+    public void init(){
         map = world.maps.loadInternalMap(mapName);
         width = map.meta.width;
         height = map.meta.height;

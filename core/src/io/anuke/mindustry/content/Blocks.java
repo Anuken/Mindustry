@@ -88,14 +88,7 @@ public class Blocks implements ContentList{
         blockpart = new BlockPart();
 
         spawn = new Block("spawn"){
-
             public void drawShadow(Tile tile){}
-
-            public void draw(Tile tile){
-                Draw.color(Color.SCARLET);
-                Lines.circle(tile.worldx(), tile.worldy(), 4f +Mathf.absin(Time.time(), 6f, 6f));
-                Draw.color();
-            }
         };
 
         //Registers build blocks from size 1-6

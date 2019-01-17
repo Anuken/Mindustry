@@ -99,9 +99,6 @@ public class MapEditor{
     }
 
     public void draw(int x, int y, Block drawBlock){
-        if(x < 0 || y < 0 || x >= map.width() || y >= map.height()){
-            return;
-        }
 
         byte writeID = drawBlock.id;
         byte partID = Blocks.blockpart.id;

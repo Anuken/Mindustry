@@ -6,6 +6,8 @@ import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
@@ -408,6 +410,47 @@ public class World implements ApplicationListener{
      * - updating occlusion<br>
      * Usually used before placing structures on a tile array.*/
     public void prepareTiles(Tile[][] tiles){
+
+        byte[][] dark = new byte[tiles.length][tiles[0].length];
+        byte[][] writeBuffer = new byte[tiles.length][tiles[0].length];
+
+        byte darkIterations = 4;
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
+                if(tile.block().solid && !tile.block().update){
+                    dark[x][y] = darkIterations;
+                }
+            }
+        }
+
+        for(int i = 0; i < darkIterations; i++){
+            for(int x = 0; x < tiles.length; x++){
+                for(int y = 0; y < tiles[0].length; y++){
+                    boolean min = false;
+                    for(Point2 point : Geometry.d4){
+                        int newX = x + point.x, newY = y + point.y;
+                        if(Structs.inBounds(newX, newY, tiles) && dark[newX][newY] < dark[x][y]){
+                            min = true;
+                            break;
+                        }
+                    }
+                    writeBuffer[x][y] = (byte)Math.max(0, dark[x][y] - Mathf.num(min));
+                }
+            }
+
+            for(int x = 0; x < tiles.length; x++){
+                for(int y = 0; y < tiles[0].length; y++){
+                    dark[x][y] = writeBuffer[x][y];
+                }
+            }
+        }
+
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                tiles[x][y].setRotation(dark[x][y]);
+            }
+        }
 
         //find multiblocks
         IntArray multiblocks = new IntArray();

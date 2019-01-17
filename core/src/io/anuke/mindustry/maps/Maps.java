@@ -63,14 +63,7 @@ public class Maps implements Disposable{
         FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
 
         try(DataInputStream ds = new DataInputStream(file.read())) {
-            MapMeta meta = MapIO.readMapMeta(ds);
-            Map map = new Map(name, meta, false, file::read);
-
-            if (!headless){
-                map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta, true)));
-            }
-
-            return map;
+            return new Map(name, MapIO.readMapMeta(ds), false, file::read);
         }catch(IOException e){
             throw new RuntimeException(e);
         }
