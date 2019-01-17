@@ -5,6 +5,7 @@ import io.anuke.arc.collection.ObjectIntMap;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.io.SaveIO.SaveException;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.ItemType;
@@ -66,8 +67,15 @@ public class DeployDialog extends FloatingDialog{
                 addButton(Core.bundle.format("resume", control.saves.getZoneSlot().getZone().localizedName()), () -> {
                     hide();
                     ui.loadAnd(() -> {
-                        control.saves.getZoneSlot().load();
-                        state.set(State.playing);
+                        try{
+                            control.saves.getZoneSlot().load();
+                            state.set(State.playing);
+                        }catch(SaveException e){ //make sure to handle any save load errors!
+                            e.printStackTrace();
+                            if(control.saves.getZoneSlot() != null) control.saves.getZoneSlot().delete();
+                            ui.showInfo("$save.corrupted");
+                            show();
+                        }
                     });
                 }).size(200f);
             }

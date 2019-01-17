@@ -110,6 +110,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
+    public void onRespawn(Tile tile){
+        boostHeat = 1f;
+        achievedFlight = true;
+    }
+
+    @Override
     public float drag(){
         return mech.drag;
     }

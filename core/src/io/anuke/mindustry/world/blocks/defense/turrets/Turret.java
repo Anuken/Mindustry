@@ -92,11 +92,6 @@ public abstract class Turret extends Block{
         return false;
     }
 
-    @Override
-    public void init(){
-        super.init();
-        viewRange = range;
-    }
 
     @Override
     public void load(){
@@ -110,10 +105,6 @@ public abstract class Turret extends Block{
     @Override
     public void setStats(){
         super.setStats();
-		/*
-		if(ammo != null) stats.add("ammo", ammo);
-		if(ammo != null) stats.add("ammocapacity", maxAmmo);
-		if(ammo != null) stats.add("ammoitem", ammoMultiplier);*/
 
         stats.add(BlockStat.shootRange, range, StatUnit.blocks);
         stats.add(BlockStat.inaccuracy, (int) inaccuracy, StatUnit.degrees);

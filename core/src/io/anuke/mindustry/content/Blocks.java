@@ -2,9 +2,6 @@ package io.anuke.mindustry.content;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.type.Item;
@@ -22,7 +19,10 @@ import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.storage.LaunchPad;
 import io.anuke.mindustry.world.blocks.storage.SortedUnloader;
 import io.anuke.mindustry.world.blocks.storage.Vault;
-import io.anuke.mindustry.world.blocks.units.*;
+import io.anuke.mindustry.world.blocks.units.MechPad;
+import io.anuke.mindustry.world.blocks.units.Reconstructor;
+import io.anuke.mindustry.world.blocks.units.RepairPoint;
+import io.anuke.mindustry.world.blocks.units.UnitFactory;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -630,20 +630,20 @@ public class Blocks implements ContentList{
 
         mechanicalDrill = new Drill("mechanical-drill"){{
             tier = 2;
-            drillTime = 300;
+            drillTime = 600;
             size = 2;
             drawMineItem = true;
         }};
 
         pneumaticDrill = new Drill("pneumatic-drill"){{
             tier = 3;
-            drillTime = 240;
+            drillTime = 480;
             size = 2;
             drawMineItem = true;
         }};
 
         laserDrill = new Drill("laser-drill"){{
-            drillTime = 140;
+            drillTime = 280;
             size = 2;
             hasPower = true;
             tier = 4;
@@ -654,7 +654,7 @@ public class Blocks implements ContentList{
         }};
 
         blastDrill = new Drill("blast-drill"){{
-            drillTime = 60;
+            drillTime = 120;
             size = 3;
             drawRim = true;
             hasPower = true;
@@ -670,7 +670,7 @@ public class Blocks implements ContentList{
 
         plasmaDrill = new Drill("plasma-drill"){{
             heatColor = Color.valueOf("ff461b");
-            drillTime = 50;
+            drillTime = 100;
             size = 4;
             hasLiquids = true;
             hasPower = true;
@@ -726,6 +726,9 @@ public class Blocks implements ContentList{
         core = new CoreBlock("core"){{
             health = 1100;
             itemCapacity = 2000;
+            launchThreshold = 1000;
+            launchTime = 60f * 10;
+            launchChunkSize = 100;
         }};
 
         vault = new Vault("vault"){{
@@ -746,6 +749,7 @@ public class Blocks implements ContentList{
             size = 3;
             itemCapacity = 100;
             launchTime = 60f * 6;
+            hasPower = true;
             consumes.power(0.1f);
         }};
         

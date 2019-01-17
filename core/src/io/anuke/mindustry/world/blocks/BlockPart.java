@@ -16,7 +16,6 @@ public class BlockPart extends Block{
         super("blockpart");
         solid = false;
         hasPower = hasItems = hasLiquids = true;
-        viewRange = -1;
     }
 
     @Override

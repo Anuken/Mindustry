@@ -14,6 +14,7 @@ import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Strings;
+import io.anuke.mindustry.io.SaveIO.SaveException;
 
 import java.io.IOException;
 
@@ -173,7 +174,7 @@ public class LoadDialog extends FloatingDialog{
             try{
                 slot.load();
                 state.set(State.playing);
-            }catch(Exception e){
+            }catch(SaveException e){
                 Log.err(e);
                 state.set(State.menu);
                 logic.reset();

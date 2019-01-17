@@ -182,8 +182,6 @@ public class Pathfinder{
                 createFor(team);
             }
         }
-
-        world.spawner.checkAllQuadrants();
     }
 
     class PathData{

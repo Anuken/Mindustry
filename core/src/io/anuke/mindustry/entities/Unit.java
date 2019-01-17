@@ -217,6 +217,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return tile == null ? (Floor) Blocks.air : tile.floor();
     }
 
+    public void onRespawn(Tile tile){}
+
     @Override
     public boolean isValid(){
         return !isDead() && isAdded();

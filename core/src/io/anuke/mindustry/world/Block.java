@@ -92,8 +92,6 @@ public class Block extends BaseBlock {
     public boolean consumesTap;
     /** The color of this block when displayed on the minimap or map preview. */
     public Color minimapColor = Color.CLEAR;
-    /** View range of this block type. Use a value < 0 to disable. */
-    public float viewRange = 10;
     /**Whether the top icon is outlined, like a turret.*/
     public boolean turretIcon = false;
     /**Whether units target this block.*/

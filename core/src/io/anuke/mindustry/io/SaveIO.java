@@ -43,7 +43,7 @@ public class SaveIO{
         }
     }
 
-    public static void loadFromSlot(int slot){
+    public static void loadFromSlot(int slot) throws SaveException{
         load(fileFor(slot));
     }
 
@@ -117,40 +117,41 @@ public class SaveIO{
         }
     }
 
-    public static void load(FileHandle file){
+    public static void load(FileHandle file) throws SaveException{
         try{
+            //try and load; if any exception at all occurs
             load(new InflaterInputStream(file.read()));
-        }catch(RuntimeException e){
+        }catch(SaveException e){
             e.printStackTrace();
             FileHandle backup = file.sibling(file.name() + "-backup." + file.extension());
             if(backup.exists()){
                 load(new InflaterInputStream(backup.read()));
             }else{
-                throw new RuntimeException(e);
+                throw new SaveException(e.getCause());
             }
         }
     }
 
-    public static void load(InputStream is){
-        logic.reset();
-
-        DataInputStream stream;
-
-        try{
-            stream = new DataInputStream(is);
+    public static void load(InputStream is) throws SaveException{
+        try(DataInputStream stream = new DataInputStream(is)){
+            logic.reset();
             int version = stream.readInt();
             SaveFileVersion ver = versions.get(version);
 
             ver.read(stream);
-
-            stream.close();
         }catch(Exception e){
             content.setTemporaryMapper(null);
-            throw new RuntimeException(e);
+            throw new SaveException(e);
         }
     }
 
     public static SaveFileVersion getVersion(){
         return versionArray.peek();
+    }
+
+    public static class SaveException extends RuntimeException{
+        public SaveException(Throwable throwable){
+            super(throwable);
+        }
     }
 }

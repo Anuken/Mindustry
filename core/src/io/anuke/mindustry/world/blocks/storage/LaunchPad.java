@@ -6,12 +6,11 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.data;
 
-public class LaunchPad extends Block{
+public class LaunchPad extends StorageBlock{
     protected final int timerLaunch = timers++;
     /**Time inbetween launches.*/
     protected float launchTime;
@@ -19,14 +18,13 @@ public class LaunchPad extends Block{
     public LaunchPad(String name){
         super(name);
         update = true;
-        hasPower = true;
         hasItems = true;
         solid = true;
     }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return item.type == ItemType.material && tile.entity.items.get(item) < getMaximumAccepted(tile, item);
+        return item.type == ItemType.material && super.acceptItem(item, tile, source);
     }
 
     @Override

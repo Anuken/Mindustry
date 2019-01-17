@@ -11,6 +11,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.io.SaveIO.SaveException;
 import io.anuke.mindustry.io.SaveMeta;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
@@ -170,11 +171,15 @@ public class Saves{
             this.index = index;
         }
 
-        public void load(){
-            SaveIO.loadFromSlot(index);
-            meta = SaveIO.getData(index);
-            current = this;
-            totalPlaytime = meta.timePlayed;
+        public void load() throws SaveException{
+            try{
+                SaveIO.loadFromSlot(index);
+                meta = SaveIO.getData(index);
+                current = this;
+                totalPlaytime = meta.timePlayed;
+            }catch(Exception e){
+                throw new SaveException(e);
+            }
         }
 
         public void save(){

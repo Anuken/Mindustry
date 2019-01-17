@@ -131,13 +131,6 @@ public class MassDriver extends Block{
     }
 
     @Override
-    public void init(){
-        super.init();
-
-        viewRange = range;
-    }
-
-    @Override
     public void update(Tile tile){
         MassDriverEntity entity = tile.entity();
 

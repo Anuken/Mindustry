@@ -182,6 +182,8 @@ public class World implements ApplicationListener{
             }
         }
 
+        addDarkness(tiles);
+
         EntityQuery.resizeTree(0, 0, tiles.length * tilesize, tiles[0].length * tilesize);
 
         generating = false;
@@ -411,11 +413,7 @@ public class World implements ApplicationListener{
         prepareTiles(tiles);
     }
 
-    /**'Prepares' a tile array by:<br>
-     * - setting up multiblocks<br>
-     * - updating occlusion<br>
-     * Usually used before placing structures on a tile array.*/
-    public void prepareTiles(Tile[][] tiles){
+    public void addDarkness(Tile[][] tiles){
 
         byte[][] dark = new byte[tiles.length][tiles[0].length];
         byte[][] writeBuffer = new byte[tiles.length][tiles[0].length];
@@ -454,9 +452,19 @@ public class World implements ApplicationListener{
 
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
-                tiles[x][y].setRotation(dark[x][y]);
+                Tile tile = tiles[x][y];
+                if(tile.block().solid && !tile.block().update){
+                    tiles[x][y].setRotation(dark[x][y]);
+                }
             }
         }
+    }
+
+    /**'Prepares' a tile array by:<br>
+     * - setting up multiblocks<br>
+     * - updating occlusion<br>
+     * Usually used before placing structures on a tile array.*/
+    public void prepareTiles(Tile[][] tiles){
 
         //find multiblocks
         IntArray multiblocks = new IntArray();

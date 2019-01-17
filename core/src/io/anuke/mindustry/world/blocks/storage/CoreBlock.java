@@ -14,36 +14,29 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import static io.anuke.mindustry.Vars.*;
 
-public class CoreBlock extends StorageBlock{
-    protected TextureRegion openRegion;
+public class CoreBlock extends LaunchPad{
     protected TextureRegion topRegion;
+    protected int launchThreshold;
+    protected int launchChunkSize;
 
     public CoreBlock(String name){
         super(name);
 
-        solid = false;
-        solidifes = true;
+        solid = true;
         update = true;
-        size = 3;
         hasItems = true;
-        viewRange = 200f;
+        size = 3;
         flags = EnumSet.of(BlockFlag.resupplyPoint, BlockFlag.target);
     }
 
@@ -53,11 +46,12 @@ public class CoreBlock extends StorageBlock{
 
         CoreEntity entity = tile.entity();
         Effects.effect(Fx.spawn, entity);
-        entity.solid = false;
         entity.progress = 0;
+        entity.currentUnit.onRespawn(tile);
         entity.currentUnit = player;
         entity.currentUnit.heal();
         entity.currentUnit.rotation = 90f;
+        entity.currentUnit.applyImpulse(0, 8f);
         entity.currentUnit.setNet(tile.drawx(), tile.drawy());
         entity.currentUnit.add();
         entity.currentUnit = null;
@@ -65,18 +59,6 @@ public class CoreBlock extends StorageBlock{
         if(player instanceof Player){
             ((Player) player).endRespawning();
         }
-    }
-
-    @Remote(called = Loc.server)
-    public static void setCoreSolid(Tile tile, boolean solid){
-        if(tile == null) return;
-        CoreEntity entity = tile.entity();
-        if(entity != null) entity.solid = solid;
-    }
-
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        return item.type == ItemType.material && super.acceptItem(item, tile, source);
     }
 
     @Override
@@ -118,7 +100,6 @@ public class CoreBlock extends StorageBlock{
     public void load(){
         super.load();
 
-        openRegion = Core.atlas.find(name + "-open");
         topRegion = Core.atlas.find(name + "-top");
     }
 
@@ -126,7 +107,7 @@ public class CoreBlock extends StorageBlock{
     public void draw(Tile tile){
         CoreEntity entity = tile.entity();
 
-        Draw.rect(entity.solid ? region : openRegion, tile.drawx(), tile.drawy());
+        Draw.rect(region, tile.drawx(), tile.drawy());
 
         Draw.alpha(entity.heat);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
@@ -159,13 +140,6 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public boolean isSolidFor(Tile tile){
-        CoreEntity entity = tile.entity();
-
-        return entity.solid;
-    }
-
-    @Override
     public void handleItem(Item item, Tile tile, Tile source){
         if(Net.server() || !Net.active()) super.handleItem(item, tile, source);
     }
@@ -174,8 +148,13 @@ public class CoreBlock extends StorageBlock{
     public void update(Tile tile){
         CoreEntity entity = tile.entity();
 
-        if(!entity.solid && !Units.anyEntities(tile)){
-            Call.setCoreSolid(tile, true);
+        for(Item item : Vars.content.items()){
+            if(entity.items.get(item) >= launchThreshold + launchChunkSize && entity.timer.get(timerLaunch, launchTime)){
+                //TODO play animation of some sort
+                Effects.effect(Fx.dooropenlarge, tile);
+                data.addItem(item, launchChunkSize);
+                entity.items.remove(item, launchChunkSize);
+            }
         }
 
         if(entity.currentUnit != null){
@@ -200,7 +179,6 @@ public class CoreBlock extends StorageBlock{
 
     public class CoreEntity extends TileEntity implements SpawnerTrait{
         public Unit currentUnit;
-        boolean solid = true;
         float progress;
         float time;
         float heat;
@@ -217,16 +195,6 @@ public class CoreBlock extends StorageBlock{
         @Override
         public float getSpawnProgress(){
             return progress;
-        }
-
-        @Override
-        public void write(DataOutput stream) throws IOException{
-            stream.writeBoolean(solid);
-        }
-
-        @Override
-        public void read(DataInput stream) throws IOException{
-            solid = stream.readBoolean();
         }
     }
 }

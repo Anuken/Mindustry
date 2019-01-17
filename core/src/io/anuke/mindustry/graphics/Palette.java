@@ -54,7 +54,7 @@ public class Palette{
     range = Color.valueOf("f4ba6e"),
     power = Color.valueOf("fbad67"),
     powerLight = Color.valueOf("fbd367"),
-    placing = Color.valueOf("616161"),
+    placing = accent,
 
     lightTrail = Color.valueOf("ffe2a9"),
 
