@@ -57,23 +57,17 @@ public class GlobalData{
      * Makes this piece of content 'unlocked', if possible.
      * If this piece of content is already unlocked or cannot be unlocked due to dependencies, nothing changes.
      * Results are not saved until you call {@link #save()}.
-     *
-     * @return whether or not this content was newly unlocked.
      */
-    public boolean unlockContent(UnlockableContent content){
-        if(!content.canBeUnlocked() || content.alwaysUnlocked()) return false;
-
-        boolean ret = unlocked.getOr(content.getContentType(), ObjectSet::new).add(content.getContentName());
+    public void unlockContent(UnlockableContent content){
+        if(!content.canBeUnlocked() || content.alwaysUnlocked()) return;
 
         //fire unlock event so other classes can use it
-        if(ret){
+        if(unlocked.getOr(content.getContentType(), ObjectSet::new).add(content.getContentName())){
             modified = true;
             content.onUnlock();
             Events.fire(new UnlockEvent(content));
             save();
         }
-
-        return ret;
     }
 
     /** Clears all unlocked content. Automatically saves.*/

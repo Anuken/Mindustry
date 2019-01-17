@@ -133,6 +133,8 @@ public class Control implements ApplicationListener{
                 }
             }
         });
+
+        Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
     }
 
     public void addPlayer(int index){

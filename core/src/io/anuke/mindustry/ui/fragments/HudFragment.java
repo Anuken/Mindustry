@@ -4,7 +4,6 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.Element;
@@ -13,7 +12,6 @@ import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.scene.ui.Label;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -24,12 +22,12 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
@@ -229,7 +227,9 @@ public class HudFragment extends Fragment{
     }
 
     /** Show unlock notification for a new recipe. */
-    public void showUnlock(Recipe recipe){
+    public void showUnlock(UnlockableContent content){
+        //some content may not have icons... yet
+        if(content.getContentIcon() == null) return;
 
         //if there's currently no unlock notification...
         if(lastUnlockTable == null){
@@ -246,14 +246,10 @@ public class HudFragment extends Fragment{
             Table in = new Table();
 
             //create texture stack for displaying
-            Stack stack = new Stack();
-            for(TextureRegion region : recipe.result.getCompactIcon()){
-                Image image = new Image(region);
-                image.setScaling(Scaling.fit);
-                stack.add(image);
-            }
+            Image image = new Image(content.getContentIcon());
+            image.setScaling(Scaling.fit);
 
-            in.add(stack).size(48f).pad(2);
+            in.add(image).size(48f).pad(2);
 
             //add to table
             table.add(in).padRight(8);
@@ -289,11 +285,6 @@ public class HudFragment extends Fragment{
             //get size of each element
             float size = 48f / Math.min(elements.size + 1, col);
 
-            //correct plurals if needed
-            if(esize == 1){
-                ((Label) lastUnlockLayout.getParent().find(e -> e instanceof Label)).setText("$unlocked.plural");
-            }
-
             lastUnlockLayout.clearChildren();
             lastUnlockLayout.defaults().size(size).pad(2);
 
@@ -308,14 +299,10 @@ public class HudFragment extends Fragment{
             //if there's space, add it
             if(esize < cap){
 
-                Stack stack = new Stack();
-                for(TextureRegion region : recipe.result.getCompactIcon()){
-                    Image image = new Image(region);
-                    image.setScaling(Scaling.fit);
-                    stack.add(image);
-                }
+                Image image = new Image(content.getContentIcon());
+                image.setScaling(Scaling.fit);
 
-                lastUnlockLayout.add(stack);
+                lastUnlockLayout.add(image);
             }else{ //else, add a specific icon to denote no more space
                 lastUnlockLayout.addImage("icon-add");
             }

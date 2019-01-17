@@ -40,8 +40,8 @@ public class Mechs implements ContentList{
             }
 
             @Override
-            public void updateAlt(Player player){
-
+            public boolean alwaysUnlocked(){
+                return true;
             }
         };
 
@@ -182,18 +182,25 @@ public class Mechs implements ContentList{
             }
         };
 
-        dart = new Mech("dart-ship", true){{
-            drillPower = 1;
-            mineSpeed = 0.9f;
-            speed = 0.4f;
-            drag = 0.1f;
-            armor = 10f;
-            weapon = Weapons.blasterSmall;
-            weaponOffsetX = -1;
-            weaponOffsetY = -1;
-            trailColor = Palette.lightTrail;
-            cellTrnsY = 1f;
-        }};
+        dart = new Mech("dart-ship", true){
+            {
+                drillPower = 1;
+                mineSpeed = 0.9f;
+                speed = 0.4f;
+                drag = 0.1f;
+                armor = 10f;
+                weapon = Weapons.blasterSmall;
+                weaponOffsetX = -1;
+                weaponOffsetY = -1;
+                trailColor = Palette.lightTrail;
+                cellTrnsY = 1f;
+            }
+
+            @Override
+            public boolean alwaysUnlocked(){
+                return true;
+            }
+        };
 
         javelin = new Mech("javelin-ship", true){
             float minV = 3.6f;

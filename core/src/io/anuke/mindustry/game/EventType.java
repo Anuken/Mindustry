@@ -60,9 +60,9 @@ public class EventType{
     }
 
     public static class UnlockEvent implements Event{
-        public final Content content;
+        public final UnlockableContent content;
 
-        public UnlockEvent(Content content){
+        public UnlockEvent(UnlockableContent content){
             this.content = content;
         }
     }
