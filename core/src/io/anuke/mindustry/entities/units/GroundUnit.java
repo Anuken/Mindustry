@@ -265,7 +265,9 @@ public abstract class GroundUnit extends BaseUnit{
         float angle = angleTo(targetTile);
 
         velocity.add(vec.trns(angleTo(targetTile), type.speed*Time.delta()));
-        rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
+        if(Units.invalidateTarget(target, this)){
+            rotation = Mathf.slerpDelta(rotation, angle, type.rotatespeed);
+        }
     }
 
     protected void moveAwayFromCore(){
