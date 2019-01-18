@@ -130,14 +130,6 @@ public abstract class InputHandler implements InputProcessor{
         return Core.input.mouseY();
     }
 
-    public void resetCursor(){
-
-    }
-
-    public boolean isCursorVisible(){
-        return false;
-    }
-
     public void buildUI(Table table){
 
     }
@@ -162,7 +154,7 @@ public abstract class InputHandler implements InputProcessor{
     boolean tileTapped(Tile tile){
         tile = tile.target();
 
-        boolean consumed = false, showedInventory = false, showedConsume = false;
+        boolean consumed = false, showedInventory = false;
 
         //check if tapped block is configurable
         if(tile.block().configurable && tile.getTeam() == player.getTeam()){
@@ -329,12 +321,8 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public boolean validPlace(int x, int y, Block type, int rotation){
-        for(Tile tile : state.teams.get(player.getTeam()).cores){
-            return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
-            Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
-        }
-
-        return false;
+        return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
+        Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
     }
 
     public boolean validBreak(int x, int y){

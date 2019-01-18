@@ -60,7 +60,7 @@ public class BlockRenderer{
     public void drawShadows(){
         if(disableShadows) return;
 
-        if(shadows.getWidth() != Core.graphics.getWidth() || shadows.getHeight() != Core.graphics.getHeight()){
+        if(!Core.graphics.isHidden() && (shadows.getWidth() != Core.graphics.getWidth() || shadows.getHeight() != Core.graphics.getHeight())){
             shadows.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         }
 
