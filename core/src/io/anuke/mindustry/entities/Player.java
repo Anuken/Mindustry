@@ -448,7 +448,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 Lines.stroke(2f, Palette.removeBack);
 
                 float rad = Mathf.absin(Time.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
-
                 Lines.square(
                 request.x * tilesize + block.offset(),
                 request.y * tilesize + block.offset() - 1,
@@ -461,15 +460,22 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 request.y * tilesize + block.offset(),
                 rad);
             }else{
-                //draw place request
-                Lines.stroke(2f, Palette.accentBack);
+                float rad = Mathf.absin(Time.time(), 7f, 1f) - 1.5f + request.recipe.result.size * tilesize / 2f;
 
-                float rad = Mathf.absin(Time.time(), 7f, 1f) - 2f + request.recipe.result.size * tilesize / 2f;
+                //draw place request
+                Lines.stroke(1f, Palette.accentBack);
 
                 Lines.square(
                 request.x * tilesize + request.recipe.result.offset(),
                 request.y * tilesize + request.recipe.result.offset() - 1,
                 rad);
+
+                Draw.color();
+
+                Draw.rect(request.recipe.result.getEditorIcon(),
+                        request.x * tilesize + request.recipe.result.offset(),
+                        request.y * tilesize + request.recipe.result.offset(), rad*2, rad*2, request.rotation * 90);
+
 
                 Draw.color(Palette.accent);
 

@@ -182,7 +182,7 @@ public class DesktopInput extends InputHandler{
             selectScale = 0f;
         }
 
-        rotation = Mathf.mod(rotation + (int) Core.input.axis(Binding.rotate), 4);
+        rotation = Mathf.mod(rotation + (int) Core.input.axisTap(Binding.rotate), 4);
 
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 

@@ -95,7 +95,7 @@ public class GlobalData{
 
         //set up default values
         if(!Core.settings.has("item-" + Items.copper)){
-        //    addItem(Items.copper, 1000);
+           addItem(Items.copper, 1000);
         }
     }
 
