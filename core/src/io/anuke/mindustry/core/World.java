@@ -5,17 +5,21 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
 import io.anuke.mindustry.ai.WaveSpawner;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -27,6 +31,7 @@ import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.maps.Maps;
 import io.anuke.mindustry.maps.generators.Generator;
 import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
@@ -193,6 +198,24 @@ public class World implements ApplicationListener{
 
     public boolean isGenerating(){
         return generating;
+    }
+
+    public void launchZone(){
+        Effects.effect(Fx.launchFull, 0, 0);
+
+        for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+            Effects.effect(Fx.launch, tile);
+        }
+
+        Time.runTask(30f, () -> {
+            for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+                for(Item item : content.items()){
+                    data.addItem(item, tile.entity.items.get(item));
+                }
+                world.removeBlock(tile);
+            }
+            state.launched = true;
+        });
     }
 
     public boolean isZone(){

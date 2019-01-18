@@ -26,7 +26,7 @@ public class Zone extends UnlockableContent{
 
     /**Whether this zone has met its condition; if true, the player can leave.*/
     public boolean metCondition(){
-        return state.wave > conditionWave;
+        return state.wave >= conditionWave;
     }
 
     @Override

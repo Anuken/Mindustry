@@ -18,6 +18,7 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 100);
             startingItems = ItemStack.with(Items.copper, 50);
             alwaysUnlocked = true;
+            conditionWave = 10;
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;

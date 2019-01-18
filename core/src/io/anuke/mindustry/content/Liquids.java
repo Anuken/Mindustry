@@ -16,7 +16,7 @@ public class Liquids implements ContentList{
             effect = StatusEffects.wet;
         }};
 
-        slag = new Liquid("slag", Color.valueOf("e37341")){{
+        slag = new Liquid("slag", Color.valueOf("ffcd66")){{
             temperature = 1f;
             viscosity = 0.8f;
             tier = 2;

@@ -165,7 +165,7 @@ public class ContentLoader{
         }
 
         if(id >= contentMap[type.ordinal()].size || id < 0){
-            throw new RuntimeException("No " + type.name() + " with ID '" + id + "' found!");
+            return null;
         }
         return (T)contentMap[type.ordinal()].get(id);
     }

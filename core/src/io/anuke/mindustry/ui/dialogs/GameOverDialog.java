@@ -22,6 +22,7 @@ public class GameOverDialog extends FloatingDialog{
     }
 
     void rebuild(){
+        title.setText(state.launched ? "$launch.title" : "$gameover");
         buttons.clear();
         cont.clear();
 
@@ -56,7 +57,7 @@ public class GameOverDialog extends FloatingDialog{
                     cont.add("$stat.delivered");
                     cont.row();
                     for(Item item : content.items()){
-                        if(state.stats.itemsDelivered.containsKey(item)){
+                        if(state.stats.itemsDelivered.get(item, 0) > 0){
                             cont.table(items -> {
                                 items.add("    [LIGHT_GRAY]" + state.stats.itemsDelivered.get(item, 0));
                                 items.addImage(item.region).size(8 *3).pad(4);

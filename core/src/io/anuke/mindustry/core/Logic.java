@@ -62,7 +62,7 @@ public class Logic implements ApplicationListener{
     public void reset(){
         state.wave = 1;
         state.wavetime = state.rules.waveSpacing;
-        state.gameOver = false;
+        state.gameOver = state.launched = false;
         state.teams = new Teams();
         state.rules = new Rules();
         state.stats = new Stats();

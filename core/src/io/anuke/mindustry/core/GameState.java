@@ -16,7 +16,7 @@ public class GameState{
     /**Wave countdown in ticks.*/
     public float wavetime;
     /**Whether the game is in game over state.*/
-    public boolean gameOver = false;
+    public boolean gameOver = false, launched = false;
     /**The current game rules.*/
     public Rules rules = new Rules();
     /**Statistics for this save/game. Displayed after game over.*/
@@ -38,7 +38,7 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return is(State.paused) && !Net.active();
+        return (is(State.paused) || gameOver) && !Net.active();
     }
 
     public boolean is(State astate){

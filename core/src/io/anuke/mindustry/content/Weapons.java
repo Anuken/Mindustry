@@ -20,7 +20,7 @@ public class Weapons implements ContentList{
 
         blasterSmall = new Weapon("blaster"){{
             length = 1.5f;
-            reload = 15f;
+            reload = 20f;
             roundrobin = true;
             ejectEffect = Fx.shellEjectSmall;
             ammo = Bullets.standardCopper;
@@ -28,7 +28,7 @@ public class Weapons implements ContentList{
 
         glaiveBlaster = new Weapon("bomber"){{
             length = 1.5f;
-            reload = 10f;
+            reload = 13f;
             roundrobin = true;
             ejectEffect = Fx.shellEjectSmall;
             ammo = Bullets.standardGlaive;
@@ -54,7 +54,7 @@ public class Weapons implements ContentList{
 
         missiles = new Weapon("missiles"){{
             length = 1.5f;
-            reload = 60f;
+            reload = 70f;
             shots = 4;
             inaccuracy = 2f;
             roundrobin = true;
