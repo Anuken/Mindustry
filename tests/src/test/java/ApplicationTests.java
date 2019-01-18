@@ -51,11 +51,12 @@ public class ApplicationTests{
 
                     BundleLoader.load();
                     content.load();
-                    content.initialize(Content::init);
 
                     add(logic = new Logic());
                     add(world = new World());
                     add(netServer = new NetServer());
+
+                    content.initialize(Content::init);
                 }
 
                 @Override
