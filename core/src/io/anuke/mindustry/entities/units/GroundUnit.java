@@ -12,6 +12,7 @@ import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
@@ -132,7 +133,7 @@ public abstract class GroundUnit extends BaseUnit{
 
     @Override
     public void draw(){
-        Draw.alpha(hitTime / hitDuration);
+        Draw.alpha(Draw.getShader() != Shaders.mix ? 1f : hitTime / hitDuration);
 
         float ft = Mathf.sin(walkTime * type.speed*5f, 6f, 2f);
 

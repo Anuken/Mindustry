@@ -26,6 +26,7 @@ import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
@@ -329,7 +330,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         Floor floor = getFloorOn();
 
         Draw.color();
-        Draw.alpha(hitTime / hitDuration);
+        Draw.alpha(Draw.getShader() != Shaders.mix ? 1f : hitTime / hitDuration);
 
         if(!mech.flying){
             if(floor.isLiquid){

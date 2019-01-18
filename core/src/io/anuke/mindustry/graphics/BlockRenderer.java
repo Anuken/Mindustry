@@ -4,11 +4,14 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.Sort;
+import io.anuke.arc.entities.EntityDraw;
+import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -71,6 +74,12 @@ public class BlockRenderer{
         Core.graphics.clear(Color.CLEAR);
         Draw.color(shadowColor);
         drawBlocks(Layer.shadow);
+
+        EntityDraw.drawWith(playerGroup, player -> !player.isDead(), Unit::draw);
+        for(EntityGroup group : unitGroups){
+            EntityDraw.drawWith(group, unit -> !unit.isDead(), Unit::draw);
+        }
+
         Draw.color();
         Draw.flush();
         shadows.end();

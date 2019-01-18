@@ -65,4 +65,5 @@ public class Zone extends UnlockableContent{
     public ContentType getContentType(){
         return ContentType.zone;
     }
+
 }

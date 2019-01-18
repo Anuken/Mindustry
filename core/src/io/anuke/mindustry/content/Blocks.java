@@ -312,10 +312,10 @@ public class Blocks implements ContentList{
 
         separator = new Separator("separator"){{
             results = new ItemStack[]{
-                    new ItemStack(Items.copper, 5),
-                    new ItemStack(Items.lead, 3),
-                    new ItemStack(Items.titanium, 2),
-                    new ItemStack(Items.thorium, 1)
+                new ItemStack(Items.copper, 5),
+                new ItemStack(Items.lead, 3),
+                new ItemStack(Items.titanium, 2),
+                new ItemStack(Items.thorium, 1)
             };
             hasPower = true;
             filterTime = 15f;

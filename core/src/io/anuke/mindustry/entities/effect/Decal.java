@@ -14,7 +14,7 @@ import static io.anuke.mindustry.Vars.groundEffectGroup;
  * Class for creating block rubble on the ground.
  */
 public abstract class Decal extends TimedEntity implements BelowLiquidTrait, DrawTrait{
-    private static final Color color = Color.valueOf("52504e");
+    private static final Color color = Color.valueOf("2c2928");
 
     @Override
     public float lifetime(){

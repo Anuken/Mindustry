@@ -38,7 +38,7 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return (is(State.paused) || gameOver) && !Net.active();
+        return is(State.paused) && !Net.active();
     }
 
     public boolean is(State astate){

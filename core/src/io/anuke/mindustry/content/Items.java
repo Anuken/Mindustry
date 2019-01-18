@@ -60,7 +60,7 @@ public class Items implements ContentList{
         }};
 
         scrap = new Item("scrap", Color.valueOf("777777")){{
-
+            genOre = true;
         }};
 
         silicon = new Item("silicon", Color.valueOf("53565c")){{
