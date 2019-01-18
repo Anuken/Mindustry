@@ -116,6 +116,25 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
+    public void move(float x, float y){
+        if(!mech.flying){
+            EntityQuery.collisions().move(this, x, y);
+        }else{
+            moveBy(x, y);
+        }
+    }
+
+    @Override
+    public boolean collidesGrid(int x, int y){
+        Tile tile = world.tile(x, y);
+        if(!isFlying()) return true;
+        if(!mech.flying && tile != null && !tile.block().synthetic() && tile.block().solid){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public float drag(){
         return mech.drag;
     }

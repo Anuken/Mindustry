@@ -75,6 +75,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     @Override
+    public boolean collidesGrid(int x, int y){
+        return !isFlying();
+    }
+
+    @Override
     public void setCarrier(CarryTrait carrier){
         this.carrier = carrier;
     }
@@ -244,8 +249,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         velocity.limit(maxVelocity()).scl(1f + (status.getSpeedMultiplier()-1f) * Time.delta());
 
         if(isFlying()){
-            x += velocity.x * Time.delta();
-            y += velocity.y * Time.delta();
+            move(velocity.x * Time.delta(), velocity.y * Time.delta());
         }else{
             boolean onLiquid = floor.isLiquid;
 

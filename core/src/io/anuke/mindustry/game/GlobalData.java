@@ -23,6 +23,7 @@ public class GlobalData{
 
     public GlobalData(){
         Core.settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
+        Core.settings.setSerializer(Item.class, (stream, t) -> stream.writeUTF(t.name), stream -> content.getByName(ContentType.item, stream.readUTF()));
     }
 
     public void addItem(Item item, int amount){
@@ -94,7 +95,7 @@ public class GlobalData{
 
         //set up default values
         if(!Core.settings.has("item-" + Items.copper)){
-            addItem(Items.copper, 1000);
+        //    addItem(Items.copper, 1000);
         }
     }
 

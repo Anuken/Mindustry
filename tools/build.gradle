@@ -105,7 +105,7 @@ task swapColors(){
 task scaleSprites4x(){
     doLast{
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit { file ->
-            if(file.isDirectory() || file.toString().contains("/ui/")) return;
+            if(file.isDirectory() || file.toString().contains("/ui/")) return
 
             for(int iteration in 0..1) {
                 def image = ImageIO.read(file.file)
@@ -169,9 +169,12 @@ task pack(){
         copy{
             from "../core/assets-raw/sprites_replacement/"
             into "../core/assets-raw/sprites_out/"
-            eachFile{file ->
-                antialias(file.file)
-            }
+        }
+
+        fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
+            if(file.isDirectory() || file.toString().contains("/ui/")) return
+
+            antialias(file.file)
         }
 
         TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites.atlas")
@@ -204,7 +207,17 @@ task cleanSprites(){
     }
 }
 
+task antialiasGen(){
+    doLast{
+        fileTree(dir: '../core/assets-raw/sprites_out/generated/', include: "**/*.png").visit{ file ->
+            antialias(file.file)
+        }
+    }
+}
+
 task genSprites(dependsOn: classes, type: JavaExec) {
+    finalizedBy 'antialiasGen'
+    
     main = "io.anuke.mindustry.ImagePacker"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in

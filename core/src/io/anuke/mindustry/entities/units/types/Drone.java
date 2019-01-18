@@ -13,7 +13,6 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.FlyingUnit;
-import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
@@ -260,11 +259,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             this.isBreaking = isBreaking;
             setState(build);
         }
-    }
-
-    @Override
-    public void onCommand(UnitCommand command){
-        //no
     }
 
     @Override

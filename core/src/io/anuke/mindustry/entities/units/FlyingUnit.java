@@ -120,11 +120,8 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     };
 
     @Override
-    public void onCommand(UnitCommand command){
-        state.set(command == UnitCommand.retreat ? retreat :
-                  command == UnitCommand.attack ? attack :
-                  command == UnitCommand.patrol ? patrol :
-                  null);
+    public void move(float x, float y){
+        moveBy(x, y);
     }
 
     @Override
