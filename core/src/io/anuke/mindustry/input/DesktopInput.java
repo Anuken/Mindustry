@@ -302,11 +302,6 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
-    public boolean isCursorVisible(){
-        return controlling;
-    }
-
-    @Override
     public void updateController(){
 
         if(state.is(State.menu)){

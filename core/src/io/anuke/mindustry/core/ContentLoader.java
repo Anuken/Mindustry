@@ -45,6 +45,7 @@ public class ContentLoader{
         new UnitTypes(),
         new Blocks(),
         new Recipes(),
+        new TechTree(),
         new Zones(),
 
         //these are not really content classes, but this makes initialization easier
