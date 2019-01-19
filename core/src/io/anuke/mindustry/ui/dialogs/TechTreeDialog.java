@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
@@ -12,31 +12,46 @@ import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.event.InputEvent;
 import io.anuke.arc.scene.event.InputListener;
 import io.anuke.arc.util.Log;
-import io.anuke.mindustry.Vars;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.TechTree;
 import io.anuke.mindustry.content.TechTree.TechNode;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.type.Recipe.RecipeVisibility;
 import io.anuke.mindustry.ui.TreeLayout;
 import io.anuke.mindustry.ui.TreeLayout.TreeNode;
 import io.anuke.mindustry.world.Block.Icon;
 
+import static io.anuke.mindustry.Vars.content;
+
 public class TechTreeDialog extends FloatingDialog{
-    private TreeLayout layout;
     private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
+    private static final float nodeSize = 60f;
 
     public TechTreeDialog(){
         super("$techtree");
 
-        layout = new TreeLayout();
+        TreeLayout layout = new TreeLayout();
         layout.gapBetweenLevels = 60f;
         layout.gapBetweenNodes = 40f;
         layout.layout(new TechTreeNode(TechTree.root, null));
         cont.add(new View()).grow();
 
-        double total = Vars.content.recipes().count(r -> r.visibility == RecipeVisibility.all);
-        if(total > nodes.size) Log.err("Recipe tree coverage: {0}%", (int)(nodes.size / total * 100));
+        { //debug code
+            ObjectSet<Recipe> used = new ObjectSet<>();
+            for(TechTreeNode node : nodes){
+                if(node.node.block != null) used.add(Recipe.getByResult(node.node.block));
+            }
+            Array<Recipe> recipes = content.recipes().select(r -> r.visibility == RecipeVisibility.all && !used.contains(r));
+            recipes.sort(Structs.comparing(r -> r.cost));
+
+            if(recipes.size > 0){
+                Log.info("Recipe tree coverage: {0}%", (int)((float)nodes.size / content.recipes().select(r -> r.visibility == RecipeVisibility.all).size * 100));
+                Log.info("Missing items: ");
+                recipes.forEach(r -> Log.info("    {0}", r));
+            }
+        }
 
         addCloseButton();
     }
@@ -47,12 +62,12 @@ public class TechTreeDialog extends FloatingDialog{
         public TechTreeNode(TechNode node, TreeNode parent){
             this.node = node;
             this.parent = parent;
-            this.width = this.height = 60f;
+            this.width = this.height = nodeSize;
             nodes.add(this);
             if(node.children != null){
-                children = new TechTreeNode[node.children.length];
+                children = new TechTreeNode[node.children.size];
                 for(int i = 0; i < children.length; i++){
-                    children[i] = new TechTreeNode(node.children[i], this);
+                    children[i] = new TechTreeNode(node.children.get(i), this);
                 }
             }
         }
@@ -64,15 +79,19 @@ public class TechTreeDialog extends FloatingDialog{
 
         {
             addListener(new InputListener(){
+                float lastX, lastY;
                 @Override
-                public void touchDragged(InputEvent event, float x, float y, int pointer){
-                    super.touchDragged(event, x, y, pointer);
-                    panX += Core.input.deltaX(pointer);
-                    panY += Core.input.deltaY(pointer);
+                public void touchDragged(InputEvent event, float mx, float my, int pointer){
+                    panX -= lastX - mx;
+                    panY -= lastY - my;
+                    lastX = mx;
+                    lastY = my;
                 }
 
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                    lastX = x;
+                    lastY = y;
                     return true;
                 }
             });
@@ -97,7 +116,7 @@ public class TechTreeDialog extends FloatingDialog{
             Draw.color();
 
             for(TechTreeNode node : nodes){
-                Draw.drawable("content-background", node.x + offsetX - node.width/2f, node.y + offsetY - node.height/2f, node.width, node.height);
+                Draw.drawable("content-background", node.x + offsetX - nodeSize/2f, node.y + offsetY - nodeSize/2f, nodeSize, nodeSize);
 
                 TextureRegion region = node.node.block == null ? Blocks.core.icon(Icon.medium) : node.node.block.icon(Icon.medium);
                 Draw.rect(region, node.x + offsetX, node.y + offsetY - 0.5f, region.getWidth(), region.getHeight());

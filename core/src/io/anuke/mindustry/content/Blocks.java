@@ -61,7 +61,7 @@ public class Blocks implements ContentList{
     core, vault, container, unloader, launchPad,
 
     //turrets
-    duo, scorch, hail, wave, lancer, arc, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
+    duo, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
     spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, titanFactory,
@@ -785,15 +785,6 @@ public class Blocks implements ContentList{
             inaccuracy = 1f;
             shootCone = 10f;
             health = 120;
-        }};
-
-        scorch = new LiquidTurret("scorch"){{
-            ammo(Liquids.oil, Bullets.basicFlame);
-            recoil = 0f;
-            reload = 4f;
-            shootCone = 50f;
-            ammoUseEffect = Fx.shellEjectSmall;
-            health = 160;
         }};
 
         wave = new LiquidTurret("wave"){{

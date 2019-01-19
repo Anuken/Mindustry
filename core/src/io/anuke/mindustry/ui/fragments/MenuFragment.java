@@ -19,6 +19,18 @@ public class MenuFragment extends Fragment{
 
     @Override
     public void build(Group parent){
+
+        if(true){
+            parent.fill(t -> {
+                t.add("do not play the bleeding edge").get().setFontScale(2f);
+                t.row();
+                t.add("none of it is playable yet");
+                t.row();
+                t.add("something usable will be released 'soon' (TM)").get().setFontScale(0.5f);
+            });
+            return;
+        }
+
         parent.fill(c -> {
             container = c;
             container.visible(() -> state.is(State.menu));

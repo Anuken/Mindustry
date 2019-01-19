@@ -68,7 +68,7 @@ public class TreeLayout{
     }
 
     public Rectangle getBounds(){
-        return new Rectangle(0, 0, boundsRight - boundsLeft, boundsBottom - boundsTop);
+        return new Rectangle(boundsLeft, boundsBottom, boundsRight - boundsLeft, boundsTop - boundsBottom);
     }
 
     private void calcSizeOfLevels(TreeNode node, int level){
