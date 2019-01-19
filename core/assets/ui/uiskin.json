@@ -37,6 +37,7 @@ TextButtonStyle: {
 },
 ImageButtonStyle: {
 	default: {down: button-down, up: button, over: button-over, imageDisabledColor: gray, imageUpColor: white },
+	node: {down: content-background-over, up: content-background, over: content-background-over},
 	right: {over: button-right-over, down: button-right-down, up: button-right},
 	empty: { imageDownColor: accent, imageUpColor: white},
 	emptytoggle: {imageCheckedColor: white, imageDownColor: white, imageUpColor: gray},

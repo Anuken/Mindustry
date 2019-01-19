@@ -88,6 +88,8 @@ public class MinimapRenderer implements Disposable{
         }
 
         Draw.color();
+
+        ScissorStack.popScissors();
     }
 
     public TextureRegion getRegion(){

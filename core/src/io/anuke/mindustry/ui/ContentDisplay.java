@@ -10,7 +10,6 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.meta.BlockStat;
@@ -20,13 +19,12 @@ import io.anuke.mindustry.world.meta.StatValue;
 
 public class ContentDisplay{
 
-    public static void displayRecipe(Table table, Recipe recipe){
-        Block block = recipe.result;
+    public static void displayBlock(Table table, Block block){
 
         table.table(title -> {
             int size = 8 * 6;
 
-            title.addImage(recipe.result.icon(Icon.large)).size(size);
+            title.addImage(block.icon(Icon.large)).size(size);
             title.add("[accent]" + block.formalName).padLeft(5);
         });
 

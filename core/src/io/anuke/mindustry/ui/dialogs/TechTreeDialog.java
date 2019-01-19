@@ -2,17 +2,18 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.ScissorStack;
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.event.InputEvent;
 import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.scene.ui.ImageButton;
+import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.TechTree;
 import io.anuke.mindustry.content.TechTree.TechNode;
@@ -36,10 +37,11 @@ public class TechTreeDialog extends FloatingDialog{
         layout.gapBetweenLevels = 60f;
         layout.gapBetweenNodes = 40f;
         layout.layout(new TechTreeNode(TechTree.root, null));
+
         cont.add(new View()).grow();
 
-        { //debug code
-            ObjectSet<Recipe> used = new ObjectSet<>();
+        { //debug code; TODO remove
+            ObjectSet<Recipe> used = new ObjectSet<Recipe>().select(t -> true);
             for(TechTreeNode node : nodes){
                 if(node.node.block != null) used.add(Recipe.getByResult(node.node.block));
             }
@@ -73,11 +75,26 @@ public class TechTreeDialog extends FloatingDialog{
         }
     }
 
-    class View extends Element{
+    class View extends Group{
         float panX = 0, panY = 0;
         Rectangle clip = new Rectangle();
+        boolean moved = false;
 
         {
+            for(TechTreeNode node : nodes){
+                ImageButton button = new ImageButton(node.node.block == null ? Blocks.core.icon(Icon.medium) : node.node.block.icon(Icon.medium), "node");
+                button.clicked(() -> {
+                    if(moved) return;
+                    Vars.ui.content.show(Recipe.getByResult(node.node.block == null ? Blocks.conveyor : node.node.block));
+                });
+                button.tapped(() -> {
+                    moved = false;
+                });
+                button.setSize(nodeSize, nodeSize);
+                button.update(() -> button.setPosition(node.x + panX + width/2f, node.y + panY + height/2f - 0.5f, Align.center));
+                addChild(button);
+            }
+
             addListener(new InputListener(){
                 float lastX, lastY;
                 @Override
@@ -86,6 +103,7 @@ public class TechTreeDialog extends FloatingDialog{
                     panY -= lastY - my;
                     lastX = mx;
                     lastY = my;
+                    moved = true;
                 }
 
                 @Override
@@ -113,6 +131,9 @@ public class TechTreeDialog extends FloatingDialog{
                 }
             }
 
+            super.draw();
+
+            /*
             Draw.color();
 
             for(TechTreeNode node : nodes){
@@ -120,7 +141,7 @@ public class TechTreeDialog extends FloatingDialog{
 
                 TextureRegion region = node.node.block == null ? Blocks.core.icon(Icon.medium) : node.node.block.icon(Icon.medium);
                 Draw.rect(region, node.x + offsetX, node.y + offsetY - 0.5f, region.getWidth(), region.getHeight());
-            }
+            }*/
 
             ScissorStack.popScissors();
         }

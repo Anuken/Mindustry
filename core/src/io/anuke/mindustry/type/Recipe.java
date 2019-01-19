@@ -93,7 +93,7 @@ public class Recipe extends UnlockableContent{
 
     @Override
     public void displayInfo(Table table){
-        ContentDisplay.displayRecipe(table, this);
+        ContentDisplay.displayBlock(table, result);
     }
 
     @Override

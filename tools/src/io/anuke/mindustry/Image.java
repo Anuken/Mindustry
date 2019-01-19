@@ -78,7 +78,6 @@ class Image {
     }
 
     void drawScaled(Image image){
-        //graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         graphics.drawImage(image.image.getScaledInstance(width(), height(), java.awt.Image.SCALE_AREA_AVERAGING), 0, 0, width(), height(), null);
     }
 
