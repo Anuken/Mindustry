@@ -11,12 +11,11 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
@@ -114,7 +113,7 @@ public class Drill extends Block{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
+    public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
     }
 
@@ -239,13 +238,13 @@ public class Drill extends Block{
     }
 
     public Item getDrop(Tile tile){
-        return tile.floor().drops.item;
+        return tile.floor().itemDrop;
     }
 
     public boolean isValid(Tile tile){
         if(tile == null) return false;
-        ItemStack drops = tile.floor().drops;
-        return drops != null && drops.item.hardness <= tier;
+        Item drops = tile.floor().itemDrop;
+        return drops != null && drops.hardness <= tier;
     }
 
     public static class DrillEntity extends TileEntity{

@@ -264,10 +264,10 @@ public interface BuilderTrait extends Entity{
         TileEntity core = unit.getClosestCore();
 
         if(core == null || tile.block() != Blocks.air || unit.dst(tile.worldx(), tile.worldy()) > mineDistance
-                || tile.floor().drops == null || !unit.inventory.canAcceptItem(tile.floor().drops.item) || !canMine(tile.floor().drops.item)){
+                || tile.floor().itemDrop == null || !unit.inventory.canAcceptItem(tile.floor().itemDrop) || !canMine(tile.floor().itemDrop)){
             setMineTile(null);
         }else{
-            Item item = tile.floor().drops.item;
+            Item item = tile.floor().itemDrop;
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.worldx(), tile.worldy()), 0.4f);
 
             if(Mathf.chance(Time.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){

@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.IndexedRenderer;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -111,7 +112,7 @@ public class MapRenderer implements Disposable{
         TextureRegion region;
 
         if(bw != 0){
-            region = wall.getEditorIcon();
+            region = wall.icon(Icon.full);
 
             if(wall.rotate){
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
@@ -124,7 +125,7 @@ public class MapRenderer implements Disposable{
                         region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
             }
         }else{
-            region = floor.getEditorIcon();
+            region = floor.icon(Icon.full);
 
             mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
         }

@@ -11,8 +11,8 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.UIUtils;
@@ -26,6 +26,7 @@ import io.anuke.mindustry.maps.MapMeta;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 
 import java.io.DataInputStream;
 import java.io.InputStream;
@@ -498,20 +499,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
         int i = 0;
 
         for(Block block : Vars.content.blocks()){
-            TextureRegion[] regions = block.getCompactIcon();
+            TextureRegion region = block.icon(Icon.medium);
 
-            if(regions.length == 0 || regions[0] == Core.atlas.find("jjfgj")) continue;
-
-            Stack stack = new Stack();
-
-            for(TextureRegion region : regions){
-                stack.add(new Image(region));
-            }
+            if(region == Core.atlas.find("jjfgj")) continue;
 
             ImageButton button = new ImageButton("white", "clear-toggle");
+            button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.setDrawBlock(block));
             button.resizeImage(8 * 4f);
-            button.replaceImage(stack);
             button.update(() -> button.setChecked(editor.getDrawBlock() == block));
             group.add(button);
             content.add(button).size(50f);

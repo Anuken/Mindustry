@@ -166,7 +166,7 @@ public class Blocks implements ContentList{
         }};
 
         sand = new Floor("sand"){{
-            drops = new ItemStack(Items.sand, 1);
+            itemDrop = Items.sand;
             minimapColor = Color.valueOf("988a67");
             hasOres = true;
             playerUnmineable = true;

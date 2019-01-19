@@ -77,6 +77,11 @@ class Image {
         draw(region, (width() - region.getWidth())/2, (height() - region.getHeight())/2, flipx, flipy);
     }
 
+    void drawScaled(Image image){
+        //graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        graphics.drawImage(image.image.getScaledInstance(width(), height(), java.awt.Image.SCALE_AREA_AVERAGING), 0, 0, width(), height(), null);
+    }
+
     /**Draws an image at the top left corner.*/
     void draw(Image image){
         draw(image, 0, 0);

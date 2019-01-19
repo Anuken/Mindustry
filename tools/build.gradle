@@ -157,6 +157,14 @@ task scaleSprites4x(){
 
 task scaleSprites(){
     finalizedBy 'genSprites'
+
+    doLast{
+        copy{
+            from "../core/assets-raw/sprites_replacement/"
+            into "../core/assets-raw/sprites_out/"
+        }
+    }
+    
     dependsOn 'scaleSprites4x'
 }
 
@@ -165,11 +173,6 @@ task pack(){
     //finalizedBy 'cleanup'
 
     doLast{
-
-        copy{
-            from "../core/assets-raw/sprites_replacement/"
-            into "../core/assets-raw/sprites_out/"
-        }
 
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
             if(file.isDirectory() || file.toString().contains("/ui/")) return

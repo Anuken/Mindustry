@@ -27,11 +27,8 @@ public class PhaseWeaver extends PowerSmelter{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
-        if(icon == null){
-            icon = new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
-        }
-        return icon;
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
     }
 
     @Override

@@ -33,6 +33,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock.CoreEntity;
@@ -472,7 +473,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
                 Draw.color();
 
-                Draw.rect(request.recipe.result.getEditorIcon(),
+                Draw.rect(request.recipe.result.icon(Icon.full),
                         request.x * tilesize + request.recipe.result.offset(),
                         request.y * tilesize + request.recipe.result.offset(), rad*2, rad*2, request.rotation * 90);
 

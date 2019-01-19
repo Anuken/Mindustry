@@ -27,7 +27,7 @@ public class LiquidJunction extends LiquidBlock{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
+    public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(name)};
     }
 

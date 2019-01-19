@@ -48,7 +48,6 @@ public class Conveyor extends Block{
         layer = Layer.overlay;
         group = BlockGroup.transportation;
         hasItems = true;
-        autoSleep = true;
         itemCapacity = 4;
     }
 
@@ -122,11 +121,8 @@ public class Conveyor extends Block{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
-        if(icon == null){
-            icon = new TextureRegion[]{Core.atlas.find(name + "-0-0")};
-        }
-        return super.getIcon();
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name + "-0-0")};
     }
 
     @Override

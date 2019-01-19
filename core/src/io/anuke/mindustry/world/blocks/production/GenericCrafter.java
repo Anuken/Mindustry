@@ -1,7 +1,10 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.type.Item;
@@ -10,11 +13,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -60,11 +58,6 @@ public class GenericCrafter extends Block{
         Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
         Draw.rect("blank", tile.drawx(), tile.drawy(), 2, 2);
         Draw.color();
-    }
-
-    @Override
-    public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Core.atlas.find(name)};
     }
 
     @Override

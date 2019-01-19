@@ -12,6 +12,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.ContentStatValue;
 import io.anuke.mindustry.world.meta.StatValue;
@@ -102,7 +103,7 @@ public class Recipe extends UnlockableContent{
 
     @Override
     public TextureRegion getContentIcon(){
-        return result.getEditorIcon();
+        return result.icon(Icon.large);
     }
 
     @Override

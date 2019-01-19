@@ -94,11 +94,8 @@ public class UnitFactory extends Block{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
-        return new TextureRegion[]{
-            Core.atlas.find(name),
-            Core.atlas.find(name + "-top")
-        };
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
     }
 
     @Override

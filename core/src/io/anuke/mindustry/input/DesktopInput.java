@@ -15,6 +15,7 @@ import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
@@ -45,13 +46,10 @@ public class DesktopInput extends InputHandler{
         if(validPlace(x, y, block, rotation)){
             Draw.color();
 
-            TextureRegion[] regions = block.getBlockIcon();
-
-            for(TextureRegion region : regions){
-                Draw.rect(region, x * tilesize + block.offset(), y * tilesize + block.offset(),
-                        region.getWidth() * selectScale * Draw.scl,
-                        region.getHeight() * selectScale * Draw.scl, block.rotate ? rotation * 90 : 0);
-            }
+            TextureRegion region = block.icon(Icon.full);
+            Draw.rect(region, x * tilesize + block.offset(), y * tilesize + block.offset(),
+                    region.getWidth() * selectScale * Draw.scl,
+                    region.getHeight() * selectScale * Draw.scl, block.rotate ? rotation * 90 : 0);
         }else{
             Draw.color(Palette.removeBack);
             Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1, block.size * tilesize / 2f);

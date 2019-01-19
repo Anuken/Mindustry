@@ -5,7 +5,7 @@ import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.Liquid;
 
 public class Liquids implements ContentList{
-    public static Liquid water, slag, oil, cryofluid, acid;
+    public static Liquid water, slag, oil, cryofluid;
 
     @Override
     public void load(){
@@ -37,11 +37,6 @@ public class Liquids implements ContentList{
             temperature = 0.25f;
             tier = 1;
             effect = StatusEffects.freezing;
-        }};
-
-        acid = new Liquid("acid", Color.valueOf("e9f9b3")){{
-            heatCapacity = 0.1f; //don't use acid as coolant, it's bad
-            effect = StatusEffects.corroded;
         }};
     }
 }

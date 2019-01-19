@@ -1,14 +1,14 @@
 package io.anuke.mindustry;
 
-import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.util.Log;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.blocks.OreBlock;
 
 import static io.anuke.mindustry.Vars.content;
@@ -20,33 +20,31 @@ public class Generators {
 
         ImagePacker.generate("block-icons", () -> {
             for(Block block : content.blocks()){
-                TextureRegion[] regions = block.getBlockIcon();
+                TextureRegion[] regions = block.getGeneratedIcons();
 
                 if(regions.length == 0){
                     continue;
                 }
 
-                if(block.turretIcon){
-
-                    Image image = ImagePacker.get(block.name);
-
-                    Image read = ImagePacker.create(image.width(), image.height());
-                    read.draw(image);
-
-                    Image base = ImagePacker.get("block-" + block.size);
-
-                    base.draw(image);
-
-                    base.save("block-icon-" + block.name);
-                }else {
-
+                try{
                     Image image = ImagePacker.get(regions[0]);
 
-                    for (TextureRegion region : regions) {
+                    for(TextureRegion region : regions){
                         image.draw(region);
                     }
 
-                    image.save("block-icon-" + block.name);
+                    image.save(block.name + "-icon-full");
+
+                    for(Icon icon : Icon.values()){
+                        if(icon.size == 0) continue;
+                        Image scaled = new Image(icon.size, icon.size);
+                        scaled.drawScaled(image);
+                        scaled.save(block.name + "-icon-" + icon.name());
+                    }
+                }catch(IllegalArgumentException e){
+                    Log.info("Skipping &ly'{0}'", block.name);
+                }catch(NullPointerException e){
+                    Log.err("Block &ly'{0}'&lr has an null region!");
                 }
             }
         });
@@ -104,39 +102,12 @@ public class Generators {
             }
         });
 
-        ImagePacker.generate("block-edges", () -> {
-            for(Block block : content.blocks()){
-                if(!(block instanceof Floor)) continue;
-                Floor floor = (Floor)block;
-                if(floor.getIcon().length > 0 && !Core.atlas.has(floor.name + "-cliff-side")){
-                    Image floori = ImagePacker.get(floor.getIcon()[0]);
-                    Color color = floori.getColor(0, 0).mul(1.3f, 1.3f, 1.3f, 1f);
-
-                    String[] names = {"cliff-edge-2", "cliff-edge", "cliff-edge-1", "cliff-side"};
-                    for(String str : names){
-                        Image image = ImagePacker.get("generic-" + str);
-
-                        for(int x = 0; x < image.width(); x++){
-                            for(int y = 0; y < image.height(); y++){
-                                Color other = image.getColor(x, y);
-                                if(other.a > 0){
-                                    image.draw(x, y, color);
-                                }
-                            }
-                        }
-
-                        image.save(floor.name + "-" + str);
-                    }
-                }
-            }
-        });
-
         ImagePacker.generate("ore-icons", () -> {
             for(Block block : content.blocks()){
                 if(!(block instanceof OreBlock)) continue;
 
                 OreBlock ore = (OreBlock)block;
-                Item item = ore.drops.item;
+                Item item = ore.itemDrop;
                 Block base = ore.base;
 
                 for (int i = 0; i < 3; i++) {
@@ -160,8 +131,16 @@ public class Generators {
 
                     image.draw(ImagePacker.get(item.name + (i+1)));
                     image.save("ore-" + item.name + "-" + base.name + (i+1));
-                }
 
+                    //save icons
+                    image.save(block.name + "-icon-full");
+                    for(Icon icon : Icon.values()){
+                        if(icon.size == 0) continue;
+                        Image scaled = new Image(icon.size, icon.size);
+                        scaled.drawScaled(image);
+                        scaled.save(block.name + "-icon-" + icon.name());
+                    }
+                }
             }
         });
     }

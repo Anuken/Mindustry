@@ -11,14 +11,16 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.event.InputEvent;
 import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.util.Log;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.TechTree;
 import io.anuke.mindustry.content.TechTree.TechNode;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.type.Recipe.RecipeVisibility;
 import io.anuke.mindustry.ui.TreeLayout;
 import io.anuke.mindustry.ui.TreeLayout.TreeNode;
-import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 
 public class TechTreeDialog extends FloatingDialog{
     private TreeLayout layout;
@@ -31,8 +33,10 @@ public class TechTreeDialog extends FloatingDialog{
         layout.gapBetweenLevels = 60f;
         layout.gapBetweenNodes = 40f;
         layout.layout(new TechTreeNode(TechTree.root, null));
-
         cont.add(new View()).grow();
+
+        double total = Vars.content.recipes().count(r -> r.visibility == RecipeVisibility.all);
+        if(total > nodes.size) Log.err("Recipe tree coverage: {0}%", (int)(nodes.size / total * 100));
 
         addCloseButton();
     }
@@ -95,10 +99,8 @@ public class TechTreeDialog extends FloatingDialog{
             for(TechTreeNode node : nodes){
                 Draw.drawable("content-background", node.x + offsetX - node.width/2f, node.y + offsetY - node.height/2f, node.width, node.height);
 
-                Content content = node.node.content;
-                TextureRegion region = content instanceof Block ? ((Block)content).getEditorIcon() :
-                                                                  ((UnlockableContent)content).getContentIcon();
-                Draw.rect(region, node.x + offsetX, node.y + offsetY, 8*3, 8*3);
+                TextureRegion region = node.node.block == null ? Blocks.core.icon(Icon.medium) : node.node.block.icon(Icon.medium);
+                Draw.rect(region, node.x + offsetX, node.y + offsetY - 0.5f, region.getWidth(), region.getHeight());
             }
 
             ScissorStack.popScissors();

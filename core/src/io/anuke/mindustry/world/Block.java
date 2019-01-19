@@ -27,7 +27,6 @@ import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.*;
 
@@ -58,10 +57,8 @@ public class Block extends BaseBlock {
     public int health = -1;
     /** base block explosiveness */
     public float baseExplosiveness = 0f;
-    /** whether this block can be placed on liquids. */
+    /** whether this block can be placed on edges of liquids. */
     public boolean floating = false;
-    /** stuff that drops when broken */
-    public ItemStack drops = null;
     /** multiblock size */
     public int size = 1;
     /** Whether to draw this block in the expanded draw range. */
@@ -84,28 +81,21 @@ public class Block extends BaseBlock {
     public BlockStats stats = new BlockStats(this);
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags;
-    /** Whether to automatically set the entity to 'sleeping' when created. */
-    public boolean autoSleep;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
     /** The color of this block when displayed on the minimap or map preview. */
     public Color minimapColor = Color.CLEAR;
-    /**Whether the top icon is outlined, like a turret.*/
-    public boolean turretIcon = false;
     /**Whether units target this block.*/
     public boolean targetable = true;
     /**Whether the overdrive core has any effect on this block.*/
     public boolean canOverdrive = true;
 
     protected Array<Tile> tempTiles = new Array<>();
-    protected TextureRegion[] blockIcon;
-    protected TextureRegion[] icon;
-    protected TextureRegion[] compactIcon;
-    protected TextureRegion editorIcon;
-
-    public TextureRegion region;
+    protected TextureRegion[] icons = new TextureRegion[Icon.values().length];
+    protected TextureRegion[] generatedIcons;
+    protected TextureRegion region;
 
     public Block(String name){
         this.name = name;
@@ -126,10 +116,6 @@ public class Block extends BaseBlock {
 
     public boolean canBreak(Tile tile){
         return true;
-    }
-
-    public boolean dropsItem(Item item){
-        return drops != null && drops.item == item;
     }
 
     public void onProximityRemoved(Tile tile){
@@ -443,55 +429,25 @@ public class Block extends BaseBlock {
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
-        return getEditorIcon();
+        return icon(Icon.medium);
     }
 
-    public TextureRegion getEditorIcon(){
-        if(editorIcon == null){
-            editorIcon = Core.atlas.find("block-icon-" + name, Core.atlas.find("clear"));
+    public TextureRegion icon(Icon icon){
+        if(icons[icon.ordinal()] == null){
+            icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name());
         }
-        return editorIcon;
+        return icons[icon.ordinal()];
     }
 
-    /** Returns the icon used for displaying this block in the place menu */
-    public TextureRegion[] getIcon(){
-        if(icon == null){
-            if(Core.atlas.has(name + "-icon")){
-                icon = new TextureRegion[]{Core.atlas.find(name + "-icon")};
-            }else if(Core.atlas.has(name)){
-                icon = new TextureRegion[]{Core.atlas.find(name)};
-            }else if(Core.atlas.has(name + "1")){
-                icon = new TextureRegion[]{Core.atlas.find(name + "1")};
-            }else{
-                icon = new TextureRegion[]{};
-            }
+    protected TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name)};
+    }
+
+    public TextureRegion[] getGeneratedIcons(){
+        if(generatedIcons == null){
+            generatedIcons = generateIcons();
         }
-
-        return icon;
-    }
-
-    /** Returns a list of regions that represent this block in the world */
-    public TextureRegion[] getBlockIcon(){
-        return getIcon();
-    }
-
-    /** Returns a list of icon regions that have been cropped to 8x8 */
-    public TextureRegion[] getCompactIcon(){
-        if(compactIcon == null){
-            compactIcon = new TextureRegion[getIcon().length];
-            for(int i = 0; i < compactIcon.length; i++){
-                compactIcon[i] = iconRegion(getIcon()[i]);
-            }
-        }
-        return compactIcon;
-    }
-
-    /** Crops a regionto 8x8 */
-    protected TextureRegion iconRegion(TextureRegion src){
-        TextureRegion region = new TextureRegion(src);
-        region.setWidth((int)(8 / Draw.scl));
-        region.setHeight((int)(8 / Draw.scl));
-        return region;
+        return generatedIcons;
     }
 
     public boolean hasEntity(){
@@ -532,5 +488,19 @@ public class Block extends BaseBlock {
             "entity.items.total", hasItems ? tile.entity.items.total() : null,
             "entity.graph", tile.entity.power != null && tile.entity.power.graph != null ? tile.entity.power.graph.getID() : null
         );
+    }
+
+    public enum Icon{
+        small(8 * 3),
+        medium(8 * 4),
+        large(8 * 6),
+        /**uses whatever the size of the block is*/
+        full(0);
+
+        public final int size;
+
+        Icon(int size){
+            this.size = size;
+        }
     }
 }

@@ -11,6 +11,7 @@ import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
@@ -43,11 +44,13 @@ public class Floor extends Block{
     public Color liquidColor;
     /** liquids that drop from this block, used for pumps */
     public Liquid liquidDrop = null;
+    /** item that drops from this block, used for drills */
+    public Item itemDrop = null;
     /** Whether ores generate on this block. */
     public boolean hasOres = false;
     /** whether this block can be drowned in */
     public boolean isLiquid;
-    /** if true, this block cannot be mined by players. useful for annoying things like stone. */
+    /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
     protected TextureRegion edgeRegion;
     protected TextureRegion[] edgeRegions;
@@ -125,29 +128,12 @@ public class Floor extends Block{
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
 
-        /*
-        if(tile.hasCliffs() && cliffRegions != null){
-            for(int i = 0; i < 4; i++){
-                if((tile.getCliffs() & (1 << i * 2)) != 0){
-                    Draw.colorl(i > 1 ? 0.6f : 1f);
+        //drawEdges(tile, false);
+    }
 
-                    boolean above = (tile.getCliffs() & (1 << ((i + 1) % 4) * 2)) != 0, below = (tile.getCliffs() & (1 << (Mathf.mod(i - 1, 4)) * 2)) != 0;
-
-                    if(above && below){
-                        Draw.rect(cliffRegions[0], tile.worldx(), tile.worldy(), i * 90);
-                    }else if(above){
-                        Draw.rect(cliffRegions[1], tile.worldx(), tile.worldy(), i * 90);
-                    }else if(below){
-                        Draw.rect(cliffRegions[2], tile.worldx(), tile.worldy(), i * 90);
-                    }else{
-                        Draw.rect(cliffRegions[3], tile.worldx(), tile.worldy(), i * 90);
-                    }
-                }
-            }
-        }
-        Draw.reset();
-
-        drawEdges(tile, false);*/
+    @Override
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
     public boolean blendOverride(Block block){

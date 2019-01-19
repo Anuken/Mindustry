@@ -12,6 +12,7 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatCategory;
@@ -25,7 +26,7 @@ public class ContentDisplay{
         table.table(title -> {
             int size = 8 * 6;
 
-            title.addImage(Core.atlas.find("block-icon-" + block.name)).size(size);
+            title.addImage(recipe.result.icon(Icon.large)).size(size);
             title.add("[accent]" + block.formalName).padLeft(5);
         });
 

@@ -109,11 +109,8 @@ public class MassDriver extends Block{
     }
 
     @Override
-    public TextureRegion[] getBlockIcon(){
-        if(blockIcon == null){
-            blockIcon = new TextureRegion[]{region, turretRegion};
-        }
-        return super.getBlockIcon();
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-turret")};
     }
 
     @Override

@@ -80,7 +80,7 @@ public class BuildBlock extends Block{
     @Override
     public TextureRegion getDisplayIcon(Tile tile){
         BuildEntity entity = tile.entity();
-        return (entity.recipe == null ? entity.previous : entity.recipe.result).getEditorIcon();
+        return (entity.recipe == null ? entity.previous : entity.recipe.result).icon(Icon.full);
     }
 
     @Override
@@ -125,9 +125,7 @@ public class BuildBlock extends Block{
 
         if(entity.previous == null) return;
 
-        for(TextureRegion region : entity.previous.getBlockIcon()){
-            Draw.rect(region, tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.getRotation() * 90 : 0);
-        }
+        Draw.rect(entity.previous.icon(Icon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.getRotation() * 90 : 0);
     }
 
     @Override
@@ -141,7 +139,7 @@ public class BuildBlock extends Block{
 
         if(target == null) return;
 
-        for(TextureRegion region : target.getBlockIcon()){
+        for(TextureRegion region : target.getGeneratedIcons()){
             Shaders.blockbuild.region = region;
             Shaders.blockbuild.progress = entity.progress;
 

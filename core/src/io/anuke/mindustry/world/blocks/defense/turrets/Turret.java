@@ -83,7 +83,6 @@ public abstract class Turret extends Block{
         solid = true;
         layer = Layer.turret;
         group = BlockGroup.turrets;
-        turretIcon = true;
         flags = EnumSet.of(BlockFlag.turret);
     }
 
@@ -133,19 +132,8 @@ public abstract class Turret extends Block{
     }
 
     @Override
-    public TextureRegion[] getBlockIcon(){
-        if(blockIcon == null){
-            blockIcon = new TextureRegion[]{Core.atlas.find("block-icon-" + name)};
-        }
-        return blockIcon;
-    }
-
-    @Override
-    public TextureRegion[] getCompactIcon(){
-        if(compactIcon == null){
-            compactIcon = new TextureRegion[]{iconRegion(Core.atlas.find("block-icon-" + name))};
-        }
-        return compactIcon;
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find("block-" + size), Core.atlas.find(name)};
     }
 
     @Override

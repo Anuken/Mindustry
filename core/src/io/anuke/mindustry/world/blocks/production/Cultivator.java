@@ -92,7 +92,7 @@ public class Cultivator extends Drill{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
+    public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top"),};
     }
 

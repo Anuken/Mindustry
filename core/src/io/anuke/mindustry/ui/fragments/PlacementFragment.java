@@ -23,8 +23,8 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.ui.ImageStack;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
 
@@ -144,7 +144,7 @@ public class PlacementFragment extends Fragment{
                             if(!ulock){
                                 button.replaceImage(new Image("icon-locked"));
                             }else{
-                                button.replaceImage(new ImageStack(recipe.result.getCompactIcon()));
+                                button.replaceImage(new Image(recipe.result.icon(Icon.medium)));
                             }
                         });
 
@@ -174,7 +174,7 @@ public class PlacementFragment extends Fragment{
                         if(lastDisplay != null){ //show selected recipe
                             topTable.table(header -> {
                                 header.left();
-                                header.add(new ImageStack(lastDisplay.getCompactIcon())).size(8 * 4);
+                                header.add(new Image(lastDisplay.icon(Icon.medium))).size(8 * 4);
                                 header.labelWrap(() ->
                                 !data.isUnlocked(Recipe.getByResult(lastDisplay)) ? Core.bundle.get("blocks.unknown") : lastDisplay.formalName)
                                 .left().width(190f).padLeft(5);
@@ -210,7 +210,7 @@ public class PlacementFragment extends Fragment{
 
                         }else if(tileDisplayBlock() != null){ //show selected tile
                             lastDisplay = tileDisplayBlock();
-                            topTable.add(new ImageStack(lastDisplay.getDisplayIcon(hoverTile))).size(8 * 4);
+                            topTable.add(new Image(lastDisplay.getDisplayIcon(hoverTile))).size(8 * 4);
                             topTable.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
                         }
                     });

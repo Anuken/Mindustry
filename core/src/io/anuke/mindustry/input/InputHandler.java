@@ -231,9 +231,9 @@ public abstract class InputHandler implements InputProcessor{
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
-                && tile.floor().drops != null && tile.floor().drops.item.hardness <= player.mech.drillPower
+                && tile.floor().itemDrop != null && tile.floor().itemDrop.hardness <= player.mech.drillPower
                 && !tile.floor().playerUnmineable
-                && player.inventory.canAcceptItem(tile.floor().drops.item)
+                && player.inventory.canAcceptItem(tile.floor().itemDrop)
                 && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= Player.mineDistance;
     }
 

@@ -33,6 +33,7 @@ import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
@@ -171,17 +172,15 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(!request.remove){
             //draw placing request
             float offset = request.recipe.result.offset();
-            TextureRegion[] regions = request.recipe.result.getBlockIcon();
+            TextureRegion region = request.recipe.result.icon(Icon.full);
 
             Draw.alpha(Mathf.clamp((1f - request.scale) / 0.5f));
             Draw.tint(Color.WHITE, Palette.breakInvalid, request.redness);
 
-            for(TextureRegion region : regions){
-                Draw.rect(region, tile.worldx() + offset, tile.worldy() + offset,
-                region.getWidth() * request.scale * Draw.scl,
-                region.getHeight() * request.scale * Draw.scl,
-                request.recipe.result.rotate ? request.rotation * 90 : 0);
-            }
+            Draw.rect(region, tile.worldx() + offset, tile.worldy() + offset,
+            region.getWidth() * request.scale * Draw.scl,
+            region.getHeight() * request.scale * Draw.scl,
+            request.recipe.result.rotate ? request.rotation * 90 : 0);
         }else{
             float rad = (tile.block().size * tilesize / 2f - 1) * request.scale;
             Draw.alpha(0f);
@@ -343,14 +342,12 @@ public class MobileInput extends InputHandler implements GestureListener{
                     if(!checkOverlapPlacement(x, y, recipe.result) && validPlace(x, y, recipe.result, result.rotation)){
                         Draw.color();
 
-                        TextureRegion[] regions = recipe.result.getBlockIcon();
+                        TextureRegion region = recipe.result.icon(Icon.full);
 
-                        for(TextureRegion region : regions){
-                            Draw.rect(region, x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(),
-                            region.getWidth() * lineScale * Draw.scl,
-                            region.getHeight() * lineScale * Draw.scl,
-                            recipe.result.rotate ? result.rotation * 90 : 0);
-                        }
+                        Draw.rect(region, x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset(),
+                        region.getWidth() * lineScale * Draw.scl,
+                        region.getHeight() * lineScale * Draw.scl,
+                        recipe.result.rotate ? result.rotation * 90 : 0);
                     }else{
                         Draw.color(Palette.removeBack);
                         Lines.square(x * tilesize + recipe.result.offset(), y * tilesize + recipe.result.offset() - 1, recipe.result.size * tilesize / 2f);
