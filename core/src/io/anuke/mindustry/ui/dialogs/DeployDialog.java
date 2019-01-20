@@ -34,7 +34,7 @@ public class DeployDialog extends FloatingDialog{
             ObjectIntMap<Item> items = data.items();
             for(Item item : Vars.content.items()){
                 if(item.type == ItemType.material && data.isUnlocked(item)){
-                    add(items.get(item, 0) + "").left();
+                    label(() -> items.get(item, 0) + "").left();
                     addImage(item.region).size(8*4).pad(4);
                     add("[LIGHT_GRAY]" + item.localizedName()).left();
                     row();

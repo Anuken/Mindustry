@@ -42,6 +42,7 @@ public class Recipes implements ContentList{
         new Recipe(effect, Blocks.container, new ItemStack(Items.titanium, 200));
         new Recipe(effect, Blocks.vault, new ItemStack(Items.titanium, 500), new ItemStack(Items.thorium, 250));
         new Recipe(effect, Blocks.launchPad, new ItemStack(Items.copper, 500));
+        new Recipe(effect, Blocks.core, new ItemStack(Items.titanium, 2000)).setHidden(true).setAlwaysUnlocked(true);
 
         //projectors
         new Recipe(effect, Blocks.mendProjector, new ItemStack(Items.lead, 200), new ItemStack(Items.titanium, 150), new ItemStack(Items.titanium, 50), new ItemStack(Items.silicon, 180));
@@ -159,9 +160,6 @@ public class Recipes implements ContentList{
         new Recipe(units, Blocks.revenantFactory, new ItemStack(Items.plastanium, 300), new ItemStack(Items.titanium, 400), new ItemStack(Items.lead, 300), new ItemStack(Items.silicon, 400), new ItemStack(Items.surgealloy, 100));
 
         new Recipe(units, Blocks.repairPoint, new ItemStack(Items.lead, 30), new ItemStack(Items.copper, 30), new ItemStack(Items.silicon, 30));
-
-        //removed for testing MOBA-style unit production
-        //new Recipe(units, Blocks.commandCenter, new ItemStack(Items.lead, 100), new ItemStack(Items.densealloy, 100), new ItemStack(Items.silicon, 200));
 
         //LIQUIDS
         new Recipe(liquid, Blocks.conduit, new ItemStack(Items.lead, 1));

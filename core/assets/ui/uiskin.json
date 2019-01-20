@@ -24,6 +24,7 @@ ButtonStyle: {
 },
 TextButtonStyle: {
 	default: {over: button-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: gray, down: button-down, up: button},
+	node: {disabled: content-background, font: default-font, fontColor: white, disabledFontColor: gray, up: content-background, over: content-background-over},
 	right: {over: button-right-over, font: default-font, fontColor: white, disabledFontColor: gray, down: button-right-down, up: button-right},
 	wave: {font: default-font, fontColor: white, disabledFontColor: gray, up: button-edge-4},
 	clear: {over: flat-over, font: default-font, fontColor: white, disabledFontColor: gray, down: flat-over, up: flat},
@@ -37,7 +38,7 @@ TextButtonStyle: {
 },
 ImageButtonStyle: {
 	default: {down: button-down, up: button, over: button-over, imageDisabledColor: gray, imageUpColor: white },
-	node: {down: content-background-over, up: content-background, over: content-background-over},
+	node: {up: content-background, over: content-background-over},
 	right: {over: button-right-over, down: button-right-down, up: button-right},
 	empty: { imageDownColor: accent, imageUpColor: white},
 	emptytoggle: {imageCheckedColor: white, imageDownColor: white, imageUpColor: gray},

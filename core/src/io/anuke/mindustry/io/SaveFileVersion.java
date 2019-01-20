@@ -8,11 +8,15 @@ import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.MappableContent;
+import io.anuke.mindustry.game.Rules;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
+import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -120,7 +124,7 @@ public abstract class SaveFileVersion{
                 tile.entity.readConfig(stream);
                 tile.entity.read(stream);
 
-                if(tile.block() == Blocks.core){
+                if(tile.block() instanceof CoreBlock){
                     state.teams.get(t).cores.add(tile);
                 }
             }else if(wallid == 0){

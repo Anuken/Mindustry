@@ -48,6 +48,10 @@ public class GlobalData{
         modified = true;
     }
 
+    public boolean has(Item item, int amount){
+        return items.get(item, 0) >= amount;
+    }
+
     public ObjectIntMap<Item> items(){
         return items;
     }

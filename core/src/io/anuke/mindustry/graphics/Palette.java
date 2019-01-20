@@ -41,6 +41,7 @@ public class Palette{
     heal = Color.valueOf("98ffa9"),
     bar = Color.SLATE,
     accent = Color.valueOf("ffd37f"),
+    locked = Color.valueOf("6b6b6b"),
     accentBack = Color.valueOf("d4816b"),
     place = Color.valueOf("6335f8"),
     remove = Color.valueOf("e55454"),

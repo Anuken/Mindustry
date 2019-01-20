@@ -13,7 +13,7 @@ public class TechTree implements ContentList{
 
     @Override
     public void load(){
-        root = node(null, with(), () -> {
+        root = node(Blocks.core, with(), () -> {
 
             node(Blocks.conveyor, with(Items.copper, 100), () -> {
                 node(Blocks.launchPad, with(Items.copper, 100), () -> {
@@ -252,12 +252,8 @@ public class TechTree implements ContentList{
         return new TechNode(block, requirements, children);
     }
 
-    private TechNode node(Block block, ItemStack[] requirements){
-        return new TechNode(block, requirements, () -> {});
-    }
-
-    private TechNode node(Block block){
-        return new TechNode(block, with(), () -> {});
+    private void node(Block block, ItemStack[] requirements){
+        new TechNode(block, requirements, () -> {});
     }
 
     public static class TechNode{
@@ -280,6 +276,10 @@ public class TechTree implements ContentList{
             context = this;
             children.run();
             context = last;
+        }
+
+        public Recipe recipe(){
+            return Recipe.getByResult(block);
         }
     }
 }
