@@ -7,6 +7,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.generators.Generator;
+import io.anuke.mindustry.world.Block;
 
 import static io.anuke.mindustry.Vars.state;
 
@@ -15,6 +16,8 @@ public class Zone extends UnlockableContent{
     public final Generator generator;
     public ItemStack[] deployCost = {};
     public ItemStack[] startingItems = {};
+    public Block[] blockRequirements = {};
+    public ItemStack[] itemRequirements = {};
     public Supplier<Rules> rules = Rules::new;
     public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;

@@ -2764,7 +2764,7 @@ bullet-back
   index: -1
 casing
   rotate: false
-  xy: 1135, 907
+  xy: 847, 891
   size: 8, 16
   orig: 8, 16
   offset: 0, 0
@@ -2834,7 +2834,7 @@ laserfull
   index: -1
 minelaser
   rotate: false
-  xy: 2041, 1233
+  xy: 847, 841
   size: 4, 48
   orig: 4, 48
   offset: 0, 0
@@ -2925,7 +2925,7 @@ shot
   index: -1
 transfer
   rotate: false
-  xy: 2041, 1183
+  xy: 847, 791
   size: 4, 48
   orig: 4, 48
   offset: 0, 0
@@ -8784,21 +8784,21 @@ icon-production
   index: -1
 icon-turret
   rotate: false
-  xy: 786, 837
+  xy: 919, 1005
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-units
   rotate: false
-  xy: 993, 919
+  xy: 960, 11
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-upgrade
   rotate: false
-  xy: 1011, 911
+  xy: 1029, 911
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -9155,7 +9155,7 @@ icon-line
   index: -1
 icon-link
   rotate: false
-  xy: 1047, 913
+  xy: 1065, 913
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9169,7 +9169,7 @@ icon-liquid-small
   index: -1
 icon-load
   rotate: false
-  xy: 1063, 913
+  xy: 1081, 913
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9204,14 +9204,14 @@ icon-locked
   index: -1
 icon-logic
   rotate: false
-  xy: 907, 913
+  xy: 923, 913
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 icon-map
   rotate: false
-  xy: 1079, 913
+  xy: 1097, 913
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9246,28 +9246,28 @@ icon-mission-background
   index: -1
 icon-mission-battle
   rotate: false
-  xy: 919, 913
+  xy: 618, 1832
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 icon-mission-defense
   rotate: false
-  xy: 618, 1832
+  xy: 1113, 913
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 icon-mission-done
   rotate: false
-  xy: 210, 4
+  xy: 1125, 913
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 icon-none
   rotate: false
-  xy: 222, 4
+  xy: 210, 4
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -9281,7 +9281,7 @@ icon-paste
   index: -1
 icon-pause
   rotate: false
-  xy: 234, 4
+  xy: 222, 4
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -9295,7 +9295,7 @@ icon-pencil
   index: -1
 icon-pencil-small
   rotate: false
-  xy: 1095, 913
+  xy: 795, 919
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9309,35 +9309,35 @@ icon-pick
   index: -1
 icon-play
   rotate: false
-  xy: 246, 4
+  xy: 234, 4
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 icon-play-2
   rotate: false
-  xy: 795, 919
+  xy: 795, 903
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-players
   rotate: false
-  xy: 636, 1840
+  xy: 246, 4
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 icon-power-small
   rotate: false
-  xy: 1111, 913
+  xy: 636, 1840
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 icon-quit
   rotate: false
-  xy: 795, 903
+  xy: 811, 925
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9351,14 +9351,14 @@ icon-redo
   index: -1
 icon-refresh
   rotate: false
-  xy: 811, 925
+  xy: 827, 925
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-rename
   rotate: false
-  xy: 827, 925
+  xy: 811, 909
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9372,35 +9372,35 @@ icon-resize
   index: -1
 icon-rotate
   rotate: false
-  xy: 811, 909
+  xy: 843, 925
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-rotate-arrow
   rotate: false
-  xy: 843, 925
+  xy: 827, 909
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-rotate-left
   rotate: false
-  xy: 827, 909
+  xy: 859, 925
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-rotate-right
   rotate: false
-  xy: 859, 925
+  xy: 843, 909
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-save
   rotate: false
-  xy: 843, 909
+  xy: 875, 925
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9421,7 +9421,7 @@ icon-save-map
   index: -1
 icon-settings
   rotate: false
-  xy: 1123, 913
+  xy: 811, 897
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
@@ -9435,28 +9435,28 @@ icon-terrain
   index: -1
 icon-tools
   rotate: false
-  xy: 875, 925
+  xy: 859, 909
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-touch
   rotate: false
-  xy: 811, 897
+  xy: 823, 897
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 icon-touchDelete
   rotate: false
-  xy: 823, 897
+  xy: 835, 897
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 icon-trash
   rotate: false
-  xy: 859, 909
+  xy: 891, 925
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9464,6 +9464,13 @@ icon-trash
 icon-trash-16
   rotate: false
   xy: 57, 3
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+icon-tree
+  rotate: false
+  xy: 786, 837
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -9477,56 +9484,56 @@ icon-tree-locked
   index: -1
 icon-trello
   rotate: false
-  xy: 891, 925
+  xy: 875, 909
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-tutorial
   rotate: false
-  xy: 875, 909
+  xy: 907, 925
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-undo
   rotate: false
-  xy: 919, 1005
+  xy: 993, 919
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-unlocked
   rotate: false
-  xy: 960, 11
+  xy: 1011, 911
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-unlocks
   rotate: false
-  xy: 907, 925
+  xy: 891, 909
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-wiki
   rotate: false
-  xy: 891, 909
+  xy: 923, 925
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-zoom
   rotate: false
-  xy: 1029, 911
+  xy: 1047, 911
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-zoom-small
   rotate: false
-  xy: 923, 925
+  xy: 907, 909
   size: 14, 14
   orig: 14, 14
   offset: 0, 0

@@ -26,7 +26,7 @@ public class DeployDialog extends FloatingDialog{
         cont.clear();
 
         addCloseButton();
-        buttons.addButton("$techtree", () -> ui.tech.show()).size(200f, 60f);
+        buttons.addImageTextButton("$techtree", "icon-tree", 16 * 2, () -> ui.tech.show()).size(230f, 64f);
 
         cont.stack(new Table(){{
             top().left().margin(10);

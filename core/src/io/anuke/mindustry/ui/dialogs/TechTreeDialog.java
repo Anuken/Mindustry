@@ -5,10 +5,10 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.ScissorStack;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.InputEvent;
@@ -36,10 +36,11 @@ public class TechTreeDialog extends FloatingDialog{
     private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
     private TechTreeNode root = new TechTreeNode(TechTree.root, null);
     private static final float nodeSize = 60f;
-    private int toasts;
 
     public TechTreeDialog(){
-        super("$techtree");
+        super("");
+
+        cont.setFillParent(true);
 
         TreeLayout layout = new TreeLayout();
         layout.gapBetweenLevels = 60f;
@@ -67,6 +68,11 @@ public class TechTreeDialog extends FloatingDialog{
         addCloseButton();
     }
 
+    @Override
+    protected void drawBackground(float x, float y){
+        drawDefaultBackground(x, y);
+    }
+
     void checkNodes(TechTreeNode node){
         boolean locked = locked(node);
         if(!locked) node.visible = true;
@@ -78,14 +84,24 @@ public class TechTreeDialog extends FloatingDialog{
     }
 
     void showToast(String info){
-        toasts ++;
-        int t = toasts;
+        int maxIndex = 0;
+
+        for(Element e : Core.scene.root.getChildren()){
+            if("toast".equals(e.getName())){
+                maxIndex = Math.max(maxIndex, (Integer)e.getUserObject() + 1);
+            }
+        }
+
+        int m = maxIndex;
+
         Table table = new Table();
-        table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.run(() -> toasts --), Actions.removeActor());
+        table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.removeActor());
         table.top().add(info);
+        table.setName("toast");
+        table.setUserObject(maxIndex);
         table.update(() -> {
             table.toFront();
-            table.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight() - 21 - t*20f, Align.top);
+            table.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight() - 21 - m*20f, Align.top);
         });
         Core.scene.add(table);
     }
@@ -117,7 +133,7 @@ public class TechTreeDialog extends FloatingDialog{
     }
 
     class View extends Group{
-        float panX = 0, panY = 0;
+        float panX = 0, panY = -200;
         boolean moved = false;
         Rectangle clip = new Rectangle();
         ImageButton hoverNode;
@@ -253,10 +269,6 @@ public class TechTreeDialog extends FloatingDialog{
 
         @Override
         public void draw(){
-            if(!ScissorStack.pushScissors(clip.set(x, y, width, height))){
-                return;
-            }
-
             float offsetX = panX + width/2f + x, offsetY = panY + height/2f + y;
 
             for(TreeNode node : nodes){
@@ -268,8 +280,6 @@ public class TechTreeDialog extends FloatingDialog{
             }
 
             super.draw();
-
-            ScissorStack.popScissors();
         }
     }
 }
