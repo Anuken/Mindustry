@@ -506,6 +506,11 @@ public class Block extends BlockStorage{
         return alwaysUnlocked;
     }
 
+    protected void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
+        requirements(cat, () -> true, stacks);
+        this.alwaysUnlocked = unlocked;
+    }
+
     protected void requirements(Category cat, ItemStack[] stacks){
         requirements(cat, () -> true, stacks);
     }

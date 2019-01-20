@@ -33,7 +33,7 @@ public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
     Array<Block> returnArray = new Array<>();
-    Category currentCategory = Category.turret;
+    Category currentCategory = Category.distribution;
     Block hovered, lastDisplay;
     Tile hoverTile;
     Table blockTable, toggler, topTable;

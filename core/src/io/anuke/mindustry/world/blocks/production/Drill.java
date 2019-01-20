@@ -136,7 +136,7 @@ public class Drill extends Block{
                 table.addImage(item.name + "1").size(8 * 3).padRight(2).padLeft(2).padTop(3).padBottom(3);
                 table.add(item.localizedName());
                 if(i != list.size - 1){
-                    table.add("/");
+                    table.add("/").padLeft(5).padRight(5);
                 }
             }
         });

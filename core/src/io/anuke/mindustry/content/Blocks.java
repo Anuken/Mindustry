@@ -4,6 +4,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.CacheLayer;
+import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
@@ -25,6 +26,7 @@ import io.anuke.mindustry.world.blocks.units.RepairPoint;
 import io.anuke.mindustry.world.blocks.units.UnitFactory;
 
 import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.state;
 
 public class Blocks implements ContentList{
     public static Block
@@ -360,11 +362,26 @@ public class Blocks implements ContentList{
         //endregion
         //region sandbox
         
-        powerVoid = new PowerVoid("power-void");
-        powerSource = new PowerSource("power-source");
-        itemSource = new ItemSource("item-source");
-        itemVoid = new ItemVoid("item-void");
-        liquidSource = new LiquidSource("liquid-source");
+        powerVoid = new PowerVoid("power-void"){{
+            requirements(Category.power, () -> state.rules.infiniteResources, ItemStack.with());
+            alwaysUnlocked = true;
+        }};
+        powerSource = new PowerSource("power-source"){{
+            requirements(Category.power, () -> state.rules.infiniteResources, ItemStack.with());
+            alwaysUnlocked = true;
+        }};
+        itemSource = new ItemSource("item-source"){{
+            requirements(Category.distribution, () -> state.rules.infiniteResources, ItemStack.with());
+            alwaysUnlocked = true;
+        }};
+        itemVoid = new ItemVoid("item-void"){{
+            requirements(Category.distribution, () -> state.rules.infiniteResources, ItemStack.with());
+            alwaysUnlocked = true;
+        }};
+        liquidSource = new LiquidSource("liquid-source"){{
+            requirements(Category.liquid, () -> state.rules.infiniteResources, ItemStack.with());
+            alwaysUnlocked = true;
+        }};
         
         //endregion
         //region defense
@@ -458,16 +475,19 @@ public class Blocks implements ContentList{
         conveyor = new Conveyor("conveyor"){{
             health = 45;
             speed = 0.03f;
+            requirements(Category.distribution, ItemStack.with(Items.copper, 1), true);
         }};
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
             health = 65;
             speed = 0.07f;
+            requirements(Category.distribution, ItemStack.with(Items.copper, 2, Items.titanium, 1));
         }};
 
         junction = new Junction("junction"){{
             speed = 26;
             capacity = 32;
+            requirements(Category.distribution, ItemStack.with(Items.copper, 2));
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
@@ -482,9 +502,13 @@ public class Blocks implements ContentList{
             consumes.power(0.03f, 1.0f);
         }};
 
-        sorter = new Sorter("sorter");
+        sorter = new Sorter("sorter"){{
+            requirements(Category.distribution, ItemStack.with(Items.copper, 5, Items.titanium, 4));
+        }};
 
-        router = new Router("router");
+        router = new Router("router"){{
+            requirements(Category.distribution, ItemStack.with(Items.copper, 6));
+        }};
 
         distributor = new Router("distributor"){{
             size = 2;
@@ -560,6 +584,28 @@ public class Blocks implements ContentList{
         //endregion
         //region power
 
+        powerNode = new PowerNode("power-node"){{
+            maxNodes = 4;
+            laserRange = 6;
+            requirements(Category.power, ItemStack.with(Items.copper, 2, Items.lead, 6));
+        }};
+
+        powerNodeLarge = new PowerNode("power-node-large"){{
+            size = 2;
+            maxNodes = 6;
+            laserRange = 9.5f;
+            requirements(Category.power, ItemStack.with(Items.silicon, 6, Items.lead, 20, Items.titanium, 6));
+        }};
+
+        battery = new Battery("battery"){{
+            consumes.powerBuffered(320f, 1f);
+        }};
+
+        batteryLarge = new Battery("battery-large"){{
+            size = 3;
+            consumes.powerBuffered(2000f, 1f);
+        }};
+
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
             powerProduction = 0.09f;
             itemDuration = 40f;
@@ -603,26 +649,6 @@ public class Blocks implements ContentList{
         fusionReactor = new FusionReactor("fusion-reactor"){{
             size = 4;
             health = 600;
-        }};
-
-        battery = new Battery("battery"){{
-            consumes.powerBuffered(320f, 1f);
-        }};
-
-        batteryLarge = new Battery("battery-large"){{
-            size = 3;
-            consumes.powerBuffered(2000f, 1f);
-        }};
-
-        powerNode = new PowerNode("power-node"){{
-            maxNodes = 4;
-            laserRange = 6;
-        }};
-
-        powerNodeLarge = new PowerNode("power-node-large"){{
-            size = 2;
-            maxNodes = 6;
-            laserRange = 9.5f;
         }};
         
         //endregion power
@@ -772,6 +798,7 @@ public class Blocks implements ContentList{
             health = 110;
             inaccuracy = 2f;
             rotatespeed = 10f;
+            requirements(Category.turret, ItemStack.with(Items.copper, 60), true);
         }};
 
         hail = new ArtilleryTurret("hail"){{
