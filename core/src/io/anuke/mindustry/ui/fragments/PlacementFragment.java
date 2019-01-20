@@ -210,8 +210,16 @@ public class PlacementFragment extends Fragment{
 
                         }else if(tileDisplayBlock() != null){ //show selected tile
                             lastDisplay = tileDisplayBlock();
-                            topTable.add(new Image(lastDisplay.getDisplayIcon(hoverTile))).size(8 * 4);
-                            topTable.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
+                            topTable.table(t -> {
+                                t.left();
+                                t.add(new Image(lastDisplay.getDisplayIcon(hoverTile))).size(8 * 4);
+                                t.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
+                            }).growX().left();
+                            topTable.row();
+                            topTable.table(t -> {
+                                t.left().defaults().left();
+                                lastDisplay.display(hoverTile, t);
+                            }).left();
                         }
                     });
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);

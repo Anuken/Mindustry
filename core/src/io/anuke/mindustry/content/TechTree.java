@@ -5,238 +5,238 @@ import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 
-import static io.anuke.mindustry.type.ItemStack.with;
+import static io.anuke.mindustry.content.Blocks.*;
 
 public class TechTree implements ContentList{
     public static TechNode root;
 
     @Override
     public void load(){
-        root = node(Blocks.core, with(), () -> {
+        root = node(core, () -> {
 
-            node(Blocks.conveyor, with(Items.copper, 100), () -> {
-                node(Blocks.launchPad, with(Items.copper, 100), () -> {
+            node(conveyor, () -> {
+                node(launchPad, () -> {
 
                 });
 
-                node(Blocks.junction, with(Items.copper, 100), () -> {
-                    node(Blocks.itemBridge, with(Items.copper, 100));
-                    node(Blocks.router, with(Items.copper, 100), () -> {
-                        node(Blocks.distributor, with(Items.copper, 100));
-                        node(Blocks.overflowGate, with(Items.copper, 100));
-                        node(Blocks.sorter, with(Items.copper, 100));
-                        node(Blocks.container, with(Items.copper, 100), () -> {
-                            node(Blocks.unloader, with(Items.copper, 100));
-                            node(Blocks.vault, with(Items.copper, 100), () -> {
+                node(junction, () -> {
+                    node(itemBridge);
+                    node(router, () -> {
+                        node(distributor);
+                        node(overflowGate);
+                        node(sorter);
+                        node(container, () -> {
+                            node(unloader);
+                            node(vault, () -> {
 
                             });
                         });
                     });
-                    node(Blocks.titaniumConveyor, with(Items.copper, 100), () -> {
-                        node(Blocks.phaseConveyor, with(Items.copper, 100), () -> {
-                            node(Blocks.massDriver, with(Items.copper, 100), () -> {
+                    node(titaniumConveyor, () -> {
+                        node(phaseConveyor, () -> {
+                            node(massDriver, () -> {
 
-                            });
-                        });
-                    });
-                });
-            });
-
-            node(Blocks.duo, with(Items.copper, 100), () -> {
-                node(Blocks.hail, with(Items.copper, 100), () -> {
-
-                    node(Blocks.salvo, with(Items.copper, 100), () -> {
-                        node(Blocks.swarmer, with(Items.copper, 100), () -> {
-                            node(Blocks.cyclone, with(Items.copper, 100), () -> {
-                                node(Blocks.spectre, with(Items.copper, 100), () -> {
-
-                                });
-                            });
-                        });
-
-                        node(Blocks.ripple, with(Items.copper, 100), () -> {
-                            node(Blocks.fuse, with(Items.copper, 100), () -> {
-
-                            });
-                        });
-                    });
-                });
-
-                node(Blocks.arc, with(Items.copper, 100), () -> {
-                    node(Blocks.wave, with(Items.copper, 100), () -> {
-
-                    });
-
-                    node(Blocks.lancer, with(Items.copper, 100), () -> {
-                        node(Blocks.meltdown, with(Items.copper, 100), () -> {
-
-                        });
-
-                        node(Blocks.shockMine, with(Items.metaglass, 100), () -> {
-
-                        });
-                    });
-                });
-
-                node(Blocks.copperWall, with(Items.copper, 100), () -> {
-                    node(Blocks.copperWallLarge, with(Items.copper, 100));
-                    node(Blocks.titaniumWall, with(Items.copper, 100), () -> {
-                        node(Blocks.door, with(Items.copper, 100), () -> {
-                            node(Blocks.doorLarge, with(Items.copper, 100));
-                        });
-                        node(Blocks.titaniumWallLarge, with(Items.copper, 100));
-                        node(Blocks.thoriumWall, with(Items.copper, 100), () -> {
-                            node(Blocks.thoriumWallLarge, with(Items.copper, 100));
-                            node(Blocks.surgeWall, with(Items.copper, 100), () -> {
-                                node(Blocks.surgeWallLarge, with(Items.copper, 100));
-                                node(Blocks.phaseWall, with(Items.copper, 100), () -> {
-                                    node(Blocks.phaseWallLarge, with(Items.copper, 100));
-                                });
                             });
                         });
                     });
                 });
             });
 
-            node(Blocks.mechanicalDrill, with(Items.copper, 100), () -> {
-                node(Blocks.pneumaticDrill, with(Items.copper, 100), () -> {
-                    node(Blocks.cultivator, with(Items.copper, 100), () -> {
+            node(duo, () -> {
+                node(hail, () -> {
 
-                    });
+                    node(salvo, () -> {
+                        node(swarmer, () -> {
+                            node(cyclone, () -> {
+                                node(spectre, () -> {
 
-                    node(Blocks.laserDrill, with(Items.copper, 100), () -> {
-                        node(Blocks.blastDrill, with(Items.copper, 100), () -> {
-
+                                });
+                            });
                         });
 
-                        node(Blocks.waterExtractor, with(Items.copper, 100), () -> {
-                            node(Blocks.oilExtractor, with(Items.copper, 100), () -> {
+                        node(ripple, () -> {
+                            node(fuse, () -> {
 
                             });
                         });
                     });
                 });
 
-                node(Blocks.siliconSmelter, with(Items.copper, 100), () -> {
+                node(arc, () -> {
+                    node(wave, () -> {
 
-                    node(Blocks.pyratiteMixer, with(Items.copper, 100), () -> {
-                        node(Blocks.blastMixer, with(Items.copper, 100), () -> {
+                    });
+
+                    node(lancer, () -> {
+                        node(meltdown, () -> {
+
+                        });
+
+                        node(shockMine, () -> {
+
+                        });
+                    });
+                });
+
+                node(copperWall, () -> {
+                    node(copperWallLarge);
+                    node(titaniumWall, () -> {
+                        node(door, () -> {
+                            node(doorLarge);
+                        });
+                        node(titaniumWallLarge);
+                        node(thoriumWall, () -> {
+                            node(thoriumWallLarge);
+                            node(surgeWall, () -> {
+                                node(surgeWallLarge);
+                                node(phaseWall, () -> {
+                                    node(phaseWallLarge);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(mechanicalDrill, () -> {
+                node(pneumaticDrill, () -> {
+                    node(cultivator, () -> {
+
+                    });
+
+                    node(laserDrill, () -> {
+                        node(blastDrill, () -> {
+
+                        });
+
+                        node(waterExtractor, () -> {
+                            node(oilExtractor, () -> {
+
+                            });
+                        });
+                    });
+                });
+
+                node(siliconSmelter, () -> {
+
+                    node(pyratiteMixer, () -> {
+                        node(blastMixer, () -> {
 
                         });
                     });
 
-                    node(Blocks.biomatterCompressor, with(Items.copper, 100), () -> {
-                        node(Blocks.plastaniumCompressor, with(Items.copper, 100), () -> {
-                            node(Blocks.phaseWeaver, with(Items.copper, 100), () -> {
+                    node(biomatterCompressor, () -> {
+                        node(plastaniumCompressor, () -> {
+                            node(phaseWeaver, () -> {
 
                             });
                         });
                     });
 
-                    node(Blocks.incinerator, with(Items.copper, 100), () -> {
-                        node(Blocks.melter, with(Items.copper, 100), () -> {
-                            node(Blocks.surgeSmelter, with(Items.copper, 100), () -> {
+                    node(incinerator, () -> {
+                        node(melter, () -> {
+                            node(surgeSmelter, () -> {
 
                             });
 
-                            node(Blocks.separator, with(Items.copper, 100), () -> {
-                                node(Blocks.pulverizer, with(Items.copper, 100), () -> {
+                            node(separator, () -> {
+                                node(pulverizer, () -> {
 
                                 });
                             });
 
-                            node(Blocks.cryofluidMixer, with(Items.copper, 100), () -> {
+                            node(cryofluidMixer, () -> {
 
                             });
                         });
                     });
                 });
 
-                node(Blocks.mechanicalPump, with(Items.metaglass, 100), () -> {
-                    node(Blocks.conduit, with(Items.metaglass, 100), () -> {
-                        node(Blocks.liquidJunction, with(Items.metaglass, 100), () -> {
-                            node(Blocks.liquidRouter, with(Items.metaglass, 100), () -> {
-                                node(Blocks.liquidTank, with(Items.metaglass, 100));
+                node(mechanicalPump, () -> {
+                    node(conduit, () -> {
+                        node(liquidJunction, () -> {
+                            node(liquidRouter, () -> {
+                                node(liquidTank);
 
-                                node(Blocks.pulseConduit, with(Items.metaglass, 100), () -> {
-                                    node(Blocks.phaseConduit, with(Items.metaglass, 100), () -> {
+                                node(pulseConduit, () -> {
+                                    node(phaseConduit, () -> {
 
                                     });
                                 });
 
-                                node(Blocks.rotaryPump, with(Items.metaglass, 100), () -> {
-                                    node(Blocks.thermalPump, with(Items.metaglass, 100), () -> {
+                                node(rotaryPump, () -> {
+                                    node(thermalPump, () -> {
 
                                     });
                                 });
                             });
-                            node(Blocks.bridgeConduit, with(Items.metaglass, 100));
+                            node(bridgeConduit);
                         });
                     });
                 });
             });
 
-            node(Blocks.powerNode, with(Items.copper, 100), () -> {
-                node(Blocks.combustionGenerator, with(Items.copper, 100), () -> {
-                    node(Blocks.powerNodeLarge, with(Items.copper, 100), () -> {
-                        node(Blocks.battery, with(Items.copper, 100), () -> {
-                            node(Blocks.batteryLarge, with(Items.copper, 100), () -> {
+            node(powerNode, () -> {
+                node(combustionGenerator, () -> {
+                    node(powerNodeLarge, () -> {
+                        node(battery, () -> {
+                            node(batteryLarge, () -> {
 
                             });
                         });
 
-                        node(Blocks.mendProjector, with(Items.copper, 100), () -> {
-                            node(Blocks.forceProjector, with(Items.copper, 100), () -> {
-                                node(Blocks.overdriveProjector, with(Items.copper, 100), () -> {
+                        node(mendProjector, () -> {
+                            node(forceProjector, () -> {
+                                node(overdriveProjector, () -> {
 
                                 });
                             });
 
-                            node(Blocks.repairPoint, with(Items.copper, 100), () -> {
+                            node(repairPoint, () -> {
 
                             });
                         });
                     });
 
-                    node(Blocks.turbineGenerator, with(Items.copper, 100), () -> {
-                        node(Blocks.thermalGenerator, with(Items.copper, 100), () -> {
-                            node(Blocks.rtgGenerator, with(Items.copper, 100), () -> {
-                                node(Blocks.thoriumReactor, with(Items.copper, 100), () -> {
+                    node(turbineGenerator, () -> {
+                        node(thermalGenerator, () -> {
+                            node(rtgGenerator, () -> {
+                                node(thoriumReactor, () -> {
 
                                 });
                             });
                         });
                     });
 
-                    node(Blocks.solarPanel, with(Items.copper, 100), () -> {
-                        node(Blocks.largeSolarPanel, with(Items.copper, 100), () -> {
+                    node(solarPanel, () -> {
+                        node(largeSolarPanel, () -> {
 
                         });
                     });
                 });
 
-                node(Blocks.alphaPad, with(Items.copper, 100), () -> {
-                    node(Blocks.dartPad, with(Items.copper, 100));
-                    node(Blocks.deltaPad, with(Items.copper, 100), () -> {
-                        node(Blocks.javelinPad, with(Items.copper, 100));
-                        node(Blocks.tauPad, with(Items.copper, 100), () -> {
-                            node(Blocks.tridentPad, with(Items.copper, 100));
-                            node(Blocks.omegaPad, with(Items.copper, 100), () -> {
-                                node(Blocks.glaivePad, with(Items.copper, 100));
+                node(alphaPad, () -> {
+                    node(dartPad);
+                    node(deltaPad, () -> {
+                        node(javelinPad);
+                        node(tauPad, () -> {
+                            node(tridentPad);
+                            node(omegaPad, () -> {
+                                node(glaivePad);
                             });
                         });
                     });
 
-                    node(Blocks.spiritFactory, with(Items.copper, 100), () -> {
-                        node(Blocks.daggerFactory, with(Items.copper, 100), () -> {
-                            node(Blocks.daggerFactory, with(Items.copper, 100), () -> {
-                                node(Blocks.titanFactory, with(Items.copper, 100), () -> {
-                                    node(Blocks.fortressFactory, with(Items.copper, 100));
+                    node(spiritFactory, () -> {
+                        node(daggerFactory, () -> {
+                            node(daggerFactory, () -> {
+                                node(titanFactory, () -> {
+                                    node(fortressFactory);
                                 });
-                                node(Blocks.wraithFactory, with(Items.copper, 100), () -> {
-                                    node(Blocks.phantomFactory, with(Items.copper, 100));
-                                    node(Blocks.ghoulFactory, with(Items.copper, 100), () -> {
-                                        node(Blocks.revenantFactory, with(Items.copper, 100));
+                                node(wraithFactory, () -> {
+                                    node(phantomFactory);
+                                    node(ghoulFactory, () -> {
+                                        node(revenantFactory);
                                     });
                                 });
                             });
@@ -247,12 +247,17 @@ public class TechTree implements ContentList{
         });
     }
 
-    private TechNode node(Block block, ItemStack[] requirements, Runnable children){
+    private TechNode node(Block block, Runnable children){
+        ItemStack[] requirements = new ItemStack[block.buildRequirements.length];
+        for(int i = 0; i < requirements.length; i++){
+            requirements[i] = new ItemStack(block.buildRequirements[i].item, block.buildRequirements[i].amount * 40);
+        }
+        
         return new TechNode(block, requirements, children);
     }
 
-    private void node(Block block, ItemStack[] requirements){
-        new TechNode(block, requirements, () -> {});
+    private TechNode node(Block block){
+        return node(block, () -> {});
     }
 
     public static class TechNode{
@@ -267,6 +272,7 @@ public class TechTree implements ContentList{
                 context.children.add(this);
             }
 
+            //TODO remove requirements... for now
             this.block = block;
             this.requirements = requirements;
 

@@ -462,6 +462,13 @@ public class Block extends BlockStorage{
         return icon(Icon.medium);
     }
 
+    public void display(Tile tile, Table table){
+        if(tile.entity != null){
+            //TODO remove/replace
+            table.label(() -> "Health: [LIGHT_GRAY]" + (int)tile.entity.health + " / " + health);
+        }
+    }
+
     public TextureRegion icon(Icon icon){
         if(icons[icon.ordinal()] == null){
             icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name());
