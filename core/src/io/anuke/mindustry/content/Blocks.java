@@ -729,6 +729,7 @@ public class Blocks implements ContentList{
             launchThreshold = 500;
             launchTime = 60f * 10;
             launchChunkSize = 100;
+            alwaysUnlocked = true;
         }};
 
         vault = new Vault("vault"){{

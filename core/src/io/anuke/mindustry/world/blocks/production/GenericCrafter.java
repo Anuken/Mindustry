@@ -50,7 +50,7 @@ public class GenericCrafter extends Block{
 
     @Override
     public void draw(Tile tile){
-        Draw.rect(name(), tile.drawx(), tile.drawy());
+        Draw.rect(name, tile.drawx(), tile.drawy());
 
         if(!hasLiquids) return;
 

@@ -23,7 +23,7 @@ public class LiquidJunction extends LiquidBlock{
 
     @Override
     public void draw(Tile tile){
-        Draw.rect(name(), tile.worldx(), tile.worldy());
+        Draw.rect(name, tile.worldx(), tile.worldy());
     }
 
     @Override

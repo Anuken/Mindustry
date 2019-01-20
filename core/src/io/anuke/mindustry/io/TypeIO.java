@@ -172,7 +172,7 @@ public class TypeIO{
             buffer.put(request.breaking ? (byte) 1 : 0);
             buffer.putInt(Pos.get(request.x, request.y));
             if(!request.breaking){
-                buffer.put(request.recipe.id);
+                buffer.put(request.block.id);
                 buffer.put((byte) request.rotation);
             }
         }
@@ -190,9 +190,9 @@ public class TypeIO{
             if(type == 1){ //remove
                 currentRequest = new BuildRequest(Pos.x(position), Pos.y(position));
             }else{ //place
-                byte recipe = buffer.get();
+                byte block = buffer.get();
                 byte rotation = buffer.get();
-                currentRequest = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.recipe(recipe));
+                currentRequest = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.block(block));
             }
 
             reqs[i] = (currentRequest);
@@ -300,16 +300,6 @@ public class TypeIO{
     public static Item readItem(ByteBuffer buffer){
         byte id = buffer.get();
         return id == -1 ? null : content.item(id);
-    }
-
-    @WriteClass(Recipe.class)
-    public static void writeRecipe(ByteBuffer buffer, Recipe recipe){
-        buffer.put(recipe.id);
-    }
-
-    @ReadClass(Recipe.class)
-    public static Recipe readRecipe(ByteBuffer buffer){
-        return content.recipe(buffer.get());
     }
 
     @WriteClass(String.class)

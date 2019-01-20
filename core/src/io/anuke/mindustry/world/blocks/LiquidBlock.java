@@ -31,7 +31,7 @@ public class LiquidBlock extends Block{
 
     @Override
     public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name() + "-bottom"), Core.atlas.find(name() + "-top")};
+        return new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name + "-top")};
     }
 
     @Override

@@ -6,6 +6,7 @@ import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.function.BooleanProvider;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
@@ -20,19 +21,26 @@ import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
-import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.consumers.ConsumePower;
-import io.anuke.mindustry.world.meta.*;
+import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
+
+import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Block extends BaseBlock {
+public class Block extends BlockStorage{
     /** internal name */
     public final String name;
     /** display name */
@@ -77,8 +85,6 @@ public class Block extends BaseBlock {
     public boolean instantTransfer = false;
     /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
     public BlockGroup group = BlockGroup.none;
-    /** List of block stats. */
-    public BlockStats stats = new BlockStats(this);
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags;
     /** Whether the block can be tapped and selected to configure. */
@@ -92,6 +98,16 @@ public class Block extends BaseBlock {
     /**Whether the overdrive core has any effect on this block.*/
     public boolean canOverdrive = true;
 
+    /**Cost of constructing this block.*/
+    public ItemStack[] buildRequirements = new ItemStack[]{};
+    /**Category in place menu.*/
+    public Category buildCategory = Category.distribution;
+    /**Cost of building this block; do not modify directly!*/
+    public float buildCost;
+    /**Whether this block is visible and can currently be built.*/
+    public BooleanProvider buildVisibility = () -> false;
+    public boolean alwaysUnlocked = false;
+
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] icons = new TextureRegion[Icon.values().length];
     protected TextureRegion[] generatedIcons;
@@ -102,16 +118,6 @@ public class Block extends BaseBlock {
         this.formalName = Core.bundle.get("block." + name + ".name", name);
         this.fullDescription = Core.bundle.getOrNull("block." + name + ".description");
         this.solid = false;
-    }
-
-    /**Populates the array with all blocks that produce this content.*/
-    public static void getByProduction(Array<Block> arr, Content result){
-        arr.clear();
-        for(Block block : content.blocks()){
-            if(block.produces.get() == result){
-                arr.add(block);
-            }
-        }
     }
 
     public boolean canBreak(Tile tile){
@@ -194,6 +200,14 @@ public class Block extends BaseBlock {
     public void drawPlace(int x, int y, int rotation, boolean valid){
     }
 
+    public void draw(Tile tile){
+        Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
+    }
+
+    public void drawShadow(Tile tile){
+        draw(tile);
+    }
+
     /** Called after the block is placed by this client. */
     public void playerPlaced(Tile tile){
     }
@@ -222,6 +236,21 @@ public class Block extends BaseBlock {
     }
 
     @Override
+    public String localizedName(){
+        return formalName;
+    }
+
+    @Override
+    public TextureRegion getContentIcon(){
+        return icon(Icon.medium);
+    }
+
+    @Override
+    public void displayInfo(Table table){
+        ContentDisplay.displayBlock(table, this);
+    }
+
+    @Override
     public ContentType getContentType(){
         return ContentType.block;
     }
@@ -237,6 +266,11 @@ public class Block extends BaseBlock {
         //initialize default health based on size
         if(health == -1){
             health = size * size * 40;
+        }
+
+        buildCost = 0f;
+        for(ItemStack stack : buildRequirements){
+            buildCost += stack.amount * stack.item.cost;
         }
 
         setStats();
@@ -317,10 +351,6 @@ public class Block extends BaseBlock {
         // Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
-    }
-
-    public String name(){
-        return name;
     }
 
     public boolean isSolidFor(Tile tile){
@@ -458,14 +488,6 @@ public class Block extends BaseBlock {
         return new TileEntity();
     }
 
-    public void draw(Tile tile){
-        Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
-    }
-
-    public void drawShadow(Tile tile){
-        draw(tile);
-    }
-
     /** Offset for placing and drawing multiblocks. */
     public float offset(){
         return ((size + 1) % 2) * tilesize / 2f;
@@ -475,19 +497,26 @@ public class Block extends BaseBlock {
         return size > 1;
     }
 
-    public Array<Object> getDebugInfo(Tile tile){
-        return Array.with(
-            "block", tile.block().name,
-            "floor", tile.floor().name,
-            "x", tile.x,
-            "y", tile.y,
-            "entity.name", tile.entity.getClass(),
-            "entity.x", tile.entity.x,
-            "entity.y", tile.entity.y,
-            "entity.id", tile.entity.id,
-            "entity.items.total", hasItems ? tile.entity.items.total() : null,
-            "entity.graph", tile.entity.power != null && tile.entity.power.graph != null ? tile.entity.power.graph.getID() : null
-        );
+    public boolean isVisible(){
+        return buildVisibility.get() && !isHidden();
+    }
+
+    @Override
+    public boolean alwaysUnlocked(){
+        return alwaysUnlocked;
+    }
+
+    protected void requirements(Category cat, ItemStack[] stacks){
+        requirements(cat, () -> true, stacks);
+    }
+
+    /**Sets up requirements. Use only this method to set up requirements.*/
+    protected void requirements(Category cat, BooleanProvider visible, ItemStack[] stacks){
+        this.buildCategory = cat;
+        this.buildRequirements = stacks;
+        this.buildVisibility = visible;
+
+        Arrays.sort(buildRequirements, (a, b) -> Integer.compare(a.item.id, b.item.id));
     }
 
     public enum Icon{

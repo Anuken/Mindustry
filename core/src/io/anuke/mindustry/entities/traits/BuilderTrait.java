@@ -26,7 +26,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Build;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
@@ -81,7 +81,7 @@ public interface BuilderTrait extends Entity{
             output.writeInt(Pos.get(request.x, request.y));
             output.writeFloat(request.progress);
             if(!request.breaking){
-                output.writeByte(request.recipe.id);
+                output.writeByte(request.block.id);
                 output.writeByte(request.rotation);
             }
         }else{
@@ -105,9 +105,9 @@ public interface BuilderTrait extends Entity{
                 if(type == 1){ //remove
                     request = new BuildRequest(Pos.x(position), Pos.y(position));
                 }else{ //place
-                    byte recipe = input.readByte();
+                    byte block = input.readByte();
                     byte rotation = input.readByte();
-                    request = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.recipe(recipe));
+                    request = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.block(block));
                 }
 
             request.progress = progress;
@@ -129,7 +129,7 @@ public interface BuilderTrait extends Entity{
      * If a place request matching this signature is present, it is removed.
      * Otherwise, a new place request is added to the queue.
      */
-    default void replaceBuilding(int x, int y, int rotation, Recipe recipe){
+    default void replaceBuilding(int x, int y, int rotation, Block block){
         for(BuildRequest request : getPlaceQueue()){
             if(request.x == x && request.y == y){
                 clearBuilding();
@@ -138,7 +138,7 @@ public interface BuilderTrait extends Entity{
             }
         }
 
-        addBuildRequest(new BuildRequest(x, y, rotation, recipe));
+        addBuildRequest(new BuildRequest(x, y, rotation, block));
     }
 
     /**Clears the placement queue.*/
@@ -184,8 +184,8 @@ public interface BuilderTrait extends Entity{
         for(BuildRequest request : removal){
             if(!((request.breaking && world.tile(request.x, request.y).block() == Blocks.air) ||
                 (!request.breaking &&
-                (world.tile(request.x, request.y).getRotation() == request.rotation || !request.recipe.result.rotate)
-                && world.tile(request.x, request.y).block() == request.recipe.result))){
+                (world.tile(request.x, request.y).getRotation() == request.rotation || !request.block.rotate)
+                && world.tile(request.x, request.y).block() == request.block))){
                 getPlaceQueue().addLast(request);
             }
         }
@@ -209,8 +209,8 @@ public interface BuilderTrait extends Entity{
         }
 
         if(!(tile.block() instanceof BuildBlock)){
-            if(canCreateBlocks() && !current.breaking && Build.validPlace(unit.getTeam(), current.x, current.y, current.recipe.result, current.rotation)){
-                Build.beginPlace(unit.getTeam(), current.x, current.y, current.recipe, current.rotation);
+            if(canCreateBlocks() && !current.breaking && Build.validPlace(unit.getTeam(), current.x, current.y, current.block, current.rotation)){
+                Build.beginPlace(unit.getTeam(), current.x, current.y, current.block, current.rotation);
             }else if(canCreateBlocks() && current.breaking && Build.validBreak(unit.getTeam(), current.x, current.y)){
                 Build.beginBreak(unit.getTeam(), current.x, current.y);
             }else{
@@ -370,18 +370,18 @@ public interface BuilderTrait extends Entity{
     /**Class for storing build requests. Can be either a place or remove request.*/
     class BuildRequest{
         public final int x, y, rotation;
-        public final Recipe recipe;
+        public final Block block;
         public final boolean breaking;
 
         public float progress;
         public boolean initialized;
 
         /**This creates a build request.*/
-        public BuildRequest(int x, int y, int rotation, Recipe recipe){
+        public BuildRequest(int x, int y, int rotation, Block block){
             this.x = x;
             this.y = y;
             this.rotation = rotation;
-            this.recipe = recipe;
+            this.block = block;
             this.breaking = false;
         }
 
@@ -390,7 +390,7 @@ public interface BuilderTrait extends Entity{
             this.x = x;
             this.y = y;
             this.rotation = -1;
-            this.recipe = Recipe.getByResult(world.tile(x, y).block());
+            this.block = world.tile(x, y).block();
             this.breaking = true;
         }
 
@@ -400,7 +400,7 @@ public interface BuilderTrait extends Entity{
             "x=" + x +
             ", y=" + y +
             ", rotation=" + rotation +
-            ", recipe=" + recipe +
+            ", recipe=" + block +
             ", breaking=" + breaking +
             ", progress=" + progress +
             ", initialized=" + initialized +

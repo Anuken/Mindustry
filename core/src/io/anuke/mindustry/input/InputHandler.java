@@ -21,7 +21,6 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.fragments.OverlayFragment;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Build;
@@ -41,7 +40,7 @@ public abstract class InputHandler implements InputProcessor{
     public final Player player;
     public final OverlayFragment frag = new OverlayFragment(this);
 
-    public Recipe recipe;
+    public Block block;
     public int rotation;
     public boolean droppingItem;
 
@@ -199,7 +198,7 @@ public abstract class InputHandler implements InputProcessor{
 
         if(!consumed && player.isBuilding()){
             player.clearBuilding();
-            recipe = null;
+            block = null;
             return true;
         }
 
@@ -245,7 +244,7 @@ public abstract class InputHandler implements InputProcessor{
     int tileX(float cursorX){
         Vector2 vec = Core.input.mouseWorld(cursorX, 0);
         if(selectedBlock()){
-            vec.sub(recipe.result.offset(), recipe.result.offset());
+            vec.sub(block.offset(), block.offset());
         }
         return world.toTile(vec.x);
     }
@@ -253,7 +252,7 @@ public abstract class InputHandler implements InputProcessor{
     int tileY(float cursorY){
         Vector2 vec = Core.input.mouseWorld(0, cursorY);
         if(selectedBlock()){
-            vec.sub(recipe.result.offset(), recipe.result.offset());
+            vec.sub(block.offset(), block.offset());
         }
         return world.toTile(vec.y);
     }
@@ -263,7 +262,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public boolean isPlacing(){
-        return recipe != null;
+        return block != null;
     }
 
     public float mouseAngle(float x, float y){
@@ -276,7 +275,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public boolean canShoot(){
-        return recipe == null && !Core.scene.hasMouse() && !onConfigurable() && !isDroppingItem();
+        return block == null && !Core.scene.hasMouse() && !onConfigurable() && !isDroppingItem();
     }
 
     public boolean onConfigurable(){
@@ -309,8 +308,8 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public void tryPlaceBlock(int x, int y){
-        if(recipe != null && validPlace(x, y, recipe.result, rotation) && cursorNear()){
-            placeBlock(x, y, recipe, rotation);
+        if(block != null && validPlace(x, y, block, rotation) && cursorNear()){
+            placeBlock(x, y, block, rotation);
         }
     }
 
@@ -329,8 +328,8 @@ public abstract class InputHandler implements InputProcessor{
         return Build.validBreak(player.getTeam(), x, y) && Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
     }
 
-    public void placeBlock(int x, int y, Recipe recipe, int rotation){
-        player.addBuildRequest(new BuildRequest(x, y, rotation, recipe));
+    public void placeBlock(int x, int y, Block block, int rotation){
+        player.addBuildRequest(new BuildRequest(x, y, rotation, block));
     }
 
     public void breakBlock(int x, int y){

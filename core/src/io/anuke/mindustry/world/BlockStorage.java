@@ -10,15 +10,16 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.effect.Puddle;
-import io.anuke.mindustry.game.MappableContent;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
+import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.Producers;
 
-public abstract class BaseBlock extends MappableContent{
+public abstract class BlockStorage extends UnlockableContent{
     public boolean hasItems;
     public boolean hasLiquids;
     public boolean hasPower;
@@ -32,6 +33,7 @@ public abstract class BaseBlock extends MappableContent{
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
 
+    public BlockStats stats = new BlockStats();
     public Consumers consumes = new Consumers();
     public Producers produces = new Producers();
 

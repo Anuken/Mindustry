@@ -461,28 +461,28 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 request.y * tilesize + block.offset(),
                 rad);
             }else{
-                float rad = Mathf.absin(Time.time(), 7f, 1f) - 1.5f + request.recipe.result.size * tilesize / 2f;
+                float rad = Mathf.absin(Time.time(), 7f, 1f) - 1.5f + request.block.size * tilesize / 2f;
 
                 //draw place request
                 Lines.stroke(1f, Palette.accentBack);
 
                 Lines.square(
-                request.x * tilesize + request.recipe.result.offset(),
-                request.y * tilesize + request.recipe.result.offset() - 1,
+                request.x * tilesize + request.block.offset(),
+                request.y * tilesize + request.block.offset() - 1,
                 rad);
 
                 Draw.color();
 
-                Draw.rect(request.recipe.result.icon(Icon.full),
-                        request.x * tilesize + request.recipe.result.offset(),
-                        request.y * tilesize + request.recipe.result.offset(), rad*2, rad*2, request.rotation * 90);
+                Draw.rect(request.block.icon(Icon.full),
+                        request.x * tilesize + request.block.offset(),
+                        request.y * tilesize + request.block.offset(), rad*2, rad*2, request.rotation * 90);
 
 
                 Draw.color(Palette.accent);
 
                 Lines.square(
-                request.x * tilesize + request.recipe.result.offset(),
-                request.y * tilesize + request.recipe.result.offset(),
+                request.x * tilesize + request.block.offset(),
+                request.y * tilesize + request.block.offset(),
                 rad);
             }
         }

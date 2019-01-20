@@ -65,13 +65,13 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                     if(isBreaking){
                         getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y));
                     }else{
-                        getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.getRotation(), entity.recipe));
+                        getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.getRotation(), entity.block));
                     }
                 }
 
                 //if it's missing requirements, try and mine them
-                if(entity.recipe != null){
-                    for(ItemStack stack : entity.recipe.requirements){
+                if(entity.block != null){
+                    for(ItemStack stack : entity.block.buildRequirements){
                         if(!core.items.has(stack.item, stack.amount) && type.toMine.contains(stack.item)){
                             targetItem = stack.item;
                             getPlaceQueue().clear();

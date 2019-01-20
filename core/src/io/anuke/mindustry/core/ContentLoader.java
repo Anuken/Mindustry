@@ -44,7 +44,6 @@ public class ContentLoader{
         new Mechs(),
         new UnitTypes(),
         new Blocks(),
-        new Recipes(),
         new TechTree(),
         new Zones(),
 
@@ -183,14 +182,6 @@ public class ContentLoader{
 
     public Block block(int id){
         return (Block) getByID(ContentType.block, id);
-    }
-
-    public Array<Recipe> recipes(){
-        return getBy(ContentType.recipe);
-    }
-
-    public Recipe recipe(int id){
-        return (Recipe) getByID(ContentType.recipe, id);
     }
 
     public Array<Item> items(){

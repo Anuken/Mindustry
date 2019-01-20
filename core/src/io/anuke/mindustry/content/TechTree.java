@@ -3,7 +3,6 @@ package io.anuke.mindustry.content;
 import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 
 import static io.anuke.mindustry.type.ItemStack.with;
@@ -264,7 +263,6 @@ public class TechTree implements ContentList{
         public final Array<TechNode> children = new Array<>();
 
         TechNode(Block block, ItemStack[] requirements, Runnable children){
-            if(block != null && Recipe.getByResult(block) == null) throw new IllegalArgumentException("Block " + block + " does not have a recipe.");
             if(context != null){
                 context.children.add(this);
             }
@@ -276,10 +274,6 @@ public class TechTree implements ContentList{
             context = this;
             children.run();
             context = last;
-        }
-
-        public Recipe recipe(){
-            return Recipe.getByResult(block);
         }
     }
 }

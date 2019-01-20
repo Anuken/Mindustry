@@ -11,7 +11,6 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.BlockBuildBeginEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 
 import static io.anuke.mindustry.Vars.*;
@@ -64,8 +63,8 @@ public class Build{
     }
 
     /**Places a BuildBlock at this location.*/
-    public static void beginPlace(Team team, int x, int y, Recipe recipe, int rotation){
-        if(!validPlace(team, x, y, recipe.result, rotation)){
+    public static void beginPlace(Team team, int x, int y, Block result, int rotation){
+        if(!validPlace(team, x, y, result, rotation)){
             return;
         }
 
@@ -74,13 +73,12 @@ public class Build{
         //just in case
         if(tile == null) return;
 
-        Block result = recipe.result;
         Block previous = tile.block();
 
         Block sub = content.getByName(ContentType.block, "build" + result.size);
 
         tile.setBlock(sub, rotation);
-        tile.<BuildEntity>entity().setConstruct(previous, recipe);
+        tile.<BuildEntity>entity().setConstruct(previous, result);
         tile.setTeam(team);
 
         if(result.isMultiblock()){
@@ -107,9 +105,7 @@ public class Build{
 
     /**Returns whether a tile can be placed at this location by this team.*/
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
-        Recipe recipe = Recipe.getByResult(type);
-
-        if(recipe == null || (!recipe.visibility.usable())){
+        if(!type.isVisible() || type.isHidden()){
             return false;
         }
 

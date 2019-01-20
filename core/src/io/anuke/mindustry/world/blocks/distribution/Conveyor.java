@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.LongArray;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
@@ -331,17 +330,6 @@ public class Conveyor extends Block{
         //this item must be greater than anything there...
         entity.convey.add(result);
         entity.lastInserted = (byte)(entity.convey.size-1);
-    }
-
-    @Override
-    public Array<Object> getDebugInfo(Tile tile){
-        ConveyorEntity entity = tile.entity();
-        Array<Object> arr = super.getDebugInfo(tile);
-        arr.addAll(Array.<Object>with(
-            "clogHeat", entity.clogHeat,
-            "sleeping", entity.isSleeping()
-        ));
-        return arr;
     }
 
     @Override

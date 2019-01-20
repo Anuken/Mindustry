@@ -1,16 +1,12 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.type.Recipe.RecipeVisibility;
-
-import static io.anuke.mindustry.type.Category.*;
 
 public class Recipes implements ContentList{
 
     @Override
     public void load(){
+        /*
         //DEBUG
         new Recipe(distribution, Blocks.itemSource).setVisible(RecipeVisibility.sandboxOnly).setHidden(true).setAlwaysUnlocked(true);
         new Recipe(distribution, Blocks.itemVoid).setVisible(RecipeVisibility.sandboxOnly).setHidden(true).setAlwaysUnlocked(true);
@@ -174,5 +170,6 @@ public class Recipes implements ContentList{
         new Recipe(liquid, Blocks.mechanicalPump, new ItemStack(Items.copper, 30), new ItemStack(Items.lead, 20));
         new Recipe(liquid, Blocks.rotaryPump, new ItemStack(Items.copper, 140), new ItemStack(Items.lead, 100), new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 70));
         new Recipe(liquid, Blocks.thermalPump, new ItemStack(Items.copper, 160), new ItemStack(Items.lead, 130), new ItemStack(Items.silicon, 60), new ItemStack(Items.titanium, 80), new ItemStack(Items.thorium, 70));
+    */
     }
 }

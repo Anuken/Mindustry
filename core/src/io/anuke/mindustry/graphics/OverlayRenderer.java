@@ -89,7 +89,7 @@ public class OverlayRenderer{
             Draw.reset();
 
             //draw selected block bars and info
-            if(input.recipe == null && !Core.scene.hasMouse()){
+            if(input.block == null && !Core.scene.hasMouse()){
                 Vector2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
                 Tile tile = world.tileWorld(vec.x, vec.y);
 

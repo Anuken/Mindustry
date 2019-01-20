@@ -103,7 +103,7 @@ public class UnitFactory extends Block{
         UnitFactoryEntity entity = tile.entity();
         TextureRegion region = type.iconRegion;
 
-        Draw.rect(name(), tile.drawx(), tile.drawy());
+        Draw.rect(name, tile.drawx(), tile.drawy());
 
         Shaders.build.region = region;
         Shaders.build.progress = entity.buildTime / produceTime;

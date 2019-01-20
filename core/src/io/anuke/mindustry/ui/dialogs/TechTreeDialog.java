@@ -24,10 +24,9 @@ import io.anuke.mindustry.content.TechTree;
 import io.anuke.mindustry.content.TechTree.TechNode;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Recipe;
-import io.anuke.mindustry.type.Recipe.RecipeVisibility;
 import io.anuke.mindustry.ui.TreeLayout;
 import io.anuke.mindustry.ui.TreeLayout.TreeNode;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 
 import static io.anuke.mindustry.Vars.*;
@@ -50,15 +49,15 @@ public class TechTreeDialog extends FloatingDialog{
         cont.add(new View()).grow();
 
         { //debug code; TODO remove
-            ObjectSet<Recipe> used = new ObjectSet<Recipe>().select(t -> true);
+            ObjectSet<Block> used = new ObjectSet<Block>().select(t -> true);
             for(TechTreeNode node : nodes){
-                used.add(node.node.recipe());
+                used.add(node.node.block);
             }
-            Array<Recipe> recipes = content.recipes().select(r -> r.visibility == RecipeVisibility.all && !used.contains(r));
-            recipes.sort(Structs.comparing(r -> r.cost));
+            Array<Block> recipes = content.blocks().select(r -> r.isVisible() && !used.contains(r));
+            recipes.sort(Structs.comparing(r -> r.buildCost));
 
             if(recipes.size > 0){
-                Log.info("Recipe tree coverage: {0}%", (int)((float)nodes.size / content.recipes().select(r -> r.visibility == RecipeVisibility.all).size * 100));
+                Log.info("Recipe tree coverage: {0}%", (int)((float)nodes.size / content.blocks().select(Block::isVisible).size * 100));
                 Log.info("Missing items: ");
                 recipes.forEach(r -> Log.info("    {0}", r));
             }
@@ -111,7 +110,7 @@ public class TechTreeDialog extends FloatingDialog{
     }
 
     boolean locked(TechNode node){
-        return !data.isUnlocked(node.recipe());
+        return !data.isUnlocked(node.block);
     }
 
     class TechTreeNode extends TreeNode{
@@ -199,7 +198,7 @@ public class TechTreeDialog extends FloatingDialog{
         }
 
         void unlock(TechNode node){
-            data.unlockContent(node.recipe());
+            data.unlockContent(node.block);
             data.removeItems(node.requirements);
             showToast(Core.bundle.format("researched", node.block.formalName));
             checkNodes(root);
@@ -230,7 +229,7 @@ public class TechTreeDialog extends FloatingDialog{
 
             infoTable.margin(0).left().defaults().left();
 
-            infoTable.addImageButton("icon-info", "node", 14*2, () -> ui.content.show(node.recipe())).growY().width(50f);
+            infoTable.addImageButton("icon-info", "node", 14*2, () -> ui.content.show(node.block)).growY().width(50f);
 
             infoTable.add().grow();
 
