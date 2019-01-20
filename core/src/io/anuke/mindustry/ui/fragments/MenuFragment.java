@@ -127,12 +127,6 @@ public class MenuFragment extends Fragment{
 
             out.row();
 
-            out.add(new MenuButton("icon-menu", "$changelog.title", ui.changelog::show));
-
-            out.add(new MenuButton("icon-unlocks", "$unlocks", ui.unlocks::show));
-
-            out.row();
-
             out.add(new MenuButton("icon-exit", "$quit", Core.app::exit)).width(bw).colspan(2);
         });
     }

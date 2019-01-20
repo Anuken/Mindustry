@@ -15,10 +15,10 @@ import io.anuke.arc.scene.utils.UIUtils;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class UnlocksDialog extends FloatingDialog{
+public class DatabaseDialog extends FloatingDialog{
 
-    public UnlocksDialog(){
-        super("$unlocks");
+    public DatabaseDialog(){
+        super("database");
 
         shouldPause = true;
         addCloseButton();
@@ -58,7 +58,7 @@ public class UnlocksDialog extends FloatingDialog{
 
                     if(unlock.isHidden()) continue;
 
-                    Image image = data.isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked");
+                    Image image = data.isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-tree-locked");
                     image.addListener(new HandCursorListener());
                     list.add(image).size(size).pad(3);
 

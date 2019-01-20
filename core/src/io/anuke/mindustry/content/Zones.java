@@ -7,9 +7,11 @@ import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.world.Block;
 
 public class Zones implements ContentList{
-    public Zone groundZero;
+    public Zone groundZero, craters, frozenForest, ruinousShores, crags, stainedMountains,
+    impact, desolateRift, arcticDesert, dryWastes, nuclearComplex, moltenFault;
 
     @Override
     public void load(){
@@ -53,6 +55,149 @@ public class Zones implements ContentList{
                         unitScaling = 1;
                     }}
                 );
+            }};
+        }};
+
+        craters = new Zone("craters", new MapGenerator("groundZero", 1)){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 300);
+            startingItems = ItemStack.with(Items.copper, 200);
+            conditionWave = 15;
+            zoneRequirements = new Zone[]{groundZero};
+            blockRequirements = new Block[]{Blocks.copperWall};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 80;
+            }};
+        }};
+
+        frozenForest = new Zone("frozenForest", new MapGenerator("groundZero", 1)){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 300);
+            startingItems = ItemStack.with(Items.copper, 200);
+            conditionWave = 15;
+            zoneRequirements = new Zone[]{groundZero};
+            blockRequirements = new Block[]{Blocks.copperWall};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 80;
+            }};
+        }};
+
+        ruinousShores = new Zone("ruinousShores", new MapGenerator("groundZero", 1)){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 300);
+            startingItems = ItemStack.with(Items.copper, 200);
+            conditionWave = 15;
+            zoneRequirements = new Zone[]{groundZero};
+            blockRequirements = new Block[]{Blocks.copperWall};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 80;
+            }};
+        }};
+
+        crags = new Zone("crags", new MapGenerator("groundZero", 1)){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 300);
+            startingItems = ItemStack.with(Items.copper, 200);
+            conditionWave = 15;
+            zoneRequirements = new Zone[]{groundZero};
+            blockRequirements = new Block[]{Blocks.copperWall};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 80;
+            }};
+        }};
+
+        stainedMountains = new Zone("stainedMountains", new MapGenerator("groundZero", 1)){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 300);
+            startingItems = ItemStack.with(Items.copper, 200);
+            conditionWave = 15;
+            zoneRequirements = new Zone[]{groundZero};
+            blockRequirements = new Block[]{Blocks.copperWall};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 80;
+            }};
+        }};
+
+        impact = new Zone("impact", new MapGenerator("groundZero", 1)){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 300);
+            startingItems = ItemStack.with(Items.copper, 200);
+            conditionWave = 15;
+            zoneRequirements = new Zone[]{groundZero};
+            blockRequirements = new Block[]{Blocks.copperWall};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 80;
+            }};
+        }};
+
+        desolateRift = new Zone("desolateRift", new MapGenerator("groundZero", 1)){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 300);
+            startingItems = ItemStack.with(Items.copper, 200);
+            conditionWave = 15;
+            zoneRequirements = new Zone[]{groundZero};
+            blockRequirements = new Block[]{Blocks.copperWall};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 80;
+            }};
+        }};
+
+        arcticDesert = new Zone("arcticDesert", new MapGenerator("groundZero", 1)){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 300);
+            startingItems = ItemStack.with(Items.copper, 200);
+            conditionWave = 15;
+            zoneRequirements = new Zone[]{groundZero};
+            blockRequirements = new Block[]{Blocks.copperWall};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 80;
+            }};
+        }};
+
+        dryWastes = new Zone("dryWastes", new MapGenerator("groundZero", 1)){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 300);
+            startingItems = ItemStack.with(Items.copper, 200);
+            conditionWave = 15;
+            zoneRequirements = new Zone[]{groundZero};
+            blockRequirements = new Block[]{Blocks.copperWall};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 80;
+            }};
+        }};
+
+        nuclearComplex = new Zone("nuclearComplex", new MapGenerator("groundZero", 1)){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 300);
+            startingItems = ItemStack.with(Items.copper, 200);
+            conditionWave = 15;
+            zoneRequirements = new Zone[]{groundZero};
+            blockRequirements = new Block[]{Blocks.copperWall};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 80;
+            }};
+        }};
+
+        moltenFault = new Zone("moltenFault", new MapGenerator("groundZero", 1)){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 300);
+            startingItems = ItemStack.with(Items.copper, 200);
+            conditionWave = 15;
+            zoneRequirements = new Zone[]{groundZero};
+            blockRequirements = new Block[]{Blocks.copperWall};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 80;
             }};
         }};
     }

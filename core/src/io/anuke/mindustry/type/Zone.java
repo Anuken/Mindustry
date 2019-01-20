@@ -18,6 +18,7 @@ public class Zone extends UnlockableContent{
     public ItemStack[] startingItems = {};
     public Block[] blockRequirements = {};
     public ItemStack[] itemRequirements = {};
+    public Zone[] zoneRequirements = {};
     public Supplier<Rules> rules = Rules::new;
     public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;

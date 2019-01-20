@@ -2,8 +2,8 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectIntMap;
+import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.io.SaveIO.SaveException;
 import io.anuke.mindustry.type.Item;
@@ -32,7 +32,7 @@ public class DeployDialog extends FloatingDialog{
             top().left().margin(10);
 
             ObjectIntMap<Item> items = data.items();
-            for(Item item : Vars.content.items()){
+            for(Item item : content.items()){
                 if(item.type == ItemType.material && data.isUnlocked(item)){
                     label(() -> items.get(item, 0) + "").left();
                     addImage(item.region).size(8*4).pad(4);
@@ -45,23 +45,31 @@ public class DeployDialog extends FloatingDialog{
 
             if(control.saves.getZoneSlot() == null){
 
-                for(Zone zone : Vars.content.zones()){
-                    if(data.isUnlocked(zone)){
-                        table(t -> {
-                            t.addButton(zone.localizedName(), () -> {
-                                data.removeItems(zone.deployCost);
-                                hide();
-                                world.playZone(zone);
-                            }).size(150f).disabled(b -> !data.hasItems(zone.deployCost));
-                            t.row();
-                            t.table(req -> {
-                                req.left();
-                                for(ItemStack stack : zone.deployCost){
-                                    req.addImage(stack.item.region).size(8 * 3);
-                                    req.add(stack.amount + "").left();
-                                }
-                            }).pad(3).growX();
-                        }).pad(3);
+                int i = 0;
+                for(Zone zone : content.zones()){
+                    table(t -> {
+                        TextButton button = t.addButton(zone.localizedName(), () -> {
+                            data.removeItems(zone.deployCost);
+                            hide();
+                            world.playZone(zone);
+                        }).size(150f).disabled(b -> !data.hasItems(zone.deployCost) || !data.isUnlocked(zone)).get();
+
+                        button.row();
+                        button.table(req -> {
+                            for(ItemStack stack : zone.deployCost){
+                                req.addImage(stack.item.region).size(8 * 3);
+                                req.add(stack.amount + "").left();
+                            }
+                        }).pad(3).growX();
+
+                        button.row();
+                        button.addImage("icon-zone-locked").visible(() -> !data.isUnlocked(zone));
+
+                        button.update(() -> button.setText(data.isUnlocked(zone) ? zone.localizedName() : "???"));
+                    }).pad(3);
+
+                    if(++i % 4 == 0){
+                        row();
                     }
                 }
             }else{

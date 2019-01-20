@@ -64,7 +64,7 @@ public class UI implements ApplicationListener{
     public TraceDialog traces;
     public ChangelogDialog changelog;
     public LocalPlayerDialog localplayers;
-    public UnlocksDialog unlocks;
+    public DatabaseDialog unlocks;
     public ContentInfoDialog content;
     public DeployDialog deploy;
     public TechTreeDialog tech;
@@ -165,7 +165,7 @@ public class UI implements ApplicationListener{
         load = new LoadDialog();
         levels = new CustomGameDialog();
         language = new LanguageDialog();
-        unlocks = new UnlocksDialog();
+        unlocks = new DatabaseDialog();
         settings = new SettingsMenuDialog();
         host = new HostDialog();
         paused = new PausedDialog();

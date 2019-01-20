@@ -69,6 +69,10 @@ public class MapGenerator extends Generator{
 
         for(int x = 0; x < data.width(); x++){
             for(int y = 0; y < data.height(); y++){
+                if(Mathf.chance(0.05) && tiles[x][y].floor() == Blocks.stone && tiles[x][y].block() == Blocks.air){
+                    tiles[x][y].setBlock(Blocks.rock);
+                }
+
                 final double scl = 10;
                 final int mag = 3;
                 int newX = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x, y) * mag + x), 0, data.width()-1);
