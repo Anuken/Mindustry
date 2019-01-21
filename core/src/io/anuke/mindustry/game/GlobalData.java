@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Zone;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -24,6 +25,22 @@ public class GlobalData{
     public GlobalData(){
         Core.settings.setSerializer(ContentType.class, (stream, t) -> stream.writeInt(t.ordinal()), stream -> ContentType.values()[stream.readInt()]);
         Core.settings.setSerializer(Item.class, (stream, t) -> stream.writeUTF(t.name), stream -> content.getByName(ContentType.item, stream.readUTF()));
+    }
+
+    public void updateWaveScore(Zone zone, int wave){
+        int value = Core.settings.getInt(zone.name + "-wave", 0);
+        if(value < wave){
+            Core.settings.put(zone.name + "-wave", wave);
+            modified = true;
+        }
+    }
+
+    public int getWaveScore(Zone zone){
+        return Core.settings.getInt(zone.name + "-wave", 0);
+    }
+
+    public boolean isCompleted(Zone zone){
+        return getWaveScore(zone) >= zone.conditionWave;
     }
 
     public void addItem(Item item, int amount){

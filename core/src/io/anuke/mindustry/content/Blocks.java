@@ -865,10 +865,10 @@ public class Blocks implements ContentList{
         duo = new DoubleTurret("duo"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 60), true);
             ammo(
-            Items.copper, Bullets.standardCopper,
-            Items.graphite, Bullets.standardDense,
-            Items.pyratite, Bullets.standardIncendiary,
-            Items.silicon, Bullets.standardHoming
+                Items.copper, Bullets.standardCopper,
+                Items.graphite, Bullets.standardDense,
+                Items.pyratite, Bullets.standardIncendiary,
+                Items.silicon, Bullets.standardHoming
             );
             reload = 20f;
             restitution = 0.03f;

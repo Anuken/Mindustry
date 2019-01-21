@@ -10,8 +10,8 @@ import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Tile;
 
@@ -31,6 +31,12 @@ public class Logic implements ApplicationListener{
         Events.on(TileChangeEvent.class, event -> {
             if(event.tile.getTeam() == defaultTeam && event.tile.block().isVisible()){
                 handleContent(event.tile.block());
+            }
+        });
+
+        Events.on(WaveEvent.class, event -> {
+            if(world.isZone()){
+                data.updateWaveScore(world.getZone(), state.wave);
             }
         });
     }

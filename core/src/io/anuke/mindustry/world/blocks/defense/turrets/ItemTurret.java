@@ -14,7 +14,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class ItemTurret extends CooledTurret{
-    protected int maxAmmo = 50;
+    protected int maxAmmo = 30;
     protected ObjectMap<Item, BulletType> ammo = new ObjectMap<>();
 
     public ItemTurret(String name){

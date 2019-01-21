@@ -267,7 +267,7 @@ public class Bullets implements ContentList{
             bulletHeight = 9f;
             homingPower = 5f;
             reloadMultiplier = 1.4f;
-            ammoMultiplier = 5;
+            ammoMultiplier = 3;
         }};
 
         standardIncendiary = new BasicBulletType(3.2f, 11, "bullet"){{

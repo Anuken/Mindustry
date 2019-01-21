@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectIntMap;
+import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.core.GameState.State;
@@ -41,32 +42,70 @@ public class DeployDialog extends FloatingDialog{
                 }
             }
 
-        }}, new Table(){{
+        }}, new ScrollPane(new Table(){{
 
             if(control.saves.getZoneSlot() == null){
 
                 int i = 0;
                 for(Zone zone : content.zones()){
                     table(t -> {
-                        TextButton button = t.addButton(zone.localizedName(), () -> {
+                        TextButton button = t.addButton(data.isUnlocked(zone) ? zone.localizedName() : "???", () -> {
                             data.removeItems(zone.deployCost);
                             hide();
                             world.playZone(zone);
-                        }).size(150f).disabled(b -> !data.hasItems(zone.deployCost) || !data.isUnlocked(zone)).get();
+                        }).size(200f).disabled(!data.hasItems(zone.deployCost) || !data.isUnlocked(zone)).get();
 
                         button.row();
-                        button.table(req -> {
-                            for(ItemStack stack : zone.deployCost){
-                                req.addImage(stack.item.region).size(8 * 3);
-                                req.add(stack.amount + "").left();
+
+                        if(data.getWaveScore(zone) > 0){
+                            button.add(Core.bundle.format("bestwave", data.getWaveScore(zone)));
+                        }
+
+                        button.row();
+
+                        if(data.isUnlocked(zone)){
+                            button.table(req -> {
+                                for(ItemStack stack : zone.deployCost){
+                                    req.addImage(stack.item.region).size(8 * 3);
+                                    req.add(stack.amount + "").left();
+                                }
+                            }).pad(3).growX();
+                        }else{
+                            boolean anyNeeded = false;
+                            for(Zone other : zone.zoneRequirements){
+                                if(!data.isCompleted(other)){
+                                    anyNeeded = true;
+                                    break;
+                                }
                             }
-                        }).pad(3).growX();
+
+                            if(anyNeeded){
+                                button.row();
+                                button.table(req -> {
+                                    req.add("$complete").left();
+                                    req.row();
+                                    for(Zone other : zone.zoneRequirements){
+                                        if(!data.isCompleted(other)){
+                                            req.add("-  [LIGHT_GRAY]" + other.localizedName()).left();
+                                            req.row();
+                                        }
+                                    }
+
+                                    req.table(r -> {
+                                        if(zone.itemRequirements.length > 0){
+                                            for(ItemStack stack : zone.itemRequirements){
+                                                r.addImage(stack.item.region).size(8 * 3);
+                                                r.add(stack.amount + "").left();
+                                            }
+                                        }
+                                    });
+                                }).pad(3).growX();
+                            }
+                        }
 
                         button.row();
                         button.addImage("icon-zone-locked").visible(() -> !data.isUnlocked(zone));
-
-                        button.update(() -> button.setText(data.isUnlocked(zone) ? zone.localizedName() : "???"));
-                    }).pad(3);
+                    }).pad(4);
 
                     if(++i % 4 == 0){
                         row();
@@ -88,6 +127,6 @@ public class DeployDialog extends FloatingDialog{
                     });
                 }).size(200f);
             }
-        }}).grow();
+        }})).grow();
     }
 }
