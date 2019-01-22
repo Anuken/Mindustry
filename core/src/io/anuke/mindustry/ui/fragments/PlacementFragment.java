@@ -35,6 +35,7 @@ public class PlacementFragment extends Fragment{
     Array<Block> returnArray = new Array<>();
     Category currentCategory = Category.distribution;
     Block hovered, lastDisplay;
+    Tile lastHover;
     Tile hoverTile;
     Table blockTable, toggler, topTable;
     boolean shown = true;
@@ -162,21 +163,25 @@ public class PlacementFragment extends Fragment{
                 frame.table("button-edge-2", top -> {
                     topTable = top;
                     top.add(new Table()).growX().update(topTable -> {
-                        if((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround) || (tileDisplayBlock() != null && lastDisplay == tileDisplayBlock() && lastGround))
+                        //don't refresh unnecessarily
+                        if((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround)
+                        || (tileDisplayBlock() != null && lastHover == hoverTile && lastGround))
                             return;
 
                         topTable.clear();
                         topTable.top().left().margin(5);
 
+                        lastHover = hoverTile;
                         lastDisplay = getSelected();
                         lastGround = tileDisplayBlock() != null;
 
                         if(lastDisplay != null){ //show selected recipe
+                            lastGround = false;
+
                             topTable.table(header -> {
                                 header.left();
                                 header.add(new Image(lastDisplay.icon(Icon.medium))).size(8 * 4);
-                                header.labelWrap(() ->
-                                !data.isUnlocked(lastDisplay) ? Core.bundle.get("blocks.unknown") : lastDisplay.formalName)
+                                header.labelWrap(() -> !data.isUnlocked(lastDisplay) ? Core.bundle.get("blocks.unknown") : lastDisplay.formalName)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(data.isUnlocked(lastDisplay)){
@@ -219,7 +224,7 @@ public class PlacementFragment extends Fragment{
                             topTable.table(t -> {
                                 t.left().defaults().left();
                                 lastDisplay.display(hoverTile, t);
-                            }).left();
+                            }).left().growX();
                         }
                     });
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);

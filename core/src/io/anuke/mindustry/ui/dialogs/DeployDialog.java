@@ -154,7 +154,11 @@ public class DeployDialog extends FloatingDialog{
             }else{
                 SaveSlot slot = control.saves.getZoneSlot();
 
+                TextButton b[] = {null};
+
                 TextButton button = addButton(Core.bundle.format("resume", slot.getZone().localizedName()), () -> {
+                    if(b[0].childrenPressed()) return;
+
                     hide();
                     ui.loadAnd(() -> {
                         try{
@@ -168,6 +172,7 @@ public class DeployDialog extends FloatingDialog{
                         }
                     });
                 }).size(200f).get();
+                b[0] = button;
 
                 String color = "[lightgray]";
 
@@ -177,6 +182,15 @@ public class DeployDialog extends FloatingDialog{
                 button.row();
                 button.label(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
                 button.row();
+                button.add().grow();
+                button.row();
+
+                button.addButton("$abandon", () -> {
+                    ui.showConfirm("$warning", "$abandon.text", () -> {
+                        slot.delete();
+                        setup();
+                    });
+                }).growX().height(50f).pad(-12).padTop(10);
             }
         }})).grow();
     }

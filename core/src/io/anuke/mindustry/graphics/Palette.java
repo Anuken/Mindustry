@@ -38,6 +38,7 @@ public class Palette{
 
     stoneGray = Color.valueOf("8f8f8f"),
 
+    health = Color.valueOf("ff341c"),
     heal = Color.valueOf("98ffa9"),
     bar = Color.SLATE,
     accent = Color.valueOf("ffd37f"),

@@ -29,6 +29,7 @@ import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -463,9 +464,28 @@ public class Block extends BlockStorage{
     }
 
     public void display(Tile tile, Table table){
-        if(tile.entity != null){
-            //TODO remove/replace
-            table.label(() -> "Health: [LIGHT_GRAY]" + (int)tile.entity.health + " / " + health);
+        TileEntity entity = tile.entity;
+
+        if(entity != null){
+            table.table(bars -> {
+                bars.defaults().growX().height(18f).pad(4);
+
+                displayBars(tile, bars);
+            }).growX();
+
+            table.marginBottom(-5);
+        }
+    }
+
+    public void displayBars(Tile tile, Table bars){
+        TileEntity entity = tile.entity;
+
+        bars.add(new Bar("blocks.health", Palette.health, entity::healthf).blink(Color.WHITE));
+        bars.row();
+
+        if(entity.liquids != null){
+            bars.add(new Bar(() -> entity.liquids.current().localizedName(), () -> entity.liquids.current().color, () -> entity.liquids.total() / liquidCapacity)).growX();
+            bars.row();
         }
     }
 
