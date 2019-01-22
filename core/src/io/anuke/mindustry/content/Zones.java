@@ -10,7 +10,7 @@ import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
 
 public class Zones implements ContentList{
-    public Zone groundZero, craters, frozenForest, ruinousShores, crags, stainedMountains,
+    public static Zone groundZero, craters, frozenForest, ruinousShores, crags, stainedMountains,
     impact, desolateRift, arcticDesert, dryWastes, nuclearComplex, moltenFault;
 
     @Override
@@ -24,7 +24,7 @@ public class Zones implements ContentList{
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 60;
+                waveSpacing = 60 * 60 * 2; //2 mins
                 spawns = Array.with(
                     new SpawnGroup(UnitTypes.dagger){{
                         unitScaling = 2;

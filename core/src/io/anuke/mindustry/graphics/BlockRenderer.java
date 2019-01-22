@@ -163,8 +163,13 @@ public class BlockRenderer{
 
             if(req.layer == Layer.shadow){
                 block.drawShadow(req.tile);
-            }else  if(req.layer == Layer.block){
+            }else if(req.layer == Layer.block){
                 block.draw(req.tile);
+                if(block.synthetic() && req.tile.getTeam() != players[0].getTeam()){
+                    Draw.color(req.tile.getTeam().color);
+                    Draw.rect("block-border", req.tile.drawx() - block.size * tilesize/2f + 4, req.tile.drawy() - block.size * tilesize/2f + 4);
+                    Draw.color();
+                }
             }else if(req.layer == block.layer){
                 block.drawLayer(req.tile);
             }else if(req.layer == block.layer2){

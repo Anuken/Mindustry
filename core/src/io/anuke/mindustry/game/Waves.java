@@ -170,7 +170,7 @@ public class Waves{
         return spawns;
     }
 
-    public static void testWaves(int from, int to){
+    public static void testWaves(Array<SpawnGroup> spawns, int from, int to){
         for(int i = from; i <= to; i++){
             System.out.print(i + ": ");
             int total = 0;

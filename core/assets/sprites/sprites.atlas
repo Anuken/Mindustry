@@ -8577,7 +8577,7 @@ bar-top
   rotate: false
   xy: 915, 683
   size: 27, 36
-  split: 9, 9, 9, 9
+  split: 9, 10, 9, 10
   orig: 27, 36
   offset: 0, 0
   index: -1

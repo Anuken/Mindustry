@@ -220,11 +220,13 @@ public class PlacementFragment extends Fragment{
                                 t.add(new Image(lastDisplay.getDisplayIcon(hoverTile))).size(8 * 4);
                                 t.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
                             }).growX().left();
-                            topTable.row();
-                            topTable.table(t -> {
-                                t.left().defaults().left();
-                                lastDisplay.display(hoverTile, t);
-                            }).left().growX();
+                            if(hoverTile.getTeam() == players[0].getTeam()){
+                                topTable.row();
+                                topTable.table(t -> {
+                                    t.left().defaults().left();
+                                    lastDisplay.display(hoverTile, t);
+                                }).left().growX();
+                            }
                         }
                     });
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);

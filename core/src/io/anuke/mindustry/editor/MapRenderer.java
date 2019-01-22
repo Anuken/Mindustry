@@ -112,7 +112,7 @@ public class MapRenderer implements Disposable{
         TextureRegion region;
 
         if(bw != 0){
-            region = wall.icon(Icon.full);
+            region = wall.icon(Icon.full) == Core.atlas.find("____") ? Core.atlas.find("clear") : wall.icon(Icon.full);
 
             if(wall.rotate){
                 mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
