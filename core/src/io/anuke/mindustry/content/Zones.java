@@ -62,8 +62,9 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
+            itemRequirements = ItemStack.with(Items.copper, 2000);
             zoneRequirements = new Zone[]{groundZero};
-            blockRequirements = new Block[]{Blocks.copperWall};
+            blockRequirements = new Block[]{Blocks.router};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -75,7 +76,7 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
-            zoneRequirements = new Zone[]{groundZero};
+            zoneRequirements = new Zone[]{frozenForest};
             blockRequirements = new Block[]{Blocks.copperWall};
             rules = () -> new Rules(){{
                 waves = true;
@@ -88,7 +89,7 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
-            zoneRequirements = new Zone[]{groundZero};
+            zoneRequirements = new Zone[]{frozenForest};
             blockRequirements = new Block[]{Blocks.copperWall};
             rules = () -> new Rules(){{
                 waves = true;
@@ -101,7 +102,7 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
-            zoneRequirements = new Zone[]{groundZero};
+            zoneRequirements = new Zone[]{frozenForest};
             blockRequirements = new Block[]{Blocks.copperWall};
             rules = () -> new Rules(){{
                 waves = true;
@@ -114,7 +115,7 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
-            zoneRequirements = new Zone[]{groundZero};
+            zoneRequirements = new Zone[]{frozenForest};
             blockRequirements = new Block[]{Blocks.copperWall};
             rules = () -> new Rules(){{
                 waves = true;
@@ -127,7 +128,7 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
-            zoneRequirements = new Zone[]{groundZero};
+            zoneRequirements = new Zone[]{frozenForest};
             blockRequirements = new Block[]{Blocks.copperWall};
             rules = () -> new Rules(){{
                 waves = true;
@@ -140,7 +141,7 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
-            zoneRequirements = new Zone[]{groundZero};
+            zoneRequirements = new Zone[]{frozenForest};
             blockRequirements = new Block[]{Blocks.copperWall};
             rules = () -> new Rules(){{
                 waves = true;
@@ -153,7 +154,7 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
-            zoneRequirements = new Zone[]{groundZero};
+            zoneRequirements = new Zone[]{frozenForest};
             blockRequirements = new Block[]{Blocks.copperWall};
             rules = () -> new Rules(){{
                 waves = true;
@@ -166,7 +167,7 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
-            zoneRequirements = new Zone[]{groundZero};
+            zoneRequirements = new Zone[]{frozenForest};
             blockRequirements = new Block[]{Blocks.copperWall};
             rules = () -> new Rules(){{
                 waves = true;
@@ -179,7 +180,7 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
-            zoneRequirements = new Zone[]{groundZero};
+            zoneRequirements = new Zone[]{frozenForest};
             blockRequirements = new Block[]{Blocks.copperWall};
             rules = () -> new Rules(){{
                 waves = true;
@@ -192,7 +193,7 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
-            zoneRequirements = new Zone[]{groundZero};
+            zoneRequirements = new Zone[]{frozenForest};
             blockRequirements = new Block[]{Blocks.copperWall};
             rules = () -> new Rules(){{
                 waves = true;
@@ -200,5 +201,7 @@ public class Zones implements ContentList{
                 waveSpacing = 60 * 80;
             }};
         }};
+
+        frozenForest.zoneRequirements = new Zone[]{frozenForest};
     }
 }

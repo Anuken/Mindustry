@@ -30,7 +30,7 @@ public class ContentDisplay{
 
         table.row();
 
-        table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+        table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(8).padLeft(0).padRight(0).fillX();
 
         table.row();
 
@@ -38,7 +38,7 @@ public class ContentDisplay{
             table.add(block.fullDescription).padLeft(5).padRight(5).width(400f).wrap().fillX();
             table.row();
 
-            table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(15).padLeft(0).padRight(0).fillX();
+            table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(8).padLeft(0).padRight(0).fillX();
             table.row();
         }
 

@@ -43,6 +43,10 @@ public class GlobalData{
         return getWaveScore(zone) >= zone.conditionWave;
     }
 
+    public int getItem(Item item){
+        return items.get(item, 0);
+    }
+
     public void addItem(Item item, int amount){
         modified = true;
         items.getAndIncrement(item, 0, amount);
@@ -84,7 +88,7 @@ public class GlobalData{
      * Results are not saved until you call {@link #save()}.
      */
     public void unlockContent(UnlockableContent content){
-        if(!content.canBeUnlocked() || content.alwaysUnlocked()) return;
+        if(content.alwaysUnlocked()) return;
 
         //fire unlock event so other classes can use it
         if(unlocked.getOr(content.getContentType(), ObjectSet::new).add(content.getContentName())){

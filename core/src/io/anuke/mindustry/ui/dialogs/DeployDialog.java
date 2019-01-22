@@ -2,15 +2,19 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectIntMap;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO.SaveException;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -49,21 +53,35 @@ public class DeployDialog extends FloatingDialog{
                 int i = 0;
                 for(Zone zone : content.zones()){
                     table(t -> {
-                        TextButton button = t.addButton(data.isUnlocked(zone) ? zone.localizedName() : "???", () -> {
-                            data.removeItems(zone.deployCost);
-                            hide();
-                            world.playZone(zone);
-                        }).size(200f).disabled(!data.hasItems(zone.deployCost) || !data.isUnlocked(zone)).get();
+                        TextButton button = t.addButton("", () -> {
+                            if(!data.isUnlocked(zone)){
+                                data.removeItems(zone.itemRequirements);
+                                data.unlockContent(zone);
+                                setup();
+                            }else{
+                                data.removeItems(zone.deployCost);
+                                hide();
+                                world.playZone(zone);
+                            }
+                        }).size(250f).disabled(b -> !canUnlock(zone)).get();
 
-                        button.row();
-
-                        if(data.getWaveScore(zone) > 0){
-                            button.add(Core.bundle.format("bestwave", data.getWaveScore(zone)));
-                        }
-
-                        button.row();
+                        button.clearChildren();
 
                         if(data.isUnlocked(zone)){
+                            button.table(title -> {
+                                title.addImage("icon-zone").padRight(3);
+                                title.add(zone.localizedName());
+                            });
+                            button.row();
+
+                            if(data.getWaveScore(zone) > 0){
+                                button.add(Core.bundle.format("bestwave", data.getWaveScore(zone)));
+                            }
+
+                            button.row();
+
+                            button.add("$launch").color(Color.LIGHT_GRAY).pad(4);
+                            button.row();
                             button.table(req -> {
                                 for(ItemStack stack : zone.deployCost){
                                     req.addImage(stack.item.region).size(8 * 3);
@@ -71,48 +89,72 @@ public class DeployDialog extends FloatingDialog{
                                 }
                             }).pad(3).growX();
                         }else{
-                            boolean anyNeeded = false;
-                            for(Zone other : zone.zoneRequirements){
-                                if(!data.isCompleted(other)){
-                                    anyNeeded = true;
-                                    break;
-                                }
-                            }
+                            button.addImage("icon-zone-locked");
+                            button.row();
+                            button.add("$locked").padBottom(6);
 
-                            if(anyNeeded){
+                            if(!hidden(zone)){
                                 button.row();
+
                                 button.table(req -> {
-                                    req.add("$complete").left();
-                                    req.row();
-                                    for(Zone other : zone.zoneRequirements){
-                                        if(!data.isCompleted(other)){
-                                            req.add("-  [LIGHT_GRAY]" + other.localizedName()).left();
-                                            req.row();
-                                        }
+                                    req.defaults().left();
+
+                                    if(zone.zoneRequirements.length > 0){
+                                        req.table(r -> {
+                                            r.add("$complete").colspan(2).left();
+                                            r.row();
+                                            for(Zone other : zone.zoneRequirements){
+                                                r.addImage("icon-zone").padRight(4);
+                                                r.add(other.localizedName()).color(Color.LIGHT_GRAY);
+                                                r.addImage(data.isCompleted(zone) ? "icon-check-2" : "icon-cancel-2")
+                                                .color(data.isCompleted(zone) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
+                                                r.row();
+                                            }
+                                        });
                                     }
 
-                                    req.table(r -> {
-                                        if(zone.itemRequirements.length > 0){
+                                    req.row();
+
+                                    if(zone.itemRequirements.length > 0){
+                                        req.table(r -> {
                                             for(ItemStack stack : zone.itemRequirements){
-                                                r.addImage(stack.item.region).size(8 * 3);
-                                                r.add(stack.amount + "").left();
+                                                r.addImage(stack.item.region).size(8 * 3).padRight(4);
+                                                r.add(Math.min(data.getItem(stack.item), stack.amount) + "/" + stack.amount)
+                                                .color(stack.amount > data.getItem(stack.item) ? Color.SCARLET : Color.LIGHT_GRAY).left();
+                                                r.row();
                                             }
-                                        }
-                                    });
-                                }).pad(3).growX();
+                                        }).padTop(10);
+                                    }
+
+                                    req.row();
+
+                                    if(zone.blockRequirements.length > 0){
+                                        req.table(r -> {
+                                            r.add("$research.list").colspan(2).left();
+                                            r.row();
+                                            for(Block block : zone.blockRequirements){
+                                                r.addImage(block.icon(Icon.small)).size(8 * 3).padRight(4);
+                                                r.add(block.formalName).color(Color.LIGHT_GRAY);
+                                                r.addImage(data.isUnlocked(block) ? "icon-check-2" : "icon-cancel-2")
+                                                .color(data.isUnlocked(block) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
+                                                r.row();
+                                            }
+
+                                        }).padTop(10);
+                                    }
+                                }).growX();
                             }
                         }
-
-                        button.row();
-                        button.addImage("icon-zone-locked").visible(() -> !data.isUnlocked(zone));
                     }).pad(4);
 
-                    if(++i % 4 == 0){
+                    if(++i % 2 == 0){
                         row();
                     }
                 }
             }else{
-                addButton(Core.bundle.format("resume", control.saves.getZoneSlot().getZone().localizedName()), () -> {
+                SaveSlot slot = control.saves.getZoneSlot();
+
+                TextButton button = addButton(Core.bundle.format("resume", slot.getZone().localizedName()), () -> {
                     hide();
                     ui.loadAnd(() -> {
                         try{
@@ -125,8 +167,42 @@ public class DeployDialog extends FloatingDialog{
                             show();
                         }
                     });
-                }).size(200f);
+                }).size(200f).get();
+
+                String color = "[lightgray]";
+
+                button.defaults().colspan(2);
+                button.row();
+                button.add(Core.bundle.format("save.wave", color + slot.getWave()));
+                button.row();
+                button.label(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
+                button.row();
             }
         }})).grow();
+    }
+
+    boolean hidden(Zone zone){
+        for(Zone other : zone.zoneRequirements){
+            if(!data.isUnlocked(other)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    boolean canUnlock(Zone zone){
+        for(Zone other : zone.zoneRequirements){
+            if(!data.isCompleted(other)){
+                return false;
+            }
+        }
+
+        for(Block other : zone.blockRequirements){
+            if(!data.isUnlocked(other)){
+                return false;
+            }
+        }
+
+        return data.hasItems(zone.itemRequirements);
     }
 }

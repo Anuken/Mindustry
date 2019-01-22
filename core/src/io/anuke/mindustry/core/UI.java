@@ -74,7 +74,7 @@ public class UI implements ApplicationListener{
     public UI(){
         Skin skin = new Skin(Core.atlas);
         generateFonts(skin);
-        skin.load(Core.files.internal("ui/uiskin.json"));
+        skin.load(Core.files.internal("sprites/uiskin.json"));
 
         for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
             font.setUseIntegerPositions(true);
@@ -238,7 +238,7 @@ public class UI implements ApplicationListener{
         Table table = new Table();
         table.setFillParent(true);
         table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.removeActor());
-        table.top().add(info).padTop(8);
+        table.top().add(info).padTop(40);
         Core.scene.add(table);
     }
 

@@ -168,7 +168,6 @@ public class MapIO{
             String name = stream.readUTF();
             Block block = content.getByName(ContentType.block, name);
             if(block == null){
-                //Log.info("Map load info: No block with name {0} found.", name);
                 block = Blocks.air;
             }
             map.put(id, block.id);
