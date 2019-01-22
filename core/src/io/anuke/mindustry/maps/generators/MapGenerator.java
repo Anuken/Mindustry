@@ -73,7 +73,7 @@ public class MapGenerator extends Generator{
                 final int mag = 3;
                 int newX = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x, y) * mag + x), 0, data.width()-1);
                 int newY = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x + 9999, y + 9999) * mag + y), 0, data.height()-1);
-                if(tiles[newX][newY].block() != Blocks.spawn){
+                if(tiles[newX][newY].block() != Blocks.spawn && !tiles[x][y].block().synthetic()&& !tiles[newX][newY].block().synthetic()){
                     tiles[x][y].setBlock(tiles[newX][newY].block());
                 }
             }
