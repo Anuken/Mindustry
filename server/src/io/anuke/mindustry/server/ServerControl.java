@@ -26,10 +26,8 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
-import io.anuke.mindustry.world.Tile;
 
 import java.io.IOException;
-import java.lang.StringBuilder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -563,33 +561,6 @@ public class ServerControl implements ApplicationListener{
             info("&lyCore destroyed.");
             inExtraRound = false;
             Events.fire(new GameOverEvent(Team.red));
-        });
-
-        handler.register("traceblock", "<x> <y>", "Prints debug info about a block", arg -> {
-            try{
-                int x = Integer.parseInt(arg[0]);
-                int y = Integer.parseInt(arg[1]);
-                Tile tile = world.tile(x, y);
-                if(tile != null){
-                    if(tile.entity != null){
-                        Array<Object> arr = tile.block().getDebugInfo(tile);
-                        StringBuilder result = new StringBuilder();
-                        for(int i = 0; i < arr.size / 2; i++){
-                            result.append(arr.get(i * 2));
-                            result.append(": ");
-                            result.append(arr.get(i * 2 + 1));
-                            result.append("\n");
-                        }
-                        info("&ly{0}", result);
-                    }else{
-                        info("No tile entity for that block.");
-                    }
-                }else{
-                    info("No tile at that location.");
-                }
-            }catch(NumberFormatException e){
-                err("Invalid coordinates passed.");
-            }
         });
 
         handler.register("info", "<IP/UUID/name...>", "Find player info(s). Can optionally check for all names or IPs a player has had.", arg -> {
