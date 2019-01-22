@@ -87,7 +87,7 @@ public class HudFragment extends Fragment{
                                 ui.chatfrag.toggle();
                             }
                         }else{
-                            ui.unlocks.show();
+                            ui.database.show();
                         }
                     }).update(i -> {
                         if(Net.active() && mobile){

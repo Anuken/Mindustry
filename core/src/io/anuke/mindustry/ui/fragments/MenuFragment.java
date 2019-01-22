@@ -62,7 +62,7 @@ public class MenuFragment extends Fragment{
             join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
             editor = new MobileButton("icon-editor", isize, "$editor", () -> ui.loadAnd(ui.editor::show)),
             tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),
-            unlocks = new MobileButton("icon-unlocks", isize, "$unlocks", ui.unlocks::show),
+            unlocks = new MobileButton("icon-unlocks", isize, "database", ui.database::show),
             donate = new MobileButton("icon-donate", isize, "$donate", Platform.instance::openDonations);
 
         if(Core.graphics.getWidth() > Core.graphics.getHeight()){
