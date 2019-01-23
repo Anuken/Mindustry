@@ -205,10 +205,8 @@ public class Blocks implements ContentList{
             variants = 1;
         }};
 
-        rocks = new Rock("rocks"){{
+        rocks = new StaticWall("rocks"){{
             variants = 2;
-            breakable = alwaysReplace = false;
-            solid = true;
         }};
 
         //endregion

@@ -73,6 +73,9 @@ public class BlockRenderer{
         shadows.begin();
         Core.graphics.clear(Color.CLEAR);
         Draw.color(shadowColor);
+        floor.beginDraw();
+        floor.drawLayer(CacheLayer.walls);
+        floor.endDraw();
         drawBlocks(Layer.shadow);
 
         EntityDraw.drawWith(playerGroup, player -> !player.isDead(), Unit::draw);
@@ -119,11 +122,11 @@ public class BlockRenderer{
                 Tile tile = world.rawTile(x, y);
                 Block block = tile.block();
 
-                if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
+                if(!expanded && block != Blocks.air && block.cacheLayer == CacheLayer.normal && world.isAccessible(x, y)){
                     tile.block().drawShadow(tile);
                 }
 
-                if(block != Blocks.air){
+                if(block != Blocks.air && block.cacheLayer == CacheLayer.normal){
                     if(!expanded){
                         addRequest(tile, Layer.shadow);
                         addRequest(tile, Layer.block);
@@ -148,6 +151,10 @@ public class BlockRenderer{
         lastCamY = avgy;
         lastRangeX = rangex;
         lastRangeY = rangey;
+
+        floor.beginDraw();
+        floor.drawLayer(CacheLayer.walls);
+        floor.endDraw();
     }
 
     public void drawBlocks(Layer stopAt){
