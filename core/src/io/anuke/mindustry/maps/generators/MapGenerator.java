@@ -3,6 +3,7 @@ package io.anuke.mindustry.maps.generators;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.noise.Simplex;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.io.MapIO;
@@ -10,6 +11,7 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import static io.anuke.mindustry.Vars.*;
@@ -90,6 +92,22 @@ public class MapGenerator extends Generator{
             for(int i = 0; i < enemySpawns; i++){
                 Point2 point = enemies.get(i);
                 tiles[point.x][point.y].setBlock(Blocks.spawn);
+
+                int rad = 10, frad = 12;
+
+                for(int x = rad; x <= rad; x++){
+                    for(int y = rad; y <= rad; y++){
+                        int wx = x + point.x, wy = y + point.y;
+                        double dst = Mathf.dst(x, y);
+                        if(dst < frad && Structs.inBounds(wx, wy, tiles) && (dst <= rad || Mathf.chance(0.5))){
+                            Tile tile = tiles[wx][wy];
+                            if(tile.floor() instanceof OreBlock){
+                                OreBlock block = (OreBlock)tile.floor();
+                                tile.setFloor(block.base);
+                            }
+                        }
+                    }
+                }
             }
         }
 

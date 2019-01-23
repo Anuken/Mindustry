@@ -138,8 +138,7 @@ public class MapTileData{
     }
 
     public enum DataPosition{
-        floor, wall, link, rotationTeam,
-        @Deprecated elevation
+        floor, wall, link, rotationTeam, elevation
     }
 
     public class TileDataMarker{

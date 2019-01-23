@@ -18,7 +18,7 @@ public class LegacyColorMapper implements ContentList{
 
     @Override
     public void load(){
-        defaultValue = new LegacyBlock(Blocks.stone, 0);
+        defaultValue = new LegacyBlock(Blocks.stone, Blocks.air);
 
         map("ff0000", Blocks.dirt, 0);
         map("00ff00", Blocks.stone, 0);
@@ -44,17 +44,22 @@ public class LegacyColorMapper implements ContentList{
         map("83bc58", OreBlock.get(Blocks.stone, Items.thorium), 0);
     }
     
-    private void map(String color, Block block, int elevation){
-        blockMap.put(Color.rgba8888(Color.valueOf(color)), new LegacyBlock(block, elevation));
+    private void map(String color, Block block, Block wall){
+        blockMap.put(Color.rgba8888(Color.valueOf(color)), new LegacyBlock(block, wall));
+    }
+
+    //todo fix this, implement proper mapping w/ walls
+    private void map(String color, Block block, int __TODO_fix_this){
+        blockMap.put(Color.rgba8888(Color.valueOf(color)), new LegacyBlock(block, Blocks.air));
     }
 
     public static class LegacyBlock{
-        public final int elevation;
         public final Floor floor;
+        public final Block wall;
 
-        public LegacyBlock(Block floor, int elevation){
-            this.elevation = elevation;
+        public LegacyBlock(Block floor, Block wall){
             this.floor = (Floor) floor;
+            this.wall = wall;
         }
     }
 
