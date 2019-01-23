@@ -24,7 +24,6 @@ public class MapRenderer implements Disposable{
     private IntSet delayedUpdates = new IntSet();
     private MapEditor editor;
     private int width, height;
-    private Color tmpColor = Color.WHITE.cpy();
 
     public MapRenderer(MapEditor editor){
         this.editor = editor;

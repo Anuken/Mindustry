@@ -32,7 +32,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, blockpart, spawn, space, metalfloor, deepwater, water, tar, stone, blackstone, dirt, sand, ice, snow,
+    air, blockpart, spawn, space, metalfloor, deepwater, water, tar, stone, craters, blackstone, dirt, sand, ice, snow,
     grass, shrub, rock, icerock, blackrock, rocks,
 
     //crafting
@@ -76,9 +76,7 @@ public class Blocks implements ContentList{
     public void load(){
         //region environment
 
-        air = new Floor("air"){
-            {
-                blend = false;
+        air = new Floor("air"){{
                 alwaysReplace = true;
             }
 
@@ -104,7 +102,6 @@ public class Blocks implements ContentList{
             variants = 0;
             cacheLayer = CacheLayer.space;
             solid = true;
-            blend = false;
             minimapColor = Color.valueOf("000001");
         }};
 
@@ -152,9 +149,11 @@ public class Blocks implements ContentList{
 
         stone = new Floor("stone"){{
             hasOres = true;
-            blends = block -> block != this && !(block instanceof OreBlock);
             minimapColor = Color.valueOf("323232");
-            playerUnmineable = true;
+        }};
+
+        craters = new Floor("craters"){{
+            minimapColor = Color.valueOf("323232");
         }};
 
         blackstone = new Floor("blackstone"){{
@@ -828,7 +827,6 @@ public class Blocks implements ContentList{
             launchThreshold = 500;
             launchTime = 60f * 10;
             launchChunkSize = 100;
-            alwaysUnlocked = true;
         }};
 
         vault = new Vault("vault"){{

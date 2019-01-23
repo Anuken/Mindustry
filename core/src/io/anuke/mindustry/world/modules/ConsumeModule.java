@@ -9,9 +9,11 @@ import java.io.IOException;
 
 public class ConsumeModule extends BlockModule{
     private boolean valid;
+    private TileEntity entity;
 
     public void update(TileEntity entity){
-        boolean prevValid = valid;
+        this.entity = entity;
+        boolean prevValid = valid();
         valid = true;
 
         for(Consume cons : entity.tile.block().consumes.all()){
@@ -26,7 +28,7 @@ public class ConsumeModule extends BlockModule{
     }
 
     public boolean valid(){
-        return valid;
+        return valid && (entity == null || entity.tile.block().canProduce(entity.tile));
     }
 
     @Override

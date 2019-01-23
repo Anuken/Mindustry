@@ -50,7 +50,6 @@ public class MapIO{
         for(int y = 0; y < data.height(); y++){
             for(int x = 0; x < data.width(); x++){
                 data.read(marker);
-                byte elev = y >= data.height() - 1 ? 0 : data.read(x, y + 1, DataPosition.elevation);
                 Block floor = content.block(marker.floor);
                 Block wall = content.block(marker.wall);
                 int color = ColorMapper.colorFor(floor, wall, Team.all[marker.team]);

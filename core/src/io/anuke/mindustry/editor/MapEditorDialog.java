@@ -1,6 +1,7 @@
 package io.anuke.mindustry.editor;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
@@ -27,6 +28,7 @@ import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
+import io.anuke.mindustry.world.blocks.OreBlock;
 
 import java.io.DataInputStream;
 import java.io.InputStream;
@@ -43,6 +45,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private FloatingDialog menu;
     private boolean saved = false;
     private boolean shownWithMap = false;
+    private Array<Block> blocksOut = new Array<>();
 
     private ButtonGroup<ImageButton> blockgroup;
 
@@ -387,7 +390,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 tools.row();
 
                 addTool.accept(EditorTool.fill);
-                addTool.accept(EditorTool.elevation);
+                addTool.accept(EditorTool.spray);
 
                 ImageButton rotate = tools.addImageButton("icon-arrow-16", "clear", 16 * 2f, () -> editor.setDrawRotation((editor.getDrawRotation() + 1) % 4)).get();
                 rotate.getImage().update(() -> {
@@ -498,7 +501,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         int i = 0;
 
-        for(Block block : Vars.content.blocks()){
+        blocksOut.clear();
+        blocksOut.addAll(Vars.content.blocks());
+        blocksOut.sort((b1, b2) -> b1.synthetic() && !b2.synthetic() ? 1 : b2.synthetic() && !b1.synthetic() ? -1 :
+            b1 instanceof OreBlock && !(b2 instanceof OreBlock) ? 1 : !(b1 instanceof OreBlock) && b2 instanceof OreBlock ? -1 :
+            Integer.compare(b1.id, b2.id));
+
+        for(Block block : blocksOut){
             TextureRegion region = block.icon(Icon.medium);
 
             if(region == Core.atlas.find("jjfgj")) continue;

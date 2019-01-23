@@ -271,4 +271,9 @@ public abstract class BlockStorage extends UnlockableContent{
         }
         return false;
     }
+
+    /** Returns whether this block's inventory has space and is ready for production.*/
+    public boolean canProduce(Tile tile){
+        return true;
+    }
 }

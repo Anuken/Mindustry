@@ -118,6 +118,11 @@ public class Drill extends Block{
     }
 
     @Override
+    public boolean canProduce(Tile tile){
+        return tile.entity.items.total() < itemCapacity;
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
 

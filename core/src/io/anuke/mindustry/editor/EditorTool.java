@@ -57,7 +57,7 @@ public enum EditorTool{
             editor.draw(x, y, Blocks.air);
         }
     },
-    elevation{
+    spray{
         {
             edit = true;
             draggable = true;
@@ -65,7 +65,7 @@ public enum EditorTool{
 
         @Override
         public void touched(MapEditor editor, int x, int y){
-            editor.elevate(x, y);
+            editor.draw(x, y, editor.getDrawBlock(), 0.012);
         }
     },
     line{
@@ -99,7 +99,6 @@ public enum EditorTool{
 
             byte bf = data.read(x, y, DataPosition.floor);
             byte bw = data.read(x, y, DataPosition.wall);
-            be = data.read(x, y, DataPosition.elevation);
             boolean synth = editor.getDrawBlock().synthetic();
             byte brt = Pack.byteByte((byte) editor.getDrawRotation(), (byte) editor.getDrawTeam().ordinal());
 

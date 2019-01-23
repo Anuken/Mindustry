@@ -146,7 +146,7 @@ public class MapView extends Element implements GestureListener{
 
                 Point2 p = project(x, y);
 
-                if(drawing && tool.draggable){
+                if(drawing && tool.draggable && !(p.x == lastx && p.y == lasty)){
                     ui.editor.resetSaved();
                     Array<Point2> points = br.line(lastx, lasty, p.x, p.y);
                     for(Point2 point : points){

@@ -58,7 +58,7 @@ public class Zones implements ContentList{
             }};
         }};
 
-        craters = new Zone("craters", new MapGenerator("groundZero", 1)){{ //TODO implement
+        craters = new Zone("craters", new MapGenerator("craters", 1){{ distortion = 1.44f; }}){{ //TODO implement
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
