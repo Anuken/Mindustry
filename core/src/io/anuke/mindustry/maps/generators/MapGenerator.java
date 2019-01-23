@@ -64,7 +64,7 @@ public class MapGenerator extends Generator{
                     marker.wall = 0;
                 }
 
-                tiles[x][y] = new Tile(x, y, marker.floor, marker.wall == Blocks.blockpart.id ? 0 : marker.wall, marker.rotation, marker.team);
+                tiles[x][y] = new Tile(x, y, marker.floor, marker.wall == Blocks.part.id ? 0 : marker.wall, marker.rotation, marker.team);
             }
         }
 

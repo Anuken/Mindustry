@@ -32,7 +32,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, blockpart, spawn, space, metalfloor, deepwater, water, tar, stone, craters, blackstone, dirt, sand, ice, snow,
+    air, part, spawn, space, metalfloor, deepwater, water, tar, stone, craters, blackstone, dirt, sand, ice, snow,
     grass, shrub, rock, icerock, blackrock, rocks,
 
     //crafting
@@ -85,7 +85,7 @@ public class Blocks implements ContentList{
             public void init(){}
         };
 
-        blockpart = new BlockPart();
+        part = new BlockPart();
 
         spawn = new Block("spawn"){
             public void drawShadow(Tile tile){}

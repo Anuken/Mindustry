@@ -212,9 +212,9 @@ public class Tile implements Position, TargetTrait{
         return link != 0;
     }
 
-    /** Sets this to a linked tile, which sets the block to a blockpart. dx and dy can only be -8-7. */
+    /** Sets this to a linked tile, which sets the block to a part. dx and dy can only be -8-7. */
     public void setLinked(byte dx, byte dy){
-        setBlock(Blocks.blockpart);
+        setBlock(Blocks.part);
         link = Pack.byteByte((byte)(dx + 8), (byte)(dy + 8));
     }
 

@@ -434,7 +434,7 @@ public class World implements ApplicationListener{
             for(int x = 0; x < data.width(); x++){
                 data.read(marker);
 
-                tiles[x][y] = new Tile(x, y, marker.floor, marker.wall == Blocks.blockpart.id ? 0 : marker.wall, marker.rotation, marker.team);
+                tiles[x][y] = new Tile(x, y, marker.floor, marker.wall == Blocks.part.id ? 0 : marker.wall, marker.rotation, marker.team);
             }
         }
 

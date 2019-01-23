@@ -101,7 +101,7 @@ public abstract class SaveFileVersion{
 
             Tile tile = new Tile(x, y, floorid, wallid);
 
-            if(wallid == Blocks.blockpart.id){
+            if(wallid == Blocks.part.id){
                 tile.link = stream.readByte();
             }else if(tile.entity != null){
                 byte tr = stream.readByte();

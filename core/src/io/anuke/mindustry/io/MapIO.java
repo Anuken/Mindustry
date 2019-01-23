@@ -87,7 +87,7 @@ public class MapIO{
                             int worldy = dy - 1 + y;
 
                             if(Structs.inBounds(worldx, worldy, pixmap.getWidth(), pixmap.getHeight())){
-                                data.write(worldx, worldy, DataPosition.wall, Blocks.blockpart.id);
+                                data.write(worldx, worldy, DataPosition.wall, Blocks.part.id);
                                 data.write(worldx, worldy, DataPosition.rotationTeam, Pack.byteByte((byte)0, (byte)Team.blue.ordinal()));
                                 data.write(worldx, worldy, DataPosition.link, Pack.byteByte((byte) (dx - 1 + 8), (byte) (dy - 1 + 8)));
                             }

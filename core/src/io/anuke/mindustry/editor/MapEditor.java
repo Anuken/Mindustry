@@ -95,7 +95,7 @@ public class MapEditor{
 
     public void draw(int x, int y, Block drawBlock, double chance){
         byte writeID = drawBlock.id;
-        byte partID = Blocks.blockpart.id;
+        byte partID = Blocks.part.id;
         byte rotationTeam = Pack.byteByte(drawBlock.rotate ? (byte)rotation : 0, drawBlock.synthetic() ? (byte)drawTeam.ordinal() : 0);
 
         boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;

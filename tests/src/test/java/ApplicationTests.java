@@ -145,7 +145,7 @@ public class ApplicationTests{
                 if(x == bx && by == y){
                     assertEquals(world.tile(x, y).block(), Blocks.core);
                 }else{
-                    assertTrue(world.tile(x, y).block() == Blocks.blockpart && world.tile(x, y).getLinked() == world.tile(bx, by));
+                    assertTrue(world.tile(x, y).block() == Blocks.part && world.tile(x, y).getLinked() == world.tile(bx, by));
                 }
             }
         }
@@ -236,7 +236,7 @@ public class ApplicationTests{
 
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
-        assertEquals(Blocks.blockpart, world.tile(1, 1).block());
+        assertEquals(Blocks.part, world.tile(1, 1).block());
     }
 
     @Test
