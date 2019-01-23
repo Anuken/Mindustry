@@ -7,17 +7,40 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.generators.Generator;
+import io.anuke.mindustry.world.Block;
+
+import static io.anuke.mindustry.Vars.state;
 
 public class Zone extends UnlockableContent{
     public final String name;
     public final Generator generator;
     public ItemStack[] deployCost = {};
     public ItemStack[] startingItems = {};
+    public Block[] blockRequirements = {};
+    public ItemStack[] itemRequirements = {};
+    public Zone[] zoneRequirements = {};
     public Supplier<Rules> rules = Rules::new;
+    public boolean alwaysUnlocked;
+    public int conditionWave = Integer.MAX_VALUE;
 
     public Zone(String name, Generator generator){
         this.name = name;
         this.generator = generator;
+    }
+
+    /**Whether this zone has met its condition; if true, the player can leave.*/
+    public boolean metCondition(){
+        return state.wave >= conditionWave;
+    }
+
+    @Override
+    public void init(){
+        generator.init();
+    }
+
+    @Override
+    public boolean alwaysUnlocked(){
+        return alwaysUnlocked;
     }
 
     @Override
@@ -46,4 +69,5 @@ public class Zone extends UnlockableContent{
     public ContentType getContentType(){
         return ContentType.zone;
     }
+
 }

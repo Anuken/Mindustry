@@ -14,7 +14,7 @@ import static io.anuke.mindustry.Vars.ui;
 public enum EditorTool{
     pick{
         public void touched(MapEditor editor, int x, int y){
-            if(!Structs.inBounds(x, y, editor.getMap().width(), editor.getMap().height())) return;
+            if(!Structs.inBounds(x, y, world.width(), world.height())) return;
 
             byte bf = editor.getMap().read(x, y, DataPosition.floor);
             byte bw = editor.getMap().read(x, y, DataPosition.wall);
@@ -54,7 +54,7 @@ public enum EditorTool{
             editor.draw(x, y, Blocks.air);
         }
     },
-    elevation{
+    spray{
         {
             edit = true;
             draggable = true;
@@ -62,7 +62,7 @@ public enum EditorTool{
 
         @Override
         public void touched(MapEditor editor, int x, int y){
-            editor.elevate(x, y);
+            editor.draw(x, y, editor.getDrawBlock(), 0.012);
         }
     },
     line{
@@ -82,7 +82,7 @@ public enum EditorTool{
         MapTileData data;
 
         public void touched(MapEditor editor, int x, int y){
-            if(!Structs.inBounds(x, y, editor.getMap().width(), editor.getMap().height())) return;
+            if(!Structs.inBounds(x, y, world.width(), world.height())) return;
 
             if(editor.getDrawBlock().isMultiblock()){
                 //don't fill multiblocks, thanks
@@ -96,7 +96,6 @@ public enum EditorTool{
 
             byte bf = data.read(x, y, DataPosition.floor);
             byte bw = data.read(x, y, DataPosition.wall);
-            be = data.read(x, y, DataPosition.elevation);
             boolean synth = editor.getDrawBlock().synthetic();
             byte brt = Pack.byteByte((byte) editor.getDrawRotation(), (byte) editor.getDrawTeam().ordinal());
 
@@ -107,8 +106,8 @@ public enum EditorTool{
                 return;
             }
 
-            width = editor.getMap().width();
-            int height = editor.getMap().height();
+            width = world.width();
+            int height = world.height();
 
             int x1;
             boolean spanAbove, spanBelow;

@@ -38,13 +38,11 @@ public class Palette{
 
     stoneGray = Color.valueOf("8f8f8f"),
 
-    portalLight = Color.valueOf("9054ea"),
-    portal = Color.valueOf("6344d7"),
-    portalDark = Color.valueOf("3f3dac"),
-
+    health = Color.valueOf("ff341c"),
     heal = Color.valueOf("98ffa9"),
     bar = Color.SLATE,
     accent = Color.valueOf("ffd37f"),
+    locked = Color.valueOf("989aa4"),
     accentBack = Color.valueOf("d4816b"),
     place = Color.valueOf("6335f8"),
     remove = Color.valueOf("e55454"),
@@ -54,7 +52,7 @@ public class Palette{
     range = Color.valueOf("f4ba6e"),
     power = Color.valueOf("fbad67"),
     powerLight = Color.valueOf("fbd367"),
-    placing = Color.valueOf("616161"),
+    placing = accent,
 
     lightTrail = Color.valueOf("ffe2a9"),
 

@@ -61,6 +61,17 @@ public class PowerCrafter extends Block{
     }
 
     @Override
+    public boolean canProduce(Tile tile){
+        if(outputItem != null && tile.entity.items.get(outputItem) >= itemCapacity){
+            return false;
+        }
+        if(outputLiquid != null && tile.entity.liquids.get(outputLiquid) >= liquidCapacity - 0.01f){
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public void update(Tile tile){
         GenericCrafterEntity entity = tile.entity();
 

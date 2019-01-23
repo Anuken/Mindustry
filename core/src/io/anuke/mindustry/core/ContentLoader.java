@@ -44,7 +44,7 @@ public class ContentLoader{
         new Mechs(),
         new UnitTypes(),
         new Blocks(),
-        new Recipes(),
+        new TechTree(),
         new Zones(),
 
         //these are not really content classes, but this makes initialization easier
@@ -165,7 +165,7 @@ public class ContentLoader{
         }
 
         if(id >= contentMap[type.ordinal()].size || id < 0){
-            throw new RuntimeException("No " + type.name() + " with ID '" + id + "' found!");
+            return null;
         }
         return (T)contentMap[type.ordinal()].get(id);
     }
@@ -182,14 +182,6 @@ public class ContentLoader{
 
     public Block block(int id){
         return (Block) getByID(ContentType.block, id);
-    }
-
-    public Array<Recipe> recipes(){
-        return getBy(ContentType.recipe);
-    }
-
-    public Recipe recipe(int id){
-        return (Recipe) getByID(ContentType.recipe, id);
     }
 
     public Array<Item> items(){

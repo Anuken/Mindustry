@@ -24,14 +24,15 @@ public class Fx implements ContentList{
     vtolHover, unitDrop, unitPickup, unitLand, pickup, healWave, heal, landShock, reactorsmoke, nuclearsmoke, nuclearcloud,
     redgeneratespark, generatespark, fuelburn, plasticburn, pulverize, pulverizeRed, pulverizeRedder, pulverizeSmall, pulverizeMedium,
     producesmoke, smeltsmoke, formsmoke, blastsmoke, lava, doorclose, dooropen, dooropenlarge, doorcloselarge, purify, purifyoil, purifystone, generate,
-    mine, mineBig, mineHuge, smelt, teleportActivate, teleport, teleportOut, ripple, bubble, commandSend,
+    mine, mineBig, mineHuge, smelt, teleportActivate, teleport, teleportOut, ripple, bubble, launch,
     healBlock, healBlockFull, healWaveMend, overdriveWave, overdriveBlockFull, shieldBreak, hitBulletSmall, hitFuse,
     hitBulletBig, hitFlameSmall, hitLiquid, hitLaser, hitLancer, hitMeltdown, despawn, flakExplosion, blastExplosion,
     plasticExplosion, artilleryTrail, incendTrail, missileTrail, absorb, flakExplosionBig, plasticExplosionFlak, burning, fire,
     fireSmoke, steam, fireballsmoke, ballfire, freezing, melting, wet, oily, overdriven, dropItem, shockwave,
     bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
     shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
-    shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot;
+    shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
+    launchFull;
 
     @Override
     public void load(){
@@ -1060,7 +1061,7 @@ public class Fx implements ContentList{
             Draw.reset();
         });
 
-        commandSend = new Effect(28, e -> {
+        launch = new Effect(28, e -> {
             Draw.color(Palette.command);
             Lines.stroke(e.fout() * 2f);
             Lines.poly(e.x, e.y, 40, 4f + e.finpow() * 120f);
@@ -1106,6 +1107,13 @@ public class Fx implements ContentList{
             Draw.color(Palette.accent);
             Lines.stroke(3f * e.fout());
             Lines.poly(e.x, e.y, 6, e.rotation + e.fin(), 90);
+            Draw.reset();
+        });
+
+        launchFull = new Effect(60, 9999999999f, e -> {
+            Draw.color();
+            Draw.alpha(e.fslope());
+            Fill.rect(Core.camera.position.x, Core.camera.position.y, Core.camera.width + 10, Core.camera.height + 10);
             Draw.reset();
         });
     }

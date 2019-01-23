@@ -212,9 +212,9 @@ public class Tile implements Position, TargetTrait{
         return link != 0;
     }
 
-    /** Sets this to a linked tile, which sets the block to a blockpart. dx and dy can only be -8-7. */
+    /** Sets this to a linked tile, which sets the block to a part. dx and dy can only be -8-7. */
     public void setLinked(byte dx, byte dy){
-        setBlock(Blocks.blockpart);
+        setBlock(Blocks.part);
         link = Pack.byteByte((byte)(dx + 8), (byte)(dy + 8));
     }
 
@@ -418,7 +418,7 @@ public class Tile implements Position, TargetTrait{
         Block block = block();
         Block floor = floor();
 
-        return floor.name() + ":" + block.name() + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
+        return floor.name + ":" + block.name + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
         (link != 0 ? " link=[" + (Pack.leftByte(link) - 8) + ", " + (Pack.rightByte(link) - 8) + "]" : "");
     }
 }

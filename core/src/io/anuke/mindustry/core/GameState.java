@@ -3,6 +3,7 @@ package io.anuke.mindustry.core;
 import io.anuke.arc.Events;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Rules;
+import io.anuke.mindustry.game.Stats;
 import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.net.Net;
 
@@ -15,9 +16,11 @@ public class GameState{
     /**Wave countdown in ticks.*/
     public float wavetime;
     /**Whether the game is in game over state.*/
-    public boolean gameOver = false;
+    public boolean gameOver = false, launched = false;
     /**The current game rules.*/
     public Rules rules = new Rules();
+    /**Statistics for this save/game. Displayed after game over.*/
+    public Stats stats = new Stats();
     /**Team data. Gets reset every new game.*/
     public Teams teams = new Teams();
     /**Number of enemies in the game; only used clientside in servers.*/

@@ -83,7 +83,6 @@ public abstract class Turret extends Block{
         solid = true;
         layer = Layer.turret;
         group = BlockGroup.turrets;
-        turretIcon = true;
         flags = EnumSet.of(BlockFlag.turret);
     }
 
@@ -92,11 +91,6 @@ public abstract class Turret extends Block{
         return false;
     }
 
-    @Override
-    public void init(){
-        super.init();
-        viewRange = range;
-    }
 
     @Override
     public void load(){
@@ -110,10 +104,6 @@ public abstract class Turret extends Block{
     @Override
     public void setStats(){
         super.setStats();
-		/*
-		if(ammo != null) stats.add("ammo", ammo);
-		if(ammo != null) stats.add("ammocapacity", maxAmmo);
-		if(ammo != null) stats.add("ammoitem", ammoMultiplier);*/
 
         stats.add(BlockStat.shootRange, range, StatUnit.blocks);
         stats.add(BlockStat.inaccuracy, (int) inaccuracy, StatUnit.degrees);
@@ -142,19 +132,8 @@ public abstract class Turret extends Block{
     }
 
     @Override
-    public TextureRegion[] getBlockIcon(){
-        if(blockIcon == null){
-            blockIcon = new TextureRegion[]{Core.atlas.find("block-icon-" + name)};
-        }
-        return blockIcon;
-    }
-
-    @Override
-    public TextureRegion[] getCompactIcon(){
-        if(compactIcon == null){
-            compactIcon = new TextureRegion[]{iconRegion(Core.atlas.find("block-icon-" + name))};
-        }
-        return compactIcon;
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find("block-" + size), Core.atlas.find(name)};
     }
 
     @Override

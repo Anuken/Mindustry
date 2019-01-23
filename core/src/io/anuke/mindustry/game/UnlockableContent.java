@@ -3,8 +3,6 @@ package io.anuke.mindustry.game;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 
-import static io.anuke.mindustry.Vars.data;
-
 /**Base interface for an unlockable content type.*/
 public abstract class UnlockableContent extends MappableContent{
     /**Returns the localized name of this content.*/
@@ -27,25 +25,5 @@ public abstract class UnlockableContent extends MappableContent{
     /**Override to make content always unlocked.*/
     public boolean alwaysUnlocked(){
         return false;
-    }
-
-    /**Lists the content that must be unlocked in order for this specific content to become unlocked. May return null.*/
-    public UnlockableContent[] getDependencies(){
-        return null;
-    }
-
-    /**Returns whether dependencies are satisfied for unlocking this content.*/
-    public boolean canBeUnlocked(){
-        UnlockableContent[] depend = getDependencies();
-        if(depend == null){
-            return true;
-        }else{
-            for(UnlockableContent cont : depend){
-                if(!data.isUnlocked(cont)){
-                    return false;
-                }
-            }
-            return true;
-        }
     }
 }

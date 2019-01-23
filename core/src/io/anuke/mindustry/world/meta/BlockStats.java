@@ -7,7 +7,6 @@ import io.anuke.arc.util.Log;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.values.*;
 
 import java.util.Locale;
@@ -17,12 +16,7 @@ public class BlockStats{
     private static final boolean errorWhenMissing = false;
 
     private final OrderedMap<StatCategory, OrderedMap<BlockStat, StatValue>> map = new OrderedMap<>();
-    private final Block block;
     private boolean dirty;
-
-    public BlockStats(Block block){
-        this.block = block;
-    }
 
     /**Adds a single float value with this stat, formatted to 2 decimal places.*/
     public void add(BlockStat stat, float value, StatUnit unit){
@@ -73,7 +67,7 @@ public class BlockStats{
         }
 
         if(map.containsKey(stat.category) && map.get(stat.category).containsKey(stat)){
-            throw new RuntimeException("Duplicate stat entry: \"" + stat + "\" in block '" + block.name + "'");
+            throw new RuntimeException("Duplicate stat entry: \"" + stat + "\" in block.");
         }
 
         if(!map.containsKey(stat.category)){
@@ -88,7 +82,7 @@ public class BlockStats{
     /**Removes a stat, if it exists.*/
     public void remove(BlockStat stat){
         if(!map.containsKey(stat.category) || !map.get(stat.category).containsKey(stat)){
-            throw new RuntimeException("No stat entry found: \"" + stat + "\" in block '" + block.name + "'!");
+            throw new RuntimeException("No stat entry found: \"" + stat + "\" in block.");
         }
 
         map.get(stat.category).remove(stat);

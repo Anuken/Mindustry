@@ -8,6 +8,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Log.LogHandler;
 import io.anuke.arc.util.Log.NoopLogHandler;
+import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.ContentLoader;
 
@@ -117,8 +118,7 @@ public class ImagePacker{
     }
 
     static void err(String message, Object... args){
-        Log.err(message, args);
-        System.exit(-1);
+        throw new IllegalArgumentException(Strings.formatArgs(message, args));
     }
 
     static class GenRegion extends AtlasRegion{

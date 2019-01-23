@@ -13,53 +13,25 @@ import io.anuke.mindustry.type.Weapon;
  * Each spawn group can have multiple sub-groups spawned in different areas of the map.
  */
 public class SpawnGroup{
-    /**
-     * The unit type spawned
-     */
+    /**The unit type spawned*/
     public final UnitType type;
-    /**
-     * When this spawn should end
-     */
+    /**When this spawn should end*/
     protected int end = Integer.MAX_VALUE;
-    /**
-     * When this spawn should start
-     */
+    /**When this spawn should start*/
     protected int begin;
-    /**
-     * The spacing, in waves, of spawns. For example, 2 = spawns every other wave
-     */
+    /**The spacing, in waves, of spawns. For example, 2 = spawns every other wave*/
     protected int spacing = 1;
-    /**
-     * Maximum amount of units that spawn
-     */
+    /**Maximum amount of units that spawn*/
     protected int max = 60;
-    /**
-     * How many waves need to pass before the amount of units spawned increases by 1
-     */
+    /**How many waves need to pass before the amount of units spawned increases by 1*/
     protected float unitScaling = 9999f;
-    /**
-     * How many waves need to pass before the amount of instances of this group increases by 1
-     */
-    protected float groupScaling = 9999f;
-    /**
-     * Amount of enemies spawned initially, with no scaling
-     */
+    /**Amount of enemies spawned initially, with no scaling*/
     protected int unitAmount = 1;
-    /**
-     * Amount of enemies spawned initially, with no scaling
-     */
-    protected int groupAmount = 1;
-    /**
-     * Weapon used by the spawned unit. Null to disable. Only applicable to ground units.
-     */
+    /**Weapon used by the spawned unit. Null to disable. Only applicable to ground units.*/
     protected Weapon weapon;
-    /**
-     * Status effect applied to the spawned unit. Null to disable.
-     */
+    /**Status effect applied to the spawned unit. Null to disable.*/
     protected StatusEffect effect;
-    /**
-     * Items this unit spawns with. Null to disable.
-     */
+    /**Items this unit spawns with. Null to disable.*/
     protected ItemStack items;
 
     public SpawnGroup(UnitType type){
@@ -75,18 +47,7 @@ public class SpawnGroup{
         }
         float scaling = this.unitScaling;
 
-        return Math.min(unitAmount - 1 + Math.max((int) ((wave / spacing) / scaling), 1), max);
-    }
-
-    /**
-     * Returns the amount of different unit groups at a specific wave.
-     */
-    public int getGroupsSpawned(int wave){
-        if(wave < begin || wave > end || (wave - begin) % spacing != 0){
-            return 0;
-        }
-
-        return Math.min(groupAmount - 1 + Math.max((int) ((wave / spacing) / groupScaling), 1), max);
+        return Math.min(unitAmount - 1 + Math.max((int) (((wave - begin) / spacing) / scaling), 1), max);
     }
 
     /**
@@ -109,5 +70,21 @@ public class SpawnGroup{
         }
 
         return unit;
+    }
+
+    @Override
+    public String toString(){
+        return "SpawnGroup{" +
+        "type=" + type +
+        ", end=" + end +
+        ", begin=" + begin +
+        ", spacing=" + spacing +
+        ", max=" + max +
+        ", unitScaling=" + unitScaling +
+        ", unitAmount=" + unitAmount +
+        ", weapon=" + weapon +
+        ", effect=" + effect +
+        ", items=" + items +
+        '}';
     }
 }

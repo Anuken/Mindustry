@@ -11,6 +11,63 @@ import java.awt.image.BufferedImage
 
 def outFolder = "../core/assets-raw/sprites_out/"
 def genFolder = "../core/assets-raw/sprites_out/generated/"
+def antialias = {File file ->
+    def image = ImageIO.read(file)
+    def out = ImageIO.read(file)
+    def getRGB = { int ix, int iy ->
+        return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
+    }
+
+    def color = new Color()
+    def sum = new Color()
+
+    for (int x = 0; x < image.getWidth(); x++){
+        for(int y = 0; y < image.getHeight(); y++){
+            int A =
+                    getRGB(x - 1, y + 1),
+                B = getRGB(x, y + 1),
+                C = getRGB(x + 1, y + 1),
+                D = getRGB(x - 1, y),
+                E = getRGB(x, y),
+                F = getRGB(x + 1, y),
+                G = getRGB(x - 1, y - 1),
+                H = getRGB(x, y - 1),
+                I = getRGB(x + 1, y - 1)
+
+            int p1=E, p2=E, p3=E, p4=E, p5=E, p6=E, p7=E, p8=E, p9=E
+            if (D==B && D!=H && B!=F) p1=D
+            if ((D==B && D!=H && B!=F && E!=C) || (B==F && B!=D && F!=H && E!=A)) p2=B
+            if (B==F && B!=D && F!=H) p3=F
+            if ((H==D && H!=F && D!=B && E!=A) || (D==B && D!=H && B!=F && E!=G)) p4=D
+            p5=E
+            if ((B==F && B!=D && F!=H && E!=I) || (F==H && F!=B && H!=D && E!=C)) p6=F
+            if (H==D && H!=F && D!=B) p7=D
+            if ((F==H && F!=B && H!=D && E!=G) || (H==D && H!=F && D!=B && E!=I)) p8=H
+            if (F==H && F!=B && H!=D) p9=F
+
+            int total = 0
+
+            [p1, p2, p3, p4, p5, p6, p7, p8, p9].each{ val ->
+                Color.argb8888ToColor(color, val)
+
+                if(color.a > 0.1){
+                    sum.r += color.r
+                    sum.g += color.g
+                    sum.b += color.b
+                    sum.a += color.a
+                    total++
+                }
+            }
+
+            sum.mul((float)(1f / total))
+            int result = Color.argb8888(sum)
+            out.setRGB(x, y, result)
+            sum.set(0)
+        }
+    }
+
+    ImageIO.write(out, "png", file)
+}
 
 task swapColors(){
     doLast{
@@ -48,7 +105,7 @@ task swapColors(){
 task scaleSprites4x(){
     doLast{
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit { file ->
-            if(file.isDirectory() || file.toString().contains("/ui/")) return;
+            if(file.isDirectory() || file.toString().contains("/ui/")) return
 
             for(int iteration in 0..1) {
                 def image = ImageIO.read(file.file)
@@ -91,6 +148,8 @@ task scaleSprites4x(){
 
                 ImageIO.write(scaled, "png", file.file)
             }
+
+            antialias(file.file)
         }
     }
 }
@@ -98,18 +157,27 @@ task scaleSprites4x(){
 
 task scaleSprites(){
     finalizedBy 'genSprites'
+
+    doLast{
+        copy{
+            from "../core/assets-raw/sprites_replacement/"
+            into "../core/assets-raw/sprites_out/"
+        }
+    }
+    
     dependsOn 'scaleSprites4x'
 }
 
 task pack(){
     dependsOn 'cleanSprites', 'scaleSprites'
-    finalizedBy 'cleanup'
+    //finalizedBy 'cleanup'
 
     doLast{
 
-        copy{
-            from "../core/assets-raw/sprites_replacement/"
-            into "../core/assets-raw/sprites_out/"
+        fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
+            if(file.isDirectory() || file.toString().contains("/ui/")) return
+
+            antialias(file.file)
         }
 
         TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites.atlas")
@@ -127,6 +195,7 @@ task cleanup(){
 }
 
 task cleanSprites(){
+
     doLast{
         delete{
             delete "../core/assets-raw/sprites_out/"
@@ -141,7 +210,17 @@ task cleanSprites(){
     }
 }
 
+task antialiasGen(){
+    doLast{
+        fileTree(dir: '../core/assets-raw/sprites_out/generated/', include: "**/*.png").visit{ file ->
+            antialias(file.file)
+        }
+    }
+}
+
 task genSprites(dependsOn: classes, type: JavaExec) {
+    finalizedBy 'antialiasGen'
+    
     main = "io.anuke.mindustry.ImagePacker"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in

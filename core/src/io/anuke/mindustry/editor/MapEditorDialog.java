@@ -1,6 +1,7 @@
 package io.anuke.mindustry.editor;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
@@ -11,21 +12,21 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
+import io.anuke.mindustry.world.blocks.OreBlock;
 
 import java.io.DataInputStream;
 import java.io.InputStream;
@@ -42,6 +43,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private FloatingDialog menu;
     private boolean saved = false;
     private boolean shownWithMap = false;
+    private Array<Block> blocksOut = new Array<>();
 
     private ButtonGroup<ImageButton> blockgroup;
 
@@ -146,7 +148,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }).padTop(-5).size(swidth * 2f + 10, 60f);
 
         resizeDialog = new MapResizeDialog(editor, (x, y) -> {
-            if(!(editor.getMap().width() == x && editor.getMap().height() == y)){
+            if(!(world.width() == x && world.height() == y)){
                 ui.loadAnd(() -> {
                     editor.resize(x, y);
                     view.clearStack();
@@ -386,7 +388,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 tools.row();
 
                 addTool.accept(EditorTool.fill);
-                addTool.accept(EditorTool.elevation);
+                addTool.accept(EditorTool.spray);
 
                 ImageButton rotate = tools.addImageButton("icon-arrow-16", "clear", 16 * 2f, () -> editor.setDrawRotation((editor.getDrawRotation() + 1) % 4)).get();
                 rotate.getImage().update(() -> {
@@ -497,29 +499,21 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         int i = 0;
 
-        for(Block block : Vars.content.blocks()){
-            TextureRegion[] regions = block.getCompactIcon();
-            if((block.synthetic() && (Recipe.getByResult(block) == null || !data.isUnlocked(Recipe.getByResult(block))))
-                    && block != Blocks.core){
-                continue;
-            }
+        blocksOut.clear();
+        blocksOut.addAll(Vars.content.blocks());
+        blocksOut.sort((b1, b2) -> b1.synthetic() && !b2.synthetic() ? 1 : b2.synthetic() && !b1.synthetic() ? -1 :
+            b1 instanceof OreBlock && !(b2 instanceof OreBlock) ? 1 : !(b1 instanceof OreBlock) && b2 instanceof OreBlock ? -1 :
+            Integer.compare(b1.id, b2.id));
 
-            if(Recipe.getByResult(block) != null && !Recipe.getByResult(block).visibility.shown()){
-                continue;
-            }
+        for(Block block : blocksOut){
+            TextureRegion region = block.icon(Icon.medium);
 
-            if(regions.length == 0 || regions[0] == Core.atlas.find("jjfgj")) continue;
-
-            Stack stack = new Stack();
-
-            for(TextureRegion region : regions){
-                stack.add(new Image(region));
-            }
+            if(region == Core.atlas.find("jjfgj")) continue;
 
             ImageButton button = new ImageButton("white", "clear-toggle");
+            button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.setDrawBlock(block));
             button.resizeImage(8 * 4f);
-            button.replaceImage(stack);
             button.update(() -> button.setChecked(editor.getDrawBlock() == block));
             group.add(button);
             content.add(button).size(50f);

@@ -14,6 +14,7 @@ import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Strings;
+import io.anuke.mindustry.io.SaveIO.SaveException;
 
 import java.io.IOException;
 
@@ -116,8 +117,6 @@ public class LoadDialog extends FloatingDialog{
             button.row();
             button.add(Core.bundle.format("save.wave", color + slot.getWave()));
             button.row();
-            button.add(Core.bundle.format("save.difficulty", color + slot.getDifficulty()));
-            button.row();
             button.label(() -> Core.bundle.format("save.autosave", color + Core.bundle.get(slot.isAutosave() ? "on" : "off")));
             button.row();
             button.label(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
@@ -175,7 +174,7 @@ public class LoadDialog extends FloatingDialog{
             try{
                 slot.load();
                 state.set(State.playing);
-            }catch(Exception e){
+            }catch(SaveException e){
                 Log.err(e);
                 state.set(State.menu);
                 logic.reset();

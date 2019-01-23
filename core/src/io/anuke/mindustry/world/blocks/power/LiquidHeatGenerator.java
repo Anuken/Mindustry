@@ -17,7 +17,7 @@ public class LiquidHeatGenerator extends ItemLiquidGenerator{
         super.setStats();
 
         stats.remove(BlockStat.basePowerGeneration);
-        // Right now, Lava is the only thing that can be used.
+        // right now, Lava is the only thing that can be used.
         stats.add(BlockStat.basePowerGeneration, powerProduction * getLiquidEfficiency(Liquids.slag) / maxLiquidGenerate * 60f, StatUnit.powerSecond);
     }
 

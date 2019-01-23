@@ -11,6 +11,7 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.CarriableTrait;
 import io.anuke.mindustry.entities.traits.CarryTrait;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -120,11 +121,8 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     };
 
     @Override
-    public void onCommand(UnitCommand command){
-        state.set(command == UnitCommand.retreat ? retreat :
-                  command == UnitCommand.attack ? attack :
-                  command == UnitCommand.patrol ? patrol :
-                  null);
+    public void move(float x, float y){
+        moveBy(x, y);
     }
 
     @Override
@@ -154,7 +152,7 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
 
     @Override
     public void draw(){
-        Draw.alpha(hitTime / hitDuration);
+        Draw.alpha(Draw.getShader() != Shaders.mix ? 1f : hitTime / hitDuration);
 
         Draw.rect(type.name, x, y, rotation - 90);
 

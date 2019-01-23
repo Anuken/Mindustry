@@ -22,7 +22,6 @@ import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
@@ -34,6 +33,7 @@ import static io.anuke.mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationTests{
+    static Map testMap;
 
     @BeforeAll
     static void launchApplication(){
@@ -51,17 +51,19 @@ public class ApplicationTests{
 
                     BundleLoader.load();
                     content.load();
-                    content.initialize(Content::init);
 
                     add(logic = new Logic());
                     add(world = new World());
                     add(netServer = new NetServer());
+
+                    content.initialize(Content::init);
                 }
 
                 @Override
                 public void init(){
                     super.init();
                     begins[0] = true;
+                    testMap = world.maps.loadInternalMap("groundZero");
                 }
             };
 
@@ -105,12 +107,12 @@ public class ApplicationTests{
     void playMap(){
         assertTrue(world.maps.all().size > 0);
 
-        world.loadMap(world.maps.all().first());
+        world.loadMap(testMap);
     }
 
     @Test
     void spawnWaves(){
-        world.loadMap(world.maps.all().first());
+        world.loadMap(testMap);
         logic.runWave();
         unitGroups[waveTeam.ordinal()].updateEvents();
         assertFalse(unitGroups[waveTeam.ordinal()].isEmpty());
@@ -143,7 +145,7 @@ public class ApplicationTests{
                 if(x == bx && by == y){
                     assertEquals(world.tile(x, y).block(), Blocks.core);
                 }else{
-                    assertTrue(world.tile(x, y).block() == Blocks.blockpart && world.tile(x, y).getLinked() == world.tile(bx, by));
+                    assertTrue(world.tile(x, y).block() == Blocks.part && world.tile(x, y).getLinked() == world.tile(bx, by));
                 }
             }
         }
@@ -176,7 +178,7 @@ public class ApplicationTests{
     void save(){
         assertTrue(world.maps.all().size > 0);
 
-        world.loadMap(world.maps.all().first());
+        world.loadMap(testMap);
         SaveIO.saveToSlot(0);
     }
 
@@ -184,14 +186,14 @@ public class ApplicationTests{
     void load(){
         assertTrue(world.maps.all().size > 0);
 
-        world.loadMap(world.maps.all().first());
+        world.loadMap(testMap);
         Map map = world.getMap();
 
         SaveIO.saveToSlot(0);
         resetWorld();
         SaveIO.loadFromSlot(0);
 
-        assertEquals(world.getMap(), map);
+        assertEquals(world.getMap().name, map.name);
         assertEquals(world.width(), map.meta.width);
         assertEquals(world.height(), map.meta.height);
     }
@@ -225,8 +227,8 @@ public class ApplicationTests{
         d1.set(10f, 20f);
         d2.set(10f, 20f);
 
-        d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(Blocks.copperWallLarge)));
-        d2.addBuildRequest(new BuildRequest(1, 1, 0, Recipe.getByResult(Blocks.copperWallLarge)));
+        d1.addBuildRequest(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
+        d2.addBuildRequest(new BuildRequest(1, 1, 0, Blocks.copperWallLarge));
 
         Time.setDeltaProvider(() -> 9999999f);
         d1.updateBuilding(d1);
@@ -234,7 +236,7 @@ public class ApplicationTests{
 
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
-        assertEquals(Blocks.blockpart, world.tile(1, 1).block());
+        assertEquals(Blocks.part, world.tile(1, 1).block());
     }
 
     @Test
@@ -247,7 +249,7 @@ public class ApplicationTests{
         d1.set(10f, 20f);
         d2.set(10f, 20f);
 
-        d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(Blocks.copperWallLarge)));
+        d1.addBuildRequest(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
         d2.addBuildRequest(new BuildRequest(1, 1));
 
         Time.setDeltaProvider(() -> 3f);

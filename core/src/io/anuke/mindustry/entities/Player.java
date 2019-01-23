@@ -26,12 +26,14 @@ import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock.CoreEntity;
@@ -107,6 +109,31 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     @Override
     public void hitboxTile(Rectangle rectangle){
         rectangle.setSize(mech.hitsize * 2f / 3f).setCenter(x, y);
+    }
+
+    @Override
+    public void onRespawn(Tile tile){
+        boostHeat = 1f;
+        achievedFlight = true;
+    }
+
+    @Override
+    public void move(float x, float y){
+        if(!mech.flying){
+            EntityQuery.collisions().move(this, x, y);
+        }else{
+            moveBy(x, y);
+        }
+    }
+
+    @Override
+    public boolean collidesGrid(int x, int y){
+        Tile tile = world.tile(x, y);
+        if(!isFlying()) return true;
+        if(!mech.flying && tile != null && !tile.block().synthetic() && tile.block().solid){
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -304,7 +331,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         Floor floor = getFloorOn();
 
         Draw.color();
-        Draw.alpha(hitTime / hitDuration);
+        Draw.alpha(Draw.getShader() != Shaders.mix ? 1f : hitTime / hitDuration);
 
         if(!mech.flying){
             if(floor.isLiquid){
@@ -422,7 +449,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 Lines.stroke(2f, Palette.removeBack);
 
                 float rad = Mathf.absin(Time.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
-
                 Lines.square(
                 request.x * tilesize + block.offset(),
                 request.y * tilesize + block.offset() - 1,
@@ -435,21 +461,28 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
                 request.y * tilesize + block.offset(),
                 rad);
             }else{
-                //draw place request
-                Lines.stroke(2f, Palette.accentBack);
+                float rad = Mathf.absin(Time.time(), 7f, 1f) - 1.5f + request.block.size * tilesize / 2f;
 
-                float rad = Mathf.absin(Time.time(), 7f, 1f) - 2f + request.recipe.result.size * tilesize / 2f;
+                //draw place request
+                Lines.stroke(1f, Palette.accentBack);
 
                 Lines.square(
-                request.x * tilesize + request.recipe.result.offset(),
-                request.y * tilesize + request.recipe.result.offset() - 1,
+                request.x * tilesize + request.block.offset(),
+                request.y * tilesize + request.block.offset() - 1,
                 rad);
+
+                Draw.color();
+
+                Draw.rect(request.block.icon(Icon.full),
+                        request.x * tilesize + request.block.offset(),
+                        request.y * tilesize + request.block.offset(), rad*2, rad*2, request.rotation * 90);
+
 
                 Draw.color(Palette.accent);
 
                 Lines.square(
-                request.x * tilesize + request.recipe.result.offset(),
-                request.y * tilesize + request.recipe.result.offset(),
+                request.x * tilesize + request.block.offset(),
+                request.y * tilesize + request.block.offset(),
                 rad);
             }
         }

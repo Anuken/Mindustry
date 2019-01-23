@@ -15,6 +15,7 @@ import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
@@ -45,13 +46,10 @@ public class DesktopInput extends InputHandler{
         if(validPlace(x, y, block, rotation)){
             Draw.color();
 
-            TextureRegion[] regions = block.getBlockIcon();
-
-            for(TextureRegion region : regions){
-                Draw.rect(region, x * tilesize + block.offset(), y * tilesize + block.offset(),
-                        region.getWidth() * selectScale * Draw.scl,
-                        region.getHeight() * selectScale * Draw.scl, block.rotate ? rotation * 90 : 0);
-            }
+            TextureRegion region = block.icon(Icon.full);
+            Draw.rect(region, x * tilesize + block.offset(), y * tilesize + block.offset(),
+                    region.getWidth() * selectScale * Draw.scl,
+                    region.getHeight() * selectScale * Draw.scl, block.rotate ? rotation * 90 : 0);
         }else{
             Draw.color(Palette.removeBack);
             Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1, block.size * tilesize / 2f);
@@ -62,7 +60,7 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public boolean isDrawing(){
-        return mode != none || recipe != null;
+        return mode != none || block != null;
     }
 
     @Override
@@ -72,22 +70,30 @@ public class DesktopInput extends InputHandler{
         int cursorY = tileY(Core.input.mouseY());
 
         //draw selection(s)
-        if(mode == placing && recipe != null){
+        if(mode == placing && block != null){
             NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, true, maxLength);
 
-            for(int i = 0; i <= result.getLength(); i += recipe.result.size){
+            for(int i = 0; i <= result.getLength(); i += block.size){
                 int x = selectX + i * Mathf.sign(cursorX - selectX) * Mathf.num(result.isX());
                 int y = selectY + i * Mathf.sign(cursorY - selectY) * Mathf.num(!result.isX());
 
-                if(i + recipe.result.size > result.getLength() && recipe.result.rotate){
-                    Draw.color(!validPlace(x, y, recipe.result, result.rotation) ? Palette.remove : Palette.placeRotate);
-                    Draw.rect(Core.atlas.find("place-arrow"), x * tilesize + recipe.result.offset(),
-                            y * tilesize + recipe.result.offset(),
-                    Core.atlas.find("place-arrow").getWidth() * Draw.scl, Core.atlas.find("place-arrow").getHeight() * Draw.scl,
-                    x * tilesize + recipe.result.offset()/2f, 0f, result.rotation * 90 - 90);
+                if(i + block.size > result.getLength() && block.rotate){
+                    Draw.color(!validPlace(x, y, block, result.rotation) ? Palette.removeBack : Palette.accentBack);
+                    Draw.rect(Core.atlas.find("place-arrow"),
+                        x * tilesize + block.offset(),
+                        y * tilesize + block.offset() - 1,
+                        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+                        Core.atlas.find("place-arrow").getHeight() * Draw.scl, result.rotation * 90 - 90);
+
+                    Draw.color(!validPlace(x, y, block, result.rotation) ? Palette.remove : Palette.accent);
+                    Draw.rect(Core.atlas.find("place-arrow"),
+                        x * tilesize + block.offset(),
+                        y * tilesize + block.offset(),
+                        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+                        Core.atlas.find("place-arrow").getHeight() * Draw.scl, result.rotation * 90 - 90);
                 }
 
-                drawPlace(x, y, recipe.result, result.rotation);
+                drawPlace(x, y, block, result.rotation);
             }
 
             Draw.reset();
@@ -113,16 +119,23 @@ public class DesktopInput extends InputHandler{
             Draw.color(Palette.remove);
             Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
         }else if(isPlacing()){
-            if(recipe.result.rotate){
-                Draw.color(!validPlace(cursorX, cursorY, recipe.result, rotation) ? Palette.remove : Palette.placeRotate);
-                Draw.rect(Core.atlas.find("place-arrow"), cursorX * tilesize + recipe.result.offset(),
-                        cursorY * tilesize + recipe.result.offset(),
-                Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-                Core.atlas.find("place-arrow").getHeight() * Draw.scl,
-                cursorX * tilesize + recipe.result.offset()/2f, 0, rotation * 90 - 90);
+            if(block.rotate){
+                Draw.color(!validPlace(cursorX, cursorY, block, rotation) ? Palette.removeBack : Palette.accentBack);
+                Draw.rect(Core.atlas.find("place-arrow"),
+                    cursorX * tilesize + block.offset(),
+                    cursorY * tilesize + block.offset() - 1,
+                    Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+                    Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
+
+                Draw.color(!validPlace(cursorX, cursorY, block, rotation) ? Palette.remove : Palette.accent);
+                Draw.rect(Core.atlas.find("place-arrow"),
+                    cursorX * tilesize + block.offset(),
+                    cursorY * tilesize + block.offset(),
+                    Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+                    Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
             }
-            drawPlace(cursorX, cursorY, recipe.result, rotation);
-            recipe.result.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, recipe.result, rotation));
+            drawPlace(cursorX, cursorY, block, rotation);
+            block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
         }
 
         Draw.reset();
@@ -167,7 +180,7 @@ public class DesktopInput extends InputHandler{
             selectScale = 0f;
         }
 
-        rotation = Mathf.mod(rotation + (int) Core.input.axis(Binding.rotate), 4);
+        rotation = Mathf.mod(rotation + (int) Core.input.axisTap(Binding.rotate), 4);
 
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
@@ -221,13 +234,13 @@ public class DesktopInput extends InputHandler{
             }else if(!ui.chatfrag.chatOpen()){ //if it's out of bounds, shooting is just fine
                 player.isShooting = true;
             }
-        }else if(Core.input.keyTap(Binding.deselect) && (recipe != null || mode != none || player.isBuilding()) &&
+        }else if(Core.input.keyTap(Binding.deselect) && (block != null || mode != none || player.isBuilding()) &&
         !(player.getCurrentRequest() != null && player.getCurrentRequest().breaking && Core.keybinds.get(Binding.deselect) == Core.keybinds.get(Binding.break_block))){
-            if(recipe == null){
+            if(block == null){
                 player.clearBuilding();
             }
 
-            recipe = null;
+            block = null;
             mode = none;
         }else if(Core.input.keyTap(Binding.break_block) && !Core.scene.hasMouse()){
             //is recalculated because setting the mode to breaking removes potential multiblock cursor offset
@@ -239,10 +252,10 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
 
-            if(mode == placing && recipe != null){ //touch up while placing, place everything in selection
+            if(mode == placing && block != null){ //touch up while placing, place everything in selection
                 NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, true, maxLength);
 
-                for(int i = 0; i <= result.getLength(); i += recipe.result.size){
+                for(int i = 0; i <= result.getLength(); i += block.size){
                     int x = selectX + i * Mathf.sign(cursorX - selectX) * Mathf.num(result.isX());
                     int y = selectY + i * Mathf.sign(cursorY - selectY) * Mathf.num(!result.isX());
 
@@ -284,11 +297,6 @@ public class DesktopInput extends InputHandler{
     @Override
     public float getMouseY(){
         return !controlling ? Core.input.mouseY() : controly;
-    }
-
-    @Override
-    public boolean isCursorVisible(){
-        return controlling;
     }
 
     @Override

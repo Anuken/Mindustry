@@ -4,11 +4,14 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.Sort;
+import io.anuke.arc.entities.EntityDraw;
+import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -57,7 +60,7 @@ public class BlockRenderer{
     public void drawShadows(){
         if(disableShadows) return;
 
-        if(shadows.getWidth() != Core.graphics.getWidth() || shadows.getHeight() != Core.graphics.getHeight()){
+        if(!Core.graphics.isHidden() && (shadows.getWidth() != Core.graphics.getWidth() || shadows.getHeight() != Core.graphics.getHeight())){
             shadows.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         }
 
@@ -70,7 +73,16 @@ public class BlockRenderer{
         shadows.begin();
         Core.graphics.clear(Color.CLEAR);
         Draw.color(shadowColor);
+        floor.beginDraw();
+        floor.drawLayer(CacheLayer.walls);
+        floor.endDraw();
         drawBlocks(Layer.shadow);
+
+        EntityDraw.drawWith(playerGroup, player -> !player.isDead(), Unit::draw);
+        for(EntityGroup group : unitGroups){
+            EntityDraw.drawWith(group, unit -> !unit.isDead(), Unit::draw);
+        }
+
         Draw.color();
         Draw.flush();
         shadows.end();
@@ -110,11 +122,11 @@ public class BlockRenderer{
                 Tile tile = world.rawTile(x, y);
                 Block block = tile.block();
 
-                if(!expanded && block != Blocks.air && world.isAccessible(x, y)){
+                if(!expanded && block != Blocks.air && block.cacheLayer == CacheLayer.normal && world.isAccessible(x, y)){
                     tile.block().drawShadow(tile);
                 }
 
-                if(block != Blocks.air){
+                if(block != Blocks.air && block.cacheLayer == CacheLayer.normal){
                     if(!expanded){
                         addRequest(tile, Layer.shadow);
                         addRequest(tile, Layer.block);
@@ -139,6 +151,10 @@ public class BlockRenderer{
         lastCamY = avgy;
         lastRangeX = rangex;
         lastRangeY = rangey;
+
+        floor.beginDraw();
+        floor.drawLayer(CacheLayer.walls);
+        floor.endDraw();
     }
 
     public void drawBlocks(Layer stopAt){
@@ -154,8 +170,13 @@ public class BlockRenderer{
 
             if(req.layer == Layer.shadow){
                 block.drawShadow(req.tile);
-            }else  if(req.layer == Layer.block){
+            }else if(req.layer == Layer.block){
                 block.draw(req.tile);
+                if(block.synthetic() && req.tile.getTeam() != players[0].getTeam()){
+                    Draw.color(req.tile.getTeam().color);
+                    Draw.rect("block-border", req.tile.drawx() - block.size * tilesize/2f + 4, req.tile.drawy() - block.size * tilesize/2f + 4);
+                    Draw.color();
+                }
             }else if(req.layer == block.layer){
                 block.drawLayer(req.tile);
             }else if(req.layer == block.layer2){

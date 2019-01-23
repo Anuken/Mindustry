@@ -30,7 +30,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     public float fluxiness = 0f;
     /**drill hardness of the item*/
     public int hardness = 0;
-    /**the burning color of this item*/
+    /**the burning color of this item. TODO unused; implement*/
     public Color flameColor = Palette.darkFlame.cpy();
     /**
      * base material cost of this item, used for calculating place times
@@ -49,7 +49,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
 
         if(!Core.bundle.has("item." + this.name + ".name")){
             Log.err("Warning: item '" + name + "' is missing a localized name. Add the following to bundle.properties:");
-            Log.err("item." + this.name + ".name=" + Strings.capitalize(name.replace('-', '_')));
+            Log.err("item." + this.name + ".name = " + Strings.capitalize(name.replace('-', '_')));
         }
     }
 
@@ -97,11 +97,8 @@ public class Item extends UnlockableContent implements Comparable<Item>{
         return ContentType.item;
     }
 
+    /**Allocates a new array containing all items the generate ores.*/
     public static Array<Item> getAllOres(){
-        Array<Item> arr = new Array<>();
-        for(Item item : Vars.content.items()){
-            if(item.genOre) arr.add(item);
-        }
-        return arr;
+        return Vars.content.items().select(i -> i.genOre);
     }
 }

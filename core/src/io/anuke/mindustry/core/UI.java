@@ -47,7 +47,7 @@ public class UI implements ApplicationListener{
     public LoadingFragment loadfrag;
 
     public AboutDialog about;
-    public RestartDialog restart;
+    public GameOverDialog restart;
     public CustomGameDialog levels;
     public MapsDialog maps;
     public LoadDialog load;
@@ -64,16 +64,17 @@ public class UI implements ApplicationListener{
     public TraceDialog traces;
     public ChangelogDialog changelog;
     public LocalPlayerDialog localplayers;
-    public UnlocksDialog unlocks;
+    public DatabaseDialog database;
     public ContentInfoDialog content;
     public DeployDialog deploy;
+    public TechTreeDialog tech;
 
     public Cursor drillCursor, unloadCursor;
 
     public UI(){
         Skin skin = new Skin(Core.atlas);
         generateFonts(skin);
-        skin.load(Core.files.internal("ui/uiskin.json"));
+        skin.load(Core.files.internal("sprites/uiskin.json"));
 
         for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
             font.setUseIntegerPositions(true);
@@ -158,13 +159,13 @@ public class UI implements ApplicationListener{
 
         editor = new MapEditorDialog();
         controls = new ControlsDialog();
-        restart = new RestartDialog();
+        restart = new GameOverDialog();
         join = new JoinDialog();
         discord = new DiscordDialog();
         load = new LoadDialog();
         levels = new CustomGameDialog();
         language = new LanguageDialog();
-        unlocks = new UnlocksDialog();
+        database = new DatabaseDialog();
         settings = new SettingsMenuDialog();
         host = new HostDialog();
         paused = new PausedDialog();
@@ -177,6 +178,7 @@ public class UI implements ApplicationListener{
         localplayers = new LocalPlayerDialog();
         content = new ContentInfoDialog();
         deploy = new DeployDialog();
+        tech = new TechTreeDialog();
 
         Group group = Core.scene.root;
 
@@ -236,7 +238,7 @@ public class UI implements ApplicationListener{
         Table table = new Table();
         table.setFillParent(true);
         table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.removeActor());
-        table.top().add(info).padTop(8);
+        table.top().add(info).padTop(40);
         Core.scene.add(table);
     }
 

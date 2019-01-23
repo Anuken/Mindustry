@@ -88,9 +88,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         return type.drag;
     }
 
-    /**Called when a command is recieved from the command center.*/
-    public abstract void onCommand(UnitCommand command);
-
     /**Initialize the type and team of this unit. Only call once!*/
     public void init(UnitType type, Team team){
         if(this.type != null) throw new RuntimeException("This unit is already initialized!");

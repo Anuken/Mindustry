@@ -11,12 +11,8 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Teams;
-import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
@@ -33,8 +29,14 @@ public class Logic implements ApplicationListener{
 
     public Logic(){
         Events.on(TileChangeEvent.class, event -> {
-            if(event.tile.getTeam() == defaultTeam && Recipe.getByResult(event.tile.block()) != null){
-                handleContent(Recipe.getByResult(event.tile.block()));
+            if(event.tile.getTeam() == defaultTeam && event.tile.block().isVisible()){
+                handleContent(event.tile.block());
+            }
+        });
+
+        Events.on(WaveEvent.class, event -> {
+            if(world.isZone()){
+                data.updateWaveScore(world.getZone(), state.wave);
             }
         });
     }
@@ -65,9 +67,11 @@ public class Logic implements ApplicationListener{
     public void reset(){
         state.wave = 1;
         state.wavetime = state.rules.waveSpacing;
-        state.gameOver = false;
+        state.gameOver = state.launched = false;
         state.teams = new Teams();
         state.rules = new Rules();
+        state.rules.spawns = Waves.getDefaultSpawns();
+        state.stats = new Stats();
 
         Time.clear();
         Entities.clear();

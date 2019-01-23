@@ -1,6 +1,7 @@
 package io.anuke.mindustry.game;
 
 import io.anuke.annotations.Annotations.Serialize;
+import io.anuke.arc.collection.Array;
 
 /**Defines current rules on how the game should function.
  * Does not store game state, just configuration.*/
@@ -24,4 +25,8 @@ public class Rules{
     public float respawnTime = 60 * 4;
     /**Time between waves in ticks.*/
     public float waveSpacing = 60 * 60;
+    /**Zone ID, -1 for invalid zone.*/
+    public byte zone = -1;
+    /**Spawn layout. Since only zones modify this, it should be assigned on save load.*/
+    public transient Array<SpawnGroup> spawns = new Array<>();
 }

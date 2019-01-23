@@ -12,5 +12,9 @@ public abstract class Generator{
 
     public Generator(){}
 
+    public void init(){
+
+    }
+
     public abstract void generate(Tile[][] tiles);
 }

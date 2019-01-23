@@ -22,7 +22,8 @@ import io.anuke.mindustry.world.blocks.Floor;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class FloorRenderer{
     private final static int chunksize = 64;
@@ -156,7 +157,11 @@ public class FloorRenderer{
                 Tile tile = world.tile(tilex, tiley);
 
                 if(tile != null){
-                    used.add(tile.floor().cacheLayer);
+                    if(tile.block().cacheLayer != CacheLayer.normal){
+                        used.add(tile.block().cacheLayer);
+                    }else{
+                        used.add(tile.floor().cacheLayer);
+                    }
                 }
             }
         }
@@ -183,7 +188,9 @@ public class FloorRenderer{
                     floor = tile.floor();
                 }
 
-                if(floor.cacheLayer == layer){
+                if(tile.block().cacheLayer == layer && layer == CacheLayer.walls){
+                    tile.block().draw(tile);
+                }else if(floor.cacheLayer == layer && tile.block().cacheLayer != CacheLayer.walls){
                     floor.draw(tile);
                 }
             }

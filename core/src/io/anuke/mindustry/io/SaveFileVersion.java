@@ -9,12 +9,14 @@ import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.MappableContent;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
+import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -33,11 +35,11 @@ public abstract class SaveFileVersion{
         long time = stream.readLong();
         long playtime = stream.readLong();
         int build = stream.readInt();
-        byte mode = stream.readByte();
+
+        Rules rules = Serialization.readRules(stream);
         String map = stream.readUTF();
         int wave = stream.readInt();
-        byte difficulty = stream.readByte();
-        return new SaveMeta(version, time, playtime, build, mode, map, wave, Difficulty.values()[difficulty]);
+        return new SaveMeta(version, time, playtime, build, map, wave, rules);
     }
 
     public void writeMap(DataOutputStream stream) throws IOException{
@@ -99,7 +101,7 @@ public abstract class SaveFileVersion{
 
             Tile tile = new Tile(x, y, floorid, wallid);
 
-            if(wallid == Blocks.blockpart.id){
+            if(wallid == Blocks.part.id){
                 tile.link = stream.readByte();
             }else if(tile.entity != null){
                 byte tr = stream.readByte();
@@ -122,7 +124,7 @@ public abstract class SaveFileVersion{
                 tile.entity.readConfig(stream);
                 tile.entity.read(stream);
 
-                if(tile.block() == Blocks.core){
+                if(tile.block() instanceof CoreBlock){
                     state.teams.get(t).cores.add(tile);
                 }
             }else if(wallid == 0){

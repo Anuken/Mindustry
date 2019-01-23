@@ -101,11 +101,8 @@ public class Conduit extends LiquidBlock{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
-        if(icon == null){
-            icon = new TextureRegion[]{Core.atlas.find("conduit-bottom"), Core.atlas.find(name + "-top-0")};
-        }
-        return icon;
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find("conduit-bottom"), Core.atlas.find(name + "-top-0")};
     }
 
     @Override

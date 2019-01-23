@@ -1,5 +1,6 @@
 package io.anuke.mindustry.graphics;
 
+//TODO implement effects again
 public enum CacheLayer{
     water{
     },
@@ -9,7 +10,9 @@ public enum CacheLayer{
     },
     space{
     },
-    normal;
+    normal,
+    walls{ //TODO implement walls
+    };
 
     public void begin(){
 

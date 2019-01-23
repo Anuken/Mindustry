@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.LongArray;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
@@ -48,7 +47,6 @@ public class Conveyor extends Block{
         layer = Layer.overlay;
         group = BlockGroup.transportation;
         hasItems = true;
-        autoSleep = true;
         itemCapacity = 4;
     }
 
@@ -122,11 +120,8 @@ public class Conveyor extends Block{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
-        if(icon == null){
-            icon = new TextureRegion[]{Core.atlas.find(name + "-0-0")};
-        }
-        return super.getIcon();
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name + "-0-0")};
     }
 
     @Override
@@ -208,8 +203,6 @@ public class Conveyor extends Block{
                     pos.x = 0f;
                 }
                 pos.x = Mathf.lerpDelta(pos.x, 0, 0.1f);
-            }else{
-                pos.x = Mathf.lerpDelta(pos.x, pos.seed / offsetScl, 0.1f);
             }
 
             pos.y = Mathf.clamp(pos.y);
@@ -294,7 +287,7 @@ public class Conveyor extends Block{
         ConveyorEntity entity = tile.entity();
 
         for(int i = amount - 1; i >= 0; i--){
-            long result = ItemPos.packItem(item, 0f, i * itemSpace, (byte) Mathf.random(255));
+            long result = ItemPos.packItem(item, 0f, i * itemSpace);
             entity.convey.insert(0, result);
             entity.items.add(item, 1);
         }
@@ -322,7 +315,7 @@ public class Conveyor extends Block{
 
         ConveyorEntity entity = tile.entity();
         entity.noSleep();
-        long result = ItemPos.packItem(item, y * 0.9f, pos, (byte) Mathf.random(255));
+        long result = ItemPos.packItem(item, y * 0.9f, pos);
 
         tile.entity.items.add(item, 1);
 
@@ -337,17 +330,6 @@ public class Conveyor extends Block{
         //this item must be greater than anything there...
         entity.convey.add(result);
         entity.lastInserted = (byte)(entity.convey.size-1);
-    }
-
-    @Override
-    public Array<Object> getDebugInfo(Tile tile){
-        ConveyorEntity entity = tile.entity();
-        Array<Object> arr = super.getDebugInfo(tile);
-        arr.addAll(Array.<Object>with(
-            "clogHeat", entity.clogHeat,
-            "sleeping", entity.isSleeping()
-        ));
-        return arr;
     }
 
     @Override
@@ -399,17 +381,15 @@ public class Conveyor extends Block{
 
         Item item;
         float x, y;
-        byte seed;
 
         private ItemPos(){
         }
 
-        static long packItem(Item item, float x, float y, byte seed){
+        static long packItem(Item item, float x, float y){
             short[] shorts = packShorts;
             shorts[0] = (short) item.id;
             shorts[1] = (short) (x * Short.MAX_VALUE);
             shorts[2] = (short) ((y - 1f) * Short.MAX_VALUE);
-            shorts[3] = seed;
             return Pack.longShorts(shorts);
         }
 
@@ -419,13 +399,11 @@ public class Conveyor extends Block{
             short itemid = values[0];
             float x = values[1] / (float) Short.MAX_VALUE;
             float y = ((float) values[2]) / Short.MAX_VALUE + 1f;
-            byte seed = (byte) values[3];
 
             byte[] bytes = writeByte;
             bytes[0] = (byte) itemid;
             bytes[1] = (byte) (x * 127);
             bytes[2] = (byte) (y * 255 - 128);
-            bytes[3] = seed;
 
             return Pack.intBytes(bytes);
         }
@@ -436,13 +414,11 @@ public class Conveyor extends Block{
             byte itemid = values[0];
             float x = values[1] / 127f;
             float y = ((int) values[2] + 128) / 255f;
-            byte seed = values[3];
 
             short[] shorts = writeShort;
             shorts[0] = (short) itemid;
             shorts[1] = (short) (x * Short.MAX_VALUE);
             shorts[2] = (short) ((y - 1f) * Short.MAX_VALUE);
-            shorts[3] = seed;
             return Pack.longShorts(shorts);
         }
 
@@ -456,12 +432,11 @@ public class Conveyor extends Block{
 
             x = values[1] / (float) Short.MAX_VALUE;
             y = ((float) values[2]) / Short.MAX_VALUE + 1f;
-            seed = (byte) values[3];
             return this;
         }
 
         long pack(){
-            return packItem(item, x, y, seed);
+            return packItem(item, x, y);
         }
     }
 }

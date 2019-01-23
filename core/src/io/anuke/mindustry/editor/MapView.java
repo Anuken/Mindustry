@@ -2,6 +2,7 @@ package io.anuke.mindustry.editor;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.GridBits;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
@@ -18,19 +19,19 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.ui.GridImage;
+import io.anuke.mindustry.world.Pos;
 
-import static io.anuke.mindustry.Vars.mobile;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class MapView extends Element implements GestureListener{
     private MapEditor editor;
     private EditorTool tool = EditorTool.pencil;
     private OperationStack stack = new OperationStack();
     private DrawOperation op;
+    private GridBits used;
     private Bresenham2 br = new Bresenham2();
     private boolean updated = false;
     private float offsetx, offsety;
@@ -86,7 +87,12 @@ public class MapView extends Element implements GestureListener{
                 mousex = x;
                 mousey = y;
 
-                op = new DrawOperation(editor.getMap());
+                op = new DrawOperation();
+                if(used == null || used.width() != world.width() || used.height() != world.height()){
+                    used = new GridBits(world.width(), world.height());
+                }else{
+                    used.clear();
+                }
 
                 updated = false;
 
@@ -146,7 +152,7 @@ public class MapView extends Element implements GestureListener{
 
                 Point2 p = project(x, y);
 
-                if(drawing && tool.draggable){
+                if(drawing && tool.draggable && !(p.x == lastx && p.y == lasty)){
                     ui.editor.resetSaved();
                     Array<Point2> points = br.line(lastx, lasty, p.x, p.y);
                     for(Point2 point : points){
@@ -196,12 +202,13 @@ public class MapView extends Element implements GestureListener{
         }
     }
 
-    public void addTileOp(TileOperation t){
-        op.addOperation(t);
+    public void addTileOp(int xy, byte type, byte from, byte to){
+        used.set(Pos.x(xy), Pos.y(xy));
+        op.addOperation(xy, type, from, to);
     }
 
     public boolean checkForDuplicates(short x, short y){
-        return op.checkDuplicate(x, y);
+        return used.get(x, y);
     }
 
     @Override
@@ -227,12 +234,12 @@ public class MapView extends Element implements GestureListener{
     }
 
     private Point2 project(float x, float y){
-        float ratio = 1f / ((float) editor.getMap().width() / editor.getMap().height());
+        float ratio = 1f / ((float) world.width() / world.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
         float sclheight = size * zoom * ratio;
-        x = (x - getWidth() / 2 + sclwidth / 2 - offsetx * zoom) / sclwidth * editor.getMap().width();
-        y = (y - getHeight() / 2 + sclheight / 2 - offsety * zoom) / sclheight * editor.getMap().height();
+        x = (x - getWidth() / 2 + sclwidth / 2 - offsetx * zoom) / sclwidth * world.width();
+        y = (y - getHeight() / 2 + sclheight / 2 - offsety * zoom) / sclheight * world.height();
 
         if(editor.getDrawBlock().size % 2 == 0 && tool != EditorTool.eraser){
             return Tmp.g1.set((int) (x - 0.5f), (int) (y - 0.5f));
@@ -242,26 +249,26 @@ public class MapView extends Element implements GestureListener{
     }
 
     private Vector2 unproject(int x, int y){
-        float ratio = 1f / ((float) editor.getMap().width() / editor.getMap().height());
+        float ratio = 1f / ((float) world.width() / world.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
         float sclheight = size * zoom * ratio;
-        float px = ((float) x / editor.getMap().width()) * sclwidth + offsetx * zoom - sclwidth / 2 + getWidth() / 2;
-        float py = ((float) (y) / editor.getMap().height()) * sclheight
+        float px = ((float) x / world.width()) * sclwidth + offsetx * zoom - sclwidth / 2 + getWidth() / 2;
+        float py = ((float) (y) / world.height()) * sclheight
                 + offsety * zoom - sclheight / 2 + getHeight() / 2;
         return vec.set(px, py);
     }
 
     @Override
     public void draw(){
-        float ratio = 1f / ((float) editor.getMap().width() / editor.getMap().height());
+        float ratio = 1f / ((float) world.width() / world.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
         float sclheight = size * zoom * ratio;
         float centerx = x + width / 2 + offsetx * zoom;
         float centery = y + height / 2 + offsety * zoom;
 
-        image.setImageSize(editor.getMap().width(), editor.getMap().height());
+        image.setImageSize(world.width(), world.height());
 
         if(!ScissorStack.pushScissors(rect.set(x, y, width, height))){
             return;
@@ -292,7 +299,7 @@ public class MapView extends Element implements GestureListener{
             }
         }
 
-        float scaling = zoom * Math.min(width, height) / editor.getMap().width();
+        float scaling = zoom * Math.min(width, height) / world.width();
 
         Draw.color(Palette.accent);
         Lines.stroke(Unit.dp.scl(1f * zoom));

@@ -7,7 +7,7 @@ import io.anuke.mindustry.type.ItemType;
 
 public class Items implements ContentList{
     public static Item scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium, phasefabric, surgealloy,
-            biomatter, sand, blastCompound, pyratite, bioglass;
+            biomatter, sand, blastCompound, pyratite, metaglass;
 
     @Override
     public void load(){
@@ -24,6 +24,11 @@ public class Items implements ContentList{
             hardness = 1;
             cost = 0.9f;
             genOre = true;
+        }};
+
+        metaglass = new Item("metaglass", Color.valueOf("648b55")){{
+            type = ItemType.material;
+            cost = 2f;
         }};
 
         graphite = new Item("graphite", Color.valueOf("b2c6d2")){{
@@ -55,7 +60,7 @@ public class Items implements ContentList{
         }};
 
         scrap = new Item("scrap", Color.valueOf("777777")){{
-
+            genOre = true;
         }};
 
         silicon = new Item("silicon", Color.valueOf("53565c")){{
@@ -98,11 +103,6 @@ public class Items implements ContentList{
         pyratite = new Item("pyratite", Color.valueOf("ffaa5f")){{
             flammability = 0.7f;
             explosiveness = 0.2f;
-        }};
-
-        bioglass = new Item("bioglass", Color.valueOf("648b55")){{
-            type = ItemType.material;
-            cost = 2f;
         }};
     }
 }

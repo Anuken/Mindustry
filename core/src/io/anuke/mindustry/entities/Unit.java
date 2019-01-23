@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.Events;
 import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.impl.DestructibleEntity;
 import io.anuke.arc.entities.trait.DamageTrait;
@@ -17,6 +18,7 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.game.EventType.UnitDestroyEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.net.Interpolator;
@@ -73,6 +75,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     @Override
+    public boolean collidesGrid(int x, int y){
+        return !isFlying();
+    }
+
+    @Override
     public void setCarrier(CarryTrait carrier){
         this.carrier = carrier;
     }
@@ -121,6 +128,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         inventory.clear();
         drownTime = 0f;
         status.clear();
+        Events.fire(new UnitDestroyEvent(this));
     }
 
     @Override
@@ -217,6 +225,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return tile == null ? (Floor) Blocks.air : tile.floor();
     }
 
+    public void onRespawn(Tile tile){}
+
     @Override
     public boolean isValid(){
         return !isDead() && isAdded();
@@ -239,8 +249,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         velocity.limit(maxVelocity()).scl(1f + (status.getSpeedMultiplier()-1f) * Time.delta());
 
         if(isFlying()){
-            x += velocity.x * Time.delta();
-            y += velocity.y * Time.delta();
+            move(velocity.x * Time.delta(), velocity.y * Time.delta());
         }else{
             boolean onLiquid = floor.isLiquid;
 

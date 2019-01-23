@@ -5,15 +5,21 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
 import io.anuke.mindustry.ai.WaveSpawner;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -22,6 +28,8 @@ import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.Maps;
 import io.anuke.mindustry.maps.generators.Generator;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
@@ -178,6 +186,8 @@ public class World implements ApplicationListener{
             }
         }
 
+        addDarkness(tiles);
+
         EntityQuery.resizeTree(0, 0, tiles.length * tilesize, tiles[0].length * tilesize);
 
         generating = false;
@@ -186,6 +196,32 @@ public class World implements ApplicationListener{
 
     public boolean isGenerating(){
         return generating;
+    }
+
+    public void launchZone(){
+        Effects.effect(Fx.launchFull, 0, 0);
+
+        for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+            Effects.effect(Fx.launch, tile);
+        }
+
+        Time.runTask(30f, () -> {
+            for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+                for(Item item : content.items()){
+                    data.addItem(item, tile.entity.items.get(item));
+                }
+                world.removeBlock(tile);
+            }
+            state.launched = true;
+        });
+    }
+
+    public boolean isZone(){
+        return getZone() != null;
+    }
+
+    public Zone getZone(){
+        return content.getByID(ContentType.zone, state.rules.zone);
     }
 
     public void playZone(Zone zone){
@@ -198,6 +234,8 @@ public class World implements ApplicationListener{
                     core.entity.items.add(stack.item, stack.amount);
                 }
             }
+            state.rules.zone = zone.id;
+            control.saves.zoneSave();
             logic.play();
         });
     }
@@ -394,11 +432,58 @@ public class World implements ApplicationListener{
             for(int x = 0; x < data.width(); x++){
                 data.read(marker);
 
-                tiles[x][y] = new Tile(x, y, marker.floor, marker.wall == Blocks.blockpart.id ? 0 : marker.wall, marker.rotation, marker.team);
+                tiles[x][y] = new Tile(x, y, marker.floor, marker.wall == Blocks.part.id ? 0 : marker.wall, marker.rotation, marker.team);
             }
         }
 
         prepareTiles(tiles);
+    }
+
+    public void addDarkness(Tile[][] tiles){
+
+        byte[][] dark = new byte[tiles.length][tiles[0].length];
+        byte[][] writeBuffer = new byte[tiles.length][tiles[0].length];
+
+        byte darkIterations = 4;
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
+                if(tile.block().solid && !tile.block().update){
+                    dark[x][y] = darkIterations;
+                }
+            }
+        }
+
+        for(int i = 0; i < darkIterations; i++){
+            for(int x = 0; x < tiles.length; x++){
+                for(int y = 0; y < tiles[0].length; y++){
+                    boolean min = false;
+                    for(Point2 point : Geometry.d4){
+                        int newX = x + point.x, newY = y + point.y;
+                        if(Structs.inBounds(newX, newY, tiles) && dark[newX][newY] < dark[x][y]){
+                            min = true;
+                            break;
+                        }
+                    }
+                    writeBuffer[x][y] = (byte)Math.max(0, dark[x][y] - Mathf.num(min));
+                }
+            }
+
+            for(int x = 0; x < tiles.length; x++){
+                for(int y = 0; y < tiles[0].length; y++){
+                    dark[x][y] = writeBuffer[x][y];
+                }
+            }
+        }
+
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
+                if(tile.block().solid && !tile.block().update){
+                    tiles[x][y].setRotation(dark[x][y]);
+                }
+            }
+        }
     }
 
     /**'Prepares' a tile array by:<br>

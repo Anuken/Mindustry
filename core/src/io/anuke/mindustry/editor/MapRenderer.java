@@ -8,9 +8,11 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Pack;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.IndexedRenderer;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -22,7 +24,6 @@ public class MapRenderer implements Disposable{
     private IntSet delayedUpdates = new IntSet();
     private MapEditor editor;
     private int width, height;
-    private Color tmpColor = Color.WHITE.cpy();
 
     public MapRenderer(MapEditor editor){
         this.editor = editor;
@@ -109,33 +110,38 @@ public class MapRenderer implements Disposable{
 
         TextureRegion region;
 
-        if(bw != 0){
-            region = wall.getEditorIcon();
+        int idxWall = (wx % chunksize) + (wy % chunksize) * chunksize;
+        int idxDecal = (wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize;
+
+        if(bw != 0 && (wall.synthetic() || wall == Blocks.part)){
+            region = wall.icon(Icon.full) == Core.atlas.find("____") ? Core.atlas.find("clear") : wall.icon(Icon.full);
 
             if(wall.rotate){
-                mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
+                mesh.draw(idxWall, region,
                         wx * tilesize + wall.offset(), wy * tilesize + wall.offset(),
                         region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, rotation * 90 - 90);
             }else{
-                mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
+                mesh.draw(idxWall, region,
                         wx * tilesize + wall.offset() + (tilesize - region.getWidth() * Draw.scl)/2f,
                         wy * tilesize + wall.offset() + (tilesize - region.getHeight() * Draw.scl)/2f,
                         region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
             }
         }else{
-            region = floor.getEditorIcon();
+            region = floor.icon(Icon.full);
 
-            mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
+            mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
         }
 
         if(wall.update || wall.destructible){
             mesh.setColor(team.color);
             region = Core.atlas.find("block-border");
+        }else if(!wall.synthetic() && bw != 0){
+            region = wall.icon(Icon.full) == Core.atlas.find("____") ? Core.atlas.find("clear") : wall.icon(Icon.full);
         }else{
             region = Core.atlas.find("clear");
         }
 
-        mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize, region,
+        mesh.draw(idxDecal, region,
                 wx * tilesize - (wall.size/3) * tilesize, wy * tilesize - (wall.size/3) * tilesize,
                 region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
         mesh.setColor(Color.WHITE);

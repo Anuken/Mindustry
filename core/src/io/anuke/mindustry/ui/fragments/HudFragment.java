@@ -4,7 +4,6 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.Element;
@@ -13,7 +12,6 @@ import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.scene.ui.Label;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -24,12 +22,12 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
@@ -76,7 +74,7 @@ public class HudFragment extends Fragment{
                         if(Net.active()){
                             i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-players");
                         }else{
-                            i.setDisabled(Net.active());
+                            i.setDisabled(false);
                             i.getStyle().imageUp = Core.scene.skin.getDrawable(state.is(State.paused) ? "icon-play" : "icon-pause");
                         }
                     }).get();
@@ -89,7 +87,7 @@ public class HudFragment extends Fragment{
                                 ui.chatfrag.toggle();
                             }
                         }else{
-                            ui.unlocks.show();
+                            ui.database.show();
                         }
                     }).update(i -> {
                         if(Net.active() && mobile){
@@ -131,7 +129,6 @@ public class HudFragment extends Fragment{
             //fps display
             infolabel = cont.table(t -> {
                 IntFormat fps = new IntFormat("fps");
-                IntFormat tps = new IntFormat("tps");
                 IntFormat ping = new IntFormat("ping");
                 t.label(() -> fps.get(Core.graphics.getFramesPerSecond())).padRight(10);
                 t.row();
@@ -199,6 +196,9 @@ public class HudFragment extends Fragment{
                 .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f))));
         });
 
+        parent.fill(t -> t.top().right().addRowImageTextButton("$launch", "icon-arrow-up", 8*3, () -> world.launchZone())
+            .size(94f, 70f).visible(() -> world.isZone() && world.getZone().metCondition()));
+
         //'saving' indicator
         parent.fill(t -> {
             t.bottom().visible(() -> !state.is(State.menu) && control.saves.isSaving());
@@ -230,7 +230,9 @@ public class HudFragment extends Fragment{
     }
 
     /** Show unlock notification for a new recipe. */
-    public void showUnlock(Recipe recipe){
+    public void showUnlock(UnlockableContent content){
+        //some content may not have icons... yet
+        if(content.getContentIcon() == null) return;
 
         //if there's currently no unlock notification...
         if(lastUnlockTable == null){
@@ -247,14 +249,10 @@ public class HudFragment extends Fragment{
             Table in = new Table();
 
             //create texture stack for displaying
-            Stack stack = new Stack();
-            for(TextureRegion region : recipe.result.getCompactIcon()){
-                Image image = new Image(region);
-                image.setScaling(Scaling.fit);
-                stack.add(image);
-            }
+            Image image = new Image(content.getContentIcon());
+            image.setScaling(Scaling.fit);
 
-            in.add(stack).size(48f).pad(2);
+            in.add(image).size(48f).pad(2);
 
             //add to table
             table.add(in).padRight(8);
@@ -290,11 +288,6 @@ public class HudFragment extends Fragment{
             //get size of each element
             float size = 48f / Math.min(elements.size + 1, col);
 
-            //correct plurals if needed
-            if(esize == 1){
-                ((Label) lastUnlockLayout.getParent().find(e -> e instanceof Label)).setText("$unlocked.plural");
-            }
-
             lastUnlockLayout.clearChildren();
             lastUnlockLayout.defaults().size(size).pad(2);
 
@@ -309,14 +302,10 @@ public class HudFragment extends Fragment{
             //if there's space, add it
             if(esize < cap){
 
-                Stack stack = new Stack();
-                for(TextureRegion region : recipe.result.getCompactIcon()){
-                    Image image = new Image(region);
-                    image.setScaling(Scaling.fit);
-                    stack.add(image);
-                }
+                Image image = new Image(content.getContentIcon());
+                image.setScaling(Scaling.fit);
 
-                lastUnlockLayout.add(stack);
+                lastUnlockLayout.add(image);
             }else{ //else, add a specific icon to denote no more space
                 lastUnlockLayout.addImage("icon-add");
             }
@@ -364,20 +353,32 @@ public class HudFragment extends Fragment{
         IntFormat wavef = new IntFormat("wave");
         IntFormat enemyf = new IntFormat("wave.enemy");
         IntFormat enemiesf = new IntFormat("wave.enemies");
+        IntFormat waitingf = new IntFormat("wave.waiting");
 
         table.clearChildren();
         table.touchable(Touchable.enabled);
 
-        table.labelWrap(() ->
-                (state.enemies() > 0 && !state.rules.waveTimer ?
-                wavef.get(state.wave) + "\n" + (state.enemies() == 1 ?
-                    enemyf.get(state.enemies()) :
-                    enemiesf.get(state.enemies())) :
-                wavef.get(state.wave) + "\n" +
-                    (state.rules.waveTimer ?
-                    Core.bundle.format("wave.waiting", (int)(state.wavetime/60)) :
-                    Core.bundle.get("waiting")))
-        ).growX().pad(8f);
+        StringBuilder builder = new StringBuilder();
+
+        table.labelWrap(() -> {
+            builder.setLength(0);
+            builder.append(wavef.get(state.wave));
+            builder.append("\n");
+
+            if(state.enemies() > 0 && !state.rules.waveTimer){
+                if(state.enemies() == 1){
+                    builder.append(enemyf.get(state.enemies()));
+                }else{
+                    builder.append(enemiesf.get(state.enemies()));
+                }
+            }else if(state.rules.waveTimer){
+                builder.append(waitingf.get((int)(state.wavetime/60)));
+            }else{
+                builder.append(Core.bundle.get("waiting"));
+            }
+
+            return builder;
+        }).growX().pad(8f);
 
         table.setDisabled(true);
         table.visible(() -> state.rules.waves);

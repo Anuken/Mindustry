@@ -1,8 +1,11 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.graphics.Color;
 import io.anuke.annotations.Annotations.ReadClass;
 import io.anuke.annotations.Annotations.WriteClass;
+import io.anuke.arc.entities.Effects;
+import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.arc.entities.Entities;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.bullet.Bullet;
@@ -12,7 +15,6 @@ import io.anuke.mindustry.entities.traits.CarriableTrait;
 import io.anuke.mindustry.entities.traits.CarryTrait;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.entities.units.BaseUnit;
-import io.anuke.mindustry.entities.units.UnitCommand;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.net.Packets.KickReason;
@@ -20,9 +22,6 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.entities.Entities;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -173,7 +172,7 @@ public class TypeIO{
             buffer.put(request.breaking ? (byte) 1 : 0);
             buffer.putInt(Pos.get(request.x, request.y));
             if(!request.breaking){
-                buffer.put(request.recipe.id);
+                buffer.put(request.block.id);
                 buffer.put((byte) request.rotation);
             }
         }
@@ -191,9 +190,9 @@ public class TypeIO{
             if(type == 1){ //remove
                 currentRequest = new BuildRequest(Pos.x(position), Pos.y(position));
             }else{ //place
-                byte recipe = buffer.get();
+                byte block = buffer.get();
                 byte rotation = buffer.get();
-                currentRequest = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.recipe(recipe));
+                currentRequest = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.block(block));
             }
 
             reqs[i] = (currentRequest);
@@ -230,16 +229,6 @@ public class TypeIO{
     @ReadClass(AdminAction.class)
     public static AdminAction readAction(ByteBuffer buffer){
         return AdminAction.values()[buffer.get()];
-    }
-
-    @WriteClass(UnitCommand.class)
-    public static void writeCommand(ByteBuffer buffer, UnitCommand reason){
-        buffer.put((byte) reason.ordinal());
-    }
-
-    @ReadClass(UnitCommand.class)
-    public static UnitCommand readCommand(ByteBuffer buffer){
-        return UnitCommand.values()[buffer.get()];
     }
 
     @WriteClass(Effect.class)
@@ -311,16 +300,6 @@ public class TypeIO{
     public static Item readItem(ByteBuffer buffer){
         byte id = buffer.get();
         return id == -1 ? null : content.item(id);
-    }
-
-    @WriteClass(Recipe.class)
-    public static void writeRecipe(ByteBuffer buffer, Recipe recipe){
-        buffer.put(recipe.id);
-    }
-
-    @ReadClass(Recipe.class)
-    public static Recipe readRecipe(ByteBuffer buffer){
-        return content.recipe(buffer.get());
     }
 
     @WriteClass(String.class)

@@ -48,7 +48,7 @@ public class AboutDialog extends FloatingDialog{
                 continue;
             }
 
-            Table table = new Table("underline-2");
+            Table table = new Table("underline");
             table.margin(0);
             table.table(img -> {
                 img.addImage("white").height(h - 5).width(40f).color(link.color);

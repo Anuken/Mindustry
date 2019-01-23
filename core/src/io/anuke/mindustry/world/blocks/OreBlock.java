@@ -2,10 +2,8 @@ package io.anuke.mindustry.world.blocks;
 
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -17,7 +15,7 @@ public class OreBlock extends Floor{
     public OreBlock(Item ore, Floor base){
         super("ore-" + ore.name + "-" + base.name);
         this.formalName = ore.localizedName() + " " + base.formalName;
-        this.drops = new ItemStack(ore, 1);
+        this.itemDrop = ore;
         this.base = base;
         this.variants = 3;
         this.minimapColor = ore.color;
@@ -28,15 +26,7 @@ public class OreBlock extends Floor{
 
     @Override
     public String getDisplayName(Tile tile){
-        return drops.item.localizedName();
-    }
-
-    @Override
-    public TextureRegion getEditorIcon(){
-        if(editorIcon == null){
-            editorIcon = variantRegions[0];
-        }
-        return editorIcon;
+        return itemDrop.localizedName();
     }
 
     @Override
