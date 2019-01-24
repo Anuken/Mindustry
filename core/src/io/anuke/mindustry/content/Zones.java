@@ -59,6 +59,8 @@ public class Zones implements ContentList{
         }};
 
         craters = new Zone("craters", new MapGenerator("craters", 1){{ distortion = 1.44f; }}){{ //TODO implement
+            alwaysUnlocked = true;
+
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
@@ -68,7 +70,39 @@ public class Zones implements ContentList{
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 80;
+                waveSpacing = 60 * 60;
+                spawns = Array.with(
+                    new SpawnGroup(UnitTypes.dagger){{
+                        unitScaling = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.crawler){{
+                        begin = 5;
+                        unitAmount = 2;
+                        spacing = 2;
+                        unitScaling = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 10;
+                        unitScaling = 1;
+                    }},
+
+                    new SpawnGroup(UnitTypes.crawler){{
+                        begin = 15;
+                        unitScaling = 1;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 20;
+                        unitScaling = 1;
+                    }},
+
+                    new SpawnGroup(UnitTypes.crawler){{
+                        begin = 25;
+                        unitScaling = 1;
+                    }}
+                );
             }};
         }};
 

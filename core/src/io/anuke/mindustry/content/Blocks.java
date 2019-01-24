@@ -32,8 +32,8 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, part, spawn, space, metalfloor, deepwater, water, tar, stone, craters, blackstone, dirt, sand, ice, snow,
-    grass, shrub, rock, icerock, blackrock, rocks,
+    air, part, spawn, space, metalfloor, deepwater, water, tar, stone, craters, charr, blackstone, dirt, sand, ice, snow,
+    grass, shrub, rock, icerock, blackrock, rocks, pine,
 
     //crafting
     siliconSmelter, plastaniumCompressor, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -156,6 +156,10 @@ public class Blocks implements ContentList{
             minimapColor = Color.valueOf("323232");
         }};
 
+        charr = new Floor("char"){{
+            minimapColor = Color.valueOf("323232");
+        }};
+
         blackstone = new Floor("blackstone"){{
             minimapColor = Color.valueOf("252525");
             playerUnmineable = true;
@@ -206,6 +210,11 @@ public class Blocks implements ContentList{
 
         rocks = new StaticWall("rocks"){{
             variants = 2;
+        }};
+
+        pine = new StaticWall("pine"){{
+            //fillsTile = false;
+            variants = 0;
         }};
 
         //endregion

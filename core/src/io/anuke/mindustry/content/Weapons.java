@@ -5,7 +5,7 @@ import io.anuke.mindustry.type.Weapon;
 
 public class Weapons implements ContentList{
     public static Weapon blaster, blasterSmall, glaiveBlaster, droneBlaster, healBlaster, healBlasterDrone, chainBlaster, shockgun,
-    swarmer, bomber, bomberTrident, flakgun, flamethrower, missiles, artillery, laserBurster, healBlasterDrone2;
+    swarmer, bomber, bomberTrident, flakgun, flamethrower, missiles, artillery, laserBurster, healBlasterDrone2, suicideBomb;
 
     @Override
     public void load(){
@@ -125,6 +125,12 @@ public class Weapons implements ContentList{
             shake = 2f;
             ejectEffect = Fx.shellEjectMedium;
             ammo = Bullets.artilleryUnit;
+        }};
+
+        suicideBomb = new Weapon("bomber"){{
+            reload = 12f;
+            ejectEffect = Fx.none;
+            ammo = Bullets.explode;
         }};
 
         bomber = new Weapon("bomber"){{

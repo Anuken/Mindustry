@@ -50,7 +50,7 @@ public class StatusEffect extends Content{
         }
 
         if(effect != Fx.none && Mathf.chance(Time.delta() * 0.15f)){
-            Effects.effect(Fx.overdriven, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+            Effects.effect(effect, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
         }
     }
 

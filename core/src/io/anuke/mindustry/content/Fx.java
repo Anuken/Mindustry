@@ -665,10 +665,10 @@ public class Fx implements ContentList{
             Draw.reset();
         });
 
-        shootSmallFlame = new Effect(30f, e -> {
+        shootSmallFlame = new Effect(32f, e -> {
             Draw.color(Palette.lightFlame, Palette.darkFlame, Color.GRAY, e.fin());
 
-            Angles.randLenVectors(e.id, 8, e.finpow() * 36f, e.rotation, 10f, (x, y) -> {
+            Angles.randLenVectors(e.id, 8, e.finpow() * 44f, e.rotation, 10f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.5f);
             });
 

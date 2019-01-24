@@ -9,7 +9,7 @@ public class UnitTypes implements ContentList{
     public static UnitType
         spirit, phantom,
         wraith, ghoul, revenant,
-        dagger, titan, fortress;
+        dagger, crawler, titan, fortress;
 
     @Override
     public void load(){
@@ -31,6 +31,16 @@ public class UnitTypes implements ContentList{
             mass = 1.75f;
             weapon = Weapons.chainBlaster;
             health = 130;
+        }};
+
+        crawler = new UnitType("crawler", Crawler.class, Crawler::new){{
+            maxVelocity = 1.1f;
+            speed = 0.22f;
+            drag = 0.4f;
+            hitsize = 8f;
+            mass = 1.75f;
+            weapon = Weapons.suicideBomb;
+            health = 100;
         }};
 
         titan = new UnitType("titan", Titan.class, Titan::new){{

@@ -10,6 +10,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.entities.Damage;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
@@ -48,7 +49,7 @@ public class Bullets implements ContentList{
     fireball, basicFlame, fuseShot, driverBolt, healBullet, frag,
 
     //bombs
-    bombExplosive, bombIncendiary, bombOil;
+    bombExplosive, bombIncendiary, bombOil, explode;
 
     @Override
     public void load(){
@@ -413,6 +414,8 @@ public class Bullets implements ContentList{
                 lifetime = 35f;
                 pierce = true;
                 drag = 0.05f;
+                statusDuration = 60f * 4;
+                shootEffect = Fx.shootSmallFlame;
                 hitEffect = Fx.hitFlameSmall;
                 despawnEffect = Fx.none;
                 status = StatusEffects.burning;
@@ -627,6 +630,35 @@ public class Bullets implements ContentList{
                 hitEffect = Fx.pulverize;
                 backColor = new Color(0x4f4f4fff);
                 frontColor = Color.GRAY;
+            }
+
+            @Override
+            public void hit(Bullet b, float x, float y){
+                super.hit(b, x, y);
+
+                for(int i = 0; i < 3; i++){
+                    Tile tile = world.tileWorld(x + Mathf.range(8f), y + Mathf.range(8f));
+                    Puddle.deposit(tile, Liquids.oil, 5f);
+                }
+            }
+        };
+
+        explode = new BombBulletType(2f, 3f, "clear"){{
+                hitEffect = Fx.pulverize;
+                lifetime = 20f;
+                speed = 1f;
+                splashDamageRadius = 60f;
+                splashDamage = 30f;
+            }
+
+            @Override
+            public void init(Bullet b){
+                if(b.getOwner() instanceof Unit){
+                    Unit unit = (Unit)b.getOwner();
+
+                    unit.damage(unit.maxHealth() + 1);
+                }
+                b.time(b.lifetime());
             }
 
             @Override

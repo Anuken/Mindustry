@@ -76,6 +76,8 @@ public class Block extends BlockStorage{
     public int timers = 0;
     /** Cache layer. Only used for 'cached' rendering. */
     public CacheLayer cacheLayer = CacheLayer.normal;
+    /**Special flag; if false, floor will be drawn under this block even if it is cached.*/
+    public boolean fillsTile = true;
     /** Layer to draw extra stuff on. */
     public Layer layer = null;
     /** Extra layer to draw extra extra stuff on. */
@@ -243,7 +245,7 @@ public class Block extends BlockStorage{
 
     @Override
     public TextureRegion getContentIcon(){
-        return icon(Icon.medium);
+        return icon(Icon.large);
     }
 
     @Override

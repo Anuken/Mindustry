@@ -450,7 +450,7 @@ public class World implements ApplicationListener{
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
-                if(tile.block().solid && !tile.block().update){
+                if(tile.block().solid && !tile.block().update && tile.block().fillsTile){
                     dark[x][y] = darkIterations;
                 }
             }

@@ -26,7 +26,7 @@ public class DeployDialog extends FloatingDialog{
         shown(this::setup);
     }
 
-    void setup(){
+    public void setup(){
         buttons.clear();
         cont.clear();
 
@@ -106,8 +106,8 @@ public class DeployDialog extends FloatingDialog{
                                             for(Zone other : zone.zoneRequirements){
                                                 r.addImage("icon-zone").padRight(4);
                                                 r.add(other.localizedName()).color(Color.LIGHT_GRAY);
-                                                r.addImage(data.isCompleted(zone) ? "icon-check-2" : "icon-cancel-2")
-                                                .color(data.isCompleted(zone) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
+                                                r.addImage(data.isCompleted(other) ? "icon-check-2" : "icon-cancel-2")
+                                                .color(data.isCompleted(other) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
                                                 r.row();
                                             }
                                         });
@@ -205,6 +205,10 @@ public class DeployDialog extends FloatingDialog{
     }
 
     boolean canUnlock(Zone zone){
+        if(data.isUnlocked(zone)){
+            return true;
+        }
+
         for(Zone other : zone.zoneRequirements){
             if(!data.isCompleted(other)){
                 return false;

@@ -64,6 +64,7 @@ public class TechTreeDialog extends FloatingDialog{
         }
 
         shown(() -> checkNodes(root));
+        hidden(ui.deploy::setup);
         addCloseButton();
     }
 

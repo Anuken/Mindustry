@@ -94,6 +94,10 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
         create(type, null, Team.none, x, y, angle);
     }
 
+    public Entity getOwner(){
+        return owner;
+    }
+
     public boolean collidesTiles(){
         return type.collidesTiles;
     }
