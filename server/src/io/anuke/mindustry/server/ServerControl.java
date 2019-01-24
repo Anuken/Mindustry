@@ -63,6 +63,11 @@ public class ServerControl implements ApplicationListener{
             DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");
 
             @Override
+            public void debug(String text, Object... args){
+                print("&lc&fb" + "[DEBUG] " + text, args);
+            }
+
+            @Override
             public void info(String text, Object... args){
                 print("&lg&fb" + "[INFO] " + text, args);
             }

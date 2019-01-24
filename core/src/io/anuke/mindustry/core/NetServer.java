@@ -156,7 +156,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            Log.info("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, connection.address);
+            Log.debug("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, connection.address);
 
             String ip = Net.getConnection(id).address;
 
@@ -234,7 +234,7 @@ public class NetServer implements ApplicationListener{
         data.stream = new ByteArrayInputStream(stream.toByteArray());
         Net.sendStream(clientID, data);
 
-        Log.info("Packed {0} compressed bytes of world data.", stream.size());
+        Log.debug("Packed {0} compressed bytes of world data.", stream.size());
     }
 
     public static void onDisconnect(Player player){
@@ -340,13 +340,13 @@ public class NetServer implements ApplicationListener{
     public static void onAdminRequest(Player player, Player other, AdminAction action){
 
         if(!player.isAdmin){
-            Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
+            Log.warn("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
                     player.name, player.con.address);
             return;
         }
 
         if(other == null || ((other.isAdmin && !player.isLocal) && other != player)){
-            Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
+            Log.warn("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
             return;
         }
 
