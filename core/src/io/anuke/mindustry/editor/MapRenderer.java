@@ -6,6 +6,7 @@ import io.anuke.arc.collection.IntSet.IntSetIterator;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
@@ -128,7 +129,7 @@ public class MapRenderer implements Disposable{
                         region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
             }
         }else{
-            region = floor.icon(Icon.full);
+            region = floor.variantRegions()[Mathf.randomSeed(idxWall, 0, floor.variantRegions().length-1)];
 
             mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
         }

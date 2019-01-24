@@ -33,7 +33,7 @@ public class Blocks implements ContentList{
 
     //environment
     air, part, spawn, space, metalfloor, deepwater, water, tar, stone, craters, charr, blackstone, dirt, sand, ice, snow,
-    grass, shrub, rock, icerock, blackrock, rocks, pine,
+    grass, shrub, rock, icerock, blackrock, rocks, cliffs, pine,
 
     //crafting
     siliconSmelter, graphitePress, plastaniumCompressor, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -154,6 +154,7 @@ public class Blocks implements ContentList{
 
         craters = new Floor("craters"){{
             minimapColor = Color.valueOf("323232");
+            variants = 6;
         }};
 
         charr = new Floor("char"){{
@@ -198,6 +199,11 @@ public class Blocks implements ContentList{
 
         rock = new Rock("rock"){{
             variants = 2;
+        }};
+
+        cliffs = new StaticWall("cliffs"){{
+            variants = 1;
+            fillsTile = false;
         }};
 
         icerock = new Rock("icerock"){{

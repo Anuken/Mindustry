@@ -186,7 +186,7 @@ public class FloorRenderer{
 
                 if(tile.block().cacheLayer == layer && layer == CacheLayer.walls){
                     tile.block().draw(tile);
-                }else if(floor.cacheLayer == layer && (tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
+                }else if(floor.cacheLayer == layer && (world.isAccessible(tile.x,tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
                     floor.draw(tile);
                 }
             }
@@ -201,7 +201,7 @@ public class FloorRenderer{
         int chunksx = Mathf.ceil((float) (world.width()) / chunksize),
         chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
         cache = new Chunk[chunksx][chunksy];
-        SpriteCache sprites = new SpriteCache(world.width() * world.height() * 2, (world.width() / chunksize) * (world.height() / chunksize) * 2, false);
+        SpriteCache sprites = new SpriteCache(world.width() * world.height() * 3, (world.width() / chunksize) * (world.height() / chunksize) * 2, false);
         cbatch = new CacheBatch(sprites);
 
         Time.mark();

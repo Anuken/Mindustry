@@ -74,6 +74,11 @@ public class Floor extends Block{
     }
 
     @Override
+    public TextureRegion[] variantRegions(){
+        return variantRegions;
+    }
+
+    @Override
     public void init(){
         super.init();
 

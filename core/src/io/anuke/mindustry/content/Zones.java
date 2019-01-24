@@ -58,7 +58,7 @@ public class Zones implements ContentList{
             }};
         }};
 
-        craters = new Zone("craters", new MapGenerator("craters", 1){{ distortion = 1.44f; }}){{
+        craters = new Zone("craters", new MapGenerator("craters", 1){{ distortion = 0; }}){{
             alwaysUnlocked = true;
 
             deployCost = ItemStack.with(Items.copper, 300);
@@ -91,6 +91,7 @@ public class Zones implements ContentList{
                     new SpawnGroup(UnitTypes.crawler){{
                         begin = 15;
                         unitScaling = 1;
+                        unitAmount = 2;
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
@@ -101,6 +102,7 @@ public class Zones implements ContentList{
                     new SpawnGroup(UnitTypes.crawler){{
                         begin = 25;
                         unitScaling = 1;
+                        unitAmount = 2;
                     }}
                 );
             }};
