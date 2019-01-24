@@ -237,6 +237,7 @@ public class World implements ApplicationListener{
                 }
             }
             state.rules.zone = zone.id;
+            state.set(State.playing);
             control.saves.zoneSave();
             logic.play();
         });

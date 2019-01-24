@@ -36,7 +36,7 @@ public class Blocks implements ContentList{
     grass, shrub, rock, icerock, blackrock, rocks, pine,
 
     //crafting
-    siliconSmelter, plastaniumCompressor, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
+    siliconSmelter, graphitePress, plastaniumCompressor, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, centrifuge, biomatterCompressor, pulverizer, incinerator,
 
     //sandbox
@@ -226,6 +226,21 @@ public class Blocks implements ContentList{
             craftEffect = Fx.smeltsmoke;
             result = Items.silicon;
             craftTime = 40f;
+            size = 2;
+            hasLiquids = false;
+            flameColor = Color.valueOf("ffef99");
+
+            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2));
+            consumes.power(0.05f);
+        }};
+
+        graphitePress = new PowerSmelter("graphite-press"){{
+            requirements(Category.crafting, ItemStack.with(Items.copper, 200, Items.lead, 50));
+
+            health = 90;
+            craftEffect = Fx.smeltsmoke;
+            result = Items.graphite;
+            craftTime = 50f;
             size = 2;
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");

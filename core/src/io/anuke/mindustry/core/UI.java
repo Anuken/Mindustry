@@ -238,7 +238,7 @@ public class UI implements ApplicationListener{
         Table table = new Table();
         table.setFillParent(true);
         table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.removeActor());
-        table.top().add(info).padTop(40);
+        table.top().add(info).padTop(10);
         Core.scene.add(table);
     }
 

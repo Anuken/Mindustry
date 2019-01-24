@@ -95,8 +95,8 @@ public class MapGenerator extends Generator{
 
                 int rad = 10, frad = 12;
 
-                for(int x = rad; x <= rad; x++){
-                    for(int y = rad; y <= rad; y++){
+                for(int x = -rad; x <= rad; x++){
+                    for(int y = -rad; y <= rad; y++){
                         int wx = x + point.x, wy = y + point.y;
                         double dst = Mathf.dst(x, y);
                         if(dst < frad && Structs.inBounds(wx, wy, tiles) && (dst <= rad || Mathf.chance(0.5))){
