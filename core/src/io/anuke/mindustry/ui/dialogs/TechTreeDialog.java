@@ -5,14 +5,10 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
-import io.anuke.arc.scene.event.InputEvent;
-import io.anuke.arc.scene.event.InputListener;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.ImageButton;
@@ -39,13 +35,12 @@ public class TechTreeDialog extends FloatingDialog{
     public TechTreeDialog(){
         super("");
 
-        cont.setFillParent(true);
-
         TreeLayout layout = new TreeLayout();
         layout.gapBetweenLevels = 60f;
         layout.gapBetweenNodes = 40f;
         layout.layout(root);
 
+        cont.setFillParent(true);
         cont.add(new View()).grow();
 
         { //debug code; TODO remove
@@ -74,10 +69,9 @@ public class TechTreeDialog extends FloatingDialog{
     }
 
     void checkNodes(TechTreeNode node){
-        boolean locked = locked(node);
+        boolean locked = locked(node.node);
         if(!locked) node.visible = true;
-        for(TreeNode child : node.children){
-            TechTreeNode l = (TechTreeNode)child;
+        for(TechTreeNode l : node.children){
             l.visible = !locked && l.node.block.isVisible();
             checkNodes(l);
         }
@@ -106,19 +100,15 @@ public class TechTreeDialog extends FloatingDialog{
         Core.scene.add(table);
     }
 
-    boolean locked(TreeNode node){
-        return locked(((TechTreeNode)node).node);
-    }
-
     boolean locked(TechNode node){
         return !data.isUnlocked(node.block);
     }
 
-    class TechTreeNode extends TreeNode{
+    class TechTreeNode extends TreeNode<TechTreeNode>{
         final TechNode node;
         boolean visible = true;
 
-        public TechTreeNode(TechNode node, TreeNode parent){
+        TechTreeNode(TechNode node, TechTreeNode parent){
             this.node = node;
             this.parent = parent;
             this.width = this.height = nodeSize;
@@ -135,7 +125,6 @@ public class TechTreeDialog extends FloatingDialog{
     class View extends Group{
         float panX = 0, panY = -200;
         boolean moved = false;
-        Rectangle clip = new Rectangle();
         ImageButton hoverNode;
         Table infoTable = new Table();
 
@@ -148,7 +137,7 @@ public class TechTreeDialog extends FloatingDialog{
                     if(mobile){
                         hoverNode = button;
                         rebuild();
-                    }else if(data.hasItems(node.node.requirements) && locked(node)){
+                    }else if(data.hasItems(node.node.requirements) && locked(node.node)){
                         unlock(node.node);
                     }
                 });
@@ -170,31 +159,18 @@ public class TechTreeDialog extends FloatingDialog{
                 button.setSize(nodeSize, nodeSize);
                 button.update(() -> {
                     button.setPosition(node.x + panX + width/2f, node.y + panY + height/2f, Align.center);
-                    button.getStyle().up = Core.scene.skin.getDrawable(!locked(node) ? "content-background" : "content-background-locked");
+                    button.getStyle().up = Core.scene.skin.getDrawable(!locked(node.node) ? "content-background" : "content-background-locked");
                     ((TextureRegionDrawable)button.getStyle().imageUp)
                         .setRegion(node.visible ? node.node.block.icon(Icon.medium) : Core.atlas.find("icon-tree-locked"));
-                    button.getImage().setColor(!locked(node) ? Color.WHITE : Color.GRAY);
+                    button.getImage().setColor(!locked(node.node) ? Color.WHITE : Color.GRAY);
                 });
                 addChild(button);
             }
 
-            addListener(new InputListener(){
-                float lastX, lastY;
-                @Override
-                public void touchDragged(InputEvent event, float mx, float my, int pointer){
-                    panX -= lastX - mx;
-                    panY -= lastY - my;
-                    lastX = mx;
-                    lastY = my;
-                    moved = true;
-                }
-
-                @Override
-                public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                    lastX = x;
-                    lastY = y;
-                    return true;
-                }
+            dragged((x, y) -> {
+                moved = true;
+                panX += x;
+                panY += y;
             });
         }
 
@@ -271,9 +247,9 @@ public class TechTreeDialog extends FloatingDialog{
         public void draw(){
             float offsetX = panX + width/2f + x, offsetY = panY + height/2f + y;
 
-            for(TreeNode node : nodes){
-                for(TreeNode child : node.children){
-                    Lines.stroke(3f, locked(node) || locked(child) ? Palette.locked : Palette.accent);
+            for(TechTreeNode node : nodes){
+                for(TechTreeNode child : node.children){
+                    Lines.stroke(3f, locked(node.node) || locked(child.node) ? Palette.locked : Palette.accent);
 
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }

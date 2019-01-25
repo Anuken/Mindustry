@@ -1,11 +1,23 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectIntMap;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.event.InputEvent;
+import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.style.TextureRegionDrawable;
+import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Structs;
+import io.anuke.mindustry.content.Zones;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO.SaveException;
@@ -13,15 +25,31 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.ui.TreeLayout;
+import io.anuke.mindustry.ui.TreeLayout.TreeNode;
+import io.anuke.mindustry.ui.dialogs.TechTreeDialog.TechTreeNode;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class DeployDialog extends FloatingDialog{
+    private static final float nodeSize = 250f;
+    private ZoneNode root;
+    private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
 
     public DeployDialog(){
-        super("$play");
+        super("");
+
+        root = new ZoneNode(Zones.groundZero, null);
+
+        TreeLayout layout = new TreeLayout();
+        layout.gapBetweenLevels = 40f;
+        layout.gapBetweenNodes = 40f;
+        layout.layout(root);
+
+        cont.setFillParent(true);
+        cont.add(new View()).grow();
 
         shown(this::setup);
     }
@@ -204,6 +232,11 @@ public class DeployDialog extends FloatingDialog{
         return false;
     }
 
+    @Override
+    protected void drawBackground(float x, float y){
+        drawDefaultBackground(x, y);
+    }
+
     boolean canUnlock(Zone zone){
         if(data.isUnlocked(zone)){
             return true;
@@ -222,5 +255,51 @@ public class DeployDialog extends FloatingDialog{
         }
 
         return data.hasItems(zone.itemRequirements);
+    }
+
+    static Array<Zone> arr = new Array<>();
+
+    class View extends Group{
+        float panX = 0, panY = -200;
+
+        {
+
+            for(ZoneNode node : nodes){
+                ImageButton button = new ImageButton("", "node");
+
+                button.setSize(nodeSize, nodeSize);
+                button.update(() -> {
+                    button.setPosition(node.x + panX + width/2f, node.y + panY + height/2f, Align.center);
+                    button.getStyle().up = Core.scene.skin.getDrawable(!locked(node.node) ? "content-background" : "content-background-locked");
+                    ((TextureRegionDrawable)button.getStyle().imageUp)
+                            .setRegion(node.visible ? node.node.block.icon(Icon.medium) : Core.atlas.find("icon-tree-locked"));
+                    button.getImage().setColor(!locked(node.node) ? Color.WHITE : Color.GRAY);
+                });
+                addChild(button);
+            }
+
+            dragged((x, y) -> {
+                panX += x;
+                panY += y;
+            });
+        }
+    }
+
+    class ZoneNode extends TreeNode<ZoneNode>{
+        final Zone zone;
+
+        ZoneNode(Zone zone, ZoneNode parent){
+            this.zone = zone;
+            this.parent = parent;
+            this.width = this.height = nodeSize;
+            nodes.add(this);
+
+            arr.selectFrom(content.zones(), other -> Structs.contains(other.zoneRequirements, zone));
+
+            children = new ZoneNode[arr.size];
+            for(int i = 0; i < children.length; i++){
+                children[i] = new ZoneNode(arr.get(i), this);
+            }
+        }
     }
 }
