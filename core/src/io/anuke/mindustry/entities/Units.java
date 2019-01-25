@@ -21,11 +21,10 @@ import static io.anuke.mindustry.Vars.*;
  */
 public class Units{
     private static Rectangle rect = new Rectangle();
-    private static Rectangle rectGraphics = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
     private static Unit result;
     private static float cdist;
-    private static boolean boolResult, boolResultGraphics;
+    private static boolean boolResult;
 
     /**
      * Validates a target.

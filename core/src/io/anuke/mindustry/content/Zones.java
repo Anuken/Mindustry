@@ -112,12 +112,12 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
-            zoneRequirements = new Zone[]{frozenForest};
+            zoneRequirements = new Zone[]{craters};
             blockRequirements = new Block[]{Blocks.copperWall};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 80;
+                waveSpacing = 60 * 60 * 2;
             }};
         }};
 

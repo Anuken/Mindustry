@@ -47,18 +47,18 @@ public class Mindustry extends ApplicationCore{
 
     @Override
     public void update(){
-        long lastFrameTime = Time.millis();
+        long lastFrameTime = Time.nanos();
 
         super.update();
 
         int fpsCap = Core.settings.getInt("fpscap", 125);
 
         if(fpsCap <= 120){
-            long target = 1000/fpsCap;
-            long elapsed = Time.timeSinceMillis(lastFrameTime);
+            long target = (1000 * 1000000)/fpsCap; //target in nanos
+            long elapsed = Time.timeSinceNanos(lastFrameTime);
             if(elapsed < target){
                 try{
-                    Thread.sleep(target - elapsed);
+                    Thread.sleep((target - elapsed) / 1000000, (int)((target - elapsed) % 1000000));
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }

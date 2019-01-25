@@ -145,7 +145,7 @@ public class Pathfinder{
     private void updateFrontier(Team team, long nsToRun){
         PathData path = paths[team.ordinal()];
 
-        long start = Time.nanoTime();
+        long start = Time.nanos();
 
         while(path.frontier.size > 0 && (nsToRun < 0 || Time.timeSinceNanos(start) <= nsToRun)){
             Tile tile = path.frontier.removeLast();
