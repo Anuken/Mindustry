@@ -20,6 +20,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class CustomGameDialog extends FloatingDialog{
     Difficulty difficulty = Difficulty.normal;
+    RulePreset lastPreset = RulePreset.survival;
 
     public CustomGameDialog(){
         super("$customgame");
@@ -30,6 +31,7 @@ public class CustomGameDialog extends FloatingDialog{
     }
 
     void setup(){
+        state.rules = lastPreset.get();
         cont.clear();
 
         Table maps = new Table();
@@ -48,10 +50,10 @@ public class CustomGameDialog extends FloatingDialog{
         modes.marginBottom(5);
 
         for(RulePreset mode : RulePreset.values()){
-
-            //todo fix presets
-            modes.addButton(mode.toString(), "toggle", () -> state.rules = mode.get())/*
-                .update(b -> b.setChecked(state.rules == mode))*/.group(group).size(140f, 54f);
+            modes.addButton(mode.toString(), "toggle", () -> {
+                state.rules = mode.get();
+                lastPreset = mode;
+            }).update(b -> b.setChecked(lastPreset == mode)).group(group).size(140f, 54f);
             if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);

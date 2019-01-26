@@ -48,7 +48,7 @@ public class UI implements ApplicationListener{
 
     public AboutDialog about;
     public GameOverDialog restart;
-    public CustomGameDialog levels;
+    public CustomGameDialog custom;
     public MapsDialog maps;
     public LoadDialog load;
     public DiscordDialog discord;
@@ -163,7 +163,7 @@ public class UI implements ApplicationListener{
         join = new JoinDialog();
         discord = new DiscordDialog();
         load = new LoadDialog();
-        levels = new CustomGameDialog();
+        custom = new CustomGameDialog();
         language = new LanguageDialog();
         database = new DatabaseDialog();
         settings = new SettingsMenuDialog();

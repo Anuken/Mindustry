@@ -111,7 +111,13 @@ public class MenuFragment extends Fragment{
             out.margin(16);
             out.defaults().size(w, 66f).padTop(5).padRight(5);
 
-            out.add(new MenuButton("icon-play-2", "$play", MenuFragment.this::showPlaySelect)).width(bw).colspan(2);
+            out.add(new MenuButton("icon-play-2", "$play", ui.deploy::show)).width(bw).colspan(2);
+
+            out.row();
+
+            out.add(new MenuButton("icon-add", "$joingame", ui.join::show));
+
+            out.add(new MenuButton("icon-play-custom", "$customgame", ui.custom::show));
 
             out.row();
 
@@ -129,42 +135,5 @@ public class MenuFragment extends Fragment{
 
             out.add(new MenuButton("icon-exit", "$quit", Core.app::exit)).width(bw).colspan(2);
         });
-    }
-
-    private void showPlaySelect(){
-        ui.deploy.show();
-
-        /*
-        float w = 220f;
-        float bw = w * 2f + 10f;
-
-        FloatingDialog dialog = new FloatingDialog("$play");
-        dialog.addCloseButton();
-        dialog.cont.defaults().height(66f).width(w).padRight(5f);
-
-        dialog.cont.add(new MenuButton("icon-play-2", "$map.random", () -> {
-            dialog.hide();
-            world.generator.playRandomMap();
-        })).width(bw).colspan(2);
-        dialog.cont.row();
-
-        dialog.cont.add(new MenuButton("icon-add", "$joingame", () -> {
-            ui.join.show();
-            dialog.hide();
-        }));
-
-        dialog.cont.add(new MenuButton("icon-editor", "$customgame", () -> {
-            dialog.hide();
-            ui.levels.show();
-        }));
-
-        dialog.cont.row();
-
-        dialog.cont.add(new MenuButton("icon-load", "$loadgame", () -> {
-            ui.load.show();
-            dialog.hide();
-        })).width(bw).colspan(2);
-
-        dialog.show();*/
     }
 }

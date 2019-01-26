@@ -152,7 +152,8 @@ public class CoreBlock extends LaunchPad{
             if(entity.items.get(item) >= launchThreshold + launchChunkSize && entity.timer.get(timerLaunch, launchTime)){
                 //TODO play animation of some sort
                 Effects.effect(Fx.dooropenlarge, tile);
-                data.addItem(item, launchChunkSize);
+                //items sent are split evenly across every player in the game
+                data.addItem(item, launchChunkSize / playerGroup.size());
                 entity.items.remove(item, launchChunkSize);
             }
         }

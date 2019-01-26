@@ -196,8 +196,8 @@ public class HudFragment extends Fragment{
                 .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f))));
         });
 
-        parent.fill(t -> t.top().right().addRowImageTextButton("$launch", "icon-arrow-up", 8*3, () -> world.launchZone())
-            .size(94f, 70f).visible(() -> world.isZone() && world.getZone().metCondition()));
+        parent.fill(t -> t.top().right().addRowImageTextButton("$launch", "icon-arrow-up", 8*3, Call::launchZone)
+            .size(94f, 70f).visible(() -> world.isZone() && world.getZone().metCondition() && !Net.client()));
 
         //'saving' indicator
         parent.fill(t -> {

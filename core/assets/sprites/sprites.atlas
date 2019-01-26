@@ -9463,6 +9463,13 @@ icon-play-2
   orig: 14, 14
   offset: 0, 0
   index: -1
+icon-play-custom
+  rotate: false
+  xy: 1887, 1303
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
 icon-players
   rotate: false
   xy: 594, 1832
@@ -9479,7 +9486,7 @@ icon-power-small
   index: -1
 icon-quit
   rotate: false
-  xy: 1887, 1303
+  xy: 1882, 1287
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9493,14 +9500,14 @@ icon-redo
   index: -1
 icon-refresh
   rotate: false
-  xy: 1882, 1287
+  xy: 1097, 849
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-rename
   rotate: false
-  xy: 1097, 849
+  xy: 1882, 1271
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9514,35 +9521,35 @@ icon-resize
   index: -1
 icon-rotate
   rotate: false
-  xy: 1882, 1271
+  xy: 1113, 849
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-rotate-arrow
   rotate: false
-  xy: 1113, 849
+  xy: 1882, 1255
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-rotate-left
   rotate: false
-  xy: 1882, 1255
+  xy: 1129, 849
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-rotate-right
   rotate: false
-  xy: 1129, 849
+  xy: 1145, 849
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-save
   rotate: false
-  xy: 1145, 849
+  xy: 1161, 849
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9584,7 +9591,7 @@ icon-terrain
   index: -1
 icon-tools
   rotate: false
-  xy: 1161, 849
+  xy: 1177, 849
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9605,7 +9612,7 @@ icon-touchDelete
   index: -1
 icon-trash
   rotate: false
-  xy: 1177, 849
+  xy: 1193, 849
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9633,14 +9640,14 @@ icon-tree-locked
   index: -1
 icon-trello
   rotate: false
-  xy: 1193, 849
+  xy: 1727, 1159
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-tutorial
   rotate: false
-  xy: 1727, 1159
+  xy: 1743, 1159
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9661,14 +9668,14 @@ icon-unlocked
   index: -1
 icon-unlocks
   rotate: false
-  xy: 1743, 1159
+  xy: 1759, 1159
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-wiki
   rotate: false
-  xy: 1759, 1159
+  xy: 1775, 1159
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9696,7 +9703,7 @@ icon-zoom
   index: -1
 icon-zoom-small
   rotate: false
-  xy: 1775, 1159
+  xy: 1791, 1159
   size: 14, 14
   orig: 14, 14
   offset: 0, 0

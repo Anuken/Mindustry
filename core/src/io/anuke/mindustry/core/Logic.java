@@ -4,15 +4,19 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
+import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Entities;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.util.Time;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
@@ -109,6 +113,25 @@ public class Logic implements ApplicationListener{
                 Events.fire(new GameOverEvent(alive));
             }
         }
+    }
+
+    @Remote(called = Loc.both)
+    public static void launchZone(){
+        Effects.effect(Fx.launchFull, 0, 0);
+
+        for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+            Effects.effect(Fx.launch, tile);
+        }
+
+        Time.runTask(30f, () -> {
+            for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+                for(Item item : content.items()){
+                    data.addItem(item, tile.entity.items.get(item) / playerGroup.size());
+                }
+                world.removeBlock(tile);
+            }
+            state.launched = true;
+        });
     }
 
     @Remote(called = Loc.both)
