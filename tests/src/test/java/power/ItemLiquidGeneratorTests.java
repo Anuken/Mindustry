@@ -7,12 +7,14 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.power.ItemLiquidGenerator;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 /**
@@ -123,7 +125,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     }
 
     void simulateItemConsumption(InputType inputType, Item item, int amount, String parameterDescription){
-        final float expectedEfficiency = Math.min(1.0f, amount > 0 ? item.flammability : 0f);
+        final float expectedEfficiency = amount > 0 ? item.flammability : 0f;
         final float expectedRemainingItemAmount = Math.max(0, amount - 1);
 
         createGenerator(inputType);

@@ -1,5 +1,6 @@
 package power;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.world.Tile;
@@ -21,8 +22,9 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
  */
 public class PowerTests extends PowerTestFixture{
 
-    @BeforeEach
-    void initTest(){
+    @BeforeAll
+    static void init(){
+        Core.graphics = new FakeGraphics();
     }
 
     @Nested

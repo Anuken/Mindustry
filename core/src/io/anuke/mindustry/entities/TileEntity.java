@@ -151,7 +151,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
         if(health <= 0){
             Call.onTileDestroyed(tile);
-        }else if(preHealth >= maxHealth() - 0.00001f && health < maxHealth()){ //when just damaged
+        }else if(preHealth >= maxHealth() - 0.00001f && health < maxHealth() && world != null){ //when just damaged
             world.indexer.notifyTileDamaged(this);
         }
     }

@@ -87,9 +87,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
             float used = Math.min(entity.liquids.get(liquid) * calculationDelta, maximumPossible);
 
             entity.liquids.remove(liquid, used);
-
-            // Note: 0.5 = 100%. PowerGraph will multiply this efficiency by two on its own.
-            entity.productionEfficiency = Mathf.clamp(baseLiquidEfficiency * used / maximumPossible);
+            entity.productionEfficiency = baseLiquidEfficiency * used / maximumPossible;
 
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
