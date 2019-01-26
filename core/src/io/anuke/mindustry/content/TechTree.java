@@ -117,40 +117,44 @@ public class TechTree implements ContentList{
                     });
                 });
 
-                node(siliconSmelter, () -> {
-
+                node(graphitePress, () -> {
                     node(pyratiteMixer, () -> {
                         node(blastMixer, () -> {
 
                         });
                     });
 
-                    node(biomatterCompressor, () -> {
-                        node(plastaniumCompressor, () -> {
-                            node(phaseWeaver, () -> {
+                    node(siliconSmelter, () -> {
 
-                            });
-                        });
-                    });
-
-                    node(incinerator, () -> {
-                        node(melter, () -> {
-                            node(surgeSmelter, () -> {
-
-                            });
-
-                            node(separator, () -> {
-                                node(pulverizer, () -> {
+                        node(biomatterCompressor, () -> {
+                            node(plastaniumCompressor, () -> {
+                                node(phaseWeaver, () -> {
 
                                 });
                             });
+                        });
 
-                            node(cryofluidMixer, () -> {
+                        node(incinerator, () -> {
+                            node(melter, () -> {
+                                node(surgeSmelter, () -> {
 
+                                });
+
+                                node(separator, () -> {
+                                    node(pulverizer, () -> {
+
+                                    });
+                                });
+
+                                node(cryofluidMixer, () -> {
+
+                                });
                             });
                         });
                     });
                 });
+
+
 
                 node(mechanicalPump, () -> {
                     node(conduit, () -> {

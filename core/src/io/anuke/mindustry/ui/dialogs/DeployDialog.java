@@ -29,13 +29,12 @@ import static io.anuke.mindustry.Vars.*;
 
 public class DeployDialog extends FloatingDialog{
     private static final float nodeSize = 250f;
-    private ZoneNode root;
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
 
     public DeployDialog(){
         super("");
 
-        root = new ZoneNode(Zones.groundZero, null);
+        ZoneNode root = new ZoneNode(Zones.groundZero, null);
 
         TreeLayout layout = new TreeLayout();
         layout.gapBetweenLevels = 40f;
@@ -43,20 +42,15 @@ public class DeployDialog extends FloatingDialog{
         layout.layout(root);
 
         cont.setFillParent(true);
-        cont.add(new View()).grow();
 
         addCloseButton();
         buttons.addImageTextButton("$techtree", "icon-tree", 16 * 2, () -> ui.tech.show()).size(230f, 64f);
 
-        //shown(this::setup);
+        shown(this::setup);
     }
 
     public void setup(){
-        buttons.clear();
         cont.clear();
-
-        addCloseButton();
-        buttons.addImageTextButton("$techtree", "icon-tree", 16 * 2, () -> ui.tech.show()).size(230f, 64f);
 
         cont.stack(new Table(){{
             top().left().margin(10);
@@ -71,7 +65,7 @@ public class DeployDialog extends FloatingDialog{
                 }
             }
 
-        }}, new Table(){{
+        }}, control.saves.getZoneSlot() == null ? new View() : new Table(){{
             SaveSlot slot = control.saves.getZoneSlot();
 
             TextButton[] b = {null};
@@ -243,8 +237,10 @@ public class DeployDialog extends FloatingDialog{
         }
     }
 
+    //should be static variables of View, but that's impossible
+    static float panX = 0, panY = -200;
+
     class View extends Group{
-        float panX = 0, panY = -200;
 
         {
             for(ZoneNode node : nodes){

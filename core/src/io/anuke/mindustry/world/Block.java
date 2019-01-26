@@ -13,6 +13,8 @@ import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Player;
@@ -280,6 +282,10 @@ public class Block extends BlockStorage{
         setStats();
 
         consumes.checkRequired(this);
+
+        if(buildRequirements.length > 0 && !Core.bundle.has("block." + name + ".name")){
+            Log.warn("No name for block '{0}' found. Add the following to bundle.properties:\nblock.{0}.name = {1}", name, Strings.capitalize(name));
+        }
     }
 
     @Override
