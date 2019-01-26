@@ -228,9 +228,8 @@ public class Blocks implements ContentList{
 
         siliconSmelter = new PowerSmelter("silicon-smelter"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 60, Items.lead, 50));
-            health = 90;
             craftEffect = Fx.smeltsmoke;
-            result = Items.silicon;
+            output = Items.silicon;
             craftTime = 40f;
             size = 2;
             hasLiquids = false;
@@ -240,19 +239,16 @@ public class Blocks implements ContentList{
             consumes.power(0.05f);
         }};
 
-        graphitePress = new PowerSmelter("graphite-press"){{
+        graphitePress = new GenericCrafter("graphite-press"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 200, Items.lead, 50));
 
-            health = 90;
-            craftEffect = Fx.smeltsmoke;
-            result = Items.graphite;
-            craftTime = 50f;
+            craftEffect = Fx.pulverizeMedium;
+            output = Items.graphite;
+            craftTime = 90f;
             size = 2;
-            hasLiquids = false;
-            flameColor = Color.valueOf("ffef99");
+            hasItems = true;
 
-            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2));
-            consumes.power(0.05f);
+            consumes.item(Items.coal, 2);
         }};
 
         plastaniumCompressor = new PlastaniumCompressor("plastanium-compressor"){{
@@ -275,7 +271,7 @@ public class Blocks implements ContentList{
         phaseWeaver = new PhaseWeaver("phase-weaver"){{
             requirements(Category.crafting, ItemStack.with(Items.silicon, 260, Items.lead, 240, Items.thorium, 150));
             craftEffect = Fx.smeltsmoke;
-            result = Items.phasefabric;
+            output = Items.phasefabric;
             craftTime = 120f;
             size = 2;
 
@@ -286,7 +282,7 @@ public class Blocks implements ContentList{
         surgeSmelter = new PowerSmelter("alloy-smelter"){{
             requirements(Category.crafting, ItemStack.with(Items.silicon, 160, Items.lead, 160, Items.thorium, 140));
             craftEffect = Fx.smeltsmoke;
-            result = Items.surgealloy;
+            output = Items.surgealloy;
             craftTime = 75f;
             size = 2;
 
@@ -327,7 +323,7 @@ public class Blocks implements ContentList{
             flameColor = Color.CLEAR;
             hasItems = true;
             hasPower = true;
-            result = Items.pyratite;
+            output = Items.pyratite;
 
             size = 2;
 

@@ -27,9 +27,8 @@ import static io.anuke.mindustry.Vars.content;
 
 public class PowerSmelter extends PowerBlock{
     protected final int timerDump = timers++;
-    protected final int timerCraft = timers++;
 
-    protected Item result;
+    protected Item output;
 
     protected float minFlux = 0.2f;
     protected int fluxNeeded = 1;
@@ -63,7 +62,7 @@ public class PowerSmelter extends PowerBlock{
 
         super.init();
 
-        produces.set(result);
+        produces.set(output);
     }
 
     @Override
@@ -76,7 +75,7 @@ public class PowerSmelter extends PowerBlock{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.outputItem, result);
+        stats.add(BlockStat.outputItem, output);
         stats.add(BlockStat.craftSpeed, 60f / craftTime, StatUnit.itemsSecond);
         stats.add(BlockStat.inputItemCapacity, itemCapacity, StatUnit.items);
         stats.add(BlockStat.outputItemCapacity, itemCapacity, StatUnit.items);
@@ -87,8 +86,8 @@ public class PowerSmelter extends PowerBlock{
 
         PowerSmelterEntity entity = tile.entity();
 
-        if(entity.timer.get(timerDump, 5) && entity.items.has(result)){
-            tryDump(tile, result);
+        if(entity.timer.get(timerDump, 5) && entity.items.has(output)){
+            tryDump(tile, output);
         }
 
         //heat it up if there's enough power
@@ -117,7 +116,7 @@ public class PowerSmelter extends PowerBlock{
 
         entity.craftTime += entity.delta() * entity.power.satisfaction;
 
-        if(entity.items.get(result) >= itemCapacity //output full
+        if(entity.items.get(output) >= itemCapacity //output full
                 || entity.heat <= minHeat //not burning
                 || entity.craftTime < craftTime*baseSmeltSpeed){ //not yet time
             return;
@@ -146,7 +145,7 @@ public class PowerSmelter extends PowerBlock{
             }
         }
 
-        offloadNear(tile, result);
+        offloadNear(tile, output);
         Effects.effect(craftEffect, flameColor, tile.drawx(), tile.drawy());
     }
 
