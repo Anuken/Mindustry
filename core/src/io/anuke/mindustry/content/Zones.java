@@ -237,7 +237,5 @@ public class Zones implements ContentList{
                 waveSpacing = 60 * 80;
             }};
         }};
-
-        frozenForest.zoneRequirements = new Zone[]{frozenForest};
     }
 }
