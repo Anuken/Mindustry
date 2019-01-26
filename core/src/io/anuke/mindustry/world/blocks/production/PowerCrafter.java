@@ -8,6 +8,8 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
 import io.anuke.mindustry.world.meta.BlockStat;
 
+/**Similar to GenericCrafter, but also optionally outputs liquids.
+ * TODO consolidate into one class*/
 public class PowerCrafter extends Block{
     protected final int timerDump = timers++;
     protected final int timerContentCheck = timers++;

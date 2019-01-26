@@ -45,6 +45,8 @@ public class Floor extends Block{
     public boolean hasOres = false;
     /** whether this block can be drowned in */
     public boolean isLiquid;
+    /** Heat of this block, 0 at baseline. Used for calculating output of thermal generators.*/
+    public float heat = 0f;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
     protected TextureRegion[] variantRegions;

@@ -5,7 +5,6 @@ import io.anuke.arc.Graphics.Cursor;
 import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.function.BooleanProvider;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -291,19 +290,6 @@ public class Block extends BlockStorage{
     @Override
     public void load(){
         region = Core.atlas.find(name);
-    }
-
-    /**Called when the world is resized.
-     * Call super!*/
-    public void transformLinks(Tile tile, int oldWidth, int oldHeight, int newWidth, int newHeight, int shiftX, int shiftY){
-        if(tile.entity != null && tile.entity.power != null){
-            IntArray links = tile.entity.power.links;
-            IntArray out = new IntArray();
-            for(int i = 0; i < links.size; i++){
-                out.add(world.transform(links.get(i), oldWidth, oldHeight, newWidth, shiftX, shiftY));
-            }
-            tile.entity.power.links = out;
-        }
     }
 
     /** Called when the block is tapped. */

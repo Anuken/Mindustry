@@ -36,7 +36,7 @@ public class Blocks implements ContentList{
     grass, shrub, rock, icerock, blackrock, rocks, cliffs, pine,
 
     //crafting
-    siliconSmelter, graphitePress, plastaniumCompressor, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
+    siliconSmelter, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, centrifuge, biomatterCompressor, pulverizer, incinerator,
 
     //sandbox
@@ -226,6 +226,33 @@ public class Blocks implements ContentList{
         //endregion
         //region crafting
 
+        graphitePress = new GenericCrafter("graphite-press"){{
+            requirements(Category.crafting, ItemStack.with(Items.copper, 300, Items.lead, 50));
+
+            craftEffect = Fx.pulverizeMedium;
+            output = Items.graphite;
+            craftTime = 90f;
+            size = 2;
+            hasItems = true;
+
+            consumes.item(Items.coal, 2);
+        }};
+
+        multiPress = new GenericCrafter("multi-press"){{
+            requirements(Category.crafting, ItemStack.with(Items.titanium, 200, Items.silicon, 50, Items.lead, 200, Items.graphite, 100));
+
+            craftEffect = Fx.pulverizeMedium;
+            output = Items.graphite;
+            craftTime = 30f;
+            size = 2;
+            hasItems = true;
+            hasLiquids = true;
+
+            consumes.power(0.2f);
+            consumes.item(Items.coal, 2);
+            consumes.liquid(Liquids.water, 0.1f);
+        }};
+
         siliconSmelter = new PowerSmelter("silicon-smelter"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 60, Items.lead, 50));
             craftEffect = Fx.smeltsmoke;
@@ -237,18 +264,6 @@ public class Blocks implements ContentList{
 
             consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2));
             consumes.power(0.05f);
-        }};
-
-        graphitePress = new GenericCrafter("graphite-press"){{
-            requirements(Category.crafting, ItemStack.with(Items.copper, 200, Items.lead, 50));
-
-            craftEffect = Fx.pulverizeMedium;
-            output = Items.graphite;
-            craftTime = 90f;
-            size = 2;
-            hasItems = true;
-
-            consumes.item(Items.coal, 2);
         }};
 
         plastaniumCompressor = new PlastaniumCompressor("plastanium-compressor"){{
@@ -693,9 +708,8 @@ public class Blocks implements ContentList{
             itemDuration = 40f;
         }};
 
-        thermalGenerator = new LiquidHeatGenerator("thermal-generator"){{
+        thermalGenerator = new ThermalGenerator("thermal-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 80, Items.graphite, 70, Items.lead, 100, Items.silicon, 70, Items.thorium, 70));
-            maxLiquidGenerate = 2f;
             powerProduction = 2f;
             generateEffect = Fx.redgeneratespark;
             size = 2;

@@ -37,8 +37,8 @@ public class Items implements ContentList{
         }};
 
         coal = new Item("coal", Color.valueOf("272727")){{
-            explosiveness = 0.2f;
-            flammability = 0.5f;
+            explosiveness = 0.4f;
+            flammability = 1f;
             hardness = 2;
             genOre = true;
         }};
@@ -52,9 +52,9 @@ public class Items implements ContentList{
 
         thorium = new Item("thorium", Color.valueOf("f9a3c7")){{
             type = ItemType.material;
-            explosiveness = 0.1f;
+            explosiveness = 0.2f;
             hardness = 4;
-            radioactivity = 0.5f;
+            radioactivity = 1f;
             cost = 1.4f;
             genOre = true;
         }};
@@ -70,16 +70,16 @@ public class Items implements ContentList{
 
         plastanium = new Item("plastanium", Color.valueOf("cbd97f")){{
             type = ItemType.material;
-            flammability = 0.1f;
-            explosiveness = 0.1f;
+            flammability = 0.2f;
+            explosiveness = 0.2f;
             cost = 1.6f;
         }};
 
         phasefabric = new Item("phase-fabric", Color.valueOf("f4ba6e")){{
             type = ItemType.material;
             cost = 1.5f;
-            fluxiness = 0.9f;
-            radioactivity = 0.3f;
+            fluxiness = 1.8f;
+            radioactivity = 0.6f;
         }};
 
         surgealloy = new Item("surge-alloy", Color.valueOf("f3e979")){{
@@ -87,22 +87,22 @@ public class Items implements ContentList{
         }};
 
         biomatter = new Item("biomatter", Color.valueOf("648b55")){{
-            flammability = 0.55f;
-            fluxiness = 0.3f;
+            flammability = 1.05f;
+            fluxiness = 0.6f;
         }};
 
         sand = new Item("sand", Color.valueOf("e3d39e")){{
-            fluxiness = 0.5f;
+            fluxiness = 1f;
         }};
 
         blastCompound = new Item("blast-compound", Color.valueOf("ff795e")){{
-            flammability = 0.2f;
-            explosiveness = 0.6f;
+            flammability = 0.4f;
+            explosiveness = 1.2f;
         }};
 
         pyratite = new Item("pyratite", Color.valueOf("ffaa5f")){{
-            flammability = 0.7f;
-            explosiveness = 0.2f;
+            flammability = 1.4f;
+            explosiveness = 0.4f;
         }};
     }
 }

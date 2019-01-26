@@ -78,6 +78,8 @@ public class GenericCrafter extends Block{
 
         if(entity.progress >= 1f){
 
+            //TODO, bad design, crafter has to know that this consumes items
+            //there should be a separate trigger in #cons to consume discrete amounts of items
             if(consumes.has(ConsumeItem.class)) tile.entity.items.remove(consumes.item(), consumes.itemAmount());
 
             useContent(tile, output);

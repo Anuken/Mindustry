@@ -25,8 +25,8 @@ public class Liquids implements ContentList{
 
         oil = new Liquid("oil", Color.valueOf("313131")){{
             viscosity = 0.7f;
-            flammability = 0.6f;
-            explosiveness = 0.6f;
+            flammability = 1.2f;
+            explosiveness = 1.2f;
             heatCapacity = 0.7f;
             tier = 1;
             effect = StatusEffects.tarred;

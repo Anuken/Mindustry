@@ -37,24 +37,16 @@ public class ItemLiquidGenerator extends PowerGenerator{
     protected Color heatColor = Color.valueOf("ff9b59");
     protected TextureRegion topRegion;
 
-    public enum InputType{
-        ItemsOnly,
-        LiquidsOnly,
-        LiquidsAndItems
-    }
-
-    public ItemLiquidGenerator(InputType inputType, String name){
+    public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
         super(name);
-        this.hasItems = inputType != InputType.LiquidsOnly;
-        this.hasLiquids = inputType != InputType.ItemsOnly;
+        this.hasItems = hasItems;
+        this.hasLiquids = hasLiquids;
 
         if(hasItems){
-            itemCapacity = 20;
             consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false).optional(true);
         }
 
         if(hasLiquids){
-            liquidCapacity = 10f;
             consumes.add(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, 0.001f, true)).update(false).optional(true);
         }
     }
@@ -72,8 +64,8 @@ public class ItemLiquidGenerator extends PowerGenerator{
     public void update(Tile tile){
         ItemLiquidGeneratorEntity entity = tile.entity();
 
-        // Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
-        //       Power amount is delta'd by PowerGraph class already.
+        //Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
+        //Power amount is delta'd by PowerGraph class already.
         float calculationDelta = entity.delta();
 
         if(!entity.cons.valid()){
@@ -115,7 +107,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
             if(entity.generateTime > 0f){
                 entity.generateTime -= Math.min(1f / itemDuration * entity.delta(), entity.generateTime);
 
-                if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
+                if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.5f))){
                     //this block is run last so that in the event of a block destruction, no code relies on the block type
                     entity.damage(Mathf.random(8f));
                     Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));

@@ -30,8 +30,8 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     private final float fakeItemDuration = 60f; // 60 ticks
     private final float maximumLiquidUsage = 0.5f;
 
-    public void createGenerator(ItemLiquidGenerator.InputType inputType){
-        generator = new ItemLiquidGenerator(inputType, "fakegen"){
+    public void createGenerator(InputType inputType){
+        generator = new ItemLiquidGenerator(inputType != InputType.liquids, inputType != InputType.items, "fakegen"){
             {
                 powerProduction = 0.1f;
                 itemDuration = 60f;
@@ -59,13 +59,13 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     DynamicTest[] generatorWorksProperlyWithLiquidInput(){
 
         // Execute all tests for the case where only liquids are accepted and for the case where liquids and items are accepted (but supply only liquids)
-        ItemLiquidGenerator.InputType[] inputTypesToBeTested = new ItemLiquidGenerator.InputType[]{
-            ItemLiquidGenerator.InputType.LiquidsOnly,
-            ItemLiquidGenerator.InputType.LiquidsAndItems
+        InputType[] inputTypesToBeTested = new InputType[]{
+            InputType.liquids,
+            InputType.any
         };
 
         ArrayList<DynamicTest> tests = new ArrayList<>();
-        for(ItemLiquidGenerator.InputType inputType : inputTypesToBeTested){
+        for(InputType inputType : inputTypesToBeTested){
             tests.add(dynamicTest("01", () -> simulateLiquidConsumption(inputType, Liquids.oil, 0.0f, "No liquids provided")));
             tests.add(dynamicTest("02", () -> simulateLiquidConsumption(inputType, Liquids.oil, maximumLiquidUsage / 4.0f, "Low oil provided")));
             tests.add(dynamicTest("03", () -> simulateLiquidConsumption(inputType, Liquids.oil, maximumLiquidUsage * 1.0f, "Sufficient oil provided")));
@@ -77,7 +77,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         return testArray;
     }
 
-    void simulateLiquidConsumption(ItemLiquidGenerator.InputType inputType, Liquid liquid, float availableLiquidAmount, String parameterDescription){
+    void simulateLiquidConsumption(InputType inputType, Liquid liquid, float availableLiquidAmount, String parameterDescription){
         final float baseEfficiency = liquid.flammability;
         final float expectedEfficiency = Math.min(1.0f, availableLiquidAmount / maximumLiquidUsage) * baseEfficiency;
         final float expectedConsumptionPerTick = Math.min(maximumLiquidUsage, availableLiquidAmount);
@@ -102,13 +102,13 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     DynamicTest[] generatorWorksProperlyWithItemInput(){
 
         // Execute all tests for the case where only items are accepted and for the case where liquids and items are accepted (but supply only items)
-        ItemLiquidGenerator.InputType[] inputTypesToBeTested = new ItemLiquidGenerator.InputType[]{
-            ItemLiquidGenerator.InputType.ItemsOnly,
-            ItemLiquidGenerator.InputType.LiquidsAndItems
+        InputType[] inputTypesToBeTested = new InputType[]{
+            InputType.items,
+            InputType.any
         };
 
         ArrayList<DynamicTest> tests = new ArrayList<>();
-        for(ItemLiquidGenerator.InputType inputType : inputTypesToBeTested){
+        for(InputType inputType : inputTypesToBeTested){
             tests.add(dynamicTest("01", () -> simulateItemConsumption(inputType, Items.coal, 0, "No items provided")));
             tests.add(dynamicTest("02", () -> simulateItemConsumption(inputType, Items.coal, 1, "Sufficient coal provided")));
             tests.add(dynamicTest("03", () -> simulateItemConsumption(inputType, Items.coal, 10, "Excess coal provided")));
@@ -122,7 +122,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         return testArray;
     }
 
-    void simulateItemConsumption(ItemLiquidGenerator.InputType inputType, Item item, int amount, String parameterDescription){
+    void simulateItemConsumption(InputType inputType, Item item, int amount, String parameterDescription){
         final float expectedEfficiency = Math.min(1.0f, amount > 0 ? item.flammability : 0f);
         final float expectedRemainingItemAmount = Math.max(0, amount - 1);
 
@@ -145,16 +145,16 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     /** Makes sure the efficiency stays equal during the item duration. */
     @Test
     void efficiencyRemainsConstantWithinItemDuration_ItemsOnly(){
-        testItemDuration(ItemLiquidGenerator.InputType.ItemsOnly);
+        testItemDuration(InputType.items);
     }
 
     /** Makes sure the efficiency stays equal during the item duration. */
     @Test
     void efficiencyRemainsConstantWithinItemDuration_ItemsAndLiquids(){
-        testItemDuration(ItemLiquidGenerator.InputType.LiquidsAndItems);
+        testItemDuration(InputType.any);
     }
 
-    void testItemDuration(ItemLiquidGenerator.InputType inputType){
+    void testItemDuration(InputType inputType){
         createGenerator(inputType);
 
         // Burn a single coal and test for the duration
@@ -171,5 +171,11 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         }
         generator.update(tile);
         assertEquals(0.0f, entity.productionEfficiency, "Duration: " + String.valueOf(currentDuration));
+    }
+    
+    enum InputType{
+        items,
+        liquids,
+        any
     }
 }
