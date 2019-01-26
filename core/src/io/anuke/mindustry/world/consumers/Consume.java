@@ -10,6 +10,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.mobile;
 
+/**An abstract class that defines a type of resource that a block can consume.*/
 public abstract class Consume{
     protected boolean optional;
     protected boolean update = true;

@@ -265,7 +265,7 @@ public class ForceProjector extends Block {
 
     public class ConsumeForceProjectorPower extends ConsumePower{
         public ConsumeForceProjectorPower(float powerCapacity, float ticksToFill){
-            super(powerCapacity / ticksToFill, 0.0f, powerCapacity, true);
+            super(powerCapacity / ticksToFill, powerCapacity, true);
         }
         @Override
         public boolean valid(Block block, TileEntity entity){

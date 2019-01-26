@@ -154,6 +154,26 @@ task scaleSprites4x(){
     }
 }
 
+task processBlocks(){
+    def str = file("/home/anuke/Projects/Mindustry/core/src/io/anuke/mindustry/content/Blocks.java").text
+    def out = str
+    def mat = "            consumes.power("
+
+    int i = 0
+    while(str.indexOf(mat, i) != -1){
+        i = str.indexOf(mat, i + 1)
+        if(i == -1) break
+
+        def line = str.substring(i, str.indexOf("\n", i))
+        def num = line.substring(line.indexOf("(") + 1, line.indexOf(")"))
+        float val = Float.parseFloat(num) * 10f;
+        boolean fmt = Math.abs((int)val - val) > 0.01f;
+
+        out = out.replace(line, (line.replace(num, (fmt ? String.format("%.2f", val) : (int)val) + "f")))
+    }
+
+    println(out)
+}
 
 task scaleSprites(){
     finalizedBy 'genSprites'

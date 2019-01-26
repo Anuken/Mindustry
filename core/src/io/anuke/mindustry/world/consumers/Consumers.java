@@ -37,21 +37,12 @@ public class Consumers{
     }
 
     /**
-     * Creates a consumer which directly uses power without buffering it. The module will work while at least 50% of power is supplied.
-     * @param powerPerTick The amount of power which is required each tick for 100% efficiency.
-     * @return the created consumer object.
-     */
-    public ConsumePower power(float powerPerTick){
-        return power(powerPerTick, 0.5f);
-    }
-
-    /**
      * Creates a consumer which directly uses power without buffering it. The module will work while the available power is greater than or equal to the minimumSatisfaction percentage (0..1).
      * @param powerPerTick The amount of power which is required each tick for 100% efficiency.
      * @return the created consumer object.
      */
-    public ConsumePower power(float powerPerTick, float minimumSatisfaction){
-        ConsumePower c = ConsumePower.consumePowerDirect(powerPerTick, minimumSatisfaction);
+    public ConsumePower power(float powerPerTick){
+        ConsumePower c = ConsumePower.consumePowerDirect(powerPerTick);
         add(c);
         return c;
     }

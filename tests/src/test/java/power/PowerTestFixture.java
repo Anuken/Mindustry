@@ -50,9 +50,9 @@ public class PowerTestFixture{
         }};
     }
 
-    protected static Block createFakeDirectConsumer(float powerPerTick, float minimumSatisfaction){
+    protected static Block createFakeDirectConsumer(float powerPerTick){
         return new PowerBlock("fakedirectconsumer"){{
-            consumes.power(powerPerTick, minimumSatisfaction);
+            consumes.power(powerPerTick);
         }};
     }
 

@@ -835,7 +835,6 @@ public class Fx implements ContentList{
             Angles.randLenVectors(e.id, 5, e.fin() * 8f, (x, y) -> {
                 float len = e.fout() * 4f;
                 Draw.color(Palette.redSpark, Color.GRAY, e.fin());
-                //Draw.alpha(e.fout());
                 Draw.rect("circle", e.x + x, e.y + y, len, len);
                 Draw.reset();
             });
