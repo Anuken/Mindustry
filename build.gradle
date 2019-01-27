@@ -194,6 +194,7 @@ project(":core"){
 
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
+        if(localArc()) compile arcModule("extensions:recorder")
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")

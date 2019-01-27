@@ -54,7 +54,7 @@ public class BlockRenderer{
             Draw.proj().setOrtho(0, 0, fog.getWidth(), fog.getHeight());
 
             //TODO highly inefficient, width*height rectangles isn't great
-            //TODO handle shadows with GPU
+            //TODO handle shadow rotation generation with GPU blur/erode algorithm
             for(int x = 0; x < world.width(); x++){
                 for(int y = 0; y < world.height(); y++){
                     Tile tile = world.rawTile(x, y);
