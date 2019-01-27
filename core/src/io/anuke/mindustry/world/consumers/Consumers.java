@@ -42,7 +42,7 @@ public class Consumers{
      * @return the created consumer object.
      */
     public ConsumePower power(float powerPerTick){
-        ConsumePower c = ConsumePower.consumePowerDirect(powerPerTick);
+        ConsumePower c = new ConsumePower(powerPerTick, 0.0f, false);
         add(c);
         return c;
     }
@@ -62,7 +62,7 @@ public class Consumers{
      * @param ticksToFill   The number of ticks it shall take to fill the buffer.
      */
     public ConsumePower powerBuffered(float powerCapacity, float ticksToFill){
-        ConsumePower c = ConsumePower.consumePowerBuffered(powerCapacity, ticksToFill);
+        ConsumePower c = new ConsumePower(powerCapacity / ticksToFill, powerCapacity, true);
         add(c);
         return c;
     }

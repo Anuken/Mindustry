@@ -17,29 +17,10 @@ public class ConsumePower extends Consume{
     /** True if the module can store power. */
     public final boolean isBuffered;
 
-    protected ConsumePower(float powerPerTick, float powerCapacity, boolean isBuffered){
+    public ConsumePower(float powerPerTick, float powerCapacity, boolean isBuffered){
         this.powerPerTick = powerPerTick;
         this.powerCapacity = powerCapacity;
         this.isBuffered = isBuffered;
-    }
-
-    /**
-     * Makes the owner consume powerPerTick each tick and disables it unless minimumSatisfaction (1.0 = 100%) of that power is being supplied.
-     * @param powerPerTick The maximum amount of power which is required per tick for 100% efficiency.
-     * @param minimumSatisfaction The percentage of powerPerTick which must be available for the module to work.
-     */
-    public static ConsumePower consumePowerDirect(float powerPerTick){
-        return new ConsumePower(powerPerTick, 0.0f, false);
-    }
-
-    /**
-     * Adds a power buffer to the owner which takes ticksToFill number of ticks to be filled.
-     * Note that this object does not remove power from the buffer.
-     * @param powerCapacity The maximum capacity in power units.
-     * @param ticksToFill   The number of ticks it shall take to fill the buffer.
-     */
-    public static ConsumePower consumePowerBuffered(float powerCapacity, float ticksToFill){
-        return new ConsumePower(powerCapacity / ticksToFill, powerCapacity, true);
     }
 
     @Override

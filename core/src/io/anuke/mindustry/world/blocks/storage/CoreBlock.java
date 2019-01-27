@@ -153,7 +153,7 @@ public class CoreBlock extends LaunchPad{
                 //TODO play animation of some sort
                 Effects.effect(Fx.dooropenlarge, tile);
                 //items sent are split evenly across every player in the game
-                data.addItem(item, launchChunkSize / playerGroup.size());
+                data.addItem(item, launchChunkSize / Math.max(playerGroup.size(), 1));
                 entity.items.remove(item, launchChunkSize);
             }
         }

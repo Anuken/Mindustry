@@ -361,10 +361,10 @@ public class Blocks implements ContentList{
         separator = new Separator("separator"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 60, Items.titanium, 50));
             results = new ItemStack[]{
-            new ItemStack(Items.copper, 5),
-            new ItemStack(Items.lead, 3),
-            new ItemStack(Items.titanium, 2),
-            new ItemStack(Items.thorium, 1)
+                new ItemStack(Items.copper, 5),
+                new ItemStack(Items.lead, 3),
+                new ItemStack(Items.titanium, 2),
+                new ItemStack(Items.thorium, 1)
             };
             hasPower = true;
             filterTime = 15f;
@@ -458,7 +458,6 @@ public class Blocks implements ContentList{
 
         titaniumWallLarge = new Wall("titanium-wall-large"){{
             requirements(Category.defense, ItemStack.with(Items.titanium, 12 * 4));
-            requirements(Category.defense, ItemStack.with(Items.titanium, 12));
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
         }};
@@ -470,7 +469,6 @@ public class Blocks implements ContentList{
 
         thoriumWallLarge = new Wall("thorium-wall-large"){{
             requirements(Category.defense, ItemStack.with(Items.thorium, 12 * 4));
-            requirements(Category.defense, ItemStack.with(Items.thorium, 12));
             health = 200 * wallHealthMultiplier * 4;
             size = 2;
         }};
@@ -482,7 +480,6 @@ public class Blocks implements ContentList{
 
         phaseWallLarge = new DeflectorWall("phase-wall-large"){{
             requirements(Category.defense, ItemStack.with(Items.phasefabric, 12 * 4));
-            requirements(Category.defense, ItemStack.with(Items.phasefabric, 12));
             health = 150 * 4 * wallHealthMultiplier;
             size = 2;
         }};
@@ -494,7 +491,6 @@ public class Blocks implements ContentList{
 
         surgeWallLarge = new SurgeWall("surge-wall-large"){{
             requirements(Category.defense, ItemStack.with(Items.surgealloy, 12 * 4));
-            requirements(Category.defense, ItemStack.with(Items.surgealloy, 12));
             health = 230 * 4 * wallHealthMultiplier;
             size = 2;
         }};
@@ -506,7 +502,6 @@ public class Blocks implements ContentList{
 
         doorLarge = new Door("door-large"){{
             requirements(Category.defense, ItemStack.with(Items.titanium, 12 * 4, Items.silicon, 8 * 4));
-            requirements(Category.defense, ItemStack.with(Items.titanium, 12, Items.silicon, 8));
             openfx = Fx.dooropenlarge;
             closefx = Fx.doorcloselarge;
             health = 100 * 4 * wallHealthMultiplier;
@@ -902,10 +897,10 @@ public class Blocks implements ContentList{
         duo = new DoubleTurret("duo"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 60), true);
             ammo(
-            Items.copper, Bullets.standardCopper,
-            Items.graphite, Bullets.standardDense,
-            Items.pyratite, Bullets.standardIncendiary,
-            Items.silicon, Bullets.standardHoming
+                Items.copper, Bullets.standardCopper,
+                Items.graphite, Bullets.standardDense,
+                Items.pyratite, Bullets.standardIncendiary,
+                Items.silicon, Bullets.standardHoming
             );
             reload = 20f;
             restitution = 0.03f;
@@ -920,9 +915,9 @@ public class Blocks implements ContentList{
         hail = new ArtilleryTurret("hail"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 60, Items.graphite, 35));
             ammo(
-            Items.graphite, Bullets.artilleryDense,
-            Items.silicon, Bullets.artilleryHoming,
-            Items.pyratite, Bullets.artlleryIncendiary
+                Items.graphite, Bullets.artilleryDense,
+                Items.silicon, Bullets.artilleryHoming,
+                Items.pyratite, Bullets.artlleryIncendiary
             );
             reload = 60f;
             recoil = 2f;
@@ -935,10 +930,10 @@ public class Blocks implements ContentList{
         wave = new LiquidTurret("wave"){{
             requirements(Category.turret, ItemStack.with(Items.titanium, 70, Items.lead, 150));
             ammo(
-            Liquids.water, Bullets.waterShot,
-            Liquids.slag, Bullets.slagShot,
-            Liquids.cryofluid, Bullets.cryoShot,
-            Liquids.oil, Bullets.oilShot
+                Liquids.water, Bullets.waterShot,
+                Liquids.slag, Bullets.slagShot,
+                Liquids.cryofluid, Bullets.cryoShot,
+                Liquids.oil, Bullets.oilShot
             );
             size = 2;
             recoil = 0f;
@@ -1001,9 +996,9 @@ public class Blocks implements ContentList{
         swarmer = new BurstTurret("swarmer"){{
             requirements(Category.turret, ItemStack.with(Items.graphite, 70, Items.titanium, 70, Items.plastanium, 90, Items.silicon, 60));
             ammo(
-            Items.blastCompound, Bullets.missileExplosive,
-            Items.pyratite, Bullets.missileIncendiary,
-            Items.surgealloy, Bullets.missileSurge
+                Items.blastCompound, Bullets.missileExplosive,
+                Items.pyratite, Bullets.missileIncendiary,
+                Items.surgealloy, Bullets.missileSurge
             );
             reload = 50f;
             shots = 4;
@@ -1018,11 +1013,11 @@ public class Blocks implements ContentList{
         salvo = new BurstTurret("salvo"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 210, Items.graphite, 190, Items.thorium, 130));
             ammo(
-            Items.copper, Bullets.standardCopper,
-            Items.graphite, Bullets.standardDense,
-            Items.pyratite, Bullets.standardIncendiary,
-            Items.silicon, Bullets.standardHoming,
-            Items.thorium, Bullets.standardThorium
+                Items.copper, Bullets.standardCopper,
+                Items.graphite, Bullets.standardDense,
+                Items.pyratite, Bullets.standardIncendiary,
+                Items.silicon, Bullets.standardHoming,
+                Items.thorium, Bullets.standardThorium
             );
 
             size = 2;
@@ -1042,11 +1037,11 @@ public class Blocks implements ContentList{
         ripple = new ArtilleryTurret("ripple"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 300, Items.graphite, 220, Items.thorium, 120));
             ammo(
-            Items.graphite, Bullets.artilleryDense,
-            Items.silicon, Bullets.artilleryHoming,
-            Items.pyratite, Bullets.artlleryIncendiary,
-            Items.blastCompound, Bullets.artilleryExplosive,
-            Items.plastanium, Bullets.arilleryPlastic
+                Items.graphite, Bullets.artilleryDense,
+                Items.silicon, Bullets.artilleryHoming,
+                Items.pyratite, Bullets.artlleryIncendiary,
+                Items.blastCompound, Bullets.artilleryExplosive,
+                Items.plastanium, Bullets.arilleryPlastic
             );
             size = 3;
             shots = 4;
@@ -1067,9 +1062,9 @@ public class Blocks implements ContentList{
         cyclone = new ItemTurret("cyclone"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 400, Items.surgealloy, 200, Items.plastanium, 150));
             ammo(
-            Items.blastCompound, Bullets.flakExplosive,
-            Items.plastanium, Bullets.flakPlastic,
-            Items.surgealloy, Bullets.flakSurge
+                Items.blastCompound, Bullets.flakExplosive,
+                Items.plastanium, Bullets.flakPlastic,
+                Items.surgealloy, Bullets.flakSurge
             );
             xRand = 4f;
             reload = 8f;
@@ -1099,9 +1094,9 @@ public class Blocks implements ContentList{
         spectre = new DoubleTurret("spectre"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 700, Items.graphite, 600, Items.surgealloy, 500, Items.plastanium, 350, Items.thorium, 500));
             ammo(
-            Items.graphite, Bullets.standardDenseBig,
-            Items.pyratite, Bullets.standardIncendiaryBig,
-            Items.thorium, Bullets.standardThoriumBig
+                Items.graphite, Bullets.standardDenseBig,
+                Items.pyratite, Bullets.standardIncendiaryBig,
+                Items.thorium, Bullets.standardThoriumBig
             );
             reload = 6f;
             coolantMultiplier = 0.5f;
