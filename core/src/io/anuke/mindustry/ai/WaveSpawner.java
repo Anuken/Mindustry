@@ -2,13 +2,24 @@ package io.anuke.mindustry.ai;
 
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.Squad;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.SpawnGroup;
+import io.anuke.mindustry.world.Pos;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -16,9 +27,29 @@ public class WaveSpawner{
     private Array<SpawnGroup> groups;
     private Array<FlyerSpawn> flySpawns = new Array<>();
     private Array<GroundSpawn> groundSpawns = new Array<>();
+    private IntArray loadedSpawns = new IntArray();
 
     public WaveSpawner(){
         Events.on(WorldLoadEvent.class, e -> reset());
+    }
+
+    public void write(DataOutput stream) throws IOException{
+        stream.writeInt(groundSpawns.size);
+        for(GroundSpawn spawn : groundSpawns){
+            stream.writeInt(Pos.get(spawn.x, spawn.y));
+        }
+    }
+
+    public void read(DataInput stream) throws IOException{
+        flySpawns.clear();
+        groundSpawns.clear();
+        loadedSpawns.clear();
+
+        int amount = stream.readInt();
+
+        for(int i = 0; i < amount; i++){
+            loadedSpawns.add(stream.readInt());
+        }
     }
 
     public void spawnEnemies(){
@@ -51,15 +82,23 @@ public class WaveSpawner{
                     Squad squad = new Squad();
                     spawnX = spawn.x * tilesize;
                     spawnY = spawn.y * tilesize;
-                    spread = tilesize;
+                    spread = tilesize*3;
 
                     for(int i = 0; i < spawned; i++){
+                        Tmp.v1.rnd(spread);
+
                         BaseUnit unit = group.createUnit(waveTeam);
                         unit.setWave();
                         unit.setSquad(squad);
-                        unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
-                        unit.add();
+                        unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
+
+                        Time.run(i*5, () -> {
+                            shockwave(unit);
+                        });
                     }
+                    Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawn.x * tilesize, spawn.y * tilesize));
+                    //would be interesting to see player structures survive this without hacks
+                    Time.run(40f, () -> Damage.damage(waveTeam, spawn.x * tilesize, spawn.y * tilesize, 350f + Mathf.random(80f), 99999999f));
                 }
             }
         }
@@ -73,17 +112,39 @@ public class WaveSpawner{
         for(int x = 0; x < world.width(); x++){
             for(int y = 0; y < world.height(); y++){
                 if(world.tile(x, y).block() == Blocks.spawn){
-                    GroundSpawn spawn = new GroundSpawn();
-                    spawn.x = x;
-                    spawn.y = y;
-                    groundSpawns.add(spawn);
+                    addSpawns(x, y);
 
-                    FlyerSpawn fspawn = new FlyerSpawn();
-                    fspawn.angle = Angles.angle(world.width()/2f, world.height()/2f, x, y);
-                    flySpawns.add(fspawn);
+                    //hide spawnpoints, they have served their purpose
+                    world.tile(x, y).setBlock(Blocks.air);
                 }
             }
         }
+
+        for(int i = 0; i < loadedSpawns.size; i++){
+            int pos = loadedSpawns.get(i);
+            addSpawns(Pos.x(pos), Pos.y(pos));
+        }
+
+        loadedSpawns.clear();
+    }
+
+    private void addSpawns(int x, int y){
+        GroundSpawn spawn = new GroundSpawn();
+        spawn.x = x;
+        spawn.y = y;
+        groundSpawns.add(spawn);
+
+        FlyerSpawn fspawn = new FlyerSpawn();
+        fspawn.angle = Angles.angle(world.width()/2f, world.height()/2f, x, y);
+        flySpawns.add(fspawn);
+    }
+
+    private void shockwave(BaseUnit unit){
+        Effects.effect(Fx.unitSpawn, unit.x, unit.y, 0f, unit);
+        Time.run(30f, () -> {
+            unit.add();
+            Effects.effect(Fx.spawn, unit);
+        });
     }
 
     private class FlyerSpawn{

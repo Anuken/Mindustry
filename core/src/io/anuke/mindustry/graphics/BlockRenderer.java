@@ -112,10 +112,10 @@ public class BlockRenderer{
         Draw.flush();
         shadows.begin();
         Core.graphics.clear(Color.CLEAR);
-        Draw.color(shadowColor);
         floor.beginDraw();
         floor.drawLayer(CacheLayer.walls);
         floor.endDraw();
+
         drawBlocks(Layer.shadow);
 
         EntityDraw.drawWith(playerGroup, player -> !player.isDead(), Unit::draw);
@@ -164,11 +164,12 @@ public class BlockRenderer{
 
                 if(block != Blocks.air && block.cacheLayer == CacheLayer.normal){
                     if(!expanded){
-                        addRequest(tile, Layer.shadow);
                         addRequest(tile, Layer.block);
                     }
 
                     if(block.expanded || !expanded){
+                        addRequest(tile, Layer.shadow);
+
                         if(block.layer != null && block.isLayer(tile)){
                             addRequest(tile, block.layer);
                         }
@@ -205,7 +206,9 @@ public class BlockRenderer{
             Block block = req.tile.block();
 
             if(req.layer == Layer.shadow){
+                Draw.color(0f, 0f, 0f, 0.45f);
                 block.drawShadow(req.tile);
+                Draw.color();
             }else if(req.layer == Layer.block){
                 block.draw(req.tile);
                 if(block.synthetic() && req.tile.getTeam() != players[0].getTeam()){

@@ -83,11 +83,11 @@ public class MapGenerator extends Generator{
             }
         }
 
-        if(enemySpawns > enemies.size){
-            throw new IllegalArgumentException("Enemy spawn pool greater than map spawn number.");
-        }
-
         if(enemySpawns != -1){
+            if(enemySpawns > enemies.size){
+                throw new IllegalArgumentException("Enemy spawn pool greater than map spawn number.");
+            }
+
             enemies.shuffle();
             for(int i = 0; i < enemySpawns; i++){
                 Point2 point = enemies.get(i);

@@ -59,8 +59,6 @@ public class Zones implements ContentList{
         }};
 
         craters = new Zone("craters", new MapGenerator("craters", 1){{ distortion = 0; }}){{
-            alwaysUnlocked = true;
-
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
@@ -108,7 +106,8 @@ public class Zones implements ContentList{
             }};
         }};
 
-        frozenForest = new Zone("frozenForest", new MapGenerator("groundZero", 1)){{ //TODO implement
+        frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest")){{ //TODO implement
+            alwaysUnlocked = true;
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;

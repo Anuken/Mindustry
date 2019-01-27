@@ -33,7 +33,7 @@ public class Blocks implements ContentList{
 
     //environment
     air, part, spawn, space, metalfloor, deepwater, water, tar, stone, craters, charr, blackstone, dirt, sand, ice, snow,
-    grass, shrub, rock, icerock, blackrock, rocks, cliffs, pine,
+    grass, shrub, rock, icerock, blackrock, rocks, cliffs, pine, whiteTree,
 
     //crafting
     siliconSmelter, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -221,6 +221,9 @@ public class Blocks implements ContentList{
         pine = new StaticWall("pine"){{
             //fillsTile = false;
             variants = 0;
+        }};
+
+        whiteTree = new TreeBlock("white-tree-dead"){{
         }};
 
         //endregion
@@ -860,9 +863,6 @@ public class Blocks implements ContentList{
 
             health = 1100;
             itemCapacity = 1000;
-            launchThreshold = 500;
-            launchTime = 60f * 10;
-            launchChunkSize = 100;
         }};
 
         vault = new Vault("vault"){{

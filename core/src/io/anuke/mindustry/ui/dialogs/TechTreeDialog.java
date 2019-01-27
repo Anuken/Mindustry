@@ -52,9 +52,8 @@ public class TechTreeDialog extends FloatingDialog{
             recipes.sort(Structs.comparing(r -> r.buildCost));
 
             if(recipes.size > 0){
-                Log.info("Recipe tree coverage: {0}%", (int)((float)nodes.size / content.blocks().select(Block::isVisible).size * 100));
-                Log.info("Missing items: ");
-                recipes.forEach(r -> Log.info("    {0}", r));
+                Log.info("Missing recipe tree items! ");
+                recipes.forEach(r -> Log.info(">    {0}", r));
             }
         }
 

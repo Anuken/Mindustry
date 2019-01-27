@@ -10,6 +10,7 @@ import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
+import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shapes;
@@ -32,12 +33,26 @@ public class Fx implements ContentList{
     bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
     shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
     shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
-    launchFull;
+    launchFull, unitSpawn, spawnShockwave;
 
     @Override
     public void load(){
 
         none = new Effect(0, 0f, e -> {});
+
+        unitSpawn = new Effect(30f, e -> {
+            if(!(e.data instanceof BaseUnit)) return;
+
+            Draw.alpha(e.fin());
+
+            float scl = 1f + e.fout()*2f;
+
+            BaseUnit unit = (BaseUnit)e.data;
+            Draw.rect(unit.getIconRegion(), e.x, e.y,
+                unit.getIconRegion().getWidth() * Draw.scl * scl, unit.getIconRegion().getWidth() * Draw.scl * scl, 180f);
+
+            Draw.reset();
+        });
 
         placeBlock = new Effect(16, e -> {
             Draw.color(Palette.accent);
@@ -78,10 +93,10 @@ public class Fx implements ContentList{
             Draw.reset();
         });
 
-        spawn = new Effect(23, e -> {
+        spawn = new Effect(30, e -> {
             Lines.stroke(2f * e.fout());
             Draw.color(Palette.accent);
-            Lines.poly(e.x, e.y, 4, 3f + e.fin() * 8f);
+            Lines.poly(e.x, e.y, 4, 5f + e.fin() * 12f);
             Draw.reset();
         });
         
@@ -542,6 +557,13 @@ public class Fx implements ContentList{
             Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.fin());
             Lines.stroke(e.fout() * 3f + 0.2f);
             Lines.poly(e.x, e.y, 40, e.fin() * 140f);
+            Draw.reset();
+        });
+
+        spawnShockwave = new Effect(20f, 400f, e -> {
+            Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.fin());
+            Lines.stroke(e.fout() * 3f + 0.5f);
+            Lines.poly(e.x, e.y, 60, e.fin() * 450f);
             Draw.reset();
         });
 

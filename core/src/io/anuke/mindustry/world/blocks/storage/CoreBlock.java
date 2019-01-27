@@ -25,10 +25,8 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class CoreBlock extends LaunchPad{
+public class CoreBlock extends StorageBlock{
     protected TextureRegion topRegion;
-    protected int launchThreshold;
-    protected int launchChunkSize;
 
     public CoreBlock(String name){
         super(name);
@@ -147,16 +145,6 @@ public class CoreBlock extends LaunchPad{
     @Override
     public void update(Tile tile){
         CoreEntity entity = tile.entity();
-
-        for(Item item : Vars.content.items()){
-            if(entity.items.get(item) >= launchThreshold + launchChunkSize && entity.timer.get(timerLaunch, launchTime)){
-                //TODO play animation of some sort
-                Effects.effect(Fx.dooropenlarge, tile);
-                //items sent are split evenly across every player in the game
-                data.addItem(item, launchChunkSize / Math.max(playerGroup.size(), 1));
-                entity.items.remove(item, launchChunkSize);
-            }
-        }
 
         if(entity.currentUnit != null){
             if(!entity.currentUnit.isDead()){

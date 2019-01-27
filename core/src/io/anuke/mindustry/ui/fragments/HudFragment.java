@@ -16,9 +16,11 @@ import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.utils.Elements;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Scaling;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
@@ -196,8 +198,40 @@ public class HudFragment extends Fragment{
                 .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f))));
         });
 
-        parent.fill(t -> t.top().right().addRowImageTextButton("$launch", "icon-arrow-up", 8*3, Call::launchZone)
-            .size(94f, 70f).visible(() -> world.isZone() && world.getZone().metCondition() && !Net.client()));
+        parent.fill(t -> {
+            t.top().right();
+
+            TextButton button = Elements.newButton("$launch", Call::launchZone);
+
+            button.getStyle().disabledFontColor = Color.WHITE;
+            button.visible(() ->
+                world.isZone() &&
+                world.getZone().metCondition() &&
+                !Net.client() &&
+                state.wave % world.getZone().launchPeriod == 0);
+
+            button.update(() -> {
+                if(world.getZone() == null){
+                    button.setText("");
+                    return;
+                }
+
+                button.setText(Core.bundle.get(state.enemies() > 0 ? "launch.unable" : "launch") + "\n" +
+                    Core.bundle.format("launch.next", state.wave + world.getZone().launchPeriod));
+
+                button.getLabel().setColor(Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Palette.accent,
+                    Mathf.absin(Time.time(), 7f, 1f)));
+            });
+
+            button.setDisabled(() -> state.enemies() > 0);
+
+            button.getLabelCell().left().get().setAlignment(Align.left, Align.left);
+
+            t.add(button).size(350f, 80f);
+
+            //.addRowImageTextButton("$launch", "icon-arrow-up", 8*3, Call::launchZone)
+            //.size(94f, 70f).visible(() -> world.isZone() && world.getZone().metCondition() && !Net.client());
+        });
 
         //'saving' indicator
         parent.fill(t -> {
