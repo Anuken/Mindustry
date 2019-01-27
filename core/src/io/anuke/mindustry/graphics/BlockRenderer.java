@@ -7,7 +7,9 @@ import io.anuke.arc.collection.Sort;
 import io.anuke.arc.entities.EntityDraw;
 import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Texture.TextureFilter;
 import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
@@ -34,6 +36,7 @@ public class BlockRenderer{
     private int requestidx = 0;
     private int iterateidx = 0;
     private FrameBuffer shadows = new FrameBuffer(2, 2);
+    private FrameBuffer fog = new FrameBuffer(2, 2);
 
     public BlockRenderer(){
 
@@ -43,6 +46,28 @@ public class BlockRenderer{
 
         Events.on(WorldLoadEvent.class, event -> {
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
+
+            fog.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            fog.resize(world.width(), world.height());
+            fog.begin();
+            Core.graphics.clear(Color.WHITE);
+            Draw.proj().setOrtho(0, 0, fog.getWidth(), fog.getHeight());
+
+            //TODO highly inefficient, width*height rectangles isn't great
+            //TODO handle shadows with GPU
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
+                    Tile tile = world.rawTile(x, y);
+                    if(tile.getRotation() > 0){
+                        Draw.color(0f, 0f, 0f, Math.min((tile.getRotation() + 0.5f)/4f, 1f));
+                        Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+                    }
+                }
+            }
+
+            Draw.flush();
+            Draw.color();
+            fog.end();
         });
 
         Events.on(TileChangeEvent.class, event -> {
@@ -55,6 +80,21 @@ public class BlockRenderer{
                 lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
             }
         });
+    }
+
+    public void drawFog(){
+        float ww = world.width() * tilesize, wh = world.height() * tilesize;
+        float u = (camera.position.x - camera.width/2f) / ww,
+        v = (camera.position.y - camera.height/2f) / wh,
+        u2 = (camera.position.x + camera.width/2f) / ww,
+        v2 = (camera.position.y + camera.height/2f) / wh;
+
+        Tmp.tr1.set(fog.getTexture());
+        Tmp.tr1.set(u, v2, u2, v);
+
+        Draw.shader(Shaders.fog);
+        Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
+        Draw.shader();
     }
 
     public void drawShadows(){
@@ -121,10 +161,6 @@ public class BlockRenderer{
                 boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
                 Tile tile = world.rawTile(x, y);
                 Block block = tile.block();
-
-                if(!expanded && block != Blocks.air && block.cacheLayer == CacheLayer.normal && world.isAccessible(x, y)){
-                    tile.block().drawShadow(tile);
-                }
 
                 if(block != Blocks.air && block.cacheLayer == CacheLayer.normal){
                     if(!expanded){

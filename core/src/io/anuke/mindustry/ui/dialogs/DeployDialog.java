@@ -41,8 +41,6 @@ public class DeployDialog extends FloatingDialog{
         layout.gapBetweenNodes = 40f;
         layout.layout(root);
 
-        cont.setFillParent(true);
-
         addCloseButton();
         buttons.addImageTextButton("$techtree", "icon-tree", 16 * 2, () -> ui.tech.show()).size(230f, 64f);
 
@@ -51,21 +49,10 @@ public class DeployDialog extends FloatingDialog{
 
     public void setup(){
         cont.clear();
+        titleTable.remove();
+        marginTop(0f);
 
-        cont.stack(new Table(){{
-            top().left().margin(10);
-
-            ObjectIntMap<Item> items = data.items();
-            for(Item item : content.items()){
-                if(item.type == ItemType.material && data.isUnlocked(item)){
-                    label(() -> items.get(item, 0) + "").left();
-                    addImage(item.region).size(8*4).pad(4);
-                    add("[LIGHT_GRAY]" + item.localizedName()).left();
-                    row();
-                }
-            }
-
-        }}, control.saves.getZoneSlot() == null ? new View() : new Table(){{
+        cont.stack(control.saves.getZoneSlot() == null ? new View() : new Table(){{
             SaveSlot slot = control.saves.getZoneSlot();
 
             TextButton[] b = {null};
@@ -105,6 +92,19 @@ public class DeployDialog extends FloatingDialog{
                     setup();
                 });
             }).growX().height(50f).pad(-12).padTop(10);
+
+        }}, new Table(){{
+            top().left().margin(10);
+
+            ObjectIntMap<Item> items = data.items();
+            for(Item item : content.items()){
+                if(item.type == ItemType.material && data.isUnlocked(item)){
+                    label(() -> items.get(item, 0) + "").left();
+                    addImage(item.region).size(8*4).pad(4);
+                    add("[LIGHT_GRAY]" + item.localizedName()).left();
+                    row();
+                }
+            }
 
         }}).grow();
     }

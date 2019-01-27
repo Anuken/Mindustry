@@ -173,6 +173,7 @@ public class Renderer implements ApplicationListener{
 
         blocks.drawShadows();
         blocks.drawBlocks(Layer.block);
+        blocks.drawFog();
 
         Draw.shader(Shaders.blockbuild, true);
         blocks.drawBlocks(Layer.placement);
