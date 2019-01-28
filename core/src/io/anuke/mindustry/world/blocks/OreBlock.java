@@ -31,7 +31,7 @@ public class OreBlock extends Floor{
 
     @Override
     public void draw(Tile tile){
-        Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
+        Draw.rect(regions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, regions.length - 1))], tile.worldx(), tile.worldy());
     }
 
     public static Block get(Block floor, Item item){

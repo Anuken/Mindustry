@@ -138,7 +138,7 @@ public class CustomGameDialog extends FloatingDialog{
     }
 
     private void displayGameModeHelp(){
-        FloatingDialog d = new FloatingDialog(Core.bundle.get("mode.text.help.title"));
+        FloatingDialog d = new FloatingDialog(Core.bundle.get("mode.help.title"));
         d.setFillParent(false);
         Table table = new Table();
         table.defaults().pad(1f);

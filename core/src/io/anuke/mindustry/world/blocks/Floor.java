@@ -14,6 +14,8 @@ import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
+import static io.anuke.mindustry.Vars.tilesize;
+
 public class Floor extends Block{
     /** number of different variant regions to use */
     public int variants;
@@ -49,7 +51,8 @@ public class Floor extends Block{
     public float heat = 0f;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
-    protected TextureRegion[] variantRegions;
+    protected TextureRegion[] regions;
+    protected TextureRegion[][] edges;
 
     public Floor(String name){
         super(name);
@@ -62,22 +65,24 @@ public class Floor extends Block{
 
         //load variant regions for drawing
         if(variants > 0){
-            variantRegions = new TextureRegion[variants];
+            regions = new TextureRegion[variants];
 
             for(int i = 0; i < variants; i++){
-                variantRegions[i] = Core.atlas.find(name + (i + 1));
+                regions[i] = Core.atlas.find(name + (i + 1));
             }
         }else{
-            variantRegions = new TextureRegion[1];
-            variantRegions[0] = Core.atlas.find(name);
+            regions = new TextureRegion[1];
+            regions[0] = Core.atlas.find(name);
         }
 
-        region = variantRegions[0];
+        int size = (int)(tilesize / Draw.scl);
+        edges = Core.atlas.find(name + "-edge").split(size, size);
+        region = regions[0];
     }
 
     @Override
     public TextureRegion[] variantRegions(){
-        return variantRegions;
+        return regions;
     }
 
     @Override
@@ -93,7 +98,7 @@ public class Floor extends Block{
     public void draw(Tile tile){
         Mathf.random.setSeed(tile.pos());
 
-        Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
+        Draw.rect(regions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, regions.length - 1))], tile.worldx(), tile.worldy());
     }
 
     @Override

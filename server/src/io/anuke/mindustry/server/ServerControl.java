@@ -16,6 +16,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
+import io.anuke.mindustry.game.RulePreset;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
@@ -189,7 +190,7 @@ public class ServerControl implements ApplicationListener{
             info("Stopped server.");
         });
 
-        handler.register("host", "[mapname]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "<mapname> [mode]", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
@@ -197,32 +198,30 @@ public class ServerControl implements ApplicationListener{
 
             if(lastTask != null) lastTask.cancel();
 
-            Map result = null;
+            Map result = world.maps.all().find(map -> map.name.equalsIgnoreCase(arg[0]));
 
-            if(arg.length > 0){
+            if(result == null){
+                err("No map with name &y'{0}'&lr found.", arg[0]);
+                return;
+            }
 
-                String search = arg[0];
-                for(Map map : world.maps.all()){
-                    if(map.name.equalsIgnoreCase(search)) result = map;
-                }
+            RulePreset preset = RulePreset.survival;
 
-                if(result == null){
-                    err("No map with name &y'{0}'&lr found.", search);
+            if(arg.length > 1){
+                try{
+                    preset = RulePreset.valueOf(arg[1]);
+                }catch(IllegalArgumentException e){
+                    err("No gamemode '{0}' found.");
                     return;
                 }
-
-
-                info("Loading map...");
-                err("TODO select gamemode");
-
-                logic.reset();
-                world.loadMap(result);
-                logic.play();
-
-            }else{
-                //TODO
-                err("TODO play generated map");
             }
+
+            info("Loading map...");
+
+            logic.reset();
+            state.rules = preset.get();
+            world.loadMap(result);
+            logic.play();
 
             info("Map loaded.");
 

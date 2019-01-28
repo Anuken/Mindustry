@@ -35,7 +35,7 @@ allprojects{
             //get latest commit hash from gtihub since JITPack's '-snapshot' version doesn't work correctly
             if(arcHash == null){
                 try{
-                    arcHash = 'git ls-remote https://github.com/Anuken/Arc.git'.execute().text.split("\t")[0]//new JsonSlurper().parse(new URL("https://api.github.com/repos/Anuken/Arc/commits/master"))["sha"]
+                    arcHash = 'git ls-remote https://github.com/Anuken/Arc.git'.execute().text.split("\t")[0]
                 }catch(e){
                     e.printStackTrace()
                     arcHash = "-SNAPSHOT";

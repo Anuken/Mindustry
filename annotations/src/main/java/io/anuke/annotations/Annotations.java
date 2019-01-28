@@ -14,6 +14,21 @@ public class Annotations{
 
     }
 
+    /** Marks a class as a special value type struct. Class name must end in 'Struct'.*/
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Struct{
+
+    }
+
+    /**Marks a field of a struct. Optional.*/
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface StructField{
+        /**Size of a struct field in bits. Not valid on booleans or floating point numbers.*/
+        int value();
+    }
+
     public enum PacketPriority{
         /** Gets put in a queue and processed if not connected. */
         normal,
