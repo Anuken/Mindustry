@@ -52,6 +52,8 @@ public class DeployDialog extends FloatingDialog{
             Class.forName("io.anuke.arc.recorder.GifRecorder");
         }catch(Throwable t){
             ui.showInfo("This is not ready for testing. Play custom games instead.");
+            hide();
+            return;
         }
 
         cont.clear();
