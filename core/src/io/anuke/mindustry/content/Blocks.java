@@ -32,8 +32,8 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, part, spawn, space, metalfloor, deepwater, water, tar, stone, craters, charr, blackstone, dirt, sand, ice, snow,
-    grass, shrub, rock, icerock, blackrock, rocks, cliffs, pine, whiteTree,
+    air, part, spawn, space, metalfloor, deepwater, water, tar, stone, craters, charr, blackstone, dirt, sand, ice, snow, iceSnow,
+    grass, holostone, holostoneSnow, shrub, rock, icerock, blackrock, rocks, icerocks, cliffs, pine, whiteTree, sporeCluster,
 
     //crafting
     siliconSmelter, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -182,12 +182,15 @@ public class Blocks implements ContentList{
             dragMultiplier = 0.2f;
             speedMultiplier = 0.4f;
             minimapColor = Color.valueOf("b8eef8");
-            hasOres = true;
         }};
 
         snow = new Floor("snow"){{
             minimapColor = Color.valueOf("c2d1d2");
-            hasOres = true;
+        }};
+
+        iceSnow = new Floor("ice-snow"){{
+            minimapColor = Color.valueOf("c2d1d2");
+            variants = 3;
         }};
 
         grass = new Floor("grass"){{
@@ -197,24 +200,16 @@ public class Blocks implements ContentList{
 
         shrub = new Rock("shrub");
 
-        rock = new Rock("rock"){{
-            variants = 2;
-        }};
-
         cliffs = new StaticWall("cliffs"){{
             variants = 1;
             fillsTile = false;
         }};
 
-        icerock = new Rock("icerock"){{
+        rocks = new StaticWall("rocks"){{
             variants = 2;
         }};
 
-        blackrock = new Rock("blackrock"){{
-            variants = 1;
-        }};
-
-        rocks = new StaticWall("rocks"){{
+        icerocks = new StaticWall("icerocks"){{
             variants = 2;
         }};
 
@@ -224,6 +219,18 @@ public class Blocks implements ContentList{
         }};
 
         whiteTree = new TreeBlock("white-tree-dead"){{
+        }};
+
+        sporeCluster = new Rock("spore-cluster"){{
+            variants = 3;
+        }};
+
+        holostone = new Floor("holostone"){{
+            hasOres = true;
+        }};
+
+        holostoneSnow = new Floor("holostone-snow"){{
+
         }};
 
         //endregion

@@ -172,6 +172,11 @@ public class Renderer implements ApplicationListener{
         blocks.processBlocks();
 
         blocks.drawShadows();
+
+        blocks.floor.beginDraw();
+        blocks.floor.drawLayer(CacheLayer.walls);
+        blocks.floor.endDraw();
+
         blocks.drawBlocks(Layer.block);
         blocks.drawFog();
 

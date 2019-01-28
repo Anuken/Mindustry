@@ -15,6 +15,7 @@ def antialias = {File file ->
     def image = ImageIO.read(file)
     def out = ImageIO.read(file)
     def getRGB = { int ix, int iy ->
+        //if(ix <= 0 || iy <= 0 || ix >= image.width || iy >= image.height) return 0
         return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
     }
 
@@ -112,6 +113,7 @@ task scaleSprites4x(){
                 def scaled = new BufferedImage(image.getWidth() * 2, image.getHeight() * 2, BufferedImage.TYPE_INT_ARGB)
 
                 def getRGB = { int ix, int iy ->
+                    //if(ix <= 0 || iy <= 0 || ix >= image.width || iy >= image.height) return 0
                     return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
                 }
 

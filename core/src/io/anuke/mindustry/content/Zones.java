@@ -5,6 +5,7 @@ import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.maps.generators.MapGenerator;
+import io.anuke.mindustry.maps.generators.MapGenerator.Decoration;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
@@ -58,7 +59,7 @@ public class Zones implements ContentList{
             }};
         }};
 
-        craters = new Zone("craters", new MapGenerator("craters", 1){{ distortion = 0; }}){{
+        craters = new Zone("craters", new MapGenerator("craters", 1).dist(0)){{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
@@ -106,7 +107,8 @@ public class Zones implements ContentList{
             }};
         }};
 
-        frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest")){{ //TODO implement
+        frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest")
+            .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.05))){{
             alwaysUnlocked = true;
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);

@@ -10,6 +10,7 @@ import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
@@ -19,10 +20,9 @@ import static io.anuke.mindustry.Vars.*;
 public class MapGenerator extends Generator{
     private Map map;
     private String mapName;
-
+    private Array<Decoration> decorations = new Array<>();
     /**How much the landscape is randomly distorted.*/
     public float distortion = 3;
-
     /**The amount of final enemy spawns used. -1 to use everything in the map.
      * This amount of enemy spawns is selected randomly from the map.*/
     public int enemySpawns = -1;
@@ -34,6 +34,16 @@ public class MapGenerator extends Generator{
     public MapGenerator(String mapName, int enemySpawns){
         this.mapName = mapName;
         this.enemySpawns = enemySpawns;
+    }
+
+    public MapGenerator decor(Decoration... decor){
+        this.decorations = Array.with(decor);
+        return this;
+    }
+
+    public MapGenerator dist(float distortion){
+        this.distortion = distortion;
+        return this;
     }
 
     @Override
@@ -75,10 +85,18 @@ public class MapGenerator extends Generator{
         for(int x = 0; x < data.width(); x++){
             for(int y = 0; y < data.height(); y++){
                 final double scl = 10;
+                Tile tile = tiles[x][y];
                 int newX = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x, y) * distortion + x), 0, data.width()-1);
                 int newY = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x + 9999, y + 9999) * distortion + y), 0, data.height()-1);
-                if(tiles[newX][newY].block() != Blocks.spawn && !tiles[x][y].block().synthetic()&& !tiles[newX][newY].block().synthetic()){
-                    tiles[x][y].setBlock(tiles[newX][newY].block());
+
+                if(tiles[newX][newY].block() != Blocks.spawn && !tile.block().synthetic()&& !tiles[newX][newY].block().synthetic()){
+                    tile.setBlock(tiles[newX][newY].block());
+                }
+
+                for(Decoration decor : decorations){
+                    if(tile.block() == Blocks.air && tile.floor() == decor.floor && Mathf.chance(decor.chance)){
+                        tile.setBlock(decor.wall);
+                    }
                 }
             }
         }
@@ -121,5 +139,17 @@ public class MapGenerator extends Generator{
 
         world.prepareTiles(tiles);
         world.setMap(map);
+    }
+
+    public static class Decoration{
+        public final Block floor;
+        public final Block wall;
+        public final double chance;
+
+        public Decoration(Block floor, Block wall, double chance){
+            this.floor = floor;
+            this.wall = wall;
+            this.chance = chance;
+        }
     }
 }

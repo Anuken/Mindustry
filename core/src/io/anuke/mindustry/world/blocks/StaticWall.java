@@ -23,14 +23,11 @@ public class StaticWall extends Rock{
 
     @Override
     public void draw(Tile tile){
-        //Draw.colorl(1f - tile.getRotation() / 4f);
-
         int rx = tile.x / 2 * 2;
         int ry = tile.y / 2 * 2;
 
         if(Core.atlas.isFound(large) && eq(rx, ry) && Mathf.randomSeed(Pos.get(rx, ry)) < 0.5){
             if(rx == tile.x && ry == tile.y){
-                //Draw.colorl(1f - avg(rx, ry) / 4f);
                 Draw.rect(large, tile.worldx() + tilesize/2f, tile.worldy() + tilesize/2f);
             }
         }else if(variants > 0){
@@ -38,7 +35,6 @@ public class StaticWall extends Rock{
         }else{
             Draw.rect(region, tile.worldx(), tile.worldy());
         }
-       // Draw.color();
     }
 
     @Override

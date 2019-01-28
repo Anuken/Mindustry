@@ -100,18 +100,21 @@ public class BlockRenderer{
     public void drawShadows(){
         if(disableShadows) return;
 
+        Draw.color();
+
         if(!Core.graphics.isHidden() && (shadows.getWidth() != Core.graphics.getWidth() || shadows.getHeight() != Core.graphics.getHeight())){
             shadows.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         }
 
         Tmp.tr1.set(shadows.getTexture());
-        Shaders.outline.color.set(shadowColor);
-        Shaders.outline.scl = renderer.cameraScale()/3f;
-        Shaders.outline.region = Tmp.tr1;
+        Shaders.shadow.color.set(shadowColor);
+        Shaders.shadow.scl = renderer.cameraScale()/3f;
+        Shaders.shadow.region = Tmp.tr1;
 
         Draw.flush();
         shadows.begin();
         Core.graphics.clear(Color.CLEAR);
+
         floor.beginDraw();
         floor.drawLayer(CacheLayer.walls);
         floor.endDraw();
@@ -127,7 +130,7 @@ public class BlockRenderer{
         Draw.flush();
         shadows.end();
 
-        Draw.shader(Shaders.outline);
+        Draw.shader(Shaders.shadow);
         Draw.rect(Draw.wrap(shadows.getTexture()),
             camera.position.x,
             camera.position.y,
@@ -188,10 +191,6 @@ public class BlockRenderer{
         lastCamY = avgy;
         lastRangeX = rangex;
         lastRangeY = rangey;
-
-        floor.beginDraw();
-        floor.drawLayer(CacheLayer.walls);
-        floor.endDraw();
     }
 
     public void drawBlocks(Layer stopAt){
@@ -206,9 +205,7 @@ public class BlockRenderer{
             Block block = req.tile.block();
 
             if(req.layer == Layer.shadow){
-                Draw.color(0f, 0f, 0f, 0.45f);
                 block.drawShadow(req.tile);
-                Draw.color();
             }else if(req.layer == Layer.block){
                 block.draw(req.tile);
                 if(block.synthetic() && req.tile.getTeam() != players[0].getTeam()){

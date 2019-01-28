@@ -12,6 +12,7 @@ import static io.anuke.mindustry.Vars.world;
 
 public class Shaders{
     public static Outline outline;
+    public static Shadow shadow;
     public static BlockBuild blockbuild;
     public static BlockPreview blockpreview;
     public static Shield shield;
@@ -27,6 +28,7 @@ public class Shaders{
 
     public static void init(){
         outline = new Outline();
+        shadow = new Shadow();
         blockbuild = new BlockBuild();
         blockpreview = new BlockPreview();
         shield = new Shield();
@@ -120,6 +122,23 @@ public class Shaders{
 
         public Outline(){
             super("outline", "default");
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_color", color);
+            setUniformf("u_scl", scl);
+            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+        }
+    }
+
+    public static class Shadow extends LoadShader{
+        public Color color = new Color();
+        public TextureRegion region = new TextureRegion();
+        public float scl;
+
+        public Shadow(){
+            super("shadow", "default");
         }
 
         @Override

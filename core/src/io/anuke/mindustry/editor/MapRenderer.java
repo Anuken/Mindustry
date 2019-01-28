@@ -134,17 +134,21 @@ public class MapRenderer implements Disposable{
             mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
         }
 
+        float offsetX = -(wall.size/3)*tilesize, offsetY = -(wall.size/3) * tilesize;
+
         if(wall.update || wall.destructible){
             mesh.setColor(team.color);
             region = Core.atlas.find("block-border");
         }else if(!wall.synthetic() && bw != 0){
             region = wall.icon(Icon.full) == Core.atlas.find("____") ? Core.atlas.find("clear") : wall.icon(Icon.full);
+            offsetX = tilesize/2f - region.getWidth()/2f * Draw.scl;
+            offsetY = tilesize/2f - region.getHeight()/2f * Draw.scl;
         }else{
             region = Core.atlas.find("clear");
         }
 
         mesh.draw(idxDecal, region,
-                wx * tilesize - (wall.size/3) * tilesize, wy * tilesize - (wall.size/3) * tilesize,
+                wx * tilesize + offsetX, wy * tilesize + offsetY,
                 region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
         mesh.setColor(Color.WHITE);
     }
