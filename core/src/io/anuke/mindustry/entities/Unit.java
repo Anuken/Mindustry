@@ -36,7 +36,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
-public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait, CarriableTrait, InventoryTrait{
+public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait, InventoryTrait{
     /**Total duration of hit flash effect*/
     public static final float hitDuration = 9f;
     /**Percision divisor of velocity, used when writing. For example a value of '2' would mean the percision is 1/2 = 0.5-size chunks.*/
@@ -56,7 +56,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected final StatusController status = new StatusController();
     protected Team team = Team.blue;
 
-    protected CarryTrait carrier;
     protected float drownTime;
 
     @Override
@@ -70,18 +69,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     @Override
-    public CarryTrait getCarrier(){
-        return carrier;
-    }
-
-    @Override
     public boolean collidesGrid(int x, int y){
         return !isFlying();
-    }
-
-    @Override
-    public void setCarrier(CarryTrait carrier){
-        this.carrier = carrier;
     }
 
     @Override
@@ -202,7 +191,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         queryRect.setSize(queryRect.getWidth() * scaling);
 
         Units.getNearby(queryRect, t -> {
-            if(t == this || t.getCarrier() == this || getCarrier() == t || t.isFlying() != isFlying()) return;
+            if(t == this || t.isFlying() != isFlying()) return;
             float dst = dst(t);
             moveVector.set(x, y).sub(t.getX(), t.getY()).setLength(1f * (1f - (dst / queryRect.getWidth())));
             applyImpulse(moveVector.x, moveVector.y);
@@ -235,12 +224,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     /**Updates velocity and status effects.*/
     public void updateVelocityStatus(){
         Floor floor = getFloorOn();
-
-        if(isCarried()){ //carried units do not take into account velocity normally
-            set(carrier.getX(), carrier.getY());
-            velocity.set(carrier.velocity());
-            return;
-        }
 
         Tile tile = world.tileWorld(x, y);
 

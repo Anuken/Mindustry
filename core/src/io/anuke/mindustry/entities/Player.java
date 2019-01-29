@@ -44,7 +44,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTrait{
+public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public static final int timerSync = 2;
     public static final int timerAbility = 3;
     private static final int timerShootLeft = 0;
@@ -76,7 +76,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     private float walktime;
     private Queue<BuildRequest> placeQueue = new Queue<>();
     private Tile mining;
-    private CarriableTrait carrying;
     private Vector2 movement = new Vector2();
     private boolean moved;
 
@@ -90,8 +89,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         player.dead = true;
         player.placeQueue.clear();
-
-        player.dropCarry();
 
         float explosiveness = 2f + (player.inventory.hasItem() ? player.inventory.getItem().item.explosiveness * player.inventory.getItem().amount : 0f);
         float flammability = (player.inventory.hasItem() ? player.inventory.getItem().item.flammability * player.inventory.getItem().amount : 0f);
@@ -185,21 +182,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
     }
 
     @Override
-    public CarriableTrait getCarry(){
-        return carrying;
-    }
-
-    @Override
-    public void setCarry(CarriableTrait unit){
-        this.carrying = unit;
-    }
-
-    @Override
-    public float getCarryWeight(){
-        return mech.carryWeight;
-    }
-
-    @Override
     public float getBuildPower(Tile tile){
         return mech.buildPower;
     }
@@ -241,7 +223,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public boolean isFlying(){
-        return mech.flying || boostHeat > liftoffBoost || isCarried();
+        return mech.flying || boostHeat > liftoffBoost;
     }
 
     @Override
@@ -284,7 +266,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
     @Override
     public void removed(){
-        dropCarryLocal();
 
         TileEntity core = getClosestCore();
         if(core != null && ((CoreEntity) core).currentUnit == this){
@@ -547,11 +528,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             status.update(this); //status effect updating also happens with non locals for effect purposes
             updateVelocityStatus(); //velocity too, for visual purposes
 
-            if(getCarrier() != null){
-                x = getCarrier().getX();
-                y = getCarrier().getY();
-            }
-
             if(Net.server()){
                 updateShooting(); //server simulates player shooting
             }
@@ -595,23 +571,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             speed *= Mathf.lerp(1f, penalty, Angles.angleDist(rotation, velocity.angle()) / 180f);
         }
 
-        //drop from carrier on key press
-        if(!ui.chatfrag.chatOpen() && Core.input.keyTap(Binding.drop_unit)){
-            if(!mech.flying){
-                if(getCarrier() != null){
-                    Call.dropSelf(this);
-                }
-            }else if(getCarry() != null){
-                dropCarry();
-            }else{
-                Unit unit = Units.getClosest(team, x, y, 8f, u -> !u.isFlying() && u.mass() <= mech.carryWeight);
-
-                if(unit != null){
-                    carry(unit);
-                }
-            }
-        }
-
         movement.setZero();
 
         float xa = Core.input.axis(Binding.move_x);
@@ -628,18 +587,12 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         movement.limit(speed).scl(Time.delta());
 
-        if(getCarrier() == null){
-            if(!ui.chatfrag.chatOpen()){
-                velocity.add(movement.x, movement.y);
-            }
-            float prex = x, prey = y;
-            updateVelocityStatus();
-            moved = dst(prex, prey) > 0.001f;
-        }else{
-            velocity.setZero();
-            x = Mathf.lerpDelta(x, getCarrier().getX(), 0.1f);
-            y = Mathf.lerpDelta(y, getCarrier().getY(), 0.1f);
+        if(!ui.chatfrag.chatOpen()){
+            velocity.add(movement.x, movement.y);
         }
+        float prex = x, prey = y;
+        updateVelocityStatus();
+        moved = dst(prex, prey) > 0.001f;
 
         if(!ui.chatfrag.chatOpen()){
             float baseLerp = mech.getRotationAlpha(this);
@@ -680,9 +633,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             }
 
             if(dst(moveTarget) < 2f){
-                if(moveTarget instanceof CarriableTrait){
-                    carry((CarriableTrait) moveTarget);
-                }else if(tapping){
+                if(tapping){
                     Tile tile = ((TileEntity) moveTarget).tile;
                     tile.block().tapped(tile, this);
                 }
@@ -691,12 +642,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
             }
         }else{
             moveTarget = null;
-        }
-
-        if(getCarrier() != null){
-            velocity.setZero();
-            x = Mathf.lerpDelta(x, getCarrier().getX(), 0.1f);
-            y = Mathf.lerpDelta(y, getCarrier().getY(), 0.1f);
         }
 
         movement.set(targetX - x, targetY - y).limit(isBoosting && !mech.flying ? mech.boostSpeed : mech.speed);
@@ -726,7 +671,7 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
 
         float lx = x, ly = y;
         updateVelocityStatus();
-        moved = dst(lx, ly) > 0.001f && !isCarried();
+        moved = dst(lx, ly) > 0.001f;
 
         if(mech.flying){
             //hovering effect
@@ -804,7 +749,6 @@ public class Player extends Unit implements BuilderTrait, CarryTrait, ShooterTra
         dead = true;
         target = null;
         moveTarget = null;
-        carrier = null;
         health = maxHealth();
         boostHeat = drownTime = hitTime = 0f;
         mech = (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);

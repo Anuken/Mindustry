@@ -9,8 +9,6 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.entities.traits.CarriableTrait;
-import io.anuke.mindustry.entities.traits.CarryTrait;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Tile;
@@ -18,10 +16,9 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 
 import static io.anuke.mindustry.Vars.world;
 
-public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
+public abstract class FlyingUnit extends BaseUnit{
     protected static Vector2 vec = new Vector2();
 
-    protected CarriableTrait carrying;
     protected final UnitState
 
     idle = new UnitState(){
@@ -123,21 +120,6 @@ public abstract class FlyingUnit extends BaseUnit implements CarryTrait{
     @Override
     public void move(float x, float y){
         moveBy(x, y);
-    }
-
-    @Override
-    public CarriableTrait getCarry(){
-        return carrying;
-    }
-
-    @Override
-    public void setCarry(CarriableTrait unit){
-        this.carrying = unit;
-    }
-
-    @Override
-    public float getCarryWeight(){
-        return type.carryWeight;
     }
 
     @Override

@@ -272,7 +272,7 @@ public class NetServer implements ApplicationListener{
         NetConnection connection = player.con;
         if(connection == null || snapshotID < connection.lastRecievedClientSnapshot) return;
 
-        boolean verifyPosition = !player.isDead() && netServer.admins.getStrict() && headless && player.getCarrier() == null;
+        boolean verifyPosition = !player.isDead() && netServer.admins.getStrict() && headless;
 
         if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = Time.millis() - 16;
 

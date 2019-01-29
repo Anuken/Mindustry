@@ -547,27 +547,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             //add to selection queue if it's a valid BREAK position
             cursor = cursor.target();
             selection.add(new PlaceRequest(cursor.worldx(), cursor.worldy()));
-        }else if(!canTapPlayer(worldx, worldy)){
-            boolean consumed = false;
-            //else, try and carry units
-            if(player.mech.flying){
-                if(player.getCarry() != null){
-                    consumed = true;
-                    player.dropCarry(); //drop off unit
-                }else{
-                    Unit unit = Units.getClosest(player.getTeam(), Core.input.mouseWorld(x, y).x, Core.input.mouseWorld(x, y).y, 4f, u -> !u.isFlying() && u.mass() <= player.mech.carryWeight);
-
-                    if(unit != null){
-                        consumed = true;
-                        player.moveTarget = unit;
-                        Effects.effect(Fx.select, unit.getX(), unit.getY());
-                    }
-                }
-            }
-
-            if(!consumed && !tileTapped(cursor.target())){
-                tryBeginMine(cursor);
-            }
+        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(cursor.target())){
+            tryBeginMine(cursor);
         }
 
         return false;

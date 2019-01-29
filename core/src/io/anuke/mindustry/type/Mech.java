@@ -27,7 +27,6 @@ public class Mech extends UnlockableContent{
     public float cellTrnsY = 0f;
     public float mineSpeed = 1f;
     public int drillPower = -1;
-    public float carryWeight = 10f;
     public float buildPower = 1f;
     public Color trailColor = Palette.boostFrom;
     public Color trailColorTo = Palette.boostTo;
