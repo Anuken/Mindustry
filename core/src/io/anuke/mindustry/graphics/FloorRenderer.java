@@ -201,7 +201,7 @@ public class FloorRenderer{
         int chunksx = Mathf.ceil((float) (world.width()) / chunksize),
         chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
         cache = new Chunk[chunksx][chunksy];
-        SpriteCache sprites = new SpriteCache(world.width() * world.height() * 3, (world.width() / chunksize) * (world.height() / chunksize) * 2, false);
+        SpriteCache sprites = new SpriteCache(world.width() * world.height() * 5, (world.width() / chunksize) * (world.height() / chunksize) * 2, false);
         cbatch = new CacheBatch(sprites);
 
         Time.mark();

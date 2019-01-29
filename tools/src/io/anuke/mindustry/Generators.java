@@ -9,6 +9,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
+import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 
 import static io.anuke.mindustry.Vars.content;
@@ -141,6 +142,31 @@ public class Generators {
                         scaled.save(block.name + "-icon-" + icon.name());
                     }
                 }
+            }
+        });
+
+        ImagePacker.generate("edges", () -> {
+            for(Block block : content.blocks()){
+                if(!(block instanceof Floor)) continue;
+
+                Floor floor = (Floor)block;
+
+                if(ImagePacker.has(floor.name + "-edge")){
+                    continue;
+                }
+
+                try{
+                    Image image = ImagePacker.get(floor.generateIcons()[0]);
+                    Image edge = ImagePacker.get("edge-stencil");
+
+                    for(int x = 0; x < edge.width(); x++){
+                        for(int y = 0; y < edge.height(); y++){
+                            edge.draw(x, y, edge.getColor(x, y).mul(image.getColor(x % image.width(), y % image.height())));
+                        }
+                    }
+
+                    edge.save(floor.name + "-edge");
+                }catch(Exception ignored){}
             }
         });
     }

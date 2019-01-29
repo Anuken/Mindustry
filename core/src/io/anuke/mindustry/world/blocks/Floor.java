@@ -6,6 +6,8 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.type.Item;
@@ -51,8 +53,9 @@ public class Floor extends Block{
     public float heat = 0f;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
-    protected TextureRegion[] regions;
+
     protected TextureRegion[][] edges;
+    protected byte eq = 0;
 
     public Floor(String name){
         super(name);
@@ -65,24 +68,26 @@ public class Floor extends Block{
 
         //load variant regions for drawing
         if(variants > 0){
-            regions = new TextureRegion[variants];
+            variantRegions = new TextureRegion[variants];
 
             for(int i = 0; i < variants; i++){
-                regions[i] = Core.atlas.find(name + (i + 1));
+                variantRegions[i] = Core.atlas.find(name + (i + 1));
             }
         }else{
-            regions = new TextureRegion[1];
-            regions[0] = Core.atlas.find(name);
+            variantRegions = new TextureRegion[1];
+            variantRegions[0] = Core.atlas.find(name);
         }
 
         int size = (int)(tilesize / Draw.scl);
-        edges = Core.atlas.find(name + "-edge").split(size, size);
-        region = regions[0];
+        if(Core.atlas.has(name + "-edge")){
+            edges = Core.atlas.find(name + "-edge").split(size, size);
+        }
+        region = variantRegions[0];
     }
 
     @Override
-    public TextureRegion[] variantRegions(){
-        return regions;
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
     @Override
@@ -98,12 +103,57 @@ public class Floor extends Block{
     public void draw(Tile tile){
         Mathf.random.setSeed(tile.pos());
 
-        Draw.rect(regions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, regions.length - 1))], tile.worldx(), tile.worldy());
+        Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
+
+        drawEdges(tile);
     }
 
-    @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
+    protected void drawEdges(Tile tile){
+        eq = 0;
+
+        Floor floor = tile.floor();
+
+        for(int i = 0; i < 8; i++){
+            Point2 point = Geometry.d8[i];
+            Tile other = tile.getNearby(point);
+            if(other != null && other.floor().id < floor.id && other.floor().edges != null){
+                eq |= (1 << i);
+            }
+        }
+
+        for(int i = 0; i < 8; i++){
+            if(eq(i)){
+                Point2 point = Geometry.d8[i];
+                Tile other = tile.getNearby(point);
+
+                TextureRegion region = edge(other.floor(), type(i), 2-(point.x + 1), 2-(point.y + 1));
+                Draw.rect(region, tile.worldx(), tile.worldy());
+            }
+        }
+    }
+
+    int type(int i){
+        if(!eq(i - 1) && !eq(i + 1)){
+            //case 0: touching
+            return 0;
+        }else if(eq(i - 1) && eq(i - 2) && eq(i + 1) && eq(i + 2)){
+            //case 2: surrounded
+            return 2;
+        }else if(eq(i - 1) && eq(i + 1)){
+            //case 1: flat
+            return 1;
+        }else{
+            //case 0 is rounded, so it's the safest choice, should work for most possibilities
+            return 0;
+        }
+    }
+
+    boolean eq(int i){
+        return (eq & (1 << Mathf.mod(i, 8))) != 0;
+    }
+
+    TextureRegion edge(Floor block, int type, int x, int y){
+        return block.edges[x + type*3][2-y];
     }
 
 }

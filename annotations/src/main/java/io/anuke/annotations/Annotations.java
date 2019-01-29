@@ -22,7 +22,7 @@ public class Annotations{
     }
 
     /**Marks a field of a struct. Optional.*/
-    @Target(ElementType.TYPE)
+    @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface StructField{
         /**Size of a struct field in bits. Not valid on booleans or floating point numbers.*/

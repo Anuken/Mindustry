@@ -111,6 +111,10 @@ public class ImagePacker{
         return get(Core.atlas.find(name));
     }
 
+    static boolean has(String name){
+        return Core.atlas.has(name);
+    }
+
     static Image get(TextureRegion region){
         GenRegion.validate(region);
 

@@ -167,7 +167,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     editor.beginEdit(data, meta.tags, false);
                     view.clearStack();
                 }catch(Exception e){
-                    ui.showError(Core.bundle.format("editor.errormapload", Strings.parseException(e, false)));
+                    ui.showError(Core.bundle.format("editor.errorimageload", Strings.parseException(e, false)));
                     Log.err(e);
                 }
             }));

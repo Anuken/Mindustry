@@ -13,6 +13,7 @@ import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
+import io.anuke.mindustry.world.blocks.StaticWall;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import static io.anuke.mindustry.Vars.*;
@@ -89,7 +90,8 @@ public class MapGenerator extends Generator{
                 int newX = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x, y) * distortion + x), 0, data.width()-1);
                 int newY = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x + 9999, y + 9999) * distortion + y), 0, data.height()-1);
 
-                if(tiles[newX][newY].block() != Blocks.spawn && !tile.block().synthetic()&& !tiles[newX][newY].block().synthetic()){
+                if(tile.block() instanceof StaticWall
+                    && tiles[newX][newY].block() instanceof StaticWall){
                     tile.setBlock(tiles[newX][newY].block());
                 }
 

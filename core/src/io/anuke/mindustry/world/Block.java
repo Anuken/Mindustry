@@ -115,7 +115,7 @@ public class Block extends BlockStorage{
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] icons = new TextureRegion[Icon.values().length];
     protected TextureRegion[] generatedIcons;
-    protected TextureRegion[] variants;
+    protected TextureRegion[] variantRegions;
     protected TextureRegion region;
 
     public Block(String name){
@@ -503,10 +503,10 @@ public class Block extends BlockStorage{
     }
 
     public TextureRegion[] variantRegions(){
-        if(variants == null){
-            variants = new TextureRegion[]{icon(Icon.full)};
+        if(variantRegions == null){
+            variantRegions = new TextureRegion[]{icon(Icon.full)};
         }
-        return variants;
+        return variantRegions;
     }
 
     public boolean hasEntity(){

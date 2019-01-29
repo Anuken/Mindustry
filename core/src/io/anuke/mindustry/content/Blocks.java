@@ -1,7 +1,9 @@
 package io.anuke.mindustry.content;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.type.Category;
@@ -32,8 +34,9 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, part, spawn, space, metalfloor, deepwater, water, tar, stone, craters, charr, blackstone, dirt, sand, ice, snow, iceSnow,
-    grass, holostone, holostoneSnow, shrub, rock, icerock, blackrock, rocks, icerocks, cliffs, pine, whiteTree, sporeCluster,
+    air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
+    grass, holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
+    iceSnow,
 
     //crafting
     siliconSmelter, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -83,6 +86,12 @@ public class Blocks implements ContentList{
             public void draw(Tile tile){}
             public void load(){}
             public void init(){}
+            public TextureRegion[] variantRegions(){
+                if(variantRegions == null){
+                    variantRegions = new TextureRegion[]{Core.atlas.find("clear")};
+                }
+                return variantRegions;
+            }
         };
 
         part = new BlockPart();
@@ -96,18 +105,6 @@ public class Blocks implements ContentList{
         for(int i = 1; i <= 6; i++){
             new BuildBlock("build" + i);
         }
-
-        space = new Floor("space"){{
-            placeableOn = false;
-            variants = 0;
-            cacheLayer = CacheLayer.space;
-            solid = true;
-            minimapColor = Color.valueOf("000001");
-        }};
-
-        metalfloor = new Floor("metalfloor"){{
-            variants = 6;
-        }};
 
         deepwater = new Floor("deepwater"){{
             liquidColor = Color.valueOf("546bb3");
@@ -161,16 +158,6 @@ public class Blocks implements ContentList{
             minimapColor = Color.valueOf("323232");
         }};
 
-        blackstone = new Floor("blackstone"){{
-            minimapColor = Color.valueOf("252525");
-            playerUnmineable = true;
-            hasOres = true;
-        }};
-
-        dirt = new Floor("dirt"){{
-            minimapColor = Color.valueOf("6e501e");
-        }};
-
         sand = new Floor("sand"){{
             itemDrop = Items.sand;
             minimapColor = Color.valueOf("988a67");
@@ -184,21 +171,18 @@ public class Blocks implements ContentList{
             minimapColor = Color.valueOf("b8eef8");
         }};
 
-        snow = new Floor("snow"){{
-            minimapColor = Color.valueOf("c2d1d2");
+        holostone = new Floor("holostone"){{
+            hasOres = true;
         }};
 
-        iceSnow = new Floor("ice-snow"){{
+        snow = new Floor("snow"){{
             minimapColor = Color.valueOf("c2d1d2");
-            variants = 3;
         }};
 
         grass = new Floor("grass"){{
             hasOres = true;
             minimapColor = Color.valueOf("549d5b");
         }};
-
-        shrub = new Rock("shrub");
 
         cliffs = new StaticWall("cliffs"){{
             variants = 1;
@@ -218,19 +202,18 @@ public class Blocks implements ContentList{
             variants = 0;
         }};
 
-        whiteTree = new TreeBlock("white-tree-dead"){{
+        whiteTreeDead = new TreeBlock("white-tree-dead"){{
+        }};
+
+        whiteTree = new TreeBlock("white-tree"){{
         }};
 
         sporeCluster = new Rock("spore-cluster"){{
             variants = 3;
         }};
 
-        holostone = new Floor("holostone"){{
-            hasOres = true;
-        }};
-
-        holostoneSnow = new Floor("holostone-snow"){{
-
+        iceSnow = new Floor("iceSnow"){{
+            variants = 3;
         }};
 
         //endregion
