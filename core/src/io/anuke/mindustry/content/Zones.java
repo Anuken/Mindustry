@@ -107,8 +107,8 @@ public class Zones implements ContentList{
             }};
         }};
 
-        frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest")
-            .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.05))){{
+        frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 2)
+            .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
             alwaysUnlocked = true;
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
@@ -119,6 +119,11 @@ public class Zones implements ContentList{
                 waves = true;
                 waveTimer = true;
                 waveSpacing = 60 * 60 * 2;
+                spawns = Array.with(
+                    new SpawnGroup(UnitTypes.dagger){{
+                        unitScaling = 2;
+                    }}
+                );
             }};
         }};
 

@@ -24,6 +24,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class WaveSpawner{
+    private static final float shockwaveBase = 350f, shockwaveRand = 10f, maxShockwaveDst = shockwaveBase + shockwaveRand;
     private Array<SpawnGroup> groups;
     private Array<FlyerSpawn> flySpawns = new Array<>();
     private Array<GroundSpawn> groundSpawns = new Array<>();
@@ -50,6 +51,11 @@ public class WaveSpawner{
         for(int i = 0; i < amount; i++){
             loadedSpawns.add(stream.readInt());
         }
+    }
+
+    /**@return true if the player is near a ground spawn point.*/
+    public boolean playerNear(){
+        return groundSpawns.count(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, players[0].x, players[0].y) < maxShockwaveDst) > 0;
     }
 
     public void spawnEnemies(){
@@ -98,7 +104,7 @@ public class WaveSpawner{
                     }
                     Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawn.x * tilesize, spawn.y * tilesize));
                     //would be interesting to see player structures survive this without hacks
-                    Time.run(40f, () -> Damage.damage(waveTeam, spawn.x * tilesize, spawn.y * tilesize, 350f + Mathf.random(80f), 99999999f));
+                    Time.run(40f, () -> Damage.damage(waveTeam, spawn.x * tilesize, spawn.y * tilesize, shockwaveBase + Mathf.random(shockwaveRand), 99999999f));
                 }
             }
         }

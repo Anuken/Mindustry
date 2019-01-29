@@ -113,12 +113,10 @@ public class Floor extends Block{
     protected void drawEdges(Tile tile){
         eq = 0;
 
-        Floor floor = tile.floor();
-
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
             Tile other = tile.getNearby(point);
-            if(other != null && other.floor().id < floor.id && other.floor().edges != null){
+            if(other != null && doEdge(other.floor()) && other.floor().edges != null){
                 eq |= (1 << i);
             }
         }
@@ -132,6 +130,14 @@ public class Floor extends Block{
                 Draw.rect(region, tile.worldx(), tile.worldy());
             }
         }
+    }
+
+    protected boolean doEdge(Floor other){
+        return (other.id < id || edges == null) && other.edgeOnto(this);
+    }
+
+    protected boolean edgeOnto(Floor other){
+        return true;
     }
 
     int type(int i){

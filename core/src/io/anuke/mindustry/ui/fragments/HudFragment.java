@@ -155,6 +155,16 @@ public class HudFragment extends Fragment{
         });
 
         parent.fill(t -> {
+            t.visible(() -> !state.is(State.menu));
+            t.table("flat", c -> c.add("$nearpoint")
+            .update(l -> l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f))))
+            .get().setAlignment(Align.center, Align.center))
+            .margin(6).update(u -> {
+                u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(world.spawner.playerNear()), 0.1f);
+            }).get().color.a = 0f;
+        });
+
+        parent.fill(t -> {
             t.visible(() -> netServer.isWaitingForPlayers() && !state.is(State.menu));
             t.table("button", c -> c.add("$waiting.players"));
         });
@@ -199,7 +209,7 @@ public class HudFragment extends Fragment{
         });
 
         parent.fill(t -> {
-            t.top().right();
+            t.top().right().visible(() -> !state.is(State.menu));
 
             TextButton button = Elements.newButton("$launch", Call::launchZone);
 

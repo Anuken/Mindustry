@@ -152,7 +152,7 @@ public class DeployDialog extends FloatingDialog{
     }
 
     void buildButton(Zone zone, TextButton button){
-        button.setDisabled(() -> !canUnlock(zone));
+        button.setDisabled(() -> !canUnlock(zone) || !data.hasItems(zone.itemRequirements));
         button.clicked(() -> {
             if(!data.isUnlocked(zone)){
                 data.removeItems(zone.itemRequirements);

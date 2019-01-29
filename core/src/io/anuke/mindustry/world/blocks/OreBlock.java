@@ -32,6 +32,18 @@ public class OreBlock extends Floor{
     @Override
     public void draw(Tile tile){
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
+
+        drawEdges(tile);
+    }
+
+    @Override
+    public boolean doEdge(Floor floor){
+        return floor != base && super.doEdge(floor);
+    }
+
+    @Override
+    protected boolean edgeOnto(Floor other){
+        return other != base;
     }
 
     public static Block get(Block floor, Item item){
