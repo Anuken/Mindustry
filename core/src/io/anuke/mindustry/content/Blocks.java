@@ -853,7 +853,7 @@ public class Blocks implements ContentList{
             alwaysUnlocked = true;
 
             health = 1100;
-            itemCapacity = 1000;
+            itemCapacity = 2000;
         }};
 
         vault = new Vault("vault"){{

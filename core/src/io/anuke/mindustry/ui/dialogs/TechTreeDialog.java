@@ -157,7 +157,8 @@ public class TechTreeDialog extends FloatingDialog{
                 button.tapped(() -> moved = false);
                 button.setSize(nodeSize, nodeSize);
                 button.update(() -> {
-                    button.setPosition(node.x + panX + width/2f, node.y + panY + height/2f, Align.center);
+                    float offset = (Core.graphics.getHeight() % 2) / 2f;
+                    button.setPosition(node.x + panX + width/2f, node.y + panY + height/2f + offset, Align.center);
                     button.getStyle().up = Core.scene.skin.getDrawable(!locked(node.node) ? "content-background" : "content-background-locked");
                     ((TextureRegionDrawable)button.getStyle().imageUp)
                         .setRegion(node.visible ? node.node.block.icon(Icon.medium) : Core.atlas.find("icon-tree-locked"));

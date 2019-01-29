@@ -110,18 +110,59 @@ public class Zones implements ContentList{
         frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 2)
             .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
             alwaysUnlocked = true;
-            deployCost = ItemStack.with(Items.copper, 300);
-            startingItems = ItemStack.with(Items.copper, 200);
+            deployCost = ItemStack.with(Items.copper, 500);
+            startingItems = ItemStack.with(Items.copper, 400);
             conditionWave = 15;
             zoneRequirements = new Zone[]{craters};
-            blockRequirements = new Block[]{Blocks.copperWall};
+            itemRequirements = ItemStack.with(Items.copper, 4000, Items.lead, 2000);
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 60 * 2;
+                waveSpacing = 60 * 60;
                 spawns = Array.with(
+                    new SpawnGroup(UnitTypes.titan){{
+                        unitScaling = 3;
+                        end = 9;
+                    }},
+
                     new SpawnGroup(UnitTypes.dagger){{
                         unitScaling = 2;
+                        begin = 2;
+                        end = 9;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        unitScaling = 2;
+                        begin = 5;
+                        end = 9;
+                    }},
+
+                    new SpawnGroup(UnitTypes.crawler){{
+                        unitScaling = 0.5f;
+                        begin = 10;
+                        spacing = 10;
+                        unitAmount = 5;
+                    }},
+
+                    new SpawnGroup(UnitTypes.titan){{
+                        begin = 11;
+                        unitAmount = 2;
+                        unitScaling = 2;
+                        spacing = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 12;
+                        unitAmount = 2;
+                        unitScaling = 2;
+                        spacing = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.crawler){{
+                        unitScaling = 0.5f;
+                        begin = 35;
+                        spacing = 10;
+                        unitAmount = 6;
                     }}
                 );
             }};
