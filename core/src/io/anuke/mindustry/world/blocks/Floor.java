@@ -53,6 +53,8 @@ public class Floor extends Block{
     public float heat = 0f;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
+    /**Style of the edge stencil. Loaded by looking up "edge-stencil-{name}".*/
+    public String edgeStyle = "smooth";
 
     protected TextureRegion[][] edges;
     protected byte eq = 0;

@@ -107,10 +107,10 @@ public class StructAnnotationProcessor extends AbstractProcessor{
                             getter.addStatement("return ($L & (1L << $L)) != 0", structParam, offset);
                         }else if(varType == TypeName.FLOAT){
                             //floats: need conversion
-                            getter.addStatement("return Float.intBitsToFloat((int)(($L >> $L) & $L))", structParam, offset, bitString(size, structTotalSize));
+                            getter.addStatement("return Float.intBitsToFloat((int)(($L >>> $L) & $L))", structParam, offset, bitString(size, structTotalSize));
                         }else{
                             //bytes, shorts, chars, ints
-                            getter.addStatement("return ($T)(($L >> $L) & $L)", varType, structParam, offset, bitString(size, structTotalSize));
+                            getter.addStatement("return ($T)(($L >>> $L) & $L)", varType, structParam, offset, bitString(size, structTotalSize));
                         }
 
                         //[setter] + [constructor building]

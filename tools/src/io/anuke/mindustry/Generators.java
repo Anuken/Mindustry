@@ -34,7 +34,9 @@ public class Generators {
                         image.draw(region);
                     }
 
-                    image.save(block.name + "-icon-full");
+                    if(regions.length > 1){
+                        image.save(block.name + "-icon-full");
+                    }
 
                     for(Icon icon : Icon.values()){
                         if(icon.size == 0) continue;
@@ -157,7 +159,7 @@ public class Generators {
 
                 try{
                     Image image = ImagePacker.get(floor.generateIcons()[0]);
-                    Image edge = ImagePacker.get("edge-stencil");
+                    Image edge = ImagePacker.get("edge-stencil-" + floor.edgeStyle);
 
                     for(int x = 0; x < edge.width(); x++){
                         for(int y = 0; y < edge.height(); y++){

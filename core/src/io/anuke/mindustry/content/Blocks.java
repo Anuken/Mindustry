@@ -165,6 +165,10 @@ public class Blocks implements ContentList{
             playerUnmineable = true;
         }};
 
+        iceSnow = new Floor("ice-snow"){{
+            variants = 3;
+        }};
+
         ice = new Floor("ice"){{
             dragMultiplier = 0.2f;
             speedMultiplier = 0.4f;
@@ -173,6 +177,7 @@ public class Blocks implements ContentList{
 
         holostone = new Floor("holostone"){{
             hasOres = true;
+            edgeStyle = "blocky";
         }};
 
         snow = new Floor("snow"){{
@@ -209,10 +214,6 @@ public class Blocks implements ContentList{
         }};
 
         sporeCluster = new Rock("spore-cluster"){{
-            variants = 3;
-        }};
-
-        iceSnow = new Floor("iceSnow"){{
             variants = 3;
         }};
 

@@ -486,7 +486,7 @@ public class Block extends BlockStorage{
 
     public TextureRegion icon(Icon icon){
         if(icons[icon.ordinal()] == null){
-            icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name());
+            icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name(), icon == Icon.full ? getGeneratedIcons()[0] : Core.atlas.find("__error"));
         }
         return icons[icon.ordinal()];
     }
