@@ -92,8 +92,8 @@ public class MapGenerator extends Generator{
 
                 if((tile.block() instanceof StaticWall
                     && tiles[newX][newY].block() instanceof StaticWall)
-                || tile.block() == Blocks.air
-                || tiles[newX][newY].block() == Blocks.air){
+                    || tile.block() == Blocks.air
+                    || (tiles[newX][newY].block() == Blocks.air && tile.block() instanceof StaticWall)){
                     tile.setBlock(tiles[newX][newY].block());
                 }
 

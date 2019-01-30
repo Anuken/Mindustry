@@ -55,6 +55,8 @@ public class Floor extends Block{
     public boolean playerUnmineable = false;
     /**Style of the edge stencil. Loaded by looking up "edge-stencil-{name}".*/
     public String edgeStyle = "smooth";
+    /**Whether edges are used at all.*/
+    public boolean hasEdges = true;
 
     protected TextureRegion[][] edges;
     protected byte eq = 0;
@@ -81,7 +83,7 @@ public class Floor extends Block{
         }
 
         int size = (int)(tilesize / Draw.scl);
-        if(Core.atlas.has(name + "-edge")){
+        if(hasEdges && Core.atlas.has(name + "-edge")){
             edges = Core.atlas.find(name + "-edge").split(size, size);
         }
         region = variantRegions[0];

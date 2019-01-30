@@ -168,7 +168,7 @@ public class Zones implements ContentList{
             }};
         }};
 
-        ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1)){{ //TODO implement
+        ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1)){{
             deployCost = ItemStack.with(Items.copper, 600, Items.graphite, 50);
             startingItems = ItemStack.with(Items.copper, 400);
             conditionWave = 20;
@@ -239,7 +239,7 @@ public class Zones implements ContentList{
             }};
         }};
 
-        stainedMountains = new Zone("stainedMountains", new MapGenerator("groundZero", 1)){{ //TODO implement
+        stainedMountains = new Zone("stainedMountains", new MapGenerator("groundZero", 2)){{ //TODO implement
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;

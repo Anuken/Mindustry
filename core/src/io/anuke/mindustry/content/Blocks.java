@@ -36,7 +36,7 @@ public class Blocks implements ContentList{
     //environment
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
     grass, holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, dunerocks,
+    iceSnow, sandWater, duneRocks, stainedRocks,
 
     //crafting
     siliconSmelter, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -153,10 +153,12 @@ public class Blocks implements ContentList{
         craters = new Floor("craters"){{
             minimapColor = Color.valueOf("323232");
             variants = 6;
+            hasEdges = false;
         }};
 
         charr = new Floor("char"){{
             minimapColor = Color.valueOf("323232");
+            hasEdges = false;
         }};
 
         sandWater = new Floor("sand-water"){{
@@ -215,7 +217,7 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
-        dunerocks = new StaticWall("dunerocks"){{
+        duneRocks = new StaticWall("dunerocks"){{
             variants = 2;
         }};
 
@@ -232,6 +234,10 @@ public class Blocks implements ContentList{
 
         sporeCluster = new Rock("spore-cluster"){{
             variants = 3;
+        }};
+
+        stainedRocks = new StaticWall("stained-rocks"){{
+            variants = 2;
         }};
 
         //endregion
