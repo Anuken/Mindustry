@@ -207,7 +207,7 @@ public class Shaders{
     public static class SurfaceShader extends LoadShader{
 
         public SurfaceShader(String frag){
-            super(frag, "default");
+            super(frag, "cache");
         }
 
         @Override
@@ -217,7 +217,7 @@ public class Shaders{
                     Core.camera.position.y - Core.camera.height / 2 );
             setUniformf("screensize", Core.camera.width,
             Core.camera.height );
-            setUniformf("time", Time.time());
+            setUniformf("u_time", Time.time());
         }
     }
     

@@ -155,6 +155,7 @@ public class HudFragment extends Fragment{
         });
 
         parent.fill(t -> {
+            t.touchable(Touchable.disabled);
             t.visible(() -> !state.is(State.menu));
             t.table("flat", c -> c.add("$nearpoint")
             .update(l -> l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f))))

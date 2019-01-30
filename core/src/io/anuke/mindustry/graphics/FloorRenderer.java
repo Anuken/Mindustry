@@ -124,6 +124,8 @@ public class FloorRenderer{
         int crangex = (int) (camera.width  / (chunksize * tilesize)) + 1;
         int crangey = (int) (camera.height  / (chunksize * tilesize)) + 1;
 
+        SpriteBatch batch = Core.batch;
+        Core.batch = cbatch;
         layer.begin();
 
         for(int x = -crangex; x <= crangex; x++){
@@ -142,6 +144,7 @@ public class FloorRenderer{
         }
 
         layer.end();
+        Core.batch = batch;
     }
 
     private void cacheChunk(int cx, int cy){

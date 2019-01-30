@@ -10,7 +10,7 @@ public class Liquids implements ContentList{
     @Override
     public void load(){
 
-        water = new Liquid("water", Color.valueOf("486acd")){{
+        water = new Liquid("water", Color.valueOf("596ab8")){{
             heatCapacity = 0.4f;
             tier = 0;
             effect = StatusEffects.wet;

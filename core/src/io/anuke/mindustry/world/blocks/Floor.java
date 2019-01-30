@@ -133,7 +133,7 @@ public class Floor extends Block{
     }
 
     protected boolean doEdge(Floor other){
-        return (other.id < id || edges == null) && other.edgeOnto(this);
+        return (other.id > id || edges == null) && other.edgeOnto(this);
     }
 
     protected boolean edgeOnto(Floor other){

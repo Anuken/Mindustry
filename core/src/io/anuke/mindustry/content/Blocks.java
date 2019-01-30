@@ -107,7 +107,7 @@ public class Blocks implements ContentList{
         }
 
         deepwater = new Floor("deepwater"){{
-            liquidColor = Color.valueOf("546bb3");
+            liquidColor = Color.valueOf("4d5ca4");
             speedMultiplier = 0.2f;
             variants = 0;
             liquidDrop = Liquids.water;
@@ -120,7 +120,7 @@ public class Blocks implements ContentList{
         }};
 
         water = new Floor("water"){{
-            liquidColor = Color.valueOf("546bb3");
+            liquidColor = Color.valueOf("596ab8");
             speedMultiplier = 0.5f;
             variants = 0;
             status = StatusEffects.wet;
@@ -165,23 +165,23 @@ public class Blocks implements ContentList{
             playerUnmineable = true;
         }};
 
+        holostone = new Floor("holostone"){{
+            hasOres = true;
+            edgeStyle = "blocky";
+        }};
+
         iceSnow = new Floor("ice-snow"){{
             variants = 3;
+        }};
+
+        snow = new Floor("snow"){{
+            minimapColor = Color.valueOf("c2d1d2");
         }};
 
         ice = new Floor("ice"){{
             dragMultiplier = 0.2f;
             speedMultiplier = 0.4f;
             minimapColor = Color.valueOf("b8eef8");
-        }};
-
-        holostone = new Floor("holostone"){{
-            hasOres = true;
-            edgeStyle = "blocky";
-        }};
-
-        snow = new Floor("snow"){{
-            minimapColor = Color.valueOf("c2d1d2");
         }};
 
         grass = new Floor("grass"){{
@@ -776,7 +776,7 @@ public class Blocks implements ContentList{
 
         blastDrill = new Drill("blast-drill"){{
             requirements(Category.production, ItemStack.with(Items.copper, 130, Items.silicon, 120, Items.titanium, 100, Items.thorium, 60));
-            drillTime = 120;
+            drillTime = 200;
             size = 3;
             drawRim = true;
             hasPower = true;
@@ -792,7 +792,7 @@ public class Blocks implements ContentList{
 
         plasmaDrill = new Drill("plasma-drill"){{
             heatColor = Color.valueOf("ff461b");
-            drillTime = 100;
+            drillTime = 150;
             size = 4;
             hasLiquids = true;
             hasPower = true;

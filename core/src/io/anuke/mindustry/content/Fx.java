@@ -117,7 +117,7 @@ public class Fx implements ContentList{
         });
 
         unitLand = new GroundEffect(30, e -> {
-            Draw.color(Palette.lightishGray, e.color, e.rotation);
+            Draw.color(Tmp.c1.set(e.color).mul(1.1f));
             Angles.randLenVectors(e.id, 6, 17f * e.finpow(), (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.3f);
             });
@@ -1067,7 +1067,7 @@ public class Fx implements ContentList{
             Draw.reset();
         });
         ripple = new GroundEffect(false, 30, e -> {
-            Draw.color(Tmp.c1.set(e.color).shiftValue(0.1f));
+            Draw.color(Tmp.c1.set(e.color).mul(1.2f));
             Lines.stroke(e.fout() + 0.4f);
             Lines.circle(e.x, e.y, 2f + e.fin() * 4f);
             Draw.reset();

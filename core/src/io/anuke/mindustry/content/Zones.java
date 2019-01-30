@@ -168,7 +168,7 @@ public class Zones implements ContentList{
             }};
         }};
 
-        ruinousShores = new Zone("ruinousShores", new MapGenerator("groundZero", 1)){{ //TODO implement
+        ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores")){{ //TODO implement
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
