@@ -84,10 +84,11 @@ public class BlockRenderer{
 
     public void drawFog(){
         float ww = world.width() * tilesize, wh = world.height() * tilesize;
-        float u = (camera.position.x - camera.width/2f) / ww,
-        v = (camera.position.y - camera.height/2f) / wh,
-        u2 = (camera.position.x + camera.width/2f) / ww,
-        v2 = (camera.position.y + camera.height/2f) / wh;
+        float x = camera.position.x + tilesize/2f, y = camera.position.y + tilesize/2f;
+        float u = (x - camera.width/2f) / ww,
+        v = (y - camera.height/2f) / wh,
+        u2 = (x + camera.width/2f) / ww,
+        v2 = (y + camera.height/2f) / wh;
 
         Tmp.tr1.set(fog.getTexture());
         Tmp.tr1.set(u, v2, u2, v);

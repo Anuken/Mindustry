@@ -2,6 +2,7 @@ package io.anuke.mindustry.world;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.function.Consumer;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Position;
@@ -330,11 +331,11 @@ public class Tile implements Position, TargetTrait{
         }
 
         if(target().synthetic()){
-            cost += target().block().health / 10f;
+            cost += Mathf.clamp(target().block().health / 10f, 0, 28);
         }
 
         if(floor.isLiquid){
-            cost += 100f;
+            cost += 80;
         }
     }
 

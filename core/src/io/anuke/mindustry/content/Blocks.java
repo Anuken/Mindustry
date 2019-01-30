@@ -36,7 +36,7 @@ public class Blocks implements ContentList{
     //environment
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
     grass, holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow,
+    iceSnow, sandWater, dunerocks,
 
     //crafting
     siliconSmelter, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -46,6 +46,7 @@ public class Blocks implements ContentList{
     powerVoid, powerSource, itemSource, liquidSource, itemVoid,
 
     //defense
+    scrapWall, scrapWallLarge,
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, overdriveProjector, forceProjector, shockMine,
 
@@ -158,6 +159,18 @@ public class Blocks implements ContentList{
             minimapColor = Color.valueOf("323232");
         }};
 
+        sandWater = new Floor("sand-water"){{
+            liquidColor = Color.valueOf("596ab8");
+            speedMultiplier = 0.8f;
+            variants = 0;
+            status = StatusEffects.wet;
+            statusDuration = 50f;
+            liquidDrop = Liquids.water;
+            isLiquid = true;
+            cacheLayer = CacheLayer.water;
+            minimapColor = Color.valueOf("506eb4");
+        }};
+
         sand = new Floor("sand"){{
             itemDrop = Items.sand;
             minimapColor = Color.valueOf("988a67");
@@ -199,6 +212,10 @@ public class Blocks implements ContentList{
         }};
 
         icerocks = new StaticWall("icerocks"){{
+            variants = 2;
+        }};
+
+        dunerocks = new StaticWall("dunerocks"){{
             variants = 2;
         }};
 
@@ -433,6 +450,16 @@ public class Blocks implements ContentList{
 
         int wallHealthMultiplier = 3;
 
+        scrapWall = new Wall("scrap-wall"){{
+            health = 80;
+            variants = 3;
+        }};
+
+        scrapWallLarge = new Wall("scrap-wall-large"){{
+            health = 80 * 4;
+            size = 2;
+        }};
+
         copperWall = new Wall("copper-wall"){{
             requirements(Category.defense, ItemStack.with(Items.copper, 12));
             health = 80 * wallHealthMultiplier;
@@ -440,7 +467,6 @@ public class Blocks implements ContentList{
 
         copperWallLarge = new Wall("copper-wall-large"){{
             requirements(Category.defense, ItemStack.with(Items.copper, 12 * 4));
-            requirements(Category.defense, ItemStack.with(Items.copper, 12));
             health = 80 * 4 * wallHealthMultiplier;
             size = 2;
         }};

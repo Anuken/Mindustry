@@ -168,16 +168,61 @@ public class Zones implements ContentList{
             }};
         }};
 
-        ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores")){{ //TODO implement
-            deployCost = ItemStack.with(Items.copper, 300);
-            startingItems = ItemStack.with(Items.copper, 200);
-            conditionWave = 15;
+        ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1)){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 600, Items.graphite, 50);
+            startingItems = ItemStack.with(Items.copper, 400);
+            conditionWave = 20;
+            launchPeriod = 20;
             zoneRequirements = new Zone[]{frozenForest};
-            blockRequirements = new Block[]{Blocks.copperWall};
+            itemRequirements = ItemStack.with(Items.lead, 6000, Items.graphite, 2000);
+            blockRequirements = new Block[]{Blocks.graphitePress, Blocks.combustionGenerator};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 80;
+                waveSpacing = 60 * 60;
+                spawns = Array.with(
+                    new SpawnGroup(UnitTypes.wraith){{
+                        unitScaling = 2;
+                        spacing = 2;
+                        end = 10;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 2;
+                        spacing = 2;
+                        unitScaling = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.wraith){{
+                        begin = 10;
+                        unitScaling = 0.5f;
+                        unitAmount = 6;
+                        spacing = 10;
+                    }},
+
+                    new SpawnGroup(UnitTypes.crawler){{
+                        begin = 5;
+                        unitScaling = 1;
+                        spacing = 5;
+                        unitAmount = 1;
+                        effect = StatusEffects.overdrive;
+                    }},
+
+                    new SpawnGroup(UnitTypes.crawler){{
+                        begin = 22;
+                        unitScaling = 1;
+                        spacing = 20;
+                        unitScaling = 0.5f;
+                        unitAmount = 10;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 11;
+                        spacing = 2;
+                        unitScaling = 2;
+                        unitAmount = 2;
+                    }}
+                );
             }};
         }};
 

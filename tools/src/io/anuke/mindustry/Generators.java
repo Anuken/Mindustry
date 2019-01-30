@@ -160,14 +160,16 @@ public class Generators {
                 try{
                     Image image = ImagePacker.get(floor.generateIcons()[0]);
                     Image edge = ImagePacker.get("edge-stencil-" + floor.edgeStyle);
+                    Image result = new Image(edge.width(), edge.height());
 
                     for(int x = 0; x < edge.width(); x++){
                         for(int y = 0; y < edge.height(); y++){
-                            edge.draw(x, y, edge.getColor(x, y).mul(image.getColor(x % image.width(), y % image.height())));
+                            result.draw(x, y, edge.getColor(x, y).mul(image.getColor(x % image.width(), y % image.height())));
                         }
                     }
 
-                    edge.save(floor.name + "-edge");
+                    result.save(floor.name + "-edge");
+
                 }catch(Exception ignored){}
             }
         });

@@ -24,7 +24,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class WaveSpawner{
-    private static final float shockwaveBase = 350f, shockwaveRand = 10f, maxShockwaveDst = shockwaveBase + shockwaveRand;
+    private static final float shockwaveBase = 380f, shockwaveRand = 50f, maxShockwaveDst = shockwaveBase + shockwaveRand;
     private Array<SpawnGroup> groups;
     private Array<FlyerSpawn> flySpawns = new Array<>();
     private Array<GroundSpawn> groundSpawns = new Array<>();

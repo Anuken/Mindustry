@@ -159,6 +159,7 @@ public class Pathfinder{
 
                     if(other != null && (path.weights[dx][dy] > cost + other.cost || path.searches[dx][dy] < path.search)
                             && passable(other, team)){
+                        if(other.cost < 0) throw new IllegalArgumentException("Tile cost cannot be negative! " + other);
                         path.frontier.addFirst(world.tile(dx, dy));
                         path.weights[dx][dy] = cost + other.cost;
                         path.searches[dx][dy] = (short)path.search;

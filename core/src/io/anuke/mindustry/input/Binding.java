@@ -18,7 +18,7 @@ public enum Binding implements KeyBind{
     dash(KeyCode.SHIFT_LEFT),
     drop_unit(KeyCode.SHIFT_LEFT),
     gridMode(KeyCode.SPACE),
-    gridModeShift(KeyCode.SHIFT_LEFT),
+    gridModeShift(KeyCode.ALT_LEFT),
     zoom_hold(KeyCode.CONTROL_LEFT, "view"),
     zoom(new Axis(KeyCode.SCROLL)),
     zoom_minimap(new Axis(KeyCode.MINUS, KeyCode.PLUS)),
