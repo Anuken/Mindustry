@@ -58,7 +58,7 @@ public class Blocks implements ContentList{
 
     //power
     combustionGenerator, thermalGenerator, turbineGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
-    fusionReactor, battery, batteryLarge, powerNode, powerNodeLarge,
+    fusionReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower,
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, plasmaDrill, waterExtractor, oilExtractor, cultivator,
@@ -741,10 +741,16 @@ public class Blocks implements ContentList{
 
         powerNodeLarge = new PowerNode("power-node-large"){{
             requirements(Category.power, ItemStack.with(Items.titanium, 10, Items.lead, 20, Items.silicon, 6));
-            requirements(Category.power, ItemStack.with(Items.copper, 2, Items.lead, 6));
             size = 2;
             maxNodes = 6;
             laserRange = 9.5f;
+        }};
+
+        surgeTower = new PowerNode("surge-tower"){{
+            requirements(Category.power, ItemStack.with(Items.titanium, 15, Items.lead, 20, Items.silicon, 30, Items.surgealloy, 10));
+            size = 2;
+            maxNodes = 2;
+            laserRange = 40f;
         }};
 
         battery = new Battery("battery"){{

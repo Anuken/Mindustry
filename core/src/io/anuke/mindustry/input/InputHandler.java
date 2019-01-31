@@ -16,6 +16,7 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Player;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.ValidateException;
@@ -184,7 +185,7 @@ public abstract class InputHandler implements InputProcessor{
         //consume tap event if necessary
         if(tile.getTeam() == player.getTeam() && tile.block().consumesTap){
             consumed = true;
-        }else if(tile.getTeam() == player.getTeam() && tile.block().synthetic() && !consumed){
+        }else if((tile.getTeam() == player.getTeam() || tile.getTeam() == Team.none) && tile.block().synthetic() && !consumed){
             if(tile.block().hasItems && tile.entity.items.total() > 0){
                 frag.inv.showFor(tile);
                 consumed = true;

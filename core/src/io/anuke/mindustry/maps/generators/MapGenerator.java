@@ -6,15 +6,19 @@ import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.noise.Simplex;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.mindustry.world.blocks.StaticWall;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
+import io.anuke.mindustry.world.blocks.storage.StorageBlock;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -27,8 +31,9 @@ public class MapGenerator extends Generator{
     /**The amount of final enemy spawns used. -1 to use everything in the map.
      * This amount of enemy spawns is selected randomly from the map.*/
     public int enemySpawns = -1;
-
+    /*Whether floor is distorted along with blocks.*/
     public boolean distortFloor = false;
+    public ItemStack[] storageDrops = ItemStack.with(Items.copper, 300, Items.lead, 300, Items.silicon, 200, Items.graphite, 200, Items.blastCompound, 200);
 
     public MapGenerator(String mapName){
         this.mapName = mapName;
@@ -112,6 +117,14 @@ public class MapGenerator extends Generator{
                 for(Decoration decor : decorations){
                     if(tile.block() == Blocks.air && tile.floor() == decor.floor && Mathf.chance(decor.chance)){
                         tile.setBlock(decor.wall);
+                    }
+                }
+
+                if(tile.getTeam() == Team.none && tile.block() instanceof StorageBlock){
+                    for(ItemStack stack : storageDrops){
+                        if(Mathf.chance(0.3)){
+                            tile.entity.items.add(stack.item, Mathf.random(stack.amount));
+                        }
                     }
                 }
             }
