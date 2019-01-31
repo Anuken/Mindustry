@@ -173,8 +173,7 @@ public class HudFragment extends Fragment{
             .update(l ->{
                 l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f)));
                 l.setText(Core.bundle.format("outofbounds", (int)((boundsCountdown - players[0].destructTime) / 60f)));
-            }).get().setAlignment(Align.center, Align.center))
-            .margin(6).update(u -> {
+            }).get().setAlignment(Align.center, Align.center)).margin(6).update(u -> {
                 u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(players[0].isOutOfBounds()), 0.1f);
             }).get().color.a = 0f;
         });

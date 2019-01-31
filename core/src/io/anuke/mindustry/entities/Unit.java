@@ -185,7 +185,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public boolean isOutOfBounds(){
-        return x < worldBounds || y < worldBounds || x > world.width() * tilesize + worldBounds || y > world.height() * tilesize + worldBounds;
+        return x < -worldBounds || y < -worldBounds || x > world.width() * tilesize + worldBounds || y > world.height() * tilesize + worldBounds;
     }
 
     public float calculateDamage(float amount){

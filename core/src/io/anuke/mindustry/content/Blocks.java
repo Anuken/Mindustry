@@ -36,10 +36,10 @@ public class Blocks implements ContentList{
     //environment
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
     grass, holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, duneRocks, stainedRocks,
+    iceSnow, sandWater, duneRocks, stainedRocks, stainedStone,
 
     //crafting
-    siliconSmelter, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
+    siliconSmelter, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, centrifuge, biomatterCompressor, pulverizer, incinerator,
 
     //sandbox
@@ -200,7 +200,6 @@ public class Blocks implements ContentList{
         }};
 
         grass = new Floor("grass"){{
-            hasOres = true;
             minimapColor = Color.valueOf("549d5b");
         }};
 
@@ -238,6 +237,11 @@ public class Blocks implements ContentList{
 
         stainedRocks = new StaticWall("stained-rocks"){{
             variants = 2;
+        }};
+
+        stainedStone = new Floor("stained-stone"){{
+            edgeStyle = "blocky";
+            hasOres = true;
         }};
 
         //endregion
@@ -283,6 +287,19 @@ public class Blocks implements ContentList{
             consumes.power(0.50f);
         }};
 
+        kiln = new PowerSmelter("kiln"){{
+            requirements(Category.crafting, ItemStack.with(Items.copper, 120, Items.graphite, 60, Items.lead, 60));
+            craftEffect = Fx.smeltsmoke;
+            output = Items.metaglass;
+            craftTime = 30f;
+            size = 2;
+            hasLiquids = false;
+            flameColor = Color.valueOf("ffc099");
+
+            consumes.items(new ItemStack(Items.lead, 1), new ItemStack(Items.sand, 1));
+            consumes.power(0.60f);
+        }};
+
         plastaniumCompressor = new PlastaniumCompressor("plastanium-compressor"){{
             requirements(Category.crafting, ItemStack.with(Items.silicon, 160, Items.lead, 230, Items.graphite, 120, Items.titanium, 160));
             hasItems = true;
@@ -317,9 +334,6 @@ public class Blocks implements ContentList{
             output = Items.surgealloy;
             craftTime = 75f;
             size = 2;
-
-            useFlux = true;
-            fluxNeeded = 3;
 
             consumes.power(4f);
             consumes.items(new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 3));

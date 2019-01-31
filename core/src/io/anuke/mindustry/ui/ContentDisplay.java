@@ -92,8 +92,6 @@ public class ContentDisplay{
         table.row();
         table.add(Core.bundle.format("item.radioactivity", (int) (item.radioactivity * 100)));
         table.row();
-        table.add(Core.bundle.format("item.fluxiness", (int) (item.fluxiness * 100)));
-        table.row();
     }
 
     public static void displayLiquid(Table table, Liquid liquid){
