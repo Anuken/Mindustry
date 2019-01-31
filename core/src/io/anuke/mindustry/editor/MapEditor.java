@@ -85,15 +85,15 @@ public class MapEditor{
         this.brushSize = size;
     }
 
-    public void draw(int x, int y){
-        draw(x, y, drawBlock);
+    public void draw(int x, int y, boolean paint){
+        draw(x, y, paint, drawBlock);
     }
 
-    public void draw(int x, int y, Block drawBlock){
-        draw(x, y, drawBlock, 1.0);
+    public void draw(int x, int y, boolean paint, Block drawBlock){
+        draw(x, y, paint, drawBlock, 1.0);
     }
 
-    public void draw(int x, int y, Block drawBlock, double chance){
+    public void draw(int x, int y, boolean paint, Block drawBlock, double chance){
         byte writeID = drawBlock.id;
         byte partID = Blocks.part.id;
         byte rotationTeam = Pack.byteByte(drawBlock.rotate ? (byte)rotation : 0, drawBlock.synthetic() ? (byte)drawTeam.ordinal() : 0);
@@ -150,7 +150,7 @@ public class MapEditor{
                     if(Mathf.dst(rx, ry) <= brushSize - 0.5f && (chance >= 0.999 || Mathf.chance(chance))){
                         int wx = x + rx, wy = y + ry;
 
-                        if(wx < 0 || wy < 0 || wx >= map.width() || wy >= map.height()){
+                        if(wx < 0 || wy < 0 || wx >= map.width() || wy >= map.height() || (paint && !isfloor && content.block(map.read(wx, wy, DataPosition.wall)) == Blocks.air)){
                             continue;
                         }
 

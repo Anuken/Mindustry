@@ -120,7 +120,7 @@ public class MapView extends Element implements GestureListener{
                     ui.editor.resetSaved();
                     Array<Point2> points = br.line(startx, starty, p.x, p.y);
                     for(Point2 point : points){
-                        editor.draw(point.x, point.y);
+                        editor.draw(point.x, point.y, EditorTool.isPaint());
                     }
                     updated = true;
                 }
@@ -295,9 +295,9 @@ public class MapView extends Element implements GestureListener{
         float scaling = zoom * Math.min(width, height) / editor.getMap().width();
 
         Draw.color(Palette.accent);
-        Lines.stroke(Unit.dp.scl(1f * zoom));
+        Lines.stroke(Unit.dp.scl(2f));
 
-        if(!editor.getDrawBlock().isMultiblock() || tool == EditorTool.eraser){
+        if((!editor.getDrawBlock().isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
             if(tool == EditorTool.line && drawing){
                 Vector2 v1 = unproject(startx, starty).add(x, y);
                 float sx = v1.x, sy = v1.y;
@@ -307,7 +307,7 @@ public class MapView extends Element implements GestureListener{
                 Lines.poly(brushPolygons[index], v2.x, v2.y, scaling);
             }
 
-            if(tool.edit && (!mobile || drawing)){
+            if((tool.edit || tool == EditorTool.line) && (!mobile || drawing)){
                 Point2 p = project(mousex, mousey);
                 Vector2 v = unproject(p.x, p.y).add(x, y);
                 Lines.poly(brushPolygons[index], v.x, v.y, scaling);

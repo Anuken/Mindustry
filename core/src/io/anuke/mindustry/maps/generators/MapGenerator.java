@@ -28,6 +28,8 @@ public class MapGenerator extends Generator{
      * This amount of enemy spawns is selected randomly from the map.*/
     public int enemySpawns = -1;
 
+    public boolean distortFloor = false;
+
     public MapGenerator(String mapName){
         this.mapName = mapName;
     }
@@ -44,6 +46,12 @@ public class MapGenerator extends Generator{
 
     public MapGenerator dist(float distortion){
         this.distortion = distortion;
+        return this;
+    }
+
+    public MapGenerator dist(float distortion, boolean floor){
+        this.distortion = distortion;
+        this.distortFloor = floor;
         return this;
     }
 
@@ -95,6 +103,10 @@ public class MapGenerator extends Generator{
                     || (tile.block() == Blocks.air && !tiles[newX][newY].block().synthetic())
                     || (tiles[newX][newY].block() == Blocks.air && tile.block() instanceof StaticWall)){
                     tile.setBlock(tiles[newX][newY].block());
+                }
+
+                if(distortFloor){
+                    tile.setFloor(tiles[newX][newY].floor());
                 }
 
                 for(Decoration decor : decorations){

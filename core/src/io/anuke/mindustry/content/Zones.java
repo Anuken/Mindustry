@@ -239,7 +239,7 @@ public class Zones implements ContentList{
             }};
         }};
 
-        stainedMountains = new Zone("stainedMountains", new MapGenerator("groundZero", 2)){{ //TODO implement
+        stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2).dist(2.5f, true)){{ //TODO implement
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;

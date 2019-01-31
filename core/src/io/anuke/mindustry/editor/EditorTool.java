@@ -1,7 +1,9 @@
 package io.anuke.mindustry.editor;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.function.IntPositionConsumer;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
@@ -43,7 +45,7 @@ public enum EditorTool{
 
         @Override
         public void touched(MapEditor editor, int x, int y){
-            editor.draw(x, y);
+            editor.draw(x, y, isPaint());
         }
     },
     eraser{
@@ -54,7 +56,7 @@ public enum EditorTool{
 
         @Override
         public void touched(MapEditor editor, int x, int y){
-            editor.draw(x, y, Blocks.air);
+            editor.draw(x, y, isPaint(), Blocks.air);
         }
     },
     spray{
@@ -65,7 +67,7 @@ public enum EditorTool{
 
         @Override
         public void touched(MapEditor editor, int x, int y){
-            editor.draw(x, y, editor.getDrawBlock(), 0.012);
+            editor.draw(x, y, isPaint(), editor.getDrawBlock(), 0.012);
         }
     },
     line{
@@ -180,6 +182,10 @@ public enum EditorTool{
     zoom;
 
     boolean edit, draggable;
+
+    public static boolean isPaint(){
+        return Core.input.keyDown(KeyCode.CONTROL_LEFT);
+    }
 
     public void touched(MapEditor editor, int x, int y){
 
