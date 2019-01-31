@@ -67,7 +67,6 @@ public class MapView extends Element implements GestureListener{
 
                 return false;
             }
-
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                 if(pointer != 0){
@@ -132,7 +131,7 @@ public class MapView extends Element implements GestureListener{
                     op = null;
                 }
 
-                if(lastTool != null){
+                if(button == KeyCode.MOUSE_MIDDLE && lastTool != null){
                     tool = lastTool;
                     lastTool = null;
                 }
@@ -214,6 +213,16 @@ public class MapView extends Element implements GestureListener{
             float ay = Core.input.axis(Binding.move_y);
             offsetx -= ax * 15f / zoom;
             offsety -= ay * 15f / zoom;
+        }
+
+        if(Core.input.keyTap(KeyCode.SHIFT_LEFT)){
+            lastTool = tool;
+            tool = EditorTool.pick;
+        }
+
+        if(Core.input.keyRelease(KeyCode.SHIFT_LEFT) && lastTool != null){
+            tool = lastTool;
+            lastTool = null;
         }
 
         if(ui.editor.hasPane()) return;

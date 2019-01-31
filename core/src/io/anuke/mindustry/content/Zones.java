@@ -226,6 +226,7 @@ public class Zones implements ContentList{
             }};
         }};
 
+        /*
         crags = new Zone("crags", new MapGenerator("groundZero", 1)){{ //TODO implement
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
@@ -237,21 +238,81 @@ public class Zones implements ContentList{
                 waveTimer = true;
                 waveSpacing = 60 * 80;
             }};
-        }};
+        }};*/
 
-        stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2).dist(2.5f, true)){{ //TODO implement
-            deployCost = ItemStack.with(Items.copper, 300);
-            startingItems = ItemStack.with(Items.copper, 200);
-            conditionWave = 15;
+        stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2)
+            .dist(2.5f, true)
+            .decor(new Decoration(Blocks.stainedStone, Blocks.stainedBoulder, 0.01))){{
+
+            deployCost = ItemStack.with(Items.copper, 500, Items.lead, 300, Items.silicon, 100);
+            startingItems = ItemStack.with(Items.copper, 400, Items.lead, 100);
+            conditionWave = 10;
+            launchPeriod = 10;
             zoneRequirements = new Zone[]{frozenForest};
-            blockRequirements = new Block[]{Blocks.copperWall};
+            blockRequirements = new Block[]{Blocks.pneumaticDrill};
+            itemRequirements = ItemStack.with(Items.copper, 8000, Items.silicon, 2000);
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 80;
+                waveSpacing = 60 * 60 * 2;
+                spawns = Array.with(
+                    new SpawnGroup(UnitTypes.titan){{
+                        unitScaling = 2;
+                        spacing = 2;
+                        end = 10;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 2;
+                        unitScaling = 1;
+                        spacing = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 10;
+                        spacing = 2;
+                        unitScaling = 2;
+                        unitAmount = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.ghoul){{
+                        begin = 5;
+                        unitScaling = 0.5f;
+                        unitAmount = 1;
+                        spacing = 5;
+                    }},
+
+                    new SpawnGroup(UnitTypes.wraith){{
+                        begin = 10;
+                        unitScaling = 1f;
+                        unitAmount = 1;
+                        spacing = 5;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 2;
+                        unitScaling = 1;
+                        spacing = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.wraith){{
+                        begin = 23;
+                        unitScaling = 1f;
+                        unitAmount = 1;
+                        spacing = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.crawler){{
+                        begin = 20;
+                        unitScaling = 1;
+                        spacing = 10;
+                        unitScaling = 0.5f;
+                        unitAmount = 10;
+                    }}
+                );
             }};
         }};
-
+/*
         impact = new Zone("impact", new MapGenerator("groundZero", 1)){{ //TODO implement
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
@@ -328,6 +389,6 @@ public class Zones implements ContentList{
                 waveTimer = true;
                 waveSpacing = 60 * 80;
             }};
-        }};
+        }};*/
     }
 }

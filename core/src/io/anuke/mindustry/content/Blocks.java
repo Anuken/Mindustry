@@ -36,7 +36,7 @@ public class Blocks implements ContentList{
     //environment
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
     grass, holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, duneRocks, stainedRocks, stainedStone, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow,
+    iceSnow, sandWater, duneRocks, stainedRocks, stainedStone, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
 
     //crafting
     siliconSmelter, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -64,7 +64,7 @@ public class Blocks implements ContentList{
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, plasmaDrill, waterExtractor, oilExtractor, cultivator,
 
     //storage
-    core, vault, container, unloader, launchPad,
+    core, coreBastion, vault, container, unloader, launchPad,
 
     //turrets
     duo, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
@@ -250,6 +250,7 @@ public class Blocks implements ContentList{
 
         stainedStoneRed = new Floor("stained-stone-red"){{
             edgeStyle = "blocky";
+            hasOres = true;
         }};
 
         stainedRocksYellow = new StaticWall("stained-rocks-yellow"){{
@@ -258,6 +259,10 @@ public class Blocks implements ContentList{
 
         stainedStoneYellow = new Floor("stained-stone-yellow"){{
             edgeStyle = "blocky";
+        }};
+
+        stainedBoulder = new Rock("stained-boulder"){{
+            variants = 2;
         }};
 
         //endregion
