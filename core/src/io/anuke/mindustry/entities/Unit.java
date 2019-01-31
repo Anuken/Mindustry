@@ -33,8 +33,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait, InventoryTrait{
     /**Total duration of hit flash effect*/
@@ -172,6 +172,20 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         stream.writeShort((short) health);
         status.writeSave(stream);
         inventory.writeSave(stream);
+    }
+
+    protected void clampPosition(){
+        x = Mathf.clamp(x, tilesize, world.width() * tilesize - tilesize);
+        y = Mathf.clamp(y, tilesize, world.height() * tilesize - tilesize);
+    }
+
+    public void kill(){
+        health = -1;
+        damage(1);
+    }
+
+    public boolean isOutOfBounds(){
+        return x < worldBounds || y < worldBounds || x > world.width() * tilesize + worldBounds || y > world.height() * tilesize + worldBounds;
     }
 
     public float calculateDamage(float amount){

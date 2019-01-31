@@ -20,6 +20,7 @@ public class OreBlock extends Floor{
         this.variants = 3;
         this.minimapColor = ore.color;
         this.edge = base.name;
+        this.blendGroup = base;
 
         oreBlockMap.getOr(ore, ObjectMap::new).put(base, this);
     }

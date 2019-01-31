@@ -51,6 +51,10 @@ public class Vars{
     public static final int maxNameLength = 40;
     /**displayed item size when ingame, TODO remove.*/
     public static final float itemSize = 5f;
+    /**extra padding around the world; units outside this bound will begin to self-destruct.*/
+    public static final float worldBounds = 100f;
+    /**ticks spent out of bound until self destruct.*/
+    public static final float boundsCountdown = 60*7;
     /**size of tiles in units*/
     public static final int tilesize = 8;
     /**all choosable player colors in join/host dialog*/

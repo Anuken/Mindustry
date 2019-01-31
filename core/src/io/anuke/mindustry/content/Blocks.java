@@ -153,12 +153,12 @@ public class Blocks implements ContentList{
         craters = new Floor("craters"){{
             minimapColor = Color.valueOf("323232");
             variants = 6;
-            hasEdges = false;
+            blendGroup = stone;
         }};
 
         charr = new Floor("char"){{
             minimapColor = Color.valueOf("323232");
-            hasEdges = false;
+            blendGroup = stone;
         }};
 
         sandWater = new Floor("sand-water"){{

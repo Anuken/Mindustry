@@ -59,7 +59,7 @@ public class MenuFragment extends Fragment{
         MobileButton
             play = new MobileButton("icon-play-2", isize, "$play", ui.deploy::show),
             maps = new MobileButton("icon-map", isize, "$maps", ui.maps::show),
-            custom = new MobileButton("icon-play-custom", isize, "customgame", this::showCustomSelect),
+            custom = new MobileButton("icon-play-custom", isize, "$customgame", this::showCustomSelect),
             join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
             editor = new MobileButton("icon-editor", isize, "$editor", () -> ui.loadAnd(ui.editor::show)),
             tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),

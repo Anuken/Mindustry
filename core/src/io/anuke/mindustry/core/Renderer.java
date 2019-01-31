@@ -126,9 +126,6 @@ public class Renderer implements ApplicationListener{
                 camera.position.lerpDelta(position, 0.08f);
             }
 
-            camera.position.x = Mathf.clamp(camera.position.x, -tilesize / 2f, world.width() * tilesize - tilesize / 2f);
-            camera.position.y = Mathf.clamp(camera.position.y, -tilesize / 2f, world.height() * tilesize - tilesize / 2f);
-
             updateShake(0.75f);
 
             draw();

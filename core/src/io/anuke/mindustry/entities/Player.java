@@ -19,10 +19,13 @@ import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
-import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait;
+import io.anuke.mindustry.entities.traits.ShooterTrait;
+import io.anuke.mindustry.entities.traits.SpawnerTrait;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
@@ -60,7 +63,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public String name = "name";
     public String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile;
-    public float boostHeat, shootHeat;
+    public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
     public Mech mech;
@@ -490,6 +493,16 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             setDead(true);
         }
 
+        if(!isDead() && isOutOfBounds()){
+            destructTime += Time.delta();
+
+            if(destructTime >= boundsCountdown){
+                kill();
+            }
+        }else{
+            destructTime = 0f;
+        }
+
         if(isDead()){
             isBoosting = false;
             boostHeat = 0f;
@@ -545,8 +558,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
         updateBuilding(this);
 
-        x = Mathf.clamp(x, 0, world.width() * tilesize - tilesize);
-        y = Mathf.clamp(y, 0, world.height() * tilesize - tilesize);
+        if(!mech.flying){
+            clampPosition();
+        }
     }
 
     protected void updateMech(){

@@ -17,10 +17,7 @@ import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.Elements;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Scaling;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
@@ -32,6 +29,8 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+
+import java.lang.StringBuilder;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -154,6 +153,7 @@ public class HudFragment extends Fragment{
             t.table("button", top -> top.add("$paused").pad(6f));
         });
 
+        //spawner warning
         parent.fill(t -> {
             t.touchable(Touchable.disabled);
             t.visible(() -> !state.is(State.menu));
@@ -162,6 +162,20 @@ public class HudFragment extends Fragment{
             .get().setAlignment(Align.center, Align.center))
             .margin(6).update(u -> {
                 u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(world.spawner.playerNear()), 0.1f);
+            }).get().color.a = 0f;
+        });
+
+        //out of bounds warning
+        parent.fill(t -> {
+            t.touchable(Touchable.disabled);
+            t.visible(() -> !state.is(State.menu));
+            t.table("flat", c -> c.add("")
+            .update(l ->{
+                l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f)));
+                l.setText(Core.bundle.format("outofbounds", (int)((boundsCountdown - players[0].destructTime) / 60f)));
+            }).get().setAlignment(Align.center, Align.center))
+            .margin(6).update(u -> {
+                u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(players[0].isOutOfBounds()), 0.1f);
             }).get().color.a = 0f;
         });
 
