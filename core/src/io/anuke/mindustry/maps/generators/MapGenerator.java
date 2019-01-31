@@ -151,7 +151,7 @@ public class MapGenerator extends Generator{
         }
 
         //TODO set specific core block?
-        tiles[core.x][core.y].setBlock(Blocks.core, defaultTeam);
+        tiles[core.x][core.y].setBlock(Blocks.coreShard, defaultTeam);
 
         world.prepareTiles(tiles);
         world.setMap(map);

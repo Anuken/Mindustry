@@ -64,7 +64,7 @@ public class Blocks implements ContentList{
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, plasmaDrill, waterExtractor, oilExtractor, cultivator,
 
     //storage
-    core, coreBastion, vault, container, unloader, launchPad,
+    coreShard, coreFoundation, coreNucleus, vault, container, unloader, launchPad,
 
     //turrets
     duo, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
@@ -915,12 +915,29 @@ public class Blocks implements ContentList{
         //endregion
         //region storage
 
-        core = new CoreBlock("core"){{
+        coreShard = new CoreBlock("core-shard"){{
             requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 2000));
             alwaysUnlocked = true;
 
             health = 1100;
             itemCapacity = 2000;
+            size = 3;
+        }};
+
+        coreFoundation = new CoreBlock("core-foundation"){{
+            requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 4000, Items.silicon, 2000));
+
+            health = 2000;
+            itemCapacity = 4000;
+            size = 4;
+        }};
+
+        coreNucleus = new CoreBlock("core-nucleus"){{
+            requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 8000, Items.silicon, 4000, Items.surgealloy, 2000));
+
+            health = 3000;
+            itemCapacity = 6000;
+            size = 5;
         }};
 
         vault = new Vault("vault"){{

@@ -34,7 +34,6 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
-        size = 3;
         flags = EnumSet.of(BlockFlag.resupplyPoint, BlockFlag.target);
     }
 

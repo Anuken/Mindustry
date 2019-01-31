@@ -138,12 +138,12 @@ public class ApplicationTests{
         createMap();
         int bx = 4;
         int by = 4;
-        world.setBlock(world.tile(bx, by), Blocks.core, Team.blue);
+        world.setBlock(world.tile(bx, by), Blocks.coreShard, Team.blue);
         assertEquals(world.tile(bx, by).getTeam(), Team.blue);
         for(int x = bx-1; x <= bx + 1; x++){
             for(int y = by-1; y <= by + 1; y++){
                 if(x == bx && by == y){
-                    assertEquals(world.tile(x, y).block(), Blocks.core);
+                    assertEquals(world.tile(x, y).block(), Blocks.coreShard);
                 }else{
                     assertTrue(world.tile(x, y).block() == Blocks.part && world.tile(x, y).getLinked() == world.tile(bx, by));
                 }
@@ -273,7 +273,7 @@ public class ApplicationTests{
         createMap();
 
         Tile core = world.tile(5, 5);
-        world.setBlock(core, Blocks.core, Team.blue);
+        world.setBlock(core, Blocks.coreShard, Team.blue);
         for(Item item : content.items()){
             core.entity.items.set(item, 3000);
         }

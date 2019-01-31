@@ -94,7 +94,7 @@ public class MapIO{
                         }
                     }
 
-                    data.write(x, y, DataPosition.wall, Blocks.core.id);
+                    data.write(x, y, DataPosition.wall, Blocks.coreShard.id);
                     data.write(x, y, DataPosition.rotationTeam, Pack.byteByte((byte)0, (byte)Team.blue.ordinal()));
                 }
             }

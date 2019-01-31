@@ -12,7 +12,7 @@ public class TechTree implements ContentList{
 
     @Override
     public void load(){
-        root = node(core, () -> {
+        root = node(coreShard, () -> {
 
             node(conveyor, () -> {
                 node(launchPad, () -> {
