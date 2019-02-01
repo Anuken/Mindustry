@@ -271,23 +271,28 @@ public class Blocks implements ContentList{
         }};
 
         metalFloorDamaged = new Floor("metal-floor-damaged"){{
-            variants = 0;
+            variants = 6;
+            blendGroup = metalFloor;
         }};
 
         metalFloor2 = new Floor("metal-floor-2"){{
             variants = 0;
+            blendGroup = metalFloor;
         }};
 
         metalFloor3 = new Floor("metal-floor-3"){{
             variants = 0;
+            blendGroup = metalFloor;
         }};
 
         metalFloor4 = new Floor("metal-floor-4"){{
             variants = 0;
+            blendGroup = metalFloor;
         }};
 
         metalFloor5 = new Floor("metal-floor-5"){{
             variants = 0;
+            blendGroup = metalFloor;
         }};
 
         //endregion
@@ -1413,6 +1418,9 @@ public class Blocks implements ContentList{
                 }
             }
         }
+
+        //special variants
+        new OreBlock(Items.scrap, (Floor)snow);
 
         //endregion
     }

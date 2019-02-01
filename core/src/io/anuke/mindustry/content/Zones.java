@@ -313,7 +313,11 @@ public class Zones implements ContentList{
             }};
         }};
 
-        impact = new Zone("impact0079", new MapGenerator("impact0079")){{ //TODO implement
+        impact = new Zone("impact0079", new MapGenerator("impact0079", 2)
+        .decor(
+            new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01),
+            new Decoration(Blocks.metalFloor, Blocks.metalFloorDamaged, 0.02))
+        ){{ //TODO implement
             deployCost = ItemStack.with(Items.copper, 4000);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;

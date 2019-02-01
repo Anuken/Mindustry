@@ -15,6 +15,7 @@ import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.mindustry.world.blocks.StaticWall;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
@@ -46,7 +47,7 @@ public class MapGenerator extends Generator{
     }
 
     public MapGenerator decor(Decoration... decor){
-        this.decorations = Array.with(decor);
+        this.decorations.addAll(decor);
         return this;
     }
 
@@ -118,8 +119,10 @@ public class MapGenerator extends Generator{
                 }
 
                 for(Decoration decor : decorations){
-                    if(tile.block() == Blocks.air && tile.floor() == decor.floor && Mathf.chance(decor.chance)){
+                    if(tile.block() == Blocks.air && !(decor.wall instanceof Floor) && tile.floor() == decor.floor && Mathf.chance(decor.chance)){
                         tile.setBlock(decor.wall);
+                    }else if(tile.floor() == decor.floor && decor.wall instanceof Floor && Mathf.chance(decor.chance)){
+                        tile.setFloor((Floor)decor.wall);
                     }
                 }
 
