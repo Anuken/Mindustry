@@ -236,10 +236,21 @@ public class MapEditor{
     }
 
     public void resize(int width, int height){
+        MapTileData previous = map;
+        int offsetX = -(width - previous.width())/2, offsetY = -(height - previous.height())/2;
+
         map = new MapTileData(width, height);
         for(int x = 0; x < map.width(); x++){
             for(int y = 0; y < map.height(); y++){
-                map.write(x, y, DataPosition.floor, Blocks.stone.id);
+                int px = offsetX + x, py = offsetY + y;
+                if(Structs.inBounds(px, py, previous.width(), previous.height())){
+                    map.write(x, y, DataPosition.floor, previous.read(px, py, DataPosition.floor));
+                    map.write(x, y, DataPosition.wall, previous.read(px, py, DataPosition.wall));
+                    map.write(x, y, DataPosition.link, previous.read(px, py, DataPosition.link));
+                    map.write(x, y, DataPosition.rotationTeam, previous.read(px, py, DataPosition.rotationTeam));
+                }else{
+                    map.write(x, y, DataPosition.floor, Blocks.stone.id);
+                }
             }
         }
         renderer.resize(width, height);

@@ -37,6 +37,7 @@ public class Blocks implements ContentList{
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
     grass, holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, duneRocks, stainedRocks, stainedStone, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5,
 
     //crafting
     siliconSmelter, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -46,7 +47,7 @@ public class Blocks implements ContentList{
     powerVoid, powerSource, itemSource, liquidSource, itemVoid,
 
     //defense
-    scrapWall, scrapWallLarge,
+    scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok these names are getting ridiculous. but at least I don't have humongous walls yet
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, overdriveProjector, forceProjector, shockMine,
 
@@ -263,6 +264,30 @@ public class Blocks implements ContentList{
 
         stainedBoulder = new Rock("stained-boulder"){{
             variants = 2;
+        }};
+
+        metalFloor = new Floor("metal-floor"){{
+            variants = 0;
+        }};
+
+        metalFloorDamaged = new Floor("metal-floor-damaged"){{
+            variants = 0;
+        }};
+
+        metalFloor2 = new Floor("metal-floor-2"){{
+            variants = 0;
+        }};
+
+        metalFloor3 = new Floor("metal-floor-3"){{
+            variants = 0;
+        }};
+
+        metalFloor4 = new Floor("metal-floor-4"){{
+            variants = 0;
+        }};
+
+        metalFloor5 = new Floor("metal-floor-5"){{
+            variants = 0;
         }};
 
         //endregion
@@ -492,13 +517,30 @@ public class Blocks implements ContentList{
         int wallHealthMultiplier = 3;
 
         scrapWall = new Wall("scrap-wall"){{
-            health = 80;
-            variants = 3;
+            health = 60 * wallHealthMultiplier;
+            variants = 5;
         }};
 
         scrapWallLarge = new Wall("scrap-wall-large"){{
-            health = 80 * 4;
+            health = 60 * 4 * wallHealthMultiplier;
             size = 2;
+            variants = 4;
+        }};
+
+        scrapWallHuge = new Wall("scrap-wall-huge"){{
+            health = 60 * 9 * wallHealthMultiplier;
+            size = 3;
+            variants = 3;
+        }};
+
+        scrapWallGigantic = new Wall("scrap-wall-gigantic"){{
+            health = 60 * 16 * wallHealthMultiplier;
+            size = 4;
+        }};
+
+        thruster = new Wall("thruster"){{
+            health = 55 * 16 * wallHealthMultiplier;
+            size = 4;
         }};
 
         copperWall = new Wall("copper-wall"){{

@@ -58,6 +58,8 @@ public class MapView extends Element implements GestureListener{
         Core.input.getInputProcessors().insert(0, new GestureDetector(20, 0.5f, 2, 0.15f, this));
         touchable(Touchable.enabled);
 
+        Point2 firstTouch = new Point2();
+
         addListener(new InputListener(){
 
             @Override
@@ -95,6 +97,7 @@ public class MapView extends Element implements GestureListener{
                 startx = p.x;
                 starty = p.y;
                 tool.touched(editor, p.x, p.y);
+                firstTouch.set(p);
 
                 if(tool.edit){
                     updated = true;
@@ -116,6 +119,14 @@ public class MapView extends Element implements GestureListener{
                 Point2 p = project(x, y);
 
                 if(tool == EditorTool.line){
+                    if(Core.input.keyDown(KeyCode.TAB)){
+                        if(Math.abs(p.x - firstTouch.x) > Math.abs(p.y - firstTouch.y)){
+                            p.y = firstTouch.y;
+                        }else{
+                            p.x = firstTouch.x;
+                        }
+                    }
+
                     ui.editor.resetSaved();
                     Array<Point2> points = br.line(startx, starty, p.x, p.y);
                     for(Point2 point : points){
@@ -140,6 +151,7 @@ public class MapView extends Element implements GestureListener{
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer){
+
                 mousex = x;
                 mousey = y;
 
@@ -153,8 +165,19 @@ public class MapView extends Element implements GestureListener{
                     }
                     updated = true;
                 }
-                lastx = p.x;
-                lasty = p.y;
+
+                if(tool == EditorTool.line && Core.input.keyDown(KeyCode.TAB)){
+                    if(Math.abs(p.x - firstTouch.x) > Math.abs(p.y - firstTouch.y)){
+                        lastx = p.x;
+                        lasty = firstTouch.y;
+                    }else{
+                        lastx = firstTouch.x;
+                        lasty = p.y;
+                    }
+                }else{
+                    lastx = p.x;
+                    lasty = p.y;
+                }
             }
         });
     }
@@ -316,7 +339,7 @@ public class MapView extends Element implements GestureListener{
                 Lines.poly(brushPolygons[index], v2.x, v2.y, scaling);
             }
 
-            if((tool.edit || tool == EditorTool.line) && (!mobile || drawing)){
+            if((tool.edit || (tool == EditorTool.line && !drawing)) && (!mobile || drawing)){
                 Point2 p = project(mousex, mousey);
                 Vector2 v = unproject(p.x, p.y).add(x, y);
                 Lines.poly(brushPolygons[index], v.x, v.y, scaling);

@@ -312,19 +312,21 @@ public class Zones implements ContentList{
                 );
             }};
         }};
-/*
-        impact = new Zone("impact", new MapGenerator("groundZero", 1)){{ //TODO implement
-            deployCost = ItemStack.with(Items.copper, 300);
+
+        impact = new Zone("impact0079", new MapGenerator("impact0079")){{ //TODO implement
+            deployCost = ItemStack.with(Items.copper, 4000);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
-            zoneRequirements = new Zone[]{frozenForest};
-            blockRequirements = new Block[]{Blocks.copperWall};
+            zoneRequirements = new Zone[]{stainedMountains};
+            blockRequirements = new Block[]{Blocks.launchPad};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
                 waveSpacing = 60 * 80;
             }};
         }};
+
+        /*
 
         desolateRift = new Zone("desolateRift", new MapGenerator("groundZero", 1)){{ //TODO implement
             deployCost = ItemStack.with(Items.copper, 300);

@@ -33,6 +33,7 @@ public class MapGenerator extends Generator{
     public int enemySpawns = -1;
     /*Whether floor is distorted along with blocks.*/
     public boolean distortFloor = false;
+    /**Items randomly added to containers and vaults.*/
     public ItemStack[] storageDrops = ItemStack.with(Items.copper, 300, Items.lead, 300, Items.silicon, 200, Items.graphite, 200, Items.blastCompound, 200);
 
     public MapGenerator(String mapName){
@@ -74,6 +75,7 @@ public class MapGenerator extends Generator{
         data.position(0, 0);
         TileDataMarker marker = data.newDataMarker();
         Array<Point2> players = new Array<>();
+        Array<Block> coreTypes = new Array<>();
         Array<Point2> enemies = new Array<>();
 
         for(int y = 0; y < data.height(); y++){
@@ -82,6 +84,7 @@ public class MapGenerator extends Generator{
 
                 if(content.block(marker.wall) instanceof CoreBlock){
                     players.add(new Point2(x, y));
+                    coreTypes.add(content.block(marker.wall));
                     marker.wall = 0;
                 }
 
@@ -164,7 +167,7 @@ public class MapGenerator extends Generator{
         }
 
         //TODO set specific core block?
-        tiles[core.x][core.y].setBlock(Blocks.coreShard, defaultTeam);
+        tiles[core.x][core.y].setBlock(coreTypes.get(players.indexOf(core)), defaultTeam);
 
         world.prepareTiles(tiles);
         world.setMap(map);
