@@ -184,6 +184,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         damage(1);
     }
 
+    public boolean isImmune(StatusEffect effect){
+        return false;
+    }
+
     public boolean isOutOfBounds(){
         return x < -worldBounds || y < -worldBounds || x > world.width() * tilesize + worldBounds || y > world.height() * tilesize + worldBounds;
     }

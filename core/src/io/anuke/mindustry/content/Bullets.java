@@ -46,7 +46,7 @@ public class Bullets implements ContentList{
     waterShot, cryoShot, slagShot, oilShot,
 
     //environment, misc.
-    fireball, basicFlame, fuseShot, driverBolt, healBullet, frag,
+    fireball, basicFlame, fuseShot, driverBolt, healBullet, frag, eruptorShot,
 
     //bombs
     bombExplosive, bombIncendiary, bombOil, explode;
@@ -557,6 +557,12 @@ public class Bullets implements ContentList{
             damage = 4;
             speed = 1.9f;
             drag = 0.03f;
+        }};
+
+        eruptorShot = new LiquidBulletType(Liquids.slag){{
+            damage = 2;
+            speed = 2.1f;
+            drag = 0.02f;
         }};
 
         oilShot = new LiquidBulletType(Liquids.oil){{

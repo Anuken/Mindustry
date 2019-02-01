@@ -66,7 +66,7 @@ public abstract class BulletType extends Content{
 
     /**Returns maximum distance the bullet this bullet type has can travel.*/
     public float range(){
-        return speed * lifetime;
+        return speed * lifetime * (1f - drag);
     }
 
     public boolean collides(Bullet bullet, Tile tile){

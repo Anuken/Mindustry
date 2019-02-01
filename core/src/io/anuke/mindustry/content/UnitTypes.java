@@ -52,6 +52,7 @@ public class UnitTypes implements ContentList{
             rotatespeed = 0.1f;
             weapon = Weapons.flamethrower;
             health = 440;
+            immunities.add(StatusEffects.burning);
         }};
 
         fortress = new UnitType("fortress", Fortress.class, Fortress::new){{
@@ -69,15 +70,16 @@ public class UnitTypes implements ContentList{
 
         eruptor = new UnitType("eruptor", Eruptor.class, Eruptor::new){{
             maxVelocity = 0.81f;
-            speed = 0.17f;
+            speed = 0.16f;
             drag = 0.4f;
             mass = 5f;
             hitsize = 9f;
-            rotatespeed = 0.07f;
-            weaponOffsetX = 1;
+            rotatespeed = 0.05f;
+            weaponOffsetX = 3;
             targetAir = false;
             weapon = Weapons.eruption;
             health = 600;
+            immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
         }};
 
         wraith = new UnitType("wraith", Wraith.class, Wraith::new){{

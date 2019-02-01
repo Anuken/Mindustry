@@ -46,6 +46,11 @@ public class MapGenerator extends Generator{
         this.enemySpawns = enemySpawns;
     }
 
+    public MapGenerator drops(ItemStack[] drops){
+        this.storageDrops = drops;
+        return this;
+    }
+
     public MapGenerator decor(Decoration... decor){
         this.decorations.addAll(decor);
         return this;

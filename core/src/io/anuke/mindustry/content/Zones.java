@@ -316,8 +316,8 @@ public class Zones implements ContentList{
         impact = new Zone("impact0079", new MapGenerator("impact0079", 2)
         .decor(
             new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01),
-            new Decoration(Blocks.metalFloor, Blocks.metalFloorDamaged, 0.02))
-        ){{
+            new Decoration(Blocks.metalFloor, Blocks.metalFloorDamaged, 0.02)
+        ).drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 1000, Items.pyratite, 2000, Items.titanium, 2000, Items.metaglass, 1000))){{
             deployCost = ItemStack.with(Items.copper, 2500, Items.lead, 1000, Items.silicon, 300);
             startingItems = ItemStack.with(Items.copper, 2000, Items.lead, 500, Items.silicon, 200);
             itemRequirements = ItemStack.with(Items.silicon, 8000, Items.titanium, 6000, Items.graphite, 4000);

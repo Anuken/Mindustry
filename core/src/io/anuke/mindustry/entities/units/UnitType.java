@@ -3,7 +3,6 @@ package io.anuke.mindustry.entities.units;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.function.Supplier;
-import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Log;
@@ -15,6 +14,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.ui.ContentDisplay;
 
@@ -42,7 +42,7 @@ public class UnitType extends UnlockableContent{
     public float buildPower = 0.3f, minePower = 0.7f;
     public Weapon weapon = Weapons.blaster;
     public float weaponOffsetX, weaponOffsetY;
-    public Color trailColor = Color.valueOf("ffa665");
+    public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
 
     public TextureRegion iconRegion, legRegion, baseRegion, region;
 

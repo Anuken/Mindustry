@@ -29,6 +29,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -203,6 +204,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
                     itemSize, itemSize, rotation);
             }
         }
+    }
+
+    @Override
+    public boolean isImmune(StatusEffect effect){
+        return type.immunities.contains(effect);
     }
 
     @Override

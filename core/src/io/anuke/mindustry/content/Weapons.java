@@ -11,11 +11,13 @@ public class Weapons implements ContentList{
     @Override
     public void load(){
         eruption = new Weapon("eruption"){{
-            length = 1.5f;
-            reload = 14f;
+            length = 3f;
+            reload = 10f;
             roundrobin = true;
             ejectEffect = Fx.none;
-            ammo = Bullets.slagShot;
+            ammo = Bullets.eruptorShot;
+            recoil = 1f;
+            width = 9f;
         }};
 
         blaster = new Weapon("blaster"){{

@@ -857,6 +857,7 @@ public class Blocks implements ContentList{
             size = 3;
             health = 700;
             powerProduction = 11f;
+            consumes.liquid(Liquids.cryofluid, maxLiquidUse);
         }};
 
         fusionReactor = new FusionReactor("fusion-reactor"){{

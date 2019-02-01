@@ -34,6 +34,11 @@ public class LiquidBulletType extends BulletType{
     }
 
     @Override
+    public float range(){
+        return speed * lifetime /2f;
+    }
+
+    @Override
     public void update(Bullet b) {
         super.update(b);
 

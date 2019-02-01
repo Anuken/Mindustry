@@ -27,7 +27,7 @@ public class StatusController implements Saveable{
     private float armorMultiplier;
 
     public void handleApply(Unit unit, StatusEffect effect, float duration){
-        if(effect == StatusEffects.none) return; //don't apply empty effects
+        if(effect == StatusEffects.none || unit.isImmune(effect)) return; //don't apply empty or immune effects
 
         if(statuses.size > 0){
             //check for opposite effects
