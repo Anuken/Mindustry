@@ -202,7 +202,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             view.clearStack();
             Core.scene.setScrollFocus(view);
             if(!shownWithMap){
-                editor.beginEdit(new MapTileData(256, 256), new ObjectMap<>(), true);
+                editor.beginEdit(new MapTileData(200, 200), new ObjectMap<>(), true);
             }
             shownWithMap = false;
 
