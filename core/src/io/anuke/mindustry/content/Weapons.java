@@ -5,10 +5,18 @@ import io.anuke.mindustry.type.Weapon;
 
 public class Weapons implements ContentList{
     public static Weapon blaster, blasterSmall, glaiveBlaster, droneBlaster, healBlaster, healBlasterDrone, chainBlaster, shockgun,
-    swarmer, bomber, bomberTrident, flakgun, flamethrower, missiles, artillery, laserBurster, healBlasterDrone2, suicideBomb;
+    swarmer, bomber, bomberTrident, flakgun, flamethrower, missiles, artillery, laserBurster, healBlasterDrone2, suicideBomb,
+    eruption;
 
     @Override
     public void load(){
+        eruption = new Weapon("eruption"){{
+            length = 1.5f;
+            reload = 14f;
+            roundrobin = true;
+            ejectEffect = Fx.none;
+            ammo = Bullets.slagShot;
+        }};
 
         blaster = new Weapon("blaster"){{
             length = 1.5f;

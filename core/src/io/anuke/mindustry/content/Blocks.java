@@ -319,6 +319,7 @@ public class Blocks implements ContentList{
             size = 2;
             hasItems = true;
             hasLiquids = true;
+            hasPower = true;
 
             consumes.power(2f);
             consumes.item(Items.coal, 2);
@@ -344,7 +345,7 @@ public class Blocks implements ContentList{
             output = Items.metaglass;
             craftTime = 30f;
             size = 2;
-            hasLiquids = false;
+            hasPower = hasItems = true;
             flameColor = Color.valueOf("ffc099");
 
             consumes.items(new ItemStack(Items.lead, 1), new ItemStack(Items.sand, 1));

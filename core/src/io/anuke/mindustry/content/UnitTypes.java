@@ -9,7 +9,7 @@ public class UnitTypes implements ContentList{
     public static UnitType
         spirit, phantom,
         wraith, ghoul, revenant,
-        dagger, crawler, titan, fortress;
+        dagger, crawler, titan, fortress, eruptor;
 
     @Override
     public void load(){
@@ -55,7 +55,7 @@ public class UnitTypes implements ContentList{
         }};
 
         fortress = new UnitType("fortress", Fortress.class, Fortress::new){{
-            maxVelocity = 0.8f;
+            maxVelocity = 0.78f;
             speed = 0.15f;
             drag = 0.4f;
             mass = 5f;
@@ -65,6 +65,19 @@ public class UnitTypes implements ContentList{
             targetAir = false;
             weapon = Weapons.artillery;
             health = 800;
+        }};
+
+        eruptor = new UnitType("eruptor", Eruptor.class, Eruptor::new){{
+            maxVelocity = 0.81f;
+            speed = 0.17f;
+            drag = 0.4f;
+            mass = 5f;
+            hitsize = 9f;
+            rotatespeed = 0.07f;
+            weaponOffsetX = 1;
+            targetAir = false;
+            weapon = Weapons.eruption;
+            health = 600;
         }};
 
         wraith = new UnitType("wraith", Wraith.class, Wraith::new){{
