@@ -496,7 +496,17 @@ public class Block extends BlockStorage{
         bars.row();
 
         if(entity.liquids != null){
-            bars.add(new Bar(() -> entity.liquids.current().localizedName(), () -> entity.liquids.current().color, () -> entity.liquids.total() / liquidCapacity)).growX();
+            bars.add(new Bar(() -> entity.liquids.get(entity.liquids.current()) <= 0.001f ? Core.bundle.get("blocks.liquid") : entity.liquids.current().localizedName(), () -> entity.liquids.current().color, () -> entity.liquids.total() / liquidCapacity)).growX();
+            bars.row();
+        }
+
+        if(entity.power != null && consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
+            bars.add(new Bar("blocks.power", Palette.power, () -> entity.power.satisfaction)).growX();
+            bars.row();
+        }
+
+        if(entity.power != null && consumes.has(ConsumePower.class) && !consumes.get(ConsumePower.class).isBuffered){
+            bars.add(new Bar("blocks.power.satisfaction", Palette.power, () -> entity.power.satisfaction)).growX();
             bars.row();
         }
     }

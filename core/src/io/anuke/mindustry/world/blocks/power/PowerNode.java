@@ -152,7 +152,7 @@ public class PowerNode extends PowerBlock{
 
         Draw.color(Palette.accent);
 
-        Lines.stroke(1f);
+        Lines.stroke(1.5f);
         Lines.circle(tile.drawx(), tile.drawy(),
                 tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time(), 4f, 1f));
 
@@ -171,8 +171,9 @@ public class PowerNode extends PowerBlock{
                             link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
 
                     if((entity.power.links.size >= maxNodes || (link.block() instanceof PowerNode && link.entity.power.links.size >= ((PowerNode) link.block()).maxNodes)) && !linked){
+                        Draw.color(Palette.breakInvalid);
+                        Lines.lineAngleCenter(link.drawx(), link.drawy(), 45, link.block().size * Mathf.sqrt2 * tilesize * 0.9f);
                         Draw.color();
-                        Draw.rect("cross-" + link.block().size, link.drawx(), link.drawy());
                     }
                 }
             }

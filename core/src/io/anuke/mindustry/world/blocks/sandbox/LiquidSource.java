@@ -4,22 +4,24 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.ButtonGroup;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.gen.Call;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.data;
 
 public class LiquidSource extends Block{
 
@@ -65,8 +67,9 @@ public class LiquidSource extends Block{
             if(!data.isUnlocked(items.get(i))) continue;
 
             final int f = i;
-            ImageButton button = cont.addImageButton("liquid-icon-" + items.get(i).name, "clear-toggle", 24,
+            ImageButton button = cont.addImageButton("clear", "clear-toggle", 24,
                     () -> Call.setLiquidSourceLiquid(null, tile, items.get(f))).size(38).group(group).get();
+            button.getStyle().imageUp = new TextureRegionDrawable(items.get(i).iconRegion);
             button.setChecked(entity.source.id == f);
 
             if(i % 4 == 3){

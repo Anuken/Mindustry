@@ -214,8 +214,10 @@ public class TechTree implements ContentList{
                     node(turbineGenerator, () -> {
                         node(thermalGenerator, () -> {
                             node(rtgGenerator, () -> {
-                                node(thoriumReactor, () -> {
+                                node(differentialGenerator, () -> {
+                                    node(thoriumReactor, () -> {
 
+                                    });
                                 });
                             });
                         });

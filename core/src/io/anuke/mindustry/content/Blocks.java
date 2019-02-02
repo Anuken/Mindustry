@@ -847,10 +847,10 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
-        differentialGenerator = new TurbineGenerator("differential-generator"){{
+        differentialGenerator = new DifferentialGenerator("differential-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 140, Items.titanium, 100, Items.lead, 200, Items.silicon, 130, Items.metaglass, 100));
             powerProduction = 12f;
-            itemDuration = 30f;
+            itemDuration = 60f;
             consumes.remove(ConsumeItemFilter.class);
             consumes.remove(ConsumeLiquidFilter.class);
             consumes.item(Items.pyratite);

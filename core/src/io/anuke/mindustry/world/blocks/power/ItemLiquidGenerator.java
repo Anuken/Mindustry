@@ -79,6 +79,9 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 break;
             }
         }
+
+        entity.heat = Mathf.lerpDelta(entity.heat, entity.generateTime >= 0.001f ? 1f : 0f, 0.05f);
+
         //liquid takes priority over solids
         if(hasLiquids && liquid != null && entity.liquids.get(liquid) >= 0.001f){
             float baseLiquidEfficiency = getLiquidEfficiency(liquid);
@@ -131,17 +134,13 @@ public class ItemLiquidGenerator extends PowerGenerator{
     public void draw(Tile tile){
         super.draw(tile);
 
-        GeneratorEntity entity = tile.entity();
+        ItemLiquidGeneratorEntity entity = tile.entity();
 
         if(hasItems){
-            if(entity.generateTime > 0){
-                Draw.color(heatColor);
-                float alpha = (entity.items.total() > 0 ? 1f : Mathf.clamp(entity.generateTime));
-                alpha = alpha * 0.7f + Mathf.absin(Time.time(), 12f, 0.3f) * alpha;
-                Draw.alpha(alpha);
-                Draw.rect(topRegion, tile.drawx(), tile.drawy());
-                Draw.reset();
-            }
+            Draw.color(heatColor);
+            Draw.alpha(entity.heat * 0.4f + Mathf.absin(Time.time(), 8f, 0.6f) * entity.heat);
+            Draw.rect(topRegion, tile.drawx(), tile.drawy());
+            Draw.reset();
         }
 
         if(hasLiquids){
@@ -171,5 +170,6 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
     public static class ItemLiquidGeneratorEntity extends GeneratorEntity{
         public float explosiveness;
+        public float heat;
     }
 }
