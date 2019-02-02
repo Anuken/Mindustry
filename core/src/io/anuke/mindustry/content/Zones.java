@@ -243,7 +243,6 @@ public class Zones implements ContentList{
         stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2)
             .dist(2.5f, true)
             .decor(new Decoration(Blocks.stainedStone, Blocks.stainedBoulder, 0.01))){{
-
             deployCost = ItemStack.with(Items.copper, 500, Items.lead, 300, Items.silicon, 100);
             startingItems = ItemStack.with(Items.copper, 400, Items.lead, 100);
             conditionWave = 10;
@@ -393,7 +392,7 @@ public class Zones implements ContentList{
             itemRequirements = ItemStack.with(Items.copper, 8000, Items.metaglass, 2000, Items.graphite, 3000);
             conditionWave = 10;
             launchPeriod = 20;
-            zoneRequirements = new Zone[]{stainedMountains};
+            zoneRequirements = new Zone[]{ruinousShores};
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             rules = () -> new Rules(){{
                 waves = true;
@@ -477,19 +476,81 @@ public class Zones implements ContentList{
             }};
         }};
 
-        nuclearComplex = new Zone("nuclearComplex", new MapGenerator("groundZero", 1)){{ //TODO implement
-            deployCost = ItemStack.with(Items.copper, 300);
-            startingItems = ItemStack.with(Items.copper, 200);
-            conditionWave = 15;
-            zoneRequirements = new Zone[]{frozenForest};
-            blockRequirements = new Block[]{Blocks.copperWall};
+        */
+        nuclearComplex = new Zone("nuclearComplex", new MapGenerator("nuclearProductionComplex")
+        .drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 1000, Items.thorium, 200, Items.titanium, 2000, Items.metaglass, 1000))
+        .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
+            deployCost = ItemStack.with(Items.copper, 3000, Items.lead, 2000, Items.silicon, 1000, Items.metaglass, 500);
+            startingItems = ItemStack.with(Items.copper, 2500, Items.lead, 1500, Items.silicon, 800, Items.metaglass, 400);
+            itemRequirements = ItemStack.with(Items.copper, 10000, Items.titanium, 8000, Items.metaglass, 6000, Items.plastanium, 2000);
+            conditionWave = 30;
+            launchPeriod = 15;
+            zoneRequirements = new Zone[]{impact};
+            blockRequirements = new Block[]{Blocks.blastDrill, Blocks.thermalGenerator};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 80;
+                waveSpacing = 60 * 60 * 2;
+
+                spawns = Array.with(
+                new SpawnGroup(UnitTypes.titan){{
+                    unitScaling = 2;
+                    spacing = 2;
+                    end = 10;
+                }},
+
+                new SpawnGroup(UnitTypes.dagger){{
+                    begin = 2;
+                    unitScaling = 1;
+                    spacing = 2;
+                }},
+
+                new SpawnGroup(UnitTypes.dagger){{
+                    begin = 10;
+                    spacing = 2;
+                    unitScaling = 2;
+                    unitAmount = 2;
+                }},
+
+                new SpawnGroup(UnitTypes.ghoul){{
+                    begin = 5;
+                    unitScaling = 0.5f;
+                    unitAmount = 1;
+                    spacing = 5;
+                }},
+
+                new SpawnGroup(UnitTypes.wraith){{
+                    begin = 10;
+                    unitScaling = 1f;
+                    unitAmount = 1;
+                    spacing = 5;
+                }},
+
+                new SpawnGroup(UnitTypes.dagger){{
+                    begin = 2;
+                    unitScaling = 1;
+                    spacing = 2;
+                }},
+
+                new SpawnGroup(UnitTypes.wraith){{
+                    begin = 23;
+                    unitScaling = 1f;
+                    unitAmount = 1;
+                    spacing = 2;
+                }},
+
+                new SpawnGroup(UnitTypes.crawler){{
+                    begin = 20;
+                    unitScaling = 1;
+                    spacing = 10;
+                    unitScaling = 0.5f;
+                    unitAmount = 10;
+                }}
+                );
             }};
         }};
 
+        /*
         moltenFault = new Zone("moltenFault", new MapGenerator("groundZero", 1)){{ //TODO implement
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);

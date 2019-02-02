@@ -37,7 +37,7 @@ public class Blocks implements ContentList{
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
     holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, duneRocks, stainedRocks, stainedStone, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, ignarock, magmarock, hotrock,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks,
 
     //crafting
     siliconSmelter, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -47,7 +47,7 @@ public class Blocks implements ContentList{
     powerVoid, powerSource, itemSource, liquidSource, itemVoid,
 
     //defense
-    scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok these names are getting ridiculous. but at least I don't have humongous walls yet
+    scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, overdriveProjector, forceProjector, shockMine,
 
@@ -200,6 +200,10 @@ public class Blocks implements ContentList{
         }};
 
         icerocks = new StaticWall("icerocks"){{
+            variants = 2;
+        }};
+
+        snowrocks = new StaticWall("snowrocks"){{
             variants = 2;
         }};
 
