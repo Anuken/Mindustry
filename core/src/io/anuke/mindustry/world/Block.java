@@ -214,6 +214,12 @@ public class Block extends BlockStorage{
         draw(tile);
     }
 
+    public void drawTeam(Tile tile){
+        Draw.color(tile.getTeam().color);
+        Draw.rect("block-border", tile.drawx() - size * tilesize/2f + 4, tile.drawy() - size * tilesize/2f + 4);
+        Draw.color();
+    }
+
     /** Called after the block is placed by this client. */
     public void playerPlaced(Tile tile){
     }

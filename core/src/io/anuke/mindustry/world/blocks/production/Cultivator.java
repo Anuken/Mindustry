@@ -84,7 +84,7 @@ public class Cultivator extends GenericCrafter{
         return new CultivatorEntity();
     }
 
-    public static class CultivatorEntity extends TileEntity{
+    public static class CultivatorEntity extends GenericCrafterEntity{
         public float warmup;
 
         @Override

@@ -38,6 +38,11 @@ public class ShockMine extends Block{
     }
 
     @Override
+    public void drawTeam(Tile tile){
+        //no
+    }
+
+    @Override
     public void draw(Tile tile){
         //nope
     }

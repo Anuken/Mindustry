@@ -387,16 +387,66 @@ public class Zones implements ContentList{
             }};
         }};
 
-        desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift")){{
-            deployCost = ItemStack.with(Items.copper, 300);
-            startingItems = ItemStack.with(Items.copper, 200);
-            conditionWave = 15;
+        desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift").dist(2f)){{
+            deployCost = ItemStack.with(Items.copper, 2000);
+            startingItems = ItemStack.with(Items.copper, 1500);
+            itemRequirements = ItemStack.with(Items.copper, 8000, Items.metaglass, 2000, Items.graphite, 3000);
+            conditionWave = 10;
+            launchPeriod = 20;
             zoneRequirements = new Zone[]{stainedMountains};
-            blockRequirements = new Block[]{Blocks.copperWall};
+            blockRequirements = new Block[]{Blocks.thermalGenerator};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 80;
+                waveSpacing = 30 * 60;
+                spawns = Array.with(
+                    new SpawnGroup(UnitTypes.crawler){{
+                        unitScaling = 1;
+                        spacing = 2;
+                        end = 10;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 2;
+                        spacing = 2;
+                        unitScaling = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.titan){{
+                        begin = 10;
+                        unitScaling = 1f;
+                        unitAmount = 3;
+                        spacing = 3;
+                    }},
+
+                    new SpawnGroup(UnitTypes.fortress){{
+                        begin = 5;
+                        unitScaling = 1;
+                        spacing = 5;
+                        unitAmount = 1;
+                    }},
+
+                    new SpawnGroup(UnitTypes.fortress){{
+                        begin = 13;
+                        unitScaling = 1;
+                        spacing = 4;
+                        unitAmount = 1;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 11;
+                        spacing = 2;
+                        unitScaling = 2;
+                        unitAmount = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.crawler){{
+                        unitScaling = 1;
+                        spacing = 2;
+                        unitAmount = 4;
+                        begin = 13;
+                    }}
+                );
             }};
         }};
 

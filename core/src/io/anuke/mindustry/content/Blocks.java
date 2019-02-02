@@ -277,18 +277,18 @@ public class Blocks implements ContentList{
         }};
 
         ignarock = new Floor("ignarock"){{
-
+            blendGroup = sand;
         }};
 
         hotrock = new Floor("hotrock"){{
             heat = 0.5f;
-            blendGroup = ignarock;
+            blendGroup = sand;
         }};
 
         magmarock = new Floor("magmarock"){{
             heat = 0.75f;
             updateEffect = Fx.magmasmoke;
-            blendGroup = ignarock;
+            blendGroup = sand;
         }};
 
         //endregion
@@ -455,6 +455,18 @@ public class Blocks implements ContentList{
             size = 2;
 
             consumes.liquid(Liquids.slag, 0.3f);
+        }};
+
+        cultivator = new Cultivator("cultivator"){{
+            requirements(Category.crafting, ItemStack.with(Items.copper, 20, Items.lead, 50, Items.silicon, 20));
+            output = Items.biomatter;
+            craftTime = 200;
+            size = 2;
+            hasLiquids = true;
+            hasPower = true;
+
+            consumes.power(0.80f);
+            consumes.liquid(Liquids.water, 0.15f);
         }};
 
         biomatterCompressor = new Compressor("biomattercompressor"){{
@@ -948,18 +960,6 @@ public class Blocks implements ContentList{
 
             consumes.item(Items.sand);
             consumes.power(3f);
-            consumes.liquid(Liquids.water, 0.15f);
-        }};
-
-        cultivator = new Cultivator("cultivator"){{
-            requirements(Category.production, ItemStack.with(Items.copper, 20, Items.lead, 50, Items.silicon, 20));
-            output = Items.biomatter;
-            craftTime = 200;
-            size = 2;
-            hasLiquids = true;
-            hasPower = true;
-
-            consumes.power(0.80f);
             consumes.liquid(Liquids.water, 0.15f);
         }};
 
