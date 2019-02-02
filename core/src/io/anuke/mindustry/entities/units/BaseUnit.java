@@ -120,8 +120,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public boolean targetHasFlag(BlockFlag flag){
-        return target instanceof TileEntity && ((TileEntity) target).tile.block().flags != null &&
-            ((TileEntity) target).tile.block().flags.contains(flag);
+        return target instanceof TileEntity && ((TileEntity) target).tile.block().flags.contains(flag);
     }
 
     public void updateRespawning(){
@@ -324,6 +323,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public void removed(){
+        Tile tile = world.tile(spawner);
+        if(tile != null){
+            tile.block().unitRemoved(tile, this);
+        }
+
         spawner = noSpawner;
     }
 

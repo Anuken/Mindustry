@@ -128,7 +128,7 @@ public class Pathfinder{
             for(int y = 0; y < world.height(); y++){
                 Tile tile = world.tile(x, y);
 
-                if(tile.block().flags != null && state.teams.areEnemies(tile.getTeam(), team)
+                if(state.teams.areEnemies(tile.getTeam(), team)
                         && tile.block().flags.contains(BlockFlag.target)){
                     path.frontier.addFirst(tile);
                     path.weights[x][y] = 0;

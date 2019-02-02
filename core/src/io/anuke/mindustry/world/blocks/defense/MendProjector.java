@@ -66,8 +66,6 @@ public class MendProjector extends Block{
 
         if(entity.charge >= reload){
             float realRange = range + entity.phaseHeat * phaseRangeBoost;
-
-            Effects.effect(Fx.healWaveMend, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
             entity.charge = 0f;
 
             int tileRange = (int)(realRange / tilesize);

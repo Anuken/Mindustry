@@ -71,7 +71,7 @@ public class Renderer implements ApplicationListener{
                     if(!(effect instanceof GroundEffect)){
                         EffectEntity entity = Pools.obtain(EffectEntity.class, EffectEntity::new);
                         entity.effect = effect;
-                        entity.color = color;
+                        entity.color.set(color);
                         entity.rotation = rotation;
                         entity.data = data;
                         entity.id++;
@@ -83,7 +83,7 @@ public class Renderer implements ApplicationListener{
                     }else{
                         GroundEffectEntity entity = Pools.obtain(GroundEffectEntity.class, GroundEffectEntity::new);
                         entity.effect = effect;
-                        entity.color = color;
+                        entity.color.set(color);
                         entity.rotation = rotation;
                         entity.id++;
                         entity.data = data;

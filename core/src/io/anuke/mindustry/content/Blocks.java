@@ -23,7 +23,6 @@ import io.anuke.mindustry.world.blocks.storage.LaunchPad;
 import io.anuke.mindustry.world.blocks.storage.SortedUnloader;
 import io.anuke.mindustry.world.blocks.storage.Vault;
 import io.anuke.mindustry.world.blocks.units.MechPad;
-import io.anuke.mindustry.world.blocks.units.Reconstructor;
 import io.anuke.mindustry.world.blocks.units.RepairPoint;
 import io.anuke.mindustry.world.blocks.units.UnitFactory;
 
@@ -72,7 +71,7 @@ public class Blocks implements ContentList{
 
     //units
     spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, titanFactory,
-    fortressFactory, reconstructor, repairPoint,
+    fortressFactory, repairPoint,
 
     //upgrades
     alphaPad, deltaPad, tauPad, omegaPad, dartPad, javelinPad, tridentPad, glaivePad;
@@ -1342,10 +1341,6 @@ public class Blocks implements ContentList{
         repairPoint = new RepairPoint("repair-point"){{
             requirements(Category.units, ItemStack.with(Items.lead, 30, Items.copper, 30, Items.silicon, 30));
             repairSpeed = 0.1f;
-        }};
-
-        reconstructor = new Reconstructor("reconstructor"){{
-            size = 2;
         }};
 
         //endregion

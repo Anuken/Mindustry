@@ -129,11 +129,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     @Override
     public boolean collidesGrid(int x, int y){
         Tile tile = world.tile(x, y);
-        if(!isFlying()) return true;
-        if(!mech.flying && tile != null && !tile.block().synthetic() && tile.block().solid){
-            return true;
-        }
-        return false;
+        return !isFlying() || (!mech.flying && tile != null && !tile.block().synthetic() && tile.block().solid);
     }
 
     @Override

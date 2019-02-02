@@ -90,7 +90,7 @@ public class Block extends BlockStorage{
     /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
-    public EnumSet<BlockFlag> flags;
+    public EnumSet<BlockFlag> flags = EnumSet.of();
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
@@ -233,6 +233,11 @@ public class Block extends BlockStorage{
 
     /** Called every frame a unit is on this tile. */
     public void unitOn(Tile tile, Unit unit){
+    }
+
+    /** Called when a unit that spawned at this tile is removed.*/
+    public void unitRemoved(Tile tile, Unit unit){
+
     }
 
     /** Returns whether ot not this block can be place on the specified tile. */

@@ -215,7 +215,7 @@ public class BlockIndexer{
     }
 
     private void process(Tile tile){
-        if(tile.block().flags != null &&
+        if(tile.block().flags.size() > 0 &&
                 tile.getTeam() != Team.none){
             ObjectSet<Tile>[] map = getFlagged(tile.getTeam());
 

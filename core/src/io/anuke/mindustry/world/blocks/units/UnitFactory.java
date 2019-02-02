@@ -12,6 +12,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.units.BaseUnit;
 import io.anuke.mindustry.entities.units.UnitType;
 import io.anuke.mindustry.gen.Call;
@@ -41,6 +42,7 @@ public class UnitFactory extends Block{
     protected float produceTime = 1000f;
     protected float launchVelocity = 0f;
     protected TextureRegion topRegion;
+    protected int maxSpawn = 4;
 
     public UnitFactory(String name){
         super(name);
@@ -61,6 +63,7 @@ public class UnitFactory extends Block{
         UnitFactory factory = (UnitFactory) tile.block();
 
         entity.buildTime = 0f;
+        entity.spawned ++;
 
         Effects.shake(2f, 3f, entity);
         Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
@@ -91,6 +94,12 @@ public class UnitFactory extends Block{
         super.setStats();
 
         stats.add(BlockStat.craftSpeed, produceTime / 60f, StatUnit.seconds);
+    }
+
+    @Override
+    public void unitRemoved(Tile tile, Unit unit){
+        UnitFactoryEntity entity = tile.entity();
+        entity.spawned --;
     }
 
     @Override
@@ -135,6 +144,10 @@ public class UnitFactory extends Block{
         UnitFactoryEntity entity = tile.entity();
 
         entity.time += entity.delta() * entity.speedScl;
+
+        if(entity.spawned >= maxSpawn){
+            return;
+        }
 
         if(tile.isEnemyCheat()){
             entity.warmup += entity.delta();
@@ -211,17 +224,20 @@ public class UnitFactory extends Block{
         public float time;
         public float speedScl;
         public float warmup; //only for enemy spawners
+        public int spawned;
 
         @Override
         public void write(DataOutput stream) throws IOException{
             stream.writeFloat(buildTime);
             stream.writeFloat(warmup);
+            stream.writeInt(spawned);
         }
 
         @Override
         public void read(DataInput stream) throws IOException{
             buildTime = stream.readFloat();
             warmup = stream.readFloat();
+            spawned = stream.readInt();
         }
     }
 }
