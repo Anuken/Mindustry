@@ -11,7 +11,6 @@ import io.anuke.arc.graphics.g2d.TextureAtlas;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Mechs;
@@ -29,7 +28,6 @@ import io.anuke.mindustry.input.MobileInput;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.mindustry.world.Block;
 
 import java.io.IOException;
 
@@ -307,7 +305,7 @@ public class Control implements ApplicationListener{
             }
 
             //auto-update rpc every 5 seconds
-            if(timer.get(60 * 5)){
+            if(timer.get(0, 60 * 5)){
                 Platform.instance.updateRPC();
             }
 

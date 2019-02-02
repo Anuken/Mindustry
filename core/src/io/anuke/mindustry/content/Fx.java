@@ -33,7 +33,7 @@ public class Fx implements ContentList{
     bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
     shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
     shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
-    launchFull, unitSpawn, spawnShockwave;
+    launchFull, unitSpawn, spawnShockwave, magmasmoke;
 
     @Override
     public void load(){
@@ -90,6 +90,12 @@ public class Fx implements ContentList{
             Draw.color(Color.GRAY, Palette.darkishGray, e.fin());
             float size = 7f - e.fin() * 7f;
             Draw.rect("circle", e.x, e.y, size, size);
+            Draw.reset();
+        });
+
+        magmasmoke = new Effect(110, e -> {
+            Draw.color(Color.GRAY);
+            Fill.circle(e.x, e.y, e.fslope() * 6f);
             Draw.reset();
         });
 

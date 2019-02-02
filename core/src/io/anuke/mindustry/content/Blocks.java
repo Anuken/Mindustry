@@ -37,7 +37,7 @@ public class Blocks implements ContentList{
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
     holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, duneRocks, stainedRocks, stainedStone, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, ignarock, magmarock, hotrock,
 
     //crafting
     siliconSmelter, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -51,7 +51,7 @@ public class Blocks implements ContentList{
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, overdriveProjector, forceProjector, shockMine,
 
-    //transport
+    //transpor
     conveyor, titaniumConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
 
     //liquids
@@ -271,14 +271,24 @@ public class Blocks implements ContentList{
             blendGroup = metalFloor;
         }};
 
-        metalFloor4 = new Floor("metal-floor-4"){{
+        metalFloor5 = new Floor("metal-floor-5"){{
             variants = 0;
             blendGroup = metalFloor;
         }};
 
-        metalFloor5 = new Floor("metal-floor-5"){{
-            variants = 0;
-            blendGroup = metalFloor;
+        ignarock = new Floor("ignarock"){{
+
+        }};
+
+        hotrock = new Floor("hotrock"){{
+            heat = 0.5f;
+            blendGroup = ignarock;
+        }};
+
+        magmarock = new Floor("magmarock"){{
+            heat = 0.75f;
+            updateEffect = Fx.magmasmoke;
+            blendGroup = ignarock;
         }};
 
         //endregion

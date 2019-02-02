@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.entities.Effects;
 import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -8,6 +9,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.type.Item;
@@ -57,6 +59,8 @@ public class Floor extends Block{
     public String edgeStyle = "smooth";
     /**Group of blocks that this block does not draw edges on.*/
     public Block blendGroup = this;
+    /**Effect displayed when randomly updated.*/
+    public Effect updateEffect = Fx.none;
 
     protected TextureRegion[][] edges;
     protected byte eq = 0;
@@ -95,6 +99,13 @@ public class Floor extends Block{
     }
 
     @Override
+    public void randomUpdate(Tile tile){
+        if(tile.block() == Blocks.air){
+            Effects.effect(updateEffect, tile.worldx() + Mathf.range(tilesize/2f), tile.worldy() + Mathf.range(tilesize/2f));
+        }
+    }
+
+    @Override
     public void init(){
         super.init();
 
@@ -118,7 +129,7 @@ public class Floor extends Block{
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
             Tile other = tile.getNearby(point);
-            if(other != null && doEdge(other.floor()) && other.floor().edges != null){
+            if(other != null && doEdge(other.floor()) && other.floor().edges() != null){
                 eq |= (1 << i);
             }
         }
@@ -134,8 +145,12 @@ public class Floor extends Block{
         }
     }
 
+    protected TextureRegion[][] edges(){
+        return ((Floor)blendGroup).edges;
+    }
+
     protected boolean doEdge(Floor other){
-        return (other.blendGroup.id > id || edges == null) && other.edgeOnto(this);
+        return (other.blendGroup.id > id || edges() == null) && other.edgeOnto(this);
     }
 
     protected boolean edgeOnto(Floor other){
@@ -163,7 +178,7 @@ public class Floor extends Block{
     }
 
     TextureRegion edge(Floor block, int type, int x, int y){
-        return block.edges[x + type*3][2-y];
+        return block.edges()[x + type*3][2-y];
     }
 
 }

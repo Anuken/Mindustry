@@ -369,6 +369,11 @@ public class Block extends BlockStorage{
     public void update(Tile tile){
     }
 
+    /**Called when this tile is randomly updated. This only happens on a client, and should be used for effects only.
+     * TODO currently unimplemented*/
+    public void randomUpdate(Tile tile){
+    }
+
     public boolean isAccessible(){
         return (hasItems && itemCapacity > 0);
     }

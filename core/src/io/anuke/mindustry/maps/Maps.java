@@ -54,7 +54,7 @@ public class Maps implements Disposable{
 
     /**Returns map by internal name.*/
     public Map getByName(String name){
-        return maps.get(name.toLowerCase());
+        return maps.get(name);
     }
 
     /**Loads a map from the map folder and returns it. Should only be used for zone maps.
@@ -136,7 +136,7 @@ public class Maps implements Disposable{
                 map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta, true)));
             }
 
-            maps.put(map.name.toLowerCase(), map);
+            maps.put(map.name, map);
             allMaps.add(map);
         }
     }

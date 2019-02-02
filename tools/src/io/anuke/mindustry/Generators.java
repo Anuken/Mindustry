@@ -170,7 +170,7 @@ public class Generators {
 
                 Floor floor = (Floor)block;
 
-                if(ImagePacker.has(floor.name + "-edge")){
+                if(ImagePacker.has(floor.name + "-edge") || floor.blendGroup != floor){
                     continue;
                 }
 
