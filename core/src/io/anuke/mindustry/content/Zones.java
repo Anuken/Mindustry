@@ -323,7 +323,7 @@ public class Zones implements ContentList{
             itemRequirements = ItemStack.with(Items.silicon, 8000, Items.titanium, 6000, Items.graphite, 4000);
             conditionWave = 20;
             zoneRequirements = new Zone[]{stainedMountains};
-            blockRequirements = new Block[]{Blocks.launchPad, Blocks.unloader, Blocks.container};
+            blockRequirements = new Block[]{Blocks.launchPad, Blocks.unloader, Blocks.coreFoundation};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -387,7 +387,7 @@ public class Zones implements ContentList{
             }};
         }};
 
-        desolateRift = new Zone("desolateRift", new MapGenerator("groundZero", 1)){{ //TODO implement
+        desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift")){{
             deployCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;

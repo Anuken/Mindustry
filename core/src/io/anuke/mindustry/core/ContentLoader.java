@@ -4,6 +4,8 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.function.Consumer;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.util.Log;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.Player;
@@ -16,10 +18,14 @@ import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.MappableContent;
-import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper;
+
+import static io.anuke.arc.Core.files;
 
 /**
  * Loads all game content.
@@ -48,7 +54,6 @@ public class ContentLoader{
         new Zones(),
 
         //these are not really content classes, but this makes initialization easier
-        new ColorMapper(),
         new LegacyColorMapper(),
     };
 
@@ -124,6 +129,22 @@ public class ContentLoader{
         }
 
         initialization.add(callable);
+    }
+
+    /**Loads block colors.*/
+    public void loadColors(){
+        Pixmap pixmap = new Pixmap(files.internal("sprites/block_colors.png"));
+        for(int i = 0; i < 256; i++){
+            if(blocks().size > i){
+                int color = pixmap.getPixel(i, 0);
+
+                if(color == 0) continue;
+
+                Block block = block(i);
+                Color.rgba8888ToColor(block.color, color);
+            }
+        }
+        pixmap.dispose();
     }
 
     public void verbose(boolean verbose){

@@ -27,6 +27,7 @@ public class Mindustry extends ApplicationCore{
         Log.setUseColors(false);
         BundleLoader.load();
         content.load();
+        content.loadColors();
 
         add(logic = new Logic());
         add(world = new World());

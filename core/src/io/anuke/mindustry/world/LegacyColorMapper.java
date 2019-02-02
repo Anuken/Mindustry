@@ -25,8 +25,8 @@ public class LegacyColorMapper implements ContentList{
         map("00ff00", Blocks.stone, 0);
         map("323232", Blocks.stone, 0);
         map("646464", Blocks.stone, 1);
-        map("50965a", Blocks.grass, 0);
-        map("5ab464", Blocks.grass, 1);
+        //map("50965a", Blocks.grass, 0);
+        //map("5ab464", Blocks.grass, 1);
         map("506eb4", Blocks.water, 0);
         map("465a96", Blocks.deepwater, 0);
         //map("252525", Blocks.blackstone, 0);

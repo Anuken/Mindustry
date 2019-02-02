@@ -18,11 +18,16 @@ public class OreBlock extends Floor{
         this.itemDrop = ore;
         this.base = base;
         this.variants = 3;
-        this.minimapColor = ore.color;
         this.edge = base.name;
         this.blendGroup = base;
+        this.color.set(ore.color);
 
         oreBlockMap.getOr(ore, ObjectMap::new).put(base, this);
+    }
+
+    @Override
+    public void init(){
+        super.init();
     }
 
     @Override

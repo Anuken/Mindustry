@@ -95,8 +95,9 @@ public class Block extends BlockStorage{
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
-    /** The color of this block when displayed on the minimap or map preview. */
-    public Color minimapColor = Color.CLEAR;
+    /** The color of this block when displayed on the minimap or map preview.
+     *  Do not set manually! This is overriden when loading.*/
+    public Color color = new Color(0, 0, 0, 1);
     /**Whether units target this block.*/
     public boolean targetable = true;
     /**Whether the overdrive core has any effect on this block.*/

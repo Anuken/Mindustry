@@ -52,7 +52,6 @@ public class Renderer implements ApplicationListener{
         batch = new SpriteBatch(4096);
         camera = new Camera();
         Lines.setCircleVertices(14);
-
         Shaders.init();
 
         Effects.setScreenShakeProvider((intensity, duration) -> {

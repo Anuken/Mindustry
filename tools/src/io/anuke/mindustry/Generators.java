@@ -20,6 +20,8 @@ public class Generators {
     public static void generate(){
 
         ImagePacker.generate("block-icons", () -> {
+            Image colors = new Image(256, 1);
+
             for(Block block : content.blocks()){
                 TextureRegion[] regions = block.getGeneratedIcons();
 
@@ -44,12 +46,27 @@ public class Generators {
                         scaled.drawScaled(image);
                         scaled.save(block.name + "-icon-" + icon.name());
                     }
+
+                    Color average = new Color();
+                    for(int x = 0; x < image.width(); x++){
+                        for(int y = 0; y < image.height(); y++){
+                            Color color = image.getColor(x, y);
+                            average.r += color.r;
+                            average.g += color.g;
+                            average.b += color.b;
+                        }
+                    }
+                    average.mul(1f / (image.width() * image.height()));
+                    average.a = 1f;
+                    colors.draw(block.id, 0, average);
                 }catch(IllegalArgumentException e){
                     Log.info("Skipping &ly'{0}'", block.name);
                 }catch(NullPointerException e){
                     Log.err("Block &ly'{0}'&lr has an null region!");
                 }
             }
+
+            colors.save("../../../assets/sprites/block_colors");
         });
 
         ImagePacker.generate("mech-icons", () -> {

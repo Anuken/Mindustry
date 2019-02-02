@@ -17,7 +17,6 @@ import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper.LegacyBlock;
 
@@ -52,7 +51,7 @@ public class MapIO{
                 data.read(marker);
                 Block floor = content.block(marker.floor);
                 Block wall = content.block(marker.wall);
-                int color = ColorMapper.colorFor(floor, wall, Team.all[marker.team]);
+                int color = colorFor(floor, wall, Team.all[marker.team]);
                 pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, color);
             }
         }
@@ -195,5 +194,12 @@ public class MapIO{
 
         stream.writeShort(meta.width);
         stream.writeShort(meta.height);
+    }
+
+    public static int colorFor(Block floor, Block wall, Team team){
+        if(wall.synthetic()){
+            return team.intColor;
+        }
+        return Color.rgba8888(wall.solid ? wall.color : floor.color);
     }
 }

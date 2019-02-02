@@ -35,7 +35,7 @@ public class Blocks implements ContentList{
 
     //environment
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
-    grass, holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
+    holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, duneRocks, stainedRocks, stainedStone, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5,
 
@@ -118,7 +118,6 @@ public class Blocks implements ContentList{
             statusDuration = 120f;
             drownTime = 140f;
             cacheLayer = CacheLayer.water;
-            minimapColor = Color.valueOf("465a96");
         }};
 
         water = new Floor("water"){{
@@ -130,7 +129,6 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
-            minimapColor = Color.valueOf("506eb4");
         }};
 
         tar = new Floor("tar"){{
@@ -143,22 +141,18 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.oil;
             isLiquid = true;
             cacheLayer = CacheLayer.oil;
-            minimapColor = Color.valueOf("292929");
         }};
 
         stone = new Floor("stone"){{
             hasOres = true;
-            minimapColor = Color.valueOf("323232");
         }};
 
         craters = new Floor("craters"){{
-            minimapColor = Color.valueOf("323232");
             variants = 6;
             blendGroup = stone;
         }};
 
         charr = new Floor("char"){{
-            minimapColor = Color.valueOf("323232");
             blendGroup = stone;
         }};
 
@@ -171,12 +165,10 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
-            minimapColor = Color.valueOf("506eb4");
         }};
 
         sand = new Floor("sand"){{
             itemDrop = Items.sand;
-            minimapColor = Color.valueOf("988a67");
             hasOres = true;
             playerUnmineable = true;
         }};
@@ -191,17 +183,11 @@ public class Blocks implements ContentList{
         }};
 
         snow = new Floor("snow"){{
-            minimapColor = Color.valueOf("c2d1d2");
         }};
 
         ice = new Floor("ice"){{
             dragMultiplier = 0.2f;
             speedMultiplier = 0.4f;
-            minimapColor = Color.valueOf("b8eef8");
-        }};
-
-        grass = new Floor("grass"){{
-            minimapColor = Color.valueOf("549d5b");
         }};
 
         cliffs = new StaticWall("cliffs"){{
@@ -957,8 +943,8 @@ public class Blocks implements ContentList{
 
         cultivator = new Cultivator("cultivator"){{
             requirements(Category.production, ItemStack.with(Items.copper, 20, Items.lead, 50, Items.silicon, 20));
-            result = Items.biomatter;
-            drillTime = 200;
+            output = Items.biomatter;
+            craftTime = 200;
             size = 2;
             hasLiquids = true;
             hasPower = true;
