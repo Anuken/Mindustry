@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.type.types;
+package io.anuke.mindustry.entities.type.base;
 
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.type.GroundUnit;

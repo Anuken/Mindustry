@@ -14,7 +14,7 @@ import io.anuke.mindustry.core.NetServer;
 import io.anuke.mindustry.core.World;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.type.BaseUnit;
-import io.anuke.mindustry.entities.type.types.Spirit;
+import io.anuke.mindustry.entities.type.base.Spirit;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.BundleLoader;
@@ -231,8 +231,8 @@ public class ApplicationTests{
         d2.addBuildRequest(new BuildRequest(1, 1, 0, Blocks.copperWallLarge));
 
         Time.setDeltaProvider(() -> 9999999f);
-        d1.updateBuilding(d1);
-        d2.updateBuilding(d2);
+        d1.updateBuilding();
+        d2.updateBuilding();
 
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
@@ -253,16 +253,16 @@ public class ApplicationTests{
         d2.addBuildRequest(new BuildRequest(1, 1));
 
         Time.setDeltaProvider(() -> 3f);
-        d1.updateBuilding(d1);
+        d1.updateBuilding();
         Time.setDeltaProvider(() -> 1f);
-        d2.updateBuilding(d2);
+        d2.updateBuilding();
 
         assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
 
         Time.setDeltaProvider(() -> 9999f);
 
-        d1.updateBuilding(d1);
-        d2.updateBuilding(d2);
+        d1.updateBuilding();
+        d2.updateBuilding();
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());

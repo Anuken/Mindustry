@@ -16,7 +16,7 @@ import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
 
 public class UnitType extends UnlockableContent{
-    protected final Supplier<? extends io.anuke.mindustry.entities.type.BaseUnit> constructor;
+    protected final Supplier<? extends BaseUnit> constructor;
 
     public final String name;
     public final String description;
@@ -42,7 +42,7 @@ public class UnitType extends UnlockableContent{
 
     public TextureRegion iconRegion, legRegion, baseRegion, region;
 
-    public <T extends io.anuke.mindustry.entities.type.BaseUnit> UnitType(String name, Class<T> type, Supplier<T> mainConstructor){
+    public <T extends BaseUnit> UnitType(String name, Class<T> type, Supplier<T> mainConstructor){
         this.name = name;
         this.constructor = mainConstructor;
         this.description = Core.bundle.getOrNull("unit." + name + ".description");
@@ -91,7 +91,7 @@ public class UnitType extends UnlockableContent{
         return name;
     }
 
-    public io.anuke.mindustry.entities.type.BaseUnit create(Team team){
+    public BaseUnit create(Team team){
         BaseUnit unit = constructor.get();
         unit.init(this, team);
         return unit;

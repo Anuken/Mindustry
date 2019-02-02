@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.type.types;
+package io.anuke.mindustry.entities.type.base;
 
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Queue;
