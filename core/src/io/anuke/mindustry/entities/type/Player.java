@@ -36,7 +36,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.storage.CoreBlock.CoreEntity;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -253,15 +252,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     @Override
     public String toString(){
         return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}";
-    }
-
-    @Override
-    public void removed(){
-
-        TileEntity core = getClosestCore();
-        if(core != null && ((CoreEntity) core).currentUnit == this){
-            ((CoreEntity) core).currentUnit = null;
-        }
     }
 
     @Override

@@ -144,10 +144,11 @@ public class CoreBlock extends StorageBlock{
         CoreEntity entity = tile.entity();
 
         if(entity.currentUnit != null){
-            if(!entity.currentUnit.isDead()){
+            if(!entity.currentUnit.isDead() || !entity.currentUnit.isAdded()){
                 entity.currentUnit = null;
                 return;
             }
+
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += entity.delta();
             entity.progress += 1f / state.rules.respawnTime * entity.delta();

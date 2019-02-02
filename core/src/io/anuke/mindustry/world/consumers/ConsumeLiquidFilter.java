@@ -62,7 +62,7 @@ public class ConsumeLiquidFilter extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        if(optional){
+        if(boost){
             stats.add(BlockStat.boostLiquid, new LiquidFilterValue(filter));
         }else if(isFuel){
             stats.add(BlockStat.inputLiquidFuel, new LiquidFilterValue(filter));

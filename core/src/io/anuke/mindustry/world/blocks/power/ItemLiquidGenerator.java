@@ -59,7 +59,6 @@ public class ItemLiquidGenerator extends PowerGenerator{
         }
     }
 
-
     @Override
     public void update(Tile tile){
         ItemLiquidGeneratorEntity entity = tile.entity();

@@ -58,6 +58,6 @@ public class ConsumeItemFilter extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        stats.add(optional ? BlockStat.boostItem : BlockStat.inputItem, new ItemFilterValue(filter));
+        stats.add(boost ? BlockStat.boostItem : BlockStat.inputItem, new ItemFilterValue(filter));
     }
 }

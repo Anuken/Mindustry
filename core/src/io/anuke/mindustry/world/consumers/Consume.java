@@ -13,7 +13,7 @@ import static io.anuke.mindustry.Vars.mobile;
 /**An abstract class that defines a type of resource that a block can consume.*/
 public abstract class Consume{
     protected boolean optional;
-    protected boolean update = true;
+    protected boolean update = true, boost = false;
 
     public Consume optional(boolean optional){
         this.optional = optional;
@@ -22,6 +22,11 @@ public abstract class Consume{
 
     public Consume update(boolean update){
         this.update = update;
+        return this;
+    }
+
+    public Consume boost(boolean boost){
+        this.boost = boost;
         return this;
     }
 

@@ -228,8 +228,7 @@ public class TechTree implements ContentList{
                     });
                 });
 
-                node(alphaPad, () -> {
-                    node(dartPad);
+                node(alphaDartPad, () -> {
                     node(deltaPad, () -> {
                         node(javelinPad);
                         node(tauPad, () -> {

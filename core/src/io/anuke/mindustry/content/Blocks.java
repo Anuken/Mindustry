@@ -25,6 +25,8 @@ import io.anuke.mindustry.world.blocks.storage.Vault;
 import io.anuke.mindustry.world.blocks.units.MechPad;
 import io.anuke.mindustry.world.blocks.units.RepairPoint;
 import io.anuke.mindustry.world.blocks.units.UnitFactory;
+import io.anuke.mindustry.world.consumers.ConsumeItemFilter;
+import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.state;
@@ -57,7 +59,7 @@ public class Blocks implements ContentList{
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
     //power
-    combustionGenerator, thermalGenerator, turbineGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
+    combustionGenerator, thermalGenerator, turbineGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
     fusionReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower,
 
     //production
@@ -74,7 +76,7 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    alphaPad, deltaPad, tauPad, omegaPad, dartPad, javelinPad, tridentPad, glaivePad;
+    alphaDartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
 
     @Override
     public void load(){
@@ -639,13 +641,13 @@ public class Blocks implements ContentList{
             requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.titanium, 150, Items.silicon, 250));
             consumes.power(3.50f);
             size = 2;
-            consumes.item(Items.phasefabric).optional(true);
+            consumes.item(Items.phasefabric).optional(true).boost(true);
         }};
 
         forceProjector = new ForceProjector("force-projector"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.titanium, 150, Items.silicon, 250));
             size = 3;
-            consumes.item(Items.phasefabric).optional(true);
+            consumes.item(Items.phasefabric).optional(true).boost(true);
         }};
 
         shockMine = new ShockMine("shock-mine"){{
@@ -843,6 +845,17 @@ public class Blocks implements ContentList{
             itemDuration = 30f;
             consumes.liquid(Liquids.water, 0.05f);
             size = 2;
+        }};
+
+        differentialGenerator = new TurbineGenerator("differential-generator"){{
+            requirements(Category.power, ItemStack.with(Items.copper, 140, Items.titanium, 100, Items.lead, 200, Items.silicon, 130, Items.metaglass, 100));
+            powerProduction = 12f;
+            itemDuration = 30f;
+            consumes.remove(ConsumeItemFilter.class);
+            consumes.remove(ConsumeLiquidFilter.class);
+            consumes.item(Items.pyratite);
+            consumes.liquid(Liquids.cryofluid, 0.06f);
+            size = 3;
         }};
 
         rtgGenerator = new DecayGenerator("rtg-generator"){{
@@ -1346,7 +1359,7 @@ public class Blocks implements ContentList{
         //endregion
         //region upgrades
 
-        alphaPad = new MechPad("alpha-mech-pad"){{
+        alphaDartPad = new MechPad("alpha-dart-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 200, Items.graphite, 100, Items.copper, 150));
             mech = Mechs.alpha;
             size = 2;
@@ -1372,13 +1385,6 @@ public class Blocks implements ContentList{
             mech = Mechs.omega;
             size = 3;
             consumes.powerBuffered(120f);
-        }};
-
-        dartPad = new MechPad("dart-ship-pad"){{
-            requirements(Category.upgrade, ItemStack.with(Items.lead, 150, Items.copper, 150, Items.silicon, 200, Items.titanium, 240));
-            mech = Mechs.dart;
-            size = 2;
-            consumes.powerBuffered(50f);
         }};
 
         javelinPad = new MechPad("javelin-ship-pad"){{

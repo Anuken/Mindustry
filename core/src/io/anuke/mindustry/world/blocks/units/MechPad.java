@@ -81,7 +81,12 @@ public class MechPad extends Block{
         Mech result = ((MechPad) tile.block()).mech;
 
         if(entity.player.mech == result){
-            entity.player.mech = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
+            Mech target = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
+            if(entity.player.mech == target){
+                entity.player.mech = (entity.player.isMobile ? Mechs.starterDesktop : Mechs.starterMobile);
+            }else{
+                entity.player.mech = target;
+            }
         }else{
             entity.player.mech = result;
         }
