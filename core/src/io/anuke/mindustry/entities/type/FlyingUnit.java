@@ -150,11 +150,6 @@ public abstract class FlyingUnit extends BaseUnit{
          Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
         }
-
-        if(squad != null){
-            squad.direction.add(velocity.x / squad.units, velocity.y / squad.units);
-            velocity.setAngle(Mathf.slerpDelta(velocity.angle(), squad.direction.angle(), 0.3f));
-        }
     }
 
     @Override

@@ -64,7 +64,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public boolean achievedFlight;
     public Color color = new Color();
     public Mech mech;
-    public SpawnerTrait spawner;
+    public SpawnerTrait spawner, lastSpawner;
 
     public NetConnection con;
     public int playerIndex = 0;
@@ -90,6 +90,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         player.dead = true;
         player.placeQueue.clear();
         player.onDeath();
+        player.mech = (player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
     }
 
     @Override
@@ -760,16 +761,18 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
         if(spawner != null && spawner.isValid()){
             spawner.updateSpawning(this);
-        }else{
-            CoreEntity entity = (CoreEntity) getClosestCore();
-            if(entity != null && !netServer.isWaitingForPlayers()){
-                this.spawner = (SpawnerTrait)entity.tile.entity;
+        }else if(!netServer.isWaitingForPlayers()){
+            if(lastSpawner != null && lastSpawner.isValid()){
+                this.spawner = lastSpawner;
+            }else if(getClosestCore() != null){
+                this.spawner = (SpawnerTrait)getClosestCore();
             }
         }
     }
 
     public void beginRespawning(SpawnerTrait spawner){
         this.spawner = spawner;
+        this.lastSpawner = spawner;
         this.dead = true;
     }
 

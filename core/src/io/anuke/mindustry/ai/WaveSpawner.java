@@ -3,7 +3,6 @@ package io.anuke.mindustry.ai;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntArray;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
@@ -11,8 +10,8 @@ import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.BaseUnit;
-import io.anuke.mindustry.entities.units.Squad;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.world.Pos;
@@ -68,7 +67,6 @@ public class WaveSpawner{
 
             if(group.type.isFlying){
                 for(FlyerSpawn spawn : flySpawns){
-                    Squad squad = new Squad();
                     float margin = 40f; //how far away from the edge flying units spawn
                     float trns = (world.width() + world.height()) * tilesize;
                     spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(spawn.angle, trns), -margin, world.width() * tilesize + margin);
@@ -77,15 +75,12 @@ public class WaveSpawner{
 
                     for(int i = 0; i < spawned; i++){
                         BaseUnit unit = group.createUnit(waveTeam);
-                        unit.setWave();
-                        unit.setSquad(squad);
                         unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
                         unit.add();
                     }
                 }
             }else{
                 for(GroundSpawn spawn : groundSpawns){
-                    Squad squad = new Squad();
                     spawnX = spawn.x * tilesize;
                     spawnY = spawn.y * tilesize;
                     spread = tilesize*3;
@@ -94,8 +89,6 @@ public class WaveSpawner{
                         Tmp.v1.rnd(spread);
 
                         BaseUnit unit = group.createUnit(waveTeam);
-                        unit.setWave();
-                        unit.setSquad(squad);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
 
                         Time.run(i*5, () -> {

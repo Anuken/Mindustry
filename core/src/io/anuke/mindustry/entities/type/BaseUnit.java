@@ -16,7 +16,6 @@ import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.mindustry.entities.units.Squad;
 import io.anuke.mindustry.entities.units.StateMachine;
 import io.anuke.mindustry.entities.units.UnitDrops;
 import io.anuke.mindustry.entities.units.UnitState;
@@ -50,8 +49,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected StateMachine state = new StateMachine();
     protected TargetTrait target;
 
-    protected boolean isWave;
-    protected Squad squad;
     protected int spawner = noSpawner;
 
     /**internal constructor used for deserialization, DO NOT USE*/
@@ -91,16 +88,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public void setSpawner(Tile tile){
         this.spawner = tile.pos();
-    }
-
-    /**Sets this to a 'wave' unit, which means it has slightly different AI and will not run out of ammo.*/
-    public void setWave(){
-        isWave = true;
-    }
-
-    public void setSquad(Squad squad){
-        this.squad = squad;
-        squad.units++;
     }
 
     public void rotate(float angle){
@@ -331,7 +318,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void writeSave(DataOutput stream) throws IOException{
         super.writeSave(stream);
         stream.writeByte(type.id);
-        stream.writeBoolean(isWave);
         stream.writeInt(spawner);
     }
 
@@ -339,7 +325,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void readSave(DataInput stream) throws IOException{
         super.readSave(stream);
         byte type = stream.readByte();
-        this.isWave = stream.readBoolean();
         this.spawner = stream.readInt();
 
         this.type = content.getByID(ContentType.unit, type);

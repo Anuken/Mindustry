@@ -212,7 +212,6 @@ public class MechPad extends Block{
 
         @Override
         public void updateSpawning(Player unit){
-
             if(player == null){
                 progress = 0f;
                 player = unit;
