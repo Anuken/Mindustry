@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
 /** Class for controlling status effects on an entity.*/
-public class StatusController implements Saveable{
+public class Statuses implements Saveable{
     private static final StatusEntry globalResult = new StatusEntry();
     private static final Array<StatusEntry> removals = new Array<>();
 

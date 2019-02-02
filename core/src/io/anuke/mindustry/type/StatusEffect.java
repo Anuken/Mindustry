@@ -9,7 +9,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.StatusController.StatusEntry;
+import io.anuke.mindustry.entities.Statuses.StatusEntry;
 import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.game.Content;
 

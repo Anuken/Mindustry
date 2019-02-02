@@ -23,6 +23,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Pos;
@@ -36,7 +37,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.Vars.tilesize;
 
-public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait, InventoryTrait{
+public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait{
     /**Total duration of hit flash effect*/
     public static final float hitDuration = 9f;
     /**Percision divisor of velocity, used when writing. For example a value of '2' would mean the percision is 1/2 = 0.5-size chunks.*/
@@ -48,24 +49,18 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     private static final Rectangle queryRect = new Rectangle();
     private static final Vector2 moveVector = new Vector2();
 
-    public final UnitInventory inventory = new UnitInventory(this);
     public float rotation;
-    public float hitTime;
 
     protected final Interpolator interpolator = new Interpolator();
-    protected final StatusController status = new StatusController();
-    protected Team team = Team.blue;
+    protected final Statuses status = new Statuses();
+    protected final ItemStack inventory = new ItemStack(content.item(0), 0);
 
-    protected float drownTime;
+    protected Team team = Team.blue;
+    protected float drownTime, hitTime;
 
     @Override
     public boolean movable(){
         return !isDead();
-    }
-
-    @Override
-    public UnitInventory getInventory(){
-        return inventory;
     }
 
     @Override
@@ -114,7 +109,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void onDeath(){
-        inventory.clear();
+        inventory.amount = 0;
         drownTime = 0f;
         status.clear();
         Events.fire(new UnitDestroyEvent(this));
@@ -342,10 +337,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public void drawShadow(float offsetX, float offsetY){
         Draw.rect(getIconRegion(), x + offsetX, y + offsetY, rotation - 90);
-    }
-
-    public void drawView(){
-        Fill.circle(x, y, getViewDistance());
     }
 
     public float getViewDistance(){
