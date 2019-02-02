@@ -5,7 +5,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntArray;
-import io.anuke.arc.entities.EntityQuery;
+import io.anuke.mindustry.entities.EntityQuery;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;

@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -9,7 +9,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.game.ContentList;
@@ -36,7 +36,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.85f;
                 weapon = Weapons.blaster;
                 trailColorTo = Color.valueOf("ffd37f");
-                armor = 20f;
+                health = 250f;
             }
 
             @Override
@@ -54,7 +54,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.95f;
                 itemCapacity = 15;
                 mass = 0.9f;
-                armor = 30f;
+                health = 220f;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
                 weapon = Weapons.shockgun;
@@ -92,7 +92,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.8f;
                 canHeal = true;
                 weapon = Weapons.healBlaster;
-                armor = 15f;
+                health = 200f;
                 trailColorTo = Palette.heal;
             }
 
@@ -135,7 +135,7 @@ public class Mechs implements ContentList{
                 weaponOffsetY = 0;
                 weapon = Weapons.swarmer;
                 trailColorTo = Color.valueOf("feb380");
-                armor = 45f;
+                health = 300f;
             }
 
             @Override
@@ -188,7 +188,7 @@ public class Mechs implements ContentList{
                 mineSpeed = 0.9f;
                 speed = 0.4f;
                 drag = 0.1f;
-                armor = 10f;
+                health = 180f;
                 weapon = Weapons.blasterSmall;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
@@ -211,7 +211,7 @@ public class Mechs implements ContentList{
                 speed = 0.11f;
                 drag = 0.01f;
                 mass = 2f;
-                armor = 5f;
+                health = 170f;
                 weapon = Weapons.missiles;
                 trailColor = Color.valueOf("d3ddff");
                 cellTrnsY = 1f;
@@ -266,7 +266,7 @@ public class Mechs implements ContentList{
                 drag = 0.034f;
                 mass = 2.5f;
                 turnCursor = false;
-                armor = 20f;
+                health = 220f;
                 itemCapacity = 30;
                 trailColor = Color.valueOf("84f491");
                 weapon = Weapons.bomberTrident;
@@ -287,7 +287,7 @@ public class Mechs implements ContentList{
                 speed = 0.32f;
                 drag = 0.06f;
                 mass = 3f;
-                armor = 30f;
+                health = 240f;
                 itemCapacity = 60;
                 trailColor = Color.valueOf("feb380");
                 cellTrnsY = 1f;

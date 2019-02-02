@@ -2,12 +2,12 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityDraw;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.EffectEntity;
-import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.entities.trait.Entity;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityDraw;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.impl.EffectEntity;
+import io.anuke.mindustry.entities.traits.DrawTrait;
+import io.anuke.mindustry.entities.traits.Entity;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Camera;
@@ -23,13 +23,13 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 
@@ -116,7 +116,7 @@ public class Renderer implements ApplicationListener{
 
             if(players[0].isDead()){
                 TileEntity core = players[0].getClosestCore();
-                if(core != null && players[0].spawner == Unit.noSpawner){
+                if(core != null && players[0].spawner == null){
                     camera.position.lerpDelta(core.x, core.y, 0.08f);
                 }else{
                     camera.position.lerpDelta(position, 0.08f);

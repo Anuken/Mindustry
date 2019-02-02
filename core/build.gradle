@@ -4,5 +4,5 @@ sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = ["src/"]
 
 compileJava{
-    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+//    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }

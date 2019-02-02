@@ -1,8 +1,8 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.mindustry.entities.units.BaseUnit;
-import io.anuke.mindustry.entities.units.GroundUnit;
-import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.GroundUnit;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.Weapon;
@@ -66,7 +66,7 @@ public class SpawnGroup{
         }
 
         if(items != null){
-            unit.inventory.addItem(items.item, items.amount);
+            unit.addItem(items.item, items.amount);
         }
 
         return unit;

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Color;
@@ -15,6 +14,7 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
@@ -109,7 +109,7 @@ public class Damage{
         rect.width += expand * 2;
         rect.height += expand * 2;
 
-        Consumer<Unit> cons = e -> {
+        Consumer<io.anuke.mindustry.entities.type.Unit> cons = e -> {
             e.hitbox(hitrect);
             Rectangle other = hitrect;
             other.y -= expand;
@@ -130,8 +130,8 @@ public class Damage{
     }
 
     /**Damages all entities and blocks in a radius that are enemies of the team.*/
-    public static void damageUnits(Team team, float x, float y, float size, float damage, Predicate<Unit> predicate, Consumer<Unit> acceptor){
-        Consumer<Unit> cons = entity -> {
+    public static void damageUnits(Team team, float x, float y, float size, float damage, Predicate<io.anuke.mindustry.entities.type.Unit> predicate, Consumer<io.anuke.mindustry.entities.type.Unit> acceptor){
+        Consumer<io.anuke.mindustry.entities.type.Unit> cons = entity -> {
             if(!predicate.test(entity)) return;
 
             entity.hitbox(hitrect);
@@ -158,7 +158,7 @@ public class Damage{
     /**Damages all entities and blocks in a radius that are enemies of the team.*/
     public static void damage(Team team, float x, float y, float radius, float damage){
         Consumer<Unit> cons = entity -> {
-            if(entity.team == team || entity.dst(x, y) > radius){
+            if(entity.getTeam() == team || entity.dst(x, y) > radius){
                 return;
             }
             float amount = calculateDamage(x, y, entity.x, entity.y, radius, damage);

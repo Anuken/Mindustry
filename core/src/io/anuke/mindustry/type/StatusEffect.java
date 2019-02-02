@@ -2,15 +2,15 @@ package io.anuke.mindustry.type;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Statuses.StatusEntry;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.units.Statuses.StatusEntry;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Content;
 
 public class StatusEffect extends Content{

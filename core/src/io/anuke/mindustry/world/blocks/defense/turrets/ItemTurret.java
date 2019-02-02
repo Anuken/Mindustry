@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;

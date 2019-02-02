@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.units;
+package io.anuke.mindustry.type;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectSet;
@@ -10,16 +10,13 @@ import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.traits.TypeTrait;
+import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.StatusEffect;
-import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.ui.ContentDisplay;
 
 public class UnitType extends UnlockableContent{
-    protected final Supplier<? extends BaseUnit> constructor;
+    protected final Supplier<? extends io.anuke.mindustry.entities.type.BaseUnit> constructor;
 
     public final String name;
     public final String description;
@@ -36,7 +33,6 @@ public class UnitType extends UnlockableContent{
     public float drag = 0.1f;
     public float maxVelocity = 5f;
     public float retreatPercent = 0.2f;
-    public float armor = 0f;
     public int itemCapacity = 30;
     public ObjectSet<Item> toMine = ObjectSet.with(Items.lead, Items.copper);
     public float buildPower = 0.3f, minePower = 0.7f;
@@ -46,7 +42,7 @@ public class UnitType extends UnlockableContent{
 
     public TextureRegion iconRegion, legRegion, baseRegion, region;
 
-    public <T extends BaseUnit> UnitType(String name, Class<T> type, Supplier<T> mainConstructor){
+    public <T extends io.anuke.mindustry.entities.type.BaseUnit> UnitType(String name, Class<T> type, Supplier<T> mainConstructor){
         this.name = name;
         this.constructor = mainConstructor;
         this.description = Core.bundle.getOrNull("unit." + name + ".description");
@@ -95,7 +91,7 @@ public class UnitType extends UnlockableContent{
         return name;
     }
 
-    public BaseUnit create(Team team){
+    public io.anuke.mindustry.entities.type.BaseUnit create(Team team){
         BaseUnit unit = constructor.get();
         unit.init(this, team);
         return unit;

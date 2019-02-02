@@ -5,7 +5,7 @@ import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Scaling;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 
 import static io.anuke.mindustry.Vars.control;
 import static io.anuke.mindustry.Vars.players;

@@ -5,7 +5,7 @@ import io.anuke.arc.collection.OrderedMap;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;
-import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
@@ -159,7 +159,7 @@ public class ContentDisplay{
             table.add(Core.bundle.format("mech.ability", Core.bundle.get("mech." + mech.name + ".ability")));
             table.row();
         }
-        table.add(Core.bundle.format("mech.armor", mech.armor));
+        table.add(Core.bundle.format("mech.health", (int)mech.health));
         table.row();
         table.add(Core.bundle.format("mech.itemcapacity", mech.itemCapacity));
         table.row();

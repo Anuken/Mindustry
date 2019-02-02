@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
@@ -10,7 +10,7 @@ import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shapes;

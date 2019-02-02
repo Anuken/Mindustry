@@ -4,16 +4,16 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
@@ -38,7 +38,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Remote(called = Loc.server)
-    public static void onUnitRespawn(Tile tile, Unit player){
+    public static void onUnitRespawn(Tile tile, Player player){
         if(player == null || tile.entity == null) return;
 
         CoreEntity entity = tile.entity();
@@ -53,9 +53,7 @@ public class CoreBlock extends StorageBlock{
         entity.currentUnit.add();
         entity.currentUnit = null;
 
-        if(player instanceof Player){
-            ((Player) player).endRespawning();
-        }
+        player.endRespawning();
     }
 
     @Override
@@ -168,23 +166,18 @@ public class CoreBlock extends StorageBlock{
     }
 
     public class CoreEntity extends TileEntity implements SpawnerTrait{
-        public Unit currentUnit;
+        public Player currentUnit;
         float progress;
         float time;
         float heat;
 
         @Override
-        public void updateSpawning(Unit unit){
+        public void updateSpawning(Player unit){
             if(!netServer.isWaitingForPlayers() && currentUnit == null){
                 currentUnit = unit;
                 progress = 0f;
                 unit.set(tile.drawx(), tile.drawy());
             }
-        }
-
-        @Override
-        public float getSpawnProgress(){
-            return progress;
         }
     }
 }

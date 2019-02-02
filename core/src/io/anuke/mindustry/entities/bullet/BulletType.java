@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.bullet;
 
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.game.Content;

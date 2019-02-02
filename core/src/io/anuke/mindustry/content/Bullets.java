@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.CapStyle;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -10,7 +10,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;

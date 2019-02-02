@@ -1,7 +1,7 @@
-package io.anuke.mindustry.entities.units.types;
+package io.anuke.mindustry.entities.type.types;
 
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.units.GroundUnit;
+import io.anuke.mindustry.entities.type.GroundUnit;
 
 public class Fortress extends GroundUnit{
 

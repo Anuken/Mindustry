@@ -3,7 +3,6 @@ package io.anuke.mindustry.entities.traits;
 import io.anuke.mindustry.core.NetClient;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.trait.Entity;
 import io.anuke.arc.util.Tmp;
 
 import java.io.DataInput;

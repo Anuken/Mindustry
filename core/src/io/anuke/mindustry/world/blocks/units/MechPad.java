@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks.units;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
@@ -11,13 +10,13 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.content.Mechs;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
@@ -92,7 +91,7 @@ public class MechPad extends Block{
         entity.player.endRespawning();
         entity.open = true;
         entity.player.setDead(false);
-        entity.player.inventory.clear();
+        entity.player.clearItem();
         entity.player = null;
     }
 
@@ -212,24 +211,17 @@ public class MechPad extends Block{
         boolean open;
 
         @Override
-        public void updateSpawning(Unit unit){
-            if(!(unit instanceof Player))
-                throw new IllegalArgumentException("Mech factories only accept player respawners.");
+        public void updateSpawning(Player unit){
 
             if(player == null){
                 progress = 0f;
-                player = (Player) unit;
+                player = unit;
 
                 player.rotation = 90f;
                 player.baseRotation = 90f;
                 player.set(x, y);
                 player.beginRespawning(this);
             }
-        }
-
-        @Override
-        public float getSpawnProgress(){
-            return progress;
         }
 
         @Override

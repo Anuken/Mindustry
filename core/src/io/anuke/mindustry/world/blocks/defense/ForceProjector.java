@@ -1,11 +1,11 @@
 package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.EntityQuery;
-import io.anuke.arc.entities.impl.BaseEntity;
-import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.impl.BaseEntity;
+import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -14,7 +14,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.traits.AbsorbTrait;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.world.Block;

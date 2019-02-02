@@ -2,7 +2,7 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.Events.Event;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.world.Tile;
 

@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities.bullet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.graphics.Palette;
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.math.Mathf;
 

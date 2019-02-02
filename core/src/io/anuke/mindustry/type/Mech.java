@@ -5,7 +5,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.content.Weapons;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.ContentDisplay;
@@ -21,7 +21,7 @@ public class Mech extends UnlockableContent{
     public float drag = 0.4f;
     public float mass = 1f;
     public float shake = 0f;
-    public float armor = 1f;
+    public float health = 200f;
 
     public float hitsize = 6f;
     public float cellTrnsY = 0f;

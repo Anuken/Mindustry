@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.entities.units;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
@@ -7,6 +7,7 @@ import io.anuke.arc.util.Tmp;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.traits.Saveable;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
 
@@ -26,7 +27,7 @@ public class Statuses implements Saveable{
     private float damageMultiplier;
     private float armorMultiplier;
 
-    public void handleApply(Unit unit, StatusEffect effect, float duration){
+    public void handleApply(io.anuke.mindustry.entities.type.Unit unit, StatusEffect effect, float duration){
         if(effect == StatusEffects.none || unit.isImmune(effect)) return; //don't apply empty or immune effects
 
         if(statuses.size > 0){

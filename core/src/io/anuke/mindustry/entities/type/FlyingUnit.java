@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.units;
+package io.anuke.mindustry.entities.type;
 
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Angles;
@@ -9,6 +9,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Tile;

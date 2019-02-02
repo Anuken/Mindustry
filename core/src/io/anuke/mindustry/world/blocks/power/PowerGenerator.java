@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockStat;

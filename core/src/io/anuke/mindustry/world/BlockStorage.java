@@ -1,14 +1,14 @@
 package io.anuke.mindustry.world;
 
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.type.Item;

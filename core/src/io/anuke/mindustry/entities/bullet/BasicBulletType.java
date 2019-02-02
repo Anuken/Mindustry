@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.bullet;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;

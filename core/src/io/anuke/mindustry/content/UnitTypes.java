@@ -1,8 +1,8 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.entities.units.types.*;
+import io.anuke.mindustry.entities.type.types.Crawler;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.game.ContentList;
 
 public class UnitTypes implements ContentList{
@@ -13,7 +13,7 @@ public class UnitTypes implements ContentList{
 
     @Override
     public void load(){
-        spirit = new UnitType("spirit", Spirit.class, Spirit::new){{
+        spirit = new UnitType("spirit", io.anuke.mindustry.entities.type.types.Spirit.class, io.anuke.mindustry.entities.type.types.Spirit::new){{
             weapon = Weapons.healBlasterDrone;
             isFlying = true;
             drag = 0.01f;
@@ -23,7 +23,7 @@ public class UnitTypes implements ContentList{
             health = 60;
         }};
 
-        dagger = new UnitType("dagger", Dagger.class, Dagger::new){{
+        dagger = new UnitType("dagger", io.anuke.mindustry.entities.type.types.Dagger.class, io.anuke.mindustry.entities.type.types.Dagger::new){{
             maxVelocity = 1.1f;
             speed = 0.2f;
             drag = 0.4f;
@@ -33,7 +33,7 @@ public class UnitTypes implements ContentList{
             health = 130;
         }};
 
-        crawler = new UnitType("crawler", Crawler.class, Crawler::new){{
+        crawler = new UnitType("crawler", io.anuke.mindustry.entities.type.types.Crawler.class, Crawler::new){{
             maxVelocity = 1.1f;
             speed = 0.22f;
             drag = 0.4f;
@@ -43,7 +43,7 @@ public class UnitTypes implements ContentList{
             health = 100;
         }};
 
-        titan = new UnitType("titan", Titan.class, Titan::new){{
+        titan = new UnitType("titan", io.anuke.mindustry.entities.type.types.Titan.class, io.anuke.mindustry.entities.type.types.Titan::new){{
             maxVelocity = 0.8f;
             speed = 0.18f;
             drag = 0.4f;
@@ -55,7 +55,7 @@ public class UnitTypes implements ContentList{
             immunities.add(StatusEffects.burning);
         }};
 
-        fortress = new UnitType("fortress", Fortress.class, Fortress::new){{
+        fortress = new UnitType("fortress", io.anuke.mindustry.entities.type.types.Fortress.class, io.anuke.mindustry.entities.type.types.Fortress::new){{
             maxVelocity = 0.78f;
             speed = 0.15f;
             drag = 0.4f;
@@ -68,7 +68,7 @@ public class UnitTypes implements ContentList{
             health = 800;
         }};
 
-        eruptor = new UnitType("eruptor", Eruptor.class, Eruptor::new){{
+        eruptor = new UnitType("eruptor", io.anuke.mindustry.entities.type.types.Eruptor.class, io.anuke.mindustry.entities.type.types.Eruptor::new){{
             maxVelocity = 0.81f;
             speed = 0.16f;
             drag = 0.4f;
@@ -82,7 +82,7 @@ public class UnitTypes implements ContentList{
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
         }};
 
-        wraith = new UnitType("wraith", Wraith.class, Wraith::new){{
+        wraith = new UnitType("wraith", io.anuke.mindustry.entities.type.types.Wraith.class, io.anuke.mindustry.entities.type.types.Wraith::new){{
             speed = 0.3f;
             maxVelocity = 1.9f;
             drag = 0.01f;
@@ -92,7 +92,7 @@ public class UnitTypes implements ContentList{
             health = 70;
         }};
 
-        ghoul = new UnitType("ghoul", Ghoul.class, Ghoul::new){{
+        ghoul = new UnitType("ghoul", io.anuke.mindustry.entities.type.types.Ghoul.class, io.anuke.mindustry.entities.type.types.Ghoul::new){{
             health = 250;
             speed = 0.2f;
             maxVelocity = 1.4f;
@@ -103,7 +103,7 @@ public class UnitTypes implements ContentList{
             weapon = Weapons.bomber;
         }};
 
-        revenant = new UnitType("revenant", Revenant.class, Revenant::new){{
+        revenant = new UnitType("revenant", io.anuke.mindustry.entities.type.types.Revenant.class, io.anuke.mindustry.entities.type.types.Revenant::new){{
             health = 250;
             mass = 5f;
             hitsize = 12f;
@@ -115,7 +115,7 @@ public class UnitTypes implements ContentList{
             weapon = Weapons.laserBurster;
         }};
 
-        phantom = new UnitType("phantom", Phantom.class, Phantom::new){{
+        phantom = new UnitType("phantom", io.anuke.mindustry.entities.type.types.Phantom.class, io.anuke.mindustry.entities.type.types.Phantom::new){{
             weapon = Weapons.healBlasterDrone2;
             isFlying = true;
             drag = 0.01f;

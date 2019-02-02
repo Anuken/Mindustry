@@ -3,7 +3,7 @@ package io.anuke.mindustry.input;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.input.InputProcessor;
 import io.anuke.arc.math.Angles;
@@ -13,7 +13,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.game.Team;
@@ -53,17 +53,17 @@ public abstract class InputHandler implements InputProcessor{
 
     @Remote(targets = Loc.client, called = Loc.server)
     public static void dropItem(Player player, float angle){
-        if(Net.server() && !player.inventory.hasItem()){
+        if(Net.server() && player.item().amount <= 0){
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        Effects.effect(Fx.dropItem, Color.WHITE, player.x, player.y, angle, player.inventory.getItem().item);
-        player.inventory.clearItem();
+        Effects.effect(Fx.dropItem, Color.WHITE, player.x, player.y, angle, player.item().item);
+        player.clearItem();
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Tile tile){
-        if(Net.server() && (!player.inventory.hasItem() || player.isTransferring)){
+        if(Net.server() && (player.item().amount <= 0 || player.isTransferring)){
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
 
@@ -71,10 +71,10 @@ public abstract class InputHandler implements InputProcessor{
 
         player.isTransferring = true;
 
-        Item item = player.inventory.getItem().item;
-        int amount = player.inventory.getItem().amount;
+        Item item = player.item().item;
+        int amount = player.item().amount;
         int accepted = tile.block().acceptStack(item, amount, tile, player);
-        player.inventory.getItem().amount -= accepted;
+        player.item().amount -= accepted;
 
         int sent = Mathf.clamp(accepted / 4, 1, 8);
         int removed = accepted / sent;
@@ -216,7 +216,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     boolean canTapPlayer(float x, float y){
-        return Mathf.dst(x, y, player.x, player.y) <= playerSelectRange && player.inventory.hasItem();
+        return Mathf.dst(x, y, player.x, player.y) <= playerSelectRange && player.item().amount > 0;
     }
 
     /**Tries to begin mining a tile, returns true if successful.*/
@@ -233,7 +233,7 @@ public abstract class InputHandler implements InputProcessor{
         return !Core.scene.hasMouse()
                 && tile.floor().itemDrop != null && tile.floor().itemDrop.hardness <= player.mech.drillPower
                 && !tile.floor().playerUnmineable
-                && player.inventory.canAcceptItem(tile.floor().itemDrop)
+                && player.acceptsItem(tile.floor().itemDrop)
                 && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= Player.mineDistance;
     }
 
@@ -288,14 +288,14 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public void tryDropItems(Tile tile, float x, float y){
-        if(!droppingItem || !player.inventory.hasItem() || canTapPlayer(x, y)){
+        if(!droppingItem || player.item().amount <= 0 || canTapPlayer(x, y)){
             droppingItem = false;
             return;
         }
 
         droppingItem = false;
 
-        ItemStack stack = player.inventory.getItem();
+        ItemStack stack = player.item();
 
         if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.getTeam() == player.getTeam() && tile.block().hasItems){
             Call.transferInventory(player, tile);

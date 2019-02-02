@@ -3,7 +3,7 @@ package io.anuke.mindustry;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.util.Log;
-import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Mech;

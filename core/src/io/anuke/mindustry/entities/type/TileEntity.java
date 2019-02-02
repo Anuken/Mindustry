@@ -1,14 +1,14 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.entities.type;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.BaseEntity;
-import io.anuke.arc.entities.trait.HealthTrait;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.impl.BaseEntity;
+import io.anuke.mindustry.entities.traits.HealthTrait;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;

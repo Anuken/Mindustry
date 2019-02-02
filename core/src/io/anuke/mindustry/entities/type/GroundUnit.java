@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.units;
+package io.anuke.mindustry.entities.type;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -8,9 +8,10 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Predict;
-import io.anuke.mindustry.entities.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.units.UnitState;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.ContentType;

@@ -1,15 +1,9 @@
-package io.anuke.mindustry.entities;
+package io.anuke.mindustry.entities.type;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.impl.DestructibleEntity;
-import io.anuke.arc.entities.trait.DamageTrait;
-import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.entities.trait.SolidTrait;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
@@ -17,12 +11,21 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Damage;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.effect.ScorchDecal;
+import io.anuke.mindustry.entities.impl.DestructibleEntity;
 import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.units.Statuses;
 import io.anuke.mindustry.game.EventType.UnitDestroyEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams.TeamData;
+import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.Weapon;
@@ -35,7 +38,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class Unit extends DestructibleEntity implements SaveTrait, TargetTrait, SyncTrait, DrawTrait, TeamTrait{
     /**Total duration of hit flash effect*/
@@ -53,7 +55,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     protected final Interpolator interpolator = new Interpolator();
     protected final Statuses status = new Statuses();
-    protected final ItemStack inventory = new ItemStack(content.item(0), 0);
+    protected final ItemStack item = new ItemStack(content.item(0), 0);
 
     protected Team team = Team.blue;
     protected float drownTime, hitTime;
@@ -109,7 +111,15 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void onDeath(){
-        inventory.amount = 0;
+        float explosiveness = 2f + item.item.explosiveness * item.amount;
+        float flammability = item.item.flammability * item.amount;
+        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, getSize() / 2f, Palette.darkFlame);
+
+        ScorchDecal.create(x, y);
+        Effects.effect(Fx.explosion, this);
+        Effects.shake(2f, 2f, this);
+
+        item.amount = 0;
         drownTime = 0f;
         status.clear();
         Events.fire(new UnitDestroyEvent(this));
@@ -130,6 +140,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     @Override
+    public boolean isValid(){
+        return !isDead() && isAdded();
+    }
+
+    @Override
     public void writeSave(DataOutput stream) throws IOException{
         writeSave(stream, false);
     }
@@ -144,9 +159,12 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         byte yv = stream.readByte();
         float rotation = stream.readShort() / 2f;
         int health = stream.readShort();
+        byte itemID = stream.readByte();
+        short itemAmount = stream.readShort();
 
         this.status.readSave(stream);
-        this.inventory.readSave(stream);
+        this.item.amount = itemAmount;
+        this.item.item = content.item(itemID);
         this.dead = dead;
         this.team = Team.all[team];
         this.health = health;
@@ -165,8 +183,9 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         stream.writeByte((byte) (Mathf.clamp(velocity.y, -maxAbsVelocity, maxAbsVelocity) * velocityPercision));
         stream.writeShort((short) (rotation * 2));
         stream.writeShort((short) health);
+        stream.writeByte(item.item.id);
+        stream.writeShort((short)item.amount);
         status.writeSave(stream);
-        inventory.writeSave(stream);
     }
 
     protected void clampPosition(){
@@ -188,7 +207,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public float calculateDamage(float amount){
-        return amount * Mathf.clamp(1f - getArmor() / 100f * status.getArmorMultiplier());
+        return amount * Mathf.clamp(1f - status.getArmorMultiplier() / 100f);
     }
 
     public float getDamageMultipler(){
@@ -228,11 +247,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void onRespawn(Tile tile){}
-
-    @Override
-    public boolean isValid(){
-        return !isDead() && isAdded();
-    }
 
     /**Updates velocity and status effects.*/
     public void updateVelocityStatus(){
@@ -292,6 +306,31 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         velocity.scl(Mathf.clamp(1f - drag() * (isFlying() ? 1f : floor.dragMultiplier) * Time.delta()));
     }
 
+    public boolean acceptsItem(Item item){
+        return this.item.amount <= 0 || (this.item.item == item && this.item.amount <= getItemCapacity());
+    }
+
+    public void addItem(Item item){
+        addItem(item, 1);
+    }
+
+    public void addItem(Item item, int amount){
+        this.item.amount = this.item.item == item ? this.item.amount + amount : amount;
+        this.item.item = item;
+    }
+
+    public void clearItem(){
+        item.amount = 0;
+    }
+
+    public ItemStack item(){
+        return item;
+    }
+
+    public int maxAccepted(Item item){
+        return this.item.item != item ? 0 : getItemCapacity() - this.item.amount;
+    }
+
     public void applyEffect(StatusEffect effect, float duration){
         if(dead || Net.client()) return; //effects are synced and thus not applied through clients
         status.handleApply(this, effect, duration);
@@ -339,17 +378,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         Draw.rect(getIconRegion(), x + offsetX, y + offsetY, rotation - 90);
     }
 
-    public float getViewDistance(){
-        return 135f;
-    }
-
     public abstract TextureRegion getIconRegion();
 
     public abstract Weapon getWeapon();
 
     public abstract int getItemCapacity();
-
-    public abstract float getArmor();
 
     public abstract float mass();
 

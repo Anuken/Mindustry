@@ -1,10 +1,8 @@
-package io.anuke.mindustry.entities.units;
+package io.anuke.mindustry.entities.type;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Angles;
@@ -14,22 +12,20 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
-import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.entities.units.Squad;
+import io.anuke.mindustry.entities.units.StateMachine;
+import io.anuke.mindustry.entities.units.UnitDrops;
+import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.StatusEffect;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -70,15 +66,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
             UnitDrops.dropItems(unit);
         }
 
-        float explosiveness = 2f + (unit.inventory.hasItem() ? unit.inventory.getItem().item.explosiveness * unit.inventory.getItem().amount : 0f);
-        float flammability = (unit.inventory.hasItem() ? unit.inventory.getItem().item.flammability * unit.inventory.getItem().amount : 0f);
-        Damage.dynamicExplosion(unit.x, unit.y, flammability, explosiveness, 0f, unit.getSize() / 2f, Palette.darkFlame);
-
         unit.onSuperDeath();
-
-        ScorchDecal.create(unit.x, unit.y);
-        Effects.effect(Fx.explosion, unit);
-        Effects.shake(2f, 2f, unit);
 
         //must run afterwards so the unit's group is not null when sending the removal packet
         Core.app.post(unit::remove);
@@ -121,19 +109,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public boolean targetHasFlag(BlockFlag flag){
         return target instanceof TileEntity && ((TileEntity) target).tile.block().flags.contains(flag);
-    }
-
-    public void updateRespawning(){
-        if(spawner == noSpawner) return;
-
-        Tile tile = world.tile(spawner);
-        if(tile != null && tile.entity != null){
-            if(tile.entity instanceof SpawnerTrait){
-                ((SpawnerTrait) tile.entity).updateSpawning(this);
-            }
-        }else{
-            spawner = noSpawner;
-        }
     }
 
     public void setState(UnitState state){
@@ -190,14 +165,13 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     protected void drawItems(){
         float backTrns = 4f, itemSize = 5f;
-        if(inventory.hasItem()){
-            ItemStack stack = inventory.getItem();
-            int stored = Mathf.clamp(stack.amount / 6, 1, 8);
+        if(item.amount > 0){
+            int stored = Mathf.clamp(item.amount / 6, 1, 8);
 
             for(int i = 0; i < stored; i++){
                 float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 60f);
                 float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 3, 1f) - 1f;
-                Draw.rect(stack.item.region,
+                Draw.rect(item.item.region,
                     x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
                     y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
                     itemSize, itemSize, rotation);
@@ -255,11 +229,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public float getArmor(){
-        return type.armor;
-    }
-
-    @Override
     public float getSize(){
         return 8;
     }
@@ -279,7 +248,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         hitTime -= Time.delta();
 
         if(isDead()){
-            updateRespawning();
             return;
         }
 
@@ -293,10 +261,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         if(spawner != noSpawner && (world.tile(spawner) == null || world.tile(spawner).entity == null)){
             damage(health);
-        }
-
-        if(squad != null){
-            squad.update();
         }
 
         updateTargeting();
