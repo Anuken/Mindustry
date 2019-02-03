@@ -36,6 +36,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
     protected Effects.Effect explodeEffect = Fx.generatespark;
     protected Color heatColor = Color.valueOf("ff9b59");
     protected TextureRegion topRegion;
+    protected boolean randomlyExplode = false;
 
     public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
         super(name);
@@ -107,9 +108,9 @@ public class ItemLiquidGenerator extends PowerGenerator{
             if(entity.generateTime > 0f){
                 entity.generateTime -= Math.min(1f / itemDuration * entity.delta(), entity.generateTime);
 
-                if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.5f))){
+                if(randomlyExplode && Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.5f))){
                     //this block is run last so that in the event of a block destruction, no code relies on the block type
-                    entity.damage(Mathf.random(8f));
+                    entity.damage(Mathf.random(11f));
                     Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
                 }
             }else{

@@ -500,13 +500,8 @@ public class Block extends BlockStorage{
             bars.row();
         }
 
-        if(entity.power != null && consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
-            bars.add(new Bar("blocks.power", Palette.power, () -> entity.power.satisfaction)).growX();
-            bars.row();
-        }
-
-        if(entity.power != null && consumes.has(ConsumePower.class) && !consumes.get(ConsumePower.class).isBuffered){
-            bars.add(new Bar("blocks.power.satisfaction", Palette.power, () -> entity.power.satisfaction)).growX();
+        if(entity.power != null && consumes.has(ConsumePower.class)){
+            bars.add(new Bar(consumes.get(ConsumePower.class).isBuffered ? "blocks.power" : "blocks.power.satisfaction", Palette.power, () -> entity.power.satisfaction)).growX();
             bars.row();
         }
     }

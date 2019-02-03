@@ -28,22 +28,20 @@ public class FusionReactor extends PowerGenerator{
         powerProduction = 2.0f;
         liquidCapacity = 30f;
         hasItems = true;
+        outputsPower = consumesPower = true;
     }
 
     @Override
     public void update(Tile tile){
         FusionReactorEntity entity = tile.entity();
 
-        float increaseOrDecrease = 1.0f;
         if(entity.cons.valid()){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.01f);
-            increaseOrDecrease = -1.0f;
         }
 
-        float efficiencyAdded = Mathf.pow(entity.warmup, 4f) * Time.delta();
-        entity.productionEfficiency = Mathf.clamp(entity.productionEfficiency + efficiencyAdded * increaseOrDecrease);
+        entity.productionEfficiency = Mathf.pow(entity.warmup, 5f);
 
         super.update(tile);
     }

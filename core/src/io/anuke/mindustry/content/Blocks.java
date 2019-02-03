@@ -317,7 +317,7 @@ public class Blocks implements ContentList{
             craftEffect = Fx.pulverizeMedium;
             output = Items.graphite;
             craftTime = 30f;
-            size = 2;
+            size = 3;
             hasItems = true;
             hasLiquids = true;
             hasPower = true;
@@ -811,7 +811,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.titanium, 15, Items.lead, 20, Items.silicon, 30, Items.surgealloy, 10));
             size = 2;
             maxNodes = 2;
-            laserRange = 40f;
+            laserRange = 30f;
         }};
 
         battery = new Battery("battery"){{
@@ -884,9 +884,13 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.cryofluid, maxLiquidUse);
         }};
 
-        fusionReactor = new FusionReactor("fusion-reactor"){{
+        fusionReactor = new ImpactGenerator("fusion-reactor"){{
+            requirements(Category.power, ItemStack.with(Items.lead, 800, Items.silicon, 600, Items.graphite, 600, Items.thorium, 200, Items.surgealloy, 400, Items.metaglass, 200));
             size = 4;
-            health = 600;
+            health = 900;
+            powerProduction = 70f;
+            //consumes.power(20f);
+            consumes.liquid(Liquids.water, 0.5f);
         }};
 
         //endregion power

@@ -2,12 +2,6 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.EntityDraw;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.impl.EffectEntity;
-import io.anuke.mindustry.entities.traits.DrawTrait;
-import io.anuke.mindustry.entities.traits.Entity;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Camera;
@@ -15,6 +9,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.SpriteBatch;
+import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
@@ -23,15 +18,22 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityDraw;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.effect.GroundEffectEntity;
+import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
+import io.anuke.mindustry.entities.impl.EffectEntity;
+import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
+import io.anuke.mindustry.entities.traits.DrawTrait;
+import io.anuke.mindustry.entities.traits.Entity;
+import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.entities.effect.GroundEffectEntity;
-import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
-import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
-import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
@@ -41,6 +43,7 @@ public class Renderer implements ApplicationListener{
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
 
+    private FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
     private Color clearColor;
     private float targetscale = io.anuke.arc.scene.ui.layout.Unit.dp.scl(4);
     private float camerascale = targetscale;
@@ -198,16 +201,25 @@ public class Renderer implements ApplicationListener{
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
         //TODO shield
-        /*
-        if(shieldGroup.size() > 0){
-            Graphics.beginShaders(Shaders.shield);
+
+        if(EntityDraw.countInBounds(shieldGroup) > 0){
+            if(graphics.getWidth() >= 2 && graphics.getHeight() >= 2 && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
+                shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
+            }
+
+            Draw.flush();
+            shieldBuffer.begin();
+            graphics.clear(Color.CLEAR);
             EntityDraw.draw(shieldGroup);
             EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
+            Draw.flush();
+            shieldBuffer.end();
+            Draw.shader(Shaders.shield);
             Draw.color(Palette.accent);
-            Graphics.endShaders();
+            Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
             Draw.color();
+            Draw.shader();
         }
-        */
 
         overlays.drawTop();
 

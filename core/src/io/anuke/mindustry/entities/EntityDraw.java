@@ -11,9 +11,16 @@ public class EntityDraw{
     private static final Rectangle viewport = new Rectangle();
     private static final Rectangle rect = new Rectangle();
     private static boolean clip = true;
+    private static int count = 0;
 
     public static void setClip(boolean clip){
         EntityDraw.clip = clip;
+    }
+
+    public static int countInBounds(EntityGroup<?> group){
+        count = 0;
+        drawWith(group, e -> true, e -> count++);
+        return count;
     }
 
     public static void draw(){

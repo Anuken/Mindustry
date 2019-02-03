@@ -198,8 +198,7 @@ public class PowerNode extends PowerBlock{
 
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));
-            if(linkValid(tile, link) && (!(link.block() instanceof PowerNode)
-                || ((tile.block().size > link.block().size) || (tile.block().size == link.block().size && tile.pos() < link.pos())))){
+            if(linkValid(tile, link)){
                 drawLaser(tile, link);
             }
         }
