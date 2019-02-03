@@ -14,14 +14,17 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class FusionReactor extends PowerGenerator{
+public class ImpactReactor extends PowerGenerator{
+    protected int timerUse = timers++;
+
     protected int plasmas = 4;
     protected float warmupSpeed = 0.001f;
+    protected float useTime = 60f;
 
     protected Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
     protected Color ind1 = Color.valueOf("858585"), ind2 = Color.valueOf("fea080");
 
-    public FusionReactor(String name){
+    public ImpactReactor(String name){
         super(name);
         hasPower = true;
         hasLiquids = true;
@@ -37,6 +40,10 @@ public class FusionReactor extends PowerGenerator{
 
         if(entity.cons.valid()){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
+
+            if(entity.timer.get(timerUse, useTime)){
+                entity.items.remove(consumes.item(), consumes.itemAmount());
+            }
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.01f);
         }

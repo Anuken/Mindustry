@@ -60,7 +60,7 @@ public class Blocks implements ContentList{
 
     //power
     combustionGenerator, thermalGenerator, turbineGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
-    fusionReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower,
+    impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower,
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, plasmaDrill, waterExtractor, oilExtractor, cultivator,
@@ -408,12 +408,10 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, ItemStack.with(Items.lead, 60, Items.titanium, 40));
             hasItems = true;
             hasPower = true;
-            hasLiquids = true;
             output = Items.blastCompound;
             size = 2;
 
-            consumes.liquid(Liquids.oil, 0.05f);
-            consumes.item(Items.pyratite, 1);
+            consumes.items(new ItemStack(Items.pyratite, 1), new ItemStack(Items.biomatter, 1));
             consumes.power(0.40f);
         }};
 
@@ -884,13 +882,14 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.cryofluid, maxLiquidUse);
         }};
 
-        fusionReactor = new ImpactGenerator("fusion-reactor"){{
+        impactReactor = new ImpactReactor("impact-reactor"){{
             requirements(Category.power, ItemStack.with(Items.lead, 800, Items.silicon, 600, Items.graphite, 600, Items.thorium, 200, Items.surgealloy, 400, Items.metaglass, 200));
             size = 4;
             health = 900;
             powerProduction = 70f;
-            //consumes.power(20f);
-            consumes.liquid(Liquids.water, 0.5f);
+            consumes.power(20f);
+            consumes.item(Items.blastCompound);
+            consumes.liquid(Liquids.water, 0.3f);
         }};
 
         //endregion power

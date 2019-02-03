@@ -477,7 +477,7 @@ public class Zones implements ContentList{
         }};
 
         */
-        nuclearComplex = new Zone("nuclearComplex", new MapGenerator("nuclearProductionComplex")
+        nuclearComplex = new Zone("nuclearComplex", new MapGenerator("nuclearProductionComplex", 1)
         .drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 1000, Items.thorium, 200, Items.titanium, 2000, Items.metaglass, 1000))
         .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
             deployCost = ItemStack.with(Items.copper, 3000, Items.lead, 2000, Items.silicon, 1000, Items.metaglass, 500);
