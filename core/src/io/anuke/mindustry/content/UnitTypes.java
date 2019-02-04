@@ -120,7 +120,53 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 bullet = Bullets.eruptorShot;
                 recoil = 1f;
-                width = 9f;
+                width = 5f;
+            }};
+        }};
+
+        chaosArray = new UnitType("chaos-array", Dagger.class, Dagger::new){{
+            maxVelocity = 0.68f;
+            speed = 0.12f;
+            drag = 0.4f;
+            mass = 5f;
+            hitsize = 20f;
+            rotatespeed = 0.06f;
+            health = 800;
+            weapon = new Weapon("chaos"){{
+                length = 8f;
+                reload = 50f;
+                width = 17.5f;
+                roundrobin = true;
+                recoil = 5f;
+                shake = 2f;
+                shots = 4;
+                spacing = 4f;
+                shotDelay = 5;
+                ejectEffect = Fx.shellEjectMedium;
+                bullet = Bullets.flakSurge;
+            }};
+        }};
+
+        eradicator = new UnitType("eradicator", Dagger.class, Dagger::new){{
+            maxVelocity = 0.68f;
+            speed = 0.12f;
+            drag = 0.4f;
+            mass = 5f;
+            hitsize = 20f;
+            rotatespeed = 0.06f;
+            health = 800;
+            weapon = new Weapon("eradication"){{
+                length = 9f;
+                reload = 30f;
+                width = 20f;
+                roundrobin = true;
+                recoil = 4f;
+                shake = 2f;
+                shots = 4;
+                spacing = 4f;
+                shotDelay = 1;
+                ejectEffect = Fx.shellEjectMedium;
+                bullet = Bullets.standardThoriumBig;
             }};
         }};
 

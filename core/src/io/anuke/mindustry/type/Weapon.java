@@ -56,7 +56,7 @@ public class Weapon{
     /**whether shooter rotation is ignored when shooting.*/
     public boolean ignoreRotation = false;
 
-    public TextureRegion equipRegion;
+    public TextureRegion region;
 
     protected Weapon(String name){
         this.name = name;
@@ -119,7 +119,7 @@ public class Weapon{
     }
 
     public void load(){
-        equipRegion = Core.atlas.find(name + "-equip", Core.atlas.find("clear"));
+        region = Core.atlas.find(name + "-equip", Core.atlas.find("clear"));
     }
 
     public void update(ShooterTrait shooter, float pointerX, float pointerY){

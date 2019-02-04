@@ -508,7 +508,7 @@ public class Block extends BlockStorage{
 
     public TextureRegion icon(Icon icon){
         if(icons[icon.ordinal()] == null){
-            icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name(), icon == Icon.full ? getGeneratedIcons()[0] : Core.atlas.find(name + "-icon-full"));
+            icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name(), icon == Icon.full ? getGeneratedIcons()[0] : Core.atlas.find(name + "-icon-full", getGeneratedIcons()[0]));
         }
         return icons[icon.ordinal()];
     }

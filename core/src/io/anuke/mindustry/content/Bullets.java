@@ -147,16 +147,19 @@ public class Bullets implements ContentList{
             hitEffect = Fx.plasticExplosion;
             frontColor = Palette.plastaniumFront;
             backColor = Palette.plastaniumBack;
+            shootEffect = Fx.shootBig;
         }};
 
         flakExplosive = new FlakBulletType(4f, 5){{
             //default bullet type, no changes
+            shootEffect = Fx.shootBig;
         }};
 
         flakSurge = new FlakBulletType(4f, 7){{
             splashDamage = 33f;
             lightining = 2;
             lightningLength = 12;
+            shootEffect = Fx.shootBig;
         }};
 
         missileExplosive = new MissileBulletType(1.8f, 10, "missile"){{

@@ -328,12 +328,12 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
         for(int i : Mathf.signs){
             float tra = rotation - 90, trY = -mech.weapon.getRecoil(this, i > 0) + mech.weaponOffsetY;
-            float w = i > 0 ? -mech.weapon.equipRegion.getWidth() : mech.weapon.equipRegion.getWidth();
-            Draw.rect(mech.weapon.equipRegion,
+            float w = i > 0 ? -mech.weapon.region.getWidth() : mech.weapon.region.getWidth();
+            Draw.rect(mech.weapon.region,
             x + Angles.trnsx(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY),
             y + Angles.trnsy(tra, (mech.weaponOffsetX + mech.spreadX(this)) * i, trY),
             w * Draw.scl,
-            mech.weapon.equipRegion.getHeight() * Draw.scl,
+            mech.weapon.region.getHeight() * Draw.scl,
             rotation - 90);
         }
 

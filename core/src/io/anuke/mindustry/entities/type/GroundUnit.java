@@ -118,7 +118,7 @@ public abstract class GroundUnit extends BaseUnit{
     public void draw(){
         Draw.alpha(Draw.getShader() != Shaders.mix ? 1f : hitTime / hitDuration);
 
-        float ft = Mathf.sin(walkTime * type.speed*5f, 6f, 2f);
+        float ft = Mathf.sin(walkTime * type.speed*5f, 6f, 2f + type.hitsize/15f);
 
         Floor floor = getFloorOn();
 
@@ -130,7 +130,7 @@ public abstract class GroundUnit extends BaseUnit{
             Draw.rect(type.legRegion,
                     x + Angles.trnsx(baseRotation, ft * i),
                     y + Angles.trnsy(baseRotation, ft * i),
-                    12f * i, 12f - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
+                    type.legRegion.getWidth() * i * Draw.scl, type.legRegion.getHeight() * Draw.scl - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
         }
 
         if(floor.isLiquid){
@@ -145,10 +145,10 @@ public abstract class GroundUnit extends BaseUnit{
 
         for(int i : Mathf.signs){
             float tra = rotation - 90, trY = -type.weapon.getRecoil(this, i > 0) + type.weaponOffsetY;
-            float w = i > 0 ? -12 : 12;
-            Draw.rect(type.weapon.equipRegion,
+            float w = - i * type.weapon.region.getWidth() * Draw.scl;
+            Draw.rect(type.weapon.region,
                     x + Angles.trnsx(tra, getWeapon().width * i, trY),
-                    y + Angles.trnsy(tra, getWeapon().width * i, trY), w, 12, rotation - 90);
+                    y + Angles.trnsy(tra, getWeapon().width * i, trY), w, type.weapon.region.getHeight() * Draw.scl, rotation - 90);
         }
 
         drawItems();

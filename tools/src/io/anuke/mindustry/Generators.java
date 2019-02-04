@@ -84,10 +84,10 @@ public class Generators {
                     image.drawCenter(mech.region);
                 }
 
-                int off = (image.width() - mech.weapon.equipRegion.getWidth())/2;
+                int off = (image.width() - mech.weapon.region.getWidth())/2;
 
-                image.draw(mech.weapon.equipRegion, -(int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, false, false);
-                image.draw(mech.weapon.equipRegion, (int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, true, false);
+                image.draw(mech.weapon.region, -(int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, false, false);
+                image.draw(mech.weapon.region, (int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, true, false);
 
 
                 image.save("mech-icon-" + mech.name);
@@ -109,13 +109,13 @@ public class Generators {
                     image.draw(type.legRegion, true, false);
                     image.draw(type.region);
 
-                    image.draw(type.weapon.equipRegion,
-                            -(int)type.weapon.width + (image.width() - type.weapon.equipRegion.getWidth())/2,
-                            (int)type.weaponOffsetY - (image.height() - type.weapon.equipRegion.getHeight())/2 + 1,
+                    image.draw(type.weapon.region,
+                            -(int)type.weapon.width + (image.width() - type.weapon.region.getWidth())/2,
+                            (int)type.weaponOffsetY - (image.height() - type.weapon.region.getHeight())/2 + 1,
                             false, false);
-                    image.draw(type.weapon.equipRegion,
-                            (int)type.weapon.width + (image.width() - type.weapon.equipRegion.getWidth())/2,
-                            (int)type.weaponOffsetY - (image.height() - type.weapon.equipRegion.getHeight())/2 + 1,
+                    image.draw(type.weapon.region,
+                            (int)type.weapon.width + (image.width() - type.weapon.region.getWidth())/2,
+                            (int)type.weaponOffsetY - (image.height() - type.weapon.region.getHeight())/2 + 1,
                             true, false);
                 }
 
