@@ -131,13 +131,13 @@ public class UnitTypes implements ContentList{
             mass = 5f;
             hitsize = 20f;
             rotatespeed = 0.06f;
-            health = 800;
+            health = 20000;
             weapon = new Weapon("chaos"){{
                 length = 8f;
                 reload = 50f;
                 width = 17.5f;
                 roundrobin = true;
-                recoil = 5f;
+                recoil = 3f;
                 shake = 2f;
                 shots = 4;
                 spacing = 4f;
@@ -154,7 +154,7 @@ public class UnitTypes implements ContentList{
             mass = 5f;
             hitsize = 20f;
             rotatespeed = 0.06f;
-            health = 800;
+            health = 80000;
             weapon = new Weapon("eradication"){{
                 length = 9f;
                 reload = 30f;
@@ -163,8 +163,7 @@ public class UnitTypes implements ContentList{
                 recoil = 4f;
                 shake = 2f;
                 shots = 4;
-                spacing = 4f;
-                shotDelay = 1;
+                shotDelay = 2;
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.standardThoriumBig;
             }};
@@ -234,7 +233,7 @@ public class UnitTypes implements ContentList{
         }};
 
         revenant = new UnitType("revenant", Revenant.class, Revenant::new){{
-            health = 400;
+            health = 4000;
             mass = 5f;
             hitsize = 20f;
             speed = 0.1f;
@@ -264,7 +263,7 @@ public class UnitTypes implements ContentList{
         }};
 
         lich = new UnitType("lich", Revenant.class, Revenant::new){{
-            health = 1500;
+            health = 15000;
             mass = 20f;
             hitsize = 40f;
             speed = 0.01f;
@@ -274,7 +273,7 @@ public class UnitTypes implements ContentList{
             shootCone = 20f;
             isFlying = true;
             rotateWeapon = true;
-            engineOffset = 22;
+            engineOffset = 21;
             engineSize = 4f;
             rotatespeed = 0.01f;
             attackLength = 90f;
@@ -296,7 +295,7 @@ public class UnitTypes implements ContentList{
         }};
 
         reaper = new UnitType("reaper", Revenant.class, Revenant::new){{
-            health = 3000;
+            health = 30000;
             mass = 30f;
             hitsize = 56f;
             speed = 0.01f;
