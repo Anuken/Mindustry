@@ -274,7 +274,7 @@ public class UnitTypes implements ContentList{
             isFlying = true;
             rotateWeapon = true;
             engineOffset = 21;
-            engineSize = 4f;
+            engineSize = 5.3f;
             rotatespeed = 0.01f;
             attackLength = 90f;
             baseRotateSpeed = 0.04f;
@@ -284,7 +284,6 @@ public class UnitTypes implements ContentList{
                 width = 22f;
                 shots = 20;
                 shotDelay = 2;
-
                 inaccuracy = 10f;
                 roundrobin = true;
                 ejectEffect = Fx.none;
@@ -306,7 +305,7 @@ public class UnitTypes implements ContentList{
             isFlying = true;
             rotateWeapon = true;
             engineOffset = 40;
-            engineSize = 6f;
+            engineSize = 7.3f;
             rotatespeed = 0.01f;
             baseRotateSpeed = 0.04f;
             weapon = new Weapon("reaper-gun"){{

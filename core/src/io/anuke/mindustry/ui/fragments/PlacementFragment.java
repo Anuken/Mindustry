@@ -64,18 +64,7 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean gridUpdate(InputHandler input){
-        if(!Core.input.keyDown(Binding.gridMode) || ui.chatfrag.chatOpen()) return false;
-        if(Core.input.keyDown(Binding.gridModeShift)){ //select category
-            int i = 0;
-            for(KeyCode key : inputCatGrid){
-                if(Core.input.keyDown(key)){
-                    input.block = getByCategory(Category.values()[i]).first();
-                    currentCategory = input.block.buildCategory;
-                }
-                i++;
-            }
-            return true;
-        }else if(Core.input.keyDown(Binding.select)){ //mouse eyedropper select
+        if(Core.input.keyDown(Binding.pick)){ //mouse eyedropper select
             Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
             if(tile != null){
@@ -87,6 +76,19 @@ public class PlacementFragment extends Fragment{
                     return true;
                 }
             }
+        }
+
+        if(!Core.input.keyDown(Binding.gridMode) || ui.chatfrag.chatOpen()) return false;
+        if(Core.input.keyDown(Binding.gridModeShift)){ //select category
+            int i = 0;
+            for(KeyCode key : inputCatGrid){
+                if(Core.input.keyDown(key)){
+                    input.block = getByCategory(Category.values()[i]).first();
+                    currentCategory = input.block.buildCategory;
+                }
+                i++;
+            }
+            return true;
         }else{ //select block
             int i = 0;
             Array<Block> recipes = getByCategory(currentCategory);

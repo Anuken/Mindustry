@@ -15,6 +15,7 @@ public enum Binding implements KeyBind{
     deselect(KeyCode.MOUSE_RIGHT),
     break_block(KeyCode.MOUSE_RIGHT),
     rotate(new Axis(KeyCode.SCROLL)),
+    pick(KeyCode.MOUSE_MIDDLE),
     dash(KeyCode.SHIFT_LEFT),
     drop_unit(KeyCode.SHIFT_LEFT),
     gridMode(KeyCode.SPACE),
@@ -30,7 +31,8 @@ public enum Binding implements KeyBind{
     chat(KeyCode.ENTER),
     chat_history_prev(KeyCode.UP),
     chat_history_next(KeyCode.DOWN),
-    chat_scroll(new Axis(KeyCode.SCROLL))
+    chat_scroll(new Axis(KeyCode.SCROLL)),
+
     ;
 
     private final KeybindValue defaultValue;
