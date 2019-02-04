@@ -4,7 +4,6 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Palette;
@@ -34,8 +33,8 @@ public class Mech extends UnlockableContent{
     public boolean turnCursor = true;
     public boolean canHeal = false;
 
-    public float weaponOffsetX, weaponOffsetY;
-    public Weapon weapon = Weapons.blaster;
+    public float weaponOffsetX, weaponOffsetY, engineOffset = 6f, engineSize = 2f;
+    public Weapon weapon;
 
     public TextureRegion baseRegion, legRegion, region, iconRegion;
 
@@ -91,6 +90,7 @@ public class Mech extends UnlockableContent{
 
     @Override
     public void load(){
+        weapon.load();
         if(!flying){
             legRegion = Core.atlas.find(name + "-leg");
             baseRegion = Core.atlas.find(name + "-base");

@@ -8,7 +8,6 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.Team;
@@ -24,20 +23,22 @@ public class UnitType extends UnlockableContent{
     public float hitsize = 7f;
     public float hitsizeTile = 4f;
     public float speed = 0.4f;
-    public float range = 0;
+    public float range = 0, attackLength = 150f;
     public float rotatespeed = 0.2f;
     public float baseRotateSpeed = 0.1f;
+    public float shootCone = 15f;
     public float mass = 1f;
     public boolean isFlying;
     public boolean targetAir = true;
+    public boolean rotateWeapon = false;
     public float drag = 0.1f;
     public float maxVelocity = 5f;
     public float retreatPercent = 0.2f;
     public int itemCapacity = 30;
     public ObjectSet<Item> toMine = ObjectSet.with(Items.lead, Items.copper);
     public float buildPower = 0.3f, minePower = 0.7f;
-    public Weapon weapon = Weapons.blaster;
-    public float weaponOffsetX, weaponOffsetY;
+    public Weapon weapon;
+    public float weaponOffsetY, engineOffset = 6f, engineSize = 2f;
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
 
     public TextureRegion iconRegion, legRegion, baseRegion, region;
@@ -72,7 +73,8 @@ public class UnitType extends UnlockableContent{
 
     @Override
     public void load(){
-        iconRegion = Core.atlas.find("unit-icon-" + name);
+        weapon.load();
+        iconRegion = Core.atlas.find("unit-icon-" + name, Core.atlas.find(name));
         region = Core.atlas.find(name);
 
         if(!isFlying){

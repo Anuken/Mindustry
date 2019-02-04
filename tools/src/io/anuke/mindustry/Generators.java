@@ -41,7 +41,7 @@ public class Generators {
                     }
 
                     for(Icon icon : Icon.values()){
-                        if(icon.size == 0) continue;
+                        if(icon.size == 0 || (icon.size == image.width() && icon.size == image.height())) continue;
                         Image scaled = new Image(icon.size, icon.size);
                         scaled.drawScaled(image);
                         scaled.save(block.name + "-icon-" + icon.name());
@@ -96,6 +96,7 @@ public class Generators {
 
         ImagePacker.generate("unit-icons", () -> {
             for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
+                if(type.isFlying) continue;
 
                 type.load();
                 type.weapon.load();
@@ -109,11 +110,11 @@ public class Generators {
                     image.draw(type.region);
 
                     image.draw(type.weapon.equipRegion,
-                            -(int)type.weaponOffsetX + (image.width() - type.weapon.equipRegion.getWidth())/2,
+                            -(int)type.weapon.width + (image.width() - type.weapon.equipRegion.getWidth())/2,
                             (int)type.weaponOffsetY - (image.height() - type.weapon.equipRegion.getHeight())/2 + 1,
                             false, false);
                     image.draw(type.weapon.equipRegion,
-                            (int)type.weaponOffsetX + (image.width() - type.weapon.equipRegion.getWidth())/2,
+                            (int)type.weapon.width + (image.width() - type.weapon.equipRegion.getWidth())/2,
                             (int)type.weaponOffsetY - (image.height() - type.weapon.equipRegion.getHeight())/2 + 1,
                             true, false);
                 }

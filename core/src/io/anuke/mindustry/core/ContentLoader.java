@@ -46,7 +46,6 @@ public class ContentLoader{
         new StatusEffects(),
         new Liquids(),
         new Bullets(),
-        new Weapons(),
         new Mechs(),
         new UnitTypes(),
         new Blocks(),

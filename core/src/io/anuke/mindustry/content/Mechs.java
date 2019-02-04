@@ -1,7 +1,6 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.Core;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -9,13 +8,15 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.Lightning;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Mech;
+import io.anuke.mindustry.type.Weapon;
 
 public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
@@ -34,9 +35,16 @@ public class Mechs implements ContentList{
                 mass = 1.2f;
                 speed = 0.5f;
                 boostSpeed = 0.85f;
-                weapon = Weapons.blaster;
                 trailColorTo = Color.valueOf("ffd37f");
                 health = 250f;
+
+                weapon = new Weapon("blaster"){{
+                    length = 1.5f;
+                    reload = 14f;
+                    roundrobin = true;
+                    ejectEffect = Fx.shellEjectSmall;
+                    bullet = Bullets.standardMechSmall;
+                }};
             }
 
             @Override
@@ -57,8 +65,18 @@ public class Mechs implements ContentList{
                 health = 220f;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
-                weapon = Weapons.shockgun;
                 trailColorTo = Color.valueOf("d3ddff");
+
+                weapon = new Weapon("shockgun"){{
+                    length = 1f;
+                    reload = 40f;
+                    roundrobin = true;
+                    shots = 1;
+                    inaccuracy = 0f;
+                    velocityRnd = 0.2f;
+                    ejectEffect = Fx.none;
+                    bullet = Bullets.lightning;
+                }};
             }
 
             @Override
@@ -91,9 +109,17 @@ public class Mechs implements ContentList{
                 drag = 0.35f;
                 boostSpeed = 0.8f;
                 canHeal = true;
-                weapon = Weapons.healBlaster;
                 health = 200f;
                 trailColorTo = Palette.heal;
+
+                weapon = new Weapon("heal-blaster"){{
+                    length = 1.5f;
+                    reload = 24f;
+                    roundrobin = false;
+                    ejectEffect = Fx.none;
+                    recoil = 2f;
+                    bullet = Bullets.healBullet;
+                }};
             }
 
             @Override
@@ -133,9 +159,20 @@ public class Mechs implements ContentList{
                 shake = 4f;
                 weaponOffsetX = 1;
                 weaponOffsetY = 0;
-                weapon = Weapons.swarmer;
                 trailColorTo = Color.valueOf("feb380");
                 health = 300f;
+                weapon = new Weapon("swarmer"){{
+                    length = 1.5f;
+                    recoil = 4f;
+                    reload = 60f;
+                    shots = 4;
+                    spacing = 8f;
+                    inaccuracy = 8f;
+                    roundrobin = true;
+                    ejectEffect = Fx.none;
+                    shake = 3f;
+                    bullet = Bullets.missileSwarm;
+                }};
             }
 
             @Override
@@ -189,11 +226,17 @@ public class Mechs implements ContentList{
                 speed = 0.4f;
                 drag = 0.1f;
                 health = 180f;
-                weapon = Weapons.blasterSmall;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
                 trailColor = Palette.lightTrail;
                 cellTrnsY = 1f;
+                weapon = new Weapon("blaster"){{
+                    length = 1.5f;
+                    reload = 20f;
+                    roundrobin = true;
+                    ejectEffect = Fx.shellEjectSmall;
+                    bullet = Bullets.standardCopper;
+                }};
             }
 
             @Override
@@ -212,9 +255,19 @@ public class Mechs implements ContentList{
                 drag = 0.01f;
                 mass = 2f;
                 health = 170f;
-                weapon = Weapons.missiles;
                 trailColor = Color.valueOf("d3ddff");
                 cellTrnsY = 1f;
+                weapon = new Weapon("missiles"){{
+                    length = 1.5f;
+                    reload = 70f;
+                    shots = 4;
+                    inaccuracy = 2f;
+                    roundrobin = true;
+                    ejectEffect = Fx.none;
+                    velocityRnd = 0.2f;
+                    spacing = 1f;
+                    bullet = Bullets.missileJavelin;
+                }};
             }
 
             @Override
@@ -269,8 +322,19 @@ public class Mechs implements ContentList{
                 health = 220f;
                 itemCapacity = 30;
                 trailColor = Color.valueOf("84f491");
-                weapon = Weapons.bomberTrident;
                 cellTrnsY = 1f;
+                weapon = new Weapon("bomber"){{
+                    length = 0f;
+                    width = 2f;
+                    reload = 8f;
+                    shots = 2;
+                    roundrobin = true;
+                    ejectEffect = Fx.none;
+                    velocityRnd = 1f;
+                    inaccuracy = 40f;
+                    ignoreRotation = true;
+                    bullet = Bullets.bombExplosive;
+                }};
             }
 
             @Override
@@ -281,7 +345,6 @@ public class Mechs implements ContentList{
 
         glaive = new Mech("glaive-ship", true){
             {
-                weapon = Weapons.glaiveBlaster;
                 drillPower = 4;
                 mineSpeed = 1.3f;
                 speed = 0.32f;
@@ -291,6 +354,14 @@ public class Mechs implements ContentList{
                 itemCapacity = 60;
                 trailColor = Color.valueOf("feb380");
                 cellTrnsY = 1f;
+
+                weapon = new Weapon("bomber"){{
+                    length = 1.5f;
+                    reload = 13f;
+                    roundrobin = true;
+                    ejectEffect = Fx.shellEjectSmall;
+                    bullet = Bullets.standardGlaive;
+                }};
             }
         };
 

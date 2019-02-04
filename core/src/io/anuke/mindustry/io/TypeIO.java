@@ -209,16 +209,6 @@ public class TypeIO{
         return new Color(buffer.getInt());
     }
 
-    @WriteClass(Weapon.class)
-    public static void writeWeapon(ByteBuffer buffer, Weapon weapon){
-        buffer.put(weapon.id);
-    }
-
-    @ReadClass(Weapon.class)
-    public static Weapon readWeapon(ByteBuffer buffer){
-        return content.getByID(ContentType.weapon, buffer.get());
-    }
-
     @WriteClass(Mech.class)
     public static void writeMech(ByteBuffer buffer, Mech mech){
         buffer.put(mech.id);

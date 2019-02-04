@@ -33,7 +33,7 @@ public class Bullets implements ContentList{
     flakPlastic, flakExplosive, flakSurge,
 
     //missiles
-    missileExplosive, missileIncendiary, missileSurge, missileJavelin, missileSwarm,
+    missileExplosive, missileIncendiary, missileSurge, missileJavelin, missileSwarm, missileRevenant,
 
     //standard
     standardCopper, standardDense, standardThorium, standardHoming, standardIncendiary, standardMechSmall,
@@ -238,6 +238,25 @@ public class Bullets implements ContentList{
             weaveMag = 2f;
         }};
 
+        missileRevenant = new MissileBulletType(2.7f, 12, "missile"){{
+            bulletWidth = 8f;
+            bulletHeight = 8f;
+            bulletShrink = 0f;
+            drag = -0.003f;
+            homingRange = 60f;
+            keepVelocity = false;
+            splashDamageRadius = 25f;
+            splashDamage = 10f;
+            lifetime = 80f;
+            trailColor = Palette.unitBack;
+            backColor = Palette.unitBack;
+            frontColor = Palette.unitFront;
+            hitEffect = Fx.blastExplosion;
+            despawnEffect = Fx.blastExplosion;
+            weaveScale = 6f;
+            weaveMag = 1f;
+        }};
+
         standardCopper = new BasicBulletType(2.5f, 7, "bullet"){{
             bulletWidth = 7f;
             bulletHeight = 9f;
@@ -304,12 +323,14 @@ public class Bullets implements ContentList{
             bulletWidth = 15f;
             bulletHeight = 21f;
             armorPierce = 0.2f;
+            shootEffect = Fx.shootBig;
         }};
 
         standardThoriumBig = new BasicBulletType(8f, 65, "bullet"){{
             bulletWidth = 16f;
             bulletHeight = 23f;
             armorPierce = 0.5f;
+            shootEffect = Fx.shootBig;
         }};
 
         standardIncendiaryBig = new BasicBulletType(7f, 38, "bullet"){{
@@ -320,6 +341,7 @@ public class Bullets implements ContentList{
             incendSpread = 3f;
             incendAmount = 2;
             incendChance = 0.3f;
+            shootEffect = Fx.shootBig;
         }};
 
         damageLightning = new BulletType(0.0001f, 0f){{
@@ -438,6 +460,11 @@ public class Bullets implements ContentList{
                 hitSize = 4;
                 lifetime = 16f;
                 pierce = true;
+            }
+
+            @Override
+            public float range(){
+                return length;
             }
 
             @Override

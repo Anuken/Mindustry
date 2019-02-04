@@ -370,6 +370,20 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         drawBuilding();
     }
 
+    @Override
+    public void drawUnder(){
+        float size = mech.engineSize * (mech.flying ? 1f : boostHeat);
+
+        Draw.color(mech.trailColorTo);
+        Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset), y + Angles.trnsy(rotation + 180, mech.engineOffset),
+        size + Mathf.absin(Time.time(), 2f, size/4f));
+
+        Draw.color(Color.WHITE);
+        Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset-1f), y + Angles.trnsy(rotation + 180, mech.engineOffset-1f),
+        (size + Mathf.absin(Time.time(), 2f, size/4f)) / 2f);
+        Draw.color();
+    }
+
     public void drawName(){
         BitmapFont font = Core.scene.skin.getFont("default-font");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
@@ -603,7 +617,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     protected void updateFlying(){
         if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
-        mech.canHeal && dst(target) < getWeapon().getAmmo().range())){
+        mech.canHeal && dst(target) < getWeapon().bullet.range())){
             target = null;
         }
 
@@ -675,11 +689,11 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 if(target == null){
                     isShooting = false;
                     if(Core.settings.getBool("autotarget")){
-                        target = Units.getClosestTarget(team, x, y, getWeapon().getAmmo().range());
+                        target = Units.getClosestTarget(team, x, y, getWeapon().bullet.range());
 
                         if(mech.canHeal && target == null){
                             target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));
-                            if(target != null && dst(target) > getWeapon().getAmmo().range()){
+                            if(target != null && dst(target) > getWeapon().bullet.range()){
                                 target = null;
                             }else if(target != null){
                                 target = ((Tile) target).entity;
@@ -691,14 +705,14 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                         }
                     }
                 }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
-                mech.canHeal && dst(target) < getWeapon().getAmmo().range())){
+                mech.canHeal && dst(target) < getWeapon().bullet.range())){
                     //rotate toward and shoot the target
                     if(mech.turnCursor){
                         rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
                     }
 
                     Vector2 intercept =
-                    Predict.intercept(x, y, target.getX(), target.getY(), target.velocity().x - velocity.x, target.velocity().y - velocity.y, getWeapon().getAmmo().speed);
+                    Predict.intercept(x, y, target.getX(), target.getY(), target.velocity().x - velocity.x, target.velocity().y - velocity.y, getWeapon().bullet.speed);
 
                     pointerX = intercept.x;
                     pointerY = intercept.y;

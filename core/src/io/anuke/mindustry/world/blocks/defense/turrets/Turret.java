@@ -64,7 +64,6 @@ public abstract class Turret extends Block{
 
     protected TextureRegion baseRegion;
     protected TextureRegion heatRegion;
-    protected TextureRegion baseTopRegion;
 
     protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) ->
         Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
@@ -97,7 +96,6 @@ public abstract class Turret extends Block{
         super.load();
 
         baseRegion = Core.atlas.find("block-" + size);
-        baseTopRegion = Core.atlas.find("block-" + size + "-top");
         heatRegion = Core.atlas.find(name + "-heat");
     }
 

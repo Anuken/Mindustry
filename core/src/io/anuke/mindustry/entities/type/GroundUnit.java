@@ -11,19 +11,12 @@ import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.units.UnitState;
-import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
-import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
 public abstract class GroundUnit extends BaseUnit{
@@ -32,7 +25,6 @@ public abstract class GroundUnit extends BaseUnit{
     protected float walkTime;
     protected float stuckTime;
     protected float baseRotation;
-    protected Weapon weapon;
 
     public final UnitState
 
@@ -45,11 +37,11 @@ public abstract class GroundUnit extends BaseUnit{
             TileEntity core = getClosestEnemyCore();
             float dst = core == null ? 0 : dst(core);
 
-            if(core != null && dst < getWeapon().getAmmo().range() / 1.1f){
+            if(core != null && dst < getWeapon().bullet.range() / 1.1f){
                 target = core;
             }
 
-            if(dst > getWeapon().getAmmo().range() * 0.5f){
+            if(dst > getWeapon().bullet.range() * 0.5f){
                 moveToCore();
             }
         }
@@ -79,12 +71,6 @@ public abstract class GroundUnit extends BaseUnit{
             moveAwayFromCore();
         }
     };
-
-    @Override
-    public void init(UnitType type, Team team){
-        super.init(type, team);
-        this.weapon = type.weapon;
-    }
 
     @Override
     public void interpolate(){
@@ -125,11 +111,7 @@ public abstract class GroundUnit extends BaseUnit{
 
     @Override
     public Weapon getWeapon(){
-        return weapon;
-    }
-
-    public void setWeapon(Weapon weapon){
-        this.weapon = weapon;
+        return type.weapon;
     }
 
     @Override
@@ -162,11 +144,11 @@ public abstract class GroundUnit extends BaseUnit{
         Draw.rect(type.region, x, y, rotation - 90);
 
         for(int i : Mathf.signs){
-            float tra = rotation - 90, trY = -weapon.getRecoil(this, i > 0) + type.weaponOffsetY;
+            float tra = rotation - 90, trY = -type.weapon.getRecoil(this, i > 0) + type.weaponOffsetY;
             float w = i > 0 ? -12 : 12;
-            Draw.rect(weapon.equipRegion,
-                    x + Angles.trnsx(tra, type.weaponOffsetX * i, trY),
-                    y + Angles.trnsy(tra, type.weaponOffsetX * i, trY), w, 12, rotation - 90);
+            Draw.rect(type.weapon.equipRegion,
+                    x + Angles.trnsx(tra, getWeapon().width * i, trY),
+                    y + Angles.trnsy(tra, getWeapon().width * i, trY), w, 12, rotation - 90);
         }
 
         drawItems();
@@ -181,11 +163,11 @@ public abstract class GroundUnit extends BaseUnit{
         }
 
         if(!Units.invalidateTarget(target, this)){
-            if(dst(target) < getWeapon().getAmmo().range()){
+            if(dst(target) < getWeapon().bullet.range()){
                 rotate(angleTo(target));
 
                 if(Angles.near(angleTo(target), rotation, 13f)){
-                    BulletType ammo = getWeapon().getAmmo();
+                    BulletType ammo = getWeapon().bullet;
 
                     Vector2 to = Predict.intercept(GroundUnit.this, target, ammo.speed);
 
@@ -204,30 +186,6 @@ public abstract class GroundUnit extends BaseUnit{
         }
 
         retarget(this::targetClosest);
-    }
-
-    @Override
-    public void write(DataOutput data) throws IOException{
-        super.write(data);
-        data.writeByte(weapon.id);
-    }
-
-    @Override
-    public void read(DataInput data) throws IOException{
-        super.read(data);
-        weapon = content.getByID(ContentType.weapon, data.readByte());
-    }
-
-    @Override
-    public void writeSave(DataOutput stream) throws IOException{
-        stream.writeByte(weapon.id);
-        super.writeSave(stream);
-    }
-
-    @Override
-    public void readSave(DataInput stream) throws IOException{
-        weapon = content.getByID(ContentType.weapon, stream.readByte());
-        super.readSave(stream);
     }
 
     protected void patrol(){

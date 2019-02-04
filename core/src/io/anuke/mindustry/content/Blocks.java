@@ -806,7 +806,7 @@ public class Blocks implements ContentList{
         }};
 
         surgeTower = new PowerNode("surge-tower"){{
-            requirements(Category.power, ItemStack.with(Items.titanium, 15, Items.lead, 20, Items.silicon, 30, Items.surgealloy, 10));
+            requirements(Category.power, ItemStack.with(Items.titanium, 15, Items.lead, 20, Items.silicon, 30, Items.surgealloy, 30));
             size = 2;
             maxNodes = 2;
             laserRange = 30f;
@@ -1101,7 +1101,7 @@ public class Blocks implements ContentList{
 
         lancer = new ChargeTurret("lancer"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 50, Items.lead, 100, Items.silicon, 90));
-            range = 90f;
+            range = 120f;
             chargeTime = 60f;
             chargeMaxDelay = 30f;
             chargeEffects = 7;

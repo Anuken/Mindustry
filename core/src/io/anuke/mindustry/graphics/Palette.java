@@ -37,6 +37,7 @@ public class Palette{
     lancerLaser = Color.valueOf("a9d8ff"),
 
     stoneGray = Color.valueOf("8f8f8f"),
+    engine = Color.valueOf("ffbb64"),
 
     health = Color.valueOf("ff341c"),
     heal = Color.valueOf("98ffa9"),
@@ -53,6 +54,9 @@ public class Palette{
     power = Color.valueOf("fbad67"),
     powerLight = Color.valueOf("fbd367"),
     placing = accent,
+
+    unitFront = Color.valueOf("ffa665"),
+    unitBack = Color.valueOf("d06b53"),
 
     lightTrail = Color.valueOf("ffe2a9"),
 

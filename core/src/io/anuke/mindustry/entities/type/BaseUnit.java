@@ -131,7 +131,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void targetClosest(){
-        target = Units.getClosestTarget(team, x, y, Math.max(getWeapon().getAmmo().range(), type.range), u -> type.targetAir || !u.isFlying());
+        target = Units.getClosestTarget(team, x, y, Math.max(getWeapon().bullet.range(), type.range), u -> type.targetAir || !u.isFlying());
     }
 
     public TileEntity getClosestEnemyCore(){
@@ -284,7 +284,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public float drawSize(){
-        return 14;
+        return type.hitsize * 10;
     }
 
     @Override

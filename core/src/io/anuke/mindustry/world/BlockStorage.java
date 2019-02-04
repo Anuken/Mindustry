@@ -33,9 +33,9 @@ public abstract class BlockStorage extends UnlockableContent{
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
 
-    public BlockStats stats = new BlockStats();
-    public Consumers consumes = new Consumers();
-    public Producers produces = new Producers();
+    public final BlockStats stats = new BlockStats();
+    public final Consumers consumes = new Consumers();
+    public final Producers produces = new Producers();
 
     public boolean shouldConsume(Tile tile){
         return true;

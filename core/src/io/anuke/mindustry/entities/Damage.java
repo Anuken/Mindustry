@@ -165,7 +165,7 @@ public class Damage{
             entity.damage(amount);
             //TODO better velocity displacement
             float dst = tr.set(entity.x - x, entity.y - y).len();
-            entity.velocity().add(tr.setLength((1f - dst / radius) * 2f));
+            entity.velocity().add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
         };
 
         rect.setSize(radius * 2).setCenter(x, y);
