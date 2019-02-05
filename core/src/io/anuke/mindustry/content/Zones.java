@@ -21,7 +21,7 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 60);
             startingItems = ItemStack.with(Items.copper, 50);
             alwaysUnlocked = true;
-            conditionWave = 5;
+            conditionWave = 10;
             launchPeriod = 5;
             rules = () -> new Rules(){{
                 waves = true;
@@ -63,14 +63,14 @@ public class Zones implements ContentList{
         craters = new Zone("craters", new MapGenerator("craters", 1).dist(0)){{
             deployCost = ItemStack.with(Items.copper, 200);
             startingItems = ItemStack.with(Items.copper, 200);
-            conditionWave = 15;
+            conditionWave = 10;
             itemRequirements = ItemStack.with(Items.copper, 2000);
             zoneRequirements = new Zone[]{groundZero};
             blockRequirements = new Block[]{Blocks.router};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 60;
+                waveSpacing = 60 * 60 * 1.5f;
                 spawns = Array.with(
                     new SpawnGroup(UnitTypes.dagger){{
                         unitScaling = 2;
@@ -112,13 +112,13 @@ public class Zones implements ContentList{
             .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
             deployCost = ItemStack.with(Items.copper, 500);
             startingItems = ItemStack.with(Items.copper, 400);
-            conditionWave = 15;
+            conditionWave = 10;
             zoneRequirements = new Zone[]{craters};
             itemRequirements = ItemStack.with(Items.copper, 4000, Items.lead, 2000);
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 60;
+                waveSpacing = 60 * 60 * 1.5f;
                 spawns = Array.with(
                     new SpawnGroup(UnitTypes.titan){{
                         unitScaling = 3;

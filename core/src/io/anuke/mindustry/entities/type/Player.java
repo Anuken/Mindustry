@@ -11,10 +11,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Mechs;
@@ -410,6 +407,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         Draw.reset();
         Pools.free(layout);
         font.getData().setScale(1f);
+        font.setColor(Color.WHITE);
         font.setUseIntegerPositions(ints);
     }
 

@@ -44,6 +44,7 @@ public class NetworkIO{
             stream.writeInt(player.id);
             player.write(stream);
 
+            world.spawner.write(stream);
             SaveIO.getSaveWriter().writeMap(stream);
 
             stream.write(Team.all.length);
@@ -105,6 +106,7 @@ public class NetworkIO{
             world.beginMapLoad();
 
             //map
+            world.spawner.read(stream);
             SaveIO.getSaveWriter().readMap(stream);
             world.setMap(new Map(map, 0, 0));
 

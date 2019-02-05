@@ -20,6 +20,7 @@ import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
@@ -58,7 +59,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
-        return itemCapacity * state.teams.get(tile.getTeam()).cores.size;
+        return item.type == ItemType.material ? itemCapacity * state.teams.get(tile.getTeam()).cores.size : 0;
     }
 
     @Override

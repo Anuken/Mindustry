@@ -329,7 +329,7 @@ public class NetServer implements ApplicationListener{
         player.y = prevy;
 
         //set interpolator target to *new* position so it moves toward it
-        player.getInterpolator().read(player.x, player.y, newx, newy, sent, rotation, baseRotation);
+        player.getInterpolator().read(player.x, player.y, newx, newy, rotation, baseRotation);
         player.velocity().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
 
         connection.lastRecievedClientSnapshot = snapshotID;

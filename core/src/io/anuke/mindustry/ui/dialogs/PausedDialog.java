@@ -40,7 +40,7 @@ public class PausedDialog extends FloatingDialog{
             cont.addButton("$back", this::hide).colspan(2).width(dw*2 + 20f);
 
             cont.row();
-            cont.addButton("$database", ui.database::show);
+            cont.addButton("techtree", ui.tech::show);
             cont.addButton("$settings", ui.settings::show);
 
             if(!world.isZone()){

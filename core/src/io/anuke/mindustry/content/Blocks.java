@@ -1052,7 +1052,7 @@ public class Blocks implements ContentList{
             range = 90f;
             shootCone = 15f;
             ammoUseEffect = Fx.shellEjectSmall;
-            health = 110;
+            health = 150;
             inaccuracy = 2f;
             rotatespeed = 10f;
         }};
