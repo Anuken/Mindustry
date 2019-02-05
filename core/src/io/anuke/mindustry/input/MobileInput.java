@@ -3,7 +3,6 @@ package io.anuke.mindustry.input;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
@@ -21,11 +20,12 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
@@ -642,7 +642,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
-        if(!canPan) return false;
         float scale = Core.camera.width / Core.graphics.getWidth();
         deltaX *= scale;
         deltaY *= scale;
@@ -671,7 +670,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     public boolean zoom(float initialDistance, float distance){
         if(lastDistance == -1) lastDistance = initialDistance;
 
-        float amount = (distance > lastDistance ? 0.07f : -0.07f) * Time.delta();
+        float amount = (Mathf.sign(distance > lastDistance) * 0.07f) * Time.delta();
         renderer.scaleCamera(io.anuke.arc.scene.ui.layout.Unit.dp.scl(amount));
         lastDistance = distance;
         return true;
@@ -679,7 +678,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean touchDown(float x, float y, int pointer, KeyCode button){
-        canPan = !Core.scene.hasMouse();
         return false;
     }
 

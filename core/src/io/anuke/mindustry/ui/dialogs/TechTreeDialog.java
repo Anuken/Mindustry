@@ -147,7 +147,7 @@ public class TechTreeDialog extends FloatingDialog{
                     }
                 });
                 button.exited(() -> {
-                    if(hoverNode == button && !infoTable.hasMouse() && !hoverNode.hasMouse()){
+                    if(!mobile && hoverNode == button && !infoTable.hasMouse() && !hoverNode.hasMouse()){
                         hoverNode = null;
                         rebuild();
                     }

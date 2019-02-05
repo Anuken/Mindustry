@@ -54,7 +54,6 @@ public class HudFragment extends Fragment{
 
         //menu at top left
         parent.fill(cont -> {
-
             cont.top().left().visible(() -> !state.is(State.menu));
 
             if(mobile){
@@ -147,12 +146,6 @@ public class HudFragment extends Fragment{
         //minimap
         //parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> !state.is(State.menu) && Core.settings.getBool("minimap")));
 
-        //paused table
-        parent.fill(t -> {
-            t.top().visible(() -> state.is(State.paused) && !Net.active());
-            t.table("button", top -> top.add("$paused").pad(6f));
-        });
-
         //spawner warning
         parent.fill(t -> {
             t.touchable(Touchable.disabled);
@@ -222,8 +215,9 @@ public class HudFragment extends Fragment{
                 .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f))));
         });
 
+        //launch button
         parent.fill(t -> {
-            t.top().right().visible(() -> !state.is(State.menu));
+            t.top().visible(() -> !state.is(State.menu));
 
             TextButton button = Elements.newButton("$launch", Call::launchZone);
 
@@ -252,9 +246,12 @@ public class HudFragment extends Fragment{
             button.getLabelCell().left().get().setAlignment(Align.left, Align.left);
 
             t.add(button).size(350f, 80f);
+        });
 
-            //.addRowImageTextButton("$launch", "icon-arrow-up", 8*3, Call::launchZone)
-            //.size(94f, 70f).visible(() -> world.isZone() && world.getZone().metCondition() && !Net.client());
+        //paused table
+        parent.fill(t -> {
+            t.top().visible(() -> state.is(State.paused) && !Net.active());
+            t.table("button", top -> top.add("$paused").pad(6f));
         });
 
         //'saving' indicator
