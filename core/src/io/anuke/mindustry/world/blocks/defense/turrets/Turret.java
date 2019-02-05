@@ -90,7 +90,6 @@ public abstract class Turret extends Block{
         return false;
     }
 
-
     @Override
     public void load(){
         super.load();
