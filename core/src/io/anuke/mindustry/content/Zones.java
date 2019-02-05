@@ -61,7 +61,7 @@ public class Zones implements ContentList{
         }};
 
         craters = new Zone("craters", new MapGenerator("craters", 1).dist(0)){{
-            deployCost = ItemStack.with(Items.copper, 300);
+            deployCost = ItemStack.with(Items.copper, 200);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
             itemRequirements = ItemStack.with(Items.copper, 2000);
