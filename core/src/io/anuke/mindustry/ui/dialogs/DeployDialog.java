@@ -48,12 +48,6 @@ public class DeployDialog extends FloatingDialog{
     }
 
     public void setup(){
-        if(!System.getProperty("mindustry.debug", "false").equals("true")){
-            ui.showInfo("This is not ready for testing. Play custom games instead.");
-            Core.app.post(this::hide);
-            return;
-        }
-
         cont.clear();
         titleTable.remove();
         marginTop(0f);

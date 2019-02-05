@@ -33,7 +33,7 @@ public class Mech extends UnlockableContent{
     public boolean turnCursor = true;
     public boolean canHeal = false;
 
-    public float weaponOffsetX, weaponOffsetY, engineOffset = 6f, engineSize = 2f;
+    public float weaponOffsetX, weaponOffsetY, engineOffset = 5f, engineSize = 2.5f;
     public Weapon weapon;
 
     public TextureRegion baseRegion, legRegion, region, iconRegion;

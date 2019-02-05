@@ -124,7 +124,9 @@ public class BuildBlock extends Block{
 
         if(entity.previous == null) return;
 
-        Draw.rect(entity.previous.icon(Icon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.getRotation() * 90 : 0);
+        if(Core.atlas.isFound(entity.previous.icon(Icon.full))){
+            Draw.rect(entity.previous.icon(Icon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.getRotation() * 90 : 0);
+        }
     }
 
     @Override

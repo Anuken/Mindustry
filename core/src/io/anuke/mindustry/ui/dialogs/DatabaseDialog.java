@@ -38,8 +38,8 @@ public class DatabaseDialog extends FloatingDialog{
         for(int j = 0; j < allContent.length; j ++){
             ContentType type = ContentType.values()[j];
 
-            Array<Content> array = allContent[j];
-            if(array.size == 0 || !(array.first() instanceof UnlockableContent)) continue;
+            Array<Content> array = allContent[j].select(c -> c instanceof UnlockableContent && !((UnlockableContent)c).isHidden());
+            if(array.size == 0) continue;
 
             table.add("$content." + type.name() + ".name").growX().left().color(Palette.accent);
             table.row();
@@ -49,14 +49,12 @@ public class DatabaseDialog extends FloatingDialog{
                 list.left();
 
                 int maxWidth = UIUtils.portrait() ? 7 : 13;
-                int size = 8 * 6;
+                int size = 8 * 4;
 
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){
                     UnlockableContent unlock = (UnlockableContent) array.get(i);
-
-                    if(unlock.isHidden()) continue;
 
                     Image image = data.isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-tree-locked");
                     image.addListener(new HandCursorListener());

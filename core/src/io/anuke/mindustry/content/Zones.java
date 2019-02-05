@@ -21,7 +21,8 @@ public class Zones implements ContentList{
             deployCost = ItemStack.with(Items.copper, 60);
             startingItems = ItemStack.with(Items.copper, 50);
             alwaysUnlocked = true;
-            conditionWave = 10;
+            conditionWave = 5;
+            launchPeriod = 5;
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -109,7 +110,6 @@ public class Zones implements ContentList{
 
         frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 2)
             .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
-            alwaysUnlocked = true;
             deployCost = ItemStack.with(Items.copper, 500);
             startingItems = ItemStack.with(Items.copper, 400);
             conditionWave = 15;
