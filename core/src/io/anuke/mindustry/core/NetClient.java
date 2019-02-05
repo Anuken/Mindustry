@@ -345,7 +345,7 @@ public class NetClient implements ApplicationListener{
                 requests[i] = player.getPlaceQueue().get(i);
             }
 
-            Call.onClientShapshot(lastSent++, Time.millis(), player.x, player.y,
+            Call.onClientShapshot(lastSent++, player.x, player.y,
                 player.pointerX, player.pointerY, player.rotation, player.baseRotation,
                 player.velocity().x, player.velocity().y,
                 player.getMineTile(),

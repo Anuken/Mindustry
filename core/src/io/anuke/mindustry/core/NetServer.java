@@ -259,7 +259,7 @@ public class NetServer implements ApplicationListener{
     @Remote(targets = Loc.client, unreliable = true)
     public static void onClientShapshot(
         Player player,
-        int snapshotID, long sent,
+        int snapshotID,
         float x, float y,
         float pointerX, float pointerY,
         float rotation, float baseRotation,
