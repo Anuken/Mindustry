@@ -60,13 +60,6 @@ public class MapInfoDialog extends FloatingDialog{
         }).size(400, 55f).get();
         author.setMessageText("$unknown");
 
-        cont.row();
-
-        cont.add().padRight(8).left();
-        cont.addCheck("$editor.oregen", enabled -> {
-            tags.put("oregen", enabled ? "1" : "0");
-        }).update(c -> c.setChecked(!tags.get("oregen", "0").equals("0"))).left();
-
         name.change();
         description.change();
         author.change();

@@ -219,7 +219,7 @@ public class HudFragment extends Fragment{
         parent.fill(t -> {
             t.top().visible(() -> !state.is(State.menu));
 
-            TextButton button = Elements.newButton("$launch", Call::launchZone);
+            TextButton button = Elements.newButton("$launch", () -> ui.showConfirm("$launch", "$launch.confirm", Call::launchZone));
 
             button.getStyle().disabledFontColor = Color.WHITE;
             button.visible(() ->
