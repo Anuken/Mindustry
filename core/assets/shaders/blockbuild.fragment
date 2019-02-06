@@ -22,7 +22,7 @@ bool id(vec2 coords, vec4 base){
 }
 
 bool cont(vec2 T, vec2 v){
-    float step = 1.0;
+    const float step = 3.0;
     vec4 base = texture2D(u_texture, T);
     return base.a > 0.1 &&
            		(id(T + vec2(0, step) * v, base) || id(T + vec2(0, -step) * v, base) ||
@@ -41,13 +41,8 @@ void main() {
 
 	vec2 center = ((u_uv + u_uv2)/2.0 - u_uv) /v;
 	float dst = (abs(center.x - coords.x) + abs(center.y - coords.y))/2.0;
-	float chance = 1.0;
 
-	if(u_progress > 0.8){
-	    chance = 1.0-(u_progress-0.8)*5.0;
-	}
-
-	if((mod(u_time / 1.5 + value, 20.0) < 5.0 && cont(t, v))){
+	if((mod(u_time / 1.5 + value, 20.0) < 15.0 && cont(t, v))){
         gl_FragColor = u_color;
     }else if(dst > (1.0-u_progress) * (center.x)){
         gl_FragColor = color;

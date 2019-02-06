@@ -251,7 +251,7 @@ public class PlacementFragment extends Fragment{
                     //update category empty values
                     for(Category cat : Category.values()){
                         Array<Block> blocks = getByCategory(cat);
-                        categoryEmpty[cat.ordinal()] = returnArray.isEmpty() || !returnArray.first().unlocked();
+                        categoryEmpty[cat.ordinal()] = blocks.isEmpty() || !blocks.first().unlocked();
                     }
 
                     int f = 0;
