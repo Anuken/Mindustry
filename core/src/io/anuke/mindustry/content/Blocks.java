@@ -188,7 +188,7 @@ public class Blocks implements ContentList{
 
         ice = new Floor("ice"){{
             dragMultiplier = 0.2f;
-            speedMultiplier = 0.4f;
+            speedMultiplier = 0.1f;
         }};
 
         cliffs = new StaticWall("cliffs"){{
