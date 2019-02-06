@@ -33,6 +33,8 @@ public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
     Array<Block> returnArray = new Array<>();
+    Array<Category> returnCatArray = new Array<>();
+    boolean[] categoryEmpty = new boolean[Category.values().length];
     Category currentCategory = Category.distribution;
     Block hovered, lastDisplay;
     Tile lastHover;
@@ -56,11 +58,16 @@ public class PlacementFragment extends Fragment{
 
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
-            currentCategory = Category.turret;
-            Group group = toggler.getParent();
-            toggler.remove();
-            build(group);
+            control.input(0).block = null;
+            rebuild();
         });
+    }
+
+    void rebuild(){
+        currentCategory = Category.turret;
+        Group group = toggler.getParent();
+        toggler.remove();
+        build(group);
     }
 
     boolean gridUpdate(InputHandler input){
@@ -121,12 +128,14 @@ public class PlacementFragment extends Fragment{
                     group.setMinCheckCount(0);
 
                     for(Block block : getByCategory(currentCategory)){
-
                         if(index++ % rowWidth == 0){
                             blockTable.row();
                         }
 
-                        boolean[] unlocked = {false};
+                        if(!data.isUnlocked(block)){
+                            blockTable.add().size(46);
+                            continue;
+                        }
 
                         ImageButton button = blockTable.addImageButton("icon-locked", "select", 8 * 4, () -> {
                             if(data.isUnlocked(block)){
@@ -134,21 +143,14 @@ public class PlacementFragment extends Fragment{
                             }
                         }).size(46f).group(group).get();
 
+                        button.replaceImage(new Image(block.icon(Icon.medium)));
+
                         button.update(() -> { //color unplacable things gray
                             boolean ulock = data.isUnlocked(block);
                             TileEntity core = players[0].getClosestCore();
                             Color color = core != null && (core.items.has(block.buildRequirements) || state.rules.infiniteResources) ? Color.WHITE : ulock ? Color.GRAY : Color.WHITE;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.block == block);
-
-                            if(ulock == unlocked[0]) return;
-                            unlocked[0] = ulock;
-
-                            if(!ulock){
-                                button.replaceImage(new Image("icon-locked"));
-                            }else{
-                                button.replaceImage(new Image(block.icon(Icon.medium)));
-                            }
                         });
 
                         button.hovered(() -> hovered = block);
@@ -246,15 +248,25 @@ public class PlacementFragment extends Fragment{
 
                     ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
+                    //update category empty values
                     for(Category cat : Category.values()){
-                        if(getByCategory(cat).isEmpty()) continue;
+                        Array<Block> blocks = getByCategory(cat);
+                        categoryEmpty[cat.ordinal()] = returnArray.isEmpty() || !returnArray.first().unlocked();
+                    }
+
+                    int f = 0;
+                    for(Category cat : getCategories()){
+                        if(f++ % 2 == 0) categories.row();
+
+                        if(categoryEmpty[cat.ordinal()]){
+                            categories.addImage("flat");
+                            continue;
+                        }
 
                         categories.addImageButton("icon-" + cat.name(), "clear-toggle", 16 * 2, () -> {
                             currentCategory = cat;
                             rebuildCategory.run();
                         }).group(group).update(i -> i.setChecked(currentCategory == cat));
-
-                        if(cat.ordinal() % 2 == 1) categories.row();
                     }
                 }).touchable(Touchable.enabled);
 
@@ -265,6 +277,13 @@ public class PlacementFragment extends Fragment{
             });
         });
     }
+
+    Array<Category> getCategories(){
+        returnCatArray.clear();
+        returnCatArray.addAll(Category.values());
+        returnCatArray.sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
+        return returnCatArray;
+    }
     
     Array<Block> getByCategory(Category cat){
         returnArray.clear();
@@ -273,6 +292,7 @@ public class PlacementFragment extends Fragment{
                 returnArray.add(block);
             }
         }
+        returnArray.sort((b1, b2) -> -Boolean.compare(b1.unlocked(), b2.unlocked()));
         return returnArray;
     }
 
