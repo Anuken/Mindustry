@@ -1125,13 +1125,12 @@ public class Blocks implements ContentList{
         arc = new PowerTurret("arc"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 70, Items.lead, 60));
             shootType = Bullets.arc;
-            reload = 85f;
-            shootShake = 1f;
+            reload = 20f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUsed = 1f / 3f;
-            consumes.powerBuffered(300f);
-            range = 150f;
+            powerUsed = 1f / 2f;
+            consumes.powerBuffered(50f);
+            range = 80f;
             shootEffect = Fx.lightningShoot;
             heatColor = Color.RED;
             recoil = 1f;

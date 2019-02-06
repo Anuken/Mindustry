@@ -32,12 +32,6 @@ import static io.anuke.mindustry.Vars.*;
 public class Logic implements ApplicationListener{
 
     public Logic(){
-        Events.on(TileChangeEvent.class, event -> {
-            if(event.tile.getTeam() == defaultTeam && event.tile.block().isVisible()){
-                handleContent(event.tile.block());
-            }
-        });
-
         Events.on(WaveEvent.class, event -> {
             if(world.isZone()){
                 data.updateWaveScore(world.getZone(), state.wave);

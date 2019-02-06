@@ -131,7 +131,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
 
     @Override
     public void draw(){
-        Lines.stroke(2f * fout());
+        Lines.stroke(3f * fout());
         Draw.color(color, Color.WHITE, fin());
         Lines.beginLine();
 
@@ -144,7 +144,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
         int i = 0;
 
         for(Position p : lines){
-            Fill.square(p.getX(), p.getY(), (4f - (float)i++/lines.size*2f) * fout(), 45);
+            Fill.square(p.getX(), p.getY(), (5f - (float)i++/lines.size*2f) * fout(), 45);
         }
         Draw.reset();
     }
