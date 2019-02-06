@@ -4,6 +4,8 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.impl.TimedEntity;
 import io.anuke.mindustry.entities.traits.DrawTrait;
@@ -129,31 +131,22 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
 
     @Override
     public void draw(){
-        float lx = x, ly = y;
+        Lines.stroke(2f * fout());
         Draw.color(color, Color.WHITE, fin());
-        //TODO this is really, really bad rendering
-        /*
-        for(int i = 0; i < lines.size; i++){
-            Position v = lines.get(i);
+        Lines.beginLine();
 
-            float f = (float) i / lines.size;
+        Lines.linePoint(x, y);
+        for(Position p : lines){
+            Lines.linePoint(p.getX(), p.getY());
+        }
+        Lines.endLine();
 
-            Lines.stroke(fout() * 3f * (1.5f - f));
+        int i = 0;
 
-            Lines.stroke(Lines.getStroke() * 4f);
-            Draw.alpha(0.3f);
-            Lines.line(lx, ly, v.getX(), v.getY());
-
-            Lines.stroke(Lines.getStroke()/4f);
-            Draw.alpha(1f);
-            Lines.line(lx, ly, v.getX(), v.getY());
-
-            Lines.stroke(3f * fout() * (1f - f));
-
-            lx = v.getX();
-            ly = v.getY();
-        }*/
-        Draw.color();
+        for(Position p : lines){
+            Fill.square(p.getX(), p.getY(), (4f - (float)i++/lines.size*2f) * fout(), 45);
+        }
+        Draw.reset();
     }
 
     @Override

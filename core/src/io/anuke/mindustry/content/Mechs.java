@@ -35,7 +35,7 @@ public class Mechs implements ContentList{
                 mass = 1.2f;
                 speed = 0.5f;
                 boostSpeed = 0.85f;
-                trailColorTo = Color.valueOf("ffd37f");
+                engineColor = Color.valueOf("ffd37f");
                 health = 250f;
 
                 weapon = new Weapon("blaster"){{
@@ -65,7 +65,7 @@ public class Mechs implements ContentList{
                 health = 220f;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
-                trailColorTo = Color.valueOf("d3ddff");
+                engineColor = Color.valueOf("d3ddff");
 
                 weapon = new Weapon("shockgun"){{
                     length = 1f;
@@ -110,7 +110,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.8f;
                 canHeal = true;
                 health = 200f;
-                trailColorTo = Palette.heal;
+                engineColor = Palette.heal;
 
                 weapon = new Weapon("heal-blaster"){{
                     length = 1.5f;
@@ -159,7 +159,7 @@ public class Mechs implements ContentList{
                 shake = 4f;
                 weaponOffsetX = 1;
                 weaponOffsetY = 0;
-                trailColorTo = Color.valueOf("feb380");
+                engineColor = Color.valueOf("feb380");
                 health = 300f;
                 weapon = new Weapon("swarmer"){{
                     length = 1.5f;
@@ -228,7 +228,7 @@ public class Mechs implements ContentList{
                 health = 180f;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
-                trailColor = Palette.lightTrail;
+                engineColor = Palette.lightTrail;
                 cellTrnsY = 1f;
                 weapon = new Weapon("blaster"){{
                     length = 1.5f;
@@ -255,7 +255,7 @@ public class Mechs implements ContentList{
                 drag = 0.01f;
                 mass = 2f;
                 health = 170f;
-                trailColor = Color.valueOf("d3ddff");
+                engineColor = Color.valueOf("d3ddff");
                 cellTrnsY = 1f;
                 weapon = new Weapon("missiles"){{
                     length = 1.5f;
@@ -321,7 +321,7 @@ public class Mechs implements ContentList{
                 turnCursor = false;
                 health = 220f;
                 itemCapacity = 30;
-                trailColor = Color.valueOf("84f491");
+                engineColor = Color.valueOf("84f491");
                 cellTrnsY = 1f;
                 weapon = new Weapon("bomber"){{
                     length = 0f;
@@ -352,7 +352,7 @@ public class Mechs implements ContentList{
                 mass = 3f;
                 health = 240f;
                 itemCapacity = 60;
-                trailColor = Color.valueOf("feb380");
+                engineColor = Color.valueOf("feb380");
                 cellTrnsY = 1f;
 
                 weapon = new Weapon("bomber"){{

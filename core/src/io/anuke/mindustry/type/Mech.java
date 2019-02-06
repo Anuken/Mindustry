@@ -27,8 +27,7 @@ public class Mech extends UnlockableContent{
     public float mineSpeed = 1f;
     public int drillPower = -1;
     public float buildPower = 1f;
-    public Color trailColor = Palette.boostFrom;
-    public Color trailColorTo = Palette.boostTo;
+    public Color engineColor = Palette.boostTo;
     public int itemCapacity = 30;
     public boolean turnCursor = true;
     public boolean canHeal = false;
