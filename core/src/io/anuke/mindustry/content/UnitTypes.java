@@ -95,8 +95,9 @@ public class UnitTypes implements ContentList{
             weapon = new Weapon("artillery"){{
                 length = 1f;
                 reload = 60f;
+                width = 10f;
                 roundrobin = true;
-                recoil = 5f;
+                recoil = 4f;
                 shake = 2f;
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.artilleryUnit;
@@ -120,7 +121,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 bullet = Bullets.eruptorShot;
                 recoil = 1f;
-                width = 5f;
+                width = 7f;
             }};
         }};
 
@@ -135,7 +136,7 @@ public class UnitTypes implements ContentList{
             weapon = new Weapon("chaos"){{
                 length = 8f;
                 reload = 50f;
-                width = 17.5f;
+                width = 17f;
                 roundrobin = true;
                 recoil = 3f;
                 shake = 2f;
@@ -156,14 +157,16 @@ public class UnitTypes implements ContentList{
             rotatespeed = 0.06f;
             health = 80000;
             weapon = new Weapon("eradication"){{
-                length = 9f;
+                length = 13f;
                 reload = 30f;
-                width = 20f;
+                width = 22f;
                 roundrobin = true;
-                recoil = 4f;
+                recoil = 3f;
                 shake = 2f;
+                inaccuracy = 3f;
                 shots = 4;
-                shotDelay = 2;
+                spacing = 0f;
+                shotDelay = 3;
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.standardThoriumBig;
             }};

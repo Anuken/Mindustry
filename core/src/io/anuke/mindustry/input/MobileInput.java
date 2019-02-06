@@ -676,16 +676,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         return true;
     }
 
-    @Override
-    public boolean touchDown(float x, float y, int pointer, KeyCode button){
-        return false;
-    }
-
-    @Override
-    public boolean fling(float velocityX, float velocityY, KeyCode button){
-        return false;
-    }
-
     //endregion
 
     class PlaceRequest{

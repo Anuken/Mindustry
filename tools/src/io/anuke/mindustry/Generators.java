@@ -103,21 +103,19 @@ public class Generators {
 
                 Image image = ImagePacker.get(type.region);
 
-                if(!type.isFlying){
-                    image.draw(type.baseRegion);
-                    image.draw(type.legRegion);
-                    image.draw(type.legRegion, true, false);
-                    image.draw(type.region);
+                image.draw(type.baseRegion);
+                image.draw(type.legRegion);
+                image.draw(type.legRegion, true, false);
+                image.draw(type.region);
 
-                    image.draw(type.weapon.region,
-                            -(int)type.weapon.width + (image.width() - type.weapon.region.getWidth())/2,
-                            (int)type.weaponOffsetY - (image.height() - type.weapon.region.getHeight())/2 + 1,
-                            false, false);
-                    image.draw(type.weapon.region,
-                            (int)type.weapon.width + (image.width() - type.weapon.region.getWidth())/2,
-                            (int)type.weaponOffsetY - (image.height() - type.weapon.region.getHeight())/2 + 1,
-                            true, false);
-                }
+                image.draw(type.weapon.region,
+                        -(int)type.weapon.width + (image.width() - type.weapon.region.getWidth())/2,
+                        (int)type.weaponOffsetY - (image.height() - type.weapon.region.getHeight())/2 + 1,
+                        false, false);
+                image.draw(type.weapon.region,
+                        (int)type.weapon.width + (image.width() - type.weapon.region.getWidth())/2,
+                        (int)type.weaponOffsetY - (image.height() - type.weapon.region.getHeight())/2 + 1,
+                        true, false);
 
                 image.save("unit-icon-" + type.name);
             }
