@@ -244,10 +244,15 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("maps", "Display all available maps.", arg -> {
-            info("Maps:");
-            for(Map map : world.maps.all()){
-                info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
+            if(!world.maps.all().isEmpty()){
+                info("Maps:");
+                for(Map map : world.maps.all()){
+                    info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
+                }
+            }else{
+                info("No maps found.");
             }
+            info("&lyMap directory: &lb&fi{0}", customMapDirectory.file().getAbsoluteFile().toString());
         });
 
         handler.register("status", "Display server status.", arg -> {

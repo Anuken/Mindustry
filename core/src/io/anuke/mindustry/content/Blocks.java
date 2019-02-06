@@ -673,9 +673,10 @@ public class Blocks implements ContentList{
         }};
 
         junction = new Junction("junction"){{
-            requirements(Category.distribution, ItemStack.with(Items.copper, 2));
+            requirements(Category.distribution, ItemStack.with(Items.copper, 3));
             speed = 26;
             capacity = 32;
+            health = 25;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
