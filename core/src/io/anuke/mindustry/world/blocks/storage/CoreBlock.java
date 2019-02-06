@@ -45,8 +45,8 @@ public class CoreBlock extends StorageBlock{
         CoreEntity entity = tile.entity();
         Effects.effect(Fx.spawn, entity);
         entity.progress = 0;
-        entity.currentUnit.onRespawn(tile);
         entity.currentUnit = player;
+        entity.currentUnit.onRespawn(tile);
         entity.currentUnit.heal();
         entity.currentUnit.rotation = 90f;
         entity.currentUnit.applyImpulse(0, 8f);
