@@ -7,7 +7,6 @@ import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
@@ -79,7 +78,7 @@ public class GlobalData{
 
     /** Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(UnlockableContent content){
-        return (!state.is(State.menu) && !world.isZone()) || content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.getContentName());
+        return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.getContentName());
     }
 
     /**

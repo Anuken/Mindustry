@@ -16,6 +16,7 @@ import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.input.Binding;
@@ -61,6 +62,12 @@ public class PlacementFragment extends Fragment{
             control.input(0).block = null;
             rebuild();
         });
+
+        Events.on(UnlockEvent.class, event -> {
+            if(event.content instanceof Block){
+                rebuild();
+            }
+        });
     }
 
     void rebuild(){
@@ -77,7 +84,7 @@ public class PlacementFragment extends Fragment{
             if(tile != null){
                 tile = tile.target();
                 Block tryRecipe = tile.block();
-                if(tryRecipe.isVisible() && data.isUnlocked(tryRecipe)){
+                if(tryRecipe.isVisible() && unlocked(tryRecipe)){
                     input.block = tryRecipe;
                     currentCategory = input.block.buildCategory;
                     return true;
@@ -101,7 +108,7 @@ public class PlacementFragment extends Fragment{
             Array<Block> recipes = getByCategory(currentCategory);
             for(KeyCode key : inputGrid){
                 if(Core.input.keyDown(key))
-                    input.block = (i < recipes.size && data.isUnlocked(recipes.get(i))) ? recipes.get(i) : null;
+                    input.block = (i < recipes.size && unlocked(recipes.get(i))) ? recipes.get(i) : null;
                 i++;
             }
         }
@@ -132,13 +139,13 @@ public class PlacementFragment extends Fragment{
                             blockTable.row();
                         }
 
-                        if(!data.isUnlocked(block)){
+                        if(!unlocked(block)){
                             blockTable.add().size(46);
                             continue;
                         }
 
                         ImageButton button = blockTable.addImageButton("icon-locked", "select", 8 * 4, () -> {
-                            if(data.isUnlocked(block)){
+                            if(unlocked(block)){
                                 input.block = input.block == block ? null : block;
                             }
                         }).size(46f).group(group).get();
@@ -146,9 +153,8 @@ public class PlacementFragment extends Fragment{
                         button.replaceImage(new Image(block.icon(Icon.medium)));
 
                         button.update(() -> { //color unplacable things gray
-                            boolean ulock = data.isUnlocked(block);
                             TileEntity core = players[0].getClosestCore();
-                            Color color = core != null && (core.items.has(block.buildRequirements) || state.rules.infiniteResources) ? Color.WHITE : ulock ? Color.GRAY : Color.WHITE;
+                            Color color = core != null && (core.items.has(block.buildRequirements) || state.rules.infiniteResources) ? Color.WHITE : Color.GRAY;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.block == block);
                         });
@@ -185,10 +191,10 @@ public class PlacementFragment extends Fragment{
                             topTable.table(header -> {
                                 header.left();
                                 header.add(new Image(lastDisplay.icon(Icon.medium))).size(8 * 4);
-                                header.labelWrap(() -> !data.isUnlocked(lastDisplay) ? Core.bundle.get("blocks.unknown") : lastDisplay.formalName)
+                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("blocks.unknown") : lastDisplay.formalName)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
-                                if(data.isUnlocked(lastDisplay)){
+                                if(unlocked(lastDisplay)){
                                     header.addButton("?", "clear-partial", () -> ui.content.show(lastDisplay))
                                     .size(8 * 5).padTop(-5).padRight(-5).right().grow();
                                 }
@@ -251,7 +257,7 @@ public class PlacementFragment extends Fragment{
                     //update category empty values
                     for(Category cat : Category.values()){
                         Array<Block> blocks = getByCategory(cat);
-                        categoryEmpty[cat.ordinal()] = blocks.isEmpty() || !blocks.first().unlocked();
+                        categoryEmpty[cat.ordinal()] = blocks.isEmpty() || !unlocked(blocks.first());
                     }
 
                     int f = 0;
@@ -292,8 +298,12 @@ public class PlacementFragment extends Fragment{
                 returnArray.add(block);
             }
         }
-        returnArray.sort((b1, b2) -> -Boolean.compare(b1.unlocked(), b2.unlocked()));
+        returnArray.sort((b1, b2) -> -Boolean.compare(unlocked(b1), unlocked(b2)));
         return returnArray;
+    }
+
+    boolean unlocked(Block block){
+        return !world.isZone() || data.isUnlocked(block);
     }
 
     /** Returns the currently displayed block in the top box. */

@@ -207,13 +207,13 @@ public class World implements ApplicationListener{
         ui.loadAnd(() -> {
             logic.reset();
             state.rules = zone.rules.get();
+            state.rules.zone = zone.id;
             loadGenerator(zone.generator);
             for(Tile core : state.teams.get(defaultTeam).cores){
                 for(ItemStack stack : zone.startingItems){
                     core.entity.items.add(stack.item, stack.amount);
                 }
             }
-            state.rules.zone = zone.id;
             state.set(State.playing);
             control.saves.zoneSave();
             logic.play();

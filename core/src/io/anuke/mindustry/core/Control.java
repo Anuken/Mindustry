@@ -19,6 +19,7 @@ import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.GlobalData;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.Binding;
@@ -227,9 +228,10 @@ public class Control implements ApplicationListener{
         return inputs[index];
     }
 
-    public void playMap(Map map){
+    public void playMap(Map map, Rules rules){
         ui.loadAnd(() -> {
             logic.reset();
+            state.rules = rules;
             world.loadMap(map);
             logic.play();
         });
