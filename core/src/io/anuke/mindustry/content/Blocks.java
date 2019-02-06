@@ -1028,7 +1028,7 @@ public class Blocks implements ContentList{
         }};
 
         launchPad = new LaunchPad("launch-pad"){{
-            requirements(Category.effect, ItemStack.with(Items.copper, 500));
+            requirements(Category.effect, ItemStack.with(Items.copper, 500, Items.titanium, 200, Items.silicon, 200, Items.lead, 200));
             size = 3;
             itemCapacity = 100;
             launchTime = 60f * 6;

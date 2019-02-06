@@ -83,7 +83,7 @@ public class WaveSpawner{
                 for(GroundSpawn spawn : groundSpawns){
                     spawnX = spawn.x * tilesize;
                     spawnY = spawn.y * tilesize;
-                    spread = tilesize*3;
+                    spread = tilesize*2;
 
                     for(int i = 0; i < spawned; i++){
                         Tmp.v1.rnd(spread);
@@ -91,9 +91,7 @@ public class WaveSpawner{
                         BaseUnit unit = group.createUnit(waveTeam);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
 
-                        Time.run(i*5, () -> {
-                            shockwave(unit);
-                        });
+                        Time.run(i*5, () -> shockwave(unit));
                     }
                     Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawn.x * tilesize, spawn.y * tilesize));
                     //would be interesting to see player structures survive this without hacks
