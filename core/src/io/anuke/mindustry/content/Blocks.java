@@ -1041,7 +1041,7 @@ public class Blocks implements ContentList{
         //region turrets
 
         duo = new DoubleTurret("duo"){{
-            requirements(Category.turret, ItemStack.with(Items.copper, 60), true);
+            requirements(Category.turret, ItemStack.with(Items.copper, 70), true);
             ammo(
                 Items.copper, Bullets.standardCopper,
                 Items.graphite, Bullets.standardDense,
@@ -1050,10 +1050,10 @@ public class Blocks implements ContentList{
             );
             reload = 20f;
             restitution = 0.03f;
-            range = 90f;
+            range = 95f;
             shootCone = 15f;
             ammoUseEffect = Fx.shellEjectSmall;
-            health = 150;
+            health = 210;
             inaccuracy = 2f;
             rotatespeed = 10f;
         }};

@@ -260,12 +260,12 @@ public class Bullets implements ContentList{
             weaveMag = 1f;
         }};
 
-        standardCopper = new BasicBulletType(2.5f, 7, "bullet"){{
+        standardCopper = new BasicBulletType(2.5f, 9, "bullet"){{
             bulletWidth = 7f;
             bulletHeight = 9f;
             shootEffect = Fx.shootSmall;
             smokeEffect = Fx.shootSmallSmoke;
-            ammoMultiplier = 2;
+            ammoMultiplier = 1;
         }};
 
         standardDense = new BasicBulletType(3.5f, 18, "bullet"){{
