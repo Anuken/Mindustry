@@ -414,7 +414,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     public void drawBuildRequests(){
         for(BuildRequest request : getPlaceQueue()){
-            if(getCurrentRequest() == request) continue;
+            if(getCurrentRequest() == request && request.progress > 0.001f) continue;
 
             if(request.breaking){
                 Block block = world.tile(request.x, request.y).target().block();

@@ -4,7 +4,6 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.Queue;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
@@ -16,6 +15,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
@@ -183,8 +183,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         for(BuildRequest request : removal){
             if(!((request.breaking && world.tile(request.x, request.y).block() == Blocks.air) ||
-                (!request.breaking &&
-                (world.tile(request.x, request.y).getRotation() == request.rotation || !request.block.rotate)
+                (!request.breaking && (world.tile(request.x, request.y).getRotation() == request.rotation || !request.block.rotate)
                 && world.tile(request.x, request.y).block() == request.block))){
                 getPlaceQueue().addLast(request);
             }
@@ -205,6 +204,10 @@ public interface BuilderTrait extends Entity, TeamTrait{
         Tile tile = world.tile(current.x, current.y);
 
         if(dst(tile) > placeDistance){
+            if(getPlaceQueue().size > 1){
+                getPlaceQueue().removeFirst();
+                getPlaceQueue().addLast(current);
+            }
             return;
         }
 
