@@ -71,12 +71,7 @@ public class MapIO{
                 LegacyBlock block = LegacyColorMapper.get(color);
 
                 data.write(x, y, DataPosition.floor, block.floor.id);
-                data.write(x, y, DataPosition.elevation, (byte)0);
-
-                //place spawn
-                if(color == Color.rgba8888(Color.RED)){
-                    data.write(x, y, DataPosition.wall, Blocks.spawn.id);
-                }
+                data.write(x, y, DataPosition.wall, block.wall.id);
 
                 //place core
                 if(color == Color.rgba8888(Color.GREEN)){

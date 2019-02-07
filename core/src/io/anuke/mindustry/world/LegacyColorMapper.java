@@ -20,7 +20,7 @@ public class LegacyColorMapper implements ContentList{
     public void load(){
         defaultValue = new LegacyBlock(Blocks.stone, Blocks.air);
 
-        map("ff0000", Blocks.stainedStone);
+        map("ff0000", Blocks.stainedStone, Blocks.spawn);
         map("00ff00", Blocks.stone);
         map("323232", Blocks.stone);
         map("646464", Blocks.stone, Blocks.rocks);
