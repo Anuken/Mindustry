@@ -833,14 +833,14 @@ public class Blocks implements ContentList{
 
         thermalGenerator = new ThermalGenerator("thermal-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 80, Items.graphite, 70, Items.lead, 100, Items.silicon, 70, Items.thorium, 70));
-            powerProduction = 2f;
+            powerProduction = 3f;
             generateEffect = Fx.redgeneratespark;
             size = 2;
         }};
 
         turbineGenerator = new TurbineGenerator("turbine-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 70, Items.graphite, 50, Items.lead, 80, Items.silicon, 60));
-            powerProduction = 4f;
+            powerProduction = 6f;
             itemDuration = 30f;
             consumes.liquid(Liquids.water, 0.05f);
             size = 2;
@@ -848,7 +848,7 @@ public class Blocks implements ContentList{
 
         differentialGenerator = new DifferentialGenerator("differential-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 140, Items.titanium, 100, Items.lead, 200, Items.silicon, 130, Items.metaglass, 100));
-            powerProduction = 12f;
+            powerProduction = 24f;
             itemDuration = 60f;
             consumes.remove(ConsumeItemFilter.class);
             consumes.remove(ConsumeLiquidFilter.class);
@@ -879,7 +879,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.lead, 600, Items.silicon, 400, Items.graphite, 300, Items.thorium, 300));
             size = 3;
             health = 700;
-            powerProduction = 11f;
+            powerProduction = 12f;
             consumes.liquid(Liquids.cryofluid, maxLiquidUse);
         }};
 
@@ -888,7 +888,7 @@ public class Blocks implements ContentList{
             size = 4;
             health = 900;
             powerProduction = 70f;
-            consumes.power(20f);
+            consumes.power(23f);
             consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.water, 0.3f);
         }};
@@ -1083,11 +1083,11 @@ public class Blocks implements ContentList{
             );
             size = 2;
             recoil = 0f;
-            reload = 4f;
+            reload = 3f;
             inaccuracy = 5f;
             shootCone = 50f;
             shootEffect = Fx.shootLiquid;
-            range = 90f;
+            range = 100f;
             health = 360;
 
             drawer = (tile, entity) -> {
@@ -1102,13 +1102,13 @@ public class Blocks implements ContentList{
 
         lancer = new ChargeTurret("lancer"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 50, Items.lead, 100, Items.silicon, 90));
-            range = 120f;
-            chargeTime = 60f;
+            range = 135f;
+            chargeTime = 50f;
             chargeMaxDelay = 30f;
             chargeEffects = 7;
             shootType = Bullets.lancerLaser;
             recoil = 2f;
-            reload = 100f;
+            reload = 90f;
             cooldown = 0.03f;
             powerUsed = 1 / 3f;
             consumes.powerBuffered(600f);
@@ -1199,7 +1199,7 @@ public class Blocks implements ContentList{
             restitution = 0.02f;
             recoil = 6f;
             shootShake = 2f;
-            range = 320f;
+            range = 290f;
 
             health = 550;
         }};
@@ -1226,14 +1226,14 @@ public class Blocks implements ContentList{
         fuse = new ItemTurret("fuse"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 450, Items.graphite, 450, Items.surgealloy, 250));
             ammo(Items.graphite, Bullets.fuseShot);
-            reload = 50f;
+            reload = 40f;
             shootShake = 4f;
             range = 80f;
             recoil = 5f;
             restitution = 0.1f;
             size = 3;
 
-            health = 155 * size * size;
+            health = 165 * size * size;
         }};
 
         spectre = new DoubleTurret("spectre"){{

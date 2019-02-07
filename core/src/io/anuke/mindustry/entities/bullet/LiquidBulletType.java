@@ -20,17 +20,17 @@ public class LiquidBulletType extends BulletType{
     Liquid liquid;
 
     public LiquidBulletType(Liquid liquid){
-        super(2.5f, 0);
+        super(2.8f, 0);
         this.liquid = liquid;
 
-        lifetime = 70f;
+        lifetime = 74f;
         status = liquid.effect;
         statusDuration = 90f;
         despawnEffect = Fx.none;
         hitEffect = Fx.hitLiquid;
         shootEffect = Fx.none;
-        drag = 0.01f;
-        knockback = 0.5f;
+        drag = 0.009f;
+        knockback = 0.55f;
     }
 
     @Override

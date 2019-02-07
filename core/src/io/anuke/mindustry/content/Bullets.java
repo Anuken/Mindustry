@@ -64,7 +64,7 @@ public class Bullets implements ContentList{
             splashDamage = 33f;
         }};
 
-        artilleryPlasticFrag = new BasicBulletType(2.5f, 6, "bullet"){{
+        artilleryPlasticFrag = new BasicBulletType(2.5f, 7, "bullet"){{
             bulletWidth = 10f;
             bulletHeight = 12f;
             bulletShrink = 1f;
@@ -74,16 +74,16 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.none;
         }};
 
-        arilleryPlastic = new ArtilleryBulletType(3.3f, 0, "shell"){{
+        arilleryPlastic = new ArtilleryBulletType(3.4f, 0, "shell"){{
             hitEffect = Fx.plasticExplosion;
             knockback = 1f;
             lifetime = 55f;
             bulletWidth = bulletHeight = 13f;
             collidesTiles = false;
             splashDamageRadius = 35f;
-            splashDamage = 35f;
+            splashDamage = 45f;
             fragBullet = artilleryPlasticFrag;
-            fragBullets = 9;
+            fragBullets = 10;
             backColor = Pal.plastaniumBack;
             frontColor = Pal.plastaniumFront;
         }};
@@ -140,10 +140,10 @@ public class Bullets implements ContentList{
             frontColor = Pal.bulletYellow;
         }};
 
-        flakPlastic = new FlakBulletType(4f, 5){{
-            splashDamageRadius = 40f;
+        flakPlastic = new FlakBulletType(4f, 6){{
+            splashDamageRadius = 50f;
             fragBullet = artilleryPlasticFrag;
-            fragBullets = 4;
+            fragBullets = 6;
             hitEffect = Fx.plasticExplosion;
             frontColor = Pal.plastaniumFront;
             backColor = Pal.plastaniumBack;
@@ -455,7 +455,7 @@ public class Bullets implements ContentList{
             Color[] colors = {Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
             float[] lenscales = {1f, 1.1f, 1.13f, 1.14f};
-            float length = 100f;
+            float length = 140f;
 
             {
                 hitEffect = Fx.hitLancer;
@@ -492,7 +492,7 @@ public class Bullets implements ContentList{
             }
         };
 
-        meltdownLaser = new BulletType(0.001f, 26){
+        meltdownLaser = new BulletType(0.001f, 35){
             Color tmpColor = new Color();
             Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
@@ -576,7 +576,7 @@ public class Bullets implements ContentList{
         };
 
         waterShot = new LiquidBulletType(Liquids.water){{
-            knockback = 0.65f;
+            knockback = 0.7f;
         }};
 
         cryoShot = new LiquidBulletType(Liquids.cryofluid){{

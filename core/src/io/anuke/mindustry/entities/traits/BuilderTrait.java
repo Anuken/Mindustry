@@ -124,22 +124,6 @@ public interface BuilderTrait extends Entity, TeamTrait{
         return getPlaceQueue().size != 0;
     }
 
-    /**
-     * If a place request matching this signature is present, it is removed.
-     * Otherwise, a new place request is added to the queue.
-     */
-    default void replaceBuilding(int x, int y, int rotation, Block block){
-        for(BuildRequest request : getPlaceQueue()){
-            if(request.x == x && request.y == y){
-                clearBuilding();
-                addBuildRequest(request);
-                return;
-            }
-        }
-
-        addBuildRequest(new BuildRequest(x, y, rotation, block));
-    }
-
     /**Clears the placement queue.*/
     default void clearBuilding(){
         getPlaceQueue().clear();
