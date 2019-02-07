@@ -23,7 +23,7 @@ import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
@@ -97,11 +97,11 @@ public class HudFragment extends Fragment{
                         }
                     }).get();
 
-                    select.addImage("blank").color(Palette.accent).width(6f).fillY();
+                    select.addImage("blank").color(Pal.accent).width(6f).fillY();
                 });
 
                 cont.row();
-                cont.addImage("blank").height(6f).color(Palette.accent).fillX();
+                cont.addImage("blank").height(6f).color(Pal.accent).fillX();
                 cont.row();
             }
 
@@ -237,7 +237,7 @@ public class HudFragment extends Fragment{
                 button.setText(Core.bundle.get(state.enemies() > 0 ? "launch.unable" : "launch") + "\n" +
                     Core.bundle.format("launch.next", state.wave + world.getZone().launchPeriod));
 
-                button.getLabel().setColor(Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Palette.accent,
+                button.getLabel().setColor(Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Pal.accent,
                     Mathf.absin(Time.time(), 7f, 1f)));
             });
 

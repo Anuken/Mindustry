@@ -26,7 +26,7 @@ import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
@@ -174,7 +174,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             TextureRegion region = request.block.icon(Icon.full);
 
             Draw.alpha(Mathf.clamp((1f - request.scale) / 0.5f));
-            Draw.tint(Color.WHITE, Palette.breakInvalid, request.redness);
+            Draw.tint(Color.WHITE, Pal.breakInvalid, request.redness);
 
             Draw.rect(region, tile.worldx() + offset, tile.worldy() + offset,
             region.getWidth() * request.scale * Draw.scl,
@@ -184,9 +184,9 @@ public class MobileInput extends InputHandler implements GestureListener{
             float rad = (tile.block().size * tilesize / 2f - 1) * request.scale;
             Draw.alpha(0f);
             //draw removing request
-            Draw.tint(Palette.removeBack);
+            Draw.tint(Pal.removeBack);
             Lines.square(tile.drawx(), tile.drawy()-1, rad);
-            Draw.tint(Palette.remove);
+            Draw.tint(Pal.remove);
             Lines.square(tile.drawx(), tile.drawy(), rad);
         }
     }
@@ -213,7 +213,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void buildUI(Table table){
-        table.addImage("blank").color(Palette.accent).height(3f).colspan(4).growX();
+        table.addImage("blank").color(Pal.accent).height(3f).colspan(4).growX();
         table.row();
         table.left().margin(0f).defaults().size(48f);
 
@@ -277,7 +277,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     public void drawOutlined(){
         Lines.stroke(1f);
 
-        Shaders.mix.color.set(Palette.accent);
+        Shaders.mix.color.set(Pal.accent);
         Draw.shader(Shaders.mix);
 
         //draw removals
@@ -318,7 +318,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         Draw.shader();
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
 
         //Draw lines
         if(lineMode){
@@ -348,9 +348,9 @@ public class MobileInput extends InputHandler implements GestureListener{
                         region.getHeight() * lineScale * Draw.scl,
                         block.rotate ? result.rotation * 90 : 0);
                     }else{
-                        Draw.color(Palette.removeBack);
+                        Draw.color(Pal.removeBack);
                         Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1, block.size * tilesize / 2f);
-                        Draw.color(Palette.remove);
+                        Draw.color(Pal.remove);
                         Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset(), block.size * tilesize / 2f);
                     }
                 }
@@ -366,16 +366,16 @@ public class MobileInput extends InputHandler implements GestureListener{
                         if(other == null || !validBreak(other.x, other.y)) continue;
                         other = other.target();
 
-                        Draw.color(Palette.removeBack);
+                        Draw.color(Pal.removeBack);
                         Lines.square(other.drawx(), other.drawy()-1, other.block().size * tilesize / 2f - 1);
-                        Draw.color(Palette.remove);
+                        Draw.color(Pal.remove);
                         Lines.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f - 1);
                     }
                 }
 
-                Draw.color(Palette.removeBack);
+                Draw.color(Pal.removeBack);
                 Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
-                Draw.color(Palette.remove);
+                Draw.color(Pal.remove);
                 Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
 
             }
@@ -393,7 +393,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             crosshairScale = Mathf.lerpDelta(crosshairScale, 1f, 0.2f);
 
-            Draw.color(Palette.remove);
+            Draw.color(Pal.remove);
             Lines.stroke(1f);
 
             float radius = Interpolation.swingIn.apply(crosshairScale);

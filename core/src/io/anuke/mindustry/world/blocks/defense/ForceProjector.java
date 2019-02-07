@@ -16,7 +16,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.traits.AbsorbTrait;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
@@ -243,7 +243,7 @@ public class ForceProjector extends Block {
 
         @Override
         public void draw(){
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
             Fill.poly(x, y, 6, realRadius(entity));
             Draw.color();
         }

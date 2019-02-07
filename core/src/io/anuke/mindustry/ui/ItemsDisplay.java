@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui;
 
 import io.anuke.arc.collection.ObjectIntMap;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
@@ -29,7 +30,7 @@ public class ItemsDisplay extends Table{
                 if(item.type == ItemType.material && data.isUnlocked(item)){
                     t.label(() -> format.format(items.get(item, 0))).left();
                     t.addImage(item.region).size(8*3).padLeft(4).padRight(4);
-                    t.add("[LIGHT_GRAY]" + item.localizedName()).left();
+                    t.add(item.localizedName()).color(Color.LIGHT_GRAY).left();
                     t.row();
                 }
             }

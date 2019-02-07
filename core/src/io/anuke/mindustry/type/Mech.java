@@ -6,7 +6,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.ContentDisplay;
 
 public class Mech extends UnlockableContent{
@@ -27,7 +27,7 @@ public class Mech extends UnlockableContent{
     public float mineSpeed = 1f;
     public int drillPower = -1;
     public float buildPower = 1f;
-    public Color engineColor = Palette.boostTo;
+    public Color engineColor = Pal.boostTo;
     public int itemCapacity = 30;
     public boolean turnCursor = true;
     public boolean canHeal = false;

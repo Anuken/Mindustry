@@ -11,11 +11,11 @@ import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 
 /**An extended BulletType for most ammo-based bullets shot from turrets and units.*/
 public class BasicBulletType extends BulletType{
-    public Color backColor = Palette.bulletYellowBack, frontColor = Palette.bulletYellow;
+    public Color backColor = Pal.bulletYellowBack, frontColor = Pal.bulletYellow;
     public float bulletWidth = 5f, bulletHeight = 7f;
     public float bulletShrink = 0.5f;
     public String bulletSprite;
@@ -107,7 +107,7 @@ public class BasicBulletType extends BulletType{
         }
 
         for (int i = 0; i < lightining; i++) {
-            Lightning.create(b.getTeam(), Palette.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
+            Lightning.create(b.getTeam(), Pal.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
 }

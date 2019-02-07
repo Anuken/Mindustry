@@ -2,7 +2,7 @@ package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.graphics.Color;
 
-public class Palette{
+public class Pal{
     public static final Color
 
     command = Color.valueOf("eab678"),

@@ -18,7 +18,7 @@ import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
@@ -98,7 +98,7 @@ public class ItemBridge extends Block{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Lines.stroke(2f);
-        Draw.color(Palette.placing);
+        Draw.color(Pal.placing);
         for(int i = 0; i < 4; i++){
             Lines.dashLine(
                     x * tilesize + Geometry.d4[i].x * (tilesize / 2f + 2),
@@ -115,7 +115,7 @@ public class ItemBridge extends Block{
     public void drawConfigure(Tile tile){
         ItemBridgeEntity entity = tile.entity();
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Lines.stroke(1f);
         Lines.square(tile.drawx(), tile.drawy(),
                 tile.block().size * tilesize / 2f + 1f);
@@ -125,7 +125,7 @@ public class ItemBridge extends Block{
                 Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
                 if(linkValid(tile, other)){
                     boolean linked = other.pos() == entity.link;
-                    Draw.color(linked ? Palette.place : Palette.breakInvalid);
+                    Draw.color(linked ? Pal.place : Pal.breakInvalid);
 
                     Lines.square(other.drawx(), other.drawy(),
                             other.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));

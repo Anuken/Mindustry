@@ -28,7 +28,7 @@ import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 
@@ -108,7 +108,7 @@ public class UI implements ApplicationListener{
             Core.app.post(() -> showError("Failed to access local storage.\nSettings will not be saved."));
         });
 
-        Colors.put("accent", Palette.accent);
+        Colors.put("accent", Pal.accent);
 
         loadCursors();
     }

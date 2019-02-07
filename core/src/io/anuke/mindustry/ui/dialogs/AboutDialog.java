@@ -4,7 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.io.Contributors;
 import io.anuke.mindustry.io.Contributors.Contributor;
 import io.anuke.mindustry.ui.Links;
@@ -103,7 +103,7 @@ public class AboutDialog extends FloatingDialog{
         dialog.cont.add("$credits.text");
         dialog.cont.row();
         if(!contributors.isEmpty()){
-            dialog.cont.addImage("blank").color(Palette.accent).fillX().height(3f).pad(3f);
+            dialog.cont.addImage("blank").color(Pal.accent).fillX().height(3f).pad(3f);
             dialog.cont.row();
             dialog.cont.add("$contributors");
             dialog.cont.row();

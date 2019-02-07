@@ -18,7 +18,7 @@ import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.TechTree;
 import io.anuke.mindustry.content.TechTree.TechNode;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.ItemsDisplay;
 import io.anuke.mindustry.ui.TreeLayout;
@@ -254,7 +254,7 @@ public class TechTreeDialog extends FloatingDialog{
 
             for(TechTreeNode node : nodes){
                 for(TechTreeNode child : node.children){
-                    Lines.stroke(3f, locked(node.node) || locked(child.node) ? Palette.locked : Palette.accent);
+                    Lines.stroke(3f, locked(node.node) || locked(child.node) ? Pal.locked : Pal.accent);
 
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }

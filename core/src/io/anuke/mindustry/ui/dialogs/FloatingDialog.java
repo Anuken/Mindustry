@@ -5,7 +5,7 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
 import io.anuke.arc.Events;
 import io.anuke.arc.scene.ui.Dialog;
@@ -22,7 +22,7 @@ public class FloatingDialog extends Dialog{
         setFillParent(true);
         this.title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.addImage("white", Palette.accent)
+        titleTable.addImage("white", Pal.accent)
                 .growX().height(3f).pad(4f);
 
         hidden(() -> {

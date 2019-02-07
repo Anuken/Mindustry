@@ -23,7 +23,7 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -38,7 +38,7 @@ public abstract class Turret extends Block{
 
     protected final int timerTarget = timers++;
 
-    protected Color heatColor = Palette.turretHeat;
+    protected Color heatColor = Pal.turretHeat;
     protected Effect shootEffect = Fx.none;
     protected Effect smokeEffect = Fx.none;
     protected Effect ammoUseEffect = Fx.none;
@@ -142,7 +142,7 @@ public abstract class Turret extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Lines.stroke(1f, Palette.placing);
+        Lines.stroke(1f, Pal.placing);
         Lines.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range);
         Draw.color();
     }

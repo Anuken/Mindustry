@@ -16,7 +16,7 @@ import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
@@ -69,8 +69,8 @@ public class Bullets implements ContentList{
             bulletHeight = 12f;
             bulletShrink = 1f;
             lifetime = 15f;
-            backColor = Palette.plastaniumBack;
-            frontColor = Palette.plastaniumFront;
+            backColor = Pal.plastaniumBack;
+            frontColor = Pal.plastaniumFront;
             despawnEffect = Fx.none;
         }};
 
@@ -84,8 +84,8 @@ public class Bullets implements ContentList{
             splashDamage = 35f;
             fragBullet = artilleryPlasticFrag;
             fragBullets = 9;
-            backColor = Palette.plastaniumBack;
-            frontColor = Palette.plastaniumFront;
+            backColor = Pal.plastaniumBack;
+            frontColor = Pal.plastaniumFront;
         }};
 
         artilleryHoming = new ArtilleryBulletType(3f, 0, "shell"){{
@@ -110,8 +110,8 @@ public class Bullets implements ContentList{
             splashDamage = 30f;
             incendAmount = 4;
             incendSpread = 11f;
-            frontColor = Palette.lightishOrange;
-            backColor = Palette.lightOrange;
+            frontColor = Pal.lightishOrange;
+            backColor = Pal.lightOrange;
             trailEffect = Fx.incendTrail;
         }};
 
@@ -123,8 +123,8 @@ public class Bullets implements ContentList{
             collidesTiles = false;
             splashDamageRadius = 45f;
             splashDamage = 50f;
-            backColor = Palette.missileYellowBack;
-            frontColor = Palette.missileYellow;
+            backColor = Pal.missileYellowBack;
+            frontColor = Pal.missileYellow;
         }};
 
         artilleryUnit = new ArtilleryBulletType(2f, 0, "shell"){{
@@ -136,8 +136,8 @@ public class Bullets implements ContentList{
             collidesTiles = true;
             splashDamageRadius = 45f;
             splashDamage = 50f;
-            backColor = Palette.bulletYellowBack;
-            frontColor = Palette.bulletYellow;
+            backColor = Pal.bulletYellowBack;
+            frontColor = Pal.bulletYellow;
         }};
 
         flakPlastic = new FlakBulletType(4f, 5){{
@@ -145,8 +145,8 @@ public class Bullets implements ContentList{
             fragBullet = artilleryPlasticFrag;
             fragBullets = 4;
             hitEffect = Fx.plasticExplosion;
-            frontColor = Palette.plastaniumFront;
-            backColor = Palette.plastaniumBack;
+            frontColor = Pal.plastaniumFront;
+            backColor = Pal.plastaniumBack;
             shootEffect = Fx.shootBig;
         }};
 
@@ -175,8 +175,8 @@ public class Bullets implements ContentList{
         }};
 
         missileIncendiary = new MissileBulletType(2f, 12, "missile"){{
-            frontColor = Palette.lightishOrange;
-            backColor = Palette.lightOrange;
+            frontColor = Pal.lightishOrange;
+            backColor = Pal.lightOrange;
             bulletWidth = 7f;
             bulletHeight = 8f;
             bulletShrink = 0f;
@@ -216,8 +216,8 @@ public class Bullets implements ContentList{
             trailColor = Color.valueOf("b6c6fd");
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
-            backColor = Palette.bulletYellowBack;
-            frontColor = Palette.bulletYellow;
+            backColor = Pal.bulletYellowBack;
+            frontColor = Pal.bulletYellow;
             weaveScale = 8f;
             weaveMag = 2f;
         }};
@@ -233,8 +233,8 @@ public class Bullets implements ContentList{
             splashDamage = 10f;
             lifetime = 120f;
             trailColor = Color.GRAY;
-            backColor = Palette.bulletYellowBack;
-            frontColor = Palette.bulletYellow;
+            backColor = Pal.bulletYellowBack;
+            frontColor = Pal.bulletYellow;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
             weaveScale = 8f;
@@ -251,9 +251,9 @@ public class Bullets implements ContentList{
             splashDamageRadius = 25f;
             splashDamage = 10f;
             lifetime = 80f;
-            trailColor = Palette.unitBack;
-            backColor = Palette.unitBack;
-            frontColor = Palette.unitFront;
+            trailColor = Pal.unitBack;
+            backColor = Pal.unitBack;
+            frontColor = Pal.unitFront;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
             weaveScale = 6f;
@@ -296,8 +296,8 @@ public class Bullets implements ContentList{
         standardIncendiary = new BasicBulletType(3.2f, 11, "bullet"){{
             bulletWidth = 10f;
             bulletHeight = 12f;
-            frontColor = Palette.lightishOrange;
-            backColor = Palette.lightOrange;
+            frontColor = Pal.lightishOrange;
+            backColor = Pal.lightOrange;
             incendSpread = 3f;
             incendAmount = 1;
             incendChance = 0.3f;
@@ -339,8 +339,8 @@ public class Bullets implements ContentList{
         standardIncendiaryBig = new BasicBulletType(7f, 38, "bullet"){{
             bulletWidth = 16f;
             bulletHeight = 21f;
-            frontColor = Palette.lightishOrange;
-            backColor = Palette.lightOrange;
+            frontColor = Pal.lightishOrange;
+            backColor = Pal.lightOrange;
             incendSpread = 3f;
             incendAmount = 2;
             incendChance = 0.3f;
@@ -371,7 +371,7 @@ public class Bullets implements ContentList{
 
             @Override
             public void draw(Bullet b){
-                Draw.color(Palette.heal);
+                Draw.color(Pal.heal);
                 Lines.stroke(2f);
                 Lines.lineAngleCenter(b.x, b.y, b.rot(), 7f);
                 Draw.color(Color.WHITE);
@@ -385,7 +385,7 @@ public class Bullets implements ContentList{
                 tile = tile.target();
 
                 if(tile != null && tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
-                    Effects.effect(Fx.healBlockFull, Palette.heal, tile.drawx(), tile.drawy(), tile.block().size);
+                    Effects.effect(Fx.healBlockFull, Pal.heal, tile.drawx(), tile.drawy(), tile.block().size);
                     tile.entity.healBy(healPercent / 100f * tile.entity.maxHealth());
                 }
             }
@@ -409,7 +409,7 @@ public class Bullets implements ContentList{
             @Override
             public void draw(Bullet b){
                 //TODO add color to the bullet depending on the color of the flame it came from
-                Draw.color(Palette.lightFlame, Palette.darkFlame, Color.GRAY, b.fin());
+                Draw.color(Pal.lightFlame, Pal.darkFlame, Color.GRAY, b.fin());
                 Fill.circle(b.x, b.y, 3f * b.fout());
                 Draw.reset();
             }
@@ -452,7 +452,7 @@ public class Bullets implements ContentList{
         };
 
         lancerLaser = new BulletType(0.001f, 140){
-            Color[] colors = {Palette.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Palette.lancerLaser, Color.WHITE};
+            Color[] colors = {Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
             float[] lenscales = {1f, 1.1f, 1.13f, 1.14f};
             float length = 100f;
@@ -562,7 +562,7 @@ public class Bullets implements ContentList{
             @Override
             public void draw(Bullet b) {
                 super.draw(b);
-                Draw.color(Color.WHITE, Palette.surge, b.fin());
+                Draw.color(Color.WHITE, Pal.surge, b.fin());
                 for(int i = 0; i < 7; i++){
                     Tmp.v1.trns(b.rot(), i * 8f);
                     float sl = Mathf.clamp(b.fout()-0.5f) * (80f - i *10);
@@ -614,7 +614,7 @@ public class Bullets implements ContentList{
 
             @Override
             public void init(Bullet b){
-                Lightning.create(b.getTeam(), Palette.lancerLaser, damage, b.x, b.y, b.rot(), 30);
+                Lightning.create(b.getTeam(), Pal.lancerLaser, damage, b.x, b.y, b.rot(), 30);
             }
         };
 
@@ -629,7 +629,7 @@ public class Bullets implements ContentList{
 
             @Override
             public void init(Bullet b){
-                Lightning.create(b.getTeam(), Palette.lancerLaser, damage, b.x, b.y, b.rot(), 14);
+                Lightning.create(b.getTeam(), Pal.lancerLaser, damage, b.x, b.y, b.rot(), 14);
             }
         };
 
@@ -653,8 +653,8 @@ public class Bullets implements ContentList{
             bulletWidth = 8f;
             bulletHeight = 12f;
             hitEffect = Fx.flakExplosion;
-            backColor = Palette.lightOrange;
-            frontColor = Palette.lightishOrange;
+            backColor = Pal.lightOrange;
+            frontColor = Pal.lightishOrange;
             incendChance = 1f;
             incendAmount = 3;
             incendSpread = 10f;

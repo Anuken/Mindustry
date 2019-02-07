@@ -22,7 +22,7 @@ import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.io.TypeIO;
@@ -420,7 +420,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 Block block = world.tile(request.x, request.y).target().block();
 
                 //draw removal request
-                Lines.stroke(2f, Palette.removeBack);
+                Lines.stroke(2f, Pal.removeBack);
 
                 float rad = Mathf.absin(Time.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
                 Lines.square(
@@ -428,7 +428,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 request.y * tilesize + block.offset() - 1,
                 rad);
 
-                Draw.color(Palette.remove);
+                Draw.color(Pal.remove);
 
                 Lines.square(
                 request.x * tilesize + block.offset(),
@@ -438,7 +438,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 float rad = Mathf.absin(Time.time(), 7f, 1f) - 1.5f + request.block.size * tilesize / 2f;
 
                 //draw place request
-                Lines.stroke(1f, Palette.accentBack);
+                Lines.stroke(1f, Pal.accentBack);
 
                 Lines.square(
                 request.x * tilesize + request.block.offset(),
@@ -452,7 +452,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                         request.y * tilesize + request.block.offset(), rad*2, rad*2, request.rotation * 90);
 
 
-                Draw.color(Palette.accent);
+                Draw.color(Pal.accent);
 
                 Lines.square(
                 request.x * tilesize + request.block.offset(),

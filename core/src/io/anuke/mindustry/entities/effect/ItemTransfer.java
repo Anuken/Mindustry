@@ -15,7 +15,7 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
@@ -105,7 +105,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
 
     @Override
     public void draw(){
-        Lines.stroke(fslope() * 2f, Palette.accent);
+        Lines.stroke(fslope() * 2f, Pal.accent);
 
         Lines.circle(x, y, fslope() * 2f);
 

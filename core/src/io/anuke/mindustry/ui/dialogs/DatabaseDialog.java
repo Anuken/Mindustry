@@ -4,7 +4,7 @@ import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.arc.scene.event.HandCursorListener;
 import io.anuke.arc.scene.ui.Image;
@@ -41,9 +41,9 @@ public class DatabaseDialog extends FloatingDialog{
             Array<Content> array = allContent[j].select(c -> c instanceof UnlockableContent && !((UnlockableContent)c).isHidden());
             if(array.size == 0) continue;
 
-            table.add("$content." + type.name() + ".name").growX().left().color(Palette.accent);
+            table.add("$content." + type.name() + ".name").growX().left().color(Pal.accent);
             table.row();
-            table.addImage("white").growX().pad(5).padLeft(0).padRight(0).height(3).color(Palette.accent);
+            table.addImage("white").growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
             table.row();
             table.table(list -> {
                 list.left();

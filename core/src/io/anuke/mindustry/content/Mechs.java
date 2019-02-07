@@ -13,7 +13,7 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.type.Weapon;
@@ -85,7 +85,7 @@ public class Mechs implements ContentList{
                     Effects.shake(1f, 1f, player);
                     Effects.effect(Fx.landShock, player);
                     for(int i = 0; i < 8; i++){
-                        Time.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), Palette.lancerLaser, 17f, player.x, player.y, Mathf.random(360f), 14));
+                        Time.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), Pal.lancerLaser, 17f, player.x, player.y, Mathf.random(360f), 14));
                     }
                 }
             }
@@ -110,7 +110,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.8f;
                 canHeal = true;
                 health = 200f;
-                engineColor = Palette.heal;
+                engineColor = Pal.heal;
 
                 weapon = new Weapon("heal-blaster"){{
                     length = 1.5f;
@@ -210,7 +210,7 @@ public class Mechs implements ContentList{
                 Shaders.build.progress = player.shootHeat;
                 Shaders.build.region = armorRegion;
                 Shaders.build.time = Time.time() / 10f;
-                Shaders.build.color.set(Palette.accent).a = player.shootHeat;
+                Shaders.build.color.set(Pal.accent).a = player.shootHeat;
                 Draw.shader(Shaders.build);
                 Draw.alpha(1f);
                 Draw.rect(armorRegion, player.x, player.y, player.rotation);
@@ -228,7 +228,7 @@ public class Mechs implements ContentList{
                 health = 180f;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
-                engineColor = Palette.lightTrail;
+                engineColor = Pal.lightTrail;
                 cellTrnsY = 1f;
                 weapon = new Weapon("blaster"){{
                     length = 1.5f;
@@ -285,8 +285,8 @@ public class Mechs implements ContentList{
             public void updateAlt(Player player){
                 float scl = scld(player);
                 if(Mathf.chance(Time.delta() * (0.15*scl))){
-                    Effects.effect(Fx.hitLancer, Palette.lancerLaser, player.x, player.y);
-                    Lightning.create(player.getTeam(), Palette.lancerLaser, 10f,
+                    Effects.effect(Fx.hitLancer, Pal.lancerLaser, player.x, player.y);
+                    Lightning.create(player.getTeam(), Pal.lancerLaser, 10f,
                     player.x + player.velocity().x, player.y + player.velocity().y, player.rotation, 14);
                 }
             }
@@ -297,7 +297,7 @@ public class Mechs implements ContentList{
                 if(scl < 0.01f) return;
                 float alpha = Draw.getColor().a;
                 Draw.shader();
-                Draw.color(Palette.lancerLaser);
+                Draw.color(Pal.lancerLaser);
                 Draw.alpha(scl/2f);
                 Draw.blend(Blending.additive);
                 Draw.rect(shield, player.x + Mathf.range(scl/2f), player.y + Mathf.range(scl/2f), player.rotation - 90);

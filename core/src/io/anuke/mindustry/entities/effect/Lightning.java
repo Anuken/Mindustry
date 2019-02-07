@@ -27,7 +27,7 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -46,7 +46,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     private static int lastSeed = 0;
 
     private Array<Position> lines = new Array<>();
-    private Color color = Palette.lancerLaser;
+    private Color color = Pal.lancerLaser;
 
     /**For pooling use only. Do not call directly!*/
     public Lightning(){
@@ -119,7 +119,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     @Override
     public void reset(){
         super.reset();
-        color = Palette.lancerLaser;
+        color = Pal.lancerLaser;
         lines.clear();
     }
 

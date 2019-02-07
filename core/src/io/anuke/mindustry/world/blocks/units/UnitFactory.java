@@ -16,7 +16,7 @@ import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -116,7 +116,7 @@ public class UnitFactory extends Block{
 
         Shaders.build.region = region;
         Shaders.build.progress = entity.buildTime / produceTime;
-        Shaders.build.color.set(Palette.accent);
+        Shaders.build.color.set(Pal.accent);
         Shaders.build.color.a = entity.speedScl;
         Shaders.build.time = -entity.time / 10f;
 
@@ -125,7 +125,7 @@ public class UnitFactory extends Block{
         Draw.rect(region, tile.drawx(), tile.drawy());
         Draw.shader();
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Draw.alpha(entity.speedScl);
 
         Lines.lineAngleCenter(

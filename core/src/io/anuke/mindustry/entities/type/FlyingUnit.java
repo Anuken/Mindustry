@@ -13,7 +13,7 @@ import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.units.UnitState;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Tile;
@@ -171,7 +171,7 @@ public abstract class FlyingUnit extends BaseUnit{
     }
 
     public void drawEngine(){
-        Draw.color(Palette.engine);
+        Draw.color(Pal.engine);
         Fill.circle(x + Angles.trnsx(rotation + 180, type.engineOffset), y + Angles.trnsy(rotation + 180, type.engineOffset),
                 type.engineSize + Mathf.absin(Time.time(), 2f, type.engineSize/4f));
 

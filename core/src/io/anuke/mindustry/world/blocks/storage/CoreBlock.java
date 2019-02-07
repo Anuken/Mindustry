@@ -16,7 +16,7 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -116,14 +116,14 @@ public class CoreBlock extends StorageBlock{
 
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
-            Shaders.build.color.set(Palette.accent);
+            Shaders.build.color.set(Pal.accent);
             Shaders.build.time = -entity.time / 10f;
 
             Draw.shader(Shaders.build, true);
             Draw.rect(region, tile.drawx(), tile.drawy());
             Draw.shader();
 
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
 
             Lines.lineAngleCenter(
                     tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),

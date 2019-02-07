@@ -22,7 +22,7 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -190,7 +190,7 @@ public class MassDriver extends Block{
     public void drawConfigure(Tile tile){
         float sin = Mathf.absin(Time.time(), 6f, 1f);
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Lines.stroke(1f);
         Lines.poly(tile.drawx(), tile.drawy(), 20, (tile.block().size/2f+1) * tilesize + sin);
 
@@ -199,12 +199,12 @@ public class MassDriver extends Block{
         if(linkValid(tile)){
             Tile target = world.tile(entity.link);
 
-            Draw.color(Palette.place);
+            Draw.color(Pal.place);
             Lines.poly(target.drawx(), target.drawy(), 20, (target.block().size/2f+1) * tilesize + sin);
             Draw.reset();
         }
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Lines.dashCircle(tile.drawx(), tile.drawy(), range);
         Draw.color();
     }

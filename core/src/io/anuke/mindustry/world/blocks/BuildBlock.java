@@ -20,7 +20,7 @@ import io.anuke.mindustry.game.EventType.BlockBuildEndEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
@@ -134,7 +134,7 @@ public class BuildBlock extends Block{
 
         BuildEntity entity = tile.entity();
 
-        Shaders.blockbuild.color = Palette.accent;
+        Shaders.blockbuild.color = Pal.accent;
 
         Block target = entity.block == null ? entity.previous : entity.block;
 

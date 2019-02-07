@@ -11,7 +11,7 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Interval;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.Packets.AdminAction;
@@ -82,7 +82,7 @@ public class PlayerListFragment extends Fragment{
                 @Override
                 public void draw(){
                     super.draw();
-                    Draw.color(Palette.accent);
+                    Draw.color(Pal.accent);
                     Draw.alpha(parentAlpha);
                     Lines.stroke(Unit.dp.scl(3f));
                     Lines.rect(x, y, width, height);
@@ -136,7 +136,7 @@ public class PlayerListFragment extends Fragment{
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
             content.row();
-            content.addImage("blank").height(3f).color(state.rules.pvp ? player.getTeam().color : Palette.accent).growX();
+            content.addImage("blank").height(3f).color(state.rules.pvp ? player.getTeam().color : Pal.accent).growX();
             content.row();
         });
 

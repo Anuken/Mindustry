@@ -14,7 +14,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
 
 import static io.anuke.mindustry.Vars.*;
@@ -49,7 +49,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         title.setAlignment(Align.center);
         titleTable.row();
         titleTable.add(new Image("white"))
-                .growX().height(3f).pad(4f).get().setColor(Palette.accent);
+                .growX().height(3f).pad(4f).get().setColor(Pal.accent);
 
         cont.clearChildren();
         cont.remove();

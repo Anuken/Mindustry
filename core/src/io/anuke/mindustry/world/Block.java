@@ -25,7 +25,7 @@ import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
@@ -344,7 +344,7 @@ public class Block extends BlockStorage{
     }
 
     public void drawConfigure(Tile tile){
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Lines.stroke(1f);
         Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1f);
         Draw.reset();
@@ -435,7 +435,7 @@ public class Block extends BlockStorage{
             });
         }
 
-        Damage.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size / 2f, Palette.darkFlame);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness, power, tilesize * size / 2f, Pal.darkFlame);
         if(!tile.floor().solid && !tile.floor().isLiquid){
             RubbleDecal.create(tile.drawx(), tile.drawy(), size);
         }
@@ -492,7 +492,7 @@ public class Block extends BlockStorage{
     public void displayBars(Tile tile, Table bars){
         TileEntity entity = tile.entity;
 
-        bars.add(new Bar("blocks.health", Palette.health, entity::healthf).blink(Color.WHITE));
+        bars.add(new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.WHITE));
         bars.row();
 
         if(entity.liquids != null){
@@ -501,7 +501,7 @@ public class Block extends BlockStorage{
         }
 
         if(entity.power != null && consumes.has(ConsumePower.class)){
-            bars.add(new Bar(consumes.get(ConsumePower.class).isBuffered ? "blocks.power" : "blocks.power.satisfaction", Palette.power, () -> entity.power.satisfaction)).growX();
+            bars.add(new Bar(consumes.get(ConsumePower.class).isBuffered ? "blocks.power" : "blocks.power.satisfaction", Pal.power, () -> entity.power.satisfaction)).growX();
             bars.row();
         }
     }

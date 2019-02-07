@@ -18,7 +18,7 @@ import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
@@ -108,7 +108,7 @@ public class MechPad extends Block{
 
     @Override
     public void drawSelect(Tile tile){
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         for(int i = 0; i < 4; i ++){
             float length = tilesize * size/2f + 3 + Mathf.absin(Time.time(), 5f, 2f);
             Draw.rect("transfer-arrow", tile.drawx() + Geometry.d4[i].x * length, tile.drawy() + Geometry.d4[i].y * length, (i+2) * 90);
@@ -154,14 +154,14 @@ public class MechPad extends Block{
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
             Shaders.build.time = -entity.time / 4f;
-            Shaders.build.color.set(Palette.accent);
+            Shaders.build.color.set(Pal.accent);
 
             Draw.shader(Shaders.build, false);
             Shaders.build.apply();
             Draw.rect(region, tile.drawx(), tile.drawy());
             Draw.shader();
 
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
 
             Lines.lineAngleCenter(
                     tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),

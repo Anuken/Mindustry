@@ -300,7 +300,7 @@ public class Blocks implements ContentList{
         //region crafting
 
         graphitePress = new GenericCrafter("graphite-press"){{
-            requirements(Category.crafting, ItemStack.with(Items.copper, 200, Items.lead, 60));
+            requirements(Category.crafting, ItemStack.with(Items.copper, 150, Items.lead, 60));
 
             craftEffect = Fx.pulverizeMedium;
             output = Items.graphite;
@@ -897,7 +897,7 @@ public class Blocks implements ContentList{
         //region production
 
         mechanicalDrill = new Drill("mechanical-drill"){{
-            requirements(Category.production, ItemStack.with(Items.copper, 20), true);
+            requirements(Category.production, ItemStack.with(Items.copper, 25), true);
             tier = 2;
             drillTime = 600;
             size = 2;
@@ -991,7 +991,7 @@ public class Blocks implements ContentList{
             alwaysUnlocked = true;
 
             health = 1100;
-            itemCapacity = 2000;
+            itemCapacity = 4000;
             size = 3;
         }};
 
@@ -999,7 +999,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 4000, Items.silicon, 2000));
 
             health = 2000;
-            itemCapacity = 4000;
+            itemCapacity = 7000;
             size = 4;
         }};
 
@@ -1007,7 +1007,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 8000, Items.silicon, 4000, Items.surgealloy, 2000));
 
             health = 3000;
-            itemCapacity = 6000;
+            itemCapacity = 10000;
             size = 5;
         }};
 

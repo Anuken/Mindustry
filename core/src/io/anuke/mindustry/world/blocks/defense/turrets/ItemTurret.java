@@ -6,7 +6,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
@@ -46,7 +46,7 @@ public class ItemTurret extends CooledTurret{
 
         TurretEntity entity = tile.entity();
 
-        bars.add(new Bar("blocks.ammo", Palette.ammo, () -> (float)entity.totalAmmo / maxAmmo)).growX();
+        bars.add(new Bar("blocks.ammo", Pal.ammo, () -> (float)entity.totalAmmo / maxAmmo)).growX();
         bars.row();
     }
 

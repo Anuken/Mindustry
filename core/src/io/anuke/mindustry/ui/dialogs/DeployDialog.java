@@ -13,7 +13,7 @@ import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Zones;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.io.SaveIO.SaveException;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Zone;
@@ -251,7 +251,7 @@ public class DeployDialog extends FloatingDialog{
 
             for(ZoneNode node : nodes){
                 for(ZoneNode child : node.children){
-                    Lines.stroke(3f, node.zone.locked() || child.zone.locked() ? Palette.locked : Palette.accent);
+                    Lines.stroke(3f, node.zone.locked() || child.zone.locked() ? Pal.locked : Pal.accent);
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
             }

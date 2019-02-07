@@ -19,7 +19,7 @@ import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.ui.GridImage;
 
@@ -299,7 +299,7 @@ public class MapView extends Element implements GestureListener{
             return;
         }
 
-        Draw.color(Palette.remove);
+        Draw.color(Pal.remove);
         Lines.stroke(2f);
         Lines.rect(centerx - sclwidth / 2 - 1, centery - sclheight / 2 - 1, sclwidth + 2, sclheight + 2);
         editor.renderer().draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
@@ -326,7 +326,7 @@ public class MapView extends Element implements GestureListener{
 
         float scaling = zoom * Math.min(width, height) / editor.getMap().width();
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Lines.stroke(Unit.dp.scl(2f));
 
         if((!editor.getDrawBlock().isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
@@ -356,7 +356,7 @@ public class MapView extends Element implements GestureListener{
             }
         }
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Lines.stroke(Unit.dp.scl(3f));
         Lines.rect(x, y, width, height);
         Draw.reset();

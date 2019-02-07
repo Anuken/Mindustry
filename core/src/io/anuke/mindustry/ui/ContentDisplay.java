@@ -6,7 +6,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.type.UnitType;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
@@ -49,7 +49,7 @@ public class ContentDisplay{
 
             if(map.size == 0) continue;
 
-            table.add("$category." + cat.name()).color(Palette.accent).fillX();
+            table.add("$category." + cat.name()).color(Pal.accent).fillX();
             table.row();
 
             for(BlockStat stat : map.keys()){

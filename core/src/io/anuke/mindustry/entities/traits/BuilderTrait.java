@@ -21,7 +21,7 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -315,7 +315,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
             return;
         }
 
-        Lines.stroke(1f, Palette.accent);
+        Lines.stroke(1f, Pal.accent);
         float focusLen = 3.8f + Mathf.absin(Time.time(), 1.1f, 0.6f);
         float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
         float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
@@ -366,7 +366,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey);
 
         if(unit instanceof Player && ((Player) unit).isLocal){
-            Lines.stroke(1f, Palette.accent);
+            Lines.stroke(1f, Pal.accent);
             Lines.poly(tile.worldx(), tile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Time.time());
         }
 

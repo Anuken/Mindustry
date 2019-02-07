@@ -9,7 +9,7 @@ import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.ContentDisplay;
 
 public class Item extends UnlockableContent implements Comparable<Item>{
@@ -29,7 +29,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     /**drill hardness of the item*/
     public int hardness = 0;
     /**the burning color of this item. TODO unused; implement*/
-    public Color flameColor = Palette.darkFlame.cpy();
+    public Color flameColor = Pal.darkFlame.cpy();
     /**
      * base material cost of this item, used for calculating place times
      * 1 cost = 1 tick added to build time

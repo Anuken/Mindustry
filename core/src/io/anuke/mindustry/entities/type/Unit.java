@@ -22,7 +22,7 @@ import io.anuke.mindustry.entities.units.Statuses;
 import io.anuke.mindustry.game.EventType.UnitDestroyEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams.TeamData;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -113,7 +113,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public void onDeath(){
         float explosiveness = 2f + item.item.explosiveness * item.amount;
         float flammability = item.item.flammability * item.amount;
-        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, getSize() / 2f, Palette.darkFlame);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, getSize() / 2f, Pal.darkFlame);
 
         ScorchDecal.create(x, y);
         Effects.effect(Fx.explosion, this);

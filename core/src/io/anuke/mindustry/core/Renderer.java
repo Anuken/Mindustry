@@ -215,7 +215,7 @@ public class Renderer implements ApplicationListener{
             Draw.flush();
             shieldBuffer.end();
             Draw.shader(Shaders.shield);
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
             Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
             Draw.color();
             Draw.shader();
