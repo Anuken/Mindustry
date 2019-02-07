@@ -73,8 +73,10 @@ public class PlacementFragment extends Fragment{
     void rebuild(){
         currentCategory = Category.turret;
         Group group = toggler.getParent();
+        int index = toggler.getZIndex();
         toggler.remove();
         build(group);
+        toggler.setZIndex(index);
     }
 
     boolean gridUpdate(InputHandler input){

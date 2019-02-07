@@ -2,7 +2,6 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectIntMap;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Lines;
@@ -16,10 +15,9 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.io.SaveIO.SaveException;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.ui.ItemsDisplay;
 import io.anuke.mindustry.ui.TreeLayout;
 import io.anuke.mindustry.ui.TreeLayout.TreeNode;
 import io.anuke.mindustry.world.Block;
@@ -93,20 +91,7 @@ public class DeployDialog extends FloatingDialog{
                 });
             }).growX().height(50f).pad(-12).padTop(10);
 
-        }}, new Table(){{
-            top().left().margin(10);
-
-            ObjectIntMap<Item> items = data.items();
-            for(Item item : content.items()){
-                if(item.type == ItemType.material && data.isUnlocked(item)){
-                    label(() -> items.get(item, 0) + "").left();
-                    addImage(item.region).size(8*4).pad(4);
-                    add("[LIGHT_GRAY]" + item.localizedName()).left();
-                    row();
-                }
-            }
-
-        }}).grow();
+        }}, new ItemsDisplay()).grow();
     }
 
     boolean hidden(Zone zone){

@@ -28,8 +28,7 @@ import io.anuke.mindustry.world.blocks.units.UnitFactory;
 import io.anuke.mindustry.world.consumers.ConsumeItemFilter;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.*;
 
 public class Blocks implements ContentList{
     public static Block
@@ -187,8 +186,9 @@ public class Blocks implements ContentList{
         }};
 
         ice = new Floor("ice"){{
-            dragMultiplier = 0.2f;
-            speedMultiplier = 0.1f;
+            //TODO fix
+            dragMultiplier = 1f;
+            speedMultiplier = 1f;
         }};
 
         cliffs = new StaticWall("cliffs"){{
@@ -300,7 +300,7 @@ public class Blocks implements ContentList{
         //region crafting
 
         graphitePress = new GenericCrafter("graphite-press"){{
-            requirements(Category.crafting, ItemStack.with(Items.copper, 300, Items.lead, 50));
+            requirements(Category.crafting, ItemStack.with(Items.copper, 200, Items.lead, 60));
 
             craftEffect = Fx.pulverizeMedium;
             output = Items.graphite;
@@ -1029,7 +1029,7 @@ public class Blocks implements ContentList{
         }};
 
         launchPad = new LaunchPad("launch-pad"){{
-            requirements(Category.effect, ItemStack.with(Items.copper, 500, Items.titanium, 200, Items.silicon, 200, Items.lead, 200));
+            requirements(Category.effect, () -> world.isZone(), ItemStack.with(Items.copper, 500, Items.titanium, 200, Items.silicon, 200, Items.lead, 200));
             size = 3;
             itemCapacity = 100;
             launchTime = 60f * 6;

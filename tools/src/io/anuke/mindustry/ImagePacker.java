@@ -81,6 +81,14 @@ public class ImagePacker{
             }
 
             @Override
+            public AtlasRegion find(String name, TextureRegion def){
+                if(!regionCache.containsKey(name)){
+                    return (AtlasRegion)def;
+                }
+                return (AtlasRegion)regionCache.get(name);
+            }
+
+            @Override
             public boolean has(String s) {
                 return regionCache.containsKey(s);
             }

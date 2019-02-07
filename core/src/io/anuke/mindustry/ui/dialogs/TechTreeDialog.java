@@ -20,6 +20,7 @@ import io.anuke.mindustry.content.TechTree;
 import io.anuke.mindustry.content.TechTree.TechNode;
 import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.ui.ItemsDisplay;
 import io.anuke.mindustry.ui.TreeLayout;
 import io.anuke.mindustry.ui.TreeLayout.TreeNode;
 import io.anuke.mindustry.world.Block;
@@ -28,9 +29,10 @@ import io.anuke.mindustry.world.Block.Icon;
 import static io.anuke.mindustry.Vars.*;
 
 public class TechTreeDialog extends FloatingDialog{
+    private static final float nodeSize = 60f;
     private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
     private TechTreeNode root = new TechTreeNode(TechTree.root, null);
-    private static final float nodeSize = 60f;
+    private ItemsDisplay items;
 
     public TechTreeDialog(){
         super("");
@@ -40,8 +42,9 @@ public class TechTreeDialog extends FloatingDialog{
         layout.gapBetweenNodes = 40f;
         layout.layout(root);
 
-        cont.setFillParent(true);
-        cont.add(new View()).grow();
+        titleTable.remove();
+        margin(0f);
+        cont.stack(new View(), items = new ItemsDisplay()).grow();
 
         { //debug code; TODO remove
             ObjectSet<Block> used = new ObjectSet<Block>().select(t -> true);
@@ -74,6 +77,8 @@ public class TechTreeDialog extends FloatingDialog{
             l.visible = !locked && l.node.block.isVisible();
             checkNodes(l);
         }
+
+        items.rebuild();
     }
 
     void showToast(String info){

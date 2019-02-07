@@ -2419,6 +2419,20 @@ vault
   orig: 96, 96
   offset: 0, 0
   index: -1
+arc
+  rotate: false
+  xy: 2013, 1570
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+arc-heat
+  rotate: false
+  xy: 2013, 1536
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
 block-1
   rotate: false
   xy: 1853, 748
@@ -2445,20 +2459,6 @@ block-4
   xy: 323, 1375
   size: 128, 128
   orig: 128, 128
-  offset: 0, 0
-  index: -1
-arc
-  rotate: false
-  xy: 2013, 1570
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-arc-heat
-  rotate: false
-  xy: 2013, 1536
-  size: 32, 32
-  orig: 32, 32
   offset: 0, 0
   index: -1
 cyclone

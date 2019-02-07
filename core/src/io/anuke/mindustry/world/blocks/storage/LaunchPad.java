@@ -9,6 +9,7 @@ import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.data;
+import static io.anuke.mindustry.Vars.world;
 
 public class LaunchPad extends StorageBlock{
     protected final int timerLaunch = timers++;
@@ -31,7 +32,7 @@ public class LaunchPad extends StorageBlock{
     public void update(Tile tile){
         TileEntity entity = tile.entity;
 
-        if(entity.cons.valid()){
+        if(entity.cons.valid() && world.isZone()){
             for(Item item : Vars.content.items()){
                 if(entity.items.get(item) >= itemCapacity && entity.timer.get(timerLaunch, launchTime)){
                     //TODO play animation of some sort
