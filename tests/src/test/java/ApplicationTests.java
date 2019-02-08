@@ -114,6 +114,11 @@ public class ApplicationTests{
     void spawnWaves(){
         world.loadMap(testMap);
         logic.runWave();
+        //force trigger delayed spawns
+        Time.setDeltaProvider(() -> 1000f);
+        Time.update();
+        Time.update();
+        Time.setDeltaProvider(() -> 1f);
         unitGroups[waveTeam.ordinal()].updateEvents();
         assertFalse(unitGroups[waveTeam.ordinal()].isEmpty());
     }

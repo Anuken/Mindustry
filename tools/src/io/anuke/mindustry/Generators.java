@@ -2,15 +2,20 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Log;
-import io.anuke.mindustry.type.UnitType;
+import io.anuke.mindustry.ImagePacker.GenRegion;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Mech;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
+
+import java.io.IOException;
+import java.nio.file.Files;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -21,6 +26,7 @@ public class Generators {
 
         ImagePacker.generate("block-icons", () -> {
             Image colors = new Image(256, 1);
+            Color outlineColor = new Color(0, 0, 0, 0.3f);
 
             for(Block block : content.blocks()){
                 TextureRegion[] regions = block.getGeneratedIcons();
@@ -45,6 +51,45 @@ public class Generators {
                         Image scaled = new Image(icon.size, icon.size);
                         scaled.drawScaled(image);
                         scaled.save(block.name + "-icon-" + icon.name());
+                    }
+
+                    if(block.outlineIcon){
+                        int radius = 3;
+                        GenRegion region = (GenRegion)regions[regions.length-1];
+                        Image base = ImagePacker.get(region);
+                        Image out = new Image(region.getWidth(), region.getHeight());
+                        for(int x = 0; x < out.width(); x++){
+                            for(int y = 0; y < out.height(); y++){
+
+                                Color color = base.getColor(x, y);
+                                if(color.a >= 0.01f){
+                                    out.draw(x, y, color);
+                                }else{
+                                    boolean found = false;
+                                    outer:
+                                    for(int rx = -radius; rx <= radius; rx++){
+                                        for(int ry = -radius; ry <= radius; ry++){
+                                            if(Mathf.dst(rx, ry) <= radius && base.getColor(rx + x, ry + y).a > 0.01f){
+                                                found = true;
+                                                break outer;
+                                            }
+                                        }
+                                    }
+                                    if(found){
+                                        out.draw(x, y, outlineColor);
+                                    }
+                                }
+
+                            }
+                        }
+
+                        try{
+                            Files.delete(region.path);
+                        }catch(IOException e){
+                            e.printStackTrace();
+                        }
+
+                        out.save(block.name);
                     }
 
                     Color average = new Color();

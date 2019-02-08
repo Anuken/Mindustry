@@ -455,7 +455,7 @@ public class Bullets implements ContentList{
             Color[] colors = {Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
             float[] lenscales = {1f, 1.1f, 1.13f, 1.14f};
-            float length = 140f;
+            float length = 160f;
 
             {
                 hitEffect = Fx.hitLancer;

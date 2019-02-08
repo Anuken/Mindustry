@@ -260,7 +260,7 @@ public class ServerControl implements ApplicationListener{
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
-                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1} &lb/&ly {2} &lb/&ly {3}", Strings.capitalize(world.getMap().name), state.wave);
+                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name), state.wave);
 
                 if(!state.rules.waves){
                     info("&ly  {0} enemies.", unitGroups[Team.red.ordinal()].size());

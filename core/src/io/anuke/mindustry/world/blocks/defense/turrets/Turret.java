@@ -62,8 +62,7 @@ public abstract class Turret extends Block{
     protected Vector2 tr = new Vector2();
     protected Vector2 tr2 = new Vector2();
 
-    protected TextureRegion baseRegion;
-    protected TextureRegion heatRegion;
+    protected TextureRegion baseRegion, heatRegion;
 
     protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) ->
         Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
@@ -83,6 +82,7 @@ public abstract class Turret extends Block{
         layer = Layer.turret;
         group = BlockGroup.turrets;
         flags = EnumSet.of(BlockFlag.turret);
+        outlineIcon = true;
     }
 
     @Override
@@ -94,6 +94,7 @@ public abstract class Turret extends Block{
     public void load(){
         super.load();
 
+        region = Core.atlas.find(name);
         baseRegion = Core.atlas.find("block-" + size);
         heatRegion = Core.atlas.find(name + "-heat");
     }

@@ -457,7 +457,7 @@ public class Blocks implements ContentList{
             spinnerSpeed = 3f;
             size = 2;
 
-            consumes.liquid(Liquids.slag, 0.3f);
+            consumes.liquid(Liquids.slag, 0.1f);
         }};
 
         cultivator = new Cultivator("cultivator"){{
@@ -467,6 +467,7 @@ public class Blocks implements ContentList{
             size = 2;
             hasLiquids = true;
             hasPower = true;
+            hasItems = true;
 
             consumes.power(0.80f);
             consumes.liquid(Liquids.water, 0.15f);
@@ -848,12 +849,12 @@ public class Blocks implements ContentList{
 
         differentialGenerator = new DifferentialGenerator("differential-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 140, Items.titanium, 100, Items.lead, 200, Items.silicon, 130, Items.metaglass, 100));
-            powerProduction = 24f;
-            itemDuration = 60f;
+            powerProduction = 16f;
+            itemDuration = 50f;
             consumes.remove(ConsumeItemFilter.class);
             consumes.remove(ConsumeLiquidFilter.class);
             consumes.item(Items.pyratite);
-            consumes.liquid(Liquids.cryofluid, 0.06f);
+            consumes.liquid(Liquids.cryofluid, 0.12f);
             size = 3;
         }};
 
@@ -991,7 +992,7 @@ public class Blocks implements ContentList{
             alwaysUnlocked = true;
 
             health = 1100;
-            itemCapacity = 4000;
+            itemCapacity = 5000;
             size = 3;
         }};
 
@@ -999,15 +1000,15 @@ public class Blocks implements ContentList{
             requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 4000, Items.silicon, 2000));
 
             health = 2000;
-            itemCapacity = 7000;
+            itemCapacity = 8000;
             size = 4;
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
             requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 8000, Items.silicon, 4000, Items.surgealloy, 2000));
 
-            health = 3000;
-            itemCapacity = 10000;
+            health = 4000;
+            itemCapacity = 12000;
             size = 5;
         }};
 
@@ -1102,7 +1103,7 @@ public class Blocks implements ContentList{
 
         lancer = new ChargeTurret("lancer"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 50, Items.lead, 100, Items.silicon, 90));
-            range = 135f;
+            range = 155f;
             chargeTime = 50f;
             chargeMaxDelay = 30f;
             chargeEffects = 7;
@@ -1130,7 +1131,7 @@ public class Blocks implements ContentList{
             shootCone = 40f;
             rotatespeed = 8f;
             powerUsed = 1f / 2f;
-            consumes.powerBuffered(50f);
+            consumes.powerBuffered(80f);
             range = 80f;
             shootEffect = Fx.lightningShoot;
             heatColor = Color.RED;

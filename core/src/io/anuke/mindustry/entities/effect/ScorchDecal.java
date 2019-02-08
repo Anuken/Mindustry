@@ -7,6 +7,7 @@ import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.world.Tile;
 
+import static io.anuke.mindustry.Vars.headless;
 import static io.anuke.mindustry.Vars.world;
 
 public class ScorchDecal extends Decal{
@@ -14,6 +15,7 @@ public class ScorchDecal extends Decal{
     private static final TextureRegion[] regions = new TextureRegion[scorches];
 
     public static void create(float x, float y){
+        if(headless) return;
         if(regions[0] == null){
             for(int i = 0; i < regions.length; i++){
                 regions[i] = Core.atlas.find("scorch" + (i + 1));

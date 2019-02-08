@@ -1,17 +1,15 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.arc.Core;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
-import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.StatusEffect;
@@ -96,13 +94,6 @@ public class Floor extends Block{
     @Override
     public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
-    }
-
-    @Override
-    public void randomUpdate(Tile tile){
-        if(tile.block() == Blocks.air){
-            Effects.effect(updateEffect, tile.worldx() + Mathf.range(tilesize/2f), tile.worldy() + Mathf.range(tilesize/2f));
-        }
     }
 
     @Override

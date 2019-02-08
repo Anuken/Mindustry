@@ -47,7 +47,7 @@ public class MassDriver extends Block{
     protected Effect smokeEffect = Fx.shootBigSmoke2;
     protected Effect recieveEffect = Fx.mineBig;
     protected float shake = 3f;
-    protected final static float powerPercentageUsed = 1.0f;
+    protected float powerPercentageUsed = 0.95f;
     protected TextureRegion turretRegion;
 
     public MassDriver(String name){
@@ -59,6 +59,7 @@ public class MassDriver extends Block{
         layer = Layer.turret;
         hasPower = true;
         consumes.powerBuffered(30f);
+        outlineIcon = true;
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
@@ -79,7 +80,7 @@ public class MassDriver extends Block{
 
         entity.reload = 1f;
 
-        entity.power.satisfaction -= Math.min(entity.power.satisfaction, powerPercentageUsed);
+        entity.power.satisfaction -= Math.min(entity.power.satisfaction, driver.powerPercentageUsed);
 
         DriverBulletData data = Pools.obtain(DriverBulletData.class, DriverBulletData::new);
         data.from = entity;
@@ -117,7 +118,7 @@ public class MassDriver extends Block{
     public void load(){
         super.load();
 
-        turretRegion = Core.atlas.find(name + "-turret");
+        turretRegion = Core.atlas.find(name);
     }
 
     @Override

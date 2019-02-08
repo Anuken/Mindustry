@@ -16,6 +16,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class ImagePacker{
@@ -38,7 +39,7 @@ public class ImagePacker{
                 fname = fname.substring(0, fname.length() - 4);
 
                 BufferedImage image = ImageIO.read(path.toFile());
-                GenRegion region = new GenRegion(fname){
+                GenRegion region = new GenRegion(fname, path){
 
                     @Override
                     public int getX(){
@@ -73,7 +74,7 @@ public class ImagePacker{
             @Override
             public AtlasRegion find(String name){
                 if(!regionCache.containsKey(name)){
-                    GenRegion region = new GenRegion(name);
+                    GenRegion region = new GenRegion(name, null);
                     region.invalid = true;
                     return region;
                 }
@@ -136,9 +137,11 @@ public class ImagePacker{
     static class GenRegion extends AtlasRegion{
         String name;
         boolean invalid;
+        Path path;
 
-        GenRegion(String name){
+        GenRegion(String name, Path path){
             this.name = name;
+            this.path = path;
         }
 
         static void validate(TextureRegion region){

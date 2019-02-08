@@ -42,7 +42,7 @@ public class UnitFactory extends Block{
     protected float produceTime = 1000f;
     protected float launchVelocity = 0f;
     protected TextureRegion topRegion;
-    protected int maxSpawn = 4;
+    protected int maxSpawn = 2;
 
     public UnitFactory(String name){
         super(name);

@@ -44,13 +44,14 @@ public class RepairPoint extends Block{
         layer2 = Layer.laser;
         hasPower = true;
         consumePower = consumes.powerBuffered(20f);
+        outlineIcon = true;
     }
 
     @Override
     public void load(){
         super.load();
 
-        topRegion = Core.atlas.find(name + "-turret");
+        topRegion = Core.atlas.find(name);
     }
 
     @Override
@@ -88,6 +89,11 @@ public class RepairPoint extends Block{
                     entity.target.x, entity.target.y, entity.strength);
             Draw.color();
         }
+    }
+
+    @Override
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-turret")};
     }
 
     @Override

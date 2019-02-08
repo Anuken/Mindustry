@@ -26,6 +26,10 @@ allprojects{
         gdxVersion = '1.9.9'
         roboVMVersion = '2.3.0'
         arcHash = null
+        
+        debugged = {
+            return new File(projectDir.parent, '../debug').exists() && System.properties["release"] == null
+        }
 
         localArc = {
             return (System.properties["release"] == null || System.properties["release"] == "false") && new File(projectDir.parent, '../Arc').exists()
@@ -117,7 +121,7 @@ project(":desktop"){
         compile project(":core")
         compile project(":net")
         
-        if(new File(projectDir.parent, '../debug').exists() && System.properties["release"] == null) compile project(":debug")
+        if(debugged()) compile project(":debug")
 
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
@@ -194,7 +198,7 @@ project(":core"){
 
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
-        if(localArc()) compile arcModule("extensions:recorder")
+        if(localArc() && debugged()) compile arcModule("extensions:recorder")
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")

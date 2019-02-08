@@ -185,7 +185,9 @@ public class World implements ApplicationListener{
 
         addDarkness(tiles);
 
-        EntityQuery.resizeTree(0, 0, tiles.length * tilesize, tiles[0].length * tilesize);
+        int padding = 50;
+
+        EntityQuery.resizeTree(-padding * tilesize, -padding * tilesize, (tiles.length + padding) * tilesize, (tiles[0].length + padding) * tilesize);
 
         generating = false;
         Events.fire(new WorldLoadEvent());

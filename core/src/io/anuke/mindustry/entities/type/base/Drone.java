@@ -32,8 +32,6 @@ import static io.anuke.mindustry.Vars.unitGroups;
 import static io.anuke.mindustry.Vars.world;
 
 public class Drone extends FlyingUnit implements BuilderTrait{
-    protected static int timerRepairEffect = timerIndex++;
-
     protected Item targetItem;
     protected Tile mineTile;
     protected Queue<BuildRequest> placeQueue = new Queue<>();

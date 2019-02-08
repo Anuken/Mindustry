@@ -96,12 +96,14 @@ public class Block extends BlockStorage{
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
     /** The color of this block when displayed on the minimap or map preview.
-     *  Do not set manually! This is overriden when loading.*/
+     *  Do not set manually! This is overriden when loading for most blocks.*/
     public Color color = new Color(0, 0, 0, 1);
     /**Whether units target this block.*/
     public boolean targetable = true;
     /**Whether the overdrive core has any effect on this block.*/
     public boolean canOverdrive = true;
+    /**Whether the icon region has an outline added.*/
+    public boolean outlineIcon = false;
 
     /**Cost of constructing this block.*/
     public ItemStack[] buildRequirements = new ItemStack[]{};
@@ -380,11 +382,6 @@ public class Block extends BlockStorage{
     public void update(Tile tile){
     }
 
-    /**Called when this tile is randomly updated. This only happens on a client, and should be used for effects only.
-     * TODO currently unimplemented*/
-    public void randomUpdate(Tile tile){
-    }
-
     public boolean isAccessible(){
         return (hasItems && itemCapacity > 0);
     }
@@ -402,11 +399,10 @@ public class Block extends BlockStorage{
         float power = 0f;
 
         if(hasItems){
-            float scaling = inventoryScaling(tile);
             for(Item item : content.items()){
                 int amount = tile.entity.items.get(item);
-                explosiveness += item.explosiveness * amount * scaling;
-                flammability += item.flammability * amount * scaling;
+                explosiveness += item.explosiveness * amount;
+                flammability += item.flammability * amount;
             }
         }
 
@@ -439,11 +435,6 @@ public class Block extends BlockStorage{
         if(!tile.floor().solid && !tile.floor().isLiquid){
             RubbleDecal.create(tile.drawx(), tile.drawy(), size);
         }
-    }
-
-    /**Returns scaled # of inventories in this block.*/
-    public float inventoryScaling(Tile tile){
-        return 1f;
     }
 
     /**
