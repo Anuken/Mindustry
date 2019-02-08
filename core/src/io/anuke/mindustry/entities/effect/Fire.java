@@ -3,9 +3,9 @@ package io.anuke.mindustry.entities.effect;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.collection.IntMap;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.TimedEntity;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.impl.TimedEntity;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
@@ -17,7 +17,7 @@ import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.gen.Call;
@@ -152,7 +152,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
                 entity.damage(0.4f);
             }
             Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f,
-                    unit -> !unit.isFlying(),
+                    unit -> !unit.isFlying() && !unit.isImmune(StatusEffects.burning),
                     unit -> unit.applyEffect(StatusEffects.burning, 60 * 5));
         }
     }

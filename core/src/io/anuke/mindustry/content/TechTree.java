@@ -12,7 +12,7 @@ public class TechTree implements ContentList{
 
     @Override
     public void load(){
-        root = node(core, () -> {
+        root = node(coreShard, () -> {
 
             node(conveyor, () -> {
                 node(launchPad, () -> {
@@ -31,11 +31,12 @@ public class TechTree implements ContentList{
 
                             });
                         });
-                    });
-                    node(titaniumConveyor, () -> {
-                        node(phaseConveyor, () -> {
-                            node(massDriver, () -> {
 
+                        node(titaniumConveyor, () -> {
+                            node(phaseConveyor, () -> {
+                                node(massDriver, () -> {
+
+                                });
                             });
                         });
                     });
@@ -117,40 +118,50 @@ public class TechTree implements ContentList{
                     });
                 });
 
-                node(siliconSmelter, () -> {
-
+                node(graphitePress, () -> {
                     node(pyratiteMixer, () -> {
                         node(blastMixer, () -> {
 
                         });
                     });
 
-                    node(biomatterCompressor, () -> {
-                        node(plastaniumCompressor, () -> {
-                            node(phaseWeaver, () -> {
+                    node(siliconSmelter, () -> {
 
-                            });
-                        });
-                    });
-
-                    node(incinerator, () -> {
-                        node(melter, () -> {
-                            node(surgeSmelter, () -> {
+                        node(biomatterCompressor, () -> {
+                            node(multiPress, () -> {
 
                             });
 
-                            node(separator, () -> {
-                                node(pulverizer, () -> {
+                            node(plastaniumCompressor, () -> {
+                                node(phaseWeaver, () -> {
 
                                 });
                             });
+                        });
 
-                            node(cryofluidMixer, () -> {
+                        node(kiln, () -> {
+                            node(incinerator, () -> {
+                                node(melter, () -> {
+                                    node(surgeSmelter, () -> {
 
+                                    });
+
+                                    node(separator, () -> {
+                                        node(pulverizer, () -> {
+
+                                        });
+                                    });
+
+                                    node(cryofluidMixer, () -> {
+
+                                    });
+                                });
                             });
                         });
                     });
                 });
+
+
 
                 node(mechanicalPump, () -> {
                     node(conduit, () -> {
@@ -181,7 +192,9 @@ public class TechTree implements ContentList{
                     node(powerNodeLarge, () -> {
                         node(battery, () -> {
                             node(batteryLarge, () -> {
+                                node(surgeTower, () -> {
 
+                                });
                             });
                         });
 
@@ -201,8 +214,12 @@ public class TechTree implements ContentList{
                     node(turbineGenerator, () -> {
                         node(thermalGenerator, () -> {
                             node(rtgGenerator, () -> {
-                                node(thoriumReactor, () -> {
+                                node(differentialGenerator, () -> {
+                                    node(thoriumReactor, () -> {
+                                        node(impactReactor, () -> {
 
+                                        });
+                                    });
                                 });
                             });
                         });
@@ -215,8 +232,7 @@ public class TechTree implements ContentList{
                     });
                 });
 
-                node(alphaPad, () -> {
-                    node(dartPad);
+                node(alphaDartPad, () -> {
                     node(deltaPad, () -> {
                         node(javelinPad);
                         node(tauPad, () -> {

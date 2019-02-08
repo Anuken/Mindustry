@@ -167,7 +167,10 @@ public class PowerGraph{
         tile.entity.power.graph = this;
         all.add(tile);
 
-        if(tile.block().outputsPower && tile.block().consumesPower){
+        if(tile.block().outputsPower && tile.block().consumesPower && !tile.block().consumes.get(ConsumePower.class).isBuffered){
+            producers.add(tile);
+            consumers.add(tile);
+        }else if(tile.block().outputsPower && tile.block().consumesPower){
             batteries.add(tile);
         }else if(tile.block().outputsPower){
             producers.add(tile);

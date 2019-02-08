@@ -128,7 +128,7 @@ public class Pathfinder{
             for(int y = 0; y < world.height(); y++){
                 Tile tile = world.tile(x, y);
 
-                if(tile.block().flags != null && state.teams.areEnemies(tile.getTeam(), team)
+                if(state.teams.areEnemies(tile.getTeam(), team)
                         && tile.block().flags.contains(BlockFlag.target)){
                     path.frontier.addFirst(tile);
                     path.weights[x][y] = 0;
@@ -145,7 +145,7 @@ public class Pathfinder{
     private void updateFrontier(Team team, long nsToRun){
         PathData path = paths[team.ordinal()];
 
-        long start = Time.nanoTime();
+        long start = Time.nanos();
 
         while(path.frontier.size > 0 && (nsToRun < 0 || Time.timeSinceNanos(start) <= nsToRun)){
             Tile tile = path.frontier.removeLast();
@@ -159,6 +159,7 @@ public class Pathfinder{
 
                     if(other != null && (path.weights[dx][dy] > cost + other.cost || path.searches[dx][dy] < path.search)
                             && passable(other, team)){
+                        if(other.cost < 0) throw new IllegalArgumentException("Tile cost cannot be negative! " + other);
                         path.frontier.addFirst(world.tile(dx, dy));
                         path.weights[dx][dy] = cost + other.cost;
                         path.searches[dx][dy] = (short)path.search;

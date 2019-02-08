@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.distribution;
 import io.anuke.arc.util.NumberUtils;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;

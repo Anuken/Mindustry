@@ -1,12 +1,12 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -78,6 +78,8 @@ public class GenericCrafter extends Block{
 
         if(entity.progress >= 1f){
 
+            //TODO, bad design, crafter has to know that this consumes items
+            //there should be a separate trigger in #cons to consume discrete amounts of items
             if(consumes.has(ConsumeItem.class)) tile.entity.items.remove(consumes.item(), consumes.itemAmount());
 
             useContent(tile, output);

@@ -6,6 +6,7 @@ import io.anuke.arc.collection.IntSet.IntSetIterator;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
@@ -128,22 +129,26 @@ public class MapRenderer implements Disposable{
                         region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
             }
         }else{
-            region = floor.icon(Icon.full);
+            region = floor.variantRegions()[Mathf.randomSeed(idxWall, 0, floor.variantRegions().length-1)];
 
             mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
         }
+
+        float offsetX = -(wall.size/3)*tilesize, offsetY = -(wall.size/3) * tilesize;
 
         if(wall.update || wall.destructible){
             mesh.setColor(team.color);
             region = Core.atlas.find("block-border");
         }else if(!wall.synthetic() && bw != 0){
             region = wall.icon(Icon.full) == Core.atlas.find("____") ? Core.atlas.find("clear") : wall.icon(Icon.full);
+            offsetX = tilesize/2f - region.getWidth()/2f * Draw.scl;
+            offsetY = tilesize/2f - region.getHeight()/2f * Draw.scl;
         }else{
             region = Core.atlas.find("clear");
         }
 
         mesh.draw(idxDecal, region,
-                wx * tilesize - (wall.size/3) * tilesize, wy * tilesize - (wall.size/3) * tilesize,
+                wx * tilesize + offsetX, wy * tilesize + offsetY,
                 region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
         mesh.setColor(Color.WHITE);
     }

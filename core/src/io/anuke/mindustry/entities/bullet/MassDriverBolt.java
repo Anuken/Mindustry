@@ -1,12 +1,12 @@
 package io.anuke.mindustry.entities.bullet;
 
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 
 import static io.anuke.mindustry.Vars.content;
@@ -26,10 +26,10 @@ public class MassDriverBolt extends BulletType{
     public void draw(Bullet b){
         float w = 11f, h = 13f;
 
-        Draw.color(Palette.bulletYellowBack);
+        Draw.color(Pal.bulletYellowBack);
         Draw.rect("shell-back", b.x, b.y, w, h, b.rot() + 90);
 
-        Draw.color(Palette.bulletYellow);
+        Draw.color(Pal.bulletYellow);
         Draw.rect("shell", b.x, b.y, w, h, b.rot() + 90);
 
         Draw.reset();

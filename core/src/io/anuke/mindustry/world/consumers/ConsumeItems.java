@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.consumers;
 
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Block;
@@ -44,6 +44,6 @@ public class ConsumeItems extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        stats.add(optional ? BlockStat.boostItem : BlockStat.inputItems, new ItemListValue(items));
+        stats.add(boost ? BlockStat.boostItem : BlockStat.inputItems, new ItemListValue(items));
     }
 }

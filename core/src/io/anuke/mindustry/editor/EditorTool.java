@@ -1,7 +1,9 @@
 package io.anuke.mindustry.editor;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.function.IntPositionConsumer;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
@@ -43,7 +45,7 @@ public enum EditorTool{
 
         @Override
         public void touched(MapEditor editor, int x, int y){
-            editor.draw(x, y);
+            editor.draw(x, y, isPaint());
         }
     },
     eraser{
@@ -54,7 +56,7 @@ public enum EditorTool{
 
         @Override
         public void touched(MapEditor editor, int x, int y){
-            editor.draw(x, y, Blocks.air);
+            editor.draw(x, y, isPaint(), Blocks.air);
         }
     },
     spray{
@@ -65,7 +67,7 @@ public enum EditorTool{
 
         @Override
         public void touched(MapEditor editor, int x, int y){
-            editor.draw(x, y, editor.getDrawBlock(), 0.012);
+            editor.draw(x, y, isPaint(), editor.getDrawBlock(), 0.012);
         }
     },
     line{
@@ -112,13 +114,6 @@ public enum EditorTool{
             width = editor.getMap().width();
             int height = editor.getMap().height();
 
-            int x1;
-            boolean spanAbove, spanBelow;
-
-            stack.clear();
-
-            stack.add(asi(x, y));
-
             IntPositionConsumer writer = (px, py) -> {
                 TileDataMarker prev = editor.getPrev(px, py, false);
 
@@ -135,32 +130,49 @@ public enum EditorTool{
                 editor.onWrite(px, py, prev);
             };
 
-            while(stack.size > 0){
-                int popped = stack.pop();
-                x = popped % width;
-                y = popped / width;
-
-                x1 = x;
-                while(x1 >= 0 && eq(x1, y)) x1--;
-                x1++;
-                spanAbove = spanBelow = false;
-                while(x1 < width && eq(x1, y)){
-                    writer.accept(x1, y);
-
-                    if(!spanAbove && y > 0 && eq(x1, y - 1)){
-                        stack.add(asi(x1, y - 1));
-                        spanAbove = true;
-                    }else if(spanAbove && y > 0 && eq(x1, y - 1)){
-                        spanAbove = false;
+            if(isAlt()){
+                for(int cx = 0; cx < width; cx++){
+                    for(int cy = 0; cy < height; cy++){
+                        if(eq(cx, cy)){
+                            writer.accept(cx, cy);
+                        }
                     }
+                }
+            }else{
+                int x1;
+                boolean spanAbove, spanBelow;
 
-                    if(!spanBelow && y < height - 1 && eq(x1, y + 1)){
-                        stack.add(asi(x1, y + 1));
-                        spanBelow = true;
-                    }else if(spanBelow && y < height - 1 && eq(x1, y + 1)){
-                        spanBelow = false;
-                    }
+                stack.clear();
+
+                stack.add(asi(x, y));
+
+                while(stack.size > 0){
+                    int popped = stack.pop();
+                    x = popped % width;
+                    y = popped / width;
+
+                    x1 = x;
+                    while(x1 >= 0 && eq(x1, y)) x1--;
                     x1++;
+                    spanAbove = spanBelow = false;
+                    while(x1 < width && eq(x1, y)){
+                        writer.accept(x1, y);
+
+                        if(!spanAbove && y > 0 && eq(x1, y - 1)){
+                            stack.add(asi(x1, y - 1));
+                            spanAbove = true;
+                        }else if(spanAbove && y > 0 && eq(x1, y - 1)){
+                            spanAbove = false;
+                        }
+
+                        if(!spanBelow && y < height - 1 && eq(x1, y + 1)){
+                            stack.add(asi(x1, y + 1));
+                            spanBelow = true;
+                        }else if(spanBelow && y < height - 1 && eq(x1, y + 1)){
+                            spanBelow = false;
+                        }
+                        x1++;
+                    }
                 }
             }
         }
@@ -180,6 +192,14 @@ public enum EditorTool{
     zoom;
 
     boolean edit, draggable;
+
+    public static boolean isPaint(){
+        return Core.input.keyDown(KeyCode.CONTROL_LEFT);
+    }
+
+    public static boolean isAlt(){
+        return Core.input.keyDown(KeyCode.TAB);
+    }
 
     public void touched(MapEditor editor, int x, int y){
 

@@ -28,11 +28,12 @@ public class MindustryServer implements ApplicationListener{
         BundleLoader.load();
         content.verbose(false);
         content.load();
-        content.initialize(Content::init);
 
         Core.app.addListener(logic = new Logic());
         Core.app.addListener(world = new World());
         Core.app.addListener(netServer = new NetServer());
         Core.app.addListener(new ServerControl(args));
+
+        content.initialize(Content::init);
     }
 }

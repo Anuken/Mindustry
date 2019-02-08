@@ -3,9 +3,9 @@ package io.anuke.mindustry.net;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectMap.Entry;
-import io.anuke.arc.entities.Entities;
+import io.anuke.mindustry.entities.Entities;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.game.Teams.TeamData;
@@ -44,6 +44,7 @@ public class NetworkIO{
             stream.writeInt(player.id);
             player.write(stream);
 
+            world.spawner.write(stream);
             SaveIO.getSaveWriter().writeMap(stream);
 
             stream.write(Team.all.length);
@@ -105,6 +106,7 @@ public class NetworkIO{
             world.beginMapLoad();
 
             //map
+            world.spawner.read(stream);
             SaveIO.getSaveWriter().readMap(stream);
             world.setMap(new Map(map, 0, 0));
 

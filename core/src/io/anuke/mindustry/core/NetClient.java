@@ -7,8 +7,8 @@ import io.anuke.annotations.Annotations.Variant;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntSet;
-import io.anuke.arc.entities.Entities;
-import io.anuke.arc.entities.EntityGroup;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Log;
@@ -17,7 +17,7 @@ import io.anuke.arc.util.io.ReusableByteArrayInputStream;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
@@ -345,7 +345,7 @@ public class NetClient implements ApplicationListener{
                 requests[i] = player.getPlaceQueue().get(i);
             }
 
-            Call.onClientShapshot(lastSent++, Time.millis(), player.x, player.y,
+            Call.onClientShapshot(lastSent++, player.x, player.y,
                 player.pointerX, player.pointerY, player.rotation, player.baseRotation,
                 player.velocity().x, player.velocity().y,
                 player.getMineTile(),

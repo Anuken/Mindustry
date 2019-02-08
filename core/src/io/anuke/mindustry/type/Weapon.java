@@ -3,58 +3,68 @@ package io.anuke.mindustry.type;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
-import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 
-public class Weapon extends Content{
+public class Weapon{
     public final String name;
 
     /**minimum cursor distance from player, fixes 'cross-eyed' shooting.*/
     protected static float minPlayerDist = 20f;
-    /**ammo type map. set with setAmmo()*/
-    protected BulletType ammo;
+    protected static int sequenceNum = 0;
+    /**bullet shot*/
+    public BulletType bullet;
     /**shell ejection effect*/
-    protected Effect ejectEffect = Fx.none;
+    public Effect ejectEffect = Fx.none;
     /**weapon reload in frames*/
-    protected float reload;
+    public float reload;
     /**amount of shots per fire*/
-    protected int shots = 1;
+    public int shots = 1;
     /**spacing in degrees between multiple shots, if applicable*/
-    protected float spacing = 12f;
+    public float spacing = 12f;
     /**inaccuracy of degrees of each shot*/
-    protected float inaccuracy = 0f;
+    public float inaccuracy = 0f;
     /**intensity and duration of each shot's screen shake*/
-    protected float shake = 0f;
+    public float shake = 0f;
     /**visual weapon knockback.*/
-    protected float recoil = 1.5f;
+    public float recoil = 1.5f;
     /**shoot barrel y offset*/
-    protected float length = 3f;
+    public float length = 3f;
     /**shoot barrel x offset.*/
-    protected float width = 4f;
+    public float width = 4f;
     /**fraction of velocity that is random*/
-    protected float velocityRnd = 0f;
+    public float velocityRnd = 0f;
     /**whether to shoot the weapons in different arms one after another, rather than all at once*/
-    protected boolean roundrobin = false;
-    /**vector for vector calulations*/
-    protected Vector2 tr = new Vector2();
+    public boolean roundrobin = false;
+    /**randomization of shot length*/
+    public float lengthRand = 0f;
+    /**delay in ticks between shots*/
+    public float shotDelay = 0;
+    /**whether shooter rotation is ignored when shooting.*/
+    public boolean ignoreRotation = false;
 
-    public TextureRegion equipRegion, region;
+    public TextureRegion region;
 
     protected Weapon(String name){
         this.name = name;
+    }
+
+    protected Weapon(){
+        //no region
+        this.name = "";
     }
 
     @Remote(targets = Loc.server, called = Loc.both, unreliable = true)
@@ -81,72 +91,63 @@ public class Weapon extends Content{
 
         Weapon weapon = shooter.getWeapon();
 
-        Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> weapon.bullet(shooter, x, y, f + Mathf.range(weapon.inaccuracy)));
-        BulletType ammo = weapon.ammo;
+        sequenceNum = 0;
+        if(weapon.shotDelay > 0.01f){
+            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
+                Time.run(sequenceNum * weapon.shotDelay, () -> weapon.bullet(shooter, x, y, f + Mathf.range(weapon.inaccuracy)));
+                sequenceNum ++;
+            });
+        }else{
+            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> weapon.bullet(shooter, x, y, f + Mathf.range(weapon.inaccuracy)));
+        }
 
-        weapon.tr.trns(rotation + 180f, ammo.recoil);
+        BulletType ammo = weapon.bullet;
 
-        shooter.velocity().add(weapon.tr);
+        Tmp.v1.trns(rotation + 180f, ammo.recoil);
 
-        weapon.tr.trns(rotation, 3f);
+        shooter.velocity().add(Tmp.v1);
+
+        Tmp.v1.trns(rotation, 3f);
 
         Effects.shake(weapon.shake, weapon.shake, x, y);
         Effects.effect(weapon.ejectEffect, x, y, rotation * -Mathf.sign(left));
-        Effects.effect(ammo.shootEffect, x + weapon.tr.x, y + weapon.tr.y, rotation, shooter);
-        Effects.effect(ammo.smokeEffect, x + weapon.tr.x, y + weapon.tr.y, rotation, shooter);
+        Effects.effect(ammo.shootEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, shooter);
+        Effects.effect(ammo.smokeEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, shooter);
 
         //reset timer for remote players
         shooter.getTimer().get(shooter.getShootTimer(left), weapon.reload);
     }
 
-    @Override
     public void load(){
-        equipRegion = Core.atlas.find(name + "-equip");
-        region = Core.atlas.find(name);
-    }
-
-    @Override
-    public ContentType getContentType(){
-        return ContentType.weapon;
-    }
-
-    public BulletType getAmmo(){
-        return ammo;
+        region = Core.atlas.find(name + "-equip", Core.atlas.find("clear"));
     }
 
     public void update(ShooterTrait shooter, float pointerX, float pointerY){
-        update(shooter, true, pointerX, pointerY);
-        update(shooter, false, pointerX, pointerY);
+        for(boolean left : Mathf.booleans){
+            Tmp.v1.set(pointerX, pointerY).sub(shooter.getX(), shooter.getY());
+            if(Tmp.v1.len() < minPlayerDist) Tmp.v1.setLength(minPlayerDist);
+
+            float cx = Tmp.v1.x + shooter.getX(), cy = Tmp.v1.y + shooter.getY();
+
+            float ang = Tmp.v1.angle();
+            Tmp.v1.trns(ang - 90, width * Mathf.sign(left), length + Mathf.range(lengthRand));
+
+            update(shooter, shooter.getX() + Tmp.v1.x, shooter.getY() + Tmp.v1.y, Angles.angle(shooter.getX() + Tmp.v1.x, shooter.getY() + Tmp.v1.y, cx, cy), left);
+        }
     }
 
-    private void update(ShooterTrait shooter, boolean left, float pointerX, float pointerY){
+    public void update(ShooterTrait shooter, float mountX, float mountY, float angle, boolean left){
         if(shooter.getTimer().get(shooter.getShootTimer(left), reload)){
             if(roundrobin){
                 shooter.getTimer().reset(shooter.getShootTimer(!left), reload / 2f);
             }
 
-            tr.set(pointerX, pointerY).sub(shooter.getX(), shooter.getY());
-            if(tr.len() < minPlayerDist) tr.setLength(minPlayerDist);
-
-            float cx = tr.x + shooter.getX(), cy = tr.y + shooter.getY();
-
-            float ang = tr.angle();
-            tr.trns(ang - 90, width * Mathf.sign(left), length);
-
-            shoot(shooter, tr.x, tr.y, Angles.angle(shooter.getX() + tr.x, shooter.getY() + tr.y, cx, cy), left);
+            shoot(shooter, mountX - shooter.getX(), mountY - shooter.getY(), angle, left);
         }
     }
 
     public float getRecoil(ShooterTrait player, boolean left){
         return (1f - Mathf.clamp(player.getTimer().getTime(player.getShootTimer(left)) / reload)) * recoil;
-    }
-
-    public float getRecoil(){
-        return recoil;
-    }
-
-    public float getReload(){
-        return reload;
     }
 
     public void shoot(ShooterTrait p, float x, float y, float angle, boolean left){
@@ -165,8 +166,8 @@ public class Weapon extends Content{
     void bullet(ShooterTrait owner, float x, float y, float angle){
         if(owner == null) return;
 
-        tr.trns(angle, 3f);
-        Bullet.create(ammo,
-                owner, owner.getTeam(), x + tr.x, y + tr.y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd));
+        Tmp.v1.trns(angle, 3f);
+        Bullet.create(bullet,
+                owner, owner.getTeam(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd));
     }
 }

@@ -4,7 +4,6 @@ import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.content.Weapons;
 import io.anuke.mindustry.type.ItemStack;
 
 public class Waves{
@@ -50,7 +49,6 @@ public class Waves{
                 begin = 28;
                 spacing = 3;
                 unitScaling = 2;
-                weapon = Weapons.flamethrower;
                 end = 40;
             }},
 
@@ -58,7 +56,6 @@ public class Waves{
                 begin = 45;
                 spacing = 3;
                 unitScaling = 2;
-                weapon = Weapons.flamethrower;
                 effect = StatusEffects.overdrive;
             }},
 
@@ -67,7 +64,6 @@ public class Waves{
                 spacing = 2;
                 unitScaling = 3;
                 unitAmount = 5;
-                weapon = Weapons.flakgun;
                 effect = StatusEffects.overdrive;
             }},
 
@@ -180,10 +176,6 @@ public class Waves{
 
                 if(a > 0){
                     System.out.print(a + "x" + spawn.type.name);
-
-                    if(spawn.weapon != null){
-                        System.out.print(":" + spawn.weapon.name);
-                    }
 
                     System.out.print(" ");
                 }

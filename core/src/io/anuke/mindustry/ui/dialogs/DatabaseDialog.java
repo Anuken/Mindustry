@@ -4,7 +4,7 @@ import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.arc.scene.event.HandCursorListener;
 import io.anuke.arc.scene.ui.Image;
@@ -38,25 +38,23 @@ public class DatabaseDialog extends FloatingDialog{
         for(int j = 0; j < allContent.length; j ++){
             ContentType type = ContentType.values()[j];
 
-            Array<Content> array = allContent[j];
-            if(array.size == 0 || !(array.first() instanceof UnlockableContent)) continue;
+            Array<Content> array = allContent[j].select(c -> c instanceof UnlockableContent && !((UnlockableContent)c).isHidden());
+            if(array.size == 0) continue;
 
-            table.add("$content." + type.name() + ".name").growX().left().color(Palette.accent);
+            table.add("$content." + type.name() + ".name").growX().left().color(Pal.accent);
             table.row();
-            table.addImage("white").growX().pad(5).padLeft(0).padRight(0).height(3).color(Palette.accent);
+            table.addImage("white").growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
             table.row();
             table.table(list -> {
                 list.left();
 
                 int maxWidth = UIUtils.portrait() ? 7 : 13;
-                int size = 8 * 6;
+                int size = 8 * 4;
 
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){
                     UnlockableContent unlock = (UnlockableContent) array.get(i);
-
-                    if(unlock.isHidden()) continue;
 
                     Image image = data.isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-tree-locked");
                     image.addListener(new HandCursorListener());

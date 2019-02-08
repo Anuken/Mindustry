@@ -2,12 +2,6 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityDraw;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.EffectEntity;
-import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.entities.trait.Entity;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Camera;
@@ -15,6 +9,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.SpriteBatch;
+import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
@@ -23,15 +18,22 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityDraw;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
+import io.anuke.mindustry.entities.impl.EffectEntity;
 import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.traits.DrawTrait;
+import io.anuke.mindustry.entities.traits.Entity;
+import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
@@ -41,6 +43,7 @@ public class Renderer implements ApplicationListener{
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
 
+    private FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
     private Color clearColor;
     private float targetscale = io.anuke.arc.scene.ui.layout.Unit.dp.scl(4);
     private float camerascale = targetscale;
@@ -52,7 +55,6 @@ public class Renderer implements ApplicationListener{
         batch = new SpriteBatch(4096);
         camera = new Camera();
         Lines.setCircleVertices(14);
-
         Shaders.init();
 
         Effects.setScreenShakeProvider((intensity, duration) -> {
@@ -72,7 +74,7 @@ public class Renderer implements ApplicationListener{
                     if(!(effect instanceof GroundEffect)){
                         EffectEntity entity = Pools.obtain(EffectEntity.class, EffectEntity::new);
                         entity.effect = effect;
-                        entity.color = color;
+                        entity.color.set(color);
                         entity.rotation = rotation;
                         entity.data = data;
                         entity.id++;
@@ -84,7 +86,7 @@ public class Renderer implements ApplicationListener{
                     }else{
                         GroundEffectEntity entity = Pools.obtain(GroundEffectEntity.class, GroundEffectEntity::new);
                         entity.effect = effect;
-                        entity.color = color;
+                        entity.color.set(color);
                         entity.rotation = rotation;
                         entity.id++;
                         entity.data = data;
@@ -117,7 +119,7 @@ public class Renderer implements ApplicationListener{
 
             if(players[0].isDead()){
                 TileEntity core = players[0].getClosestCore();
-                if(core != null && players[0].spawner == Unit.noSpawner){
+                if(core != null && players[0].spawner == null){
                     camera.position.lerpDelta(core.x, core.y, 0.08f);
                 }else{
                     camera.position.lerpDelta(position, 0.08f);
@@ -125,9 +127,6 @@ public class Renderer implements ApplicationListener{
             }else if(!mobile){
                 camera.position.lerpDelta(position, 0.08f);
             }
-
-            camera.position.x = Mathf.clamp(camera.position.x, -tilesize / 2f, world.width() * tilesize - tilesize / 2f);
-            camera.position.y = Mathf.clamp(camera.position.y, -tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
             updateShake(0.75f);
 
@@ -172,7 +171,13 @@ public class Renderer implements ApplicationListener{
         blocks.processBlocks();
 
         blocks.drawShadows();
+
+        blocks.floor.beginDraw();
+        blocks.floor.drawLayer(CacheLayer.walls);
+        blocks.floor.endDraw();
+
         blocks.drawBlocks(Layer.block);
+        blocks.drawFog();
 
         Draw.shader(Shaders.blockbuild, true);
         blocks.drawBlocks(Layer.placement);
@@ -196,16 +201,25 @@ public class Renderer implements ApplicationListener{
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
         //TODO shield
-        /*
-        if(shieldGroup.size() > 0){
-            Graphics.beginShaders(Shaders.shield);
+
+        if(EntityDraw.countInBounds(shieldGroup) > 0){
+            if(graphics.getWidth() >= 2 && graphics.getHeight() >= 2 && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
+                shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
+            }
+
+            Draw.flush();
+            shieldBuffer.begin();
+            graphics.clear(Color.CLEAR);
             EntityDraw.draw(shieldGroup);
             EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
-            Draw.color(Palette.accent);
-            Graphics.endShaders();
+            Draw.flush();
+            shieldBuffer.end();
+            Draw.shader(Shaders.shield);
+            Draw.color(Pal.accent);
+            Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
             Draw.color();
+            Draw.shader();
         }
-        */
 
         overlays.drawTop();
 
@@ -247,7 +261,7 @@ public class Renderer implements ApplicationListener{
                     playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
-            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawUnder);
+            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
 
             Shaders.outline.color.set(team.color);
             Shaders.mix.color.set(Color.WHITE);

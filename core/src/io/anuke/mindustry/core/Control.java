@@ -3,8 +3,6 @@ package io.anuke.mindustry.core;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureAtlas;
@@ -15,10 +13,13 @@ import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.GlobalData;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.Binding;
@@ -227,9 +228,10 @@ public class Control implements ApplicationListener{
         return inputs[index];
     }
 
-    public void playMap(Map map){
+    public void playMap(Map map, Rules rules){
         ui.loadAnd(() -> {
             logic.reset();
+            state.rules = rules;
             world.loadMap(map);
             logic.play();
         });
@@ -305,7 +307,7 @@ public class Control implements ApplicationListener{
             }
 
             //auto-update rpc every 5 seconds
-            if(timer.get(60 * 5)){
+            if(timer.get(0, 60 * 5)){
                 Platform.instance.updateRPC();
             }
 

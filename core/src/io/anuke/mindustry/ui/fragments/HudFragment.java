@@ -16,20 +16,21 @@ import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Scaling;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.scene.utils.Elements;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+
+import java.lang.StringBuilder;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -53,7 +54,6 @@ public class HudFragment extends Fragment{
 
         //menu at top left
         parent.fill(cont -> {
-
             cont.top().left().visible(() -> !state.is(State.menu));
 
             if(mobile){
@@ -97,11 +97,11 @@ public class HudFragment extends Fragment{
                         }
                     }).get();
 
-                    select.addImage("blank").color(Palette.accent).width(6f).fillY();
+                    select.addImage("blank").color(Pal.accent).width(6f).fillY();
                 });
 
                 cont.row();
-                cont.addImage("blank").height(6f).color(Palette.accent).fillX();
+                cont.addImage("blank").height(6f).color(Pal.accent).fillX();
                 cont.row();
             }
 
@@ -146,10 +146,29 @@ public class HudFragment extends Fragment{
         //minimap
         //parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> !state.is(State.menu) && Core.settings.getBool("minimap")));
 
-        //paused table
+        //spawner warning
         parent.fill(t -> {
-            t.top().visible(() -> state.is(State.paused) && !Net.active());
-            t.table("button", top -> top.add("$paused").pad(6f));
+            t.touchable(Touchable.disabled);
+            t.visible(() -> !state.is(State.menu));
+            t.table("flat", c -> c.add("$nearpoint")
+            .update(l -> l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f))))
+            .get().setAlignment(Align.center, Align.center))
+            .margin(6).update(u -> {
+                u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(world.spawner.playerNear()), 0.1f);
+            }).get().color.a = 0f;
+        });
+
+        //out of bounds warning
+        parent.fill(t -> {
+            t.touchable(Touchable.disabled);
+            t.visible(() -> !state.is(State.menu));
+            t.table("flat", c -> c.add("")
+            .update(l ->{
+                l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f)));
+                l.setText(Core.bundle.format("outofbounds", (int)((boundsCountdown - players[0].destructTime) / 60f)));
+            }).get().setAlignment(Align.center, Align.center)).margin(6).update(u -> {
+                u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(players[0].isOutOfBounds()), 0.1f);
+            }).get().color.a = 0f;
         });
 
         parent.fill(t -> {
@@ -196,8 +215,44 @@ public class HudFragment extends Fragment{
                 .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f))));
         });
 
-        parent.fill(t -> t.top().right().addRowImageTextButton("$launch", "icon-arrow-up", 8*3, () -> world.launchZone())
-            .size(94f, 70f).visible(() -> world.isZone() && world.getZone().metCondition()));
+        //launch button
+        parent.fill(t -> {
+            t.top().visible(() -> !state.is(State.menu));
+
+            TextButton button = Elements.newButton("$launch", () -> ui.showConfirm("$launch", "$launch.confirm", Call::launchZone));
+
+            button.getStyle().disabledFontColor = Color.WHITE;
+            button.visible(() ->
+                world.isZone() &&
+                world.getZone().metCondition() &&
+                !Net.client() &&
+                state.wave % world.getZone().launchPeriod == 0);
+
+            button.update(() -> {
+                if(world.getZone() == null){
+                    button.setText("");
+                    return;
+                }
+
+                button.setText(Core.bundle.get(state.enemies() > 0 ? "launch.unable" : "launch") + "\n" +
+                    Core.bundle.format("launch.next", state.wave + world.getZone().launchPeriod));
+
+                button.getLabel().setColor(Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Pal.accent,
+                    Mathf.absin(Time.time(), 7f, 1f)));
+            });
+
+            button.setDisabled(() -> state.enemies() > 0);
+
+            button.getLabelCell().left().get().setAlignment(Align.left, Align.left);
+
+            t.add(button).size(350f, 80f);
+        });
+
+        //paused table
+        parent.fill(t -> {
+            t.top().visible(() -> state.is(State.paused) && !Net.active());
+            t.table("button", top -> top.add("$paused").pad(6f));
+        });
 
         //'saving' indicator
         parent.fill(t -> {

@@ -32,8 +32,10 @@ public class Bar extends Element{
 
     public Bar(Supplier<String> name, Supplier<Color> color, FloatProvider fraction){
         this.fraction = fraction;
+        lastValue = value = fraction.get();
         update(() -> {
             this.name = name.get();
+            this.blinkColor.set(color.get());
             setColor(color.get());
         });
     }

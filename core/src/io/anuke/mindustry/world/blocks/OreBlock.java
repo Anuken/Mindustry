@@ -18,10 +18,16 @@ public class OreBlock extends Floor{
         this.itemDrop = ore;
         this.base = base;
         this.variants = 3;
-        this.minimapColor = ore.color;
         this.edge = base.name;
+        this.blendGroup = base.blendGroup;
+        this.color.set(ore.color);
 
         oreBlockMap.getOr(ore, ObjectMap::new).put(base, this);
+    }
+
+    @Override
+    public void init(){
+        super.init();
     }
 
     @Override
@@ -32,6 +38,18 @@ public class OreBlock extends Floor{
     @Override
     public void draw(Tile tile){
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
+
+        drawEdges(tile);
+    }
+
+    @Override
+    public boolean doEdge(Floor floor){
+        return floor != base && super.doEdge(floor);
+    }
+
+    @Override
+    protected boolean edgeOnto(Floor other){
+        return other != base;
     }
 
     public static Block get(Block floor, Item item){

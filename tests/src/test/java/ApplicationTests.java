@@ -13,8 +13,8 @@ import io.anuke.mindustry.core.Logic;
 import io.anuke.mindustry.core.NetServer;
 import io.anuke.mindustry.core.World;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
-import io.anuke.mindustry.entities.units.BaseUnit;
-import io.anuke.mindustry.entities.units.types.Spirit;
+import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.base.Spirit;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.BundleLoader;
@@ -114,6 +114,11 @@ public class ApplicationTests{
     void spawnWaves(){
         world.loadMap(testMap);
         logic.runWave();
+        //force trigger delayed spawns
+        Time.setDeltaProvider(() -> 1000f);
+        Time.update();
+        Time.update();
+        Time.setDeltaProvider(() -> 1f);
         unitGroups[waveTeam.ordinal()].updateEvents();
         assertFalse(unitGroups[waveTeam.ordinal()].isEmpty());
     }
@@ -138,12 +143,12 @@ public class ApplicationTests{
         createMap();
         int bx = 4;
         int by = 4;
-        world.setBlock(world.tile(bx, by), Blocks.core, Team.blue);
+        world.setBlock(world.tile(bx, by), Blocks.coreShard, Team.blue);
         assertEquals(world.tile(bx, by).getTeam(), Team.blue);
         for(int x = bx-1; x <= bx + 1; x++){
             for(int y = by-1; y <= by + 1; y++){
                 if(x == bx && by == y){
-                    assertEquals(world.tile(x, y).block(), Blocks.core);
+                    assertEquals(world.tile(x, y).block(), Blocks.coreShard);
                 }else{
                     assertTrue(world.tile(x, y).block() == Blocks.part && world.tile(x, y).getLinked() == world.tile(bx, by));
                 }
@@ -231,8 +236,8 @@ public class ApplicationTests{
         d2.addBuildRequest(new BuildRequest(1, 1, 0, Blocks.copperWallLarge));
 
         Time.setDeltaProvider(() -> 9999999f);
-        d1.updateBuilding(d1);
-        d2.updateBuilding(d2);
+        d1.updateBuilding();
+        d2.updateBuilding();
 
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
@@ -253,16 +258,16 @@ public class ApplicationTests{
         d2.addBuildRequest(new BuildRequest(1, 1));
 
         Time.setDeltaProvider(() -> 3f);
-        d1.updateBuilding(d1);
+        d1.updateBuilding();
         Time.setDeltaProvider(() -> 1f);
-        d2.updateBuilding(d2);
+        d2.updateBuilding();
 
         assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
 
         Time.setDeltaProvider(() -> 9999f);
 
-        d1.updateBuilding(d1);
-        d2.updateBuilding(d2);
+        d1.updateBuilding();
+        d2.updateBuilding();
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
@@ -273,7 +278,7 @@ public class ApplicationTests{
         createMap();
 
         Tile core = world.tile(5, 5);
-        world.setBlock(core, Blocks.core, Team.blue);
+        world.setBlock(core, Blocks.coreShard, Team.blue);
         for(Item item : content.items()){
             core.entity.items.set(item, 3000);
         }

@@ -5,8 +5,8 @@ import io.anuke.arc.collection.OrderedMap;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;
-import io.anuke.mindustry.entities.units.UnitType;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.type.UnitType;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
@@ -49,7 +49,7 @@ public class ContentDisplay{
 
             if(map.size == 0) continue;
 
-            table.add("$category." + cat.name()).color(Palette.accent).fillX();
+            table.add("$category." + cat.name()).color(Pal.accent).fillX();
             table.row();
 
             for(BlockStat stat : map.keys()){
@@ -86,13 +86,11 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        table.add(Core.bundle.format("item.explosiveness", (int) (item.explosiveness * 100 * 2f)));
+        table.add(Core.bundle.format("item.explosiveness", (int) (item.explosiveness * 100)));
         table.row();
-        table.add(Core.bundle.format("item.flammability", (int) (item.flammability * 100 * 2f)));
+        table.add(Core.bundle.format("item.flammability", (int) (item.flammability * 100)));
         table.row();
-        table.add(Core.bundle.format("item.radioactivity", (int) (item.radioactivity * 100 * 2f)));
-        table.row();
-        table.add(Core.bundle.format("item.fluxiness", (int) (item.fluxiness * 100 * 2f)));
+        table.add(Core.bundle.format("item.radioactivity", (int) (item.radioactivity * 100)));
         table.row();
     }
 
@@ -119,9 +117,9 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        table.add(Core.bundle.format("item.explosiveness", (int) (liquid.explosiveness * 100 * 2f)));
+        table.add(Core.bundle.format("item.explosiveness", (int) (liquid.explosiveness * 100)));
         table.row();
-        table.add(Core.bundle.format("item.flammability", (int) (liquid.flammability * 100 * 2f)));
+        table.add(Core.bundle.format("item.flammability", (int) (liquid.flammability * 100)));
         table.row();
         table.add(Core.bundle.format("liquid.heatcapacity", (int) (liquid.heatCapacity * 100)));
         table.row();
@@ -161,7 +159,7 @@ public class ContentDisplay{
             table.add(Core.bundle.format("mech.ability", Core.bundle.get("mech." + mech.name + ".ability")));
             table.row();
         }
-        table.add(Core.bundle.format("mech.armor", mech.armor));
+        table.add(Core.bundle.format("mech.health", (int)mech.health));
         table.row();
         table.add(Core.bundle.format("mech.itemcapacity", mech.itemCapacity));
         table.row();

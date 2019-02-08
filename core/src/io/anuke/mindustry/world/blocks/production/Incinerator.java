@@ -1,14 +1,14 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
@@ -24,9 +24,6 @@ public class Incinerator extends Block{
         hasLiquids = true;
         update = true;
         solid = true;
-
-        // Incinerator has no speed which could be adjusted, so it will only operate fully powered for now
-        consumes.power(0.05f, 1.0f);
     }
 
     @Override

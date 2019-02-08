@@ -3,6 +3,13 @@ package io.anuke.mindustry.graphics;
 //TODO implement effects again
 public enum CacheLayer{
     water{
+        public void begin(){
+            //Draw.shader(Shaders.water);
+        }
+
+        public void end(){
+            //Draw.shader();
+        }
     },
     lava{
     },
@@ -11,8 +18,7 @@ public enum CacheLayer{
     space{
     },
     normal,
-    walls{ //TODO implement walls
-    };
+    walls;
 
     public void begin(){
 

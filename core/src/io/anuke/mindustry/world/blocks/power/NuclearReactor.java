@@ -1,22 +1,21 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.mindustry.content.Items;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -63,11 +62,9 @@ public class NuclearReactor extends PowerGenerator{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.inputLiquid, new LiquidFilterValue(liquid -> liquid.temperature <= 0.5f));
 
         stats.remove(BlockStat.basePowerGeneration);
-        // Display the power which will be produced at 50% efficiency
-        stats.add(BlockStat.basePowerGeneration, powerProduction * 60f * 0.5f, StatUnit.powerSecond);
+        stats.add(BlockStat.basePowerGeneration, powerProduction * 60f, StatUnit.powerSecond);
     }
 
     @Override
@@ -76,7 +73,7 @@ public class NuclearReactor extends PowerGenerator{
 
         int fuel = entity.items.get(consumes.item());
         float fullness = (float) fuel / itemCapacity;
-        entity.productionEfficiency = fullness / 2.0f; // Currently, efficiency of 0.5 = 100%
+        entity.productionEfficiency = fullness;
 
         if(fuel > 0){
             entity.heat += fullness * heating * Math.min(entity.delta(), 4f);
@@ -151,12 +148,6 @@ public class NuclearReactor extends PowerGenerator{
                 Effects.effect(Fx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
             });
         }
-    }
-
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && liquid.temperature <= 0.5f &&
-                (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.01f);
     }
 
     @Override

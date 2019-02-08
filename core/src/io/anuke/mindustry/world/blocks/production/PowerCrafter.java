@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
@@ -8,6 +8,8 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
 import io.anuke.mindustry.world.meta.BlockStat;
 
+/**Similar to GenericCrafter, but also optionally outputs liquids.
+ * TODO consolidate into one class*/
 public class PowerCrafter extends Block{
     protected final int timerDump = timers++;
     protected final int timerContentCheck = timers++;

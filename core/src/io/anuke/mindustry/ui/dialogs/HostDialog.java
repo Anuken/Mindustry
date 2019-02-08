@@ -6,7 +6,7 @@ import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.net.Net;
 
 import java.io.IOException;

@@ -20,6 +20,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class CustomGameDialog extends FloatingDialog{
     Difficulty difficulty = Difficulty.normal;
+    RulePreset lastPreset = RulePreset.survival;
 
     public CustomGameDialog(){
         super("$customgame");
@@ -30,6 +31,7 @@ public class CustomGameDialog extends FloatingDialog{
     }
 
     void setup(){
+        state.rules = lastPreset.get();
         cont.clear();
 
         Table maps = new Table();
@@ -48,10 +50,10 @@ public class CustomGameDialog extends FloatingDialog{
         modes.marginBottom(5);
 
         for(RulePreset mode : RulePreset.values()){
-
-            //todo fix presets
-            modes.addButton(mode.toString(), "toggle", () -> state.rules = mode.get())/*
-                .update(b -> b.setChecked(state.rules == mode))*/.group(group).size(140f, 54f);
+            modes.addButton(mode.toString(), "toggle", () -> {
+                state.rules = mode.get();
+                lastPreset = mode;
+            }).update(b -> b.setChecked(lastPreset == mode)).group(group).size(140f, 54f);
             if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);
@@ -112,21 +114,13 @@ public class CustomGameDialog extends FloatingDialog{
 
             image.clicked(() -> {
                 hide();
-                control.playMap(map);
+                control.playMap(map, lastPreset.get());
             });
 
             maps.add(image);
 
             i++;
         }
-
-        /*
-        ImageButton gen = maps.addImageButton("icon-editor", "clear", 16*4, () -> {
-            hide();
-            world.generator.playRandomMap();
-        }).growY().get();
-        gen.row();
-        gen.add("$map.random");*/
 
         if(world.maps.all().size == 0){
             maps.add("$maps.none").pad(50);
@@ -136,7 +130,7 @@ public class CustomGameDialog extends FloatingDialog{
     }
 
     private void displayGameModeHelp(){
-        FloatingDialog d = new FloatingDialog(Core.bundle.get("mode.text.help.title"));
+        FloatingDialog d = new FloatingDialog(Core.bundle.get("mode.help.title"));
         d.setFillParent(false);
         Table table = new Table();
         table.defaults().pad(1f);

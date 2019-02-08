@@ -1,2 +1,3 @@
 io.anuke.annotations.RemoteMethodAnnotationProcessor
 io.anuke.annotations.SerializeAnnotationProcessor
+io.anuke.annotations.StructAnnotationProcessor

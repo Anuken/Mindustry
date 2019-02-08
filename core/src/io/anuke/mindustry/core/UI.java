@@ -28,7 +28,7 @@ import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 
@@ -48,7 +48,7 @@ public class UI implements ApplicationListener{
 
     public AboutDialog about;
     public GameOverDialog restart;
-    public CustomGameDialog levels;
+    public CustomGameDialog custom;
     public MapsDialog maps;
     public LoadDialog load;
     public DiscordDialog discord;
@@ -108,7 +108,7 @@ public class UI implements ApplicationListener{
             Core.app.post(() -> showError("Failed to access local storage.\nSettings will not be saved."));
         });
 
-        Colors.put("accent", Palette.accent);
+        Colors.put("accent", Pal.accent);
 
         loadCursors();
     }
@@ -163,7 +163,7 @@ public class UI implements ApplicationListener{
         join = new JoinDialog();
         discord = new DiscordDialog();
         load = new LoadDialog();
-        levels = new CustomGameDialog();
+        custom = new CustomGameDialog();
         language = new LanguageDialog();
         database = new DatabaseDialog();
         settings = new SettingsMenuDialog();
@@ -277,7 +277,7 @@ public class UI implements ApplicationListener{
 
     public void showConfirm(String title, String text, Runnable confirmed){
         FloatingDialog dialog = new FloatingDialog(title);
-        dialog.cont.add(text).width(400f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+        dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
         dialog.buttons.addButton("$cancel", dialog::hide);

@@ -20,7 +20,7 @@ import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Item;
@@ -49,7 +49,7 @@ public class BlockInventoryFragment extends Fragment{
 
         int removed = tile.block().removeStack(tile, item, amount);
 
-        player.inventory.addItem(item, removed);
+        player.addItem(item, removed);
         for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
             Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.drawx(), tile.drawy(), player));
         }
@@ -97,7 +97,7 @@ public class BlockInventoryFragment extends Fragment{
                     holdTime += Time.delta();
 
                     if(holdTime >= holdWithdraw){
-                        int amount = Math.min(tile.entity.items.get(lastItem), player.inventory.itemCapacityUsed(lastItem));
+                        int amount = Math.min(tile.entity.items.get(lastItem), player.maxAccepted(lastItem));
                         Call.requestItem(player, tile, lastItem, amount);
                         holding = false;
                         holdTime = 0f;
@@ -130,7 +130,7 @@ public class BlockInventoryFragment extends Fragment{
 
                 container.add(i);
 
-                BooleanProvider canPick = () -> player.inventory.canAcceptItem(item);
+                BooleanProvider canPick = () -> player.acceptsItem(item);
 
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);
@@ -147,7 +147,7 @@ public class BlockInventoryFragment extends Fragment{
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                         if(!canPick.get() || !tile.entity.items.has(item)) return false;
-                        int amount = Math.min(1, player.inventory.itemCapacityUsed(item));
+                        int amount = Math.min(1, player.maxAccepted(item));
                         Call.requestItem(player, tile, item, amount);
                         lastItem = item;
                         holding = true;

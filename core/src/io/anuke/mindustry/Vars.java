@@ -2,21 +2,21 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.Application.ApplicationType;
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Entities;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.EffectEntity;
-import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.impl.EffectEntity;
+import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.SyncTrait;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.GlobalData;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
@@ -51,6 +51,10 @@ public class Vars{
     public static final int maxNameLength = 40;
     /**displayed item size when ingame, TODO remove.*/
     public static final float itemSize = 5f;
+    /**extra padding around the world; units outside this bound will begin to self-destruct.*/
+    public static final float worldBounds = 100f;
+    /**ticks spent out of bound until self destruct.*/
+    public static final float boundsCountdown = 60*7;
     /**size of tiles in units*/
     public static final int tilesize = 8;
     /**all choosable player colors in join/host dialog*/

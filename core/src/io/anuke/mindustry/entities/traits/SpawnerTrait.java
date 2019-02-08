@@ -1,12 +1,15 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.world.Tile;
 
-public interface SpawnerTrait{
+public interface SpawnerTrait extends TargetTrait{
     Tile getTile();
 
-    void updateSpawning(Unit unit);
+    void updateSpawning(Player unit);
 
-    float getSpawnProgress();
+    @Override
+    default boolean isValid(){
+        return getTile().entity instanceof SpawnerTrait;
+    }
 }

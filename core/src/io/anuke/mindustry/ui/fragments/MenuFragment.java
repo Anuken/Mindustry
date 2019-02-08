@@ -11,6 +11,7 @@ import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.MobileButton;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -56,19 +57,19 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-            play = new MobileButton("icon-play-2", isize, "$play", this::showPlaySelect),
+            play = new MobileButton("icon-play-2", isize, "$play", ui.deploy::show),
             maps = new MobileButton("icon-map", isize, "$maps", ui.maps::show),
-            load = new MobileButton("icon-load", isize, "$load", ui.load::show),
+            custom = new MobileButton("icon-play-custom", isize, "$customgame", this::showCustomSelect),
             join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
             editor = new MobileButton("icon-editor", isize, "$editor", () -> ui.loadAnd(ui.editor::show)),
             tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),
-            unlocks = new MobileButton("icon-unlocks", isize, "database", ui.database::show),
+            unlocks = new MobileButton("icon-unlocks", isize, "$database", ui.database::show),
             donate = new MobileButton("icon-donate", isize, "$donate", Platform.instance::openDonations);
 
         if(Core.graphics.getWidth() > Core.graphics.getHeight()){
             container.add(play);
             container.add(join);
-            container.add(load);
+            container.add(custom);
             container.add(maps);
             container.row();
 
@@ -85,7 +86,7 @@ public class MenuFragment extends Fragment{
             container.add(play);
             container.add(maps);
             container.row();
-            container.add(load);
+            container.add(custom);
             container.add(join);
             container.row();
             container.add(editor);
@@ -111,7 +112,13 @@ public class MenuFragment extends Fragment{
             out.margin(16);
             out.defaults().size(w, 66f).padTop(5).padRight(5);
 
-            out.add(new MenuButton("icon-play-2", "$play", MenuFragment.this::showPlaySelect)).width(bw).colspan(2);
+            out.add(new MenuButton("icon-play-2", "$play", ui.deploy::show)).width(bw).colspan(2);
+
+            out.row();
+
+            out.add(new MenuButton("icon-add", "$joingame", ui.join::show));
+
+            out.add(new MenuButton("icon-play-custom", "$customgame", this::showCustomSelect));
 
             out.row();
 
@@ -131,40 +138,20 @@ public class MenuFragment extends Fragment{
         });
     }
 
-    private void showPlaySelect(){
-        ui.deploy.show();
-
-        /*
-        float w = 220f;
-        float bw = w * 2f + 10f;
-
+    private void showCustomSelect(){
         FloatingDialog dialog = new FloatingDialog("$play");
+        dialog.setFillParent(false);
         dialog.addCloseButton();
-        dialog.cont.defaults().height(66f).width(w).padRight(5f);
-
-        dialog.cont.add(new MenuButton("icon-play-2", "$map.random", () -> {
+        dialog.cont.defaults().size(230f, 64f);
+        dialog.cont.add(new MenuButton("icon-editor", "$newgame", () -> {
             dialog.hide();
-            world.generator.playRandomMap();
-        })).width(bw).colspan(2);
-        dialog.cont.row();
-
-        dialog.cont.add(new MenuButton("icon-add", "$joingame", () -> {
-            ui.join.show();
-            dialog.hide();
+            ui.custom.show();
         }));
-
-        dialog.cont.add(new MenuButton("icon-editor", "$customgame", () -> {
-            dialog.hide();
-            ui.levels.show();
-        }));
-
         dialog.cont.row();
-
         dialog.cont.add(new MenuButton("icon-load", "$loadgame", () -> {
             ui.load.show();
             dialog.hide();
-        })).width(bw).colspan(2);
-
-        dialog.show();*/
+        }));
+        dialog.show();
     }
 }

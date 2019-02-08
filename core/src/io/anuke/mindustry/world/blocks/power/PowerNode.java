@@ -9,11 +9,11 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.meta.BlockStat;
@@ -141,7 +141,7 @@ public class PowerNode extends PowerBlock{
 
         Lines.stroke(1f);
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Lines.poly(tile.drawx(), tile.drawy(), 50, laserRange*tilesize);
         Draw.reset();
     }
@@ -150,9 +150,9 @@ public class PowerNode extends PowerBlock{
     public void drawConfigure(Tile tile){
         TileEntity entity = tile.entity();
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
 
-        Lines.stroke(1f);
+        Lines.stroke(1.5f);
         Lines.circle(tile.drawx(), tile.drawy(),
                 tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time(), 4f, 1f));
 
@@ -165,14 +165,15 @@ public class PowerNode extends PowerBlock{
 
                 if(link != tile && linkValid(tile, link, false)){
                     boolean linked = linked(tile, link);
-                    Draw.color(linked ? Palette.place : Palette.breakInvalid);
+                    Draw.color(linked ? Pal.place : Pal.breakInvalid);
 
                     Lines.circle(link.drawx(), link.drawy(),
                             link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
 
                     if((entity.power.links.size >= maxNodes || (link.block() instanceof PowerNode && link.entity.power.links.size >= ((PowerNode) link.block()).maxNodes)) && !linked){
+                        Draw.color(Pal.breakInvalid);
+                        Lines.lineAngleCenter(link.drawx(), link.drawy(), 45, link.block().size * Mathf.sqrt2 * tilesize * 0.9f);
                         Draw.color();
-                        Draw.rect("cross-" + link.block().size, link.drawx(), link.drawy());
                     }
                 }
             }
@@ -184,7 +185,7 @@ public class PowerNode extends PowerBlock{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Lines.stroke(1f);
-        Draw.color(Palette.placing);
+        Draw.color(Pal.placing);
         Lines.poly(x * tilesize + offset(), y * tilesize + offset(), 50, laserRange*tilesize);
         Draw.reset();
     }
@@ -197,8 +198,7 @@ public class PowerNode extends PowerBlock{
 
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));
-            if(linkValid(tile, link) && (!(link.block() instanceof PowerNode)
-                || ((tile.block().size > link.block().size) || (tile.block().size == link.block().size && tile.pos() < link.pos())))){
+            if(linkValid(tile, link)){
                 drawLaser(tile, link);
             }
         }
@@ -245,7 +245,7 @@ public class PowerNode extends PowerBlock{
         x2 += t2.x;
         y2 += t2.y;
 
-        Draw.color(Palette.powerLight, Palette.power, Mathf.absin(Time.time(), 8f, 1f));
+        Draw.color(Pal.powerLight, Pal.power, Mathf.absin(Time.time(), 8f, 1f));
         Lines.stroke(2f);
         Lines.line(x1, y1, x2, y2);
     }

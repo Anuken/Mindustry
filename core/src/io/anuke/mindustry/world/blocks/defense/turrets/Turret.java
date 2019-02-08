@@ -3,8 +3,8 @@ package io.anuke.mindustry.world.blocks.defense.turrets;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.function.BiConsumer;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
@@ -17,13 +17,13 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Predict;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -38,7 +38,7 @@ public abstract class Turret extends Block{
 
     protected final int timerTarget = timers++;
 
-    protected Color heatColor = Palette.turretHeat;
+    protected Color heatColor = Pal.turretHeat;
     protected Effect shootEffect = Fx.none;
     protected Effect smokeEffect = Fx.none;
     protected Effect ammoUseEffect = Fx.none;
@@ -62,9 +62,7 @@ public abstract class Turret extends Block{
     protected Vector2 tr = new Vector2();
     protected Vector2 tr2 = new Vector2();
 
-    protected TextureRegion baseRegion;
-    protected TextureRegion heatRegion;
-    protected TextureRegion baseTopRegion;
+    protected TextureRegion baseRegion, heatRegion;
 
     protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) ->
         Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
@@ -84,6 +82,7 @@ public abstract class Turret extends Block{
         layer = Layer.turret;
         group = BlockGroup.turrets;
         flags = EnumSet.of(BlockFlag.turret);
+        outlineIcon = true;
     }
 
     @Override
@@ -91,13 +90,12 @@ public abstract class Turret extends Block{
         return false;
     }
 
-
     @Override
     public void load(){
         super.load();
 
+        region = Core.atlas.find(name);
         baseRegion = Core.atlas.find("block-" + size);
-        baseTopRegion = Core.atlas.find("block-" + size + "-top");
         heatRegion = Core.atlas.find(name + "-heat");
     }
 
@@ -145,7 +143,7 @@ public abstract class Turret extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Lines.stroke(1f, Palette.placing);
+        Lines.stroke(1f, Pal.placing);
         Lines.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range);
         Draw.color();
     }

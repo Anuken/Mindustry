@@ -1,14 +1,14 @@
 package io.anuke.mindustry.world;
 
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.type.Item;
@@ -33,9 +33,9 @@ public abstract class BlockStorage extends UnlockableContent{
     public float liquidCapacity = 10f;
     public float liquidFlowFactor = 4.9f;
 
-    public BlockStats stats = new BlockStats();
-    public Consumers consumes = new Consumers();
-    public Producers produces = new Producers();
+    public final BlockStats stats = new BlockStats();
+    public final Consumers consumes = new Consumers();
+    public final Producers produces = new Producers();
 
     public boolean shouldConsume(Tile tile){
         return true;

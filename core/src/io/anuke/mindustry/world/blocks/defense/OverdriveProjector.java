@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntSet;
-import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -10,9 +9,7 @@ import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -31,7 +28,7 @@ public class OverdriveProjector extends Block{
     protected int timerUse = timers ++;
 
     protected TextureRegion topRegion;
-    protected float reload = 260f;
+    protected float reload = 60f;
     protected float range = 80f;
     protected float speedBoost = 1.5f;
     protected float speedBoostPhase = 0.75f;
@@ -69,7 +66,6 @@ public class OverdriveProjector extends Block{
             float realRange = range + entity.phaseHeat * phaseRangeBoost;
             float realBoost = (speedBoost + entity.phaseHeat*speedBoostPhase) * entity.power.satisfaction;
 
-            Effects.effect(Fx.overdriveWave, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
             entity.charge = 0f;
 
             int tileRange = (int)(realRange / tilesize);
@@ -87,8 +83,7 @@ public class OverdriveProjector extends Block{
                     if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null){
                         other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
                         other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
-                        Effects.effect(Fx.overdriveBlockFull, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
-                        healed.add(other.pos());
+                       healed.add(other.pos());
                     }
                 }
             }

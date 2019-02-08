@@ -1,14 +1,14 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
@@ -36,25 +36,18 @@ public class ItemLiquidGenerator extends PowerGenerator{
     protected Effects.Effect explodeEffect = Fx.generatespark;
     protected Color heatColor = Color.valueOf("ff9b59");
     protected TextureRegion topRegion;
+    protected boolean randomlyExplode = false;
 
-    public enum InputType{
-        ItemsOnly,
-        LiquidsOnly,
-        LiquidsAndItems
-    }
-
-    public ItemLiquidGenerator(InputType inputType, String name){
+    public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
         super(name);
-        this.hasItems = inputType != InputType.LiquidsOnly;
-        this.hasLiquids = inputType != InputType.ItemsOnly;
+        this.hasItems = hasItems;
+        this.hasLiquids = hasLiquids;
 
         if(hasItems){
-            itemCapacity = 20;
             consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false).optional(true);
         }
 
         if(hasLiquids){
-            liquidCapacity = 10f;
             consumes.add(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, 0.001f, true)).update(false).optional(true);
         }
     }
@@ -67,13 +60,12 @@ public class ItemLiquidGenerator extends PowerGenerator{
         }
     }
 
-
     @Override
     public void update(Tile tile){
         ItemLiquidGeneratorEntity entity = tile.entity();
 
-        // Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
-        //       Power amount is delta'd by PowerGraph class already.
+        //Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
+        //Power amount is delta'd by PowerGraph class already.
         float calculationDelta = entity.delta();
 
         if(!entity.cons.valid()){
@@ -88,6 +80,9 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 break;
             }
         }
+
+        entity.heat = Mathf.lerpDelta(entity.heat, entity.generateTime >= 0.001f ? 1f : 0f, 0.05f);
+
         //liquid takes priority over solids
         if(hasLiquids && liquid != null && entity.liquids.get(liquid) >= 0.001f){
             float baseLiquidEfficiency = getLiquidEfficiency(liquid);
@@ -95,9 +90,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
             float used = Math.min(entity.liquids.get(liquid) * calculationDelta, maximumPossible);
 
             entity.liquids.remove(liquid, used);
-
-            // Note: 0.5 = 100%. PowerGraph will multiply this efficiency by two on its own.
-            entity.productionEfficiency = Mathf.clamp(baseLiquidEfficiency * used / maximumPossible);
+            entity.productionEfficiency = baseLiquidEfficiency * used / maximumPossible;
 
             if(used > 0.001f && Mathf.chance(0.05 * entity.delta())){
                 Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
@@ -115,9 +108,9 @@ public class ItemLiquidGenerator extends PowerGenerator{
             if(entity.generateTime > 0f){
                 entity.generateTime -= Math.min(1f / itemDuration * entity.delta(), entity.generateTime);
 
-                if(Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.25f))){
+                if(randomlyExplode && Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.5f))){
                     //this block is run last so that in the event of a block destruction, no code relies on the block type
-                    entity.damage(Mathf.random(8f));
+                    entity.damage(Mathf.random(11f));
                     Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
                 }
             }else{
@@ -142,17 +135,13 @@ public class ItemLiquidGenerator extends PowerGenerator{
     public void draw(Tile tile){
         super.draw(tile);
 
-        GeneratorEntity entity = tile.entity();
+        ItemLiquidGeneratorEntity entity = tile.entity();
 
         if(hasItems){
-            if(entity.generateTime > 0){
-                Draw.color(heatColor);
-                float alpha = (entity.items.total() > 0 ? 1f : Mathf.clamp(entity.generateTime));
-                alpha = alpha * 0.7f + Mathf.absin(Time.time(), 12f, 0.3f) * alpha;
-                Draw.alpha(alpha);
-                Draw.rect(topRegion, tile.drawx(), tile.drawy());
-                Draw.reset();
-            }
+            Draw.color(heatColor);
+            Draw.alpha(entity.heat * 0.4f + Mathf.absin(Time.time(), 8f, 0.6f) * entity.heat);
+            Draw.rect(topRegion, tile.drawx(), tile.drawy());
+            Draw.reset();
         }
 
         if(hasLiquids){
@@ -182,5 +171,6 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
     public static class ItemLiquidGeneratorEntity extends GeneratorEntity{
         public float explosiveness;
+        public float heat;
     }
 }

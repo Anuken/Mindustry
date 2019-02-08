@@ -22,6 +22,7 @@ public class Zone extends UnlockableContent{
     public Supplier<Rules> rules = Rules::new;
     public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;
+    public int launchPeriod = 10;
 
     public Zone(String name, Generator generator){
         this.name = name;

@@ -10,11 +10,11 @@ import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -33,7 +33,7 @@ public class RepairPoint extends Block{
     protected float powerPerEvent = 0.06f;
     protected ConsumePower consumePower;
 
-    protected TextureRegion topRegion;
+    protected TextureRegion baseRegion;
 
     public RepairPoint(String name){
         super(name);
@@ -44,13 +44,14 @@ public class RepairPoint extends Block{
         layer2 = Layer.laser;
         hasPower = true;
         consumePower = consumes.powerBuffered(20f);
+        outlineIcon = true;
     }
 
     @Override
     public void load(){
         super.load();
 
-        topRegion = Core.atlas.find(name + "-turret");
+        baseRegion = Core.atlas.find(name + "-base");
     }
 
     @Override
@@ -61,16 +62,21 @@ public class RepairPoint extends Block{
 
     @Override
     public void drawSelect(Tile tile){
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Lines.dashCircle(tile.drawx(), tile.drawy(), repairRadius);
         Draw.color();
+    }
+
+    @Override
+    public void draw(Tile tile){
+        Draw.rect(baseRegion, tile.drawx(), tile.drawy());
     }
 
     @Override
     public void drawLayer(Tile tile){
         RepairPointEntity entity = tile.entity();
 
-        Draw.rect(topRegion, tile.drawx(), tile.drawy(), entity.rotation - 90);
+        Draw.rect(region, tile.drawx(), tile.drawy(), entity.rotation - 90);
     }
 
     @Override
@@ -88,6 +94,11 @@ public class RepairPoint extends Block{
                     entity.target.x, entity.target.y, entity.strength);
             Draw.color();
         }
+    }
+
+    @Override
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name + "-base"), Core.atlas.find(name + "-turret")};
     }
 
     @Override

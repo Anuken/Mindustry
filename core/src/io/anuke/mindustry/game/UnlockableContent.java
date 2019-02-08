@@ -2,6 +2,7 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.Vars;
 
 /**Base interface for an unlockable content type.*/
 public abstract class UnlockableContent extends MappableContent{
@@ -25,5 +26,13 @@ public abstract class UnlockableContent extends MappableContent{
     /**Override to make content always unlocked.*/
     public boolean alwaysUnlocked(){
         return false;
+    }
+
+    public final boolean unlocked(){
+        return Vars.data.isUnlocked(this);
+    }
+
+    public final boolean locked(){
+        return !unlocked();
     }
 }

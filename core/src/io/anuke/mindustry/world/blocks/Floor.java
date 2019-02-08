@@ -1,18 +1,22 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class Floor extends Block{
     /** number of different variant regions to use */
@@ -45,9 +49,19 @@ public class Floor extends Block{
     public boolean hasOres = false;
     /** whether this block can be drowned in */
     public boolean isLiquid;
+    /** Heat of this block, 0 at baseline. Used for calculating output of thermal generators.*/
+    public float heat = 0f;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
-    protected TextureRegion[] variantRegions;
+    /**Style of the edge stencil. Loaded by looking up "edge-stencil-{name}".*/
+    public String edgeStyle = "smooth";
+    /**Group of blocks that this block does not draw edges on.*/
+    public Block blendGroup = this;
+    /**Effect displayed when randomly updated.*/
+    public Effect updateEffect = Fx.none;
+
+    protected TextureRegion[][] edges;
+    protected byte eq = 0;
 
     public Floor(String name){
         super(name);
@@ -70,7 +84,16 @@ public class Floor extends Block{
             variantRegions[0] = Core.atlas.find(name);
         }
 
+        int size = (int)(tilesize / Draw.scl);
+        if(Core.atlas.has(name + "-edge")){
+            edges = Core.atlas.find(name + "-edge").split(size, size);
+        }
         region = variantRegions[0];
+    }
+
+    @Override
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
     @Override
@@ -87,11 +110,66 @@ public class Floor extends Block{
         Mathf.random.setSeed(tile.pos());
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
+
+        drawEdges(tile);
     }
 
-    @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
+    protected void drawEdges(Tile tile){
+        eq = 0;
+
+        for(int i = 0; i < 8; i++){
+            Point2 point = Geometry.d8[i];
+            Tile other = tile.getNearby(point);
+            if(other != null && doEdge(other.floor()) && other.floor().edges() != null){
+                eq |= (1 << i);
+            }
+        }
+
+        for(int i = 0; i < 8; i++){
+            if(eq(i)){
+                Point2 point = Geometry.d8[i];
+                Tile other = tile.getNearby(point);
+
+                TextureRegion region = edge(other.floor(), type(i), 2-(point.x + 1), 2-(point.y + 1));
+                Draw.rect(region, tile.worldx(), tile.worldy());
+            }
+        }
+    }
+
+    protected TextureRegion[][] edges(){
+        return ((Floor)blendGroup).edges;
+    }
+
+    protected boolean doEdge(Floor other){
+        return (other.blendGroup.id > blendGroup.id || edges() == null) && other.edgeOnto(this);
+    }
+
+    protected boolean edgeOnto(Floor other){
+        return true;
+    }
+
+    int type(int i){
+        if(!eq(i - 1) && !eq(i + 1)){
+            //case 0: touching
+            return 0;
+        }else if(eq(i - 1) && eq(i - 2) && eq(i + 1) && eq(i + 2)){
+            //case 2: surrounded
+            return 2;
+        }else if(eq(i - 1) && eq(i + 1)){
+            //case 1: flat
+            return 1;
+        }else{
+            //case 0 is rounded, so it's the safest choice, should work for most possibilities
+            return 0;
+        }
+    }
+
+    boolean eq(int i){
+        return (eq & (1 << Mathf.mod(i, 8))) != 0;
+    }
+
+    TextureRegion edge(Floor block, int type, int x, int y){
+        return block.edges()[x + type*3][2-y];
     }
 
 }

@@ -1,8 +1,8 @@
 package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.arc.scene.ui.Tooltip;
@@ -10,9 +10,10 @@ import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.mobile;
 
+/**An abstract class that defines a type of resource that a block can consume.*/
 public abstract class Consume{
     protected boolean optional;
-    protected boolean update = true;
+    protected boolean update = true, boost = false;
 
     public Consume optional(boolean optional){
         this.optional = optional;
@@ -21,6 +22,11 @@ public abstract class Consume{
 
     public Consume update(boolean update){
         this.update = update;
+        return this;
+    }
+
+    public Consume boost(boolean boost){
+        this.boost = boost;
         return this;
     }
 
@@ -41,8 +47,8 @@ public abstract class Consume{
 
         table.table(out -> {
             out.addImage(getIcon()).size(10 * scale).color(Color.DARK_GRAY).padRight(-10 * scale).padBottom(-scale * 2);
-            out.addImage(getIcon()).size(10 * scale).color(Palette.accent);
-            out.addImage("icon-missing").size(10 * scale).color(Palette.remove).padLeft(-10 * scale);
+            out.addImage(getIcon()).size(10 * scale).color(Pal.accent);
+            out.addImage("icon-missing").size(10 * scale).color(Pal.remove).padLeft(-10 * scale);
         }).size(10 * scale).get().addListener(new Tooltip<>(t));
     }
 

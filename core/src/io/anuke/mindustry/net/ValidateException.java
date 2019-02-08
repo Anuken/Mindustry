@@ -1,6 +1,6 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 
 /**
  * Thrown when a client sends invalid information.

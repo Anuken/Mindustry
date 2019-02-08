@@ -25,7 +25,7 @@ public interface SelectionTrait{
         int i = 0;
 
         for(Item item : items){
-            if(!data.isUnlocked(item)) continue;
+            if(!data.isUnlocked(item) && world.isZone()) continue;
 
             ImageButton button = cont.addImageButton("white", "clear-toggle", 24, () -> {}).group(group).get();
             button.changed(() -> consumer.accept(button.isChecked() ? item : null));

@@ -1,5 +1,6 @@
 package power;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
@@ -24,13 +25,13 @@ import java.lang.reflect.Field;
  *  Note: All tests which subclass this will run with a fixed delta of 0.5!
  * */
 public class PowerTestFixture{
-
     public static final float smallRoundingTolerance = Mathf.FLOAT_ROUNDING_ERROR;
     public static final float mediumRoundingTolerance = Mathf.FLOAT_ROUNDING_ERROR * 10;
     public static final float highRoundingTolerance = Mathf.FLOAT_ROUNDING_ERROR * 100;
 
     @BeforeAll
     static void initializeDependencies(){
+        Core.graphics = new FakeGraphics();
         Vars.content = new ContentLoader();
         Vars.content.load();
         Time.setDeltaProvider(() -> 0.5f);
@@ -49,9 +50,9 @@ public class PowerTestFixture{
         }};
     }
 
-    protected static Block createFakeDirectConsumer(float powerPerTick, float minimumSatisfaction){
+    protected static Block createFakeDirectConsumer(float powerPerTick){
         return new PowerBlock("fakedirectconsumer"){{
-            consumes.power(powerPerTick, minimumSatisfaction);
+            consumes.power(powerPerTick);
         }};
     }
 
@@ -99,7 +100,7 @@ public class PowerTestFixture{
 
             return tile;
         }catch(Exception ex){
-            return null;
+            throw new RuntimeException(ex);
         }
     }
 }

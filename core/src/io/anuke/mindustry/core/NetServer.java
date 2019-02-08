@@ -7,10 +7,10 @@ import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntMap;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.entities.Entities;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.EntityQuery;
-import io.anuke.arc.entities.trait.Entity;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.traits.Entity;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Colors;
 import io.anuke.arc.math.Mathf;
@@ -24,7 +24,7 @@ import io.anuke.arc.util.io.CountableByteArrayOutputStream;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -156,7 +156,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            Log.info("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, connection.address);
+            Log.debug("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, connection.address);
 
             String ip = Net.getConnection(id).address;
 
@@ -234,7 +234,7 @@ public class NetServer implements ApplicationListener{
         data.stream = new ByteArrayInputStream(stream.toByteArray());
         Net.sendStream(clientID, data);
 
-        Log.info("Packed {0} compressed bytes of world data.", stream.size());
+        Log.debug("Packed {0} compressed bytes of world data.", stream.size());
     }
 
     public static void onDisconnect(Player player){
@@ -259,7 +259,7 @@ public class NetServer implements ApplicationListener{
     @Remote(targets = Loc.client, unreliable = true)
     public static void onClientShapshot(
         Player player,
-        int snapshotID, long sent,
+        int snapshotID,
         float x, float y,
         float pointerX, float pointerY,
         float rotation, float baseRotation,
@@ -272,7 +272,7 @@ public class NetServer implements ApplicationListener{
         NetConnection connection = player.con;
         if(connection == null || snapshotID < connection.lastRecievedClientSnapshot) return;
 
-        boolean verifyPosition = !player.isDead() && netServer.admins.getStrict() && headless && player.getCarrier() == null;
+        boolean verifyPosition = !player.isDead() && netServer.admins.getStrict() && headless;
 
         if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = Time.millis() - 16;
 
@@ -329,7 +329,7 @@ public class NetServer implements ApplicationListener{
         player.y = prevy;
 
         //set interpolator target to *new* position so it moves toward it
-        player.getInterpolator().read(player.x, player.y, newx, newy, sent, rotation, baseRotation);
+        player.getInterpolator().read(player.x, player.y, newx, newy, rotation, baseRotation);
         player.velocity().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
 
         connection.lastRecievedClientSnapshot = snapshotID;
@@ -340,13 +340,13 @@ public class NetServer implements ApplicationListener{
     public static void onAdminRequest(Player player, Player other, AdminAction action){
 
         if(!player.isAdmin){
-            Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
+            Log.warn("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
                     player.name, player.con.address);
             return;
         }
 
         if(other == null || ((other.isAdmin && !player.isLocal) && other != player)){
-            Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
+            Log.warn("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
             return;
         }
 

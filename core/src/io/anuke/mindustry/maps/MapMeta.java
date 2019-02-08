@@ -35,10 +35,6 @@ public class MapMeta{
         return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Core.bundle.get("unknown");
     }
 
-    public boolean hasOreGen(){
-        return !tags.get("oregen", "0").equals("0");
-    }
-
     @Override
     public String toString(){
         return "MapMeta{" +

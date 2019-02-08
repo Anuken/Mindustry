@@ -1,10 +1,14 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.Unit;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
@@ -33,6 +37,17 @@ public class ItemTurret extends CooledTurret{
 
         stats.remove(BlockStat.itemCapacity);
         stats.add(BlockStat.inputItems, new ItemFilterValue(item -> ammo.containsKey(item)));
+    }
+
+
+    @Override
+    public void displayBars(Tile tile, Table bars){
+        super.displayBars(tile, bars);
+
+        TurretEntity entity = tile.entity();
+
+        bars.add(new Bar("blocks.ammo", Pal.ammo, () -> (float)entity.totalAmmo / maxAmmo)).growX();
+        bars.row();
     }
 
     @Override
@@ -66,7 +81,6 @@ public class ItemTurret extends CooledTurret{
 
         BulletType type = ammo.get(item);
         entity.totalAmmo += type.ammoMultiplier;
-        entity.items.add(item, 1);
 
         //find ammo entry by type
         for(int i = 0; i < entity.ammo.size; i++){
@@ -89,6 +103,11 @@ public class ItemTurret extends CooledTurret{
         TurretEntity entity = tile.entity();
 
         return ammo != null && ammo.get(item) != null && entity.totalAmmo + ammo.get(item).ammoMultiplier <= maxAmmo;
+    }
+
+    @Override
+    public TileEntity newEntity(){
+        return new ItemTurretEntity();
     }
 
     public class ItemTurretEntity extends TurretEntity{

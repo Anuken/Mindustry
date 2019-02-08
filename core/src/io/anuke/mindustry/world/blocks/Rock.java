@@ -8,7 +8,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
 
 public class Rock extends Block{
-    protected TextureRegion[] shadowRegions, regions;
+    protected TextureRegion[] regions;
     protected int variants;
 
     public Rock(String name){
@@ -19,13 +19,16 @@ public class Rock extends Block{
 
     @Override
     public void draw(Tile tile){
-        Draw.colorl(1f - tile.getRotation() / 4f);
         if(variants > 0){
             Draw.rect(regions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, regions.length - 1))], tile.worldx(), tile.worldy());
         }else{
             Draw.rect(region, tile.worldx(), tile.worldy());
         }
-        Draw.color();
+    }
+
+    @Override
+    public TextureRegion[] variantRegions(){
+        return regions;
     }
 
     @Override
@@ -38,11 +41,9 @@ public class Rock extends Block{
         super.load();
 
         if(variants > 0){
-            shadowRegions = new TextureRegion[variants];
             regions = new TextureRegion[variants];
 
             for(int i = 0; i < variants; i++){
-                shadowRegions[i] = Core.atlas.find(name + "shadow" + (i + 1));
                 regions[i] = Core.atlas.find(name + (i + 1));
             }
         }

@@ -3,10 +3,10 @@ package io.anuke.mindustry.world.blocks.defense;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -38,6 +38,11 @@ public class ShockMine extends Block{
     }
 
     @Override
+    public void drawTeam(Tile tile){
+        //no
+    }
+
+    @Override
     public void draw(Tile tile){
         //nope
     }
@@ -46,7 +51,7 @@ public class ShockMine extends Block{
     public void unitOn(Tile tile, Unit unit){
         if(unit.getTeam() != tile.getTeam() && tile.entity.timer.get(timerDamage, cooldown)){
             for(int i = 0; i < tendrils; i++){
-                Lightning.create(tile.getTeam(), Palette.lancerLaser, damage, tile.drawx(), tile.drawy(), Mathf.random(360f), length);
+                Lightning.create(tile.getTeam(), Pal.lancerLaser, damage, tile.drawx(), tile.drawy(), Mathf.random(360f), length);
             }
             tile.entity.damage(tileDamage);
         }

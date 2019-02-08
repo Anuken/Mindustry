@@ -20,4 +20,12 @@ public class ItemStack{
         }
         return stacks;
     }
+
+    @Override
+    public String toString(){
+        return "ItemStack{" +
+        "item=" + item +
+        ", amount=" + amount +
+        '}';
+    }
 }

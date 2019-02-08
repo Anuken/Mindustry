@@ -26,6 +26,10 @@ allprojects{
         gdxVersion = '1.9.9'
         roboVMVersion = '2.3.0'
         arcHash = null
+        
+        debugged = {
+            return new File(projectDir.parent, '../debug').exists() && System.properties["release"] == null
+        }
 
         localArc = {
             return (System.properties["release"] == null || System.properties["release"] == "false") && new File(projectDir.parent, '../Arc').exists()
@@ -35,7 +39,7 @@ allprojects{
             //get latest commit hash from gtihub since JITPack's '-snapshot' version doesn't work correctly
             if(arcHash == null){
                 try{
-                    arcHash = 'git ls-remote https://github.com/Anuken/Arc.git'.execute().text.split("\t")[0]//new JsonSlurper().parse(new URL("https://api.github.com/repos/Anuken/Arc/commits/master"))["sha"]
+                    arcHash = 'git ls-remote https://github.com/Anuken/Arc.git'.execute().text.split("\t")[0]
                 }catch(e){
                     e.printStackTrace()
                     arcHash = "-SNAPSHOT";
@@ -117,7 +121,7 @@ project(":desktop"){
         compile project(":core")
         compile project(":net")
         
-        if(new File(projectDir.parent, '../debug').exists() && System.properties["release"] == null) compile project(":debug")
+        if(debugged()) compile project(":debug")
 
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
@@ -194,6 +198,7 @@ project(":core"){
 
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
+        if(localArc() && debugged()) compile arcModule("extensions:recorder")
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
