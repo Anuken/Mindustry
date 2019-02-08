@@ -38,9 +38,8 @@ public class PowerTestFixture{
     }
 
     protected static PowerGenerator createFakeProducerBlock(float producedPower){
-        // Multiply produced power by 2 since production efficiency is defined to be 0.5 = 100%
         return new PowerGenerator("fakegen"){{
-            powerProduction = producedPower * 2.0f;
+            powerProduction = producedPower;
         }};
     }
 

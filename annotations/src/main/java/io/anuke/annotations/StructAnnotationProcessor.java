@@ -73,7 +73,7 @@ public class StructAnnotationProcessor extends AbstractProcessor{
                     Class<?> structType = typeForSize(structSize);
 
                     //[constructor] get(fields...) : structType
-                    MethodSpec.Builder constructor = MethodSpec.methodBuilder("get") //TODO 'get'..?
+                    MethodSpec.Builder constructor = MethodSpec.methodBuilder("get")
                     .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
                     .returns(structType);
 

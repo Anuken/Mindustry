@@ -36,6 +36,7 @@ public class MapGenerator extends Generator{
     public boolean distortFloor = false;
     /**Items randomly added to containers and vaults.*/
     public ItemStack[] storageDrops = ItemStack.with(Items.copper, 300, Items.lead, 300, Items.silicon, 200, Items.graphite, 200, Items.blastCompound, 200);
+    public Block coreBlock;
 
     public MapGenerator(String mapName){
         this.mapName = mapName;
@@ -44,6 +45,11 @@ public class MapGenerator extends Generator{
     public MapGenerator(String mapName, int enemySpawns){
         this.mapName = mapName;
         this.enemySpawns = enemySpawns;
+    }
+
+    public MapGenerator core(Block block){
+        this.coreBlock = block;
+        return this;
     }
 
     public MapGenerator drops(ItemStack[] drops){
@@ -174,8 +180,7 @@ public class MapGenerator extends Generator{
             throw new IllegalArgumentException("All zone maps must have a core.");
         }
 
-        //TODO set specific core block?
-        tiles[core.x][core.y].setBlock(coreTypes.get(players.indexOf(core)), defaultTeam);
+        tiles[core.x][core.y].setBlock(coreBlock == null ? coreTypes.get(players.indexOf(core)) : coreBlock, defaultTeam);
 
         world.prepareTiles(tiles);
         world.setMap(map);

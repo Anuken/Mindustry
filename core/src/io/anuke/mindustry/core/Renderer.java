@@ -200,8 +200,6 @@ public class Renderer implements ApplicationListener{
         overlays.drawBottom();
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
-        //TODO shield
-
         if(EntityDraw.countInBounds(shieldGroup) > 0){
             if(graphics.getWidth() >= 2 && graphics.getHeight() >= 2 && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
                 shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
@@ -232,9 +230,6 @@ public class Renderer implements ApplicationListener{
     }
 
     private void drawFlyerShadows(){
-        //TODO fix flyer shadows
-        //Graphics.surface(effectSurface, true, false);
-
         float trnsX = -12, trnsY = -13;
         Draw.color(0, 0, 0, 0.15f);
 
@@ -248,8 +243,6 @@ public class Renderer implements ApplicationListener{
             drawAndInterpolate(playerGroup, unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
         }
 
-        //Draw.color(0, 0, 0, 0.15f);
-        //Graphics.flushSurface();
         Draw.color();
     }
 

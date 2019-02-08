@@ -210,6 +210,12 @@ public class UnitFactory extends Block{
         return new UnitFactoryEntity();
     }
 
+    @Override
+    public boolean canProduce(Tile tile){
+        UnitFactoryEntity entity = tile.entity();
+        return entity.spawned < maxSpawn;
+    }
+
     protected boolean hasRequirements(ItemModule inv, float fraction){
         for(ItemStack stack : consumes.items()){
             if(!inv.has(stack.item, (int) (fraction * stack.amount))){

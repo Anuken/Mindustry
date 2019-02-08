@@ -17,8 +17,6 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 
 import static io.anuke.mindustry.Vars.*;
 
-//TODO consider using quadtrees for finding specific types of blocks within an area
-
 /**Class used for indexing special target blocks for AI.*/
 @SuppressWarnings("unchecked")
 public class BlockIndexer{

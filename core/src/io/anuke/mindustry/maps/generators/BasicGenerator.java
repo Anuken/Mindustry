@@ -21,7 +21,6 @@ public class BasicGenerator extends RandomGenerator{
 
     @Override
     public void generate(Tile[][] tiles){
-        //todo use set seed
         int seed = Mathf.random(99999999);
         sim.setSeed(seed);
         sim2.setSeed(seed + 1);

@@ -42,8 +42,6 @@ public class Smelter extends Block{
     public void setStats(){
         super.setStats();
 
-        //TODO
-        //stats.add(BlockStat.inputFuel, fuel);
         stats.add(BlockStat.fuelBurnTime, burnDuration / 60f, StatUnit.seconds);
         stats.add(BlockStat.outputItem, result);
         stats.add(BlockStat.craftSpeed, 60f / craftTime, StatUnit.itemsSecond);

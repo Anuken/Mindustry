@@ -51,7 +51,7 @@ public class Blocks implements ContentList{
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, overdriveProjector, forceProjector, shockMine,
 
-    //transpor
+    //transport
     conveyor, titaniumConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
 
     //liquids
@@ -992,7 +992,7 @@ public class Blocks implements ContentList{
             alwaysUnlocked = true;
 
             health = 1100;
-            itemCapacity = 5000;
+            itemCapacity = 3000;
             size = 3;
         }};
 
@@ -1000,7 +1000,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 4000, Items.silicon, 2000));
 
             health = 2000;
-            itemCapacity = 8000;
+            itemCapacity = 6000;
             size = 4;
         }};
 
@@ -1008,7 +1008,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 8000, Items.silicon, 4000, Items.surgealloy, 2000));
 
             health = 4000;
-            itemCapacity = 12000;
+            itemCapacity = 10000;
             size = 5;
         }};
 

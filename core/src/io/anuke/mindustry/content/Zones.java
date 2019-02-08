@@ -29,7 +29,7 @@ public class Zones implements ContentList{
                 waveSpacing = 60 * 60 * 2; //2 mins
                 spawns = Array.with(
                     new SpawnGroup(UnitTypes.dagger){{
-                        unitScaling = 2;
+                        unitScaling = 1.5f;
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
@@ -73,7 +73,7 @@ public class Zones implements ContentList{
                 waveSpacing = 60 * 60 * 1.5f;
                 spawns = Array.with(
                     new SpawnGroup(UnitTypes.dagger){{
-                        unitScaling = 2;
+                        unitScaling = 1.5f;
                     }},
 
                     new SpawnGroup(UnitTypes.crawler){{
@@ -109,7 +109,8 @@ public class Zones implements ContentList{
         }};
 
         frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 2)
-            .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
+            .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))
+            .core(Blocks.coreFoundation)){{
             deployCost = ItemStack.with(Items.copper, 500);
             startingItems = ItemStack.with(Items.copper, 400);
             conditionWave = 10;
@@ -168,7 +169,8 @@ public class Zones implements ContentList{
             }};
         }};
 
-        ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1)){{
+        ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1)
+            .core(Blocks.coreFoundation)){{
             deployCost = ItemStack.with(Items.copper, 600, Items.graphite, 50);
             startingItems = ItemStack.with(Items.copper, 400);
             conditionWave = 20;
@@ -242,7 +244,8 @@ public class Zones implements ContentList{
 
         stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2)
             .dist(2.5f, true)
-            .decor(new Decoration(Blocks.stainedStone, Blocks.stainedBoulder, 0.01))){{
+            .decor(new Decoration(Blocks.stainedStone, Blocks.stainedBoulder, 0.01))
+            .core(Blocks.coreFoundation)){{
             deployCost = ItemStack.with(Items.copper, 500, Items.lead, 300, Items.silicon, 100);
             startingItems = ItemStack.with(Items.copper, 400, Items.lead, 100);
             conditionWave = 10;
@@ -386,7 +389,8 @@ public class Zones implements ContentList{
             }};
         }};
 
-        desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift").dist(2f)){{
+        desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift")
+                .core(Blocks.coreFoundation).dist(2f)){{
             deployCost = ItemStack.with(Items.copper, 2000);
             startingItems = ItemStack.with(Items.copper, 1500);
             itemRequirements = ItemStack.with(Items.copper, 8000, Items.metaglass, 2000, Items.graphite, 3000);

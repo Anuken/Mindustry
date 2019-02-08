@@ -51,7 +51,6 @@ public class PowerTests extends PowerTestFixture{
         }
         void simulateDirectConsumption(float producedPower, float requiredPower, float expectedSatisfaction, String parameterDescription){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 0.5f; // Currently, 0.5f = 100%
             Tile directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requiredPower));
 
             PowerGraph powerGraph = new PowerGraph();
@@ -91,7 +90,6 @@ public class PowerTests extends PowerTestFixture{
         }
         void simulateBufferedConsumption(float producedPower, float maxBuffer, float powerConsumedPerTick, float initialSatisfaction, float expectedSatisfaction, String parameterDescription){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 0.5f; // Currently, 0.5 = 100%
             Tile bufferedConsumerTile = createFakeTile(0, 1, createFakeBufferedConsumer(maxBuffer, maxBuffer > 0.0f ? maxBuffer/powerConsumedPerTick : 1.0f));
             bufferedConsumerTile.entity.power.satisfaction = initialSatisfaction;
 
@@ -136,7 +134,6 @@ public class PowerTests extends PowerTestFixture{
 
             if(producedPower > 0.0f){
                 Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-                producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 0.5f;
                 powerGraph.add(producerTile);
             }
             Tile directConsumerTile = null;

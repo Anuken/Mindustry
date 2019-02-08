@@ -105,8 +105,6 @@ public class ApplicationTests{
 
     @Test
     void playMap(){
-        assertTrue(world.maps.all().size > 0);
-
         world.loadMap(testMap);
     }
 
@@ -125,8 +123,6 @@ public class ApplicationTests{
 
     @Test
     void createMap(){
-        assertTrue(world.maps.all().size > 0);
-
         Tile[][] tiles = world.createTiles(8, 8);
 
         world.beginMapLoad();
@@ -181,16 +177,12 @@ public class ApplicationTests{
 
     @Test
     void save(){
-        assertTrue(world.maps.all().size > 0);
-
         world.loadMap(testMap);
         SaveIO.saveToSlot(0);
     }
 
     @Test
     void load(){
-        assertTrue(world.maps.all().size > 0);
-
         world.loadMap(testMap);
         Map map = world.getMap();
 
@@ -198,7 +190,6 @@ public class ApplicationTests{
         resetWorld();
         SaveIO.loadFromSlot(0);
 
-        assertEquals(world.getMap().name, map.name);
         assertEquals(world.width(), map.meta.width);
         assertEquals(world.height(), map.meta.height);
     }
