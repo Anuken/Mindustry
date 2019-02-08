@@ -390,7 +390,7 @@ public class Zones implements ContentList{
         }};
 
         desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift")
-                .core(Blocks.coreFoundation).dist(2f)){{
+                .core(Blocks.coreNucleus).dist(2f)){{
             deployCost = ItemStack.with(Items.copper, 2000);
             startingItems = ItemStack.with(Items.copper, 1500);
             itemRequirements = ItemStack.with(Items.copper, 8000, Items.metaglass, 2000, Items.graphite, 3000);
@@ -483,7 +483,8 @@ public class Zones implements ContentList{
         */
         nuclearComplex = new Zone("nuclearComplex", new MapGenerator("nuclearProductionComplex", 1)
         .drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 1000, Items.thorium, 200, Items.titanium, 2000, Items.metaglass, 1000))
-        .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
+        .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))
+        .core(Blocks.coreFoundation)){{
             deployCost = ItemStack.with(Items.copper, 3000, Items.lead, 2000, Items.silicon, 1000, Items.metaglass, 500);
             startingItems = ItemStack.with(Items.copper, 2500, Items.lead, 1500, Items.silicon, 800, Items.metaglass, 400);
             itemRequirements = ItemStack.with(Items.copper, 10000, Items.titanium, 8000, Items.metaglass, 6000, Items.plastanium, 2000);

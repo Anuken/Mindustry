@@ -26,7 +26,7 @@ public class Generators {
 
         ImagePacker.generate("block-icons", () -> {
             Image colors = new Image(256, 1);
-            Color outlineColor = new Color(0, 0, 0, 0.3f);
+            Color outlineColor = new Color(0, 0, 0, 0.2f);
 
             for(Block block : content.blocks()){
                 TextureRegion[] regions = block.getGeneratedIcons();
@@ -36,28 +36,12 @@ public class Generators {
                 }
 
                 try{
-                    Image image = ImagePacker.get(regions[0]);
-
-                    for(TextureRegion region : regions){
-                        image.draw(region);
-                    }
-
-                    if(regions.length > 1){
-                        image.save(block.name + "-icon-full");
-                    }
-
-                    for(Icon icon : Icon.values()){
-                        if(icon.size == 0 || (icon.size == image.width() && icon.size == image.height())) continue;
-                        Image scaled = new Image(icon.size, icon.size);
-                        scaled.drawScaled(image);
-                        scaled.save(block.name + "-icon-" + icon.name());
-                    }
-
+                    Image last = null;
                     if(block.outlineIcon){
                         int radius = 3;
                         GenRegion region = (GenRegion)regions[regions.length-1];
                         Image base = ImagePacker.get(region);
-                        Image out = new Image(region.getWidth(), region.getHeight());
+                        Image out = last = new Image(region.getWidth(), region.getHeight());
                         for(int x = 0; x < out.width(); x++){
                             for(int y = 0; y < out.height(); y++){
 
@@ -90,6 +74,29 @@ public class Generators {
                         }
 
                         out.save(block.name);
+                    }
+
+                    Image image = ImagePacker.get(regions[0]);
+
+                    int i = 0;
+                    for(TextureRegion region : regions){
+                        i ++;
+                        if(i != regions.length || last == null){
+                            image.draw(region);
+                        }else{
+                            image.draw(last);
+                        }
+                    }
+
+                    if(regions.length > 1){
+                        image.save(block.name + "-icon-full");
+                    }
+
+                    for(Icon icon : Icon.values()){
+                        if(icon.size == 0 || (icon.size == image.width() && icon.size == image.height())) continue;
+                        Image scaled = new Image(icon.size, icon.size);
+                        scaled.drawScaled(image);
+                        scaled.save(block.name + "-icon-" + icon.name());
                     }
 
                     Color average = new Color();
