@@ -368,7 +368,7 @@ junction
   orig: 32, 32
   offset: 0, 0
   index: -1
-mass-driver
+mass-driver-base
   rotate: false
   xy: 1359, 1494
   size: 96, 96
@@ -2615,7 +2615,7 @@ phantom-factory-top-open
   orig: 64, 64
   offset: 0, 0
   index: -1
-repair-point
+repair-point-base
   rotate: false
   xy: 1949, 544
   size: 32, 32

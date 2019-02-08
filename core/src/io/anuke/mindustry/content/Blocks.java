@@ -432,7 +432,7 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, ItemStack.with(Items.copper, 60, Items.lead, 70, Items.graphite, 90));
             health = 200;
             outputLiquid = Liquids.slag;
-            outputLiquidAmount = 1.5f;
+            outputLiquidAmount = 2f;
             craftTime = 10f;
             hasLiquids = hasPower = true;
 
@@ -630,21 +630,21 @@ public class Blocks implements ContentList{
         }};
 
         mendProjector = new MendProjector("mend-projector"){{
-            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.titanium, 50, Items.silicon, 180));
+            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 50, Items.silicon, 180));
             consumes.power(2f);
             size = 2;
             consumes.item(Items.phasefabric).optional(true);
         }};
 
         overdriveProjector = new OverdriveProjector("overdrive-projector"){{
-            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.titanium, 150, Items.silicon, 250));
+            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.silicon, 250));
             consumes.power(3.50f);
             size = 2;
             consumes.item(Items.phasefabric).optional(true).boost(true);
         }};
 
         forceProjector = new ForceProjector("force-projector"){{
-            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.titanium, 150, Items.silicon, 250));
+            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.silicon, 250));
             size = 3;
             consumes.item(Items.phasefabric).optional(true).boost(true);
         }};

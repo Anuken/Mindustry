@@ -33,7 +33,7 @@ public class RepairPoint extends Block{
     protected float powerPerEvent = 0.06f;
     protected ConsumePower consumePower;
 
-    protected TextureRegion topRegion;
+    protected TextureRegion baseRegion;
 
     public RepairPoint(String name){
         super(name);
@@ -51,7 +51,7 @@ public class RepairPoint extends Block{
     public void load(){
         super.load();
 
-        topRegion = Core.atlas.find(name);
+        baseRegion = Core.atlas.find(name + "-base");
     }
 
     @Override
@@ -68,10 +68,15 @@ public class RepairPoint extends Block{
     }
 
     @Override
+    public void draw(Tile tile){
+        Draw.rect(baseRegion, tile.drawx(), tile.drawy());
+    }
+
+    @Override
     public void drawLayer(Tile tile){
         RepairPointEntity entity = tile.entity();
 
-        Draw.rect(topRegion, tile.drawx(), tile.drawy(), entity.rotation - 90);
+        Draw.rect(region, tile.drawx(), tile.drawy(), entity.rotation - 90);
     }
 
     @Override
@@ -93,7 +98,7 @@ public class RepairPoint extends Block{
 
     @Override
     public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-turret")};
+        return new TextureRegion[]{Core.atlas.find(name + "-base"), Core.atlas.find(name + "-turret")};
     }
 
     @Override

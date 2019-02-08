@@ -48,7 +48,7 @@ public class MassDriver extends Block{
     protected Effect recieveEffect = Fx.mineBig;
     protected float shake = 3f;
     protected float powerPercentageUsed = 0.95f;
-    protected TextureRegion turretRegion;
+    protected TextureRegion baseRegion;
 
     public MassDriver(String name){
         super(name);
@@ -111,14 +111,14 @@ public class MassDriver extends Block{
 
     @Override
     public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-turret")};
+        return new TextureRegion[]{Core.atlas.find(name + "-base"), Core.atlas.find(name + "-turret")};
     }
 
     @Override
     public void load(){
         super.load();
 
-        turretRegion = Core.atlas.find(name);
+        baseRegion = Core.atlas.find(name + "-base");
     }
 
     @Override
@@ -179,10 +179,15 @@ public class MassDriver extends Block{
     }
 
     @Override
+    public void draw(Tile tile){
+        Draw.rect(baseRegion, tile.drawx(), tile.drawy());
+    }
+
+    @Override
     public void drawLayer(Tile tile){
         MassDriverEntity entity = tile.entity();
 
-        Draw.rect(turretRegion,
+        Draw.rect(region,
                 tile.drawx() + Angles.trnsx(entity.rotation + 180f, entity.reload * knockback),
                 tile.drawy() + Angles.trnsy(entity.rotation + 180f, entity.reload * knockback), entity.rotation - 90);
     }
