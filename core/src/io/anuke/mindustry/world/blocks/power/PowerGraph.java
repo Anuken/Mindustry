@@ -22,7 +22,7 @@ public class PowerGraph{
     private final ObjectSet<Tile> batteries = new ObjectSet<>();
     private final ObjectSet<Tile> all = new ObjectSet<>();
 
-    private long lastFrameUpdated;
+    private long lastFrameUpdated = -1;
     private final int graphID;
     private static int lastGraphID;
 
@@ -137,7 +137,7 @@ public class PowerGraph{
     }
 
     public void update(){
-        if(Core.graphics.getFrameId() == lastFrameUpdated || consumers.size == 0 && producers.size == 0 && batteries.size == 0){
+        if(Core.graphics.getFrameId() == lastFrameUpdated || (consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
             return;
         }
 
