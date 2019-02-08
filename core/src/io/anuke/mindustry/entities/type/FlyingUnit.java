@@ -5,7 +5,6 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
@@ -16,34 +15,12 @@ import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-
-import static io.anuke.mindustry.Vars.world;
 
 public abstract class FlyingUnit extends BaseUnit{
     protected float[] weaponAngles = {0, 0};
 
     protected final UnitState
-
-    idle = new UnitState(){
-        public void update(){
-            retarget(() -> {
-                targetClosest();
-                targetClosestEnemyFlag(BlockFlag.target);
-
-                if(target != null){
-                    setState(attack);
-                }
-            });
-
-            target = getClosestCore();
-            if(target != null){
-                circle(50f);
-            }
-            velocity.scl(0.8f);
-        }
-    },
 
     attack = new UnitState(){
         public void entered(){
@@ -51,6 +28,7 @@ public abstract class FlyingUnit extends BaseUnit{
         }
 
         public void update(){
+
             if(Units.invalidateTarget(target, team, x, y)){
                 target = null;
             }
@@ -60,19 +38,15 @@ public abstract class FlyingUnit extends BaseUnit{
                 retarget(() -> {
                     targetClosest();
 
-                    if(target == null){
-                        setState(patrol);
-                        return;
-                    }
-
                     if(target == null) targetClosestEnemyFlag(BlockFlag.target);
                     if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
                     if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
 
                     if(target == null){
-                        setState(idle);
+                        setState(patrol);
                     }
                 });
+
             }else{
                 attack(type.attackLength);
 
@@ -103,6 +77,7 @@ public abstract class FlyingUnit extends BaseUnit{
         public void update(){
             retarget(() -> {
                 targetClosest();
+                targetClosestEnemyFlag(BlockFlag.target);
 
                 if(target != null){
                     setState(attack);
@@ -113,24 +88,6 @@ public abstract class FlyingUnit extends BaseUnit{
 
             if(target != null){
                 circle(60f + Mathf.absin(Time.time() + id * 23525, 70f, 1200f));
-            }
-        }
-    },
-    retreat = new UnitState(){
-        public void entered(){
-            target = null;
-        }
-
-        public void update(){
-            if(health >= maxHealth()){
-                state.set(attack);
-            }else if(!targetHasFlag(BlockFlag.repair)){
-                retarget(() -> {
-                    Tile target = Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair));
-                    if(target != null) FlyingUnit.this.target = target.entity;
-                });
-            }else{
-                circle(20f);
             }
         }
     };
@@ -183,16 +140,12 @@ public abstract class FlyingUnit extends BaseUnit{
 
     @Override
     public void behavior(){
+
         if(Units.invalidateTarget(target, this)){
             for(boolean left : Mathf.booleans){
                 int wi = Mathf.num(left);
                 weaponAngles[wi] = Mathf.slerpDelta(weaponAngles[wi],rotation, 0.1f);
             }
-        }
-
-        if(health <= health * type.retreatPercent &&
-         Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
-            setState(retreat);
         }
     }
 

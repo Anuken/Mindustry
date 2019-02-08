@@ -57,19 +57,6 @@ public abstract class GroundUnit extends BaseUnit{
                 }
             }
         }
-    },
-    retreat = new UnitState(){
-        public void entered(){
-            target = null;
-        }
-
-        public void update(){
-            if(health >= maxHealth()){
-                state.set(attack);
-            }
-
-            moveAwayFromCore();
-        }
     };
 
     @Override
@@ -158,9 +145,6 @@ public abstract class GroundUnit extends BaseUnit{
 
     @Override
     public void behavior(){
-        if(health <= health * type.retreatPercent){
-            setState(retreat);
-        }
 
         if(!Units.invalidateTarget(target, this)){
             if(dst(target) < getWeapon().bullet.range()){

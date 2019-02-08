@@ -258,6 +258,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         velocity.limit(maxVelocity()).scl(1f + (status.getSpeedMultiplier()-1f) * Time.delta());
 
+        if(x < -finalWorldBounds || y < -finalWorldBounds || x >= world.width() * tilesize + finalWorldBounds || y >= world.height() * tilesize + finalWorldBounds){
+            kill();
+        }
+
         if(isFlying()){
             move(velocity.x * Time.delta(), velocity.y * Time.delta());
         }else{

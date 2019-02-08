@@ -292,4 +292,12 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public EntityGroup targetGroup(){
         return tileGroup;
     }
+
+    @Override
+    public String toString(){
+        return "TileEntity{" +
+        "tile=" + tile +
+        ", health=" + health +
+        '}';
+    }
 }
