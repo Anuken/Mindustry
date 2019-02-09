@@ -4,10 +4,12 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Zones;
@@ -26,7 +28,7 @@ import io.anuke.mindustry.world.Block.Icon;
 import static io.anuke.mindustry.Vars.*;
 
 public class DeployDialog extends FloatingDialog{
-    private static final float nodeSize = 250f;
+    private final float nodeSize = Unit.dp.scl(250f);
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
 
     public DeployDialog(){
@@ -35,8 +37,7 @@ public class DeployDialog extends FloatingDialog{
         ZoneNode root = new ZoneNode(Zones.groundZero, null);
 
         TreeLayout layout = new TreeLayout();
-        layout.gapBetweenLevels = 40f;
-        layout.gapBetweenNodes = 40f;
+        layout.gapBetweenLevels = layout.gapBetweenNodes = Unit.dp.scl(40f);
         layout.layout(root);
 
         addCloseButton();
@@ -230,7 +231,7 @@ public class DeployDialog extends FloatingDialog{
         {
             for(ZoneNode node : nodes){
                 TextButton button = new TextButton("", "node");
-                button.setSize(nodeSize, nodeSize);
+                button.setSize(nodeSize);
                 button.update(() -> {
                     button.setPosition(node.x + panX + width/2f, node.y + panY + height/2f, Align.center);
                 });
@@ -251,11 +252,12 @@ public class DeployDialog extends FloatingDialog{
 
             for(ZoneNode node : nodes){
                 for(ZoneNode child : node.children){
-                    Lines.stroke(3f, node.zone.locked() || child.zone.locked() ? Pal.locked : Pal.accent);
+                    Lines.stroke(Unit.dp.scl(3f), node.zone.locked() || child.zone.locked() ? Pal.locked : Pal.accent);
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
             }
 
+            Draw.reset();
             super.draw();
         }
     }

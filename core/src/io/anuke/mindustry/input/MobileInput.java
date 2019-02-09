@@ -16,6 +16,7 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
@@ -327,6 +328,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             //draw placing
             if(mode == placing && block != null){
+                Log.info(Core.input.mouseY());
                 NormalizeDrawResult dresult = PlaceUtils.normalizeDrawArea(block, lineStartX, lineStartY, tileX, tileY, true, maxLength, lineScale);
 
                 Lines.rect(dresult.x, dresult.y, dresult.x2 - dresult.x, dresult.y2 - dresult.y);

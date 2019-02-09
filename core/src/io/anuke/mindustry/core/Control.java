@@ -291,7 +291,6 @@ public class Control implements ApplicationListener{
 
     @Override
     public void update(){
-
         saves.update();
 
         for(InputHandler inputHandler : inputs){

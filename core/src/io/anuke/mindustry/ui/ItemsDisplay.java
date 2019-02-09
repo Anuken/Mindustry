@@ -22,9 +22,10 @@ public class ItemsDisplay extends Table{
     public void rebuild(){
         clear();
         top().left();
+        margin(0);
 
         table("flat", t -> {
-            t.margin(4);
+            t.margin(2);
             ObjectIntMap<Item> items = data.items();
             for(Item item : content.items()){
                 if(item.type == ItemType.material && data.isUnlocked(item)){

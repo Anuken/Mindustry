@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.scene.Element;
@@ -13,6 +14,7 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
@@ -29,7 +31,7 @@ import io.anuke.mindustry.world.Block.Icon;
 import static io.anuke.mindustry.Vars.*;
 
 public class TechTreeDialog extends FloatingDialog{
-    private static final float nodeSize = 60f;
+    private final float nodeSize = Unit.dp.scl(60f);
     private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
     private TechTreeNode root = new TechTreeNode(TechTree.root, null);
     private ItemsDisplay items;
@@ -38,8 +40,8 @@ public class TechTreeDialog extends FloatingDialog{
         super("");
 
         TreeLayout layout = new TreeLayout();
-        layout.gapBetweenLevels = 60f;
-        layout.gapBetweenNodes = 40f;
+        layout.gapBetweenLevels = Unit.dp.scl(60f);
+        layout.gapBetweenNodes = Unit.dp.scl(40f);
         layout.layout(root);
 
         titleTable.remove();
@@ -160,7 +162,7 @@ public class TechTreeDialog extends FloatingDialog{
                 button.touchable(() -> !node.visible ? Touchable.disabled : Touchable.enabled);
                 button.setUserObject(node.node);
                 button.tapped(() -> moved = false);
-                button.setSize(nodeSize, nodeSize);
+                button.setSize(nodeSize);
                 button.update(() -> {
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
                     button.setPosition(node.x + panX + width/2f, node.y + panY + height/2f + offset, Align.center);
@@ -254,12 +256,13 @@ public class TechTreeDialog extends FloatingDialog{
 
             for(TechTreeNode node : nodes){
                 for(TechTreeNode child : node.children){
-                    Lines.stroke(3f, locked(node.node) || locked(child.node) ? Pal.locked : Pal.accent);
+                    Lines.stroke(Unit.dp.scl(3f), locked(node.node) || locked(child.node) ? Pal.locked : Pal.accent);
 
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
             }
 
+            Draw.reset();
             super.draw();
         }
     }

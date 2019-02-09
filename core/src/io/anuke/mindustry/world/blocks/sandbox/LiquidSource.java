@@ -21,7 +21,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.data;
 
 public class LiquidSource extends Block{
 
@@ -64,8 +63,6 @@ public class LiquidSource extends Block{
         Table cont = new Table();
 
         for(int i = 0; i < items.size; i++){
-            if(!data.isUnlocked(items.get(i))) continue;
-
             final int f = i;
             ImageButton button = cont.addImageButton("clear", "clear-toggle", 24,
                     () -> Call.setLiquidSourceLiquid(null, tile, items.get(f))).size(38).group(group).get();

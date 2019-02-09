@@ -118,6 +118,8 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        customMapDirectory.mkdirs();
+
         Thread thread = new Thread(this::readCommands, "Server Controls");
         thread.setDaemon(true);
         thread.start();
