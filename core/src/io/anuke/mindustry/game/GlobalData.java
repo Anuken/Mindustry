@@ -94,7 +94,6 @@ public class GlobalData{
             modified = true;
             content.onUnlock();
             Events.fire(new UnlockEvent(content));
-            save();
         }
     }
 

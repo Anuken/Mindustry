@@ -63,7 +63,6 @@ public class Generators {
                                         out.draw(x, y, outlineColor);
                                     }
                                 }
-
                             }
                         }
 

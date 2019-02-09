@@ -28,7 +28,9 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.MobileInput;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+import io.anuke.mindustry.world.Tile;
 
 import java.io.IOException;
 
@@ -299,6 +301,16 @@ public class Control implements ApplicationListener{
         if(!state.is(State.menu)){
             for(InputHandler input : inputs){
                 input.update();
+            }
+
+            if(world.isZone()){
+                for(Tile tile : state.teams.get(players[0].getTeam()).cores){
+                    for(Item item : content.items()){
+                        if(tile.entity.items.has(item)){
+                            data.unlockContent(item);
+                        }
+                    }
+                }
             }
 
             //autosave global data every second if it's modified
