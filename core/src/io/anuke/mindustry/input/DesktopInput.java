@@ -24,10 +24,6 @@ import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
-    private final String section;
-    //controller info
-    private float controlx, controly;
-    private boolean controlling;
     /**Current cursor type.*/
     private Cursor cursorType = SystemCursor.arrow;
 
@@ -40,7 +36,6 @@ public class DesktopInput extends InputHandler{
 
     public DesktopInput(Player player){
         super(player);
-        this.section = "player_" + (player.playerIndex + 1);
     }
 
     /**Draws a placement icon for a specific block.*/
@@ -302,12 +297,12 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public float getMouseX(){
-        return !controlling ? Core.input.mouseX() : controlx;
+        return Core.input.mouseX();
     }
 
     @Override
     public float getMouseY(){
-        return !controlling ? Core.input.mouseY() : controly;
+        return Core.input.mouseY();
     }
 
     @Override

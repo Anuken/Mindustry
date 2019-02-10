@@ -62,7 +62,7 @@ public class Blocks implements ContentList{
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower,
 
     //production
-    mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, plasmaDrill, waterExtractor, oilExtractor, cultivator,
+    mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
 
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader, launchPad,
@@ -916,7 +916,7 @@ public class Blocks implements ContentList{
         laserDrill = new Drill("laser-drill"){{
             requirements(Category.production, ItemStack.with(Items.copper, 70, Items.graphite, 90, Items.silicon, 60, Items.titanium, 50));
             drillTime = 280;
-            size = 2;
+            size = 3;
             hasPower = true;
             tier = 4;
             updateEffect = Fx.pulverizeMedium;
@@ -928,7 +928,7 @@ public class Blocks implements ContentList{
         blastDrill = new Drill("blast-drill"){{
             requirements(Category.production, ItemStack.with(Items.copper, 130, Items.silicon, 120, Items.titanium, 100, Items.thorium, 60));
             drillTime = 200;
-            size = 3;
+            size = 4;
             drawRim = true;
             hasPower = true;
             tier = 5;
@@ -939,23 +939,6 @@ public class Blocks implements ContentList{
             warmupSpeed = 0.01f;
 
             consumes.power(3f);
-        }};
-
-        plasmaDrill = new Drill("plasma-drill"){{
-            heatColor = Color.valueOf("ff461b");
-            drillTime = 150;
-            size = 4;
-            hasLiquids = true;
-            hasPower = true;
-            tier = 5;
-            rotateSpeed = 9f;
-            drawRim = true;
-            updateEffect = Fx.pulverizeRedder;
-            updateEffectChance = 0.04f;
-            drillEffect = Fx.mineHuge;
-            warmupSpeed = 0.005f;
-
-            consumes.power(7f);
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
