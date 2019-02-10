@@ -4,6 +4,7 @@ import io.anuke.arc.collection.ObjectIntMap;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.type.ItemType;
 
 import java.text.NumberFormat;
@@ -30,7 +31,7 @@ public class ItemsDisplay extends Table{
             for(Item item : content.items()){
                 if(item.type == ItemType.material && data.isUnlocked(item)){
                     t.label(() -> format.format(items.get(item, 0))).left();
-                    t.addImage(item.region).size(8*3).padLeft(4).padRight(4);
+                    t.addImage(item.icon(Icon.medium)).size(8*3).padLeft(4).padRight(4);
                     t.add(item.localizedName()).color(Color.LIGHT_GRAY).left();
                     t.row();
                 }

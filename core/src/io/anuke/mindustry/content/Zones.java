@@ -6,6 +6,7 @@ import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.maps.generators.MapGenerator.Decoration;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
@@ -23,6 +24,7 @@ public class Zones implements ContentList{
             alwaysUnlocked = true;
             conditionWave = 10;
             launchPeriod = 5;
+            resources = new Item[]{Items.copper, Items.scrap};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -67,6 +69,7 @@ public class Zones implements ContentList{
             itemRequirements = ItemStack.with(Items.copper, 2000);
             zoneRequirements = new Zone[]{groundZero};
             blockRequirements = new Block[]{Blocks.router};
+            resources = new Item[]{Items.copper, Items.lead};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -116,6 +119,7 @@ public class Zones implements ContentList{
             conditionWave = 10;
             zoneRequirements = new Zone[]{craters};
             itemRequirements = ItemStack.with(Items.copper, 4000, Items.lead, 2000);
+            resources = new Item[]{Items.copper, Items.lead, Items.coal};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -178,6 +182,7 @@ public class Zones implements ContentList{
             zoneRequirements = new Zone[]{frozenForest};
             itemRequirements = ItemStack.with(Items.lead, 6000, Items.graphite, 2000);
             blockRequirements = new Block[]{Blocks.graphitePress, Blocks.combustionGenerator};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -253,6 +258,7 @@ public class Zones implements ContentList{
             zoneRequirements = new Zone[]{frozenForest};
             blockRequirements = new Block[]{Blocks.pneumaticDrill};
             itemRequirements = ItemStack.with(Items.copper, 8000, Items.silicon, 2000);
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -326,6 +332,7 @@ public class Zones implements ContentList{
             conditionWave = 20;
             zoneRequirements = new Zone[]{stainedMountains};
             blockRequirements = new Block[]{Blocks.launchPad, Blocks.unloader, Blocks.coreFoundation};
+            resources = new Item[]{Items.scrap};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -398,6 +405,7 @@ public class Zones implements ContentList{
             launchPeriod = 20;
             zoneRequirements = new Zone[]{ruinousShores};
             blockRequirements = new Block[]{Blocks.thermalGenerator};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -492,6 +500,7 @@ public class Zones implements ContentList{
             launchPeriod = 15;
             zoneRequirements = new Zone[]{impact};
             blockRequirements = new Block[]{Blocks.blastDrill, Blocks.thermalGenerator};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;

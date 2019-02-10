@@ -131,6 +131,13 @@ class Image {
         }
     }
 
+    void save(String name, boolean antialias){
+        save(name);
+        if(!antialias){
+            new File(name + ".png").setLastModified(0);
+        }
+    }
+
     static int total(){
         return toDispose.size();
     }

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -16,8 +15,6 @@ import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.TechTree;
 import io.anuke.mindustry.content.TechTree.TechNode;
 import io.anuke.mindustry.graphics.Pal;
@@ -25,7 +22,6 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.ItemsDisplay;
 import io.anuke.mindustry.ui.TreeLayout;
 import io.anuke.mindustry.ui.TreeLayout.TreeNode;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 
 import static io.anuke.mindustry.Vars.*;
@@ -45,22 +41,8 @@ public class TechTreeDialog extends FloatingDialog{
         layout.layout(root);
 
         titleTable.remove();
-        margin(0f);
+        margin(0f).marginBottom(8);
         cont.stack(new View(), items = new ItemsDisplay()).grow();
-
-        { //debug code; TODO remove
-            ObjectSet<Block> used = new ObjectSet<Block>().select(t -> true);
-            for(TechTreeNode node : nodes){
-                used.add(node.node.block);
-            }
-            Array<Block> recipes = content.blocks().select(r -> r.isVisible() && !used.contains(r));
-            recipes.sort(Structs.comparing(r -> r.buildCost));
-
-            if(recipes.size > 0){
-                Log.info("Missing recipe tree items! ");
-                recipes.forEach(r -> Log.info(">    {0}", r));
-            }
-        }
 
         shown(() -> checkNodes(root));
         hidden(ui.deploy::setup);

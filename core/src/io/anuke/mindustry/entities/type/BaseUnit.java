@@ -22,10 +22,7 @@ import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.StatusEffect;
-import io.anuke.mindustry.type.UnitType;
-import io.anuke.mindustry.type.Weapon;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
@@ -151,14 +148,14 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     protected void drawItems(){
-        float backTrns = 4f, itemSize = 5f;
+        float backTrns = 4f;
         if(item.amount > 0){
             int stored = Mathf.clamp(item.amount / 6, 1, 8);
 
             for(int i = 0; i < stored; i++){
                 float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 60f);
                 float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 3, 1f) - 1f;
-                Draw.rect(item.item.region,
+                Draw.rect(item.item.icon(Item.Icon.large),
                     x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
                     y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
                     itemSize, itemSize, rotation);

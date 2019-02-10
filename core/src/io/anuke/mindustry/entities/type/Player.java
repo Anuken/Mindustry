@@ -334,7 +334,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             rotation - 90);
         }
 
-        float backTrns = 4f, itemSize = 5f;
+        float backTrns = 4f;
         if(item.amount > 0){
             ItemStack stack = item;
             int stored = Mathf.clamp(stack.amount / 6, 1, 8);
@@ -342,7 +342,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             for(int i = 0; i < stored; i++){
                 float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 1, 60f);
                 float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 1f) - 1f;
-                Draw.rect(stack.item.region,
+                Draw.rect(stack.item.icon(Item.Icon.large),
                 x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
                 y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
                 itemSize, itemSize, rotation);

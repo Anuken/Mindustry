@@ -24,6 +24,7 @@ import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
 
@@ -135,7 +136,7 @@ public class BlockInventoryFragment extends Fragment{
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);
 
-                ItemImage image = new ItemImage(item.region, () -> {
+                ItemImage image = new ItemImage(item.icon(Icon.large), () -> {
                     if(tile == null || tile.entity == null){
                         return "";
                     }

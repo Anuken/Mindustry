@@ -22,6 +22,7 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Category;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
@@ -209,7 +210,7 @@ public class PlacementFragment extends Fragment{
                                 for(ItemStack stack : lastDisplay.buildRequirements){
                                     req.table(line -> {
                                         line.left();
-                                        line.addImage(stack.item.region).size(8 * 2);
+                                        line.addImage(stack.item.icon(Item.Icon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName()).color(Color.LIGHT_GRAY).padLeft(2).left();
                                         line.labelWrap(() -> {
                                             TileEntity core = players[0].getClosestCore();

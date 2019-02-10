@@ -8,6 +8,7 @@ import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
+import io.anuke.mindustry.game.EventType.ZoneCompleteEvent;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -31,6 +32,9 @@ public class GlobalData{
         if(value < wave){
             Core.settings.put(zone.name + "-wave", wave);
             modified = true;
+            if(wave > zone.conditionWave){
+                Events.fire(new ZoneCompleteEvent(zone));
+            }
         }
     }
 

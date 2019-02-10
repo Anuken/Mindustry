@@ -445,11 +445,10 @@ public class Blocks implements ContentList{
             results = new ItemStack[]{
                 new ItemStack(Items.copper, 5),
                 new ItemStack(Items.lead, 3),
-                new ItemStack(Items.titanium, 2),
-                new ItemStack(Items.thorium, 1)
+                new ItemStack(Items.titanium, 2)
             };
             hasPower = true;
-            filterTime = 15f;
+            filterTime = 30f;
             health = 50 * 4;
             spinnerLength = 1.5f;
             spinnerRadius = 3.5f;
@@ -457,6 +456,7 @@ public class Blocks implements ContentList{
             spinnerSpeed = 3f;
             size = 2;
 
+            consumes.power(1f);
             consumes.liquid(Liquids.slag, 0.1f);
         }};
 

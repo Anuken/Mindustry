@@ -120,6 +120,18 @@ public class Generators {
             colors.save("../../../assets/sprites/block_colors");
         });
 
+        ImagePacker.generate("item-icons", () -> {
+            for(Item item : content.items()){
+                Image base = ImagePacker.get("item-" + item.name);
+                for(Item.Icon icon : Item.Icon.values()){
+                    if(icon.size == base.width()) continue;
+                    Image image = new Image(icon.size, icon.size);
+                    image.drawScaled(base);
+                    image.save("item-" + item.name + "-" + icon.name(), false);
+                }
+            }
+        });
+
         ImagePacker.generate("mech-icons", () -> {
             for(Mech mech : content.<Mech>getBy(ContentType.mech)){
 
@@ -160,12 +172,12 @@ public class Generators {
                 image.draw(type.region);
 
                 image.draw(type.weapon.region,
-                        -(int)type.weapon.width + (image.width() - type.weapon.region.getWidth())/2,
-                        (int)type.weaponOffsetY - (image.height() - type.weapon.region.getHeight())/2 + 1,
+                        -(int)type.weapon.width + image.width()/2 - type.weapon.region.getWidth()/2,
+                        (int)type.weaponOffsetY - image.height()/2 - type.weapon.region.getHeight()/2 + 1,
                         false, false);
                 image.draw(type.weapon.region,
-                        (int)type.weapon.width + (image.width() - type.weapon.region.getWidth())/2,
-                        (int)type.weaponOffsetY - (image.height() - type.weapon.region.getHeight())/2 + 1,
+                        (int)type.weapon.width + image.width()/2 - type.weapon.region.getWidth()/2,
+                        (int)type.weaponOffsetY - image.height()/2 - type.weapon.region.getHeight()/2 + 1,
                         true, false);
 
                 image.save("unit-icon-" + type.name);

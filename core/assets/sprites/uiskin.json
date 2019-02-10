@@ -59,7 +59,7 @@
   TextButtonStyle: {
     default: {
       over: button-over,
-      disabled: button,
+      disabled: button-disabled,
       font: default-font,
       fontColor: white,
       disabledFontColor: gray,

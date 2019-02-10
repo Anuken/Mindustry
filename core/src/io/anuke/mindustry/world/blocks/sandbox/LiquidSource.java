@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.sandbox;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.ButtonGroup;
@@ -12,7 +13,9 @@ import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -32,6 +35,14 @@ public class LiquidSource extends Block{
         liquidCapacity = 100f;
         configurable = true;
         outputsLiquid = true;
+    }
+
+    @Override
+    public void displayBars(Tile tile, Table bars){
+        TileEntity entity = tile.entity;
+
+        bars.add(new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.WHITE));
+        bars.row();
     }
 
     @Override

@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.consumers;
 import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
@@ -28,7 +29,7 @@ public class ConsumeItemFilter extends Consume{
 
         for(int i = 0; i < list.size; i++){
             Item item = list.get(i);
-            table.addImage(item.region).size(8 * 4).padRight(2).padLeft(2);
+            table.addImage(item.icon(Icon.large)).size(8 * 4).padRight(2).padLeft(2);
             if(i != list.size - 1){
                 table.add("/");
             }

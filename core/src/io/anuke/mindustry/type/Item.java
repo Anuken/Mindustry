@@ -16,7 +16,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     public final String name;
     public final String description;
     public final Color color;
-    public TextureRegion region;
+    private TextureRegion[] regions;
 
     /**type of the item; used for tabs and core acceptance. default value is {@link ItemType#resource}.*/
     public ItemType type = ItemType.resource;
@@ -52,7 +52,15 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     }
 
     public void load(){
-        this.region = Core.atlas.find("item-" + name);
+        regions = new TextureRegion[Icon.values().length];
+        for(int i = 0; i < regions.length; i++){
+            Icon icon = Icon.values()[i];
+            regions[i] = Core.atlas.find(icon == Icon.large ? "item-" + name : "item-" + name + "-" + icon.name());
+        }
+    }
+
+    public TextureRegion icon(Icon icon){
+        return regions[icon.ordinal()];
     }
 
     @Override
@@ -72,7 +80,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
 
     @Override
     public TextureRegion getContentIcon(){
-        return region;
+        return icon(Icon.large);
     }
 
     @Override
@@ -93,6 +101,18 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     @Override
     public ContentType getContentType(){
         return ContentType.item;
+    }
+
+    public enum Icon{
+        small(8*2),
+        medium(8*3),
+        large(8*4);
+
+        public final int size;
+
+        Icon(int size){
+            this.size = size;
+        }
     }
 
     /**Allocates a new array containing all items the generate ores.*/

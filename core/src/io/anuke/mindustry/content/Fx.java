@@ -15,6 +15,7 @@ import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Item.Icon;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -541,7 +542,7 @@ public class Fx implements ContentList{
             float length = 20f * e.finpow();
             float size = 7f * e.fout();
 
-            Draw.rect(((Item) e.data).region, e.x + Angles.trnsx(e.rotation, length), e.y + Angles.trnsy(e.rotation, length), size, size);
+            Draw.rect(((Item) e.data).icon(Icon.large), e.x + Angles.trnsx(e.rotation, length), e.y + Angles.trnsy(e.rotation, length), size, size);
         });
 
 

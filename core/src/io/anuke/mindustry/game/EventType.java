@@ -4,12 +4,18 @@ import io.anuke.arc.Events.Event;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
+import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Tile;
 
 public class EventType{
 
-    public static class SectorCompleteEvent implements Event{
+    /**Called when a zone's requirements are met.*/
+    public static class ZoneCompleteEvent implements Event{
+        public final Zone zone;
 
+        public ZoneCompleteEvent(Zone zone){
+            this.zone = zone;
+        }
     }
 
     /**Called when the game is first loaded.*/

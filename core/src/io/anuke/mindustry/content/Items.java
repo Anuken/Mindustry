@@ -26,7 +26,7 @@ public class Items implements ContentList{
             genOre = true;
         }};
 
-        metaglass = new Item("metaglass", Color.valueOf("648b55")){{
+        metaglass = new Item("metaglass", Color.valueOf("ebeef5")){{
             type = ItemType.material;
             cost = 2f;
         }};

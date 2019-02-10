@@ -3,7 +3,6 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.scene.Group;
@@ -17,19 +16,17 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.io.SaveIO.SaveException;
-import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.ui.ItemsDisplay;
 import io.anuke.mindustry.ui.TreeLayout;
 import io.anuke.mindustry.ui.TreeLayout.TreeNode;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Block.Icon;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class DeployDialog extends FloatingDialog{
-    private final float nodeSize = Unit.dp.scl(250f);
+    private final float nodeSize = Unit.dp.scl(210f);
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
+    private ZoneInfoDialog info = new ZoneInfoDialog();
 
     public DeployDialog(){
         super("");
@@ -37,7 +34,7 @@ public class DeployDialog extends FloatingDialog{
         ZoneNode root = new ZoneNode(Zones.groundZero, null);
 
         TreeLayout layout = new TreeLayout();
-        layout.gapBetweenLevels = layout.gapBetweenNodes = Unit.dp.scl(40f);
+        layout.gapBetweenLevels = layout.gapBetweenNodes = Unit.dp.scl(50f);
         layout.layout(root);
 
         addCloseButton();
@@ -49,7 +46,7 @@ public class DeployDialog extends FloatingDialog{
     public void setup(){
         cont.clear();
         titleTable.remove();
-        marginTop(0f);
+        margin(0f).marginBottom(8);
 
         cont.stack(control.saves.getZoneSlot() == null ? new View() : new Table(){{
             SaveSlot slot = control.saves.getZoneSlot();
@@ -109,53 +106,23 @@ public class DeployDialog extends FloatingDialog{
         drawDefaultBackground(x, y);
     }
 
-    boolean canUnlock(Zone zone){
-        if(data.isUnlocked(zone)){
-            return true;
-        }
 
-        for(Zone other : zone.zoneRequirements){
-            if(!data.isCompleted(other)){
-                return false;
-            }
-        }
-
-        for(Block other : zone.blockRequirements){
-            if(!data.isUnlocked(other)){
-                return false;
-            }
-        }
-
-        return data.hasItems(zone.itemRequirements);
-    }
 
     void buildButton(Zone zone, TextButton button){
-        button.setDisabled(() -> !canUnlock(zone) || !data.hasItems(zone.deployCost));
-        button.clicked(() -> {
-            if(!data.isUnlocked(zone)){
-                data.removeItems(zone.itemRequirements);
-                data.unlockContent(zone);
-                setup();
-            }else{
-                data.removeItems(zone.deployCost);
-                hide();
-                world.playZone(zone);
-            }
-        });
+        button.setDisabled(() -> hidden(zone));
+        button.clicked(() -> info.show(zone));
 
         if(zone.unlocked()){
-            button.table(title -> {
-                title.addImage("icon-zone").padRight(3);
-                title.add(zone.localizedName());
-            });
-            button.row();
+            //button.table(title -> {
+            button.addImage("icon-zone").padRight(3);
+            button.labelWrap(zone.localizedName()).width(140).growX();
+            //});
 
-            if(data.getWaveScore(zone) > 0){
-                button.add(Core.bundle.format("bestwave", data.getWaveScore(zone)));
-            }
+            //if(data.getWaveScore(zone) > 0){
+            //    button.add(Core.bundle.format("bestwave", data.getWaveScore(zone)));
+            //}
 
-            button.row();
-
+            /*
             button.add("$launch").color(Color.LIGHT_GRAY).pad(4);
             button.row();
             button.table(req -> {
@@ -163,8 +130,13 @@ public class DeployDialog extends FloatingDialog{
                     req.addImage(stack.item.region).size(8 * 3);
                     req.add(stack.amount + "").left();
                 }
-            }).pad(3).growX();
+            }).pad(3).growX();*/
         }else{
+            button.addImage("icon-zone-locked");
+            button.row();
+            button.add("$locked");
+
+            /*else{
             button.addImage("icon-zone-locked");
             button.row();
             button.add("$locked").padBottom(6);
@@ -220,6 +192,7 @@ public class DeployDialog extends FloatingDialog{
                     }
                 }).growX();
             }
+        }*/
         }
     }
 
@@ -231,7 +204,7 @@ public class DeployDialog extends FloatingDialog{
         {
             for(ZoneNode node : nodes){
                 TextButton button = new TextButton("", "node");
-                button.setSize(nodeSize);
+                button.setSize(node.width, node.height);
                 button.update(() -> {
                     button.setPosition(node.x + panX + width/2f, node.y + panY + height/2f, Align.center);
                 });
@@ -270,6 +243,7 @@ public class DeployDialog extends FloatingDialog{
             this.zone = zone;
             this.parent = parent;
             this.width = this.height = nodeSize;
+            this.height /= 2f;
             nodes.add(this);
 
             arr.selectFrom(content.zones(), other -> Structs.contains(other.zoneRequirements, zone));

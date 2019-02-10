@@ -167,6 +167,10 @@ public class Control implements ApplicationListener{
                 state.stats.enemyUnitsDestroyed ++;
             }
         });
+
+        Events.on(ZoneCompleteEvent.class, e -> {
+            ui.hudfrag.showToast(Core.bundle.get("zone.complete"));
+        });
     }
 
     public void addPlayer(int index){

@@ -13,6 +13,7 @@ import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
@@ -98,7 +99,7 @@ public class OverlayRenderer{
             if(input.isDroppingItem()){
                 Vector2 v = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
                 float size = 8;
-                Draw.rect(player.item().item.region, v.x, v.y, size, size);
+                Draw.rect(player.item().item.icon(Item.Icon.large), v.x, v.y, size, size);
                 Draw.color(Pal.accent);
                 Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time(), 5f, 1f));
                 Draw.reset();

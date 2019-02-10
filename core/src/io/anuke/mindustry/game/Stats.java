@@ -20,4 +20,8 @@ public class Stats{
     public int buildingsDeconstructed;
     /**Friendly buildings destroyed.*/
     public int buildingsDestroyed;
+
+    public Rank calculateRank(boolean launched){
+        return Rank.F;
+    }
 }

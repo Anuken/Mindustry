@@ -14,7 +14,7 @@ def genFolder = "../core/assets-raw/sprites_out/generated/"
 def doAntialias = true
 
 def antialias = {File file ->
-    if(!doAntialias) return
+    if(!doAntialias || file.lastModified() <= 1000) return
 
     def image = ImageIO.read(file)
     def out = ImageIO.read(file)
