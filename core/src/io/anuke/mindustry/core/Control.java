@@ -301,6 +301,11 @@ public class Control implements ApplicationListener{
             inputHandler.updateController();
         }
 
+        //autosave global data every second if it's modified
+        if(timer.get(1, 60)){
+            data.checkSave();
+        }
+
         if(!state.is(State.menu)){
             for(InputHandler input : inputs){
                 input.update();
@@ -314,11 +319,6 @@ public class Control implements ApplicationListener{
                         }
                     }
                 }
-            }
-
-            //autosave global data every second if it's modified
-            if(timer.get(1, 60)){
-                data.checkSave();
             }
 
             //auto-update rpc every 5 seconds
