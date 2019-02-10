@@ -245,15 +245,13 @@ public class TechTree implements ContentList{
 
                     node(spiritFactory, () -> {
                         node(daggerFactory, () -> {
-                            node(daggerFactory, () -> {
-                                node(titanFactory, () -> {
-                                    node(fortressFactory);
-                                });
-                                node(wraithFactory, () -> {
-                                    node(phantomFactory);
-                                    node(ghoulFactory, () -> {
-                                        node(revenantFactory);
-                                    });
+                            node(titanFactory, () -> {
+                                node(fortressFactory);
+                            });
+                            node(wraithFactory, () -> {
+                                node(phantomFactory);
+                                node(ghoulFactory, () -> {
+                                    node(revenantFactory);
                                 });
                             });
                         });

@@ -32,8 +32,6 @@ public class Separator extends Block{
     protected Color color = Color.valueOf("858585");
     protected TextureRegion liquidRegion;
 
-    protected boolean offloading = false;
-
     public Separator(String name){
         super(name);
         update = true;
@@ -113,20 +111,13 @@ public class Separator extends Block{
             }
 
             if(item != null && entity.items.get(item) < itemCapacity){
-                offloading = true;
                 offloadNear(tile, item);
-                offloading = false;
             }
         }
 
         if(entity.timer.get(timerDump, 5)){
             tryDump(tile);
         }
-    }
-
-    @Override
-    public boolean canDump(Tile tile, Tile to, Item item){
-        return offloading || item != consumes.item();
     }
 
     @Override
