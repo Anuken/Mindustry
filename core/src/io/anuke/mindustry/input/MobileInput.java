@@ -12,6 +12,8 @@ import io.anuke.arc.input.GestureDetector.GestureListener;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -181,6 +183,16 @@ public class MobileInput extends InputHandler implements GestureListener{
             region.getWidth() * request.scale * Draw.scl,
             region.getHeight() * request.scale * Draw.scl,
             request.block.rotate ? request.rotation * 90 : 0);
+
+            Draw.alpha(1f);
+            for(int i = 0; i < 4; i++){
+                Point2 p = Geometry.d8edge[i];
+                float poffset = -Math.max(request.block.size-1, 0)/2f * tilesize;
+                TextureRegion find = Core.atlas.find("block-select");
+                Draw.rect("block-select", request.tile().x * tilesize + request.block.offset() + poffset * p.x, request.tile().y * tilesize + request.block.offset() + poffset * p.y,
+                        find.getWidth() * Draw.scl * request.scale, find.getHeight() * Draw.scl * request.scale, i * 90);
+            }
+            Draw.color();
         }else{
             float rad = (tile.block().size * tilesize / 2f - 1) * request.scale;
             Draw.alpha(0f);
@@ -349,6 +361,14 @@ public class MobileInput extends InputHandler implements GestureListener{
                         region.getWidth() * lineScale * Draw.scl,
                         region.getHeight() * lineScale * Draw.scl,
                         block.rotate ? result.rotation * 90 : 0);
+
+                        Draw.color(Pal.accent);
+                        for(int j = 0; j < 4; j++){
+                            Point2 p = Geometry.d8edge[j];
+                            float offset = -Math.max(block.size-1, 0)/2f * tilesize;
+                            Draw.rect("block-select", x * tilesize + block.offset() + offset * p.x, y * tilesize + block.offset() + offset * p.y,j  * 90);
+                        }
+                        Draw.color();
                     }else{
                         Draw.color(Pal.removeBack);
                         Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1, block.size * tilesize / 2f);

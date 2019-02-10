@@ -7,6 +7,8 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.Player;
@@ -47,9 +49,18 @@ public class DesktopInput extends InputHandler{
             Draw.color();
 
             TextureRegion region = block.icon(Icon.full);
+
             Draw.rect(region, x * tilesize + block.offset(), y * tilesize + block.offset(),
-                    region.getWidth() * selectScale * Draw.scl,
-                    region.getHeight() * selectScale * Draw.scl, block.rotate ? rotation * 90 : 0);
+                region.getWidth() * selectScale * Draw.scl,
+                region.getHeight() * selectScale * Draw.scl, block.rotate ? rotation * 90 : 0);
+
+            Draw.color(Pal.accent);
+            for(int i = 0; i < 4; i++){
+                Point2 p = Geometry.d8edge[i];
+                float offset = -Math.max(block.size-1, 0)/2f * tilesize;
+                Draw.rect("block-select", x * tilesize + block.offset() + offset * p.x, y * tilesize + block.offset() + offset * p.y, i * 90);
+            }
+            Draw.color();
         }else{
             Draw.color(Pal.removeBack);
             Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1, block.size * tilesize / 2f);

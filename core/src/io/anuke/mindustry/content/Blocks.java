@@ -442,12 +442,12 @@ public class Blocks implements ContentList{
 
         separator = new Separator("separator"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 60, Items.titanium, 50));
-            results = new ItemStack[]{
-                new ItemStack(Items.copper, 5),
-                new ItemStack(Items.lead, 3),
-                new ItemStack(Items.graphite, 2),
-                new ItemStack(Items.titanium, 2)
-            };
+            results = ItemStack.with(
+                Items.copper, 5,
+                Items.lead, 3,
+                Items.graphite, 2,
+                Items.titanium, 2
+            );
             hasPower = true;
             filterTime = 30f;
             spinnerLength = 1.5f;
