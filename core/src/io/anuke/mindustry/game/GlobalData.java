@@ -32,7 +32,7 @@ public class GlobalData{
         if(value < wave){
             Core.settings.put(zone.name + "-wave", wave);
             modified = true;
-            if(wave > zone.conditionWave){
+            if(wave == zone.conditionWave + 1){
                 Events.fire(new ZoneCompleteEvent(zone));
             }
         }

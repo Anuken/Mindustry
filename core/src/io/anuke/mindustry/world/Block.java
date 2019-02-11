@@ -6,6 +6,7 @@ import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.function.BooleanProvider;
+import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
@@ -16,22 +17,20 @@ import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.Category;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.ContentDisplay;
+import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockGroup;
@@ -487,7 +486,14 @@ public class Block extends BlockStorage{
         bars.row();
 
         if(entity.liquids != null){
-            bars.add(new Bar(() -> entity.liquids.get(entity.liquids.current()) <= 0.001f ? Core.bundle.get("blocks.liquid") : entity.liquids.current().localizedName(), () -> entity.liquids.current().color, () -> entity.liquids.total() / liquidCapacity)).growX();
+            Supplier<Liquid> current;
+            if(consumes.has(ConsumeLiquid.class)){
+                Liquid liquid = consumes.liquid();
+                current = () -> liquid;
+            }else{
+                current = () -> entity.liquids.current();
+            }
+            bars.add(new Bar(() -> entity.liquids.get(current.get()) <= 0.001f ? Core.bundle.get("blocks.liquid") : current.get().localizedName(), () -> current.get().color, () -> entity.liquids.get(current.get()) / liquidCapacity)).growX();
             bars.row();
         }
 

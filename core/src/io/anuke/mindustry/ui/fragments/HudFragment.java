@@ -226,7 +226,8 @@ public class HudFragment extends Fragment{
                 world.isZone() &&
                 world.getZone().metCondition() &&
                 !Net.client() &&
-                state.wave % world.getZone().launchPeriod == 0);
+                state.wave % world.getZone().launchPeriod == 0 &&
+                state.wavetime < state.rules.waveSpacing - 70);
 
             button.update(() -> {
                 if(world.getZone() == null){

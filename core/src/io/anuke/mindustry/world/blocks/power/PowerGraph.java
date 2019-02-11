@@ -237,12 +237,14 @@ public class PowerGraph{
         }
     }
 
+    //currently ignores all other values and consumes power anyway.
     private boolean otherConsumersAreValid(Tile tile, Consume consumePower){
+        /*
         for(Consume cons : tile.block().consumes.all()){
             if(cons != consumePower && !cons.isOptional() && !cons.valid(tile.block(), tile.entity())){
                 return false;
             }
-        }
+        }*/
         return true;
     }
 
