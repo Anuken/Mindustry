@@ -237,7 +237,7 @@ public class PowerGraph{
         }
     }
 
-    //currently ignores all other values and consumes power anyway.
+    //currently ignores all other consumers and consumes power anyway.
     private boolean otherConsumersAreValid(Tile tile, Consume consumePower){
         /*
         for(Consume cons : tile.block().consumes.all()){

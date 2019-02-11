@@ -58,7 +58,7 @@ public class TechTreeDialog extends FloatingDialog{
         boolean locked = locked(node.node);
         if(!locked) node.visible = true;
         for(TechTreeNode l : node.children){
-            l.visible = !locked && l.node.block.isVisible();
+            l.visible = !locked;
             checkNodes(l);
         }
 
@@ -89,7 +89,7 @@ public class TechTreeDialog extends FloatingDialog{
     }
 
     boolean locked(TechNode node){
-        return !data.isUnlocked(node.block);
+        return node.block.locked();
     }
 
     class TechTreeNode extends TreeNode<TechTreeNode>{
