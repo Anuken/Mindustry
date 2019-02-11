@@ -181,7 +181,9 @@ public class Conveyor extends Block{
 
         ConveyorEntity entity = tile.entity();
         entity.minitem = 1f;
+        Tile next = tile.getNearby(tile.getRotation());
 
+        float nextMax = next.block() instanceof Conveyor ? 1f - Math.max(itemSpace - next.<ConveyorEntity>entity().minitem, 0) : 1f;
         int minremove = Integer.MAX_VALUE;
 
         for(int i = entity.convey.size - 1; i >= 0; i--){
@@ -205,10 +207,9 @@ public class Conveyor extends Block{
                 pos.x = Mathf.lerpDelta(pos.x, 0, 0.1f);
             }
 
-            pos.y = Mathf.clamp(pos.y);
+            pos.y = Mathf.clamp(pos.y, 0, nextMax);
 
             if(pos.y >= 0.9999f && offloadDir(tile, pos.item)){
-                Tile next = tile.getNearby(tile.getRotation());
                 if(next.block() instanceof Conveyor){
                     ConveyorEntity othere = next.entity();
 

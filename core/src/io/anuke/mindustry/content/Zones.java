@@ -195,7 +195,7 @@ public class Zones implements ContentList{
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
-                        begin = 2;
+                        begin = 1;
                         spacing = 2;
                         unitScaling = 2;
                     }},
@@ -271,20 +271,20 @@ public class Zones implements ContentList{
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
-                        begin = 2;
+                        begin = 1;
                         unitScaling = 1;
                         spacing = 2;
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
-                        begin = 10;
+                        begin = 11;
                         spacing = 2;
                         unitScaling = 2;
                         unitAmount = 2;
                     }},
 
                     new SpawnGroup(UnitTypes.ghoul){{
-                        begin = 5;
+                        begin = 6;
                         unitScaling = 0.5f;
                         unitAmount = 1;
                         spacing = 5;
