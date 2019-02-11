@@ -980,7 +980,7 @@ public class Blocks implements ContentList{
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
-            requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 4000, Items.silicon, 2000));
+            requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 3000, Items.silicon, 2000));
 
             health = 2000;
             itemCapacity = 6000;

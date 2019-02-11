@@ -331,7 +331,7 @@ public class Zones implements ContentList{
             itemRequirements = ItemStack.with(Items.silicon, 8000, Items.titanium, 6000, Items.graphite, 4000);
             conditionWave = 20;
             zoneRequirements = new Zone[]{stainedMountains};
-            blockRequirements = new Block[]{Blocks.launchPad, Blocks.unloader, Blocks.coreFoundation};
+            blockRequirements = new Block[]{Blocks.launchPad, Blocks.unloader};
             resources = new Item[]{Items.scrap};
             rules = () -> new Rules(){{
                 waves = true;
