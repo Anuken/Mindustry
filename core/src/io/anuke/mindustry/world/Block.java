@@ -6,7 +6,7 @@ import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.function.BooleanProvider;
-import io.anuke.arc.function.Supplier;
+import io.anuke.arc.function.Function;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
@@ -292,6 +292,7 @@ public class Block extends BlockStorage{
         }
 
         setStats();
+        setBars();
 
         consumes.checkRequired(this);
 
@@ -360,6 +361,25 @@ public class Block extends BlockStorage{
         // Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
+    }
+
+    public void setBars(){
+        bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.WHITE));
+
+        if(hasLiquids){
+            Function<TileEntity, Liquid> current;
+            if(consumes.has(ConsumeLiquid.class)){
+                Liquid liquid = consumes.liquid();
+                current = entity -> liquid;
+            }else{
+                current = entity -> entity.liquids.current();
+            }
+            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("blocks.liquid") : current.get(entity).localizedName(), () -> current.get(entity).color, () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
+        }
+
+        if(hasPower && consumes.has(ConsumePower.class)){
+            bars.add("power", entity -> new Bar(consumes.get(ConsumePower.class).isBuffered ? "blocks.power" : "blocks.power.satisfaction", Pal.power, () -> entity.power.satisfaction));
+        }
     }
 
     public boolean isSolidFor(Tile tile){
@@ -479,28 +499,12 @@ public class Block extends BlockStorage{
         }
     }
 
-    public void displayBars(Tile tile, Table bars){
-        TileEntity entity = tile.entity;
-
-        bars.add(new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.WHITE));
-        bars.row();
-
-        if(entity.liquids != null){
-            Supplier<Liquid> current;
-            if(consumes.has(ConsumeLiquid.class)){
-                Liquid liquid = consumes.liquid();
-                current = () -> liquid;
-            }else{
-                current = () -> entity.liquids.current();
-            }
-            bars.add(new Bar(() -> entity.liquids.get(current.get()) <= 0.001f ? Core.bundle.get("blocks.liquid") : current.get().localizedName(), () -> current.get().color, () -> entity.liquids.get(current.get()) / liquidCapacity)).growX();
-            bars.row();
+    public void displayBars(Tile tile, Table table){
+        for(Function<TileEntity, Bar> bar : bars.list()){
+            table.add(bar.get(tile.entity)).growX();
+            table.row();
         }
 
-        if(entity.power != null && consumes.has(ConsumePower.class)){
-            bars.add(new Bar(consumes.get(ConsumePower.class).isBuffered ? "blocks.power" : "blocks.power.satisfaction", Pal.power, () -> entity.power.satisfaction)).growX();
-            bars.row();
-        }
     }
 
     public TextureRegion icon(Icon icon){

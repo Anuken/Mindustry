@@ -16,6 +16,7 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
+import io.anuke.mindustry.world.meta.BlockBars;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.Producers;
 
@@ -34,6 +35,7 @@ public abstract class BlockStorage extends UnlockableContent{
     public float liquidFlowFactor = 4.9f;
 
     public final BlockStats stats = new BlockStats();
+    public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
     public final Producers produces = new Producers();
 
