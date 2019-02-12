@@ -106,7 +106,8 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     public enum Icon{
         small(8*2),
         medium(8*3),
-        large(8*4);
+        large(8*4),
+        xlarge(8*5);
 
         public final int size;
 

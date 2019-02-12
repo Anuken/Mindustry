@@ -13,6 +13,7 @@ public class BlockBars{
     }
 
     public void remove(String name){
+        if(!bars.containsKey(name)) throw new RuntimeException("No bar with name '" + name + "' found; current bars: " + bars.keys().toArray());
         bars.remove(name);
     }
 

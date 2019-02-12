@@ -59,7 +59,7 @@ public class Conveyor extends Block{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.itemSpeed, speed * 60, StatUnit.pixelsSecond);
+        stats.add(BlockStat.itemsMoved, speed * 60, StatUnit.itemsSecond);
     }
 
     @Override

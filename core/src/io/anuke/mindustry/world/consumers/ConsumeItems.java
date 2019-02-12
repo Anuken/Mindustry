@@ -38,6 +38,13 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
+    public void trigger(Block block, TileEntity entity){
+        for(ItemStack stack : items){
+            entity.items.remove(stack);
+        }
+    }
+
+    @Override
     public boolean valid(Block block, TileEntity entity){
         return entity.items != null && entity.items.has(items);
     }

@@ -32,6 +32,11 @@ public class ConsumeItem extends Consume{
     }
 
     @Override
+    public void trigger(Block block, TileEntity entity){
+        entity.items.remove(item, amount);
+    }
+
+    @Override
     public void buildTooltip(Table table){
         table.add(new ItemImage(new ItemStack(item, amount))).size(8 * 4);
     }

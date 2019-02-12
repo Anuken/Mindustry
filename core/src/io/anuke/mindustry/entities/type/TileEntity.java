@@ -284,7 +284,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         Block previous = tile.block();
         tile.block().update(tile);
         if(tile.block() == previous && cons != null){
-            cons.update(this);
+            cons.update();
         }
     }
 

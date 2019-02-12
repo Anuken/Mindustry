@@ -52,6 +52,11 @@ public abstract class Consume{
         }).size(10 * scale).get().addListener(new Tooltip<>(t));
     }
 
+    /**Called when a consumption is triggered manually.*/
+    public void trigger(Block block, TileEntity entity){
+
+    }
+
     public abstract void buildTooltip(Table table);
 
     public abstract String getIcon();

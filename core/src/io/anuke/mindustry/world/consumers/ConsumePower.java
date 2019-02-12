@@ -50,7 +50,7 @@ public class ConsumePower extends Consume{
     @Override
     public void display(BlockStats stats){
         if(isBuffered){
-            stats.add(BlockStat.powerCapacity, powerCapacity, StatUnit.powerSecond);
+            stats.add(BlockStat.powerCapacity, powerCapacity, StatUnit.none);
         }else{
             stats.add(BlockStat.powerUse, powerPerTick * 60f, StatUnit.powerSecond);
         }

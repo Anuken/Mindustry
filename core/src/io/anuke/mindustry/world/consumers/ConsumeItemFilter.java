@@ -47,6 +47,17 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
+    public void trigger(Block block, TileEntity entity){
+        for(int i = 0; i < content.items().size; i++){
+            Item item = content.item(i);
+            if(entity.items != null && entity.items.has(item) && this.filter.test(item)){
+                entity.items.remove(item, 1);
+                break;
+            }
+        }
+    }
+
+    @Override
     public boolean valid(Block block, TileEntity entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
