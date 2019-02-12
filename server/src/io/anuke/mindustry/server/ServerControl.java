@@ -264,14 +264,13 @@ public class ServerControl implements ApplicationListener{
                 info("Status:");
                 info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name), state.wave);
 
-                if(!state.rules.waves){
+                if(state.rules.waves){
                     info("&ly  {0} enemies.", unitGroups[Team.red.ordinal()].size());
                 }else{
                     info("&ly  {0} seconds until next wave.", (int) (state.wavetime / 60));
                 }
 
-                info("  &ly{0} FPS.", (int) (60f / Time.delta()));
-                info("  &ly{0} MB used.", Core.app.getJavaHeap() / 1024 / 1024);
+                info("  &ly{0} FPS, {1} MB used.", (int)(60f/Time.delta()), Core.app.getJavaHeap() / 1024 / 1024);
 
                 if(playerGroup.size() > 0){
                     info("  &lyPlayers: {0}", playerGroup.size());
