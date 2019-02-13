@@ -322,10 +322,11 @@ public class Zones implements ContentList{
         }};
 
         impact = new Zone("impact0079", new MapGenerator("impact0079", 2)
+        .core(Blocks.coreFoundation)
         .decor(
             new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01),
             new Decoration(Blocks.metalFloor, Blocks.metalFloorDamaged, 0.02)
-        ).drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 1000, Items.pyratite, 2000, Items.titanium, 2000, Items.metaglass, 1000))){{
+        ).drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 2000, Items.pyratite, 2000, Items.titanium, 2000, Items.metaglass, 1000, Items.coal, 2000))){{
             deployCost = ItemStack.with(Items.copper, 2500, Items.lead, 1000, Items.silicon, 300);
             startingItems = ItemStack.with(Items.copper, 2000, Items.lead, 500, Items.silicon, 200);
             itemRequirements = ItemStack.with(Items.silicon, 8000, Items.titanium, 6000, Items.graphite, 4000);
@@ -492,7 +493,7 @@ public class Zones implements ContentList{
         nuclearComplex = new Zone("nuclearComplex", new MapGenerator("nuclearProductionComplex", 1)
         .drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 1000, Items.thorium, 200, Items.titanium, 2000, Items.metaglass, 1000))
         .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))
-        .core(Blocks.coreFoundation)){{
+        .core(Blocks.coreNucleus)){{
             deployCost = ItemStack.with(Items.copper, 3000, Items.lead, 2000, Items.silicon, 1000, Items.metaglass, 500);
             startingItems = ItemStack.with(Items.copper, 2500, Items.lead, 1500, Items.silicon, 800, Items.metaglass, 400);
             itemRequirements = ItemStack.with(Items.copper, 10000, Items.titanium, 8000, Items.metaglass, 6000, Items.plastanium, 2000);

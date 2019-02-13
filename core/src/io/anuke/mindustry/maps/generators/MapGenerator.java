@@ -36,7 +36,7 @@ public class MapGenerator extends Generator{
     public boolean distortFloor = false;
     /**Items randomly added to containers and vaults.*/
     public ItemStack[] storageDrops = ItemStack.with(Items.copper, 300, Items.lead, 300, Items.silicon, 200, Items.graphite, 200, Items.blastCompound, 200);
-    public Block coreBlock;
+    public Block coreBlock = Blocks.coreShard;
 
     public MapGenerator(String mapName){
         this.mapName = mapName;

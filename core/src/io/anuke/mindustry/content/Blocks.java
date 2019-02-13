@@ -668,7 +668,7 @@ public class Blocks implements ContentList{
         }};
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
-            requirements(Category.distribution, ItemStack.with(Items.copper, 2, Items.titanium, 1));
+            requirements(Category.distribution, ItemStack.with(Items.copper, 2, Items.lead, 1, Items.titanium, 1));
             health = 65;
             speed = 0.07f;
         }};
@@ -681,7 +681,7 @@ public class Blocks implements ContentList{
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
-            requirements(Category.distribution, ItemStack.with(Items.titanium, 8, Items.copper, 8));
+            requirements(Category.distribution, ItemStack.with(Items.lead, 8, Items.copper, 8));
             range = 4;
             speed = 60f;
             bufferCapacity = 15;
@@ -695,7 +695,7 @@ public class Blocks implements ContentList{
         }};
 
         sorter = new Sorter("sorter"){{
-            requirements(Category.distribution, ItemStack.with(Items.titanium, 4, Items.copper, 4));
+            requirements(Category.distribution, ItemStack.with(Items.lead, 4, Items.copper, 4));
 
         }};
 
@@ -705,13 +705,12 @@ public class Blocks implements ContentList{
         }};
 
         distributor = new Router("distributor"){{
-            requirements(Category.distribution, ItemStack.with(Items.titanium, 8, Items.copper, 8));
+            requirements(Category.distribution, ItemStack.with(Items.lead, 8, Items.copper, 8));
             size = 2;
         }};
 
         overflowGate = new OverflowGate("overflow-gate"){{
-            requirements(Category.distribution, ItemStack.with(Items.titanium, 4, Items.copper, 8));
-
+            requirements(Category.distribution, ItemStack.with(Items.lead, 4, Items.copper, 8));
         }};
 
         massDriver = new MassDriver("mass-driver"){{

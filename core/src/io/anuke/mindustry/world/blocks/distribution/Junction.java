@@ -74,7 +74,7 @@ public class Junction extends Block{
         if(entity == null || relative == -1 || entity.buffers[relative].full())
             return false;
         Tile to = tile.getNearby(relative);
-        return to != null && to.block().acceptItem(item, to, tile);
+        return to != null;
     }
 
     @Override

@@ -6,7 +6,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.maps.generators.Generator;
+import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.world.Block;
 
 import static io.anuke.mindustry.Vars.data;
@@ -14,7 +14,7 @@ import static io.anuke.mindustry.Vars.state;
 
 public class Zone extends UnlockableContent{
     public final String name;
-    public final Generator generator;
+    public final MapGenerator generator;
     public ItemStack[] deployCost = {};
     public ItemStack[] startingItems = {};
     public Block[] blockRequirements = {};
@@ -27,7 +27,7 @@ public class Zone extends UnlockableContent{
     public int configureWave = 50;
     public int launchPeriod = 10;
 
-    public Zone(String name, Generator generator){
+    public Zone(String name, MapGenerator generator){
         this.name = name;
         this.generator = generator;
     }
