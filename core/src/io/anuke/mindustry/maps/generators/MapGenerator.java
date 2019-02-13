@@ -140,7 +140,7 @@ public class MapGenerator extends Generator{
                 if(tile.getTeam() == Team.none && tile.block() instanceof StorageBlock){
                     for(ItemStack stack : storageDrops){
                         if(Mathf.chance(0.3)){
-                            tile.entity.items.add(stack.item, Mathf.random(stack.amount));
+                            tile.entity.items.add(stack.item, Math.min(Mathf.random(stack.amount), tile.block().itemCapacity));
                         }
                     }
                 }

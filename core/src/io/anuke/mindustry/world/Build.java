@@ -128,7 +128,7 @@ public class Build{
         if(tile == null) return false;
 
         if(type.isMultiblock()){
-            if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile)){
+            if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile) && tile.getTeam() == team){
                 return true;
             }
 

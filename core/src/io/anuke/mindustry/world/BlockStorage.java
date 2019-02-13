@@ -1,19 +1,21 @@
 package io.anuke.mindustry.world;
 
 import io.anuke.arc.collection.Array;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.consumers.ConsumeItem;
+import io.anuke.mindustry.world.consumers.ConsumeItems;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
 import io.anuke.mindustry.world.meta.BlockBars;
@@ -91,6 +93,13 @@ public abstract class BlockStorage extends UnlockableContent{
     }
 
     public boolean acceptItem(Item item, Tile tile, Tile source){
+        if(tile.entity != null && consumes.has(ConsumeItems.class)){
+            for(ItemStack stack : consumes.items()){
+                if(stack.item == item){
+                    return tile.entity.items.get(item) < getMaximumAccepted(tile, item);
+                }
+            }
+        }
         return tile.entity != null && consumes.has(ConsumeItem.class) && consumes.item() == item &&
             tile.entity.items.get(item) < getMaximumAccepted(tile, item);
     }

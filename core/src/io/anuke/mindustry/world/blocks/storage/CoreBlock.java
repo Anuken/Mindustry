@@ -105,9 +105,11 @@ public class CoreBlock extends StorageBlock{
 
         Draw.rect(region, tile.drawx(), tile.drawy());
 
-        Draw.alpha(entity.heat);
-        Draw.rect(topRegion, tile.drawx(), tile.drawy());
-        Draw.color();
+        if(Core.atlas.isFound(topRegion)){
+            Draw.alpha(entity.heat);
+            Draw.rect(topRegion, tile.drawx(), tile.drawy());
+            Draw.color();
+        }
 
         if(entity.currentUnit != null){
             Unit player = entity.currentUnit;
