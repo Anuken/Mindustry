@@ -833,7 +833,7 @@ public class Blocks implements ContentList{
         }};
 
         thermalGenerator = new ThermalGenerator("thermal-generator"){{
-            requirements(Category.power, ItemStack.with(Items.copper, 80, Items.graphite, 70, Items.lead, 100, Items.silicon, 70, Items.thorium, 70));
+            requirements(Category.power, ItemStack.with(Items.copper, 80, Items.graphite, 70, Items.lead, 100, Items.silicon, 70, Items.metaglass, 80));
             powerProduction = 3f;
             generateEffect = Fx.redgeneratespark;
             size = 2;
