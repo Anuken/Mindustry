@@ -409,7 +409,7 @@ public class Zones implements ContentList{
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 30 * 60;
+                waveSpacing = 60 * 60 * 2;
                 spawns = Array.with(
                     new SpawnGroup(UnitTypes.crawler){{
                         unitScaling = 1;
