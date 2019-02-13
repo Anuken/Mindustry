@@ -449,7 +449,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
                 Draw.rect(request.block.icon(Icon.full),
                         request.x * tilesize + request.block.offset(),
-                        request.y * tilesize + request.block.offset(), rad*2, rad*2, request.rotation * 90);
+                        request.y * tilesize + request.block.offset(), rad*2, rad*2, request.block.rotate ? request.rotation * 90 : 0);
 
 
                 Draw.color(Pal.accent);
