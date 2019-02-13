@@ -1,11 +1,12 @@
 package io.anuke.mindustry.io.versions;
 
-import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.mindustry.game.Difficulty;
-import io.anuke.mindustry.game.GameMode;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.Zone;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -24,31 +25,29 @@ public class Save16 extends SaveFileVersion{
         stream.readLong(); //time
         stream.readLong(); //total playtime
         stream.readInt(); //build
-        int sector = stream.readInt(); //sector ID
 
         //general state
-        byte mode = stream.readByte();
+        state.rules = Serialization.readRules(stream);
+        //load zone spawn patterns if applicable
+        if(content.getByID(ContentType.zone, state.rules.zone) != null){
+            state.rules.spawns = content.<Zone>getByID(ContentType.zone, state.rules.zone).rules.get().spawns;
+        }
         String mapname = stream.readUTF();
         Map map = world.maps.getByName(mapname);
+        if(map == null) map = new Map("unknown", 1, 1);
         world.setMap(map);
 
-        world.setSector(world.sectors.get(sector));
-
         int wave = stream.readInt();
-        byte difficulty = stream.readByte();
         float wavetime = stream.readFloat();
 
-        state.difficulty = Difficulty.values()[difficulty];
-        state.mode = GameMode.values()[mode];
         state.wave = wave;
         state.wavetime = wavetime;
+        state.stats = Serialization.readStats(stream);
+        world.spawner.read(stream);
 
         content.setTemporaryMapper(readContentHeader(stream));
 
-        world.spawner.read(stream);
-
         readEntities(stream);
-
         readMap(stream);
     }
 
@@ -56,22 +55,21 @@ public class Save16 extends SaveFileVersion{
     public void write(DataOutputStream stream) throws IOException{
         //--META--
         stream.writeInt(version); //version id
-        stream.writeLong(TimeUtils.millis()); //last saved
+        stream.writeLong(Time.millis()); //last saved
         stream.writeLong(headless ? 0 : control.saves.getTotalPlaytime()); //playtime
         stream.writeInt(Version.build); //build
-        stream.writeInt(world.getSector() == null ? invalidSector : world.getSector().pos()); //sector ID
 
         //--GENERAL STATE--
-        stream.writeByte(state.mode.ordinal()); //gamemode
-        stream.writeUTF(world.getMap().name); //map ID
+        Serialization.writeRules(stream, state.rules);
+        stream.writeUTF(world.getMap().name); //map name
 
         stream.writeInt(state.wave); //wave
-        stream.writeByte(state.difficulty.ordinal()); //difficulty ordinal
         stream.writeFloat(state.wavetime); //wave countdown
 
-        writeContentHeader(stream);
+        Serialization.writeStats(stream, state.stats);
+        world.spawner.write(stream);
 
-        world.spawner.write(stream); //spawnes
+        writeContentHeader(stream);
 
         //--ENTITIES--
 

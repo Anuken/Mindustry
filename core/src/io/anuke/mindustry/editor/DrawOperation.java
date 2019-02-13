@@ -1,10 +1,10 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntSet;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
-import io.anuke.ucore.util.Bits;
 
 public class DrawOperation{
     /**
@@ -29,7 +29,7 @@ public class DrawOperation{
     }
 
     public boolean checkDuplicate(short x, short y){
-        int i = Bits.packInt(x, y);
+        int i = Pack.shortInt(x, y);
         if(checks.contains(i)) return true;
 
         checks.add(i);

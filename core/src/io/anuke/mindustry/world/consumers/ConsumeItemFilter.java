@@ -1,14 +1,15 @@
 package io.anuke.mindustry.world.consumers;
 
-import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.arc.collection.Array;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.scene.ui.layout.Table;
 import static io.anuke.mindustry.Vars.*;
 
 public class ConsumeItemFilter extends Consume{
@@ -28,7 +29,7 @@ public class ConsumeItemFilter extends Consume{
 
         for(int i = 0; i < list.size; i++){
             Item item = list.get(i);
-            table.addImage(item.region).size(8 * 4).padRight(2).padLeft(2);
+            table.addImage(item.icon(Icon.large)).size(8 * 4).padRight(2).padLeft(2);
             if(i != list.size - 1){
                 table.add("/");
             }
@@ -46,6 +47,17 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
+    public void trigger(Block block, TileEntity entity){
+        for(int i = 0; i < content.items().size; i++){
+            Item item = content.item(i);
+            if(entity.items != null && entity.items.has(item) && this.filter.test(item)){
+                entity.items.remove(item, 1);
+                break;
+            }
+        }
+    }
+
+    @Override
     public boolean valid(Block block, TileEntity entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
@@ -58,6 +70,6 @@ public class ConsumeItemFilter extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        stats.add(optional ? BlockStat.boostItem : BlockStat.inputItem, new ItemFilterValue(filter));
+        stats.add(boost ? BlockStat.boostItem : BlockStat.inputItem, new ItemFilterValue(filter));
     }
 }

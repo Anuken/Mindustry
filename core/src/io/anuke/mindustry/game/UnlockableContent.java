@@ -1,9 +1,8 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.ucore.scene.ui.layout.Table;
-
-import static io.anuke.mindustry.Vars.control;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.Vars;
 
 /**Base interface for an unlockable content type.*/
 public abstract class UnlockableContent extends MappableContent{
@@ -29,23 +28,11 @@ public abstract class UnlockableContent extends MappableContent{
         return false;
     }
 
-    /**Lists the content that must be unlocked in order for this specific content to become unlocked. May return null.*/
-    public UnlockableContent[] getDependencies(){
-        return null;
+    public final boolean unlocked(){
+        return Vars.data.isUnlocked(this);
     }
 
-    /**Returns whether dependencies are satisfied for unlocking this content.*/
-    public boolean canBeUnlocked(){
-        UnlockableContent[] depend = getDependencies();
-        if(depend == null){
-            return true;
-        }else{
-            for(UnlockableContent cont : depend){
-                if(!control.unlocks.isUnlocked(cont)){
-                    return false;
-                }
-            }
-            return true;
-        }
+    public final boolean locked(){
+        return !unlocked();
     }
 }

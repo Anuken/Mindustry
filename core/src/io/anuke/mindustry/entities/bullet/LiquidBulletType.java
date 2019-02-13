@@ -1,18 +1,17 @@
 package io.anuke.mindustry.entities.bullet;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.GridPoint2;
-import io.anuke.mindustry.content.fx.BulletFx;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -21,14 +20,22 @@ public class LiquidBulletType extends BulletType{
     Liquid liquid;
 
     public LiquidBulletType(Liquid liquid){
-        super(2.5f, 0);
+        super(2.8f, 0);
         this.liquid = liquid;
 
-        lifetime = 70f;
-        despawneffect = Fx.none;
-        hiteffect = BulletFx.hitLiquid;
-        drag = 0.01f;
-        knockback = 0.5f;
+        lifetime = 74f;
+        status = liquid.effect;
+        statusDuration = 90f;
+        despawnEffect = Fx.none;
+        hitEffect = Fx.hitLiquid;
+        shootEffect = Fx.none;
+        drag = 0.009f;
+        knockback = 0.55f;
+    }
+
+    @Override
+    public float range(){
+        return speed * lifetime /2f;
     }
 
     @Override
@@ -54,13 +61,13 @@ public class LiquidBulletType extends BulletType{
 
     @Override
     public void hit(Bullet b, float hitx, float hity){
-        Effects.effect(hiteffect, liquid.color, hitx, hity);
+        Effects.effect(hitEffect, liquid.color, hitx, hity);
         Puddle.deposit(world.tileWorld(hitx, hity), liquid, 5f);
 
         if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){
             float intensity = 400f;
             Fire.extinguish(world.tileWorld(hitx, hity), intensity);
-            for(GridPoint2 p : Geometry.d4){
+            for(Point2 p : Geometry.d4){
                 Fire.extinguish(world.tileWorld(hitx + p.x * tilesize, hity + p.y * tilesize), intensity);
             }
         }

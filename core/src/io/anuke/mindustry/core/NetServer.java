@@ -1,19 +1,30 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.TimeUtils;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.traits.Entity;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Colors;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.io.ByteBufferOutput;
+import io.anuke.arc.util.io.CountableByteArrayOutputStream;
 import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -21,35 +32,25 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadServer;
-import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.net.Administration;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
+import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.NetConnection;
+import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityQuery;
-import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.io.ByteBufferOutput;
-import io.anuke.ucore.io.CountableByteArrayOutputStream;
-import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Structs;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.zip.DeflaterOutputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class NetServer extends Module{
-    public final static int maxSnapshotSize = 2047;
+public class NetServer implements ApplicationListener{
+    public final static int maxSnapshotSize = 430;
 
     public final static boolean debugSnapshots = false;
     public final static float maxSnapshotDelay = 200;
@@ -122,7 +123,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            if(TimeUtils.millis() - info.lastKicked < kickDuration){
+            if(Time.millis() - info.lastKicked < kickDuration){
                 kick(id, KickReason.recentKick);
                 return;
             }
@@ -155,7 +156,7 @@ public class NetServer extends Module{
                 return;
             }
 
-            Log.info("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, connection.address);
+            Log.debug("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, connection.address);
 
             String ip = Net.getConnection(id).address;
 
@@ -192,7 +193,8 @@ public class NetServer extends Module{
                 return;
             }
 
-            if(state.mode.isPvp){
+            //playing in pvp mode automatically assigns players to teams
+            if(state.rules.pvp){
                 //find team with minimum amount of players and auto-assign player to that.
                 Team min = Structs.findMin(Team.all, team -> {
                     if(state.teams.isActive(team)){
@@ -224,45 +226,6 @@ public class NetServer extends Module{
         });
     }
 
-    /** Sends a raw byte[] snapshot to a client, splitting up into chunks when needed.*/
-    private static void sendSplitSnapshot(int userid, byte[] bytes, int snapshotID, int uncompressedLength){
-        if(bytes.length < maxSnapshotSize){
-            scheduleSnapshot(() -> Call.onSnapshot(userid, bytes, snapshotID, (short) 0, bytes.length, uncompressedLength));
-        }else{
-            int remaining = bytes.length;
-            int offset = 0;
-            int chunkid = 0;
-            while(remaining > 0){
-                int used = Math.min(remaining, maxSnapshotSize);
-                byte[] toSend;
-                //re-use sent byte arrays when possible
-                if(used == maxSnapshotSize && !debugSnapshots){
-                    toSend = reusableSnapArray;
-                    System.arraycopy(bytes, offset, toSend, 0, Math.min(offset + maxSnapshotSize, bytes.length) - offset);
-                }else{
-                    toSend = Arrays.copyOfRange(bytes, offset, Math.min(offset + maxSnapshotSize, bytes.length));
-                }
-
-                short fchunk = (short)chunkid;
-                scheduleSnapshot(() -> Call.onSnapshot(userid, toSend, snapshotID, fchunk, bytes.length, uncompressedLength));
-
-                remaining -= used;
-                offset += used;
-                chunkid++;
-            }
-        }
-    }
-
-    private static void scheduleSnapshot(Runnable r){
-        if(debugSnapshots){
-            if(!Mathf.chance(snapshotDropchance)){
-                Timers.run(maxSnapshotDelay / 1000f * 60f, r);
-            }
-        }else{
-            r.run();
-        }
-    }
-
     public void sendWorldData(Player player, int clientID){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         DeflaterOutputStream def = new DeflaterOutputStream(stream);
@@ -271,7 +234,7 @@ public class NetServer extends Module{
         data.stream = new ByteArrayInputStream(stream.toByteArray());
         Net.sendStream(clientID, data);
 
-        Log.info("Packed {0} compressed bytes of world data.", stream.size());
+        Log.debug("Packed {0} compressed bytes of world data.", stream.size());
     }
 
     public static void onDisconnect(Player player){
@@ -296,7 +259,7 @@ public class NetServer extends Module{
     @Remote(targets = Loc.client, unreliable = true)
     public static void onClientShapshot(
         Player player,
-        int snapshotID, long sent,
+        int snapshotID,
         float x, float y,
         float pointerX, float pointerY,
         float rotation, float baseRotation,
@@ -309,16 +272,16 @@ public class NetServer extends Module{
         NetConnection connection = player.con;
         if(connection == null || snapshotID < connection.lastRecievedClientSnapshot) return;
 
-        boolean verifyPosition = !player.isDead() && netServer.admins.getStrict() && headless && player.getCarrier() == null;
+        boolean verifyPosition = !player.isDead() && netServer.admins.getStrict() && headless;
 
-        if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = TimeUtils.millis() - 16;
+        if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = Time.millis() - 16;
 
         connection.viewX = viewX;
         connection.viewY = viewY;
         connection.viewWidth = viewWidth;
         connection.viewHeight = viewHeight;
 
-        long elapsed = TimeUtils.timeSinceMillis(connection.lastRecievedClientTime);
+        long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
 
         float maxSpeed = boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
         float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.25f, player.mech.maxSpeed * 1.1f);
@@ -333,7 +296,7 @@ public class NetServer extends Module{
             //auto-skip done requests
             if(req.breaking && world.tile(req.x, req.y).block() == Blocks.air){
                 continue;
-            }else if(!req.breaking && world.tile(req.x, req.y).block() == req.recipe.result && (!req.recipe.result.rotate || world.tile(req.x, req.y).getRotation() == req.rotation)){
+            }else if(!req.breaking && world.tile(req.x, req.y).block() == req.block && (!req.block.rotate || world.tile(req.x, req.y).getRotation() == req.rotation)){
                 continue;
             }
             player.getPlaceQueue().addLast(req);
@@ -357,7 +320,7 @@ public class NetServer extends Module{
             player.y = prevy;
             newx = x;
             newy = y;
-        }else if(Vector2.dst(x, y, newx, newy) > correctDist){
+        }else if(Mathf.dst(x, y, newx, newy) > correctDist){
             Call.onPositionSet(player.con.id, newx, newy); //teleport and correct position when necessary
         }
 
@@ -366,24 +329,24 @@ public class NetServer extends Module{
         player.y = prevy;
 
         //set interpolator target to *new* position so it moves toward it
-        player.getInterpolator().read(player.x, player.y, newx, newy, sent, rotation, baseRotation);
-        player.getVelocity().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
+        player.getInterpolator().read(player.x, player.y, newx, newy, rotation, baseRotation);
+        player.velocity().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
 
         connection.lastRecievedClientSnapshot = snapshotID;
-        connection.lastRecievedClientTime = TimeUtils.millis();
+        connection.lastRecievedClientTime = Time.millis();
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
     public static void onAdminRequest(Player player, Player other, AdminAction action){
 
         if(!player.isAdmin){
-            Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
+            Log.warn("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
                     player.name, player.con.address);
             return;
         }
 
         if(other == null || ((other.isAdmin && !player.isLocal) && other != player)){
-            Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
+            Log.warn("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
             return;
         }
 
@@ -420,7 +383,7 @@ public class NetServer extends Module{
     }
 
     public boolean isWaitingForPlayers(){
-        if(state.mode.isPvp){
+        if(state.rules.pvp){
             int used = 0;
             for(Team t : Team.all){
                 if(playerGroup.count(p -> p.getTeam() == t) > 0){
@@ -436,8 +399,8 @@ public class NetServer extends Module{
 
         if(!headless && !closing && Net.server() && state.is(State.menu)){
             closing = true;
-            threads.runGraphics(() -> ui.loadfrag.show("$text.server.closing"));
-            Timers.runTask(5f, () -> {
+            ui.loadfrag.show("$server.closing");
+            Time.runTask(5f, () -> {
                 Net.closeServer();
                 ui.loadfrag.hide();
                 closing = false;
@@ -469,45 +432,34 @@ public class NetServer extends Module{
         if(player != null && (reason == KickReason.kick || reason == KickReason.banned) && player.uuid != null){
             PlayerInfo info = admins.getInfo(player.uuid);
             info.timesKicked++;
-            info.lastKicked = TimeUtils.millis();
+            info.lastKicked = Time.millis();
         }
 
         Call.onKick(connection, reason);
 
-        Timers.runTask(2f, con::close);
+        Time.runTask(2f, con::close);
 
         admins.save();
     }
 
-    public void writeSnapshot(Player player, DataOutputStream dataStream) throws IOException{
-        viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
-
-        //write wave datas
-        dataStream.writeFloat(state.wavetime);
-        dataStream.writeInt(state.wave);
-        dataStream.writeInt(state.enemies());
-
+    public void writeSnapshot(Player player) throws IOException{
+        syncStream.reset();
         ObjectSet<Tile> cores = state.teams.get(player.getTeam()).cores;
 
         dataStream.writeByte(cores.size);
 
-        //write all core inventory data
         for(Tile tile : cores){
             dataStream.writeInt(tile.pos());
             tile.entity.items.write(dataStream);
         }
 
-        //write timestamp
-        dataStream.writeLong(TimeUtils.millis());
+        dataStream.close();
+        byte[] stateBytes = syncStream.toByteArray();
 
-        int totalGroups = 0;
+        //write basic state data.
+        Call.onStateSnapshot(player.con.id, state.wavetime, state.wave, state.enemies, (short)stateBytes.length, Net.compressSnapshot(stateBytes));
 
-        for(EntityGroup<?> group : Entities.getAllGroups()){
-            if(!group.isEmpty() && (group.all().get(0) instanceof SyncTrait)) totalGroups++;
-        }
-
-        //write total amount of serializable groups
-        dataStream.writeByte(totalGroups);
+        viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 
         //check for syncable groups
         for(EntityGroup<?> group : Entities.getAllGroups()){
@@ -535,15 +487,32 @@ public class NetServer extends Module{
                 }
             }
 
-            //write group ID + group size
-            dataStream.writeByte(group.getID());
-            dataStream.writeShort(returnArray.size);
+            syncStream.reset();
+
+            int sent = 0;
 
             for(Entity entity : returnArray){
                 //write all entities now
                 dataStream.writeInt(entity.getID()); //write id
                 dataStream.writeByte(((SyncTrait) entity).getTypeID()); //write type ID
                 ((SyncTrait) entity).write(dataStream); //write entity
+
+                sent ++;
+
+                if(syncStream.position() > maxSnapshotSize){
+                    dataStream.close();
+                    byte[] syncBytes = syncStream.toByteArray();
+                    Call.onEntitySnapshot(player.con.id, (byte)group.getID(), (short)sent, (short)syncBytes.length, Net.compressSnapshot(syncBytes));
+                    sent = 0;
+                    syncStream.reset();
+                }
+            }
+
+            if(sent > 0){
+                dataStream.close();
+
+                byte[] syncBytes = syncStream.toByteArray();
+                Call.onEntitySnapshot(player.con.id, (byte)group.getID(), (short)sent, (short)syncBytes.length, Net.compressSnapshot(syncBytes));
             }
         }
     }
@@ -617,21 +586,7 @@ public class NetServer extends Module{
 
                 if(!player.timer.get(Player.timerSync, serverSyncTime) || !connection.hasConnected) continue;
 
-                //reset stream to begin writing
-                Timers.mark();
-                syncStream.reset();
-
-                writeSnapshot(player, dataStream);
-
-                dataStream.close();
-
-                byte[] bytes = syncStream.toByteArray();
-                int uncompressed = bytes.length;
-                bytes = Net.compressSnapshot(bytes);
-                int snapid = connection.lastSentSnapshotID ++;
-
-                if(debugSnapshots) Log.info("Sent snapshot: {0} bytes.", bytes.length);
-                sendSplitSnapshot(connection.id, bytes, snapid, uncompressed);
+                writeSnapshot(player);
             }
 
         }catch(IOException e){

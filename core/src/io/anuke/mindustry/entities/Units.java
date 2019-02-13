@@ -1,18 +1,19 @@
 package io.anuke.mindustry.entities;
 
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityQuery;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.Geometry;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -21,11 +22,10 @@ import static io.anuke.mindustry.Vars.*;
  */
 public class Units{
     private static Rectangle rect = new Rectangle();
-    private static Rectangle rectGraphics = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
     private static Unit result;
     private static float cdist;
-    private static boolean boolResult, boolResultGraphics;
+    private static boolean boolResult;
 
     /**
      * Validates a target.
@@ -38,7 +38,7 @@ public class Units{
      * @return whether the target is invalid
      */
     public static boolean invalidateTarget(TargetTrait target, Team team, float x, float y, float range){
-        return target == null || (range != Float.MAX_VALUE && target.distanceTo(x, y) > range) || target.getTeam() == team || !target.isValid();
+        return target == null || (range != Float.MAX_VALUE && target.dst(x, y) > range) || target.getTeam() == team || !target.isValid();
     }
 
     /**See {@link #invalidateTarget(TargetTrait, Team, float, float, float)}*/
@@ -48,7 +48,7 @@ public class Units{
 
     /**See {@link #invalidateTarget(TargetTrait, Team, float, float, float)}*/
     public static boolean invalidateTarget(TargetTrait target, Unit targeter){
-        return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.getWeapon().getAmmo().getRange());
+        return invalidateTarget(target, targeter.getTeam(), targeter.x, targeter.y, targeter.getWeapon().bullet.range());
     }
 
     /**Returns whether there are any entities on this tile.*/
@@ -67,7 +67,7 @@ public class Units{
         Units.getNearby(rect, unit -> {
             if(boolResult) return;
             if(!unit.isFlying()){
-                unit.getHitbox(hitrect);
+                unit.hitbox(hitrect);
 
                 if(hitrect.overlaps(rect)){
                     boolResult = true;
@@ -89,7 +89,7 @@ public class Units{
         Units.getNearby(rect, unit -> {
             if(value[0] || !pred.test(unit) || unit.isDead()) return;
             if(!unit.isFlying()){
-                unit.getHitbox(hitrect);
+                unit.hitbox(hitrect);
 
                 if(hitrect.overlaps(rect)){
                     value[0] = true;
@@ -101,18 +101,18 @@ public class Units{
     }
 
     /**Returns the neareset damaged tile.*/
-    public static TileEntity findDamagedTile(Team team, float x, float y){
+    public static io.anuke.mindustry.entities.type.TileEntity findDamagedTile(Team team, float x, float y){
         Tile tile = Geometry.findClosest(x, y, world.indexer.getDamaged(team));
         return tile == null ? null : tile.entity;
     }
 
     /**Returns the neareset ally tile in a range.*/
-    public static TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+    public static io.anuke.mindustry.entities.type.TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
         return world.indexer.findTile(team, x, y, range, pred);
     }
 
     /**Returns the neareset enemy tile in a range.*/
-    public static TileEntity findEnemyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+    public static io.anuke.mindustry.entities.type.TileEntity findEnemyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
         for(Team enemy : state.teams.enemiesOf(team)){
             TileEntity entity = world.indexer.findTile(enemy, x, y, range, pred);
             if(entity != null){
@@ -134,7 +134,7 @@ public class Units{
         }
 
         //then check all player groups
-        for(Player player : playerGroup.all()){
+        for(io.anuke.mindustry.entities.type.Player player : playerGroup.all()){
             cons.accept(player);
         }
     }
@@ -165,7 +165,7 @@ public class Units{
             if(e.isDead() || !predicate.test(e))
                 return;
 
-            float dist = Vector2.dst(e.x, e.y, x, y);
+            float dist = Mathf.dst(e.x, e.y, x, y);
             if(dist < range){
                 if(result == null || dist < cdist){
                     result = e;
@@ -188,7 +188,7 @@ public class Units{
             if(!predicate.test(e))
                 return;
 
-            float dist = Vector2.dst(e.x, e.y, x, y);
+            float dist = Mathf.dst(e.x, e.y, x, y);
             if(dist < range){
                 if(result == null || dist < cdist){
                     result = e;
@@ -210,7 +210,7 @@ public class Units{
 
         //now check all players
         EntityQuery.getNearby(playerGroup, rect, player -> {
-            if(((Unit) player).team == team) cons.accept((Unit) player);
+            if(((Unit) player).getTeam() == team) cons.accept((Unit) player);
         });
     }
 
@@ -221,7 +221,7 @@ public class Units{
         EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
         if(!group.isEmpty()){
             EntityQuery.getNearby(group, rect, entity -> {
-                if(entity.distanceTo(x, y) <= radius){
+                if(entity.dst(x, y) <= radius){
                     cons.accept((Unit) entity);
                 }
             });
@@ -229,7 +229,7 @@ public class Units{
 
         //now check all players
         EntityQuery.getNearby(playerGroup, rect, player -> {
-            if(((Unit) player).team == team && player.distanceTo(x, y) <= radius){
+            if(((Unit) player).getTeam() == team && player.dst(x, y) <= radius){
                 cons.accept((Unit) player);
             }
         });
@@ -262,7 +262,7 @@ public class Units{
 
         //now check all enemy players
         EntityQuery.getNearby(playerGroup, rect, player -> {
-            if(targets.contains(((Player) player).team)){
+            if(targets.contains(((Player) player).getTeam())){
                 cons.accept((Unit) player);
             }
         });

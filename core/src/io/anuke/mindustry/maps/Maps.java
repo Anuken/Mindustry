@@ -1,15 +1,14 @@
 package io.anuke.mindustry.maps;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.Core;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.Disposable;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.mindustry.io.MapIO;
-import io.anuke.ucore.function.Supplier;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.ThreadArray;
+import io.anuke.arc.function.Supplier;
+import io.anuke.arc.util.Log;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -19,16 +18,16 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
     /**List of all built-in maps.*/
-    private static final String[] defaultMapNames = {"sandbox"};
+    private static final String[] defaultMapNames = {};
     /**Tile format version.*/
     private static final int version = 0;
 
     /**Maps map names to the real maps.*/
     private ObjectMap<String, Map> maps = new ObjectMap<>();
     /**All maps stored in an ordered array.*/
-    private Array<Map> allMaps = new ThreadArray<>();
+    private Array<Map> allMaps = new Array<>();
     /**Temporary array used for returning things.*/
-    private Array<Map> returnArray = new ThreadArray<>();
+    private Array<Map> returnArray = new Array<>();
 
     /**Returns a list of all maps, including custom ones.*/
     public Array<Map> all(){
@@ -55,14 +54,26 @@ public class Maps implements Disposable{
 
     /**Returns map by internal name.*/
     public Map getByName(String name){
-        return maps.get(name.toLowerCase());
+        return maps.get(name);
+    }
+
+    /**Loads a map from the map folder and returns it. Should only be used for zone maps.
+     * Does not add this map to the map list.*/
+    public Map loadInternalMap(String name){
+        FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
+
+        try(DataInputStream ds = new DataInputStream(file.read())) {
+            return new Map(name, MapIO.readMapMeta(ds), false, file::read);
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
     }
 
     /**Load all maps. Should be called at application start.*/
     public void load(){
-        try {
+        try{
             for (String name : defaultMapNames) {
-                FileHandle file = Gdx.files.internal("maps/" + name + "." + mapExtension);
+                FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
                 loadMap(file.nameWithoutExtension(), file::read, false);
             }
         }catch (IOException e){
@@ -125,7 +136,7 @@ public class Maps implements Disposable{
                 map.texture = new Texture(MapIO.generatePixmap(MapIO.readTileData(ds, meta, true)));
             }
 
-            maps.put(map.name.toLowerCase(), map);
+            maps.put(map.name, map);
             allMaps.add(map);
         }
     }

@@ -1,13 +1,13 @@
 package io.anuke.mindustry.world.consumers;
 
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.ItemListValue;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Table;
 
 public class ConsumeItems extends Consume{
     private ItemStack[] items;
@@ -38,12 +38,19 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
+    public void trigger(Block block, TileEntity entity){
+        for(ItemStack stack : items){
+            entity.items.remove(stack);
+        }
+    }
+
+    @Override
     public boolean valid(Block block, TileEntity entity){
         return entity.items != null && entity.items.has(items);
     }
 
     @Override
     public void display(BlockStats stats){
-        stats.add(optional ? BlockStat.boostItem : BlockStat.inputItems, new ItemListValue(items));
+        stats.add(boost ? BlockStat.boostItem : BlockStat.inputItems, new ItemListValue(items));
     }
 }

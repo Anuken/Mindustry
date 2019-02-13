@@ -12,6 +12,7 @@ import javax.lang.model.util.ElementFilter;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
@@ -46,6 +47,7 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
 
             TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
             classBuilder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
+            classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
             MethodSpec.Builder method = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
             for(TypeElement elem : elements){
@@ -53,20 +55,18 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
 
                 TypeSpec.Builder serializer = TypeSpec.anonymousClassBuilder("")
                 .addSuperinterface(ParameterizedTypeName.get(
-                ClassName.bestGuess("io.anuke.ucore.io.TypeSerializer"), type));
+                ClassName.bestGuess("io.anuke.arc.Settings.TypeSerializer"), type));
 
                 MethodSpec.Builder writeMethod = MethodSpec.methodBuilder("write")
                 .returns(void.class)
                 .addParameter(DataOutput.class, "stream")
                 .addParameter(type, "object")
-                .addAnnotation(Override.class)
                 .addException(IOException.class)
                 .addModifiers(Modifier.PUBLIC);
 
                 MethodSpec.Builder readMethod = MethodSpec.methodBuilder("read")
                 .returns(type)
                 .addParameter(DataInput.class, "stream")
-                .addAnnotation(Override.class)
                 .addException(IOException.class)
                 .addModifiers(Modifier.PUBLIC);
 
@@ -84,8 +84,8 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                         writeMethod.addStatement("stream.write" + capName + "(object." + name + ")");
                         readMethod.addStatement("object." + name + "= stream.read" + capName + "()");
                     }else{
-                        writeMethod.addStatement("io.anuke.ucore.core.Settings.getSerializer(" + typeName+ ".class).write(stream, object." + name + ")");
-                        readMethod.addStatement("object." + name + " = (" +typeName+")io.anuke.ucore.core.Settings.getSerializer(" + typeName+ ".class).read(stream)");
+                        writeMethod.addStatement("io.anuke.arc.Core.settings.getSerializer(" + typeName+ ".class).write(stream, object." + name + ")");
+                        readMethod.addStatement("object." + name + " = (" +typeName+")io.anuke.arc.Core.settings.getSerializer(" + typeName+ ".class).read(stream)");
                     }
                 }
 
@@ -94,7 +94,18 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                 serializer.addMethod(writeMethod.build());
                 serializer.addMethod(readMethod.build());
 
-                method.addStatement("io.anuke.ucore.core.Settings.setSerializer($N, $L)",  Utils.elementUtils.getBinaryName(elem).toString().replace('$', '.') + ".class", serializer.build());
+                method.addStatement("io.anuke.arc.Core.settings.setSerializer($N, $L)",  Utils.elementUtils.getBinaryName(elem).toString().replace('$', '.') + ".class", serializer.build());
+
+                String sname = type.toString().substring(type.toString().lastIndexOf('.') + 1);
+
+                name(writeMethod, "write" + sname);
+                name(readMethod, "read" + sname);
+
+                writeMethod.addModifiers(Modifier.STATIC);
+                readMethod.addModifiers(Modifier.STATIC);
+
+                classBuilder.addMethod(writeMethod.build());
+                classBuilder.addMethod(readMethod.build());
             }
 
             classBuilder.addMethod(method.build());
@@ -105,6 +116,16 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
             return true;
         }catch(Exception e){
             e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    static void name(MethodSpec.Builder builder, String name){
+        try{
+            Field field = builder.getClass().getDeclaredField("name");
+            field.setAccessible(true);
+            field.set(builder, name);
+        }catch(Exception e){
             throw new RuntimeException(e);
         }
     }

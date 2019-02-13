@@ -1,24 +1,24 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.SelectionTrait;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.scene.ui.layout.Table;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.threads;
 
 public class SortedUnloader extends Block implements SelectionTrait{
     protected float speed = 1f;
@@ -42,11 +42,8 @@ public class SortedUnloader extends Block implements SelectionTrait{
     }
 
     @Override
-    public void setBars(){}
-
-    @Override
     public void playerPlaced(Tile tile){
-        threads.runDelay(() -> Call.setSortedUnloaderItem(null, tile, lastItem));
+        Core.app.post(() -> Call.setSortedUnloaderItem(null, tile, lastItem));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)

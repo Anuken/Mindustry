@@ -1,18 +1,20 @@
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.headless.HeadlessApplication;
-import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
-import com.badlogic.gdx.math.GridPoint2;
+import io.anuke.arc.ApplicationCore;
+import io.anuke.arc.backends.headless.HeadlessApplication;
+import io.anuke.arc.backends.headless.HeadlessApplicationConfiguration;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.content.blocks.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Logic;
 import io.anuke.mindustry.core.NetServer;
 import io.anuke.mindustry.core.World;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
-import io.anuke.mindustry.entities.units.BaseUnit;
-import io.anuke.mindustry.entities.units.types.Spirit;
+import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.base.Spirit;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.BundleLoader;
@@ -20,24 +22,18 @@ import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.modules.ModuleCore;
-import io.anuke.ucore.util.EmptyLogger;
-import io.anuke.ucore.util.Log;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 import static io.anuke.mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationTests{
+    static Map testMap;
 
     @BeforeAll
     static void launchApplication(){
@@ -46,37 +42,34 @@ public class ApplicationTests{
             Throwable[] exceptionThrown = {null};
             Log.setUseColors(false);
 
-            ModuleCore core = new ModuleCore(){
+            ApplicationCore core = new ApplicationCore(){
                 @Override
-                public void init(){
+                public void setup(){
                     Vars.init();
 
                     headless = true;
 
                     BundleLoader.load();
                     content.load();
-                    content.initialize(Content::init);
 
-                    module(logic = new Logic());
-                    module(world = new World());
-                    module(netServer = new NetServer());
+                    add(logic = new Logic());
+                    add(world = new World());
+                    add(netServer = new NetServer());
+
+                    content.initialize(Content::init);
                 }
 
                 @Override
-                public void postInit(){
-                    super.postInit();
+                public void init(){
+                    super.init();
                     begins[0] = true;
+                    testMap = world.maps.loadInternalMap("groundZero");
                 }
             };
 
             HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-            config.preferencesDirectory = "test_files/";
 
-            new File("tests_files/").delete();
-
-            new HeadlessApplication(core, config){{
-                Gdx.app.setApplicationLogger(new EmptyLogger());
-            }};
+            new HeadlessApplication(core, config);
 
             for(Thread thread : Thread.getAllStackTraces().keySet()){
                 if(thread.getName().equals("HeadlessApplication")){
@@ -98,7 +91,7 @@ public class ApplicationTests{
 
     @BeforeEach
     void resetWorld(){
-        Timers.setDeltaProvider(() ->  1f);
+        Time.setDeltaProvider(() ->  1f);
         logic.reset();
         state.set(State.menu);
     }
@@ -111,30 +104,25 @@ public class ApplicationTests{
     }
 
     @Test
-    void loadSector(){
-        world.sectors.createSector(0, 0);
-        world.sectors.playSector(world.sectors.get(0, 0));
-    }
-
-    @Test
     void playMap(){
-        assertTrue(world.maps.all().size > 0);
-
-        world.loadMap(world.maps.all().first());
+        world.loadMap(testMap);
     }
 
     @Test
     void spawnWaves(){
-        world.loadMap(world.maps.all().first());
+        world.loadMap(testMap);
         logic.runWave();
+        //force trigger delayed spawns
+        Time.setDeltaProvider(() -> 1000f);
+        Time.update();
+        Time.update();
+        Time.setDeltaProvider(() -> 1f);
         unitGroups[waveTeam.ordinal()].updateEvents();
         assertFalse(unitGroups[waveTeam.ordinal()].isEmpty());
     }
 
     @Test
     void createMap(){
-        assertTrue(world.maps.all().size > 0);
-
         Tile[][] tiles = world.createTiles(8, 8);
 
         world.beginMapLoad();
@@ -151,14 +139,14 @@ public class ApplicationTests{
         createMap();
         int bx = 4;
         int by = 4;
-        world.setBlock(world.tile(bx, by), StorageBlocks.core, Team.blue);
+        world.setBlock(world.tile(bx, by), Blocks.coreShard, Team.blue);
         assertEquals(world.tile(bx, by).getTeam(), Team.blue);
         for(int x = bx-1; x <= bx + 1; x++){
             for(int y = by-1; y <= by + 1; y++){
                 if(x == bx && by == y){
-                    assertEquals(world.tile(x, y).block(), StorageBlocks.core);
+                    assertEquals(world.tile(x, y).block(), Blocks.coreShard);
                 }else{
-                    assertTrue(world.tile(x, y).block() == Blocks.blockpart && world.tile(x, y).getLinked() == world.tile(bx, by));
+                    assertTrue(world.tile(x, y).block() == Blocks.part && world.tile(x, y).getLinked() == world.tile(bx, by));
                 }
             }
         }
@@ -179,54 +167,49 @@ public class ApplicationTests{
     @Test
     void timers(){
         boolean[] ran = {false};
-        Timers.run(1.9999f, () -> ran[0] = true);
+        Time.run(1.9999f, () -> ran[0] = true);
 
-        Timers.update();
+        Time.update();
         assertFalse(ran[0]);
-        Timers.update();
+        Time.update();
         assertTrue(ran[0]);
     }
 
     @Test
     void save(){
-        assertTrue(world.maps.all().size > 0);
-
-        world.loadMap(world.maps.all().first());
+        world.loadMap(testMap);
         SaveIO.saveToSlot(0);
     }
 
     @Test
     void load(){
-        assertTrue(world.maps.all().size > 0);
-
-        world.loadMap(world.maps.all().first());
+        world.loadMap(testMap);
         Map map = world.getMap();
 
         SaveIO.saveToSlot(0);
         resetWorld();
         SaveIO.loadFromSlot(0);
 
-        assertEquals(world.getMap(), map);
         assertEquals(world.width(), map.meta.width);
         assertEquals(world.height(), map.meta.height);
     }
 
     @Test
     void inventoryDeposit(){
-        depositTest(CraftingBlocks.smelter, Items.copper);
-        depositTest(StorageBlocks.vault, Items.copper);
-        depositTest(PowerBlocks.thoriumReactor, Items.thorium);
+        depositTest(Blocks.surgeSmelter, Items.copper);
+        depositTest(Blocks.vault, Items.copper);
+        depositTest(Blocks.thoriumReactor, Items.thorium);
     }
 
     @Test
     void edges(){
-        GridPoint2[] edges = Edges.getEdges(1);
-        assertEquals(edges[0], new GridPoint2(1, 0));
-        assertEquals(edges[1], new GridPoint2(0, 1));
-        assertEquals(edges[2], new GridPoint2(-1, 0));
-        assertEquals(edges[3], new GridPoint2(0, -1));
+        Point2[] edges = Edges.getEdges(1);
+        assertEquals(edges[0], new Point2(1, 0));
+        assertEquals(edges[1], new Point2(0, 1));
+        assertEquals(edges[2], new Point2(-1, 0));
+        assertEquals(edges[3], new Point2(0, -1));
 
-        GridPoint2[] edges2 = Edges.getEdges(2);
+        Point2[] edges2 = Edges.getEdges(2);
         assertEquals(8, edges2.length);
     }
 
@@ -240,16 +223,16 @@ public class ApplicationTests{
         d1.set(10f, 20f);
         d2.set(10f, 20f);
 
-        d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
-        d2.addBuildRequest(new BuildRequest(1, 1, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
+        d1.addBuildRequest(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
+        d2.addBuildRequest(new BuildRequest(1, 1, 0, Blocks.copperWallLarge));
 
-        Timers.setDeltaProvider(() -> 9999999f);
-        d1.updateBuilding(d1);
-        d2.updateBuilding(d2);
+        Time.setDeltaProvider(() -> 9999999f);
+        d1.updateBuilding();
+        d2.updateBuilding();
 
-        assertEquals(DefenseBlocks.copperWallLarge, world.tile(0, 0).block());
+        assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
-        assertEquals(Blocks.blockpart, world.tile(1, 1).block());
+        assertEquals(Blocks.part, world.tile(1, 1).block());
     }
 
     @Test
@@ -262,20 +245,20 @@ public class ApplicationTests{
         d1.set(10f, 20f);
         d2.set(10f, 20f);
 
-        d1.addBuildRequest(new BuildRequest(0, 0, 0, Recipe.getByResult(DefenseBlocks.copperWallLarge)));
+        d1.addBuildRequest(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
         d2.addBuildRequest(new BuildRequest(1, 1));
 
-        Timers.setDeltaProvider(() -> 3f);
-        d1.updateBuilding(d1);
-        Timers.setDeltaProvider(() -> 1f);
-        d2.updateBuilding(d2);
+        Time.setDeltaProvider(() -> 3f);
+        d1.updateBuilding();
+        Time.setDeltaProvider(() -> 1f);
+        d2.updateBuilding();
 
         assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
 
-        Timers.setDeltaProvider(() -> 9999f);
+        Time.setDeltaProvider(() -> 9999f);
 
-        d1.updateBuilding(d1);
-        d2.updateBuilding(d2);
+        d1.updateBuilding();
+        d2.updateBuilding();
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
@@ -286,7 +269,7 @@ public class ApplicationTests{
         createMap();
 
         Tile core = world.tile(5, 5);
-        world.setBlock(core, StorageBlocks.core, Team.blue);
+        world.setBlock(core, Blocks.coreShard, Team.blue);
         for(Item item : content.items()){
             core.entity.items.set(item, 3000);
         }
@@ -295,7 +278,7 @@ public class ApplicationTests{
     }
 
     void depositTest(Block block, Item item){
-        BaseUnit unit = UnitTypes.alphaDrone.create(Team.none);
+        BaseUnit unit = UnitTypes.spirit.create(Team.none);
         Tile tile = new Tile(0, 0, Blocks.air.id, block.id);
         int capacity = tile.block().itemCapacity;
 

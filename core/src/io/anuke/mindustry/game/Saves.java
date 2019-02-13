@@ -1,20 +1,21 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.io.SaveIO.SaveException;
 import io.anuke.mindustry.io.SaveMeta;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Strings;
-import io.anuke.ucore.util.ThreadArray;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.Zone;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -24,7 +25,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Saves{
     private int nextSlot;
-    private Array<SaveSlot> saves = new ThreadArray<>();
+    private Array<SaveSlot> saves = new Array<>();
     private IntMap<SaveSlot> saveMap = new IntMap<>();
     private SaveSlot current;
     private boolean saving;
@@ -36,18 +37,16 @@ public class Saves{
     public Saves(){
         Events.on(StateChangeEvent.class, event -> {
             if(event.to == State.menu){
-                threads.run(() -> {
-                    totalPlaytime = 0;
-                    lastTimestamp = 0;
-                    current = null;
-                });
+                totalPlaytime = 0;
+                lastTimestamp = 0;
+                current = null;
             }
         });
     }
 
     public void load(){
         saves.clear();
-        IntArray slots = Settings.getObject("save-slots", IntArray.class, IntArray::new);
+        IntArray slots = Core.settings.getObject("save-slots", IntArray.class, IntArray::new);
 
         for(int i = 0; i < slots.size; i ++){
             int index = slots.get(i);
@@ -69,19 +68,19 @@ public class Saves{
         SaveSlot current = this.current;
 
         if(current != null && !state.is(State.menu)
-            && !(state.isPaused() && ui.hasDialog())){
+            && !(state.isPaused() && Core.scene.hasDialog())){
             if(lastTimestamp != 0){
-                totalPlaytime += TimeUtils.timeSinceMillis(lastTimestamp);
+                totalPlaytime += Time.timeSinceMillis(lastTimestamp);
             }
-            lastTimestamp = TimeUtils.millis();
+            lastTimestamp = Time.millis();
         }
 
         if(!state.is(State.menu) && !state.gameOver && current != null && current.isAutosave()){
-            time += Timers.delta();
-            if(time > Settings.getInt("saveinterval") * 60){
+            time += Time.delta();
+            if(time > Core.settings.getInt("saveinterval") * 60){
                 saving = true;
 
-                Timers.runTask(2f, () -> {
+                Time.runTask(2f, () -> {
                     try{
                         current.save();
                     }catch(Exception e){
@@ -109,6 +108,16 @@ public class Saves{
         return saving;
     }
 
+    public void zoneSave(){
+        SaveSlot slot = new SaveSlot(-1);
+        slot.setName("zone");
+        saves.remove(s -> s.index == -1);
+        saves.add(slot);
+        saveMap.put(slot.index, slot);
+        slot.save();
+        saveSlots();
+    }
+
     public SaveSlot addSave(String name){
         SaveSlot slot = new SaveSlot(nextSlot);
         nextSlot++;
@@ -129,9 +138,13 @@ public class Saves{
         saveMap.put(slot.index, slot);
         slot.meta = SaveIO.getData(slot.index);
         current = slot;
-        slot.meta.sector = invalidSector;
         saveSlots();
         return slot;
+    }
+
+    public SaveSlot getZoneSlot(){
+        SaveSlot slot = getByID(-1);
+        return slot == null || slot.getZone() == null ? null : slot;
     }
 
     public SaveSlot getByID(int id){
@@ -146,8 +159,8 @@ public class Saves{
         IntArray result = new IntArray(saves.size);
         for(int i = 0; i < saves.size; i++) result.add(saves.get(i).index);
 
-        Settings.putObject("save-slots", result);
-        Settings.save();
+        Core.settings.putObject("save-slots", result);
+        Core.settings.save();
     }
 
     public class SaveSlot{
@@ -158,16 +171,19 @@ public class Saves{
             this.index = index;
         }
 
-        public void load(){
-            SaveIO.loadFromSlot(index);
-            meta = SaveIO.getData(index);
-            current = this;
-            totalPlaytime = meta.timePlayed;
+        public void load() throws SaveException{
+            try{
+                SaveIO.loadFromSlot(index);
+                meta = SaveIO.getData(index);
+                current = this;
+                totalPlaytime = meta.timePlayed;
+            }catch(Exception e){
+                throw new SaveException(e);
+            }
         }
 
         public void save(){
             long time = totalPlaytime;
-            renderer.fog.writeFog();
             long prev = totalPlaytime;
             totalPlaytime = time;
 
@@ -181,7 +197,7 @@ public class Saves{
         }
 
         public boolean isHidden(){
-            return meta.sector != invalidSector;
+            return false;
         }
 
         public String getPlayTime(){
@@ -201,12 +217,16 @@ public class Saves{
         }
 
         public String getName(){
-            return Settings.getString("save-" + index + "-name", "untittled");
+            return Core.settings.getString("save-" + index + "-name", "untittled");
         }
 
         public void setName(String name){
-            Settings.putString("save-" + index + "-name", name);
-            Settings.save();
+            Core.settings.put("save-" + index + "-name", name);
+            Core.settings.save();
+        }
+
+        public Zone getZone(){
+            return content.getByID(ContentType.zone, meta.rules.zone);
         }
 
         public int getBuild(){
@@ -217,21 +237,13 @@ public class Saves{
             return meta.wave;
         }
 
-        public Difficulty getDifficulty(){
-            return meta.difficulty;
-        }
-
-        public GameMode getMode(){
-            return meta.mode;
-        }
-
         public boolean isAutosave(){
-            return Settings.getBool("save-" + index + "-autosave", true);
+            return Core.settings.getBool("save-" + index + "-autosave", true);
         }
 
         public void setAutosave(boolean save){
-            Settings.putBool("save-" + index + "-autosave", save);
-            Settings.save();
+            Core.settings.put("save-" + index + "-autosave", save);
+            Core.settings.save();
         }
 
         public void importFile(FileHandle file) throws IOException{

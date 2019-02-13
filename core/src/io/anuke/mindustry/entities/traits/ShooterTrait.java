@@ -1,12 +1,11 @@
 package io.anuke.mindustry.entities.traits;
 
+import io.anuke.arc.util.Interval;
 import io.anuke.mindustry.type.Weapon;
-import io.anuke.ucore.entities.trait.VelocityTrait;
-import io.anuke.ucore.util.Timer;
 
-public interface ShooterTrait extends VelocityTrait, TeamTrait, InventoryTrait{
+public interface ShooterTrait extends VelocityTrait, TeamTrait{
 
-    Timer getTimer();
+    Interval getTimer();
 
     int getShootTimer(boolean left);
 

@@ -1,8 +1,7 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.BarType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -21,12 +20,6 @@ public abstract class StorageBlock extends Block{
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
         return itemCapacity;
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-        bars.remove(BarType.inventory);
     }
 
     @Override

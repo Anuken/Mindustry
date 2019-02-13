@@ -1,13 +1,12 @@
 package io.anuke.mindustry.type;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
 
 public class Liquid extends UnlockableContent{
     public final Color color;
@@ -30,13 +29,13 @@ public class Liquid extends UnlockableContent{
     public StatusEffect effect = StatusEffects.none;
     /**Pump tier. Controls which pumps can use this liquid.*/
     public int tier;
-    /**Displayed icon.*/
+    /**Displayed icon. TODO fix it by removing autogen, draw icons manually*/
     public TextureRegion iconRegion;
 
     public Liquid(String name, Color color){
         this.name = name;
         this.color = new Color(color);
-        this.description = Bundles.getOrNull("liquid." + name + ".description");
+        this.description = Core.bundle.getOrNull("liquid." + name + ".description");
     }
 
     public boolean canExtinguish(){
@@ -45,7 +44,7 @@ public class Liquid extends UnlockableContent{
 
     @Override
     public void load(){
-        iconRegion = Draw.region("liquid-icon-" + name);
+        iconRegion = Core.atlas.find("liquid-" + name);
     }
 
     @Override
@@ -55,7 +54,7 @@ public class Liquid extends UnlockableContent{
 
     @Override
     public String localizedName(){
-        return Bundles.get("liquid." + this.name + ".name");
+        return Core.bundle.get("liquid." + this.name + ".name");
     }
 
     @Override

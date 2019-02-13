@@ -1,14 +1,13 @@
 package io.anuke.mindustry.content;
 
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
 public class Items implements ContentList{
-    public static Item stone, copper, lead, densealloy, coal, titanium, thorium, silicon, plastanium, phasefabric, surgealloy,
-            biomatter, sand, blastCompound, pyratite;
+    public static Item scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium, phasefabric, surgealloy,
+            biomatter, sand, blastCompound, pyratite, metaglass;
 
     @Override
     public void load(){
@@ -27,14 +26,19 @@ public class Items implements ContentList{
             genOre = true;
         }};
 
-        densealloy = new Item("dense-alloy", Color.valueOf("b2c6d2")){{
+        metaglass = new Item("metaglass", Color.valueOf("ebeef5")){{
             type = ItemType.material;
-            cost = 1.2f;
+            cost = 2f;
+        }};
+
+        graphite = new Item("graphite", Color.valueOf("b2c6d2")){{
+            type = ItemType.material;
+            cost = 1.3f;
         }};
 
         coal = new Item("coal", Color.valueOf("272727")){{
-            explosiveness = 0.2f;
-            flammability = 0.5f;
+            explosiveness = 0.4f;
+            flammability = 1f;
             hardness = 2;
             genOre = true;
         }};
@@ -48,15 +52,15 @@ public class Items implements ContentList{
 
         thorium = new Item("thorium", Color.valueOf("f9a3c7")){{
             type = ItemType.material;
-            explosiveness = 0.1f;
+            explosiveness = 0.2f;
             hardness = 4;
-            radioactivity = 0.5f;
+            radioactivity = 1f;
             cost = 1.4f;
             genOre = true;
         }};
 
-        stone = new Item("stone", Color.valueOf("777777")){{
-            hardness = 3;
+        scrap = new Item("scrap", Color.valueOf("777777")){{
+            genOre = true;
         }};
 
         silicon = new Item("silicon", Color.valueOf("53565c")){{
@@ -66,16 +70,15 @@ public class Items implements ContentList{
 
         plastanium = new Item("plastanium", Color.valueOf("cbd97f")){{
             type = ItemType.material;
-            flammability = 0.1f;
-            explosiveness = 0.1f;
+            flammability = 0.2f;
+            explosiveness = 0.2f;
             cost = 1.6f;
         }};
 
         phasefabric = new Item("phase-fabric", Color.valueOf("f4ba6e")){{
             type = ItemType.material;
             cost = 1.5f;
-            fluxiness = 0.9f;
-            radioactivity = 0.3f;
+            radioactivity = 0.6f;
         }};
 
         surgealloy = new Item("surge-alloy", Color.valueOf("f3e979")){{
@@ -83,27 +86,21 @@ public class Items implements ContentList{
         }};
 
         biomatter = new Item("biomatter", Color.valueOf("648b55")){{
-            flammability = 0.55f;
-            fluxiness = 0.3f;
+            flammability = 1.05f;
         }};
 
         sand = new Item("sand", Color.valueOf("e3d39e")){{
-            fluxiness = 0.5f;
+
         }};
 
         blastCompound = new Item("blast-compound", Color.valueOf("ff795e")){{
-            flammability = 0.2f;
-            explosiveness = 0.6f;
+            flammability = 0.4f;
+            explosiveness = 1.2f;
         }};
 
         pyratite = new Item("pyratite", Color.valueOf("ffaa5f")){{
-            flammability = 0.7f;
-            explosiveness = 0.2f;
+            flammability = 1.4f;
+            explosiveness = 0.4f;
         }};
-    }
-
-    @Override
-    public ContentType type(){
-        return ContentType.item;
     }
 }

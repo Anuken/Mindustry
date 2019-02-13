@@ -1,12 +1,12 @@
 package io.anuke.mindustry.world.consumers;
 
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Table;
 
 public class ConsumeLiquid extends Consume{
     protected final float use;
@@ -47,7 +47,7 @@ public class ConsumeLiquid extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        if(!optional){
+        if(!boost){
             stats.add(BlockStat.liquidUse, use * 60f, StatUnit.liquidSecond);
             stats.add(BlockStat.inputLiquid, liquid);
         }else{

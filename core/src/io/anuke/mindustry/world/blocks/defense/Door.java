@@ -1,28 +1,28 @@
 package io.anuke.mindustry.world.blocks.defense;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
-import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics.Cursor;
+import io.anuke.arc.Graphics.Cursor.SystemCursor;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.input.CursorType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.graphics.Draw;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.threads;
-
 public class Door extends Wall{
     protected final Rectangle rect = new Rectangle();
 
-    protected Effect openfx = BlockFx.dooropen;
-    protected Effect closefx = BlockFx.doorclose;
+    protected Effect openfx = Fx.dooropen;
+    protected Effect closefx = Fx.doorclose;
 
     protected TextureRegion openRegion;
 
@@ -36,7 +36,7 @@ public class Door extends Wall{
     @Override
     public void load(){
         super.load();
-        openRegion = Draw.region(name + "-open");
+        openRegion = Core.atlas.find(name + "-open");
     }
 
     @Override
@@ -51,8 +51,8 @@ public class Door extends Wall{
     }
 
     @Override
-    public CursorType getCursor(Tile tile){
-        return CursorType.hand;
+    public Cursor getCursor(Tile tile){
+        return SystemCursor.hand;
     }
 
     @Override
@@ -65,19 +65,16 @@ public class Door extends Wall{
     public void tapped(Tile tile, Player player){
         DoorEntity entity = tile.entity();
 
-        threads.run(() -> {
+        if(Units.anyEntities(tile) && entity.open){
+            return;
+        }
 
-            if(Units.anyEntities(tile) && entity.open){
-                return;
-            }
-
-            entity.open = !entity.open;
-            if(!entity.open){
-                Effects.effect(closefx, tile.drawx(), tile.drawy());
-            }else{
-                Effects.effect(openfx, tile.drawx(), tile.drawy());
-            }
-        });
+        entity.open = !entity.open;
+        if(!entity.open){
+            Effects.effect(closefx, tile.drawx(), tile.drawy());
+        }else{
+            Effects.effect(openfx, tile.drawx(), tile.drawy());
+        }
     }
 
     @Override

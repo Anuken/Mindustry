@@ -1,37 +1,31 @@
 package io.anuke.mindustry.input;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.arc.Core;
+import io.anuke.arc.Graphics.Cursor;
+import io.anuke.arc.Graphics.Cursor.SystemCursor;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.core.Inputs.DeviceType;
-import io.anuke.ucore.core.KeyBinds;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.input.CursorType.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
-    private final String section;
-    //controller info
-    private float controlx, controly;
-    private boolean controlling;
     /**Current cursor type.*/
-    private CursorType cursorType = normal;
+    private Cursor cursorType = SystemCursor.arrow;
 
     /**Position where the player started dragging a line.*/
     private int selectX, selectY;
@@ -42,7 +36,6 @@ public class DesktopInput extends InputHandler{
 
     public DesktopInput(Player player){
         super(player);
-        this.section = "player_" + (player.playerIndex + 1);
     }
 
     /**Draws a placement icon for a specific block.*/
@@ -50,45 +43,63 @@ public class DesktopInput extends InputHandler{
         if(validPlace(x, y, block, rotation)){
             Draw.color();
 
-            TextureRegion[] regions = block.getBlockIcon();
+            TextureRegion region = block.icon(Icon.full);
 
-            for(TextureRegion region : regions){
-                Draw.rect(region, x * tilesize + block.offset(), y * tilesize + block.offset(),
-                        region.getRegionWidth() * selectScale, region.getRegionHeight() * selectScale, block.rotate ? rotation * 90 : 0);
+            Draw.rect(region, x * tilesize + block.offset(), y * tilesize + block.offset(),
+                region.getWidth() * selectScale * Draw.scl,
+                region.getHeight() * selectScale * Draw.scl, block.rotate ? rotation * 90 : 0);
+
+            Draw.color(Pal.accent);
+            for(int i = 0; i < 4; i++){
+                Point2 p = Geometry.d8edge[i];
+                float offset = -Math.max(block.size-1, 0)/2f * tilesize;
+                Draw.rect("block-select", x * tilesize + block.offset() + offset * p.x, y * tilesize + block.offset() + offset * p.y, i * 90);
             }
+            Draw.color();
         }else{
-            Draw.color(Palette.removeBack);
+            Draw.color(Pal.removeBack);
             Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1, block.size * tilesize / 2f);
-            Draw.color(Palette.remove);
+            Draw.color(Pal.remove);
             Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset(), block.size * tilesize / 2f);
         }
     }
 
     @Override
     public boolean isDrawing(){
-        return mode != none || recipe != null;
+        return mode != none || block != null;
     }
 
     @Override
     public void drawOutlined(){
-        int cursorX = tileX(Gdx.input.getX());
-        int cursorY = tileY(Gdx.input.getY());
+        Lines.stroke(1f);
+        int cursorX = tileX(Core.input.mouseX());
+        int cursorY = tileY(Core.input.mouseY());
 
         //draw selection(s)
-        if(mode == placing && recipe != null){
+        if(mode == placing && block != null){
             NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, true, maxLength);
 
-            for(int i = 0; i <= result.getLength(); i += recipe.result.size){
-                int x = selectX + i * Mathf.sign(cursorX - selectX) * Mathf.bool(result.isX());
-                int y = selectY + i * Mathf.sign(cursorY - selectY) * Mathf.bool(!result.isX());
+            for(int i = 0; i <= result.getLength(); i += block.size){
+                int x = selectX + i * Mathf.sign(cursorX - selectX) * Mathf.num(result.isX());
+                int y = selectY + i * Mathf.sign(cursorY - selectY) * Mathf.num(!result.isX());
 
-                if(i + recipe.result.size > result.getLength() && recipe.result.rotate){
-                    Draw.color(!validPlace(x, y, recipe.result, result.rotation) ? Palette.remove : Palette.placeRotate);
-                    Draw.grect("place-arrow", x * tilesize + recipe.result.offset(),
-                            y * tilesize + recipe.result.offset(), result.rotation * 90 - 90);
+                if(i + block.size > result.getLength() && block.rotate){
+                    Draw.color(!validPlace(x, y, block, result.rotation) ? Pal.removeBack : Pal.accentBack);
+                    Draw.rect(Core.atlas.find("place-arrow"),
+                        x * tilesize + block.offset(),
+                        y * tilesize + block.offset() - 1,
+                        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+                        Core.atlas.find("place-arrow").getHeight() * Draw.scl, result.rotation * 90 - 90);
+
+                    Draw.color(!validPlace(x, y, block, result.rotation) ? Pal.remove : Pal.accent);
+                    Draw.rect(Core.atlas.find("place-arrow"),
+                        x * tilesize + block.offset(),
+                        y * tilesize + block.offset(),
+                        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+                        Core.atlas.find("place-arrow").getHeight() * Draw.scl, result.rotation * 90 - 90);
                 }
 
-                drawPlace(x, y, recipe.result, result.rotation);
+                drawPlace(x, y, block, result.rotation);
             }
 
             Draw.reset();
@@ -102,25 +113,35 @@ public class DesktopInput extends InputHandler{
                     if(tile == null || !validBreak(tile.x, tile.y)) continue;
                     tile = tile.target();
 
-                    Draw.color(Palette.removeBack);
+                    Draw.color(Pal.removeBack);
                     Lines.square(tile.drawx(), tile.drawy()-1, tile.block().size * tilesize / 2f - 1);
-                    Draw.color(Palette.remove);
+                    Draw.color(Pal.remove);
                     Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f - 1);
                 }
             }
 
-            Draw.color(Palette.removeBack);
+            Draw.color(Pal.removeBack);
             Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
-            Draw.color(Palette.remove);
+            Draw.color(Pal.remove);
             Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
         }else if(isPlacing()){
-            if(recipe.result.rotate){
-                Draw.color(!validPlace(cursorX, cursorY, recipe.result, rotation) ? Palette.remove : Palette.placeRotate);
-                Draw.grect("place-arrow", cursorX * tilesize + recipe.result.offset(),
-                        cursorY * tilesize + recipe.result.offset(), rotation * 90 - 90);
+            if(block.rotate){
+                Draw.color(!validPlace(cursorX, cursorY, block, rotation) ? Pal.removeBack : Pal.accentBack);
+                Draw.rect(Core.atlas.find("place-arrow"),
+                    cursorX * tilesize + block.offset(),
+                    cursorY * tilesize + block.offset() - 1,
+                    Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+                    Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
+
+                Draw.color(!validPlace(cursorX, cursorY, block, rotation) ? Pal.remove : Pal.accent);
+                Draw.rect(Core.atlas.find("place-arrow"),
+                    cursorX * tilesize + block.offset(),
+                    cursorY * tilesize + block.offset(),
+                    Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+                    Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
             }
-            drawPlace(cursorX, cursorY, recipe.result, rotation);
-            recipe.result.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, recipe.result, rotation));
+            drawPlace(cursorX, cursorY, block, rotation);
+            block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
         }
 
         Draw.reset();
@@ -128,24 +149,22 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void update(){
-        if(Net.active() && Inputs.keyTap("player_list")){
+        if(Net.active() && Core.input.keyTap(Binding.player_list)){
             ui.listfrag.toggle();
         }
 
-        if(Inputs.keyRelease(section, "select")){
+        if(Core.input.keyRelease(Binding.select)){
             player.isShooting = false;
         }
 
-        if(state.is(State.menu) || ui.hasDialog()) return;
-
-        boolean controller = KeyBinds.getSection(section).device.type == DeviceType.controller;
+        if(state.is(State.menu) || Core.scene.hasDialog()) return;
 
         //zoom and rotate things
-        if(Inputs.getAxisActive("zoom") && (Inputs.keyDown(section, "zoom_hold") || controller)){
-            renderer.scaleCamera((int) Inputs.getAxisTapped(section, "zoom"));
+        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && (Core.input.keyDown(Binding.zoom_hold))){
+            renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
-        renderer.minimap.zoomBy(-(int) Inputs.getAxisTapped(section, "zoom_minimap"));
+        renderer.minimap.zoomBy(-Core.input.axisTap(Binding.zoom_minimap));
 
         if(player.isDead()) return;
 
@@ -161,90 +180,90 @@ public class DesktopInput extends InputHandler{
         }
 
         if(isPlacing()){
-            cursorType = hand;
+            cursorType = SystemCursor.hand;
             selectScale = Mathf.lerpDelta(selectScale, 1f, 0.2f);
         }else{
             selectScale = 0f;
         }
 
-        rotation = Mathf.mod(rotation + (int) Inputs.getAxisTapped(section, "rotate"), 4);
+        rotation = Mathf.mod(rotation + (int) Core.input.axisTap(Binding.rotate), 4);
 
-        Tile cursor = tileAt(Gdx.input.getX(), Gdx.input.getY());
+        Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
         if(player.isDead()){
-            cursorType = normal;
+            cursorType = SystemCursor.arrow;
         }else if(cursor != null){
             cursor = cursor.target();
 
             cursorType = cursor.block().getCursor(cursor);
 
             if(isPlacing()){
-                cursorType = hand;
+                cursorType = SystemCursor.hand;
             }
 
             if(!isPlacing() && canMine(cursor)){
-                cursorType = drill;
+                cursorType = ui.drillCursor;
             }
 
-            if(canTapPlayer(Graphics.mouseWorld().x, Graphics.mouseWorld().y)){
-                cursorType = unload;
+            if(canTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y)){
+                cursorType = ui.unloadCursor;
             }
         }
 
-        if(!ui.hasMouse()){
-            cursorType.set();
+        if(!Core.scene.hasMouse()){
+            Core.graphics.cursor(cursorType);
         }
 
-        cursorType = normal;
+        cursorType = SystemCursor.arrow;
     }
 
     void pollInput(){
-        Tile selected = tileAt(Gdx.input.getX(), Gdx.input.getY());
-        int cursorX = tileX(Gdx.input.getX());
-        int cursorY = tileY(Gdx.input.getY());
+        Tile selected = tileAt(Core.input.mouseX(), Core.input.mouseY());
+        int cursorX = tileX(Core.input.mouseX());
+        int cursorY = tileY(Core.input.mouseY());
 
-        if(Inputs.keyTap(section, "deselect")){
+        if(Core.input.keyTap(Binding.deselect)){
             player.setMineTile(null);
         }
 
-        if(Inputs.keyTap(section, "select") && !ui.hasMouse()){
+        if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
             if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
                 mode = placing;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if (!tileTapped(selected) && !tryTapPlayer(Graphics.mouseWorld().x, Graphics.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
+                if (!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
                         !tryBeginMine(selected) && player.getMineTile() == null && !ui.chatfrag.chatOpen()) {
                     player.isShooting = true;
                 }
             }else if(!ui.chatfrag.chatOpen()){ //if it's out of bounds, shooting is just fine
                 player.isShooting = true;
             }
-        }else if(Inputs.keyTap(section, "deselect") && (recipe != null || mode != none || player.isBuilding()) &&
-        !(player.getCurrentRequest() != null && player.getCurrentRequest().breaking && KeyBinds.get(section, "deselect") == KeyBinds.get(section, "break"))){
-            if(recipe == null){
+        }else if(Core.input.keyTap(Binding.deselect) && (block != null || mode != none || player.isBuilding()) &&
+        !(player.getCurrentRequest() != null && player.getCurrentRequest().breaking && Core.keybinds.get(Binding.deselect) == Core.keybinds.get(Binding.break_block))){
+            if(block == null){
                 player.clearBuilding();
             }
 
-            recipe = null;
+            block = null;
             mode = none;
-        }else if(Inputs.keyTap(section, "break") && !ui.hasMouse()){
+        }else if(Core.input.keyTap(Binding.break_block) && !Core.scene.hasMouse()){
             //is recalculated because setting the mode to breaking removes potential multiblock cursor offset
             mode = breaking;
-            selectX = tileX(Gdx.input.getX());
-            selectY = tileY(Gdx.input.getY());
+            selectX = tileX(Core.input.mouseX());
+            selectY = tileY(Core.input.mouseY());
         }
 
 
-        if(Inputs.keyRelease(section, "break") || Inputs.keyRelease(section, "select")){
+        if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
 
-            if(mode == placing){ //touch up while placing, place everything in selection
+            if(mode == placing && block != null){ //touch up while placing, place everything in selection
                 NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, true, maxLength);
 
-                for(int i = 0; i <= result.getLength(); i += recipe.result.size){
-                    int x = selectX + i * Mathf.sign(cursorX - selectX) * Mathf.bool(result.isX());
-                    int y = selectY + i * Mathf.sign(cursorY - selectY) * Mathf.bool(!result.isX());
+                for(int i = 0; i <= result.getLength(); i += block.size){
+                    int x = selectX + i * Mathf.sign(cursorX - selectX) * Mathf.num(result.isX());
+                    int y = selectY + i * Mathf.sign(cursorY - selectY) * Mathf.num(!result.isX());
 
                     rotation = result.rotation;
 
@@ -263,7 +282,7 @@ public class DesktopInput extends InputHandler{
             }
 
             if(selected != null){
-                tryDropItems(selected.target(), Graphics.mouseWorld().x, Graphics.mouseWorld().y);
+                tryDropItems(selected.target(), Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             }
 
             mode = none;
@@ -278,60 +297,19 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public float getMouseX(){
-        return !controlling ? Gdx.input.getX() : controlx;
+        return Core.input.mouseX();
     }
 
     @Override
     public float getMouseY(){
-        return !controlling ? Gdx.input.getY() : controly;
-    }
-
-    @Override
-    public boolean isCursorVisible(){
-        return controlling;
+        return Core.input.mouseY();
     }
 
     @Override
     public void updateController(){
-        //TODO no controller support
-        //TODO move controller input to new class, ControllerInput
-        boolean mousemove = Gdx.input.getDeltaX() > 1 || Gdx.input.getDeltaY() > 1;
 
         if(state.is(State.menu)){
             droppingItem = false;
-        }
-
-        if(KeyBinds.getSection(section).device.type == DeviceType.controller && (!mousemove || player.playerIndex > 0)){
-            if(player.playerIndex > 0){
-                controlling = true;
-            }
-
-            float xa = Inputs.getAxis(section, "cursor_x");
-            float ya = Inputs.getAxis(section, "cursor_y");
-
-            if(Math.abs(xa) > controllerMin || Math.abs(ya) > controllerMin){
-                float scl = Settings.getInt("sensitivity", 100) / 100f * Unit.dp.scl(1f);
-                controlx += xa * baseControllerSpeed * scl;
-                controly -= ya * baseControllerSpeed * scl;
-                controlling = true;
-
-                if(player.playerIndex == 0){
-                    Gdx.input.setCursorCatched(true);
-                }
-
-                Inputs.getProcessor().touchDragged((int) getMouseX(), (int) getMouseY(), player.playerIndex);
-            }
-
-            controlx = Mathf.clamp(controlx, 0, Gdx.graphics.getWidth());
-            controly = Mathf.clamp(controly, 0, Gdx.graphics.getHeight());
-        }else{
-            controlling = false;
-            Gdx.input.setCursorCatched(false);
-        }
-
-        if(!controlling){
-            controlx = Gdx.input.getX();
-            controly = Gdx.input.getY();
         }
     }
 

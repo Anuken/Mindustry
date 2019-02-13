@@ -1,9 +1,10 @@
 package io.anuke.mindustry.maps;
 
-import com.badlogic.gdx.utils.IntIntMap;
-import com.badlogic.gdx.utils.ObjectMap;
-import io.anuke.ucore.util.Bundles;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.IntIntMap;
+import io.anuke.arc.collection.ObjectMap;
 
+//todo: specify preferred game rules here; can be overriden
 public class MapMeta{
     public final int version;
     public final ObjectMap<String, String> tags;
@@ -31,11 +32,7 @@ public class MapMeta{
     }
 
     public String tag(String name){
-        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Bundles.get("text.unknown");
-    }
-
-    public boolean hasOreGen(){
-        return !tags.get("oregen", "0").equals("0");
+        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Core.bundle.get("unknown");
     }
 
     @Override

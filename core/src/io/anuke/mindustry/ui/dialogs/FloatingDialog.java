@@ -1,16 +1,15 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.utils.Align;
+import io.anuke.arc.Core;
+import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.util.Align;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.scene.ui.Dialog;
-import io.anuke.ucore.scene.ui.ScrollPane;
+import io.anuke.arc.Events;
+import io.anuke.arc.scene.ui.Dialog;
+import io.anuke.arc.scene.ui.ScrollPane;
 
 import static io.anuke.mindustry.Vars.state;
 
@@ -21,9 +20,9 @@ public class FloatingDialog extends Dialog{
     public FloatingDialog(String title){
         super(title, "dialog");
         setFillParent(true);
-        title().setAlignment(Align.center);
-        getTitleTable().row();
-        getTitleTable().addImage("white", Palette.accent)
+        this.title.setAlignment(Align.center);
+        titleTable.row();
+        titleTable.addImage("white", Pal.accent)
                 .growX().height(3f).pad(4f);
 
         hidden(() -> {
@@ -43,7 +42,7 @@ public class FloatingDialog extends Dialog{
 
         boolean[] done = {false};
 
-        shown(() -> Gdx.app.postRunnable(() ->
+        shown(() -> Core.app.post(() ->
                 forEach(child -> {
                     if(done[0]) return;
 
@@ -64,11 +63,11 @@ public class FloatingDialog extends Dialog{
 
     @Override
     public void addCloseButton(){
-        buttons().addImageTextButton("$text.back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+        buttons.addImageTextButton("$back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
 
         keyDown(key -> {
-            if(key == Keys.ESCAPE || key == Keys.BACK) {
-                Gdx.app.postRunnable(this::hide);
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK) {
+                Core.app.post(this::hide);
             }
         });
     }

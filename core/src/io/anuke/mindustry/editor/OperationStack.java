@@ -1,6 +1,6 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.collection.Array;
 
 public class OperationStack{
     private final static int maxSize = 10;
@@ -22,7 +22,7 @@ public class OperationStack{
         stack.add(action);
 
         if(stack.size > maxSize){
-            stack.removeIndex(0);
+            stack.remove(0);
         }
     }
 

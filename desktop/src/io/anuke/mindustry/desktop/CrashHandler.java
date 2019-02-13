@@ -1,14 +1,14 @@
 package io.anuke.mindustry.desktop;
 
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.JsonValue.ValueType;
-import com.badlogic.gdx.utils.JsonWriter.OutputType;
+import io.anuke.arc.Core;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.OS;
+import io.anuke.arc.util.serialization.JsonValue;
+import io.anuke.arc.util.serialization.JsonValue.ValueType;
+import io.anuke.arc.util.serialization.JsonWriter.OutputType;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.OS;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -25,7 +25,7 @@ public class CrashHandler{
 
         try{
             //check crash report setting
-            if(!Settings.getBool("crashreport")){
+            if(!Core.settings.getBool("crashreport")){
                 return;
             }
         }catch(Throwable ignored){
@@ -77,7 +77,6 @@ public class CrashHandler{
         ex(() -> value.addChild("build", new JsonValue(Version.build)));
         ex(() -> value.addChild("net", new JsonValue(fn)));
         ex(() -> value.addChild("server", new JsonValue(fs)));
-        ex(() -> value.addChild("gamemode", new JsonValue(Vars.state.mode.name())));
         ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
         ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name"))));
         ex(() -> value.addChild("trace", new JsonValue(parseException(e))));
