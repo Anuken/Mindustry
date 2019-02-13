@@ -35,9 +35,15 @@ public abstract class GroundUnit extends BaseUnit{
 
         public void update(){
             TileEntity core = getClosestEnemyCore();
-            float dst = core == null ? 0 : dst(core);
 
-            if(core != null && dst < getWeapon().bullet.range() / 1.1f){
+            if(core == null){
+                setState(patrol);
+                return;
+            }
+
+            float dst = dst(core);
+
+            if(dst < getWeapon().bullet.range() / 1.1f){
                 target = core;
             }
 
@@ -173,7 +179,7 @@ public abstract class GroundUnit extends BaseUnit{
     }
 
     protected void patrol(){
-        vec.trns(baseRotation, type.speed * Time.delta());
+        vec.trns(baseRotation, type.speed * Time.delta() * 2);
         velocity.add(vec.x, vec.y);
         vec.trns(baseRotation, type.hitsizeTile);
         Tile tile = world.tileWorld(x + vec.x, y + vec.y);
