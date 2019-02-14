@@ -398,7 +398,7 @@ public class Zones implements ContentList{
         }};
 
         desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift")
-                .core(Blocks.coreNucleus).dist(2f)){{
+        .core(Blocks.coreNucleus).dist(2f)){{
             deployCost = ItemStack.with(Items.copper, 2000);
             startingItems = ItemStack.with(Items.copper, 1500);
             itemRequirements = ItemStack.with(Items.copper, 8000, Items.metaglass, 2000, Items.graphite, 3000);

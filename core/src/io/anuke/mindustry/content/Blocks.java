@@ -820,7 +820,6 @@ public class Blocks implements ContentList{
 
         batteryLarge = new Battery("battery-large"){{
             requirements(Category.power, ItemStack.with(Items.titanium, 40, Items.lead, 80, Items.silicon, 30));
-            requirements(Category.power, ItemStack.with(Items.copper, 8, Items.lead, 30, Items.silicon, 4));
             size = 3;
             consumes.powerBuffered(20000f, 1f);
         }};
