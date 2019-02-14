@@ -1,14 +1,10 @@
 package io.anuke.mindustry.world.consumers;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.meta.BlockStats;
-import io.anuke.arc.scene.ui.Tooltip;
 import io.anuke.arc.scene.ui.layout.Table;
-
-import static io.anuke.mindustry.Vars.mobile;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStats;
 
 /**An abstract class that defines a type of resource that a block can consume.*/
 public abstract class Consume{
@@ -38,7 +34,8 @@ public abstract class Consume{
         return update;
     }
 
-    public void build(Table table){
+    public abstract void build(Tile tile, Table table);/*{
+
         Table t = new Table("flat");
         t.margin(4);
         buildTooltip(t);
@@ -50,14 +47,12 @@ public abstract class Consume{
             out.addImage(getIcon()).size(10 * scale).color(Pal.accent);
             out.addImage("icon-missing").size(10 * scale).color(Pal.remove).padLeft(-10 * scale);
         }).size(10 * scale).get().addListener(new Tooltip<>(t));
-    }
+    }*/
 
     /**Called when a consumption is triggered manually.*/
     public void trigger(Block block, TileEntity entity){
 
     }
-
-    public abstract void buildTooltip(Table table);
 
     public abstract String getIcon();
 

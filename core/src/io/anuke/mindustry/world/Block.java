@@ -30,6 +30,7 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.ContentDisplay;
+import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -494,8 +495,19 @@ public class Block extends BlockStorage{
 
                 displayBars(tile, bars);
             }).growX();
+            table.row();
+            table.table(ctable -> {
+                displayConsumption(tile, ctable);
+            }).growX();
 
             table.marginBottom(-5);
+        }
+    }
+
+    public void displayConsumption(Tile tile, Table table){
+        table.left();
+        for(Consume cons : consumes.all()){
+            cons.build(tile, table);
         }
     }
 
@@ -504,7 +516,6 @@ public class Block extends BlockStorage{
             table.add(bar.get(tile.entity)).growX();
             table.row();
         }
-
     }
 
     public TextureRegion icon(Icon icon){

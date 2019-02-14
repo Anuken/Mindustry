@@ -883,7 +883,7 @@ public class Blocks implements ContentList{
         }};
 
         impactReactor = new ImpactReactor("impact-reactor"){{
-            requirements(Category.power, ItemStack.with(Items.lead, 800, Items.silicon, 600, Items.graphite, 600, Items.thorium, 200, Items.surgealloy, 400, Items.metaglass, 200));
+            requirements(Category.power, ItemStack.with(Items.lead, 1000, Items.silicon, 600, Items.graphite, 600, Items.thorium, 200, Items.surgealloy, 400, Items.metaglass, 200));
             size = 4;
             health = 900;
             powerProduction = 70f;

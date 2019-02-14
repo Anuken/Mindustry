@@ -93,9 +93,9 @@ public class PowerNode extends PowerBlock{
         super.setBars();
         bars.add("power", entity -> new Bar(() ->
             Core.bundle.format("blocks.powerbalance",
-            (entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.toFixed(entity.power.graph.getPowerBalance()*60, 1)),
+            entity.power.graph == null ? "+0" : ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.toFixed(entity.power.graph.getPowerBalance()*60, 1))),
             () -> Pal.powerBar,
-            () -> Mathf.clamp(entity.power.graph.getPowerProduced() / entity.power.graph.getPowerNeeded())));
+            () -> entity.power.graph == null ? 0 :Mathf.clamp(entity.power.graph.getPowerProduced() / entity.power.graph.getPowerNeeded())));
     }
 
     @Override

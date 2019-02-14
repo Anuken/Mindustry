@@ -5,6 +5,7 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
@@ -20,12 +21,8 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void buildTooltip(Table table){
-        Array<Item> list = new Array<>();
-
-        for(Item item : content.items()){
-            if(filter.test(item)) list.add(item);
-        }
+    public void build(Tile tile, Table table){
+        Array<Item> list = content.items().select(filter);
 
         for(int i = 0; i < list.size; i++){
             Item item = list.get(i);

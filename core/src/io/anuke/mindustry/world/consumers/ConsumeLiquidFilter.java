@@ -1,15 +1,17 @@
 package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.ui.ReqImage;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -29,16 +31,13 @@ public class ConsumeLiquidFilter extends Consume{
     }
 
     @Override
-    public void buildTooltip(Table table){
-        Array<Liquid> list = new Array<>();
-
-        for(Liquid item : content.liquids()){
-            if(!item.isHidden() && filter.test(item)) list.add(item);
-        }
+    public void build(Tile tile, Table table){
+        Array<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.test(l));
 
         for(int i = 0; i < list.size; i++){
-            Liquid item = list.get(i);
-            table.addImage(item.getContentIcon()).size(8 * 3).padRight(2).padLeft(2).padTop(2).padBottom(2);
+            Liquid liquid = list.get(i);
+
+            table.add(new ReqImage(liquid.getContentIcon(), () -> valid(tile.block(), tile.entity))).size(8*4).pad(2);
             if(i != list.size - 1){
                 table.add("/");
             }

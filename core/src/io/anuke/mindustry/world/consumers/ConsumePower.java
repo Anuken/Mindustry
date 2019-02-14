@@ -4,6 +4,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -24,7 +25,8 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public void buildTooltip(Table table){
+    public void build(Tile tile, Table table){
+        //table.add(new ReqImage(new Image("icon-power-requirement"), () -> valid(tile.block(), tile.entity))).size(8*4).padRight(4);
         // No tooltip for power
     }
 

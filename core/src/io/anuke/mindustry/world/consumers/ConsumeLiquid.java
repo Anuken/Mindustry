@@ -1,12 +1,14 @@
 package io.anuke.mindustry.world.consumers;
 
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.ui.ReqImage;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.scene.ui.layout.Table;
 
 public class ConsumeLiquid extends Consume{
     protected final float use;
@@ -26,8 +28,8 @@ public class ConsumeLiquid extends Consume{
     }
 
     @Override
-    public void buildTooltip(Table table){
-        table.addImage(liquid.getContentIcon()).size(8 * 3);
+    public void build(Tile tile, Table table){
+        table.add(new ReqImage(liquid.getContentIcon(), () -> valid(tile.block(), tile.entity))).size(8*4);
     }
 
     @Override

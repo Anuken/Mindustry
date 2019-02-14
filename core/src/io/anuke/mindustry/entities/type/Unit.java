@@ -332,7 +332,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public int maxAccepted(Item item){
-        return this.item.item != item ? 0 : getItemCapacity() - this.item.amount;
+        return this.item.item != item && this.item.amount > 0 ? 0 : getItemCapacity() - this.item.amount;
     }
 
     public void applyEffect(StatusEffect effect, float duration){
