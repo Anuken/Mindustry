@@ -53,7 +53,7 @@ public class Stats{
             score *= 0.5f;
         }
 
-        int rankIndex = Mathf.clamp((int)score, 0, Rank.values().length-1);
+        int rankIndex = Mathf.clamp((int)(score), 0, Rank.values().length-1);
         Rank rank = Rank.values()[rankIndex];
         String sign = Math.abs((rankIndex + 0.5f) - score) < 0.2f || rank.name().contains("S") ? "" : (rankIndex + 0.5f) < score ? "-" : "+";
 
