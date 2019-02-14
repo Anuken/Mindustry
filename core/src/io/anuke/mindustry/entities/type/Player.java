@@ -749,6 +749,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         dead = true;
         target = null;
         moveTarget = null;
+        spawner = lastSpawner = null;
         health = maxHealth();
         boostHeat = drownTime = hitTime = 0f;
         mech = (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
