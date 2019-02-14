@@ -378,7 +378,7 @@ public class Block extends BlockStorage{
         }
 
         if(hasPower && consumes.has(ConsumePower.class)){
-            bars.add("power", entity -> new Bar(consumes.get(ConsumePower.class).isBuffered ? "blocks.power" : "blocks.power.satisfaction", Pal.power, () -> entity.power.satisfaction));
+            bars.add("power", entity -> new Bar(consumes.get(ConsumePower.class).isBuffered ? "blocks.power" : "blocks.power.satisfaction", Pal.powerBar, () -> entity.power.satisfaction));
         }
     }
 

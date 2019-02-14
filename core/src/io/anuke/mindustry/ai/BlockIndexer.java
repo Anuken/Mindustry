@@ -26,7 +26,7 @@ public class BlockIndexer{
     private final static int structQuadrantSize = 12;
 
     /**Set of all ores that are being scanned.*/
-    private final ObjectSet<Item> scanOres = new ObjectSet<Item>(){{addAll(Item.getAllOres());}};
+    private final ObjectSet<Item> scanOres = ObjectSet.with(Item.getAllOres().toArray(Item.class));
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
     /**Stores all ore quadtrants on the map.*/
     private ObjectMap<Item, ObjectSet<Tile>> ores;

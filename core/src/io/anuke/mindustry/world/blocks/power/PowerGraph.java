@@ -6,6 +6,7 @@ import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.WindowedMean;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.consumers.ConsumePower;
@@ -22,6 +23,8 @@ public class PowerGraph{
     private final ObjectSet<Tile> batteries = new ObjectSet<>();
     private final ObjectSet<Tile> all = new ObjectSet<>();
 
+    private final WindowedMean powerBalance = new WindowedMean(60);
+
     private long lastFrameUpdated = -1;
     private final int graphID;
     private static int lastGraphID;
@@ -32,6 +35,10 @@ public class PowerGraph{
 
     public int getID(){
         return graphID;
+    }
+
+    public float getPowerBalance(){
+        return powerBalance.getMean();
     }
 
     public float getPowerProduced(){
@@ -153,6 +160,8 @@ public class PowerGraph{
                 powerProduced -= chargeBatteries(powerProduced - powerNeeded);
             }
         }
+
+        powerBalance.addValue(powerProduced - powerNeeded);
 
         distributePower(powerNeeded, powerProduced);
     }

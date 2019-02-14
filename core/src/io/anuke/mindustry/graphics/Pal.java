@@ -53,6 +53,7 @@ public class Pal{
     breakInvalid = Color.valueOf("d44b3d"),
     range = Color.valueOf("f4ba6e"),
     power = Color.valueOf("fbad67"),
+    powerBar = Color.valueOf("ec7b4c"),
     powerLight = Color.valueOf("fbd367"),
     placing = accent,
 
