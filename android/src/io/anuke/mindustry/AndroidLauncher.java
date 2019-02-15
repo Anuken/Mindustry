@@ -172,10 +172,10 @@ public class AndroidLauncher extends AndroidApplication{
                                 SaveSlot slot = control.saves.importSave(file);
                                 ui.load.runLoadSave(slot);
                             }catch(IOException e){
-                                ui.showError(Core.bundle.format("text.save.import.fail", Strings.parseException(e, false)));
+                                ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, false)));
                             }
                         }else{
-                            ui.showError("$text.save.import.invalid");
+                            ui.showError("$save.import.invalid");
                         }
                     }else if(map){ //open map
                         Core.app.post(() -> {

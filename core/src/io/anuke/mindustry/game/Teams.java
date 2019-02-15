@@ -23,9 +23,10 @@ public class Teams{
     public TeamData get(Team team){
         if(map[team.ordinal()] == null){
             //By default, a non-defined team will be enemies of everything.
+            //neutral teams (none) do not have any enemies.
             Team[] others = new Team[Team.all.length-1];
             for(int i = 0, j = 0; i < Team.all.length; i++){
-                if(Team.all[i] != team) others[j++] = Team.all[i];
+                if(Team.all[i] != team && team != Team.none && Team.all[i] != Team.none) others[j++] = Team.all[i];
             }
             add(team, others);
         }

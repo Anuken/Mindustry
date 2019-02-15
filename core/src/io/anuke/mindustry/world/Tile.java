@@ -312,6 +312,10 @@ public class Tile implements Position, TargetTrait{
         return null;
     }
 
+    public boolean interactable(Team team){
+        return getTeam() == Team.none || team == getTeam();
+    }
+
     public void updateOcclusion(){
         cost = 1;
         boolean occluded = false;
