@@ -88,7 +88,7 @@ public class PowerGraph{
 
     public float useBatteries(float needed){
         float stored = getBatteryStored();
-        if(Mathf.isEqual(stored, 0f)){ return 0f; }
+        if(Mathf.isEqual(stored, 0f)) return 0f;
 
         float used = Math.min(stored, needed);
         float consumedPowerPercentage = Math.min(1.0f, needed / stored);
@@ -155,6 +155,8 @@ public class PowerGraph{
         float powerNeeded = getPowerNeeded();
         float powerProduced = getPowerProduced();
 
+        powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
+
         if(!Mathf.isEqual(powerNeeded, powerProduced)){
             if(powerNeeded > powerProduced){
                 powerProduced += useBatteries(powerNeeded - powerProduced);
@@ -162,8 +164,6 @@ public class PowerGraph{
                 powerProduced -= chargeBatteries(powerProduced - powerNeeded);
             }
         }
-
-        powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
 
         distributePower(powerNeeded, powerProduced);
     }
