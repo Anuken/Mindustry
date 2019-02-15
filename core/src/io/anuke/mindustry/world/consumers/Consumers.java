@@ -53,7 +53,7 @@ public class Consumers{
      * @param powerCapacity The maximum capacity in power units.
      */
     public ConsumePower powerBuffered(float powerCapacity){
-        return powerBuffered(powerCapacity, 1f);
+        return powerBuffered(powerCapacity, 60f * 3);
     }
 
     /**

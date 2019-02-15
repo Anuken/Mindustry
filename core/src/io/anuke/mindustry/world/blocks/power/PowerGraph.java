@@ -7,6 +7,7 @@ import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.WindowedMean;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.consumers.ConsumePower;
@@ -131,7 +132,6 @@ public class PowerGraph{
                 //if(!otherConsumersAreValid(consumer, consumePower)){
                 //    consumer.entity.power.satisfaction = 0.0f; // Only supply power if the consumer would get valid that way
                 //}else{
-
                 //currently satisfies power even if it's not required yet
                 if(consumePower.isBuffered){
                     // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
@@ -140,7 +140,7 @@ public class PowerGraph{
                 }else{
                     consumer.entity.power.satisfaction = coverage;
                 }
-               // }
+                //}
             }
         }
     }
@@ -163,7 +163,7 @@ public class PowerGraph{
             }
         }
 
-        powerBalance.addValue(powerProduced - powerNeeded);
+        powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
 
         distributePower(powerNeeded, powerProduced);
     }
