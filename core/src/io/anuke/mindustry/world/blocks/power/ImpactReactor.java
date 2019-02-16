@@ -77,25 +77,6 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     @Override
-    public float handleDamage(Tile tile, float amount){
-        FusionReactorEntity entity = tile.entity();
-
-        if(entity.warmup < 0.4f) return amount;
-
-        float healthFract = tile.entity.health / health;
-
-        //5% chance to explode when hit at <50% HP with a normal bullet
-        if(amount > 5f && healthFract <= 0.5f && Mathf.chance(0.05)){
-            return health;
-            //10% chance to explode when hit at <25% HP with a powerful bullet
-        }else if(amount > 8f && healthFract <= 0.2f && Mathf.chance(0.1)){
-            return health;
-        }
-
-        return amount;
-    }
-
-    @Override
     public void draw(Tile tile){
         FusionReactorEntity entity = tile.entity();
 
