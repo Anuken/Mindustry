@@ -128,7 +128,7 @@ public class Build{
         if(tile == null) return false;
 
         if(type.isMultiblock()){
-            if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile) && tile.getTeam() == team){
+            if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile) && tile.interactable(team)){
                 return true;
             }
 
@@ -154,7 +154,7 @@ public class Build{
             }
             return true;
         }else{
-            return (tile.getTeam() == Team.none || tile.getTeam() == team)
+            return tile.interactable(team)
                     && contactsGround(tile.x, tile.y, type)
                     && (!tile.floor().isLiquid || type.floating)
                     && tile.floor().placeableOn
@@ -190,6 +190,6 @@ public class Build{
         Tile tile = world.tile(x, y);
         if(tile != null) tile = tile.target();
 
-        return tile != null && tile.block().canBreak(tile) && tile.breakable() && (!tile.block().synthetic() || tile.getTeam() == team);
+        return tile != null && tile.block().canBreak(tile) && tile.breakable() && tile.interactable(team);
     }
 }

@@ -20,13 +20,13 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
 
-public class SortedUnloader extends Block implements SelectionTrait{
+public class Unloader extends Block implements SelectionTrait{
     protected float speed = 1f;
     protected final int timerUnload = timers++;
 
     private static Item lastItem;
 
-    public SortedUnloader(String name){
+    public Unloader(String name){
         super(name);
         update = true;
         solid = true;
@@ -59,7 +59,7 @@ public class SortedUnloader extends Block implements SelectionTrait{
 
         if(tile.entity.timer.get(timerUnload, speed) && tile.entity.items.total() == 0){
             for(Tile other : tile.entity.proximity()){
-                if(other.getTeam() == tile.getTeam() && other.block() instanceof StorageBlock && entity.items.total() == 0 &&
+                if(other.interactable(tile.getTeam()) && other.block() instanceof StorageBlock && entity.items.total() == 0 &&
                 ((entity.sortItem == null && other.entity.items.total() > 0) || ((StorageBlock) other.block()).hasItem(other, entity.sortItem))){
                     offloadNear(tile, ((StorageBlock) other.block()).removeItem(other, entity.sortItem));
                 }

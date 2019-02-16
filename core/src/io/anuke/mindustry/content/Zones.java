@@ -228,6 +228,20 @@ public class Zones implements ContentList{
                         spacing = 2;
                         unitScaling = 2;
                         unitAmount = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 12;
+                        spacing = 2;
+                        unitScaling = 2;
+                        unitAmount = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.crawler){{
+                        begin = 12;
+                        spacing = 3;
+                        unitScaling = 3;
+                        unitAmount = 2;
                     }}
                 );
             }};
@@ -347,6 +361,12 @@ public class Zones implements ContentList{
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
+                        begin = 1;
+                        unitScaling = 1;
+                        spacing = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.dagger){{
                         begin = 2;
                         unitScaling = 1;
                         spacing = 2;
@@ -416,6 +436,12 @@ public class Zones implements ContentList{
                         unitScaling = 1;
                         spacing = 2;
                         end = 10;
+                    }},
+
+                    new SpawnGroup(UnitTypes.titan){{
+                        begin = 1;
+                        unitScaling = 3;
+                        spacing = 2;
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
@@ -508,59 +534,72 @@ public class Zones implements ContentList{
                 waveSpacing = 60 * 60 * 2;
 
                 spawns = Array.with(
-                new SpawnGroup(UnitTypes.titan){{
-                    unitScaling = 2;
-                    spacing = 2;
-                    end = 10;
-                }},
+                    new SpawnGroup(UnitTypes.titan){{
+                        unitScaling = 2;
+                        spacing = 2;
+                        end = 10;
+                    }},
 
-                new SpawnGroup(UnitTypes.dagger){{
-                    begin = 2;
-                    unitScaling = 1;
-                    spacing = 2;
-                }},
+                    new SpawnGroup(UnitTypes.crawler){{
+                        begin = 1;
+                        unitScaling = 2;
+                        spacing = 2;
+                        unitAmount = 3;
+                    }},
 
-                new SpawnGroup(UnitTypes.dagger){{
-                    begin = 10;
-                    spacing = 2;
-                    unitScaling = 2;
-                    unitAmount = 2;
-                }},
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 2;
+                        unitScaling = 1;
+                        spacing = 2;
+                    }},
 
-                new SpawnGroup(UnitTypes.ghoul){{
-                    begin = 5;
-                    unitScaling = 0.5f;
-                    unitAmount = 1;
-                    spacing = 5;
-                }},
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 10;
+                        spacing = 2;
+                        unitScaling = 2;
+                        unitAmount = 2;
+                    }},
 
-                new SpawnGroup(UnitTypes.wraith){{
-                    begin = 10;
-                    unitScaling = 1f;
-                    unitAmount = 1;
-                    spacing = 5;
-                }},
+                    new SpawnGroup(UnitTypes.ghoul){{
+                        begin = 5;
+                        unitScaling = 0.5f;
+                        unitAmount = 1;
+                        spacing = 5;
+                    }},
 
-                new SpawnGroup(UnitTypes.dagger){{
-                    begin = 2;
-                    unitScaling = 1;
-                    spacing = 2;
-                }},
+                    new SpawnGroup(UnitTypes.fortress){{
+                        begin = 13;
+                        unitScaling = 2;
+                        spacing = 3;
+                    }},
 
-                new SpawnGroup(UnitTypes.wraith){{
-                    begin = 23;
-                    unitScaling = 1f;
-                    unitAmount = 1;
-                    spacing = 2;
-                }},
+                    new SpawnGroup(UnitTypes.wraith){{
+                        begin = 10;
+                        unitScaling = 1f;
+                        unitAmount = 1;
+                        spacing = 5;
+                    }},
 
-                new SpawnGroup(UnitTypes.crawler){{
-                    begin = 20;
-                    unitScaling = 1;
-                    spacing = 10;
-                    unitScaling = 0.5f;
-                    unitAmount = 10;
-                }}
+                    new SpawnGroup(UnitTypes.dagger){{
+                        begin = 2;
+                        unitScaling = 1;
+                        spacing = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.wraith){{
+                        begin = 23;
+                        unitScaling = 1f;
+                        unitAmount = 1;
+                        spacing = 2;
+                    }},
+
+                    new SpawnGroup(UnitTypes.crawler){{
+                        begin = 20;
+                        unitScaling = 1;
+                        spacing = 10;
+                        unitScaling = 0.5f;
+                        unitAmount = 10;
+                    }}
                 );
             }};
         }};

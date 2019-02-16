@@ -182,7 +182,7 @@ public class DeployDialog extends FloatingDialog{
                             r.row();
                             for(Block block : zone.blockRequirements){
                                 r.addImage(block.icon(Icon.small)).size(8 * 3).padRight(4);
-                                r.add(block.formalName).color(Color.LIGHT_GRAY);
+                                r.add(block.localizedName).color(Color.LIGHT_GRAY);
                                 r.addImage(data.isUnlocked(block) ? "icon-check-2" : "icon-cancel-2")
                                 .color(data.isUnlocked(block) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
                                 r.row();

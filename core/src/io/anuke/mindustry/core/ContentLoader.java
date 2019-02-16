@@ -80,7 +80,7 @@ public class ContentLoader{
 
             for(Content c : contentMap[type.ordinal()]){
                 if(c instanceof MappableContent){
-                    String name = ((MappableContent) c).getContentName();
+                    String name = ((MappableContent) c).name;
                     if(contentNameMap[type.ordinal()].containsKey(name)){
                         throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + name + "')");
                     }

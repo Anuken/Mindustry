@@ -14,7 +14,7 @@ public class OreBlock extends Floor{
 
     public OreBlock(Item ore, Floor base){
         super("ore-" + ore.name + "-" + base.name);
-        this.formalName = ore.localizedName() + " " + base.formalName;
+        this.localizedName = ore.localizedName() + " " + base.localizedName;
         this.itemDrop = ore;
         this.base = base;
         this.variants = 3;

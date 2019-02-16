@@ -510,7 +510,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         for(Block block : blocksOut){
             TextureRegion region = block.icon(Icon.medium);
 
-            if(region == Core.atlas.find("jjfgj")) continue;
+            if(!Core.atlas.isFound(region)) continue;
 
             ImageButton button = new ImageButton("white", "clear-toggle");
             button.getStyle().imageUp = new TextureRegionDrawable(region);
@@ -527,7 +527,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         group.getButtons().get(2).setChecked(true);
 
-        table.table("underline", extra -> extra.labelWrap(() -> editor.getDrawBlock().formalName).width(200f).center()).growX();
+        table.table("underline", extra -> extra.labelWrap(() -> editor.getDrawBlock().localizedName).width(200f).center()).growX();
         table.row();
         table.add(pane).growY().fillX();
     }

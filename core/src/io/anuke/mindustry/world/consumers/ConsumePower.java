@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.meta.StatUnit;
 /** Consumer class for blocks which consume power while being connected to a power graph. */
 public class ConsumePower extends Consume{
     /** The maximum amount of power which can be processed per tick. This might influence efficiency or load a buffer. */
-    protected final float powerPerTick;
+    public final float powerPerTick;
     /** The maximum power capacity in power units. */
     public final float powerCapacity;
     /** True if the module can store power. */

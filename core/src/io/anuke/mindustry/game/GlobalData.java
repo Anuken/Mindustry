@@ -82,7 +82,7 @@ public class GlobalData{
 
     /** Returns whether or not this piece of content is unlocked yet.*/
     public boolean isUnlocked(UnlockableContent content){
-        return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.getContentName());
+        return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.name);
     }
 
     /**
@@ -94,7 +94,7 @@ public class GlobalData{
         if(content.alwaysUnlocked()) return;
 
         //fire unlock event so other classes can use it
-        if(unlocked.getOr(content.getContentType(), ObjectSet::new).add(content.getContentName())){
+        if(unlocked.getOr(content.getContentType(), ObjectSet::new).add(content.name)){
             modified = true;
             content.onUnlock();
             Events.fire(new UnlockEvent(content));

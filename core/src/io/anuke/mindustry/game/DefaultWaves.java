@@ -6,7 +6,7 @@ import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.type.ItemStack;
 
-public class Waves{
+public class DefaultWaves{
     private static Array<SpawnGroup> spawns;
 
     public static Array<SpawnGroup> getDefaultSpawns(){
@@ -164,24 +164,5 @@ public class Waves{
             );
         }
         return spawns;
-    }
-
-    public static void testWaves(Array<SpawnGroup> spawns, int from, int to){
-        for(int i = from; i <= to; i++){
-            System.out.print(i + ": ");
-            int total = 0;
-            for(SpawnGroup spawn : spawns){
-                int a = spawn.getUnitsSpawned(i);
-                total += a;
-
-                if(a > 0){
-                    System.out.print(a + "x" + spawn.type.name);
-
-                    System.out.print(" ");
-                }
-            }
-            System.out.print(" (" + total + ")");
-            System.out.println();
-        }
     }
 }

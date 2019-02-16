@@ -34,7 +34,7 @@ public class Fx implements ContentList{
     bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
     shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
     shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
-    launchFull, unitSpawn, spawnShockwave, magmasmoke;
+    launchFull, unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke;
 
     @Override
     public void load(){
@@ -567,6 +567,13 @@ public class Fx implements ContentList{
             Draw.reset();
         });
 
+        impactShockwave = new Effect(13f, 300f, e -> {
+            Draw.color(Pal.lighterOrange, Color.LIGHT_GRAY, e.fin());
+            Lines.stroke(e.fout() * 4f + 0.2f);
+            Lines.poly(e.x, e.y, 60, e.fin() * 200f);
+            Draw.reset();
+        });
+
         spawnShockwave = new Effect(20f, 400f, e -> {
             Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.fin());
             Lines.stroke(e.fout() * 3f + 0.5f);
@@ -856,6 +863,22 @@ public class Fx implements ContentList{
             Angles.randLenVectors(e.id, 10, e.finpow() * 90f, (x, y) -> {
                 float size = e.fout() * 14f;
                 Draw.color(Color.LIME, Color.GRAY, e.fin());
+                Draw.rect("circle", e.x + x, e.y + y, size, size);
+                Draw.reset();
+            });
+        });
+        impactsmoke = new Effect(60, e -> {
+            Angles.randLenVectors(e.id, 7, e.fin() * 20f, (x, y) -> {
+                float size = e.fslope() * 4f;
+                Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.fin());
+                Draw.rect("circle", e.x + x, e.y + y, size, size);
+                Draw.reset();
+            });
+        });
+        impactcloud = new Effect(140, 400f, e -> {
+            Angles.randLenVectors(e.id, 20, e.finpow() * 160f, (x, y) -> {
+                float size = e.fout() * 15f;
+                Draw.color(Pal.lighterOrange, Color.LIGHT_GRAY, e.fin());
                 Draw.rect("circle", e.x + x, e.y + y, size, size);
                 Draw.reset();
             });

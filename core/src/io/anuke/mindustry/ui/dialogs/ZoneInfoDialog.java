@@ -21,6 +21,11 @@ public class ZoneInfoDialog extends FloatingDialog{
         addCloseButton();
     }
 
+    @Override
+    protected void drawBackground(float x, float y){
+        drawDefaultBackground(x, y);
+    }
+
     public void show(Zone zone){
         setup(zone);
         show();
@@ -61,7 +66,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                             r.row();
                             for(Block block : zone.blockRequirements){
                                 r.addImage(block.icon(Icon.small)).size(8 * 3).padRight(4);
-                                r.add(block.formalName).color(Color.LIGHT_GRAY);
+                                r.add(block.localizedName).color(Color.LIGHT_GRAY);
                                 r.addImage(data.isUnlocked(block) ? "icon-check-2" : "icon-cancel-2")
                                 .color(data.isUnlocked(block) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
                                 r.row();
@@ -91,8 +96,23 @@ public class ZoneInfoDialog extends FloatingDialog{
                     cont.row();
                     cont.add(Core.bundle.format("bestwave", data.getWaveScore(zone)));
                 }
+
+                cont.row();
+                cont.table(t -> {
+                    t.left();
+                    for(ItemStack stack : zone.startingItems){
+                        t.addImage(stack.item.icon(Item.Icon.medium)).size(8 * 3).padRight(4);
+                        t.label(() -> stack.amount + "");
+                    }
+                }).growX().left();
             }
         });
+
+        cont.row();
+
+        cont.addButton(!zone.canConfigure() ? Core.bundle.format("configure.locked", zone.configureWave) : "$configure", () -> {
+
+        }).disabled(b -> !zone.canConfigure()).size(300f, 70f).padTop(5).get();
 
         cont.row();
 

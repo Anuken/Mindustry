@@ -217,7 +217,7 @@ public abstract class SaveFileVersion{
                 stream.writeByte(arr.first().getContentType().ordinal());
                 stream.writeShort(arr.size);
                 for(Content c : arr){
-                    stream.writeUTF(((MappableContent) c).getContentName());
+                    stream.writeUTF(((MappableContent) c).name);
                 }
             }
         }

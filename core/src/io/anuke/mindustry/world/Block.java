@@ -43,12 +43,6 @@ import java.util.Arrays;
 import static io.anuke.mindustry.Vars.*;
 
 public class Block extends BlockStorage{
-    /** internal name */
-    public final String name;
-    /** display name */
-    public String formalName;
-    /** Detailed description of the block. Can be as long as necesary. */
-    public final String fullDescription;
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */
@@ -122,9 +116,8 @@ public class Block extends BlockStorage{
     protected TextureRegion region;
 
     public Block(String name){
-        this.name = name;
-        this.formalName = Core.bundle.get("block." + name + ".name", name);
-        this.fullDescription = Core.bundle.getOrNull("block." + name + ".description");
+        super(name);
+        this.description = Core.bundle.getOrNull("block." + name + ".description");
         this.solid = false;
     }
 
@@ -256,7 +249,7 @@ public class Block extends BlockStorage{
 
     @Override
     public String localizedName(){
-        return formalName;
+        return localizedName;
     }
 
     @Override
@@ -272,11 +265,6 @@ public class Block extends BlockStorage{
     @Override
     public ContentType getContentType(){
         return ContentType.block;
-    }
-
-    @Override
-    public String getContentName() {
-        return name;
     }
 
     /** Called after all blocks are created. */
@@ -479,7 +467,7 @@ public class Block extends BlockStorage{
     }
 
     public String getDisplayName(Tile tile){
-        return formalName;
+        return localizedName;
     }
 
     public TextureRegion getDisplayIcon(Tile tile){

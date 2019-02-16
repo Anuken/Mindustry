@@ -20,7 +20,7 @@ import io.anuke.mindustry.world.blocks.production.*;
 import io.anuke.mindustry.world.blocks.sandbox.*;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.storage.LaunchPad;
-import io.anuke.mindustry.world.blocks.storage.SortedUnloader;
+import io.anuke.mindustry.world.blocks.storage.Unloader;
 import io.anuke.mindustry.world.blocks.storage.Vault;
 import io.anuke.mindustry.world.blocks.units.MechPad;
 import io.anuke.mindustry.world.blocks.units.RepairPoint;
@@ -88,6 +88,7 @@ public class Blocks implements ContentList{
             public void draw(Tile tile){}
             public void load(){}
             public void init(){}
+            public boolean isHidden(){ return true; }
             public TextureRegion[] variantRegions(){
                 if(variantRegions == null){
                     variantRegions = new TextureRegion[]{Core.atlas.find("clear")};
@@ -883,13 +884,14 @@ public class Blocks implements ContentList{
         }};
 
         impactReactor = new ImpactReactor("impact-reactor"){{
-            requirements(Category.power, ItemStack.with(Items.lead, 1000, Items.silicon, 600, Items.graphite, 600, Items.thorium, 200, Items.surgealloy, 400, Items.metaglass, 200));
+            requirements(Category.power, ItemStack.with(Items.lead, 1000, Items.silicon, 600, Items.graphite, 800, Items.thorium, 200, Items.surgealloy, 500, Items.metaglass, 500));
             size = 4;
             health = 900;
-            powerProduction = 70f;
+            powerProduction = 80f;
+            useTime = 40f;
             consumes.power(23f);
             consumes.item(Items.blastCompound);
-            consumes.liquid(Liquids.water, 0.3f);
+            consumes.liquid(Liquids.water, 0.4f);
         }};
 
         //endregion power
@@ -1005,7 +1007,7 @@ public class Blocks implements ContentList{
             itemCapacity = 300;
         }};
 
-        unloader = new SortedUnloader("unloader"){{
+        unloader = new Unloader("unloader"){{
             requirements(Category.distribution, ItemStack.with(Items.titanium, 50, Items.silicon, 60));
             speed = 7f;
         }};

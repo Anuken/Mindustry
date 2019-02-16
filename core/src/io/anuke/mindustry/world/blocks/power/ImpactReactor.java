@@ -6,13 +6,23 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
+import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Damage;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.ConsumePower;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class ImpactReactor extends PowerGenerator{
     protected int timerUse = timers++;
@@ -20,6 +30,8 @@ public class ImpactReactor extends PowerGenerator{
     protected int plasmas = 4;
     protected float warmupSpeed = 0.001f;
     protected float useTime = 60f;
+    protected int explosionRadius = 30;
+    protected int explosionDamage = 180;
 
     protected Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
     protected Color ind1 = Color.valueOf("858585"), ind2 = Color.valueOf("fea080");
@@ -32,6 +44,17 @@ public class ImpactReactor extends PowerGenerator{
         liquidCapacity = 30f;
         hasItems = true;
         outputsPower = consumesPower = true;
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        bars.add("poweroutput", entity -> new Bar(() ->
+            Core.bundle.format("blocks.poweroutput",
+            Strings.toFixed(Math.max(entity.tile.block().getPowerProduction(entity.tile) - consumes.get(ConsumePower.class).powerPerTick, 0)*60, 1)),
+            () -> Pal.powerBar,
+            () -> ((GeneratorEntity)entity).productionEfficiency));
     }
 
     @Override
@@ -118,7 +141,28 @@ public class ImpactReactor extends PowerGenerator{
 
         if(entity.warmup < 0.4f) return;
 
-        //TODO catastrophic failure
+        Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
+        Effects.effect(Fx.impactShockwave, tile.worldx(), tile.worldy());
+        for(int i = 0; i < 6; i++){
+            Time.run(Mathf.random(80), () -> Effects.effect(Fx.impactcloud, tile.worldx(), tile.worldy()));
+        }
+
+        Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
+
+
+        for(int i = 0; i < 20; i++){
+            Time.run(Mathf.random(80), () -> {
+                Tmp.v1.rnd(Mathf.random(40f));
+                Effects.effect(Fx.explosion, Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
+            });
+        }
+
+        for(int i = 0; i < 70; i++){
+            Time.run(Mathf.random(90), () -> {
+                Tmp.v1.rnd(Mathf.random(120f));
+                Effects.effect(Fx.impactsmoke, Tmp.v1.x + tile.worldx(), Tmp.v1.y + tile.worldy());
+            });
+        }
     }
 
     public static class FusionReactorEntity extends GeneratorEntity{

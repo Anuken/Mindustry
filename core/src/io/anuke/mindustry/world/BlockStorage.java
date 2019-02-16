@@ -41,6 +41,10 @@ public abstract class BlockStorage extends UnlockableContent{
     public final Consumers consumes = new Consumers();
     public final Producers produces = new Producers();
 
+    public BlockStorage(String name){
+        super(name);
+    }
+
     public boolean shouldConsume(Tile tile){
         return true;
     }

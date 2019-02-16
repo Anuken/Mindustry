@@ -249,7 +249,6 @@ public class KryoServer implements ServerProvider{
     @Override
     public void dispose(){
         close();
-        Log.info("Disposed server.");
     }
 
     private void handleException(Throwable e){

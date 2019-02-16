@@ -13,7 +13,6 @@ import static io.anuke.mindustry.Vars.data;
 import static io.anuke.mindustry.Vars.state;
 
 public class Zone extends UnlockableContent{
-    public final String name;
     public final MapGenerator generator;
     public ItemStack[] deployCost = {};
     public ItemStack[] startingItems = {};
@@ -28,7 +27,7 @@ public class Zone extends UnlockableContent{
     public int launchPeriod = 10;
 
     public Zone(String name, MapGenerator generator){
-        this.name = name;
+        super(name);
         this.generator = generator;
     }
 
@@ -62,11 +61,6 @@ public class Zone extends UnlockableContent{
 
     @Override
     public TextureRegion getContentIcon(){ return null; }
-
-    @Override
-    public String getContentName(){
-        return name;
-    }
 
     @Override
     public String localizedName(){
