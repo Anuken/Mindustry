@@ -891,7 +891,7 @@ public class Blocks implements ContentList{
             useTime = 40f;
             consumes.power(23f);
             consumes.item(Items.blastCompound);
-            consumes.liquid(Liquids.water, 0.4f);
+            consumes.liquid(Liquids.cryofluid, 0.8f);
         }};
 
         //endregion power

@@ -35,7 +35,7 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
-        flags = EnumSet.of(BlockFlag.target);
+        flags = EnumSet.of(BlockFlag.target, BlockFlag.producer);
     }
 
     @Remote(called = Loc.server)

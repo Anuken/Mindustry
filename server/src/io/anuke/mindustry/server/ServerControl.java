@@ -29,6 +29,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -671,6 +672,8 @@ public class ServerControl implements ApplicationListener{
         try{
             Net.host(Core.settings.getInt("port"));
             info("&lcOpened a server on port {0}.", Core.settings.getInt("port"));
+        }catch(BindException e){
+            Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
         }catch(IOException e){
             err(e);
             state.set(State.menu);

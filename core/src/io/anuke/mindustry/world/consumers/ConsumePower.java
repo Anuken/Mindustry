@@ -26,8 +26,7 @@ public class ConsumePower extends Consume{
 
     @Override
     public void build(Tile tile, Table table){
-        //table.add(new ReqImage(new Image("icon-power-requirement"), () -> valid(tile.block(), tile.entity))).size(8*4).padRight(4);
-        // No tooltip for power
+        //No tooltip for power, for now
     }
 
     @Override

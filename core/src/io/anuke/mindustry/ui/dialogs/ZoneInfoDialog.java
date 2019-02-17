@@ -98,23 +98,25 @@ public class ZoneInfoDialog extends FloatingDialog{
                 }
 
                 cont.row();
-                cont.table(t -> {
+                cont.table("button-disabled", t -> {
                     t.left();
-                    for(ItemStack stack : zone.startingItems){
-                        t.addImage(stack.item.icon(Item.Icon.medium)).size(8 * 3).padRight(4);
-                        t.label(() -> stack.amount + "");
-                    }
+                    t.add(!zone.canConfigure() ? Core.bundle.format("configure.locked", zone.configureWave) : "$configure");
+                    t.row();
+                    t.table(load -> {
+                        load.left();
+                        for(ItemStack stack : zone.startingItems){
+                            load.addImage(stack.item.icon(Item.Icon.medium)).size(8 * 3).padRight(4);
+                            load.label(() -> stack.amount + "");
+                        }
+                    }).growX().left();
                 }).growX().left();
             }
         });
 
         cont.row();
 
-        cont.addButton(!zone.canConfigure() ? Core.bundle.format("configure.locked", zone.configureWave) : "$configure", () -> {
-
-        }).disabled(b -> !zone.canConfigure()).size(300f, 70f).padTop(5).get();
-
-        cont.row();
+        //cont.addButton(!zone.canConfigure() ? Core.bundle.format("configure.locked", zone.configureWave) : "$configure", () -> { }).disabled(b -> !zone.canConfigure()).size(300f, 70f).padTop(5).get();
+        //cont.row();
 
         Button button = cont.addButton(zone.locked() ? "$uncover" : "$launch", () -> {
             if(!data.isUnlocked(zone)){

@@ -38,7 +38,6 @@ public abstract class FlyingUnit extends BaseUnit{
                 retarget(() -> {
                     targetClosest();
 
-                    if(target == null) targetClosestEnemyFlag(BlockFlag.target);
                     if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
                     if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
 

@@ -106,93 +106,17 @@ public class DeployDialog extends FloatingDialog{
         drawDefaultBackground(x, y);
     }
 
-
-
     void buildButton(Zone zone, TextButton button){
         button.setDisabled(() -> hidden(zone));
         button.clicked(() -> info.show(zone));
 
         if(zone.unlocked()){
-            //button.table(title -> {
             button.addImage("icon-zone").padRight(3);
             button.labelWrap(zone.localizedName()).width(140).growX();
-            //});
-
-            //if(data.getWaveScore(zone) > 0){
-            //    button.add(Core.bundle.format("bestwave", data.getWaveScore(zone)));
-            //}
-
-            /*
-            button.add("$launch").color(Color.LIGHT_GRAY).pad(4);
-            button.row();
-            button.table(req -> {
-                for(ItemStack stack : zone.deployCost){
-                    req.addImage(stack.item.region).size(8 * 3);
-                    req.add(stack.amount + "").left();
-                }
-            }).pad(3).growX();*/
         }else{
             button.addImage("icon-zone-locked");
             button.row();
             button.add("$locked");
-
-            /*else{
-            button.addImage("icon-zone-locked");
-            button.row();
-            button.add("$locked").padBottom(6);
-
-            if(!hidden(zone)){
-                button.row();
-
-                button.table(req -> {
-                    req.defaults().left();
-
-                    if(zone.zoneRequirements.length > 0){
-                        req.table(r -> {
-                            r.add("$complete").colspan(2).left();
-                            r.row();
-                            for(Zone other : zone.zoneRequirements){
-                                r.addImage("icon-zone").padRight(4);
-                                r.add(other.localizedName()).color(Color.LIGHT_GRAY);
-                                r.addImage(data.isCompleted(other) ? "icon-check-2" : "icon-cancel-2")
-                                .color(data.isCompleted(other) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
-                                r.row();
-                            }
-                        });
-                    }
-
-                    req.row();
-
-                    if(zone.itemRequirements.length > 0){
-                        req.table(r -> {
-                            for(ItemStack stack : zone.itemRequirements){
-                                r.addImage(stack.item.region).size(8 * 3).padRight(4);
-                                r.add(Math.min(data.getItem(stack.item), stack.amount) + "/" + stack.amount)
-                                .color(stack.amount > data.getItem(stack.item) ? Color.SCARLET : Color.LIGHT_GRAY).left();
-                                r.row();
-                            }
-                        }).padTop(10);
-                    }
-
-                    req.row();
-
-                    if(zone.blockRequirements.length > 0){
-                        req.table(r -> {
-                            r.add("$research.list").colspan(2).left();
-                            r.row();
-                            for(Block block : zone.blockRequirements){
-                                r.addImage(block.icon(Icon.small)).size(8 * 3).padRight(4);
-                                r.add(block.localizedName).color(Color.LIGHT_GRAY);
-                                r.addImage(data.isUnlocked(block) ? "icon-check-2" : "icon-cancel-2")
-                                .color(data.isUnlocked(block) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
-                                r.row();
-                            }
-
-                        }).padTop(10);
-                    }
-                }).growX();
-            }
-        }*/
         }
     }
 
