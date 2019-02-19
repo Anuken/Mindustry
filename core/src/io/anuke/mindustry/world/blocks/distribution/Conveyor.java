@@ -156,7 +156,7 @@ public class Conveyor extends Block{
 
         entity.noSleep();
 
-        float speed = this.speed * tilesize / 2.3f;
+        float speed = this.speed * tilesize / 2.4f;
         float centerSpeed = 0.1f;
         float centerDstScl = 3f;
         float tx = Geometry.d4[tile.getRotation()].x, ty = Geometry.d4[tile.getRotation()].y;

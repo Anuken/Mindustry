@@ -23,6 +23,7 @@ import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 
 import java.io.DataInput;
@@ -64,10 +65,10 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     }
 
     public static boolean has(int x, int y){
-        if(!Structs.inBounds(x, y, world.width(), world.height()) || !map.containsKey(x + y * world.width())){
+        if(!Structs.inBounds(x, y, world.width(), world.height()) || !map.containsKey(Pos.get(x, y))){
             return false;
         }
-        Fire fire = map.get(x + y * world.width());
+        Fire fire = map.get(Pos.get(x, y));
         return fire.isAdded() && fire.fin() < 1f && fire.tile != null && fire.tile.x == x && fire.tile.y == y;
     }
 
