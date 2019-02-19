@@ -25,9 +25,14 @@ public class Build{
         }
 
         Tile tile = world.tile(x, y);
+        float prevPercent = 1f;
 
         //just in case
         if(tile == null) return;
+
+        if(tile.entity != null){
+            prevPercent = tile.entity.health();
+        }
 
         tile = tile.target();
 
@@ -38,6 +43,7 @@ public class Build{
         tile.setBlock(sub);
         tile.<BuildEntity>entity().setDeconstruct(previous);
         tile.setTeam(team);
+        tile.entity.health = tile.entity.maxHealth() * prevPercent;
 
         if(previous.isMultiblock()){
             int offsetx = -(previous.size - 1) / 2;

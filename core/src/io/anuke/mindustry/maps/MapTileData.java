@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 
 public class MapTileData{
     /**
-     * Tile size: 4 bytes. <br>
+     * Tile size: 5 bytes. <br>
      * 0: ground tile <br>
      * 1: wall tile <br>
      * 2: rotation + team <br>

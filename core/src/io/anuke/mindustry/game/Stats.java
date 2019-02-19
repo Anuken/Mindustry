@@ -33,11 +33,6 @@ public class Stats{
            score += (float)((zone.conditionWave - wavesLasted) / zone.launchPeriod + 1) * 1.5f;
         }
 
-        //building more stuff gives a better score slightly
-        score += (buildingsBuilt - buildingsDeconstructed)*0.001f;
-        //destroyed buildings penalize score
-        score -= buildingsDestroyed * 0.003f;
-
         int capacity = zone.generator.coreBlock.itemCapacity;
 
         //weigh used fractions of

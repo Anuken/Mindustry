@@ -17,7 +17,10 @@ import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.Elements;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Scaling;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
@@ -28,9 +31,6 @@ import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.IntFormat;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-
-import java.lang.StringBuilder;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -235,7 +235,7 @@ public class HudFragment extends Fragment{
                     return;
                 }
 
-                button.setText(Core.bundle.get(state.enemies() > 0 ? "launch.unable" : "launch") + "\n" +
+                button.setText(state.enemies() > 0 ? Core.bundle.format("launch.unable", state.enemies()) : Core.bundle.get("launch") + "\n" +
                     Core.bundle.format("launch.next", state.wave + world.getZone().launchPeriod));
 
                 button.getLabel().setColor(Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Pal.accent,
@@ -370,14 +370,17 @@ public class HudFragment extends Fragment{
         }
     }
 
-    public void showTextDialog(String str){
-        new FloatingDialog("$mission.info"){{
-            shouldPause = true;
-            setFillParent(false);
-            getCell(cont).growX();
-            cont.margin(15).add(str).width(400f).wrap().get().setAlignment(Align.left, Align.left);
-            buttons.addButton("$continue", this::hide).size(140, 60).pad(4);
-        }}.show();
+    public void showLaunch(){
+        Image image = new Image("white");
+        image.getColor().a = 0f;
+        image.setFillParent(true);
+        image.actions(Actions.fadeIn(40f / 60f));
+        image.update(() -> {
+            if(state.is(State.menu)){
+                image.remove();
+            }
+        });
+        Core.scene.add(image);
     }
 
     private void toggleMenus(){

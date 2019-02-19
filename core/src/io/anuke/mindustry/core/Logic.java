@@ -111,7 +111,9 @@ public class Logic implements ApplicationListener{
 
     @Remote(called = Loc.both)
     public static void launchZone(){
-        Effects.effect(Fx.launchFull, 0, 0);
+        if(!headless){
+            ui.hudfrag.showLaunch();
+        }
 
         for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
             Effects.effect(Fx.launch, tile);

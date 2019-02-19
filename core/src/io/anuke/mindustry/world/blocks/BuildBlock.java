@@ -39,7 +39,7 @@ public class BuildBlock extends Block{
         super(name);
         update = true;
         size = Integer.parseInt(name.charAt(name.length() - 1) + "");
-        health = 10;
+        health = 20;
         layer = Layer.placement;
         consumesTap = true;
         solidifes = true;

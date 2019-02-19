@@ -34,7 +34,7 @@ public class Fx implements ContentList{
     bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
     shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
     shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
-    launchFull, unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke;
+    unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke;
 
     @Override
     public void load(){
@@ -1158,13 +1158,6 @@ public class Fx implements ContentList{
             Draw.color(Pal.accent);
             Lines.stroke(3f * e.fout());
             Lines.poly(e.x, e.y, 6, e.rotation + e.fin(), 90);
-            Draw.reset();
-        });
-
-        launchFull = new Effect(60, 9999999999f, e -> {
-            Draw.color();
-            Draw.alpha(e.fslope());
-            Fill.rect(Core.camera.position.x, Core.camera.position.y, Core.camera.width + 10, Core.camera.height + 10);
             Draw.reset();
         });
     }
