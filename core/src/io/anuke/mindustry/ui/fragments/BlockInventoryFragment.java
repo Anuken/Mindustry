@@ -131,7 +131,7 @@ public class BlockInventoryFragment extends Fragment{
 
                 container.add(i);
 
-                BooleanProvider canPick = () -> player.acceptsItem(item);
+                BooleanProvider canPick = () -> player.acceptsItem(item) && !state.isPaused();
 
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);

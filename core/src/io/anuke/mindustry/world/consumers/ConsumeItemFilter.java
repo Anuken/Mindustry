@@ -1,17 +1,21 @@
 package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
+import io.anuke.mindustry.ui.ItemImage;
+import io.anuke.mindustry.ui.MultiReqImage;
+import io.anuke.mindustry.ui.ReqImage;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.scene.ui.layout.Table;
-import static io.anuke.mindustry.Vars.*;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class ConsumeItemFilter extends Consume{
     private final Predicate<Item> filter;
@@ -23,14 +27,10 @@ public class ConsumeItemFilter extends Consume{
     @Override
     public void build(Tile tile, Table table){
         Array<Item> list = content.items().select(filter);
+        MultiReqImage image = new MultiReqImage();
+        list.each(item -> image.add(new ReqImage(new ItemImage(item.icon(Icon.large), 1), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(item))));
 
-        for(int i = 0; i < list.size; i++){
-            Item item = list.get(i);
-            table.addImage(item.icon(Icon.large)).size(8 * 4).padRight(2).padLeft(2);
-            if(i != list.size - 1){
-                table.add("/");
-            }
-        }
+        table.add(image).size(8*4);
     }
 
     @Override

@@ -19,8 +19,8 @@ public class Zones implements ContentList{
     public void load(){
 
         groundZero = new Zone("groundZero", new MapGenerator("groundZero", 1)){{
-            deployCost = ItemStack.with();
-            startingItems = ItemStack.with(Items.copper, 50);
+            baseLaunchCost = ItemStack.with(Items.copper, -50);
+            startingItems = ItemStack.list(Items.copper, 50);
             alwaysUnlocked = true;
             conditionWave = 10;
             launchPeriod = 5;
@@ -63,8 +63,7 @@ public class Zones implements ContentList{
         }};
 
         craters = new Zone("craters", new MapGenerator("craters", 1).dist(0)){{
-            deployCost = ItemStack.with(Items.copper, 200);
-            startingItems = ItemStack.with(Items.copper, 200);
+            startingItems = ItemStack.list(Items.copper, 200);
             conditionWave = 10;
             itemRequirements = ItemStack.with(Items.copper, 2000);
             zoneRequirements = new Zone[]{groundZero};
@@ -114,8 +113,8 @@ public class Zones implements ContentList{
         frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 2)
             .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))
             .core(Blocks.coreFoundation)){{
-            deployCost = ItemStack.with(Items.copper, 500);
-            startingItems = ItemStack.with(Items.copper, 400);
+            baseLaunchCost = ItemStack.with(Items.copper, 100);
+            startingItems = ItemStack.list(Items.copper, 400);
             conditionWave = 10;
             zoneRequirements = new Zone[]{craters};
             itemRequirements = ItemStack.with(Items.copper, 4000, Items.lead, 2000);
@@ -175,8 +174,8 @@ public class Zones implements ContentList{
 
         ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1)
             .core(Blocks.coreFoundation)){{
-            deployCost = ItemStack.with(Items.copper, 600, Items.graphite, 50);
-            startingItems = ItemStack.with(Items.copper, 400);
+            baseLaunchCost = ItemStack.with(Items.copper, 200, Items.graphite, 50);
+            startingItems = ItemStack.list(Items.copper, 400);
             conditionWave = 20;
             launchPeriod = 20;
             zoneRequirements = new Zone[]{frozenForest};
@@ -249,7 +248,7 @@ public class Zones implements ContentList{
 
         /*
         crags = new Zone("crags", new MapGenerator("groundZero", 1)){{ //TODO implement
-            deployCost = ItemStack.with(Items.copper, 300);
+            baseLaunchCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
             zoneRequirements = new Zone[]{frozenForest};
@@ -265,8 +264,8 @@ public class Zones implements ContentList{
             .dist(2.5f, true)
             .decor(new Decoration(Blocks.stainedStone, Blocks.stainedBoulder, 0.01))
             .core(Blocks.coreFoundation)){{
-            deployCost = ItemStack.with(Items.copper, 500, Items.lead, 300, Items.silicon, 100);
-            startingItems = ItemStack.with(Items.copper, 400, Items.lead, 100);
+            baseLaunchCost = ItemStack.with(Items.copper, 100, Items.lead, 200, Items.silicon, 100);
+            startingItems = ItemStack.list(Items.copper, 400, Items.lead, 100);
             conditionWave = 10;
             launchPeriod = 10;
             zoneRequirements = new Zone[]{frozenForest};
@@ -341,8 +340,8 @@ public class Zones implements ContentList{
             new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01),
             new Decoration(Blocks.metalFloor, Blocks.metalFloorDamaged, 0.02)
         ).drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 2000, Items.pyratite, 2000, Items.titanium, 2000, Items.metaglass, 1000, Items.coal, 2000))){{
-            deployCost = ItemStack.with(Items.copper, 2500, Items.lead, 1000, Items.silicon, 300);
-            startingItems = ItemStack.with(Items.copper, 2000, Items.lead, 500, Items.silicon, 200);
+            baseLaunchCost = ItemStack.with(Items.copper, 500, Items.lead, 500, Items.silicon, 100);
+            startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 500, Items.silicon, 200);
             itemRequirements = ItemStack.with(Items.silicon, 8000, Items.titanium, 6000, Items.graphite, 4000);
             conditionWave = 20;
             zoneRequirements = new Zone[]{stainedMountains};
@@ -419,8 +418,8 @@ public class Zones implements ContentList{
 
         desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift")
         .core(Blocks.coreNucleus).dist(2f)){{
-            deployCost = ItemStack.with(Items.copper, 2000);
-            startingItems = ItemStack.with(Items.copper, 1500);
+            baseLaunchCost = ItemStack.with(Items.copper, 500);
+            startingItems = ItemStack.list(Items.copper, 1500);
             itemRequirements = ItemStack.with(Items.copper, 8000, Items.metaglass, 2000, Items.graphite, 3000);
             conditionWave = 10;
             launchPeriod = 20;
@@ -430,7 +429,7 @@ public class Zones implements ContentList{
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 60 * 2;
+                waveSpacing = 60 * 60 * 1.5f;
                 spawns = Array.with(
                     new SpawnGroup(UnitTypes.crawler){{
                         unitScaling = 1;
@@ -490,7 +489,7 @@ public class Zones implements ContentList{
 
         /*
         arcticDesert = new Zone("arcticDesert", new MapGenerator("groundZero", 1)){{ //TODO implement
-            deployCost = ItemStack.with(Items.copper, 300);
+            baseLaunchCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
             zoneRequirements = new Zone[]{frozenForest};
@@ -503,7 +502,7 @@ public class Zones implements ContentList{
         }};
 
         dryWastes = new Zone("dryWastes", new MapGenerator("groundZero", 1)){{ //TODO implement
-            deployCost = ItemStack.with(Items.copper, 300);
+            baseLaunchCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
             zoneRequirements = new Zone[]{frozenForest};
@@ -520,8 +519,8 @@ public class Zones implements ContentList{
         .drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 1000, Items.thorium, 200, Items.titanium, 2000, Items.metaglass, 1000))
         .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))
         .core(Blocks.coreNucleus)){{
-            deployCost = ItemStack.with(Items.copper, 3000, Items.lead, 2000, Items.silicon, 1000, Items.metaglass, 500);
-            startingItems = ItemStack.with(Items.copper, 2500, Items.lead, 1500, Items.silicon, 800, Items.metaglass, 400);
+            baseLaunchCost = ItemStack.with(Items.copper, 500, Items.lead, 500, Items.silicon, 200, Items.metaglass, 100);
+            startingItems = ItemStack.list(Items.copper, 2500, Items.lead, 1500, Items.silicon, 800, Items.metaglass, 400);
             itemRequirements = ItemStack.with(Items.copper, 10000, Items.titanium, 8000, Items.metaglass, 6000, Items.plastanium, 2000);
             conditionWave = 30;
             launchPeriod = 15;
@@ -606,7 +605,7 @@ public class Zones implements ContentList{
 
         /*
         moltenFault = new Zone("moltenFault", new MapGenerator("groundZero", 1)){{ //TODO implement
-            deployCost = ItemStack.with(Items.copper, 300);
+            baseLaunchCost = ItemStack.with(Items.copper, 300);
             startingItems = ItemStack.with(Items.copper, 200);
             conditionWave = 15;
             zoneRequirements = new Zone[]{frozenForest};

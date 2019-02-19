@@ -6,7 +6,7 @@ import io.anuke.mindustry.type.Liquid;
 public class BurnerGenerator extends ItemLiquidGenerator{
 
     public BurnerGenerator(String name){
-        super(true, true, name);
+        super(true, false, name);
     }
 
     @Override

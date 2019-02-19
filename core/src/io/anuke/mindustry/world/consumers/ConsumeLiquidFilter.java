@@ -5,6 +5,7 @@ import io.anuke.arc.function.Predicate;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.ui.MultiReqImage;
 import io.anuke.mindustry.ui.ReqImage;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -33,15 +34,10 @@ public class ConsumeLiquidFilter extends Consume{
     @Override
     public void build(Tile tile, Table table){
         Array<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.test(l));
+        MultiReqImage image = new MultiReqImage();
+        list.each(liquid -> image.add(new ReqImage(liquid.getContentIcon(), () -> tile.entity != null && tile.entity.liquids != null && tile.entity.liquids.get(liquid) >= use(tile.block(), tile.entity))));
 
-        for(int i = 0; i < list.size; i++){
-            Liquid liquid = list.get(i);
-
-            table.add(new ReqImage(liquid.getContentIcon(), () -> valid(tile.block(), tile.entity))).size(8*4).pad(2);
-            if(i != list.size - 1){
-                table.add("/");
-            }
-        }
+        table.add(image).size(8*4);
     }
 
     @Override

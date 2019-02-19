@@ -34,7 +34,7 @@ public class Logic implements ApplicationListener{
     public Logic(){
         Events.on(WaveEvent.class, event -> {
             if(world.isZone()){
-                data.updateWaveScore(world.getZone(), state.wave);
+                world.getZone().updateWave(state.wave);
             }
         });
     }

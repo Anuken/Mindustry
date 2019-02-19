@@ -210,7 +210,7 @@ public class World implements ApplicationListener{
             state.rules.zone = zone.id;
             loadGenerator(zone.generator);
             for(Tile core : state.teams.get(defaultTeam).cores){
-                for(ItemStack stack : zone.startingItems){
+                for(ItemStack stack : zone.getStartingItems()){
                     core.entity.items.add(stack.item, stack.amount);
                 }
             }

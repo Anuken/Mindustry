@@ -11,8 +11,10 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.mindustry.graphics.Pal;
 
 public class ReqImage extends Stack{
+    private final BooleanProvider valid;
 
     public ReqImage(Element image, BooleanProvider valid){
+        this.valid = valid;
         add(image);
         add(new Element(){
             {
@@ -32,5 +34,9 @@ public class ReqImage extends Stack{
 
     public ReqImage(TextureRegion region, BooleanProvider valid){
         this(new Image(region), valid);
+    }
+
+    public boolean valid(){
+        return valid.get();
     }
 }
