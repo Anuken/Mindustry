@@ -553,6 +553,11 @@ public class Block extends BlockStorage{
     }
 
     @Override
+    public boolean isHidden(){
+        return !buildVisibility.get();
+    }
+
+    @Override
     public boolean alwaysUnlocked(){
         return alwaysUnlocked;
     }

@@ -8918,44 +8918,51 @@ icon-cursor
   orig: 10, 10
   offset: 0, 0
   index: -1
-icon-dev-builds
+icon-database
   rotate: false
   xy: 1363, 545
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
-icon-discord
+icon-dev-builds
   rotate: false
   xy: 1837, 541
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
-icon-donate
+icon-discord
   rotate: false
   xy: 1863, 473
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
-icon-dots
+icon-donate
   rotate: false
   xy: 1889, 439
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
-icon-editor
+icon-dots
   rotate: false
   xy: 1351, 409
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
-icon-egg
+icon-editor
   rotate: false
   xy: 1380, 375
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
+icon-egg
+  rotate: false
+  xy: 1407, 307
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -8976,7 +8983,7 @@ icon-eraser
   index: -1
 icon-exit
   rotate: false
-  xy: 1407, 307
+  xy: 579, 191
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -8997,7 +9004,7 @@ icon-file-image
   index: -1
 icon-file-text
   rotate: false
-  xy: 579, 191
+  xy: 997, 141
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9011,7 +9018,7 @@ icon-fill
   index: -1
 icon-floppy
   rotate: false
-  xy: 997, 141
+  xy: 1433, 273
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9025,14 +9032,14 @@ icon-floppy-16
   index: -1
 icon-folder
   rotate: false
-  xy: 1433, 273
+  xy: 1767, 903
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-folder-parent
   rotate: false
-  xy: 1767, 903
+  xy: 513, 191
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9046,14 +9053,14 @@ icon-generated
   index: -1
 icon-github
   rotate: false
-  xy: 513, 191
+  xy: 513, 175
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-google-play
   rotate: false
-  xy: 513, 175
+  xy: 1867, 253
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9081,28 +9088,28 @@ icon-holdDelete
   index: -1
 icon-home
   rotate: false
-  xy: 1867, 253
+  xy: 1031, 114
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-host
   rotate: false
-  xy: 1031, 114
+  xy: 845, 971
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-info
   rotate: false
-  xy: 845, 971
+  xy: 1843, 801
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-itch.io
   rotate: false
-  xy: 1843, 801
+  xy: 1757, 407
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9130,7 +9137,7 @@ icon-line
   index: -1
 icon-link
   rotate: false
-  xy: 1757, 407
+  xy: 535, 1084
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9144,7 +9151,7 @@ icon-liquid-small
   index: -1
 icon-load
   rotate: false
-  xy: 535, 1084
+  xy: 1553, 779
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9186,7 +9193,7 @@ icon-logic
   index: -1
 icon-map
   rotate: false
-  xy: 1553, 779
+  xy: 569, 457
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9270,7 +9277,7 @@ icon-pencil
   index: -1
 icon-pencil-small
   rotate: false
-  xy: 569, 457
+  xy: 623, 907
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9291,14 +9298,14 @@ icon-play
   index: -1
 icon-play-2
   rotate: false
-  xy: 623, 907
+  xy: 1363, 529
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-play-custom
   rotate: false
-  xy: 1363, 529
+  xy: 579, 175
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9326,7 +9333,7 @@ icon-power-small
   index: -1
 icon-quit
   rotate: false
-  xy: 579, 175
+  xy: 2009, 1
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9340,14 +9347,14 @@ icon-redo
   index: -1
 icon-refresh
   rotate: false
-  xy: 2009, 1
+  xy: 1031, 98
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-rename
   rotate: false
-  xy: 1031, 98
+  xy: 2025, 1
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9361,35 +9368,35 @@ icon-resize
   index: -1
 icon-rotate
   rotate: false
-  xy: 2025, 1
+  xy: 2033, 541
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-rotate-arrow
   rotate: false
-  xy: 2033, 541
+  xy: 2033, 525
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-rotate-left
   rotate: false
-  xy: 2033, 525
+  xy: 2033, 509
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-rotate-right
   rotate: false
-  xy: 2033, 509
+  xy: 2033, 493
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-save
   rotate: false
-  xy: 2033, 493
+  xy: 1879, 1
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9431,7 +9438,7 @@ icon-terrain
   index: -1
 icon-tools
   rotate: false
-  xy: 1879, 1
+  xy: 1895, 1
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9452,7 +9459,7 @@ icon-touchDelete
   index: -1
 icon-trash
   rotate: false
-  xy: 1895, 1
+  xy: 1911, 1
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9480,14 +9487,14 @@ icon-tree-locked
   index: -1
 icon-trello
   rotate: false
-  xy: 1911, 1
+  xy: 1927, 1
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-tutorial
   rotate: false
-  xy: 1927, 1
+  xy: 451, 1
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9508,14 +9515,14 @@ icon-unlocked
   index: -1
 icon-unlocks
   rotate: false
-  xy: 451, 1
+  xy: 467, 1
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 icon-wiki
   rotate: false
-  xy: 467, 1
+  xy: 483, 1
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -9543,7 +9550,7 @@ icon-zoom
   index: -1
 icon-zoom-small
   rotate: false
-  xy: 483, 1
+  xy: 2033, 477
   size: 14, 14
   orig: 14, 14
   offset: 0, 0

@@ -93,7 +93,7 @@ public class HudFragment extends Fragment{
                         if(Net.active() && mobile){
                             i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-chat");
                         }else{
-                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-unlocks");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-database");
                         }
                     }).get();
 
