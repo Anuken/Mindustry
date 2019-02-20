@@ -41,22 +41,22 @@ public class Zones implements ContentList{
 
                     new SpawnGroup(UnitTypes.dagger){{
                         begin = 15;
-                        unitScaling = 1;
+                        unitScaling = 3;
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
                         begin = 20;
-                        unitScaling = 1;
+                        unitScaling = 3;
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
                         begin = 25;
-                        unitScaling = 1;
+                        unitScaling = 3;
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
                         begin = 30;
-                        unitScaling = 1;
+                        unitScaling = 2;
                     }}
                 );
             }};
@@ -87,7 +87,7 @@ public class Zones implements ContentList{
 
                     new SpawnGroup(UnitTypes.dagger){{
                         begin = 10;
-                        unitScaling = 1;
+                        unitScaling = 1.5f;
                     }},
 
                     new SpawnGroup(UnitTypes.crawler){{
@@ -98,7 +98,7 @@ public class Zones implements ContentList{
 
                     new SpawnGroup(UnitTypes.dagger){{
                         begin = 20;
-                        unitScaling = 1;
+                        unitScaling = 2;
                     }},
 
                     new SpawnGroup(UnitTypes.crawler){{

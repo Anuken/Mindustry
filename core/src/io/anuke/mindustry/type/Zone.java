@@ -8,6 +8,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.game.EventType.ZoneCompleteEvent;
 import io.anuke.mindustry.game.EventType.ZoneConfigureCompleteEvent;
+import io.anuke.mindustry.game.Loadout;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.generators.MapGenerator;
@@ -25,8 +26,9 @@ public class Zone extends UnlockableContent{
     public Supplier<Rules> rules = Rules::new;
     public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;
-    public int configureWave = 50;
+    public int configureWave = 40;
     public int launchPeriod = 10;
+    public Loadout loadout;
 
     protected ItemStack[] baseLaunchCost = {};
     protected Array<ItemStack> startingItems = new Array<>();

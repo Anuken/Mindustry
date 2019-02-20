@@ -1,6 +1,7 @@
 import io.anuke.arc.ApplicationCore;
 import io.anuke.arc.backends.headless.HeadlessApplication;
 import io.anuke.arc.backends.headless.HeadlessApplicationConfiguration;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
@@ -16,12 +17,14 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.entities.type.base.Spirit;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
@@ -233,6 +236,44 @@ public class ApplicationTests{
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
         assertEquals(Blocks.part, world.tile(1, 1).block());
+    }
+
+    @Test
+    void zoneEmptyWaves(){
+        for(Zone zone : content.zones()){
+            checkNoEmptyWaves(zone, zone.rules.get().spawns, 1, 100);
+        }
+    }
+
+    @Test
+    void zoneOverflowWaves(){
+        for(Zone zone : content.zones()){
+            checkExtraWaves(zone, zone.rules.get().spawns, 1, 40, 140);
+        }
+    }
+
+    void checkNoEmptyWaves(Zone zone, Array<SpawnGroup> spawns, int from, int to){
+        for(int i = from; i <= to; i++){
+            int total = 0;
+            for(SpawnGroup spawn : spawns){
+                total += spawn.getUnitsSpawned(i);
+            }
+
+            assertNotEquals(0, total, "Zone " + zone + " has no spawned enemies at wave " + i);
+        }
+    }
+
+    void checkExtraWaves(Zone zone, Array<SpawnGroup> spawns, int from, int to, int max){
+        for(int i = from; i <= to; i++){
+            int total = 0;
+            for(SpawnGroup spawn : spawns){
+                total += spawn.getUnitsSpawned(i);
+            }
+
+            if(total >= max){
+                fail("Zone '" + zone + "' has too many spawned enemies at wave " + i + " : " + total);
+            }
+        }
     }
 
     @Test

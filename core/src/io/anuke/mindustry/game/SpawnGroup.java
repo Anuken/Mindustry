@@ -20,7 +20,7 @@ public class SpawnGroup{
     /**The spacing, in waves, of spawns. For example, 2 = spawns every other wave*/
     protected int spacing = 1;
     /**Maximum amount of units that spawn*/
-    protected int max = 60;
+    protected int max = 40;
     /**How many waves need to pass before the amount of units spawned increases by 1*/
     protected float unitScaling = 9999f;
     /**Amount of enemies spawned initially, with no scaling*/
