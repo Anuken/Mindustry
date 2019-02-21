@@ -219,6 +219,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return status.hasEffect(effect);
     }
 
+    //TODO optimize
     public void avoidOthers(float scaling){
         hitbox(queryRect);
         queryRect.setSize(queryRect.getWidth() * scaling);
