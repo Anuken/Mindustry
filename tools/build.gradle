@@ -55,7 +55,7 @@ def antialias = {File file ->
             [p1, p2, p3, p4, p5, p6, p7, p8, p9].each{ val ->
                 Color.argb8888ToColor(color, val)
 
-                if(color.a > 0.1){
+                if(color.a > 0.05){
                     sum.r += color.r
                     sum.g += color.g
                     sum.b += color.b

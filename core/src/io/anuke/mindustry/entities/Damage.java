@@ -60,7 +60,7 @@ public class Damage{
 
         float shake = Math.min(explosiveness / 4f + 3f, 9f);
         Effects.shake(shake, shake, x, y);
-        Effects.effect(Fx.blockExplosion, x, y);
+        Effects.effect(Fx.dynamicExplosion, x, y, radius/8f);
     }
 
     public static void createIncend(float x, float y, float range, int amount){

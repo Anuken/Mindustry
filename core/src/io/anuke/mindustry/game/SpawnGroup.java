@@ -11,10 +11,12 @@ import io.anuke.mindustry.type.UnitType;
  * Each spawn group can have multiple sub-groups spawned in different areas of the map.
  */
 public class SpawnGroup{
+    protected static final int never = Integer.MAX_VALUE;
+
     /**The unit type spawned*/
     public final UnitType type;
     /**When this spawn should end*/
-    protected int end = Integer.MAX_VALUE;
+    protected int end = never;
     /**When this spawn should start*/
     protected int begin;
     /**The spacing, in waves, of spawns. For example, 2 = spawns every other wave*/
@@ -34,9 +36,7 @@ public class SpawnGroup{
         this.type = type;
     }
 
-    /**
-     * Returns the amount of units spawned on a specific wave.
-     */
+    /**Returns the amount of units spawned on a specific wave.*/
     public int getUnitsSpawned(int wave){
         if(wave < begin || wave > end || (wave - begin) % spacing != 0){
             return 0;

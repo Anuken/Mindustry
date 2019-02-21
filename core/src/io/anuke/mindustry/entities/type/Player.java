@@ -214,11 +214,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     @Override
-    public float getSize(){
-        return 8;
-    }
-
-    @Override
     public void damage(float amount){
         hitTime = hitDuration;
         if(!Net.client()){

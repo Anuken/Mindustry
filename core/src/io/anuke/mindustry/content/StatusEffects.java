@@ -6,7 +6,7 @@ import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.StatusEffect;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded, shocked, corroded;
+    public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded, shocked, corroded, boss;
 
     @Override
     public void load(){
@@ -69,6 +69,14 @@ public class StatusEffects implements ContentList{
 
         shielded = new StatusEffect(){{
             armorMultiplier = 3f;
+        }};
+
+        boss = new StatusEffect(){{
+            armorMultiplier = 3f;
+            damageMultiplier = 3f;
+            speedMultiplier = 1.1f;
+            //TODO custom effect
+            //effect = Fx.overdriven;
         }};
 
         shocked = new StatusEffect();

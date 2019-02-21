@@ -6,6 +6,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Tmp;
 
 //TODO remove
 public class Shapes{
@@ -19,16 +20,16 @@ public class Shapes{
     }
 
     public static void laser(String line, String edge, float x, float y, float x2, float y2, float rotation, float scale){
-
-        Lines.stroke(12f * scale);
-        Lines.line(Core.atlas.find(line), x, y, x2, y2, CapStyle.none, 0f);
-        Lines.stroke(1f);
-
         TextureRegion region = Core.atlas.find(edge);
 
-        Draw.rect(Core.atlas.find(edge), x, y, region.getWidth() * Draw.scl, region.getHeight() * scale * Draw.scl, rotation + 180);
+        Tmp.v1.trns(rotation, 8f * scale * Draw.scl);
 
-        Draw.rect(Core.atlas.find(edge), x2, y2, region.getWidth() * Draw.scl, region.getHeight() * scale * Draw.scl, rotation);
+        Draw.rect(Core.atlas.find(edge), x, y, region.getWidth() * scale * Draw.scl, region.getHeight() * scale * Draw.scl, rotation + 180);
+        Draw.rect(Core.atlas.find(edge), x2, y2, region.getWidth() * scale * Draw.scl, region.getHeight() * scale * Draw.scl, rotation);
+
+        Lines.stroke(12f * scale);
+        Lines.line(Core.atlas.find(line), x + Tmp.v1.x, y + Tmp.v1.y, x2 - Tmp.v1.x, y2 - Tmp.v1.y, CapStyle.none, 0f);
+        Lines.stroke(1f);
     }
 
     public static void tri(float x, float y, float width, float length, float rotation){

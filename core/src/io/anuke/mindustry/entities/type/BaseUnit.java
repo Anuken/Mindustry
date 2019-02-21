@@ -12,6 +12,7 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
@@ -163,6 +164,10 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
     }
 
+    public boolean isBoss(){
+        return hasEffect(StatusEffects.boss);
+    }
+
     @Override
     public boolean isImmune(StatusEffect effect){
         return type.immunities.contains(effect);
@@ -210,11 +215,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public float maxHealth(){
         return type.health;
-    }
-
-    @Override
-    public float getSize(){
-        return 8;
     }
 
     @Override
@@ -282,6 +282,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public float drawSize(){
         return type.hitsize * 10;
+    }
+
+    @Override
+    public float clipSize(){
+        return isBoss() ? 10000000000f : super.clipSize();
     }
 
     @Override

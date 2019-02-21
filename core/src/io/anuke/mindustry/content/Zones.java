@@ -57,7 +57,10 @@ public class Zones implements ContentList{
                     new SpawnGroup(UnitTypes.dagger){{
                         begin = 30;
                         unitScaling = 2;
-                    }}
+                    }},
+
+
+                    bossGroup(UnitTypes.fortress)
                 );
             }};
         }};
@@ -105,7 +108,9 @@ public class Zones implements ContentList{
                         begin = 25;
                         unitScaling = 1;
                         unitAmount = 2;
-                    }}
+                    }},
+
+                    bossGroup(UnitTypes.revenant)
                 );
             }};
         }};
@@ -167,7 +172,16 @@ public class Zones implements ContentList{
                         begin = 35;
                         spacing = 10;
                         unitAmount = 6;
-                    }}
+                    }},
+
+                    //boss
+                    new SpawnGroup(UnitTypes.revenant){{
+                        begin = configureWave;
+                        effect = StatusEffects.boss;
+                        unitScaling = never;
+                    }},
+
+                    bossGroup(UnitTypes.eruptor)
                 );
             }};
         }};
@@ -241,7 +255,10 @@ public class Zones implements ContentList{
                         spacing = 3;
                         unitScaling = 3;
                         unitAmount = 2;
-                    }}
+                    }},
+
+                    bossGroup(UnitTypes.revenant),
+                    bossGroup(UnitTypes.revenant)
                 );
             }};
         }};
@@ -329,7 +346,9 @@ public class Zones implements ContentList{
                         spacing = 10;
                         unitScaling = 0.5f;
                         unitAmount = 10;
-                    }}
+                    }},
+
+                    bossGroup(UnitTypes.chaosArray)
                 );
             }};
         }};
@@ -411,7 +430,9 @@ public class Zones implements ContentList{
                         spacing = 10;
                         unitScaling = 0.5f;
                         unitAmount = 10;
-                    }}
+                    }},
+
+                    bossGroup(UnitTypes.lich)
                 );
             }};
         }};
@@ -482,7 +503,9 @@ public class Zones implements ContentList{
                         spacing = 2;
                         unitAmount = 4;
                         begin = 13;
-                    }}
+                    }},
+
+                    bossGroup(UnitTypes.chaosArray)
                 );
             }};
         }};
@@ -598,7 +621,9 @@ public class Zones implements ContentList{
                         spacing = 10;
                         unitScaling = 0.5f;
                         unitAmount = 10;
-                    }}
+                    }},
+
+                    bossGroup(UnitTypes.reaper)
                 );
             }};
         }};

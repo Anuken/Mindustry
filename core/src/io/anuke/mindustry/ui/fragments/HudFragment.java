@@ -30,6 +30,7 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
+import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.IntFormat;
 
 import static io.anuke.mindustry.Vars.*;
@@ -93,7 +94,7 @@ public class HudFragment extends Fragment{
                         if(Net.active() && mobile){
                             i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-chat");
                         }else{
-                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-database");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-database-small");
                         }
                     }).get();
 
@@ -126,6 +127,12 @@ public class HudFragment extends Fragment{
 
             cont.row();
 
+            Table healthTable = cont.table("button", t ->
+                t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE)).grow()
+            ).fillX().visible(() -> world.isZone() && state.boss() != null).height(60f).update(t -> t.getTranslation().set(wavetable.getTranslation())).get();
+
+            cont.row();
+
             //fps display
             infolabel = cont.table(t -> {
                 IntFormat fps = new IntFormat("fps");
@@ -135,7 +142,8 @@ public class HudFragment extends Fragment{
                 if(Net.hasClient()){
                     t.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
                 }
-            }).size(-1).visible(() -> Core.settings.getBool("fps")).update(t -> t.setTranslation(0, (!waves.isVisible() ? wavetable.getHeight() : Math.min(wavetable.getTranslation().y, wavetable.getHeight())))).get();
+            }).size(-1).visible(() -> Core.settings.getBool("fps")).update(t -> t.setTranslation(0,
+                (!waves.isVisible() ? wavetable.getHeight() + healthTable.getHeight() : Math.min(wavetable.getTranslation().y + healthTable.getHeight(), wavetable.getHeight() + healthTable.getHeight())))).get();
 
             //make wave box appear below rest of menu
             if(mobile){

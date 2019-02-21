@@ -37,6 +37,7 @@ public class BlockRenderer{
     private int iterateidx = 0;
     private FrameBuffer shadows = new FrameBuffer(2, 2);
     private FrameBuffer fog = new FrameBuffer(2, 2);
+    private Array<Tile> outArray = new Array<>();
 
     public BlockRenderer(){
 
@@ -180,6 +181,14 @@ public class BlockRenderer{
 
                         if(block.layer2 != null && block.isLayer2(tile)){
                             addRequest(tile, block.layer2);
+                        }
+
+                        if(tile.entity != null && tile.entity.power != null && tile.entity.power.links.size > 0){
+                            for(Tile other : block.getPowerConnections(tile, outArray)){
+                                if(other.block().layer == Layer.power){
+                                    addRequest(other, Layer.power);
+                                }
+                            }
                         }
                     }
                 }

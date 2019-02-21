@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.Bits;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
@@ -22,6 +23,7 @@ public class Statuses implements Saveable{
     private static final Array<StatusEntry> removals = new Array<>();
 
     private Array<StatusEntry> statuses = new Array<>();
+    private Bits applied = new Bits(content.getBy(ContentType.status).size);
 
     private float speedMultiplier;
     private float damageMultiplier;
@@ -76,6 +78,7 @@ public class Statuses implements Saveable{
     }
 
     public void update(Unit unit){
+        applied.clear();
         speedMultiplier = damageMultiplier = armorMultiplier = 1f;
 
         if(statuses.size == 0) return;
@@ -84,6 +87,7 @@ public class Statuses implements Saveable{
 
         for(StatusEntry entry : statuses){
             entry.time = Math.max(entry.time - Time.delta(), 0);
+            applied.set(entry.effect.id);
 
             if(entry.time <= 0){
                 Pools.free(entry);
@@ -114,10 +118,7 @@ public class Statuses implements Saveable{
     }
 
     public boolean hasEffect(StatusEffect effect){
-        for(StatusEntry entry : statuses){
-            if(entry.effect == effect) return true;
-        }
-        return false;
+        return applied.get(effect.id);
     }
 
     @Override
@@ -125,7 +126,7 @@ public class Statuses implements Saveable{
         stream.writeByte(statuses.size);
         for(StatusEntry entry : statuses){
             stream.writeByte(entry.effect.id);
-            stream.writeShort((short) (entry.time * 2));
+            stream.writeFloat(entry.time);
         }
     }
 
@@ -140,7 +141,7 @@ public class Statuses implements Saveable{
         byte amount = stream.readByte();
         for(int i = 0; i < amount; i++){
             byte id = stream.readByte();
-            float time = stream.readShort() / 2f;
+            float time = stream.readFloat();
             StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
             entry.set(content.getByID(ContentType.status, id), time);
             statuses.add(entry);

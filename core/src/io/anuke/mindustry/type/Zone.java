@@ -6,10 +6,12 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.game.EventType.ZoneCompleteEvent;
 import io.anuke.mindustry.game.EventType.ZoneConfigureCompleteEvent;
 import io.anuke.mindustry.game.Loadout;
 import io.anuke.mindustry.game.Rules;
+import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.world.Block;
@@ -37,6 +39,19 @@ public class Zone extends UnlockableContent{
     public Zone(String name, MapGenerator generator){
         super(name);
         this.generator = generator;
+    }
+
+    protected SpawnGroup bossGroup(UnitType type){
+        return new SpawnGroup(type){{
+            begin = configureWave-1;
+            effect = StatusEffects.boss;
+            unitScaling = 1;
+            spacing = configureWave;
+        }};
+    }
+
+    public boolean isBossWave(int wave){
+        return wave % configureWave == 0 && wave > 0;
     }
 
     public ItemStack[] getLaunchCost(){

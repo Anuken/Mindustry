@@ -3,11 +3,12 @@ package io.anuke.mindustry.world.blocks.power;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.math.Angles;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.type.Player;
@@ -15,6 +16,7 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
@@ -240,6 +242,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void drawLaser(Tile tile, Tile target){
+
         float x1 = tile.drawx(), y1 = tile.drawy(),
                 x2 = target.drawx(), y2 = target.drawy();
 
@@ -254,9 +257,11 @@ public class PowerNode extends PowerBlock{
         x2 += t2.x;
         y2 += t2.y;
 
-        Draw.color(Pal.powerLight, Pal.power, Mathf.absin(Time.time(), 8f, 1f));
-        Lines.stroke(2f);
-        Lines.line(x1, y1, x2, y2);
+        Draw.color(Pal.powerLight, Color.WHITE, Mathf.absin(Time.time(), 8f, 0.3f) + 0.2f);
+        //Lines.stroke(2f);
+        //Lines.line(x1, y1, x2, y2);
+
+        Shapes.laser("laser", "laser-end", x1, y1, x2, y2, 0.5f);
     }
 
 }

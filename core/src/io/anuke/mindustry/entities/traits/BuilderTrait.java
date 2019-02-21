@@ -347,7 +347,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
 
-        Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey);
+        Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey, 0.75f);
 
         if(unit instanceof Player && ((Player) unit).isLocal){
             Lines.stroke(1f, Pal.accent);

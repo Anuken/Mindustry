@@ -1,7 +1,6 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.Core;
-import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
@@ -9,6 +8,7 @@ import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Tmp;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.ContentList;
@@ -34,7 +34,7 @@ public class Fx implements ContentList{
     bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
     shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
     shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
-    unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke;
+    unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke, dynamicExplosion;
 
     @Override
     public void load(){
@@ -599,6 +599,31 @@ public class Fx implements ContentList{
 
             Angles.randLenVectors(e.id + 1, 8, 1f + 23f * e.finpow(), (x, y) -> {
                 Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
+            });
+
+            Draw.reset();
+        });
+
+        dynamicExplosion = new Effect(30, e -> {
+            float intensity = e.rotation;
+
+            e.scaled(5 + intensity*2, i -> {
+                Lines.stroke(3.1f * i.fout());
+                Lines.poly(e.x, e.y, (int)(20 * intensity), (3f + i.fin() * 14f) * intensity);
+            });
+
+            Draw.color(Color.GRAY);
+
+            Angles.randLenVectors(e.id, e.finpow(), (int)(6 * intensity), 21f*intensity, (x, y, in, out) -> {
+                Fill.circle(e.x + x, e.y + y, out * (2f+intensity) * 3 + 0.5f);
+                Fill.circle(e.x + x / 2f, e.y + y / 2f, out * (intensity) * 3);
+            });
+
+            Draw.color(Pal.lighterOrange, Pal.lightOrange, Color.GRAY, e.fin());
+            Lines.stroke((1.7f * e.fout()) * (1f + (intensity - 1f) / 2f));
+
+            Angles.randLenVectors(e.id + 1, e.finpow(), (int)(9*intensity), 40f*intensity, (x, y, in, out) -> {
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + out * 4 * (3f+intensity));
             });
 
             Draw.reset();
