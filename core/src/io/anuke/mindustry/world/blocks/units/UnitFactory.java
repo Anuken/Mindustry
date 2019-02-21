@@ -120,8 +120,7 @@ public class UnitFactory extends Block{
         Shaders.build.color.a = entity.speedScl;
         Shaders.build.time = -entity.time / 10f;
 
-        Draw.shader(Shaders.build, false);
-        Shaders.build.apply();
+        Draw.shader(Shaders.build);
         Draw.rect(region, tile.drawx(), tile.drawy());
         Draw.shader();
 

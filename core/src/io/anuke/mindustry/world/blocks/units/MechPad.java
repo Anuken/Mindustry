@@ -57,7 +57,7 @@ public class MechPad extends Block{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void onMechFactoryTap(Player player, Tile tile){
-        if(player == null || !checkValidTap(tile, player) || !(tile.block() instanceof MechPad)) return;
+        if(player == null  || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.entity();
         MechPad pad = (MechPad)tile.block();
@@ -153,11 +153,10 @@ public class MechPad extends Block{
 
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
-            Shaders.build.time = -entity.time / 4f;
+            Shaders.build.time = -entity.time / 5f;
             Shaders.build.color.set(Pal.accent);
 
-            Draw.shader(Shaders.build, false);
-            Shaders.build.apply();
+            Draw.shader(Shaders.build);
             Draw.rect(region, tile.drawx(), tile.drawy());
             Draw.shader();
 

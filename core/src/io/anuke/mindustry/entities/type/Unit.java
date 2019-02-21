@@ -264,6 +264,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
 
         if(isFlying()){
+            drownTime = 0f;
             move(velocity.x * Time.delta(), velocity.y * Time.delta());
         }else{
             boolean onLiquid = floor.isLiquid;
