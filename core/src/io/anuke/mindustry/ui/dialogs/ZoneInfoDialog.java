@@ -42,6 +42,7 @@ public class ZoneInfoDialog extends FloatingDialog{
             iteminfo.clear();
             ItemStack[] stacks = zone.unlocked() ? zone.getLaunchCost() : zone.itemRequirements;
             for(ItemStack stack : stacks){
+                if(stack.amount == 0) continue;
                 iteminfo.addImage(stack.item.icon(Item.Icon.medium)).size(8*3).padRight(1);
                 iteminfo.add(stack.amount + "").color(Color.LIGHT_GRAY).padRight(5);
             }
