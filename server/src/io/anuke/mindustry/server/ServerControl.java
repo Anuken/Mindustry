@@ -19,6 +19,7 @@ import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.maps.MapException;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.KickReason;
@@ -220,12 +221,16 @@ public class ServerControl implements ApplicationListener{
 
             logic.reset();
             state.rules = preset.get();
-            world.loadMap(result);
-            logic.play();
+            try{
+                world.loadMap(result);
+                logic.play();
 
-            info("Map loaded.");
+                info("Map loaded.");
 
-            host();
+                host();
+            }catch(MapException e){
+                Log.err(e.map.getDisplayName() + ": " + e.getMessage());
+            }
         });
 
         handler.register("port", "[port]", "Sets or displays the port for hosting the server.", arg -> {
@@ -657,7 +662,12 @@ public class ServerControl implements ApplicationListener{
             lastTask = new Task(){
                 @Override
                 public void run(){
-                    r.run();
+                    try{
+                        r.run();
+                    }catch(MapException e){
+                        Log.err(e.map.getDisplayName() + ": " + e.getMessage());
+                        Net.closeServer();
+                    }
                 }
             };
 

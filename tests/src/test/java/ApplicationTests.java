@@ -181,6 +181,7 @@ public class ApplicationTests{
     @Test
     void save(){
         world.loadMap(testMap);
+        assertTrue(state.teams.get(defaultTeam).cores.size > 0);
         SaveIO.saveToSlot(0);
     }
 
@@ -195,6 +196,7 @@ public class ApplicationTests{
 
         assertEquals(world.width(), map.meta.width);
         assertEquals(world.height(), map.meta.height);
+        assertTrue(state.teams.get(defaultTeam).cores.size > 0);
     }
 
     @Test

@@ -464,8 +464,12 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     //region update methods
 
+    Vector2 last = new Vector2();
+
     @Override
     public void update(){
+        last.set(this);
+
         hitTime -= Time.delta();
 
         if(Float.isNaN(x) || Float.isNaN(y)){
@@ -766,6 +770,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             }else if(getClosestCore() != null){
                 this.spawner = (SpawnerTrait)getClosestCore();
             }
+        }else if(getClosestCore() != null){
+            set(getClosestCore().getX(), getClosestCore().getY());
         }
     }
 
@@ -841,7 +847,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public void read(DataInput buffer) throws IOException{
-        float lastx = x, lasty = y, lastrot = rotation;
+        float lastx = x, lasty = y, lastrot = rotation, lastvx = velocity.x, lastvy = velocity.y;
         super.readSave(buffer);
         name = TypeIO.readStringData(buffer);
         byte bools = buffer.readByte();
@@ -862,6 +868,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(isLocal){
             x = lastx;
             y = lasty;
+            velocity.x = lastvx;
+            velocity.y = lastvy;
         }else{
             mining = world.tile(mine);
             isBoosting = boosting;

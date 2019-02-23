@@ -30,7 +30,7 @@ public class Stats{
 
         //each new launch period adds onto the rank 1.5 'points'
         if(wavesLasted >= zone.conditionWave){
-           score += (float)((zone.conditionWave - wavesLasted) / zone.launchPeriod + 1) * 1.5f;
+           score += (float)((wavesLasted - zone.conditionWave) / zone.launchPeriod + 1) * 1.5f;
         }
 
         int capacity = zone.generator.coreBlock.itemCapacity;

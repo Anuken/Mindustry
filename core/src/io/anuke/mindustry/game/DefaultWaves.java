@@ -10,7 +10,7 @@ public class DefaultWaves{
     private static Array<SpawnGroup> spawns;
 
     public static Array<SpawnGroup> getDefaultSpawns(){
-        if(spawns == null){
+        if(spawns == null && UnitTypes.dagger != null){
             spawns = Array.with(
             new SpawnGroup(UnitTypes.dagger){{
                 end = 8;
@@ -164,6 +164,6 @@ public class DefaultWaves{
             }}
             );
         }
-        return spawns;
+        return spawns == null ? new Array<>() : spawns;
     }
 }

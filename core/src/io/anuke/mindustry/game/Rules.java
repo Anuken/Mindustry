@@ -28,5 +28,5 @@ public class Rules{
     /**Zone ID, -1 for invalid zone.*/
     public byte zone = -1;
     /**Spawn layout. Since only zones modify this, it should be assigned on save load.*/
-    public transient Array<SpawnGroup> spawns = new Array<>();
+    public transient Array<SpawnGroup> spawns = DefaultWaves.getDefaultSpawns();
 }

@@ -15,6 +15,7 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.ScreenRecorder;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
@@ -48,7 +49,6 @@ public class Renderer implements ApplicationListener{
     private float targetscale = io.anuke.arc.scene.ui.layout.Unit.dp.scl(4);
     private float camerascale = targetscale;
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
-    private Vector2 avgPosition = new Vector2();
     private float shakeIntensity, shaketime;
 
     public Renderer(){
@@ -115,7 +115,7 @@ public class Renderer implements ApplicationListener{
         if(state.is(State.menu)){
             graphics.clear(Color.BLACK);
         }else{
-            Vector2 position = averagePosition();
+            Vector2 position = Tmp.v3.set(players[0]);
 
             if(players[0].isDead()){
                 TileEntity core = players[0].getClosestCore();
@@ -286,15 +286,6 @@ public class Renderer implements ApplicationListener{
 
     public float cameraScale(){
         return camerascale;
-    }
-
-    public Vector2 averagePosition(){
-        avgPosition.setZero();
-
-        drawAndInterpolate(playerGroup, p -> p.isLocal, p -> avgPosition.add(p.x, p.y));
-
-        avgPosition.scl(1f / players.length);
-        return avgPosition;
     }
 
     public void scaleCamera(float amount){

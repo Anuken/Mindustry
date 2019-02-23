@@ -68,7 +68,6 @@ public class Logic implements ApplicationListener{
         state.gameOver = state.launched = false;
         state.teams = new Teams();
         state.rules = new Rules();
-        state.rules.spawns = DefaultWaves.getDefaultSpawns();
         state.stats = new Stats();
 
         Time.clear();

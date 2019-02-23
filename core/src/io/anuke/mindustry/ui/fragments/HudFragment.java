@@ -144,7 +144,7 @@ public class HudFragment extends Fragment{
             }
             infolabel.visible(() -> Core.settings.getBool("fps")).update(() ->
                 infolabel.setPosition(0,
-                    healthTable.isVisible() ? healthTable.getY() + healthTable.getTranslation().y : wavetable.isVisible() ? wavetable.getY() : 0f,
+                    healthTable.isVisible() ? healthTable.getY() + healthTable.getTranslation().y : waves.isVisible() ? wavetable.getY() : Core.graphics.getHeight(),
                     Align.topLeft));
 
             infolabel.pack();

@@ -101,9 +101,7 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            if(mobile){
-                Core.app.post(() -> Core.camera.position.set(players[0]));
-            }
+            Core.app.post(() -> Core.camera.position.set(players[0]));
         });
 
         Events.on(ResetEvent.class, event -> {

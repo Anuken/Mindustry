@@ -5,7 +5,6 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntArray;
-import io.anuke.mindustry.entities.EntityQuery;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
@@ -17,11 +16,13 @@ import io.anuke.mindustry.ai.Pathfinder;
 import io.anuke.mindustry.ai.WaveSpawner;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.EntityQuery;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.maps.MapException;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.maps.Maps;
@@ -269,6 +270,17 @@ public class World implements ApplicationListener{
                 if(invalidMap){
                     ui.showError("$map.nospawn.pvp");
                 }
+            }
+        }else{
+            invalidMap = true;
+            for(Team team : Team.all){
+                if(state.teams.get(team).cores.size != 0){
+                    invalidMap = false;
+                }
+            }
+
+            if(invalidMap){
+                throw new MapException(map, "Map has no cores!");
             }
         }
 
