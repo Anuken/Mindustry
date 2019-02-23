@@ -134,16 +134,21 @@ public class HudFragment extends Fragment{
             cont.row();
 
             //fps display
-            infolabel = cont.table(t -> {
-                IntFormat fps = new IntFormat("fps");
-                IntFormat ping = new IntFormat("ping");
-                t.label(() -> fps.get(Core.graphics.getFramesPerSecond())).padRight(10);
-                t.row();
-                if(Net.hasClient()){
-                    t.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
-                }
-            }).size(-1).visible(() -> Core.settings.getBool("fps")).update(t -> t.setTranslation(0,
-                (!waves.isVisible() ? wavetable.getHeight() + healthTable.getHeight() : Math.min(wavetable.getTranslation().y + healthTable.getHeight(), wavetable.getHeight() + healthTable.getHeight())))).get();
+            infolabel = new Table();
+            IntFormat fps = new IntFormat("fps");
+            IntFormat ping = new IntFormat("ping");
+            infolabel.label(() -> fps.get(Core.graphics.getFramesPerSecond())).padRight(10);
+            infolabel.row();
+            if(Net.hasClient()){
+                infolabel.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
+            }
+            infolabel.visible(() -> Core.settings.getBool("fps")).update(() ->
+                infolabel.setPosition(0,
+                    healthTable.isVisible() ? healthTable.getY() + healthTable.getTranslation().y : wavetable.isVisible() ? wavetable.getY() : 0f,
+                    Align.topLeft));
+
+            infolabel.pack();
+            cont.addChild(infolabel);
 
             //make wave box appear below rest of menu
             if(mobile){

@@ -68,6 +68,7 @@ public abstract class BlockStorage extends UnlockableContent{
 
     /**Remove a stack from this inventory, and return the amount removed.*/
     public int removeStack(Tile tile, Item item, int amount){
+        amount = Math.min(amount, tile.entity.items.get(item));
         tile.entity.noSleep();
         tile.entity.items.remove(item, amount);
         return amount;

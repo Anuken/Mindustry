@@ -14,11 +14,8 @@ import io.anuke.arc.util.CommandHandler.ResponseType;
 import io.anuke.arc.util.Timer.Task;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.game.Difficulty;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.game.RulePreset;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
@@ -48,7 +45,7 @@ public class ServerControl implements ApplicationListener{
     private FileHandle currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
-
+    private RulePreset lastPreset;
 
     public ServerControl(String[] args){
         Core.settings.defaults(
@@ -214,7 +211,7 @@ public class ServerControl implements ApplicationListener{
                 try{
                     preset = RulePreset.valueOf(arg[1]);
                 }catch(IllegalArgumentException e){
-                    err("No gamemode '{0}' found.");
+                    err("No gamemode '{0}' found.", arg[1]);
                     return;
                 }
             }
@@ -643,7 +640,9 @@ public class ServerControl implements ApplicationListener{
                 players.add(p);
                 p.setDead(true);
             }
+            Rules rules = state.rules;
             logic.reset();
+            state.rules = rules;
             Call.onWorldDataBegin();
             run.run();
             logic.play();

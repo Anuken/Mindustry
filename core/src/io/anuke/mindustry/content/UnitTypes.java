@@ -132,7 +132,7 @@ public class UnitTypes implements ContentList{
             mass = 5f;
             hitsize = 20f;
             rotatespeed = 0.06f;
-            health = 20000;
+            health = 4000;
             weapon = new Weapon("chaos"){{
                 length = 8f;
                 reload = 50f;
@@ -155,7 +155,7 @@ public class UnitTypes implements ContentList{
             mass = 5f;
             hitsize = 20f;
             rotatespeed = 0.06f;
-            health = 80000;
+            health = 10000;
             weapon = new Weapon("eradication"){{
                 length = 13f;
                 reload = 30f;
@@ -236,7 +236,7 @@ public class UnitTypes implements ContentList{
         }};
 
         revenant = new UnitType("revenant", Revenant.class, Revenant::new){{
-            health = 4000;
+            health = 3000;
             mass = 5f;
             hitsize = 20f;
             speed = 0.1f;
@@ -266,7 +266,7 @@ public class UnitTypes implements ContentList{
         }};
 
         lich = new UnitType("lich", Revenant.class, Revenant::new){{
-            health = 15000;
+            health = 9000;
             mass = 20f;
             hitsize = 40f;
             speed = 0.01f;
@@ -297,7 +297,7 @@ public class UnitTypes implements ContentList{
         }};
 
         reaper = new UnitType("reaper", Revenant.class, Revenant::new){{
-            health = 30000;
+            health = 20000;
             mass = 30f;
             hitsize = 56f;
             speed = 0.01f;

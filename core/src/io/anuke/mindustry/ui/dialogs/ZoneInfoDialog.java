@@ -39,10 +39,15 @@ public class ZoneInfoDialog extends FloatingDialog{
 
         Table iteminfo = new Table();
         Runnable rebuildItems = () -> {
+            int i = 0;
             iteminfo.clear();
             ItemStack[] stacks = zone.unlocked() ? zone.getLaunchCost() : zone.itemRequirements;
             for(ItemStack stack : stacks){
                 if(stack.amount == 0) continue;
+
+                if(i++ % 2 == 0){
+                    iteminfo.row();
+                }
                 iteminfo.addImage(stack.item.icon(Item.Icon.medium)).size(8*3).padRight(1);
                 iteminfo.add(stack.amount + "").color(Color.LIGHT_GRAY).padRight(5);
             }
@@ -157,7 +162,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                             dialog.cont.row();
                         }
                         dialog.show();
-                    }).colspan(4).size(100f, bsize).left();
+                    }).colspan(4).size(100f, bsize).left().disabled(b -> !content.items().contains(item -> data.getItem(item) > 0 && item.type == ItemType.material && !zone.getStartingItems().contains(stack -> stack.item == item)));
                 };
 
                 rebuildLoadout[0].run();
@@ -188,7 +193,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 hide();
                 world.playZone(zone);
             }
-        }).size(300f, 70f).padTop(5).disabled(b -> zone.locked() ? !canUnlock(zone) : !data.hasItems(zone.getLaunchCost())).get();
+        }).margin(13f).padTop(5).disabled(b -> zone.locked() ? !canUnlock(zone) : !data.hasItems(zone.getLaunchCost())).get();
 
         button.row();
         button.add(iteminfo);

@@ -49,6 +49,7 @@ public class ContentLoader{
         new Mechs(),
         new UnitTypes(),
         new Blocks(),
+        new Loadouts(),
         new TechTree(),
         new Zones(),
 

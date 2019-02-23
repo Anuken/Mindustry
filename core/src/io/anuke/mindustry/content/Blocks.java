@@ -833,7 +833,7 @@ public class Blocks implements ContentList{
 
         thermalGenerator = new ThermalGenerator("thermal-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 80, Items.graphite, 70, Items.lead, 100, Items.silicon, 70, Items.metaglass, 80));
-            powerProduction = 2f;
+            powerProduction = 1.8f;
             generateEffect = Fx.redgeneratespark;
             size = 2;
         }};
@@ -843,6 +843,7 @@ public class Blocks implements ContentList{
             powerProduction = 6f;
             itemDuration = 30f;
             consumes.liquid(Liquids.water, 0.05f);
+            hasLiquids = true;
             size = 2;
         }};
 

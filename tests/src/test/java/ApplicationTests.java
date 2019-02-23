@@ -241,37 +241,32 @@ public class ApplicationTests{
     @Test
     void zoneEmptyWaves(){
         for(Zone zone : content.zones()){
-            checkNoEmptyWaves(zone, zone.rules.get().spawns, 1, 100);
+            Array<SpawnGroup> spawns = zone.rules.get().spawns;
+            for(int i = 1; i <= 100; i++){
+                int total = 0;
+                for(SpawnGroup spawn : spawns){
+                    total += spawn.getUnitsSpawned(i);
+                }
+
+                assertNotEquals(0, total, "Zone " + zone + " has no spawned enemies at wave " + i);
+            }
         }
     }
 
     @Test
     void zoneOverflowWaves(){
         for(Zone zone : content.zones()){
-            checkExtraWaves(zone, zone.rules.get().spawns, 1, 40, 140);
-        }
-    }
+            Array<SpawnGroup> spawns = zone.rules.get().spawns;
 
-    void checkNoEmptyWaves(Zone zone, Array<SpawnGroup> spawns, int from, int to){
-        for(int i = from; i <= to; i++){
-            int total = 0;
-            for(SpawnGroup spawn : spawns){
-                total += spawn.getUnitsSpawned(i);
-            }
+            for(int i = 1; i <= 40; i++){
+                int total = 0;
+                for(SpawnGroup spawn : spawns){
+                    total += spawn.getUnitsSpawned(i);
+                }
 
-            assertNotEquals(0, total, "Zone " + zone + " has no spawned enemies at wave " + i);
-        }
-    }
-
-    void checkExtraWaves(Zone zone, Array<SpawnGroup> spawns, int from, int to, int max){
-        for(int i = from; i <= to; i++){
-            int total = 0;
-            for(SpawnGroup spawn : spawns){
-                total += spawn.getUnitsSpawned(i);
-            }
-
-            if(total >= max){
-                fail("Zone '" + zone + "' has too many spawned enemies at wave " + i + " : " + total);
+                if(total >= 140){
+                    fail("Zone '" + zone + "' has too many spawned enemies at wave " + i + " : " + total);
+                }
             }
         }
     }

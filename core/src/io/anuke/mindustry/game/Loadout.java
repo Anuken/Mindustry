@@ -1,17 +1,10 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
-public enum Loadout{
-    test(Blocks.coreShard){
-        @Override
-        public void setup(Tile tile){
-
-        }
-    };
-
+public abstract class Loadout extends Content{
     public final Block core;
 
     Loadout(Block core){
@@ -19,4 +12,9 @@ public enum Loadout{
     }
 
     public abstract void setup(Tile tile);
+
+    @Override
+    public ContentType getContentType(){
+        return ContentType.loadout;
+    }
 }

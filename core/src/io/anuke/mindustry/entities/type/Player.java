@@ -364,8 +364,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public void drawUnder(){
-        float size = mech.engineSize * (mech.flying ? 1f : boostHeat);
+        if(dead) return;
 
+        float size = mech.engineSize * (mech.flying ? 1f : boostHeat);
         Draw.color(mech.engineColor);
         Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset), y + Angles.trnsy(rotation + 180, mech.engineOffset),
         size + Mathf.absin(Time.time(), 2f, size/4f));
