@@ -331,15 +331,15 @@ public class Tile implements Position, TargetTrait{
         }
 
         if(occluded){
-            cost += 1;
+            cost += 2;
         }
 
         if(target().synthetic()){
-            cost += Mathf.clamp(target().block().health / 10f, 0, 28);
+            cost += Mathf.clamp(target().block().health / 10f, 0, 20);
         }
 
         if(floor.isLiquid){
-            cost += 80;
+            cost += 10;
         }
     }
 

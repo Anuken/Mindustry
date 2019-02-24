@@ -16,7 +16,7 @@ import io.anuke.mindustry.type.ContentType;
 public class DatabaseDialog extends FloatingDialog{
 
     public DatabaseDialog(){
-        super("database");
+        super("$database");
 
         shouldPause = true;
         addCloseButton();

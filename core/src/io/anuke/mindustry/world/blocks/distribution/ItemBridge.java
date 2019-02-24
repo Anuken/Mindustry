@@ -36,8 +36,9 @@ public class ItemBridge extends Block{
     protected int range;
     protected float transportTime = 2f;
     protected IntArray removals = new IntArray();
-
     protected TextureRegion endRegion, bridgeRegion, arrowRegion;
+
+    private static int lastPlaced = Pos.invalid;
 
     public ItemBridge(String name){
         super(name);
@@ -85,9 +86,15 @@ public class ItemBridge extends Block{
         if(linkValid(tile, link)){
             Call.linkItemBridge(null, link, tile);
         }
+
+        lastPlaced = tile.pos();
     }
 
     public Tile findLink(int x, int y){
+        if(linkValid(world.tile(x, y), world.tile(lastPlaced))){
+            return world.tile(lastPlaced);
+        }
+
         for(int j = 0; j < 4; j ++){
             Point2 p = Geometry.d4(j + 1);
             for(int i = 1; i <= range; i++){

@@ -74,7 +74,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean canBreak(Tile tile){
-        return state.teams.get(tile.getTeam()).cores.size > 1;
+        return false;
     }
 
     @Override

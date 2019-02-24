@@ -129,12 +129,13 @@ public class HudFragment extends Fragment{
 
             Table healthTable = cont.table("button", t ->
                 t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE)).grow()
-            ).fillX().visible(() -> world.isZone() && state.boss() != null).height(60f).update(t -> t.getTranslation().set(wavetable.getTranslation())).get();
+            ).fillX().visible(() -> world.isZone() && state.boss() != null).height(60f).update(t -> t.getTranslation().set(0, Unit.dp.scl(wavetable.getTranslation().y))).get();
 
             cont.row();
 
             //fps display
             infolabel = new Table();
+            infolabel.marginLeft(10f);
             IntFormat fps = new IntFormat("fps");
             IntFormat ping = new IntFormat("ping");
             infolabel.label(() -> fps.get(Core.graphics.getFramesPerSecond())).padRight(10);
@@ -144,7 +145,7 @@ public class HudFragment extends Fragment{
             }
             infolabel.visible(() -> Core.settings.getBool("fps")).update(() ->
                 infolabel.setPosition(0,
-                    healthTable.isVisible() ? healthTable.getY() + healthTable.getTranslation().y : waves.isVisible() ? wavetable.getY() : Core.graphics.getHeight(),
+                    healthTable.isVisible() ? healthTable.getY() + healthTable.getTranslation().y : waves.isVisible() ? Math.min(wavetable.getY(), Core.graphics.getHeight()) : Core.graphics.getHeight(),
                     Align.topLeft));
 
             infolabel.pack();
