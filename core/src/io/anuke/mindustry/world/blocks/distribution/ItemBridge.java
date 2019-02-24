@@ -91,7 +91,7 @@ public class ItemBridge extends Block{
     }
 
     public Tile findLink(int x, int y){
-        if(linkValid(world.tile(x, y), world.tile(lastPlaced))){
+        if(linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Pos.get(x, y)){
             return world.tile(lastPlaced);
         }
 
@@ -101,7 +101,7 @@ public class ItemBridge extends Block{
                 Tile tile = world.tile(x + p.x * i, y + p.y * i);
 
                 if(tile == null) break;
-                if(tile.block() == this && tile.<ItemBridgeEntity>entity().link == Pos.invalid){
+                if(tile.block() == this && !(tile.x == x && tile.y == y) && tile.entity != null && tile.<ItemBridgeEntity>entity().link == Pos.invalid){
                     return tile;
                 }
             }
@@ -113,7 +113,8 @@ public class ItemBridge extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Tile link = findLink(x, y);
 
-        Lines.stroke(1f, Pal.placing);
+        Draw.tint(Pal.placing);
+        Lines.stroke(1f);
         if(link != null){
             int rot = link.absoluteRelativeTo(x, y);
             float w = (link.x == x ? tilesize : Math.abs(link.x - x) * tilesize - tilesize);

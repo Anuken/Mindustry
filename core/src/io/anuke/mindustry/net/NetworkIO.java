@@ -103,8 +103,6 @@ public class NetworkIO{
             player.resetID(id);
             player.add();
 
-            world.beginMapLoad();
-
             //map
             world.spawner.read(stream);
             SaveIO.getSaveWriter().readMap(stream);
@@ -134,8 +132,6 @@ public class NetworkIO{
                     Core.camera.position.set(state.teams.get(team).cores.first().drawx(), state.teams.get(team).cores.first().drawy());
                 }
             }
-
-            world.endMapLoad();
 
         }catch(IOException e){
             throw new RuntimeException(e);

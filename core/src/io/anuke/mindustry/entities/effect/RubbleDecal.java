@@ -5,14 +5,18 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 
+import static io.anuke.mindustry.Vars.headless;
+
 public class RubbleDecal extends Decal{
-    private static TextureRegion[][] regions = new TextureRegion[16][0];
+    private static final TextureRegion[][] regions = new TextureRegion[16][0];
     private TextureRegion region;
 
     /**
      * Creates a rubble effect at a position. Provide a block size to use.
      */
     public static void create(float x, float y, int size){
+        if(headless) return;
+
         if(regions[size].length == 0){
             int i = 0;
             for(; i < 2; i++){

@@ -10,6 +10,7 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.ButtonGroup;
 import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.ImageButton;
@@ -153,7 +154,7 @@ public class PlacementFragment extends Fragment{
                             }
                         }).size(46f).group(group).get();
 
-                        button.replaceImage(new Image(block.icon(Icon.medium)));
+                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Icon.medium));
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = players[0].getClosestCore();

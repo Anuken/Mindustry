@@ -234,6 +234,10 @@ public class TechTree implements ContentList{
 
                 node(alphaDartPad, () -> {
                     node(deltaPad, () -> {
+                        node(spiritFactory, () -> {
+                            node(phantomFactory);
+                        });
+
                         node(javelinPad, () -> {
                             node(tridentPad, () -> {
                                 node(glaivePad);
@@ -246,20 +250,6 @@ public class TechTree implements ContentList{
                             });
                         });
                     });
-
-                    node(spiritFactory, () -> {
-                        node(daggerFactory, () -> {
-                            node(titanFactory, () -> {
-                                node(fortressFactory);
-                            });
-                            node(wraithFactory, () -> {
-                                node(phantomFactory);
-                                node(ghoulFactory, () -> {
-                                    node(revenantFactory);
-                                });
-                            });
-                        });
-                    });
                 });
             });
         });
@@ -268,7 +258,7 @@ public class TechTree implements ContentList{
     private TechNode node(Block block, Runnable children){
         ItemStack[] requirements = new ItemStack[block.buildRequirements.length];
         for(int i = 0; i < requirements.length; i++){
-            requirements[i] = new ItemStack(block.buildRequirements[i].item, block.buildRequirements[i].amount * 40);
+            requirements[i] = new ItemStack(block.buildRequirements[i].item, block.buildRequirements[i].amount * 35);
         }
         
         return new TechNode(block, requirements, children);

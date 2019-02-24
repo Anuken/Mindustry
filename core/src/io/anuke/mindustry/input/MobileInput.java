@@ -319,11 +319,11 @@ public class MobileInput extends InputHandler implements GestureListener{
                 request.redness = Mathf.lerpDelta(request.redness, 1f, 0.2f);
             }
 
-
             drawRequest(request);
 
             //draw last placed request
             if(!request.remove && request == lastPlaced && request.block != null){
+                Draw.alpha(0f);
                 request.block.drawPlace(tile.x, tile.y, rotation, validPlace(tile.x, tile.y, request.block, rotation));
             }
         }

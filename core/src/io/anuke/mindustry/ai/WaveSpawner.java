@@ -102,6 +102,7 @@ public class WaveSpawner{
     }
 
     private void reset(){
+
         flySpawns.clear();
         groundSpawns.clear();
         groups = state.rules.spawns;

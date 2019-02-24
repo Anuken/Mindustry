@@ -87,6 +87,8 @@ public class HudFragment extends Fragment{
                             }else{
                                 ui.chatfrag.toggle();
                             }
+                        }else if(world.isZone()){
+                            ui.tech.show();
                         }else{
                             ui.database.show();
                         }

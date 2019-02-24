@@ -80,6 +80,8 @@ public class PausedDialog extends FloatingDialog{
                 cont.row();
 
                 cont.addRowImageTextButton("$load", "icon-load", isize, load::show).disabled(b -> Net.active());
+            }else{
+                cont.row();
             }
 
             cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
