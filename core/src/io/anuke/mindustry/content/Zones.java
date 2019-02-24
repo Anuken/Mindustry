@@ -116,8 +116,8 @@ public class Zones implements ContentList{
         }};
 
         frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 2)
-            .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))
-            .core(Blocks.coreFoundation)){{
+            .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
+            loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with(Items.copper, 100);
             startingItems = ItemStack.list(Items.copper, 400);
             conditionWave = 10;
@@ -186,8 +186,8 @@ public class Zones implements ContentList{
             }};
         }};
 
-        ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1)
-            .core(Blocks.coreFoundation)){{
+        ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1)){{
+            loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with(Items.copper, 200, Items.graphite, 50);
             startingItems = ItemStack.list(Items.copper, 400);
             conditionWave = 20;
@@ -279,8 +279,8 @@ public class Zones implements ContentList{
 
         stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2)
             .dist(2.5f, true)
-            .decor(new Decoration(Blocks.stainedStone, Blocks.stainedBoulder, 0.01))
-            .core(Blocks.coreFoundation)){{
+            .decor(new Decoration(Blocks.stainedStone, Blocks.stainedBoulder, 0.01))){{
+            loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with(Items.copper, 100, Items.lead, 200, Items.silicon, 100);
             startingItems = ItemStack.list(Items.copper, 400, Items.lead, 100);
             conditionWave = 10;
@@ -354,11 +354,11 @@ public class Zones implements ContentList{
         }};
 
         impact = new Zone("impact0079", new MapGenerator("impact0079", 2)
-        .core(Blocks.coreFoundation)
         .decor(
             new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01),
             new Decoration(Blocks.metalFloor, Blocks.metalFloorDamaged, 0.02)
         ).drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 2000, Items.pyratite, 2000, Items.titanium, 2000, Items.metaglass, 1000, Items.coal, 2000))){{
+            loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with(Items.copper, 500, Items.lead, 500, Items.silicon, 100);
             startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 500, Items.silicon, 200);
             itemRequirements = ItemStack.with(Items.silicon, 8000, Items.titanium, 6000, Items.graphite, 4000);
@@ -437,8 +437,8 @@ public class Zones implements ContentList{
             }};
         }};
 
-        desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift")
-        .core(Blocks.coreNucleus).dist(2f)){{
+        desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift").dist(2f)){{
+            loadout = Loadouts.basicNucleus;
             baseLaunchCost = ItemStack.with(Items.copper, 500);
             startingItems = ItemStack.list(Items.copper, 1500);
             itemRequirements = ItemStack.with(Items.copper, 8000, Items.metaglass, 2000, Items.graphite, 3000);
@@ -540,8 +540,8 @@ public class Zones implements ContentList{
         */
         nuclearComplex = new Zone("nuclearComplex", new MapGenerator("nuclearProductionComplex", 1)
         .drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 1000, Items.thorium, 200, Items.titanium, 2000, Items.metaglass, 1000))
-        .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))
-        .core(Blocks.coreNucleus)){{
+        .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
+            loadout = Loadouts.basicNucleus;
             baseLaunchCost = ItemStack.with(Items.copper, 500, Items.lead, 500, Items.silicon, 200, Items.metaglass, 100);
             startingItems = ItemStack.list(Items.copper, 2500, Items.lead, 1500, Items.silicon, 800, Items.metaglass, 400);
             itemRequirements = ItemStack.with(Items.copper, 10000, Items.titanium, 8000, Items.metaglass, 6000, Items.plastanium, 2000);

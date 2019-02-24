@@ -13,6 +13,7 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Loadout;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -27,6 +28,7 @@ public class MapGenerator extends Generator{
     private Map map;
     private String mapName;
     private Array<Decoration> decorations = new Array<>();
+    private Loadout loadout;
     /**How much the landscape is randomly distorted.*/
     public float distortion = 3;
     /**The amount of final enemy spawns used. -1 to use everything in the map.
@@ -36,7 +38,6 @@ public class MapGenerator extends Generator{
     public boolean distortFloor = false;
     /**Items randomly added to containers and vaults.*/
     public ItemStack[] storageDrops = ItemStack.with(Items.copper, 300, Items.lead, 300, Items.silicon, 200, Items.graphite, 200, Items.blastCompound, 200);
-    public Block coreBlock = Blocks.coreShard;
 
     public MapGenerator(String mapName){
         this.mapName = mapName;
@@ -45,11 +46,6 @@ public class MapGenerator extends Generator{
     public MapGenerator(String mapName, int enemySpawns){
         this.mapName = mapName;
         this.enemySpawns = enemySpawns;
-    }
-
-    public MapGenerator core(Block block){
-        this.coreBlock = block;
-        return this;
     }
 
     public MapGenerator drops(ItemStack[] drops){
@@ -74,7 +70,8 @@ public class MapGenerator extends Generator{
     }
 
     @Override
-    public void init(){
+    public void init(Loadout loadout){
+        this.loadout = loadout;
         map = world.maps.loadInternalMap(mapName);
         width = map.meta.width;
         height = map.meta.height;
@@ -87,7 +84,6 @@ public class MapGenerator extends Generator{
         data.position(0, 0);
         TileDataMarker marker = data.newDataMarker();
         Array<Point2> players = new Array<>();
-        Array<Block> coreTypes = new Array<>();
         Array<Point2> enemies = new Array<>();
 
         for(int y = 0; y < data.height(); y++){
@@ -96,7 +92,6 @@ public class MapGenerator extends Generator{
 
                 if(content.block(marker.wall) instanceof CoreBlock){
                     players.add(new Point2(x, y));
-                    coreTypes.add(content.block(marker.wall));
                     marker.wall = 0;
                 }
 
@@ -180,7 +175,7 @@ public class MapGenerator extends Generator{
             throw new IllegalArgumentException("All zone maps must have a core.");
         }
 
-        tiles[core.x][core.y].setBlock(coreBlock == null ? coreTypes.get(players.indexOf(core)) : coreBlock, defaultTeam);
+        loadout.setup(core.x, core.y);
 
         world.prepareTiles(tiles);
         world.setMap(map);

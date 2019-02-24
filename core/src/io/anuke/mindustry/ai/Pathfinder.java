@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
@@ -162,7 +163,7 @@ public class Pathfinder{
                     if(other != null && (path.weights[dx][dy] > cost + other.cost || path.searches[dx][dy] < path.search)
                             && passable(other, team)){
                         if(other.cost < 0) throw new IllegalArgumentException("Tile cost cannot be negative! " + other);
-                        path.frontier.addFirst(world.tile(dx, dy).pos());
+                        path.frontier.addFirst(Pos.get(dx, dy));
                         path.weights[dx][dy] = cost + other.cost;
                         path.searches[dx][dy] = (short)path.search;
                     }

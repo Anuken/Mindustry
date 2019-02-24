@@ -11,6 +11,7 @@ import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
 
 import static io.anuke.mindustry.Vars.content;
@@ -107,7 +108,7 @@ public enum EditorTool{
             dest = floor ? bf : bw;
             byte draw = editor.getDrawBlock().id;
 
-            if(dest == draw){
+            if(dest == draw || content.block(bw) instanceof BlockPart || content.block(bw).isMultiblock()){
                 return;
             }
 

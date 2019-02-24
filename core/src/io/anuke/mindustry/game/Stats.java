@@ -33,7 +33,7 @@ public class Stats{
            score += (float)((wavesLasted - zone.conditionWave) / zone.launchPeriod + 1) * 1.5f;
         }
 
-        int capacity = zone.generator.coreBlock.itemCapacity;
+        int capacity = zone.loadout.core().itemCapacity;
 
         //weigh used fractions of
         float frac = 0f;

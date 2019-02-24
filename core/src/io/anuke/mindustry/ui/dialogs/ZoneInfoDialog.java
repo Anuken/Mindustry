@@ -134,7 +134,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                             rebuildItems.run();
                         }).size(bsize).pad(2);
                         load.addButton("+", () -> {
-                            stack.amount = Math.min(stack.amount + step, zone.generator.coreBlock.itemCapacity);
+                            stack.amount = Math.min(stack.amount + step, zone.loadout.core().itemCapacity);
                             zone.updateLaunchCost();
                             rebuildItems.run();
                         }).size(bsize).pad(2);
@@ -193,7 +193,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 hide();
                 world.playZone(zone);
             }
-        }).margin(13f).padTop(5).disabled(b -> zone.locked() ? !canUnlock(zone) : !data.hasItems(zone.getLaunchCost())).get();
+        }).minWidth(150f).margin(13f).padTop(5).disabled(b -> zone.locked() ? !canUnlock(zone) : !data.hasItems(zone.getLaunchCost())).get();
 
         button.row();
         button.add(iteminfo);

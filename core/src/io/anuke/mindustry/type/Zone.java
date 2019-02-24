@@ -6,13 +6,14 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.content.Loadouts;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.game.EventType.ZoneCompleteEvent;
 import io.anuke.mindustry.game.EventType.ZoneConfigureCompleteEvent;
-import io.anuke.mindustry.game.Loadout;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.maps.generators.Generator;
 import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.world.Block;
 
@@ -20,7 +21,7 @@ import static io.anuke.mindustry.Vars.data;
 import static io.anuke.mindustry.Vars.state;
 
 public class Zone extends UnlockableContent{
-    public final MapGenerator generator;
+    public final Generator generator;
     public Block[] blockRequirements = {};
     public ItemStack[] itemRequirements = {};
     public Zone[] zoneRequirements = {};
@@ -30,7 +31,7 @@ public class Zone extends UnlockableContent{
     public int conditionWave = Integer.MAX_VALUE;
     public int configureWave = 40;
     public int launchPeriod = 10;
-    public Loadout loadout;
+    public Loadout loadout = Loadouts.basicShard;
 
     protected ItemStack[] baseLaunchCost = {};
     protected Array<ItemStack> startingItems = new Array<>();
@@ -52,6 +53,10 @@ public class Zone extends UnlockableContent{
 
     public boolean isBossWave(int wave){
         return wave % configureWave == 0 && wave > 0;
+    }
+
+    public boolean isLaunchWave(int wave){
+        return metCondition() && wave % launchPeriod == 0;
     }
 
     public ItemStack[] getLaunchCost(){
@@ -126,7 +131,7 @@ public class Zone extends UnlockableContent{
 
     @Override
     public void init(){
-        generator.init();
+        generator.init(loadout);
 
         Array<ItemStack> arr = Core.settings.getObject(name + "-starting-items", Array.class, () -> null);
         if(arr != null){
