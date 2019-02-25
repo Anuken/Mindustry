@@ -261,7 +261,7 @@ public class PowerNode extends PowerBlock{
         //Lines.stroke(2f);
         //Lines.line(x1, y1, x2, y2);
 
-        Shapes.laser("laser", "laser-end", x1, y1, x2, y2, 0.5f);
+        Shapes.laser("laser", "laser-end", x1, y1, x2, y2, 0.6f);
     }
 
 }

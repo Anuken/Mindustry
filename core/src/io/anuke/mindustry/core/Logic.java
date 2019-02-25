@@ -122,7 +122,7 @@ public class Logic implements ApplicationListener{
         Time.runTask(30f, () -> {
             for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
                 for(Item item : content.items()){
-                    data.addItem(item, tile.entity.items.get(item) / playerGroup.size());
+                    data.addItem(item, tile.entity.items.get(item));
                 }
                 world.removeBlock(tile);
             }

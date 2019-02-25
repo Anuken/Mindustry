@@ -172,7 +172,7 @@ public class Conveyor extends Block{
         }
 
         if(entity.convey.size * itemSpace < 0.9f){
-            unit.velocity().add((tx * speed + centerx) * entity.delta(), (ty * speed + centery) * entity.delta());
+            unit.applyImpulse((tx * speed + centerx) * entity.delta(), (ty * speed + centery) * entity.delta());
         }
     }
 

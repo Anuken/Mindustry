@@ -103,6 +103,7 @@ public class Zone extends UnlockableContent{
             for(ItemStack other : startingItems){
                 if(other.item == out.item){
                     out.amount += other.amount;
+                    out.amount = Math.max(out.amount, 0);
                 }
             }
             stacks.add(out);

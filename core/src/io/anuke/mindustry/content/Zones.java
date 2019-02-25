@@ -22,20 +22,20 @@ public class Zones implements ContentList{
             baseLaunchCost = ItemStack.with(Items.copper, -50);
             startingItems = ItemStack.list(Items.copper, 50);
             alwaysUnlocked = true;
-            conditionWave = 10;
+            conditionWave = 5;
             launchPeriod = 5;
             resources = new Item[]{Items.copper, Items.scrap};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 60 * 2; //2 mins
+                waveSpacing = 60 * 60 * 2;
                 spawns = Array.with(
                     new SpawnGroup(UnitTypes.dagger){{
                         unitScaling = 1.5f;
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
-                        begin = 10;
+                        begin = 5;
                         unitScaling = 2;
                     }},
 
