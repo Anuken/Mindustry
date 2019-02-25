@@ -29,6 +29,12 @@ _Building:_ `./gradlew desktop:dist`
 
 Server builds are bundled with each released build (in Releases). If you'd rather compile on your own, replace 'desktop' with 'server', e.g. `gradlew server:dist`.
 
+##### Troubleshooting
+
+If the terminal returns `Permission denied` or `Command not found` on Mac/Linux, run `chmod +x ./gradlew` before running `./gradlew`. 
+
+NOTE: this is a one-time procedure.
+
 ---
 
 Gradle may take up to several minutes to download files. Be patient. <br>
