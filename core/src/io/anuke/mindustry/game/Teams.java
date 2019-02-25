@@ -6,9 +6,6 @@ import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.waveTeam;
-import static io.anuke.mindustry.Vars.world;
-
 /**Class for various team-based utilities.*/
 public class Teams{
     private TeamData[] map = new TeamData[Team.all.length];
@@ -26,8 +23,7 @@ public class Teams{
     /**Returns team data by type.*/
     public TeamData get(Team team){
         if(map[team.ordinal()] == null){
-            Array<Team> enemies = Array.with(Team.all).select(t -> t != team && ((t != Team.none && team != Team.none) || (world.isZone() && team == waveTeam)));
-            add(team, enemies.toArray(Team.class));
+            add(team, Array.with(Team.all).select(t -> t != team).toArray(Team.class));
         }
         return map[team.ordinal()];
     }

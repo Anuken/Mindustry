@@ -101,18 +101,20 @@ public class Units{
     }
 
     /**Returns the neareset damaged tile.*/
-    public static io.anuke.mindustry.entities.type.TileEntity findDamagedTile(Team team, float x, float y){
+    public static TileEntity findDamagedTile(Team team, float x, float y){
         Tile tile = Geometry.findClosest(x, y, world.indexer.getDamaged(team));
         return tile == null ? null : tile.entity;
     }
 
     /**Returns the neareset ally tile in a range.*/
-    public static io.anuke.mindustry.entities.type.TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+    public static TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
         return world.indexer.findTile(team, x, y, range, pred);
     }
 
     /**Returns the neareset enemy tile in a range.*/
-    public static io.anuke.mindustry.entities.type.TileEntity findEnemyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+    public static TileEntity findEnemyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+        if(team == Team.none) return null;
+
         for(Team enemy : state.teams.enemiesOf(team)){
             TileEntity entity = world.indexer.findTile(enemy, x, y, range, pred);
             if(entity != null){
@@ -134,7 +136,7 @@ public class Units{
         }
 
         //then check all player groups
-        for(io.anuke.mindustry.entities.type.Player player : playerGroup.all()){
+        for(Player player : playerGroup.all()){
             cons.accept(player);
         }
     }
@@ -156,6 +158,8 @@ public class Units{
 
     /**Returns the closest enemy of this team. Filter by predicate.*/
     public static Unit getClosestEnemy(Team team, float x, float y, float range, Predicate<Unit> predicate){
+        if(team == Team.none) return null;
+
         result = null;
         cdist = 0f;
 
