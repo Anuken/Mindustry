@@ -1,17 +1,17 @@
 package io.anuke.mindustry.world.blocks.defense;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.arc.graphics.Blending;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Physics;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -34,16 +34,14 @@ public class DeflectorWall extends Wall{
 
         if(entity.hit < 0.0001f) return;
 
-        Graphics.setAdditiveBlending();
-
         Draw.color(Color.WHITE);
         Draw.alpha(entity.hit * 0.5f);
+        Draw.blend(Blending.additive);
         Draw.rect("blank", tile.drawx(), tile.drawy(), tilesize * size, tilesize * size);
+        Draw.blend();
         Draw.reset();
 
-        entity.hit = Mathf.clamp(entity.hit - Timers.delta() / hitTime);
-
-        Graphics.setNormalBlending();
+        entity.hit = Mathf.clamp(entity.hit - Time.delta() / hitTime);
     }
 
     @Override
@@ -51,13 +49,13 @@ public class DeflectorWall extends Wall{
         super.handleBulletHit(entity, bullet);
 
         //doesn't reflect powerful bullets
-        if(bullet.getDamage() > maxDamageDeflect) return;
+        if(bullet.damage() > maxDamageDeflect) return;
 
         float penX = Math.abs(entity.x - bullet.x), penY = Math.abs(entity.y - bullet.y);
 
-        bullet.getHitbox(rect2);
+        bullet.hitbox(rect2);
 
-        Vector2 position = Physics.raycastRect(bullet.x, bullet.y, bullet.x + bullet.getVelocity().x, bullet.y + bullet.getVelocity().y,
+        Vector2 position = Geometry.raycastRect(bullet.x, bullet.y, bullet.x + bullet.velocity().x, bullet.y + bullet.velocity().y,
                 rect.setCenter(entity.x, entity.y).setSize(size * tilesize + rect2.width + rect2.height));
 
         if(position != null){
@@ -65,9 +63,9 @@ public class DeflectorWall extends Wall{
         }
 
         if(penX > penY){
-            bullet.getVelocity().x *= -1;
+            bullet.velocity().x *= -1;
         }else{
-            bullet.getVelocity().y *= -1;
+            bullet.velocity().y *= -1;
         }
 
         bullet.updateVelocity();

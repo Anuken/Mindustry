@@ -2,8 +2,6 @@ package io.anuke.annotations;
 
 import com.squareup.javapoet.*;
 import io.anuke.annotations.IOFinder.ClassSerializer;
-import io.anuke.annotations.MethodEntry;
-import io.anuke.annotations.Utils;
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -28,7 +26,7 @@ public class RemoteReadGenerator{
     /**
      * Generates a class for reading remote invoke packets.
      *
-     * @param entries List of methods to use/
+     * @param entries List of methods to use.
      * @param className Simple target class name.
      * @param packageName Full target package name.
      * @param needsPlayer Whether this read method requires a reference to the player sender.
@@ -37,6 +35,7 @@ public class RemoteReadGenerator{
             throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException, IOException{
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
+        classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
 
         //create main method builder
         MethodSpec.Builder readMethod = MethodSpec.methodBuilder("readPacket")
@@ -51,7 +50,7 @@ public class RemoteReadGenerator{
             Constructor<TypeName> cons = TypeName.class.getDeclaredConstructor(String.class);
             cons.setAccessible(true);
 
-            TypeName playerType = cons.newInstance("io.anuke.mindustry.entities.Player");
+            TypeName playerType = cons.newInstance("io.anuke.mindustry.entities.type.Player");
             //add player parameter
             readMethod.addParameter(playerType, "player");
         }

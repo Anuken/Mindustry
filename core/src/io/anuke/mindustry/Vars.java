@@ -1,57 +1,69 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.Application.ApplicationType;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
+import io.anuke.arc.Application.ApplicationType;
+import io.anuke.arc.Core;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.impl.EffectEntity;
+import io.anuke.mindustry.entities.traits.DrawTrait;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.SyncTrait;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.game.GlobalData;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.EffectEntity;
-import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Translator;
 
 import java.util.Arrays;
 import java.util.Locale;
 
 @SuppressWarnings("unchecked")
 public class Vars{
+    /**main application name, capitalized*/
     public static final String appName = "Mindustry";
+    /**URL for discord invite.*/
     public static final String discordURL = "https://discord.gg/mindustry";
+    /**URL for Github API for releases*/
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
+    /**URL for Github API for contributors*/
+    public static final String contributorsURL = "https://api.github.com/repos/Anuken/Mindustry/contributors";
+    /**URL for sending crash reports to*/
     public static final String crashReportURL = "http://mindustry.us.to/report";
-    //time between waves in frames (on normal mode)
-    public static final float wavespace = 60 * 60 * 1.5f;
-
+    /**maximum distance between mine and core that supports automatic transferring*/
     public static final float mineTransferRange = 220f;
-    //set ridiculously high for now
-    public static final float coreBuildRange = 999999f;
-    //team of the player by default
+    /**team of the player by default*/
     public static final Team defaultTeam = Team.blue;
-    //team of the enemy in waves
+    /**team of the enemy in waves/sectors*/
     public static final Team waveTeam = Team.red;
-    public static final float unlockResourceScaling = 1f;
+    /**how many times longer a boss wave takes*/
+    public static final float bossWaveMultiplier = 3f;
+    /**how many times longer a launch wave takes*/
+    public static final float launchWaveMultiplier = 2f;
+    /**max chat message length*/
     public static final int maxTextLength = 150;
+    /**max player name length in bytes*/
     public static final int maxNameLength = 40;
+    /**displayed item size when ingame, TODO remove.*/
     public static final float itemSize = 5f;
+    /**extra padding around the world; units outside this bound will begin to self-destruct.*/
+    public static final float worldBounds = 100f;
+    /**units outside of this bound will simply die instantly*/
+    public static final float finalWorldBounds = worldBounds + 500;
+    /**ticks spent out of bound until self destruct.*/
+    public static final float boundsCountdown = 60*7;
+    /**size of tiles in units*/
     public static final int tilesize = 8;
-    public static final int sectorSize = 256;
-    public static final int invalidSector = Integer.MAX_VALUE;
-    public static Locale[] locales;
+    /**all choosable player colors in join/host dialog*/
     public static final Color[] playerColors = {
         Color.valueOf("82759a"),
         Color.valueOf("c0c1c5"),
@@ -70,33 +82,39 @@ public class Vars{
         Color.valueOf("4b5ef1"),
         Color.valueOf("2cabfe"),
     };
-    //server port
+    /**default server port*/
     public static final int port = 6567;
+    /**if true, UI is not drawn*/
+    public static boolean disableUI;
+    /**if true, game is set up in mobile mode, even on desktop. used for debugging*/
     public static boolean testMobile;
-    //shorthand for whether or not this is running on android or ios
+    /**whether the game is running on a mobile device*/
     public static boolean mobile;
+    /**whether the game is running on an iOS device*/
     public static boolean ios;
+    /**whether the game is running on an Android device*/
     public static boolean android;
-    //main data directory
+    /**whether the game is running on a headless server*/
+    public static boolean headless;
+    /**application data directory, equivalent to {@link io.anuke.arc.Settings#getDataDirectory()}*/
     public static FileHandle dataDirectory;
-    //directory for user-created map data
+    /**data subdirectory used for screenshots*/
+    public static FileHandle screenshotDirectory;
+    /**data subdirectory used for custom mmaps*/
     public static FileHandle customMapDirectory;
-    //save file directory
+    /**data subdirectory used for saves*/
     public static FileHandle saveDirectory;
-    public static String mapExtension = "mmap";
-    public static String saveExtension = "msav";
-    //camera zoom displayed on startup
-    public static int baseCameraScale;
-    public static boolean showBlockDebug = false;
-    public static boolean showFog = true;
-    public static boolean headless = false;
-    public static float controllerMin = 0.25f;
-    public static float baseControllerSpeed = 11f;
-    public static boolean snapCamera = true;
+    /**map file extension*/
+    public static final String mapExtension = "mmap";
+    /**save file extension*/
+    public static final String saveExtension = "msav";
+
+    /**list of all locales that can be switched to*/
+    public static Locale[] locales;
 
     public static ContentLoader content;
     public static GameState state;
-    public static ThreadHandler threads;
+    public static GlobalData data;
 
     public static Control control;
     public static Logic logic;
@@ -105,8 +123,6 @@ public class Vars{
     public static World world;
     public static NetServer netServer;
     public static NetClient netClient;
-
-    public static Player[] players = {};
 
     public static EntityGroup<Player> playerGroup;
     public static EntityGroup<TileEntity> tileGroup;
@@ -118,13 +134,14 @@ public class Vars{
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<BaseUnit>[] unitGroups;
 
-    public static final Translator[] tmptr = new Translator[]{new Translator(), new Translator(), new Translator(), new Translator()};
+    /**all local players, currently only has one player. may be used for local co-op in the future*/
+    public static Player[] players = {};
 
     public static void init(){
         Serialization.init();
 
         //load locales
-        String[] stra = Gdx.files.internal("locales").readString().split("\n");
+        String[] stra = Core.files.internal("locales").readString().split("\n");
         locales = new Locale[stra.length];
         for(int i = 0; i < locales.length; i++){
             String code = stra[i];
@@ -135,7 +152,7 @@ public class Vars{
             }
         }
 
-        Arrays.sort(locales, (l1, l2) -> l1.getDisplayName(l1).compareTo(l2.getDisplayName(l2)));
+        Arrays.sort(locales, Structs.comparing(l -> l.getDisplayName(l), String.CASE_INSENSITIVE_ORDER));
         Version.init();
 
         content = new ContentLoader();
@@ -163,15 +180,17 @@ public class Vars{
         }
 
         state = new GameState();
-        threads = new ThreadHandler();
+        data = new GlobalData();
 
-        mobile = Gdx.app.getType() == ApplicationType.Android || Gdx.app.getType() == ApplicationType.iOS || testMobile;
-        ios = Gdx.app.getType() == ApplicationType.iOS;
-        android = Gdx.app.getType() == ApplicationType.Android;
+        mobile = Core.app.getType() == ApplicationType.Android || Core.app.getType() == ApplicationType.iOS || testMobile;
+        ios = Core.app.getType() == ApplicationType.iOS;
+        android = Core.app.getType() == ApplicationType.Android;
 
-        dataDirectory = Settings.getDataDirectory(appName);
+        Core.settings.setAppName(appName);
+
+        dataDirectory = Core.settings.getDataDirectory();
+        screenshotDirectory = dataDirectory.child("screenshots/");
         customMapDirectory = dataDirectory.child("maps/");
         saveDirectory = dataDirectory.child("saves/");
-        baseCameraScale = Math.round(Unit.dp.scl(4));
     }
 }

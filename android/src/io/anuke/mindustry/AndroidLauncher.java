@@ -11,25 +11,25 @@ import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Base64Coder;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
-import io.anuke.kryonet.KryoClient;
-import io.anuke.kryonet.KryoServer;
+import io.anuke.arc.Core;
+import io.anuke.arc.backends.android.surfaceview.AndroidApplication;
+import io.anuke.arc.backends.android.surfaceview.AndroidApplicationConfiguration;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.serialization.Base64Coder;
+import io.anuke.net.KryoClient;
+import io.anuke.net.KryoServer;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Strings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class AndroidLauncher extends PatchedAndroidApplication{
+public class AndroidLauncher extends AndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
     boolean doubleScaleTablets = true;
     FileChooser chooser;
@@ -49,6 +49,7 @@ public class AndroidLauncher extends PatchedAndroidApplication{
         super.onCreate(savedInstanceState);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.useImmersiveMode = true;
+        config.depth = 0;
         Platform.instance = new Platform(){
 
             @Override
@@ -161,23 +162,23 @@ public class AndroidLauncher extends PatchedAndroidApplication{
                 InputStream inStream;
                 if(myFile != null) inStream = new FileInputStream(myFile);
                 else inStream = getContentResolver().openInputStream(uri);
-                Gdx.app.postRunnable(() -> {
+                Core.app.post(() -> {
                     if(save){ //open save
                         System.out.println("Opening save.");
-                        FileHandle file = Gdx.files.local("temp-save." + saveExtension);
+                        FileHandle file = Core.files.local("temp-save." + saveExtension);
                         file.write(inStream, false);
                         if(SaveIO.isSaveValid(file)){
                             try{
                                 SaveSlot slot = control.saves.importSave(file);
                                 ui.load.runLoadSave(slot);
                             }catch(IOException e){
-                                ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
+                                ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, false)));
                             }
                         }else{
-                            ui.showError("$text.save.import.invalid");
+                            ui.showError("$save.import.invalid");
                         }
                     }else if(map){ //open map
-                        Gdx.app.postRunnable(() -> {
+                        Core.app.post(() -> {
                             System.out.println("Opening map.");
                             if(!ui.editor.isShown()){
                                 ui.editor.show();

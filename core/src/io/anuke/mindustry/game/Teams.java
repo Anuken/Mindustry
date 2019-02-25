@@ -1,14 +1,12 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.ThreadSet;
 
-/**
- * Class for various team-based utilities.
- */
+/**Class for various team-based utilities.*/
 public class Teams{
     private TeamData[] map = new TeamData[Team.all.length];
 
@@ -25,12 +23,7 @@ public class Teams{
     /**Returns team data by type.*/
     public TeamData get(Team team){
         if(map[team.ordinal()] == null){
-            //By default, a non-defined team will be enemies of everything.
-            Team[] others = new Team[Team.all.length-1];
-            for(int i = 0, j = 0; i < Team.all.length; i++){
-                if(Team.all[i] != team) others[j++] = Team.all[i];
-            }
-            add(team, others);
+            add(team, Array.with(Team.all).select(t -> t != team).toArray(Team.class));
         }
         return map[team.ordinal()];
     }
@@ -38,7 +31,7 @@ public class Teams{
     /**Returns whether a team is active, e.g. whether it has any cores remaining.*/
     public boolean isActive(Team team){
         //the enemy wave team is always active
-        return (!Vars.state.mode.disableWaves && team == Vars.waveTeam) || get(team).cores.size > 0;
+        return (Vars.state.rules.waves && team == Vars.waveTeam) || get(team).cores.size > 0;
     }
 
     /**Returns a set of all teams that are enemies of this team.*/
@@ -52,7 +45,7 @@ public class Teams{
     }
 
     public class TeamData{
-        public final ObjectSet<Tile> cores = new ThreadSet<>();
+        public final ObjectSet<Tile> cores = new ObjectSet<>();
         public final EnumSet<Team> enemies;
         public final Team team;
 

@@ -1,9 +1,9 @@
 package io.anuke.mindustry.io;
 
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.IntMap;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.files.FileHandle;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save16;
 
@@ -13,8 +13,9 @@ import java.util.zip.InflaterInputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
+//TODO load backup meta if possible
 public class SaveIO{
-    public static final IntArray breakingVersions = IntArray.with(47, 48, 49, 50, 51, 52, 53, 54, 55, 56);
+    public static final IntArray breakingVersions = IntArray.with(47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 63);
     public static final IntMap<SaveFileVersion> versions = new IntMap<>();
     public static final Array<SaveFileVersion> versionArray = Array.with(
         new Save16()
@@ -42,7 +43,7 @@ public class SaveIO{
         }
     }
 
-    public static void loadFromSlot(int slot){
+    public static void loadFromSlot(int slot) throws SaveException{
         load(fileFor(slot));
     }
 
@@ -65,9 +66,7 @@ public class SaveIO{
     public static boolean isSaveValid(DataInputStream stream){
 
         try{
-            int version = stream.readInt();
-            SaveFileVersion ver = versions.get(version);
-            ver.getData(stream);
+            getData(stream);
             return true;
         }catch(Exception e){
             e.printStackTrace();
@@ -118,40 +117,41 @@ public class SaveIO{
         }
     }
 
-    public static void load(FileHandle file){
+    public static void load(FileHandle file) throws SaveException{
         try{
+            //try and load; if any exception at all occurs
             load(new InflaterInputStream(file.read()));
-        }catch(RuntimeException e){
+        }catch(SaveException e){
             e.printStackTrace();
             FileHandle backup = file.sibling(file.name() + "-backup." + file.extension());
             if(backup.exists()){
                 load(new InflaterInputStream(backup.read()));
             }else{
-                throw new RuntimeException(e);
+                throw new SaveException(e.getCause());
             }
         }
     }
 
-    public static void load(InputStream is){
-        logic.reset();
-
-        DataInputStream stream;
-
-        try{
-            stream = new DataInputStream(is);
+    public static void load(InputStream is) throws SaveException{
+        try(DataInputStream stream = new DataInputStream(is)){
+            logic.reset();
             int version = stream.readInt();
             SaveFileVersion ver = versions.get(version);
 
             ver.read(stream);
-
-            stream.close();
         }catch(Exception e){
             content.setTemporaryMapper(null);
-            throw new RuntimeException(e);
+            throw new SaveException(e);
         }
     }
 
     public static SaveFileVersion getVersion(){
         return versionArray.peek();
+    }
+
+    public static class SaveException extends RuntimeException{
+        public SaveException(Throwable throwable){
+            super(throwable);
+        }
     }
 }

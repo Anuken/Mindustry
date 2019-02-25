@@ -14,6 +14,10 @@ public class StateMachine{
         if(next != null) next.entered();
     }
 
+    public UnitState current(){
+        return state;
+    }
+
     public boolean is(UnitState state){
         return this.state == state;
     }

@@ -1,27 +1,33 @@
 package io.anuke.mindustry.entities.effect;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntSet;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.mindustry.content.bullets.TurretBullets;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.impl.TimedEntity;
+import io.anuke.mindustry.entities.traits.DrawTrait;
+import io.anuke.mindustry.entities.traits.TimeTrait;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.RandomXS128;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Position;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.pooling.Pools;
+import io.anuke.mindustry.content.Bullets;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.impl.TimedEntity;
-import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.entities.trait.PosTrait;
-import io.anuke.ucore.entities.trait.TimeTrait;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.*;
+import io.anuke.mindustry.graphics.Pal;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -31,7 +37,7 @@ import static io.anuke.mindustry.Vars.bulletGroup;
 public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, TimeTrait{
     public static final float lifetime = 10f;
 
-    private static final SeedRandom random = new SeedRandom();
+    private static final RandomXS128 random = new RandomXS128();
     private static final Rectangle rect = new Rectangle();
     private static final Array<Unit> entities = new Array<>();
     private static final IntSet hit = new IntSet();
@@ -39,8 +45,8 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     private static final float hitRange = 30f;
     private static int lastSeed = 0;
 
-    private Array<PosTrait> lines = new Array<>();
-    private Color color = Palette.lancerLaser;
+    private Array<Position> lines = new Array<>();
+    private Color color = Pal.lancerLaser;
 
     /**For pooling use only. Do not call directly!*/
     public Lightning(){
@@ -55,7 +61,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     @Remote(called = Loc.server)
     public static void createLighting(int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
 
-        Lightning l = Pooling.obtain(Lightning.class, Lightning::new);
+        Lightning l = Pools.obtain(Lightning.class, Lightning::new);
         Float dmg = damage;
 
         l.x = x;
@@ -67,8 +73,8 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
         hit.clear();
 
         for (int i = 0; i < length/2; i++) {
-            Bullet.create(TurretBullets.damageLightning, l, team, x, y, 0f, 1f, 1f, dmg);
-            l.lines.add(new Translator(x + Mathf.range(3f), y + Mathf.range(3f)));
+            Bullet.create(Bullets.damageLightning, l, team, x, y, 0f, 1f, 1f, dmg);
+            l.lines.add(new Vector2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
             rect.setSize(hitRange).setCenter(x, y);
             entities.clear();
@@ -91,7 +97,6 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
                 x += Angles.trnsx(rotation, hitRange/2f);
                 y += Angles.trnsy(rotation, hitRange/2f);
             }
-
         }
     }
 
@@ -104,7 +109,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     public void write(DataOutput data){}
 
     @Override
-    public void read(DataInput data, long time){}
+    public void read(DataInput data){}
 
     @Override
     public float lifetime(){
@@ -114,42 +119,34 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     @Override
     public void reset(){
         super.reset();
-        color = Palette.lancerLaser;
+        color = Pal.lancerLaser;
         lines.clear();
     }
 
     @Override
     public void removed(){
         super.removed();
-        Pooling.free(this);
+        Pools.free(this);
     }
 
     @Override
     public void draw(){
-        float lx = x, ly = y;
+        Lines.stroke(3f * fout());
         Draw.color(color, Color.WHITE, fin());
-        for(int i = 0; i < lines.size; i++){
-            PosTrait v = lines.get(i);
+        Lines.beginLine();
 
-            float f = (float) i / lines.size;
-
-            Lines.stroke(fout() * 3f * (1.5f - f));
-
-            Lines.stroke(Lines.getStroke() * 4f);
-            Draw.alpha(0.3f);
-            Lines.line(lx, ly, v.getX(), v.getY());
-
-            Lines.stroke(Lines.getStroke()/4f);
-            Draw.alpha(1f);
-            Lines.line(lx, ly, v.getX(), v.getY());
-
-            Lines.stroke(3f * fout() * (1f - f));
-           // Lines.lineAngleCenter(lx, ly, Angles.angle(lx, ly, v.getX(), v.getY()) + 90f, 20f);
-
-            lx = v.getX();
-            ly = v.getY();
+        Lines.linePoint(x, y);
+        for(Position p : lines){
+            Lines.linePoint(p.getX(), p.getY());
         }
-        Draw.color();
+        Lines.endLine();
+
+        int i = 0;
+
+        for(Position p : lines){
+            Fill.square(p.getX(), p.getY(), (5f - (float)i++/lines.size*2f) * fout(), 45);
+        }
+        Draw.reset();
     }
 
     @Override

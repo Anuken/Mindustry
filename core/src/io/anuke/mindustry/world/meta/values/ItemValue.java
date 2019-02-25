@@ -5,7 +5,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.ItemDisplay;
 import io.anuke.mindustry.world.meta.ContentStatValue;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Table;
 
 public class ItemValue implements ContentStatValue{
     private final ItemStack item;

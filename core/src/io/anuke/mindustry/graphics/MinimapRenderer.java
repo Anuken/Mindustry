@@ -1,54 +1,53 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.graphics.Pixmap;
+import io.anuke.arc.graphics.Pixmap.Format;
+import io.anuke.arc.graphics.Pixmaps;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.ScissorStack;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.util.Disposable;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
-import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
-import io.anuke.mindustry.world.ColorMapper;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
+import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Pixmaps;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadArray;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 public class MinimapRenderer implements Disposable{
     private static final int baseSize = 16;
-    private final Array<Unit> units = new ThreadArray<>();
+    private final Array<Unit> units = new Array<>();
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;
-    private Rectangle rect = new Rectangle();
+    private Rectangle rect = new Rectangle(), scissor = new Rectangle();
     private int zoom = 4;
 
     public MinimapRenderer(){
-        Events.on(WorldLoadGraphicsEvent.class, event -> {
+        Events.on(WorldLoadEvent.class, event -> {
             reset();
             updateAll();
         });
 
         //make sure to call on the graphics thread
-        Events.on(TileChangeEvent.class, event -> Gdx.app.postRunnable(() -> update(event.tile)));
+        Events.on(TileChangeEvent.class, event -> Core.app.post(() -> update(event.tile)));
     }
 
     public Texture getTexture(){
         return texture;
     }
 
-    public void zoomBy(int amount){
+    public void zoomBy(float amount){
         zoom += amount;
         zoom = Mathf.clamp(zoom, 1, Math.min(world.width(), world.height()) / baseSize / 2);
     }
@@ -68,24 +67,29 @@ public class MinimapRenderer implements Disposable{
     }
 
     public void drawEntities(float x, float y, float w, float h){
+        updateUnitArray();
+
         int sz = baseSize * zoom;
         float dx = (Core.camera.position.x / tilesize);
         float dy = (Core.camera.position.y / tilesize);
         dx = Mathf.clamp(dx, sz, world.width() - sz);
         dy = Mathf.clamp(dy, sz, world.height() - sz);
 
+        if(!ScissorStack.pushScissors(scissor.set(x, y, w, h))){
+            return;
+        }
+
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
-        Graphics.beginClip(x, y, w, h);
 
         for(Unit unit : units){
             float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
             Draw.color(unit.getTeam().color);
-            Draw.crect(Draw.getBlankRegion(), x + rx, y + ry, w / (sz * 2), h / (sz * 2));
+            Fill.crect(x + rx, y + ry, w / (sz * 2), h / (sz * 2));
         }
 
         Draw.color();
 
-        Graphics.endClip();
+        ScissorStack.popScissors();
     }
 
     public TextureRegion getRegion(){
@@ -99,7 +103,7 @@ public class MinimapRenderer implements Disposable{
         float invTexWidth = 1f / texture.getWidth();
         float invTexHeight = 1f / texture.getHeight();
         float x = dx - sz, y = world.height() - dy - sz, width = sz * 2, height = sz * 2;
-        region.setRegion(x * invTexWidth, y * invTexHeight, (x + width) * invTexWidth, (y + height) * invTexHeight);
+        region.set(x * invTexWidth, y * invTexHeight, (x + width) * invTexWidth, (y + height) * invTexHeight);
         return region;
     }
 
@@ -133,7 +137,7 @@ public class MinimapRenderer implements Disposable{
 
     private int colorFor(Tile tile){
         tile = tile.target();
-        return ColorMapper.colorFor(tile.floor(), tile.block(), tile.getTeam(), tile.getElevation(), tile.getCliffs());
+        return MapIO.colorFor(tile.floor(), tile.block(), tile.getTeam());
     }
 
     @Override

@@ -1,18 +1,18 @@
 package io.anuke.mindustry.world.consumers;
 
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.function.Consumer;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.util.ThreadArray;
 
 public class Consumers{
     private ObjectMap<Class<? extends Consume>, Consume> map = new ObjectMap<>();
     private ObjectSet<Class<? extends Consume>> required = new ObjectSet<>();
-    private ThreadArray<Consume> results = new ThreadArray<>();
+    private Array<Consume> results = new Array<>();
 
     public void require(Class<? extends Consume> type){
         required.add(type);
@@ -30,14 +30,39 @@ public class Consumers{
         }
     }
 
-    public ConsumePower power(float amount){
-        ConsumePower p = new ConsumePower(amount);
-        add(p);
-        return p;
-    }
-
     public ConsumeLiquid liquid(Liquid liquid, float amount){
         ConsumeLiquid c = new ConsumeLiquid(liquid, amount);
+        add(c);
+        return c;
+    }
+
+    /**
+     * Creates a consumer which directly uses power without buffering it. The module will work while the available power is greater than or equal to the minimumSatisfaction percentage (0..1).
+     * @param powerPerTick The amount of power which is required each tick for 100% efficiency.
+     * @return the created consumer object.
+     */
+    public ConsumePower power(float powerPerTick){
+        ConsumePower c = new ConsumePower(powerPerTick, 0.0f, false);
+        add(c);
+        return c;
+    }
+
+    /**
+     * Creates a consumer which stores power and uses it only in case of certain events (e.g. a turret firing).
+     * It will take 180 ticks (three second) to fill the buffer, given enough power supplied.
+     * @param powerCapacity The maximum capacity in power units.
+     */
+    public ConsumePower powerBuffered(float powerCapacity){
+        return powerBuffered(powerCapacity, 60f * 3);
+    }
+
+    /**
+     * Creates a consumer which stores power and uses it only in case of certain events (e.g. a turret firing).
+     * @param powerCapacity The maximum capacity in power units.
+     * @param ticksToFill   The number of ticks it shall take to fill the buffer.
+     */
+    public ConsumePower powerBuffered(float powerCapacity, float ticksToFill){
+        ConsumePower c = new ConsumePower(powerCapacity / ticksToFill, powerCapacity, true);
         add(c);
         return c;
     }
@@ -75,7 +100,7 @@ public class Consumers{
     }
 
     public Consume add(Consume consume){
-        map.put(consume.getClass(), consume);
+        map.put((consume instanceof ConsumePower ? ConsumePower.class : consume.getClass()), consume);
         return consume;
     }
 
@@ -87,6 +112,7 @@ public class Consumers{
         return map.containsKey(type);
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Consume> T get(Class<T> type){
         if(!map.containsKey(type)){
             throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "'!");
@@ -98,7 +124,7 @@ public class Consumers{
         return map.values();
     }
 
-    public ThreadArray<Consume> array(){
+    public Array<Consume> array(){
         return results;
     }
 

@@ -6,17 +6,21 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 /**
- * Used for multiblocks. Each block that is not the center of the multiblock is a blockpart.
+ * Used for multiblocks. Each block that is not the center of the multiblock is a part.
  * Think of these as delegates to the actual block; all events are passed to the target block.
  * They are made to share all properties from the linked tile/block.
  */
 public class BlockPart extends Block{
 
     public BlockPart(){
-        super("blockpart");
+        super("part");
         solid = false;
         hasPower = hasItems = hasLiquids = true;
-        viewRange = -1;
+    }
+
+    @Override
+    public boolean isHidden(){
+        return true;
     }
 
     @Override
@@ -57,22 +61,6 @@ public class BlockPart extends Block{
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         Block block = linked(tile);
         block.handleLiquid(tile.getLinked(), source, liquid, amount);
-    }
-
-    @Override
-    public float addPower(Tile tile, float amount){
-        Block block = linked(tile);
-        if(block.hasPower){
-            return block.addPower(tile.getLinked(), amount);
-        }else{
-            return amount;
-        }
-    }
-
-    @Override
-    public boolean acceptPower(Tile tile, Tile from, float amount){
-        Block block = linked(tile);
-        return block.hasPower && block.acceptPower(tile.getLinked(), from, amount);
     }
 
     private Block linked(Tile tile){

@@ -1,16 +1,14 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.utils.Scaling;
+import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.scene.ui.ButtonGroup;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.ScrollPane.ScrollPaneStyle;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.scene.ui.ButtonGroup;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -18,12 +16,12 @@ public class MapLoadDialog extends FloatingDialog{
     private Map selected = null;
 
     public MapLoadDialog(Consumer<Map> loader){
-        super("$text.editor.loadmap");
+        super("$editor.loadmap");
 
         shown(this::rebuild);
         rebuild();
 
-        TextButton button = new TextButton("$text.load");
+        TextButton button = new TextButton("$load");
         button.setDisabled(() -> selected == null);
         button.clicked(() -> {
             if(selected != null){
@@ -32,13 +30,13 @@ public class MapLoadDialog extends FloatingDialog{
             }
         });
 
-        buttons().defaults().size(200f, 50f);
-        buttons().addButton("$text.cancel", this::hide);
-        buttons().add(button);
+        buttons.defaults().size(200f, 50f);
+        buttons.addButton("$cancel", this::hide);
+        buttons.add(button);
     }
 
     public void rebuild(){
-        content().clear();
+        cont.clear();
         if(world.maps.all().size > 0){
             selected = world.maps.all().first();
         }
@@ -69,14 +67,13 @@ public class MapLoadDialog extends FloatingDialog{
         }
 
         if(world.maps.all().size == 0){
-            pane.setStyle(Core.skin.get("clear", ScrollPaneStyle.class));
-            table.add("$text.maps.none").center();
+            table.add("$maps.none").center();
         }else{
-            content().add("$text.editor.loadmap");
+            cont.add("$editor.loadmap");
         }
 
-        content().row();
-        content().add(pane);
+        cont.row();
+        cont.add(pane);
     }
 
 }

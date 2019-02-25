@@ -1,8 +1,8 @@
 package io.anuke.mindustry.entities.traits;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectIntMap;
-import io.anuke.ucore.function.Supplier;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectIntMap;
+import io.anuke.arc.function.Supplier;
 
 public interface TypeTrait{
     int[] lastRegisteredID = {0};

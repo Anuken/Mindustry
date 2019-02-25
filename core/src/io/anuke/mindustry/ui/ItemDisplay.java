@@ -2,7 +2,7 @@ package io.anuke.mindustry.ui;
 
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Table;
 
 /**An item image with text.*/
 public class ItemDisplay extends Table{

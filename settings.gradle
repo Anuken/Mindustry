@@ -1,4 +1,9 @@
-include 'desktop', 'core', 'kryonet', 'server', 'ios', 'annotations', 'tools', 'tests'
+include 'desktop', 'core', 'net', 'server', 'ios', 'annotations', 'tools', 'tests'
+
+def use = { String name, String path ->
+    include(name)
+    project(name).projectDir = new File(settingsDir, path)
+}
 
 Properties properties = new Properties()
 
@@ -15,18 +20,20 @@ if(new File(settingsDir, 'local.properties').exists()){
 }
 
 if(System.properties["release"] == null || System.properties["release"] == "false"){
-    if (new File(settingsDir, '../uCore').exists()) {
-        include ':uCore'
-        project(':uCore').projectDir = new File(settingsDir, '../uCore')
-    }
-
-    if (new File(settingsDir, '../GDXGifRecorder').exists()) {
-        include ':GDXGifRecorder'
-        project(':GDXGifRecorder').projectDir = new File(settingsDir, '../GDXGifRecorder')
+    if (new File(settingsDir, '../Arc').exists()) {
+        use(':Arc', '../Arc')
+        use(':Arc:arc-core', '../Arc/arc-core')
+        use(':Arc:extensions', '../Arc/extensions')
+        use(':Arc:extensions:freetype', '../Arc/extensions/freetype')
+        use(':Arc:extensions:recorder', '../Arc/extensions/recorder')
+        use(':Arc:backends', '../Arc/backends')
+        use(':Arc:backends:backend-lwjgl3', '../Arc/backends/backend-lwjgl3')
+        use(':Arc:backends:backend-android', '../Arc/backends/backend-android')
+        use(':Arc:backends:backend-robovm', '../Arc/backends/backend-robovm')
+        use(':Arc:backends:backend-headless', '../Arc/backends/backend-headless')
     }
     if (new File(settingsDir, '../debug').exists()) {
-        include ':debug'
-        project(':debug').projectDir = new File(settingsDir, '../debug')
+        use(':debug', '../debug')
     }
 }else{
     println("Not including local repositories.")

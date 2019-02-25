@@ -1,16 +1,17 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.math.Mathf;
 
 /**
  * Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.
@@ -30,7 +31,7 @@ public class SolidPump extends Pump{
     public void load(){
         super.load();
 
-        liquidRegion = Draw.region(name + "-liquid");
+        liquidRegion = Core.atlas.find(name + "-liquid");
     }
 
     @Override
@@ -55,8 +56,8 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-rotator"), Draw.region(name + "-top")};
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
     }
 
     @Override
@@ -76,7 +77,7 @@ public class SolidPump extends Pump{
         }
 
         if(tile.entity.cons.valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
-            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction);
+            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction * entity.power.satisfaction);
             tile.entity.liquids.add(result, maxPump);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
             if(Mathf.chance(entity.delta() * updateEffectChance))

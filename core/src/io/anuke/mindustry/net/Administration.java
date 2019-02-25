@@ -1,10 +1,10 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
 import io.anuke.annotations.Annotations.Serialize;
-import io.anuke.ucore.core.Settings;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.ObjectSet;
 
 import static io.anuke.mindustry.Vars.headless;
 
@@ -15,7 +15,7 @@ public class Administration{
     private Array<String> bannedIPs = new Array<>();
 
     public Administration(){
-        Settings.defaultList(
+        Core.settings.defaults(
             "strict", true
         );
 
@@ -23,21 +23,21 @@ public class Administration{
     }
 
     public void setStrict(boolean on){
-        Settings.putBool("strict", on);
-        Settings.save();
+        Core.settings.put("strict", on);
+        Core.settings.save();
     }
 
     public boolean getStrict(){
-        return Settings.getBool("strict");
+        return Core.settings.getBool("strict");
     }
 
     public boolean allowsCustomClients(){
-        return Settings.getBool("allow-custom", !headless);
+        return Core.settings.getBool("allow-custom", !headless);
     }
 
     public void setCustomClients(boolean allowed){
-        Settings.putBool("allow-custom", allowed);
-        Settings.save();
+        Core.settings.put("allow-custom", allowed);
+        Core.settings.save();
     }
 
     /**Call when a player joins to update their information here.*/
@@ -196,9 +196,9 @@ public class Administration{
         return getCreateInfo(uuid).banned;
     }
 
-    public boolean isAdmin(String id, String usip){
+    public boolean isAdmin(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
-        return info.admin && usip.equals(info.adminUsid);
+        return info.admin && usid.equals(info.adminUsid);
     }
 
     /**Finds player info by IP, UUID and name.*/
@@ -256,14 +256,15 @@ public class Administration{
     }
 
     public void save(){
-        Settings.putObject("player-info", playerInfo);
-        Settings.putObject("banned-ips", bannedIPs);
-        Settings.save();
+        Core.settings.putObject("player-info", playerInfo);
+        Core.settings.putObject("banned-ips", bannedIPs);
+        Core.settings.save();
     }
 
+    @SuppressWarnings("unchecked")
     private void load(){
-        playerInfo = Settings.getObject("player-info", ObjectMap.class, ObjectMap::new);
-        bannedIPs = Settings.getObject("banned-ips", Array.class, Array::new);
+        playerInfo = Core.settings.getObject("player-info", ObjectMap.class, ObjectMap::new);
+        bannedIPs = Core.settings.getObject("banned-ips", Array.class, Array::new);
     }
 
     @Serialize

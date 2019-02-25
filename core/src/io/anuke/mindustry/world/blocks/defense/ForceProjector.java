@@ -1,29 +1,28 @@
 package io.anuke.mindustry.world.blocks.defense;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.content.fx.BulletFx;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.arc.Core;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.impl.BaseEntity;
+import io.anuke.mindustry.entities.traits.DrawTrait;
+import io.anuke.arc.graphics.Blending;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.traits.AbsorbTrait;
-import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.world.BarType;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.mindustry.world.meta.BlockBar;
+import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.EntityQuery;
-import io.anuke.ucore.entities.impl.BaseEntity;
-import io.anuke.ucore.entities.trait.DrawTrait;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -41,8 +40,11 @@ public class ForceProjector extends Block {
     protected float cooldownNormal = 1.75f;
     protected float cooldownLiquid = 1.5f;
     protected float cooldownBrokenBase = 0.35f;
+    protected float basePowerDraw = 0.2f;
     protected float powerDamage = 0.1f;
+    protected final ConsumeForceProjectorPower consumePower;
     protected TextureRegion topRegion;
+
 
     public ForceProjector(String name) {
         super(name);
@@ -51,30 +53,24 @@ public class ForceProjector extends Block {
         hasPower = true;
         canOverdrive = false;
         hasLiquids = true;
-        powerCapacity = 60f;
         hasItems = true;
-        itemCapacity = 10;
-        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).optional(true).update(false);
+        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).optional(true).boost(true).update(false);
+        consumePower = new ConsumeForceProjectorPower(60f, 60f);
+        consumes.add(consumePower);
     }
 
     @Override
     public void load(){
         super.load();
-        topRegion = Draw.region(name + "-top");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
+        stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
         stats.add(BlockStat.powerDamage, powerDamage, StatUnit.powerUnits);
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-
-        bars.add(new BlockBar(BarType.heat, true, tile -> tile.<ForceEntity>entity().buildup / breakage));
     }
 
     @Override
@@ -95,19 +91,31 @@ public class ForceProjector extends Block {
 
         entity.radscl = Mathf.lerpDelta(entity.radscl, entity.broken ? 0f : 1f, 0.05f);
 
-        if(Mathf.chance(Timers.delta() * entity.buildup / breakage * 0.1f)){
-            Effects.effect(BlockFx.reactorsmoke, tile.drawx() + Mathf.range(tilesize/2f), tile.drawy() + Mathf.range(tilesize/2f));
+        if(Mathf.chance(Time.delta() * entity.buildup / breakage * 0.1f)){
+            Effects.effect(Fx.reactorsmoke, tile.drawx() + Mathf.range(tilesize/2f), tile.drawy() + Mathf.range(tilesize/2f));
         }
 
-        if(!entity.cons.valid() && !cheat){
+        // Use Cases:
+        // - There is enough power in the buffer, and there are no shots fired => Draw base power and keep shield up
+        // - There is enough power in the buffer, but not enough power to cope for shots being fired => Draw all power and break shield
+        // - There is enough power in the buffer and enough power to cope for shots being fired => Draw base power + additional power based on shots absorbed
+        // - There is not enough base power in the buffer => Draw all power and break shield
+        // - The generator is in the AI base and uses cheat mode => Only draw power from shots being absorbed
+
+        float relativePowerDraw = 0.0f;
+        if(!cheat){
+            relativePowerDraw = basePowerDraw / consumePower.powerCapacity;
+        }
+
+        if(entity.power.satisfaction < relativePowerDraw){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.15f);
+            entity.power.satisfaction = .0f;
             if(entity.warmup <= 0.09f){
                 entity.broken = true;
             }
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.1f);
-            float powerUse = Math.min(powerDamage * entity.delta() * (1f + entity.buildup / breakage), powerCapacity);
-            entity.power.amount -= powerUse;
+            entity.power.satisfaction -= Math.min(entity.power.satisfaction, relativePowerDraw);
         }
 
         if(entity.buildup > 0){
@@ -117,7 +125,7 @@ public class ForceProjector extends Block {
                 scale *= (cooldownLiquid * (1f+(entity.liquids.current().heatCapacity-0.4f)*0.9f));
             }
 
-            entity.buildup -= Timers.delta()*scale;
+            entity.buildup -= Time.delta()*scale;
         }
 
         if(entity.broken && entity.buildup <= 0 && entity.warmup >= 0.9f){
@@ -127,11 +135,11 @@ public class ForceProjector extends Block {
         if(entity.buildup >= breakage && !entity.broken){
             entity.broken = true;
             entity.buildup = breakage;
-            Effects.effect(BlockFx.shieldBreak, tile.drawx(), tile.drawy(), radius);
+            Effects.effect(Fx.shieldBreak, tile.drawx(), tile.drawy(), radius);
         }
 
         if(entity.hit > 0f){
-            entity.hit -= 1f/5f * Timers.delta();
+            entity.hit -= 1f/5f * Time.delta();
         }
 
         float realRadius = realRadius(entity);
@@ -141,13 +149,13 @@ public class ForceProjector extends Block {
                 AbsorbTrait trait = (AbsorbTrait)bullet;
                 if(trait.canBeAbsorbed() && trait.getTeam() != tile.getTeam() && isInsideHexagon(trait.getX(), trait.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
                     trait.absorb();
-                    Effects.effect(BulletFx.absorb, trait);
-                    float hit = trait.getShieldDamage()*powerDamage;
+                    Effects.effect(Fx.absorb, trait);
+                    float relativeDamagePowerDraw = trait.getShieldDamage() * powerDamage / consumePower.powerCapacity;
                     entity.hit = 1f;
-                    entity.power.amount -= Math.min(hit, entity.power.amount);
 
-                    if(entity.power.amount <= 0.0001f){
-                        entity.buildup += trait.getShieldDamage() * entity.warmup*2f;
+                    entity.power.satisfaction -= Math.min(relativeDamagePowerDraw, entity.power.satisfaction);
+                    if(entity.power.satisfaction <= 0.0001f){
+                       entity.buildup += trait.getShieldDamage() * entity.warmup * 2f;
                     }
                     entity.buildup += trait.getShieldDamage() * entity.warmup;
                 }
@@ -174,11 +182,9 @@ public class ForceProjector extends Block {
 
         if(entity.buildup <= 0f) return;
         Draw.alpha(entity.buildup / breakage * 0.75f);
-
-        Graphics.setAdditiveBlending();
+        Draw.blend(Blending.additive);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
-        Graphics.setNormalBlending();
-
+        Draw.blend();
         Draw.reset();
     }
 
@@ -237,7 +243,7 @@ public class ForceProjector extends Block {
 
         @Override
         public void draw(){
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
             Fill.poly(x, y, 6, realRadius(entity));
             Draw.color();
         }
@@ -254,6 +260,16 @@ public class ForceProjector extends Block {
         @Override
         public EntityGroup targetGroup(){
             return shieldGroup;
+        }
+    }
+
+    public class ConsumeForceProjectorPower extends ConsumePower{
+        public ConsumeForceProjectorPower(float powerCapacity, float ticksToFill){
+            super(powerCapacity / ticksToFill, powerCapacity, true);
+        }
+        @Override
+        public boolean valid(Block block, TileEntity entity){
+            return entity.power.satisfaction >= basePowerDraw / powerCapacity && super.valid(block, entity);
         }
     }
 }

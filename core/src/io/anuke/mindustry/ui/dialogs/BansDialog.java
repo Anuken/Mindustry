@@ -1,15 +1,15 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.net.Administration.PlayerInfo;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class BansDialog extends FloatingDialog{
 
     public BansDialog(){
-        super("$text.server.bans");
+        super("$server.bans");
 
         addCloseButton();
 
@@ -19,17 +19,17 @@ public class BansDialog extends FloatingDialog{
     }
 
     private void setup(){
-        content().clear();
+        cont.clear();
 
         float w = 400f, h = 80f;
 
         Table table = new Table();
 
-        ScrollPane pane = new ScrollPane(table, "clear");
+        ScrollPane pane = new ScrollPane(table);
         pane.setFadeScrollBars(false);
 
         if(netServer.admins.getBanned().size == 0){
-            table.add("$text.server.bans.none");
+            table.add("$server.bans.none");
         }
 
         for(PlayerInfo info : netServer.admins.getBanned()){
@@ -39,7 +39,7 @@ public class BansDialog extends FloatingDialog{
             res.labelWrap("IP: [LIGHT_GRAY]" + info.lastIP + "\n[]Name: [LIGHT_GRAY]" + info.lastName).width(w - h - 24f);
             res.add().growX();
             res.addImageButton("icon-cancel", 14 * 3, () -> {
-                ui.showConfirm("$text.confirm", "$text.confirmunban", () -> {
+                ui.showConfirm("$confirm", "$confirmunban", () -> {
                     netServer.admins.unbanPlayerID(info.id);
                     setup();
                 });
@@ -49,6 +49,6 @@ public class BansDialog extends FloatingDialog{
             table.row();
         }
 
-        content().add(pane);
+        cont.add(pane);
     }
 }

@@ -1,18 +1,12 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Base64Coder;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.function.Consumer;
-import io.anuke.ucore.scene.ui.Dialog;
-import io.anuke.ucore.scene.ui.TextField;
-import io.anuke.ucore.util.Log;
-
-import java.util.Random;
+import io.anuke.arc.Core;
+import io.anuke.arc.Input.TextInput;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.math.RandomXS128;
+import io.anuke.arc.scene.ui.TextField;
+import io.anuke.arc.util.serialization.Base64Coder;
 
 import static io.anuke.mindustry.Vars.mobile;
 
@@ -29,34 +23,20 @@ public abstract class Platform {
         if(!mobile) return; //this is mobile only, desktop doesn't need dialogs
 
         field.tapped(() -> {
-            Log.info("yappd");
-            Dialog dialog = new Dialog("", "dialog");
-            dialog.setFillParent(true);
-            dialog.content().top();
-            dialog.content().defaults().height(65f);
-            TextField to = dialog.content().addField(field.getText(), t-> {}).pad(15).width(250f).get();
-            to.setMaxLength(maxLength);
-            to.keyDown(Keys.ENTER, () -> dialog.content().find("okb").fireClick());
-            dialog.content().addButton("$text.ok", () -> {
+            TextInput input = new TextInput();
+            input.text = field.getText();
+            input.maxLength = maxLength;
+            input.accepted = text -> {
                 field.clearText();
-                field.appendText(to.getText());
+                field.appendText(text);
                 field.change();
-                dialog.hide();
-                Gdx.input.setOnscreenKeyboardVisible(false);
-            }).width(90f).name("okb");
-
-            dialog.show();
-            Timers.runTask(1f, () -> {
-                to.setCursorPosition(to.getText().length());
-                Core.scene.setKeyboardFocus(to);
-                Gdx.input.setOnscreenKeyboardVisible(true);
-            });
+                Core.input.setOnscreenKeyboardVisible(false);
+            };
+            Core.input.getTextInput(input);
         });
     }
     /**Update discord RPC.*/
     public void updateRPC(){}
-    /**Called when the game is exited.*/
-    public void onGameExit(){}
     /**Open donation dialog. Currently android only.*/
     public void openDonations(){}
     /**Whether donating is supported.*/
@@ -65,13 +45,13 @@ public abstract class Platform {
     }
     /**Must be a base64 string 8 bytes in length.*/
     public String getUUID(){
-        String uuid = Settings.getString("uuid", "");
+        String uuid = Core.settings.getString("uuid", "");
         if(uuid.isEmpty()){
             byte[] result = new byte[8];
-            new Random().nextBytes(result);
+            new RandomXS128().nextBytes(result);
             uuid = new String(Base64Coder.encode(result));
-            Settings.putString("uuid", uuid);
-            Settings.save();
+            Core.settings.put("uuid", uuid);
+            Core.settings.save();
             return uuid;
         }
         return uuid;

@@ -1,36 +1,37 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import com.badlogic.gdx.math.Vector2;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.graphics.Shapes;
+import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Angles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Translator;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class PowerNode extends PowerBlock{
-    public static final float thicknessScl = 0.7f;
-    public static final float flashScl = 0.12f;
-
     //last distribution block placed
     private static int lastPlaced = -1;
 
-    protected Translator t1 = new Translator();
-    protected Translator t2 = new Translator();
+    protected Vector2 t1 = new Vector2();
+    protected Vector2 t2 = new Vector2();
 
     protected float laserRange = 6;
     protected int maxNodes = 3;
@@ -39,7 +40,6 @@ public class PowerNode extends PowerBlock{
         super(name);
         expanded = true;
         layer = Layer.power;
-        powerCapacity = 5f;
         configurable = true;
         consumesPower = false;
         outputsPower = false;
@@ -47,18 +47,19 @@ public class PowerNode extends PowerBlock{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void linkPowerNodes(Player player, Tile tile, Tile other){
-        if(tile.entity.power == null || !((PowerNode)tile.block()).linkValid(tile, other)) return;
+        if(tile.entity.power == null || !((PowerNode)tile.block()).linkValid(tile, other)
+            || tile.entity.power.links.size >= ((PowerNode)tile.block()).maxNodes) return;
 
         TileEntity entity = tile.entity();
 
-        if(!entity.power.links.contains(other.packedPosition())){
-            entity.power.links.add(other.packedPosition());
+        if(!entity.power.links.contains(other.pos())){
+            entity.power.links.add(other.pos());
         }
 
         if(other.getTeamID() == tile.getTeamID()){
 
-            if(!other.entity.power.links.contains(tile.packedPosition())){
-                other.entity.power.links.add(tile.packedPosition());
+            if(!other.entity.power.links.contains(tile.pos())){
+                other.entity.power.links.add(tile.pos());
             }
         }
 
@@ -67,7 +68,7 @@ public class PowerNode extends PowerBlock{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unlinkPowerNodes(Player player, Tile tile, Tile other){
-        if(tile.entity.power == null) return;
+        if(tile.entity.power == null || other.entity == null || other.entity.power == null) return;
 
         TileEntity entity = tile.entity();
 
@@ -75,8 +76,8 @@ public class PowerNode extends PowerBlock{
         PowerGraph tg = entity.power.graph;
         tg.clear();
 
-        entity.power.links.removeValue(other.packedPosition());
-        other.entity.power.links.removeValue(tile.packedPosition());
+        entity.power.links.removeValue(other.pos());
+        other.entity.power.links.removeValue(tile.pos());
 
         //reflow from this point, covering all tiles on this side
         tg.reflow(tile);
@@ -91,6 +92,12 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void setBars(){
+        super.setBars();
+        bars.add("power", entity -> new Bar(() ->
+            Core.bundle.format("blocks.powerbalance",
+            entity.power.graph == null ? "+0" : ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.toFixed(entity.power.graph.getPowerBalance()*60, 1))),
+            () -> Pal.powerBar,
+            () -> entity.power.graph == null ? 0 : Mathf.clamp(entity.power.graph.getPowerProduced() / entity.power.graph.getPowerNeeded())));
     }
 
     @Override
@@ -99,14 +106,14 @@ public class PowerNode extends PowerBlock{
         if(linkValid(tile, before) && before.block() instanceof PowerNode){
             for(Tile near : before.entity.proximity()){
                 if(near.target() == tile){
-                    lastPlaced = tile.packedPosition();
+                    lastPlaced = tile.pos();
                     return;
                 }
             }
             Call.linkPowerNodes(null, tile, before);
         }
 
-        lastPlaced = tile.packedPosition();
+        lastPlaced = tile.pos();
     }
 
     @Override
@@ -130,9 +137,9 @@ public class PowerNode extends PowerBlock{
 
         if(linkValid(tile, other)){
             if(linked(tile, other)){
-                threads.run(() -> Call.unlinkPowerNodes(null, tile, result));
+                Call.unlinkPowerNodes(null, tile, result);
             }else if(entity.power.links.size < maxNodes){
-                threads.run(() -> Call.linkPowerNodes(null, tile, result));
+                Call.linkPowerNodes(null, tile, result);
             }
             return false;
         }
@@ -145,7 +152,7 @@ public class PowerNode extends PowerBlock{
 
         Lines.stroke(1f);
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Lines.poly(tile.drawx(), tile.drawy(), 50, laserRange*tilesize);
         Draw.reset();
     }
@@ -154,11 +161,11 @@ public class PowerNode extends PowerBlock{
     public void drawConfigure(Tile tile){
         TileEntity entity = tile.entity();
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
 
-        Lines.stroke(1f);
+        Lines.stroke(1.5f);
         Lines.circle(tile.drawx(), tile.drawy(),
-                tile.block().size * tilesize / 2f + 1f + Mathf.absin(Timers.time(), 4f, 1f));
+                tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time(), 4f, 1f));
 
         Lines.poly(tile.drawx(), tile.drawy(), 50, laserRange*tilesize);
 
@@ -169,14 +176,15 @@ public class PowerNode extends PowerBlock{
 
                 if(link != tile && linkValid(tile, link, false)){
                     boolean linked = linked(tile, link);
-                    Draw.color(linked ? Palette.place : Palette.breakInvalid);
+                    Draw.color(linked ? Pal.place : Pal.breakInvalid);
 
                     Lines.circle(link.drawx(), link.drawy(),
-                            link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Timers.time(), 4f, 1f)));
+                            link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
 
                     if((entity.power.links.size >= maxNodes || (link.block() instanceof PowerNode && link.entity.power.links.size >= ((PowerNode) link.block()).maxNodes)) && !linked){
+                        Draw.color(Pal.breakInvalid);
+                        Lines.lineAngleCenter(link.drawx(), link.drawy(), 45, link.block().size * Mathf.sqrt2 * tilesize * 0.9f);
                         Draw.color();
-                        Draw.rect("cross-" + link.block().size, link.drawx(), link.drawy());
                     }
                 }
             }
@@ -188,21 +196,20 @@ public class PowerNode extends PowerBlock{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Lines.stroke(1f);
-        Draw.color(Palette.placing);
+        Draw.color(Pal.placing);
         Lines.poly(x * tilesize + offset(), y * tilesize + offset(), 50, laserRange*tilesize);
         Draw.reset();
     }
 
     @Override
     public void drawLayer(Tile tile){
-        if(!Settings.getBool("lasers")) return;
+        if(!Core.settings.getBool("lasers")) return;
 
         TileEntity entity = tile.entity();
 
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));
-            if(linkValid(tile, link) && (!(link.block() instanceof PowerNode)
-                || ((tile.block().size > link.block().size) || (tile.block().size == link.block().size && tile.id() < link.id())))){
+            if(linkValid(tile, link)){
                 drawLaser(tile, link);
             }
         }
@@ -211,7 +218,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected boolean linked(Tile tile, Tile other){
-        return tile.entity.power.links.contains(other.packedPosition());
+        return tile.entity.power.links.contains(other.pos());
     }
 
     protected boolean linkValid(Tile tile, Tile link){
@@ -224,48 +231,37 @@ public class PowerNode extends PowerBlock{
         if(link.block() instanceof PowerNode){
             TileEntity oe = link.entity();
 
-            return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
+            return Mathf.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
                     ((PowerNode) link.block()).laserRange * tilesize)
                     + (link.block().size - 1) * tilesize / 2f + (tile.block().size - 1) * tilesize / 2f &&
-                    (!checkMaxNodes || (oe.power.links.size < ((PowerNode) link.block()).maxNodes || oe.power.links.contains(tile.packedPosition())));
+                    (!checkMaxNodes || (oe.power.links.size < ((PowerNode) link.block()).maxNodes || oe.power.links.contains(tile.pos())));
         }else{
-            return Vector2.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
+            return Mathf.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
                     <= laserRange * tilesize + (link.block().size - 1) * tilesize;
         }
     }
 
     protected void drawLaser(Tile tile, Tile target){
+
         float x1 = tile.drawx(), y1 = tile.drawy(),
                 x2 = target.drawx(), y2 = target.drawy();
 
         float angle1 = Angles.angle(x1, y1, x2, y2);
         float angle2 = angle1 + 180f;
 
-        t1.trns(angle1, tile.block().size * tilesize / 2f - 1f);
-        t2.trns(angle2, target.block().size * tilesize / 2f - 1f);
+        t1.trns(angle1, tile.block().size * tilesize / 2f - 1.5f);
+        t2.trns(angle2, target.block().size * tilesize / 2f - 1.5f);
 
         x1 += t1.x;
         y1 += t1.y;
         x2 += t2.x;
         y2 += t2.y;
 
-        float space = Vector2.dst(x1, y1, x2, y2);
-        float scl = 4f, mag = 2f, tscl = 4f, segscl = 3f;
+        Draw.color(Pal.powerLight, Color.WHITE, Mathf.absin(Time.time(), 8f, 0.3f) + 0.2f);
+        //Lines.stroke(2f);
+        //Lines.line(x1, y1, x2, y2);
 
-        int segments = Mathf.ceil(space / segscl);
-
-        Draw.color(Palette.power, Palette.powerLight, Mathf.absin(Timers.time(), 5f, 1f));
-        Lines.stroke(1f);
-
-        for(int i = 0; i < segments; i++){
-            float f1 = (float)i / segments;
-            float f2 = (float)(i+1) / segments;
-            t1.trns(angle1 + 90f, Mathf.lerp(Mathf.sin(tile.entity.id * 124f + Timers.time()/tscl + f1 * space, scl, mag), 0f, Math.abs(f1 - 0.5f)*2f));
-            t2.trns(angle1 + 90f, Mathf.lerp(Mathf.sin(tile.entity.id * 124f + Timers.time()/tscl + f2 * space, scl, mag), 0f, Math.abs(f2 - 0.5f)*2f));
-
-            Lines.line(x1 + (x2 - x1) * f1 + t1.x, y1 + (y2 - y1) * f1 + t1.y,
-                        x1 + (x2 - x1) * f2 + t2.x, y1 + (y2 - y1) * f2 + t2.y);
-        }
+        Shapes.laser("laser", "laser-end", x1, y1, x2, y2, 0.6f);
     }
 
 }

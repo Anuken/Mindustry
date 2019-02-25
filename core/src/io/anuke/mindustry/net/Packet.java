@@ -1,6 +1,6 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.Pool.Poolable;
+import io.anuke.arc.util.pooling.Pool.Poolable;
 
 import java.nio.ByteBuffer;
 

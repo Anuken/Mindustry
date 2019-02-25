@@ -1,8 +1,8 @@
 package io.anuke.mindustry.maps;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.ObjectMap;
-import io.anuke.ucore.function.Supplier;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.function.Supplier;
 
 import java.io.InputStream;
 
@@ -31,5 +31,14 @@ public class Map{
 
     public String getDisplayName(){
         return meta.tags.get("name", name);
+    }
+
+    @Override
+    public String toString(){
+        return "Map{" +
+                "name='" + name + '\'' +
+                ", custom=" + custom +
+                ", meta=" + meta +
+                '}';
     }
 }

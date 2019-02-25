@@ -1,9 +1,12 @@
 package io.anuke.mindustry.ai;
 
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.*;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -11,17 +14,8 @@ import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.util.EnumSet;
-import io.anuke.ucore.util.Geometry;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.ThreadArray;
 
 import static io.anuke.mindustry.Vars.*;
-
-//TODO consider using quadtrees for finding specific types of blocks within an area
-//TODO maybe use Arrays instead of ObjectSets?
 
 /**Class used for indexing special target blocks for AI.*/
 @SuppressWarnings("unchecked")
@@ -32,7 +26,7 @@ public class BlockIndexer{
     private final static int structQuadrantSize = 12;
 
     /**Set of all ores that are being scanned.*/
-    private final ObjectSet<Item> scanOres = new ObjectSet<Item>(){{addAll(Item.getAllOres());}};
+    private final ObjectSet<Item> scanOres = ObjectSet.with(Item.getAllOres().toArray(Item.class));
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
     /**Stores all ore quadtrants on the map.*/
     private ObjectMap<Item, ObjectSet<Tile>> ores;
@@ -48,12 +42,12 @@ public class BlockIndexer{
     /**Empty set used for returning.*/
     private ObjectSet<Tile> emptySet = new ObjectSet<>();
     /**Array used for returning and reusing.*/
-    private Array<Tile> returnArray = new ThreadArray<>();
+    private Array<Tile> returnArray = new Array<>();
 
     public BlockIndexer(){
         Events.on(TileChangeEvent.class, event -> {
-            if(typeMap.get(event.tile.packedPosition()) != null){
-                TileIndex index = typeMap.get(event.tile.packedPosition());
+            if(typeMap.get(event.tile.pos()) != null){
+                TileIndex index = typeMap.get(event.tile.pos());
                 for(BlockFlag flag : index.flags){
                     getFlagged(index.team)[flag.ordinal()].remove(event.tile);
                 }
@@ -87,7 +81,7 @@ public class BlockIndexer{
 
                     process(tile);
 
-                    if(tile.entity != null && tile.entity.healthf() < 0.9999f){
+                    if(tile.entity != null && tile.entity.damaged()){
                         notifyTileDamaged(tile.entity);
                     }
                 }
@@ -117,7 +111,7 @@ public class BlockIndexer{
 
         ObjectSet<Tile> set = damagedTiles[team.ordinal()];
         for(Tile tile : set){
-            if(tile.entity == null || tile.entity.getTeam() != team || tile.entity.healthf() >= 0.9999f){
+            if(tile.entity == null || tile.entity.getTeam() != team || !tile.entity.damaged()){
                 returnArray.add(tile);
             }
         }
@@ -177,7 +171,7 @@ public class BlockIndexer{
 
                         TileEntity e = other.entity;
 
-                        float ndst = Vector2.dst(x, y, e.x, e.y);
+                        float ndst = Mathf.dst(x, y, e.x, e.y);
                         if(ndst < range && (closest == null || ndst < dst)){
                             dst = ndst;
                             closest = e;
@@ -209,7 +203,7 @@ public class BlockIndexer{
         for(int x = Math.max(0, tile.x - oreQuadrantSize / 2); x < tile.x + oreQuadrantSize / 2 && x < world.width(); x++){
             for(int y = Math.max(0, tile.y - oreQuadrantSize / 2); y < tile.y + oreQuadrantSize / 2 && y < world.height(); y++){
                 Tile res = world.tile(x, y);
-                if(res.block() == Blocks.air && res.floor().drops != null && res.floor().drops.item == item){
+                if(res.block() == Blocks.air && res.floor().itemDrop == item){
                     return res;
                 }
             }
@@ -219,7 +213,7 @@ public class BlockIndexer{
     }
 
     private void process(Tile tile){
-        if(tile.block().flags != null &&
+        if(tile.block().flags.size() > 0 &&
                 tile.getTeam() != Team.none){
             ObjectSet<Tile>[] map = getFlagged(tile.getTeam());
 
@@ -231,7 +225,7 @@ public class BlockIndexer{
 
                 map[flag.ordinal()] = arr;
             }
-            typeMap.put(tile.packedPosition(), new TileIndex(tile.block().flags, tile.getTeam()));
+            typeMap.put(tile.pos(), new TileIndex(tile.block().flags, tile.getTeam()));
         }
 
         if(ores == null) return;
@@ -247,9 +241,9 @@ public class BlockIndexer{
         for(int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++){
             for(int y = quadrantY * structQuadrantSize; y < world.height() && y < (quadrantY + 1) * structQuadrantSize; y++){
                 Tile result = world.tile(x, y);
-                if( result == null || result.block().drops == null || !scanOres.contains(result.block().drops.item)) continue;
+                if( result == null || result.floor().itemDrop == null || !scanOres.contains(result.floor().itemDrop)) continue;
 
-                itemSet.add(result.block().drops.item);
+                itemSet.add(result.floor().itemDrop);
             }
         }
 
@@ -326,8 +320,8 @@ public class BlockIndexer{
                 Tile tile = world.tile(x, y);
 
                 //add position of quadrant to list when an ore is found
-                if(tile.floor().drops != null && scanOres.contains(tile.floor().drops.item) && tile.block() == Blocks.air){
-                    ores.get(tile.floor().drops.item).add(world.tile(
+                if(tile.floor().itemDrop != null && scanOres.contains(tile.floor().itemDrop) && tile.block() == Blocks.air){
+                    ores.get(tile.floor().itemDrop).add(world.tile(
                             //make sure to clamp quadrant middle position, since it might go off bounds
                             Mathf.clamp(qx * oreQuadrantSize + oreQuadrantSize / 2, 0, world.width() - 1),
                             Mathf.clamp(qy * oreQuadrantSize + oreQuadrantSize / 2, 0, world.height() - 1)));

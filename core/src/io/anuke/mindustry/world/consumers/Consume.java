@@ -1,18 +1,15 @@
 package io.anuke.mindustry.world.consumers;
 
-import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStats;
-import io.anuke.ucore.scene.ui.Tooltip;
-import io.anuke.ucore.scene.ui.layout.Table;
 
-import static io.anuke.mindustry.Vars.mobile;
-
+/**An abstract class that defines a type of resource that a block can consume.*/
 public abstract class Consume{
     protected boolean optional;
-    protected boolean update = true;
+    protected boolean update = true, boost = false;
 
     public Consume optional(boolean optional){
         this.optional = optional;
@@ -24,6 +21,11 @@ public abstract class Consume{
         return this;
     }
 
+    public Consume boost(boolean boost){
+        this.boost = boost;
+        return this;
+    }
+
     public boolean isOptional(){
         return optional;
     }
@@ -32,8 +34,9 @@ public abstract class Consume{
         return update;
     }
 
-    public void build(Table table){
-        Table t = new Table("clear");
+    public abstract void build(Tile tile, Table table);/*{
+
+        Table t = new Table("flat");
         t.margin(4);
         buildTooltip(t);
 
@@ -41,12 +44,15 @@ public abstract class Consume{
 
         table.table(out -> {
             out.addImage(getIcon()).size(10 * scale).color(Color.DARK_GRAY).padRight(-10 * scale).padBottom(-scale * 2);
-            out.addImage(getIcon()).size(10 * scale).color(Palette.accent);
-            out.addImage("icon-missing").size(10 * scale).color(Palette.remove).padLeft(-10 * scale);
+            out.addImage(getIcon()).size(10 * scale).color(Pal.accent);
+            out.addImage("icon-missing").size(10 * scale).color(Pal.remove).padLeft(-10 * scale);
         }).size(10 * scale).get().addListener(new Tooltip<>(t));
-    }
+    }*/
 
-    public abstract void buildTooltip(Table table);
+    /**Called when a consumption is triggered manually.*/
+    public void trigger(Block block, TileEntity entity){
+
+    }
 
     public abstract String getIcon();
 

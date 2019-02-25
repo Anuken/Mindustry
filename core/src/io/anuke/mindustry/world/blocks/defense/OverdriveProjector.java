@@ -1,20 +1,17 @@
 package io.anuke.mindustry.world.blocks.defense;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.IntSet;
-import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.graphics.Blending;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Hue;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -31,11 +28,12 @@ public class OverdriveProjector extends Block{
     protected int timerUse = timers ++;
 
     protected TextureRegion topRegion;
-    protected float reload = 260f;
+    protected float reload = 60f;
     protected float range = 80f;
     protected float speedBoost = 1.5f;
     protected float speedBoostPhase = 0.75f;
     protected float useTime = 400f;
+    protected float phaseRangeBoost = 20f;
 
     public OverdriveProjector(String name){
         super(name);
@@ -44,20 +42,19 @@ public class OverdriveProjector extends Block{
         hasPower = true;
         hasItems = true;
         canOverdrive = false;
-        itemCapacity = 10;
     }
 
     @Override
     public void load(){
         super.load();
-        topRegion = Draw.region(name + "-top");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
     public void update(Tile tile){
         OverdriveEntity entity = tile.entity();
         entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() ? 1f : 0f, 0.08f);
-        entity.charge += entity.heat * Timers.delta();
+        entity.charge += entity.heat * Time.delta();
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, (float)entity.items.get(consumes.item()) / itemCapacity, 0.1f);
 
@@ -66,10 +63,9 @@ public class OverdriveProjector extends Block{
         }
 
         if(entity.charge >= reload){
-            float realRange = range + entity.phaseHeat * 20f;
-            float realBoost = speedBoost + entity.phaseHeat*speedBoostPhase;
+            float realRange = range + entity.phaseHeat * phaseRangeBoost;
+            float realBoost = (speedBoost + entity.phaseHeat*speedBoostPhase) * entity.power.satisfaction;
 
-            Effects.effect(BlockFx.overdriveWave, Hue.mix(color, phase, entity.phaseHeat), tile.drawx(), tile.drawy(), realRange);
             entity.charge = 0f;
 
             int tileRange = (int)(realRange / tilesize);
@@ -77,18 +73,17 @@ public class OverdriveProjector extends Block{
 
             for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
                 for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(Vector2.dst(x, y, tile.x, tile.y) > realRange) continue;
+                    if(Mathf.dst(x, y, tile.x, tile.y) > realRange) continue;
 
                     Tile other = world.tile(x, y);
 
                     if(other == null) continue;
                     other = other.target();
 
-                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.packedPosition()) && other.entity != null){
+                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null){
                         other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
                         other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
-                        Effects.effect(BlockFx.overdriveBlockFull, Hue.mix(color, phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
-                        healed.add(other.packedPosition());
+                       healed.add(other.pos());
                     }
                 }
             }
@@ -97,8 +92,11 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawSelect(Tile tile){
+        OverdriveEntity entity = tile.entity();
+        float realRange = range + entity.phaseHeat * phaseRangeBoost;
+
         Draw.color(color);
-        Lines.dashCircle(tile.drawx(), tile.drawy() - 1f, range);
+        Lines.dashCircle(tile.drawx(), tile.drawy(), realRange);
         Draw.color();
     }
 
@@ -107,14 +105,13 @@ public class OverdriveProjector extends Block{
         super.draw(tile);
 
         OverdriveEntity entity = tile.entity();
-        float f = 1f - (Timers.time() / 100f) % 1f;
+        float f = 1f - (Time.time() / 100f) % 1f;
 
         Draw.color(color, phase, entity.phaseHeat);
-        Draw.alpha(entity.heat * Mathf.absin(Timers.time(), 10f, 1f) * 0.5f);
-        Graphics.setAdditiveBlending();
+        Draw.alpha(entity.heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
+        Draw.blend(Blending.additive);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
-
-        Graphics.setNormalBlending();
+        Draw.blend();
         Draw.alpha(1f);
         Lines.stroke((2f  * f + 0.2f)* entity.heat);
         Lines.circle(tile.drawx(), tile.drawy(), (1f-f) * 9f);

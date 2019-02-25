@@ -2,24 +2,27 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.arc.Core;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.SelectionTrait;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import static io.anuke.mindustry.Vars.*;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class Sorter extends Block implements SelectionTrait{
+    private static Item lastItem;
 
     public Sorter(String name){
         super(name);
@@ -35,19 +38,25 @@ public class Sorter extends Block implements SelectionTrait{
         return true;
     }
 
+    @Override
+    public void playerPlaced(Tile tile){
+        Core.app.post(() -> Call.setSorterItem(null, tile, lastItem));
+    }
+
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSorterItem(Player player, Tile tile, Item item){
         SorterEntity entity = tile.entity();
-        if(entity != null) entity.sortItem = item;
+        if(entity != null){
+            entity.sortItem = item;
+        }
     }
 
     @Override
     public void draw(Tile tile){
         super.draw(tile);
 
-        //TODO call event for change
-
         SorterEntity entity = tile.entity();
+        if(entity.sortItem == null) return;
 
         Draw.color(entity.sortItem.color);
         Draw.rect("blank", tile.worldx(), tile.worldy(), 4f, 4f);
@@ -110,7 +119,10 @@ public class Sorter extends Block implements SelectionTrait{
     @Override
     public void buildTable(Tile tile, Table table){
         SorterEntity entity = tile.entity();
-        buildItemTable(table, () -> entity.sortItem, item -> Call.setSorterItem(null, tile, item));
+        buildItemTable(table, () -> entity.sortItem, item -> {
+            lastItem = item;
+            Call.setSorterItem(null, tile, item);
+        });
     }
 
     @Override
@@ -119,16 +131,17 @@ public class Sorter extends Block implements SelectionTrait{
     }
 
     public static class SorterEntity extends TileEntity{
-        public Item sortItem = content.item(0);
+        public Item sortItem;
 
         @Override
         public void writeConfig(DataOutput stream) throws IOException{
-            stream.writeByte(sortItem.id);
+            stream.writeByte(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
         public void readConfig(DataInput stream) throws IOException{
-            sortItem = content.items().get(stream.readByte());
+            byte b = stream.readByte();
+            sortItem = b == -1 ? null : content.items().get(b);
         }
     }
 }
