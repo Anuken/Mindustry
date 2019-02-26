@@ -99,6 +99,10 @@ public class Consumers{
         return get(ConsumeLiquid.class).get();
     }
 
+    public float liquidAmount(){
+        return get(ConsumeLiquid.class).use;
+    }
+
     public Consume add(Consume consume){
         map.put((consume instanceof ConsumePower ? ConsumePower.class : consume.getClass()), consume);
         return consume;

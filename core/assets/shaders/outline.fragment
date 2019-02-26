@@ -28,7 +28,7 @@ void main() {
             for(float cy = -RADIUS; cy <= RADIUS; cy ++){
                 if(texture2D(u_texture, v_texCoord.xy + vec2(cx, cy) * v * spacing).a >= 0.001){
                     gl_FragColor = u_color;
-                    return;
+                    break;
                 }
             }
         }

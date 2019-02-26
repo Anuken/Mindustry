@@ -8,11 +8,12 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
 
 import java.io.DataInput;
@@ -29,24 +30,21 @@ public class NuclearReactor extends PowerGenerator{
     protected Color coolColor = new Color(1, 1, 1, 0f);
     protected Color hotColor = Color.valueOf("ff9575a3");
     protected int fuelUseTime = 120; //time to consume 1 fuel
-    protected float heating = 0.013f; //heating per frame
-    protected float coolantPower = 0.015f; //how much heat decreases per coolant unit
+    protected float heating = 0.01f; //heating per frame * fullness
     protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
-    protected float maxLiquidUse = 2f; //max liquid use per frame
     protected int explosionRadius = 19;
     protected int explosionDamage = 135;
     protected float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
+    protected float coolantPower = 0.5f;
 
     protected TextureRegion topRegion, lightsRegion;
 
     public NuclearReactor(String name){
         super(name);
         itemCapacity = 30;
-        liquidCapacity = 50;
+        liquidCapacity = 30;
         hasItems = true;
         hasLiquids = true;
-
-        consumes.item(Items.thorium);
     }
 
     @Override
@@ -55,6 +53,12 @@ public class NuclearReactor extends PowerGenerator{
 
         topRegion = Core.atlas.find(name + "-center");
         lightsRegion = Core.atlas.find(name + "-lights");
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+        bars.add("heat", entity -> new Bar("blocks.heat", Pal.lightOrange, () -> ((NuclearReactorEntity)entity).heat));
     }
 
     @Override
@@ -69,24 +73,17 @@ public class NuclearReactor extends PowerGenerator{
             entity.heat += fullness * heating * Math.min(entity.delta(), 4f);
 
             if(entity.timer.get(timerFuel, fuelUseTime)){
-                entity.items.remove(consumes.item(), 1);
+                entity.cons.trigger();
             }
         }
 
-        if(entity.liquids.total() > 0){
-            Liquid liquid = entity.liquids.current();
+        Liquid liquid = consumes.liquid();
+        float liquidAmount = consumes.liquidAmount();
 
-            if(liquid.temperature <= 0.5f){ //is coolant
-                float pow = coolantPower * (liquid.heatCapacity + 0.5f / liquid.temperature); //heat depleted per unit of liquid
-                float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), entity.heat / pow), maxLiquidUse * entity.delta()); //max that can be cooled in terms of liquid
-                entity.heat -= maxUsed * pow;
-                entity.liquids.remove(liquid, maxUsed);
-            }else{ //is heater
-                float heat = coolantPower * liquid.heatCapacity / 4f; //heat created per unit of liquid
-                float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), (1f - entity.heat) / heat), maxLiquidUse * entity.delta()); //max liquid used
-                entity.heat += maxUsed * heat;
-                entity.liquids.remove(liquid, maxUsed);
-            }
+        if(entity.heat > 0){
+            float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), entity.heat / coolantPower), liquidAmount * entity.delta());
+            entity.heat -= maxUsed * coolantPower;
+            entity.liquids.remove(liquid, maxUsed);
         }
 
         if(entity.heat > smokeThreshold){

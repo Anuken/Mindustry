@@ -849,12 +849,12 @@ public class Blocks implements ContentList{
 
         differentialGenerator = new DifferentialGenerator("differential-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 140, Items.titanium, 100, Items.lead, 200, Items.silicon, 130, Items.metaglass, 100));
-            powerProduction = 16f;
+            powerProduction = 13f;
             itemDuration = 50f;
             consumes.remove(ConsumeItemFilter.class);
             consumes.remove(ConsumeLiquidFilter.class);
             consumes.item(Items.pyratite);
-            consumes.liquid(Liquids.cryofluid, 0.12f);
+            consumes.liquid(Liquids.cryofluid, 0.2f);
             size = 3;
         }};
 
@@ -880,8 +880,9 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.lead, 600, Items.silicon, 400, Items.graphite, 300, Items.thorium, 300));
             size = 3;
             health = 700;
-            powerProduction = 12f;
-            consumes.liquid(Liquids.cryofluid, maxLiquidUse);
+            powerProduction = 14f;
+            consumes.item(Items.thorium);
+            consumes.liquid(Liquids.cryofluid, 0.1f);
         }};
 
         impactReactor = new ImpactReactor("impact-reactor"){{
