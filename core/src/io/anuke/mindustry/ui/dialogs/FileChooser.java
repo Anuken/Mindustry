@@ -45,7 +45,7 @@ public class FileChooser extends FloatingDialog{
     }
 
     private void setupWidgets(){
-        content().margin(-10);
+        cont.margin(-10);
 
         Table content = new Table();
 
@@ -54,7 +54,7 @@ public class FileChooser extends FloatingDialog{
         if(!open) Platform.instance.addDialog(filefield);
         filefield.setDisabled(open);
 
-        ok = new TextButton(open ? "$text.load" : "$text.save");
+        ok = new TextButton(open ? "$load" : "$save");
 
         ok.clicked(() -> {
             if(ok.isDisabled()) return;
@@ -69,7 +69,7 @@ public class FileChooser extends FloatingDialog{
 
         filefield.change();
 
-        TextButton cancel = new TextButton("$text.cancel");
+        TextButton cancel = new TextButton("$cancel");
         cancel.clicked(this::hide);
 
         navigation = new TextField("");
@@ -129,7 +129,7 @@ public class FileChooser extends FloatingDialog{
         icontable.add(up);
 
         Table fieldcontent = new Table();
-        fieldcontent.bottom().left().add(new Label("$text.filename"));
+        fieldcontent.bottom().left().add(new Label("$filename"));
         fieldcontent.add(filefield).height(40f).fillX().expandX().padLeft(10f);
 
         Table buttons = new Table();
@@ -151,7 +151,7 @@ public class FileChooser extends FloatingDialog{
 
         content.add(buttons).growX();
 
-        content().add(content);
+        cont.add(content);
     }
 
     private void updateFileFieldStatus(){
@@ -264,7 +264,7 @@ public class FileChooser extends FloatingDialog{
     @Override
     public Dialog show(){
         Time.runTask(2f, () -> {
-            content().clear();
+            cont.clear();
             setupWidgets();
             super.show();
             Core.scene.setScrollFocus(pane);

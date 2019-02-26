@@ -77,7 +77,6 @@ public class CrashHandler{
         ex(() -> value.addChild("build", new JsonValue(Version.build)));
         ex(() -> value.addChild("net", new JsonValue(fn)));
         ex(() -> value.addChild("server", new JsonValue(fs)));
-        ex(() -> value.addChild("gamemode", new JsonValue(Vars.state.mode.name())));
         ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
         ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name"))));
         ex(() -> value.addChild("trace", new JsonValue(parseException(e))));

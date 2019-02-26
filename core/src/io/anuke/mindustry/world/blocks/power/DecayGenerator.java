@@ -2,10 +2,10 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.mindustry.type.Item;
 
-public class DecayGenerator extends ItemGenerator{
+public class DecayGenerator extends ItemLiquidGenerator{
 
     public DecayGenerator(String name){
-        super(name);
+        super(true, false, name);
         hasItems = true;
         hasLiquids = false;
     }

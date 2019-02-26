@@ -23,11 +23,11 @@ public class LiquidJunction extends LiquidBlock{
 
     @Override
     public void draw(Tile tile){
-        Draw.rect(name(), tile.worldx(), tile.worldy());
+        Draw.rect(name, tile.worldx(), tile.worldy());
     }
 
     @Override
-    public TextureRegion[] getIcon(){
+    public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(name)};
     }
 

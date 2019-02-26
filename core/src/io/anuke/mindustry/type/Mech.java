@@ -4,16 +4,12 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.content.Weapons;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.ContentDisplay;
 
 public class Mech extends UnlockableContent{
-    public final String name;
-    public final String description;
-
     public boolean flying;
     public float speed = 1.1f;
     public float maxSpeed = 10f;
@@ -21,28 +17,26 @@ public class Mech extends UnlockableContent{
     public float drag = 0.4f;
     public float mass = 1f;
     public float shake = 0f;
-    public float armor = 1f;
+    public float health = 200f;
 
     public float hitsize = 6f;
     public float cellTrnsY = 0f;
     public float mineSpeed = 1f;
     public int drillPower = -1;
-    public float carryWeight = 10f;
     public float buildPower = 1f;
-    public Color trailColor = Palette.boostFrom;
-    public Color trailColorTo = Palette.boostTo;
+    public Color engineColor = Pal.boostTo;
     public int itemCapacity = 30;
     public boolean turnCursor = true;
     public boolean canHeal = false;
 
-    public float weaponOffsetX, weaponOffsetY;
-    public Weapon weapon = Weapons.blaster;
+    public float weaponOffsetX, weaponOffsetY, engineOffset = 5f, engineSize = 2.5f;
+    public Weapon weapon;
 
     public TextureRegion baseRegion, legRegion, region, iconRegion;
 
     public Mech(String name, boolean flying){
+        super(name);
         this.flying = flying;
-        this.name = name;
         this.description = Core.bundle.get("mech." + name + ".description");
     }
 
@@ -81,17 +75,13 @@ public class Mech extends UnlockableContent{
     }
 
     @Override
-    public String getContentName(){
-        return name;
-    }
-
-    @Override
     public ContentType getContentType(){
         return ContentType.mech;
     }
 
     @Override
     public void load(){
+        weapon.load();
         if(!flying){
             legRegion = Core.atlas.find(name + "-leg");
             baseRegion = Core.atlas.find(name + "-base");

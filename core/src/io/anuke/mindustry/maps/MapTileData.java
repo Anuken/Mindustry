@@ -4,14 +4,14 @@ import io.anuke.arc.collection.IntIntMap;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.world.Block;
 
 import java.nio.ByteBuffer;
 
 public class MapTileData{
     /**
-     * Tile size: 4 bytes. <br>
+     * Tile size: 5 bytes. <br>
      * 0: ground tile <br>
      * 1: wall tile <br>
      * 2: rotation + team <br>
@@ -48,7 +48,7 @@ public class MapTileData{
                 read(marker);
 
                 //strip blockparts from map data, as they can be invalid
-                if(marker.wall == Blocks.blockpart.id){
+                if(marker.wall == Blocks.part.id){
                     marker.wall = Blocks.air.id;
                 }
 
@@ -72,7 +72,7 @@ public class MapTileData{
                                 int worldy = dy + offsety + y;
 
                                 if(Structs.inBounds(worldx, worldy, width, height) && !(dx + offsetx == 0 && dy + offsety == 0)){
-                                    write(worldx, worldy, DataPosition.wall, Blocks.blockpart.id);
+                                    write(worldx, worldy, DataPosition.wall, Blocks.part.id);
                                     write(worldx, worldy, DataPosition.link, Pack.byteByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8)));
                                 }
                             }

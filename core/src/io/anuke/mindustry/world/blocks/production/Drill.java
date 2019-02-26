@@ -3,20 +3,19 @@ package io.anuke.mindustry.world.blocks.production;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectIntMap;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
@@ -48,11 +47,11 @@ public class Drill extends Block{
     /**Whether to draw the item this drill is mining.*/
     protected boolean drawMineItem = false;
     /**Effect played when an item is produced. This is colored.*/
-    protected Effect drillEffect = BlockFx.mine;
+    protected Effect drillEffect = Fx.mine;
     /**Speed the drill bit rotates at.*/
     protected float rotateSpeed = 2f;
     /**Effect randomly played while drilling.*/
-    protected Effect updateEffect = BlockFx.pulverizeSmall;
+    protected Effect updateEffect = Fx.pulverizeSmall;
     /**Chance the update effect will appear.*/
     protected float updateEffectChance = 0.02f;
 
@@ -68,7 +67,6 @@ public class Drill extends Block{
         update = true;
         solid = true;
         layer = Layer.overlay;
-        itemCapacity = 5;
         group = BlockGroup.drills;
         hasLiquids = true;
         liquidCapacity = 5f;
@@ -115,8 +113,13 @@ public class Drill extends Block{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
+    public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
+    }
+
+    @Override
+    public boolean canProduce(Tile tile){
+        return tile.entity.items.total() < itemCapacity;
     }
 
     @Override
@@ -138,7 +141,7 @@ public class Drill extends Block{
                 table.addImage(item.name + "1").size(8 * 3).padRight(2).padLeft(2).padTop(3).padBottom(3);
                 table.add(item.localizedName());
                 if(i != list.size - 1){
-                    table.add("/");
+                    table.add("/").padLeft(5).padRight(5);
                 }
             }
         });
@@ -190,6 +193,9 @@ public class Drill extends Block{
             if(entity.consumed(ConsumeLiquid.class) && !liquidRequired){
                 speed = liquidBoostIntensity;
             }
+            if(hasPower){
+                speed *= entity.power.satisfaction; // Drill slower when not at full power
+            }
 
             entity.warmup = Mathf.lerpDelta(entity.warmup, speed, warmupSpeed);
             entity.progress += entity.delta()
@@ -237,13 +243,13 @@ public class Drill extends Block{
     }
 
     public Item getDrop(Tile tile){
-        return tile.floor().drops.item;
+        return tile.floor().itemDrop;
     }
 
     public boolean isValid(Tile tile){
         if(tile == null) return false;
-        ItemStack drops = tile.floor().drops;
-        return drops != null && drops.item.hardness <= tier;
+        Item drops = tile.floor().itemDrop;
+        return drops != null && drops.hardness <= tier;
     }
 
     public static class DrillEntity extends TileEntity{

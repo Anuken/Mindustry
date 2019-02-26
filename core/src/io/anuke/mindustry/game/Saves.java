@@ -11,8 +11,11 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.io.SaveIO.SaveException;
 import io.anuke.mindustry.io.SaveMeta;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.Zone;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -105,6 +108,16 @@ public class Saves{
         return saving;
     }
 
+    public void zoneSave(){
+        SaveSlot slot = new SaveSlot(-1);
+        slot.setName("zone");
+        saves.remove(s -> s.index == -1);
+        saves.add(slot);
+        saveMap.put(slot.index, slot);
+        slot.save();
+        saveSlots();
+    }
+
     public SaveSlot addSave(String name){
         SaveSlot slot = new SaveSlot(nextSlot);
         nextSlot++;
@@ -125,9 +138,13 @@ public class Saves{
         saveMap.put(slot.index, slot);
         slot.meta = SaveIO.getData(slot.index);
         current = slot;
-        slot.meta.sector = invalidSector;
         saveSlots();
         return slot;
+    }
+
+    public SaveSlot getZoneSlot(){
+        SaveSlot slot = getByID(-1);
+        return slot == null || slot.getZone() == null ? null : slot;
     }
 
     public SaveSlot getByID(int id){
@@ -154,11 +171,15 @@ public class Saves{
             this.index = index;
         }
 
-        public void load(){
-            SaveIO.loadFromSlot(index);
-            meta = SaveIO.getData(index);
-            current = this;
-            totalPlaytime = meta.timePlayed;
+        public void load() throws SaveException{
+            try{
+                SaveIO.loadFromSlot(index);
+                meta = SaveIO.getData(index);
+                current = this;
+                totalPlaytime = meta.timePlayed;
+            }catch(Exception e){
+                throw new SaveException(e);
+            }
         }
 
         public void save(){
@@ -176,7 +197,7 @@ public class Saves{
         }
 
         public boolean isHidden(){
-            return meta.sector != invalidSector;
+            return getZone() != null;
         }
 
         public String getPlayTime(){
@@ -204,20 +225,16 @@ public class Saves{
             Core.settings.save();
         }
 
+        public Zone getZone(){
+            return content.getByID(ContentType.zone, meta.rules.zone);
+        }
+
         public int getBuild(){
             return meta.build;
         }
 
         public int getWave(){
             return meta.wave;
-        }
-
-        public Difficulty getDifficulty(){
-            return meta.difficulty;
-        }
-
-        public GameMode getMode(){
-            return meta.mode;
         }
 
         public boolean isAutosave(){

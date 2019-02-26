@@ -4,8 +4,8 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
@@ -15,19 +15,18 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pool.Poolable;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.content.bullets.TurretBullets;
-import io.anuke.mindustry.content.fx.BlockFx;
-import io.anuke.mindustry.content.fx.EnvironmentFx;
-import io.anuke.mindustry.content.fx.ShootFx;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.content.Bullets;
+import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
@@ -44,11 +43,12 @@ public class MassDriver extends Block{
     protected int minDistribute = 10;
     protected float knockback = 4f;
     protected float reloadTime = 100f;
-    protected Effect shootEffect = ShootFx.shootBig2;
-    protected Effect smokeEffect = ShootFx.shootBigSmoke2;
-    protected Effect recieveEffect = BlockFx.mineBig;
+    protected Effect shootEffect = Fx.shootBig2;
+    protected Effect smokeEffect = Fx.shootBigSmoke2;
+    protected Effect recieveEffect = Fx.mineBig;
     protected float shake = 3f;
-    protected TextureRegion turretRegion;
+    protected float powerPercentageUsed = 0.95f;
+    protected TextureRegion baseRegion;
 
     public MassDriver(String name){
         super(name);
@@ -58,6 +58,8 @@ public class MassDriver extends Block{
         hasItems = true;
         layer = Layer.turret;
         hasPower = true;
+        consumes.powerBuffered(30f);
+        outlineIcon = true;
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
@@ -77,7 +79,8 @@ public class MassDriver extends Block{
         MassDriverEntity other = target.entity();
 
         entity.reload = 1f;
-        entity.power.amount = 0f;
+
+        entity.power.satisfaction -= Math.min(entity.power.satisfaction, driver.powerPercentageUsed);
 
         DriverBulletData data = Pools.obtain(DriverBulletData.class, DriverBulletData::new);
         data.from = entity;
@@ -93,7 +96,7 @@ public class MassDriver extends Block{
         float angle = tile.angleTo(target);
 
         other.isRecieving = true;
-        Bullet.create(TurretBullets.driverBolt, entity, entity.getTeam(),
+        Bullet.create(Bullets.driverBolt, entity, entity.getTeam(),
                 tile.drawx() + Angles.trnsx(angle, driver.translation), tile.drawy() + Angles.trnsy(angle, driver.translation),
                 angle, 1f, 1f, data);
 
@@ -107,32 +110,22 @@ public class MassDriver extends Block{
     }
 
     @Override
-    public TextureRegion[] getBlockIcon(){
-        if(blockIcon == null){
-            blockIcon = new TextureRegion[]{region, turretRegion};
-        }
-        return super.getBlockIcon();
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name + "-base"), Core.atlas.find(name + "-turret")};
     }
 
     @Override
     public void load(){
         super.load();
 
-        turretRegion = Core.atlas.find(name + "-turret");
+        baseRegion = Core.atlas.find(name + "-base");
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.powerShot, powerCapacity, StatUnit.powerUnits);
-    }
-
-    @Override
-    public void init(){
-        super.init();
-
-        viewRange = range;
+        stats.add(BlockStat.powerShot, consumes.get(ConsumePower.class).powerCapacity * powerPercentageUsed, StatUnit.powerUnits);
     }
 
     @Override
@@ -164,8 +157,8 @@ public class MassDriver extends Block{
 
                 entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(waiter), rotateSpeed);
             }else if(tile.entity.items.total() >= minDistribute &&
-                    linkValid(tile) && //only fire when at least at half-capacity and power
-                    tile.entity.power.amount >= powerCapacity * 0.8f &&
+                    linkValid(tile) && //only fire when at 100% power capacity
+                    tile.entity.power.satisfaction >= powerPercentageUsed &&
                     link.block().itemCapacity - link.entity.items.total() >= minDistribute && entity.reload <= 0.0001f){
 
                 MassDriverEntity other = link.entity();
@@ -186,10 +179,15 @@ public class MassDriver extends Block{
     }
 
     @Override
+    public void draw(Tile tile){
+        Draw.rect(baseRegion, tile.drawx(), tile.drawy());
+    }
+
+    @Override
     public void drawLayer(Tile tile){
         MassDriverEntity entity = tile.entity();
 
-        Draw.rect(turretRegion,
+        Draw.rect(region,
                 tile.drawx() + Angles.trnsx(entity.rotation + 180f, entity.reload * knockback),
                 tile.drawy() + Angles.trnsy(entity.rotation + 180f, entity.reload * knockback), entity.rotation - 90);
     }
@@ -198,7 +196,7 @@ public class MassDriver extends Block{
     public void drawConfigure(Tile tile){
         float sin = Mathf.absin(Time.time(), 6f, 1f);
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Lines.stroke(1f);
         Lines.poly(tile.drawx(), tile.drawy(), 20, (tile.block().size/2f+1) * tilesize + sin);
 
@@ -207,12 +205,12 @@ public class MassDriver extends Block{
         if(linkValid(tile)){
             Tile target = world.tile(entity.link);
 
-            Draw.color(Palette.place);
+            Draw.color(Pal.place);
             Lines.poly(target.drawx(), target.drawy(), 20, (target.block().size/2f+1) * tilesize + sin);
             Draw.reset();
         }
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Lines.dashCircle(tile.drawx(), tile.drawy(), range);
         Draw.color();
     }
@@ -237,14 +235,6 @@ public class MassDriver extends Block{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         return tile.entity.items.total() < itemCapacity;
-    }
-
-    @Override
-    public void transformLinks(Tile tile, int oldWidth, int oldHeight, int newWidth, int newHeight, int shiftX, int shiftY){
-        super.transformLinks(tile, oldWidth, oldHeight, newWidth, newHeight, shiftX, shiftY);
-
-        MassDriverEntity entity = tile.entity();
-        entity.link = world.transform(entity.link, oldWidth, oldHeight, newWidth, shiftX, shiftY);
     }
 
     @Override
@@ -303,7 +293,7 @@ public class MassDriver extends Block{
                 int amountDropped = Mathf.random(0, data.items[i]);
                 if(amountDropped > 0){
                     float angle = Mathf.range(180f);
-                    Effects.effect(EnvironmentFx.dropItem, Color.WHITE, bullet.x, bullet.y, angle, content.item(i));
+                    Effects.effect(Fx.dropItem, Color.WHITE, bullet.x, bullet.y, angle, content.item(i));
                 }
             }
 

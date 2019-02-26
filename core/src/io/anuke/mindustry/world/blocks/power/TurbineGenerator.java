@@ -15,6 +15,6 @@ public class TurbineGenerator extends BurnerGenerator{
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return super.acceptLiquid(tile, source, liquid, amount) || liquid == consumes.liquid() && tile.entity.liquids.get(consumes.liquid()) < liquidCapacity;
+        return (liquid == consumes.liquid() && tile.entity.liquids.get(consumes.liquid()) < liquidCapacity);
     }
 }

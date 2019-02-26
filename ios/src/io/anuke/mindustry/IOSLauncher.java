@@ -101,10 +101,10 @@ public class IOSLauncher extends IOSApplication.Delegate {
                         SaveSlot slot = control.saves.importSave(file);
                         ui.load.runLoadSave(slot);
                     }catch (IOException e){
-                        ui.showError(Core.bundle.format("text.save.import.fail", Strings.parseException(e, false)));
+                        ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, false)));
                     }
                 }else{
-                    ui.showError("$text.save.import.invalid");
+                    ui.showError("save.import.invalid");
                 }
 
             }else if(file.extension().equalsIgnoreCase(mapExtension)){ //open map

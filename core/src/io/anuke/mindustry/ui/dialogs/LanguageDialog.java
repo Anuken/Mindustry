@@ -16,7 +16,7 @@ public class LanguageDialog extends FloatingDialog{
     private Locale lastLocale;
 
     public LanguageDialog(){
-        super("$text.settings.language");
+        super("$settings.language");
         addCloseButton();
         setup();
     }
@@ -36,12 +36,12 @@ public class LanguageDialog extends FloatingDialog{
                 Core.settings.put("locale", loc.toString());
                 Core.settings.save();
                 Log.info("Setting locale: {0}", loc.toString());
-                ui.showInfo("$text.language.restart");
+                ui.showInfo("$language.restart");
             });
             langs.add(button).group(group).update(t -> t.setChecked(loc.equals(getLocale()))).size(400f, 50f).pad(2).row();
         }
 
-        content().add(pane);
+        cont.add(pane);
     }
 
     public Locale getLocale(){

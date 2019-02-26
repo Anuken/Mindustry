@@ -6,15 +6,15 @@ import io.anuke.arc.collection.IntSet.IntSetIterator;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Structs;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.IndexedRenderer;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -26,7 +26,6 @@ public class MapRenderer implements Disposable{
     private IntSet delayedUpdates = new IntSet();
     private MapEditor editor;
     private int width, height;
-    private Color tmpColor = Color.WHITE.cpy();
 
     public MapRenderer(MapEditor editor){
         this.editor = editor;
@@ -102,11 +101,9 @@ public class MapRenderer implements Disposable{
     private void render(int wx, int wy){
         int x = wx / chunksize, y = wy / chunksize;
         IndexedRenderer mesh = chunks[x][y];
-        //TileDataMarker data = editor.getMap().readAt(wx, wy);
         byte bf = editor.getMap().read(wx, wy, DataPosition.floor);
         byte bw = editor.getMap().read(wx, wy, DataPosition.wall);
         byte btr = editor.getMap().read(wx, wy, DataPosition.rotationTeam);
-        byte elev = editor.getMap().read(wx, wy, DataPosition.elevation);
         byte rotation = Pack.leftByte(btr);
         Team team = Team.all[Pack.rightByte(btr)];
 
@@ -115,60 +112,45 @@ public class MapRenderer implements Disposable{
 
         TextureRegion region;
 
-        if(bw != 0){
-            region = wall.getEditorIcon();
+        int idxWall = (wx % chunksize) + (wy % chunksize) * chunksize;
+        int idxDecal = (wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize;
+
+        if(bw != 0 && (wall.synthetic() || wall == Blocks.part)){
+            region = wall.icon(Icon.full) == Core.atlas.find("____") ? Core.atlas.find("clear") : wall.icon(Icon.full);
 
             if(wall.rotate){
-                mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
+                mesh.draw(idxWall, region,
                         wx * tilesize + wall.offset(), wy * tilesize + wall.offset(),
                         region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, rotation * 90 - 90);
             }else{
-                mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region,
+                mesh.draw(idxWall, region,
                         wx * tilesize + wall.offset() + (tilesize - region.getWidth() * Draw.scl)/2f,
                         wy * tilesize + wall.offset() + (tilesize - region.getHeight() * Draw.scl)/2f,
                         region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
             }
         }else{
-            region = floor.getEditorIcon();
+            region = floor.variantRegions()[Mathf.randomSeed(idxWall, 0, floor.variantRegions().length-1)];
 
-            mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize, region, wx * tilesize, wy * tilesize, 8, 8);
+            mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
         }
 
-        boolean check = checkElevation(elev, wx, wy);
+        float offsetX = -(wall.size/3)*tilesize, offsetY = -(wall.size/3) * tilesize;
 
         if(wall.update || wall.destructible){
             mesh.setColor(team.color);
             region = Core.atlas.find("block-border");
-        }else if(elev > 0 && check){
-            mesh.setColor(tmpColor.fromHsv((360f * elev / 127f * 4f) % 360f, 0.5f + (elev / 4f) % 0.5f, 1f));
-            region = Core.atlas.find("block-elevation");
-        }else if(elev == -1){
-            region = Core.atlas.find("block-slope");
+        }else if(!wall.synthetic() && bw != 0){
+            region = wall.icon(Icon.full) == Core.atlas.find("____") ? Core.atlas.find("clear") : wall.icon(Icon.full);
+            offsetX = tilesize/2f - region.getWidth()/2f * Draw.scl;
+            offsetY = tilesize/2f - region.getHeight()/2f * Draw.scl;
         }else{
             region = Core.atlas.find("clear");
         }
 
-        mesh.draw((wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize, region,
-                wx * tilesize - (wall.size/3) * tilesize, wy * tilesize - (wall.size/3) * tilesize,
+        mesh.draw(idxDecal, region,
+                wx * tilesize + offsetX, wy * tilesize + offsetY,
                 region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
         mesh.setColor(Color.WHITE);
-    }
-
-    private boolean checkElevation(byte elev, int x, int y){
-        for(Point2 p : Geometry.d4){
-            int wx = x + p.x, wy = y + p.y;
-            if(!Structs.inBounds(wx, wy, editor.getMap().width(), editor.getMap().height())){
-                return true;
-            }
-            byte value = editor.getMap().read(wx, wy, DataPosition.elevation);
-
-            if(value < elev){
-                return true;
-            }else if(value > elev){
-                delayedUpdates.add(wx + wy * width);
-            }
-        }
-        return false;
     }
 
     @Override

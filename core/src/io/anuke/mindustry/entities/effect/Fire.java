@@ -3,9 +3,9 @@ package io.anuke.mindustry.entities.effect;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.collection.IntMap;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.TimedEntity;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.impl.TimedEntity;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
@@ -13,16 +13,17 @@ import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pool.Poolable;
 import io.anuke.arc.util.pooling.Pools;
+import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.content.bullets.TurretBullets;
-import io.anuke.mindustry.content.fx.EnvironmentFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 
 import java.io.DataInput;
@@ -64,10 +65,10 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     }
 
     public static boolean has(int x, int y){
-        if(!Structs.inBounds(x, y, world.width(), world.height()) || !map.containsKey(x + y * world.width())){
+        if(!Structs.inBounds(x, y, world.width(), world.height()) || !map.containsKey(Pos.get(x, y))){
             return false;
         }
-        Fire fire = map.get(x + y * world.width());
+        Fire fire = map.get(Pos.get(x, y));
         return fire.isAdded() && fire.fin() < 1f && fire.tile != null && fire.tile.x == x && fire.tile.y == y;
     }
 
@@ -93,11 +94,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     @Override
     public void update(){
         if(Mathf.chance(0.1 * Time.delta())){
-            Effects.effect(EnvironmentFx.fire, x + Mathf.range(4f), y + Mathf.range(4f));
+            Effects.effect(Fx.fire, x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
         if(Mathf.chance(0.05 * Time.delta())){
-            Effects.effect(EnvironmentFx.smoke, x + Mathf.range(4f), y + Mathf.range(4f));
+            Effects.effect(Fx.fireSmoke, x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
         if(Net.client()){
@@ -136,7 +137,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
             create(other);
 
             if(Mathf.chance(fireballChance * Time.delta() * Mathf.clamp(flammability / 10f))){
-                Call.createBullet(TurretBullets.fireball, x, y, Mathf.random(360f));
+                Call.createBullet(Bullets.fireball, x, y, Mathf.random(360f));
             }
         }
 
@@ -151,7 +152,9 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
             if(damage){
                 entity.damage(0.4f);
             }
-            Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f, unit -> !unit.isFlying(), unit -> unit.applyEffect(StatusEffects.burning, 0.8f));
+            Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f,
+                    unit -> !unit.isFlying() && !unit.isImmune(StatusEffects.burning),
+                    unit -> unit.applyEffect(StatusEffects.burning, 60 * 5));
         }
     }
 

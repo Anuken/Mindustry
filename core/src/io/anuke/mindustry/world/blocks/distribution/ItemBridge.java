@@ -7,18 +7,16 @@ import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.collection.IntSet.IntSetIterator;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.CapStyle;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
@@ -34,14 +32,13 @@ import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 public class ItemBridge extends Block{
-    protected static int lastPlaced;
-
     protected int timerTransport = timers++;
     protected int range;
     protected float transportTime = 2f;
     protected IntArray removals = new IntArray();
-
     protected TextureRegion endRegion, bridgeRegion, arrowRegion;
+
+    private static int lastPlaced = Pos.invalid;
 
     public ItemBridge(String name){
         super(name);
@@ -85,29 +82,46 @@ public class ItemBridge extends Block{
 
     @Override
     public void playerPlaced(Tile tile){
-        Tile last = world.tile(lastPlaced);
-        if(linkValid(tile, last)){
-            ItemBridgeEntity entity = last.entity();
-            if(!linkValid(last, world.tile(entity.link))){
-                Call.linkItemBridge(null, last, tile);
+        Tile link = findLink(tile.x, tile.y);
+        if(linkValid(tile, link)){
+            Call.linkItemBridge(null, link, tile);
+        }
+
+        lastPlaced = tile.pos();
+    }
+
+    public Tile findLink(int x, int y){
+        if(linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Pos.get(x, y)){
+            return world.tile(lastPlaced);
+        }
+
+        for(int j = 0; j < 4; j ++){
+            Point2 p = Geometry.d4(j + 1);
+            for(int i = 1; i <= range; i++){
+                Tile tile = world.tile(x + p.x * i, y + p.y * i);
+
+                if(tile == null) break;
+                if(tile.block() == this && !(tile.x == x && tile.y == y) && tile.entity != null && tile.<ItemBridgeEntity>entity().link == Pos.invalid){
+                    return tile;
+                }
             }
         }
-        lastPlaced = tile.pos();
+        return null;
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Lines.stroke(2f);
-        Draw.color(Palette.placing);
-        for(int i = 0; i < 4; i++){
-            Lines.dashLine(
-                    x * tilesize + Geometry.d4[i].x * (tilesize / 2f + 2),
-                    y * tilesize + Geometry.d4[i].y * (tilesize / 2f + 2),
-                    x * tilesize + Geometry.d4[i].x * (range + 0.5f) * tilesize,
-                    y * tilesize + Geometry.d4[i].y * (range + 0.5f) * tilesize,
-                    range);
-        }
+        Tile link = findLink(x, y);
 
+        Draw.tint(Pal.placing);
+        Lines.stroke(1f);
+        if(link != null){
+            int rot = link.absoluteRelativeTo(x, y);
+            float w = (link.x == x ? tilesize : Math.abs(link.x - x) * tilesize - tilesize);
+            float h = (link.y == y ? tilesize : Math.abs(link.y - y) * tilesize - tilesize);
+            Lines.rect((x + link.x)/2f * tilesize - w/2f, (y + link.y)/2f * tilesize - h/2f, w, h);
+            Fill.poly(link.x * tilesize + Geometry.d4[rot].x * tilesize, link.y * tilesize + Geometry.d4[rot].y * tilesize, 3, 2.8f, link.absoluteRelativeTo(x, y)*90);
+        }
         Draw.reset();
     }
 
@@ -115,7 +129,7 @@ public class ItemBridge extends Block{
     public void drawConfigure(Tile tile){
         ItemBridgeEntity entity = tile.entity();
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Lines.stroke(1f);
         Lines.square(tile.drawx(), tile.drawy(),
                 tile.block().size * tilesize / 2f + 1f);
@@ -125,7 +139,7 @@ public class ItemBridge extends Block{
                 Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
                 if(linkValid(tile, other)){
                     boolean linked = other.pos() == entity.link;
-                    Draw.color(linked ? Palette.place : Palette.breakInvalid);
+                    Draw.color(linked ? Pal.place : Pal.breakInvalid);
 
                     Lines.square(other.drawx(), other.drawy(),
                             other.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
@@ -175,6 +189,7 @@ public class ItemBridge extends Block{
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
+            entity.link = Pos.invalid;
             tryDump(tile);
             entity.uptime = 0f;
         }else{
@@ -288,14 +303,6 @@ public class ItemBridge extends Block{
     }
 
     @Override
-    public void transformLinks(Tile tile, int oldWidth, int oldHeight, int newWidth, int newHeight, int shiftX, int shiftY){
-        super.transformLinks(tile, oldWidth, oldHeight, newWidth, newHeight, shiftX, shiftY);
-
-        ItemBridgeEntity entity = tile.entity();
-        entity.link = world.transform(entity.link, oldWidth, oldHeight, newWidth, shiftX, shiftY);
-    }
-
-    @Override
     public TileEntity newEntity(){
         return new ItemBridgeEntity();
     }
@@ -318,7 +325,7 @@ public class ItemBridge extends Block{
     }
 
     public static class ItemBridgeEntity extends TileEntity{
-        public int link = -1;
+        public int link = Pos.invalid;
         public IntSet incoming = new IntSet();
         public float uptime;
         public float time;

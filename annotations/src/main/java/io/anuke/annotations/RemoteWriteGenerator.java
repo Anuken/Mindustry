@@ -29,6 +29,7 @@ public class RemoteWriteGenerator{
         for(ClassEntry entry : entries){
             //create builder
             TypeSpec.Builder classBuilder = TypeSpec.classBuilder(entry.name).addModifiers(Modifier.PUBLIC);
+            classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
 
             //add temporary write buffer
             classBuilder.addField(FieldSpec.builder(ByteBuffer.class, "TEMP_BUFFER", Modifier.STATIC, Modifier.PRIVATE, Modifier.FINAL)
@@ -79,7 +80,7 @@ public class RemoteWriteGenerator{
                 return;
             }
 
-            if(!elem.getParameters().get(0).asType().toString().equals("io.anuke.mindustry.entities.Player")){
+            if(!elem.getParameters().get(0).asType().toString().equals("io.anuke.mindustry.entities.type.Player")){
                 Utils.messager.printMessage(Kind.ERROR, "Client invoke methods should have a first parameter of type Player.", elem);
                 return;
             }

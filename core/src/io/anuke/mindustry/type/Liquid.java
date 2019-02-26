@@ -10,8 +10,6 @@ import io.anuke.mindustry.ui.ContentDisplay;
 
 public class Liquid extends UnlockableContent{
     public final Color color;
-    public final String name;
-    public final String description;
 
     /**0-1, 0 is completely inflammable, anything above that may catch fire when exposed to heat, 0.5+ is very flammable.*/
     public float flammability;
@@ -29,11 +27,11 @@ public class Liquid extends UnlockableContent{
     public StatusEffect effect = StatusEffects.none;
     /**Pump tier. Controls which pumps can use this liquid.*/
     public int tier;
-    /**Displayed icon.*/
+    /**Displayed icon. TODO fix it by removing autogen, draw icons manually*/
     public TextureRegion iconRegion;
 
     public Liquid(String name, Color color){
-        this.name = name;
+        super(name);
         this.color = new Color(color);
         this.description = Core.bundle.getOrNull("liquid." + name + ".description");
     }
@@ -44,7 +42,7 @@ public class Liquid extends UnlockableContent{
 
     @Override
     public void load(){
-        iconRegion = Core.atlas.find("liquid-icon-" + name);
+        iconRegion = Core.atlas.find("liquid-" + name);
     }
 
     @Override
@@ -65,11 +63,6 @@ public class Liquid extends UnlockableContent{
     @Override
     public String toString(){
         return localizedName();
-    }
-
-    @Override
-    public String getContentName(){
-        return name;
     }
 
     @Override

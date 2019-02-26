@@ -1,15 +1,16 @@
 package io.anuke.mindustry.entities;
 
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -21,11 +22,10 @@ import static io.anuke.mindustry.Vars.*;
  */
 public class Units{
     private static Rectangle rect = new Rectangle();
-    private static Rectangle rectGraphics = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
     private static Unit result;
     private static float cdist;
-    private static boolean boolResult, boolResultGraphics;
+    private static boolean boolResult;
 
     /**
      * Validates a target.
@@ -48,7 +48,7 @@ public class Units{
 
     /**See {@link #invalidateTarget(TargetTrait, Team, float, float, float)}*/
     public static boolean invalidateTarget(TargetTrait target, Unit targeter){
-        return invalidateTarget(target, targeter.team, targeter.x, targeter.y, targeter.getWeapon().getAmmo().getRange());
+        return invalidateTarget(target, targeter.getTeam(), targeter.x, targeter.y, targeter.getWeapon().bullet.range());
     }
 
     /**Returns whether there are any entities on this tile.*/
@@ -67,7 +67,7 @@ public class Units{
         Units.getNearby(rect, unit -> {
             if(boolResult) return;
             if(!unit.isFlying()){
-                unit.getHitbox(hitrect);
+                unit.hitbox(hitrect);
 
                 if(hitrect.overlaps(rect)){
                     boolResult = true;
@@ -89,7 +89,7 @@ public class Units{
         Units.getNearby(rect, unit -> {
             if(value[0] || !pred.test(unit) || unit.isDead()) return;
             if(!unit.isFlying()){
-                unit.getHitbox(hitrect);
+                unit.hitbox(hitrect);
 
                 if(hitrect.overlaps(rect)){
                     value[0] = true;
@@ -113,6 +113,8 @@ public class Units{
 
     /**Returns the neareset enemy tile in a range.*/
     public static TileEntity findEnemyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+        if(team == Team.none) return null;
+
         for(Team enemy : state.teams.enemiesOf(team)){
             TileEntity entity = world.indexer.findTile(enemy, x, y, range, pred);
             if(entity != null){
@@ -156,6 +158,8 @@ public class Units{
 
     /**Returns the closest enemy of this team. Filter by predicate.*/
     public static Unit getClosestEnemy(Team team, float x, float y, float range, Predicate<Unit> predicate){
+        if(team == Team.none) return null;
+
         result = null;
         cdist = 0f;
 
@@ -210,7 +214,7 @@ public class Units{
 
         //now check all players
         EntityQuery.getNearby(playerGroup, rect, player -> {
-            if(((Unit) player).team == team) cons.accept((Unit) player);
+            if(((Unit) player).getTeam() == team) cons.accept((Unit) player);
         });
     }
 
@@ -229,7 +233,7 @@ public class Units{
 
         //now check all players
         EntityQuery.getNearby(playerGroup, rect, player -> {
-            if(((Unit) player).team == team && player.dst(x, y) <= radius){
+            if(((Unit) player).getTeam() == team && player.dst(x, y) <= radius){
                 cons.accept((Unit) player);
             }
         });
@@ -262,7 +266,7 @@ public class Units{
 
         //now check all enemy players
         EntityQuery.getNearby(playerGroup, rect, player -> {
-            if(targets.contains(((Player) player).team)){
+            if(targets.contains(((Player) player).getTeam())){
                 cons.accept((Unit) player);
             }
         });

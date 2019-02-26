@@ -1,12 +1,24 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
-
-import static io.anuke.mindustry.Vars.control;
+import io.anuke.mindustry.Vars;
 
 /**Base interface for an unlockable content type.*/
 public abstract class UnlockableContent extends MappableContent{
+    /**Localized, formal name. Never null. Set to block name if not found in bundle.*/
+    public String localizedName;
+    /**Localized description. May be null.*/
+    public String description;
+
+    public UnlockableContent(String name){
+        super(name);
+
+        this.localizedName = Core.bundle.get(getContentType() + "." + name + ".name", name);
+        this.description = Core.bundle.getOrNull(getContentType() + "." + name + ".description");
+    }
+
     /**Returns the localized name of this content.*/
     public abstract String localizedName();
 
@@ -29,23 +41,11 @@ public abstract class UnlockableContent extends MappableContent{
         return false;
     }
 
-    /**Lists the content that must be unlocked in order for this specific content to become unlocked. May return null.*/
-    public UnlockableContent[] getDependencies(){
-        return null;
+    public final boolean unlocked(){
+        return Vars.data.isUnlocked(this);
     }
 
-    /**Returns whether dependencies are satisfied for unlocking this content.*/
-    public boolean canBeUnlocked(){
-        UnlockableContent[] depend = getDependencies();
-        if(depend == null){
-            return true;
-        }else{
-            for(UnlockableContent cont : depend){
-                if(!control.unlocks.isUnlocked(cont)){
-                    return false;
-                }
-            }
-            return true;
-        }
+    public final boolean locked(){
+        return !unlocked();
     }
 }

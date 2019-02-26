@@ -1,7 +1,5 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.arc.entities.trait.SolidTrait;
-import io.anuke.arc.entities.trait.VelocityTrait;
 import io.anuke.arc.math.geom.Position;
 import io.anuke.mindustry.game.Team;
 
@@ -18,14 +16,14 @@ public interface TargetTrait extends Position, VelocityTrait{
         if(this instanceof SolidTrait){
             return ((SolidTrait) this).getDeltaX();
         }
-        return getVelocity().x;
+        return velocity().x;
     }
 
     default float getTargetVelocityY(){
         if(this instanceof SolidTrait){
             return ((SolidTrait) this).getDeltaY();
         }
-        return getVelocity().y;
+        return velocity().y;
     }
 
     /**

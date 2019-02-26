@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks.units;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
@@ -11,21 +10,19 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumePowerExact;
-import io.anuke.mindustry.world.meta.BlockStat;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -37,6 +34,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 public class MechPad extends Block{
     protected Mech mech;
     protected float buildTime = 60 * 5;
+    protected float requiredSatisfaction = 1f;
 
     protected TextureRegion openRegion;
 
@@ -49,14 +47,7 @@ public class MechPad extends Block{
 
     @Override
     public void init(){
-        consumes.add(new ConsumePowerExact(powerCapacity * 0.8f));
         super.init();
-    }
-
-    @Override
-    public void setStats(){
-        super.setStats();
-        stats.remove(BlockStat.powerUse);
     }
 
     @Override
@@ -66,10 +57,14 @@ public class MechPad extends Block{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void onMechFactoryTap(Player player, Tile tile){
-        if(player == null || !checkValidTap(tile, player)) return;
+        if(player == null  || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.entity();
-        entity.power.amount = 0f;
+        MechPad pad = (MechPad)tile.block();
+
+        if(entity.power.satisfaction < pad.requiredSatisfaction) return;
+
+        entity.power.satisfaction -= Math.min(entity.power.satisfaction, pad.requiredSatisfaction);
         player.beginRespawning(entity);
     }
 
@@ -86,7 +81,12 @@ public class MechPad extends Block{
         Mech result = ((MechPad) tile.block()).mech;
 
         if(entity.player.mech == result){
-            entity.player.mech = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
+            Mech target = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
+            if(entity.player.mech == target){
+                entity.player.mech = (entity.player.isMobile ? Mechs.starterDesktop : Mechs.starterMobile);
+            }else{
+                entity.player.mech = target;
+            }
         }else{
             entity.player.mech = result;
         }
@@ -96,19 +96,19 @@ public class MechPad extends Block{
         entity.player.endRespawning();
         entity.open = true;
         entity.player.setDead(false);
-        entity.player.inventory.clear();
+        entity.player.clearItem();
         entity.player = null;
     }
 
     protected static boolean checkValidTap(Tile tile, Player player){
         MechFactoryEntity entity = tile.entity();
-        return Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
+        return  Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
                 Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.cons.valid() && entity.player == null;
     }
 
     @Override
     public void drawSelect(Tile tile){
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         for(int i = 0; i < 4; i ++){
             float length = tilesize * size/2f + 3 + Mathf.absin(Time.time(), 5f, 2f);
             Draw.rect("transfer-arrow", tile.drawx() + Geometry.d4[i].x * length, tile.drawy() + Geometry.d4[i].y * length, (i+2) * 90);
@@ -153,15 +153,14 @@ public class MechPad extends Block{
 
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
-            Shaders.build.time = -entity.time / 4f;
-            Shaders.build.color.set(Palette.accent);
+            Shaders.build.time = -entity.time / 5f;
+            Shaders.build.color.set(Pal.accent);
 
-            Draw.shader(Shaders.build, false);
-            Shaders.build.apply();
+            Draw.shader(Shaders.build);
             Draw.rect(region, tile.drawx(), tile.drawy());
             Draw.shader();
 
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
 
             Lines.lineAngleCenter(
                     tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
@@ -216,24 +215,16 @@ public class MechPad extends Block{
         boolean open;
 
         @Override
-        public void updateSpawning(Unit unit){
-            if(!(unit instanceof Player))
-                throw new IllegalArgumentException("Mech factories only accept player respawners.");
-
+        public void updateSpawning(Player unit){
             if(player == null){
                 progress = 0f;
-                player = (Player) unit;
+                player = unit;
 
                 player.rotation = 90f;
                 player.baseRotation = 90f;
                 player.set(x, y);
                 player.beginRespawning(this);
             }
-        }
-
-        @Override
-        public float getSpawnProgress(){
-            return progress;
         }
 
         @Override

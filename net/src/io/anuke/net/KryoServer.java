@@ -61,7 +61,7 @@ public class KryoServer implements ServerProvider{
                 c.id = kn.id;
                 c.addressTCP = ip;
 
-                Log.info("&bRecieved connection: {0}", c.addressTCP);
+                Log.debug("&bRecieved connection: {0}", c.addressTCP);
 
                 connections.add(kn);
                 Core.app.post(() -> Net.handleServerReceived(kn.id, c));
@@ -90,7 +90,7 @@ public class KryoServer implements ServerProvider{
                     try{
                         Net.handleServerReceived(k.id, object);
                     }catch(ValidateException e){
-                        Log.err("Validate failed: {0} ({1})", e.player.name, e.getMessage());
+                        Log.err("Validation failed: {0} ({1})", e.player.name, e.getMessage());
                     }catch(Exception e){
                         e.printStackTrace();
                     }
@@ -249,7 +249,6 @@ public class KryoServer implements ServerProvider{
     @Override
     public void dispose(){
         close();
-        Log.info("Disposed server.");
     }
 
     private void handleException(Throwable e){

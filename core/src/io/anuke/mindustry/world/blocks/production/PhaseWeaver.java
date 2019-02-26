@@ -6,7 +6,7 @@ import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.world.Tile;
 
@@ -27,11 +27,8 @@ public class PhaseWeaver extends PowerSmelter{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
-        if(icon == null){
-            icon = new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
-        }
-        return icon;
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
     }
 
     @Override
@@ -44,7 +41,7 @@ public class PhaseWeaver extends PowerSmelter{
 
         Shaders.build.region = weaveRegion;
         Shaders.build.progress = progress;
-        Shaders.build.color.set(Palette.accent);
+        Shaders.build.color.set(Pal.accent);
         Shaders.build.color.a = entity.heat;
         Shaders.build.time = -entity.time / 10f;
 
@@ -53,7 +50,7 @@ public class PhaseWeaver extends PowerSmelter{
         Draw.rect(weaveRegion, tile.drawx(), tile.drawy(), entity.time);
         Draw.shader();
 
-        Draw.color(Palette.accent);
+        Draw.color(Pal.accent);
         Draw.alpha(entity.heat);
 
         Lines.lineAngleCenter(

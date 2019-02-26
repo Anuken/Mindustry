@@ -5,7 +5,7 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
 import io.anuke.arc.Events;
 import io.anuke.arc.scene.ui.Dialog;
@@ -20,9 +20,9 @@ public class FloatingDialog extends Dialog{
     public FloatingDialog(String title){
         super(title, "dialog");
         setFillParent(true);
-        title().setAlignment(Align.center);
-        getTitleTable().row();
-        getTitleTable().addImage("white", Palette.accent)
+        this.title.setAlignment(Align.center);
+        titleTable.row();
+        titleTable.addImage("white", Pal.accent)
                 .growX().height(3f).pad(4f);
 
         hidden(() -> {
@@ -63,7 +63,7 @@ public class FloatingDialog extends Dialog{
 
     @Override
     public void addCloseButton(){
-        buttons().addImageTextButton("$text.back", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+        buttons.addImageTextButton("$back", "icon-arrow-left", 30f, this::hide).size(210f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK) {

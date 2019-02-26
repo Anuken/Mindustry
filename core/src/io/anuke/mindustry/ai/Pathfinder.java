@@ -2,7 +2,7 @@ package io.anuke.mindustry.ai;
 
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.IntArray;
-import io.anuke.arc.collection.Queue;
+import io.anuke.arc.collection.IntQueue;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Structs;
@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
@@ -19,7 +20,7 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 public class Pathfinder{
-    private long maxUpdate = Time.millisToNanos(4);
+    private static final long maxUpdate = Time.millisToNanos(4);
     private PathData[] paths;
     private IntArray blocked = new IntArray();
 
@@ -37,10 +38,6 @@ public class Pathfinder{
 
             update(event.tile, event.tile.getTeam());
         });
-    }
-
-    public void activateTeamPath(Team team){
-        createFor(team);
     }
 
     public void update(){
@@ -82,7 +79,7 @@ public class Pathfinder{
     }
 
     public float getValueforTeam(Team team, int x, int y){
-        return paths == null || team.ordinal() >= paths.length ? 0 : Structs.inBounds(x, y, paths[team.ordinal()].weights) ? paths[team.ordinal()].weights[x][y] : 0;
+        return paths == null || paths[team.ordinal()].weights == null || team.ordinal() >= paths.length ? 0 : Structs.inBounds(x, y, paths[team.ordinal()].weights) ? paths[team.ordinal()].weights[x][y] : 0;
     }
 
     private boolean passable(Tile tile, Team team){
@@ -93,7 +90,7 @@ public class Pathfinder{
      * This only occurs for active teams.*/
     private void update(Tile tile, Team team){
         //make sure team exists
-        if(paths[team.ordinal()] != null){
+        if(paths[team.ordinal()] != null && paths[team.ordinal()].weights != null){
             PathData path = paths[team.ordinal()];
 
             //impassable tiles have a weight of float.max
@@ -109,14 +106,16 @@ public class Pathfinder{
             //add all targets to the frontier
             for(Tile other : world.indexer.getEnemy(team, BlockFlag.target)){
                 path.weights[other.x][other.y] = 0;
-                path.searches[other.x][other.y] = path.search;
-                path.frontier.addFirst(other);
+                path.searches[other.x][other.y] = (short)path.search;
+                path.frontier.addFirst(other.pos());
             }
         }
     }
 
     private void createFor(Team team){
         PathData path = new PathData();
+        path.weights = new float[world.width()][world.height()];
+        path.searches = new short[world.width()][world.height()];
         path.search++;
         path.frontier.ensureCapacity((world.width() + world.height()) * 3);
 
@@ -126,11 +125,11 @@ public class Pathfinder{
             for(int y = 0; y < world.height(); y++){
                 Tile tile = world.tile(x, y);
 
-                if(tile.block().flags != null && state.teams.areEnemies(tile.getTeam(), team)
+                if(state.teams.areEnemies(tile.getTeam(), team)
                         && tile.block().flags.contains(BlockFlag.target)){
-                    path.frontier.addFirst(tile);
+                    path.frontier.addFirst(tile.pos());
                     path.weights[x][y] = 0;
-                    path.searches[x][y] = path.search;
+                    path.searches[x][y] = (short)path.search;
                 }else{
                     path.weights[x][y] = Float.MAX_VALUE;
                 }
@@ -143,11 +142,17 @@ public class Pathfinder{
     private void updateFrontier(Team team, long nsToRun){
         PathData path = paths[team.ordinal()];
 
-        long start = Time.nanoTime();
+        long start = Time.nanos();
 
         while(path.frontier.size > 0 && (nsToRun < 0 || Time.timeSinceNanos(start) <= nsToRun)){
-            Tile tile = path.frontier.removeLast();
+            Tile tile = world.tile(path.frontier.removeLast());
             float cost = path.weights[tile.x][tile.y];
+
+            //pathfinding overflowed for some reason, time to bail. the next block update will handle this, hopefully
+            if(path.frontier.size >= world.width() * world.height()){
+                path.frontier.clear();
+                return;
+            }
 
             if(cost < Float.MAX_VALUE){
                 for(Point2 point : Geometry.d4){
@@ -157,9 +162,10 @@ public class Pathfinder{
 
                     if(other != null && (path.weights[dx][dy] > cost + other.cost || path.searches[dx][dy] < path.search)
                             && passable(other, team)){
-                        path.frontier.addFirst(world.tile(dx, dy));
+                        if(other.cost < 0) throw new IllegalArgumentException("Tile cost cannot be negative! " + other);
+                        path.frontier.addFirst(Pos.get(dx, dy));
                         path.weights[dx][dy] = cost + other.cost;
-                        path.searches[dx][dy] = path.search;
+                        path.searches[dx][dy] = (short)path.search;
                     }
                 }
             }
@@ -180,20 +186,13 @@ public class Pathfinder{
                 createFor(team);
             }
         }
-
-        world.spawner.checkAllQuadrants();
     }
 
     class PathData{
         float[][] weights;
-        int[][] searches;
+        short[][] searches;
         int search = 0;
         long lastSearchTime;
-        Queue<Tile> frontier = new Queue<>();
-
-        PathData(){
-            weights = new float[world.width()][world.height()];
-            searches = new int[world.width()][world.height()];
-        }
+        IntQueue frontier = new IntQueue();
     }
 }

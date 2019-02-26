@@ -61,22 +61,22 @@ public class Net{
             String type = t.getClass().toString().toLowerCase();
 
             if(e instanceof BufferUnderflowException || e instanceof BufferOverflowException){
-                error = Core.bundle.get("text.error.io");
+                error = Core.bundle.get("error.io");
             }else if(error.equals("mismatch")){
-                error = Core.bundle.get("text.error.mismatch");
+                error = Core.bundle.get("error.mismatch");
             }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address"))){
-                error = Core.bundle.get("text.error.invalidaddress");
+                error = Core.bundle.get("error.invalidaddress");
             }else if(error.contains("connection refused") || error.contains("route to host") || type.contains("unknownhost")){
-                error = Core.bundle.get("text.error.unreachable");
+                error = Core.bundle.get("error.unreachable");
             }else if(type.contains("timeout")){
-                error = Core.bundle.get("text.error.timedout");
+                error = Core.bundle.get("error.timedout");
             }else if(error.equals("alreadyconnected")){
-                error = Core.bundle.get("text.error.alreadyconnected");
+                error = Core.bundle.get("error.alreadyconnected");
             }else if(!error.isEmpty()){
-                error = Core.bundle.get("text.error.any");
+                error = Core.bundle.get("error.any");
             }
 
-            ui.showText("", Core.bundle.format("text.connectfail", error));
+            ui.showText("", Core.bundle.format("connectfail", error));
             ui.loadfrag.hide();
 
             if(Net.client()){

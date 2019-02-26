@@ -2,60 +2,41 @@ package io.anuke.mindustry.content;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Liquid;
 
 public class Liquids implements ContentList{
-    public static Liquid water, lava, oil, cryofluid;
+    public static Liquid water, slag, oil, cryofluid;
 
     @Override
     public void load(){
 
-        water = new Liquid("water", Color.valueOf("486acd")){
-            {
-                heatCapacity = 0.4f;
-                tier = 0;
-                effect = StatusEffects.wet;
-            }
+        water = new Liquid("water", Color.valueOf("596ab8")){{
+            heatCapacity = 0.4f;
+            tier = 0;
+            effect = StatusEffects.wet;
+        }};
 
-            @Override
-            public boolean alwaysUnlocked() {
-                return true;
-            }
-        };
+        slag = new Liquid("slag", Color.valueOf("ffa166")){{
+            temperature = 1f;
+            viscosity = 0.8f;
+            tier = 2;
+            effect = StatusEffects.melting;
+        }};
 
-        lava = new Liquid("lava", Color.valueOf("e37341")){
-            {
-                temperature = 1f;
-                viscosity = 0.8f;
-                tier = 2;
-                effect = StatusEffects.melting;
-            }
-        };
+        oil = new Liquid("oil", Color.valueOf("313131")){{
+            viscosity = 0.7f;
+            flammability = 1.2f;
+            explosiveness = 1.2f;
+            heatCapacity = 0.7f;
+            tier = 1;
+            effect = StatusEffects.tarred;
+        }};
 
-        oil = new Liquid("oil", Color.valueOf("313131")){
-            {
-                viscosity = 0.7f;
-                flammability = 0.6f;
-                explosiveness = 0.6f;
-                heatCapacity = 0.7f;
-                tier = 1;
-                effect = StatusEffects.tarred;
-            }
-        };
-
-        cryofluid = new Liquid("cryofluid", Color.SKY){
-            {
-                heatCapacity = 0.9f;
-                temperature = 0.25f;
-                tier = 1;
-                effect = StatusEffects.freezing;
-            }
-        };
-    }
-
-    @Override
-    public ContentType type(){
-        return ContentType.liquid;
+        cryofluid = new Liquid("cryofluid", Color.valueOf("6ecdec")){{
+            heatCapacity = 0.9f;
+            temperature = 0.25f;
+            tier = 1;
+            effect = StatusEffects.freezing;
+        }};
     }
 }

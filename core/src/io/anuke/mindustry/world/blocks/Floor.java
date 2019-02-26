@@ -1,17 +1,16 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.function.BiPredicate;
-import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.entities.Effects.Effect;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Block;
@@ -33,31 +32,36 @@ public class Floor extends Block{
     /** How many ticks it takes to drown on this. */
     public float drownTime = 0f;
     /** Effect when walking on this floor. */
-    public Effect walkEffect = BlockFx.ripple;
+    public Effect walkEffect = Fx.ripple;
     /** Effect displayed when drowning on this floor. */
-    public Effect drownUpdateEffect = BlockFx.bubble;
+    public Effect drownUpdateEffect = Fx.bubble;
     /** Status effect applied when walking on. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */
-    public float statusIntensity = 0.6f;
+    public float statusDuration = 60f;
     /** Color of this floor's liquid. Used for tinting sprites. */
     public Color liquidColor;
     /** liquids that drop from this block, used for pumps */
     public Liquid liquidDrop = null;
+    /** item that drops from this block, used for drills */
+    public Item itemDrop = null;
     /** Whether ores generate on this block. */
     public boolean hasOres = false;
     /** whether this block can be drowned in */
     public boolean isLiquid;
-    /** if true, this block cannot be mined by players. useful for annoying things like stone. */
+    /** Heat of this block, 0 at baseline. Used for calculating output of thermal generators.*/
+    public float heat = 0f;
+    /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
-    protected TextureRegion edgeRegion;
-    protected TextureRegion[] edgeRegions;
-    protected TextureRegion[] cliffRegions;
-    protected TextureRegion[] variantRegions;
-    protected Vector2[] offsets;
-    protected Predicate<Floor> blends = block -> block != this && !block.blendOverride(this);
-    protected BiPredicate<Tile, Tile> tileBlends = (tile, other) -> false;
-    protected boolean blend = true;
+    /**Style of the edge stencil. Loaded by looking up "edge-stencil-{name}".*/
+    public String edgeStyle = "smooth";
+    /**Group of blocks that this block does not draw edges on.*/
+    public Block blendGroup = this;
+    /**Effect displayed when randomly updated.*/
+    public Effect updateEffect = Fx.none;
+
+    protected TextureRegion[][] edges;
+    protected byte eq = 0;
 
     public Floor(String name){
         super(name);
@@ -67,42 +71,6 @@ public class Floor extends Block{
     @Override
     public void load(){
         super.load();
-
-        if(blend){
-            edgeRegion = Core.atlas.has(name + "edge") ? Core.atlas.find(name + "edge") : Core.atlas.find(edge + "edge");
-            edgeRegions = new TextureRegion[8];
-            offsets = new Vector2[8];
-
-            for(int i = 0; i < 8; i++){
-                int dx = Geometry.d8[i].x, dy = Geometry.d8[i].y;
-
-                TextureRegion result = new TextureRegion();
-
-                int padSize = (int)(tilesize/Draw.scl/2);
-                int texSize = (int)(tilesize/Draw.scl);
-                int totSize = padSize + texSize;
-
-                int sx = -dx * texSize + padSize/2, sy = -dy * texSize + padSize/2;
-                int x = Mathf.clamp(sx, 0, totSize);
-                int y = Mathf.clamp(sy, 0, totSize);
-                int w = Mathf.clamp(sx + texSize, 0, totSize) - x, h = Mathf.clamp(sy + texSize, 0, totSize) - y;
-
-                float rx = Mathf.clamp(dx * texSize, 0, texSize - w);
-                float ry = Mathf.clamp(dy * texSize, 0, texSize - h);
-
-                result.setTexture(edgeRegion.getTexture());
-                result.set(edgeRegion.getX() + x, edgeRegion.getY() + y + h, w, -h);
-
-                edgeRegions[i] = result;
-                offsets[i] = new Vector2(-padSize + rx, -padSize + ry);
-            }
-
-            cliffRegions = new TextureRegion[4];
-            cliffRegions[0] = Core.atlas.find(name + "-cliff-edge-2");
-            cliffRegions[1] = Core.atlas.find(name + "-cliff-edge");
-            cliffRegions[2] = Core.atlas.find(name + "-cliff-edge-1");
-            cliffRegions[3] = Core.atlas.find(name + "-cliff-side");
-        }
 
         //load variant regions for drawing
         if(variants > 0){
@@ -115,6 +83,17 @@ public class Floor extends Block{
             variantRegions = new TextureRegion[1];
             variantRegions[0] = Core.atlas.find(name);
         }
+
+        int size = (int)(tilesize / Draw.scl);
+        if(Core.atlas.has(name + "-edge")){
+            edges = Core.atlas.find(name + "-edge").split(size, size);
+        }
+        region = variantRegions[0];
+    }
+
+    @Override
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
     @Override
@@ -127,72 +106,70 @@ public class Floor extends Block{
     }
 
     @Override
-    public void drawNonLayer(Tile tile){
-        Mathf.random.setSeed(tile.pos());
-
-        drawEdges(tile, true);
-    }
-
-    @Override
     public void draw(Tile tile){
         Mathf.random.setSeed(tile.pos());
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
 
-        if(tile.hasCliffs() && cliffRegions != null){
-            for(int i = 0; i < 4; i++){
-                if((tile.getCliffs() & (1 << i * 2)) != 0){
-                    Draw.colorl(i > 1 ? 0.6f : 1f);
-
-                    boolean above = (tile.getCliffs() & (1 << ((i + 1) % 4) * 2)) != 0, below = (tile.getCliffs() & (1 << (Mathf.mod(i - 1, 4)) * 2)) != 0;
-
-                    if(above && below){
-                        Draw.rect(cliffRegions[0], tile.worldx(), tile.worldy(), i * 90);
-                    }else if(above){
-                        Draw.rect(cliffRegions[1], tile.worldx(), tile.worldy(), i * 90);
-                    }else if(below){
-                        Draw.rect(cliffRegions[2], tile.worldx(), tile.worldy(), i * 90);
-                    }else{
-                        Draw.rect(cliffRegions[3], tile.worldx(), tile.worldy(), i * 90);
-                    }
-                }
-            }
-        }
-        Draw.reset();
-
-        drawEdges(tile, false);
+        drawEdges(tile);
     }
 
-    public boolean blendOverride(Block block){
-        return false;
-    }
-
-    protected void drawEdges(Tile tile, boolean sameLayer){
-        if(!blend || tile.getCliffs() > 0) return;
+    protected void drawEdges(Tile tile){
+        eq = 0;
 
         for(int i = 0; i < 8; i++){
-            int dx = Geometry.d8[i].x, dy = Geometry.d8[i].y;
-
-            Tile other = tile.getNearby(dx, dy);
-
-            if(other == null) continue;
-
-            Floor floor = other.floor();
-            Floor cur = this;
-            if(floor instanceof OreBlock) floor = ((OreBlock) floor).base;
-            if(cur instanceof OreBlock) cur = ((OreBlock) cur).base;
-
-            if(floor.edgeRegions == null || (floor.id <= cur.id && !(tile.getElevation() != -1 && other.getElevation() > tile.getElevation())) || (!cur.blends.test(floor) && !cur.tileBlends.test(tile, other)) || (floor.cacheLayer.ordinal() > cur.cacheLayer.ordinal() && !sameLayer) ||
-                    (sameLayer && floor.cacheLayer == cur.cacheLayer)) continue;
-
-            TextureRegion region = floor.edgeRegions[i];
-
-            Draw.rect(region,
-                tile.worldx() + floor.offsets[i].x * Draw.scl + Draw.scl * region.getWidth()/2f,
-                tile.worldy() + floor.offsets[i].y * Draw.scl + Draw.scl * region.getHeight()/2f,
-                region.getWidth() * Draw.scl,
-                region.getHeight() * Draw.scl);
+            Point2 point = Geometry.d8[i];
+            Tile other = tile.getNearby(point);
+            if(other != null && doEdge(other.floor()) && other.floor().edges() != null){
+                eq |= (1 << i);
+            }
         }
+
+        for(int i = 0; i < 8; i++){
+            if(eq(i)){
+                Point2 point = Geometry.d8[i];
+                Tile other = tile.getNearby(point);
+
+                TextureRegion region = edge(other.floor(), type(i), 2-(point.x + 1), 2-(point.y + 1));
+                Draw.rect(region, tile.worldx(), tile.worldy());
+            }
+        }
+    }
+
+    protected TextureRegion[][] edges(){
+        return ((Floor)blendGroup).edges;
+    }
+
+    protected boolean doEdge(Floor other){
+        return (other.blendGroup.id > blendGroup.id || edges() == null) && other.edgeOnto(this);
+    }
+
+    protected boolean edgeOnto(Floor other){
+        return true;
+    }
+
+    int type(int i){
+        if(!eq(i - 1) && !eq(i + 1)){
+            //case 0: touching
+            return 0;
+        }else if(eq(i - 1) && eq(i - 2) && eq(i + 1) && eq(i + 2)){
+            //case 2: surrounded
+            return 2;
+        }else if(eq(i - 1) && eq(i + 1)){
+            //case 1: flat
+            return 1;
+        }else{
+            //case 0 is rounded, so it's the safest choice, should work for most possibilities
+            return 0;
+        }
+    }
+
+    boolean eq(int i){
+        return (eq & (1 << Mathf.mod(i, 8))) != 0;
+    }
+
+    TextureRegion edge(Floor block, int type, int x, int y){
+        return block.edges()[x + type*3][2-y];
     }
 
 }

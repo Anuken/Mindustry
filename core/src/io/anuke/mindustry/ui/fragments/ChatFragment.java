@@ -119,12 +119,14 @@ public class ChatFragment extends Table{
             chatfield.tapped(() -> {
                 Dialog dialog = new Dialog("", "dialog");
                 dialog.setFillParent(true);
-                dialog.content().top();
-                dialog.content().defaults().height(65f);
-                TextField to = dialog.content().addField("", t-> {}).pad(15).width(250f).get();
+                dialog.cont.top();
+                dialog.cont.defaults().height(65f);
+                TextField to = dialog.cont.addField("", t-> {}).pad(15).width(250f).get();
                 to.setMaxLength(maxTextLength);
-                to.keyDown(KeyCode.ENTER, () -> dialog.content().find("okb").fireClick());
-                dialog.content().addButton("$text.ok", () -> {
+                to.keyDown(KeyCode.ENTER, () -> {
+                    dialog.cont.find("okb").fireClick();
+                });
+                dialog.cont.addButton("$ok", () -> {
                     chatfield.clearText();
                     chatfield.appendText(to.getText());
                     chatfield.change();

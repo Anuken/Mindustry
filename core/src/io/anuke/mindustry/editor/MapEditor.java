@@ -5,7 +5,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.MapTileData;
@@ -17,14 +17,13 @@ import io.anuke.mindustry.world.blocks.Floor;
 import static io.anuke.mindustry.Vars.content;
 
 public class MapEditor{
-    public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15};
+    public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};
 
     private MapTileData map;
     private ObjectMap<String, String> tags = new ObjectMap<>();
     private MapRenderer renderer = new MapRenderer(this);
 
     private int brushSize = 1;
-    private byte elevation;
     private int rotation;
     private Block drawBlock = Blocks.stone;
     private Team drawTeam = Team.blue;
@@ -52,14 +51,6 @@ public class MapEditor{
 
         drawBlock = Blocks.stone;
         renderer.resize(map.width(), map.height());
-    }
-
-    public byte getDrawElevation(){
-        return elevation;
-    }
-
-    public void setDrawElevation(int elevation){
-        this.elevation = (byte) elevation;
     }
 
     public int getDrawRotation(){
@@ -94,17 +85,17 @@ public class MapEditor{
         this.brushSize = size;
     }
 
-    public void draw(int x, int y){
-        draw(x, y, drawBlock);
+    public void draw(int x, int y, boolean paint){
+        draw(x, y, paint, drawBlock);
     }
 
-    public void draw(int x, int y, Block drawBlock){
-        if(x < 0 || y < 0 || x >= map.width() || y >= map.height()){
-            return;
-        }
+    public void draw(int x, int y, boolean paint, Block drawBlock){
+        draw(x, y, paint, drawBlock, 1.0);
+    }
 
+    public void draw(int x, int y, boolean paint, Block drawBlock, double chance){
         byte writeID = drawBlock.id;
-        byte partID = Blocks.blockpart.id;
+        byte partID = Blocks.part.id;
         byte rotationTeam = Pack.byteByte(drawBlock.rotate ? (byte)rotation : 0, drawBlock.synthetic() ? (byte)drawTeam.ordinal() : 0);
 
         boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
@@ -154,13 +145,12 @@ public class MapEditor{
 
             onWrite(x, y, prev);
         }else{
-
             for(int rx = -brushSize; rx <= brushSize; rx++){
                 for(int ry = -brushSize; ry <= brushSize; ry++){
-                    if(Mathf.dst(rx, ry) <= brushSize - 0.5f){
+                    if(Mathf.dst(rx, ry) <= brushSize - 0.5f && (chance >= 0.999 || Mathf.chance(chance))){
                         int wx = x + rx, wy = y + ry;
 
-                        if(wx < 0 || wy < 0 || wx >= map.width() || wy >= map.height()){
+                        if(wx < 0 || wy < 0 || wx >= map.width() || wy >= map.height() || (paint && !isfloor && content.block(map.read(wx, wy, DataPosition.wall)) == Blocks.air)){
                             continue;
                         }
 
@@ -178,7 +168,6 @@ public class MapEditor{
 
                         if(isfloor){
                             map.write(wx, wy, DataPosition.floor, writeID);
-                            map.write(wx, wy, DataPosition.elevation, elevation);
                         }else{
                             map.write(wx, wy, DataPosition.wall, writeID);
                             map.write(wx, wy, DataPosition.link, (byte) 0);
@@ -187,30 +176,6 @@ public class MapEditor{
 
                         onWrite(x + rx, y + ry, prev);
                     }
-                }
-            }
-        }
-    }
-
-    public void elevate(int x, int y){
-        if(x < 0 || y < 0 || x >= map.width() || y >= map.height()){
-            return;
-        }
-
-        for(int rx = -brushSize; rx <= brushSize; rx++){
-            for(int ry = -brushSize; ry <= brushSize; ry++){
-                if(Mathf.dst(rx, ry) <= brushSize - 0.5f){
-                    int wx = x + rx, wy = y + ry;
-
-                    if(wx < 0 || wy < 0 || wx >= map.width() || wy >= map.height()){
-                        continue;
-                    }
-
-                    TileDataMarker prev = getPrev(wx, wy, true);
-
-                    map.write(wx, wy, DataPosition.elevation, elevation);
-
-                    onWrite(x + rx, y + ry, prev);
                 }
             }
         }
@@ -271,10 +236,21 @@ public class MapEditor{
     }
 
     public void resize(int width, int height){
+        MapTileData previous = map;
+        int offsetX = -(width - previous.width())/2, offsetY = -(height - previous.height())/2;
+
         map = new MapTileData(width, height);
         for(int x = 0; x < map.width(); x++){
             for(int y = 0; y < map.height(); y++){
-                map.write(x, y, DataPosition.floor, Blocks.stone.id);
+                int px = offsetX + x, py = offsetY + y;
+                if(Structs.inBounds(px, py, previous.width(), previous.height())){
+                    map.write(x, y, DataPosition.floor, previous.read(px, py, DataPosition.floor));
+                    map.write(x, y, DataPosition.wall, previous.read(px, py, DataPosition.wall));
+                    map.write(x, y, DataPosition.link, previous.read(px, py, DataPosition.link));
+                    map.write(x, y, DataPosition.rotationTeam, previous.read(px, py, DataPosition.rotationTeam));
+                }else{
+                    map.write(x, y, DataPosition.floor, Blocks.stone.id);
+                }
             }
         }
         renderer.resize(width, height);

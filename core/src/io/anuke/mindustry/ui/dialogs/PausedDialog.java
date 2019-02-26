@@ -2,8 +2,6 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.scene.style.Drawable;
-import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
 
@@ -12,12 +10,10 @@ import static io.anuke.mindustry.Vars.*;
 public class PausedDialog extends FloatingDialog{
     private SaveDialog save = new SaveDialog();
     private LoadDialog load = new LoadDialog();
-    private Table missionTable;
 
     public PausedDialog(){
-        super("$text.menu");
+        super("$menu");
         shouldPause = true;
-        setup();
 
         shown(this::rebuild);
 
@@ -29,46 +25,42 @@ public class PausedDialog extends FloatingDialog{
     }
 
     void rebuild(){
-        missionTable.clear();
-        missionTable.background((Drawable) null);
-        if(world.getSector() != null){
-            missionTable.background("underline");
-            missionTable.add(Core.bundle.format("text.sector", world.getSector().x + ", " + world.getSector().y));
-        }
-    }
+        cont.clear();
 
-    void setup(){
         update(() -> {
             if(state.is(State.menu) && isShown()){
                 hide();
             }
         });
 
-        content().table(t -> missionTable = t).colspan(mobile ? 3 : 2);
-        content().row();
-
         if(!mobile){
             float dw = 210f;
-            content().defaults().width(dw).height(50).pad(5f);
+            cont.defaults().width(dw).height(50).pad(5f);
 
-            content().addButton("$text.back", this::hide).colspan(2).width(dw*2 + 20f);
+            cont.addButton("$back", this::hide).colspan(2).width(dw*2 + 20f);
 
-            content().row();
-            content().addButton("$text.unlocks", ui.unlocks::show);
-            content().addButton("$text.settings", ui.settings::show);
+            cont.row();
+            if(world.isZone()){
+                cont.addButton("$techtree", ui.tech::show);
+            }else{
+                cont.addButton("$database", ui.database::show);
+            }
+            cont.addButton("$settings", ui.settings::show);
 
-            content().row();
-            content().addButton("$text.savegame", save::show).disabled(s -> world.getSector() != null);
-            content().addButton("$text.loadgame", load::show).disabled(b -> Net.active());
+            if(!world.isZone()){
+                cont.row();
+                cont.addButton("$savegame", save::show);
+                cont.addButton("$loadgame", load::show).disabled(b -> Net.active());
+            }
 
-            content().row();
+            cont.row();
 
-            content().addButton("$text.hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw*2 + 20f);
+            cont.addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw*2 + 20f);
 
-            content().row();
+            cont.row();
 
-            content().addButton("$text.quit", () -> {
-                ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
+            cont.addButton("$quit", () -> {
+                ui.showConfirm("$confirm", "$quit.confirm", () -> {
                     if(Net.client()) netClient.disconnectQuietly();
                     runExitSave();
                     hide();
@@ -76,21 +68,25 @@ public class PausedDialog extends FloatingDialog{
             }).colspan(2).width(dw + 10f);
 
         }else{
-            content().defaults().size(120f).pad(5);
+            cont.defaults().size(120f).pad(5);
             float isize = 14f * 4;
 
-            content().addRowImageTextButton("$text.back", "icon-play-2", isize, () -> {
-                hide();
-            });
-            content().addRowImageTextButton("$text.settings", "icon-tools", isize, ui.settings::show);
-            content().addRowImageTextButton("$text.save", "icon-save", isize, save::show).disabled(b -> world.getSector() != null);
+            cont.addRowImageTextButton("$back", "icon-play-2", isize, this::hide);
+            cont.addRowImageTextButton("$settings", "icon-tools", isize, ui.settings::show);
 
-            content().row();
+            if(!world.isZone()){
+                cont.addRowImageTextButton("$save", "icon-save", isize, save::show);
 
-            content().addRowImageTextButton("$text.load", "icon-load", isize, load::show).disabled(b -> Net.active());
-            content().addRowImageTextButton("$text.hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
-            content().addRowImageTextButton("$text.quit", "icon-quit", isize, () -> {
-                ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
+                cont.row();
+
+                cont.addRowImageTextButton("$load", "icon-load", isize, load::show).disabled(b -> Net.active());
+            }else{
+                cont.row();
+            }
+
+            cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
+            cont.addRowImageTextButton("$quit", "icon-quit", isize, () -> {
+                ui.showConfirm("$confirm", "$quit.confirm", () -> {
                     if(Net.client()) netClient.disconnectQuietly();
                     runExitSave();
                     hide();
@@ -106,12 +102,12 @@ public class PausedDialog extends FloatingDialog{
             return;
         }
 
-        ui.loadLogic("$text.saveload", () -> {
+        ui.loadAnd("$saveload", () -> {
             try{
                 control.saves.getCurrent().save();
             }catch(Throwable e){
                 e.printStackTrace();
-               ui.showError("[accent]" + Core.bundle.get("text.savefail"));
+               ui.showError("[accent]" + Core.bundle.get("savefail"));
             }
             state.set(State.menu);
         });

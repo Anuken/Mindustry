@@ -7,9 +7,8 @@ import io.anuke.annotations.Annotations.Variant;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntSet;
-import io.anuke.arc.entities.Entities;
-import io.anuke.arc.entities.EntityGroup;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.RandomXS128;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
@@ -17,10 +16,12 @@ import io.anuke.arc.util.io.ReusableByteArrayInputStream;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadClient;
@@ -34,7 +35,6 @@ import io.anuke.mindustry.world.modules.ItemModule;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Random;
 import java.util.zip.InflaterInputStream;
 
 import static io.anuke.mindustry.Vars.*;
@@ -70,7 +70,7 @@ public class NetClient implements ApplicationListener{
             reset();
 
             ui.loadfrag.hide();
-            ui.loadfrag.show("$text.connecting.data");
+            ui.loadfrag.show("$connecting.data");
 
             ui.loadfrag.setButton(() -> {
                 ui.loadfrag.hide();
@@ -88,7 +88,7 @@ public class NetClient implements ApplicationListener{
             c.uuid = Platform.instance.getUUID();
 
             if(c.uuid == null){
-                ui.showError("$text.invalidid");
+                ui.showError("$invalidid");
                 ui.loadfrag.hide();
                 disconnectQuietly();
                 return;
@@ -104,7 +104,7 @@ public class NetClient implements ApplicationListener{
 
             state.set(State.menu);
 
-            ui.showError("$text.disconnect");
+            ui.showError("$disconnect");
             connecting = false;
 
             Platform.instance.updateRPC();
@@ -158,7 +158,7 @@ public class NetClient implements ApplicationListener{
             if(reason.extraText() != null){
                 ui.showText(reason.toString(), reason.extraText());
             }else{
-                ui.showText("$text.disconnect", reason.toString());
+                ui.showText("$disconnect", reason.toString());
             }
         }
         ui.loadfrag.hide();
@@ -177,7 +177,7 @@ public class NetClient implements ApplicationListener{
         ui.chatfrag.clearMessages();
         Net.setClientLoaded(false);
 
-        ui.loadfrag.show("$text.connecting.data");
+        ui.loadfrag.show("$connecting.data");
 
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
@@ -276,7 +276,7 @@ public class NetClient implements ApplicationListener{
                 Log.err("Failed to load data!");
                 ui.loadfrag.hide();
                 quiet = true;
-                ui.showError("$text.disconnect.data");
+                ui.showError("$disconnect.data");
                 Net.disconnect();
                 timeoutTime = 0f;
             }
@@ -345,9 +345,9 @@ public class NetClient implements ApplicationListener{
                 requests[i] = player.getPlaceQueue().get(i);
             }
 
-            Call.onClientShapshot(lastSent++, Time.millis(), player.x, player.y,
+            Call.onClientShapshot(lastSent++, player.x, player.y,
                 player.pointerX, player.pointerY, player.rotation, player.baseRotation,
-                player.getVelocity().x, player.getVelocity().y,
+                player.velocity().x, player.velocity().y,
                 player.getMineTile(),
                 player.isBoosting, player.isShooting, requests,
                 Core.camera.position.x, Core.camera.position.y,
@@ -364,7 +364,7 @@ public class NetClient implements ApplicationListener{
             return Core.settings.getString("usid-" + ip, null);
         }else{
             byte[] bytes = new byte[8];
-            new Random().nextBytes(bytes);
+            new RandomXS128().nextBytes(bytes);
             String result = new String(Base64Coder.encode(bytes));
             Core.settings.put("usid-" + ip, result);
             Core.settings.save();

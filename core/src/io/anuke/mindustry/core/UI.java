@@ -28,7 +28,7 @@ import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 
@@ -47,8 +47,8 @@ public class UI implements ApplicationListener{
     public LoadingFragment loadfrag;
 
     public AboutDialog about;
-    public RestartDialog restart;
-    public CustomGameDialog levels;
+    public GameOverDialog restart;
+    public CustomGameDialog custom;
     public MapsDialog maps;
     public LoadDialog load;
     public DiscordDialog discord;
@@ -64,17 +64,17 @@ public class UI implements ApplicationListener{
     public TraceDialog traces;
     public ChangelogDialog changelog;
     public LocalPlayerDialog localplayers;
-    public UnlocksDialog unlocks;
+    public DatabaseDialog database;
     public ContentInfoDialog content;
-    public SectorsDialog sectors;
-    public MissionDialog missions;
+    public DeployDialog deploy;
+    public TechTreeDialog tech;
 
     public Cursor drillCursor, unloadCursor;
 
     public UI(){
         Skin skin = new Skin(Core.atlas);
         generateFonts(skin);
-        skin.load(Core.files.internal("ui/uiskin.json"));
+        skin.load(Core.files.internal("sprites/uiskin.json"));
 
         for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
             font.setUseIntegerPositions(true);
@@ -108,7 +108,7 @@ public class UI implements ApplicationListener{
             Core.app.post(() -> showError("Failed to access local storage.\nSettings will not be saved."));
         });
 
-        Colors.put("accent", Palette.accent);
+        Colors.put("accent", Pal.accent);
 
         loadCursors();
     }
@@ -159,13 +159,13 @@ public class UI implements ApplicationListener{
 
         editor = new MapEditorDialog();
         controls = new ControlsDialog();
-        restart = new RestartDialog();
+        restart = new GameOverDialog();
         join = new JoinDialog();
         discord = new DiscordDialog();
         load = new LoadDialog();
-        levels = new CustomGameDialog();
+        custom = new CustomGameDialog();
         language = new LanguageDialog();
-        unlocks = new UnlocksDialog();
+        database = new DatabaseDialog();
         settings = new SettingsMenuDialog();
         host = new HostDialog();
         paused = new PausedDialog();
@@ -177,8 +177,8 @@ public class UI implements ApplicationListener{
         maps = new MapsDialog();
         localplayers = new LocalPlayerDialog();
         content = new ContentInfoDialog();
-        sectors = new SectorsDialog();
-        missions = new MissionDialog();
+        deploy = new DeployDialog();
+        tech = new TechTreeDialog();
 
         Group group = Core.scene.root;
 
@@ -202,11 +202,11 @@ public class UI implements ApplicationListener{
         generator.dispose();
     }
 
-    public void loadGraphics(Runnable call){
-        loadGraphics("$text.loading", call);
+    public void loadAnd(Runnable call){
+        loadAnd("$loading", call);
     }
 
-    public void loadGraphics(String text, Runnable call){
+    public void loadAnd(String text, Runnable call){
         loadfrag.show(text);
         Time.runTask(7f, () -> {
             call.run();
@@ -214,32 +214,19 @@ public class UI implements ApplicationListener{
         });
     }
 
-    public void loadLogic(Runnable call){
-        loadLogic("$text.loading", call);
-    }
-
-    public void loadLogic(String text, Runnable call){
-        loadfrag.show(text);
-        Time.runTask(7f, () ->
-            Core.app.post(() -> {
-                call.run();
-                loadfrag.hide();
-            }));
-    }
-
-    public void showTextInput(String title, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){
-        new Dialog(title, "dialog"){{
-            content().margin(30).add(text).padRight(6f);
-            TextField field = content().addField(def, t -> {
+    public void showTextInput(String titleText, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){
+        new Dialog(titleText, "dialog"){{
+            cont.margin(30).add(text).padRight(6f);
+            TextField field = cont.addField(def, t -> {
             }).size(170f, 50f).get();
             field.setTextFieldFilter((f, c) -> field.getText().length() < 12 && filter.acceptChar(f, c));
             Platform.instance.addDialog(field);
-            buttons().defaults().size(120, 54).pad(4);
-            buttons().addButton("$text.ok", () -> {
+            buttons.defaults().size(120, 54).pad(4);
+            buttons.addButton("$ok", () -> {
                 confirmed.accept(field.getText());
                 hide();
             }).disabled(b -> field.getText().isEmpty());
-            buttons().addButton("$text.cancel", this::hide);
+            buttons.addButton("$cancel", this::hide);
         }}.show();
     }
 
@@ -251,23 +238,23 @@ public class UI implements ApplicationListener{
         Table table = new Table();
         table.setFillParent(true);
         table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.removeActor());
-        table.top().add(info).padTop(8);
+        table.top().add(info).padTop(10);
         Core.scene.add(table);
     }
 
     public void showInfo(String info){
         new Dialog("", "dialog"){{
-            getCell(content()).growX();
-            content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
+            getCell(cont).growX();
+            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
     }
 
     public void showInfo(String info, Runnable clicked){
         new Dialog("", "dialog"){{
-            getCell(content()).growX();
-            content().margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons().addButton("$text.ok", () -> {
+            getCell(cont).growX();
+            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", () -> {
                 clicked.run();
                 hide();
             }).size(90, 50).pad(4);
@@ -275,26 +262,26 @@ public class UI implements ApplicationListener{
     }
 
     public void showError(String text){
-        new Dialog("$text.error.title", "dialog"){{
-            content().margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
+        new Dialog("$error.title", "dialog"){{
+            cont.margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
     }
 
-    public void showText(String title, String text){
-        new Dialog(title, "dialog"){{
-            content().margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons().addButton("$text.ok", this::hide).size(90, 50).pad(4);
+    public void showText(String titleText, String text){
+        new Dialog(titleText, "dialog"){{
+            cont.margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
     }
 
     public void showConfirm(String title, String text, Runnable confirmed){
         FloatingDialog dialog = new FloatingDialog(title);
-        dialog.content().add(text).width(400f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
-        dialog.buttons().defaults().size(200f, 54f).pad(2f);
+        dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+        dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons().addButton("$text.cancel", dialog::hide);
-        dialog.buttons().addButton("$text.ok", () -> {
+        dialog.buttons.addButton("$cancel", dialog::hide);
+        dialog.buttons.addButton("$ok", () -> {
             dialog.hide();
             confirmed.run();
         });

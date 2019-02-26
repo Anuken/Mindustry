@@ -1,64 +1,144 @@
 package io.anuke.mindustry;
 
-import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.entities.units.UnitType;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Log;
+import io.anuke.mindustry.ImagePacker.GenRegion;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.type.Mech;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 
+import java.io.IOException;
+import java.nio.file.Files;
+
 import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class Generators {
 
-    public static void generate(ImageContext context){
+    public static void generate(){
 
-        ImageContext.generate("block-icons", () -> {
+        ImagePacker.generate("block-icons", () -> {
+            Image colors = new Image(256, 1);
+            Color outlineColor = new Color(0, 0, 0, 0.2f);
+
             for(Block block : content.blocks()){
-                TextureRegion[] regions = block.getBlockIcon();
+                TextureRegion[] regions = block.getGeneratedIcons();
 
                 if(regions.length == 0){
                     continue;
                 }
 
-                if(block.turretIcon){
+                try{
+                    Image last = null;
+                    if(block.outlineIcon){
+                        int radius = 3;
+                        GenRegion region = (GenRegion)regions[regions.length-1];
+                        Image base = ImagePacker.get(region);
+                        Image out = last = new Image(region.getWidth(), region.getHeight());
+                        for(int x = 0; x < out.width(); x++){
+                            for(int y = 0; y < out.height(); y++){
 
-                    Image image = ImageContext.get(block.name);
+                                Color color = base.getColor(x, y);
+                                if(color.a >= 0.01f){
+                                    out.draw(x, y, color);
+                                }else{
+                                    boolean found = false;
+                                    outer:
+                                    for(int rx = -radius; rx <= radius; rx++){
+                                        for(int ry = -radius; ry <= radius; ry++){
+                                            if(Mathf.dst(rx, ry) <= radius && base.getColor(rx + x, ry + y).a > 0.01f){
+                                                found = true;
+                                                break outer;
+                                            }
+                                        }
+                                    }
+                                    if(found){
+                                        out.draw(x, y, outlineColor);
+                                    }
+                                }
+                            }
+                        }
 
-                    Image read = ImageContext.create(image.width(), image.height());
-                    read.draw(image);
+                        try{
+                            Files.delete(region.path);
+                        }catch(IOException e){
+                            e.printStackTrace();
+                        }
 
-                    Image base = ImageContext.get("block-" + block.size);
-
-                    base.draw(image);
-
-                    base.save("block-icon-" + block.name);
-                }else {
-
-                    Image image = ImageContext.get(regions[0]);
-
-                    for (TextureRegion region : regions) {
-                        image.draw(region);
+                        out.save(block.name);
                     }
 
-                    image.save("block-icon-" + block.name);
+                    Image image = ImagePacker.get(regions[0]);
+
+                    int i = 0;
+                    for(TextureRegion region : regions){
+                        i ++;
+                        if(i != regions.length || last == null){
+                            image.draw(region);
+                        }else{
+                            image.draw(last);
+                        }
+                    }
+
+                    if(regions.length > 1){
+                        image.save(block.name + "-icon-full");
+                    }
+
+                    for(Icon icon : Icon.values()){
+                        if(icon.size == 0 || (icon.size == image.width() && icon.size == image.height())) continue;
+                        Image scaled = new Image(icon.size, icon.size);
+                        scaled.drawScaled(image);
+                        scaled.save(block.name + "-icon-" + icon.name());
+                    }
+
+                    Color average = new Color();
+                    for(int x = 0; x < image.width(); x++){
+                        for(int y = 0; y < image.height(); y++){
+                            Color color = image.getColor(x, y);
+                            average.r += color.r;
+                            average.g += color.g;
+                            average.b += color.b;
+                        }
+                    }
+                    average.mul(1f / (image.width() * image.height()));
+                    average.a = 1f;
+                    colors.draw(block.id, 0, average);
+                }catch(IllegalArgumentException e){
+                    Log.info("Skipping &ly'{0}'", block.name);
+                }catch(NullPointerException e){
+                    Log.err("Block &ly'{0}'&lr has an null region!");
+                }
+            }
+
+            colors.save("../../../assets/sprites/block_colors");
+        });
+
+        ImagePacker.generate("item-icons", () -> {
+            for(Item item : content.items()){
+                Image base = ImagePacker.get("item-" + item.name);
+                for(Item.Icon icon : Item.Icon.values()){
+                    if(icon.size == base.width()) continue;
+                    Image image = new Image(icon.size, icon.size);
+                    image.drawScaled(base);
+                    image.save("item-" + item.name + "-" + icon.name(), false);
                 }
             }
         });
 
-        ImageContext.generate("mech-icons", () -> {
+        ImagePacker.generate("mech-icons", () -> {
             for(Mech mech : content.<Mech>getBy(ContentType.mech)){
 
                 mech.load();
                 mech.weapon.load();
 
-                Image image = ImageContext.get(mech.region);
+                Image image = ImagePacker.get(mech.region);
 
                 if(!mech.flying){
                     image.drawCenter(mech.baseRegion);
@@ -67,100 +147,57 @@ public class Generators {
                     image.drawCenter(mech.region);
                 }
 
-                int off = (image.width() - mech.weapon.equipRegion.getWidth())/2;
+                int off = (image.width() - mech.weapon.region.getWidth())/2;
 
-                image.draw(mech.weapon.equipRegion, -(int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, false, false);
-                image.draw(mech.weapon.equipRegion, (int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, true, false);
+                image.draw(mech.weapon.region, -(int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, false, false);
+                image.draw(mech.weapon.region, (int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, true, false);
 
 
                 image.save("mech-icon-" + mech.name);
             }
         });
 
-        ImageContext.generate("unit-icons", () -> {
+        ImagePacker.generate("unit-icons", () -> {
             for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
+                if(type.isFlying) continue;
 
                 type.load();
                 type.weapon.load();
 
-                Image image = ImageContext.get(type.region);
+                Image image = ImagePacker.get(type.region);
 
-                if(!type.isFlying){
-                    image.draw(type.baseRegion);
-                    image.draw(type.legRegion);
-                    image.draw(type.legRegion, true, false);
-                    image.draw(type.region);
+                image.draw(type.baseRegion);
+                image.draw(type.legRegion);
+                image.draw(type.legRegion, true, false);
+                image.draw(type.region);
 
-                    image.draw(type.weapon.equipRegion,
-                            -(int)type.weaponOffsetX + (image.width() - type.weapon.equipRegion.getWidth())/2,
-                            (int)type.weaponOffsetY - (image.height() - type.weapon.equipRegion.getHeight())/2 + 1,
-                            false, false);
-                    image.draw(type.weapon.equipRegion,
-                            (int)type.weaponOffsetX + (image.width() - type.weapon.equipRegion.getWidth())/2,
-                            (int)type.weaponOffsetY - (image.height() - type.weapon.equipRegion.getHeight())/2 + 1,
-                            true, false);
-                }
+                image.draw(type.weapon.region,
+                        -(int)type.weapon.width + image.width()/2 - type.weapon.region.getWidth()/2,
+                        (int)type.weaponOffsetY - image.height()/2 - type.weapon.region.getHeight()/2 + 1,
+                        false, false);
+                image.draw(type.weapon.region,
+                        (int)type.weapon.width + image.width()/2 - type.weapon.region.getWidth()/2,
+                        (int)type.weaponOffsetY - image.height()/2 - type.weapon.region.getHeight()/2 + 1,
+                        true, false);
 
                 image.save("unit-icon-" + type.name);
             }
         });
 
-        ImageContext.generate("liquid-icons", () -> {
-            for(Liquid liquid : content.liquids()){
-                Image image = ImageContext.get("liquid-icon");
-                for (int x = 0; x < image.width(); x++) {
-                    for (int y = 0; y < image.height(); y++) {
-                        Color color = image.getColor(x, y);
-                        color.mul(liquid.color);
-                        image.draw(x, y, color);
-                    }
-                }
-
-                image.save("liquid-icon-" + liquid.name);
-            }
-        });
-
-        ImageContext.generate("block-edges", () -> {
-            for(Block block : content.blocks()){
-                if(!(block instanceof Floor)) continue;
-                Floor floor = (Floor)block;
-                if(floor.getIcon().length > 0 && !Core.atlas.has(floor.name + "-cliff-side")){
-                    Image floori = ImageContext.get(floor.getIcon()[0]);
-                    Color color = floori.getColor(0, 0).mul(1.3f, 1.3f, 1.3f, 1f);
-
-                    String[] names = {"cliff-edge-2", "cliff-edge", "cliff-edge-1", "cliff-side"};
-                    for(String str : names){
-                        Image image = ImageContext.get("generic-" + str);
-
-                        for(int x = 0; x < image.width(); x++){
-                            for(int y = 0; y < image.height(); y++){
-                                Color other = image.getColor(x, y);
-                                if(other.a > 0){
-                                    image.draw(x, y, color);
-                                }
-                            }
-                        }
-
-                        image.save(floor.name + "-" + str);
-                    }
-                }
-            }
-        });
-
-        ImageContext.generate("ore-icons", () -> {
+        ImagePacker.generate("ore-icons", () -> {
             for(Block block : content.blocks()){
                 if(!(block instanceof OreBlock)) continue;
 
                 OreBlock ore = (OreBlock)block;
-                Item item = ore.drops.item;
+                Item item = ore.itemDrop;
                 Block base = ore.base;
 
                 for (int i = 0; i < 3; i++) {
                     //get base image to draw on
-                    Image image = ImageContext.get(base.name + (i+1));
-                    Image shadow = ImageContext.get(item.name + (i+1));
+                    Image image = ImagePacker.get(base.name + (i+1));
+                    Image shadow = ImagePacker.get(item.name + (i+1));
 
-                    int offset = 3;
+                    int offset = image.width()/tilesize;
 
                     for (int x = 0; x < image.width(); x++) {
                         for (int y = offset; y < image.height(); y++) {
@@ -174,10 +211,45 @@ public class Generators {
                         }
                     }
 
-                    image.draw(ImageContext.get(item.name + (i+1)));
+                    image.draw(ImagePacker.get(item.name + (i+1)));
                     image.save("ore-" + item.name + "-" + base.name + (i+1));
+
+                    //save icons
+                    image.save(block.name + "-icon-full");
+                    for(Icon icon : Icon.values()){
+                        if(icon.size == 0) continue;
+                        Image scaled = new Image(icon.size, icon.size);
+                        scaled.drawScaled(image);
+                        scaled.save(block.name + "-icon-" + icon.name());
+                    }
+                }
+            }
+        });
+
+        ImagePacker.generate("edges", () -> {
+            for(Block block : content.blocks()){
+                if(!(block instanceof Floor)) continue;
+
+                Floor floor = (Floor)block;
+
+                if(ImagePacker.has(floor.name + "-edge") || floor.blendGroup != floor){
+                    continue;
                 }
 
+                try{
+                    Image image = ImagePacker.get(floor.generateIcons()[0]);
+                    Image edge = ImagePacker.get("edge-stencil-" + floor.edgeStyle);
+                    Image result = new Image(edge.width(), edge.height());
+
+                    for(int x = 0; x < edge.width(); x++){
+                        for(int y = 0; y < edge.height(); y++){
+                            result.draw(x, y, edge.getColor(x, y).mul(image.getColor(x % image.width(), y % image.height())));
+                        }
+                    }
+
+                    result.save(floor.name + "-edge");
+
+                }catch(Exception ignored){}
             }
         });
     }

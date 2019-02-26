@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeItem;
@@ -18,7 +18,6 @@ public class Fracker extends SolidPump{
     public Fracker(String name){
         super(name);
         hasItems = true;
-        itemCapacity = 20;
         singleLiquid = false;
 
         consumes.require(ConsumeItem.class);
@@ -49,7 +48,7 @@ public class Fracker extends SolidPump{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
+    public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
     }
 
@@ -65,7 +64,7 @@ public class Fracker extends SolidPump{
 
         if(entity.cons.valid() && entity.accumulator < itemUseTime){
             super.update(tile);
-            entity.accumulator += entity.delta();
+            entity.accumulator += entity.delta() * entity.power.satisfaction;
         }else{
             tryDumpLiquid(tile, result);
         }

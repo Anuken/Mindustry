@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
@@ -101,11 +101,8 @@ public class Conduit extends LiquidBlock{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
-        if(icon == null){
-            icon = new TextureRegion[]{Core.atlas.find("conduit-bottom"), Core.atlas.find(name + "-top-0")};
-        }
-        return icon;
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find("conduit-bottom"), Core.atlas.find(name + "-top-0")};
     }
 
     @Override

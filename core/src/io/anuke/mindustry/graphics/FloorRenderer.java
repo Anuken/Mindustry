@@ -11,6 +11,7 @@ import io.anuke.arc.graphics.GL20;
 import io.anuke.arc.graphics.g2d.CacheBatch;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.SpriteBatch;
+import io.anuke.arc.graphics.g2d.SpriteCache;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
@@ -21,7 +22,8 @@ import io.anuke.mindustry.world.blocks.Floor;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class FloorRenderer{
     private final static int chunksize = 64;
@@ -30,6 +32,7 @@ public class FloorRenderer{
     private CacheBatch cbatch;
     private IntSet drawnLayerSet = new IntSet();
     private IntArray drawnLayers = new IntArray();
+    private ObjectSet<CacheLayer> used = new ObjectSet<>();
 
     public FloorRenderer(){
         Events.on(WorldLoadEvent.class, event -> clearTiles());
@@ -121,6 +124,8 @@ public class FloorRenderer{
         int crangex = (int) (camera.width  / (chunksize * tilesize)) + 1;
         int crangey = (int) (camera.height  / (chunksize * tilesize)) + 1;
 
+        SpriteBatch batch = Core.batch;
+        Core.batch = cbatch;
         layer.begin();
 
         for(int x = -crangex; x <= crangex; x++){
@@ -139,19 +144,23 @@ public class FloorRenderer{
         }
 
         layer.end();
+        Core.batch = batch;
     }
 
     private void cacheChunk(int cx, int cy){
+        used.clear();
         Chunk chunk = cache[cx][cy];
-
-        ObjectSet<CacheLayer> used = new ObjectSet<>();
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
                 Tile tile = world.tile(tilex, tiley);
 
                 if(tile != null){
-                    used.add(tile.floor().cacheLayer);
+                    if(tile.block().cacheLayer != CacheLayer.normal){
+                        used.add(tile.block().cacheLayer);
+                    }else{
+                        used.add(tile.floor().cacheLayer);
+                    }
                 }
             }
         }
@@ -178,10 +187,10 @@ public class FloorRenderer{
                     floor = tile.floor();
                 }
 
-                if(floor.cacheLayer == layer){
+                if(tile.block().cacheLayer == layer && layer == CacheLayer.walls){
+                    tile.block().draw(tile);
+                }else if(floor.cacheLayer == layer && (world.isAccessible(tile.x,tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
                     floor.draw(tile);
-                }else if(floor.cacheLayer.ordinal() < layer.ordinal()){
-                    floor.drawNonLayer(tile);
                 }
             }
         }
@@ -195,7 +204,8 @@ public class FloorRenderer{
         int chunksx = Mathf.ceil((float) (world.width()) / chunksize),
         chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
         cache = new Chunk[chunksx][chunksy];
-        cbatch = new CacheBatch(world.width() * world.height() * 4 * 4);
+        SpriteCache sprites = new SpriteCache(world.width() * world.height() * 5, (world.width() / chunksize) * (world.height() / chunksize) * 2, false);
+        cbatch = new CacheBatch(sprites);
 
         Time.mark();
 

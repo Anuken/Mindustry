@@ -4,12 +4,11 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.function.Consumer;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.util.Log;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.content.blocks.*;
-import io.anuke.mindustry.content.bullets.*;
-import io.anuke.mindustry.content.fx.*;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.effect.Fire;
@@ -22,10 +21,11 @@ import io.anuke.mindustry.game.MappableContent;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.ColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper;
+
+import static io.anuke.arc.Core.files;
 
 /**
  * Loads all game content.
@@ -41,66 +41,20 @@ public class ContentLoader{
     private MappableContent[][] temporaryMapper;
     private ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
-        //effects
-        new BlockFx(),
-        new BulletFx(),
-        new EnvironmentFx(),
-        new ExplosionFx(),
         new Fx(),
-        new ShootFx(),
-        new UnitFx(),
-
-        //items
         new Items(),
-
-        //status effects
         new StatusEffects(),
-
-        //liquids
         new Liquids(),
-
-        //bullets
-        new ArtilleryBullets(),
-        new FlakBullets(),
-        new MissileBullets(),
-        new StandardBullets(),
-        new TurretBullets(),
-        new WeaponBullets(),
-
-
-        //ammotypes
-        new AmmoTypes(),
-
-        //weapons
-        new Weapons(),
-
-        //mechs
+        new Bullets(),
         new Mechs(),
-
-        //units
         new UnitTypes(),
-
-        //blocks
         new Blocks(),
-        new DefenseBlocks(),
-        new DistributionBlocks(),
-        new ProductionBlocks(),
-        new TurretBlocks(),
-        new DebugBlocks(),
-        new LiquidBlocks(),
-        new StorageBlocks(),
-        new UnitBlocks(),
-        new PowerBlocks(),
-        new CraftingBlocks(),
-        new UpgradeBlocks(),
-        new OreBlocks(),
+        new Loadouts(),
+        new TechTree(),
+        new Zones(),
 
-        //not really a content class, but this makes initialization easier
-        new ColorMapper(),
+        //these are not really content classes, but this makes initialization easier
         new LegacyColorMapper(),
-
-        //recipes
-        new Recipes(),
     };
 
     /**Creates all content types.*/
@@ -127,7 +81,7 @@ public class ContentLoader{
 
             for(Content c : contentMap[type.ordinal()]){
                 if(c instanceof MappableContent){
-                    String name = ((MappableContent) c).getContentName();
+                    String name = ((MappableContent) c).name;
                     if(contentNameMap[type.ordinal()].containsKey(name)){
                         throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + name + "')");
                     }
@@ -177,6 +131,22 @@ public class ContentLoader{
         initialization.add(callable);
     }
 
+    /**Loads block colors.*/
+    public void loadColors(){
+        Pixmap pixmap = new Pixmap(files.internal("sprites/block_colors.png"));
+        for(int i = 0; i < 256; i++){
+            if(blocks().size > i){
+                int color = pixmap.getPixel(i, 0);
+
+                if(color == 0) continue;
+
+                Block block = block(i);
+                Color.rgba8888ToColor(block.color, color);
+            }
+        }
+        pixmap.dispose();
+    }
+
     public void verbose(boolean verbose){
         this.verbose = verbose;
     }
@@ -216,7 +186,7 @@ public class ContentLoader{
         }
 
         if(id >= contentMap[type.ordinal()].size || id < 0){
-            throw new RuntimeException("No " + type.name() + " with ID '" + id + "' found!");
+            return null;
         }
         return (T)contentMap[type.ordinal()].get(id);
     }
@@ -233,14 +203,6 @@ public class ContentLoader{
 
     public Block block(int id){
         return (Block) getByID(ContentType.block, id);
-    }
-
-    public Array<Recipe> recipes(){
-        return getBy(ContentType.recipe);
-    }
-
-    public Recipe recipe(int id){
-        return (Recipe) getByID(ContentType.recipe, id);
     }
 
     public Array<Item> items(){
@@ -267,6 +229,10 @@ public class ContentLoader{
         return (BulletType) getByID(ContentType.bullet, id);
     }
 
+    public Array<Zone> zones(){
+        return getBy(ContentType.zone);
+    }
+
     /**
      * Registers sync IDs for all types of sync entities.
      * Do not register units here!
@@ -279,7 +245,5 @@ public class ContentLoader{
         TypeTrait.registerType(Lightning.class, Lightning::new);
     }
 
-    private class ImpendingDoomException extends RuntimeException{
-        public ImpendingDoomException(String s){ super(s); }
-    }
+    private class ImpendingDoomException extends RuntimeException{ ImpendingDoomException(String s){ super(s); }}
 }

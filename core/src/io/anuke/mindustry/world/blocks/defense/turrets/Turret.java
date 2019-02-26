@@ -3,8 +3,8 @@ package io.anuke.mindustry.world.blocks.defense.turrets;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.function.BiConsumer;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
@@ -15,18 +15,15 @@ import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.fx.Fx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Predict;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
-import io.anuke.mindustry.type.AmmoEntry;
-import io.anuke.mindustry.type.AmmoType;
-import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -34,11 +31,6 @@ import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
-import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public abstract class Turret extends Block{
@@ -46,7 +38,7 @@ public abstract class Turret extends Block{
 
     protected final int timerTarget = timers++;
 
-    protected Color heatColor = Palette.turretHeat;
+    protected Color heatColor = Pal.turretHeat;
     protected Effect shootEffect = Fx.none;
     protected Effect smokeEffect = Fx.none;
     protected Effect ammoUseEffect = Fx.none;
@@ -70,9 +62,7 @@ public abstract class Turret extends Block{
     protected Vector2 tr = new Vector2();
     protected Vector2 tr2 = new Vector2();
 
-    protected TextureRegion baseRegion;
-    protected TextureRegion heatRegion;
-    protected TextureRegion baseTopRegion;
+    protected TextureRegion baseRegion, heatRegion;
 
     protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) ->
         Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
@@ -91,8 +81,8 @@ public abstract class Turret extends Block{
         solid = true;
         layer = Layer.turret;
         group = BlockGroup.turrets;
-        turretIcon = true;
         flags = EnumSet.of(BlockFlag.turret);
+        outlineIcon = true;
     }
 
     @Override
@@ -101,27 +91,17 @@ public abstract class Turret extends Block{
     }
 
     @Override
-    public void init(){
-        super.init();
-        viewRange = range;
-    }
-
-    @Override
     public void load(){
         super.load();
 
+        region = Core.atlas.find(name);
         baseRegion = Core.atlas.find("block-" + size);
-        baseTopRegion = Core.atlas.find("block-" + size + "-top");
         heatRegion = Core.atlas.find(name + "-heat");
     }
 
     @Override
     public void setStats(){
         super.setStats();
-		/*
-		if(ammo != null) stats.add("ammo", ammo);
-		if(ammo != null) stats.add("ammocapacity", maxAmmo);
-		if(ammo != null) stats.add("ammoitem", ammoMultiplier);*/
 
         stats.add(BlockStat.shootRange, range, StatUnit.blocks);
         stats.add(BlockStat.inaccuracy, (int) inaccuracy, StatUnit.degrees);
@@ -150,19 +130,8 @@ public abstract class Turret extends Block{
     }
 
     @Override
-    public TextureRegion[] getBlockIcon(){
-        if(blockIcon == null){
-            blockIcon = new TextureRegion[]{Core.atlas.find("block-icon-" + name)};
-        }
-        return blockIcon;
-    }
-
-    @Override
-    public TextureRegion[] getCompactIcon(){
-        if(compactIcon == null){
-            compactIcon = new TextureRegion[]{iconRegion(Core.atlas.find("block-icon-" + name))};
-        }
-        return compactIcon;
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find("block-" + size), Core.atlas.find(name)};
     }
 
     @Override
@@ -174,7 +143,7 @@ public abstract class Turret extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Lines.stroke(1f, Palette.placing);
+        Lines.stroke(1f, Pal.placing);
         Lines.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range);
         Draw.color();
     }
@@ -197,8 +166,8 @@ public abstract class Turret extends Block{
 
             if(validateTarget(tile)){
 
-                AmmoType type = peekAmmo(tile);
-                float speed = type.bullet.speed;
+                BulletType type = peekAmmo(tile);
+                float speed = type.speed;
                 if(speed < 0.1f) speed = 9999999f;
 
                 Vector2 result = Predict.intercept(entity, entity.target, speed);
@@ -246,7 +215,7 @@ public abstract class Turret extends Block{
     }
 
     /**Consume ammo and return a type.*/
-    public AmmoType useAmmo(Tile tile){
+    public BulletType useAmmo(Tile tile){
         if(tile.isEnemyCheat()) return peekAmmo(tile);
 
         TurretEntity entity = tile.entity();
@@ -255,15 +224,15 @@ public abstract class Turret extends Block{
         if(entry.amount == 0) entity.ammo.pop();
         entity.totalAmmo -= ammoPerShot;
         Time.run(reload / 2f, () -> ejectEffects(tile));
-        return entry.type;
+        return entry.type();
     }
 
     /**
      * Get the ammo type that will be returned if useAmmo is called.
      */
-    public AmmoType peekAmmo(Tile tile){
+    public BulletType peekAmmo(Tile tile){
         TurretEntity entity = tile.entity();
-        return entity.ammo.peek().type;
+        return entity.ammo.peek().type();
     }
 
     /**
@@ -278,7 +247,7 @@ public abstract class Turret extends Block{
         TurretEntity entity = tile.entity();
 
         if(entity.reload >= reload){
-            AmmoType type = peekAmmo(tile);
+            BulletType type = peekAmmo(tile);
 
             shoot(tile, type);
 
@@ -288,18 +257,16 @@ public abstract class Turret extends Block{
         }
     }
 
-    protected void shoot(Tile tile, AmmoType ammo){
+    protected void shoot(Tile tile, BulletType type){
         TurretEntity entity = tile.entity();
 
         entity.recoil = recoil;
         entity.heat = 1f;
 
-        AmmoType type = peekAmmo(tile);
-
         tr.trns(entity.rotation, size * tilesize / 2f, Mathf.range(xRand));
 
         for(int i = 0; i < shots; i++){
-            bullet(tile, ammo.bullet, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i-shots/2) * spread);
+            bullet(tile, type, entity.rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i-shots/2) * spread);
         }
 
         effects(tile);
@@ -343,6 +310,12 @@ public abstract class Turret extends Block{
         return new TurretEntity();
     }
 
+    public static abstract class AmmoEntry{
+        public int amount;
+
+        public abstract BulletType type();
+    }
+
     public static class TurretEntity extends TileEntity{
         public Array<AmmoEntry> ammo = new Array<>();
         public int totalAmmo;
@@ -352,25 +325,5 @@ public abstract class Turret extends Block{
         public float heat;
         public int shots;
         public TargetTrait target;
-
-        @Override
-        public void write(DataOutput stream) throws IOException{
-            stream.writeByte(ammo.size);
-            for(AmmoEntry entry : ammo){
-                stream.writeByte(entry.type.id);
-                stream.writeShort(entry.amount);
-            }
-        }
-
-        @Override
-        public void read(DataInput stream) throws IOException{
-            byte amount = stream.readByte();
-            for(int i = 0; i < amount; i++){
-                AmmoType type = content.getByID(ContentType.ammo, stream.readByte());
-                short ta = stream.readShort();
-                ammo.add(new AmmoEntry(type, ta));
-                totalAmmo += ta;
-            }
-        }
     }
 }

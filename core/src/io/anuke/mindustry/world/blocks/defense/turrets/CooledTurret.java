@@ -1,11 +1,11 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.math.Mathf;
 
@@ -16,7 +16,7 @@ public class CooledTurret extends Turret{
     protected float coolantMultiplier = 1f;
     /**Max coolant used per tick.*/
     protected float maxCoolantUsed = 1f;
-    protected Effect coolEffect = BlockFx.fuelburn;
+    protected Effect coolEffect = Fx.fuelburn;
 
     public CooledTurret(String name){
         super(name);

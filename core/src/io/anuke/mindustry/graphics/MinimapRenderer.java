@@ -14,11 +14,11 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Disposable;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
-import io.anuke.mindustry.world.ColorMapper;
+import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -88,6 +88,8 @@ public class MinimapRenderer implements Disposable{
         }
 
         Draw.color();
+
+        ScissorStack.popScissors();
     }
 
     public TextureRegion getRegion(){
@@ -135,7 +137,7 @@ public class MinimapRenderer implements Disposable{
 
     private int colorFor(Tile tile){
         tile = tile.target();
-        return ColorMapper.colorFor(tile.floor(), tile.block(), tile.getTeam(), tile.getElevation(), tile.getCliffs());
+        return MapIO.colorFor(tile.floor(), tile.block(), tile.getTeam());
     }
 
     @Override

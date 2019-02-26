@@ -20,10 +20,11 @@ import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
 
@@ -49,7 +50,7 @@ public class BlockInventoryFragment extends Fragment{
 
         int removed = tile.block().removeStack(tile, item, amount);
 
-        player.inventory.addItem(item, removed);
+        player.addItem(item, removed);
         for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
             Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.drawx(), tile.drawy(), player));
         }
@@ -97,7 +98,7 @@ public class BlockInventoryFragment extends Fragment{
                     holdTime += Time.delta();
 
                     if(holdTime >= holdWithdraw){
-                        int amount = Math.min(tile.entity.items.get(lastItem), player.inventory.itemCapacityUsed(lastItem));
+                        int amount = Math.min(tile.entity.items.get(lastItem), player.maxAccepted(lastItem));
                         Call.requestItem(player, tile, lastItem, amount);
                         holding = false;
                         holdTime = 0f;
@@ -120,7 +121,7 @@ public class BlockInventoryFragment extends Fragment{
         int row = 0;
 
         table.margin(6f);
-        table.defaults().size(mobile ? 16 * 3 : 16 * 2).space(6f);
+        table.defaults().size(8 * 5).space(6f);
 
         if(tile.block().hasItems){
 
@@ -130,12 +131,12 @@ public class BlockInventoryFragment extends Fragment{
 
                 container.add(i);
 
-                BooleanProvider canPick = () -> player.inventory.canAcceptItem(item);
+                BooleanProvider canPick = () -> player.acceptsItem(item) && !state.isPaused();
 
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);
 
-                ItemImage image = new ItemImage(item.region, () -> {
+                ItemImage image = new ItemImage(item.icon(Icon.xlarge), () -> {
                     if(tile == null || tile.entity == null){
                         return "";
                     }
@@ -147,11 +148,13 @@ public class BlockInventoryFragment extends Fragment{
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                         if(!canPick.get() || !tile.entity.items.has(item)) return false;
-                        int amount = Math.min(1, player.inventory.itemCapacityUsed(item));
-                        Call.requestItem(player, tile, item, amount);
-                        lastItem = item;
-                        holding = true;
-                        holdTime = 0f;
+                        int amount = Math.min(1, player.maxAccepted(item));
+                        if(amount > 0){
+                            Call.requestItem(player, tile, item, amount);
+                            lastItem = item;
+                            holding = true;
+                            holdTime = 0f;
+                        }
                         return true;
                     }
 

@@ -3,8 +3,6 @@ package io.anuke.mindustry.core;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureAtlas;
@@ -15,12 +13,14 @@ import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.GlobalData;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Saves;
-import io.anuke.mindustry.game.Unlocks;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.input.DesktopInput;
@@ -28,9 +28,9 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.MobileInput;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+import io.anuke.mindustry.world.Tile;
 
 import java.io.IOException;
 
@@ -45,16 +45,15 @@ import static io.anuke.mindustry.Vars.*;
  */
 public class Control implements ApplicationListener{
     public final Saves saves;
-    public final Unlocks unlocks;
 
-    private Interval timerRPC = new Interval(), timerUnlock = new Interval();
+    private Interval timer = new Interval(2);
     private boolean hiscore = false;
     private boolean wasPaused = false;
     private InputHandler[] inputs = {};
 
     public Control(){
         saves = new Saves();
-        unlocks = new Unlocks();
+        data = new GlobalData();
 
         Core.input.setCatch(KeyCode.BACK, true);
 
@@ -70,7 +69,7 @@ public class Control implements ApplicationListener{
             "If more textures are used, the map editor will not display them correctly.");
         }
 
-        unlocks.load();
+        data.load();
 
         Core.settings.setAppName(appName);
         Core.settings.defaults(
@@ -102,9 +101,7 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            if(mobile){
-                Core.app.post(() -> Core.camera.position.set(players[0]));
-            }
+            Core.app.post(() -> Core.camera.position.set(players[0]));
         });
 
         Events.on(ResetEvent.class, event -> {
@@ -117,40 +114,64 @@ public class Control implements ApplicationListener{
             saves.resetSave();
         });
 
-        Events.on(WaveEvent.class, event -> {
-
-            int last = Core.settings.getInt("hiscore" + world.getMap().name, 0);
-
-            if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer && world.getSector() == null){
-                Core.settings.put("hiscore" + world.getMap().name, state.wave);
-                Core.settings.save();
-                hiscore = true;
-            }
-
-            Platform.instance.updateRPC();
-        });
+        //todo high scores for custom maps, as well as other statistics
 
         Events.on(GameOverEvent.class, event -> {
-            //delete saves for game-over sectors
-            if(world.getSector() != null && world.getSector().hasSave()){
-                world.getSector().getSave().delete();
-            }
+            state.stats.wavesLasted = state.wave;
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);
+            if(state.rules.zone != -1){
+                //remove zone save on game over
+                if(saves.getZoneSlot() != null){
+                    saves.getZoneSlot().delete();
+                }
+            }
         });
 
         //autohost for pvp sectors
         Events.on(WorldLoadEvent.class, event -> {
-            if(state.mode.isPvp && !Net.active()){
+            if(state.rules.pvp && !Net.active()){
                 try{
                     Net.host(port);
                     players[0].isAdmin = true;
                 }catch(IOException e){
-                    ui.showError(Core.bundle.format("text.server.error", Strings.parseException(e, false)));
+                    ui.showError(Core.bundle.format("server.error", Strings.parseException(e, false)));
                     Core.app.post(() -> state.set(State.menu));
                 }
             }
+        });
+
+        Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
+
+        Events.on(BlockBuildEndEvent.class, e -> {
+            if(e.team == players[0].getTeam()){
+                if(e.breaking){
+                    state.stats.buildingsDeconstructed++;
+                }else{
+                    state.stats.buildingsBuilt ++;
+                }
+            }
+        });
+
+        Events.on(BlockDestroyEvent.class, e -> {
+            if(e.tile.getTeam() == players[0].getTeam()){
+                state.stats.buildingsDestroyed ++;
+            }
+        });
+
+        Events.on(UnitDestroyEvent.class, e -> {
+            if(e.unit.getTeam() != players[0].getTeam()){
+                state.stats.enemyUnitsDestroyed ++;
+            }
+        });
+
+        Events.on(ZoneCompleteEvent.class, e -> {
+            ui.hudfrag.showToast(Core.bundle.format("zone.complete", e.zone.conditionWave));
+        });
+
+        Events.on(ZoneConfigureCompleteEvent.class, e -> {
+            ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
     }
 
@@ -215,9 +236,10 @@ public class Control implements ApplicationListener{
         return inputs[index];
     }
 
-    public void playMap(Map map){
-        ui.loadLogic(() -> {
+    public void playMap(Map map, Rules rules){
+        ui.loadAnd(() -> {
             logic.reset();
+            state.rules = rules;
             world.loadMap(map);
             logic.play();
         });
@@ -227,35 +249,8 @@ public class Control implements ApplicationListener{
         return hiscore;
     }
 
-    private void checkUnlockableBlocks(){
-        TileEntity entity = players[0].getClosestCore();
-
-        if(entity == null) return;
-
-        entity.items.forEach((item, amount) -> unlocks.unlockContent(item));
-
-        if(players[0].inventory.hasItem()){
-            unlocks.unlockContent(players[0].inventory.getItem().item);
-        }
-
-        outer:
-        for(int i = 0; i < content.recipes().size; i ++){
-            Recipe recipe = content.recipes().get(i);
-            if(!recipe.isHidden() && recipe.requirements != null){
-                for(ItemStack stack : recipe.requirements){
-                    if(!entity.items.has(stack.item, Math.min((int) (stack.amount), 2000))) continue outer;
-                }
-
-                if(unlocks.unlockContent(recipe)){
-                    ui.hudfrag.showUnlock(recipe);
-                }
-            }
-        }
-    }
-
     @Override
     public void dispose(){
-        Platform.instance.onGameExit();
         content.dispose();
         Net.dispose();
         ui.editor.dispose();
@@ -286,12 +281,12 @@ public class Control implements ApplicationListener{
 
             Time.run(5f, () -> {
                 FloatingDialog dialog = new FloatingDialog("WARNING!");
-                dialog.buttons().addButton("$text.ok", () -> {
+                dialog.buttons.addButton("$ok", () -> {
                     dialog.hide();
                     Core.settings.put("4.0-warning-2", true);
                     Core.settings.save();
                 }).size(100f, 60f);
-                dialog.content().add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
+                dialog.cont.add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
                         "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
                         "All current art and UI is temporary, and will be re-drawn before release. " +
                         "\n\n[accent]Saves and maps may be corrupted without warning between updates.").wrap().width(400f);
@@ -302,11 +297,15 @@ public class Control implements ApplicationListener{
 
     @Override
     public void update(){
-
         saves.update();
 
         for(InputHandler inputHandler : inputs){
             inputHandler.updateController();
+        }
+
+        //autosave global data every second if it's modified
+        if(timer.get(1, 60)){
+            data.checkSave();
         }
 
         if(!state.is(State.menu)){
@@ -314,19 +313,19 @@ public class Control implements ApplicationListener{
                 input.update();
             }
 
-            //auto-update rpc every 5 seconds
-            if(timerRPC.get(60 * 5)){
-                Platform.instance.updateRPC();
+            if(world.isZone()){
+                for(Tile tile : state.teams.get(players[0].getTeam()).cores){
+                    for(Item item : content.items()){
+                        if(tile.entity.items.has(item)){
+                            data.unlockContent(item);
+                        }
+                    }
+                }
             }
 
-            //check unlocks every 2 seconds
-            if(!state.mode.infiniteResources && timerUnlock.get(120)){
-                checkUnlockableBlocks();
-
-                //save if the unlocks changed
-                if(unlocks.isDirty()){
-                    unlocks.save();
-                }
+            //auto-update rpc every 5 seconds
+            if(timer.get(0, 60 * 5)){
+                Platform.instance.updateRPC();
             }
 
             if(Core.input.keyTap(Binding.pause) && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){

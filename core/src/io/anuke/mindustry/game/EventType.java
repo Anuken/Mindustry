@@ -2,13 +2,29 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.Events.Event;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
+import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Tile;
 
 public class EventType{
 
-    public static class SectorCompleteEvent implements Event{
+    /**Called when a zone's requirements are met.*/
+    public static class ZoneCompleteEvent implements Event{
+        public final Zone zone;
 
+        public ZoneCompleteEvent(Zone zone){
+            this.zone = zone;
+        }
+    }
+
+    /**Called when a zone's requirements are met.*/
+    public static class ZoneConfigureCompleteEvent implements Event{
+        public final Zone zone;
+
+        public ZoneConfigureCompleteEvent(Zone zone){
+            this.zone = zone;
+        }
     }
 
     /**Called when the game is first loaded.*/
@@ -60,9 +76,9 @@ public class EventType{
     }
 
     public static class UnlockEvent implements Event{
-        public final Content content;
+        public final UnlockableContent content;
 
-        public UnlockEvent(Content content){
+        public UnlockEvent(UnlockableContent content){
             this.content = content;
         }
     }
@@ -75,6 +91,18 @@ public class EventType{
         public final boolean breaking;
 
         public BlockBuildBeginEvent(Tile tile, Team team, boolean breaking){
+            this.tile = tile;
+            this.team = team;
+            this.breaking = breaking;
+        }
+    }
+
+    public static class BlockBuildEndEvent implements Event{
+        public final Tile tile;
+        public final Team team;
+        public final boolean breaking;
+
+        public BlockBuildEndEvent(Tile tile, Team team, boolean breaking){
             this.tile = tile;
             this.team = team;
             this.breaking = breaking;
@@ -94,6 +122,22 @@ public class EventType{
             this.team = team;
             this.builder = builder;
             this.breaking = breaking;
+        }
+    }
+
+    public static class BlockDestroyEvent implements Event{
+        public final Tile tile;
+
+        public BlockDestroyEvent(Tile tile){
+            this.tile = tile;
+        }
+    }
+
+    public static class UnitDestroyEvent implements Event{
+        public final Unit unit;
+
+        public UnitDestroyEvent(Unit unit){
+            this.unit = unit;
         }
     }
 

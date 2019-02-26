@@ -1,15 +1,12 @@
 package io.anuke.mindustry.graphics;
 
 public enum CacheLayer{
-    water{
-    },
-    lava{
-    },
-    oil{
-    },
-    space{
-    },
-    normal;
+    water,
+    lava,
+    oil,
+    space,
+    normal,
+    walls;
 
     public void begin(){
 
@@ -17,12 +14,5 @@ public enum CacheLayer{
 
     public void end(){
 
-    }
-
-    protected void beginShader(){
-
-    }
-
-    public void endShader(){
     }
 }

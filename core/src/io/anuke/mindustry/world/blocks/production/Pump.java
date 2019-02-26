@@ -47,7 +47,7 @@ public class Pump extends LiquidBlock{
 
     @Override
     public void draw(Tile tile){
-        Draw.rect(name(), tile.drawx(), tile.drawy());
+        Draw.rect(name, tile.drawx(), tile.drawy());
 
         Draw.color(tile.entity.liquids.current().color);
         Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
@@ -56,7 +56,7 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
+    public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(name)};
     }
 
@@ -96,6 +96,9 @@ public class Pump extends LiquidBlock{
 
         if(tile.entity.cons.valid() && liquidDrop != null){
             float maxPump = Math.min(liquidCapacity - tile.entity.liquids.total(), tiles * pumpAmount * tile.entity.delta());
+            if(hasPower){
+                maxPump *= tile.entity.power.satisfaction; // Produce slower if not at full power
+            }
             tile.entity.liquids.add(liquidDrop, maxPump);
         }
 

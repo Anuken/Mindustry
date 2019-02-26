@@ -1,11 +1,11 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.entities.Predict;
 import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.type.AmmoType;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -21,23 +21,23 @@ public class ArtilleryTurret extends ItemTurret{
     }
 
     @Override
-    protected void shoot(Tile tile, AmmoType ammo){
+    protected void shoot(Tile tile, BulletType ammo){
         TurretEntity entity = tile.entity();
 
         entity.recoil = recoil;
         entity.heat = 1f;
 
-        AmmoType type = peekAmmo(tile);
+        BulletType type = peekAmmo(tile);
 
         tr.trns(entity.rotation, size * tilesize / 2);
 
-        Vector2 predict = Predict.intercept(tile, entity.target, type.bullet.speed);
+        Vector2 predict = Predict.intercept(tile, entity.target, type.speed);
 
         float dst = entity.dst(predict.x, predict.y);
-        float maxTraveled = type.bullet.lifetime * type.bullet.speed;
+        float maxTraveled = type.lifetime * type.speed;
 
         for(int i = 0; i < shots; i++){
-            Bullet.create(ammo.bullet, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y,
+            Bullet.create(ammo, tile.entity, tile.getTeam(), tile.drawx() + tr.x, tile.drawy() + tr.y,
             entity.rotation + Mathf.range(inaccuracy + type.inaccuracy), 1f + Mathf.range(velocityInaccuracy), (dst / maxTraveled));
         }
 

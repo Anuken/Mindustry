@@ -40,7 +40,7 @@ public class IndexedRenderer implements Disposable{
         program.setUniformMatrix4("u_projTrans", BatchShader.copyTransform(combined));
         program.setUniformi("u_texture", 0);
 
-        mesh.render(program, GL20.GL_TRIANGLES, 0, vertices.length / 5);
+        mesh.render(program, GL20.GL_TRIANGLES, 0, vertices.length / vsize);
 
         program.end();
     }
@@ -185,14 +185,6 @@ public class IndexedRenderer implements Disposable{
 
     public Matrix3 getTransformMatrix(){
         return transMatrix;
-    }
-
-    public void setTransformMatrix(Matrix3 matrix){
-        transMatrix = matrix;
-    }
-
-    public Matrix3 getProjectionMatrix(){
-        return projMatrix;
     }
 
     public void setProjectionMatrix(Matrix3 matrix){
