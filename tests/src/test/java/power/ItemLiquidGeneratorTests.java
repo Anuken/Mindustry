@@ -116,7 +116,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
             tests.add(dynamicTest("03", () -> simulateItemConsumption(inputType, Items.coal, 10, "Excess coal provided")));
             tests.add(dynamicTest("04", () -> simulateItemConsumption(inputType, Items.blastCompound, 1, "Blast compound provided")));
             //dynamicTest("03", () -> simulateItemConsumption(inputType, Items.plastanium, 1, "Plastanium provided")), // Not accepted by generator due to low flammability
-            tests.add(dynamicTest("05", () -> simulateItemConsumption(inputType, Items.biomatter, 1, "Biomatter provided")));
+            tests.add(dynamicTest("05", () -> simulateItemConsumption(inputType, Items.sporePod, 1, "Biomatter provided")));
             tests.add(dynamicTest("06", () -> simulateItemConsumption(inputType, Items.pyratite, 1, "Pyratite provided")));
         }
         DynamicTest[] testArray = new DynamicTest[tests.size()];

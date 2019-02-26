@@ -127,7 +127,7 @@ public class TechTree implements ContentList{
 
                     node(siliconSmelter, () -> {
 
-                        node(biomatterCompressor, () -> {
+                        node(sporePress, () -> {
                             node(multiPress, () -> {
 
                             });

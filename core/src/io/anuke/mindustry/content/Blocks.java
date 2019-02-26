@@ -41,7 +41,7 @@ public class Blocks implements ContentList{
 
     //crafting
     siliconSmelter, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
-    melter, separator, centrifuge, biomatterCompressor, pulverizer, incinerator,
+    melter, separator, sporePress, pulverizer, incinerator,
 
     //sandbox
     powerVoid, powerSource, itemSource, liquidSource, itemVoid,
@@ -412,7 +412,7 @@ public class Blocks implements ContentList{
             output = Items.blastCompound;
             size = 2;
 
-            consumes.items(new ItemStack(Items.pyratite, 1), new ItemStack(Items.biomatter, 1));
+            consumes.items(new ItemStack(Items.pyratite, 1), new ItemStack(Items.sporePod, 1));
             consumes.power(0.40f);
         }};
 
@@ -463,7 +463,7 @@ public class Blocks implements ContentList{
 
         cultivator = new Cultivator("cultivator"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 20, Items.lead, 50, Items.silicon, 20));
-            output = Items.biomatter;
+            output = Items.sporePod;
             craftTime = 200;
             size = 2;
             hasLiquids = true;
@@ -474,7 +474,7 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.water, 0.15f);
         }};
 
-        biomatterCompressor = new Compressor("biomattercompressor"){{
+        sporePress = new Compressor("spore-press"){{
             requirements(Category.crafting, ItemStack.with(Items.lead, 70, Items.silicon, 60));
             liquidCapacity = 60f;
             craftTime = 20f;
@@ -484,7 +484,7 @@ public class Blocks implements ContentList{
             health = 320;
             hasLiquids = true;
 
-            consumes.item(Items.biomatter, 1);
+            consumes.item(Items.sporePod, 1);
             consumes.power(0.60f);
         }};
 

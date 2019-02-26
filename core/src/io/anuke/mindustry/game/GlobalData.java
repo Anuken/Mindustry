@@ -44,6 +44,7 @@ public class GlobalData{
     }
 
     public void addItem(Item item, int amount){
+        unlockContent(item);
         modified = true;
         items.getAndIncrement(item, 0, amount);
         state.stats.itemsDelivered.getAndIncrement(item, 0, amount);

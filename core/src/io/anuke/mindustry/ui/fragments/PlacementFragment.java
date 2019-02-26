@@ -179,7 +179,7 @@ public class PlacementFragment extends Fragment{
                     top.add(new Table()).growX().update(topTable -> {
                         //don't refresh unnecessarily
                         if((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround)
-                        || (tileDisplayBlock() != null && lastHover == hoverTile && lastGround))
+                        || (tileDisplayBlock() != null && lastHover == hoverTile && lastDisplay == tileDisplayBlock() && lastGround))
                             return;
 
                         topTable.clear();
