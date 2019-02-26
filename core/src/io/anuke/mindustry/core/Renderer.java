@@ -256,16 +256,13 @@ public class Renderer implements ApplicationListener{
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
 
-            Shaders.outline.color.set(team.color);
             Shaders.mix.color.set(Color.WHITE);
 
-            //Graphics.beginShaders(Shaders.outline);
             Draw.shader(Shaders.mix, true);
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
             Draw.shader();
             blocks.drawTeamBlocks(Layer.turret, team);
-            //Graphics.endShaders();
 
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);

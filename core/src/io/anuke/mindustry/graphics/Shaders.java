@@ -8,7 +8,6 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Time;
 
 public class Shaders{
-    public static Outline outline;
     public static Shadow shadow;
     public static BlockBuild blockbuild;
     public static BlockPreview blockpreview;
@@ -20,7 +19,6 @@ public class Shaders{
     public static MenuShader menu;
 
     public static void init(){
-        outline = new Outline();
         shadow = new Shadow();
         blockbuild = new BlockBuild();
         blockpreview = new BlockPreview();
@@ -87,23 +85,6 @@ public class Shaders{
             setUniformf("u_progress", progress);
             setUniformf("u_uv", region.getU(), region.getV());
             setUniformf("u_uv2", region.getU2(), region.getV2());
-            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
-        }
-    }
-
-    public static class Outline extends LoadShader{
-        public Color color = new Color();
-        public TextureRegion region = new TextureRegion();
-        public float scl;
-
-        public Outline(){
-            super("outline", "default");
-        }
-
-        @Override
-        public void apply(){
-            setUniformf("u_color", color);
-            setUniformf("u_scl", scl);
             setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
         }
     }
