@@ -148,7 +148,7 @@ public class MechPad extends Block{
             TextureRegion region = mech.iconRegion;
 
             if(entity.player.mech == mech){
-                region = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop).iconRegion;
+                region = (entity.player.mech == Mechs.starterDesktop ? Mechs.starterMobile : Mechs.starterDesktop).iconRegion;
             }
 
             Shaders.build.region = region;

@@ -206,16 +206,13 @@ public class Mechs implements ContentList{
             public void draw(Player player){
                 if(player.shootHeat <= 0.01f) return;
 
-                float alpha = Draw.getColor().a;
                 Shaders.build.progress = player.shootHeat;
                 Shaders.build.region = armorRegion;
                 Shaders.build.time = Time.time() / 10f;
                 Shaders.build.color.set(Pal.accent).a = player.shootHeat;
                 Draw.shader(Shaders.build);
-                Draw.alpha(1f);
                 Draw.rect(armorRegion, player.x, player.y, player.rotation);
-                Draw.shader(Shaders.mix);
-                Draw.color(1f, 1f, 1f, alpha);
+                Draw.shader();
             }
         };
 
@@ -295,16 +292,11 @@ public class Mechs implements ContentList{
             public void draw(Player player){
                 float scl = scld(player);
                 if(scl < 0.01f) return;
-                float alpha = Draw.getColor().a;
-                Draw.shader();
                 Draw.color(Pal.lancerLaser);
                 Draw.alpha(scl/2f);
                 Draw.blend(Blending.additive);
                 Draw.rect(shield, player.x + Mathf.range(scl/2f), player.y + Mathf.range(scl/2f), player.rotation - 90);
                 Draw.blend();
-                Draw.shader(Shaders.mix);
-                Draw.color();
-                Draw.alpha(alpha);
             }
 
             float scld(Player player){

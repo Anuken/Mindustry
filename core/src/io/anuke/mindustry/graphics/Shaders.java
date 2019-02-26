@@ -10,23 +10,17 @@ import io.anuke.arc.util.Time;
 public class Shaders{
     public static Shadow shadow;
     public static BlockBuild blockbuild;
-    public static BlockPreview blockpreview;
     public static Shield shield;
     public static UnitBuild build;
-    public static MixShader mix;
-    public static Shader fullMix;
     public static FogShader fog;
     public static MenuShader menu;
 
     public static void init(){
         shadow = new Shadow();
         blockbuild = new BlockBuild();
-        blockpreview = new BlockPreview();
         shield = new Shield();
         build = new UnitBuild();
-        mix = new MixShader();
         fog = new FogShader();
-        fullMix = new LoadShader("fullmix", "default");
         menu = new MenuShader();
     }
 
@@ -55,27 +49,13 @@ public class Shaders{
         }
     }
 
-    public static class MixShader extends LoadShader{
-        public Color color = new Color(Color.WHITE);
-
-        public MixShader(){
-            super("mix", "default");
-        }
-
-        @Override
-        public void apply(){
-            super.apply();
-            setUniformf("u_color", color);
-        }
-    }
-
     public static class UnitBuild extends LoadShader{
         public float progress, time;
         public Color color = new Color();
         public TextureRegion region;
 
         public UnitBuild(){
-            super("build", "default");
+            super("unitbuild", "default");
         }
 
         @Override
@@ -122,23 +102,6 @@ public class Shaders{
             setUniformf("u_uv", region.getU(), region.getV());
             setUniformf("u_uv2", region.getU2(), region.getV2());
             setUniformf("u_time", Time.time());
-            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
-        }
-    }
-
-    public static class BlockPreview extends LoadShader{
-        public Color color = new Color();
-        public TextureRegion region = new TextureRegion();
-
-        public BlockPreview(){
-            super("blockpreview", "default");
-        }
-
-        @Override
-        public void apply(){
-            setUniformf("u_color", color);
-            setUniformf("u_uv", region.getU(), region.getV());
-            setUniformf("u_uv2", region.getU2(), region.getV2());
             setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
         }
     }

@@ -365,7 +365,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public void drawStats(){
         Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf()*5f, 1f - healthf()));
-        Draw.alpha(hitTime);
         Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
         Draw.color();
     }

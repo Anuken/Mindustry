@@ -23,7 +23,6 @@ import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
@@ -285,11 +284,11 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         Floor floor = getFloorOn();
 
         Draw.color();
-        Draw.alpha(Draw.getShader() != Shaders.mix ? 1f : hitTime / hitDuration);
+        Draw.mixcol(Color.WHITE, hitTime / hitDuration);
 
         if(!mech.flying){
             if(floor.isLiquid){
-                Draw.tint(Color.WHITE, floor.liquidColor, 0.5f);
+                Draw.color(Color.WHITE, floor.liquidColor, 0.5f);
             }
 
             float boostTrnsY = -boostHeat * 3f;
@@ -309,9 +308,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         }
 
         if(floor.isLiquid){
-            Draw.tint(Color.WHITE, floor.liquidColor, drownTime);
+            Draw.color(Color.WHITE, floor.liquidColor, drownTime);
         }else{
-            Draw.tint(Color.WHITE);
+            Draw.color(Color.WHITE);
         }
 
         Draw.rect(mech.region, x, y, rotation - 90);
@@ -344,13 +343,12 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             }
         }
 
-        Draw.alpha(1f);
+        Draw.reset();
     }
 
     @Override
     public void drawStats(){
         Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
-        Draw.alpha(hitTime / hitDuration);
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.color();
     }

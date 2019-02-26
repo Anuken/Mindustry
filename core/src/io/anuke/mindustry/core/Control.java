@@ -342,7 +342,7 @@ public class Control implements ApplicationListener{
             }
 
             if(!mobile && Core.input.keyTap(Binding.screenshot) && !(scene.getKeyboardFocus() instanceof TextField) && !ui.chatfrag.chatOpen()){
-                renderer.takeMapScreenshot();
+                //renderer.takeMapScreenshot();
             }
 
         }else{
