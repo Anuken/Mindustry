@@ -140,7 +140,7 @@ public class HudFragment extends Fragment{
             infolabel.marginLeft(10f);
             IntFormat fps = new IntFormat("fps");
             IntFormat ping = new IntFormat("ping");
-            infolabel.label(() -> fps.get(Core.graphics.getFramesPerSecond())).padRight(10);
+            infolabel.label(() -> fps.get(Core.graphics.getFramesPerSecond())).padLeft(10).growX();
             infolabel.row();
             if(Net.hasClient()){
                 infolabel.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
