@@ -1,28 +1,28 @@
 package io.anuke.mindustry.io;
 
-import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.blocks.StorageBlocks;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.Pack;
+import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.traits.Entity;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.Difficulty;
 import io.anuke.mindustry.game.MappableContent;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.entities.trait.Entity;
-import io.anuke.ucore.util.Bits;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.world;
 
 public abstract class SaveFileVersion{
     public final int version;
@@ -35,12 +35,11 @@ public abstract class SaveFileVersion{
         long time = stream.readLong();
         long playtime = stream.readLong();
         int build = stream.readInt();
-        int sector = stream.readInt();
-        byte mode = stream.readByte();
+
+        Rules rules = Serialization.readRules(stream);
         String map = stream.readUTF();
         int wave = stream.readInt();
-        byte difficulty = stream.readByte();
-        return new SaveMeta(version, time, playtime, build, sector, mode, map, wave, Difficulty.values()[difficulty]);
+        return new SaveMeta(version, time, playtime, build, map, wave, rules);
     }
 
     public void writeMap(DataOutputStream stream) throws IOException{
@@ -54,12 +53,11 @@ public abstract class SaveFileVersion{
 
             stream.writeByte(tile.getFloorID());
             stream.writeByte(tile.getBlockID());
-            stream.writeByte(tile.getElevation());
 
             if(tile.block() instanceof BlockPart){
                 stream.writeByte(tile.link);
             }else if(tile.entity != null){
-                stream.writeByte(Bits.packByte(tile.getTeamID(), tile.getRotation())); //team + rotation
+                stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
                 stream.writeShort((short) tile.entity.health); //health
 
                 if(tile.entity.items != null) tile.entity.items.write(stream);
@@ -75,7 +73,7 @@ public abstract class SaveFileVersion{
                 for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                     Tile nextTile = world.tile(j % world.width(), j / world.width());
 
-                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getElevation() != tile.getElevation()){
+                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air){
                         break;
                     }
 
@@ -86,39 +84,11 @@ public abstract class SaveFileVersion{
                 i += consecutives;
             }
         }
-
-        //write visibility, length-run encoded
-        for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.tile(i % world.width(), i / world.width());
-            boolean discovered = tile.discovered();
-
-            int consecutives = 0;
-
-            for(int j = i + 1; j < world.width() * world.height() && consecutives < 32767*2-1; j++){
-                Tile nextTile = world.tile(j % world.width(), j / world.width());
-
-                if(nextTile.discovered() != discovered){
-                    break;
-                }
-
-                consecutives++;
-            }
-
-            stream.writeBoolean(discovered);
-            stream.writeShort(consecutives);
-            i += consecutives;
-        }
     }
 
     public void readMap(DataInputStream stream) throws IOException{
         short width = stream.readShort();
         short height = stream.readShort();
-
-        if(world.getSector() != null){
-            world.setMap(new Map("Sector " + world.getSector().x + ", " + world.getSector().y, width, height));
-        }else if(world.getMap() == null){
-            world.setMap(new Map("unknown", width, height));
-        }
 
         world.beginMapLoad();
 
@@ -128,21 +98,17 @@ public abstract class SaveFileVersion{
             int x = i % width, y = i / width;
             byte floorid = stream.readByte();
             byte wallid = stream.readByte();
-            byte elevation = stream.readByte();
 
             Tile tile = new Tile(x, y, floorid, wallid);
-            tile.setElevation(elevation);
 
-            if(wallid == Blocks.blockpart.id){
+            if(wallid == Blocks.part.id){
                 tile.link = stream.readByte();
             }else if(tile.entity != null){
                 byte tr = stream.readByte();
                 short health = stream.readShort();
 
-                byte team = Bits.getLeftByte(tr);
-                byte rotation = Bits.getRightByte(tr);
-
-                Team t = Team.all[team];
+                byte team = Pack.leftByte(tr);
+                byte rotation = Pack.rightByte(tr);
 
                 tile.setTeam(Team.all[team]);
                 tile.entity.health = health;
@@ -155,17 +121,12 @@ public abstract class SaveFileVersion{
 
                 tile.entity.readConfig(stream);
                 tile.entity.read(stream);
-
-                if(tile.block() == StorageBlocks.core){
-                    state.teams.get(t).cores.add(tile);
-                }
             }else if(wallid == 0){
                 int consecutives = stream.readUnsignedByte();
 
                 for(int j = i + 1; j < i + 1 + consecutives; j++){
                     int newx = j % width, newy = j / width;
                     Tile newTile = new Tile(newx, newy, floorid, wallid);
-                    newTile.setElevation(elevation);
                     tiles[newx][newy] = newTile;
                 }
 
@@ -173,18 +134,6 @@ public abstract class SaveFileVersion{
             }
 
             tiles[x][y] = tile;
-        }
-
-        for(int i = 0; i < width * height; i++){
-            boolean discovered = stream.readBoolean();
-            int consecutives = stream.readUnsignedShort();
-            if(discovered){
-                for(int j = i + 1; j < i + 1 + consecutives; j++){
-                    int newx = j % width, newy = j / width;
-                    tiles[newx][newy].setVisibility((byte) 1);
-                }
-            }
-            i += consecutives;
         }
 
         content.setTemporaryMapper(null);
@@ -262,7 +211,7 @@ public abstract class SaveFileVersion{
                 stream.writeByte(arr.first().getContentType().ordinal());
                 stream.writeShort(arr.size);
                 for(Content c : arr){
-                    stream.writeUTF(((MappableContent) c).getContentName());
+                    stream.writeUTF(((MappableContent) c).name);
                 }
             }
         }

@@ -1,13 +1,14 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.math.Mathf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -30,21 +31,10 @@ public class Conduit extends LiquidBlock{
     public void load(){
         super.load();
 
-        liquidRegion = Draw.region("conduit-liquid");
+        liquidRegion = Core.atlas.find("conduit-liquid");
         for(int i = 0; i < topRegions.length; i++){
-            topRegions[i] = Draw.region(name + "-top-" + i);
-            botRegions[i] = Draw.region("conduit-bottom-" + i);
-        }
-    }
-
-    @Override
-    public void drawShadow(Tile tile){
-        ConduitEntity entity = tile.entity();
-
-        if(entity.blendshadowrot == -1){
-            super.drawShadow(tile);
-        }else{
-            Draw.rect("shadow-corner", tile.drawx(), tile.drawy(), (tile.getRotation() + 3 + entity.blendshadowrot) * 90);
+            topRegions[i] = Core.atlas.find(name + "-top-" + i);
+            botRegions[i] = Core.atlas.find("conduit-bottom-" + i);
         }
     }
 
@@ -111,11 +101,8 @@ public class Conduit extends LiquidBlock{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
-        if(icon == null){
-            icon = new TextureRegion[]{Draw.region("conduit-bottom"), Draw.region(name + "-top-0")};
-        }
-        return icon;
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find("conduit-bottom"), Core.atlas.find(name + "-top-0")};
     }
 
     @Override

@@ -1,13 +1,13 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import com.badlogic.gdx.utils.NumberUtils;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.arc.util.NumberUtils;
+import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Bits;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -38,11 +38,11 @@ public class Junction extends Block{
             if(buffer.index > 0){
                 if(buffer.index > buffer.items.length) buffer.index = buffer.items.length;
                 long l = buffer.items[0];
-                float time = NumberUtils.intBitsToFloat(Bits.getLeftInt(l));
+                float time = NumberUtils.intBitsToFloat(Pack.leftInt(l));
 
-                if(Timers.time() >= time + speed || Timers.time() < time){
+                if(Time.time() >= time + speed || Time.time() < time){
 
-                    Item item = content.item(Bits.getRightInt(l));
+                    Item item = content.item(Pack.rightInt(l));
                     Tile dest = tile.getNearby(i);
 
                     //skip blocks that don't want the item, keep waiting until they do
@@ -61,7 +61,7 @@ public class Junction extends Block{
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
         JunctionEntity entity = tile.entity();
-        long value = Bits.packLong(NumberUtils.floatToIntBits(Timers.time()), item.id);
+        long value = Pack.longInt(NumberUtils.floatToIntBits(Time.time()), item.id);
         int relative = source.relativeTo(tile.x, tile.y);
         entity.buffers[relative].add(value);
     }
@@ -74,7 +74,7 @@ public class Junction extends Block{
         if(entity == null || relative == -1 || entity.buffers[relative].full())
             return false;
         Tile to = tile.getNearby(relative);
-        return to != null && to.block().acceptItem(item, to, tile);
+        return to != null;
     }
 
     @Override

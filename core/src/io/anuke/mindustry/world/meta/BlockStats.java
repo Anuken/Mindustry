@@ -1,14 +1,13 @@
 package io.anuke.mindustry.world.meta;
 
-import com.badlogic.gdx.utils.ObjectMap.Entry;
-import com.badlogic.gdx.utils.OrderedMap;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.ObjectMap.Entry;
+import io.anuke.arc.collection.OrderedMap;
+import io.anuke.arc.util.Log;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.values.*;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
 
 import java.util.Locale;
 
@@ -17,12 +16,7 @@ public class BlockStats{
     private static final boolean errorWhenMissing = false;
 
     private final OrderedMap<StatCategory, OrderedMap<BlockStat, StatValue>> map = new OrderedMap<>();
-    private final Block block;
     private boolean dirty;
-
-    public BlockStats(Block block){
-        this.block = block;
-    }
 
     /**Adds a single float value with this stat, formatted to 2 decimal places.*/
     public void add(BlockStat stat, float value, StatUnit unit){
@@ -56,7 +50,7 @@ public class BlockStats{
 
     /**Adds a stat value.*/
     public void add(BlockStat stat, StatValue value){
-        if(!Bundles.has("text.blocks." + stat.name().toLowerCase(Locale.ROOT))){
+        if(!Core.bundle.has("blocks." + stat.name().toLowerCase(Locale.ROOT))){
             if(!errorWhenMissing){
                 Log.err("Warning: No bundle entry for stat type \"" + stat + "\"!");
             }else{
@@ -64,7 +58,7 @@ public class BlockStats{
             }
         }
 
-        if(!Bundles.has("text.category." + stat.category.name().toLowerCase(Locale.ROOT))){
+        if(!Core.bundle.has("category." + stat.category.name().toLowerCase(Locale.ROOT))){
             if(!errorWhenMissing){
                 Log.err("Warning: No bundle entry for stat category \"" + stat.category + "\"!");
             }else{
@@ -73,7 +67,7 @@ public class BlockStats{
         }
 
         if(map.containsKey(stat.category) && map.get(stat.category).containsKey(stat)){
-            throw new RuntimeException("Duplicate stat entry: \"" + stat + "\" in block '" + block.name + "'");
+            throw new RuntimeException("Duplicate stat entry: \"" + stat + "\" in block.");
         }
 
         if(!map.containsKey(stat.category)){
@@ -88,7 +82,7 @@ public class BlockStats{
     /**Removes a stat, if it exists.*/
     public void remove(BlockStat stat){
         if(!map.containsKey(stat.category) || !map.get(stat.category).containsKey(stat)){
-            throw new RuntimeException("No stat entry found: \"" + stat + "\" in block '" + block.name + "'!");
+            throw new RuntimeException("No stat entry found: \"" + stat + "\" in block.");
         }
 
         map.get(stat.category).remove(stat);

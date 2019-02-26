@@ -1,57 +1,41 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.blocks.Blocks;
-import io.anuke.mindustry.content.fx.Fx;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.type.Item;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.RandomXS128;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.SeedRandom;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class Cultivator extends Drill{
-    protected Color plantColor = Color.valueOf("648b55");
-    protected Color plantColorLight = Color.valueOf("73a75f");
-    protected Color bottomColor = Color.valueOf("474747");
+public class Cultivator extends GenericCrafter{
+    protected static final Color plantColor = Color.valueOf("648b55");
+    protected static final Color plantColorLight = Color.valueOf("73a75f");
+    protected static final Color bottomColor = Color.valueOf("474747");
+
     protected TextureRegion middleRegion, topRegion;
-
-    protected Item result;
-
-    protected SeedRandom random = new SeedRandom(0);
+    protected RandomXS128 random = new RandomXS128(0);
     protected float recurrence = 6f;
 
     public Cultivator(String name){
         super(name);
-        drillEffect = Fx.none;
-    }
-
-    @Override
-    public void setStats(){
-        super.setStats();
-
-        stats.remove(BlockStat.drillTier);
-        stats.add(BlockStat.drillTier, table -> {
-            table.addImage("grass1").size(8 * 3).padBottom(3).padTop(3);
-            table.add(Blocks.grass.formalName).padLeft(3);
-        });
+        craftEffect = Fx.none;
     }
 
     @Override
     public void load(){
         super.load();
 
-        middleRegion = Draw.region(name + "-middle");
-        topRegion = Draw.region(name + "-top");
+        middleRegion = Core.atlas.find(name + "-middle");
+        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
@@ -78,7 +62,7 @@ public class Cultivator extends Drill{
         for(int i = 0; i < 12; i++){
             float offset = random.nextFloat() * 999999f;
             float x = random.range(4f), y = random.range(4f);
-            float life = 1f - (((Timers.time() + offset) / 50f) % recurrence);
+            float life = 1f - (((Time.time() + offset) / 50f) % recurrence);
 
             if(life > 0){
                 Lines.stroke(entity.warmup * (life * 1f + 0.2f));
@@ -91,8 +75,8 @@ public class Cultivator extends Drill{
     }
 
     @Override
-    public TextureRegion[] getIcon(){
-        return new TextureRegion[]{Draw.region(name), Draw.region(name + "-top"),};
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top"),};
     }
 
     @Override
@@ -100,17 +84,7 @@ public class Cultivator extends Drill{
         return new CultivatorEntity();
     }
 
-    @Override
-    public boolean isValid(Tile tile){
-        return tile != null && tile.floor() == Blocks.grass;
-    }
-
-    @Override
-    public Item getDrop(Tile tile){
-        return Items.biomatter;
-    }
-
-    public static class CultivatorEntity extends DrillEntity{
+    public static class CultivatorEntity extends GenericCrafterEntity{
         public float warmup;
 
         @Override

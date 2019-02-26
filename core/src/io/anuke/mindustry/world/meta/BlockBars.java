@@ -1,42 +1,23 @@
 package io.anuke.mindustry.world.meta;
 
-import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.world.BarType;
+import io.anuke.arc.collection.OrderedMap;
+import io.anuke.arc.function.Function;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.ui.Bar;
 
 public class BlockBars{
-    private Array<BlockBar> list = Array.with(new BlockBar(BarType.health, false, tile -> tile.entity.health / (float) tile.block().health));
+    private OrderedMap<String, Function<TileEntity, Bar>> bars = new OrderedMap<>();
 
-    public void add(BlockBar bar){
-        list.add(bar);
+    public void add(String name,Function<TileEntity, Bar> sup){
+        bars.put(name, sup);
     }
 
-    public void replace(BlockBar bar){
-        remove(bar.type);
-        list.add(bar);
+    public void remove(String name){
+        if(!bars.containsKey(name)) throw new RuntimeException("No bar with name '" + name + "' found; current bars: " + bars.keys().toArray());
+        bars.remove(name);
     }
 
-    public void remove(BarType type){
-        for(BlockBar bar : list){
-            if(bar.type == type){
-                list.removeValue(bar, true);
-                break;
-            }
-        }
-    }
-
-    public void removeAll(BarType type){
-        Array<BlockBar> removals = new Array<>(4);
-
-        for(BlockBar bar : list){
-            if(bar.type == type){
-                removals.add(bar);
-            }
-        }
-
-        list.removeAll(removals, true);
-    }
-
-    public Array<BlockBar> list(){
-        return list;
+    public Iterable<Function<TileEntity, Bar>> list(){
+        return bars.values();
     }
 }

@@ -1,27 +1,24 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.IntSet.IntSetIterator;
-import com.badlogic.gdx.utils.ObjectSet;
-import io.anuke.mindustry.game.EventType.WorldLoadGraphicsEvent;
-import io.anuke.mindustry.maps.Sector;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.collection.IntSet.IntSetIterator;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.graphics.Camera;
+import io.anuke.arc.graphics.GL20;
+import io.anuke.arc.graphics.g2d.CacheBatch;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.SpriteBatch;
+import io.anuke.arc.graphics.g2d.SpriteCache;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.graphics.CacheBatch;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Fill;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Structs;
 
 import java.util.Arrays;
 
@@ -35,9 +32,10 @@ public class FloorRenderer{
     private CacheBatch cbatch;
     private IntSet drawnLayerSet = new IntSet();
     private IntArray drawnLayers = new IntArray();
+    private ObjectSet<CacheLayer> used = new ObjectSet<>();
 
     public FloorRenderer(){
-        Events.on(WorldLoadGraphicsEvent.class, event -> clearTiles());
+        Events.on(WorldLoadEvent.class, event -> clearTiles());
     }
 
     public void drawFloor(){
@@ -45,13 +43,13 @@ public class FloorRenderer{
             return;
         }
 
-        OrthographicCamera camera = Core.camera;
+        Camera camera = Core.camera;
 
-        int crangex = (int) (camera.viewportWidth * camera.zoom / (chunksize * tilesize)) + 1;
-        int crangey = (int) (camera.viewportHeight * camera.zoom / (chunksize * tilesize)) + 1;
+        int crangex = (int) (camera.width  / (chunksize * tilesize)) + 1;
+        int crangey = (int) (camera.height  / (chunksize * tilesize)) + 1;
 
-        int camx = Mathf.scl(camera.position.x, chunksize * tilesize);
-        int camy = Mathf.scl(camera.position.y, chunksize * tilesize);
+        int camx = (int)(camera.position.x / (chunksize * tilesize));
+        int camy = (int)(camera.position.y / (chunksize * tilesize));
 
         int layers = CacheLayer.values().length;
 
@@ -85,7 +83,7 @@ public class FloorRenderer{
 
         drawnLayers.sort();
 
-        Graphics.end();
+        Draw.flush();
         beginDraw();
 
         for(int i = 0; i < drawnLayers.size; i++){
@@ -95,7 +93,6 @@ public class FloorRenderer{
         }
 
         endDraw();
-        Graphics.begin();
     }
 
     public void beginDraw(){
@@ -103,10 +100,10 @@ public class FloorRenderer{
             return;
         }
 
-        cbatch.setProjectionMatrix(Core.camera.combined);
+        cbatch.setProjection(Core.camera.projection());
         cbatch.beginDraw();
 
-        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Core.gl.glEnable(GL20.GL_BLEND);
     }
 
     public void endDraw(){
@@ -122,17 +119,19 @@ public class FloorRenderer{
             return;
         }
 
-        OrthographicCamera camera = Core.camera;
+        Camera camera = Core.camera;
 
-        int crangex = (int) (camera.viewportWidth * camera.zoom / (chunksize * tilesize)) + 1;
-        int crangey = (int) (camera.viewportHeight * camera.zoom / (chunksize * tilesize)) + 1;
+        int crangex = (int) (camera.width  / (chunksize * tilesize)) + 1;
+        int crangey = (int) (camera.height  / (chunksize * tilesize)) + 1;
 
+        SpriteBatch batch = Core.batch;
+        Core.batch = cbatch;
         layer.begin();
 
         for(int x = -crangex; x <= crangex; x++){
             for(int y = -crangey; y <= crangey; y++){
-                int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
-                int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
+                int worldx = (int)(camera.position.x / (chunksize * tilesize)) + x;
+                int worldy = (int)(camera.position.y / (chunksize * tilesize)) + y;
 
                 if(!Structs.inBounds(worldx, worldy, cache)){
                     continue;
@@ -145,27 +144,23 @@ public class FloorRenderer{
         }
 
         layer.end();
-    }
-
-    private void fillChunk(float x, float y){
-        Draw.color(Color.BLACK);
-        Fill.crect(x, y, chunksize * tilesize, chunksize * tilesize);
-        Draw.color();
+        Core.batch = batch;
     }
 
     private void cacheChunk(int cx, int cy){
+        used.clear();
         Chunk chunk = cache[cx][cy];
-
-        ObjectSet<CacheLayer> used = new ObjectSet<>();
-
-        Sector sector = world.getSector();
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
                 Tile tile = world.tile(tilex, tiley);
 
                 if(tile != null){
-                    used.add(tile.floor().cacheLayer);
+                    if(tile.block().cacheLayer != CacheLayer.normal){
+                        used.add(tile.block().cacheLayer);
+                    }else{
+                        used.add(tile.floor().cacheLayer);
+                    }
                 }
             }
         }
@@ -176,11 +171,10 @@ public class FloorRenderer{
     }
 
     private void cacheChunkLayer(int cx, int cy, Chunk chunk, CacheLayer layer){
+        SpriteBatch current = Core.batch;
+        Core.batch = cbatch;
 
-        Graphics.useBatch(cbatch);
-        cbatch.begin();
-
-        Sector sector = world.getSector();
+        cbatch.beginCache();
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
@@ -193,28 +187,27 @@ public class FloorRenderer{
                     floor = tile.floor();
                 }
 
-                if(floor.cacheLayer == layer){
+                if(tile.block().cacheLayer == layer && layer == CacheLayer.walls){
+                    tile.block().draw(tile);
+                }else if(floor.cacheLayer == layer && (world.isAccessible(tile.x,tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
                     floor.draw(tile);
-                }else if(floor.cacheLayer.ordinal() < layer.ordinal()){
-                    floor.drawNonLayer(tile);
                 }
             }
         }
-
-        cbatch.end();
-        Graphics.popBatch();
-        chunk.caches[layer.ordinal()] = cbatch.getLastCache();
+        Core.batch = current;
+        chunk.caches[layer.ordinal()] = cbatch.endCache();
     }
 
     public void clearTiles(){
         if(cbatch != null) cbatch.dispose();
 
         int chunksx = Mathf.ceil((float) (world.width()) / chunksize),
-            chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
+        chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
         cache = new Chunk[chunksx][chunksy];
-        cbatch = new CacheBatch(world.width() * world.height() * 4 * 4);
+        SpriteCache sprites = new SpriteCache(world.width() * world.height() * 5, (world.width() / chunksize) * (world.height() / chunksize) * 2, false);
+        cbatch = new CacheBatch(sprites);
 
-        Timers.mark();
+        Time.mark();
 
         for(int x = 0; x < chunksx; x++){
             for(int y = 0; y < chunksy; y++){
@@ -225,7 +218,7 @@ public class FloorRenderer{
             }
         }
 
-        Log.info("Time to cache: {0}", Timers.elapsed());
+        Log.info("Time to cache: {0}", Time.elapsed());
     }
 
     private class Chunk{

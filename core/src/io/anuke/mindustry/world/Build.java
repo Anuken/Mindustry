@@ -1,17 +1,17 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.BlockBuildBeginEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Recipe;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.util.Geometry;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -25,9 +25,14 @@ public class Build{
         }
 
         Tile tile = world.tile(x, y);
+        float prevPercent = 1f;
 
         //just in case
         if(tile == null) return;
+
+        if(tile.entity != null){
+            prevPercent = tile.entity.health();
+        }
 
         tile = tile.target();
 
@@ -38,6 +43,7 @@ public class Build{
         tile.setBlock(sub);
         tile.<BuildEntity>entity().setDeconstruct(previous);
         tile.setTeam(team);
+        tile.entity.health = tile.entity.maxHealth() * prevPercent;
 
         if(previous.isMultiblock()){
             int offsetx = -(previous.size - 1) / 2;
@@ -45,9 +51,9 @@ public class Build{
 
             for(int dx = 0; dx < previous.size; dx++){
                 for(int dy = 0; dy < previous.size; dy++){
-                    int worldx = dx + offsetx + x;
-                    int worldy = dy + offsety + y;
-                    if(!(worldx == x && worldy == y)){
+                    int worldx = dx + offsetx + tile.x;
+                    int worldy = dy + offsety + tile.y;
+                    if(!(worldx == tile.x && worldy == tile.y)){
                         Tile toplace = world.tile(worldx, worldy);
                         if(toplace != null){
                             toplace.setLinked((byte) (dx + offsetx), (byte) (dy + offsety));
@@ -59,12 +65,12 @@ public class Build{
         }
 
         Tile ftile = tile;
-        threads.runDelay(() -> Events.fire(new BlockBuildBeginEvent(ftile, team, true)));
+        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(ftile, team, true)));
     }
 
     /**Places a BuildBlock at this location.*/
-    public static void beginPlace(Team team, int x, int y, Recipe recipe, int rotation){
-        if(!validPlace(team, x, y, recipe.result, rotation)){
+    public static void beginPlace(Team team, int x, int y, Block result, int rotation){
+        if(!validPlace(team, x, y, result, rotation)){
             return;
         }
 
@@ -73,13 +79,12 @@ public class Build{
         //just in case
         if(tile == null) return;
 
-        Block result = recipe.result;
         Block previous = tile.block();
 
         Block sub = content.getByName(ContentType.block, "build" + result.size);
 
         tile.setBlock(sub, rotation);
-        tile.<BuildEntity>entity().setConstruct(previous, recipe);
+        tile.<BuildEntity>entity().setConstruct(previous, result);
         tile.setTeam(team);
 
         if(result.isMultiblock()){
@@ -101,14 +106,12 @@ public class Build{
             }
         }
 
-        threads.runDelay(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
+        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
     }
 
     /**Returns whether a tile can be placed at this location by this team.*/
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
-        Recipe recipe = Recipe.getByResult(type);
-
-        if(recipe == null || (recipe.mode != null && recipe.mode != state.mode)){
+        if(!type.isVisible() || type.isHidden()){
             return false;
         }
 
@@ -120,7 +123,7 @@ public class Build{
         //check for enemy cores
         for(Team enemy : state.teams.enemiesOf(team)){
             for(Tile core : state.teams.get(enemy).cores){
-                if(Vector2.dst(x*tilesize + type.offset(), y*tilesize + type.offset(), core.drawx(), core.drawy()) < state.mode.enemyCoreBuildRadius + type.size*tilesize/2f){
+                if(Mathf.dst(x*tilesize + type.offset(), y*tilesize + type.offset(), core.drawx(), core.drawy()) < state.rules.enemyCoreBuildRadius + type.size*tilesize/2f){
                     return false;
                 }
             }
@@ -131,7 +134,7 @@ public class Build{
         if(tile == null) return false;
 
         if(type.isMultiblock()){
-            if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile)){
+            if(type.canReplace(tile.block()) && tile.block().size == type.size && type.canPlaceOn(tile) && tile.interactable(team)){
                 return true;
             }
 
@@ -148,8 +151,8 @@ public class Build{
             for(int dx = 0; dx < type.size; dx++){
                 for(int dy = 0; dy < type.size; dy++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace)
-                            || other.hasCliffs() || !other.floor().placeableOn ||
+                    if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) ||
+                            !other.floor().placeableOn ||
                             (other.floor().isLiquid && !type.floating)){
                         return false;
                     }
@@ -157,10 +160,10 @@ public class Build{
             }
             return true;
         }else{
-            return (tile.getTeam() == Team.none || tile.getTeam() == team)
+            return tile.interactable(team)
                     && contactsGround(tile.x, tile.y, type)
                     && (!tile.floor().isLiquid || type.floating)
-                    && tile.floor().placeableOn && !tile.hasCliffs()
+                    && tile.floor().placeableOn
                     && ((type.canReplace(tile.block())
                     && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
                     && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
@@ -169,17 +172,17 @@ public class Build{
 
     private static boolean contactsGround(int x, int y, Block block){
         if(block.isMultiblock()){
-            for(GridPoint2 point : Edges.getInsideEdges(block.size)){
+            for(Point2 point : Edges.getInsideEdges(block.size)){
                 Tile tile = world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isLiquid) return true;
             }
 
-            for(GridPoint2 point : Edges.getEdges(block.size)){
+            for(Point2 point : Edges.getEdges(block.size)){
                 Tile tile = world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isLiquid) return true;
             }
         }else{
-            for(GridPoint2 point : Geometry.d4){
+            for(Point2 point : Geometry.d4){
                 Tile tile = world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isLiquid) return true;
             }
@@ -193,6 +196,6 @@ public class Build{
         Tile tile = world.tile(x, y);
         if(tile != null) tile = tile.target();
 
-        return tile != null && tile.block().canBreak(tile) && tile.breakable() && (!tile.block().synthetic() || tile.getTeam() == team);
+        return tile != null && tile.block().canBreak(tile) && tile.breakable() && tile.interactable(team);
     }
 }

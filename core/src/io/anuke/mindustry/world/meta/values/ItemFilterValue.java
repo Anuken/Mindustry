@@ -1,11 +1,11 @@
 package io.anuke.mindustry.world.meta.values;
 
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.ItemDisplay;
 import io.anuke.mindustry.world.meta.StatValue;
-import io.anuke.ucore.function.Predicate;
-import io.anuke.ucore.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -18,11 +18,7 @@ public class ItemFilterValue implements StatValue{
 
     @Override
     public void display(Table table){
-        Array<Item> list = new Array<>();
-
-        for(Item item : content.items()){
-            if(filter.test(item)) list.add(item);
-        }
+        Array<Item> list = content.items().select(filter);
 
         for(int i = 0; i < list.size; i++){
             Item item = list.get(i);

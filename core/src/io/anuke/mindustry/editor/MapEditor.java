@@ -1,8 +1,11 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.blocks.Blocks;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.maps.MapTileData;
@@ -10,19 +13,17 @@ import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.ucore.util.Structs;
-import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Mathf;
+
 import static io.anuke.mindustry.Vars.content;
+
 public class MapEditor{
-    public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15};
+    public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};
 
     private MapTileData map;
     private ObjectMap<String, String> tags = new ObjectMap<>();
     private MapRenderer renderer = new MapRenderer(this);
 
     private int brushSize = 1;
-    private byte elevation;
     private int rotation;
     private Block drawBlock = Blocks.stone;
     private Team drawTeam = Team.blue;
@@ -50,14 +51,6 @@ public class MapEditor{
 
         drawBlock = Blocks.stone;
         renderer.resize(map.width(), map.height());
-    }
-
-    public byte getDrawElevation(){
-        return elevation;
-    }
-
-    public void setDrawElevation(int elevation){
-        this.elevation = (byte) elevation;
     }
 
     public int getDrawRotation(){
@@ -92,18 +85,18 @@ public class MapEditor{
         this.brushSize = size;
     }
 
-    public void draw(int x, int y){
-        draw(x, y, drawBlock);
+    public void draw(int x, int y, boolean paint){
+        draw(x, y, paint, drawBlock);
     }
 
-    public void draw(int x, int y, Block drawBlock){
-        if(x < 0 || y < 0 || x >= map.width() || y >= map.height()){
-            return;
-        }
+    public void draw(int x, int y, boolean paint, Block drawBlock){
+        draw(x, y, paint, drawBlock, 1.0);
+    }
 
+    public void draw(int x, int y, boolean paint, Block drawBlock, double chance){
         byte writeID = drawBlock.id;
-        byte partID = Blocks.blockpart.id;
-        byte rotationTeam = Bits.packByte(drawBlock.rotate ? (byte) rotation : 0, drawBlock.synthetic() ? (byte) drawTeam.ordinal() : 0);
+        byte partID = Blocks.part.id;
+        byte rotationTeam = Pack.byteByte(drawBlock.rotate ? (byte)rotation : 0, drawBlock.synthetic() ? (byte)drawTeam.ordinal() : 0);
 
         boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
 
@@ -126,13 +119,13 @@ public class MapEditor{
                             if(i == 1){
                                 map.write(worldx, worldy, DataPosition.wall, partID);
                                 map.write(worldx, worldy, DataPosition.rotationTeam, rotationTeam);
-                                map.write(worldx, worldy, DataPosition.link, Bits.packByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8)));
+                                map.write(worldx, worldy, DataPosition.link, Pack.byteByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8)));
                             }else{
                                 byte link = map.read(worldx, worldy, DataPosition.link);
                                 byte block = map.read(worldx, worldy, DataPosition.wall);
 
                                 if(link != 0){
-                                    removeLinked(worldx - (Bits.getLeftByte(link) - 8), worldy - (Bits.getRightByte(link) - 8));
+                                    removeLinked(worldx - (Pack.leftByte(link) - 8), worldy - (Pack.rightByte(link) - 8));
                                 }else if(content.block(block).isMultiblock()){
                                     removeLinked(worldx, worldy);
                                 }
@@ -152,13 +145,12 @@ public class MapEditor{
 
             onWrite(x, y, prev);
         }else{
-
             for(int rx = -brushSize; rx <= brushSize; rx++){
                 for(int ry = -brushSize; ry <= brushSize; ry++){
-                    if(Mathf.dst(rx, ry) <= brushSize - 0.5f){
+                    if(Mathf.dst(rx, ry) <= brushSize - 0.5f && (chance >= 0.999 || Mathf.chance(chance))){
                         int wx = x + rx, wy = y + ry;
 
-                        if(wx < 0 || wy < 0 || wx >= map.width() || wy >= map.height()){
+                        if(wx < 0 || wy < 0 || wx >= map.width() || wy >= map.height() || (paint && !isfloor && content.block(map.read(wx, wy, DataPosition.wall)) == Blocks.air)){
                             continue;
                         }
 
@@ -170,13 +162,12 @@ public class MapEditor{
                             if(content.block(map.read(wx, wy, DataPosition.wall)).isMultiblock()){
                                 removeLinked(wx, wy);
                             }else if(link != 0){
-                                removeLinked(wx - (Bits.getLeftByte(link) - 8), wy - (Bits.getRightByte(link) - 8));
+                                removeLinked(wx - (Pack.leftByte(link) - 8), wy - (Pack.rightByte(link) - 8));
                             }
                         }
 
                         if(isfloor){
                             map.write(wx, wy, DataPosition.floor, writeID);
-                            map.write(wx, wy, DataPosition.elevation, elevation);
                         }else{
                             map.write(wx, wy, DataPosition.wall, writeID);
                             map.write(wx, wy, DataPosition.link, (byte) 0);
@@ -185,30 +176,6 @@ public class MapEditor{
 
                         onWrite(x + rx, y + ry, prev);
                     }
-                }
-            }
-        }
-    }
-
-    public void elevate(int x, int y){
-        if(x < 0 || y < 0 || x >= map.width() || y >= map.height()){
-            return;
-        }
-
-        for(int rx = -brushSize; rx <= brushSize; rx++){
-            for(int ry = -brushSize; ry <= brushSize; ry++){
-                if(Mathf.dst(rx, ry) <= brushSize - 0.5f){
-                    int wx = x + rx, wy = y + ry;
-
-                    if(wx < 0 || wy < 0 || wx >= map.width() || wy >= map.height()){
-                        continue;
-                    }
-
-                    TileDataMarker prev = getPrev(wx, wy, true);
-
-                    map.write(wx, wy, DataPosition.elevation, elevation);
-
-                    onWrite(x + rx, y + ry, prev);
                 }
             }
         }
@@ -269,10 +236,21 @@ public class MapEditor{
     }
 
     public void resize(int width, int height){
+        MapTileData previous = map;
+        int offsetX = -(width - previous.width())/2, offsetY = -(height - previous.height())/2;
+
         map = new MapTileData(width, height);
         for(int x = 0; x < map.width(); x++){
             for(int y = 0; y < map.height(); y++){
-                map.write(x, y, DataPosition.floor, Blocks.stone.id);
+                int px = offsetX + x, py = offsetY + y;
+                if(Structs.inBounds(px, py, previous.width(), previous.height())){
+                    map.write(x, y, DataPosition.floor, previous.read(px, py, DataPosition.floor));
+                    map.write(x, y, DataPosition.wall, previous.read(px, py, DataPosition.wall));
+                    map.write(x, y, DataPosition.link, previous.read(px, py, DataPosition.link));
+                    map.write(x, y, DataPosition.rotationTeam, previous.read(px, py, DataPosition.rotationTeam));
+                }else{
+                    map.write(x, y, DataPosition.floor, Blocks.stone.id);
+                }
             }
         }
         renderer.resize(width, height);

@@ -1,36 +1,40 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureAtlas;
+import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.scene.ui.TextField;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.GlobalData;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Saves;
-import io.anuke.mindustry.game.Unlocks;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.input.DefaultKeybinds;
+import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.input.DesktopInput;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.MobileInput;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Recipe;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.mindustry.world.Pos;
-import io.anuke.ucore.core.*;
-import io.anuke.ucore.entities.EntityQuery;
-import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.*;
+import io.anuke.mindustry.world.Tile;
 
 import java.io.IOException;
 
+import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
 
 /**
@@ -39,51 +43,36 @@ import static io.anuke.mindustry.Vars.*;
  * Should <i>not</i> handle any logic-critical state.
  * This class is not created in the headless server.
  */
-public class Control extends Module{
-    /** Minimum period of time between the same sound being played.*/
-    private static final long minSoundPeriod = 100;
-
+public class Control implements ApplicationListener{
     public final Saves saves;
-    public final Unlocks unlocks;
 
-    private Timer timerRPC= new Timer(), timerUnlock = new Timer();
+    private Interval timer = new Interval(2);
     private boolean hiscore = false;
     private boolean wasPaused = false;
     private InputHandler[] inputs = {};
-    private ObjectMap<Sound, Long> soundMap = new ObjectMap<>();
-    private Throwable error;
 
     public Control(){
         saves = new Saves();
-        unlocks = new Unlocks();
+        data = new GlobalData();
 
-        Inputs.useControllers(true);
-
-        Gdx.input.setCatchBackKey(true);
+        Core.input.setCatch(KeyCode.BACK, true);
 
         Effects.setShakeFalloff(10000f);
 
         content.initialize(Content::init);
-        Core.atlas = new Atlas("sprites.atlas");
-        Core.atlas.setErrorRegion("error");
+        Core.atlas = new TextureAtlas("sprites/sprites.atlas");
+        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
         content.initialize(Content::load);
 
-        unlocks.load();
+        if(Core.atlas.getTextures().size != 1){
+            throw new IllegalStateException("Atlas must be exactly one texture. " +
+            "If more textures are used, the map editor will not display them correctly.");
+        }
 
-        Sounds.setFalloff(9000f);
-        Sounds.setPlayer((sound, volume) -> {
-            long time = TimeUtils.millis();
-            long value = soundMap.get(sound, 0L);
+        data.load();
 
-            if(TimeUtils.timeSinceMillis(value) >= minSoundPeriod){
-                threads.runGraphics(() -> sound.play(volume));
-                soundMap.put(sound, time);
-            }
-        });
-
-        DefaultKeybinds.load();
-
-        Settings.defaultList(
+        Core.settings.setAppName(appName);
+        Core.settings.defaults(
             "ip", "localhost",
             "color-0", Color.rgba8888(playerColors[8]),
             "color-1", Color.rgba8888(playerColors[11]),
@@ -93,15 +82,13 @@ public class Control extends Module{
             "lastBuild", 0
         );
 
-        KeyBinds.load();
-
         addPlayer(0);
 
         saves.load();
 
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
-                Timers.runTask(5f, Platform.instance::updateRPC);
+                Time.runTask(5f, Platform.instance::updateRPC);
             }
         });
 
@@ -113,10 +100,8 @@ public class Control extends Module{
             state.set(State.playing);
         });
 
-        Events.on(WorldLoadGraphicsEvent.class, event -> {
-            if(mobile){
-                Gdx.app.postRunnable(() -> Core.camera.position.set(players[0].x, players[0].y, 0));
-            }
+        Events.on(WorldLoadEvent.class, event -> {
+            Core.app.post(() -> Core.camera.position.set(players[0]));
         });
 
         Events.on(ResetEvent.class, event -> {
@@ -129,46 +114,65 @@ public class Control extends Module{
             saves.resetSave();
         });
 
-        Events.on(WaveEvent.class, event -> {
-
-            int last = Settings.getInt("hiscore" + world.getMap().name, 0);
-
-            if(state.wave > last && !state.mode.infiniteResources && !state.mode.disableWaveTimer && world.getSector() == null){
-                Settings.putInt("hiscore" + world.getMap().name, state.wave);
-                Settings.save();
-                hiscore = true;
-            }
-
-            Platform.instance.updateRPC();
-        });
+        //todo high scores for custom maps, as well as other statistics
 
         Events.on(GameOverEvent.class, event -> {
-            //delete saves for game-over sectors
-            if(world.getSector() != null && world.getSector().hasSave()){
-                world.getSector().getSave().delete();
-            }
-
-            threads.runGraphics(() -> {
-                Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
-                //the restart dialog can show info for any number of scenarios
-                Call.onGameOver(event.winner);
-            });
-        });
-
-        //autohost for pvp sectors
-        Events.on(WorldLoadEvent.class, event -> {
-            if(state.mode.isPvp && !Net.active()){
-                try{
-                    Net.host(port);
-                    players[0].isAdmin = true;
-                }catch(IOException e){
-                    ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
-                    threads.runDelay(() -> state.set(State.menu));
+            state.stats.wavesLasted = state.wave;
+            Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+            //the restart dialog can show info for any number of scenarios
+            Call.onGameOver(event.winner);
+            if(state.rules.zone != -1){
+                //remove zone save on game over
+                if(saves.getZoneSlot() != null){
+                    saves.getZoneSlot().delete();
                 }
             }
         });
 
-        Events.on(WorldLoadEvent.class, event -> threads.runGraphics(() -> Events.fire(new WorldLoadGraphicsEvent())));
+        //autohost for pvp sectors
+        Events.on(WorldLoadEvent.class, event -> {
+            if(state.rules.pvp && !Net.active()){
+                try{
+                    Net.host(port);
+                    players[0].isAdmin = true;
+                }catch(IOException e){
+                    ui.showError(Core.bundle.format("server.error", Strings.parseException(e, false)));
+                    Core.app.post(() -> state.set(State.menu));
+                }
+            }
+        });
+
+        Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
+
+        Events.on(BlockBuildEndEvent.class, e -> {
+            if(e.team == players[0].getTeam()){
+                if(e.breaking){
+                    state.stats.buildingsDeconstructed++;
+                }else{
+                    state.stats.buildingsBuilt ++;
+                }
+            }
+        });
+
+        Events.on(BlockDestroyEvent.class, e -> {
+            if(e.tile.getTeam() == players[0].getTeam()){
+                state.stats.buildingsDestroyed ++;
+            }
+        });
+
+        Events.on(UnitDestroyEvent.class, e -> {
+            if(e.unit.getTeam() != players[0].getTeam()){
+                state.stats.enemyUnitsDestroyed ++;
+            }
+        });
+
+        Events.on(ZoneCompleteEvent.class, e -> {
+            ui.hudfrag.showToast(Core.bundle.format("zone.complete", e.zone.conditionWave));
+        });
+
+        Events.on(ZoneConfigureCompleteEvent.class, e -> {
+            ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
+        });
     }
 
     public void addPlayer(int index){
@@ -187,9 +191,9 @@ public class Control extends Module{
         Player setTo = (index == 0 ? null : players[0]);
 
         Player player = new Player();
-        player.name = Settings.getString("name");
+        player.name = Core.settings.getString("name");
         player.mech = mobile ? Mechs.starterMobile : Mechs.starterDesktop;
-        player.color.set(Settings.getInt("color-" + index));
+        player.color.set(Core.settings.getInt("color-" + index));
         player.isLocal = true;
         player.playerIndex = index;
         player.isMobile = mobile;
@@ -212,7 +216,7 @@ public class Control extends Module{
         }
 
         inputs[index] = input;
-        Inputs.addProcessor(input);
+        Core.input.addProcessor(input);
     }
 
     public void removePlayer(){
@@ -228,17 +232,14 @@ public class Control extends Module{
         System.arraycopy(oldi, 0, inputs, 0, inputs.length);
     }
 
-    public void setError(Throwable error){
-        this.error = error;
-    }
-
     public InputHandler input(int index){
         return inputs[index];
     }
 
-    public void playMap(Map map){
-        ui.loadLogic(() -> {
+    public void playMap(Map map, Rules rules){
+        ui.loadAnd(() -> {
             logic.reset();
+            state.rules = rules;
             world.loadMap(map);
             logic.play();
         });
@@ -248,35 +249,8 @@ public class Control extends Module{
         return hiscore;
     }
 
-    private void checkUnlockableBlocks(){
-        TileEntity entity = players[0].getClosestCore();
-
-        if(entity == null) return;
-
-        entity.items.forEach((item, amount) -> unlocks.unlockContent(item));
-
-        if(players[0].inventory.hasItem()){
-            unlocks.unlockContent(players[0].inventory.getItem().item);
-        }
-
-        outer:
-        for(int i = 0; i < content.recipes().size; i ++){
-            Recipe recipe = content.recipes().get(i);
-            if(!recipe.isHidden() && recipe.requirements != null){
-                for(ItemStack stack : recipe.requirements){
-                    if(!entity.items.has(stack.item, Math.min((int) (stack.amount * unlockResourceScaling), 2000))) continue outer;
-                }
-
-                if(unlocks.unlockContent(recipe)){
-                    ui.hudfrag.showUnlock(recipe);
-                }
-            }
-        }
-    }
-
     @Override
     public void dispose(){
-        Platform.instance.onGameExit();
         content.dispose();
         Net.dispose();
         ui.editor.dispose();
@@ -303,16 +277,16 @@ public class Control extends Module{
 
         Platform.instance.updateRPC();
 
-        if(!Settings.getBool("4.0-warning-2", false)){
+        if(!Core.settings.getBool("4.0-warning-2", false)){
 
-            Timers.run(5f, () -> {
-                FloatingDialog dialog = new FloatingDialog("[accent]WARNING![]");
-                dialog.buttons().addButton("$text.ok", () -> {
+            Time.run(5f, () -> {
+                FloatingDialog dialog = new FloatingDialog("WARNING!");
+                dialog.buttons.addButton("$ok", () -> {
                     dialog.hide();
-                    Settings.putBool("4.0-warning-2", true);
-                    Settings.save();
+                    Core.settings.put("4.0-warning-2", true);
+                    Core.settings.save();
                 }).size(100f, 60f);
-                dialog.content().add("Reminder: The beta version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
+                dialog.cont.add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
                         "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
                         "All current art and UI is temporary, and will be re-drawn before release. " +
                         "\n\n[accent]Saves and maps may be corrupted without warning between updates.").wrap().width(400f);
@@ -321,23 +295,17 @@ public class Control extends Module{
         }
     }
 
-    /** Called from main logic thread.*/
-    public void runUpdateLogic(){
-        if(!state.is(State.menu)){
-            renderer.minimap.updateUnitArray();
-        }
-    }
-
     @Override
     public void update(){
-        if(error != null){
-            throw new RuntimeException(error);
-        }
-
         saves.update();
 
         for(InputHandler inputHandler : inputs){
             inputHandler.updateController();
+        }
+
+        //autosave global data every second if it's modified
+        if(timer.get(1, 60)){
+            data.checkSave();
         }
 
         if(!state.is(State.menu)){
@@ -345,41 +313,41 @@ public class Control extends Module{
                 input.update();
             }
 
-            //auto-update rpc every 5 seconds
-            if(timerRPC.get(60 * 5)){
-                Platform.instance.updateRPC();
-            }
-
-            //check unlocks every 2 seconds
-            if(!state.mode.infiniteResources && timerUnlock.get(120)){
-                checkUnlockableBlocks();
-
-                //save if the unlocks changed
-                if(unlocks.isDirty()){
-                    unlocks.save();
+            if(world.isZone()){
+                for(Tile tile : state.teams.get(players[0].getTeam()).cores){
+                    for(Item item : content.items()){
+                        if(tile.entity.items.has(item)){
+                            data.unlockContent(item);
+                        }
+                    }
                 }
             }
 
-            if(Inputs.keyTap("pause") && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            //auto-update rpc every 5 seconds
+            if(timer.get(0, 60 * 5)){
+                Platform.instance.updateRPC();
+            }
+
+            if(Core.input.keyTap(Binding.pause) && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
             }
 
-            if(Inputs.keyTap("menu") && !ui.restart.isShown()){
+            if(Core.input.keyTap(Binding.menu) && !ui.restart.isShown()){
                 if(ui.chatfrag.chatOpen()){
                     ui.chatfrag.hide();
-                }else if(!ui.paused.isShown() && !ui.hasDialog()){
+                }else if(!ui.paused.isShown() && !scene.hasDialog()){
                     ui.paused.show();
                     state.set(State.paused);
                 }
             }
 
-            if(Inputs.keyTap("screenshot") && !ui.chatfrag.chatOpen()){
+            if(!mobile && Core.input.keyTap(Binding.screenshot) && !(scene.getKeyboardFocus() instanceof TextField) && !ui.chatfrag.chatOpen()){
                 renderer.takeMapScreenshot();
             }
 
         }else{
             if(!state.isPaused()){
-                Timers.update();
+                Time.update();
             }
         }
     }

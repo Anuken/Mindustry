@@ -1,10 +1,10 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.ItemBuffer;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.math.Mathf;
 
 public class BufferedItemBridge extends ExtendingItemBridge{
     protected int timerAccept = timers++;

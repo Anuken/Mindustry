@@ -1,15 +1,15 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.mindustry.net.Administration.PlayerInfo;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class AdminsDialog extends FloatingDialog{
 
     public AdminsDialog(){
-        super("$text.server.admins");
+        super("$server.admins");
 
         addCloseButton();
 
@@ -18,7 +18,7 @@ public class AdminsDialog extends FloatingDialog{
     }
 
     private void setup(){
-        content().clear();
+        cont.clear();
 
         float w = 400f, h = 80f;
 
@@ -28,7 +28,7 @@ public class AdminsDialog extends FloatingDialog{
         pane.setFadeScrollBars(false);
 
         if(netServer.admins.getAdmins().size == 0){
-            table.add("$text.server.admins.none");
+            table.add("$server.admins.none");
         }
 
         for(PlayerInfo info : netServer.admins.getAdmins()){
@@ -38,7 +38,7 @@ public class AdminsDialog extends FloatingDialog{
             res.labelWrap("[LIGHT_GRAY]" + info.lastName).width(w - h - 24f);
             res.add().growX();
             res.addImageButton("icon-cancel", 14 * 3, () -> {
-                ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
+                ui.showConfirm("$confirm", "$confirmunadmin", () -> {
                     netServer.admins.unAdminPlayer(info.id);
                     playerGroup.forEach(player -> {
                         if(player != null && player.uuid != null && player.uuid.equals(info.id)){
@@ -53,6 +53,6 @@ public class AdminsDialog extends FloatingDialog{
             table.row();
         }
 
-        content().add(pane);
+        cont.add(pane);
     }
 }

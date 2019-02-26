@@ -1,8 +1,8 @@
 package io.anuke.mindustry.entities;
 
-import com.badlogic.gdx.math.Vector2;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.ucore.util.Mathf;
 
 /**
  * Class for predicting shoot angles based on velocities of targets.

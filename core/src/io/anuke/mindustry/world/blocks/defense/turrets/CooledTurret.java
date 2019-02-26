@@ -1,13 +1,13 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import io.anuke.mindustry.content.fx.BlockFx;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.ucore.core.Effects;
-import io.anuke.ucore.core.Effects.Effect;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -16,7 +16,7 @@ public class CooledTurret extends Turret{
     protected float coolantMultiplier = 1f;
     /**Max coolant used per tick.*/
     protected float maxCoolantUsed = 1f;
-    protected Effect coolEffect = BlockFx.fuelburn;
+    protected Effect coolEffect = Fx.fuelburn;
 
     public CooledTurret(String name){
         super(name);
@@ -33,7 +33,7 @@ public class CooledTurret extends Turret{
         TurretEntity entity = tile.entity();
         Liquid liquid = entity.liquids.current();
 
-        float used = Math.min(Math.min(entity.liquids.get(liquid), maxCoolantUsed * Timers.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity));
+        float used = Math.min(Math.min(entity.liquids.get(liquid), maxCoolantUsed * Time.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity));
         entity.reload += (used * liquid.heatCapacity) / liquid.heatCapacity;
         entity.liquids.remove(liquid, used);
 

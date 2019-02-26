@@ -8,7 +8,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.3.1'
     }
 }
 
@@ -26,24 +26,22 @@ repositories {
 
 dependencies {
     implementation project(":core")
-    implementation project(":kryonet")
+    implementation project(":net")
     implementation 'com.android.support:support-v4:28.0.0'
     implementation 'org.sufficientlysecure:donations:2.5'
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
 
-    implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+    implementation arcModule("backends:backend-android")
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
-    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi"
     natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
     natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
     natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
     natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
-    implementation "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
 }
 
 task deploy(type: Copy){

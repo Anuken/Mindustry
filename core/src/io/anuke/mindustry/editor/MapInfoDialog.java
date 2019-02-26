@@ -1,11 +1,11 @@
 package io.anuke.mindustry.editor;
 
-import com.badlogic.gdx.utils.ObjectMap;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.scene.ui.TextArea;
+import io.anuke.arc.scene.ui.TextField;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.scene.ui.TextArea;
-import io.anuke.ucore.scene.ui.TextField;
 
 public class MapInfoDialog extends FloatingDialog{
     private final MapEditor editor;
@@ -15,7 +15,7 @@ public class MapInfoDialog extends FloatingDialog{
     private TextField name;
 
     public MapInfoDialog(MapEditor editor){
-        super("$text.editor.mapinfo");
+        super("$editor.mapinfo");
         this.editor = editor;
 
         addCloseButton();
@@ -28,44 +28,37 @@ public class MapInfoDialog extends FloatingDialog{
     }
 
     private void setup(){
-        content().clear();
+        cont.clear();
 
         ObjectMap<String, String> tags = editor.getTags();
 
-        content().add("$text.editor.name").padRight(8).left();
+        cont.add("$editor.name").padRight(8).left();
 
-        content().defaults().padTop(15);
+        cont.defaults().padTop(15);
 
-        name = content().addField(tags.get("name", ""), text -> {
+        name = cont.addField(tags.get("name", ""), text -> {
             tags.put("name", text);
         }).size(400, 55f).get();
-        name.setMessageText("$text.unknown");
+        name.setMessageText("$unknown");
 
-        content().row();
+        cont.row();
 
-        content().add("$text.editor.description").padRight(8).left();
+        cont.add("$editor.description").padRight(8).left();
 
-        description = content().addArea(tags.get("description", ""), "textarea", text -> {
+        description = cont.addArea(tags.get("description", ""), "textarea", text -> {
             tags.put("description", text);
         }).size(400f, 140f).get();
 
-        content().row();
+        cont.row();
 
-        content().add("$text.editor.author").padRight(8).left();
+        cont.add("$editor.author").padRight(8).left();
 
-        author = content().addField(tags.get("author", Settings.getString("mapAuthor", "")), text -> {
+        author = cont.addField(tags.get("author", Core.settings.getString("mapAuthor", "")), text -> {
             tags.put("author", text);
-            Settings.putString("mapAuthor", text);
-            Settings.save();
+            Core.settings.put("mapAuthor", text);
+            Core.settings.save();
         }).size(400, 55f).get();
-        author.setMessageText("$text.unknown");
-
-        content().row();
-
-        content().add().padRight(8).left();
-        content().addCheck("$text.editor.oregen", enabled -> {
-            tags.put("oregen", enabled ? "1" : "0");
-        }).update(c -> c.setChecked(!tags.get("oregen", "0").equals("0"))).left();
+        author.setMessageText("$unknown");
 
         name.change();
         description.change();
