@@ -75,9 +75,9 @@ public class Zones implements ContentList{
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 60 * 1.5f;
+                waveSpacing = 60 * 60 * 1f;
                 spawns = Array.with(
-                    new SpawnGroup(UnitTypes.dagger){{
+                    new SpawnGroup(UnitTypes.crawler){{
                         unitScaling = 1.5f;
                     }},
 
@@ -89,7 +89,7 @@ public class Zones implements ContentList{
                     }},
 
                     new SpawnGroup(UnitTypes.dagger){{
-                        begin = 10;
+                        begin = 3;
                         unitScaling = 1.5f;
                     }},
 
@@ -446,7 +446,7 @@ public class Zones implements ContentList{
             launchPeriod = 20;
             zoneRequirements = new Zone[]{ruinousShores};
             blockRequirements = new Block[]{Blocks.thermalGenerator};
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -549,7 +549,7 @@ public class Zones implements ContentList{
             launchPeriod = 15;
             zoneRequirements = new Zone[]{impact};
             blockRequirements = new Block[]{Blocks.blastDrill, Blocks.thermalGenerator};
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium, Items.sand};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;

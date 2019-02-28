@@ -17,6 +17,8 @@ import io.anuke.mindustry.maps.generators.Generator;
 import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.world.Block;
 
+import java.util.Arrays;
+
 import static io.anuke.mindustry.Vars.data;
 import static io.anuke.mindustry.Vars.state;
 
@@ -133,6 +135,7 @@ public class Zone extends UnlockableContent{
     @Override
     public void init(){
         generator.init(loadout);
+        Arrays.sort(resources);
 
         Array<ItemStack> arr = Core.settings.getObject(name + "-starting-items", Array.class, () -> null);
         if(arr != null){
