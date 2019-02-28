@@ -751,41 +751,41 @@ public class Blocks implements ContentList{
         }};
 
         conduit = new Conduit("conduit"){{
-            requirements(Category.liquid, ItemStack.with(Items.lead, 1));
+            requirements(Category.liquid, ItemStack.with(Items.metaglass, 1));
             health = 45;
         }};
 
         pulseConduit = new Conduit("pulse-conduit"){{
-            requirements(Category.liquid, ItemStack.with(Items.titanium, 1, Items.lead, 1));
+            requirements(Category.liquid, ItemStack.with(Items.titanium, 1, Items.metaglass, 2));
             liquidCapacity = 16f;
             liquidFlowFactor = 4.9f;
             health = 90;
         }};
 
         liquidRouter = new LiquidRouter("liquid-router"){{
-            requirements(Category.liquid, ItemStack.with(Items.titanium, 4, Items.lead, 4));
+            requirements(Category.liquid, ItemStack.with(Items.titanium, 4, Items.metaglass, 4));
             liquidCapacity = 20f;
         }};
 
         liquidTank = new LiquidTank("liquid-tank"){{
-            requirements(Category.liquid, ItemStack.with(Items.titanium, 50, Items.lead, 50));
+            requirements(Category.liquid, ItemStack.with(Items.titanium, 50, Items.metaglass, 50));
             size = 3;
             liquidCapacity = 1500f;
             health = 500;
         }};
 
         liquidJunction = new LiquidJunction("liquid-junction"){{
-            requirements(Category.liquid, ItemStack.with(Items.titanium, 4, Items.lead, 4));
+            requirements(Category.liquid, ItemStack.with(Items.titanium, 4, Items.metaglass, 4));
         }};
 
         bridgeConduit = new LiquidExtendingBridge("bridge-conduit"){{
-            requirements(Category.liquid, ItemStack.with(Items.titanium, 8, Items.lead, 8));
+            requirements(Category.liquid, ItemStack.with(Items.titanium, 8, Items.metaglass, 8));
             range = 4;
             hasPower = false;
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
-            requirements(Category.liquid, ItemStack.with(Items.phasefabric, 10, Items.silicon, 15, Items.lead, 20, Items.titanium, 20));
+            requirements(Category.liquid, ItemStack.with(Items.phasefabric, 10, Items.silicon, 15, Items.metaglass, 40, Items.titanium, 20));
             range = 12;
             hasPower = true;
             consumes.power(0.30f);

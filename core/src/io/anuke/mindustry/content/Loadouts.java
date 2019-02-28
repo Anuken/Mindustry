@@ -6,6 +6,7 @@ import io.anuke.mindustry.type.Loadout;
 public class Loadouts implements ContentList{
     public static Loadout
     basicShard,
+    advancedShard,
     basicFoundation,
     basicNucleus;
 
@@ -20,14 +21,23 @@ public class Loadouts implements ContentList{
         " C# C# "
         );
 
+        advancedShard = new Loadout(
+        "  ###  ",
+        "  #1#  ",
+        "#######",
+        "C#^ ^C#",
+        " ## ## ",
+        " C# C# "
+        );
+
         basicFoundation = new Loadout(
         "  ####  ",
         "  ####  ",
         "  #2##  ",
         "  ####  ",
-        "  ^  ^  ",
-        " ##  ## ",
-        " C#  C# "
+        "  ^^^^  ",
+        " ###### ",
+        " C#C#C# "
         );
 
         basicNucleus = new Loadout(

@@ -8,6 +8,7 @@ import io.anuke.arc.scene.ui.Tooltip;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.Pal;
@@ -77,6 +78,6 @@ public class DatabaseDialog extends FloatingDialog{
     }
 
     boolean unlocked(UnlockableContent content){
-        return !Vars.world.isZone() || content.unlocked();
+        return (!Vars.world.isZone() && !Vars.state.is(State.menu)) || content.unlocked();
     }
 }

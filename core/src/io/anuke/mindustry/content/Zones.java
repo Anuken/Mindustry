@@ -115,7 +115,7 @@ public class Zones implements ContentList{
             }};
         }};
 
-        frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 2)
+        frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 1)
             .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with(Items.copper, 100);
