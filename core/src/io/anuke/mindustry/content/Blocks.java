@@ -913,6 +913,7 @@ public class Blocks implements ContentList{
             drillTime = 480;
             size = 2;
             drawMineItem = true;
+            consumes.liquid(Liquids.water, 0.06f).optional(true);
         }};
 
         laserDrill = new Drill("laser-drill"){{
@@ -925,6 +926,7 @@ public class Blocks implements ContentList{
             drillEffect = Fx.mineBig;
 
             consumes.power(1.10f);
+            consumes.liquid(Liquids.water, 0.08f).optional(true);
         }};
 
         blastDrill = new Drill("blast-drill"){{
@@ -941,6 +943,7 @@ public class Blocks implements ContentList{
             warmupSpeed = 0.01f;
 
             consumes.power(3f);
+            consumes.liquid(Liquids.water, 0.1f).optional(true);
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
