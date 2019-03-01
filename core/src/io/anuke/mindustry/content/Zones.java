@@ -542,8 +542,8 @@ public class Zones implements ContentList{
         .drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 1000, Items.thorium, 200, Items.titanium, 2000, Items.metaglass, 1000))
         .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
             loadout = Loadouts.basicNucleus;
-            baseLaunchCost = ItemStack.with(Items.copper, 500, Items.lead, 500, Items.silicon, 200, Items.metaglass, 100);
-            startingItems = ItemStack.list(Items.copper, 2500, Items.lead, 1500, Items.silicon, 800, Items.metaglass, 400);
+            baseLaunchCost = ItemStack.with(Items.copper, 500, Items.silicon, 200, Items.metaglass, 100);
+            startingItems = ItemStack.list(Items.copper, 2500, Items.lead, 3000, Items.silicon, 800, Items.metaglass, 400);
             itemRequirements = ItemStack.with(Items.copper, 10000, Items.titanium, 8000, Items.metaglass, 6000, Items.plastanium, 2000);
             conditionWave = 30;
             launchPeriod = 15;
