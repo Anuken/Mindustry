@@ -14,8 +14,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public enum EditorTool{
     pick{
@@ -139,6 +138,17 @@ public enum EditorTool{
                         }
                     }
                 }
+            }else if(isAlt2()){
+                for(int cx = 0; cx < width; cx++){
+                    for(int cy = 0; cy < height; cy++){
+                        byte w = data.read(cx, cy, DataPosition.wall);
+                        if(content.block(w).synthetic()){
+                            TileDataMarker prev = editor.getPrev(cx, cy, false);
+                            data.write(cx, cy, DataPosition.rotationTeam, (byte)editor.getDrawTeam().ordinal());
+                            editor.onWrite(cx, cy, prev);
+                        }
+                    }
+                }
             }else{
                 int x1;
                 boolean spanAbove, spanBelow;
@@ -200,6 +210,10 @@ public enum EditorTool{
 
     public static boolean isAlt(){
         return Core.input.keyDown(KeyCode.TAB);
+    }
+
+    public static boolean isAlt2(){
+        return Core.input.keyDown(KeyCode.GRAVE);
     }
 
     public void touched(MapEditor editor, int x, int y){
