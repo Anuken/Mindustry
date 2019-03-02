@@ -462,11 +462,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     //region update methods
 
-    Vector2 last = new Vector2();
-
     @Override
     public void update(){
-        last.set(this);
 
         hitTime -= Time.delta();
 
@@ -685,7 +682,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 if(target == null){
                     isShooting = false;
                     if(Core.settings.getBool("autotarget")){
-                        target = Units.getClosestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.none);
+                        target = Units.getClosestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.none, u -> u.getTeam() != Team.none);
 
                         if(mech.canHeal && target == null){
                             target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));

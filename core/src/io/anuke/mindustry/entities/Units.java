@@ -143,16 +143,21 @@ public class Units{
 
     /**Returns the closest target enemy. First, units are checked, then tile entities.*/
     public static TargetTrait getClosestTarget(Team team, float x, float y, float range){
-        return getClosestTarget(team, x, y, range, u -> !u.isDead() && u.isAdded());
+        return getClosestTarget(team, x, y, range, Unit::isValid);
     }
 
     /**Returns the closest target enemy. First, units are checked, then tile entities.*/
     public static TargetTrait getClosestTarget(Team team, float x, float y, float range, Predicate<Unit> unitPred){
+        return getClosestTarget(team, x, y, range, unitPred, t -> true);
+    }
+
+    /**Returns the closest target enemy. First, units are checked, then tile entities.*/
+    public static TargetTrait getClosestTarget(Team team, float x, float y, float range, Predicate<Unit> unitPred, Predicate<Tile> tilePred){
         Unit unit = getClosestEnemy(team, x, y, range, unitPred);
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, tile -> true);
+            return findEnemyTile(team, x, y, range, tilePred);
         }
     }
 

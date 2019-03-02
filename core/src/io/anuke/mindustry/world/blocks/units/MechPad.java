@@ -222,7 +222,7 @@ public class MechPad extends Block{
 
                 player.rotation = 90f;
                 player.baseRotation = 90f;
-                player.set(x, y);
+                player.setNet(x, y);
                 player.beginRespawning(this);
             }
         }

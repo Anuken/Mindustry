@@ -28,7 +28,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Conveyor extends Block{
     private static final float itemSpace = 0.135f * 3f;
-    private static final float offsetScl = 128f * 3f;
     private static final float minmove = 1f / (Short.MAX_VALUE - 2);
     private static ItemPos drawpos = new ItemPos();
     private static ItemPos pos1 = new ItemPos();

@@ -727,7 +727,6 @@ public class Blocks implements ContentList{
         mechanicalPump = new Pump("mechanical-pump"){{
             requirements(Category.liquid, ItemStack.with(Items.copper, 30, Items.lead, 20));
             pumpAmount = 0.1f;
-            tier = 0;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
@@ -737,17 +736,15 @@ public class Blocks implements ContentList{
             liquidCapacity = 30f;
             hasPower = true;
             size = 2;
-            tier = 1;
         }};
 
         thermalPump = new Pump("thermal-pump"){{
             requirements(Category.liquid, ItemStack.with(Items.copper, 160, Items.lead, 130, Items.silicon, 60, Items.titanium, 80, Items.thorium, 70));
-            pumpAmount = 0.275f;
+            pumpAmount = 0.22f;
             consumes.power(0.30f);
             liquidCapacity = 40f;
             hasPower = true;
-            size = 2;
-            tier = 2;
+            size = 3;
         }};
 
         conduit = new Conduit("conduit"){{
@@ -949,7 +946,7 @@ public class Blocks implements ContentList{
         waterExtractor = new SolidPump("water-extractor"){{
             requirements(Category.production, ItemStack.with(Items.copper, 50, Items.graphite, 50, Items.lead, 40));
             result = Liquids.water;
-            pumpAmount = 0.065f;
+            pumpAmount = 0.13f;
             size = 2;
             liquidCapacity = 30f;
             rotateSpeed = 1.4f;
@@ -963,7 +960,7 @@ public class Blocks implements ContentList{
             updateEffect = Fx.pulverize;
             liquidCapacity = 50f;
             updateEffectChance = 0.05f;
-            pumpAmount = 0.09f;
+            pumpAmount = 0.25f;
             size = 3;
             liquidCapacity = 30f;
 

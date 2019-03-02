@@ -160,7 +160,7 @@ public class Drill extends Block{
             }
         });
 
-        stats.add(BlockStat.drillSpeed, 60f / drillTime, StatUnit.itemsSecond);
+        stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
     }
 
     @Override

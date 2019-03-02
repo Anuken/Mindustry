@@ -69,7 +69,7 @@ public class SolidPump extends Pump{
         if(isMultiblock()){
             for(Tile other : tile.getLinkedTiles(tempTiles)){
                 if(isValid(other)){
-                    fraction += 1f / size;
+                    fraction += 1f / (size * size);
                 }
             }
         }else{

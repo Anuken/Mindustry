@@ -23,7 +23,6 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
-import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
@@ -466,12 +465,8 @@ public class HudFragment extends Fragment{
             }else{
                 state.wavetime = 0f;
             }
-        }).growY().fillX().right().width(40f).update(l -> {
-            boolean vis = !state.rules.waveTimer && ((Net.server() || players[0].isAdmin) || !Net.active());
-            boolean paused = state.is(State.paused) || !vis;
-
-            l.getStyle().imageUp = Core.scene.skin.getDrawable(vis ? "icon-play" : "clear");
-            l.touchable(!paused ? Touchable.enabled : Touchable.disabled);
-        }).visible(() -> !state.rules.waveTimer && ((Net.server() || players[0].isAdmin) || !Net.active()) && unitGroups[Team.red.ordinal()].size() == 0);
+        }).growY().fillX().right().width(40f)
+        .visible(() -> state.rules.waves && ((Net.server() || players[0].isAdmin) || !Net.active()) && state.enemies() == 0
+        && state.wavetime < state.rules.waveSpacing - 60);
     }
 }

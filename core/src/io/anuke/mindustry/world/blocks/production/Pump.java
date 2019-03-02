@@ -21,8 +21,6 @@ public class Pump extends LiquidBlock{
 
     /**Pump amount per tile this block is on.*/
     protected float pumpAmount = 1f;
-    /**Maximum liquid tier this pump can use.*/
-    protected int tier = 0;
 
     public Pump(String name){
         super(name);
@@ -42,7 +40,7 @@ public class Pump extends LiquidBlock{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.liquidOutputSpeed, 60f * pumpAmount, StatUnit.liquidSecond);
+        stats.add(BlockStat.liquidOutputSpeed, 60f * pumpAmount * size * size, StatUnit.liquidSecond);
     }
 
     @Override
@@ -115,7 +113,7 @@ public class Pump extends LiquidBlock{
     }
 
     protected boolean isValid(Tile tile){
-        return tile != null && tile.floor().liquidDrop != null && tier >= tile.floor().liquidDrop.tier;
+        return tile != null && tile.floor().liquidDrop != null;
     }
 
 }
