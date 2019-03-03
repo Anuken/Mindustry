@@ -359,6 +359,7 @@ public class Bullets implements ContentList{
             float healPercent = 3f;
 
             {
+                shootEffect = Fx.shootHeal;
                 hitEffect = Fx.hitLaser;
                 despawnEffect = Fx.hitLaser;
                 collidesTeam = true;

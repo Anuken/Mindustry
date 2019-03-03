@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage
 
 def outFolder = "../core/assets-raw/sprites_out/"
 def genFolder = "../core/assets-raw/sprites_out/generated/"
-def doAntialias = true
+def doAntialias = !project.hasProperty("disableAntialias")
 
 def antialias = {File file ->
     if(!doAntialias || file.lastModified() <= 1000) return

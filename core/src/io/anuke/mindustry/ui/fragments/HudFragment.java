@@ -467,6 +467,6 @@ public class HudFragment extends Fragment{
             }
         }).growY().fillX().right().width(40f)
         .visible(() -> state.rules.waves && ((Net.server() || players[0].isAdmin) || !Net.active()) && state.enemies() == 0
-        && state.wavetime < state.rules.waveSpacing - 60);
+        && (state.wavetime < state.rules.waveSpacing - 60 || !state.rules.waveTimer));
     }
 }

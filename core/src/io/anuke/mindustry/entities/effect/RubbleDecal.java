@@ -35,6 +35,10 @@ public class RubbleDecal extends Decal{
 
     @Override
     public void drawDecal(){
+        if(!Core.atlas.isFound(region)){
+            remove();
+            return;
+        }
         Draw.rect(region, x, y, Mathf.randomSeed(id, 0, 4) * 90);
     }
 }

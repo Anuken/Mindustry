@@ -731,7 +731,7 @@ public class Blocks implements ContentList{
 
         rotaryPump = new Pump("rotary-pump"){{
             requirements(Category.liquid, ItemStack.with(Items.copper, 140, Items.lead, 100, Items.silicon, 40, Items.titanium, 70));
-            pumpAmount = 0.2f;
+            pumpAmount = 0.8f;
             consumes.power(1.50f);
             liquidCapacity = 30f;
             hasPower = true;
@@ -740,7 +740,7 @@ public class Blocks implements ContentList{
 
         thermalPump = new Pump("thermal-pump"){{
             requirements(Category.liquid, ItemStack.with(Items.copper, 160, Items.lead, 130, Items.silicon, 60, Items.titanium, 80, Items.thorium, 70));
-            pumpAmount = 0.22f;
+            pumpAmount = 1.95f;
             consumes.power(0.30f);
             liquidCapacity = 40f;
             hasPower = true;

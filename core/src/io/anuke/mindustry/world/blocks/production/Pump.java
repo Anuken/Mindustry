@@ -19,7 +19,7 @@ public class Pump extends LiquidBlock{
 
     protected final int timerContentCheck = timers++;
 
-    /**Pump amount per tile this block is on.*/
+    /**Pump amount, total.*/
     protected float pumpAmount = 1f;
 
     public Pump(String name){
@@ -40,7 +40,7 @@ public class Pump extends LiquidBlock{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.liquidOutputSpeed, 60f * pumpAmount * size * size, StatUnit.liquidSecond);
+        stats.add(BlockStat.liquidOutputSpeed, 60f * pumpAmount, StatUnit.liquidSecond);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class Pump extends LiquidBlock{
         }
 
         if(tile.entity.cons.valid() && liquidDrop != null){
-            float maxPump = Math.min(liquidCapacity - tile.entity.liquids.total(), tiles * pumpAmount * tile.entity.delta());
+            float maxPump = Math.min(liquidCapacity - tile.entity.liquids.total(), tiles * pumpAmount * tile.entity.delta() / size / size);
             if(hasPower){
                 maxPump *= tile.entity.power.satisfaction; // Produce slower if not at full power
             }

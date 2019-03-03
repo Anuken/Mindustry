@@ -147,10 +147,10 @@ public class Generators {
                     image.drawCenter(mech.region);
                 }
 
-                int off = (image.width() - mech.weapon.region.getWidth())/2;
+                int off = image.width()/2 - mech.weapon.region.getWidth()/2;
 
-                image.draw(mech.weapon.region, -(int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, false, false);
-                image.draw(mech.weapon.region, (int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, true, false);
+                image.draw(mech.weapon.region, -(int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off + 4, false, false);
+                image.draw(mech.weapon.region, (int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off + 4, true, false);
 
 
                 image.save("mech-icon-" + mech.name);
