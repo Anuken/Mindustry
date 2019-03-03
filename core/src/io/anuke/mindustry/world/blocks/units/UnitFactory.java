@@ -51,7 +51,7 @@ public class UnitFactory extends Block{
         hasPower = true;
         hasItems = true;
         solid = false;
-        flags = EnumSet.of(BlockFlag.producer, BlockFlag.target);
+        flags = EnumSet.of(BlockFlag.producer);
 
         consumes.require(ConsumeItems.class);
     }

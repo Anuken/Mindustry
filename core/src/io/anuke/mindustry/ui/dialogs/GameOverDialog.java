@@ -70,7 +70,7 @@ public class GameOverDialog extends FloatingDialog{
                 }
 
                 if(world.isZone()){
-                    RankResult result = state.stats.calculateRank(world.getZone(), state.rules, state.launched);
+                    RankResult result = state.stats.calculateRank(world.getZone(), state.launched);
                     cont.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
                     cont.row();
                 }

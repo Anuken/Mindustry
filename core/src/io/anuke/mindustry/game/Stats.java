@@ -25,7 +25,7 @@ public class Stats{
     /**Friendly buildings destroyed.*/
     public int buildingsDestroyed;
 
-    public RankResult calculateRank(Zone zone, Rules rules, boolean launched){
+    public RankResult calculateRank(Zone zone, boolean launched){
         float score = 0;
 
         //each new launch period adds onto the rank 1.5 'points'
@@ -35,14 +35,14 @@ public class Stats{
 
         int capacity = zone.loadout.core().itemCapacity;
 
-        //weigh used fractions of
+        //weigh used fractions
         float frac = 0f;
         Array<Item> obtainable = Array.with(zone.resources).select(i -> i.type == ItemType.material);
         for(Item item : obtainable){
             frac += Mathf.clamp((float)itemsDelivered.get(item, 0) / capacity) / (float)obtainable.size;
         }
 
-        score += frac*3f;
+        score += frac*2.4f;
 
         if(!launched){
             score *= 0.5f;
