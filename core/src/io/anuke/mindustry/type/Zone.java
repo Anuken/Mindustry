@@ -3,6 +3,7 @@ package io.anuke.mindustry.type;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -99,22 +100,21 @@ public class Zone extends UnlockableContent{
     public void updateLaunchCost(){
         Array<ItemStack> stacks = new Array<>();
 
-        //TODO optimize
-        for(ItemStack stack : baseLaunchCost){
-            ItemStack out = new ItemStack(stack.item, stack.amount);
-            for(ItemStack other : startingItems){
-                if(other.item == out.item){
-                    out.amount += other.amount;
-                    out.amount = Math.max(out.amount, 0);
+        Consumer<ItemStack> adder = stack -> {
+            for(ItemStack other : stacks){
+                if(other.item == stack.item){
+                    other.amount += stack.amount;
+                    return;
                 }
             }
-            stacks.add(out);
-        }
+            stacks.add(new ItemStack(stack.item, stack.amount));
+        };
 
-        for(ItemStack other : startingItems){
-            if(stacks.find(s -> s.item == other.item) == null){
-                stacks.add(other);
-            }
+        for(ItemStack stack : baseLaunchCost) adder.accept(stack);
+        for(ItemStack stack : startingItems) adder.accept(stack);
+
+        for(ItemStack stack : stacks){
+            if(stack.amount < 0) stack.amount = 0;
         }
 
         stacks.sort();

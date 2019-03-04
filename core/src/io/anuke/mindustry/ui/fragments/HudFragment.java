@@ -15,7 +15,6 @@ import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.Elements;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Scaling;
@@ -37,9 +36,7 @@ import static io.anuke.mindustry.Vars.*;
 public class HudFragment extends Fragment{
     public final PlacementFragment blockfrag = new PlacementFragment();
 
-    private ImageButton menu, flip;
-    private Stack wavetable;
-    private Table infolabel;
+    private ImageButton flip;
     private Table lastUnlockTable;
     private Table lastUnlockLayout;
     private boolean shown = true;
@@ -61,7 +58,7 @@ public class HudFragment extends Fragment{
                     select.left();
                     select.defaults().size(dsize).left();
 
-                    menu = select.addImageButton("icon-menu", "clear", isize, ui.paused::show).get();
+                    ImageButton menu = select.addImageButton("icon-menu", "clear", isize, ui.paused::show).get();
                     flip = select.addImageButton("icon-arrow-up", "clear", isize, this::toggleMenus).get();
 
                     select.addImageButton("icon-pause", "clear", isize, () -> {
@@ -113,53 +110,35 @@ public class HudFragment extends Fragment{
                 }
             });
 
-            Stack stack = new Stack();
-            TextButton waves = new TextButton("", "wave");
-            Table btable = new Table().margin(0);
+            cont.table(stuff -> {
+                stuff.left();
+                Stack stack = new Stack();
+                TextButton waves = new TextButton("", "wave");
+                Table btable = new Table().margin(0);
 
-            stack.add(waves);
-            stack.add(btable);
+                stack.add(waves);
+                stack.add(btable);
 
-            wavetable = stack;
-
-            addWaveTable(waves);
-            addPlayButton(btable);
-            cont.add(stack).width(dsize * 4 + 6f);
-
-            cont.row();
-
-            Table healthTable = cont.table("button", t ->
-                t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE)).grow()
-            ).fillX().visible(() -> world.isZone() && state.boss() != null).height(60f).update(t -> t.getTranslation().set(0, Unit.dp.scl(wavetable.getTranslation().y))).get();
-
-            cont.row();
-
-            //fps display
-            infolabel = new Table();
-            infolabel.marginLeft(10f);
-            IntFormat fps = new IntFormat("fps");
-            IntFormat ping = new IntFormat("ping");
-            infolabel.label(() -> fps.get(Core.graphics.getFramesPerSecond())).padLeft(10).growX();
-            infolabel.row();
-            if(Net.hasClient()){
-                infolabel.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
-            }
-            infolabel.visible(() -> Core.settings.getBool("fps")).update(() ->
-                infolabel.setPosition(0,
-                    healthTable.isVisible() ? healthTable.getY() + healthTable.getTranslation().y : waves.isVisible() ? Math.min(wavetable.getY(), Core.graphics.getHeight()) : Core.graphics.getHeight(),
-                    Align.topLeft));
-
-            infolabel.pack();
-            cont.addChild(infolabel);
-
-            //make wave box appear below rest of menu
-            if(mobile){
-                cont.swapActor(wavetable, menu.getParent());
-            }
+                addWaveTable(waves);
+                addPlayButton(btable);
+                stuff.add(stack).width(dsize * 4 + 6f);
+                stuff.row();
+                stuff.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
+                    .grow()).fillX().visible(() -> world.isZone() && state.boss() != null).height(60f).get();
+                stuff.row();
+            }).visible(() -> shown);
         });
 
-        //minimap
-        //parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> !state.is(State.menu) && Core.settings.getBool("minimap")));
+
+        //fps display
+        parent.fill(info -> {
+            info.top().right().margin(4).visible(() -> Core.settings.getBool("fps"));
+            IntFormat fps = new IntFormat("fps");
+            IntFormat ping = new IntFormat("ping");
+            info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).right();
+            info.row();
+            info.label(() -> ping.get(Net.getPing())).visible(Net::client).right();
+        });
 
         //spawner warning
         parent.fill(t -> {
@@ -300,6 +279,10 @@ public class HudFragment extends Fragment{
         Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.removeActor())));
     }
 
+    public boolean shown(){
+        return shown;
+    }
+
     /** Show unlock notification for a new recipe. */
     public void showUnlock(UnlockableContent content){
         //some content may not have icons... yet
@@ -399,27 +382,11 @@ public class HudFragment extends Fragment{
     }
 
     private void toggleMenus(){
-        wavetable.clearActions();
-        infolabel.clearActions();
-
-        float dur = 0.3f;
-        Interpolation in = Interpolation.pow3Out;
-
         if(flip != null){
             flip.getStyle().imageUp = Core.scene.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
         }
 
-        if(shown){
-            shown = false;
-            blockfrag.toggle(dur, in);
-            wavetable.actions(Actions.translateBy(0, (wavetable.getHeight() + Unit.dp.scl(dsize) + Unit.dp.scl(6)) - wavetable.getTranslation().y, dur, in));
-            infolabel.actions(Actions.translateBy(0, (wavetable.getHeight()) - wavetable.getTranslation().y, dur, in));
-        }else{
-            shown = true;
-            blockfrag.toggle(dur, in);
-            wavetable.actions(Actions.translateBy(0, -wavetable.getTranslation().y, dur, in));
-            infolabel.actions(Actions.translateBy(0, -infolabel.getTranslation().y, dur, in));
-        }
+        shown = !shown;
     }
 
     private void addWaveTable(TextButton table){

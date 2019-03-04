@@ -266,7 +266,7 @@ public class UnitTypes implements ContentList{
         }};
 
         lich = new UnitType("lich", Revenant.class, Revenant::new){{
-            health = 6000;
+            health = 7000;
             mass = 20f;
             hitsize = 40f;
             speed = 0.01f;
@@ -285,7 +285,7 @@ public class UnitTypes implements ContentList{
                 length = 4f;
                 reload = 180f;
                 width = 22f;
-                shots = 20;
+                shots = 22;
                 shotDelay = 2;
                 inaccuracy = 10f;
                 roundrobin = true;
@@ -297,7 +297,7 @@ public class UnitTypes implements ContentList{
         }};
 
         reaper = new UnitType("reaper", Revenant.class, Revenant::new){{
-            health = 12000;
+            health = 13000;
             mass = 30f;
             hitsize = 56f;
             speed = 0.01f;

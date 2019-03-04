@@ -5,10 +5,8 @@ import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.ButtonGroup;
@@ -43,7 +41,6 @@ public class PlacementFragment extends Fragment{
     Tile lastHover;
     Tile hoverTile;
     Table blockTable, toggler, topTable;
-    boolean shown = true;
     boolean lastGround;
 
     //TODO make this configurable
@@ -123,7 +120,7 @@ public class PlacementFragment extends Fragment{
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;
-            full.bottom().right().visible(() -> !state.is(State.menu));
+            full.bottom().right().visible(() -> !state.is(State.menu) && ui.hudfrag.shown());
 
             full.table(frame -> {
                 InputHandler input = control.input(0);
@@ -344,17 +341,5 @@ public class PlacementFragment extends Fragment{
     /** Returns the block currently being hovered over in the world. */
     Block tileDisplayBlock(){
         return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.floor() instanceof OreBlock ? hoverTile.floor() : null;
-    }
-
-    /** Show or hide the placement menu. */
-    void toggle(float t, Interpolation ip){
-        toggler.clearActions();
-        if(shown){
-            shown = false;
-            toggler.actions(Actions.translateBy(toggler.getTranslation().x + toggler.getWidth(), 0, t, ip));
-        }else{
-            shown = true;
-            toggler.actions(Actions.translateBy(-toggler.getTranslation().x, 0, t, ip));
-        }
     }
 }

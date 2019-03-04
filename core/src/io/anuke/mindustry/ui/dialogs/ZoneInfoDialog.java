@@ -173,7 +173,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                     t.add(!zone.canConfigure() ? Core.bundle.format("configure.locked", zone.configureWave) : "$configure").growX().wrap();
                     if(zone.canConfigure()){
                         t.row();
-                        t.add(load).pad(2).growX().left();
+                        t.pane(load).pad(2).growX().left();
                     }
                 }).width(300f).pad(4).left();
             }

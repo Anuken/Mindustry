@@ -195,7 +195,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
         graphics.checkPref("lasers", true);
-        graphics.checkPref("minimap", !mobile); //minimap is disabled by default on mobile devices
     }
 
     private void back(){
