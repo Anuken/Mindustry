@@ -65,4 +65,8 @@ public class Stats{
             this.modifier = modifier;
         }
     }
+
+    public enum Rank{
+        F, D, C, B, A, S, SS
+    }
 }

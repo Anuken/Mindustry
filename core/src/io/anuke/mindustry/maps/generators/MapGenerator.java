@@ -7,7 +7,6 @@ import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.noise.Simplex;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapTileData;
@@ -22,7 +21,8 @@ import io.anuke.mindustry.world.blocks.StaticWall;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.storage.StorageBlock;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.world;
 
 public class MapGenerator extends Generator{
     private Map map;
@@ -34,7 +34,7 @@ public class MapGenerator extends Generator{
     /**The amount of final enemy spawns used. -1 to use everything in the map.
      * This amount of enemy spawns is selected randomly from the map.*/
     public int enemySpawns = -1;
-    /*Whether floor is distorted along with blocks.*/
+    /**Whether floor is distorted along with blocks.*/
     public boolean distortFloor = false;
     /**Items randomly added to containers and vaults.*/
     public ItemStack[] storageDrops = ItemStack.with(Items.copper, 300, Items.lead, 300, Items.silicon, 200, Items.graphite, 200, Items.blastCompound, 200);
@@ -132,7 +132,7 @@ public class MapGenerator extends Generator{
                     }
                 }
 
-                if(tile.getTeam() == Team.none && tile.block() instanceof StorageBlock){
+                if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock)){
                     for(ItemStack stack : storageDrops){
                         if(Mathf.chance(0.3)){
                             tile.entity.items.add(stack.item, Math.min(Mathf.random(stack.amount), tile.block().itemCapacity));

@@ -638,7 +638,7 @@ public class Blocks implements ContentList{
         }};
 
         overdriveProjector = new OverdriveProjector("overdrive-projector"){{
-            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.silicon, 250));
+            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.silicon, 150, Items.plastanium, 60));
             consumes.power(3.50f);
             size = 2;
             consumes.item(Items.phasefabric).optional(true).boost(true);
@@ -1060,7 +1060,7 @@ public class Blocks implements ContentList{
         }};
 
         wave = new LiquidTurret("wave"){{
-            requirements(Category.turret, ItemStack.with(Items.titanium, 70, Items.lead, 150));
+            requirements(Category.turret, ItemStack.with(Items.metaglass, 90, Items.lead, 150));
             ammo(
                 Liquids.water, Bullets.waterShot,
                 Liquids.slag, Bullets.slagShot,
@@ -1110,7 +1110,7 @@ public class Blocks implements ContentList{
         }};
 
         arc = new PowerTurret("arc"){{
-            requirements(Category.turret, ItemStack.with(Items.copper, 70, Items.lead, 60));
+            requirements(Category.turret, ItemStack.with(Items.copper, 70, Items.lead, 70));
             shootType = Bullets.arc;
             reload = 20f;
             shootCone = 40f;
@@ -1142,7 +1142,7 @@ public class Blocks implements ContentList{
         }};
 
         salvo = new BurstTurret("salvo"){{
-            requirements(Category.turret, ItemStack.with(Items.copper, 210, Items.graphite, 190, Items.thorium, 130));
+            requirements(Category.turret, ItemStack.with(Items.copper, 210, Items.graphite, 190, Items.titanium, 120));
             ammo(
                 Items.copper, Bullets.standardCopper,
                 Items.graphite, Bullets.standardDense,
@@ -1166,7 +1166,7 @@ public class Blocks implements ContentList{
         }};
 
         ripple = new ArtilleryTurret("ripple"){{
-            requirements(Category.turret, ItemStack.with(Items.copper, 300, Items.graphite, 220, Items.thorium, 120));
+            requirements(Category.turret, ItemStack.with(Items.copper, 300, Items.graphite, 270, Items.titanium, 120));
             ammo(
                 Items.graphite, Bullets.artilleryDense,
                 Items.silicon, Bullets.artilleryHoming,
@@ -1191,7 +1191,7 @@ public class Blocks implements ContentList{
         }};
 
         cyclone = new ItemTurret("cyclone"){{
-            requirements(Category.turret, ItemStack.with(Items.copper, 400, Items.surgealloy, 200, Items.plastanium, 150));
+            requirements(Category.turret, ItemStack.with(Items.copper, 400, Items.titanium, 250, Items.plastanium, 160));
             ammo(
                 Items.blastCompound, Bullets.flakExplosive,
                 Items.plastanium, Bullets.flakPlastic,

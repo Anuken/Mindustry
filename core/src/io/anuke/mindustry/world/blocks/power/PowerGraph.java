@@ -123,16 +123,11 @@ public class PowerGraph{
 
     public void distributePower(float needed, float produced){
         //distribute even if not needed. this is because some might be requiring power but not requesting it; it updates consumers
-        //if(Mathf.isEqual(needed, 0f)) return;
-
         float coverage = Math.min(1, produced / needed);
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
             if(consumes.has(ConsumePower.class)){
                 ConsumePower consumePower = consumes.get(ConsumePower.class);
-                //if(!otherConsumersAreValid(consumer, consumePower)){
-                //    consumer.entity.power.satisfaction = 0.0f; // Only supply power if the consumer would get valid that way
-                //}else{
                 //currently satisfies power even if it's not required yet
                 if(consumePower.isBuffered){
                     // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
@@ -141,7 +136,6 @@ public class PowerGraph{
                 }else{
                     consumer.entity.power.satisfaction = coverage;
                 }
-                //}
             }
         }
     }

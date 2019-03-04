@@ -303,10 +303,8 @@ public class Control implements ApplicationListener{
             inputHandler.updateController();
         }
 
-        //autosave global data every second if it's modified
-        if(timer.get(1, 60)){
-            data.checkSave();
-        }
+        //autosave global data if it's modified
+        data.checkSave();
 
         if(!state.is(State.menu)){
             for(InputHandler input : inputs){

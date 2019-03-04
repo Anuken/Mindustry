@@ -354,6 +354,7 @@ public class Zones implements ContentList{
         }};
 
         impact = new Zone("impact0079", new MapGenerator("impact0079", 2)
+        .dist(2.2f, true)
         .decor(
             new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01),
             new Decoration(Blocks.metalFloor, Blocks.metalFloorDamaged, 0.02)
