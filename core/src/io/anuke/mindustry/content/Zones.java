@@ -361,11 +361,11 @@ public class Zones implements ContentList{
         ).drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 2000, Items.pyratite, 2000, Items.titanium, 2000, Items.metaglass, 1000, Items.coal, 2000))){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with(Items.copper, 500, Items.lead, 500, Items.silicon, 100);
-            startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 500, Items.silicon, 200);
+            startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 500, Items.silicon, 200, Items.titanium, 400, Items.graphite, 200);
             itemRequirements = ItemStack.with(Items.silicon, 8000, Items.titanium, 6000, Items.graphite, 4000);
             conditionWave = 20;
             zoneRequirements = new Zone[]{stainedMountains};
-            blockRequirements = new Block[]{Blocks.launchPad, Blocks.unloader};
+            blockRequirements = new Block[]{Blocks.launchPad, Blocks.unloader, Blocks.melter, Blocks.separator};
             resources = new Item[]{Items.scrap};
             rules = () -> new Rules(){{
                 waves = true;

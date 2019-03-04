@@ -450,7 +450,7 @@ public class Blocks implements ContentList{
                 Items.titanium, 2
             );
             hasPower = true;
-            filterTime = 30f;
+            filterTime = 35f;
             spinnerLength = 1.5f;
             spinnerRadius = 3.5f;
             spinnerThickness = 1.5f;
@@ -458,7 +458,7 @@ public class Blocks implements ContentList{
             size = 2;
 
             consumes.power(1f);
-            consumes.liquid(Liquids.slag, 0.09f);
+            consumes.liquid(Liquids.slag, 0.07f);
         }};
 
         cultivator = new Cultivator("cultivator"){{

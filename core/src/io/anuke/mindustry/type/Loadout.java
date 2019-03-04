@@ -56,7 +56,7 @@ public class Loadout extends Content{
                 char c = layout[y].charAt(x);
                 if(entries.containsKey(c)){
                     BlockEntry entry = entries.get(c);
-                    blocks.put(Pos.get(x - coreX, layout.length - 1 - (y - coreY)), entry);
+                    blocks.put(Pos.get(x - coreX, -(y - coreY)), entry);
                 }
             }
         }
